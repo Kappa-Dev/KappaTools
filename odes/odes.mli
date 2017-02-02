@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 01 2017>
+  * Last modification: Time-stamp: <Feb 02 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -43,6 +43,7 @@ sig
   val get_divide_rate_by : enriched_rule -> int
 
   val get_list_of_divide_rule_by_rate :
-    I.compil -> Loggers.t -> I.nauto_in_rules_cache * unit
+    Remanent_parameters_sig.parameters ->
+    I.compil -> I.nauto_in_rules_cache * unit
 
 end

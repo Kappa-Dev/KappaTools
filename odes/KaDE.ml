@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 01 2017>
+  * Last modification: Time-stamp: <Feb 02 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -162,8 +162,10 @@ let main () =
     in
     (*********************************************************************)
     (*TEST*)
+    let errors = Exception.empty_error_handler in
+    let _, parameters, _ = Get_option.get_option errors in
     let cache, () =
-      A.get_list_of_divide_rule_by_rate compil logger
+      A.get_list_of_divide_rule_by_rate parameters compil
     in
     (*********************************************************************)
     let () = A.export_network

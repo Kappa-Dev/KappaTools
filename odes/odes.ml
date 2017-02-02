@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 01 2017>
+  * Last modification: Time-stamp: <Feb 02 2017>
 *)
 
 let local_trace = false
@@ -1707,13 +1707,14 @@ struct
     (**********************************************************)
     (*TEST*)
 
-    let get_list_of_divide_rule_by_rate compil logger =
+    let get_list_of_divide_rule_by_rate parameters compil =
       let empty_cache = I.empty_lkappa_cache () in
+      let log = Remanent_parameters.get_logger parameters in
       let cache, i_lis =
         List.fold_left (fun (cache, current_list) rule ->
             let () =
               match
-                Loggers.formatter_of_logger logger
+                Loggers.formatter_of_logger log
               with
               | None -> ()
               | Some fmt ->
@@ -1721,20 +1722,25 @@ struct
                   I.print_rule_name ~compil fmt rule
                 in
                 I.print_rule ~compil fmt rule;
-                Ode_loggers.print_newline logger
+                Ode_loggers.print_newline log
             in
             let cache, int =
               I.divide_rule_rate_by cache compil rule
             in
+            let rule_cach, hash =
+              I.map_to_hash_list parameters
+                cache compil rule
+            in
+
             cache, int :: current_list
           ) (empty_cache, []) (I.get_rules compil)
       in
       let () =
         List.iter (fun i ->
-            Loggers.fprintf logger "\ndivide_rule_rate_by: %i \n\n" i
+            Loggers.fprintf log "\ndivide_rule_rate_by: %i \n\n" i
           ) i_lis
       in
-      let () = Ode_loggers.print_newline logger in
+      let () = Ode_loggers.print_newline log in
       cache, ()
 
   let export_network
@@ -1780,7 +1786,5 @@ struct
     List.rev_map
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
-
-
 
 end

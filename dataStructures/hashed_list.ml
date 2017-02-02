@@ -1,10 +1,30 @@
+module type Hash =
+sig
+
+type hashed_list
+type elt
+type cache
+
+val compare : hashed_list -> hashed_list -> int
+val init : unit -> cache
+val hash : cache -> elt list -> cache * hashed_list
+val cons : cache -> elt -> hashed_list -> cache * hashed_list
+val empty : hashed_list
+val print : Format.formatter -> hashed_list -> unit
+val print_cache : Format.formatter -> cache -> unit
+
+end
+
 module Make =
   functor (A:SetMap.OrderedType) ->
   struct
+    type elt = A.t
     type elt_id = int
     type hashed_list = int
     let compare = compare
+
     module SetMap = SetMap.Make(A)
+
     type cache =
       {
         dictionary: elt_id SetMap.Map.t ;
@@ -33,6 +53,7 @@ module Make =
       }
 
     let empty = 0
+
     let hash_elt cache elt =
       match
         SetMap.Map.find_option elt cache.dictionary

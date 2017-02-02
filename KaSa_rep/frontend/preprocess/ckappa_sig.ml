@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jan 12 2017>
+ * Last modification: Time-stamp: <Feb 02 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -417,7 +417,10 @@ module PairAgentSitesState_map_and_set =
 (*******************************************************************)
 
 module Views_bdu =
-  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
+  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu
+   with type key = c_site_name
+    and type value = c_state
+   with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
 
 module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)
 

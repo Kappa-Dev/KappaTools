@@ -19,6 +19,7 @@ struct
 end
 
 module Binding_idSetMap = SetMap.Make (Binding_id)
+
 module Binding_idMap = Binding_idSetMap.Map
 
 module Binding_states =
@@ -73,14 +74,14 @@ module CannonicSet_and_map =
 
 module CannonicMap = CannonicSet_and_map.Map
 
-module Int =
+module PairInt =
 struct
   type t = (CannonicMap.elt * int)
   let compare = compare
   let print _ _  = ()
 end
 
-module RuleCache  = Hashed_list.Make(Int)
+module RuleCache  = Hashed_list.Make(PairInt)
 
 type cache =
   {
@@ -650,10 +651,11 @@ let nauto rate_convention cache lkappa_mixture created =
 
 (****************************************************************)
 
-let map_to_hash_list logger rate_convention cache lkappa_mixture
+let map_to_hash_list parameters rate_convention cache lkappa_mixture
     created =
   match rate_convention with
-  | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+  | Ode_args.KaSim
+  | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
     RuleCache.init (), RuleCache.empty
   | Ode_args.Biochemist ->
   let cache, map =
@@ -667,11 +669,28 @@ let map_to_hash_list logger rate_convention cache lkappa_mixture
            (cannonic, nocc) :: current_list
          in
          list
-
       ) map []
   in
   let cache, hash_list =
     RuleCache.hash cache.rule_cache pair_list
+  in
+  let log = Remanent_parameters.get_logger parameters in
+  let () =
+    let () =Loggers.print_newline log in
+    let () = Loggers.fprintf log "***************\n HASH LIST" in
+    let () =
+      Loggers.fprintf log "Hash_list:%a"
+        RuleCache.print hash_list
+    in
+    let () = Loggers.fprintf log "***************" in
+    let () = Loggers.print_newline log in
+    let () = Loggers.fprintf log "***************\n CACHE" in
+    let () =
+      Loggers.fprintf log "Cach:%a"
+        RuleCache.print_cache cache
+    in
+    let () = Loggers.fprintf log "***************" in
+    ()
   in
   (*TODO:total order*)
   cache, hash_list

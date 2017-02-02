@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Dec 06 2016>
+  * Last modification: Time-stamp: <Feb 02 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -13,7 +13,8 @@
   * under the terms of the GNU Library General Public License *)
 
 
-type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
+type site  =
+  (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
 
@@ -102,12 +103,13 @@ let join_interface parameters error interface1 interface2 =
     Ckappa_sig.Site_map_and_set.Map.empty
 
 module KaSim_Site_map_and_set =
-  Map_wrapper.Make( SetMap.Make
-                      (struct
-                        type t = (string, string) Ckappa_sig.site_type
-                        let compare = compare
-                        let print _ _ = ()
-                      end))
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (string, string) Ckappa_sig.site_type
+         let compare = compare
+         let print _ _ = ()
+       end))
 
 let join_interface' =
   KaSim_Site_map_and_set.Set.union
@@ -116,9 +118,7 @@ let rename_proper_agent parameters error f agent =
   let error, id = f parameters error agent.agent_kasim_id in
   error,
   {
-    agent
-    with
-      agent_kasim_id = id
+    agent with agent_kasim_id = id
   }
 
 exception False of Exception.method_handler
@@ -194,14 +194,13 @@ let build_address k agent site =
   }
 
 module Address_map_and_set =
-  Map_wrapper.Make (SetMap.Make
-                      (struct
-                        type t = site_address
-                        let compare = compare
-			let print _ _ = ()
-                       end))
-
-
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = site_address
+         let compare = compare
+         let print _ _ = ()
+       end))
 
 type agent =
 | Ghost

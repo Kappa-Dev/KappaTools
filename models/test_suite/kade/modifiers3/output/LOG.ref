@@ -18,33 +18,61 @@ done
 	 -variables 
 	 -observables 
 	 -check time homogeneity 
-+ exporting the network... 
-	 -main function 
-	 -initial state 
-	 -ode system 
-	 -observables 
-Parsing modifiers.ka...
-done
-+ Sanity checks
-+ Compiling...
-+ Building initial simulation conditions...
-	 -simulation parameters
-	 -variable declarations
-	 -rules
-	 -perturbations
-	 -observables
-	 -update_domain construction
-	 8 (sub)observables 0 navigation steps
-	 -initial conditions
-+ generate the network... 
-	 -initial states 
-	 -saturating the set of molecular species 
-	 -tokens 
-	 -variables 
-	 -observables 
-	 -check time homogeneity 
-+ exporting the network... 
-	 -main function 
-	 -initial state 
-	 -ode system 
-	 -observables 
+Here is the list of recognized options
+
+General options
+  --help            Verbose help
+   -h               Short help
+  --version         Show version number
+  --gui             GUI to select
+  --(no-)expert     Expert mode (more options)
+0_Actions
+  --do-all
+  --reset-all
+  --(no-)compute-contact-map    (default: enabled)
+  --(no-)compute-influence-map    (default: enabled)
+  --(no-)compute-reachability-analysis    (default: enabled)
+  --(no-)views-domain    (default: enabled)
+  --(no-)double-bonds-domain    (default: enabled)
+  --(no-)sites-accross-bonds-domain    (default: enabled)
+  --(no-)compute-local-traces    (default: disabled)
+1_Output
+  --output-directory <value>
+  --output-contact-map-directory <name>   (default: output)
+  --output-contact-map <name>   (default: contact)
+  --output-influence-map-directory <name>   (default: output)
+  --output-influence-map <name>   (default: influence)
+  --influence-map-format DOT | DIM | HTML    (default: DOT)
+  --output-local-traces-directory <name>   (default: output)
+  --local-traces-format DOT | HTML    (default: DOT)
+2_Reachability_analysis
+  --(no-)compute-reachability-analysis    (default: enabled)
+  --enable-every-domain
+  --disable-every-domain
+  --contact-map-domain static | dynamic    (default: dynamic)
+  --(no-)views-domain    (default: enabled)
+  --(no-)double-bonds-domain    (default: enabled)
+  --(no-)sites-accross-bonds-domain    (default: enabled)
+  --verbosity-level-for-reachability-analysis Mute | Low | Medium | High |
+                                              Full    (default: Low)
+  --output-mode-for-reachability-analysis raw | kappa | english    (default: kappa)
+3_Trace_analysis
+  --(no-)compute-local-traces    (default: disabled)
+  --(no-)show-rule-names-in-local-traces    (default: enabled)
+  --(no-)use-macrotransitions-in-local-traces    (default: disabled)
+  --output-local-traces-directory <name>   (default: output)
+  --local-traces-format DOT | HTML    (default: DOT)
+4_Contact_map
+  --(no-)compute-contact-map    (default: enabled)
+  --output-contact-map-directory <name>   (default: output)
+  --output-contact-map <name>   (default: contact)
+5_Influence_map
+  --(no-)compute-influence-map    (default: enabled)
+  --influence-map-accuracy-level Low | Medium | High    (default: Medium)
+  --output-influence-map-directory <name>   (default: output)
+  --output-influence-map <name>   (default: influence)
+  --influence-map-format DOT | DIM | HTML    (default: DOT)
+(44 options)
+
+Unrecognized option: -d
+

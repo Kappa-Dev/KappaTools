@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Dec 31 2016>
+   * Last modification: Time-stamp: <Feb 02 2017>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -252,9 +252,9 @@ module type Nul =
   sig
   end
 
-module Internalize
-    (M:Mvbdu with type key = int and type value = int) :
-  Internalized_mvbdu with type mvbdu = M.mvbdu and type key = int and type value = int
+module Internalize (M:Mvbdu with type key = int and type value = int) :
+  Internalized_mvbdu
+  with type mvbdu = M.mvbdu and type key = int and type value = int
 
 module Make (M:Nul): Mvbdu with type key = int and type value = int
 module Mvbdu:Mvbdu with type key = int and type value = int

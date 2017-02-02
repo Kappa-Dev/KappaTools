@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Dec 05 2016>
+  * Last modification: Time-stamp: <Feb 02 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -137,7 +137,7 @@ val join_mixture: Remanent_parameters_sig.parameters ->
 (*TODO*)
 module Mixture_setmap: SetMap.S with type elt = mixture
 
-module Mixture_map_and_set  :Map_wrapper.S_with_logs with type
+module Mixture_map_and_set : Map_wrapper.S_with_logs with type
   elt = mixture
 
 module MixtureAgent_map_and_set  :Map_wrapper.S_with_logs with type

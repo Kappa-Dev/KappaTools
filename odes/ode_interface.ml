@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 01 2017>
+  * Last modification: Time-stamp: <Feb 02 2017>
 *)
 
 type compil =
@@ -350,3 +350,15 @@ let divide_rule_rate_by cache compil rule =
     in
     LKappa_auto.nauto compil.rate_convention cache
       lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created
+
+(*TEST*)
+let map_to_hash_list parameters cache compil rule =
+  let rule_id = rule.Primitives.syntactic_rule in
+  let lkappa_rule =
+    Model.get_ast_rule compil.environment rule_id
+  in
+  LKappa_auto.map_to_hash_list parameters
+    compil.rate_convention
+    cache
+    lkappa_rule.LKappa.r_mix
+    lkappa_rule.LKappa.r_created
