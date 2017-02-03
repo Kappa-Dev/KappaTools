@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 02 2017>
+  * Last modification: Time-stamp: <Feb 03 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -162,10 +162,12 @@ let main () =
     in
     (*********************************************************************)
     (*TEST*)
-    (*let errors = Exception.empty_error_handler in
-    let _, parameters, _ = Get_option.get_option errors in*)
+      let my_out_channel =
+        Kappa_files.open_out "my_logger.txt"
+    in
+    let my_logger = Loggers.open_logger_from_channel my_out_channel in
     let cache, () =
-      A.get_list_of_divide_rule_by_rate logger compil
+      A.get_list_of_divide_rule_by_rate my_logger compil
     in
     (*********************************************************************)
     let () = A.export_network

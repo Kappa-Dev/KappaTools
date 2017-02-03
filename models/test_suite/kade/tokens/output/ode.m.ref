@@ -1,4 +1,3 @@
-
 function main=main()
 % command line: 
 %      'KaDE' '../../compiler/tokens/tokens.ka' '-d' 'output' '-l' '1' '-p''0.1'

@@ -1,10 +1,3 @@
-expo3 -- t <- 1.1 ++ t <- 2.2
-@expo3_rate
-expo2 -- t <- ||t|| ++ t <- 2
-@expo2_rate
-expo0: /*cc1*/ T/*1*/() --  ++ T()
-@1
-divide_rule_rate_by: 1 divide_rule_rate_by: 1 divide_rule_rate_by: 1 
 function main=main()
 % command line: 
 %      'KaDE' 'tokens3.ka' '-d' 'output' '-l' '1' '-p''0.1'
