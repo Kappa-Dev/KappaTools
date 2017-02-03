@@ -43,12 +43,11 @@
 %start interactive_command
 %type <(Ast.mixture,string) Ast.command> interactive_command
 
-%start effect_list
-%type <(Ast.mixture,string) Ast.modif_expr list> effect_list
+%start standalone_effect_list
+%type <(Ast.mixture,string) Ast.modif_expr list> standalone_effect_list
 
-%start bool_expr
-%type <(Ast.mixture,string) Alg_expr.bool Locality.annot> bool_expr
-
+%start standalone_bool_expr
+%type <(Ast.mixture,string) Alg_expr.bool Locality.annot> standalone_bool_expr
 
 %% /*Grammar rules*/
 
@@ -60,6 +59,9 @@ start_rule:
     | newline {$1}
     | rule_expression newline
         {fun c -> let r = $2 c in {r with Ast.rules = $1::r.Ast.rules}}
+    | edit_rule_expression newline
+        {fun c -> let r = $2 c in
+	{r with Ast.edit_rules = $1::r.Ast.edit_rules}}
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
@@ -171,6 +173,8 @@ perturbation_declaration:
 		 ($1,$3)} /*For backward compatibility*/
     ;
 
+standalone_effect_list: effect_list EOF {$1}
+
 effect_list:
     | OP_PAR effect_list CL_PAR {$2}
     | effect {[$1]}
@@ -250,11 +254,17 @@ bool_expr:
     | FALSE {add_pos Alg_expr.FALSE}
     | bool_expr AND bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.AND,$1,$3))}
     | bool_expr OR bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.OR,$1,$3))}
-    | alg_expr GREATER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
-    | alg_expr SMALLER alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.SMALLER,$1,$3))}
-    | alg_expr EQUAL alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.EQUAL,$1,$3))}
-    | alg_expr DIFF alg_expr {add_pos (Alg_expr.COMPARE_OP(Operator.DIFF,$1,$3))}
+    | alg_expr GREATER alg_expr
+      {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
+    | alg_expr SMALLER alg_expr
+      {add_pos (Alg_expr.COMPARE_OP(Operator.SMALLER,$1,$3))}
+    | alg_expr EQUAL alg_expr
+      {add_pos (Alg_expr.COMPARE_OP(Operator.EQUAL,$1,$3))}
+    | alg_expr DIFF alg_expr
+      {add_pos (Alg_expr.COMPARE_OP(Operator.DIFF,$1,$3))}
     ;
+
+standalone_bool_expr: bool_expr EOF {$1}
 
 rule_label:
   /*empty */
@@ -279,10 +289,9 @@ sum_token:
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
-mixture:
-      /*empty*/ {[]}
-    | non_empty_mixture {$1}
-;
+edit_rule_expression:
+	rule_label mixture AT rate
+	{ let (act,un_act) = $4 in $1, {Ast.mix = $2; Ast.act; Ast.un_act} };
 
 rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs birate
@@ -374,18 +383,32 @@ alg_with_radius:
     | alg_expr TYPE alg_expr {($1, Some $3)}
     ;
 
+mixture:
+      /*empty*/ {[]}
+    | OP_PAR mixture CL_PAR {$2}
+    | agent_expression COMMA mixture {$1 :: $3}
+    | agent_expression {[$1]}
+;
+
 non_empty_mixture:
     | OP_PAR non_empty_mixture CL_PAR {$2}
-    | agent_expression COMMA non_empty_mixture {$1 :: $3}
-    | agent_expression {[$1]}
+    | ID OP_PAR interface_expression CL_PAR
+    { [($1,rhs_pos 1), $3, None] }
+    | ID OP_PAR interface_expression CL_PAR COMMA mixture
+    { (($1,rhs_pos 1), $3, None) :: $6}
     ;
 
+mod_agent:
+	| { None }
+	| PLUS { Some Ast.Create }
+	| MINUS { Some Ast.Erase };
+
 agent_expression:
-    | ID OP_PAR interface_expression CL_PAR
-	 {(($1,rhs_pos 1), $3, None)}
-    | ID error
+    | mod_agent ID OP_PAR interface_expression CL_PAR
+	 {(($2,rhs_pos 2), $4, $1)}
+    | mod_agent ID error
 	 { raise (ExceptionDefn.Syntax_Error
-		    (add_pos ("Malformed agent '"^$1^"'")))}
+		    (add_pos ("Malformed agent '"^$2^"'")))}
     ;
 
 interface_expression:
@@ -400,29 +423,51 @@ ne_interface_expression:
 
 
 port_expression:
-    | ID internal_state link_state
+    | ID internal_state link_state_mod
+	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
+	    Ast.port_int_mod = None; Ast.port_lnk_mod = $3; } }
+    | ID internal_state link_state link_state_mod
 	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
-	    Ast.port_lnk_mod = None; Ast.port_int_mod = None; } }
+	    Ast.port_int_mod = None; Ast.port_lnk_mod = $4; } }
+    | ID internal_state DIV KAPPA_MRK link_state_mod
+	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $5; } }
+    | ID internal_state DIV KAPPA_MRK link_state link_state_mod
+	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
+	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $6; } }
     ;
 
 internal_state:
   /*empty*/ {[]}
-    | KAPPA_MRK internal_state {add_pos $1::$2}
+    | KAPPA_MRK internal_state {($1,rhs_pos 1)::$2}
     | error
-	{raise (ExceptionDefn.Syntax_Error (add_pos "Invalid internal state"))}
+       {raise (ExceptionDefn.Syntax_Error
+       (add_pos "Issue after internal state"))}
     ;
 
-link_state:
-  /*empty*/ {[]}
-    | KAPPA_LNK INT link_state {(Ast.LNK_VALUE ($2,()),rhs_pos 2)::$3}
-    | KAPPA_LNK KAPPA_SEMI link_state {(Ast.LNK_SOME,rhs_pos 2)::$3}
-    | KAPPA_LNK ID DOT ID link_state {add_pos (Ast.LNK_TYPE
-				      (($2,rhs_pos 2),($4,rhs_pos 4)))::$5}
-    | KAPPA_WLD link_state {add_pos Ast.LNK_ANY::$2}
+link_state_mod:
+	| {None}
+	| DIV {Some None}
+	| DIV KAPPA_LNK INT {Some (Some ($3,rhs_pos 3))}
+	| DIV error
+	{raise (ExceptionDefn.Syntax_Error
+	  (add_pos "Incorrect link modification"))};
+
+
+a_link_state:
+    | KAPPA_LNK INT {(Ast.LNK_VALUE ($2,()),rhs_pos 2)}
+    | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
+    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
+				      (($2,rhs_pos 2),($4,rhs_pos 4)))}
+    | KAPPA_WLD {add_pos Ast.LNK_ANY}
     | KAPPA_LNK error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Invalid link state"))}
 ;
+
+link_state:
+	| a_link_state link_state {$1::$2}
+	| a_link_state {[$1]};
 
 interactive_command:
 	| RUN NEWLINE {Ast.RUN (Locality.dummy_annot Alg_expr.FALSE)}

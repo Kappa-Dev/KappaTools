@@ -412,7 +412,7 @@ let start
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
       let () = reinitialize random_state t in
-      Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
+      Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
       fun pause ->
       Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
         t.contact_map t.env t.graph pause >>=
@@ -515,7 +515,8 @@ let perturbation
          Lwt.return
            (`Error (Api_data.api_message_errors msg_process_not_paused))
        else
-         Lwt.wrap2 KappaParser.effect_list KappaLexer.token lexbuf >>=
+         Lwt.wrap2
+           KappaParser.standalone_effect_list KappaLexer.token lexbuf >>=
          fun e ->
          Lwt.wrap6
            (Evaluator.do_interactive_directives
@@ -540,7 +541,7 @@ let continue
        if t.is_running then
          Lwt.return (`Ok ())
        else
-         Lwt.wrap2 KappaParser.bool_expr KappaLexer.token lexbuf >>=
+         Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
          fun pause ->
          Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
            t.contact_map t.env t.graph pause >>=
