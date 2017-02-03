@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 02 2017>
+  * Last modification: Time-stamp: <Feb 03 2017>
 *)
 
 let local_trace = false
@@ -1707,12 +1707,13 @@ struct
     (**********************************************************)
     (*TEST*)
 
-    let get_list_of_divide_rule_by_rate log compil =
-      let empty_cache = I.empty_lkappa_cache () in
+  let get_list_of_divide_rule_by_rate log compil =
+    let empty_cache = I.empty_lkappa_cache () in
+    (*let empty_rule_cache = LKappa_auto.RuleCache.init () in*)
       (*let log = Remanent_parameters.get_logger parameters in*)
-      let cache, i_lis =
+      let cache, hash_list =
         List.fold_left (fun (cache, current_list) rule ->
-            let () =
+            (*let () =
               match
                 Loggers.formatter_of_logger log
               with
@@ -1723,22 +1724,28 @@ struct
                 in
                 I.print_rule ~compil fmt rule;
                 Ode_loggers.print_newline log
-            in
-            let cache, int =
+            in*)
+            (*let cache, int =
               I.divide_rule_rate_by cache compil rule
-            in
+            in*)
             (*RULE CACHE, HASH_LIST*)
-            let rule_cache, hash =
-              I.map_to_hash_list log
-                cache compil rule
+            let cache, rule_cache, hash =
+              I.map_to_hash_list log cache compil rule
             in
-            cache, int :: current_list
+            cache, (rule_cache, hash) :: current_list
           ) (empty_cache, []) (I.get_rules compil)
       in
       let () =
-        List.iter (fun i ->
-            Loggers.fprintf log "\ndivide_rule_rate_by: %i \n\n" i
-          ) i_lis
+        List.iter (fun (rule_cache, hash) ->
+            let () = Loggers.fprintf log "***************\n" in
+            let () = Loggers.fprintf log "Cache:%a\n"
+                LKappa_auto.RuleCache.print_cache rule_cache in
+            let () =
+              Loggers.fprintf log "Hash_list:%a\n"
+                LKappa_auto.RuleCache.print hash in
+           let () = Loggers.fprintf log "***************\n" in
+            ()
+          ) hash_list
       in
       let () = Ode_loggers.print_newline log in
       cache, ()

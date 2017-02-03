@@ -44,4 +44,4 @@ val nauto:
 val map_to_hash_list:
     Loggers.t -> Ode_args.rate_convention ->
     cache -> LKappa.rule_mixture -> Raw_mixture.t ->
-    RuleCache.cache * RuleCache.hashed_list
+    cache * RuleCache.cache * RuleCache.hashed_list

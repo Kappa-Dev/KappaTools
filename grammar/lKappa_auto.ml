@@ -656,7 +656,7 @@ let map_to_hash_list log rate_convention cache lkappa_mixture
   match rate_convention with
   | Ode_args.KaSim
   | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
-    RuleCache.init (), RuleCache.empty
+    init_cache (), RuleCache.init (), RuleCache.empty
   | Ode_args.Biochemist ->
   let cache, map =
     mixture_to_species_map Ode_args.Biochemist cache
@@ -671,26 +671,8 @@ let map_to_hash_list log rate_convention cache lkappa_mixture
          list
       ) map []
   in
-  let cache, hash_list =
+  let rule_cache, hash_list =
     RuleCache.hash cache.rule_cache pair_list
   in
-  (*let log = Remanent_parameters.get_logger parameters in*)
-  let () =
-    let () =Loggers.print_newline log in
-    let () = Loggers.fprintf log "***************\n HASH LIST" in
-    let () =
-      Loggers.fprintf log "Hash_list:%a"
-        RuleCache.print hash_list
-    in
-    let () = Loggers.fprintf log "***************" in
-    let () = Loggers.print_newline log in
-    let () = Loggers.fprintf log "***************\n CACHE" in
-    let () =
-      Loggers.fprintf log "Cach:%a"
-        RuleCache.print_cache cache
-    in
-    let () = Loggers.fprintf log "***************" in
-    ()
-  in
   (*TODO:total order*)
-  cache, hash_list
+  cache, rule_cache, hash_list
