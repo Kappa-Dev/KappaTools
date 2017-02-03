@@ -162,13 +162,13 @@ let main () =
     in
     (*********************************************************************)
     (*TEST*)
-      let my_out_channel =
+    (*let my_out_channel =
         Kappa_files.open_out "my_logger.txt"
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
     let cache, () =
       A.get_list_of_divide_rule_by_rate my_logger compil
-    in
+    in*)
     (*********************************************************************)
     let () = A.export_network
         ~command_line
