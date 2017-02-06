@@ -3,7 +3,7 @@
 %var: 'goal' 0
 %var: 'bad' 1
 A(x!_/) @ 'bad'
-A(x!_/) +C() @ 'goal'
+A(x!_/), +C() @ 'goal'
 A(x/!1),B(x/!1) @1
 A(x/!1),B(x/!1) @1
 'GOAL' A(x!1),B(x~1!1),C() -> @1
