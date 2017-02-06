@@ -21,6 +21,7 @@ module Make =
     type elt = A.t
     type elt_id = int
     type hashed_list = int
+
     let compare = compare
 
     module SetMap = SetMap.Make(A)
@@ -35,15 +36,25 @@ module Make =
 
     let fst_elt_id = 1
     let next_elt_id = succ
+
     let fresh_elt_id cache =
       cache.next_elt_id,
-      {cache with next_elt_id = next_elt_id cache.next_elt_id}
+      {
+        cache with
+        next_elt_id = next_elt_id cache.next_elt_id
+      }
 
     let fst_list_id = 1
+
     let next_list_id = succ
+
     let fresh_list_id cache =
-      {cache with next_list_id = next_list_id cache.next_list_id},
+      {
+        cache with
+        next_list_id = next_list_id cache.next_list_id
+      },
       cache.next_list_id
+
     let init () =
       {
         dictionary = SetMap.Map.empty ;

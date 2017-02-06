@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jan 30 2017>
+   * Last modification: Time-stamp: <Feb 06 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -224,7 +224,7 @@ let collect_partition_contact_map parameters error contact_map store_result =
     Ckappa_sig.Agent_map_and_set.Map.fold
       (fun agent_type site_map (error, store_result) ->
          Ckappa_sig.Site_map_and_set.Map.fold
-           (fun site_type (state_list, pair_list) (error, store_result) ->
+           (fun site_type (_state_list, pair_list) (error, store_result) ->
               let error, old_list =
                 Common_map.get_agent_type parameters error
                   agent_type []

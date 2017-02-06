@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 03 2017>
+  * Last modification: Time-stamp: <Feb 06 2017>
 *)
 
 module type Interface =
@@ -28,12 +28,16 @@ sig
 
   val compare_connected_component :
     connected_component -> connected_component -> int
+
   val print_connected_component :
     ?compil:compil -> Format.formatter -> connected_component -> unit
+
   val print_token :
     ?compil:compil -> Format.formatter -> int -> unit
+
   val print_chemical_species:
     ?compil:compil -> Format.formatter -> chemical_species -> unit
+
   val print_canonic_species:
     ?compil:compil -> Format.formatter -> canonic_species -> unit
 
@@ -54,11 +58,15 @@ sig
 
   type embedding (* the domain is connected *)
   type embedding_forest (* the domain may be not connected *)
+
   val lift_embedding: embedding -> embedding_forest
+
   val find_embeddings:
     compil -> connected_component -> chemical_species -> embedding list
+
   val find_embeddings_unary_binary:
     compil -> pattern -> chemical_species -> embedding_forest list
+
   val disjoint_union:
     compil  ->
     (connected_component * embedding * chemical_species) list ->
@@ -78,9 +86,9 @@ sig
   val map_to_hash_list :
     Loggers.t ->
     nauto_in_rules_cache -> compil -> rule ->
-    nauto_in_rules_cache * LKappa_auto.RuleCache.cache *
-    LKappa_auto.RuleCache.hashed_list
-
+    nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list * bool
+    (*nauto_in_rules_cache * LKappa_auto.RuleCache.cache *
+    LKappa_auto.RuleCache.hashed_list*)
 
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
 
@@ -89,40 +97,55 @@ sig
   val token_vector:
     rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+
   val consumed_tokens:
     rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+
   val produced_tokens:
     rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+
   val token_vector_of_init:
     hidden_init ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+
   val print_rule_id: Format.formatter -> rule_id -> unit
+
   val print_rule:
     ?compil:compil -> Format.formatter -> rule -> unit
+
   val print_rule_name:
     ?compil:compil -> Format.formatter -> rule -> unit
+
   val string_of_var_id:
     ?compil:compil -> int -> string
+
   val rate:
     compil -> rule -> rule_id_with_mode ->
     (connected_component array list,int) Alg_expr.e Locality.annot option
+
   val rate_name:
     compil -> rule -> rule_id_with_mode -> rule_name
+
   val apply: compil -> rule -> embedding_forest -> mixture  -> mixture
+
   val mixture_of_init: compil -> hidden_init -> mixture
+
   val lift_species: compil -> chemical_species -> mixture
 
   val get_compil:
     rate_convention:Ode_args.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> compil
+
   val get_rules: compil -> rule list
+
   val get_variables:
     compil ->
     (string *
      (connected_component array list,int) Alg_expr.e Locality.annot) array
+
   val get_obs: compil -> (connected_component array list,int) Alg_expr.e list
 
   val get_obs_titles: compil -> string list

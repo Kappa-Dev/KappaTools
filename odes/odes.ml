@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 03 2017>
+  * Last modification: Time-stamp: <Feb 06 2017>
 *)
 
 let local_trace = false
@@ -1704,52 +1704,6 @@ struct
     let () = Ode_loggers.print_newline logger in
     ()
 
-    (**********************************************************)
-    (*TEST*)
-
-  let get_list_of_divide_rule_by_rate log compil =
-    let empty_cache = I.empty_lkappa_cache () in
-    (*let empty_rule_cache = LKappa_auto.RuleCache.init () in*)
-      (*let log = Remanent_parameters.get_logger parameters in*)
-      let cache, hash_list =
-        List.fold_left (fun (cache, current_list) rule ->
-            (*let () =
-              match
-                Loggers.formatter_of_logger log
-              with
-              | None -> ()
-              | Some fmt ->
-                let () =
-                  I.print_rule_name ~compil fmt rule
-                in
-                I.print_rule ~compil fmt rule;
-                Ode_loggers.print_newline log
-            in*)
-            (*let cache, int =
-              I.divide_rule_rate_by cache compil rule
-            in*)
-            (*RULE CACHE, HASH_LIST*)
-            let cache, rule_cache, hash =
-              I.map_to_hash_list log cache compil rule
-            in
-            cache, (rule_cache, hash) :: current_list
-          ) (empty_cache, []) (I.get_rules compil)
-      in
-      let () =
-        List.iter (fun (rule_cache, hash) ->
-            let () = Loggers.fprintf log "***************\n" in
-            let () = Loggers.fprintf log "Cache:%a\n"
-                LKappa_auto.RuleCache.print_cache rule_cache in
-            let () =
-              Loggers.fprintf log "Hash_list:%a\n"
-                LKappa_auto.RuleCache.print hash in
-           let () = Loggers.fprintf log "***************\n" in
-            ()
-          ) hash_list
-      in
-      let () = Ode_loggers.print_newline log in
-      cache, ()
-
   let export_network
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
       logger logger_buffer compil network =
@@ -1793,5 +1747,58 @@ struct
     List.rev_map
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
+
+  (**********************************************************)
+  (*TEST*)
+
+  let get_list_of_divide_rule_by_rate log compil =
+    let empty_cache = I.empty_lkappa_cache () in
+    let empty_rule_cache = LKappa_auto.RuleCache.init () in
+    (*let log = Remanent_parameters.get_logger parameters in*)
+    let cache, hash_list =
+      List.fold_left (fun (cache, current_list) rule ->
+          let () = match Loggers.formatter_of_logger log with
+            | None -> ()
+            | Some fmt ->
+              let () = I.print_rule_name ~compil fmt rule in ()
+          in
+          (* I.print_rule ~compil fmt rule;
+              Ode_loggers.print_newline log
+            in*)
+          (*let cache, int =
+            I.divide_rule_rate_by cache compil rule
+            in*)
+          (*RULE CACHE, HASH_LIST*)
+          let cache, hash, bool =
+            I.map_to_hash_list log cache compil rule
+          in
+          cache, (hash, bool) :: current_list
+          (*let cache, rule_cache, hash =
+            I.map_to_hash_list log cache compil rule
+          in
+          cache, (rule_cache, hash) :: current_list*)
+        ) (empty_cache, []) (I.get_rules compil)
+    in
+    (*let () =
+      Loggers.fprintf log "%a\n"
+      LKappa_auto.RuleCache.print_cache cache.LKappa_auto.rule_cache
+    in*)
+    let () =
+      List.iter (fun (hash, b) ->
+          let () = Loggers.fprintf log "***************\n" in
+          (*let () = Loggers.fprintf log "%a\n"
+              LKappa_auto.RuleCache.print_cache rule_cache
+          in*)
+          let () =
+            Loggers.fprintf log "Hash_list:%a\n"
+              LKappa_auto.RuleCache.print hash;
+          in
+          let () = Loggers.fprintf log "BOOL:%b\n" b in
+          let () = Loggers.fprintf log "***************\n" in
+          ()
+        ) hash_list
+    in
+    let () = Ode_loggers.print_newline log in
+    cache, ()
 
 end

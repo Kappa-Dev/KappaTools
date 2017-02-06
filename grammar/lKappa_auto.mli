@@ -21,11 +21,9 @@ module Binding_states : SetMap.S with type elt =  int * ((int, unit) Ast.link)*)
 
 module CannonicCache : Hashed_list.Hash
 
-module CannonicSet_and_map : SetMap.S
-  with type elt = CannonicCache.hashed_list
+module CannonicSet_and_map : SetMap.S with type elt = CannonicCache.hashed_list
 
-module CannonicMap : SetMap.Map with type elt =
-                                       CannonicCache.hashed_list
+module CannonicMap : SetMap.Map with type elt = CannonicCache.hashed_list
 
 (*module PairInt  : SetMap.OrderedType with type elt = (CannonicMap.elt * int)*)
 
@@ -34,7 +32,6 @@ module RuleCache : Hashed_list.Hash
 (*module BindingCache : Hashed_list.Hash
   with type elt = int * ((int, unit) Ast.link)*)
 
-
 val init_cache: unit -> cache
 
 val nauto:
@@ -42,6 +39,6 @@ val nauto:
   LKappa.rule_mixture -> Raw_mixture.t -> cache * int
 
 val map_to_hash_list:
-    Loggers.t -> Ode_args.rate_convention ->
-    cache -> LKappa.rule_mixture -> Raw_mixture.t ->
-    cache * RuleCache.cache * RuleCache.hashed_list
+  Loggers.t -> cache -> LKappa.rule_mixture -> Raw_mixture.t ->
+  cache * RuleCache.hashed_list * bool
+    (*cache * RuleCache.cache * RuleCache.hashed_list*)
