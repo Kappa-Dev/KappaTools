@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 06 2017>
+  * Last modification: Time-stamp: <Feb 07 2017>
 *)
 
 let local_trace = false
@@ -1107,7 +1107,7 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ~ignore_obs compil =
+  let network_from_compil log ~ignore_obs compil =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let network = init compil in
@@ -1749,55 +1749,67 @@ struct
       (List.rev list)
 
   (**********************************************************)
-  (*TEST*)
+  (*morphism_per_rules*)
 
-  let get_list_of_divide_rule_by_rate log compil =
+  let print_hash log hash =
+    Loggers.fprintf log "Hash:%a\n"
+      LKappa_auto.RuleCache.print hash
+
+    let print_line_stars log =
+      Loggers.fprintf log "***************\n"
+
+  let print_canonic_form_from_syntactic_rule log hash_list =
+    List.iter (fun hash ->
+        let () = print_line_stars log in
+        let () = print_hash log hash in
+        let () = print_line_stars log in ()
+      ) hash_list
+
+  let print_map log map =
+    let () = print_line_stars log in
+    let () = Loggers.print_newline log in
+    let () =
+      LKappa_auto.CannonicMap.fold (fun cannonic (nocc, nauto) () ->
+          let () = Loggers.fprintf log "nocc:%i - " nocc in
+          let () = Loggers.fprintf log "nauto:%i - " nauto in
+          let () = Loggers.fprintf log "cannonic:%a"
+              LKappa_auto.CannonicCache.print cannonic
+          in
+          let () = Loggers.print_newline log in ()
+        ) map ()
+    in
+    let () = print_line_stars log in
+    ()
+
+  let print_divide_rule_rate_by log i =
+    Loggers.fprintf log " Divide_rule_rate_by:%i\n" i
+
+  let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
-    let empty_rule_cache = LKappa_auto.RuleCache.init () in
-    (*let log = Remanent_parameters.get_logger parameters in*)
     let cache, hash_list =
       List.fold_left (fun (cache, current_list) rule ->
-          let () = match Loggers.formatter_of_logger log with
+          (*Card(G_r)*)
+          let cache, i =
+            I.divide_rule_rate_by cache compil rule
+          in
+          (*gamma(r)*)
+          let cache, hash =
+            I.cannonic_form_from_syntactic_rule cache compil rule
+          in
+          (*PRINT*)
+          let () =
+            match Loggers.formatter_of_logger log with
             | None -> ()
             | Some fmt ->
-              let () = I.print_rule_name ~compil fmt rule in ()
+              let () = I.print_rule_name ~compil fmt rule in
+              let () = print_divide_rule_rate_by log i in
+              let () = print_hash log hash in
+              ()
           in
-          (* I.print_rule ~compil fmt rule;
-              Ode_loggers.print_newline log
-            in*)
-          (*let cache, int =
-            I.divide_rule_rate_by cache compil rule
-            in*)
-          (*RULE CACHE, HASH_LIST*)
-          let cache, hash, bool =
-            I.map_to_hash_list log cache compil rule
-          in
-          cache, (hash, bool) :: current_list
-          (*let cache, rule_cache, hash =
-            I.map_to_hash_list log cache compil rule
-          in
-          cache, (rule_cache, hash) :: current_list*)
+          cache, hash :: current_list
         ) (empty_cache, []) (I.get_rules compil)
     in
-    (*let () =
-      Loggers.fprintf log "%a\n"
-      LKappa_auto.RuleCache.print_cache cache.LKappa_auto.rule_cache
-    in*)
-    let () =
-      List.iter (fun (hash, b) ->
-          let () = Loggers.fprintf log "***************\n" in
-          (*let () = Loggers.fprintf log "%a\n"
-              LKappa_auto.RuleCache.print_cache rule_cache
-          in*)
-          let () =
-            Loggers.fprintf log "Hash_list:%a\n"
-              LKappa_auto.RuleCache.print hash;
-          in
-          let () = Loggers.fprintf log "BOOL:%b\n" b in
-          let () = Loggers.fprintf log "***************\n" in
-          ()
-        ) hash_list
-    in
+    (*let () = print_canonic_form_from_syntactic_rule log hash_list in*)
     let () = Ode_loggers.print_newline log in
     cache, ()
 

@@ -34,11 +34,8 @@ module RuleCache : Hashed_list.Hash
 
 val init_cache: unit -> cache
 
-val nauto:
-  Ode_args.rate_convention -> cache ->
+val nauto: Ode_args.rate_convention -> cache ->
   LKappa.rule_mixture -> Raw_mixture.t -> cache * int
 
-val map_to_hash_list:
-  Loggers.t -> cache -> LKappa.rule_mixture -> Raw_mixture.t ->
-  cache * RuleCache.hashed_list * bool
-    (*cache * RuleCache.cache * RuleCache.hashed_list*)
+val cannonic_form: cache -> LKappa.rule_mixture -> Raw_mixture.t ->
+  cache * RuleCache.hashed_list

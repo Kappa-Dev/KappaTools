@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 06 2017>
+  * Last modification: Time-stamp: <Feb 07 2017>
 *)
 
 module type Interface =
@@ -83,12 +83,9 @@ sig
     nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
 
   (*TEST*)
-  val map_to_hash_list :
-    Loggers.t ->
+  val cannonic_form_from_syntactic_rule :
     nauto_in_rules_cache -> compil -> rule ->
-    nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list * bool
-    (*nauto_in_rules_cache * LKappa_auto.RuleCache.cache *
-    LKappa_auto.RuleCache.hashed_list*)
+    nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list
 
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
 

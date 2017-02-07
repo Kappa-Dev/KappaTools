@@ -565,7 +565,7 @@ let mixture_to_species_map rate_convention cache lkappa_mixture created =
            match cc with
            | [] -> cache, map
            | h::t ->
-             let _,occs =
+             let _, occs =
                List.fold_left
                  (fun (best,occs) i ->
                     let cmp = compare array.(i) best in
@@ -586,9 +586,21 @@ let mixture_to_species_map rate_convention cache lkappa_mixture created =
                | [] -> assert false
                | h::t ->
                  let cache, hash = CannonicCache.hash cache h in
+                 (*TEST*)
+                 (*let () =
+                   Loggers.fprintf log " hash:%a\n"
+                     CannonicCache.print hash
+                 in*)
                  List.fold_left
                    (fun (cache, cannonic, nauto) list ->
                       let cache, hash = CannonicCache.hash cache list in
+                      (*let () =
+                        Loggers.fprintf log
+                          " (cannonic:%a, nauto:%i) Hash_pair_list:%a\n"
+                          CannonicCache.print cannonic
+                          nauto
+                          CannonicCache.print hash
+                      in*)
                       let cmp = compare cannonic hash in
                       if cmp < 0
                       then cache, cannonic, nauto
@@ -631,38 +643,13 @@ let nauto rate_convention cache lkappa_mixture created =
   let cache, map =
     mixture_to_species_map rate_convention cache lkappa_mixture created
   in
-  (*let () = Loggers.fprintf logger "*****" in
-  let () = Loggers.print_newline logger in
-  let () =
-    CannonicMap.fold (fun cannonic (nocc, nauto) () ->
-        let () = Loggers.fprintf logger "nocc:%i - " nocc in
-        let () = Loggers.fprintf logger "nauto:%i - " nauto in
-        let () = Loggers.fprintf logger "cannonic:%a"
-            CannonicCache.print  cannonic
-        in
-        let () = Loggers.print_newline logger in
-        ()
-      ) map ()
-  in
-  let () = Loggers.fprintf logger "*****" in
-  let () = Loggers.print_newline logger in*)
   cache, nauto_of_map map
 
 (****************************************************************)
-(*TEST*)
+(*cannonic form*)
 
-let compare_two_hashes cmp l =
-  let rec analyze l prevs =
-    match l with
-    | [] -> true
-    | [x] -> cmp prevs x
-    | x :: xs ->
-      (cmp prevs x)  && (analyze xs x)
-  in analyze (List.tl l) (List.hd l)
-
-(*Morphism: (cannonic * nocc) list -> hash_list *)
-let map_to_hash_list log cache lkappa_mixture created =
-  (*Compute this map only in the case of Biochemist*)
+let cannonic_form cache lkappa_mixture created =
+  (*compute this map only in the case of Biochemist*)
   let cache, map =
     mixture_to_species_map Ode_args.Biochemist cache
       lkappa_mixture created
@@ -670,88 +657,13 @@ let map_to_hash_list log cache lkappa_mixture created =
   let pair_list =
     CannonicMap.fold
       (fun cannonic (nocc, nauto) current_list ->
-         (*let () =
-           Loggers.fprintf log " nocc:%i - " nocc
-         in
-         let () = Loggers.fprintf log " nauto:%i - " nauto in
-         let () = Loggers.fprintf log " cannonic:%a"
-             CannonicCache.print cannonic
-         in
-         let () = Loggers.print_newline log in*)
          let pair_list =
            (cannonic, nocc) :: current_list
          in
          pair_list
       ) map []
   in
-  let rule_cache, hash, bool =
-    match pair_list with
-    | [] -> assert false
-    | h :: t ->
-      let (can, nocc) = h in
-      (*let () = Loggers.fprintf log " cannonic:%a"
-          CannonicCache.print can
-      in*)
-      let cache, hash = RuleCache.hash cache.rule_cache [h] in
-      let () =
-        Loggers.fprintf log "(cannonic:%a, nocc:%i) Hash_pair_list:%a\n"
-          CannonicCache.print can
-          nocc
-          RuleCache.print hash
-      in
-      List.fold_left (fun (cache, hash, bool) list ->
-          let cache, next_hash = RuleCache.hash cache list in
-          let () =
-            Loggers.fprintf log "Hash:%a\n"
-              RuleCache.print hash
-          in
-          let () =
-            Loggers.fprintf log "Next_Hash:%a\n"
-              RuleCache.print next_hash
-          in
-          (*compare two hashes*)
-          let cmp = RuleCache.compare hash next_hash in
-          if cmp < 0
-          then cache, hash, bool
-          else
-            (*If two hashes are equal*)
-          if cmp = 0
-          then cache, hash, true
-          else cache, hash, bool
-        ) (cache, hash, false) [t]
-  in
-  {cache with rule_cache = rule_cache}, hash, bool
-  (*let cache, hash_list =
-    RuleCache.hash cache pair_list
-  in
-  (*TODO:total order*)
-  cache, cache.rule_cache, hash_list*)
-
-(*compute the permutation in a contact map: int list list Agent_type map*)
-let get_site_list_lists parameters error agent_type map =
-  match
-    Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
-      parameters error agent_type map
-  with
-  | error, None -> error, []
-  | error, Some l -> error, l
-
-(*let rec permutation parameters error site_type_list _ =
-  match site_type_list with
-  | [] ->
-  | [_] ->
-  | x :: y :: xs ->
-
-
-let permutation_in_contact_map parameters error agent_type contact_map =
-  let error, site_list_lists =
-    get_site_list_lists parameters error agent_type contact_map
-  in
-  let _ =
-    List.fold_left (fun site_type_list _ ->
-
-
-
-
-      ) _ site_type_list_list
-  in*)
+  let rule_cache, hash = RuleCache.hash cache.rule_cache pair_list in
+  {
+    cache with rule_cache = rule_cache
+  }, hash

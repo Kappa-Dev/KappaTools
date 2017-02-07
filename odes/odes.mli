@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 06 2017>
+  * Last modification: Time-stamp: <Feb 07 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -15,7 +15,7 @@ sig
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
-  val network_from_compil:
+  val network_from_compil: Loggers.t ->
     ignore_obs:bool -> I.compil -> (int,int) network
 
   val get_reactions:
@@ -35,14 +35,19 @@ sig
     (int,int) network -> ode_var_id -> I.chemical_species * int
 
   val get_comment: enriched_rule -> string
+
   val get_rule_id_with_mode: enriched_rule -> rule_id * I.arity * I.direction
+
   val get_rule : enriched_rule -> I.rule
+
   val get_lhs : enriched_rule -> I.pattern
+
   val get_lhs_cc :
     enriched_rule -> (connected_component_id * I.connected_component) list
+
   val get_divide_rate_by : enriched_rule -> int
 
-  val get_list_of_divide_rule_by_rate :
+  val cannonic_form_from_syntactic_rules :
     Loggers.t ->
     I.compil -> I.nauto_in_rules_cache * unit
 

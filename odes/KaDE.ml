@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 06 2017>
+  * Last modification: Time-stamp: <Feb 07 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -142,10 +142,15 @@ let main () =
       | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
     in
+    let my_out_channel =
+        Kappa_files.open_out "my_logger.txt"
+    in
+    (*OPEN NEW LOGGER FOR SYMMETRIES*)
+    let my_logger = Loggers.open_logger_from_channel my_out_channel in
     let compil =
       A.get_compil
         ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
-    let network = A.network_from_compil ~ignore_obs compil in
+    let network = A.network_from_compil my_logger ~ignore_obs compil in
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
@@ -165,9 +170,9 @@ let main () =
     (*let my_out_channel =
         Kappa_files.open_out "my_logger.txt"
     in
-    let my_logger = Loggers.open_logger_from_channel my_out_channel in
-    let cache, () =
-      A.get_list_of_divide_rule_by_rate my_logger compil
+      let my_logger = Loggers.open_logger_from_channel my_out_channel in*)
+    (*let cache, () =
+      A.cannonic_form_from_syntactic_rules my_logger compil
     in*)
     (*********************************************************************)
     let () = A.export_network

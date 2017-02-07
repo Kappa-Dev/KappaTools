@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 06 2017>
+  * Last modification: Time-stamp: <Feb 07 2017>
 *)
 
 type compil =
@@ -344,7 +344,7 @@ let divide_rule_rate_by cache compil rule =
   | Ode_args.KaSim -> cache, 1
   | Ode_args.Biochemist
   | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
-    let rule_id = rule.Primitives.syntactic_rule  in
+    let rule_id = rule.Primitives.syntactic_rule in
     let lkappa_rule =
       Model.get_ast_rule compil.environment rule_id
     in
@@ -352,15 +352,14 @@ let divide_rule_rate_by cache compil rule =
       lkappa_rule.LKappa.r_mix lkappa_rule.LKappa.r_created
 
 (****************************************************************)
-(*TEST*)
+(*cannonic form per rule*)
 
-let map_to_hash_list log cache compil rule =
+let cannonic_form_from_syntactic_rule cache compil rule =
   let rule_id = rule.Primitives.syntactic_rule in
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
-  LKappa_auto.map_to_hash_list
-    log
+  LKappa_auto.cannonic_form
     cache
     lkappa_rule.LKappa.r_mix
     lkappa_rule.LKappa.r_created
