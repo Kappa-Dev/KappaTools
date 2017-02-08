@@ -33,6 +33,8 @@ type mixture = agent list
 
 type edit_rule = {
   mix: mixture;
+  delta_token: ((mixture,string) Alg_expr.e Locality.annot *
+                string Locality.annot) list;
   act: (mixture,string) Alg_expr.e Locality.annot;
   un_act:
     ((mixture,string) Alg_expr.e Locality.annot *

@@ -622,9 +622,9 @@ declarations\index{declaration} of the form:
 One may then use these tokens in conjunction with a classical rule
 using the hybrid format:
 \begin{lstlisting}[language=kappa]
-'hybrid rule' S(x~u!1),K(y!1) | 0.1:atp -> S(x~p),K(y) | 0.1:adp @ 'k'
+'hybrid rule' S(x~u!1),K(y!1) | 0.2:atp -> S(x~p),K(y) | 0.1:adp @ 'k'
 \end{lstlisting}
-When applied, the above rule will consume 0.1 \ttt{atp} token and
+When applied, the above rule will consume 0.2 \ttt{atp} token and
 produce 0.1 \ttt{adp} token. Note that as specified by the grammar
 given Table~\ref{tab:tokens}, the number of consumed (and produced)
 tokens can be given by a sum of the form: \ITE{
@@ -644,7 +644,17 @@ see in the next section, it is however possible to make its rate
 explicitly depend on the concentrations of the tokens using a
 \imp{variable} rate.
 
-There is no notation with edits for hybrid rules.
+Consuming $t$ tokens is strickly equivalent to produicing $-k$
+tokens. So, all variation in amount of tokens can be written on the
+right hand side of rules. This is what you do when you use tokens in
+edit notation:
+\begin{lstlisting}[language=kappa]
+'hybrid rule' S(x~u/~p!1/),K(y!1/) | (-0.1):atp @ 'k'
+\end{lstlisting}
+
+Also, speaking only about variation makes clear that the simulator
+does not check that the consumed amount of token is available. It
+consumes it even if the quantity becomes then negative!
 
 \subsection{Rates}\label{sec:kinetics}
 As said earlier, Kappa rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.

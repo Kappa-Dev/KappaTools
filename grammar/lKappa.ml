@@ -1066,7 +1066,10 @@ let name_and_purify_edit_rule (label_opt,r) (pack,acc,rules) =
        Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
     else (acc,r.Ast.act) in
   let acc'',un_act = add_un_variable r.Ast.un_act acc' (label^"_un_rate") in
-  (pack',acc'',(label_opt,{Ast.mix = r.Ast.mix; Ast.act; Ast.un_act})::rules)
+  (pack',acc'',
+   (label_opt,
+    {Ast.mix = r.Ast.mix; Ast.delta_token = r.Ast.delta_token;
+     Ast.act; Ast.un_act})::rules)
 
 let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
   let pack',label =
@@ -1335,8 +1338,10 @@ let compil_of_ast overwrite c =
     List.rev_map (fun (label,r) ->
         let mix,cmix =
           annotate_edit_mixture ~is_rule:true sigs ~contact_map r.Ast.mix in
-        (label, Locality.dummy_annot
-           (assemble_rule sigs tk_nd algs mix cmix [] [] r.Ast.act r.Ast.un_act)))
+        (label,
+         Locality.dummy_annot
+           (assemble_rule sigs tk_nd algs mix cmix [] r.Ast.delta_token
+              r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
   sigs,contact_map,tk_nd,updated_vars,

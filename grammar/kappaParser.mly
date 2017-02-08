@@ -290,8 +290,9 @@ sum_token:
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
 edit_rule_expression:
-	rule_label mixture AT rate
-	{ let (act,un_act) = $4 in $1, {Ast.mix = $2; Ast.act; Ast.un_act} };
+	rule_label mixture token_expr AT rate
+	{ let (act,un_act) = $5 in
+	$1, {Ast.mix = $2; Ast.delta_token = $3; Ast.act; Ast.un_act} };
 
 rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs birate

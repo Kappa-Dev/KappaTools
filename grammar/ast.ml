@@ -32,6 +32,8 @@ type mixture = agent list
 
 type edit_rule = {
   mix: mixture;
+  delta_token: ((mixture,string) Alg_expr.e Locality.annot
+                * string Locality.annot) list;
   act: (mixture,string) Alg_expr.e Locality.annot;
   un_act:
     ((mixture,string) Alg_expr.e Locality.annot *
@@ -490,6 +492,12 @@ let edit_rule_to_yojson r =
   let mix_to_json = JsonUtil.of_list agent_to_json in
   JsonUtil.smart_assoc [
     "mix", JsonUtil.of_list agent_to_json r.mix;
+    "delta_token",
+    JsonUtil.of_list
+      (JsonUtil.of_pair
+         (Locality.annot_to_json
+            (Alg_expr.e_to_yojson mix_to_json JsonUtil.of_string))
+         string_annot_to_json) r.delta_token;
     "k_def", Locality.annot_to_json
       (Alg_expr.e_to_yojson mix_to_json JsonUtil.of_string) r.act;
     "k_un",
@@ -507,24 +515,20 @@ let edit_rule_of_yojson r =
   let mix_of_json =
     JsonUtil.to_list agent_of_json in
   match r with
-  | `Assoc [ "mix", m; "k_def", a ]
-  | `Assoc [ "k_def", a; "mix", m ] -> {
-      mix = JsonUtil.to_list agent_of_json m;
+  | `Assoc l as x when List.length l < 5 ->
+    begin try {
+      mix = JsonUtil.to_list agent_of_json (List.assoc "mix" l);
+      delta_token =JsonUtil.to_list
+          (JsonUtil.to_pair
+             (Locality.annot_of_json
+                (Alg_expr.e_of_yojson
+                   mix_of_json (JsonUtil.to_string ?error_msg:None)))
+             string_annot_of_json)
+          (Yojson.Basic.Util.member "delta_token" x);
       act = Locality.annot_of_json
           (Alg_expr.e_of_yojson
-             mix_of_json (JsonUtil.to_string ?error_msg:None)) a;
-      un_act = None;
-    }
-  | `Assoc [ "mix", m; "k_def", a; "k_un", u ]
-  | `Assoc [ "k_def", a; "mix", m; "k_un", u ]
-  | `Assoc [ "mix", m; "k_un", u; "k_def", a ]
-  | `Assoc [ "k_def", a; "k_un", u; "mix", m ]
-  | `Assoc [ "k_un", u; "mix", m; "k_def", a ]
-  | `Assoc [ "k_un", u; "k_def", a; "mix", m ] ->  {
-      mix = JsonUtil.to_list agent_of_json m;
-      act = Locality.annot_of_json
-          (Alg_expr.e_of_yojson
-             mix_of_json (JsonUtil.to_string ?error_msg:None)) a;
+             mix_of_json (JsonUtil.to_string ?error_msg:None))
+          (List.assoc "k_def" l);
       un_act =
         JsonUtil.to_option
           (JsonUtil.to_pair
@@ -535,8 +539,11 @@ let edit_rule_of_yojson r =
                                     (Alg_expr.e_of_yojson
                                        mix_of_json
                                        (JsonUtil.to_string ?error_msg:None)))))
-      u;
+           (Yojson.Basic.Util.member "k_un" x);
     }
+    with Not_found ->
+      raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit rule",x))
+    end
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit rule",x))
 let print_expr_to_json f_mix f_var = function
