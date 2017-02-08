@@ -71,31 +71,19 @@ let elementary_rule ?env f r =
         sigs r.Primitives.inserted
   in
   Format.fprintf
-    f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a%a%a@]%t@[%a@]@]@ @@%a%t"
-    (Pp.array Pp.comma boxed_cc)
-    r.Primitives.connected_components
-    (Pp.list Pp.comma pr_trans)
+    f "@[%a@]@ -- @[%a@]@ ++ @[@[%a%a%a@]%t@[%a@]@]@ @@%a%t"
+    (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
 
-    r.Primitives.removed
+    (Pp.list Pp.comma pr_trans) r.Primitives.removed
 
-    (if r.Primitives.removed <> [] && r.Primitives.consumed_tokens <> []
-     then Pp.space else Pp.empty)
-
-    (Pp.list Pp.space pr_tok)
-    r.Primitives.consumed_tokens
-
-    (Raw_mixture.print ~compact:true ?sigs)
-    (List.map snd ins_fresh)
-    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte)
-
-    ins_mixte
+    (Raw_mixture.print ~compact:true ?sigs) (List.map snd ins_fresh)
+    (Pp.list ~trailing:Pp.space Pp.comma pr_mixte) ins_mixte
     (Pp.list Pp.comma pr_trans) ins_existing
-    (if r.Primitives.inserted <> [] && r.Primitives.injected_tokens <> []
+
+    (if r.Primitives.inserted <> [] && r.Primitives.delta_tokens <> []
      then Pp.space else Pp.empty)
-    (Pp.list Pp.space pr_tok)
-    r.Primitives.injected_tokens
-    pr_alg
-    r.Primitives.rate
+    (Pp.list Pp.space pr_tok) r.Primitives.delta_tokens
+    pr_alg r.Primitives.rate
     (fun f ->
        match r.Primitives.unary_rate with
        | None -> ()
@@ -118,11 +106,12 @@ let modification ?env f m =
   | Primitives.ITER_RULE ((n,_),rule) ->
     if rule.Primitives.inserted = [] then
       if rule.Primitives.connected_components = [||] then
-        match rule.Primitives.injected_tokens with
+        match rule.Primitives.delta_tokens with
         | [ va, id ] ->
-          Format.fprintf f "%a <- %a"
+          Format.fprintf f "%a <- %a + |%a|"
             (Model.print_token ?env) id
             (fun f (a,_) -> alg_expr ?env f a) va
+            (Model.print_token ?env) id
         | _ -> assert false
       else
         let boxed_cc i f cc =

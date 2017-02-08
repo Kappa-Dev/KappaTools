@@ -49,8 +49,7 @@ type elementary_rule = {
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
     (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list;
-  consumed_tokens : (Alg_expr.t Locality.annot * int) list;
-  injected_tokens : (Alg_expr.t Locality.annot * int) list;
+  delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;

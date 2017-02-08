@@ -1449,8 +1449,7 @@ struct
                let rule_string =
                  Format.asprintf "%a" (I.print_rule_name ~compil) enriched_rule.rule
                in
-               let tokens_cons = I.consumed_tokens enriched_rule.rule in
-               let tokens_prod = I.produced_tokens enriched_rule.rule in
+               let tokens_prod = I.token_vector enriched_rule.rule in
                let dump_token_list fmt list =
                  let _ =
                    List.fold_left
@@ -1522,9 +1521,8 @@ struct
                with
                | Loggers.Matlab | Loggers.Octave  | Loggers.SBML ->
                  let s = Format.asprintf
-                     "reaction: %a%a -> %a%a "
+                     "reaction: %a -> %a%a "
                      dump reactants
-                     dump_token_list tokens_cons
                      dump products
                      dump_token_list tokens_prod
                  in

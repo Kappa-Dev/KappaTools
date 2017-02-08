@@ -50,9 +50,7 @@ val print_rule_mixture :
 type rule =
   { r_mix: rule_mixture;
     r_created: Raw_mixture.t;
-    r_rm_tokens :
-      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
-    r_add_tokens :
+    r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
     r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot

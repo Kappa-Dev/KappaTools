@@ -576,30 +576,25 @@ let overwrite_var i counter state expr =
    outdated_elements =
      (Operator.DepSet.add (Operator.ALG i) rdeps,changed_connectivity)}
 
-let update_tokens env counter state consumed injected =
-  let compute_them = List.rev_map
-      (fun  ((expr,_),i) -> (value_alg counter state expr,i)) in
-  let do_op op state l =
-    List.fold_left
-      (fun st (va,i) ->
-         let () = st.tokens.(i) <- op st.tokens.(i) va in
-         let deps' = Model.get_token_reverse_dependencies env i in
-         if Operator.DepSet.is_empty deps' then st
-         else
-           let rdeps,changed_connectivity = st.outdated_elements in
-           { st with outdated_elements =
-                       Operator.DepSet.union rdeps deps',changed_connectivity }
-      ) state l in
-  let consumed' = compute_them consumed in
-  let injected' = compute_them injected in
-  let state' = do_op Nbr.sub state consumed' in do_op Nbr.add state' injected'
+let update_tokens env counter state injected =
+  let injected' = List.rev_map
+      (fun  ((expr,_),i) -> (value_alg counter state expr,i)) injected in
+  List.fold_left
+    (fun st (va,i) ->
+       let () = st.tokens.(i) <- Nbr.add st.tokens.(i) va in
+       let deps' = Model.get_token_reverse_dependencies env i in
+       if Operator.DepSet.is_empty deps' then st
+       else
+         let rdeps,changed_connectivity = st.outdated_elements in
+         { st with outdated_elements =
+                     Operator.DepSet.union rdeps deps',changed_connectivity }
+    ) state injected'
 
 let transform_by_a_rule outputs env unary_patterns counter
     state event_kind ?path rule inj =
   let state' =
     update_tokens
-      env counter state rule.Primitives.consumed_tokens
-      rule.Primitives.injected_tokens in
+      env counter state rule.Primitives.delta_tokens in
   update_edges outputs counter (Model.domain env) unary_patterns inj
     state' event_kind ?path rule
 

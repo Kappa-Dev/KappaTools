@@ -95,14 +95,6 @@ sig
     rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
 
-  val consumed_tokens:
-    rule ->
-    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
-
-  val produced_tokens:
-    rule ->
-    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
-
   val token_vector_of_init:
     hidden_init ->
     ((connected_component array list,int) Alg_expr.e Locality.annot * int) list

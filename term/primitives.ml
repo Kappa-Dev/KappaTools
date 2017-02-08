@@ -141,8 +141,7 @@ type elementary_rule = {
   fresh_bindings :
     (Instantiation.abstract Instantiation.site *
      Instantiation.abstract Instantiation.site) list;
-  consumed_tokens : (Alg_expr.t Locality.annot * int) list;
-  injected_tokens : (Alg_expr.t Locality.annot * int) list;
+  delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
@@ -188,16 +187,12 @@ let extract_connected_components_rule acc r =
   let a =
     List.fold_left
       (fun acc (x,_) -> extract_connected_components_expr acc x)
-      acc r.injected_tokens in
-  let b =
-    List.fold_left
-      (fun acc (x,_) -> extract_connected_components_expr acc x)
-      a r.consumed_tokens in
-  let c = match r.unary_rate with
-    | None -> b
-    | Some (x,_) -> extract_connected_components_expr b x in
-  let d = extract_connected_components_expr c r.rate in
-  List.rev_append (Array.to_list r.connected_components) d
+      acc r.delta_tokens in
+  let b = match r.unary_rate with
+    | None -> a
+    | Some (x,_) -> extract_connected_components_expr a x in
+  let c = extract_connected_components_expr b r.rate in
+  List.rev_append (Array.to_list r.connected_components) c
 
 let extract_connected_components_print acc x =
   List.fold_left (fun acc -> function
@@ -228,8 +223,7 @@ let map_expr_rule f x = {
   removed = x.removed;
   inserted = x.inserted;
   fresh_bindings = x.fresh_bindings;
-  consumed_tokens = List.map (fun (x,t) -> (f x,t)) x.consumed_tokens;
-  injected_tokens = List.map (fun (x,t) -> (f x,t)) x.injected_tokens;
+  delta_tokens = List.map (fun (x,t) -> (f x,t)) x.delta_tokens;
   syntactic_rule = x.syntactic_rule;
   instantiations = x.instantiations;
 }

@@ -74,10 +74,8 @@ let tokenify contact_map domain l =
 (* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast
     ?deps_machinery contact_map domain ~syntax_ref short_branch_agents (rule,_) =
-  let domain',rm_toks =
-    tokenify contact_map domain rule.LKappa.r_rm_tokens in
-  let domain'',add_toks =
-    tokenify contact_map domain' rule.LKappa.r_add_tokens in
+  let domain',delta_toks =
+    tokenify contact_map domain rule.LKappa.r_delta_tokens in
   (*  let one_side syntax_ref label (domain,deps_machinery,unary_ccs,acc)
         rate unary_rate lhs rhs rm add =*)
   let origin,deps =
@@ -125,14 +123,13 @@ let rules_of_ast
       Primitives.inserted = pos;
       Primitives.fresh_bindings =
         Primitives.Transformation.fresh_bindings ~short_branch_agents pos;
-      Primitives.consumed_tokens = rm_toks;
-      Primitives.injected_tokens = add_toks;
+      Primitives.delta_tokens = delta_toks;
       Primitives.syntactic_rule = syntax_ref;
       Primitives.instantiations = syntax;
     } in
   let rule_mixtures,(domain',origin') =
     Snip.connected_components_sum_of_ambiguous_rule
-      contact_map domain'' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
+      contact_map domain' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
   let deps_algs',unary_ccs',rules_l =
     List.fold_right
       (fun r (deps_algs,un_ccs,out) ->
@@ -200,12 +197,12 @@ let cflows_of_label
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
 let rule_effect
-    contact_map domain alg_expr (mix,created,rm,add) mix_pos rev_effects =
+    contact_map domain alg_expr (mix,created,tks) mix_pos rev_effects =
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
-      LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
+      LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
       LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
-      LKappa.r_un_rate = None; } in
+    } in
   let (domain',alg_pos) =
     compile_alg contact_map domain alg_expr in
   let domain'',_,_,elem_rules =
@@ -224,12 +221,12 @@ let effects_of_modif
     ast_algs ast_rules origin contact_map (domain,rev_effects) = function
   | INTRO (alg_expr, (ast_mix,mix_pos)) ->
     rule_effect contact_map domain alg_expr
-      ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,
-       [],[]) mix_pos rev_effects
+      ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,[])
+      mix_pos rev_effects
   | DELETE (alg_expr, (ast_mix, mix_pos)) ->
     rule_effect contact_map domain alg_expr
-      (LKappa.to_erased (Pattern.PreEnv.sigs domain) ast_mix,
-       [],[],[]) mix_pos rev_effects
+      (LKappa.to_erased (Pattern.PreEnv.sigs domain) ast_mix,[],[])
+      mix_pos rev_effects
   | UPDATE ((i, _), alg_expr) ->
     let (domain', alg_pos) =
       compile_alg contact_map domain alg_expr in
@@ -238,8 +235,10 @@ let effects_of_modif
     rule_effect contact_map domain
       (Locality.dummy_annot (Alg_expr.CONST (Nbr.one)))
       ([],[],
-       [Locality.dummy_annot (Alg_expr.TOKEN_ID tk_id), tk_id],
-       [(alg_expr, tk_id)])
+       [Locality.dummy_annot
+          (Alg_expr.BIN_ALG_OP
+             (Operator.MINUS,alg_expr,
+              Locality.dummy_annot (Alg_expr.TOKEN_ID tk_id))), tk_id])
       tk_pos rev_effects
   | SNAPSHOT pexpr ->
     let (domain',pexpr') =
@@ -352,7 +351,7 @@ let inits_of_result ?rescale contact_map env preenv res =
            let fake_rule =
              { LKappa.r_mix = [];
                LKappa.r_created = LKappa.to_raw_mixture sigs ast;
-               LKappa.r_rm_tokens = []; LKappa.r_add_tokens = [];
+               LKappa.r_delta_tokens = [];
                LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            let preenv'',state' =
@@ -370,8 +369,8 @@ let inits_of_result ?rescale contact_map env preenv res =
            preenv'',state'
          | INIT_TOK tk_id,pos_tk ->
            let fake_rule =
-             { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
-               LKappa.r_add_tokens = [(alg, tk_id)];
+             { LKappa.r_mix = []; LKappa.r_created = [];
+               LKappa.r_delta_tokens = [(alg, tk_id)];
                LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
                LKappa.r_un_rate = None; } in
            match

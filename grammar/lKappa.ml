@@ -32,9 +32,7 @@ type rule =
   {
     r_mix: rule_mixture;
     r_created: Raw_mixture.t;
-    r_rm_tokens :
-      ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
-    r_add_tokens :
+    r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
     r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
@@ -256,24 +254,12 @@ let print_rates sigs pr_tok pr_var f r =
 
 let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
   Format.fprintf
-    f "@[<h>%a%t%a -> %a%t%a%t@]"
+    f "@[<h>%a -> %a%t%a%t@]"
     (Pp.list Pp.comma (print_agent_lhs ~ltypes sigs)) r.r_mix
-    (fun f -> match r.r_rm_tokens with [] -> ()
-                                     | _::_ -> Format.pp_print_string f " | ")
-    (Pp.list
-       (fun f -> Format.pp_print_string f " + ")
-       (fun f ((nb,_),tk) ->
-          Format.fprintf
-            f "%a:%a"
-            (Alg_expr.print
-               (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
-               pr_tok pr_var) nb
-            pr_tok tk))
-    r.r_rm_tokens
     (print_rhs ~ltypes sigs r.r_created) r.r_mix
     (fun f ->
-       match r.r_add_tokens with [] -> ()
-                               | _::_ -> Format.pp_print_string f " | ")
+       match r.r_delta_tokens with [] -> ()
+                                 | _::_ -> Format.pp_print_string f " | ")
     (Pp.list
        (fun f -> Format.pp_print_string f " + ")
        (fun f ((nb,_),tk) ->
@@ -283,7 +269,7 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
                (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
                pr_tok pr_var) nb
             pr_tok tk))
-    r.r_add_tokens
+    r.r_delta_tokens
     (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
 
 let rule_agent_to_json a =
@@ -353,18 +339,12 @@ let rule_to_json r =
     [
       "mixture", rule_mixture_to_json r.r_mix;
       "created", Raw_mixture.to_json r.r_created;
-      "rm_tokens",
+      "delta_tokens",
       JsonUtil.of_list
         (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
            (Locality.annot_to_json lalg_expr_to_json)
            JsonUtil.of_int)
-        r.r_rm_tokens;
-      "add_tokens",
-      JsonUtil.of_list
-        (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-           (Locality.annot_to_json lalg_expr_to_json)
-           JsonUtil.of_int)
-        r.r_add_tokens;
+        r.r_delta_tokens;
       "rate", Locality.annot_to_json lalg_expr_to_json r.r_rate;
       "unary_rate",
       JsonUtil.of_option
@@ -374,24 +354,18 @@ let rule_to_json r =
         r.r_un_rate;
     ]
 let rule_of_json = function
-  | `Assoc l as x when List.length l < 7 ->
+  | `Assoc l as x when List.length l < 6 ->
     begin
       try
         {
           r_mix = rule_mixture_of_json (List.assoc "mixture" l);
           r_created = Raw_mixture.of_json (List.assoc "created" l);
-          r_rm_tokens =
+          r_delta_tokens =
             JsonUtil.to_list
               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
                  (Locality.annot_of_json lalg_expr_of_json)
                  (JsonUtil.to_int ?error_msg:None))
-              (List.assoc "rm_tokens" l);
-          r_add_tokens =
-            JsonUtil.to_list
-              (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                 (Locality.annot_of_json lalg_expr_of_json)
-                 (JsonUtil.to_int ?error_msg:None))
-              (List.assoc "rm_tokens" l);
+              (List.assoc "delta_tokens" l);
           r_rate =
             Locality.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
           r_un_rate =
@@ -1266,17 +1240,19 @@ let init_of_ast sigs tok contact_map = function
 let assemble_rule
     sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
   let tok = tk_nd.NamedDecls.finder in
+  let tks =
+    List.rev_map (fun (al,tk) ->
+        (alg_expr_of_ast sigs tok algs
+           (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
+         NamedDecls.elt_id ~kind:"token" tk_nd tk))
+      rm_tk in
+  let tks' =
+    List_util.rev_map_append (fun (al,tk) ->
+          (alg_expr_of_ast sigs tok algs al,
+           NamedDecls.elt_id ~kind:"token" tk_nd tk))
+      add_tk tks in
   { r_mix; r_created;
-    r_rm_tokens =
-      List.map (fun (al,tk) ->
-          (alg_expr_of_ast sigs tok algs al,
-           NamedDecls.elt_id ~kind:"token" tk_nd tk))
-        rm_tk;
-    r_add_tokens =
-      List.map (fun (al,tk) ->
-          (alg_expr_of_ast sigs tok algs al,
-           NamedDecls.elt_id ~kind:"token" tk_nd tk))
-        add_tk;
+    r_delta_tokens = List.rev tks';
     r_rate = alg_expr_of_ast sigs tok algs rate;
     r_un_rate =
       let r_dist d =

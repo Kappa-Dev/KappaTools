@@ -199,18 +199,7 @@ let rate _compil rule (_,arity,_) =
   | Usual -> Some rule.Primitives.rate
   | Unary -> Tools.option_map fst rule.Primitives.unary_rate
 
-let token_vector a =
-  let add,remove  =
-    a.Primitives.injected_tokens,a.Primitives.consumed_tokens
-  in
-  List.fold_left
-    (fun token_vector (a,b) ->
-       (Locality.dummy_annot (Alg_expr.UN_ALG_OP(Operator.UMINUS,a)),b)::token_vector)
-    add remove
-
-let consumed_tokens a = a.Primitives.consumed_tokens
-
-let produced_tokens a = a.Primitives.injected_tokens
+let token_vector a = a.Primitives.delta_tokens
 
 let token_vector_of_init = token_vector
 
