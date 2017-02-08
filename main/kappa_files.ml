@@ -198,9 +198,3 @@ let with_snapshot str event ext f =
     let () =
       Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
     close_out desc
-
-let set_influence s = influenceFileName := s
-let set_up_influence () =
-  set_influence
-    (if !influenceFileName = "" then "im.dot" else !influenceFileName)
-let with_influence f = with_formatter !influenceFileName f

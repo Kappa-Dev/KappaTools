@@ -476,10 +476,6 @@ let configurations_of_result result =
                           ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
             ) Parameter.useColor in
         acc
-      | "influenceMapFileName" ->
-        let () = get_value pos_p param value_list
-            (fun x _ -> Kappa_files.set_influence x) in
-        acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) ((false,false,false), "dot", None) result.configurations
