@@ -159,7 +159,7 @@ dydt(1)=dydt(1)+k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 
 % rule    : expo2
-% reaction:  | 1:t ->  | 2:t 
+% reaction:  ->  | 2:t + (- 1):t 
 
 dydt(2)=dydt(2)+k(2)*((-1));
 dydt(2)=dydt(2)+k(2)*(2);
