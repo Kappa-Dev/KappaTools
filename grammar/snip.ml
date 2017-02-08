@@ -659,15 +659,11 @@ let connected_components_sum_of_ambiguous_rule
            Pp.cut
            (fun f x ->
               Format.fprintf
-                f "@[%a%t@]"
-                (LKappa.print_rule_mixture sigs) x
-                (fun f ->
-                   match created with
-                   | [] -> ()
-                   | _ -> Format.fprintf
-                            f "@ (+%t) %a" Pp.nu
-                            (Raw_mixture.print ~compact:false ~sigs)
-                            (List.rev created))))
+                f "@[%a%t%a@]"
+                (LKappa.print_rule_mixture sigs ~ltypes:true) x
+                (if x <> [] && created <> [] then Pp.comma else Pp.empty)
+                (Raw_mixture.print ~compact:false ~created:true ~sigs)
+                (List.rev created)))
         all_mixs in
   List_util.fold_right_map (connected_components_of_mixture created)
     all_mixs (env,origin)

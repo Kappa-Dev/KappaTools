@@ -45,7 +45,7 @@ val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val of_raw_mixture : Raw_mixture.t -> rule_mixture
 val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
-  Signature.s -> Format.formatter -> rule_agent list -> unit
+  Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
 
 type rule =
   { r_mix: rule_mixture;

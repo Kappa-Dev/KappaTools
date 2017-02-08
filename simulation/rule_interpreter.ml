@@ -867,7 +867,7 @@ let print env f state =
     f "@[<v>%a@,%a@]"
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
-           (Raw_mixture.print ~compact:false ~sigs) mix))
+           (Raw_mixture.print ~compact:false ~created:false ~sigs) mix))
     (Edges.build_snapshot sigs state.edges)
     (Pp.array Pp.space (fun i f el ->
          Format.fprintf

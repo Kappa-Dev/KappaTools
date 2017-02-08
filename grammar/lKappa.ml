@@ -45,21 +45,22 @@ let print_link_annot ~ltypes sigs f (s,a) =
       (Signature.print_site sigs a) s
       (Signature.print_agent sigs) a
 
-let print_rule_internal sigs ag_ty site f = function
+let print_rule_internal sigs ~show_erased ag_ty site f = function
   | I_ANY -> ()
   | I_ANY_CHANGED j ->
-    Format.fprintf f "~>>%a" (Signature.print_internal_state sigs ag_ty site) j
-  | I_ANY_ERASED -> Format.fprintf f "~--"
+    Format.fprintf f "/~%a" (Signature.print_internal_state sigs ag_ty site) j
+  | I_ANY_ERASED -> if show_erased then Format.fprintf f "~--"
   | I_VAL_CHANGED (i,j) ->
     if i <> j then
       Format.fprintf
-        f "~%a>>%a" (Signature.print_internal_state sigs ag_ty site) i
+        f "~%a/~%a" (Signature.print_internal_state sigs ag_ty site) i
         (Signature.print_internal_state sigs ag_ty site) j
     else
       Format.fprintf f "~%a" (Signature.print_internal_state sigs ag_ty site) i
   | I_VAL_ERASED i ->
     Format.fprintf
-      f "~%a--" (Signature.print_internal_state sigs ag_ty site) i
+      f "~%a%t" (Signature.print_internal_state sigs ag_ty site) i
+      (fun f -> if show_erased then Format.pp_print_string f "--")
 
 let rule_internal_to_json = function
   | I_ANY -> `Null
@@ -76,11 +77,11 @@ let rule_internal_of_json = function
   | `List [ `Int i; `String "ERASED"] -> I_VAL_ERASED i
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule_internal",x))
 
-let print_switching f = function
-  | Linked (i,_) -> Format.fprintf f ">>%i" i
-  | Freed -> Format.fprintf f ">>%t" Pp.bottom
+let print_switching ~show_erased f = function
+  | Linked (i,_) -> Format.fprintf f "/!%i" i
+  | Freed -> Format.pp_print_string f "/"
   | Maintained -> ()
-  | Erased -> Format.fprintf f "--"
+  | Erased -> if show_erased then Format.pp_print_string f "--"
 
 let switching_to_json = function
   | Freed -> `String "Freed"
@@ -95,17 +96,17 @@ let switching_of_json = function
   | x -> Linked (Locality.annot_of_json
                    (JsonUtil.to_int~error_msg:"Invalid Switching") x)
 
-let print_rule_link sigs f ((e,_),s) =
+let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
   Format.fprintf
     f "%a%a"
     (Ast.print_link
        (Signature.print_site sigs)
        (Signature.print_agent sigs)
-       (print_link_annot ~ltypes:true sigs))
+       (print_link_annot ~ltypes sigs))
     e
-    print_switching s
+    (print_switching ~show_erased) s
 
-let print_rule_intf sigs ag_ty f (ports,ints) =
+let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
@@ -116,18 +117,21 @@ let print_rule_intf sigs ag_ty f (ports,ints) =
         let () = Format.fprintf
             f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
             (Signature.print_site sigs ag_ty) i
-            (print_rule_internal sigs ag_ty i)
-            ints.(i) (print_rule_link sigs) ports.(i) in
+            (print_rule_internal sigs ~show_erased ag_ty i)
+            ints.(i) (print_rule_link sigs ~show_erased ~ltypes) ports.(i) in
         aux false (succ i)
       else aux empty (succ i) in
   aux true 0
 
-let print_rule_agent sigs f ag =
-  Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
-    (print_rule_intf sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
+let print_rule_agent sigs ~ltypes f ag =
+  Format.fprintf f "%t%a(@[<h>%a@])"
+    (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
+    (Signature.print_agent sigs) ag.ra_type
+    (print_rule_intf sigs ~show_erased:false ~ltypes ag.ra_type)
+    (ag.ra_ports,ag.ra_ints)
 
-let print_rule_mixture sigs f mix =
-  Pp.list Pp.comma (print_rule_agent sigs) f mix
+let print_rule_mixture sigs ~ltypes f mix =
+  Pp.list Pp.comma (print_rule_agent sigs ~ltypes) f mix
 
 let print_internal_lhs sigs ag_ty site f = function
   | (I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED) -> ()
@@ -219,7 +223,7 @@ let print_rhs ~ltypes sigs created f mix =
     | [] ->
       Format.fprintf f "%t%a"
         (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~compact:true ~sigs) created
+        (Raw_mixture.print ~compact:true ~created:false ~sigs) created
     | h :: t ->
       if h.ra_erased then aux empty t
       else
@@ -230,10 +234,11 @@ let print_rhs ~ltypes sigs created f mix =
   aux true mix
 
 let print_rates sigs pr_tok pr_var f r =
+  let ltypes = false in
   Format.fprintf
     f " @@ %a%t"
     (Alg_expr.print
-       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs ~ltypes) m)
        pr_tok pr_var) (fst r.r_rate)
     (fun f ->
        match r.r_un_rate with
@@ -242,14 +247,15 @@ let print_rates sigs pr_tok pr_var f r =
          Format.fprintf
            f "(%a%a)"
            (Alg_expr.print
-              (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+              (fun f m -> Format.fprintf f "|%a|"
+                  (print_rule_mixture sigs ~ltypes) m)
               pr_tok pr_var) ra
            (Pp.option
               (fun f (md,_) ->
                 Format.fprintf f ":%a"
                 (Alg_expr.print
                    (fun f m -> Format.fprintf f "|%a|"
-                                              (print_rule_mixture sigs) m)
+                       (print_rule_mixture sigs ~ltypes) m)
                    pr_tok pr_var) md)) max_dist)
 
 let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
@@ -266,7 +272,8 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
           Format.fprintf
             f "%a:%a"
             (Alg_expr.print
-               (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs) m)
+               (fun f m -> Format.fprintf
+                   f "|%a|" (print_rule_mixture sigs ~ltypes:false) m)
                pr_tok pr_var) nb
             pr_tok tk))
     r.r_delta_tokens

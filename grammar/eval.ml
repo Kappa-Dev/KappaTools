@@ -365,7 +365,8 @@ let inits_of_result ?rescale contact_map env preenv res =
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
                            "initial mixture %a is partially defined"
-                           (LKappa.print_rule_mixture sigs) ast,mix_pos)) in
+                           (LKappa.print_rule_mixture sigs ~ltypes:false) ast,
+                         mix_pos)) in
            preenv'',state'
          | INIT_TOK tk_id,pos_tk ->
            let fake_rule =

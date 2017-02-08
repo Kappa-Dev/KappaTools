@@ -71,18 +71,22 @@ let elementary_rule ?env f r =
         sigs r.Primitives.inserted
   in
   Format.fprintf
-    f "@[%a@]@ -- @[%a@]@ ++ @[@[%a%a%a@]%t@[%a@]@]@ @@%a%t"
+    f "@[@[%a%t%a@]%t@[%a@]@]@ -- @[%a@]@ ++ @[@[%a%a@]@]@ @@%a%t"
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
+    (if r.Primitives.connected_components <> [||] && ins_fresh <> []
+     then Pp.comma else Pp.empty)
+    (Raw_mixture.print ~compact:true ~created:true ?sigs)
+    (List.map snd ins_fresh)
+    (if r.Primitives.delta_tokens <> []
+     then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
+    (Pp.list (fun f -> Format.fprintf f "@ + ") pr_tok)
+    r.Primitives.delta_tokens
 
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
 
-    (Raw_mixture.print ~compact:true ?sigs) (List.map snd ins_fresh)
     (Pp.list ~trailing:Pp.space Pp.comma pr_mixte) ins_mixte
     (Pp.list Pp.comma pr_trans) ins_existing
 
-    (if r.Primitives.inserted <> [] && r.Primitives.delta_tokens <> []
-     then Pp.space else Pp.empty)
-    (Pp.list Pp.space pr_tok) r.Primitives.delta_tokens
     pr_alg r.Primitives.rate
     (fun f ->
        match r.Primitives.unary_rate with
@@ -136,7 +140,8 @@ let modification ?env f m =
               sigs rule.Primitives.inserted in
           if ins_existing = [] then
             Format.fprintf f "$ADD %a %a" (alg_expr ~env) n
-              (Raw_mixture.print ~compact:false ~sigs) (List.map snd ins_fresh)
+              (Raw_mixture.print ~compact:false ~created:false ~sigs)
+              (List.map snd ins_fresh)
           else
             Format.fprintf f "$APPLY %a %a" (alg_expr ~env) n
               (elementary_rule ~env) rule

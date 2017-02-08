@@ -47,12 +47,14 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent compact link ?sigs f ag =
-  Format.fprintf f "%a(@[<h>%a@])" (aux_pp_ag sigs) ag.a_type
+let print_agent compact created link ?sigs f ag =
+  Format.fprintf f "%t%a(@[<h>%a@])"
+    (fun f -> if created then Format.pp_print_string f "+")
+    (aux_pp_ag sigs) ag.a_type
     (print_intf compact link ?sigs ag.a_type) (ag.a_ports, ag.a_ints)
 
-let print ~compact ?sigs f mix =
-  Pp.list Pp.comma (print_agent compact true ?sigs) f mix
+let print ~compact ~created ?sigs f mix =
+  Pp.list Pp.comma (print_agent compact created true ?sigs) f mix
 
 let agent_to_json a =
   `Assoc
@@ -107,7 +109,7 @@ let print_dot sigs nb_cc f mix =
     (fun i f ag ->
        Format.fprintf
          f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-         nb_cc i (print_agent true false ~sigs) ag
+         nb_cc i (print_agent true false false ~sigs) ag
          (get_color ag.a_type);
        Format.fprintf
          f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
