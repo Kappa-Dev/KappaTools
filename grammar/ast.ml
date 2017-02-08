@@ -71,13 +71,12 @@ type ('mixture,'id) modif_expr =
       (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
   | UPDATE of
       ('id Locality.annot *
-       ('mixture,'id) Alg_expr.e Locality.annot) (*TODO: pause*)
+       ('mixture,'id) Alg_expr.e Locality.annot)
   | UPDATE_TOK of
       ('id Locality.annot *
-       ('mixture,'id) Alg_expr.e Locality.annot) (*TODO: pause*)
+       ('mixture,'id) Alg_expr.e Locality.annot)
   | STOP of ('mixture,'id) Alg_expr.e print_expr list
   | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
-  (*maybe later of mixture too*)
   | PRINT of
       ((('mixture,'id) Alg_expr.e print_expr list) *
        (('mixture,'id)  Alg_expr.e print_expr list))
@@ -223,8 +222,12 @@ let print_ast_internal =
   Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x)
 
 let print_ast_port f p =
-  let f_mod_i = Pp.option ~with_space:false (fun _ _ -> ()) (*TODO*) in
-  let f_mod_l = Pp.option ~with_space:false (fun _ _ -> ()) (*TODO*) in
+  let f_mod_i = Pp.option ~with_space:false
+      (fun f (i,_) -> Format.fprintf f "/~%s" i) in
+  let f_mod_l = Pp.option ~with_space:false
+      (fun f x -> Format.fprintf f "/%a"
+          (Pp.option ~with_space:false (fun f (l,_)-> Format.fprintf f "!%i" l))
+          x) in
   Format.fprintf f "%s%a%a%a%a" (fst p.port_nme)
     print_ast_internal p.port_int f_mod_i p.port_int_mod
     (Pp.list Pp.empty (fun f (x,_) -> print_ast_link f x)) p.port_lnk
@@ -287,9 +290,13 @@ let port_of_json = function
     }
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
+let print_agent_mod f = function
+  | Create -> Format.pp_print_string f "+"
+  | Erase -> Format.pp_print_string f "-"
+
 let print_ast_agent f ((ag_na,_),l,m) =
-  let f_mod _ _ = () (*TODO*) in
-  Format.fprintf f "%s%a(%a)" ag_na f_mod m
+  Format.fprintf f "%a%s(%a)"
+    (Pp.option ~with_space:false print_agent_mod) m ag_na
     (Pp.list (fun f -> Format.fprintf f ",")
        print_ast_port) l
 
