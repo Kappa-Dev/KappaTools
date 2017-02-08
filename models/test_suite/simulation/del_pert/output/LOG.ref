@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-l' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka'
 Parsing del_pert.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-l' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka'
 ____________________________________________________________
 ############################################################
 Simulation ended

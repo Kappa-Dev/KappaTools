@@ -9,7 +9,7 @@
 type directive_unit = Time | Event
 
 let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
-  let (env, contact_map, updated_vars, story_compression,
+  let (seed,env, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
       alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
@@ -21,14 +21,14 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
       let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
         LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
       let () = Format.printf "+ Compiling...@." in
-      let (env, story_compression,
+      let (seed, env, story_compression,
            formatCflow, cflowFile, init_l) =
         Eval.compile
           ~outputs:(Outputs.go (Signature.create [||]))
           ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
           ?rescale_init:cli_args.Run_cli_args.rescale
           sigs_nd tk_nd contact_map result' in
-      (env, contact_map, updated_vars, story_compression,
+      (seed, env, contact_map, updated_vars, story_compression,
        formatCflow, cflowFile,init_l),[]
     | marshalized_file ->
       try
@@ -41,10 +41,10 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
                    f "Simulation package loaded, all kappa files are ignored") in
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
-        let env,contact_map,updated_vars,story_compression,
+        let seed, env,contact_map,updated_vars,story_compression,
             formatCflow,cflowFile,init_l =
           (Marshal.from_channel d :
-             Model.t*Signature.contact_map*int list*
+             int option*Model.t*Signature.contact_map*int list*
              (bool*bool*bool) option*string*string option*
              (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) in
         let () = Pervasives.close_in d  in
@@ -57,7 +57,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
         let updated_vars' =
           List.fold_left
             (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-        (env,contact_map,updated_vars',story_compression,
+        (seed,env,contact_map,updated_vars',story_compression,
          formatCflow,cflowFile,init_l),
         alg_overwrite
       with
@@ -81,5 +81,5 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
   let counter =
     Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
 
-  (env, contact_map, updated_vars, story_compression,
+  (seed, env, contact_map, updated_vars, story_compression,
    formatCflows, cflowFile, init_l),counter,alg_overwrite

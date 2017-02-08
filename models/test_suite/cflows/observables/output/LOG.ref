@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-i' 'observables.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '--time-independent'
 Parsing observables.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-i' 'observables.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

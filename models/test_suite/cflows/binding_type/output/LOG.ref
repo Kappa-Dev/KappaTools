@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'binding_type.ka' '-seed' '924556145' '-l' '10000' '-u' 'event' '-d' 'output' '--time-independent'
 Parsing binding_type.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'binding_type.ka' '-seed' '924556145' '-l' '10000' '-u' 'event' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

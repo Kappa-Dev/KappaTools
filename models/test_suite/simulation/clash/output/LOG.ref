@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output'
 Parsing clash.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output'
 ____________________________________________________________
 ############################################################
 Simulation ended

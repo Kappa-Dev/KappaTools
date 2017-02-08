@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'link_passing.ka' '-seed' '924556145' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent'
 Parsing link_passing.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'link_passing.ka' '-seed' '924556145' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

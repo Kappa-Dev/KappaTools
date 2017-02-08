@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-p' '2' 'abbcd.ka'
 Parsing abbcd.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '200' '-seed' '718860825' '-o' 'data.svg' '-d' 'output' '-p' '2' 'abbcd.ka'
 ____________________________________________________________
 ############################################################
 Simulation ended

@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent'
 Parsing abc-cflow.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

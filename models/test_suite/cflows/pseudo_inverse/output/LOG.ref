@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent' '-p' '100'
 Parsing pseudo.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-u' 'e' '-l' '10000' '-d' 'output' '--time-independent' '-p' '100'
 ____________________________________________________________
 ############################################################
 + Loading trace

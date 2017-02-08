@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent'
 Parsing agents_without_sites.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

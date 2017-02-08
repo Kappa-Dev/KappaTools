@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'lpc2.ka' '-seed' '924556145' '-u' 'event' '-l' '2' '-d' 'output'
 Parsing lpc2.ka...
 done
 + Sanity checks

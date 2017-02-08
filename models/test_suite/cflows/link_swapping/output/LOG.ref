@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'link_swapping.ka' '-seed' '924556145' '-u' 'event' '-l' '3' '-d' 'output' '--time-independent'
 Parsing link_swapping.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'link_swapping.ka' '-seed' '924556145' '-u' 'event' '-l' '3' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

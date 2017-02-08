@@ -314,7 +314,7 @@ let get_obs_titles compil =
 
 let get_compil
     ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
-  let (env, contact_map,  _, _, _, _, init), _, _ =
+  let (_,env, contact_map,  _, _, _, _, init), _, _ =
     Cli_init.get_compilation cli_args in
   {
     environment = env ;

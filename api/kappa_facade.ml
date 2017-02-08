@@ -223,7 +223,6 @@ let catch_error : 'a .
 
 let build_ast
     (indexes : file_index list)
-    (random_state : Random.State.t)
     (code : string)
     (yield : unit -> unit Lwt.t) =
   let lexbuf : Lexing.lexbuf = Lexing.from_string code in
@@ -267,12 +266,16 @@ let build_ast
                         | Data.TraceStep _
                         | Data.Print _ -> assert false)
                     ~max_sharing:false sig_nd tk_nd contact_map result >>=
-                  (fun (env,has_tracking,_,_,init_l) ->
+                  (fun (seed,env,has_tracking,_,_,init_l) ->
                      let counter =
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
                          ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
                      let () = ExceptionDefn.flush_warning log_form in
+                     let random_state =
+                       match seed with
+                       | None -> Random.State.make_self_init ()
+                       | Some theSeed -> Random.State.make [|theSeed|] in
                      let simulation =
                        create_t
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
@@ -325,7 +328,6 @@ let parse
   Lwt.bind
     (build_ast
        indexes
-       (Random.State.make_self_init ())
        kappa_code system_process#yield)
     (function
       | `Ok simulation -> Lwt.return (`Ok simulation)

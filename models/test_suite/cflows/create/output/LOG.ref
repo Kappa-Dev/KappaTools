@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'create.ka' '-seed' '931056658' '-u' 'event' '-l' '500' '-d' 'output' '--time-independent'
 Parsing create.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'create.ka' '-seed' '931056658' '-u' 'event' '-l' '500' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

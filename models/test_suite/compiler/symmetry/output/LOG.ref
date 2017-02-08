@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-l' '0'
 Parsing symmetry.ka...
 done
 + Sanity checks
@@ -14,3 +13,4 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-l' '0'

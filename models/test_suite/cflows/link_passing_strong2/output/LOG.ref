@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'link_passing_strong2.ka' '-seed' '611463625' '-u' 'event' '-l' '280' '-d' 'output' '--time-independent'
 Parsing link_passing_strong2.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'link_passing_strong2.ka' '-seed' '611463625' '-u' 'event' '-l' '280' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

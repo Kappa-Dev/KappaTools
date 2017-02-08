@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '496408597' '-d' 'output' 'model.ka'
 Parsing model.ka...
 done
 + Sanity checks
@@ -14,11 +13,12 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '496408597' '-d' 'output' 'model.ka'
++ Loading simulation package /tmp/KaSim-test-blob-marshal...
++ Building initial state
+Done
 + Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '958076642' '-d' 'output'
 + Loading simulation package /tmp/KaSim-test-blob-marshal...
 + Building initial state
 Done
 + Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '458154606' '-d' 'output' '-var' 'init' '300'
-+ Loading simulation package /tmp/KaSim-test-blob-marshal...
-+ Building initial state
-Done

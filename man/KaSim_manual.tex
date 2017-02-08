@@ -1310,22 +1310,23 @@ where tunable parameters are described table~\ref{tab:parameters} (default value
 \begin{tabular}{l|l|l}
 parameter & possible values & description \\
 \hline
-\textit{Causality analysis}& &\\
+\textit{Simulation} & &\\
+\ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\
+&& \small before giving up \\
+&& \small square approximation\\
+\ttt{"seed"} & any positive integer & \small pseudo-random number\\&& generator seed\\ \hline
+\textit{Causality analysis}&\textbf{Deprecated}&Please use KaStor\\
 \ttt{"displayCompression"} & any combination of & \small type of compression \\
 &  \ttt{"none", "strong", "weak"} & \\
 \ttt{"cflowFileName"} & \ttt{"cflow"}, any string & \small file name prefix for causal flows\\
 \ttt{"dotCflows"} & \ttt{"no", "html"} & \small generate causal flows in html \\
 & \ttt{"yes", "dot"} & \small generate causal flows in dot \\
-& \ttt{"json"} & \small generate causal flows in json \\
+& \ttt{"json"} & \small generate causal flows in json\\ \hline
 \textit{Pretty printing}& &\\
+\ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
 \ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
-\ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\
-\textit{Simulation options} & &\\
-\ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
-\ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\
-&& \small before giving up \\
-&& \small square approximation\\
+\ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\
 \end{tabular}
 \label{tab:parameters}
 \end{table}

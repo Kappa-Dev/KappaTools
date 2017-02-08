@@ -407,7 +407,7 @@ let configurations_of_result result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (story_compression,formatCflow,cflowFile as acc)
+    (fun (seed,story_compression,formatCflow,cflowFile as acc)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -416,7 +416,7 @@ let configurations_of_result result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> ((a,b,c),formatCflow,cflowFile)
+          | [] -> (seed,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unkown value "^error^" for compression mode", pos))
@@ -424,12 +424,20 @@ let configurations_of_result result =
         parse story_compression value_list
       | "cflowFileName" ->
         get_value pos_p param value_list
-          (fun x _ -> (story_compression,formatCflow,Some x))
+          (fun x _ -> (seed,story_compression,formatCflow,Some x))
+      | "seed" ->
+        get_value pos_p param value_list
+          (fun s p ->
+             try
+               (Some (int_of_string s),story_compression,formatCflow,cflowFile)
+             with Failure _ ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Value "^s^" should be an integer", p)))
       | "progressBarSize" ->
         let () = set_value pos_p param value_list
             (fun v p ->
                try int_of_string v
-               with _ ->
+               with Failure _ ->
                  raise (ExceptionDefn.Malformed_Decl
                           ("Value "^v^" should be an integer", p))
             ) Parameter.progressBarSize in
@@ -461,7 +469,7 @@ let configurations_of_result result =
         acc
       | "dotCflows" ->
          let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
-         (story_compression,formatCflow,cflowFile)
+         (seed,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
            (story_compression, Dot) else
            (story_compression, Html)*)
@@ -478,7 +486,7 @@ let configurations_of_result result =
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) ((false,false,false), "dot", None) result.configurations
+    ) (None, (false,false,false), "dot", None) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   Tools.array_fold_left_mapi
@@ -563,7 +571,7 @@ let compile ~outputs ~pause ~return ~max_sharing
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let (nstor,wstor,sstor as story_compression),formatCflow,cflowFile =
+  let seed,(nstor,wstor,sstor as story_compression),formatCflow,cflowFile =
     configurations_of_result result in
   pause @@ fun () ->
   let preenv = Pattern.minimal_env sigs_nd contact_map in
@@ -608,7 +616,7 @@ let compile ~outputs ~pause ~return ~max_sharing
   let _,init_l =
     inits_of_result
       ?rescale:rescale_init contact_map env preenv result in
-  return (env,
+  return (seed, env,
           (if has_tracking && (nstor||wstor||sstor)
            then Some story_compression else None),
           formatCflow, cflowFile, init_l)

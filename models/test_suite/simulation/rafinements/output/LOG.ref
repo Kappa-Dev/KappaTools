@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-u' 't' '-l' '2' '-p' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-seed' '16602' '--max-sharing'
 Parsing rafinements.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-u' 't' '-l' '2' '-p' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-seed' '16602' '--max-sharing'
 ____________________________________________________________
 ############################################################
 Simulation ended

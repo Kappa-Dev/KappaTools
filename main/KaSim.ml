@@ -124,16 +124,31 @@ let () =
       (!Parameter.debugModeOn || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
+    let (seed0, env0, contact_map, updated_vars, story_compression,
+         formatCflows, cflowFile, init_l as init_result),
+        counter,alg_overwrite = Cli_init.get_compilation
+        ~unit:kasim_args.Kasim_args.unit
+        ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
+
     let theSeed,seed_arg =
-      match kasim_args.Kasim_args.seedValue with
-      | Some seed -> seed,[||]
-      | None ->
+      match kasim_args.Kasim_args.seedValue,seed0 with
+      | Some seed,_ | None, Some seed -> seed,[||]
+      | None, None ->
         let () = Format.printf "+ Self seeding...@." in
-        let () = Random.self_init() in
+        let () = Random.self_init () in
         let out = Random.bits () in
         out,[|"-seed";string_of_int out|] in
     let () = Random.init theSeed (*for reproducible  colors in dot snaphot*) in
     let random_state = Random.State.make [|theSeed|] in
+
+    let () =
+      if cli_args.Run_cli_args.batchmode &&
+       Counter.max_time counter = None && Counter.max_events counter = None then
+        Model.check_if_counter_is_filled_enough env0 in
+    let env = Model.propagate_constant
+        ?max_time:(Counter.max_time counter)
+        ?max_events:(Counter.max_events counter) updated_vars env0 in
+
     let command_line =
       Format.asprintf "@[<h>%a%t%a@]"
         (Pp.array Pp.space
@@ -143,20 +158,6 @@ let () =
         Sys.argv
         (fun f -> if Array.length seed_arg > 0 then Format.pp_print_space f ())
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
-    Format.printf "+ Command line to rerun is: %s@." command_line;
-
-    let (env0, contact_map, updated_vars, story_compression,
-         formatCflows, cflowFile, init_l as init_result),
-        counter,alg_overwrite = Cli_init.get_compilation
-        ~unit:kasim_args.Kasim_args.unit
-        ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
-    let () =
-      if cli_args.Run_cli_args.batchmode &&
-       Counter.max_time counter = None && Counter.max_events counter = None then
-        Model.check_if_counter_is_filled_enough env0 in
-    let env = Model.propagate_constant
-        ?max_time:(Counter.max_time counter)
-        ?max_events:(Counter.max_events counter) updated_vars env0 in
 
     let outputs = Outputs.go (Model.signatures env) in
     let trace_file =
@@ -194,6 +195,9 @@ let () =
         ~outputs alg_overwrite counter env
         ~with_trace:(trace_file<>None) random_state init_l in
     let () = Format.printf "Done@." in
+
+    Format.printf "+ Command line to rerun is: %s@." command_line;
+
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
         Format.eprintf

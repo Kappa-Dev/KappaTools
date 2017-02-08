@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-p' '20' 'activity.ka'
 Parsing activity.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-p' '20' 'activity.ka'
 ____________________________________________________________
 ############################################################
 Simulation ended

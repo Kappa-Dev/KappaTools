@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent'
 Parsing none_only.ka...
 done
 + Sanity checks
@@ -14,6 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
++ Command line to rerun is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace

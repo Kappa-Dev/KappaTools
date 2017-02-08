@@ -1,4 +1,3 @@
-+ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug'
 Parsing clashing_instances.ka...
 done
 + Sanity checks
@@ -115,6 +114,7 @@ On roots:
 On roots: 
 Rule rule has now 10000 instances.
 Done
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug'
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1

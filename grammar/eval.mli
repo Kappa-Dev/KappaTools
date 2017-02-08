@@ -27,7 +27,7 @@ val compile_modifications_no_track:
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
-  return:(Model.t * (bool*bool*bool) option *
+  return:(int option (*seed*) * Model.t * (bool*bool*bool) option *
           string (*cflowFormat*) * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
