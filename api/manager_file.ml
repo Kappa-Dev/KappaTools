@@ -208,7 +208,8 @@ class manager_file
                 (Api_common.result_ok
                    { Api_types_j.file_status_data =
                        file.Api_types_j.file_metadata ;
-          	     Api_types_j.file_status_contact_map = Kappa_facade.get_contact_map kappa_facade ; }
+                     Api_types_j.file_status_contact_map =
+                       Kappa_facade.get_contact_map kappa_facade ; }
                 )
             )
         )

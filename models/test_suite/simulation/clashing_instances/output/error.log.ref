@@ -7,6 +7,8 @@ Environment:
   Rules:
     0: 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x)
       -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
+Polymers:
+  
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]] -> ()

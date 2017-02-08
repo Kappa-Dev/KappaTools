@@ -8,6 +8,8 @@ Environment:
     
   Rules:
     
+Polymers:
+  
 Domain:
   /*cc0*/  -> ()
 Intial graph;

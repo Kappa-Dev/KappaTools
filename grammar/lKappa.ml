@@ -265,7 +265,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
        if full then
          Format.fprintf f "%a%t%a"
            (print_rule_mixture sigs ~ltypes:false) r.r_mix
-           (fun f -> ())
+           (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
            (Raw_mixture.print ~sigs ~compact:false ~created:true) r.r_created
        else Format.fprintf f "%a -> %a"
            (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix

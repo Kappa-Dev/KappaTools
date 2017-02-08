@@ -10,7 +10,7 @@
 %var:/*1*/ 'bad' 1
 %plot: [T]
 A(x!_/) @ bad
-A(x!_/)+C() @ goal
+A(x!_/), +C() @ goal
 A(x/!1), B(x/!1) @ 1
 A(x/!1), B(x/!1) @ 1
 'GOAL' -A(x!1), -B(x~1!1), -C() @ 1

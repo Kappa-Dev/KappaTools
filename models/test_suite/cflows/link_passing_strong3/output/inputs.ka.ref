@@ -8,9 +8,9 @@
 %agent: E(x!x.A!x.C)
 
 %plot: [T]
--A(x)+B(x) @ 1
--B(x)+C(x) @ 1
--C(x)+A(x) @ 1
+-A(x), +B(x) @ 1
+-B(x), +C(x) @ 1
+-C(x), +A(x) @ 1
 A(x/!1), E(x!1/!1), C(x!1/) @ 1
 E(x/!1), C(x/!1) @ 1
 'GOAL' A(x!1/), E(x!1/) @ 1

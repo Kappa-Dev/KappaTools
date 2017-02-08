@@ -211,8 +211,10 @@ let () =
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
         Format.eprintf
-          "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
+          "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Polymers:@,%a@]@,\
+@[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
           Kappa_printer.env env
+          (Contact_map.print_cycles (Model.signatures env)) contact_map
           Pattern.Env.print (Model.domain env)
           (Rule_interpreter.print env) graph in
     let () = match kasim_args.Kasim_args.domainOutputFile with

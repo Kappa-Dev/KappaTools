@@ -12,6 +12,8 @@ Environment:
     %agent: A(x)
   Rules:
     
+Polymers:
+  
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) -> ()
