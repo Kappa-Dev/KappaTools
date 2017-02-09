@@ -1747,7 +1747,7 @@ struct
   (*morphism_per_rules*)
 
   let print_hash log hash =
-    Loggers.fprintf log "Hash:%a\n"
+    Loggers.fprintf log "Hash-:%a\n"
       LKappa_auto.RuleCache.print hash
 
     let print_line_stars log =
@@ -1779,18 +1779,17 @@ struct
   let print_divide_rule_rate_by log i =
     Loggers.fprintf log " Divide_rule_rate_by:%i\n" i
 
-  (*let print_kinetic_rate_list ?env log fmt l =
+  let print_kinetic_rate_list ?env log fmt l =
     List.iter (fun rate_opt ->
         match rate_opt with
         | None -> ()
         | Some (alg, loc) ->
-          let () = Locality.print fmt loc in
-          let pr_alg f (a, _) = Kappa_printer.alg_expr ?env f a in
-          let () =
-            Format.fprintf fmt "%a" pr_alg alg
-          in
+          (*let () = Locality.print fmt loc in*)
+          let () = Loggers.fprintf log " Rate: " in
+          let () = Kappa_printer.alg_expr ?env fmt alg in
+          let () = Loggers.print_newline log in
           ()
-      ) l*)
+      ) l
 
   (******************************************************************)
   (*We say that the rules have a symmetric action over the site x and
@@ -1799,10 +1798,46 @@ struct
     the number of automorphisms in the left hand side of the rule r,
     is the same for any pair of symmetric rules.*)
 
+  let compute_gamma log connected_components nbr_auto_in_lhs =
+    List.fold_left (fun current_list l ->
+        List.fold_left (fun current_list' arr ->
+            Array.fold_left (fun current_array i ->
+                let k = Pattern.int_of_id i in
+                let g = k / nbr_auto_in_lhs in
+                g :: current_array
+              ) current_list' arr
+          ) current_list l
+      ) [] (List.flatten connected_components)
+
+  let compute_isomorphism_in_hashes log nbr_auto_in_rule_list =
+    match nbr_auto_in_rule_list with
+    | [] -> [], []
+    | x :: tl ->
+      let () = print_hash log x in
+      List.partition (fun y ->
+          let () = print_hash log y in
+          let cmp = LKappa_auto.RuleCache.compare x y in
+          if cmp = 0 then true else false
+        ) tl
+
+  let print_isomorphism log pair_list =
+    let (l1, l2) = pair_list in
+    let () =
+      List.iter (fun hash ->
+          print_hash log hash
+        ) l1
+    in
+    let () =
+      List.iter (fun hash ->
+          print_hash log hash
+        ) l2
+    in ()
+
+
   let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
-    let cache, nbr_auto_in_rule_list =
-      List.fold_left (fun (cache, current_list) rule ->
+    let cache, gamma_list, nbr_auto_in_rule_list =
+      List.fold_left (fun (cache, _gammar, current_list) rule ->
           (* convention of r:
             the number of automorphisms in the lhs of the rule r*)
           let cache, nbr_auto_in_lhs =
@@ -1811,6 +1846,24 @@ struct
           (* identifiers of rule up to isomorphism*)
           let rate_opt_list, cache, nbr_auto_in_rule =
             I.cannonic_form_from_syntactic_rule cache compil rule
+          in
+          (*compute gamma(r)= k(r)/convention(r)*)
+          (*Pattern.id array list list*)
+          let connected_components =
+            List.fold_left (fun current_list rate_opt ->
+                match rate_opt with
+                | None -> current_list
+                | Some s ->
+                  (*extract connected components:
+                    pattern_id array list *)
+                  let connected_components =
+                      Alg_expr.extract_connected_components s
+                  in
+                  connected_components :: current_list
+              ) [] rate_opt_list
+          in
+          let gamma_list =
+            compute_gamma log connected_components nbr_auto_in_lhs
           in
           (*****************************************************)
           (*PRINT*)
@@ -1821,21 +1874,21 @@ struct
               let () = I.print_rule_name ~compil fmt rule in
               let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
               let () = print_hash log nbr_auto_in_rule in
-              (*let () = print_kinetic_rate_list log fmt rate_opt_list in*)
+              let () = print_kinetic_rate_list log fmt rate_opt_list in
               ()
           in
-          cache, nbr_auto_in_rule :: current_list
-        ) (empty_cache, []) (I.get_rules compil)
+          cache, gamma_list,
+          nbr_auto_in_rule :: current_list
+        ) (empty_cache,[], []) (I.get_rules compil)
     in
     (*compute the isomorphism of two rules:
       if the hashes of two rules are the same then they are isomorphism.
       sigma(ri) = ri'
     *)
-    (*let _ =
-
-    in*)
-
-    (*let () = print_canonic_form_from_syntactic_rule log hash_list in*)
+    let isomorphism_rule =
+      compute_isomorphism_in_hashes log nbr_auto_in_rule_list
+    in
+    let () = print_isomorphism log isomorphism_rule in
     let () = Ode_loggers.print_newline log in
     cache, ()
 

@@ -25,6 +25,8 @@ type t = cc
 
 type id = int
 
+let int_of_id (id: id) : int = id
+
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
