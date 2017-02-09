@@ -21,10 +21,7 @@ let cc_mix ?env =
               (Pattern.print ?domain ~with_id:false) cc) f ccs)
 
 let alg_expr ?env =
-  Alg_expr.print
-    (cc_mix ?env)
-    (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
-    (Model.print_alg ?env)
+  Alg_expr.print (cc_mix ?env) (Model.print_token ?env) (Model.print_alg ?env)
 
 let bool_expr ?env =
   Alg_expr.print_bool

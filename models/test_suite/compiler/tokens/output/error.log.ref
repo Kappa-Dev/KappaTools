@@ -12,7 +12,7 @@ Environment:
   Rules:
     
   Perturbations:
-    /*0*/%mod: ([E] = 5) do tt <- (22 - ||tt||) + |tt|
+    /*0*/%mod: ([E] = 5) do tt <- (22 - |tt|) + |tt|
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) -> ()
