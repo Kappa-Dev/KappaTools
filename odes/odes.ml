@@ -1,9 +1,10 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 07 2017>
+  * Last modification: Time-stamp: <Feb 09 2017>
 *)
 
 let local_trace = false
+
 let debug s =
   if local_trace || !Parameter.debugModeOn
   then Format.kfprintf (fun f -> Format.pp_print_break f 0 0)
@@ -950,7 +951,6 @@ struct
      obs = List.rev network.obs;
      n_obs = network.n_obs - 1}
 
-
   let species_of_initial_state compil cc_cache =
     List.fold_left
       (fun (cc_cache,list) (_,r,_) ->
@@ -1021,7 +1021,6 @@ struct
       const_decl = List.rev decl.const_decl ;
       var_decl = List.rev decl.var_decl ;
       init = List.rev decl.init}
-
 
   let split_rules compil network sort_rules_and_decls =
     let sort =
@@ -1107,7 +1106,7 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil log ~ignore_obs compil =
+  let network_from_compil ~ignore_obs compil =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let network = init compil in
@@ -1233,9 +1232,7 @@ struct
     in
     ()
 
-
   let breakline = true
-
 
   let export_main
       ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
@@ -1782,33 +1779,83 @@ struct
   let print_divide_rule_rate_by log i =
     Loggers.fprintf log " Divide_rule_rate_by:%i\n" i
 
+  (*let print_kinetic_rate_list ?env log fmt l =
+    List.iter (fun rate_opt ->
+        match rate_opt with
+        | None -> ()
+        | Some (alg, loc) ->
+          let () = Locality.print fmt loc in
+          let pr_alg f (a, _) = Kappa_printer.alg_expr ?env f a in
+          let () =
+            Format.fprintf fmt "%a" pr_alg alg
+          in
+          ()
+      ) l*)
+
+  (******************************************************************)
+  (*We say that the rules have a symmetric action over the site x and
+    the site y, whenever the the product between the number of
+    automorphisms of the rule r and its kinetic rate k(r), divided by
+    the number of automorphisms in the left hand side of the rule r,
+    is the same for any pair of symmetric rules.*)
+
   let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
-    let cache, hash_list =
+    let cache, nbr_auto_in_rule_list =
       List.fold_left (fun (cache, current_list) rule ->
-          (*Card(G_r)*)
-          let cache, i =
+          (* convention of r:
+            the number of automorphisms in the lhs of the rule r*)
+          let cache, nbr_auto_in_lhs =
             I.divide_rule_rate_by cache compil rule
           in
-          (*gamma(r)*)
-          let cache, hash =
+          (* identifiers of rule up to isomorphism*)
+          let rate_opt_list, cache, nbr_auto_in_rule =
             I.cannonic_form_from_syntactic_rule cache compil rule
           in
+          (*****************************************************)
           (*PRINT*)
           let () =
             match Loggers.formatter_of_logger log with
             | None -> ()
             | Some fmt ->
               let () = I.print_rule_name ~compil fmt rule in
-              let () = print_divide_rule_rate_by log i in
-              let () = print_hash log hash in
+              let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
+              let () = print_hash log nbr_auto_in_rule in
+              (*let () = print_kinetic_rate_list log fmt rate_opt_list in*)
               ()
           in
-          cache, hash :: current_list
+          cache, nbr_auto_in_rule :: current_list
         ) (empty_cache, []) (I.get_rules compil)
     in
+    (*compute the isomorphism of two rules:
+      if the hashes of two rules are the same then they are isomorphism.
+      sigma(ri) = ri'
+    *)
+    (*let _ =
+
+    in*)
+
     (*let () = print_canonic_form_from_syntactic_rule log hash_list in*)
     let () = Ode_loggers.print_newline log in
     cache, ()
+
+(*
+[Strongly symmetric model]:
+iff
+1. for any element i,j in I such that i different than j,
+ we have ri different than rj;
+2. for any element i in I and any pair of permutation sigma in
+Gri , there exists an element j in I, such that:
+(a) sigma.ri = rj.
+(b) ki/[Li,Li] = kj/ [Lj ,Lj]
+where:
+i. Li is the left hand side of the rule ri,
+ii. Lj is the left hand side of the rule rj,
+iii. and for any site graph [E, E] denotes the number of
+automorphisms in the site graph E.
+*)
+
+
+
 
 end

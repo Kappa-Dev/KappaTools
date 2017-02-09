@@ -586,21 +586,9 @@ let mixture_to_species_map rate_convention cache lkappa_mixture created =
                | [] -> assert false
                | h::t ->
                  let cache, hash = CannonicCache.hash cache h in
-                 (*TEST*)
-                 (*let () =
-                   Loggers.fprintf log " hash:%a\n"
-                     CannonicCache.print hash
-                 in*)
                  List.fold_left
                    (fun (cache, cannonic, nauto) list ->
                       let cache, hash = CannonicCache.hash cache list in
-                      (*let () =
-                        Loggers.fprintf log
-                          " (cannonic:%a, nauto:%i) Hash_pair_list:%a\n"
-                          CannonicCache.print cannonic
-                          nauto
-                          CannonicCache.print hash
-                      in*)
                       let cmp = compare cannonic hash in
                       if cmp < 0
                       then cache, cannonic, nauto
@@ -646,7 +634,8 @@ let nauto rate_convention cache lkappa_mixture created =
   cache, nauto_of_map map
 
 (****************************************************************)
-(*cannonic form*)
+(*cannonic form for symmetries*)
+(****************************************************************)
 
 let cannonic_form cache lkappa_mixture created =
   (*compute this map only in the case of Biochemist*)
@@ -667,3 +656,5 @@ let cannonic_form cache lkappa_mixture created =
   {
     cache with rule_cache = rule_cache
   }, hash
+
+(*permutation: deal with the internal state*)

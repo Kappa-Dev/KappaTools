@@ -9,6 +9,7 @@
 (** Printers (user readable) of Kappa compiled units *)
 
 val alg_expr : ?env:Model.t -> Format.formatter -> Alg_expr.t -> unit
+
 val bool_expr : ?env:Model.t -> Format.formatter ->
   (Pattern.id array list,int) Alg_expr.bool -> unit
 
@@ -17,8 +18,10 @@ val print_expr_val :
 
 val elementary_rule :
   ?env:Model.t -> Format.formatter -> Primitives.elementary_rule -> unit
+
 val modification :
   ?env:Model.t -> Format.formatter -> Primitives.modification -> unit
+
 val perturbation :
   ?env:Model.t -> Format.formatter -> Primitives.perturbation -> unit
 

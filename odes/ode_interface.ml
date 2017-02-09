@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 07 2017>
+  * Last modification: Time-stamp: <Feb 08 2017>
 *)
 
 type compil =
@@ -348,7 +348,21 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
-  LKappa_auto.cannonic_form
-    cache
-    lkappa_rule.LKappa.r_mix
-    lkappa_rule.LKappa.r_created
+  (*get rule_id_with_mode*)
+  let rule_id_with_mode_list = valid_modes compil rule rule_id in
+  let rate_opt_list =
+    List.fold_left (fun current_list rule_id_with_mode ->
+        let rate_opt =
+          rate compil rule rule_id_with_mode
+        in
+        let l = rate_opt :: current_list in
+        l
+      ) [] rule_id_with_mode_list
+  in
+  let cache, hash_list =
+    LKappa_auto.cannonic_form
+      cache
+      lkappa_rule.LKappa.r_mix
+      lkappa_rule.LKappa.r_created
+  in
+  rate_opt_list, cache, hash_list

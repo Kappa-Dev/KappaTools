@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 07 2017>
+  * Last modification: Time-stamp: <Feb 08 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -15,7 +15,7 @@ sig
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
-  val network_from_compil: Loggers.t ->
+  val network_from_compil:
     ignore_obs:bool -> I.compil -> (int,int) network
 
   val get_reactions:

@@ -33,6 +33,7 @@ type t = (Pattern.id array list, int) e
 val e_to_yojson :
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a,'b) e -> Yojson.Basic.json
+
 val e_of_yojson :
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) e
@@ -44,6 +45,7 @@ val print :
 val bool_to_yojson :
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a,'b) bool -> Yojson.Basic.json
+
 val bool_of_yojson :
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) bool
@@ -59,11 +61,13 @@ val add_dep :
   Operator.rev_dep ->
   ('a,int) e Locality.annot ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+
 val add_dep_bool :
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
   Operator.rev_dep ->
   ('a,int) bool Locality.annot ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+
 val setup_alg_vars_rev_dep :
   unit NamedDecls.t ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->
@@ -72,6 +76,7 @@ val setup_alg_vars_rev_dep :
 val has_mix : ?var_decls:('b -> ('c,'b) e) -> ('a,'b) e -> pervasives_bool
 
 val extract_connected_components : ('a,'b) e Locality.annot -> 'a list
+
 val extract_connected_components_bool : ('a,'b) bool Locality.annot -> 'a list
 
 val propagate_constant :

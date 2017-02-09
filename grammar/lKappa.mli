@@ -57,6 +57,9 @@ type rule =
                  * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
   }
 
+val print_rates : Signature.s -> (Format.formatter -> int -> unit)
+  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
+
 val print_rule :
   ltypes:bool -> rates:bool -> Signature.s ->
   (Format.formatter -> int -> unit) -> (Format.formatter -> int -> unit) ->

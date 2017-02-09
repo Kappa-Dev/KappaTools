@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 07 2017>
+  * Last modification: Time-stamp: <Feb 08 2017>
 *)
 
 module type Interface =
@@ -82,11 +82,6 @@ sig
   val divide_rule_rate_by:
     nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
 
-  (*TEST*)
-  val cannonic_form_from_syntactic_rule :
-    nauto_in_rules_cache -> compil -> rule ->
-    nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list
-
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
 
   val lhs: compil -> rule_id_with_mode -> rule -> pattern
@@ -112,7 +107,7 @@ sig
 
   val rate:
     compil -> rule -> rule_id_with_mode ->
-    (connected_component array list,int) Alg_expr.e Locality.annot option
+    (connected_component array list, int) Alg_expr.e Locality.annot option
 
   val rate_name:
     compil -> rule -> rule_id_with_mode -> rule_name
@@ -139,4 +134,10 @@ sig
 
   val get_obs_titles: compil -> string list
   val nb_tokens: compil -> int
+
+  (*TEST*)
+  val cannonic_form_from_syntactic_rule :
+    nauto_in_rules_cache -> compil -> rule ->
+    Alg_expr.t Locality.annot option list *
+    nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list
 end
