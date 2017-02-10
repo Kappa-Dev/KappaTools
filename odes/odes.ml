@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 09 2017>
+  * Last modification: Time-stamp: <Feb 10 2017>
 *)
 
 let local_trace = false
@@ -1809,30 +1809,28 @@ struct
           ) current_list l
       ) [] (List.flatten connected_components)
 
-  let compute_isomorphism_in_hashes log nbr_auto_in_rule_list =
-    match nbr_auto_in_rule_list with
-    | [] -> [], []
+  let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
+    let rec aux acc l =
+    match l with
+    | [] | [_] -> acc
     | x :: tl ->
-      let () = print_hash log x in
-      List.partition (fun y ->
-          let () = print_hash log y in
-          let cmp = LKappa_auto.RuleCache.compare x y in
-          if cmp = 0 then true else false
-        ) tl
-
-  let print_isomorphism log pair_list =
-    let (l1, l2) = pair_list in
-    let () =
-      List.iter (fun hash ->
-          print_hash log hash
-        ) l1
+      if List.mem x tl
+      then aux (x::x::acc) tl
+      else aux acc tl
     in
+    aux [] nbr_auto_in_rule_list
+
+  let print_isomorphism log list =
     let () =
       List.iter (fun hash ->
+          let () =
+            Loggers.fprintf log
+              "List of hashes that are equals "
+          in
           print_hash log hash
-        ) l2
-    in ()
-
+        ) list
+    in
+    ()
 
   let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
@@ -1886,7 +1884,7 @@ struct
       sigma(ri) = ri'
     *)
     let isomorphism_rule =
-      compute_isomorphism_in_hashes log nbr_auto_in_rule_list
+      compute_isomorphism_in_hashes nbr_auto_in_rule_list
     in
     let () = print_isomorphism log isomorphism_rule in
     let () = Ode_loggers.print_newline log in
