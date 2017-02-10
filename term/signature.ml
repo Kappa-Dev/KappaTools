@@ -182,19 +182,18 @@ let print_one ?sigs f sign =
                   Format.fprintf f "!%a.%a"
                     (print_site sigs (i+ag)) si (print_agent sigs) (i+ag)))
           f links in
-  Format.fprintf
-    f "@[%a@]"
-    (NamedDecls.print
-       ~sep:(fun f -> Format.fprintf f ",@,")
-       (fun i name f (ints,links) ->
-           Format.fprintf f "%s%a%a" name pp_int ints (pp_link i) links))
-    sign
+  (NamedDecls.print
+     ~sep:(fun f -> Format.fprintf f ",@,")
+     (fun i name f (ints,links) ->
+        Format.fprintf f "%s%a%a" name pp_int ints (pp_link i) links))
+    f sign
 
 let print f sigs =
   Format.fprintf
     f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space
-       (fun _ n f si -> Format.fprintf f "%s(%a)" n (print_one ~sigs) si))
+       (fun _ n f si ->
+          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs) si))
     sigs
 
 let to_json = NamedDecls.to_json one_to_json

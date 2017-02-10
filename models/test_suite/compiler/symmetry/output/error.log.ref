@@ -13,12 +13,18 @@ A(x!1(*y.A*), y?/!3), A(x!2(*y.A*), y!1(*x.A*)), A(x~b/!3, y!2(*x.A*))
 _____(1)
 A(y!1(*x.A*)), A(x~a!1(*y.A*))
 Environment:
-  Signatures:
-    A(x~a~b,y)
-  Tokens: 
-  Alg_expr:
-    0:tourne: |A(x~b, y!1), A(x!1, y!2), A(x!2)|
-  Plot: [T] |A(x~a!1), A(y!1)|
+  %agent: A(x~a~b,y)
+  
+  %var:/*0*/ 'tourne' |A(x~b, y!1), A(x!1, y!2), A(x!2)|
+  %plot: [T]
+  %plot: |A(x~a!1), A(y!1)|
+  
+  'colle' A(x/!1), A(y/!1) @ 1
+  'colle_op' A(x!1/), A(y!1/) @ 1
+  'monte' A(x~a/~b!1/), A(y!1/) @ 1
+  'detruit' -A(x!1, y!2), -A(x!2, y!1) @ 1
+  'boucle' A(x!1, y?/!3), A(x!2, y!1), A(x~b/!3, y!2) @ 1
+  
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc6*/ A/*1*/(y)
       -- A/*1*//*1*/.y = ⊥, A/*1*//*0*/.x = ⊥
@@ -35,8 +41,6 @@ Environment:
     4: 0: /*cc7*/ A/*1*/(x~b, y!1), A/*2*/(x!1, y!2), A/*3*/(x!2)
       -- A/*1*//*0*/.x = ⊥, A/*3*//*0*/.y = ???
       ++ A/*1*//*0*/.x = A/*3*//*0*/.y @1
-  Perturbations:
-    
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]]

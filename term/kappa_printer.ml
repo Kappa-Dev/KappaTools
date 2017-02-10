@@ -115,12 +115,8 @@ let modification ?env f m =
             (Model.print_token ?env) id
         | _ -> assert false
       else
-        let boxed_cc i f cc =
-          let () = Format.pp_open_box f 2 in
-          let () = Format.pp_print_int f i in
-          let () = Format.pp_print_string f ": " in
-          let () = Pattern.print ?domain ~with_id:false f cc in
-          Format.pp_close_box f () in
+        let boxed_cc _ =
+          Pattern.print ?domain ~with_id:false in
         Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
           (Pp.array Pp.comma boxed_cc)
           rule.Primitives.connected_components
@@ -182,3 +178,6 @@ let perturbation ?env f pert =
 let env f env =
   Model.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)
     (fun env -> perturbation ~env) f env
+let env_kappa f env =
+  Model.print_kappa
+    (fun env -> alg_expr ~env) (fun env -> perturbation ~env) f env

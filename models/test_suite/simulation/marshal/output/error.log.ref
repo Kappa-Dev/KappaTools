@@ -5,21 +5,21 @@ A(x!1(*x.B*)/), B(x!1(*x.A*)/)
 _____(1)
 +B(x!1), +A(x!1)
 Environment:
-  Signatures:
-    A(x)
-    B(x)
-  Tokens: 
-  Alg_expr:
-    0:init: 100
-  Plot: [T]
+  %agent: A(x)
+  %agent: B(x)
+  
+  %var:/*0*/ 'init' 100
+  %plot: [T]
+  'dim' A(x/!1), B(x/!1) @ 1
+  'dim_op' A(x!1/), B(x!1/) @ 0.01
+  
+  /*0*/%mod: [false] do STOP 
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
     1: 0: /*cc2*/ A/*1*/(x!1), B/*2*/(x!1) -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
-  Perturbations:
-    /*0*/%mod: [false] do STOP 
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]] -> ()
@@ -29,21 +29,21 @@ Intial graph;
   %init: 100 B(x!1), A(x!1)
   
 Environment:
-  Signatures:
-    A(x)
-    B(x)
-  Tokens: 
-  Alg_expr:
-    0:init: 100
-  Plot: [T]
+  %agent: A(x)
+  %agent: B(x)
+  
+  %var:/*0*/ 'init' 100
+  %plot: [T]
+  'dim' A(x/!1), B(x/!1) @ 1
+  'dim_op' A(x!1/), B(x!1/) @ 0.01
+  
+  /*0*/%mod: [false] do STOP 
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
     1: 0: /*cc2*/ A/*1*/(x!1), B/*2*/(x!1) -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
-  Perturbations:
-    /*0*/%mod: [false] do STOP 
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]] -> ()
@@ -53,21 +53,21 @@ Intial graph;
   %init: 100 B(x!1), A(x!1)
   
 Environment:
-  Signatures:
-    A(x)
-    B(x)
-  Tokens: 
-  Alg_expr:
-    0:init: 100
-  Plot: [T]
+  %agent: A(x)
+  %agent: B(x)
+  
+  %var:/*0*/ 'init' 100
+  %plot: [T]
+  'dim' A(x/!1), B(x/!1) @ 1
+  'dim_op' A(x!1/), B(x!1/) @ 0.01
+  
+  /*0*/%mod: [false] do STOP 
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
     1: 0: /*cc2*/ A/*1*/(x!1), B/*2*/(x!1) -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
-  Perturbations:
-    /*0*/%mod: [false] do STOP 
 Domain:
   /*cc0*/  -> ()
   /*cc1*/ A/*1*/(x) [rate_of_rule [0]] -> ()

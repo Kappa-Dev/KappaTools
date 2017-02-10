@@ -258,11 +258,18 @@ let print_rates sigs pr_tok pr_var f r =
                        (print_rule_mixture sigs ~ltypes) m)
                    pr_tok pr_var) md)) max_dist)
 
-let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
+let print_rule ~full sigs pr_tok pr_var f r =
   Format.fprintf
-    f "@[<h>%a -> %a%t%a%t@]"
-    (Pp.list Pp.comma (print_agent_lhs ~ltypes sigs)) r.r_mix
-    (print_rhs ~ltypes sigs r.r_created) r.r_mix
+    f "@[<h>%t%t%a%t@]"
+    (fun f ->
+       if full then
+         Format.fprintf f "%a%t%a"
+           (print_rule_mixture sigs ~ltypes:false) r.r_mix
+           (fun f -> ())
+           (Raw_mixture.print ~sigs ~compact:false ~created:true) r.r_created
+       else Format.fprintf f "%a -> %a"
+           (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix
+           (print_rhs ~ltypes:false sigs r.r_created) r.r_mix)
     (fun f ->
        match r.r_delta_tokens with [] -> ()
                                  | _::_ -> Format.pp_print_string f " | ")
@@ -277,7 +284,7 @@ let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
                pr_tok pr_var) nb
             pr_tok tk))
     r.r_delta_tokens
-    (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
+    (fun f -> if full then print_rates sigs pr_tok pr_var f r)
 
 let rule_agent_to_json a =
   `Assoc [

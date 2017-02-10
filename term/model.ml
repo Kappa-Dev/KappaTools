@@ -120,7 +120,7 @@ let print_ast_rule ?env f i =
       match env.ast_rules.(pred i) with
       | (Some (na,_),_) -> Format.pp_print_string f na
       | (None,(r,_)) ->
-        LKappa.print_rule ~ltypes:false ~rates:false sigs
+        LKappa.print_rule ~full:false sigs
           (print_token ~env) (print_alg ~env) f r
 
 let print_rule ?env f id =
@@ -131,30 +131,44 @@ let print_rule ?env f id =
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
 
-let print pr_alg pr_rule pr_pert f env =
-  let () =
-    Format.fprintf
-      f "@[<v>@[<v 2>Signatures:@,%a@]@,@[<2>Tokens:@ %a@]@,"
-      Signature.print (signatures env)
-      (NamedDecls.print ~sep:Pp.space (fun _ n f () -> Format.pp_print_string f n))
-      env.tokens in
-  let () =
-    Format.fprintf
-      f "@[<v 2>Alg_expr:@,%a@]@,@[<2>Plot:@ %a@]@,"
-      (NamedDecls.print
-         ~sep:Pp.space
-         (fun i n f (e,_) -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_alg env) e))
-      env.algs
-      (Pp.array Pp.space (fun _ f (e,_) -> pr_alg env f e))
-      env.observables in
+let print_kappa pr_alg pr_pert f env =
+  let sigs = signatures env in
   Format.fprintf
-    f"@[<v 2>Rules:@,%a@]@,@[<v 2>Perturbations:@,%a@]@]"
+    f "@[<v>%a%t%a@,@,%a%t%a@,%a%t%a@]" Signature.print sigs
+    (fun f -> if env.tokens.NamedDecls.decls <> [||] then Pp.space f)
+    (NamedDecls.print
+       ~sep:Pp.space (fun _ n f () -> Format.fprintf f "%%token: %s" n))
+    env.tokens
+    (NamedDecls.print
+       ~sep:Pp.space
+       (fun i n f (e,_) ->
+          Format.fprintf f "@[<h>%%var:/*%i*/ '%s' %a@]" i n (pr_alg env) e))
+    env.algs
+    (fun f -> if env.algs.NamedDecls.decls <> [||] then Pp.space f)
+    (Pp.array Pp.space ~trailing:Pp.space
+       (fun _ f (e,_) -> Format.fprintf f "@[<h>%%plot: %a@]" (pr_alg env) e))
+    env.observables
+    (Pp.array Pp.space ~trailing:Pp.space
+       (fun _ f (na,(e,_)) ->
+          Format.fprintf f "%a%a"
+            (Pp.option ~with_space:false
+               (fun f (na,_) -> Format.fprintf f "'%s' " na)) na
+            (LKappa.print_rule
+               ~full:true sigs (print_token ~env) (print_alg ~env))
+            e))
+    env.ast_rules
+    (fun f -> if env.perturbations <> [||] then Pp.space f)
+    (Pp.array Pp.space (fun i f p ->
+         Format.fprintf f "@[<h>/*%i*/%a@]" i (pr_pert env) p))
+    env.perturbations
+
+let print pr_alg pr_rule pr_pert f env =
+  let () = print_kappa pr_alg pr_pert f env in
+  Format.fprintf
+    f "@,@[<v>@[<v 2>Rules:@,%a@]@]"
     (Pp.array Pp.space
        (fun i f r -> Format.fprintf f "@[<2>%i:@ %a@]" i (pr_rule env) r))
     env.rules
-    (Pp.array Pp.space (fun i f p ->
-         Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
-    env.perturbations
 
 let check_if_counter_is_filled_enough x =
   if not @@

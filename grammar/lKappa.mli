@@ -61,9 +61,8 @@ val print_rates : Signature.s -> (Format.formatter -> int -> unit)
   -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
 val print_rule :
-  ltypes:bool -> rates:bool -> Signature.s ->
-  (Format.formatter -> int -> unit) -> (Format.formatter -> int -> unit) ->
-  Format.formatter -> rule -> unit
+  full:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
+  (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
 val rule_to_json : rule -> Yojson.Basic.json
 val rule_of_json : Yojson.Basic.json -> rule
@@ -86,22 +85,23 @@ val compil_of_ast :
   (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
-@return the signature of agent, the signature of tokens and an
-Ast.compil where identifiers are integers and not string, syntactic
-sugar on rules are expansed (syntactic sugar on mixture are not)
+    @return the signature of agent, the contact map, the signature of
+    tokens, algebraic variable on which constant propagation is
+    forbidden, and an Ast.compil where identifiers are integers and
+    not string, syntactic sugar on rules are expansed (syntactic sugar
+    on mixture are not)
 
-This function sorts out longest prefix convention as well as ensure a
-lot of sanity on mixtures:
-- agent exists
-- sites exist
-- unique site occurence / agent
-- internal_states exist
-- unique internal_state / site
-- links appear exactly twice
+    This function sorts out longest prefix convention as well as ensure a
+    lot of sanity on mixtures:
+    - agent exists
+    - sites exist
+    - unique site occurence / agent
+    - internal_states exist
+    - unique internal_state / site
+    - links appear exactly twice
 
-The sanity checks on rates consists in ensuring that
-- either absolute or unary rates are provided;
+    The sanity checks on rates consists in ensuring that
+    - either absolute or unary rates are provided;
     - if the algebraic expression of the rate contains a mixture then
-    a  new variable
-    is declared called rulelabel_un_rate; it is necessary in the
-    update phase.*)
+    a new variable is declared called rulelabel_un_rate; it is
+    necessary in the update phase.*)

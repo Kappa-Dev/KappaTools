@@ -71,6 +71,11 @@ val print :
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
 
+val print_kappa :
+  (t -> Format.formatter -> Alg_expr.t -> unit) ->
+  (t -> Format.formatter -> Primitives.perturbation -> unit) ->
+  Format.formatter -> t -> unit
+
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 

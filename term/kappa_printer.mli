@@ -25,5 +25,6 @@ val modification :
 val perturbation :
   ?env:Model.t -> Format.formatter -> Primitives.perturbation -> unit
 
-val env :
-  Format.formatter -> Model.t -> unit
+val env : Format.formatter -> Model.t -> unit
+
+val env_kappa : Format.formatter -> Model.t -> unit
