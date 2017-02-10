@@ -1,0 +1,13 @@
+%def: "seed" "924556145"
+
+%agent: A(x)
+%agent: B(x)
+
+%plot: [T]
+'a.b' A(x/!1), B(x/!1) @ 1
+'B-' -B(x!_) @ 1
+'B+' +B(x) @ 1
+
+/*0*/%mod: [true] do $TRACK A(x!1), B(x!1) [true]
+%init: 1000 B(x)
+%init: 1 A(x)

@@ -287,7 +287,37 @@ let go env = function
         Yojson.Basic.to_channel d (Trace.step_to_yojson step)
     end
 
+let inputsDesc = ref None
+
 let close () =
   let () = close_plot () in
   let () = close_trace () in
+  let () = match !inputsDesc with None -> () | Some x -> close_out x in
   close_desc ()
+
+let initial_inputs theSeed env init =
+  let inputs = Kappa_files.open_out_fresh "inputs" "" "ka" in
+  let inputs_form = Format.formatter_of_out_channel inputs in
+  let () = Format.fprintf inputs_form "@[<v># \"uuid\" : \"%i\"@," uuid in
+  let () = Format.fprintf inputs_form "%%def: \"seed\" \"%i\"@,@]@." theSeed in
+  let () = Format.fprintf inputs_form "%a@." Kappa_printer.env_kappa env in
+  let sigs = Model.signatures env in
+  let () = Format.fprintf inputs_form "%a@."
+      (Pp.list Pp.space
+         (fun f (n,r,_) ->
+            let ins_fresh,_,_ =
+              Primitives.Transformation.raw_mixture_of_fresh
+                sigs r.Primitives.inserted in
+            Format.fprintf f "%%init: %a %a" (Kappa_printer.alg_expr ~env) n
+              (Raw_mixture.print ~compact:false ~created:false ~sigs)
+              (List.map snd ins_fresh))) init in
+  inputsDesc := Some inputs
+
+let input_modifications env event mods =
+  match !inputsDesc with
+  | None -> ()
+  | Some inputs ->
+    Format.fprintf
+      (Format.formatter_of_out_channel inputs)
+      "%%mod: [E] = %i do %a@."
+      event (Pp.list Pp.colon (Kappa_printer.modification ~env)) mods

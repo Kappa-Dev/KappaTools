@@ -1,0 +1,10 @@
+%def: "seed" "728130018"
+
+%agent: A(x)
+
+%plot: [T]
+'a..a' A(x!_/), A(x!_) @ 1
+'rem_a' A(), A(x!_) @ 1
+
+%init: 1 A(x!1),
+A(x!1)

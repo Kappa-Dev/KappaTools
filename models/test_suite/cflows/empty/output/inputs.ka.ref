@@ -1,0 +1,19 @@
+%def: "seed" "126704914"
+
+%agent: A(x)
+%agent: B(x)
+%agent: C()
+
+%var:/*0*/ 'goal' |C()|
+%plot: [T]
+%plot: goal
+
+-A(x?) @ 1
++A(x) @ 1
+-B(x?) @ 0
+A(x/!1), B(x/!1) @ 1
+A(x!1), B(x!1)+C() @ 1
+
+/*0*/%mod: ([T] < 100) do $TRACK C() [true]
+%init: 10 B(x)
+%init: 1 A(x)

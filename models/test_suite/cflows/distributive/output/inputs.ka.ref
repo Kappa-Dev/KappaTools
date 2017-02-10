@@ -1,0 +1,16 @@
+%def: "seed" "240056667"
+
+%agent: A(y~u~p,z~u~p)
+%agent: K(x)
+
+%plot: [T]
+A(y/!1), K(x/!1) @ 10
+K(x!_/) @ 1
+A(z/!1), K(x/!1) @ 10
+A(y~u/~p!1), K(x!1) @ 1
+A(z~u/~p!1), K(x!1) @ 1
+'GOAL' A(y~p, z~p) @ 10
+
+/*0*/%mod: [true] do $TRACK A(y~p, z~p) [true]
+%init: 10 A(y~u, z~u)
+%init: 10 K(x)

@@ -1,0 +1,15 @@
+%def: "seed" "880671133"
+
+%agent: A(x~a~b,y)
+
+%var:/*0*/ 'tourne' |A(x~b, y!1), A(x!1, y!2), A(x!2)|
+%plot: [T]
+%plot: |A(x~a!1), A(y!1)|
+
+'colle' A(x/!1), A(y/!1) @ 1
+'colle_op' A(x!1/), A(y!1/) @ 1
+'monte' A(x~a/~b!1/), A(y!1/) @ 1
+'detruit' -A(x!1, y!2), -A(x!2, y!1) @ 1
+'boucle' A(x!1, y?/!3), A(x!2, y!1), A(x~b/!3, y!2) @ 1
+
+

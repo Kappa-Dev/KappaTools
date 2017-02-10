@@ -165,7 +165,7 @@ let print_site_internal_state sigs ag_ty site f = function
     Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
 
-let print_one ?sigs f sign =
+let print_one ?sigs i f sign =
   let pp_int =
     NamedDecls.print
       ~sep:(fun _ -> ())
@@ -184,7 +184,7 @@ let print_one ?sigs f sign =
           f links in
   (NamedDecls.print
      ~sep:(fun f -> Format.fprintf f ",@,")
-     (fun i name f (ints,links) ->
+     (fun _ name f (ints,links) ->
         Format.fprintf f "%s%a%a" name pp_int ints (pp_link i) links))
     f sign
 
@@ -192,8 +192,8 @@ let print f sigs =
   Format.fprintf
     f "@[<v>%a@]"
     (NamedDecls.print ~sep:Pp.space
-       (fun _ n f si ->
-          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs) si))
+       (fun i n f si ->
+          Format.fprintf f "@[<h>%%agent: %s(%a)@]" n (print_one ~sigs i) si))
     sigs
 
 let to_json = NamedDecls.to_json one_to_json

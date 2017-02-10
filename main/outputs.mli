@@ -12,5 +12,11 @@ val initialize :
   string option -> (string * string * string array) option ->
   Model.t -> unit
 
+val initial_inputs :
+  int -> Model.t ->
+  (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> unit
+
+val input_modifications : Model.t -> int -> Primitives.modification list -> unit
+
 val go : Signature.s -> Data.t -> unit
 val close : unit -> unit

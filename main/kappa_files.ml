@@ -70,8 +70,8 @@ let get_fresh_filename base_name concat_list facultative ext =
   let base_name = String.concat "_" (tmp_name::concat_list) in
   find_available_name base_name facultative ext
 
-let open_out_fresh_filename base_name concat_list facultative ext =
-  open_out (get_fresh_filename base_name concat_list facultative ext)
+let open_out_fresh base_name facultative ext =
+  open_out (get_fresh_filename base_name [] facultative ext)
 
 let mk_dir_r d =
   let rec aux d =
@@ -191,10 +191,8 @@ let with_flux str f =
 
 let with_snapshot str event ext f =
   let str = if str="" then !snapshotFileName else str in
-  let desc =
-    open_out_fresh_filename
-      str [] (string_of_int event) ext in
-    let fr = Format.formatter_of_out_channel desc in
-    let () =
-      Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
-    close_out desc
+  let desc = open_out_fresh str (string_of_int event) ext in
+  let fr = Format.formatter_of_out_channel desc in
+  let () =
+    Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
+  close_out desc

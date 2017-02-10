@@ -9,6 +9,9 @@
 (** Utilities on files *)
 
 val open_out : string -> out_channel
+val open_out_fresh : string -> string -> string -> out_channel
+(** [open_out_fresh base facultative ext] *)
+
 val path : string -> string
 val mk_dir_r : string -> unit
 val setCheckFileExists : batchmode:bool -> string -> unit
