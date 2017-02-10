@@ -10,17 +10,16 @@ module UIState = Ui_state
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
-let navli (_ : Ui_simulation.t) = []
+let navli () = []
 
-let navcontent (t : Ui_simulation.t) =
+let content () =
   let state_log , set_state_log =
     React.S.create ("" : string)
   in
-  let simulation_output = (Ui_simulation.simulation_output t) in
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let _ = React.S.l1
       (fun _ ->
          Ui_simulation.manager_operation
-           t
            (fun
              manager
              project_id
@@ -44,5 +43,5 @@ let navcontent (t : Ui_simulation.t) =
       ~a:[Html.a_class ["panel-pre" ]]
       [ Tyxml_js.R.Html.pcdata state_log ]
   ]
-let onload (_ : Ui_simulation.t) = ()
-let onresize (_ : Ui_simulation.t) : unit = ()
+let onload () = ()
+let onresize () : unit = ()

@@ -136,11 +136,10 @@ let select_runtime =
 let hidden_class = ["hidden"]
 let visible_class = ["visible"]
 let visible_on_states
-    (t : Ui_simulation.t)
     ?(a_class=[])
     (state : Ui_simulation.ui_status list) : string list React.signal =
   (React.S.bind
-     (Ui_simulation.simulation_status t)
+     (Ui_simulation.simulation_status ())
      (fun run_state ->
         React.S.const
           (if List.mem run_state state then
@@ -172,8 +171,8 @@ let progress_bar
     ]
 
 let lift f x = match x with | None -> None | Some x -> f x
-let time_progress_bar  (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let time_progress_bar  () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   progress_bar
     (React.S.map (fun state ->
          let time_percent : int option =
@@ -195,8 +194,8 @@ let time_progress_bar  (t : Ui_simulation.t) =
        )
        simulation_output)
 
-let event_progress_bar (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let event_progress_bar () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   progress_bar
     (React.S.map (fun state ->
          let event_percentage : int option =
@@ -231,8 +230,8 @@ let tracked_events state =
     else
       None
 
-let tracked_events_count (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let tracked_events_count () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   Tyxml_js.R.Html.pcdata
     (React.S.map (fun state -> match tracked_events state with
            Some tracked_events -> string_of_int tracked_events
@@ -240,8 +239,8 @@ let tracked_events_count (t : Ui_simulation.t) =
        )
         simulation_output)
 
-let tracked_events_label (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let tracked_events_label () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   Tyxml_js.R.Html.pcdata
     (React.S.map (fun state -> match tracked_events state with
            Some _ -> "tracked events"
@@ -249,13 +248,13 @@ let tracked_events_label (t : Ui_simulation.t) =
        )
         simulation_output)
 
-let status_indicator (t : Ui_simulation.t) =
+let status_indicator () =
   Html.div
     ~a:[ Html.a_class [ "col-md-2" ] ]
     (Ui_common.level
     ~debug:(Tyxml_js.R.Html.pcdata
               (React.S.bind
-                 (Ui_simulation.simulation_status t)
+                 (Ui_simulation.simulation_status ())
                  (fun status ->
                     React.S.const
                       (match status with
@@ -267,16 +266,16 @@ let status_indicator (t : Ui_simulation.t) =
                  )
               )) ())
 
-let perturbation_control (t : Ui_simulation.t) =
+let perturbation_control () =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
-           (visible_on_states t ~a_class:["row"] [Ui_simulation.PAUSED]) ]
+           (visible_on_states ~a_class:["row"] [Ui_simulation.PAUSED]) ]
     [Html.div ~a:[Html.a_class [ "col-md-10" ]] [ perturbation_code_input ] ;
      Html.div ~a:[Html.a_class [ "col-md-2"  ]] [ perturbation_button ] ; ]
-let initializing_xml (t : Ui_simulation.t) =
+let initializing_xml () =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
-           (visible_on_states t [ Ui_simulation.INITALIZING ; ])
+           (visible_on_states [ Ui_simulation.INITALIZING ; ])
        ]
   [[%html {|
   <div class="panel-body panel-controls">
@@ -313,13 +312,12 @@ let alert_messages =
        )
     ]
 
-let stopped_xml (t : Ui_simulation.t) =
+let stopped_xml () =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states
               ~a_class:[ "panel-body" ;
                          "panel-controls" ; ]
-              t
               [Ui_simulation.STOPPED ;
                Ui_simulation.PAUSED ; ])
        ]
@@ -334,7 +332,6 @@ let stopped_xml (t : Ui_simulation.t) =
       |}[ Html.div
             ~a:[ Tyxml_js.R.Html.a_class
                    (visible_on_states
-                      t
                       ~a_class:[ "form-group" ]
                       [ Ui_simulation.STOPPED ; ]) ]
             [ Html.label ~a:[Html.a_class ["col-sm-5"] ]
@@ -345,21 +342,21 @@ let stopped_xml (t : Ui_simulation.t) =
         <div class="col-md-9">|}[ alert_messages ]{|</div>
      </div>
 
-     |}[ perturbation_control t ]{|
+     |}[ perturbation_control () ]{|
    |}]
 
-let running_xml (t : Ui_simulation.t) =
+let running_xml () =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (visible_on_states
               ~a_class:[ "panel-body" ;
                          "panel-controls" ; ]
-              t [ Ui_simulation.RUNNING ; ]) ]
+              [ Ui_simulation.RUNNING ; ]) ]
   [%html {|
      <div class="row">
         <div class="col-md-4">
             <div class="progress">
-            |}[ event_progress_bar t ]{|
+            |}[ event_progress_bar () ]{|
             </div>
         </div>
         <div class="col-md-2">events</div>
@@ -368,7 +365,7 @@ let running_xml (t : Ui_simulation.t) =
      <div class="row">
         <div class="col-md-4">
             <div class="progress">
-            |}[ time_progress_bar t ]{|
+            |}[ time_progress_bar () ]{|
             </div>
         </div>
         <div class="col-md-2">time</div>
@@ -376,40 +373,36 @@ let running_xml (t : Ui_simulation.t) =
 
      <div class="row">
         <div class="col-md-4">
-           |}[ tracked_events_count t ]{|
+           |}[ tracked_events_count () ]{|
         </div>
         <div class="col-md-2">
-           |}[ tracked_events_label t ]{|
+           |}[ tracked_events_label ()]{|
         </div>
      </div>
    |}]
-let controls_xml (t : Ui_simulation.t) =
+let controls_xml () =
   [Html.div
      ~a:[ Tyxml_js.R.Html.a_class
             (visible_on_states
-               t
                ~a_class:[ "col-md-2" ]
                [ Ui_simulation.STOPPED ; ]) ]
      [ start_button ] ;
    Html.div
      ~a:[ Tyxml_js.R.Html.a_class
             (visible_on_states
-               t
                ~a_class:[ "col-md-2" ]
                [ Ui_simulation.PAUSED ; ]) ]
      [ continue_button ] ;
    Html.div
             ~a:[ Tyxml_js.R.Html.a_class
                    (visible_on_states
-                     t
                      ~a_class:[ "col-md-2" ]
                      [ Ui_simulation.RUNNING ; ]) ]
             [ pause_button ] ;
-   status_indicator t ;
+   status_indicator () ;
    Html.div
      ~a:[ Tyxml_js.R.Html.a_class
             (visible_on_states
-               t
                ~a_class:[ "col-md-2" ]
                [ Ui_simulation.PAUSED ;
                  Ui_simulation.RUNNING ; ]) ]
@@ -417,24 +410,23 @@ let controls_xml (t : Ui_simulation.t) =
    Html.div
      ~a:[ Tyxml_js.R.Html.a_class
             (visible_on_states
-               t
                ~a_class:[ "col-md-2" ]
                [ Ui_simulation.STOPPED ; ]) ]
      [ select_runtime ] ;
    Html.entity "nbsp" ;
 
   ]
-let footer_xml (t : Ui_simulation.t) =
+let footer_xml () =
   [%html {|
   <div class="panel-footer">
       |}[ Html.div
             ~a:[ Html.a_class [ "row"; ] ]
-            (controls_xml t) ]{|
+            (controls_xml ()) ]{|
   </div>|}]
 
 let configuration_id = "configuration-id"
-let xml  (t : Ui_simulation.t) =
-  Html.div
+let content  () =
+  [Html.div
     ~a:[ Html.a_id configuration_id;
          R.Html.a_class
            (React.S.bind
@@ -454,12 +446,12 @@ let xml  (t : Ui_simulation.t) =
                   )
               )
            )]
-    [ initializing_xml t ;
-      stopped_xml t ;
-      running_xml t ;
-      footer_xml t ; ]
+    [ initializing_xml () ;
+      stopped_xml () ;
+      running_xml () ;
+      footer_xml () ; ] ]
 
-let onload (t : Ui_simulation.t) : unit =
+let onload () : unit =
   let perturbation_button_dom =
     Tyxml_js.To_dom.of_button perturbation_button
   in
@@ -527,14 +519,14 @@ let onload (t : Ui_simulation.t) : unit =
          let code : string =
            Js.to_string perturbation_code_input_dom##.value
          in
-         Ui_simulation.perturb_simulation t ~code:code)
+         Ui_simulation.perturb_simulation ~code:code)
   in
   let () = continue_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
            let () =
              Common.async
-               (fun _ -> Ui_simulation.continue_simulation t) in
+               (fun _ -> Ui_simulation.continue_simulation ()) in
            Js._true)
   in
   let () = pause_button_dom##.onclick :=
@@ -542,7 +534,7 @@ let onload (t : Ui_simulation.t) : unit =
         (fun _ ->
            let () =
              Common.async
-               (fun _ -> Ui_simulation.pause_simulation t) in
+               (fun _ -> Ui_simulation.pause_simulation ()) in
            Js._true)
   in
   let () = clear_button_dom##.onclick :=
@@ -550,7 +542,7 @@ let onload (t : Ui_simulation.t) : unit =
         (fun _ ->
            let () =
              Common.async
-               (fun _ -> Ui_simulation.stop_simulation t)
+               (fun _ -> Ui_simulation.stop_simulation ())
            in
            Js._true)
   in
@@ -558,7 +550,7 @@ let onload (t : Ui_simulation.t) : unit =
       Dom.handler
         (fun _ ->
            let () = Common.async
-               (fun _ -> Ui_simulation.start_simulation t) in
+               (fun _ -> Ui_simulation.start_simulation ()) in
            Js._true)
   in
   let () = select_runtime_dom##.onchange :=
@@ -589,4 +581,4 @@ let onload (t : Ui_simulation.t) : unit =
       Dom.handler (fun _ -> let () = run_perturbation () in Js._true) in
 
   ()
-let onresize (_ : Ui_simulation.t) : unit = ()
+let onresize () : unit = ()

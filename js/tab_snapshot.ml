@@ -33,16 +33,13 @@ let snapshot_count
   | Some state ->
     state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_snapshots
 
-let navli (t : Ui_simulation.t) =
-  Ui_common.badge
-    t
-    (fun state -> snapshot_count state)
+let navli () = Ui_common.badge (fun state -> snapshot_count state)
 
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
-let configuration (t : Ui_simulation.t) : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let configuration () : Widget_export.configuration =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   { Widget_export.id = "snapshot"
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -93,8 +90,8 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
 
 let format_select_id = "format_select_id"
 
-let content (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let xml () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let list, handle = ReactiveData.RList.create [] in
   let select (snapshots : Api_types_j.snapshot_id list) =
     List.mapi
@@ -115,7 +112,6 @@ let content (t : Ui_simulation.t) =
   let _ = React.S.map
       (fun _ ->
          Ui_simulation.manager_operation
-           t
            (fun
              manager
              project_id
@@ -183,7 +179,7 @@ let content (t : Ui_simulation.t) =
   let snapshot_chooser = Html.div [ snapshot_label ; snapshot_select ]
   in
   let export_controls =
-    Widget_export.content (configuration t)
+    Widget_export.content (configuration ())
   in
   let kappa_snapshot_display =
       Html.div
@@ -251,11 +247,10 @@ let content (t : Ui_simulation.t) =
           </div>
   |}]
 
-let navcontent (t : Ui_simulation.t) =
+let content () =
   [Ui_common.toggle_element
-     t
      (fun state -> snapshot_count state > 0)
-     (content t) ]
+     (xml ()) ]
 
 let render_snapshot_graph
     (snapshot_js : Js_contact.contact_map Js.t)
@@ -278,8 +273,8 @@ let render_snapshot_graph
       (Js.Opt.option (Ui_state.agent_count ()))
   | Kappa -> ()
 
-let select_snapshot (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let select_snapshot () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let snapshot_js : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
@@ -300,7 +295,6 @@ let select_snapshot (t : Ui_simulation.t) =
     if snapshot_count (Some state) > 0 then
       let () =
         Ui_simulation.manager_operation
-          t
           (fun
             manager
             project_id
@@ -348,8 +342,8 @@ let select_snapshot (t : Ui_simulation.t) =
 
 
 
-let onload (t : Ui_simulation.t) : unit =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let onload () : unit =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -370,7 +364,7 @@ let onload (t : Ui_simulation.t) : unit =
       onchange := Dom_html.handler
 	(fun _ ->
          let () = Common.debug ("onchange") in
-         let () = select_snapshot t in Js._true)
+         let () = select_snapshot () in Js._true)
   in
   let update_format () =
     let format_text : string = (Js.to_string format_select_dom##.value) in
@@ -406,9 +400,9 @@ let onload (t : Ui_simulation.t) : unit =
       (fun _ ->
          match (React.S.value simulation_output) with
            None -> ()
-         | Some _state -> select_snapshot t)
+         | Some _state -> select_snapshot ())
   in
-  let () = Widget_export.onload (configuration t) in
+  let () = Widget_export.onload (configuration ()) in
   ()
 
-let onresize (_ : Ui_simulation.t) : unit = ()
+let onresize () : unit = ()

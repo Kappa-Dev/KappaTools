@@ -9,7 +9,7 @@
 module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 
-let navli (_ : Ui_simulation.t) = []
+let navli () = []
 
 let display_id = "contact-map-display"
 let export_id = "contact-export"
@@ -39,7 +39,7 @@ let configuration : Widget_export.configuration =
   }
 
 
-let content =
+let xml () =
   let export_controls =
     Widget_export.content configuration
   in
@@ -52,7 +52,7 @@ let content =
 	   |}[ export_controls ]{|
         </div>|}]
 
-let navcontent (_ : Ui_simulation.t) = [ Html.div [content] ]
+let content () = [ Html.div [xml ()] ]
 
 let update
     (data : Api_types_j.contact_map)
@@ -68,7 +68,7 @@ let update
     (Js.string json)
     (Js.Opt.option (Ui_state.agent_count ()))
 
-let onload (_ : Ui_simulation.t) =
+let onload () =
   let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id false in
@@ -93,4 +93,4 @@ let onload (_ : Ui_simulation.t) =
        | None -> (contactmap##clearData)
        | Some data -> update data contactmap)
 
-let onresize (_ : Ui_simulation.t) : unit = ()
+let onresize () : unit = ()

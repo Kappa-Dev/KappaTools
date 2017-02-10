@@ -34,6 +34,13 @@ type ui_status =
 type t = { setter : simulation_state -> unit
          ; signal : simulation_state React.signal }
 
+let t_ref =
+  let signal , _ = React.S.create SIMULATION_STOPPED in
+  ref { setter = (fun _ -> ()) ; signal = signal ; }
+
+let set_t (t : t) = t_ref := t
+let get_t () = !t_ref
+
 let create () : t =
   let model_simulation_state , set_model_simulation_state =
     React.S.create (SIMULATION_STOPPED : simulation_state)
@@ -41,7 +48,8 @@ let create () : t =
   { setter = set_model_simulation_state ?step:None ;
     signal = model_simulation_state ; }
 
-let simulation_status (t : t) : ui_status React.signal =
+let simulation_status () : ui_status React.signal =
+  let t = !t_ref in
   React.S.map
     (function
       | SIMULATION_STOPPED -> STOPPED
@@ -57,8 +65,9 @@ let simulation_status (t : t) : ui_status React.signal =
         else PAUSED)
     t.signal
 
-let simulation_output (t : t) :
+let simulation_output () :
   Api_types_j.simulation_info option React.signal =
+  let t = !t_ref in
   React.S.map
     (function
       | SIMULATION_STOPPED ->
@@ -86,14 +95,12 @@ let ready_default (_loc : string) (msg : string) =
 (* lwt_error loc msg supress messages for now *)
 
 let ready_simulation
-    ?(stopped : Api.manager -> unit Lwt.t =
-       ready_default __LOC__ "Simulation stopped")
-    ?(initializing : Api.manager -> unit Lwt.t =
-       ready_default __LOC__ "Simulation initalizing")
-    ?(ready : (Api.manager * ready_state) -> unit Lwt.t =
-       ready_default __LOC__ "Simulation ready")
-    (t : t) :
-    unit Lwt.t =
+    ?(stopped : Api.manager -> unit Lwt.t = ready_default __LOC__ "Simulation stopped")
+    ?(initializing : Api.manager -> unit Lwt.t = ready_default __LOC__ "Simulation initalizing")
+    ?(ready : (Api.manager * ready_state) -> unit Lwt.t = ready_default __LOC__ "Simulation ready")
+    ()
+  : unit Lwt.t =
+  let t = !t_ref in
   match !Ui_state.runtime_state with
   | None ->
     let () = Ui_state.set_model_error
@@ -118,7 +125,6 @@ let return_project ()  : Api_types_j.project_id Api.result Lwt.t =
         Lwt.return (Api_common.result_ok project_id)
 
 let manager_operation
-  (t : t)
   (handler :
      Api.manager ->
      Api_types_j.project_id ->
@@ -142,8 +148,8 @@ let manager_operation
                                let msg = "unable to create context" in
                                let () = set_error  __LOC__ msg in
                            Lwt.return_unit))
-                 )
-               t
+               )
+           ()
       )
 
 let create_parameter (simulation_id : Api_types_j.simulation_id ) :
@@ -155,7 +161,8 @@ let create_parameter (simulation_id : Api_types_j.simulation_id ) :
     Api_types_j.simulation_id = simulation_id ;
   }
 
-let rec update_simulation (t : t) : unit Lwt.t =
+let rec update_simulation () : unit Lwt.t =
+  let t = !t_ref in
   ready_simulation
     ~stopped:(fun _ -> Lwt.return_unit)
     ~initializing:(fun _ -> Lwt.return_unit)
@@ -183,7 +190,7 @@ let rec update_simulation (t : t) : unit Lwt.t =
                      .simulation_progress_is_running
                   then
                     (*sleep poll_interval*)Lwt.return_unit >>=
-                    fun () -> update_simulation t
+                    fun () -> update_simulation ()
                   else
                     Lwt.return_unit
                 )
@@ -192,11 +199,9 @@ let rec update_simulation (t : t) : unit Lwt.t =
                   Lwt.return_unit)
               result)
       )
-    t
+    ()
 
-let continue_simulation
-    (t : t)
-  : unit Lwt.t =
+let continue_simulation () : unit Lwt.t =
   ready_simulation
     ~ready:
       (fun (runtime_state,ready_state) ->
@@ -211,7 +216,7 @@ let continue_simulation
          (Api_common.result_map
             ~ok:(fun _  _ ->
                 let () = Ui_state.clear_model_error () in
-                let () = Common.async (fun _ -> update_simulation t) in
+                let () = Common.async (fun _ -> update_simulation ()) in
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit)
             ~error:(fun _ errors ->
@@ -219,11 +224,9 @@ let continue_simulation
                 let () = Common.debug (Js.string "continue_simulation.3") in
                 Lwt.return_unit))
       )
-    t
+    ()
 
-let pause_simulation
-    (t : t)
-  : unit Lwt.t =
+let pause_simulation () : unit Lwt.t =
   ready_simulation
     ~ready:
       (fun (runtime_state,ready_state) ->
@@ -242,14 +245,13 @@ let pause_simulation
                 let () = Ui_state.set_model_error __LOC__ error in
                 Lwt.return_unit))
       )
-    t
+    ()
 
-let stop_simulation
-    (t : t)
-  : unit Lwt.t =
+let stop_simulation () : unit Lwt.t =
   ready_simulation
     ~ready:
       (fun (runtime_state,ready_state) ->
+         let t = !t_ref in
          let () = t.setter SIMULATION_STOPPED in
          (return_project ()) >>=
          (Api_common.result_bind_lwt
@@ -266,16 +268,15 @@ let stop_simulation
                 let () = Ui_state.set_model_error __LOC__ error in
                 Lwt.return_unit))
       )
-    t
+    ()
 
-let flush_simulation
-    (t : t)
-  : unit Lwt.t =
+let flush_simulation () : unit Lwt.t =
   ready_simulation
     ~stopped:(fun _ -> Lwt.return_unit)
     ~initializing:(fun _ -> Lwt.return_unit)
     ~ready:
       (fun (runtime_state,ready_state) ->
+         let t = !t_ref in
          let () = t.setter SIMULATION_STOPPED in
          (return_project ()) >>=
          (Api_common.result_bind_lwt
@@ -285,12 +286,9 @@ let flush_simulation
                   ready_state.simulation_id)
          )>>=
          (fun _ -> Lwt.return_unit))
-    t
+    ()
 
-let perturb_simulation
-    (t : t)
-    ~(code : string)
-  : unit Lwt.t =
+let perturb_simulation ~(code : string) : unit Lwt.t =
   ready_simulation
     ~ready:
       (fun (runtime_state,ready_state) ->
@@ -318,13 +316,13 @@ let perturb_simulation
            (Api_common.result_map
               ~ok:(fun _  _ ->
                   let () = Ui_state.clear_model_error () in
-                  update_simulation t)
+                  update_simulation ())
               ~error:(fun _ error ->
                   let () = Ui_state.set_model_error __LOC__ error in
                   Lwt.return_unit))
 
       )
-    t
+    ()
 
 let rec simulation_next_id
     (catalog : Api_types_j.simulation_catalog)
@@ -354,11 +352,10 @@ let simulation_next (runtime_state : Api.manager) :
         )
       )
 
-let start_simulation
-    (t : t)
-  =
+let start_simulation () : unit Lwt.t =
   let on_error (errors : Api_types_j.errors) =
     let () = Ui_state.set_model_error __LOC__ errors in
+    let t = !t_ref in
     let () = t.setter SIMULATION_STOPPED in
     Lwt.return_unit
   in
@@ -368,6 +365,7 @@ let start_simulation
          Lwt.catch
            (fun () ->
               let () = Ui_state.clear_model_error () in
+              let t = !t_ref in
               let () = t.setter SIMULATION_INITALIZING in
               (return_project ()) >>=
               (simulation_next runtime_state)>>=
@@ -396,7 +394,7 @@ let start_simulation
                                              simulation_status)) in
                                    let () =
                                      Common.async
-                                       (fun _ -> update_simulation t) in
+                                       (fun _ -> update_simulation ()) in
                                    Lwt.return (Api_common.result_ok ())
                                    )
                             )
@@ -421,4 +419,4 @@ let start_simulation
                on_error
                  (Api_data.api_message_errors "Inialization error"))
       )
-    t
+    ()

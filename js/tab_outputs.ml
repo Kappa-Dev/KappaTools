@@ -16,10 +16,9 @@ let export_id = "output-export"
 let current_file, set_current_file =
   React.S.create (None : Api_types_j.file_line_detail option)
 
-let update_outputs (t : Ui_simulation.t) key : unit =
+let update_outputs key : unit =
   let file_line_info_id = if key = "/dev/stdout" then None else Some key in
   Ui_simulation.manager_operation
-    t
     (fun
       manager
       project_id
@@ -40,7 +39,8 @@ let update_outputs (t : Ui_simulation.t) key : unit =
       )
     )
 
-let file_count = function
+let file_count state =
+  match state with
   | None -> 0
   | Some state ->
     state.Api_types_t.simulation_info_output.Api_types_t.simulation_output_file_lines
@@ -53,11 +53,11 @@ let get_file_line_id
   | h::_ -> h.Api_types_j.file_line_name
   | [] -> None
 
-let navli (t : Ui_simulation.t) =
-  Ui_common.badge t (fun state -> (file_count state))
+let navli () =
+  Ui_common.badge (fun state -> (file_count state))
 
-let content (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let xml () =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let select file_line_info =
     let file_ids : Api_types_j.file_line_id list =
       file_line_info.Api_types_j.file_line_ids in
@@ -77,7 +77,7 @@ let content (t : Ui_simulation.t) =
                   else  []))
              (Html.pcdata (Ui_common.option_label (Tools.unsome "" key))))
         file_ids in
-    let () = update_outputs t (Tools.unsome "/dev/stdout" current_file_id) in
+    let () = update_outputs (Tools.unsome "/dev/stdout" current_file_id) in
     Tyxml_js.Html.select
       ~a:[ Html.a_class ["form-control"] ; Html.a_id select_id ]
       file_options in
@@ -88,7 +88,6 @@ let content (t : Ui_simulation.t) =
        let _ = React.S.map
            (fun _ ->
               Ui_simulation.manager_operation
-                t
                 (fun
                   manager
                   project_id
@@ -104,8 +103,7 @@ let content (t : Ui_simulation.t) =
                              (match file_line_info.Api_types_j.file_line_ids with
                               | [] -> []
                               | key::[] ->
-                                let () = update_outputs
-                                    t (Tools.unsome "/dev/stdout" key) in
+                                let () = update_outputs (Tools.unsome "/dev/stdout" key) in
                                 [Html.h4
                                    [ Html.pcdata
                                        (Ui_common.option_label
@@ -145,7 +143,7 @@ let content (t : Ui_simulation.t) =
              |}file_content{|
              </div> |}] ]
 
-let select_outputs (t : Ui_simulation.t) =
+let select_outputs () =
   Js.Opt.case
     (Ui_common.document##getElementById (Js.string select_id))
     (fun () -> ())
@@ -153,18 +151,17 @@ let select_outputs (t : Ui_simulation.t) =
        let select_dom : Dom_html.inputElement Js.t =
          Js.Unsafe.coerce dom in
        let fileindex = Js.to_string (select_dom##.value) in
-       update_outputs t fileindex)
+       update_outputs fileindex)
 
-let navcontent (t : Ui_simulation.t) =
-  [ Ui_common.toggle_element t (fun t -> file_count t > 0) (content t) ]
+let content () =
+  [ Ui_common.toggle_element (fun t -> file_count t > 0) (xml ()) ]
 
-let onload (t : Ui_simulation.t) =
+let onload () =
   let () =
     Common.jquery_on
       (Format.sprintf "#%s" select_id)
       ("change")
-      (fun _ ->
-         let () = select_outputs t in Js._true)
+      (fun _ -> let () = select_outputs () in Js._true)
   in  ()
   (* TODO
   let select_dom : Dom_html.inputElement Js.t =
@@ -181,4 +178,4 @@ let onload (t : Ui_simulation.t) =
   in
      *)
 
-let onresize (_ : Ui_simulation.t) : unit = ()
+let onresize () : unit = ()

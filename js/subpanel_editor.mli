@@ -6,4 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-include Ui_common.Tab
+include Ui_common.Panel

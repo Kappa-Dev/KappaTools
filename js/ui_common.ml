@@ -11,13 +11,12 @@ module Html = Tyxml_js.Html5
 module UIState = Ui_state
 
 let toggle_element
-  (t : Ui_simulation.t)
   (projection : Api_types_j.simulation_info option -> bool)
   (content : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) =
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
           (React.S.bind
-             (Ui_simulation.simulation_output t)
+             (Ui_simulation.simulation_output ())
              (fun state -> React.S.const
                  (if projection state then
                     ["show"]
@@ -100,23 +99,28 @@ let save_plot_ui
     ?(svg_style_id = (Some default_svg_style_id))
     dat_file_extension
   =
+  let error label id =
+    (fun () ->
+       Common.toss
+         (Format.sprintf
+            "ui_common.save_plot_ui : %s : could not find id %s" label id)) in
   let export_button : Dom_html.buttonElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
           (document##getElementById (Js.string export_button_id))
-          (fun () -> assert false))
+          (error "export_button_id" export_button_id))
        : Dom_html.element Js.t) in
   let export_filename : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
           (document##getElementById (Js.string export_filename_id))
-          (fun () -> assert false))
+          (error "export_filename_id" export_filename_id))
        : Dom_html.element Js.t) in
   let export_format : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
           (document##getElementById (Js.string export_format_id))
-          (fun () -> assert false))
+          (error "export_format_id" export_format_id))
        : Dom_html.element Js.t) in
   let export_button_toggle () : unit =
     let filename : string =
@@ -174,9 +178,7 @@ let save_plot_ui
            Js._true)
   in
   ()
-let badge
-    (t : Ui_simulation.t)
-    (counter : Api_types_j.simulation_info option -> int)
+let badge (counter : Api_types_j.simulation_info option -> int)
   =
   let badge_list, badge_handle = ReactiveData.RList.create [] in
   [ Tyxml_js.R.Html.span
@@ -194,7 +196,7 @@ let badge
               else
                  ReactiveData.RList.set badge_handle []
            )
-           (Ui_simulation.simulation_output t) in
+           (Ui_simulation.simulation_output ()) in
        badge_list
       )
   ]
@@ -236,7 +238,7 @@ let navli label active decorations =
     ]
 
 let navtabs nav_tab_id = function
-  | [] -> assert false
+  | [] -> Common.toss "ui_common.navtabs : missing tabs"
   | (ti,l) :: t ->
     Html.ul
       ~a:[ Html.a_id nav_tab_id
@@ -254,7 +256,7 @@ let onenavcontent label active content =
        ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
 
 let navcontent ?id (classes : string list) = function
-  | [] -> assert false
+  | [] -> Common.toss "ui_common.navcontent : missing content"
   | (t,c) :: l ->
     let id : [> `Id ] Html.attrib list =
       match id with
@@ -308,10 +310,84 @@ let features
   | [] -> default
   | _::_ -> matches
 
-
 let input_change input_dom signal_handler =
   input_dom##.onchange :=
     Dom_html.handler
       (fun _ ->
          let () = signal_handler (Js.to_string (input_dom##.value)) in
          Js._true)
+
+module type Menu = sig
+  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val onload : unit -> unit
+end;;
+
+module type Div = sig
+  val content : unit -> [> Html_types.div ] Tyxml_js.Html.elt list
+  val onload : unit -> unit
+end;;
+
+module type Tab = sig
+  val navli : unit -> Html_types.flow5_without_interactive Tyxml_js.Html5.elt list
+  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val onload : unit -> unit
+  val onresize : unit -> unit
+end;;
+
+module type Panel = sig
+  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val onload : unit -> unit
+  val onresize : unit -> unit
+end;;
+
+let id_dom (id : string) : 'a Js.t =
+  Js.Unsafe.coerce
+    ((Js.Opt.get (document##getElementById (Js.string id))
+        (fun () ->
+           Common.toss
+             (Format.sprintf "ui_common.id_dom : could not find id %s" id)))
+     : Dom_html.element Js.t)
+
+let create_modal
+    ~(id : string)
+    ~(title_label : string)
+    ~(buttons : [< Html_types.div_content_fun > `Button ] Html.elt list)
+    ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) :
+  [> Html_types.div ] Html.elt =
+  Html.div
+    ~a:[ Html.a_class [ "modal" ; "fade" ] ;
+         Html.a_id id ;
+         Html.Unsafe.string_attrib "tabindex" "-1" ;
+         Html.Unsafe.string_attrib "role" "dialog" ;
+       ]
+    [ Html.div
+        ~a:[ Html.a_class [ "modal-dialog" ] ;
+             Html.Unsafe.string_attrib "role" "document" ;
+           ]
+        [ Html.div
+            ~a:[ Html.a_class [ "modal-content" ] ]
+            [ Html.div
+                ~a:[ Html.a_class [ "modal-header" ] ]
+                [ Html.button
+                    ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+                         Html.a_class [ "close" ] ;
+                         Html.Unsafe.string_attrib "data-dismiss" "modal" ;
+                         Html.Unsafe.string_attrib "aria-label" "Close" ; ]
+                    [ Html.span
+                        ~a:[ Html.Unsafe.string_attrib "aria-hidden" "true" ]
+                        [ Html.entity "times" ]
+                    ] ;
+                  Html.h4 [ Html.cdata title_label ] ;
+                  Html.div ~a:[ Html.a_class [ "modal-body" ] ] body ;
+                  Html.div ~a:[ Html.a_class [ "modal-footer" ] ]
+                    ([ Html.button
+                        ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+                             Html.a_class [ "btn" ; "btn-default" ] ;
+                             Html.Unsafe.string_attrib "data-dismiss" "modal" ;
+                           ]
+                        [ Html.cdata "Cancel" ] ;
+                    ]@buttons)
+                ]
+            ]
+        ]
+    ]

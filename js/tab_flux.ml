@@ -27,8 +27,8 @@ let has_fluxmap
 
 let serialize_json : (string -> unit) ref = ref (fun _ -> ())
 
-let configuration (t : Ui_simulation.t) : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let configuration () : Widget_export.configuration =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg
@@ -46,8 +46,7 @@ let configuration (t : Ui_simulation.t) : Widget_export.configuration =
         simulation_output
   }
 
-let content (t : Ui_simulation.t) =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let xml () =
   let flux_select =
     Tyxml_js.R.Html.select
       ~a:[ Html.a_class ["form-control"]
@@ -56,7 +55,6 @@ let content (t : Ui_simulation.t) =
        let _ = React.S.map
            (fun _ ->
               Ui_simulation.manager_operation
-                t
                 (fun
                   manager
                   project_id
@@ -85,7 +83,7 @@ let content (t : Ui_simulation.t) =
                   )
                 )
            )
-           simulation_output in
+           in
        flux_list
       )
   in
@@ -96,7 +94,6 @@ let content (t : Ui_simulation.t) =
        let _ = React.S.map
            (fun _ ->
               Ui_simulation.manager_operation
-                t
                 (fun
                   manager
                   project_id
@@ -126,7 +123,6 @@ let content (t : Ui_simulation.t) =
                   )
                 )
            )
-           simulation_output
        in
        flux_list
       )
@@ -136,7 +132,7 @@ let content (t : Ui_simulation.t) =
                   ; Html.a_class ["checkbox-control"]
                   ; Html.a_input_type `Checkbox ] () in
   let export_controls =
-    Widget_export.content (configuration t)
+    Widget_export.content (configuration ())
   in
   [%html {|<div class="navcontent-view">
            <div class="row">
@@ -182,18 +178,15 @@ let content (t : Ui_simulation.t) =
      </div>
      <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
-let navcontent (t : Ui_simulation.t) =
+let content () =
   [Ui_common.toggle_element
-     t
      has_fluxmap
-     (content t) ]
+     (xml ()) ]
 
 let update_flux_map
-    (t : Ui_simulation.t)
     (flux_js : Js_flux.flux_map Js.t)
     (index : int ): unit =
   Ui_simulation.manager_operation
-    t
     (fun
       manager
       project_id
@@ -240,8 +233,8 @@ let update_flux_map
      )
     )
 
-let select_fluxmap (t : Ui_simulation.t) flux_map =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let select_fluxmap flux_map =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom -> let select_dom : Dom_html.inputElement Js.t =
@@ -256,21 +249,20 @@ let select_fluxmap (t : Ui_simulation.t) flux_map =
   | Some state -> let index = Js.Opt.get index (fun _ -> 0) in
     if state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps > 0 then
       update_flux_map
-        t
         flux_map
         index
     else
       ()
 
-let navli (t : Ui_simulation.t) =
-  Ui_common.badge t
+let navli () =
+  Ui_common.badge
     (fun state ->
        match state with
        | None -> 0
        | Some state -> state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps)
 
-let onload (t : Ui_simulation.t) =
-  let () = Widget_export.onload (configuration t) in
+let onload () =
+  let () = Widget_export.onload (configuration ()) in
   let flux_configuration : Js_flux.flux_configuration Js.t =
     Js_flux.create_configuration
       ~short_labels:true
@@ -295,7 +287,7 @@ let onload (t : Ui_simulation.t) =
     Common.jquery_on
       (Format.sprintf "#%s" select_id)
       ("change")
-      (fun _ -> let () = select_fluxmap t flux in Js._true)
+      (fun _ -> let () = select_fluxmap flux in Js._true)
   in
 
   let div : Dom_html.element Js.t =
@@ -309,7 +301,7 @@ let onload (t : Ui_simulation.t) =
          "\" width=\"300\" height=\"300\"><g/></svg>") in
   let () = Common.jquery_on "#navflux"
       "shown.bs.tab"
-      (fun _ -> select_fluxmap t flux)
+      (fun _ -> select_fluxmap flux)
   in
-  select_fluxmap t flux
-let onresize (_ : Ui_simulation.t) : unit = ()
+  select_fluxmap flux
+let onresize () : unit = ()

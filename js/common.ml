@@ -6,6 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(* need to specify messages where there is an error *)
+let toss : 'a 'b . 'a -> 'b =
+  fun e ->
+    let () = Js.Unsafe.fun_call
+        (Js.Unsafe.js_expr "toss")
+        [| Js.Unsafe.inject e |]
+    in assert false
+
 let id value =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "id")
@@ -145,3 +153,55 @@ let async (task : unit -> 'a Lwt.t) : unit =
             Lwt.return_unit
          )
     )
+
+let guid () : string =
+  Js.to_string
+    (Js.Unsafe.fun_call
+       (Js.Unsafe.js_expr "guid")
+       [| |])
+
+let modal ~(id: string) ~(action: string) : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "modal")
+    [| Js.Unsafe.inject (Js.string id);
+       Js.Unsafe.inject (Js.string action); |]
+
+let element_data
+    (element : Dom_html.element Js.t)
+    (label : string) : Js.js_string Js.t Js.opt =
+    (Js.Unsafe.fun_call
+       (Js.Unsafe.js_expr "elementData")
+       [| Js.Unsafe.inject element;
+          Js.Unsafe.inject (Js.string label) |])
+
+let create_sort
+    (id : string)
+    (handler : Dom_html.event Js.t  -> 'b -> unit) : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "createSort")
+    [| Js.Unsafe.inject (Js.string id);
+       Js.Unsafe.inject handler
+    |]
+
+let children_value
+    (element : Dom_html.element Js.t)
+    (selector : string)
+    (map : Dom_html.element Js.t -> 'a) : 'a list =
+  Array.to_list
+    (Js.to_array
+       (Js.Unsafe.fun_call
+          (Js.Unsafe.js_expr "childrenValue")
+          [| Js.Unsafe.inject element ;
+             Js.Unsafe.inject (Js.string selector);
+             Js.Unsafe.inject map
+          |]))
+
+let hide_codemirror () : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "hideCodeMirror")
+    [| |]
+
+let show_codemirror () : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "showCodeMirror")
+    [| |]

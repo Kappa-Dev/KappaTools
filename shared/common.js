@@ -261,7 +261,56 @@ function ajaxRequest(url,type,timeout,data,handler){
 	   });
 
 }
-
+/* Apply an action to a modal window. */
 function modal(id,action){
     $(id).modal(action);
+}
+// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript/2117523#2117523
+/* Used primarily to create a client id */
+function guid(){
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+	return v.toString(16);
+    });
+}
+/* Throw an exception */
+function toss(e){ throw e; }
+
+/* Return the data of an element. */
+function elementData(element,label){
+    var result = $(element).data(label);
+    return result;
+}
+
+/* create a jquery ui sort */
+function createSort(id,handler){
+    $("#"+id).sortable({
+        items : "li:not(.ui-sort-disabled)",
+	change : function() {
+	    var list = $(this).closest('ul');
+	    /* used to pin elements to the top */
+	    var topAnchor = $(list).find('.ui-sort-top-anchor');
+	    /* used to pin elements to the bottom */
+	    var bottomAnchor = $(list).find('.ui-sort-bottom-anchor');
+	    $(list).prepend($(topAnchor).detach());
+	    $(list).append($(bottomAnchor).detach());
+	}
+    });
+    $("#"+id).on("sortupdate",handler);
+}
+/* apply a map over the child nodes */
+function childrenValue(element,selector,map){
+    var result = [];
+    $(element).children(selector).each(function(index){ result.push(map(this)); })
+    return result;
+}
+
+function hideCodeMirror(){
+    var cm = $('.CodeMirror')[0].CodeMirror;
+    $(cm.getWrapperElement()).hide();
+}
+
+function showCodeMirror(){
+    var cm = $('.CodeMirror')[0].CodeMirror;
+    $(cm.getWrapperElement()).show();
 }

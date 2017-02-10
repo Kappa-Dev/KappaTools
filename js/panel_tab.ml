@@ -10,49 +10,48 @@ module Html = Tyxml_js.Html5
 
 let nav_tab_id = "navtabs"
 
-let navtabs (t : Ui_simulation.t) =
+let navtabs () =
   Tyxml_js.To_dom.of_ul @@
   Ui_common.navtabs nav_tab_id
-    ([ "editor",    (Tab_editor.navli t)
-     ; "plot",      (Tab_plot.navli t)
-     ; "flux",      (Tab_flux.navli t)
-     ; "snapshot",  (Tab_snapshot.navli t)
-     ; "outputs",   (Tab_outputs.navli t) ])
+    ([ "editor",    (Tab_editor.navli ())
+     ; "plot",      (Tab_plot.navli ())
+     ; "flux",      (Tab_flux.navli ())
+     ; "snapshot",  (Tab_snapshot.navli ())
+     ; "outputs",   (Tab_outputs.navli ()) ])
 
-let navcontents_id : string = "navcontents"
-let navcontents (t : Ui_simulation.t) =
+let navcontents_id : string =
+  "navcontents"
+
+let navcontents () =
   Tyxml_js.To_dom.of_div @@
   Ui_common.navcontent
     ~id:navcontents_id
     []
-    ([ "editor",    (Tab_editor.navcontent t)
-    ; "plot",      (Tab_plot.navcontent t)
-    ; "flux",      (Tab_flux.navcontent t)
-    ; "snapshot",  (Tab_snapshot.navcontent t)
-    ; "outputs",   (Tab_outputs.navcontent t) ])
+    ([ "editor",    (Tab_editor.content ())
+    ; "plot",      (Tab_plot.content ())
+    ; "flux",      (Tab_flux.content ())
+    ; "snapshot",  (Tab_snapshot.content ())
+    ; "outputs",   (Tab_outputs.content ()) ])
 
-let controls t =
- Tyxml_js.To_dom.of_div (Tab_settings.xml t)
+let controls () =
+  Tyxml_js.To_dom.of_div (Html.div (Panel_settings.content ()))
 
-let onload (t : Ui_simulation.t) =
-  let () = Tab_editor.onload t in
-  let () = Tab_plot.onload t in
-  let () = Tab_flux.onload t in
-  let () = Tab_snapshot.onload t in
-  let () = Tab_outputs.onload t in
-  let () = Tab_log.onload t in
-  let () = Tab_settings.onload t in
+let onload () =
+  let () = Tab_editor.onload () in
+  let () = Tab_plot.onload () in
+  let () = Tab_flux.onload () in
+  let () = Tab_snapshot.onload () in
+  let () = Tab_outputs.onload () in
+  let () = Tab_log.onload () in
+  let () = Panel_settings.onload () in
   ()
 
-let onunload () =
-  Tab_editor.onunload ()
-
-let onresize t =
-  let () = Tab_editor.onresize t in
-  let () = Tab_plot.onresize t in
-  let () = Tab_flux.onresize t in
-  let () = Tab_snapshot.onresize t in
-  let () = Tab_outputs.onresize t in
-  let () = Tab_log.onresize t in
-  let () = Tab_settings.onresize t in
+let onresize () =
+  let () = Tab_editor.onresize () in
+  let () = Tab_plot.onresize () in
+  let () = Tab_flux.onresize () in
+  let () = Tab_snapshot.onresize () in
+  let () = Tab_outputs.onresize () in
+  let () = Tab_log.onresize () in
+  let () = Panel_settings.onresize () in
   ()

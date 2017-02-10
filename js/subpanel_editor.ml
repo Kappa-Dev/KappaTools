@@ -71,7 +71,7 @@ let panel_heading =
              </div>
             </div>|}]
 
-let xml (_ : Ui_simulation.t) =
+let content () =
   [Html.div ~a:[Html.a_class ["panel";"panel-default"]]
      [%html {|<div class="panel-heading">
             |}[panel_heading]{|
@@ -160,7 +160,7 @@ let initialize codemirror () =
     let () = codemirror##setValue(Js.string filecontent) in
     Lwt.return_unit
 
-let onload (t : Ui_simulation.t) : unit =
+let onload () : unit =
   let lint_config =
     Codemirror.create_lint_configuration () in
   let () = lint_config##.getAnnotations := setup_lint in
@@ -263,7 +263,7 @@ let onload (t : Ui_simulation.t) : unit =
                       ) >>=
                       (fun  (va : Js.js_string Js.t) ->
                          let () = codemirror##setValue(va) in
-                         Ui_simulation.flush_simulation t)))
+                         Ui_simulation.flush_simulation ())))
               in
               let () = has_been_modified := false in
               Lwt.return_unit)) in
@@ -291,4 +291,4 @@ let onload (t : Ui_simulation.t) : unit =
               else Lwt.return_unit))
   in ()
 
-let onunload () = ()
+let onresize () = ()

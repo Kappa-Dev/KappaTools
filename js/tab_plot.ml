@@ -20,9 +20,7 @@ let offset , set_offset = React.S.create (None : offset option)
 let default_point = 1000
 let point , set_points = React.S.create default_point
 
-let has_plot
-    (state : Api_types_j.simulation_info option) :
-  bool =
+let has_plot (state : Api_types_j.simulation_info option) : bool =
   match state with
   | None -> false
   | Some state ->
@@ -41,8 +39,8 @@ let plot_time
 let serialize_json : (unit -> string) ref = ref (fun _ -> "null")
 let serialize_csv : (unit -> string) ref = ref (fun _ -> "")
 
-let configuration (t : Ui_simulation.t) : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output t) in
+let configuration () : Widget_export.configuration =
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -94,7 +92,7 @@ let plot_offset_input =
                   Html.a_placeholder "offset" ;
                 ] ()
 
-let content (t : Ui_simulation.t) =
+let xml () =
   let plot_show_legend =
     Html.input ~a:[ Html.a_id "plot-show-legend"
                   ; Html.a_input_type `Checkbox
@@ -112,7 +110,7 @@ let content (t : Ui_simulation.t) =
                   ; Html.a_input_type `Checkbox
                   ] () in
   let export_controls =
-    Widget_export.content (configuration t)
+    Widget_export.content (configuration ())
   in
   [%html {|
   <div class="navcontent-view">
@@ -148,11 +146,8 @@ let content (t : Ui_simulation.t) =
   </div>
   <div class="navcontent-controls"> |}[export_controls]{| </div> |}]
 
-let navcontent (t : Ui_simulation.t) : [> Html_types.div ] Html.elt list =
-  [Ui_common.toggle_element
-     t
-     (fun s -> has_plot s )
-     (content t) ]
+let content () : [> Html_types.div ] Html.elt list =
+  [Ui_common.toggle_element (fun s -> has_plot s ) (xml ()) ]
 
 let dimension_ref : Js_plot.plot_dimension Js.t option ref = ref None
 let calculate_dimension () =
@@ -191,10 +186,8 @@ let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
   let plot_size = simulation_info.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot in
   max 0 (plot_size - (React.S.value point))
 
-let update_offset
-    (update_offset_input : bool)
-    (t : Ui_simulation.t) : unit =
-  match React.S.value (Ui_simulation.simulation_output t) with
+let update_offset (update_offset_input : bool) : unit =
+  match React.S.value (Ui_simulation.simulation_output ()) with
   | None -> ()
   | Some simulation_info ->
     if simulation_info.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running then
@@ -223,37 +216,33 @@ let update_offset
           None
       in set_offset new_offset
 
-let plot_limit_offset (t : Ui_simulation.t) : int =
+let plot_limit_offset () : int =
   match React.S.value offset with
   | None ->
-    (match React.S.value (Ui_simulation.simulation_output t) with
+    (match React.S.value (Ui_simulation.simulation_output ()) with
      | None -> 0
      | Some t -> simulation_info_offset_max t)
   | Some offset -> offset.offset_current
 
 
-let plot_parameter (t : Ui_simulation.t) : Api_types_j.plot_parameter =
+let plot_parameter () : Api_types_j.plot_parameter =
   let point = React.S.value point in
   { Api_types_j.plot_parameter_plot_limit =
-      Some { Api_types_j.plot_limit_offset = Some (plot_limit_offset t) ;
+      Some { Api_types_j.plot_limit_offset = Some (plot_limit_offset ()) ;
              Api_types_j.plot_limit_points = Some point ; } }
 
 
-let update_plot
-    (update_offset_input : bool)
-    (t : Ui_simulation.t)
-    (js_plot : Js_plot.observable_plot Js.t) : unit =
+let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
   Ui_simulation.manager_operation
-    t
     (fun
       manager
       project_id
       simulation_id ->
-      let () = update_offset true t in
+      let () = update_offset true in
       (manager#simulation_detail_plot
          project_id
          simulation_id
-         (plot_parameter t)) >>=
+         (plot_parameter ())) >>=
       (Api_common.result_map
          ~ok:(fun _ (plot_detail : Api_types_t.plot_detail)  ->
              let plot = plot_detail.Api_types_j.plot_detail_plot in
@@ -271,7 +260,6 @@ let update_plot
     )
 
 let onload_plot_points_input
-    (t : Ui_simulation.t)
     (js_plot : Js_plot.observable_plot Js.t) : unit =
   let plot_points_input_dom : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input plot_points_input in
   let js_point : Js.js_string Js.t = Js.string (string_of_int (React.S.value point)) in
@@ -297,17 +285,17 @@ let onload_plot_points_input
                let () = plot_points_input_dom##.value := Js.string plot_point_string in
                let () = set_points default_point in ()
            in
-           let () = update_plot true t js_plot in
+           let () = update_plot js_plot in
            Js._true)
   in
   ()
 
 let plot_ref = ref None
 
-let onload (t : Ui_simulation.t) =
+let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
-  let simulation_output = (Ui_simulation.simulation_output t) in
-  let () = Widget_export.onload (configuration t) in
+  let simulation_output = (Ui_simulation.simulation_output ()) in
+  let () = Widget_export.onload (configuration ()) in
   let configuration : Js_plot.plot_configuration Js.t =
     Js_plot.create_configuration
       ~plot_div_id:display_id
@@ -323,7 +311,7 @@ let onload (t : Ui_simulation.t) =
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)
-  let () = onload_plot_points_input t plot in
+  let () = onload_plot_points_input plot in
   let () = plot_ref := Some plot in
   let () = Common.jquery_on
       "#navplot"
@@ -331,13 +319,13 @@ let onload (t : Ui_simulation.t) =
       (fun _ ->
          match (React.S.value simulation_output) with
          | None -> ()
-         | Some _ -> update_plot true t plot)
+         | Some _ -> update_plot plot)
   in
   let _ =
     React.S.l1
       (fun state -> match state with
          | None -> ()
-         | Some _ -> update_plot true t plot)
+         | Some _ -> update_plot plot)
       simulation_output
   in
   let () =
@@ -350,17 +338,17 @@ let onload (t : Ui_simulation.t) =
                          | Some offset -> Some { offset with offset_current = int_of_string value })
            with | Failure _ -> ()
          in
-         let () = update_plot true t plot in
+         let () = update_plot plot in
          ()
       )
   in
   ()
 
-let navli (_ : Ui_simulation.t) = []
+let navli () = []
 
-let onresize (t : Ui_simulation.t) =
+let onresize () =
   (* recalcuate size *)
-  let simulation_output = (Ui_simulation.simulation_output t) in
+  let simulation_output = (Ui_simulation.simulation_output ()) in
   let _ = calculate_dimension () in
   let () =
     match !plot_ref with
@@ -368,6 +356,6 @@ let onresize (t : Ui_simulation.t) =
     | Some plot ->
       (match React.S.value simulation_output with
        | None -> ()
-       | Some _ -> update_plot true t plot)
+       | Some _ -> update_plot plot)
   in
   ()
