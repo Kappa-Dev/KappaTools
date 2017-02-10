@@ -77,6 +77,15 @@ let get_simulation fname =
   let () = Yojson.Basic.read_lcurl lex_st lex_buf in
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let ident = Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "uuid") in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_colon lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let _ = Yojson.Basic.read_string lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = Yojson.Basic.read_comma lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let ident = Yojson.Basic.read_ident lex_st lex_buf in
   let () = assert (ident = "env") in
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let () = Yojson.Basic.read_colon lex_st lex_buf in

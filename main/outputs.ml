@@ -9,6 +9,8 @@
 let print_desc : (string,out_channel * Format.formatter) Hashtbl.t =
   Hashtbl.create 2
 
+let uuid = Random.State.bits (Random.State.make_self_init ())
+
 let get_desc file =
   try snd (Hashtbl.find print_desc file)
   with Not_found ->
@@ -21,8 +23,9 @@ let close_desc () =
 
 let dot_of_flux flux =
   let printer desc =
+    let () = Format.fprintf desc "@[<v>// \"uuid\" : \"%i\",@," uuid in
     let () = Format.fprintf
-        desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
+        desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
     let () = Format.fprintf
         desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
     let () =
@@ -52,8 +55,8 @@ let print_json_of_flux f flux =
       f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
       flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () = Format.fprintf
-      f "@[<v>\"normalized\" : %b,@ "
-      flux.Data.flux_data.Data.flux_normalized in
+      f "@[<v>\"normalized\" : %b,@ \"uuid\" : \"%i\",@,"
+      flux.Data.flux_data.Data.flux_normalized uuid in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
@@ -179,7 +182,7 @@ let close_trace () =
   match !traceDescr with
   | None -> ()
   | Some desc ->
-    let () = output_string desc "]}\n" in
+    let () = output_string desc "]\n}\n" in
     let () = close_out desc in
     traceDescr := None
 
@@ -189,9 +192,10 @@ let initialize trace_file plotPack env =
     | None -> ()
     | Some s ->
       let desc = Kappa_files.open_out s in
-      let () = output_string desc "{\"env\":" in
+      let () = output_string
+          desc ("{\n\"uuid\" : \""^string_of_int uuid^"\",\n\"env\":") in
       let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
-      let () = output_string desc ",\"trace\":[" in
+      let () = output_string desc ",\n\"trace\":[" in
       traceDescr := Some desc in
   match plotPack with
   | None -> ()
@@ -200,7 +204,7 @@ let initialize trace_file plotPack env =
       if Filename.check_suffix filename ".svg" then
         Svg {Pp_svg.file = filename;
              Pp_svg.title = title;
-             Pp_svg.descr = "";
+             Pp_svg.descr = "\"uuid\" : \""^string_of_int uuid^"\"";
              Pp_svg.legend = head;
              Pp_svg.points = [];
             }
@@ -209,6 +213,8 @@ let initialize trace_file plotPack env =
         let d = Format.formatter_of_out_channel d_chan in
         let is_tsv = Filename.check_suffix filename ".tsv" in
         let () = if not is_tsv then Format.fprintf d "# %s@." title in
+        let () = if not is_tsv
+          then Format.fprintf d "# \"uuid\" : \"%i\"@." uuid in
         let () = print_header_raw is_tsv d head in
         Raw {desc=d_chan; form=d; is_tsv} in
     plotDescr := Some format
@@ -221,7 +227,8 @@ let plot_now l =
 
 let print_snapshot sigs f s =
   Format.fprintf
-    f "@[<v>%a@,%a@]"
+    f "@[<v># \"uuid\" : \"%i\"@,%a@,%a@]"
+    uuid
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
            (Raw_mixture.print ~compact:false ~created:false ~sigs) mix))
@@ -233,7 +240,8 @@ let print_snapshot sigs f s =
 
 let print_dot_snapshot sigs f s =
   Format.fprintf
-    f "@[<v>digraph G{@,%a@,%a}@]"
+    f "@[<v>// \"uuid\" : \"%i\"@,digraph G{@,%a@,%a}@]"
+    uuid
     (Pp.listi
        Pp.cut
        (fun i f (nb,mix) ->

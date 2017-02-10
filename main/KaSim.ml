@@ -159,7 +159,6 @@ let () =
         (fun f -> if Array.length seed_arg > 0 then Format.pp_print_space f ())
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
 
-    let outputs = Outputs.go (Model.signatures env) in
     let trace_file =
       match kasim_args.Kasim_args.traceFile with
       | Some _ as x -> x
@@ -185,6 +184,7 @@ let () =
     if not !Parameter.compileModeOn then
       Outputs.initialize trace_file plotPack env;
 
+    let outputs = Outputs.go (Model.signatures env) in
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in

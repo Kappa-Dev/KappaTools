@@ -34,8 +34,8 @@ help:
 
 %.diff:
 	@touch $(basename $@).ref $(basename $@)
-	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -q $(basename $@).ref - || true
-	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
+	@sed '/uuid/d;/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -q $(basename $@).ref - || true
+	@sed '/uuid/d;/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
 %.bin.diff:
 	@touch $(basename $@).ref $(basename $@)
@@ -64,7 +64,7 @@ build:
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
 	find "$(CURDIR)" \( -name profiling.txt -or -name profiling.html -or -name compression_status.txt \) -delete
 	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
-	find "$(CURDIR)" -name \*.ref -exec file \{\} \; | grep text | cut -d: -f1 | xargs sed -i.rewritten -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d'
+	find "$(CURDIR)" -name \*.ref -exec sed -i.rewritten -e '/uuid/d;/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' \{\} \;
 	find "$(CURDIR)" -name \*.rewritten -delete
 
 .PHONY: clean clean_all

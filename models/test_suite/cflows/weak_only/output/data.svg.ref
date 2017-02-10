@@ -5,7 +5,6 @@
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 <title>Output of 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-o' 'data.svg' '-p' '1000' '--time-independent'</title>
-<descr></descr>
 
 <style type="text/css" >
 <![CDATA[
