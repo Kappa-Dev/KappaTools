@@ -121,13 +121,6 @@ let setup_lint _ _ _ =
 
 let initialize codemirror () =
   let args = Url.Current.arguments in
-  let () =
-    try Ui_state.set_model_pause_condition (List.assoc "pause" args)
-    with Not_found | Failure _ -> () in
-  let () =
-    try Ui_state.set_model_plot_period
-          (float_of_string (List.assoc "plot_period" args))
-    with Not_found | Failure _ -> () in
   try
     let url = List.assoc "model" args in
     XmlHttpRequest.get url >>=
@@ -171,9 +164,7 @@ let onload () : unit =
   let gutter_option : Js.string_array Js.t =
     gutter_options##split(Js.string ",")
   in
-  let textarea : Dom_html.element Js.t =
-    Js.Opt.get (document##getElementById (Js.string "code-mirror"))
-      (fun () -> assert false) in
+  let textarea : Dom_html.element Js.t = Ui_common.id_dom "code-mirror" in
   let () =
     configuration##.lineNumbers := Js._true;
     configuration##.lineWrapping := Js._true;
@@ -220,14 +211,8 @@ let onload () : unit =
   in
   let () = codemirror##onChange(handler) in
   let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
-  let save_button_dom : Dom_html.linkElement Js.t =
-    Js.Unsafe.coerce
-      (Js.Opt.get (document##getElementById (Js.string save_button_id))
-         (fun () -> assert false)) in
-  let toggle_button_dom : Dom_html.linkElement Js.t =
-    Js.Unsafe.coerce
-      (Js.Opt.get (document##getElementById (Js.string toggle_button_id))
-         (fun () -> assert false)) in
+  let save_button_dom : Dom_html.linkElement Js.t = Ui_common.id_dom save_button_id in
+  let toggle_button_dom : Dom_html.linkElement Js.t = Ui_common.id_dom toggle_button_id in
   let () =
     save_button_dom##.onclick :=
       Dom.handler

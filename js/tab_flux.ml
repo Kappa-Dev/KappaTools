@@ -290,11 +290,7 @@ let onload () =
       (fun _ -> let () = select_fluxmap flux in Js._true)
   in
 
-  let div : Dom_html.element Js.t =
-    Js.Opt.get
-      (Ui_common.document##getElementById
-         (Js.string display_id))
-      (fun () -> assert false) in
+  let div : Dom_html.element Js.t = Ui_common.id_dom display_id in
   let () = div##.innerHTML := Js.string
         ("<svg id=\""^
          svg_id^

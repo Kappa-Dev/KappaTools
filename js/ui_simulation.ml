@@ -154,10 +154,9 @@ let manager_operation
 
 let create_parameter (simulation_id : Api_types_j.simulation_id ) :
   Api_types_j.simulation_parameter =
-  { Api_types_j.simulation_plot_period = React.S.value Ui_state.model_plot_period ;
-    Api_types_j.simulation_pause_condition =
-      React.S.value Ui_state.model_pause_condition ;
-    Api_types_j.simulation_seed = React.S.value Ui_state.model_seed;
+  { Api_types_j.simulation_plot_period = React.S.value State_parameter.model_plot_period ;
+    Api_types_j.simulation_pause_condition = React.S.value State_parameter.model_pause_condition ;
+    Api_types_j.simulation_seed = React.S.value State_parameter.model_seed;
     Api_types_j.simulation_id = simulation_id ;
   }
 

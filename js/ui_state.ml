@@ -9,8 +9,7 @@
 open Lwt.Infix
 
 exception InvalidState of string
-let editor_full , set_editor_full =
-  React.S.create (false : bool)
+let editor_full , set_editor_full = React.S.create (false : bool)
 let model_parse , set_model_parse =
   React.S.create (None : Api_types_j.contact_map option)
 (* Add the location where the error was emitted from *)
@@ -22,23 +21,16 @@ let model_error, _set_model_error =
 let set_model_error location messages =
   _set_model_error (Some ({ model_error_messages = messages;
                             model_error_location =  location; }))
-let clear_model_error () =
-  _set_model_error None
+let clear_model_error () = _set_model_error None
 let has_model_error () =
   match React.S.value model_error with
   | None -> false
   | Some _ -> true
-let model_pause_condition, set_model_pause_condition =
-  React.S.create "[T] > 100"
-let model_seed, set_model_seed =
-  React.S.create (None : int option)
-let model_plot_period, set_model_plot_period = React.S.create 1.0
+
 let current_file , set_current_file =
   React.S.create (None : Api_types_j.file option)
 let current_project_id, set_current_project_id =
-  React.S.create
-    (Some "default" : Api_types_j.project_id option)
-    (*None : Api_types_j.project_id option)*)
+  React.S.create (Some "default" : Api_types_j.project_id option)
 
 type cli = { url : string;
              command : string;
@@ -226,10 +218,7 @@ let synch_lwt () : unit Lwt.t =
                                  current_file.Api_types_j.file_metadata.Api_types_j.file_metadata_hash ; })
                         | [] ->
                           (format_file ()) >>=
-                          (fun _ ->
-                             manager#file_create
-                               project_id
-                               current_file)
+                          (fun _ -> manager#file_create project_id current_file)
                       )
                 )
                 >>=

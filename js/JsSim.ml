@@ -9,10 +9,9 @@
 module Html5 = Tyxml_js.Html5
 
 let onload _ =
+  let () = State_ui.onload () in
   let () = Ui_simulation.set_t (Ui_simulation.create ()) in
-  let main =
-    Js.Opt.get (Ui_common.document##getElementById (Js.string "main"))
-      (fun () -> assert false) in
+  let main = Ui_common.id_dom "main" in
   let () = Dom.appendChild main (Panel_tab.navtabs ()) in
   let () = Dom.appendChild main (Panel_tab.navcontents ()) in
   let () = Dom.appendChild main (Panel_tab.controls ()) in

@@ -143,15 +143,10 @@ let xml () =
              |}file_content{|
              </div> |}] ]
 
-let select_outputs () =
-  Js.Opt.case
-    (Ui_common.document##getElementById (Js.string select_id))
-    (fun () -> ())
-    (fun dom ->
-       let select_dom : Dom_html.inputElement Js.t =
-         Js.Unsafe.coerce dom in
-       let fileindex = Js.to_string (select_dom##.value) in
-       update_outputs fileindex)
+let select_outputs () : unit =
+  let select_dom =  Ui_common.id_dom select_id in
+  let fileindex = Js.to_string (select_dom##.value) in
+  update_outputs fileindex
 
 let content () =
   [ Ui_common.toggle_element (fun t -> file_count t > 0) (xml ()) ]

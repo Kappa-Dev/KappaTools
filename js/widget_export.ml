@@ -92,27 +92,11 @@ let content
 
 let onload (configuration :  configuration) =
   let export_button : Dom_html.buttonElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string (export_button_id configuration))
-          )
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+    Ui_common.id_dom (export_button_id configuration) in
   let export_filename : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string (export_filename_id configuration)))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+    Ui_common.id_dom (export_filename_id configuration) in
   let export_format : Dom_html.selectElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string (export_format_id configuration)))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+    Ui_common.id_dom (export_format_id configuration) in
   let export_button_toggle () : unit =
     let filename : string =
       Js.to_string (export_filename##.value)

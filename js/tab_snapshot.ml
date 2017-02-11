@@ -345,19 +345,9 @@ let select_snapshot () =
 let onload () : unit =
   let simulation_output = (Ui_simulation.simulation_output ()) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string select_id))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+    Ui_common.id_dom select_id in
   let format_select_dom : Dom_html.inputElement Js.t =
-    Js.Unsafe.coerce
-      ((Js.Opt.get
-          (Ui_common.document##getElementById
-             (Js.string format_select_id))
-          (fun () -> assert false))
-       : Dom_html.element Js.t) in
+    Ui_common.id_dom format_select_id in
   let () =
     snapshot_select_dom
     ##.
