@@ -125,6 +125,82 @@ let input =
 
 end
 
+module ButtonConfiguration : Ui_common.Div = struct
+  let configuration_seed_input_id = "configuration_input"
+  let configuration_seed_input =
+    Html.input ~a:[ Html.a_id configuration_seed_input_id ;
+                    Html.a_input_type `Number;
+                    Html.a_class ["form-control"];
+                  ] ()
+  let configuration_save_button_id = "configuration_save_button"
+  let configuration_save_button =
+    Html.button
+      ~a:[ Html.a_class [ "btn" ; "btn-default" ] ;
+           Html.a_id configuration_save_button_id ;
+         ]
+      [ Html.cdata "Save" ]
+  let simulation_configuration_modal_id = "simulation_configuration_modal"
+  let configuration_modal = Ui_common.create_modal
+      ~id:simulation_configuration_modal_id
+      ~title_label:"Simulation Configuration"
+      ~buttons:[ configuration_save_button ]
+      ~body:[[%html
+              {|<div class="row">
+                   <div class="col-md-1"><label for={[configuration_seed_input_id]}>Seed</label></div>
+                   <div class="col-md-5">|}
+                     [configuration_seed_input]{|</div>
+                </div>|}] ; ]
+
+  let configuration_button_id = "configuration_button"
+  let configuration_button =
+    Html.button
+      ~a:[ Html.a_class [ "btn" ; "btn-default" ] ;
+           Html.a_id configuration_button_id ;
+         ]
+      [ Html.cdata "Options" ]
+
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
+    [ [%html {|<div class="input-group input-group-offset-5">
+              |}[configuration_button]{|
+              |}[configuration_modal]{|
+             </div>|}] ]
+  let onload () =
+    let () = Common.jquery_on
+      (Format.sprintf "#%s" configuration_save_button_id)
+      ("click")
+      (Dom_html.handler
+         (fun (_ : Dom_html.event Js.t)  ->
+            let input : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input configuration_seed_input in
+            let value : string = Js.to_string input##.value in
+            let model_seed = try Some (int_of_string value) with Failure _ -> None in
+            let () = State_parameter.set_model_seed model_seed in
+            let () =
+              Common.modal
+                ~id:("#"^simulation_configuration_modal_id)
+                ~action:"hide"
+            in
+
+            Js._true))
+    in
+    let () = Common.jquery_on
+      ("#"^configuration_button_id)
+      ("click")
+      (Dom_html.handler
+         (fun (_ : Dom_html.event Js.t)  ->
+            let input : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input configuration_seed_input in
+            let () = input##.value := Js.string
+                  (match React.S.value State_parameter.model_seed with
+                   | None -> ""
+                   | Some model_seed -> string_of_int model_seed) in
+            let () =
+              Common.modal
+                ~id:("#"^simulation_configuration_modal_id)
+                ~action:"show"
+            in
+            Js._false)) in
+    ()
+end
+
 module DivErrorMessage : Ui_common.Div = struct
   let alert_messages =
   Html.div
@@ -516,6 +592,8 @@ let stopped_body : [> Html_types.div ] Tyxml_js.Html5.elt =
                 ~a_class:[ "row" ]
                 [ Ui_simulation.STOPPED ; ]) ]
       [ Html.div ~a:[ Html.a_class ["col-md-2" ] ] (InputPlotPeriod.content ()) ;
+        Html.div ~a:[ Html.a_class ["col-md-1" ] ] (ButtonConfiguration.content ()) ;
+
         Html.div ~a:[ Html.a_class ["col-md-9" ] ] (DivErrorMessage.content ()) ]
     in
     let paused_row =
@@ -609,6 +687,7 @@ let onload () : unit =
   let () = InputPerturbation.onload () in
   let () = InputPauseCondition.onload () in
   let () = InputPlotPeriod.onload () in
+  let () = ButtonConfiguration.onload () in
   let () = DivErrorMessage.onload () in
   let () = ButtonStart.onload () in
   let () = ButtonPause.onload () in
