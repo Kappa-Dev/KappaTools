@@ -25,10 +25,8 @@ sig
       ode_var_id  Locality.annot) list  * I.rule) list
 
   val export_network:
-    command_line:string ->
-    command_line_quotes:string ->
-    data_file:string ->
-    init_t:float -> max_t:float -> plot_period:float ->
+    command_line:string -> command_line_quotes:string ->
+    ?data_file:string -> init_t:float -> max_t:float -> ?plot_period:float ->
     Loggers.t -> Loggers.t -> I.compil -> (int,int) network -> unit
 
   val species_of_species_id:

@@ -1,4 +1,6 @@
 %def: "seed" "16602"
+%def: "plotPeriod" "0.008" "t.u."
+%def: "outputFileName" "data.tsv"
 
 %agent: A(b!a.B, d!a.D)
 %agent: B(a!b.A, c!b.C)

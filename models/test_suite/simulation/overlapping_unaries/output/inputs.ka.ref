@@ -1,4 +1,6 @@
 %def: "seed" "56235278"
+%def: "plotPeriod" "0.84" "t.u."
+%def: "outputFileName" "data.svg"
 
 %agent: fE(c!e.fC, s!e.fS)
 %agent: fC(e!c.fE, s!c.fS)

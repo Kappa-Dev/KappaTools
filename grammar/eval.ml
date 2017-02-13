@@ -385,14 +385,28 @@ let inits_of_result ?rescale contact_map env preenv res =
       ) res.Ast.init preenv in
   (preenv',init_l)
 
+type configuration = {
+  seed : int option;
+  traceFileName : string option;
+  plotPeriod : Counter.period option;
+  outputFileName : string option;
+}
+
+let empty_config = {
+  seed = None;
+  traceFileName = None;
+  plotPeriod = None;
+  outputFileName = None;
+}
+
 let configurations_of_result result =
   let get_value pos_p param value_list f =
     match value_list with
-    | (v,pos) :: _ -> f v pos
-    | [] ->
+    | [v,pos] -> f v pos
+    | _ ->
       raise
         (ExceptionDefn.Malformed_Decl
-           ("Empty value for parameter "^param,pos_p)) in
+           ("Wrong number of arguments for parameter "^param,pos_p)) in
   let set_value pos_p param value_list f ass =
     get_value pos_p param value_list (fun x p -> ass := f x p) in
   let get_bool_value pos_p param value_list =
@@ -407,7 +421,7 @@ let configurations_of_result result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (seed,story_compression,formatCflow,cflowFile as acc)
+    (fun (conf,story_compression,formatCflow,cflowFile as acc)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -416,7 +430,7 @@ let configurations_of_result result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> (seed,(a,b,c),formatCflow,cflowFile)
+          | [] -> (conf,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unkown value "^error^" for compression mode", pos))
@@ -424,15 +438,61 @@ let configurations_of_result result =
         parse story_compression value_list
       | "cflowFileName" ->
         get_value pos_p param value_list
-          (fun x _ -> (seed,story_compression,formatCflow,Some x))
+          (fun x _ -> (conf,story_compression,formatCflow,Some x))
       | "seed" ->
         get_value pos_p param value_list
           (fun s p ->
              try
-               (Some (int_of_string s),story_compression,formatCflow,cflowFile)
+               ({ conf with seed = Some (int_of_string s) },
+                story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be an integer", p)))
+      | "plotPeriod" ->
+        begin match value_list with
+          | [s,p] ->
+            (try
+               ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
+                story_compression,formatCflow,cflowFile)
+             with Failure _ ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Value "^s^" should be a float", p)))
+          | [s,sp;u,up] ->
+            if u = "e" || u = "event" || u = "events" ||
+               u = "Event" || u = "Events" then
+              try
+                ({conf with plotPeriod = Some (Counter.DE (int_of_string s))},
+                 story_compression,formatCflow,cflowFile)
+              with Failure _ ->
+                raise (ExceptionDefn.Malformed_Decl
+                         ("Value "^s^" should be a int", sp))
+            else if u = "t.u." || u = "time units" || u = "Time units" ||
+                    u = "time unit" || u = "Time unit" then
+              try
+                ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
+                 story_compression,formatCflow,cflowFile)
+              with Failure _ ->
+                raise (ExceptionDefn.Malformed_Decl
+                         ("Value "^s^" should be a float", sp))
+            else
+              raise (ExceptionDefn.Malformed_Decl
+                       ("Incorrect unit "^u, up))
+          | _ ->
+            raise
+              (ExceptionDefn.Malformed_Decl
+                 ("Wrong number of arguments for parameter "^param,pos_p))
+        end
+      | "outputFileName" ->
+        get_value pos_p param value_list
+          (fun s _ ->
+               ({ conf with outputFileName = Some s },
+                story_compression,formatCflow,cflowFile))
+      | "traceFileName" ->
+        get_value pos_p param value_list
+          (fun s _ ->
+               ({ conf with traceFileName = Some s },
+                story_compression,formatCflow,cflowFile))
+
       | "progressBarSize" ->
         let () = set_value pos_p param value_list
             (fun v p ->
@@ -469,7 +529,7 @@ let configurations_of_result result =
         acc
       | "dotCflows" ->
          let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
-         (seed,story_compression,formatCflow,cflowFile)
+         (conf,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
            (story_compression, Dot) else
            (story_compression, Html)*)
@@ -486,7 +546,7 @@ let configurations_of_result result =
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) (None, (false,false,false), "dot", None) result.configurations
+    ) (empty_config, (false,false,false), "dot", None) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   Tools.array_fold_left_mapi

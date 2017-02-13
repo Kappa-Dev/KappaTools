@@ -66,7 +66,7 @@ let main () =
       | None -> ()
       | Some s ->
         Kappa_files.set_ode
-          Loggers.Matlab
+          ~mode:Loggers.Matlab
           s
     in
     let () =
@@ -76,7 +76,7 @@ let main () =
       | None -> ()
       | Some s ->
         Kappa_files.set_ode
-          Loggers.Octave
+          ~mode:Loggers.Octave
           s
     in
     let () =
@@ -86,7 +86,7 @@ let main () =
       | None -> ()
       | Some s ->
         Kappa_files.set_ode
-          Loggers.SBML
+          ~mode:Loggers.SBML
           s
     in
     let count =
@@ -173,10 +173,10 @@ let main () =
     let () = A.export_network
         ~command_line
         ~command_line_quotes
-        ~data_file:cli_args.Run_cli_args.outputDataFile
+        ?data_file:cli_args.Run_cli_args.outputDataFile
         ~init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)
-        ~plot_period:cli_args.Run_cli_args.plotPeriod logger logger_buffer compil network in
+        ?plot_period:cli_args.Run_cli_args.plotPeriod logger logger_buffer compil network in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in
     ()

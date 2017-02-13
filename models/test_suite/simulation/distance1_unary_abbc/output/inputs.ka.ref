@@ -1,4 +1,6 @@
 %def: "seed" "904918633"
+%def: "plotPeriod" "4" "events"
+%def: "outputFileName" "data.svg"
 
 %agent: A(a~u~p!a.B)
 %agent: B(a!a.A, b!b.B, c!c.C)

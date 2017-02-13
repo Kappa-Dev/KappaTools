@@ -1,4 +1,6 @@
 %def: "seed" "611463625"
+%def: "plotPeriod" "0.4" "t.u."
+%def: "outputFileName" "data.csv"
 
 %agent: C()
 %agent: L(z!l.Z, s!l.S)

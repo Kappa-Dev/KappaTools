@@ -295,13 +295,28 @@ let close () =
   let () = match !inputsDesc with None -> () | Some x -> close_out x in
   close_desc ()
 
-let initial_inputs theSeed env contact_map init =
+let initial_inputs conf env contact_map init =
   let inputs = Kappa_files.open_out_fresh "inputs" "" "ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () = Format.fprintf inputs_form "@[<v># \"uuid\" : \"%i\"@," uuid in
-  let () = Format.fprintf inputs_form "%%def: \"seed\" \"%i\"@,@]@." theSeed in
+  let () = Pp.option ~with_space:false
+      (fun f -> Format.fprintf f "%%def: \"seed\" \"%i\"@,")
+      inputs_form conf.Eval.seed in
+  let () = Pp.option ~with_space:false
+      (fun f -> function
+         | Counter.DE i ->
+           Format.fprintf f "%%def: \"plotPeriod\" \"%i\" \"events\"@," i
+         | Counter.DT t ->
+           Format.fprintf f "%%def: \"plotPeriod\" \"%g\" \"t.u.\"@," t)
+      inputs_form conf.Eval.plotPeriod in
+  let () = Pp.option ~with_space:false
+      (fun f -> Format.fprintf f "%%def: \"outputFileName\" \"%s\"@,")
+      inputs_form conf.Eval.outputFileName in
+  let () = Pp.option ~with_space:false
+      (fun f -> Format.fprintf f "%%def: \"traceFileName\" \"%s\"@,")
+      inputs_form conf.Eval.traceFileName in
   let () = Format.fprintf inputs_form
-      "%a@." (Kappa_printer.env_kappa contact_map) env in
+      "@]@.%a@." (Kappa_printer.env_kappa contact_map) env in
   let sigs = Model.signatures env in
   let () = Format.fprintf inputs_form "@.@[<v>%a@]@."
       (Pp.list Pp.space

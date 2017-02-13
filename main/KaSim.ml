@@ -124,14 +124,14 @@ let () =
       (!Parameter.debugModeOn || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
-    let (seed0, env, contact_map, _, story_compression,
+    let (conf, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
         counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
 
     let theSeed,seed_arg =
-      match kasim_args.Kasim_args.seedValue,seed0 with
+      match kasim_args.Kasim_args.seedValue,conf.Eval.seed with
       | Some seed,_ | None, Some seed -> seed,[||]
       | None, None ->
         let () = Format.printf "+ Self seeding...@." in
@@ -146,9 +146,6 @@ let () =
          Counter.max_time counter = None && Counter.max_events counter = None then
         Model.check_if_counter_is_filled_enough env in
 
-    let () =
-      Outputs.initial_inputs theSeed env contact_map init_l in
-
     let command_line =
       Format.asprintf "@[<h>%a%t%a@]"
         (Pp.array Pp.space
@@ -159,15 +156,19 @@ let () =
         (fun f -> if Array.length seed_arg > 0 then Format.pp_print_space f ())
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
 
-    let trace_file =
-      match kasim_args.Kasim_args.traceFile with
-      | Some _ as x -> x
-      | None ->
+    let trace_file,user_trace_file =
+      match kasim_args.Kasim_args.traceFile,conf.Eval.traceFileName with
+      | Some _ as x,_ -> x,x
+      | _, (Some _ as x) -> x,x
+      | None, None ->
         match story_compression with
-        | None -> None
+        | None -> None,None
         | Some _ ->
           let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
-          !tmp_trace in
+          !tmp_trace,None in
+    let plot_file = Tools.unsome
+        (Tools.unsome "data.csv" conf.Eval.outputFileName)
+        cli_args.Run_cli_args.outputDataFile in
     let plotPack =
       let head =
         Model.map_observables
@@ -175,12 +176,19 @@ let () =
           env in
       if Array.length head > 1 then
         let title = "Output of " ^ command_line in
-        Some (cli_args.Run_cli_args.outputDataFile,title,head)
+        Some (plot_file,title,head)
       else None in
+
+    let () =
+      Outputs.initial_inputs
+        {Eval.seed = Some theSeed; Eval.traceFileName = user_trace_file;
+         Eval.plotPeriod = Some (Counter.plot_period counter);
+         Eval.outputFileName = Some plot_file;}
+        env contact_map init_l in
 
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
-      cli_args.Run_cli_args.outputDataFile;
+      plot_file;
     if not !Parameter.compileModeOn then
       Outputs.initialize trace_file plotPack env;
 

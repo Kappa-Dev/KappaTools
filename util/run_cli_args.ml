@@ -10,11 +10,11 @@ type t = {
   mutable alg_var_overwrite   : (string * Nbr.t) list;
   mutable minValue            : float;
   mutable maxValue            : float option;
-  mutable plotPeriod          : float;
+  mutable plotPeriod          : float option;
   mutable rescale             : float option;
   mutable marshalizedInFile   : string;
   mutable inputKappaFileNames : string list;
-  mutable outputDataFile      : string;
+  mutable outputDataFile      : string option;
   mutable outputDirectory     : string;
   mutable batchmode           : bool;
   mutable interactive         : bool;
@@ -24,11 +24,11 @@ let default : t = {
   alg_var_overwrite = [];
   minValue = 0. ;
   maxValue = None;
-  plotPeriod = 1.;
+  plotPeriod = None;
   rescale = None;
   marshalizedInFile = "";
   inputKappaFileNames = [];
-  outputDataFile = "data.csv";
+  outputDataFile = None;
   outputDirectory = ".";
   batchmode  = false;
   interactive = false;
@@ -50,7 +50,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
        raise (Arg.Bad ("Option '-t' has been replace by '[-u time] -l "^
                        string_of_float f^"'"))),"Deprecated option");
   ("-p",
-   Arg.Float(fun pointNumberValue -> t.plotPeriod <- pointNumberValue),
+   Arg.Float(fun pointNumberValue -> t.plotPeriod <- Some pointNumberValue),
    "plot period: time interval between points in plot (default: 1.0)");
   ("-var",
    Arg.Tuple
@@ -64,7 +64,8 @@ let options (t :t)  : (string * Arg.spec * string) list = [
                 raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
              ::t.alg_var_overwrite)]),
    "Set a variable to a given value");
-  ("-o", Arg.String (fun outputDataFile -> t.outputDataFile <- outputDataFile),
+  ("-o", Arg.String
+     (fun outputDataFile -> t.outputDataFile <- Some outputDataFile),
    "file name for data output") ;
   ("-d",
    Arg.String (fun outputDirectory -> t.outputDirectory <- outputDirectory),

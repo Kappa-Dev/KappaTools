@@ -1,4 +1,6 @@
 %def: "seed" "785872661"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
 
 %agent: A(x!x.B, c!x1.C!x2.C)
 %agent: B(x!x.A)

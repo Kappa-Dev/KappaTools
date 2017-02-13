@@ -13,7 +13,7 @@ val initialize :
   Model.t -> unit
 
 val initial_inputs :
-  int -> Model.t -> Contact_map.t ->
+  Eval.configuration -> Model.t -> Contact_map.t ->
   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> unit
 
 val input_modifications : Model.t -> int -> Primitives.modification list -> unit

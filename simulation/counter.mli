@@ -41,7 +41,7 @@ val time_percentage : t -> int option
 val time : t -> float
 val tracked_events : t -> int option
 
-val plot_period : t -> float
+val plot_period : t -> period
 val set_plot_period : t -> period -> unit
 
 val current_time : t -> float

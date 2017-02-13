@@ -266,21 +266,22 @@ let build_ast
                         | Data.TraceStep _
                         | Data.Print _ -> assert false)
                     ~max_sharing:false sig_nd tk_nd contact_map result >>=
-                  (fun (seed,env,has_tracking,_,_,init_l) ->
+                  (fun (conf,env,has_tracking,_,_,init_l) ->
                      let counter =
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
                          ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
                      let () = ExceptionDefn.flush_warning log_form in
                      let random_state =
-                       match seed with
+                       match conf.Eval.seed with
                        | None -> Random.State.make_self_init ()
                        | Some theSeed -> Random.State.make [|theSeed|] in
                      let simulation =
                        create_t
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
                          ~graph:(Rule_interpreter.empty
-                                   ~with_trace:(has_tracking <>None)
+                                   ~with_trace:((*TODO conf.Eval.traceFileName*)
+                                     has_tracking <>None)
                                    random_state env counter)
                          ~state:(State_interpreter.empty env [])
                          ~init_l ~has_tracking ~lastyield

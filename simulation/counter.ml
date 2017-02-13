@@ -121,7 +121,7 @@ let one_time_correction_event c ti =
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
 let max_time c = c.max_time
 let max_events c = c.max_event
-let plot_period c = match c.plot_period with DT dt -> dt | DE de -> float de
+let plot_period c = c.plot_period
 
 let time_ratio t =
   match t.max_time with

@@ -1234,9 +1234,12 @@ struct
 
   let breakline = true
 
+  (* TODO : if unspecified, data_file and plot_period should get their
+     value from field [conf] of [compil] before falling back to their
+     default *)
   let export_main
-      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
-      logger logger_buffer compil network split =
+      ~command_line ~command_line_quotes ?(data_file="data.csv") ~init_t ~max_t
+      ?(plot_period=1.) logger logger_buffer compil network split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
@@ -1700,8 +1703,8 @@ struct
     ()
 
   let export_network
-      ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
-      logger logger_buffer compil network =
+      ~command_line ~command_line_quotes ?data_file ~init_t ~max_t
+      ?plot_period logger logger_buffer compil network =
     let network =
       if
         may_be_not_time_homogeneous network
@@ -1718,7 +1721,7 @@ struct
     let () = Format.printf "\t -main function @." in
     let () =
       export_main
-        ~command_line ~command_line_quotes ~data_file ~init_t ~max_t ~plot_period
+        ~command_line ~command_line_quotes ?data_file ~init_t ~max_t ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
