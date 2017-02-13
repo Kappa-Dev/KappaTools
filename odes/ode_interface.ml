@@ -61,10 +61,11 @@ let do_we_count_in_embeddings compil =
 let do_we_prompt_reactions compil =
   compil.show_reactions
 
-let print_chemical_species ?compil =
-  Pattern.print_cc
-    ?sigs:(Tools.option_map Model.signatures (environment_opt compil))
-    ?cc_id:None
+let print_chemical_species ?compil f =
+  Format.fprintf f "@[<h>%a@]"
+    (Pattern.print_cc
+       ?sigs:(Tools.option_map Model.signatures (environment_opt compil))
+       ?cc_id:None)
 
 let print_token ?compil fmt k =
   Format.fprintf fmt

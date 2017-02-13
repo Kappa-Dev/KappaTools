@@ -410,7 +410,6 @@ let print_cc ?sigs ?cc_id f cc =
                   (free,(succ free, Mods.Int2Map.add (ag_i,p) free link_ids)) in
               let () = Format.fprintf f "!%i" i in
               true,out') (false,link_ids) neigh) in
-  let () = Format.pp_open_box f 2 in
   let () = match cc_id with
     | None -> ()
     | Some cc_id -> Format.fprintf f "/*cc%i*/@ " cc_id in
@@ -426,7 +425,7 @@ let print_cc ?sigs ?cc_id f cc =
          let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in
          true,out) cc.nodes (false,(1,Mods.Int2Map.empty)) in
-  Format.pp_close_box f ()
+  ()
 
 let to_yojson cc =
   match Mods.IntMap.max_key cc.nodes with
