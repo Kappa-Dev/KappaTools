@@ -5,6 +5,7 @@ type hashed_list
 type elt
 type cache
 
+val int_of_hashed_list : hashed_list -> int
 val compare : hashed_list -> hashed_list -> int
 val init : unit -> cache
 val hash : cache -> elt list -> cache * hashed_list
@@ -21,6 +22,8 @@ module Make =
     type elt = A.t
     type elt_id = int
     type hashed_list = int
+
+    let int_of_hashed_list (h:hashed_list) : int = h
 
     let compare = compare
 

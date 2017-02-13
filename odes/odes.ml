@@ -1832,6 +1832,34 @@ struct
     in
     ()
 
+  (*compute the biggest hash *)
+  let max_hash h1 h2 =
+    if h1 >= h2
+    then h1
+    else h2
+
+  let rec max_hashes nbr_auto_in_rule_list =
+    match nbr_auto_in_rule_list with
+    | [] -> LKappa_auto.RuleCache.empty
+    | x :: [] -> x
+    | x :: xs ->
+      max_hash x (max_hashes xs)
+
+  let print_max_hash log hash =
+    let () = Loggers.fprintf log "Biggest hash:\n" in
+    print_hash log hash
+
+  let print_bool_array log arr =
+    Mods.DynArray.iter (fun b ->
+        Loggers.fprintf log " %b " b
+      ) arr
+
+  let print_int_array log arr =
+    Mods.DynArray.iter (fun i ->
+        Loggers.fprintf log " %i " i
+      ) arr
+
+
   let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
     let cache, (*gamma_list, *)nbr_auto_in_rule_list =
@@ -1887,7 +1915,30 @@ struct
     let isomorphism_rule =
       compute_isomorphism_in_hashes nbr_auto_in_rule_list
     in
+    (*a) compute the biggest hash*)
+    let max_hash =
+      max_hashes nbr_auto_in_rule_list
+    in
+    (*b. create an array of size: hash+1, true*)
+    let size_hash_plus_1 =
+      (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
+    in
+    let to_check =
+      Mods.DynArray.create size_hash_plus_1 true
+    in
+    (*b. create an array of size: hash+1, 0*)
+    let hit =
+      Mods.DynArray.create size_hash_plus_1 0
+    in
+    (*c. *)
+    (*PRINT*)
     let () = print_isomorphism log isomorphism_rule in
+    let () = print_max_hash log max_hash in
+    let () = Loggers.fprintf log "To_check_array: " in
+    let () = print_bool_array log to_check in
+    let () = Ode_loggers.print_newline log in
+    let () = Loggers.fprintf log "\nHit_array: " in
+    let () = print_int_array log hit in
     let () = Ode_loggers.print_newline log in
     cache, ()
 
@@ -1907,6 +1958,62 @@ iii. and for any site graph [E, E] denotes the number of
 automorphisms in the site graph E.
 *)
 
+(*
+2) Now we have a list of rules, with a hash.
+
+a) compute the biggest hash.
+
+We want to check whether the rule set if symmetric w.r.t the sites x
+and y in A.
+
+b) make an array (named to_check) of size hash+1, with the value true
+everywhere.
+and another array (named hit) of size hash+1, with the value 0
+everywhere
+
+c) for each rule, put true in the corresponding element of the
+array.
+
+d) take your list of rule
+     -> if the corresponding element is false in the array to_check
+         Ignore this rule
+     -> otherwise
+         Compute the list of the positions (of all agents: both in
+the lhs/rhs, degraded agents, created agents)
+of the agent A with at least a site x or y in the rule.
+
+         Compute the powerset of this list (the list of sublist)
+         Each element of the result is a list, encoding a
+transformation as the list of the agent position in which we swap x
+and y.
+
+         For each transformation, apply the following transformation,
+and compute the hash of the result.
+         Count how many time you obtain each hash, by incrementing
+the corresponding element in the array hit.
+
+        Once you have done that, for all the potential
+transformations, check that:
+gamma(hash)/nbr of time you get the hash is the same for all
+the hashs that you have obtained.
+
+-> if yes, mark all the hash that you have found as false (to_check)
+(they do not have to be checked anymore) and as 0
+(hit).
+
+-> if no, the final result is « false » abort the iteration with this
+value.
+
+If you can do that for all rules, then output true.
+
+*)
+
+
+(*
+  b) make an array (named to_check) of size hash+1, with the value
+true everywhere. and another array (named hit) of size hash+1, with
+the value 0 everywhere
+*)
 
 
 

@@ -4,6 +4,8 @@ sig
   type hashed_list
   type elt = A.t
 
+  val int_of_hashed_list : hashed_list -> int
+
   val compare: hashed_list -> hashed_list -> int
   val init: unit -> cache
   val hash:
@@ -19,6 +21,8 @@ sig
   type hashed_list
   type elt
   type cache
+
+  val int_of_hashed_list : hashed_list -> int
 
   val compare : hashed_list -> hashed_list -> int
   val init : unit -> cache
