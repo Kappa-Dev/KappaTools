@@ -38,36 +38,38 @@ let navli () = Ui_common.badge (fun state -> snapshot_count state)
 let select_id = "snapshot-select-id"
 let display_id = "snapshot-map-display"
 
-let configuration () : Widget_export.configuration =
+let configuration_template
+  id
+  additional_handlers : Widget_export.configuration =
   let simulation_output = (Ui_simulation.simulation_output ()) in
-  { Widget_export.id = "snapshot"
-  ; Widget_export.handlers =
-      [ Widget_export.export_svg ~svg_div_id:display_id ()
-      ; Widget_export.export_png ~svg_div_id:display_id ()
-      ; Widget_export.export_json
-          ~serialize_json:(fun () ->
-              (match
-		 (React.S.value current_snapshot : Api_types_j.snapshot option) with
+  let json_handler = Widget_export.export_json
+        ~serialize_json:(fun () ->
+            (match
+	       (React.S.value current_snapshot : Api_types_j.snapshot option) with
               | None -> "null"
               | Some s -> Api_types_j.string_of_snapshot s
-              )
             )
-      ; { Widget_export.suffix = "ka"
-        ; Widget_export.label = "kappa"
-        ; Widget_export.export =
-	    fun (filename : string) ->
-              let data = match
-		  (React.S.value current_snapshot : Api_types_j.snapshot option) with
-              | None -> ""
-              | Some s ->
-                Api_data_v1.api_snapshot_kappa (Api_data_v1.api_snapshot s)
-              in
-              Common.saveFile
-		~data:data
-		~mime:"application/json"
-		~filename:filename
-        }
-      ; { Widget_export.suffix = "dot"
+          )
+  in
+  let kappa_handler =
+    { Widget_export.suffix = "ka"
+    ; Widget_export.label = "kappa"
+    ; Widget_export.export =
+	fun (filename : string) ->
+   let data = match
+       (React.S.value current_snapshot : Api_types_j.snapshot option) with
+   | None -> ""
+   | Some s ->
+     Api_data_v1.api_snapshot_kappa (Api_data_v1.api_snapshot s)
+   in
+   Common.saveFile
+     ~data:data
+     ~mime:"application/json"
+     ~filename:filename
+    }
+  in
+  let dot_handler =
+    { Widget_export.suffix = "dot"
         ; Widget_export.label = "dot"
         ; Widget_export.export =
 	    fun (filename : string) ->
@@ -80,13 +82,34 @@ let configuration () : Widget_export.configuration =
 		~data:data
 		~mime:"text/vnd.graphviz"
 		~filename:filename
-        }
-      ];
-    show = React.S.map
+    }
+  in
+  let default_handlers =
+    [ json_handler ;
+      kappa_handler ;
+      dot_handler ;]
+  in
+  { Widget_export.id = id ;
+    Widget_export.handlers = default_handlers @ additional_handlers ;
+    Widget_export.show = React.S.map
         (fun state -> snapshot_count state > 0)
         simulation_output
 
   }
+
+(* Only allow the export of non-graphical data. *)
+let configuration_kappa () : Widget_export.configuration =
+  configuration_template
+    "snapshot_kappa"
+    []
+
+(* The maps are rendered so allow the export of
+   graphical data. *)
+let configuration_graph () : Widget_export.configuration =
+  configuration_template
+    "snapshot_graph"
+    [ Widget_export.export_svg ~svg_div_id:display_id ()
+    ; Widget_export.export_png ~svg_div_id:display_id () ]
 
 let format_select_id = "format_select_id"
 
@@ -178,8 +201,21 @@ let xml () =
   in
   let snapshot_chooser = Html.div [ snapshot_label ; snapshot_select ]
   in
+  let toggle_controls ~kappa ~graph =
+    Tyxml_js.R.Html.a_class
+               (React.S.map
+                  (function
+                    | Kappa -> kappa
+                    | Graph -> graph
+                  )
+               display_format) in
   let export_controls =
-    Widget_export.content (configuration ())
+    [ Html.div
+        ~a:[ toggle_controls ~kappa:["visible"] ~graph:["hidden"] ; ]
+        [ Widget_export.content (configuration_kappa ()) ] ;
+      Html.div
+        ~a:[ toggle_controls ~kappa:["hidden"] ~graph:["visible"] ; ]
+        [ Widget_export.content (configuration_graph ()) ] ]
   in
   let kappa_snapshot_display =
       Html.div
@@ -243,7 +279,7 @@ let xml () =
 	     </div>
           </div>
           <div class="navcontent-controls">
-          |}[export_controls]{|
+          |}export_controls{|
           </div>
   |}]
 
@@ -392,7 +428,8 @@ let onload () : unit =
            None -> ()
          | Some _state -> select_snapshot ())
   in
-  let () = Widget_export.onload (configuration ()) in
+  let () = Widget_export.onload (configuration_kappa ()) in
+  let () = Widget_export.onload (configuration_graph ()) in
   ()
 
 let onresize () : unit = ()
