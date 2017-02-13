@@ -149,7 +149,7 @@ let () =
         ?max_time:(Counter.max_time counter)
         ?max_events:(Counter.max_events counter) updated_vars env0 in
 
-    let () = Outputs.initial_inputs theSeed env init_l in
+    let () = Outputs.initial_inputs theSeed env contact_map init_l in
 
     let command_line =
       Format.asprintf "@[<h>%a%t%a@]"

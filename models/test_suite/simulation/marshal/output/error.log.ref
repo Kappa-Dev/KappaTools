@@ -5,8 +5,6 @@ A(x!1(*x.B*)/), B(x!1(*x.A*)/)
 _____(1)
 +B(x!1), +A(x!1)
 Environment:
-  %agent: A(x)
-  %agent: B(x)
   
   %var:/*0*/ 'init' 100
   %plot: [T]
@@ -14,6 +12,9 @@ Environment:
   'dim_op' A(x!1/), B(x!1/) @ 0.01
   
   /*0*/%mod: [false] do STOP 
+  Signatures:
+    %agent: A(x)
+    %agent: B(x)
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -29,8 +30,6 @@ Intial graph;
   %init: 100 B(x!1), A(x!1)
   
 Environment:
-  %agent: A(x)
-  %agent: B(x)
   
   %var:/*0*/ 'init' 100
   %plot: [T]
@@ -38,6 +37,9 @@ Environment:
   'dim_op' A(x!1/), B(x!1/) @ 0.01
   
   /*0*/%mod: [false] do STOP 
+  Signatures:
+    %agent: A(x)
+    %agent: B(x)
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
@@ -53,8 +55,6 @@ Intial graph;
   %init: 100 B(x!1), A(x!1)
   
 Environment:
-  %agent: A(x)
-  %agent: B(x)
   
   %var:/*0*/ 'init' 100
   %plot: [T]
@@ -62,6 +62,9 @@ Environment:
   'dim_op' A(x!1/), B(x!1/) @ 0.01
   
   /*0*/%mod: [false] do STOP 
+  Signatures:
+    %agent: A(x)
+    %agent: B(x)
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc3*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥

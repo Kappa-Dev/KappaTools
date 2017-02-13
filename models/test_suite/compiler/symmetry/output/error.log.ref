@@ -13,7 +13,6 @@ A(x!1(*y.A*), y?/!3), A(x!2(*y.A*), y!1(*x.A*)), A(x~b/!3, y!2(*x.A*))
 _____(1)
 A(y!1(*x.A*)), A(x~a!1(*y.A*))
 Environment:
-  %agent: A(x~a~b,y)
   
   %var:/*0*/ 'tourne' |A(x~b, y!1), A(x!1, y!2), A(x!2)|
   %plot: [T]
@@ -25,6 +24,8 @@ Environment:
   'detruit' -A(x!1, y!2), -A(x!2, y!1) @ 1
   'boucle' A(x!1, y?/!3), A(x!2, y!1), A(x~b/!3, y!2) @ 1
   
+  Signatures:
+    %agent: A(x~a~b,y)
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc6*/ A/*1*/(y)
       -- A/*1*//*1*/.y = ⊥, A/*1*//*0*/.x = ⊥

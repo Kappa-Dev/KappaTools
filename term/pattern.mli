@@ -97,7 +97,7 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 
 val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*cc*id)
 
-val minimal_env : Signature.s -> Signature.contact_map -> PreEnv.t
+val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
 
 (** {6 Use a connected component } *)
 

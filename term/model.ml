@@ -134,11 +134,11 @@ let map_observables f env =
 let print_kappa pr_alg pr_pert f env =
   let sigs = signatures env in
   Format.fprintf
-    f "@[<v>%a%t%a@,@,%a%t%a@,%a%t%a@]" Signature.print sigs
-    (fun f -> if env.tokens.NamedDecls.decls <> [||] then Pp.space f)
+    f "@[<v>%a%t@,%a%t%a@,%a%t%a@]"
     (NamedDecls.print
        ~sep:Pp.space (fun _ n f () -> Format.fprintf f "%%token: %s" n))
     env.tokens
+    (fun f -> if env.tokens.NamedDecls.decls <> [||] then Pp.space f)
     (NamedDecls.print
        ~sep:Pp.space
        (fun i n f (e,_) ->
@@ -165,7 +165,8 @@ let print_kappa pr_alg pr_pert f env =
 let print pr_alg pr_rule pr_pert f env =
   let () = print_kappa pr_alg pr_pert f env in
   Format.fprintf
-    f "@,@[<v>@[<v 2>Rules:@,%a@]@]"
+    f "@,@[<v>@[<v 2>Signatures:@,%a@]@,@[<v 2>Rules:@,%a@]@]"
+     Signature.print (signatures env)
     (Pp.array Pp.space
        (fun i f r -> Format.fprintf f "@[<2>%i:@ %a@]" i (pr_rule env) r))
     env.rules

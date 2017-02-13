@@ -1,6 +1,6 @@
 %def: "seed" "199095194"
 
-%agent: A(A1,A2~n~p)
+%agent: A(A1!A2.A, A2~n~p!A1.A)
 
 %plot: [T]
 'r' A(A1/!1), A(A2/!1) @ 0.0001(1)

@@ -1,8 +1,8 @@
 %def: "seed" "438438234"
 
-%agent: A(a~u~p)
-%agent: B(a,b,c)
-%agent: C(c)
+%agent: A(a~u~p!a.B)
+%agent: B(a!a.A, b!b.B, c!c.C)
+%agent: C(c!c.B)
 
 %var:/*0*/ 'Ap' |A(a~p?)|
 %plot: [T]

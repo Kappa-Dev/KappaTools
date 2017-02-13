@@ -1,9 +1,9 @@
 %def: "seed" "16602"
 
-%agent: A(b,d)
-%agent: B(a,c)
-%agent: C(b,d)
-%agent: D(c,a)
+%agent: A(b!a.B, d!a.D)
+%agent: B(a!b.A, c!b.C)
+%agent: C(b!c.B, d!c.D)
+%agent: D(c!d.C, a!d.A)
 
 %var:/*0*/ 'un' |A(b!1, d!2), B(a!1, c!3), D(c!4, a!2), C(b!3, d!4)|
 %var:/*1*/ 'deux' |A(b!1, d!2), B(a!3, c!4), D(c!5, a!2), C(b!4, d!5),

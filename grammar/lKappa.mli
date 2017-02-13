@@ -75,13 +75,12 @@ val bool_expr_of_ast :
 
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
-  Signature.contact_map ->
-  (Ast.mixture, string) Ast.modif_expr -> int list ->
+  Contact_map.t -> (Ast.mixture, string) Ast.modif_expr -> int list ->
   (rule_agent list, int) Ast.modif_expr * int list
 
 val compil_of_ast :
   (string * Nbr.t) list -> Ast.parsing_compil ->
-  Signature.s * Signature.contact_map * unit NamedDecls.t * int list *
+  Signature.s * Contact_map.t * unit NamedDecls.t * int list *
   (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 

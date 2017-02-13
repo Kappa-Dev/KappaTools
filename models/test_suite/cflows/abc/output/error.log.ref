@@ -31,9 +31,6 @@ _____(1)
 _____(1)
 +B(x), +A(x, c)
 Environment:
-  %agent: A(x,c)
-  %agent: B(x)
-  %agent: C(x1~u~p,x2~u~p)
   
   %var:/*0*/ 'on_rate' 0.001
   %var:/*1*/ 'off_rate' 0.1
@@ -62,6 +59,10 @@ Environment:
   /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
   /*3*/%mod: [true] do $FLUX "flux_map.dot" "absolute" [true]
   /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false]; $DEL 10000 C(x1~p?, x2~p?)
+  Signatures:
+    %agent: A(x,c)
+    %agent: B(x)
+    %agent: C(x1~u~p,x2~u~p)
   Rules:
     0: 0: /*cc1*/ A/*1*/(x), 1: /*cc6*/ B/*2*/(x)
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥

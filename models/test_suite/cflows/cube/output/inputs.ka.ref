@@ -1,6 +1,6 @@
 %def: "seed" "240056667"
 
-%agent: A(x~u~p,y~u~p,z~u~p)
+%agent: A(x~u~p, y~u~p, z~u~p)
 
 %plot: [T]
 'x++' A(x~u/~p, z~u) @ 10

@@ -27,4 +27,4 @@ val perturbation :
 
 val env : Format.formatter -> Model.t -> unit
 
-val env_kappa : Format.formatter -> Model.t -> unit
+val env_kappa : Contact_map.t -> Format.formatter -> Model.t -> unit

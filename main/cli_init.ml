@@ -44,7 +44,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
         let seed, env,contact_map,updated_vars,story_compression,
             formatCflow,cflowFile,init_l =
           (Marshal.from_channel d :
-             int option*Model.t*Signature.contact_map*int list*
+             int option*Model.t*Contact_map.t*int list*
              (bool*bool*bool) option*string*string option*
              (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) in
         let () = Pervasives.close_in d  in

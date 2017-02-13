@@ -1,7 +1,7 @@
 %def: "seed" "253329392"
 
-%agent: A(x)
-%agent: B(x~0~1)
+%agent: A(x!x.B)
+%agent: B(x~0~1!x.A)
 %agent: C()
 
 %var:/*0*/ 'goal' 0

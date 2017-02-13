@@ -15,13 +15,13 @@
   Primitives.contact_map * Export_to_KaSim.state
 *)
 val compile_bool:
-  ?origin:Operator.rev_dep -> Signature.contact_map -> Pattern.PreEnv.t ->
+  ?origin:Operator.rev_dep -> Contact_map.t -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
   Pattern.PreEnv.t *
   (Pattern.id array list,int) Alg_expr.bool Locality.annot
 
 val compile_modifications_no_track:
-  Signature.contact_map -> Pattern.PreEnv.t ->
+  Contact_map.t -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
@@ -31,7 +31,7 @@ val compile :
           string (*cflowFormat*) * string option (*cflowFile*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
-  Signature.contact_map ->
+  Contact_map.t ->
   ('c, LKappa.rule_mixture, int, LKappa.rule, unit) Ast.compil -> 'b
 
 val build_initial_state :

@@ -1,6 +1,6 @@
 %def: "seed" "20543"
 
-%agent: A(x)
+%agent: A(x!x.A)
 
 %plot: [T]
 'dimmer' A(x/!12), A(x/!12) @ 0.01

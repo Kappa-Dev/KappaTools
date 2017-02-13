@@ -1,7 +1,7 @@
 %def: "seed" "240056667"
 
-%agent: A(y~u~p,z~u~p)
-%agent: K(x)
+%agent: A(y~u~p!x.K, z~u~p!x.K)
+%agent: K(x!y.A!z.A)
 
 %plot: [T]
 A(y/!1), K(x/!1) @ 10

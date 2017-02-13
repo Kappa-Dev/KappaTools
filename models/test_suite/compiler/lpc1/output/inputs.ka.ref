@@ -1,7 +1,7 @@
 %def: "seed" "785872661"
 
-%agent: A(x,y,z)
-%agent: B(x)
+%agent: A(x!z.A, y!x.B, z!x.A)
+%agent: B(x!y.A)
 
 %plot: [T]
 'delete A' A(x!1/), -A(x?, y?, z!1) @ 1

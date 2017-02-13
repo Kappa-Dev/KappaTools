@@ -7,12 +7,12 @@
 (******************************************************************************)
 
 val do_interactive_directives :
-  outputs:(Data.t -> unit) -> max_sharing:bool -> Signature.contact_map ->
+  outputs:(Data.t -> unit) -> max_sharing:bool -> Contact_map.t ->
   Model.t -> Counter.t -> Rule_interpreter.t -> State_interpreter.t ->
   (Ast.mixture, string) Ast.modif_expr list ->
   Model.t * (bool * Rule_interpreter.t * State_interpreter.t)
 
 val get_pause_criteria :
-  max_sharing:bool -> Signature.contact_map -> Model.t -> Rule_interpreter.t ->
+  max_sharing:bool -> Contact_map.t -> Model.t -> Rule_interpreter.t ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   Model.t * Rule_interpreter.t * (Pattern.id array list, int) Alg_expr.bool

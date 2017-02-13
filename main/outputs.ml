@@ -295,12 +295,13 @@ let close () =
   let () = match !inputsDesc with None -> () | Some x -> close_out x in
   close_desc ()
 
-let initial_inputs theSeed env init =
+let initial_inputs theSeed env contact_map init =
   let inputs = Kappa_files.open_out_fresh "inputs" "" "ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () = Format.fprintf inputs_form "@[<v># \"uuid\" : \"%i\"@," uuid in
   let () = Format.fprintf inputs_form "%%def: \"seed\" \"%i\"@,@]@." theSeed in
-  let () = Format.fprintf inputs_form "%a@." Kappa_printer.env_kappa env in
+  let () = Format.fprintf inputs_form
+      "%a@." (Kappa_printer.env_kappa contact_map) env in
   let sigs = Model.signatures env in
   let () = Format.fprintf inputs_form "%a@."
       (Pp.list Pp.space

@@ -1,6 +1,6 @@
 %def: "seed" "728130018"
 
-%agent: A(x)
+%agent: A(x!x.A)
 
 %plot: [T]
 'a..a' A(x!_/), A(x!_) @ 1

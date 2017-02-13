@@ -1,6 +1,6 @@
 %def: "seed" "924556145"
 
-%agent: A(x~u~p,y~u~p,z~u~p)
+%agent: A(x~u~p, y~u~p, z~u~p)
 %agent: K()
 %agent: KK()
 

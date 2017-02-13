@@ -1,6 +1,6 @@
 %def: "seed" "880671133"
 
-%agent: A(x~a~b,y)
+%agent: A(x~a~b!y.A, y!x.A)
 
 %var:/*0*/ 'tourne' |A(x~b, y!1), A(x!1, y!2), A(x!2)|
 %plot: [T]
