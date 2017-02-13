@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 10 2017>
+  * Last modification: Time-stamp: <Feb 13 2017>
 *)
 
 let local_trace = false
@@ -1834,8 +1834,8 @@ struct
 
   let cannonic_form_from_syntactic_rules log compil =
     let empty_cache = I.empty_lkappa_cache () in
-    let cache, gamma_list, nbr_auto_in_rule_list =
-      List.fold_left (fun (cache, _gammar, current_list) rule ->
+    let cache, (*gamma_list, *)nbr_auto_in_rule_list =
+      List.fold_left (fun (cache, (*_gammar,*) current_list) rule ->
           (* convention of r:
             the number of automorphisms in the lhs of the rule r*)
           let cache, nbr_auto_in_lhs =
@@ -1851,11 +1851,11 @@ struct
             List.fold_left (fun current_list rate_opt ->
                 match rate_opt with
                 | None -> current_list
-                | Some s ->
+                | Some annot ->
                   (*extract connected components:
                     pattern_id array list *)
                   let connected_components =
-                      Alg_expr.extract_connected_components s
+                      Alg_expr.extract_connected_components annot
                   in
                   connected_components :: current_list
               ) [] rate_opt_list
@@ -1875,12 +1875,13 @@ struct
               let () = print_kinetic_rate_list log fmt rate_opt_list in
               ()
           in
-          cache, gamma_list,
+          cache, (*gamma_list,*)
           nbr_auto_in_rule :: current_list
-        ) (empty_cache,[], []) (I.get_rules compil)
+        ) (empty_cache,[]) (I.get_rules compil)
     in
     (*compute the isomorphism of two rules:
-      if the hashes of two rules are the same then they are isomorphism.
+      if the hashes of two rules are the same then they are
+      isomorphism.
       sigma(ri) = ri'
     *)
     let isomorphism_rule =
