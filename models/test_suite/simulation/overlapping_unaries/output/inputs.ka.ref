@@ -22,5 +22,7 @@
 'f:E.X-' fE(s!1/), fS(e!1/, s~x) @ 0.1
 'f:S->P' fE(), fS(s~o/~x) @ 0.(1.)
 
-%init: 1000 fC(e, s) %init: 10 fE(c, s)
+
+%init: 1000 fC(e, s)
+%init: 10 fE(c, s)
 %init: 10000 fS(c, e, s~o)

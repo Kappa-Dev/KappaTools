@@ -179,7 +179,7 @@ let reinitialize random_state t =
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
       ~with_trace:(t.has_tracking <>None)
-      random_state t.env t.counter [];
+      random_state t.env t.counter;
   t.state <- State_interpreter.empty t.env []
 
 let clone_t t =
@@ -281,7 +281,7 @@ let build_ast
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace:(has_tracking <>None)
-                                   random_state env counter [])
+                                   random_state env counter)
                          ~state:(State_interpreter.empty env [])
                          ~init_l ~has_tracking ~lastyield
                          ~file_indexes:(Some indexes)
@@ -435,7 +435,7 @@ let start
                  ~bind:(fun x f ->
                      (time_yield ~system_process:system_process ~t:t) >>=
                      (fun () -> x >>= f))
-                 ~return:Lwt.return ~outputs:(outputs t) []
+                 ~return:Lwt.return ~outputs:(outputs t)
                  ~with_trace:(t.has_tracking <> None)
                  t.counter
                  t.env

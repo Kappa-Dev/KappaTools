@@ -1,3 +1,5 @@
+%def:  "seed" "16602"
+
 %agent: A(b,d)
 %agent: B(a,c)
 %agent: C(b,d)

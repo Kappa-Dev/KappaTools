@@ -15,8 +15,7 @@ type result = Clash | Corrected | Success of t
 (** {6 Initialisation} *)
 
 val empty :
-  with_trace:bool -> Random.State.t ->
-  Model.t -> Counter.t -> (int * Alg_expr.t) list -> t
+  with_trace:bool -> Random.State.t -> Model.t -> Counter.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Model.get_alg] but it is not hard
@@ -82,7 +81,7 @@ val get_random_state : t -> Random.State.t
 (** {6 Stories} *)
 
 val add_tracked :
-  Pattern.id array -> Trace.event_kind ->
+  Pattern.id array -> string ->
   Instantiation.abstract Instantiation.test list list -> t -> t
 val remove_tracked : Pattern.id array -> t -> t
 

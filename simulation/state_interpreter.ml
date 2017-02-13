@@ -116,7 +116,7 @@ let do_modification ~outputs env counter graph state extra modification =
           (Pp.array Pp.comma
              (fun _ -> Pattern.print ~domain ~with_id:false)) cc in
     ((false,
-      Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
+      Rule_interpreter.add_tracked cc name tests graph,
       state),
      extra)
   | Primitives.CFLOWOFF cc ->

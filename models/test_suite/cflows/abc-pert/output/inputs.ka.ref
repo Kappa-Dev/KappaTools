@@ -34,5 +34,6 @@
 /*2*/%mod: ([T] > 20) do $TRACK C(x1~p?, x2~p?) [true]; $UPDATE cflow Cpp
 /*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1~p?, x2~p?) [false]
 /*4*/%mod: repeat (([E] [mod] ([Emax] / 50)) = 0) do $PLOTENTRY until [false]
+
 %init: n_ab A(x, c), B(x)
 %init: n_c C(x1~u, x2~u)

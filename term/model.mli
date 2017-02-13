@@ -80,6 +80,8 @@ val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 
 val check_if_counter_is_filled_enough : t -> unit
+val overwrite_vars : (int * Alg_expr.t) list -> t -> t
 val propagate_constant :
-  ?max_time:float -> ?max_events:int -> int list -> t -> t
-(** [propagate_constant updated_vars env] *)
+  ?max_time:float -> ?max_events:int ->
+  int list -> (int * Alg_expr.t) list -> t -> t
+(** [propagate_constant updated_vars overwrite_vars env] *)

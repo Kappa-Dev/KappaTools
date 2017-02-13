@@ -15,4 +15,4 @@ done
 	 -initial conditions
 + Building initial state
 Done
-+ Command line to rerun is: 'KaSim' 'file1.ka' 'file2.ka' '-seed' '1061933100' '--compile' '-d' 'output' '-l' '0'
++ Command line to rerun is: 'KaSim' 'file1.ka' 'file2.ka' '-mode' 'batch' '--compile' '-d' 'output' '-l' '0'

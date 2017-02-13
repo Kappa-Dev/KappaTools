@@ -12,4 +12,5 @@
 'GOAL' -A(x~p, y~u, z~p) @ 0
 
 /*0*/%mod: [true] do $TRACK A(x~p?, y~u?, z~p?) [true]
+
 %init: 10000 A(x~u, y~u, z~u)

@@ -6,4 +6,5 @@
 %plot: [T]
 
 /*0*/%mod: ([E] = 5) do tt <- (22 - |tt|) + |tt|
+
 %init: 1 

@@ -303,13 +303,14 @@ let initial_inputs theSeed env contact_map init =
   let () = Format.fprintf inputs_form
       "%a@." (Kappa_printer.env_kappa contact_map) env in
   let sigs = Model.signatures env in
-  let () = Format.fprintf inputs_form "%a@."
+  let () = Format.fprintf inputs_form "@.@[<v>%a@]@."
       (Pp.list Pp.space
          (fun f (n,r,_) ->
             let ins_fresh,_,_ =
               Primitives.Transformation.raw_mixture_of_fresh
                 sigs r.Primitives.inserted in
-            Format.fprintf f "%%init: %a %a" (Kappa_printer.alg_expr ~env) n
+            Format.fprintf f "@[<h>%%init: %a %a@]"
+              (Kappa_printer.alg_expr ~env) n
               (Raw_mixture.print ~compact:false ~created:false ~sigs)
               (List.map snd ins_fresh))) init in
   inputsDesc := Some inputs

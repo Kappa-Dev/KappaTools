@@ -71,13 +71,11 @@ let recompute env counter state i =
   state.variables_cache.(i) <-
     value_alg counter state (raw_get_alg env state.variables_overwrite i)
 
-let empty ~with_trace random_state env counter alg_overwrite =
+let empty ~with_trace random_state env counter =
   let with_connected_components =
     not (Pattern.Set.is_empty
            (Model.connected_components_of_unary_rules env)) in
   let variables_overwrite = Array.make (Model.nb_algs env) None in
-  let () =
-    List.iter (fun (i,v) -> variables_overwrite.(i) <- Some v) alg_overwrite in
   let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
   let cand =
     {
@@ -887,10 +885,16 @@ let debug_print f state =
     (print_unary_injections ?domain:None)
     state.roots_of_unary_patterns
 
-let add_tracked patterns event_kind tests state =
+let add_tracked patterns name tests state =
   let () = assert (not state.outdated) in
   match state.story_machinery with
-  | None -> state
+  | None ->
+    let () =
+      ExceptionDefn.warning
+        (fun f -> Format.fprintf f
+            "Observable %s should be tracked but the trace is not stored"
+            name) in
+    state
   | Some tpattern ->
     let () = state.outdated <- true in
     let () =
@@ -898,7 +902,7 @@ let add_tracked patterns event_kind tests state =
         (fun pattern ->
            let acc = Pattern.ObsMap.get tpattern pattern in
            Pattern.ObsMap.set tpattern
-             pattern ((event_kind,patterns,tests)::acc))
+             pattern ((Trace.OBS name,patterns,tests)::acc))
         patterns in
     { state with outdated = false }
 let remove_tracked patterns state =

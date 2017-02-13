@@ -9,7 +9,7 @@
 type directive_unit = Time | Event
 
 let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
-  let (seed,env, contact_map, updated_vars, story_compression,
+  let (seed, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
       alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
@@ -54,10 +54,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
                Model.num_of_alg (Locality.dummy_annot s) env,
                Alg_expr.CONST v)
             cli_args.Run_cli_args.alg_var_overwrite in
-        let updated_vars' =
-          List.fold_left
-            (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-        (seed,env,contact_map,updated_vars',story_compression,
+        (seed,env,contact_map,updated_vars,story_compression,
          formatCflow,cflowFile,init_l),
         alg_overwrite
       with
@@ -80,6 +77,12 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
       Counter.DE (int_of_float (ceil cli_args.Run_cli_args.plotPeriod)) in
   let counter =
     Counter.create ?init_t ?init_e ?max_time ?max_event ~plot_period in
+  let env =
+    if cli_args.Run_cli_args.batchmode then
+      Model.propagate_constant
+        ?max_time:(Counter.max_time counter)
+        ?max_events:(Counter.max_events counter) updated_vars alg_overwrite env0
+    else Model.overwrite_vars alg_overwrite env0 in
 
   (seed, env, contact_map, updated_vars, story_compression,
-   formatCflows, cflowFile, init_l),counter,alg_overwrite
+   formatCflows, cflowFile, init_l),counter

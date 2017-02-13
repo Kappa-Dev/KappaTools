@@ -118,6 +118,6 @@ Intial graph;
   %init: 1000 B(x)
   %init: 1000 A(x, c)
   
-File "abc.ka", line 39, characters 12-18:
+File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
 Warning: Model.to_yojson is partial

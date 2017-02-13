@@ -13,5 +13,6 @@
 'goal' A(x~u, y~p, z~p)+KK() @ 100
 
 /*0*/%mod: [true] do $TRACK A(x~u?, y~p?, z~p?) [true]
+
 %init: 1 A(x~u, y~u, z~u)
 %init: 1 K()

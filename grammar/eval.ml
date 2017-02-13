@@ -622,8 +622,7 @@ let compile ~outputs ~pause ~return ~max_sharing
           formatCflow, cflowFile, init_l)
 
 let build_initial_state
-    ~bind ~return ~outputs alg_overwrite counter env
-    ~with_trace random_state init_l =
+    ~bind ~return ~outputs counter env ~with_trace random_state init_l =
   let stops = Model.fold_perturbations
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
@@ -631,7 +630,7 @@ let build_initial_state
          List.fold_left (fun acc s -> (s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty
-      ~with_trace random_state env counter alg_overwrite in
+      ~with_trace random_state env counter in
   let state0 = State_interpreter.empty env stops in
   State_interpreter.initialize
     ~bind ~return ~outputs env counter graph0 state0 init_l

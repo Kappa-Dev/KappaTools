@@ -143,9 +143,9 @@ let modification ?env f m =
     Format.fprintf f "$UPDATE %a %a"
       (Model.print_alg ?env) id (alg_expr ?env) va
   | Primitives.SNAPSHOT fn ->
-    Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn
+    Format.fprintf f "$SNAPSHOT %a" (print_expr ?env) fn
   | Primitives.STOP fn ->
-    Format.fprintf f "STOP %a" (print_expr ?env) fn
+    Format.fprintf f "$STOP %a" (print_expr ?env) fn
   | Primitives.FLUX (relative,fn) ->
     Format.fprintf
       f "$FLUX %a %t[true]" (print_expr ?env) fn

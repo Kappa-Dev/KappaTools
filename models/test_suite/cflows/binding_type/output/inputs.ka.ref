@@ -10,5 +10,6 @@ A(x!x.K, y~u/~p) @ 1
 'GOAL' A(y~p) @ 1
 
 /*0*/%mod: [true] do $TRACK A(y~p?) [true]
+
 %init: 100 A(x, y~u)
 %init: 100 K(x)

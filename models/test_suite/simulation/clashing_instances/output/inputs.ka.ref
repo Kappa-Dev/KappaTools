@@ -4,4 +4,5 @@
 
 %plot: [T]
 'rule' A(x), -A(x) @ 1
+
 %init: 100 A(x)

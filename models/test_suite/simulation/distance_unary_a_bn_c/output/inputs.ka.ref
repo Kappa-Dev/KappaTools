@@ -18,5 +18,7 @@
 'ap' A(a~u/~p?), C() @ 0(100 :3)
 'cp' C(c~u/~p?), B() @ 0(100)
 
-%init: 100 A(a~u) %init: 100 B(a, b, b1, c)
+
+%init: 100 A(a~u)
+%init: 100 B(a, b, b1, c)
 %init: 100 C(c~u)

@@ -9,4 +9,5 @@ A(x!_/) @ 1
 'GOAL' -A(x~p, y?) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x~p) [true]
+
 %init: 1000 A(x~u, y)

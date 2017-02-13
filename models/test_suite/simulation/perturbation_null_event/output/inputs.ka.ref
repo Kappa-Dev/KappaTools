@@ -8,4 +8,5 @@
 
 /*0*/%mod: repeat [true] do $PRINTF "stream.txt" <"At ".[E]." ".|A(x!1),
                                                                    A(x!1)|> until [false]
+
 %init: 7 A(x)

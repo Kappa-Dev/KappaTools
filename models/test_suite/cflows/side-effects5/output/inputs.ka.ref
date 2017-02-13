@@ -10,5 +10,5 @@ A(x/!1), B(x/!1) @ 1
 'GOAL' A(x!1/), B(x!1/) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x!1), B(x!1) [true]
-%init: 1 A(x),
-B(x)
+
+%init: 1 A(x), B(x)

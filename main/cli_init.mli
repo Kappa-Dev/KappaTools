@@ -13,4 +13,4 @@ val get_compilation :
   (int option * Model.t * Contact_map.t * int list * (bool*bool*bool) option *
    string * string option *
    (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) *
-  Counter.t * (int * Alg_expr.t) list
+  Counter.t

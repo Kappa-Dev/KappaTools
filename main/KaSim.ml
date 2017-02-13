@@ -124,9 +124,9 @@ let () =
       (!Parameter.debugModeOn || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
-    let (seed0, env0, contact_map, updated_vars, story_compression,
+    let (seed0, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
-        counter,alg_overwrite = Cli_init.get_compilation
+        counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
 
@@ -143,13 +143,11 @@ let () =
 
     let () =
       if cli_args.Run_cli_args.batchmode &&
-       Counter.max_time counter = None && Counter.max_events counter = None then
-        Model.check_if_counter_is_filled_enough env0 in
-    let env = Model.propagate_constant
-        ?max_time:(Counter.max_time counter)
-        ?max_events:(Counter.max_events counter) updated_vars env0 in
+         Counter.max_time counter = None && Counter.max_events counter = None then
+        Model.check_if_counter_is_filled_enough env in
 
-    let () = Outputs.initial_inputs theSeed env contact_map init_l in
+    let () =
+      Outputs.initial_inputs theSeed env contact_map init_l in
 
     let command_line =
       Format.asprintf "@[<h>%a%t%a@]"
@@ -193,8 +191,7 @@ let () =
     let () = Format.printf "+ Building initial state@." in
     let (stop,graph,state) =
       Eval.build_initial_state
-        ~bind:(fun x f -> f x) ~return:(fun x -> x)
-        ~outputs alg_overwrite counter env
+        ~bind:(fun x f -> f x) ~return:(fun x -> x) ~outputs counter env
         ~with_trace:(trace_file<>None) random_state init_l in
     let () = Format.printf "Done@." in
 
@@ -274,7 +271,7 @@ let () =
               "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
                @ effect@ to@ perform@ it@]@." in
-          toplevel env0 graph state
+          toplevel env graph state
         else
           let (stop,graph',state') =
             interactive_loop ~outputs Alg_expr.FALSE env counter graph state in
@@ -288,7 +285,7 @@ let () =
                 "@.@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
                  @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
                  @ effect@ to@ perform@ it@]@." in
-            toplevel env0 graph' state' in
+            toplevel env graph' state' in
     Format.printf "Simulation ended@.";
     remove_trace ();
     if Counter.nb_null_event counter <> 0 then

@@ -15,5 +15,6 @@ A(x/!1), B(x/!1) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x!1), B(x~1!1), C() [true]
 /*1*/%mod: ([T] > 10) do $UPDATE bad 0; $UPDATE goal 1
+
 %init: 1 A(x!1), B(x~1!1)
 %init: 10 B(x~0)

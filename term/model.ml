@@ -184,10 +184,20 @@ let check_if_counter_is_filled_enough x =
              (Locality.dummy_annot
                 "There is no way for the simulation to stop."))
 
-let propagate_constant ?max_time ?max_events updated_vars x =
+let overwrite_vars alg_overwrite env =
+  let algs' =
+    Array.map (fun (x,y) -> (Locality.dummy_annot x,y))
+      env.algs.NamedDecls.decls in
+  let () = List.iter (fun (i,v) ->
+      algs'.(i) <- (fst algs'.(i),Locality.dummy_annot v)) alg_overwrite in
+  { env with algs = NamedDecls.create algs' }
+
+let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
   let algs' =
     Array.map (fun (x,y) -> (Locality.dummy_annot x,y))
       x.algs.NamedDecls.decls in
+  let () = List.iter (fun (i,v) ->
+      algs'.(i) <- (fst algs'.(i),Locality.dummy_annot v)) alg_overwrite in
   let () =
     Array.iteri
       (fun i (na,v) ->

@@ -4,7 +4,7 @@
 %agent: B(x!x.A)
 %agent: C(x1~u~p!c.A, x2~u~p!c.A)
 
-%var:/*0*/ 'on_rate' 0.001
+%var:/*0*/ 'on_rate' 0.0001
 %var:/*1*/ 'off_rate' 0.1
 %var:/*2*/ 'mod_rate' 1
 %var:/*3*/ 'AB' |A(x!1), B(x!1)|
@@ -30,6 +30,7 @@
 /*1*/%mod: [true] do $TRACK C(x1~p?, x2~u?) [true]
 /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
 /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
-/*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false]
+/*4*/%mod: ([E] = 1999) do $FLUX "flux_map.dot" [false]
+
 %init: n_ab A(x, c), B(x)
 %init: n_c C(x1~u, x2~u)
