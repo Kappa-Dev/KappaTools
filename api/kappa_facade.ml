@@ -524,7 +524,7 @@ let perturbation
            (Evaluator.do_interactive_directives
               ~outputs:(outputs t) ~max_sharing:false)
            t.contact_map t.env t.counter t.graph t.state e >>=
-         fun (env',(_,graph'',state')) ->
+         fun (_,(env',(_,graph'',state'))) ->
          let () = t.env <- env' in
          let () = t.graph <- graph'' in
          let () = t.state <- state' in

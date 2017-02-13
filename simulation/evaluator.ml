@@ -35,8 +35,9 @@ let do_interactive_directives
          (Rule_interpreter.incorporate_extra_pattern fenv)
          graph
          (Primitives.extract_connected_components_modifications e'')) in
-  env',
-  State_interpreter.do_modifications ~outputs env' counter graph' state e''
+  e'',
+  (env',
+   State_interpreter.do_modifications ~outputs env' counter graph' state e'')
 
 let get_pause_criteria ~max_sharing contact_map env graph b =
   let cc_preenv =

@@ -248,9 +248,13 @@ let () =
                  env',interactive_loop ~outputs b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
-                Evaluator.do_interactive_directives
-                  ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
-                  contact_map env counter graph state e
+                let e', (env',_ as o) =
+                  Evaluator.do_interactive_directives
+                    ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
+                    contact_map env counter graph state e in
+                let () =
+                  Outputs.input_modifications env' (Counter.event counter) e' in
+                o
             with
             | ExceptionDefn.Syntax_Error (msg,pos) ->
               let () = Pp.error Format.pp_print_string (msg,pos) in

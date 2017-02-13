@@ -10,7 +10,8 @@ val do_interactive_directives :
   outputs:(Data.t -> unit) -> max_sharing:bool -> Contact_map.t ->
   Model.t -> Counter.t -> Rule_interpreter.t -> State_interpreter.t ->
   (Ast.mixture, string) Ast.modif_expr list ->
-  Model.t * (bool * Rule_interpreter.t * State_interpreter.t)
+  Primitives.modification list *
+  (Model.t * (bool * Rule_interpreter.t * State_interpreter.t))
 
 val get_pause_criteria :
   max_sharing:bool -> Contact_map.t -> Model.t -> Rule_interpreter.t ->
