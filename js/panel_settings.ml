@@ -110,6 +110,7 @@ let input =
     ~a:[Html.a_input_type `Number;
         Html.a_class [ "form-control"];
         Html.a_placeholder "time units";
+        Html.Unsafe.string_attrib "min" "0.0000000001";
         Tyxml_js.R.Html.a_value
           (React.S.l1 format_float_string State_parameter.model_plot_period)]
     ()
@@ -117,10 +118,18 @@ let input =
     [ Html.div [ input ] ]
 
   let onload () =
-    let () = signal_change (Tyxml_js.To_dom.of_input input)
+    let input_dom = Tyxml_js.To_dom.of_input input in
+    let () = signal_change input_dom
         (fun value ->
-           try State_parameter.set_model_plot_period (float_of_string value)
-         with | Not_found | Failure _ -> ()) in
+           let old_value = React.S.value State_parameter.model_plot_period in
+           let reset_value () = input_dom##.value := Js.string (string_of_float old_value) in
+           try
+             let new_value = (float_of_string value) in
+             if new_value > 0.0 then
+               State_parameter.set_model_plot_period new_value
+             else
+               reset_value ()
+         with | Not_found | Failure _ -> reset_value ()) in
     ()
 
 end
@@ -413,7 +422,8 @@ module SelectRuntime : Ui_common.Div = struct
 end
 
 module DivStatusIndicator : Ui_common.Div = struct
-  let debug =
+  (*
+  let label () =
     Tyxml_js.R.Html.pcdata
       (React.S.bind
          (Ui_simulation.simulation_status ())
@@ -429,8 +439,26 @@ module DivStatusIndicator : Ui_common.Div = struct
       )
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
+    let debug = label () in
     [ Html.div (Ui_common.level ~debug ()) ]
-
+*)
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
+    [  Html.div
+    ~a:[ Html.a_class [ "col-md-2" ] ]
+    (Ui_common.level
+       ~debug:(Tyxml_js.R.Html.pcdata
+                 (React.S.bind
+                    (Ui_simulation.simulation_status ())
+                    (fun status ->
+                       React.S.const
+                         (match status with
+                          | Ui_simulation.STOPPED -> "stopped"
+                          | Ui_simulation.INITALIZING -> "initalizing"
+                          | Ui_simulation.RUNNING -> "running"
+                          | Ui_simulation.PAUSED -> "paused"
+                         )
+                    )
+                 )) ())]
   let onload () = ()
 end
 
@@ -584,7 +612,7 @@ let visible_on_states
      )
   )
 
-let stopped_body : [> Html_types.div ] Tyxml_js.Html5.elt =
+let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
   let stopped_row =
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
@@ -620,7 +648,7 @@ let stopped_body : [> Html_types.div ] Tyxml_js.Html5.elt =
         paused_row; ]
 
 
-  let initializing_body : [> Html_types.div ] Tyxml_js.Html5.elt =
+  let initializing_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
@@ -628,14 +656,14 @@ let stopped_body : [> Html_types.div ] Tyxml_js.Html5.elt =
                 [ Ui_simulation.INITALIZING ; ]) ]
       [ Html.entity "nbsp" ]
 
-  let running_body =
+  let running_body () =
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "panel-body" ; "panel-controls" ]
                 [ Ui_simulation.RUNNING ; ]) ]
       (RunningPanelLayout.content ())
-let footer =
+let footer () =
   [%html {|
          <div class="panel-footer">
             <div class="row">
@@ -672,13 +700,13 @@ let footer =
             </div>
          </div>
   |}]
-  let content () =
-    [[%html {|
+let content () =
+  [[%html {|
       <div class="panel panel-default">
-         |}[stopped_body]{|
-         |}[initializing_body]{|
-         |}[running_body]{|
-         |}[footer]{|
+         |}[stopped_body ()]{|
+         |}[initializing_body ()]{|
+         |}[running_body ()]{|
+         |}[footer ()]{|
      </div>
   |}]]
 
