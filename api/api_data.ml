@@ -37,7 +37,7 @@ let api_mixture
   let links = links_of_mix mix in
   Array.mapi
     (fun i a ->
-       { Api_types_j.site_node_quantity = None;
+       {
          Api_types_j.site_node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
          Api_types_j.site_node_sites =
@@ -82,7 +82,7 @@ let api_contact_map
     (cm : Contact_map.t) : Api_types_j.site_node array =
   Array.mapi
     (fun ag sites ->
-       { Api_types_j.site_node_quantity = None;
+       {
          Api_types_j.site_node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) ag;
          Api_types_j.site_node_sites =

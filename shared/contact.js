@@ -206,13 +206,8 @@ function SiteEdge(targetNode,sourceNode){
  */
 function Node(nodeData){
     var that = new D3Object(nodeData.node_name);
-    if(nodeData.node_quantity){
-        that.node_quantity = nodeData.node_quantity;
-    }
     that.sites = nodeData.node_sites.map(function(siteData){
-        var site = Site(siteData,that);
-        site.node_quantity = nodeData.node_quantity;
-        return site;
+        return Site(siteData,that);
     });
 
     that.sitesList = function(){
@@ -525,30 +520,6 @@ function Render(id,contactMap){
         return color;
     };
 
-    if(that.contactMap.isSnapshot){
-        var min = 0;
-        var max = 0;
-        that.contactMap.nodeList().forEach(function(node){
-            min = (node.node_quantity < min)?node.node_quantity:min;
-            max = (node.node_quantity > max)?node.node_quantity:max;
-            });
-
-        that.handleMouseOver = function(d,i){
-            var background_color = that.fill(d);
-            debug(background_color);
-            that.tooltip
-                .style("background-color", background_color)
-                .style("visibility", "visible")
-                .text("Quantity : "+d.node_quantity);
-        };
-        that.handleMouseOut = function(d,i){
-            that.tooltip
-                .style("visibility", "hidden");
-        };
-        } else {
-            that.handleMouseOver = function(){};
-            that.handleMouseOut = function(){};
-        }
     this.renderNodes = function(){
         var dragmove = function(d){
             that.updateLinks();

@@ -59,7 +59,6 @@ type site = {
 }
 
 type site_node = {
-     site_node_quantity : float nullable;
      site_node_name: string;
      site_node_sites: site list <ocaml repr="array">;
 }

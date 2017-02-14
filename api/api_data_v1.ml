@@ -60,7 +60,7 @@ let api_mixture sigs mix =
   let links = links_of_mix mix in
   Array.mapi
     (fun i a ->
-       { Api_types_v1_j.node_quantity = None;
+       {
          Api_types_v1_j.node_name =
            Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
          Api_types_v1_j.node_sites =
@@ -105,20 +105,19 @@ let find_link cm (a,s) =
 
 let api_contact_map (contact_map : Api_types_j.site_node array) : Api_types_v1_j.site_graph =
   Array.map
-    (fun { Api_types_j.site_node_quantity = node_quantity ;
-           Api_types_j.site_node_name = node_name;
-           Api_types_j.site_node_sites = node_sites
-         } -> {
-        Api_types_v1_j.node_quantity = node_quantity ;
-        Api_types_v1_j.node_name = node_name ;
-        Api_types_v1_j.node_sites =
-          Array.map
-            (fun site ->
-               { Api_types_v1_j.site_name = site.Api_types_j.site_name ;
-                 Api_types_v1_j.site_links = site.Api_types_j.site_links ;
-                 Api_types_v1_j.site_states = site.Api_types_j.site_states })
-            node_sites
-      }
+    (fun {
+       Api_types_j.site_node_name = node_name;
+       Api_types_j.site_node_sites = node_sites
+     } -> {
+         Api_types_v1_j.node_name = node_name ;
+         Api_types_v1_j.node_sites =
+           Array.map
+             (fun site ->
+                { Api_types_v1_j.site_name = site.Api_types_j.site_name ;
+                  Api_types_v1_j.site_links = site.Api_types_j.site_links ;
+                  Api_types_v1_j.site_states = site.Api_types_j.site_states })
+             node_sites
+       }
     )
     contact_map
 
@@ -147,14 +146,13 @@ let offset_site_graph
 
 let api_snapshot_site_graph
     (snapshot : Api_types_v1_j.snapshot) : Api_types_v1_j.site_graph =
-  let tokens_sg = Tools.array_map_of_list (fun (value,token) ->
+  let tokens_sg = Tools.array_map_of_list (fun (_,token) ->
       { Api_types_v1_j.node_name = token ;
-        Api_types_v1_j.node_quantity = Some value;
         Api_types_v1_j.node_sites = [||] })
       snapshot.Api_types_v1_j.tokens in
   snd
     (List.fold_left
-       (fun (old_offset,old_agents) (agent,mixture) ->
+       (fun (old_offset,old_agents) (_,mixture) ->
           let new_offset = old_offset + (Array.length mixture) in
           let update_links (agent_id,site_id : int * int) =
             (agent_id+old_offset,site_id)
@@ -169,7 +167,6 @@ let api_snapshot_site_graph
             Array.map
               (fun (node : Api_types_v1_j.site_node)->
                  { node with
-                   Api_types_v1_j.node_quantity = Some (float_of_int agent) ;
                    Api_types_v1_j.node_sites =
                      Array.map
                        update_sites
@@ -365,8 +362,7 @@ let api_snapshot (snapshot : Api_types_j.snapshot) : Api_types_v1_j.snapshot =
            (index,
             Array.map
               (fun site_node ->
-                 { Api_types_v1_j.node_quantity = site_node.Api_types_j.site_node_quantity ;
-                   Api_types_v1_j.node_name = site_node.Api_types_j.site_node_name ;
+                 { Api_types_v1_j.node_name = site_node.Api_types_j.site_node_name ;
                    Api_types_v1_j.node_sites =
                      Array.map
                        (fun (site : Api_types_j.site) ->

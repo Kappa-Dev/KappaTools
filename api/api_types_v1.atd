@@ -64,7 +64,6 @@ type site = {
      site_states: string list;
 }
 type site_node = {
-     node_quantity: float nullable;
      node_name: string;
      node_sites: site list <ocaml repr="array">;
 }
