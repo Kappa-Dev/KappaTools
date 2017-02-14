@@ -83,6 +83,7 @@ val propagate_constant :
   ?max_time:float -> ?max_events:int -> int list ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->
   ('a,int) e Locality.annot -> ('a,int) e Locality.annot
+
 val propagate_constant_bool :
   ?max_time:float -> ?max_events:int -> int list ->
   (string Locality.annot * ('a,int) e Locality.annot) array ->

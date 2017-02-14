@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 13 2017>
+  * Last modification: Time-stamp: <Feb 14 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -167,7 +167,7 @@ let main () =
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
     (*let cache, () =
-      A.cannonic_form_from_syntactic_rules my_logger compil
+      A.compute_symmetries_from_syntactic_rules my_logger compil
     in*)
     (*********************************************************************)
     let () = A.export_network

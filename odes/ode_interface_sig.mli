@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 08 2017>
+  * Last modification: Time-stamp: <Feb 14 2017>
 *)
 
 module type Interface =
@@ -130,14 +130,16 @@ sig
     (string *
      (connected_component array list,int) Alg_expr.e Locality.annot) array
 
-  val get_obs: compil -> (connected_component array list,int) Alg_expr.e list
+  val get_obs:
+    compil -> (connected_component array list,int) Alg_expr.e list
 
   val get_obs_titles: compil -> string list
   val nb_tokens: compil -> int
 
-  (*TEST*)
+  (*symmetries*)
   val cannonic_form_from_syntactic_rule :
     nauto_in_rules_cache -> compil -> rule ->
+    int *
     Alg_expr.t Locality.annot option list *
     nauto_in_rules_cache * LKappa_auto.RuleCache.hashed_list
 end

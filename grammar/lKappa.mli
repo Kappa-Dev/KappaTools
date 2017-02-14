@@ -73,6 +73,7 @@ val bool_expr_of_ast :
   ?max_allowed_var: int ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (rule_agent list, int) Alg_expr.bool Locality.annot
+
 val modif_expr_of_ast :
   Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   Signature.contact_map ->
@@ -100,5 +101,7 @@ lot of sanity on mixtures:
 
 The sanity checks on rates consists in ensuring that
 - either absolute or unary rates are provided;
-- if the algebraic expression of the rate contains a mixture then a new variable
- is declared called rulelabel_un_rate; it is necessary in the update phase.*)
+    - if the algebraic expression of the rate contains a mixture then
+    a  new variable
+    is declared called rulelabel_un_rate; it is necessary in the
+    update phase.*)

@@ -656,5 +656,3 @@ let cannonic_form cache lkappa_mixture created =
   {
     cache with rule_cache = rule_cache
   }, hash
-
-(*permutation: deal with the internal state*)

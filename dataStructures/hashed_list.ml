@@ -125,15 +125,14 @@ module Make =
       in
       Mods.DynArray.iteri
         (fun a opt ->
-           match opt
-           with
+           match opt with
            | None -> ()
            | Some opt ->
              Mods.DynArray.iteri (fun b k ->
-                 match k
-                 with
+                 match k with
                  | None -> ()
                  | Some k ->
-                   Format.fprintf formatter "(%i,%i)->%i \n" a b k) opt)
+                   Format.fprintf formatter
+                     "(%i,%i)->%i \n" a b k) opt)
         cache.cons
   end

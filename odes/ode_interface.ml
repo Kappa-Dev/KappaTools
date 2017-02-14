@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 08 2017>
+  * Last modification: Time-stamp: <Feb 14 2017>
 *)
 
 type compil =
@@ -365,4 +365,4 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       lkappa_rule.LKappa.r_mix
       lkappa_rule.LKappa.r_created
   in
-  rate_opt_list, cache, hash_list
+  rule_id, rate_opt_list, cache, hash_list

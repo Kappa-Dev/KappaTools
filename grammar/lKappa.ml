@@ -463,9 +463,11 @@ let link_only_one_occurence i pos =
 let copy_rule_agent a =
   let p = Array.copy a.ra_ports in
   let i = Array.copy a.ra_ints in
-  { ra_type = a.ra_type; ra_erased = a.ra_erased; ra_ports = p; ra_ints = i;
+  { ra_type = a.ra_type; ra_erased = a.ra_erased; ra_ports = p;
+    ra_ints = i;
     ra_syntax =
-      Tools.option_map (fun _ -> Array.copy p, Array.copy i) a.ra_syntax; }
+      Tools.option_map (fun _ -> Array.copy p, Array.copy i)
+        a.ra_syntax; }
 
 let to_erased sigs x =
   List.map
@@ -473,12 +475,15 @@ let to_erased sigs x =
        let ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
        let ints =
          Array.mapi (fun j -> function
-             | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED i
+             | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED
+                                                         i
              | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED ->
-               match Signature.default_internal_state r.ra_type j sigs with
+               match Signature.default_internal_state r.ra_type j
+                       sigs with
                | Some _ -> I_ANY_ERASED
                | None -> I_ANY) r.ra_ints in
-       { ra_type = r.ra_type; ra_erased = true; ra_ports = ports; ra_ints =ints;
+       { ra_type = r.ra_type; ra_erased = true; ra_ports = ports;
+         ra_ints =ints;
          ra_syntax =
            match r.ra_syntax with
            | None -> None
@@ -525,7 +530,8 @@ let to_raw_mixture sigs x =
            )
            r.ra_ports in
        { Raw_mixture.a_type = r.ra_type;
-         Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; })
+         Raw_mixture.a_ports = ports; Raw_mixture.a_ints =
+                                        internals; })
     x
 
 let of_raw_mixture x =
@@ -541,7 +547,8 @@ let of_raw_mixture x =
          Array.map
            (function
              | Raw_mixture.VAL i ->
-                 (Locality.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))), Maintained)
+               (Locality.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))),
+                Maintained)
              | Raw_mixture.FREE ->
                (Locality.dummy_annot Ast.FREE, Maintained)
            )
