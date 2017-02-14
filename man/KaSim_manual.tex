@@ -905,9 +905,32 @@ As any other declaration\index{declaration}, \ttt{\%init} can be used multiple t
 \section{General usage}
 From a terminal window, \KaSim~can be invoked by typing
 \ITE{
-\item[\$] \ttt{KaSim file\_1 ... file\_n [option] }
-}
-where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}). Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in simulated or bio-time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie{\textquotesingle}s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it{\textquotesingle}s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event is bounded (in CPU time) by a constant, so the CPU-time used for simulating $n$ events is roughly $k$ times lower than that used for simulating $k\times n$ events.
+\item[\$] \ttt{KaSim file\_1 ... file\_n [option] } } where
+\ttt{file\_i} are the input Kappa files containing the rules, initial
+conditions and observables (see Chapter~\ref{chap:kappa}). A
+simulation can generate several files that are described below. You
+should really take advantage of the option \ttt{-d} so that they all
+ends in a distinct directory.
+
+In any case, a log called \ttt{inputs.ka} is generated. This is a
+valid kappa files such that \ttt{KaSim inputs.ka} reruns exactly the
+simulation just ran outputing the exact same outputs (using the same
+pseudo random numbers!). First line of this file contains an \ttt{uuid}
+that is also present in any file output during the same run.
+
+Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the
+options that can be given to the simulator.
+
+Basically, one can specify an upper bound and a plot period either in
+simulated or bio-time (arbitrary time unit), or in number of
+events. Note that bio-time is computed using
+Gillespie{\textquotesingle}s formula for time advance (see
+Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time
+(it{\textquotesingle}s not even proportional).
+%In doubt, we recommend using a bound in number of events since the
+%cost of one event is bounded (in CPU time) by a constant, so the
+%CPU-time used for simulating $n$ events is roughly $k$ times lower
+%than that used for simulating $k\times n$ events.
 
 \section{Main options}
 
@@ -1324,7 +1347,16 @@ parameter & possible values & description \\
 \ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\
 && \small before giving up \\
 && \small square approximation\\
-\ttt{"seed"} & any positive integer & \small pseudo-random number\\&& generator seed\\ \hline
+\ttt{"T0"} & float & \small simulation starting time\\
+&& \small (outputs convienience only)\\
+\ttt{"seed"} & any positive integer & \small pseudo-random number\\
+&& \small generator seed\\ \hline
+\textit{Outputs}&&\\
+\ttt{"traceFileName"} & string & \small outputs simulation trace\\
+&&\small in the given file\\
+\ttt{"outputFileName"} & string & \small data file name\\
+\ttt{"plotPeriod"} & number then optionally& \small interval between\\
+& \ttt{"events"} & plot lines\\
 \textit{Causality analysis}&\textbf{Deprecated}&Please use KaStor\\
 \ttt{"displayCompression"} & any combination of & \small type of compression \\
 &  \ttt{"none", "strong", "weak"} & \\
