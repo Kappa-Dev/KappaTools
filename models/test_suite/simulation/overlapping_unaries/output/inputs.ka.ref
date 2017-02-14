@@ -28,3 +28,5 @@
 %init: 1000 fC(e, s)
 %init: 10 fE(c, s)
 %init: 10000 fS(c, e, s~o)
+
+%mod: [E] = 3980 do $STOP

@@ -18,3 +18,5 @@ C(a!_/) @ 2
 
 %init: 10 A(a!1, b, c), B(a!1, b, c)
 %init: 10 C(a~u!1, b, c), C(a~p!1, b, c)
+
+%mod: [E] = 12 do $STOP

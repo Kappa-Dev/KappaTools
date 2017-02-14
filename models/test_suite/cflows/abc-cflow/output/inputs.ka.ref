@@ -38,3 +38,5 @@
 
 %init: n_ab A(x, c), B(x)
 %init: n_c C(x1~u, x2~u)
+
+%mod: [E] = 100000 do $STOP

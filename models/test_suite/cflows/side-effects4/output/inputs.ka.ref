@@ -20,3 +20,5 @@ A(x/!1), B(x/!1) @ 1
 
 %init: 1 A(x!1), B(x~1!1)
 %init: 10 B(x~0)
+
+%mod: [E] = 25 do $STOP

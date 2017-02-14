@@ -19,3 +19,5 @@
 
 %init: nT T()
 %init: 1 
+
+%mod: [E] = 1000 do $STOP

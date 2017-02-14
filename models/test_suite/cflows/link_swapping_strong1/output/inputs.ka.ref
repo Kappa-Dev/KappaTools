@@ -17,3 +17,5 @@ A(y!1/), B(x!1/) @ 1
 /*0*/%mod: [true] do $TRACK A(x!1), B(y!1) [true]
 
 %init: 2 A(x, y)
+
+%mod: [E] = 300 do $STOP

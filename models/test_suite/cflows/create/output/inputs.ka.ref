@@ -13,3 +13,5 @@ A(x!_/) @ 1
 /*0*/%mod: [true] do $TRACK A(x~p) [true]
 
 %init: 1000 A(x~u, y)
+
+%mod: [E] = 500 do $STOP

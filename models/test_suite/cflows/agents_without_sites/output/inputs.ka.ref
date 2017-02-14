@@ -16,3 +16,5 @@
 /*0*/%mod: [true] do $TRACK C() [true]
 
 %init: 10000 A()
+
+%mod: [E] = 10000 do $STOP

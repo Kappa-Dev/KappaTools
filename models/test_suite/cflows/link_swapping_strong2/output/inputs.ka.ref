@@ -19,3 +19,5 @@ A(y!1/), B(x!1/) @ 1
 
 %init: 1 A(x, y)
 %init: 1 B(x, y)
+
+%mod: [E] = 300 do $STOP

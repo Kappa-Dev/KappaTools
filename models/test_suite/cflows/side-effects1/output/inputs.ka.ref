@@ -16,3 +16,5 @@ C(a!_/) @ 2
 /*0*/%mod: [true] do $TRACK A(a!1), B(a!1), C(a~u) [true]
 
 %init: 2 C(a~u!1), C(a~p!1)
+
+%mod: [E] = 10000 do $STOP

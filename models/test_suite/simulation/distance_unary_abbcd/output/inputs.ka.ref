@@ -25,3 +25,5 @@
 %init: 100 B(a, b, c, d)
 %init: 100 C(c, d)
 %init: 100 D(a, d)
+
+%mod: [E] = 200 do $STOP

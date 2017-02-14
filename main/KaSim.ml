@@ -53,7 +53,7 @@ let finalize
   let () = State_interpreter.end_of_simulation
       ~outputs  Format.err_formatter env counter graph state in
   let () = Counter.complete_progress_bar counter in
-  let () = Outputs.close () in
+  let () = Outputs.close ~event:(Counter.current_event counter) () in
   match trace_file,stories_compression with
   | None,_ -> ()
   | Some _, None -> ()

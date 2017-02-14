@@ -12,3 +12,5 @@
 /*1*/%mod: ([T] > 2) do $DEL 1 A()
 
 %init: 2 A(A1, A2~n)
+
+%mod: [E] = 1 do $STOP

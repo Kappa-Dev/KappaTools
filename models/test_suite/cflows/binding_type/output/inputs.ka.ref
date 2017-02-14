@@ -15,3 +15,5 @@ A(x!x.K, y~u/~p) @ 1
 
 %init: 100 A(x, y~u)
 %init: 100 K(x)
+
+%mod: [E] = 10000 do $STOP

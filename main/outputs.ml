@@ -289,10 +289,22 @@ let go env = function
 
 let inputsDesc = ref None
 
-let close () =
+let close_input ?event () =
+  match !inputsDesc with
+  | None -> ()
+  | Some inputs ->
+    let () =
+      match event with
+      | None -> ()
+      | Some event -> Format.fprintf
+                        (Format.formatter_of_out_channel inputs)
+                        "@.%%mod: [E] = %i do $STOP@." event in
+    close_out inputs
+
+let close ?event () =
   let () = close_plot () in
   let () = close_trace () in
-  let () = match !inputsDesc with None -> () | Some x -> close_out x in
+  let () = close_input ?event () in
   close_desc ()
 
 let initial_inputs conf env contact_map init =

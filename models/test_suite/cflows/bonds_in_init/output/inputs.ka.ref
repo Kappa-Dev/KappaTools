@@ -21,3 +21,5 @@
 /*0*/%mod: [true] do $TRACK L(z) [true]
 
 %init: 10 K(s, x~u), S(k, l, z, x~u, y~u), L(z!1, s), Z(l!1, s)
+
+%mod: [E] = 689 do $STOP
