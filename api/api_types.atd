@@ -125,6 +125,7 @@ type snapshot_id = string
 type ('agent,'token) generic_snapshot <ocaml predef module="Data"> = {
     snapshot_file : snapshot_id;
     snapshot_event : int;
+    snapshot_time : float;
     snapshot_agents : 'agent list;
     snapshot_tokens : 'token list <ocaml repr="array">; }
 type snapshot = ((int * site_graph),(float * string)) generic_snapshot

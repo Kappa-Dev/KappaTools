@@ -853,6 +853,7 @@ let incorporate_extra_pattern domain state pattern =
 let snapshot env counter fn state = {
   Data.snapshot_file = fn;
   Data.snapshot_event = Counter.current_event counter;
+  Data.snapshot_time = Counter.current_time counter;
   Data.snapshot_agents =
     Edges.build_snapshot (Model.signatures env) state.edges;
   Data.snapshot_tokens = Array.mapi (fun i x ->

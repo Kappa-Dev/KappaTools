@@ -67,6 +67,7 @@ let label_snapshot
     (snapshot : Data.snapshot) : Api_types_j.snapshot =
   { Api_types_j.snapshot_file = snapshot.Data.snapshot_file
   ; Api_types_j.snapshot_event = snapshot.Data.snapshot_event
+  ; Api_types_j.snapshot_time = snapshot.Data.snapshot_time
   ; Api_types_j.snapshot_agents =
       List.map
         (fun (agent,mixture) -> (agent,api_mixture sigs mixture))

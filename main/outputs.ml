@@ -227,8 +227,9 @@ let plot_now l =
 
 let print_snapshot sigs f s =
   Format.fprintf
-    f "@[<v># \"uuid\" : \"%i\"@,%a@,%a@]"
+    f "@[<v># \"uuid\" : \"%i\"@,%%def: \"T0\" \"%g\"@,@,%a@,%a@]"
     uuid
+    s.Data.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
            (Raw_mixture.print ~compact:false ~created:false ~sigs) mix))

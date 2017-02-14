@@ -25,6 +25,7 @@ type file_line = { file_line_name : string option ;
 type ('agent,'token) generic_snapshot   = {
     snapshot_file : string;
     snapshot_event : int;
+    snapshot_time : float;
     snapshot_agents : 'agent list;
     snapshot_tokens : 'token array; }
 
