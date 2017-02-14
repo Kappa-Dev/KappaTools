@@ -390,6 +390,7 @@ type configuration = {
   traceFileName : string option;
   plotPeriod : Counter.period option;
   outputFileName : string option;
+  initial : float option;
 }
 
 let empty_config = {
@@ -397,6 +398,7 @@ let empty_config = {
   traceFileName = None;
   plotPeriod = None;
   outputFileName = None;
+  initial = None;
 }
 
 let configurations_of_result result =
@@ -448,6 +450,15 @@ let configurations_of_result result =
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be an integer", p)))
+      | "T0" ->
+        get_value pos_p param value_list
+          (fun s p ->
+             try
+               ({ conf with initial = Some (float_of_string s) },
+                story_compression,formatCflow,cflowFile)
+             with Failure _ ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Value "^s^" should be a float", p)))
       | "plotPeriod" ->
         begin match value_list with
           | [s,p] ->
@@ -465,7 +476,7 @@ let configurations_of_result result =
                  story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
-                         ("Value "^s^" should be a int", sp))
+                         ("Value "^s^" should be an integer", sp))
             else if u = "t.u." || u = "time units" || u = "Time units" ||
                     u = "time unit" || u = "Time unit" then
               try

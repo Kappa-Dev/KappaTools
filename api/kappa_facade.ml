@@ -575,11 +575,11 @@ let continue
 let create_info ~(t : t) : Api_types_j.simulation_detail =
   let progress :  Api_types_j.simulation_progress =
     { Api_types_j.simulation_progress_time =
-        Counter.time t.counter ;
+        Counter.current_time t.counter ;
       Api_types_j.simulation_progress_time_percentage =
         Counter.time_percentage t.counter ;
       Api_types_j.simulation_progress_event =
-        Counter.event t.counter ;
+        Counter.current_event t.counter ;
       Api_types_j.simulation_progress_event_percentage =
         Counter.event_percentage t.counter ;
       Api_types_j.simulation_progress_tracked_events =

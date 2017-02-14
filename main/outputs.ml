@@ -315,6 +315,9 @@ let initial_inputs conf env contact_map init =
       (fun f -> Format.fprintf f "%%def: \"seed\" \"%i\"@,")
       inputs_form conf.Eval.seed in
   let () = Pp.option ~with_space:false
+      (fun f -> Format.fprintf f "%%def: \"T0\" \"%g\"@,")
+      inputs_form conf.Eval.initial in
+  let () = Pp.option ~with_space:false
       (fun f -> function
          | Counter.DE i ->
            Format.fprintf f "%%def: \"plotPeriod\" \"%i\" \"events\"@," i

@@ -119,6 +119,7 @@ let one_time_correction_event c ti =
     let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
     check_time c && check_events c
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
+let init_time c = c.init_time
 let max_time c = c.max_time
 let max_events c = c.max_event
 let plot_period c = c.plot_period
@@ -139,14 +140,12 @@ let event_ratio t =
     else float_of_int (t.events - t.init_event) /.
          float_of_int (emax - t.init_event)
 
-let event (counter : t) : int = counter.events
 let event_percentage t : int option =
   let p_e = event_ratio t in
   match classify_float p_e with
     | FP_normal -> Some (int_of_float (p_e *. 100.))
     | FP_subnormal | FP_zero | FP_infinite | FP_nan -> None
 
-let time (counter : t) : float = counter.time
 let time_percentage t : int option =
   let p_t = time_ratio t in
   match classify_float p_t with

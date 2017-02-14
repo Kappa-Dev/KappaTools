@@ -30,6 +30,7 @@ val array_min_equal_not_null :
 
 (** {5 Misc utilities } *)
 
+val float_is_zero : float -> bool
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val not_an_id : string -> bool

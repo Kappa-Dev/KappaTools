@@ -13,6 +13,7 @@ type configuration = {
   traceFileName : string option;
   plotPeriod : Counter.period option;
   outputFileName : string option;
+  initial : float option;
 }
 
 (*val init_kasa :

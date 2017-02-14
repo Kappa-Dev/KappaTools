@@ -182,6 +182,9 @@ let () =
     let () =
       Outputs.initial_inputs
         {Eval.seed = Some theSeed; Eval.traceFileName = user_trace_file;
+         Eval.initial =
+           if Tools.float_is_zero (Counter.init_time counter) then None
+           else Some (Counter.init_time counter);
          Eval.plotPeriod = Some (Counter.plot_period counter);
          Eval.outputFileName = Some plot_file;}
         env contact_map init_l in
@@ -257,8 +260,8 @@ let () =
                   Evaluator.do_interactive_directives
                     ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
                     contact_map env counter graph state e in
-                let () =
-                  Outputs.input_modifications env' (Counter.event counter) e' in
+                let () = Outputs.input_modifications
+                    env' (Counter.current_event counter) e' in
                 o
             with
             | ExceptionDefn.Syntax_Error (msg,pos) ->

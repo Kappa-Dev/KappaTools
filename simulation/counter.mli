@@ -31,14 +31,13 @@ val one_time_correction_event : t -> Nbr.t -> bool
 
 val inc_stories : t -> unit
 
+val init_time : t -> float
 val max_time : t -> float option
 val max_events : t -> int option
 val set_max_time  : t -> float option -> unit
 val set_max_events : t -> int option -> unit
 val event_percentage : t -> int option
-val event : t -> int
 val time_percentage : t -> int option
-val time : t -> float
 val tracked_events : t -> int option
 
 val plot_period : t -> period

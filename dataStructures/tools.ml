@@ -6,6 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let float_is_zero x =
+  match classify_float x with
+  | FP_zero -> true
+  | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
+
 let pow x n =
   assert (n >= 0);
   let rec aux x n acc =

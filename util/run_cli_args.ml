@@ -8,7 +8,7 @@
 
 type t = {
   mutable alg_var_overwrite   : (string * Nbr.t) list;
-  mutable minValue            : float;
+  mutable minValue            : float option;
   mutable maxValue            : float option;
   mutable plotPeriod          : float option;
   mutable rescale             : float option;
@@ -22,7 +22,7 @@ type t = {
 
 let default : t = {
   alg_var_overwrite = [];
-  minValue = 0. ;
+  minValue = None ;
   maxValue = None;
   plotPeriod = None;
   rescale = None;
@@ -40,7 +40,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
        t.inputKappaFileNames <- fic::t.inputKappaFileNames),
    "name of a kappa file to use as input (can be used multiple times for multiple input files)");
   ("-initial",
-   Arg.Float (fun time -> t.minValue <- time),
+   Arg.Float (fun time -> t.minValue <- Some time),
    "Min time of simulation (arbitrary time unit)");
   ("-l",
    Arg.Float(fun time -> t.maxValue <- Some time),

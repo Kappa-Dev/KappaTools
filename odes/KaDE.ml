@@ -174,7 +174,7 @@ let main () =
         ~command_line
         ~command_line_quotes
         ?data_file:cli_args.Run_cli_args.outputDataFile
-        ~init_t:cli_args.Run_cli_args.minValue
+        ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)
         ?plot_period:cli_args.Run_cli_args.plotPeriod logger logger_buffer compil network in
     let () = Loggers.flush_logger logger in
