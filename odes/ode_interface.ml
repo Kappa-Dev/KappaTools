@@ -1,11 +1,14 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 14 2017>
+  * Last modification: Time-stamp: <Feb 15 2017>
 *)
+
+type contact_map = (int list * (int * int) list) array array
 
 type compil =
   {
-    contact_map: (int list * (int * int) list) array array ;
+    (*contact_map: state list * (agent_name * site) list *)
+    contact_map: (*(int list * (int * int) list) array array*) contact_map ;
     environment: Model.t ;
     init: (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     rate_convention: Ode_args.rate_convention ;

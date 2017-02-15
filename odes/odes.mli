@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 14 2017>
+  * Last modification: Time-stamp: <Feb 15 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -48,12 +48,9 @@ sig
   val cannonic_form_from_syntactic_rules :
     Loggers.t ->
     I.compil ->
-    I.nauto_in_rules_cache *
-    (I.rule * int) list *
-    Alg_expr.t Locality.annot option list list *
-    int list * LKappa_auto.RuleCache.hashed_list list
+    I.nauto_in_rules_cache * unit
 
-  val compute_symmetries_from_syntactic_rules : Loggers.t ->
-    I.compil -> I.nauto_in_rules_cache * unit
+  (*val compute_symmetries_from_syntactic_rules : Loggers.t ->
+    I.compil -> I.nauto_in_rules_cache * unit*)
 
 end

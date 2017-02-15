@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 14 2017>
+  * Last modification: Time-stamp: <Feb 15 2017>
 *)
 
 let local_trace = false
@@ -1770,7 +1770,7 @@ automorphisms in the site graph E.
       LKappa_auto.RuleCache.print hash
 
   let print_line_stars log =
-    Loggers.fprintf log "***************\n"
+    Loggers.fprintf log "\n***************\n"
 
   let print_canonic_form_from_syntactic_rule log hash_list =
     List.iter (fun hash ->
@@ -1835,7 +1835,7 @@ automorphisms in the site graph E.
   r3: hash : 7
   ==> r1, r2 are isomorphism rules
 *)
-  let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
+  let compute_isomorphism_in_hashes' nbr_auto_in_rule_list =
     let rec aux acc l =
     match l with
     | [] | [_] -> acc
@@ -1846,12 +1846,23 @@ automorphisms in the site graph E.
     in
     aux [] nbr_auto_in_rule_list
 
+    let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
+      let rec aux acc l =
+      match l with
+      | [] | [_] -> acc
+      | (r, x) :: tl ->
+        if List.mem x (snd (List.split tl))
+        then aux ((r, x)::(r,x)::acc) tl
+        else aux acc tl
+      in
+      aux [] nbr_auto_in_rule_list
+
   let print_isomorphism log list =
     let () =
-      List.iter (fun hash ->
+      List.iter (fun (r, hash) ->
           let () =
             Loggers.fprintf log
-              "List of hashes that are equals "
+              "List of hashes that are equals:rule_id:%i " r
           in
           print_hash log hash
         ) list
@@ -1887,6 +1898,15 @@ automorphisms in the site graph E.
         Loggers.fprintf log " %i " i
       ) arr
 
+  let print_list_array log list_array =
+    Array.iter (fun l ->
+        if l = [] then Loggers.fprintf log "[]"
+        else
+        List.iter (fun i ->
+            Loggers.fprintf log " [rule_id:%i] " i
+          ) l
+      ) list_array
+
 (******************************************************)
 (*compute symmetries with syntactic_rule*)
 (******************************************************)
@@ -1908,52 +1928,188 @@ automorphisms in the site graph E.
     compute_gamma log connected_components nbr_auto_in_lhs
     in*)
 
-  let cannonic_form_from_syntactic_rules log compil =
-    let empty_cache = I.empty_lkappa_cache () in
-    let cache, rule_list, rate_list, nbr_lhs_list, nbr_rule_list
-      =
-      List.fold_left
-        (fun (cache, rule_list, rate_list,nbr_list, current_list)
-          rule ->
-          (* convention of r:
-            the number of automorphisms in the lhs of the rule r*)
-          let cache, nbr_auto_in_lhs =
-            I.divide_rule_rate_by cache compil rule
-          in
-          (* identifiers of rule up to isomorphism*)
-          let rule_id, rate_opt_list, cache, nbr_auto_in_rule =
-            I.cannonic_form_from_syntactic_rule cache compil rule
-          in
-          (*compute gamma(r)= k(r)/convention(r)*)
-          (* You can cast an integer into an algebraic expression.
-          And divide two algebraic expressions.
-          Have a look in the corresponding module.*)
-          (*****************************************************)
-          let rule_list = (rule, rule_id) :: rule_list in
-          let rate_list = rate_opt_list :: rate_list  in
-          let nbr_lhs_list = nbr_auto_in_lhs :: nbr_list in
-          let nbr_rule_list = nbr_auto_in_rule :: current_list in
-          (*****************************************************)
-          (*PRINT*)
-          let () =
-            match Loggers.formatter_of_logger log with
-            | None -> ()
-            | Some fmt ->
-              let () =
-                print_divide_rule_rate_by log nbr_auto_in_lhs in
-              let () = print_hash log nbr_auto_in_rule in
-              let () =
-                print_kinetic_rate_list log fmt rate_opt_list in
-              ()
-          in
-          (*return values*)
-          cache, rule_list, rate_list, nbr_lhs_list,
-          nbr_rule_list
-        ) (empty_cache, [], [], [], []) (I.get_rules compil)
-    in
-    cache, rule_list, rate_list, nbr_lhs_list, nbr_rule_list
+  let print_general_information ~compil log rule_id rule nbr_auto_in_lhs
+      nbr_auto_in_rule rate_opt_list =
+    match Loggers.formatter_of_logger log with
+    | None -> ()
+    | Some fmt ->
+      let () = Loggers.fprintf log "rule_id: " in
+      let () = I.print_rule_id fmt rule_id in
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log "rule_name: " in
+      let () = I.print_rule_name ~compil fmt rule in
+      let () = Loggers.print_newline log in
+      let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
+      let () = print_hash log nbr_auto_in_rule in
+      let () =
+        print_kinetic_rate_list log fmt rate_opt_list in
+      let () = print_line_stars log in
+      ()
 
-  let compute_symmetries_from_syntactic_rules log compil =
+  let print_array_for_symmetries log max_hash to_check_array hit_array
+      hash_rule_list_array =
+    let () = print_max_hash log max_hash in
+    let i = Array.length to_check_array in
+    let () = Loggers.fprintf log "length:%i\n" i in
+    let () = Loggers.fprintf log "To_check_array: " in
+    let () = print_bool_array log to_check_array in
+    let () = Loggers.fprintf log "\nHit_array: " in
+    let () = print_int_array log hit_array in
+    let () = Ode_loggers.print_newline log in
+    let () = Loggers.fprintf log "\nHash_rule_list_array: " in
+    let () = print_list_array log hash_rule_list_array in
+    let () = Ode_loggers.print_newline log in
+    ()
+
+  let build_array_for_symmetries log nbr_rule_list =
+    (*a) compute the biggest hash*)
+    let max_hash = max_hashes nbr_rule_list in
+    (*b. create a size for an array: hash+1*)
+    let size_hash_plus_1 =
+      (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
+    in
+    (*b. create an array of size: hash+1, false*)
+    let to_check_array =
+      Array.make size_hash_plus_1 false
+    in
+    (*b. create an array of size: hash+1, 0*)
+    let hit_array =
+      Array.make size_hash_plus_1 0
+    in
+    (*b. create an array size:hash+1, rule_list, according to its hash*)
+    let hash_rule_list_array =
+      Array.make size_hash_plus_1 []
+    in
+    let () =
+      print_array_for_symmetries log
+        max_hash
+        to_check_array
+        hit_array
+        hash_rule_list_array
+    in
+    to_check_array, hit_array, hash_rule_list_array
+
+  let compute_general_information log compil =
+    let empty_cache = I.empty_lkappa_cache () in
+    let cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
+      List.fold_left
+        (fun (cache, rate_list, nbr_list, current_list, pair_list) rule ->
+           (* convention of r:
+              the number of automorphisms in the lhs of the rule r*)
+           let cache, nbr_auto_in_lhs =
+             I.divide_rule_rate_by cache compil rule
+           in
+           (* identifiers of rule up to isomorphism*)
+           let rule_id, rate_opt_list, cache, nbr_auto_in_rule =
+             I.cannonic_form_from_syntactic_rule cache compil rule
+           in
+           (*compute gamma(r)= k(r)/convention(r)*)
+           (* You can cast an integer into an algebraic expression.
+              And divide two algebraic expressions.
+              Have a look in the corresponding module.*)
+           (*****************************************************)
+           (*let rule_list = (rule, rule_id) :: rule_list in*)
+           let rate_list = rate_opt_list :: rate_list  in
+           let nbr_lhs_list = nbr_auto_in_lhs :: nbr_list in
+           let nbr_rule_list = nbr_auto_in_rule :: current_list in
+           let pair_hash_rule_id = (rule_id, nbr_auto_in_rule) :: pair_list in
+           (*****************************************************)
+           (*PRINT*)
+           let () = print_general_information ~compil
+               log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule rate_opt_list
+           in
+           (*return values*)
+           cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id
+        ) (empty_cache, [], [], [],[]) (I.get_rules compil)
+    in
+    cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list
+
+  let cannonic_form_from_syntactic_rules log compil =
+    let contact_map = I.contact_map compil in
+    let cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
+      compute_general_information log compil
+    in
+    (*****************************************************)
+    (*compute the isomorphism of rules:
+      if the hashes of two rules are the same then they are
+      isomorphism.
+      sigma(ri) = ri'
+    *)
+    (*let isomorphism_rule_hash_list =
+      compute_isomorphism_in_hashes pair_hash_rule_id_list
+    in*)
+    (*let isomorphism_rule_int_list =
+      List.fold_left (fun current_list h ->
+          List.fold_left (fun current_list' (rule_id, hash) ->
+              if h = hash
+              then
+                rule_id :: current_list'
+              else current_list'
+             (*let i = LKappa_auto.RuleCache.int_of_hashed_list h in
+              i :: current_list*)
+            ) current_list pair_hash_rule_id_list
+        ) [] isomorphism_rule_hash_list
+    in
+    let () =
+      List.iter (fun rule_id ->
+          let () = Loggers.fprintf log "true,rule_id:%i\n" rule_id in
+          ()
+        ) isomorphism_rule_int_list
+    in*)
+    let to_check_array, hit_array, hash_rule_list_array =
+      build_array_for_symmetries log nbr_rule_list
+    in
+    let hash_rule_id_list_array, to_check_array, hit_array =
+      List.fold_left
+        (fun (hash_array, to_check_array, hit_array)
+          (rule_id, nbr_rule_hash) ->
+          let int_nbr_rule_hash =
+            LKappa_auto.RuleCache.int_of_hashed_list nbr_rule_hash
+          in
+          let hash_array =
+            hash_rule_list_array.(int_nbr_rule_hash) <-[rule_id];
+            hash_array
+          in
+          (*turn to true rule_id*)
+          let to_check_array =
+            to_check_array.(rule_id) <- true;
+            to_check_array
+          in
+          (*count the number in the list of rule_id*)
+          let length_rule_id_list = List.length [rule_id] in
+          (*let () = Loggers.fprintf log "\nlength rule_id:%i\n"
+              length_rule_id_list
+          in*)
+          let hit_array =
+            hit_array.(rule_id) <- length_rule_id_list;
+            hit_array
+          in
+          hash_array, to_check_array, hit_array
+        ) (hash_rule_list_array, to_check_array, hit_array)
+        pair_hash_rule_id_list
+    in
+    (*PRINT*)
+    let () =
+      let () =
+        Loggers.fprintf log "\nHash_rule_id_list_array:\n"
+      in
+      let i = Array.length hash_rule_id_list_array in
+      (*let () = Loggers.fprintf log "\nlength:%i\n" i in
+      let () = print_list_array log hash_rule_id_list_array in*)
+      let () = Loggers.fprintf log "\nto_check_update_array: " in
+      let () = print_bool_array log to_check_array in
+      let () = Ode_loggers.print_newline log in
+      let () = Loggers.fprintf log "\nHit_update_array: " in
+      let () = print_int_array log hit_array in
+      ()
+    in
+
+    (*c.for each rule, put true in the corresponding element of the
+      array, the element i in the array, where i is the normal form
+      of the rule *)
+    cache, ()
+
+  (*  let compute_symmetries_from_syntactic_rules log compil =
     let cache, pair_rule_list, rate_list, nbr_lhs_list,
         nbr_rule_list
       = cannonic_form_from_syntactic_rules log compil
@@ -1974,11 +2130,11 @@ automorphisms in the site graph E.
     in
     (*b. create an array of size: hash+1, false*)
     let to_check_array =
-      Array.create size_hash_plus_1 false
+      Array.make size_hash_plus_1 false
     in
     (*b. create an array of size: hash+1, 0*)
     let hit_array =
-      Array.create size_hash_plus_1 0
+      Array.make size_hash_plus_1 0
     in
     (*c.for each rule, put true in the corresponding element of the
       array, the element i in the array, where i is the normal form
@@ -2036,7 +2192,7 @@ automorphisms in the site graph E.
     let () = Loggers.fprintf log "\nHit_array: " in
     let () = print_int_array log hit_array in
     let () = Ode_loggers.print_newline log in
-    cache, ()
+    cache, ()*)
 
 
 (*
