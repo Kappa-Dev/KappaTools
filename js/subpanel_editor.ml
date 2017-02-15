@@ -54,20 +54,20 @@ let file_selector =
          Html.Unsafe.string_attrib "accept" ".ka" ] ()
 let panel_heading =
   [%html {|<div class="row">
-             <div class="col-md-2">
+             <div class="col-md-2 col-xs-3">
                 <label class="btn btn-default" for="file-selector">
          |}[file_selector]{|
                    Load
                 </label>
              </div>
-             <div class="col-md-3">
+             <div class="col-md-3 col-xs-6">
                 <label class="filename">|}[file_label]{|</label>
                                                          </div>
-                                                         <div class="col-md-2 col-sm-offset-3 pull-right">
-                                                      |}[save_button]{|
-             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 hidden-xs hidden-sm">
        |}[toggle_button]{|
+             </div>
+                                                         <div class="col-md-2 col-xs-3 pull-right">
+                                                      |}[save_button]{|
              </div>
             </div>|}]
 

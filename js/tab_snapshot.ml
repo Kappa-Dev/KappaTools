@@ -262,21 +262,12 @@ let xml () =
   in
   [%html {|<div class="navcontent-view">
              <div class="row" style="margin : 5px;">
-                <div class="col-sm-2">
+                <div class="col-sm-2 col-xs-4">
                 |}[ format_chooser ]{|
                </div>
-               <div class="col-sm-10"> |}[ snapshot_chooser ]{| </div>
+               <div class="col-sm-10 col-xs-8"> |}[ snapshot_chooser ]{| </div>
              </div>
-             <div class="row">
-                <div class="col-sm-12">
-                |}[ kappa_snapshot_display ]{|
-    	        </div>
-	     </div>
-             <div class="row">
-                <div class="col-sm-12">
-                |}[ kappa_graph_display ]{|
-    	        </div>
-	     </div>
+                |}[ kappa_snapshot_display; kappa_graph_display ]{|
           </div>
           <div class="navcontent-controls">
           |}export_controls{|

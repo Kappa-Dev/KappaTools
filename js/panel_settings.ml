@@ -110,7 +110,7 @@ let input =
     ~a:[Html.a_input_type `Number;
         Html.a_class [ "form-control"];
         Html.a_placeholder "time units";
-        Html.Unsafe.string_attrib "min" "0.0000000001";
+        Html.Unsafe.string_attrib "min" (string_of_float epsilon_float);
         Tyxml_js.R.Html.a_value
           (React.S.l1 format_float_string State_parameter.model_plot_period)]
     ()
@@ -444,21 +444,20 @@ module DivStatusIndicator : Ui_common.Div = struct
 *)
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [  Html.div
-    ~a:[ Html.a_class [ "col-md-2" ] ]
-    (Ui_common.level
-       ~debug:(Tyxml_js.R.Html.pcdata
-                 (React.S.bind
-                    (Ui_simulation.simulation_status ())
-                    (fun status ->
-                       React.S.const
-                         (match status with
-                          | Ui_simulation.STOPPED -> "stopped"
-                          | Ui_simulation.INITALIZING -> "initalizing"
-                          | Ui_simulation.RUNNING -> "running"
-                          | Ui_simulation.PAUSED -> "paused"
+         (Ui_common.level
+            ~debug:(Tyxml_js.R.Html.pcdata
+                      (React.S.bind
+                         (Ui_simulation.simulation_status ())
+                         (fun status ->
+                            React.S.const
+                              (match status with
+                               | Ui_simulation.STOPPED -> "stopped"
+                               | Ui_simulation.INITALIZING -> "initalizing"
+                               | Ui_simulation.RUNNING -> "running"
+                               | Ui_simulation.PAUSED -> "paused"
+                              )
                          )
-                    )
-                 )) ())]
+                      )) ())]
   let onload () = ()
 end
 
@@ -565,28 +564,28 @@ module RunningPanelLayout : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ [%html {|
      <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 col-xs-10">
             <div class="progress">
             |}[ event_progress_bar () ]{|
             </div>
         </div>
-        <div class="col-md-2">events</div>
+        <div class="col-md-2 col-xs-2">events</div>
      </div>|}] ;
      [%html {|
      <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 col-xs-10">
             <div class="progress">
             |}[ time_progress_bar () ]{|
             </div>
         </div>
-        <div class="col-md-2">time</div>
+        <div class="col-md-2 col-xs-2">time</div>
      </div>|}] ;
      [%html {|
      <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4 col-xs-10">
            |}[ tracked_events_count () ]{|
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 col-xs-2">
            |}[ tracked_events_label () ]{|
         </div>
      </div>
@@ -619,10 +618,8 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
              (visible_on_states
                 ~a_class:[ "row" ]
                 [ Ui_simulation.STOPPED ; ]) ]
-      [ Html.div ~a:[ Html.a_class ["col-md-2" ] ] (InputPlotPeriod.content ()) ;
-        Html.div ~a:[ Html.a_class ["col-md-1" ] ] (ButtonConfiguration.content ()) ;
-
-        Html.div ~a:[ Html.a_class ["col-md-9" ] ] (DivErrorMessage.content ()) ]
+      [ Html.div ~a:[ Html.a_class ["col-md-3"; "col-xs-5" ] ] (InputPlotPeriod.content ()) ;
+        Html.div ~a:[ Html.a_class ["col-md-1"; "col-xs-1" ] ] (ButtonConfiguration.content ())]
     in
     let paused_row =
       Html.div
@@ -630,8 +627,8 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
              (visible_on_states
                 ~a_class:[ "row" ]
                 [ Ui_simulation.PAUSED ; ]) ]
-      [ Html.div ~a:[ Html.a_class ["col-md-10" ] ] (InputPerturbation.content ()) ;
-        Html.div ~a:[ Html.a_class ["col-md-2" ] ] (ButtonPerturbation.content ()) ]
+      [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-8" ] ] (InputPerturbation.content ()) ;
+        Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-4" ] ] (ButtonPerturbation.content ()) ]
     in
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
@@ -642,8 +639,9 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
 
       [ Html.div ~a:[ Html.a_class ["row" ] ]
           [ Html.div
-              ~a:[ Html.a_class ["col-md-2" ] ]
-              (InputPauseCondition.content ()) ] ;
+              ~a:[ Html.a_class ["col-md-3" ; "col-xs-5" ] ]
+              (InputPauseCondition.content ()) ;
+            Html.div ~a:[ Html.a_class ["col-md-9"; "col-xs-7" ] ] (DivErrorMessage.content ())  ] ;
         stopped_row ;
         paused_row; ]
 
@@ -670,30 +668,30 @@ let footer () =
          |}[ Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2" ]
+                    ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.STOPPED ; ]) ]
                (ButtonStart.content ()) ]{|
          |}[ Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2" ]
+                    ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.PAUSED ; ]) ]
                (ButtonContinue.content ()) ]{|
          |}[ Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2" ]
+                    ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.RUNNING ; ]) ]
                (ButtonPause.content ()) ]{|
          |}[ Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2" ]
+                    ~a_class:[ "col-md-2"; "col-xs-3" ]
                     [ Ui_simulation.PAUSED ;
                       Ui_simulation.RUNNING ; ]) ]
                (ButtonClear.content ()) ]{|
          |}[ Html.div
-               ~a:[ Html.a_class [ "col-md-1" ] ]
+               ~a:[ Html.a_class [ "col-md-1"; "col-xs-5" ] ]
                ((DivStatusIndicator.content ())
                 @
                 [ Html.entity "nbsp" ; ]) ]{|
