@@ -591,11 +591,11 @@ Near any modified element, modification is specified. Created agents
 are prefixed by a $+$. Degraded agents are prefixed by a $-$. Site
 modification are described by writing the new (linking or internal)
 state after a $/$. Therefore, $/$ alone means that the site becomes
-free, $/!9$ means that the site becomes part of link $9$ and $/~zzz$
+free, $/!9$ means that the site becomes part of link $9$ and $/\intstate{}zzz$
 means that the new internal state of the site is $zzz$.
 
 Here are all the rules mentionned above (+1 extra) translated in this
-unambiguous (less readable) notation:
+unambiguous notation:
 \begin{lstlisting}[language=kappa]
 'A dimerization' A(x/!1),A(y~p/!1) @ 'gamma'
 'destroy A' -A(x,y~u,z) @ 'gamma'
