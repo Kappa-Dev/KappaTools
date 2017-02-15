@@ -11,10 +11,10 @@ module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 
 module ButtonPerturbation : Ui_common.Div = struct
-  let button_id = "panel_settings_perturbation_button"
+  let id = "panel_settings_perturbation_button"
   let button =
     Html.button
-      ~a:[ Html.a_id button_id
+      ~a:[ Html.a_id id
          ; Html.Unsafe.string_attrib "type" "button"
          ; Html.a_class ["btn" ; "btn-default" ; ] ]
       [ Html.cdata "perturbation" ]
@@ -74,7 +74,7 @@ let signal_change input_dom signal_handler =
         Js._true)
 
 module InputPauseCondition : Ui_common.Div = struct
-  let id = "panel_settings_puase_condition"
+  let id = "panel_settings_pause_condition"
   let input =
     Html.input
       ~a:[Html.a_id id ;
@@ -83,8 +83,7 @@ module InputPauseCondition : Ui_common.Div = struct
           Html.a_placeholder "[T] > 100" ;
           Tyxml_js.R.Html.a_value State_parameter.model_pause_condition ]
     ()
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [ Html.div [ input ] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [input]
 
   let dom = Tyxml_js.To_dom.of_input input
 
@@ -97,6 +96,7 @@ module InputPauseCondition : Ui_common.Div = struct
 end
 
 module InputPlotPeriod : Ui_common.Div = struct
+  let id = "panel_settings_plot_period"
 let format_float_string value =
   let n = string_of_float value in
   let length = String.length n in
@@ -108,14 +108,14 @@ let format_float_string value =
 let input =
   Html.input
     ~a:[Html.a_input_type `Number;
+        Html.a_id id;
         Html.a_class [ "form-control"];
         Html.a_placeholder "time units";
         Html.Unsafe.string_attrib "min" (string_of_float epsilon_float);
         Tyxml_js.R.Html.a_value
           (React.S.l1 format_float_string State_parameter.model_plot_period)]
     ()
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [ Html.div [ input ] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [input]
 
   let onload () =
     let input_dom = Tyxml_js.To_dom.of_input input in
@@ -160,19 +160,16 @@ module ButtonConfiguration : Ui_common.Div = struct
                      [configuration_seed_input]{|</div>
                 </div>|}] ; ]
 
-  let configuration_button_id = "configuration_button"
+  let id = "configuration_button"
   let configuration_button =
     Html.button
       ~a:[ Html.a_class [ "btn" ; "btn-default" ] ;
-           Html.a_id configuration_button_id ;
+           Html.a_id id ;
          ]
       [ Html.cdata "Options" ]
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [ [%html {|<div class="input-group input-group-offset-5">
-              |}[configuration_button]{|
-              |}[configuration_modal]{|
-             </div>|}] ]
+    [configuration_button; configuration_modal]
   let onload () =
     let () = Common.jquery_on
       (Format.sprintf "#%s" configuration_save_button_id)
@@ -192,7 +189,7 @@ module ButtonConfiguration : Ui_common.Div = struct
             Js._true))
     in
     let () = Common.jquery_on
-      ("#"^configuration_button_id)
+      ("#"^id)
       ("click")
       (Dom_html.handler
          (fun (_ : Dom_html.event Js.t)  ->
@@ -211,9 +208,11 @@ module ButtonConfiguration : Ui_common.Div = struct
 end
 
 module DivErrorMessage : Ui_common.Div = struct
+  let id = "configuration_error_div"
   let alert_messages =
   Html.div
-    ~a:[Tyxml_js.R.Html.a_class
+    ~a:[Html.a_id id;
+        Tyxml_js.R.Html.a_class
           (React.S.bind
              UIState.model_error
              (fun error ->
@@ -256,7 +255,7 @@ module ButtonStart : Ui_common.Div = struct
                            "btn-default" ; ] ; ])
       [ Html.cdata "start" ]
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ Html.div [button] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
 
   let onload () =
     let start_button_dom = Tyxml_js.To_dom.of_button button in
@@ -280,7 +279,7 @@ module ButtonClear : Ui_common.Div = struct
                        "btn-default" ; ] ]
     [ Html.cdata "clear" ]
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ Html.div [button] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
 
   let onload () =
     let dom = Tyxml_js.To_dom.of_button button in
@@ -307,7 +306,7 @@ module ButtonPause : Ui_common.Div = struct
                        "btn-default" ; ] ]
     [ Html.cdata "pause" ]
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ Html.div [button] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
 
   let onload () =
     let button_dom = Tyxml_js.To_dom.of_button button in
@@ -333,7 +332,7 @@ module ButtonContinue : Ui_common.Div = struct
                        "btn-default" ; ] ]
     [ Html.cdata "continue" ]
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ Html.div [button] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
 
   let onload () =
     let button_dom = Tyxml_js.To_dom.of_button button in
@@ -351,12 +350,14 @@ end
 
 module SelectRuntime : Ui_common.Div = struct
 
+let id ="settings_select_runtime"
   let select_default_runtime = [ UIState.WebWorker ;
                                  UIState.Embedded ; ]
   let select_runtime_options, select_runtime_options_handle =
     ReactiveData.RList.create select_default_runtime
   let select =
     Tyxml_js.R.Html.select
+      ~a:[Html.a_id id]
       (ReactiveData.RList.map
          (fun runtime -> Html.option
              ~a:[Html.a_value
@@ -364,7 +365,7 @@ module SelectRuntime : Ui_common.Div = struct
              (Html.pcdata (UIState.runtime_label runtime)))
          select_runtime_options)
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ Html.div [ select] ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [select]
 
   let onload () =
     let args = Url.Current.arguments in
@@ -422,28 +423,10 @@ module SelectRuntime : Ui_common.Div = struct
 end
 
 module DivStatusIndicator : Ui_common.Div = struct
-  (*
-  let label () =
-    Tyxml_js.R.Html.pcdata
-      (React.S.bind
-         (Ui_simulation.simulation_status ())
-         (fun status ->
-            React.S.const
-              (match status with
-               | Ui_simulation.STOPPED -> "stopped"
-               | Ui_simulation.INITALIZING -> "initalizing"
-               | Ui_simulation.RUNNING -> "running"
-               | Ui_simulation.PAUSED -> "paused"
-              )
-         )
-      )
-
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    let debug = label () in
-    [ Html.div (Ui_common.level ~debug ()) ]
-*)
+  let id = "setting_status_indicator"
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [  Html.div
+         ~a:[Html.a_id id]
          (Ui_common.level
             ~debug:(Tyxml_js.R.Html.pcdata
                       (React.S.bind
@@ -462,6 +445,7 @@ module DivStatusIndicator : Ui_common.Div = struct
 end
 
 module RunningPanelLayout : Ui_common.Div = struct
+  let id = "settings_runetime_layout"
   let lift f x = match x with | None -> None | Some x -> f x
   let progress_bar
       (percent_signal : int Tyxml_js.R.Html.wrap)
@@ -563,7 +547,7 @@ module RunningPanelLayout : Ui_common.Div = struct
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ [%html {|
-     <div class="row">
+     <div class="row" id="|}id{|">
         <div class="col-md-4 col-xs-10">
             <div class="progress">
             |}[ event_progress_bar () ]{|
@@ -595,8 +579,8 @@ module RunningPanelLayout : Ui_common.Div = struct
 
 end
 
-let hidden_class = ["hidden"]
-let visible_class = ["visible"]
+let hidden_class = "hidden"
+let visible_class = "visible"
 let visible_on_states
     ?(a_class=[])
     (state : Ui_simulation.ui_status list) : string list React.signal =
@@ -604,10 +588,10 @@ let visible_on_states
      (Ui_simulation.simulation_status ())
      (fun run_state ->
         React.S.const
-          (if List.mem run_state state then
-             a_class@visible_class
+          ((if List.mem run_state state then
+             visible_class
            else
-             a_class@hidden_class)
+             hidden_class)::a_class)
      )
   )
 
@@ -616,19 +600,21 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
-                ~a_class:[ "row" ]
+                ~a_class:[ "form-group"; "form-group-sm" ]
                 [ Ui_simulation.STOPPED ; ]) ]
-      [ Html.div ~a:[ Html.a_class ["col-md-3"; "col-xs-5" ] ] (InputPlotPeriod.content ()) ;
-        Html.div ~a:[ Html.a_class ["col-md-1"; "col-xs-1" ] ] (ButtonConfiguration.content ())]
-    in
+    [%html {|
+            <label class="col-lg-1 col-md-2 col-xs-2 control-label" for="|}InputPlotPeriod.id{|">Plot period</label>
+            <div class="col-md-2 col-xs-3">|}(InputPlotPeriod.content ()){|</div>
+            <div class="col-xs-6 col-md-3">|}
+        (ButtonConfiguration.content ()){|</div>|}] in
     let paused_row =
       Html.div
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
-                ~a_class:[ "row" ]
+                ~a_class:[ "form-group" ]
                 [ Ui_simulation.PAUSED ; ]) ]
-      [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-8" ] ] (InputPerturbation.content ()) ;
-        Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-4" ] ] (ButtonPerturbation.content ()) ]
+      [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-9" ] ] (InputPerturbation.content ()) ;
+        Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-3" ] ] (ButtonPerturbation.content ()) ]
     in
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
@@ -636,15 +622,16 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
                 ~a_class:[ "panel-body" ; "panel-controls" ]
                 [ Ui_simulation.STOPPED ;
                   Ui_simulation.PAUSED ;]) ]
-
-      [ Html.div ~a:[ Html.a_class ["row" ] ]
-          [ Html.div
-              ~a:[ Html.a_class ["col-md-3" ; "col-xs-5" ] ]
-              (InputPauseCondition.content ()) ;
-            Html.div ~a:[ Html.a_class ["col-md-9"; "col-xs-7" ] ] (DivErrorMessage.content ())  ] ;
-        stopped_row ;
-        paused_row; ]
-
+      [[%html {|
+         <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-1 col-sm-2 hidden-xs control-label" for="|}InputPauseCondition.id{|">Pause if</label>
+            <div class="col-md-2 col-sm-3 col-xs-5">|}(InputPauseCondition.content ()){|</div>
+            <div class="col-lg-9 col-md-8 col-xs-7">|}(DivErrorMessage.content ()){|</div>
+          </div>
+                                                                       |}
+          [paused_row;stopped_row]
+          {|</form>|}]]
 
   let initializing_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
     Html.div
@@ -670,27 +657,27 @@ let footer () =
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.STOPPED ; ]) ]
-               (ButtonStart.content ()) ]{|
-         |}[ Html.div
+               (ButtonStart.content ());
+             Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.PAUSED ; ]) ]
-               (ButtonContinue.content ()) ]{|
-         |}[ Html.div
+               (ButtonContinue.content ());
+             Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
                      [ Ui_simulation.RUNNING ; ]) ]
-               (ButtonPause.content ()) ]{|
-         |}[ Html.div
+               (ButtonPause.content ());
+             Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-3" ]
                     [ Ui_simulation.PAUSED ;
                       Ui_simulation.RUNNING ; ]) ]
-               (ButtonClear.content ()) ]{|
-         |}[ Html.div
+               (ButtonClear.content ());
+             Html.div
                ~a:[ Html.a_class [ "col-md-1"; "col-xs-5" ] ]
                ((DivStatusIndicator.content ())
                 @

@@ -323,7 +323,8 @@ module type Menu = sig
 end;;
 
 module type Div = sig
-  val content : unit -> [> Html_types.div ] Tyxml_js.Html.elt list
+  val id : string
+  val content : unit -> Html_types.div_content_fun Tyxml_js.Html.elt list
   val onload : unit -> unit
 end;;
 
