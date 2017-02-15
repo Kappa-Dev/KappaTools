@@ -576,7 +576,7 @@ $G' =\ttt{A(x!1,y{\intstate}p,z\intstate2),C(t)}$ where the site
 \ttt{!\_} (for bound to someone), may also induce side effects when
 they are not preserved in the RHS of a rule, as in
 \begin{lstlisting}[language=kappa]
-'Disconnect A' A(x!\_) -> A(x) @ 'gamma'
+'Disconnect A' A(x!_) -> A(x) @ 'gamma'
 \end{lstlisting}
 or
 \begin{lstlisting}[language=kappa]
@@ -602,7 +602,7 @@ unambiguous notation:
 'building A' A(z/!1), +A(x!1) @ 'gamma'
 'deleting A' A(x!1/), -A(z!1) @ 'gamma'
 'weird' -A(z!1), -A(x!1), +A(x) @ 'gamma'
-'Disconnect A' A(x!\_/) @ 'gamma'
+'Disconnect A' A(x!_/) @ 'gamma'
 'Force bind A' A(x?/!1), C(t/!1) @ 'gamma'
 'phos C' C(x1~u/~p!1/),A(c!1/) @ 'modrate'
 \end{lstlisting}
