@@ -29,6 +29,7 @@ Pattern
 Matching
 Instantiation
 Alg_expr
+Alg_expr_extra
 Raw_mixture
 Primitives
 Model

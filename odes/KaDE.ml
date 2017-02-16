@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 15 2017>
+  * Last modification: Time-stamp: <Feb 16 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -193,3 +193,4 @@ let main () =
     let () = Format.pp_print_flush Format.err_formatter () in raise e
 
 let () = main ()
+let _ = Alg_expr_extra.print 
