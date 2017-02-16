@@ -22,5 +22,7 @@ cat kasa_options.foot >> LOG_medium_KO.txt && \
 cat kasa_options.foot >> LOG_high_init.txt && \
 cat kasa_options.foot >> LOG_high_rule.txt && \
 cat kasa_options.foot >> LOG_full.txt && \
-cp LOG*.txt ../generated_img/ #&& \
+mv LOG*.txt ../generated_img/ #&& \
 #rm LOG*.txt
+
+rm -r output/

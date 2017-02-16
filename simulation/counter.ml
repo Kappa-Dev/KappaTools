@@ -207,6 +207,11 @@ let complete_progress_bar c =
   | None -> ()
   | Some pr -> Progress_report.complete_progress_bar c.time c.events pr
 
+let positive_plot_period counter =
+  match plot_period counter with
+  | DE e -> e > 0
+  | DT t -> t > 0.
+
 let next_point counter dt =
   match counter.plot_period with
   | DT dT ->

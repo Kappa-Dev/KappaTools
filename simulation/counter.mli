@@ -40,6 +40,7 @@ val event_percentage : t -> int option
 val time_percentage : t -> int option
 val tracked_events : t -> int option
 
+val positive_plot_period : t -> bool
 val plot_period : t -> period
 val set_plot_period : t -> period -> unit
 

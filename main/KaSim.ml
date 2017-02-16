@@ -180,14 +180,15 @@ let () =
       else None in
 
     let () =
-      Outputs.initial_inputs
-        {Eval.seed = Some theSeed; Eval.traceFileName = user_trace_file;
-         Eval.initial =
-           if Tools.float_is_zero (Counter.init_time counter) then None
-           else Some (Counter.init_time counter);
-         Eval.plotPeriod = Some (Counter.plot_period counter);
-         Eval.outputFileName = Some plot_file;}
-        env contact_map init_l in
+      if not !Parameter.compileModeOn then
+        Outputs.initial_inputs
+          {Eval.seed = Some theSeed; Eval.traceFileName = user_trace_file;
+           Eval.initial =
+             if Tools.float_is_zero (Counter.init_time counter) then None
+             else Some (Counter.init_time counter);
+           Eval.plotPeriod = Some (Counter.plot_period counter);
+           Eval.outputFileName = Some plot_file;}
+          env contact_map init_l in
 
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
@@ -227,10 +228,10 @@ let () =
 
     let () = match plotPack with
       | Some _ ->
-        (*if cli_args.Run_cli_args.plotPeriod > 0. then*)
-        Outputs.go (Model.signatures env)
-          (Data.Plot
-             (State_interpreter.observables_values env graph counter))
+        if Counter.positive_plot_period counter then
+          Outputs.go (Model.signatures env)
+            (Data.Plot
+               (State_interpreter.observables_values env graph counter))
       | _ -> () in
 
     let () =

@@ -263,7 +263,7 @@ clean_ide:
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
 	find man \( -name \*.htm \) -delete
-	find man/scripts \( -name \*.witness \) -delete
+	find man/scripts -name \*.witness -delete
 	rm -rf $(MANGENREP)
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc clean_ide

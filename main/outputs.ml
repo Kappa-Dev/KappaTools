@@ -151,13 +151,14 @@ type fd = {
   is_tsv:bool;
 }
 
-type format = Raw of fd | Svg of Pp_svg.store
+type format = StandBy of (string * string * string array)
+            | Raw of fd | Svg of Pp_svg.store
 
 let plotDescr = ref None
 
 let close_plot () =
   match !plotDescr with
-  | None -> ()
+  | (None | Some (StandBy _)) -> ()
   | Some (Raw plot) -> close_out plot.desc
   | Some (Svg s) -> Pp_svg.to_file s
 
@@ -199,29 +200,32 @@ let initialize trace_file plotPack env =
       traceDescr := Some desc in
   match plotPack with
   | None -> ()
-  | Some (filename,title,head) ->
-    let format =
-      if Filename.check_suffix filename ".svg" then
-        Svg {Pp_svg.file = filename;
-             Pp_svg.title = title;
-             Pp_svg.descr = "\"uuid\" : \""^string_of_int uuid^"\"";
-             Pp_svg.legend = head;
-             Pp_svg.points = [];
-            }
-      else
-        let d_chan = Kappa_files.open_out filename in
-        let d = Format.formatter_of_out_channel d_chan in
-        let is_tsv = Filename.check_suffix filename ".tsv" in
-        let () = if not is_tsv then Format.fprintf d "# %s@." title in
-        let () = if not is_tsv
-          then Format.fprintf d "# \"uuid\" : \"%i\"@." uuid in
-        let () = print_header_raw is_tsv d head in
-        Raw {desc=d_chan; form=d; is_tsv} in
+  | Some pack -> plotDescr := Some (StandBy pack)
+
+let launch_plot (filename,title,head) =
+  let format =
+    if Filename.check_suffix filename ".svg" then
+      Svg {Pp_svg.file = filename;
+           Pp_svg.title = title;
+           Pp_svg.descr = "\"uuid\" : \""^string_of_int uuid^"\"";
+           Pp_svg.legend = head;
+           Pp_svg.points = [];
+          }
+    else
+      let d_chan = Kappa_files.open_out filename in
+      let d = Format.formatter_of_out_channel d_chan in
+      let is_tsv = Filename.check_suffix filename ".tsv" in
+      let () = if not is_tsv then Format.fprintf d "# %s@." title in
+      let () = if not is_tsv
+        then Format.fprintf d "# \"uuid\" : \"%i\"@." uuid in
+      let () = print_header_raw is_tsv d head in
+      Raw {desc=d_chan; form=d; is_tsv} in
     plotDescr := Some format
 
-let plot_now l =
+let rec plot_now l =
   match !plotDescr with
   | None -> assert false
+  | Some (StandBy p) -> let () = launch_plot p in plot_now l
   | Some (Raw fd) -> print_values_raw fd.is_tsv fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
