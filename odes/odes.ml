@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 15 2017>
+  * Last modification: Time-stamp: <Feb 16 2017>
 *)
 
 let local_trace = false
@@ -1766,13 +1766,14 @@ automorphisms in the site graph E.
 *)
 
   let print_hash log hash =
-    Loggers.fprintf log "Hash-:%a\n"
-      LKappa_auto.RuleCache.print hash
+    Loggers.fprintf log " Hash-:%a\n"
+      LKappa_auto.RuleCache.print hash;
+    Loggers.print_newline log
 
   let print_line_stars log =
     Loggers.fprintf log "\n***************\n"
 
-  let print_canonic_form_from_syntactic_rule log hash_list =
+  let print_hash_list log hash_list =
     List.iter (fun hash ->
         let () = print_line_stars log in
         let () = print_hash log hash in
@@ -1835,7 +1836,7 @@ automorphisms in the site graph E.
   r3: hash : 7
   ==> r1, r2 are isomorphism rules
 *)
-  let compute_isomorphism_in_hashes' nbr_auto_in_rule_list =
+  let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
     let rec aux acc l =
     match l with
     | [] | [_] -> acc
@@ -1846,28 +1847,14 @@ automorphisms in the site graph E.
     in
     aux [] nbr_auto_in_rule_list
 
-    let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
-      let rec aux acc l =
-      match l with
-      | [] | [_] -> acc
-      | (r, x) :: tl ->
-        if List.mem x (snd (List.split tl))
-        then aux ((r, x)::(r,x)::acc) tl
-        else aux acc tl
-      in
-      aux [] nbr_auto_in_rule_list
-
   let print_isomorphism log list =
-    let () =
-      List.iter (fun (r, hash) ->
-          let () =
-            Loggers.fprintf log
-              "List of hashes that are equals:rule_id:%i " r
-          in
-          print_hash log hash
-        ) list
-    in
-    ()
+    List.iter (fun hash ->
+        let () =
+          Loggers.fprintf log
+            "List of hashes that are equals: "
+        in
+        print_hash log hash
+      ) list
 
 (******************************************************)
 (*compute the biggest hash *)
@@ -1885,7 +1872,7 @@ automorphisms in the site graph E.
       max_hash x (max_hashes xs)
 
   let print_max_hash log hash =
-    let () = Loggers.fprintf log "Biggest hash:\n" in
+    let () = Loggers.fprintf log "The biggest hash: " in
     print_hash log hash
 
   let print_bool_array log arr =
@@ -1898,14 +1885,19 @@ automorphisms in the site graph E.
         Loggers.fprintf log " %i " i
       ) arr
 
+  let print_list log l =
+    let rec print_elements = function
+      | [] ->  (*Loggers.fprintf log "[]"*) ()
+      | x :: xs ->
+        Loggers.fprintf log " rule_id:%i" x; Loggers.fprintf log " ";
+        print_elements xs
+    in
+    Loggers.fprintf log "[";
+    print_elements l;
+    Loggers.fprintf log "]"
+
   let print_list_array log list_array =
-    Array.iter (fun l ->
-        if l = [] then Loggers.fprintf log "[]"
-        else
-        List.iter (fun i ->
-            Loggers.fprintf log " [rule_id:%i] " i
-          ) l
-      ) list_array
+    Array.iter (fun l -> print_list log l) list_array
 
 (******************************************************)
 (*compute symmetries with syntactic_rule*)
@@ -1933,36 +1925,70 @@ automorphisms in the site graph E.
     match Loggers.formatter_of_logger log with
     | None -> ()
     | Some fmt ->
-      let () = Loggers.fprintf log "rule_id: " in
-      let () = I.print_rule_id fmt rule_id in
-      let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log "rule_name: " in
+      let () = Loggers.fprintf log " rule_name: " in
       let () = I.print_rule_name ~compil fmt rule in
       let () = Loggers.print_newline log in
       let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
+      let () = print_kinetic_rate_list log fmt rate_opt_list in
+      let () = Loggers.fprintf log " rule_id: " in
+      let () = I.print_rule_id fmt rule_id in
+      let () = Loggers.print_newline log in
       let () = print_hash log nbr_auto_in_rule in
-      let () =
-        print_kinetic_rate_list log fmt rate_opt_list in
       let () = print_line_stars log in
       ()
+
+  let compute_general_information log compil =
+    let empty_cache = I.empty_lkappa_cache () in
+    let cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
+      List.fold_left
+        (fun (cache, rate_list, nbr_lhs_list, current_list, pair_list) rule ->
+           (* convention of r:
+              the number of automorphisms in the lhs of the rule r*)
+           let cache, nbr_auto_in_lhs =
+             I.divide_rule_rate_by cache compil rule
+           in
+           (* identifiers of rule up to isomorphism*)
+           let rule_id, rate_opt_list, cache, nbr_auto_in_rule =
+             I.cannonic_form_from_syntactic_rule cache compil rule
+           in
+           (*compute gamma(r)= k(r)/convention(r)*)
+           (* You can cast an integer into an algebraic expression.
+              And divide two algebraic expressions.
+              Have a look in the corresponding module.*)
+           (*****************************************************)
+           let rate_list = rate_opt_list :: rate_list  in
+           let nbr_lhs_list = nbr_auto_in_lhs :: nbr_lhs_list in
+           let nbr_rule_list = nbr_auto_in_rule :: current_list in
+           let pair_hash_rule_id = (rule_id, nbr_auto_in_rule) :: pair_list in
+           (*****************************************************)
+           (*PRINT*)
+           let () = print_general_information ~compil
+               log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule rate_opt_list
+           in
+           (*return values*)
+           cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id
+        ) (empty_cache, [], [], [],[]) (I.get_rules compil)
+    in
+    cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list
+
+(******************************************************)
+(*Build array for symmetries*)
 
   let print_array_for_symmetries log max_hash to_check_array hit_array
       hash_rule_list_array =
     let () = print_max_hash log max_hash in
     let i = Array.length to_check_array in
-    let () = Loggers.fprintf log "length:%i\n" i in
-    let () = Loggers.fprintf log "To_check_array: " in
+    let () = Loggers.fprintf log "The length of array to_check: %i\n" i in
+    let () = Loggers.fprintf log "\nHash_rule_list_array: " in
+    let () = print_list_array log hash_rule_list_array in
+    let () = Loggers.fprintf log "\nTo_check_array: " in
     let () = print_bool_array log to_check_array in
     let () = Loggers.fprintf log "\nHit_array: " in
     let () = print_int_array log hit_array in
-    let () = Ode_loggers.print_newline log in
-    let () = Loggers.fprintf log "\nHash_rule_list_array: " in
-    let () = print_list_array log hash_rule_list_array in
-    let () = Ode_loggers.print_newline log in
     ()
 
   let build_array_for_symmetries log nbr_rule_list =
-    (*a) compute the biggest hash*)
+  (*a) compute the biggest hash*)
     let max_hash = max_hashes nbr_rule_list in
     (*b. create a size for an array: hash+1*)
     let size_hash_plus_1 =
@@ -1980,6 +2006,7 @@ automorphisms in the site graph E.
     let hash_rule_list_array =
       Array.make size_hash_plus_1 []
     in
+    (*PRINT*)
     let () =
       print_array_for_symmetries log
         max_hash
@@ -1989,44 +2016,169 @@ automorphisms in the site graph E.
     in
     to_check_array, hit_array, hash_rule_list_array
 
-  let compute_general_information log compil =
-    let empty_cache = I.empty_lkappa_cache () in
-    let cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
-      List.fold_left
-        (fun (cache, rate_list, nbr_list, current_list, pair_list) rule ->
-           (* convention of r:
-              the number of automorphisms in the lhs of the rule r*)
-           let cache, nbr_auto_in_lhs =
-             I.divide_rule_rate_by cache compil rule
-           in
-           (* identifiers of rule up to isomorphism*)
-           let rule_id, rate_opt_list, cache, nbr_auto_in_rule =
-             I.cannonic_form_from_syntactic_rule cache compil rule
-           in
-           (*compute gamma(r)= k(r)/convention(r)*)
-           (* You can cast an integer into an algebraic expression.
-              And divide two algebraic expressions.
-              Have a look in the corresponding module.*)
-           (*****************************************************)
-           (*let rule_list = (rule, rule_id) :: rule_list in*)
-           let rate_list = rate_opt_list :: rate_list  in
-           let nbr_lhs_list = nbr_auto_in_lhs :: nbr_list in
-           let nbr_rule_list = nbr_auto_in_rule :: current_list in
-           let pair_hash_rule_id = (rule_id, nbr_auto_in_rule) :: pair_list in
-           (*****************************************************)
-           (*PRINT*)
-           let () = print_general_information ~compil
-               log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule rate_opt_list
-           in
-           (*return values*)
-           cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id
-        ) (empty_cache, [], [], [],[]) (I.get_rules compil)
+(******************************************************)
+
+  let list_of_rule_id_with_its_hashes pair_hash_rule_id_list
+      isomorphism_rule_hash_list =
+    List.fold_left (fun (same_list, different_list) (rule_id, hash) ->
+        if List.mem hash isomorphism_rule_hash_list
+        then (rule_id, hash) :: same_list, different_list
+        else same_list, (rule_id, hash) :: different_list
+      ) ([], []) pair_hash_rule_id_list
+
+  let print_pair_hash_rule_id_list log l =
+    List.iter (fun (i, hash) ->
+        let () = Loggers.fprintf log " rule_id: %i ++ " i in
+        let () = print_hash log hash in
+        ()
+      ) l
+
+  let print_list_of_rule_id_with_its_hashes log (l1, l2) =
+    let () = Loggers.fprintf log "List of rule_id has the same hashes: " in
+    let () = print_pair_hash_rule_id_list log l1 in
+    let () = Loggers.print_newline log in
+    let () = Loggers.fprintf log "List of rule_id has different hashes: " in
+    let () = print_pair_hash_rule_id_list log l2 in
+    Loggers.print_newline log
+
+  (******************************************************)
+  (*update array*)
+
+  let update_array log cache hash_rule_list_array
+      to_check_array
+      hit_array
+      same_hash_list different_hash_list
+      rule_id_same_hash_list
+      list_of_rule_id_has_different_hashes
+    =
+    (*update the array hash_rule_list_array: for example
+      r1: hash 0
+      r2: hash 1
+      r3: hash 0
+      r4: hash 2
+      => array:
+      Hash :     0       1    2     3
+      rule_id:  [r1;r3] [r2]  [r4]  []
+    *)
+    let cache, update_hash_rule_list_array =
+      List.fold_left (fun (cache, hash_array) same_hash ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              same_hash
+          in
+          (*put the list of rules that has the same hash*)
+          let hash_array =
+            hash_array.(int_hash_array) <- rule_id_same_hash_list;
+            hash_array
+          in
+          (*put rule id that does not has the same hashes*)
+          let cache, hash_array =
+            List.fold_left (fun (cache, hash_array) (rule_id, different_hash) ->
+                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+                    different_hash
+                in
+                let hash_array =
+                  hash_array.(int_hash_array) <- [rule_id];
+                  hash_array
+                in
+                cache, hash_array
+              ) (cache, hash_array) list_of_rule_id_has_different_hashes
+          in
+          cache, hash_array
+        ) (cache, hash_rule_list_array) same_hash_list
     in
-    cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list
+    let () =
+      let () = print_line_stars log in
+      let () = Loggers.fprintf log
+          "\nUpdate Hash_rule_list_array: \n"
+      in
+      let () = print_list_array log update_hash_rule_list_array in
+      Loggers.print_newline log
+    in
+  (*
+   update to_check_array:
+   Hash : 0     1     2      3
+   Bool:  T     T     T      F
+  *)
+    let cache, update_to_check_array =
+      List.fold_left (fun (cache, hash_array) same_hash ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              same_hash
+          in
+          let hash_array =
+            hash_array.(int_hash_array) <- true;
+            hash_array
+          in
+          let cache, hash_array =
+            List.fold_left (fun (cache, hash_array) different_hash ->
+                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+                    different_hash
+                in
+                let hash_array =
+                  hash_array.(int_hash_array) <- true;
+                  hash_array
+                in
+                cache, hash_array
+              ) (cache, hash_array) different_hash_list
+          in
+          cache, hash_array
+        ) (cache, to_check_array) same_hash_list
+    in
+    let () =
+      let () = Loggers.fprintf log "Update to_check_array:"
+      in
+      let () = print_bool_array log update_to_check_array in
+      Loggers.print_newline log
+    in
+  (*
+   update hit_array:
+   Hash :     0    1    2   3
+   counter :  2    1    1   0
+   counter : the length of the list of rule_id in the hash_rule_list_array
+  *)
+    let length_rule_id_same_hash =
+      List.length rule_id_same_hash_list
+    in
+    let cache, update_hit_array =
+      List.fold_left (fun (cache, hash_array) same_hash ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              same_hash
+          in
+          let hash_array =
+            hash_array.(int_hash_array) <- length_rule_id_same_hash;
+            hash_array
+          in
+        (*different hash*)
+          let cache, hash_array =
+            List.fold_left (fun (cache, hash_array) different_hash ->
+                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+                    different_hash
+                in
+                (*it is a singleton in the case of different_hash hash*)
+                let hash_array =
+                  hash_array.(int_hash_array) <- 1; (*singleton*)
+                  hash_array
+                in
+                cache, hash_array
+              ) (cache, hash_array) different_hash_list
+          in
+          cache, hash_array
+        ) (cache, hit_array) same_hash_list
+    in
+    let () =
+      let () = Loggers.fprintf log "Update hit_array: " in
+      let () = print_int_array log update_hit_array in
+      Loggers.print_newline log
+    in
+    cache, update_hash_rule_list_array, update_to_check_array,
+    update_hit_array
+
+(******************************************************)
+(*main function computing symmetries with syntactic_rule*)
 
   let cannonic_form_from_syntactic_rules log compil =
     let contact_map = I.contact_map compil in
-    let cache, rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
+    let cache, rate_list, nbr_lhs_list, nbr_rule_list,
+        pair_hash_rule_id_list =
       compute_general_information log compil
     in
     (*****************************************************)
@@ -2035,165 +2187,77 @@ automorphisms in the site graph E.
       isomorphism.
       sigma(ri) = ri'
     *)
-    (*let isomorphism_rule_hash_list =
-      compute_isomorphism_in_hashes pair_hash_rule_id_list
-    in*)
-    (*let isomorphism_rule_int_list =
-      List.fold_left (fun current_list h ->
-          List.fold_left (fun current_list' (rule_id, hash) ->
-              if h = hash
-              then
-                rule_id :: current_list'
-              else current_list'
-             (*let i = LKappa_auto.RuleCache.int_of_hashed_list h in
-              i :: current_list*)
-            ) current_list pair_hash_rule_id_list
-        ) [] isomorphism_rule_hash_list
+    let isomorphism_rule_hash_list =
+      compute_isomorphism_in_hashes nbr_rule_list
     in
-    let () =
-      List.iter (fun rule_id ->
-          let () = Loggers.fprintf log "true,rule_id:%i\n" rule_id in
-          ()
-        ) isomorphism_rule_int_list
-    in*)
+    let () = print_isomorphism log isomorphism_rule_hash_list in
+    let list_of_rule_id_with_its_hashes =
+      list_of_rule_id_with_its_hashes pair_hash_rule_id_list
+        isomorphism_rule_hash_list
+    in
+    let ()  =
+      print_list_of_rule_id_with_its_hashes log
+        list_of_rule_id_with_its_hashes
+    in
+    let list_of_rule_id_has_the_same_hashes,
+        list_of_rule_id_has_different_hashes =
+      list_of_rule_id_with_its_hashes
+    in
+    (*****************************************************)
+    (*array*)
     let to_check_array, hit_array, hash_rule_list_array =
       build_array_for_symmetries log nbr_rule_list
     in
-    let hash_rule_id_list_array, to_check_array, hit_array =
-      List.fold_left
-        (fun (hash_array, to_check_array, hit_array)
-          (rule_id, nbr_rule_hash) ->
-          let int_nbr_rule_hash =
-            LKappa_auto.RuleCache.int_of_hashed_list nbr_rule_hash
-          in
-          let hash_array =
-            hash_rule_list_array.(int_nbr_rule_hash) <-[rule_id];
-            hash_array
-          in
-          (*turn to true rule_id*)
-          let to_check_array =
-            to_check_array.(rule_id) <- true;
-            to_check_array
-          in
-          (*count the number in the list of rule_id*)
-          let length_rule_id_list = List.length [rule_id] in
-          (*let () = Loggers.fprintf log "\nlength rule_id:%i\n"
-              length_rule_id_list
-          in*)
-          let hit_array =
-            hit_array.(rule_id) <- length_rule_id_list;
-            hit_array
-          in
-          hash_array, to_check_array, hit_array
-        ) (hash_rule_list_array, to_check_array, hit_array)
-        pair_hash_rule_id_list
+    let rule_id_same_hash_list, same_hash_list =
+      List.split
+        list_of_rule_id_has_the_same_hashes
     in
-    (*PRINT*)
-    let () =
-      let () =
-        Loggers.fprintf log "\nHash_rule_id_list_array:\n"
-      in
-      let i = Array.length hash_rule_id_list_array in
-      (*let () = Loggers.fprintf log "\nlength:%i\n" i in
-      let () = print_list_array log hash_rule_id_list_array in*)
-      let () = Loggers.fprintf log "\nto_check_update_array: " in
-      let () = print_bool_array log to_check_array in
-      let () = Ode_loggers.print_newline log in
-      let () = Loggers.fprintf log "\nHit_update_array: " in
-      let () = print_int_array log hit_array in
-      ()
+    let rule_id_different_hash_list, different_hash_list =
+      List.split
+        list_of_rule_id_has_different_hashes
     in
-
-    (*c.for each rule, put true in the corresponding element of the
-      array, the element i in the array, where i is the normal form
-      of the rule *)
+    (*****************************************************)
+    (*update array*)
+    let cache, update_hash_rule_list_array,
+        update_to_check_array,
+        update_hit_array =
+      update_array log cache
+        hash_rule_list_array
+        to_check_array
+        hit_array
+        same_hash_list
+        different_hash_list
+        rule_id_same_hash_list
+        list_of_rule_id_has_different_hashes
+    in
+    (*****************************************************)
+    (*a set of /the list of the positions (of all agents:
+      both in the lhs/rhs, degraded agents (deleted),
+      created agents) of the agent A with at least a
+      site x or y in the rule.
+      - The positions are the agent_id of agents of type A
+      with at least a site x or y.*)
+    (*let l =
+      Array.fold_left (fun current_list pair_array ->
+          Array.fold_left (fun current_list (state_list, pair_list) ->
+              List.fold_left (fun current_list state ->
+                  List.fold_left (fun current_list (agent_name, site_name) ->
+                      let l = (agent_name, site_name, state) ::
+                              current_list
+                      in
+                      let () = Loggers.fprintf log
+                          "agent_name:%i, site_name:%i, state:%i\n"
+                          agent_name
+                          site_name
+                          state
+                      in
+                      l
+                    ) current_list pair_list
+                ) current_list state_list
+            ) current_list pair_array
+        ) [] contact_map
+    in*)
     cache, ()
-
-  (*  let compute_symmetries_from_syntactic_rules log compil =
-    let cache, pair_rule_list, rate_list, nbr_lhs_list,
-        nbr_rule_list
-      = cannonic_form_from_syntactic_rules log compil
-    in
-    (*compute the isomorphism of rules:
-      if the hashes of two rules are the same then they are
-      isomorphism.
-      sigma(ri) = ri'
-    *)
-    let isomorphism_rule_list =
-      compute_isomorphism_in_hashes nbr_rule_list
-    in
-    (*a) compute the biggest hash*)
-    let max_hash = max_hashes nbr_rule_list in
-    (*b. create a size for an array: hash+1*)
-    let size_hash_plus_1 =
-      (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
-    in
-    (*b. create an array of size: hash+1, false*)
-    let to_check_array =
-      Array.make size_hash_plus_1 false
-    in
-    (*b. create an array of size: hash+1, 0*)
-    let hit_array =
-      Array.make size_hash_plus_1 0
-    in
-    (*c.for each rule, put true in the corresponding element of the
-      array, the element i in the array, where i is the normal form
-      of the rule *)
-    let arr, positions_list =
-      List.fold_left (fun (arr, current_list) (rule, rule_id) ->
-          let () =
-            match Loggers.formatter_of_logger log with
-            | None -> ()
-            | Some fmt ->
-              let () = Loggers.fprintf log "rule_id: " in
-              let () = I.print_rule_id fmt rule_id in
-              let () = Loggers.print_newline log in
-              let () = Loggers.fprintf log "rule_name: " in
-              let () = I.print_rule_name ~compil fmt rule in
-              let () = Loggers.print_newline log in
-              ()
-          in
-          let update_to_check =
-            to_check_array.(rule_id) <- true;
-            arr
-          in
-          (*d. if the corrsponding element is false then ignore
-            this rule *)
-          let b =
-            if update_to_check.(rule_id) = false
-            then false
-            else
-              true
-          in
-          if b
-          then
-            (*b = false*)
-            arr, current_list
-          else
-            (*b = true*)
-            (*the positions are the agent_id of agents of type A
-              with at least a site x or y. Both in the lhs/rhs,
-              degrated agents, created agents*)
-            let list_of_positions =
-              current_list (*TODO*)
-            in
-          update_to_check, list_of_positions
-        ) (to_check_array, []) pair_rule_list
-    in
-    (*PRINT*)
-    let () = print_isomorphism log isomorphism_rule_list in
-    let () = print_max_hash log max_hash in
-    let () = Loggers.fprintf log "To_check_array: " in
-    let () = print_bool_array log to_check_array in
-    let () = Ode_loggers.print_newline log in
-    let () = Loggers.fprintf log "\nTo_check_update: " in
-    let () = print_bool_array log arr in
-    let () = Ode_loggers.print_newline log in
-    let () = Loggers.fprintf log "\nHit_array: " in
-    let () = print_int_array log hit_array in
-    let () = Ode_loggers.print_newline log in
-    cache, ()*)
-
 
 (*
 2) Now we have a list of rules, with a hash.
@@ -2222,7 +2286,7 @@ d) take your list of rule
          Ignore this rule
      -> otherwise
   Compute the list of the positions (of all agents: both in
-the lhs/rhs, degraded agents, created agents)
+the lhs/rhs, degraded agents (deleted), created agents)
 of the agent A with at least a site x or y in the rule.
 
 - The positions are the agent_id of agents of type A with at least a

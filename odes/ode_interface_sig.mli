@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 15 2017>
+  * Last modification: Time-stamp: <Feb 16 2017>
 *)
 
 module type Interface =
@@ -21,8 +21,7 @@ sig
     ((connected_component array list,int) Alg_expr.e * hidden_init * Locality.t) list
 
   (*contact map*)
-  type contact_map
-  val contact_map : compil -> contact_map
+  val contact_map : compil -> (int list * (int * int) list) array array
 
   val empty_cache: compil -> cache
   val empty_lkappa_cache: unit -> nauto_in_rules_cache

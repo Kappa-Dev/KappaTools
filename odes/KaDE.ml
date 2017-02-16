@@ -169,6 +169,8 @@ let main () =
     (*let cache, () =
       A.cannonic_form_from_syntactic_rules my_logger compil
     in*)
+    let () = Loggers.flush_logger my_logger in
+    let () = close_out my_out_channel in
     (*********************************************************************)
     let () = A.export_network
         ~command_line
