@@ -6,5 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val onload : unit -> unit
 val sync : unit -> unit Lwt.t
+val init : unit -> unit Lwt.t
+val onload : unit -> unit

@@ -7,5 +7,3 @@
 (******************************************************************************)
 val model_perturbation : string React.signal
 val set_model_perturbation : ?step:React.step -> string -> unit
-
-val init : unit -> unit Lwt.t

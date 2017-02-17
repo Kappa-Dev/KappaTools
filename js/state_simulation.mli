@@ -19,13 +19,32 @@ type model_state = STOPPED | INITALIZING | RUNNING | PAUSED
 val model_state_to_string : model_state -> string
 val model_simulation_state : t option -> model_state option
 
+val create_simulation : Api_types_j.simulation_id -> unit Api.result Lwt.t
+val set_simulation : Api_types_j.simulation_id -> unit Api.result Lwt.t
+val remove_simulation : unit -> unit Api.result Lwt.t
 (* run on application init *)
 val init : unit -> unit Lwt.t
+(* to synch state of application with runtime *)
+val sync : unit -> unit Api.result Lwt.t
 
 val with_simulation :
   label:string ->
   (Api.manager -> Api_types_j.project_id -> t -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t
+
+val with_simulation_info :
+  label:string ->
+  ?stopped:(Api.manager ->
+            Api_types_j.project_id ->
+            Api_types_j.simulation_id -> unit Api.result Lwt.t) ->
+  ?initializing:(Api.manager ->
+                 Api_types_j.project_id ->
+                 Api_types_j.simulation_id -> unit Api.result Lwt.t) ->
+  ?ready:(Api.manager ->
+          Api_types_j.project_id ->
+          Api_types_j.simulation_id ->
+          Api_types_j.simulation_info -> unit Api.result Lwt.t) ->
+  unit -> unit Api.result Lwt.t
 
 val when_ready :
   label:string ->

@@ -8,39 +8,23 @@
 
 open Js
 open Codemirror
-
 open Lwt.Infix
-
+module Html = Tyxml_js.Html5
 
 let editor_full , set_editor_full = React.S.create (false : bool)
 
-let document = Dom_html.window##.document
-let has_been_modified = ref (false)
-
-module Html = Tyxml_js.Html5
 
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
   Tyxml_js.R.Html.pcdata
-    (React.S.bind file_label_signal (fun env -> React.S.const env))
-
-let save_button_id = "save_button"
-let save_button =
-  Html.a
-    ~a:[ Html.a_id save_button_id
-       ; Tyxml_js.R.Html.Unsafe.string_attrib
-           "download"
-           (React.S.map
-              (function
-                | None -> ""
-                | Some file -> file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
-              )
-              Ui_state.current_file
-           )
-       ; Html.Unsafe.string_attrib "role" "button"
-       ; Html.a_class ["btn";"btn-default";"pull-right"]
-       ]
-    [ Html.cdata "save" ]
+    (React.S.bind
+       State_file.model
+       (fun model ->
+          React.S.const
+            (match model.State_file.model_current with
+             | None -> ""
+             | Some filename -> filename)
+       ))
 
 let toggle_button_id = "toggle_button"
 let toggle_button =
@@ -51,38 +35,72 @@ let toggle_button =
        ]
     [ Html.cdata "toggle" ]
 
-let file_selector =
-  Html.input
-    ~a:[ Html.a_id "file-selector" ;
-         Html.Unsafe.string_attrib "type" "file" ;
-         Html.Unsafe.string_attrib "accept" ".ka" ] ()
+let panel_heading_group_id = "panel_heading_group"
 let panel_heading =
+  let menu_editor_settings_content :
+    [> Html_types.div ] Tyxml_js.Html5.elt list =
+    Menu_editor_settings.content ()
+  in
+  let menu_editor_project_content :
+    [> Html_types.div ] Tyxml_js.Html5.elt list =
+    Menu_editor_project.content ()
+  in
+  let menu_editor_file_content :
+    [> Html_types.div ] Tyxml_js.Html5.elt list =
+    Menu_editor_file.content ()
+  in
+  let menu_editor_simulation_content :
+    [> Html_types.div ] Tyxml_js.Html5.elt list =
+    Menu_editor_simulation.content ()
+  in
+  let buttons =
+    Html.div
+      ~a:[ Html.a_id panel_heading_group_id ;
+           Html.a_class [ "btn-group" ] ;
+           Html.Unsafe.string_attrib "role" "group" ; ]
+      (menu_editor_settings_content @
+       menu_editor_project_content @
+       menu_editor_file_content @
+       menu_editor_simulation_content @
+       [toggle_button]
+      )
+  in
   [%html {|<div class="row">
-             <div class="col-md-2 col-xs-3">
-                <label class="btn btn-default" for="file-selector">
-         |}[file_selector]{|
-                   Load
-                </label>
-             </div>
-             <div class="col-md-3 col-xs-6">
-                <label class="filename">|}[file_label]{|</label>
-                                                         </div>
-            <div class="col-md-2 hidden-xs hidden-sm">
-       |}[toggle_button]{|
-             </div>
-                                                         <div class="col-md-2 col-xs-3 pull-right">
-                                                      |}[save_button]{|
+             <div class="col-md-8">|}[ buttons ]{|</div>
+             <div class="col-md-2">
+                <label class="filename">|}[ file_label ]{|</label>
              </div>
             </div>|}]
 
+let codemirror_id = "code-mirror"
+let editor_panel_id = "editor-panel"
+
 let content () =
-  [Html.div ~a:[Html.a_class ["panel";"panel-default"]]
-     [%html {|<div class="panel-heading">
-            |}[panel_heading]{|
-             </div>
-             <div class="panel-body">
-                <textarea id="code-mirror"> </textarea>
-             </div>|}]]
+  let textarea =
+    Html.div
+      [ Html.textarea
+          ~a:[Html.a_id codemirror_id]
+          (Html.pcdata "") ]
+  in
+  [Html.div
+     ~a:[Html.a_class ["panel";"panel-default"]]
+     [ Html.div
+         ~a:[Html.a_class ["panel-heading"]]
+         [ panel_heading ] ;
+       Html.div
+         ~a:[ Tyxml_js.R.Html.a_class
+                (React.S.map
+                   (fun model ->
+                      match model.State_file.model_current with
+                      | None -> ["no-panel-body" ; ]
+                      | Some _ -> ["panel-body" ; ])
+                   State_file.model) ;
+             Html.a_id editor_panel_id
+            ]
+         [ textarea  ] ;
+
+     ]
+  ]
 
 let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
   let position p =
@@ -154,6 +172,10 @@ let initialize codemirror () =
     Lwt.return_unit
 
 let onload () : unit =
+  let () = Menu_editor_settings.onload () in
+  let () = Menu_editor_project.onload () in
+  let () = Menu_editor_file.onload () in
+  let () = Menu_editor_simulation.onload () in
   let lint_config =
     Codemirror.create_lint_configuration () in
   let () = lint_config##.getAnnotations := setup_lint in
@@ -183,7 +205,6 @@ let onload () : unit =
   let _ = Common.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
-    let () = has_been_modified := true in
     let text : string = Js.to_string codemirror##getValue in
     let () = match !timeout with
         None -> ()
@@ -210,18 +231,10 @@ let onload () : unit =
     ()
   in
   let () = codemirror##onChange(handler) in
-  let file_select_dom = Tyxml_js.To_dom.of_input file_selector in
-  let save_button_dom : Dom_html.linkElement Js.t = Ui_common.id_dom save_button_id in
-  let toggle_button_dom : Dom_html.linkElement Js.t = Ui_common.id_dom toggle_button_id in
-  let () =
-    save_button_dom##.onclick :=
-      Dom.handler
-        (fun _ ->
-           let header = Js.string "data:text/plain;charset=utf-8," in
-           let editor_text :  Js.js_string Js.t = codemirror##getValue in
-           let () =
-             save_button_dom##.href := header##concat((Js.escape editor_text)) in
-           Js._true) in
+  let toggle_button_dom : Dom_html.linkElement Js.t =
+    Js.Unsafe.coerce
+      (Js.Opt.get (Ui_common.document##getElementById (Js.string toggle_button_id))
+         (fun () -> assert false)) in
   let () =
     toggle_button_dom##.onclick :=
       Dom.handler
@@ -229,55 +242,23 @@ let onload () : unit =
            let editor_full = React.S.value editor_full in
            let () = set_editor_full (not editor_full) in
            Js._true) in
-  let file_select_handler () =
-    Js.Optdef.case (file_select_dom##.files)
-      (fun () -> Lwt.return_unit)
-      (fun files ->
-         Js.Opt.case (files##item (0))
-           (fun () -> Lwt.return_unit)
-           (fun file ->
-              let filename = to_string file##.name in
-              let () = set_file_label filename in
-              let () =
-                Common.async
-                  ((fun _ ->
-                      File.readAsText file >>=
-                      (fun  (va : Js.js_string Js.t) ->
-                         let () = Ui_state.set_file filename "" in
-                         Lwt.return va
-                      ) >>=
-                      (fun  (va : Js.js_string Js.t) ->
-                         let () = codemirror##setValue(va) in
-                         let () = Subpanel_editor_controller.stop_simulation () in
-                         Lwt.return_unit
-                      )
-                    )
-                  )
-              in
-              let () = has_been_modified := false in
-              Lwt.return_unit)) in
-  let confirm () : bool = Js.to_bool
-      (Dom_html.window##confirm
-         (Js.string "Modifications will be lost, do you wish to continue?"))
+  let _ =
+    React.S.map
+      (fun model ->
+         match model.State_file.model_current with
+         | None -> Common.hide_codemirror ()
+         | Some _ -> Common.show_codemirror ())
+      State_file.model
   in
-  let () =
-    Lwt_js_events.async
-      (fun () ->
-         Lwt_js_events.clicks
-           file_select_dom
-           (fun _ _ ->
-              let () =
-                file_select_dom##.value := file_select_dom##.defaultValue in
-              Lwt.return_unit)) in
-  let ()  =
-    Common.async
-      (fun () ->
-         Lwt_js_events.changes
-           file_select_dom
-           (fun _ _ ->
-              if (not !has_been_modified) || confirm ()
-              then file_select_handler ()
-              else Lwt.return_unit))
-  in ()
+  let _ =
+    React.S.map
+      (fun refresh_file ->
+         match refresh_file with
+         | None -> ()
+         | Some content -> codemirror##setValue(Js.string content)
+      )
+      State_file.refresh_file
+  in
+  ()
 
 let onresize () = ()

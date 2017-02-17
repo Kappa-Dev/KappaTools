@@ -6,4 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let model_perturbation, set_model_perturbation = React.S.create ""
+include Ui_common.Menu
