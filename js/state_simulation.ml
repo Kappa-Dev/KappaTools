@@ -301,37 +301,30 @@ let when_ready
       )
 
 let rec update_simulation () : unit Api.result Lwt.t =
+  let handle_update = (fun manager project_id simulation_id ->
+        manager#simulation_info
+          project_id
+          simulation_id >>=
+        (Api_common.result_bind_lwt
+           ~ok:(fun (simulation_info : Api_types_j.simulation_info) ->
+               let () = update_simulation_state
+                   simulation_id
+                   (SIMULATION_STATE_READY simulation_info)
+               in
+               if simulation_info.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running then
+                 update_simulation ()
+               else
+                 Lwt.return (Api_common.result_ok ()))
+        )
+    )
+  in
   (with_simulation_info
     ~label:"start_simulation"
     ~stopped:(fun _ _ _ -> Lwt.return (Api_common.result_ok ()))
-    ~initializing:(fun manager project_id simulation_id ->
-        manager#simulation_info
-          project_id
-          simulation_id >>=
-        (Api_common.result_bind_lwt
-           ~ok:(fun (simulation_info : Api_types_j.simulation_info) ->
-               let () = update_simulation_state
-                   simulation_id
-                   (SIMULATION_STATE_READY simulation_info)
-               in
-               Lwt.return (Api_common.result_ok ()))
-        )
-      )
-    ~ready:(fun manager project_id simulation_id _ ->
-        manager#simulation_info
-          project_id
-          simulation_id >>=
-        (Api_common.result_bind_lwt
-           ~ok:(fun (simulation_info : Api_types_j.simulation_info) ->
-               let () = update_simulation_state
-                   simulation_id
-                   (SIMULATION_STATE_READY simulation_info)
-               in
-               Lwt.return (Api_common.result_ok ()))
-        )
-      )
-    () : unit Api.result Lwt.t) >>=
-  (Api_common.result_bind_lwt ~ok:update_simulation)
+    ~initializing:handle_update
+    ~ready:(fun m p s _ -> handle_update m p s)
+    ())
+
 
 
 let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
