@@ -674,6 +674,11 @@ let sig_from_inits =
        | _,_,(INIT_MIX m,_) -> (merge_agents ags m,toks)
        | _,na,(INIT_TOK t,pos) -> (ags,merge_tokens toks [na,(t,pos)]))
 
+let sig_from_edit_rules =
+  List.fold_left
+    (fun (ags,toks) (_,r) ->
+       (merge_agents ags r.mix, merge_tokens toks r.delta_token))
+
 let sig_from_rules =
   List.fold_left
     (fun (ags,toks) (_,(r,_)) ->
@@ -699,8 +704,40 @@ let sig_from_perts =
 let implicit_signature r =
   let acc = sig_from_inits (r.signatures,r.tokens) r.init in
   let acc' = sig_from_rules acc r.rules in
-  let ags,toks = sig_from_perts acc' r.perturbations in
+  let acc'' = sig_from_edit_rules acc' r.edit_rules in
+  let ags,toks = sig_from_perts acc'' r.perturbations in
   { r with signatures = ags; tokens = toks }
+
+let split_mixture m =
+    List.fold_right
+      (fun  (na,intf,modif) (lhs,rhs,add,del) ->
+         match modif with
+         | Some Erase -> (lhs,rhs,add,(na,intf,None)::del)
+         | Some Create -> (lhs,rhs,(na,intf,None)::add,del)
+         | None ->
+           let (intfl,intfr) =
+             List.fold_left
+               (fun (l,r) p ->
+                  ({port_nme = p.port_nme;
+                    port_int = p.port_int;
+                    port_int_mod = None;
+                    port_lnk = p.port_lnk;
+                    port_lnk_mod=None}::l,
+                   {port_nme = p.port_nme;
+                    port_int =
+                      (match p.port_int_mod with
+                       | None -> p.port_int
+                       | Some x -> [x]);
+                    port_int_mod = None;
+                    port_lnk =
+                      (match p.port_lnk_mod with
+                       | None -> p.port_lnk
+                       | Some None -> [Locality.dummy_annot FREE]
+                       | Some (Some (i,pos)) -> [LNK_VALUE (i,()),pos]);
+                    port_lnk_mod=None}::r)
+               ) ([],[]) intf in
+           ((na,intfl,None)::lhs,(na,intfr,None)::rhs,add,del)
+      ) m ([],[],[],[])
 
 let compil_to_json c =
   let mix_to_json = JsonUtil.of_list agent_to_json in

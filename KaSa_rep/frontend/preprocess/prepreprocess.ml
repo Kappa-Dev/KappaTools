@@ -731,7 +731,7 @@ let translate_compil parameters error compil =
       (error,[])
       compil.Ast.observables
   in
-  let error,_id_set,rules_rev =
+  let error,id_set',chem_rules_rev =
     List.fold_left
       (fun (error,id_set,list) (id,(rule,p)) ->
          let error,id_set =
@@ -775,6 +775,42 @@ let translate_compil parameters error compil =
          else error,id_set,(id,((Ckappa_sig.Direct,direct),p))::list)
       (error,id_set,[])
       compil.Ast.rules
+  in
+  let error,_id_set,rules_rev =
+    List.fold_left
+      (fun (error,id_set,list) (id,rule) ->
+         let error,id_set =
+           match id with
+           | None -> error,id_set
+           | Some id -> check_freshness parameters error "Label" (fst id) id_set
+         in
+         let raw_lhs,raw_rhs,add,del = Ast.split_mixture rule.Ast.mix in
+         let ast_lhs,ast_rhs = raw_lhs@del,raw_rhs@add in
+         let prefix,tail_lhs,tail_rhs =
+           (List.length raw_lhs, List.length del, List.length add) in
+         let error,lhs =
+           refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
+         let error,rhs =
+           refine_mixture_in_rule parameters error prefix tail_lhs 0 ast_rhs in
+         let error,k_def =
+           alg_with_pos_map (refine_mixture parameters) error rule.Ast.act in
+         let error,k_un =
+           alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.un_act) in
+         let error,direct =
+           error,
+           {
+             Ckappa_sig.prefix = prefix ;
+             Ckappa_sig.delta = tail_lhs ;
+             Ckappa_sig.lhs = lhs ;
+             Ckappa_sig.rhs =  rhs ;
+             Ckappa_sig.bidirectional = false;
+             Ckappa_sig.k_def = k_def ;
+             Ckappa_sig.k_un = k_un ;
+           }
+         in
+         error,id_set,(id,(Locality.dummy_annot (Ckappa_sig.Direct,direct)))::list)
+      (error,id_set',chem_rules_rev)
+      compil.Ast.edit_rules
   in
   let error,init_rev =
     List.fold_left
@@ -844,7 +880,7 @@ let translate_compil parameters error compil =
   error,{
     Ast.variables = List.rev var_rev;
     Ast.signatures = List.rev signatures_rev;
-    Ast.rules = List.rev rules_rev ; (* TODO concatenates edit_rules *)
+    Ast.rules = List.rev rules_rev ;
     Ast.edit_rules = [] ;
     Ast.observables  = List.rev observables_rev;
     Ast.init = List.rev init_rev ;
