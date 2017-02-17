@@ -14,15 +14,19 @@ type 'ok result = ('ok,manager_code) Api_types_j.result
 
 class type manager_environment =
   object
-    method environment_info :
+    method environment_info:
       unit ->
       Api_types_j.environment_info result Lwt.t
   end;;
 
 class type manager_project =
   object
-    method project_info :
-      unit -> Api_types_j.project_info result Lwt.t
+    method project_catalog :
+      unit -> Api_types_j.project_catalog result Lwt.t
+    method project_get :
+      Api_types_j.project_id -> Api_types_j.project result Lwt.t
+    method project_parse :
+      Api_types_j.project_id -> Api_types_j.project_parse result Lwt.t
     method project_create :
       Api_types_j.project_parameter ->
       Api_types_j.project_id result Lwt.t
@@ -30,17 +34,22 @@ class type manager_project =
       Api_types_j.project_id ->
       unit result Lwt.t
   end;;
+(* The type is parameterized here are there are
+   implementations of the file manager that cannot
+   generate the contact map.
 
-class type manager_file =
+   'file_status_summary = Api_types_j.contact_map
+*)
+class type ['file_status_summary] manager_file =
   object
-    method file_info :
+    method file_catalog :
       Api_types_j.project_id ->
-      Api_types_j.file_info result Lwt.t
+      Api_types_j.file_catalog result Lwt.t
 
     method file_create :
       Api_types_j.project_id ->
       Api_types_j.file ->
-      Api_types_j.file_metadata Api_types_j.file_result result Lwt.t
+      ((Api_types_j.file_metadata, 'file_status_summary) Api_types_j.file_result) result Lwt.t
 
     method file_get :
       Api_types_j.project_id ->
@@ -51,21 +60,21 @@ class type manager_file =
       Api_types_j.project_id ->
       Api_types_j.file_id ->
       Api_types_j.file_modification ->
-      Api_types_j.file_metadata Api_types_j.file_result result Lwt.t
+      ((Api_types_j.file_metadata, 'file_status_summary) Api_types_j.file_result) result Lwt.t
 
     method file_delete :
       Api_types_j.project_id ->
       Api_types_j.file_id ->
-      unit Api_types_j.file_result result Lwt.t
+      ((unit, 'file_status_summary) Api_types_j.file_result) result Lwt.t
 
   end;;
 
 class type  manager_file_line =
   object
-    method simulation_info_file_line :
+    method simulation_catalog_file_line :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
-      Api_types_j.file_line_info result Lwt.t
+      Api_types_j.file_line_catalog result Lwt.t
     method simulation_detail_file_line :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
@@ -75,10 +84,10 @@ class type  manager_file_line =
 
 class type  manager_flux_map =
   object
-    method simulation_info_flux_map :
+    method simulation_catalog_flux_map :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
-      Api_types_j.flux_map_info result Lwt.t
+      Api_types_j.flux_map_catalog result Lwt.t
     method simulation_detail_flux_map :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
@@ -105,10 +114,10 @@ class type  manager_plot =
 
 class type  manager_snapshot =
   object
-    method simulation_info_snapshot :
+    method simulation_catalog_snapshot :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
-      Api_types_j.snapshot_info result Lwt.t
+      Api_types_j.snapshot_catalog result Lwt.t
     method simulation_detail_snapshot :
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
@@ -118,7 +127,7 @@ class type  manager_snapshot =
 
 class type  manager_simulation =
   object
-    method simulation_list :
+    method simulation_catalog :
       Api_types_j.project_id ->
       Api_types_j.simulation_catalog result Lwt.t
 
@@ -165,7 +174,7 @@ class type  manager_simulation =
 class type manager =
   object
     inherit manager_environment
-    inherit manager_file
+    inherit [Api_types_j.project_parse] manager_file
     inherit manager_project
     inherit manager_simulation
   end;;

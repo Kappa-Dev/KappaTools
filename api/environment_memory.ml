@@ -11,17 +11,18 @@ class simulation
       _runtime_state
     method set_runtime_state (runtime_state : Kappa_facade.t) =
       _runtime_state <- runtime_state
+
   end
 
 class project
     (project_id : Api_types_j.project_id)
-    (state : Kappa_facade.t) :
+    (state : Api_environment.parse_state) :
   Api_environment.project =
   object
     val mutable _simulations = []
     val mutable _files = []
-    val mutable _state : Kappa_facade.t = state
-
+    val mutable _state : Api_environment.parse_state = state
+    val mutable _version : Api_types_j.project_version = 0
     method create_simulation
         (simulation_id : Api_types_j.simulation_id)
         (state : Kappa_facade.t) : Api_environment.simulation =
@@ -35,14 +36,22 @@ class project
       _simulations
     method set_simulations (simulation : Api_environment.simulation list) =
       _simulations <- simulation
-    method get_files () =
-      _files
+
+    method get_version () = _version
+
+    method get_files () = _files
     method set_files (files : Api_types_j.file list) =
-      _files <- files
-    method get_state () =
+      let () = _files <- files in
+      _version
+
+    method set_state (state : Api_environment.parse_state)
+      : Api_types_j.project_version =
+      let () = _version <- 1 + _version in
+      let () = _state <- state in
+      _version
+    method get_state () : Api_environment.parse_state =
       _state
-    method set_state (state : Kappa_facade.t) =
-      _state <- state
+
   end
 
 class environment () : Api_environment.environment =
@@ -53,5 +62,5 @@ class environment () : Api_environment.environment =
       _projects <- projects
     method create_project
         (project_id : Api_types_j.project_id)
-        (state : Kappa_facade.t) = new project project_id state
+        (state : Api_environment.parse_state) = new project project_id state
   end;;

@@ -18,7 +18,8 @@ let current_file, set_current_file =
 
 let update_outputs key : unit =
   let file_line_info_id = if key = "/dev/stdout" then None else Some key in
-  Ui_simulation.manager_operation
+  State_simulation.when_ready
+    ~label:__LOC__
     (fun
       manager
       project_id
@@ -28,14 +29,12 @@ let update_outputs key : unit =
          simulation_id
          file_line_info_id
       ) >>=
-      (Api_common.result_map
-         ~ok:(fun _ (file_line_detail : Api_types_j.file_line_detail) ->
+      (Api_common.result_bind_lwt
+         ~ok:(fun (file_line_detail : Api_types_j.file_line_detail) ->
              let () = set_current_file (Some file_line_detail) in
-             Lwt.return_unit
+             Lwt.return (Api_common.result_ok ()
+                        )
            )
-         ~error:(fun _ errors  ->
-             let () = Ui_state.set_model_error __LOC__ errors in
-             Lwt.return_unit)
       )
     )
 
@@ -57,7 +56,6 @@ let navli () =
   Ui_common.badge (fun state -> (file_count state))
 
 let xml () =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let select file_line_info =
     let file_ids : Api_types_j.file_line_id list =
       file_line_info.Api_types_j.file_line_ids in
@@ -87,17 +85,18 @@ let xml () =
       (let list, handle = ReactiveData.RList.create [] in
        let _ = React.S.map
            (fun _ ->
-              Ui_simulation.manager_operation
+              State_simulation.when_ready
+                ~label:__LOC__
                 (fun
                   manager
                   project_id
                   simulation_id ->
-                  (manager#simulation_info_file_line
+                  (manager#simulation_catalog_file_line
                      project_id
                      simulation_id
                   ) >>=
-                  (Api_common.result_map
-                     ~ok:(fun _ (file_line_info : Api_types_j.file_line_info) ->
+                  (Api_common.result_bind_lwt
+                     ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
                          let () = ReactiveData.RList.set
                              handle
                              (match file_line_info.Api_types_j.file_line_ids with
@@ -111,15 +110,12 @@ let xml () =
                                        )]]
                               | _ :: _ :: _ -> [select file_line_info])
                          in
-                         Lwt.return_unit
+                         Lwt.return (Api_common.result_ok ())
                        )
-                     ~error:(fun _ errors  ->
-                         let () = Ui_state.set_model_error __LOC__ errors in
-                         Lwt.return_unit)
                   )
                 )
            )
-           simulation_output in
+           State_simulation.model in
        list
       )
   in

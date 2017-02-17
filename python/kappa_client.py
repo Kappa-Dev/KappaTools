@@ -19,17 +19,19 @@ class FileMetadata(object):
                  file_metadata_id,
                  file_metadata_position,
                  file_metadata_compile = True ,
-                 file_metadata_hash = None):
+                 file_metadata_hash = None ,
+                 file_version = []):
         self.file_metadata_id = file_metadata_id
         self.file_metadata_position = file_metadata_position
         self.file_metadata_compile = file_metadata_compile
         self.file_metadata_hash = file_metadata_hash
-
+        self.file_version = file_version
     def toJSON(self):
         return({ "file_metadata_compile" : self.file_metadata_compile ,
                  "file_metadata_hash" : self.file_metadata_hash ,
                  "file_metadata_id" : self.file_metadata_id ,
-                 "file_metadata_position" : self.file_metadata_position })
+                 "file_metadata_position" : self.file_metadata_position ,
+                 "file_metadata_version" : self.file_version })
 
     def get_file_id(self):
         return(self.file_metadata_id)
@@ -116,12 +118,12 @@ class PlotParameter(object):
             url = ""
         return url
 
-# the outputs are returned as json hydrate to an object model
-def hydrate_filemetada (info):
-    return(FileMetadata(info["file_metadata_id"],
-                        info["file_metadata_position"],
-                        info["file_metadata_compile"],
-                        info["file_metadata_hash"]))
+def project_catalog_project_id (project_catalog):
+    print(project_catalog)
+    return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
+
+def file_catalog_file_id (file_catalog):
+    return(map((lambda entry: entry["file_metadata_id"]),file_catalog["file_metadata_list"]))
 
 def hydrate_file (info):
     return(File(info["file_metadata"],
@@ -146,10 +148,10 @@ class KappaStd(kappa_common.StdBase):
         return(self.dispatch("EnvironmentInfo",None))
 
     def project_create(self,project_id):
-        project_parameter = { "project_id" : project_id }
+        project_parameter = { "project_parameter_project_id" : project_id }
         return(self.dispatch("ProjectCreate",project_parameter))
     def project_info(self):
-        return(self.dispatch("ProjectInfo",None))
+        return(self.dispatch("ProjectCatalog",None))
 
     def project_delete(self,project_id):
         return(self.dispatch("ProjectDelete",project_id))
@@ -166,8 +168,9 @@ class KappaStd(kappa_common.StdBase):
         return(hydrate_file(f))
 
     def file_info(self,project_id):
-        info = self.dispatch("FileInfo",project_id)
-        return(list(map(hydrate_filemetada,info)))
+        info = self.dispatch("FileCatalog",project_id)
+        #return(list(map(hydrate_filemetadata,info)))
+        return(info)
 
     def simulation_delete(self,project_id,simulation_id):
         return(self.dispatch("SimulationDelete",[project_id,simulation_id]))
@@ -202,19 +205,19 @@ class KappaStd(kappa_common.StdBase):
                              [project_id,simulation_id]))
 
     def simulation_info_file_line(self,project_id,simulation_id):
-        return(self.dispatch("SimulationInfoFileLine",
+        return(self.dispatch("SimulationCatalogFileLine",
                              [project_id,simulation_id]))
 
     def simulation_info_flux_map(self,project_id,simulation_id):
-        return(self.dispatch("SimulationInfoFluxMap",
+        return(self.dispatch("SimulationCatalogFluxMap",
                              [project_id,simulation_id]))
 
     def simulation_info_snapshot(self,project_id,simulation_id):
-        return(self.dispatch("SimulationInfoSnapshot",
+        return(self.dispatch("SimulationCatalogSnapshot",
                              [project_id,simulation_id]))
 
     def simulation_list(self,project_id):
-        return(self.dispatch("SimulationInfoSnapshot",
+        return(self.dispatch("SimulationCatalog",
                              project_id))
 
     def simulation_pause(self,project_id,simulation_id):
@@ -245,7 +248,7 @@ class KappaRest(kappa_common.RestBase):
     def project_create(self,project_id):
         method = "POST"
         url = "{0}/projects".format(self.url)
-        body = { "project_id" : project_id }
+        body = { "project_parameter_project_id" : project_id }
         return(self.dispatch(method,url,body))
 
     def project_info(self):
@@ -284,7 +287,8 @@ class KappaRest(kappa_common.RestBase):
         url = "{0}/projects/{1}/files".format(self.url,project_id)
         body = None
         info = self.dispatch(method,url,body)
-        return(list(map(hydrate_filemetada,info)))
+        #return(list(map(hydrate_filemetada,info)))
+        return(info)
 
     def simulation_delete(self,project_id,simulation_id):
         method = "DELETE"

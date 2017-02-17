@@ -16,9 +16,9 @@ let toggle_element
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
           (React.S.bind
-             (Ui_simulation.simulation_output ())
-             (fun state -> React.S.const
-                 (if projection state then
+             State_simulation.model
+             (fun model -> React.S.const
+                 (if projection (Utility.option_bind State_simulation.t_simulation_info model.State_simulation.model_current) then
                     ["show"]
                   else
                     ["hidden"])
@@ -178,13 +178,16 @@ let save_plot_ui
            Js._true)
   in
   ()
-let badge (counter : Api_types_j.simulation_info option -> int)
+
+let badge
+    (counter : Api_types_j.simulation_info option -> int)
   =
   let badge_list, badge_handle = ReactiveData.RList.create [] in
   [ Tyxml_js.R.Html.span
       (let _ = React.S.map
-           (fun state ->
-              let count = counter state in
+           (fun model ->
+              let simulation_info = Utility.option_bind State_simulation.t_simulation_info model.State_simulation.model_current in
+              let count = counter simulation_info in
               if count > 0  then
                 ReactiveData.RList.set
                   badge_handle
@@ -194,12 +197,14 @@ let badge (counter : Api_types_j.simulation_info option -> int)
                       [ Html.pcdata (string_of_int count) ; ] ;
                   ]
               else
-                 ReactiveData.RList.set badge_handle []
+                ReactiveData.RList.set badge_handle []
            )
-           (Ui_simulation.simulation_output ()) in
+           State_simulation.model
+       in
        badge_list
       )
   ]
+
 let arguments (key : string) : string list =
     List.map
       snd

@@ -39,9 +39,9 @@ let on_message
   | `FileGet (project_id,file_id) ->
     (manager#file_get project_id file_id) >>=
     (handler (fun result -> `FileGet result))
-  | `FileInfo project_id ->
-    (manager#file_info project_id) >>=
-    (handler (fun result -> `FileInfo result))
+  | `FileCatalog project_id ->
+    (manager#file_catalog project_id) >>=
+    (handler (fun result -> `FileCatalog result))
   | `FileUpdate (project_id,file_id,file_modification) ->
     (manager#file_update project_id file_id file_modification) >>=
     (handler (fun result -> `FileUpdate result))
@@ -51,9 +51,15 @@ let on_message
   | `ProjectDelete project_id ->
     (manager#project_delete project_id) >>=
     (handler (fun result -> `ProjectDelete result))
-  | `ProjectInfo () ->
-    (manager#project_info ()) >>=
-    (handler (fun result -> `ProjectInfo result))
+  | `ProjectCatalog () ->
+    (manager#project_catalog ()) >>=
+    (handler (fun result -> `ProjectCatalog result))
+  |  `ProjectGet project_id ->
+    (manager#project_get project_id) >>=
+    (handler (fun result -> `ProjectGet result))
+  |  `ProjectParse project_id ->
+    (manager#project_parse project_id) >>=
+    (handler (fun result -> `ProjectParse result))
   | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
     (manager#simulation_continue project_id simulation_id simulation_parameter) >>=
     (handler (fun result -> `SimulationContinue result))
@@ -78,18 +84,18 @@ let on_message
   | `SimulationInfo (project_id,simulation_id) ->
     (manager#simulation_info project_id simulation_id) >>=
     (handler (fun result -> `SimulationInfo result))
-  | `SimulationInfoFileLine (project_id,simulation_id) ->
-    (manager#simulation_info_file_line project_id simulation_id) >>=
-    (handler (fun result -> `SimulationInfoFileLine result))
-  | `SimulationInfoFluxMap (project_id,simulation_id) ->
-    (manager#simulation_info_flux_map project_id simulation_id) >>=
-    (handler (fun result -> `SimulationInfoFluxMap result))
-  | `SimulationInfoSnapshot (project_id,simulation_id) ->
-    (manager#simulation_info_snapshot project_id simulation_id) >>=
-    (handler (fun result -> `SimulationInfoSnapshot result))
-  | `SimulationList project_id ->
-    (manager#simulation_list project_id) >>=
-    (handler (fun result -> `SimulationList result))
+  | `SimulationCatalogFileLine (project_id,simulation_id) ->
+    (manager#simulation_catalog_file_line project_id simulation_id) >>=
+    (handler (fun result -> `SimulationCatalogFileLine result))
+  | `SimulationCatalogFluxMap (project_id,simulation_id) ->
+    (manager#simulation_catalog_flux_map project_id simulation_id) >>=
+    (handler (fun result -> `SimulationCatalogFluxMap result))
+  | `SimulationCatalogSnapshot (project_id,simulation_id) ->
+    (manager#simulation_catalog_snapshot project_id simulation_id) >>=
+    (handler (fun result -> `SimulationCatalogSnapshot result))
+  | `SimulationCatalog project_id ->
+    (manager#simulation_catalog project_id) >>=
+    (handler (fun result -> `SimulationCatalog result))
   | `SimulationPause (project_id,simulation_id) ->
     (manager#simulation_pause project_id simulation_id) >>=
     (handler (fun result -> `SimulationPause result))
@@ -99,6 +105,7 @@ let on_message
   | `SimulationStart (project_id,simulation_parameter) ->
     (manager#simulation_start project_id simulation_parameter) >>=
     (handler (fun result -> `SimulationStart result))
+
 
 class type virtual manager_base_type =
   object
@@ -133,7 +140,7 @@ class virtual  manager_base () : manager_base_type =
     method file_create
         (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
-      Api_types_j.file_metadata Api_types_j.file_result Api.result Lwt.t =
+      (Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
       self#message (`FileCreate (project_id,file)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -147,7 +154,7 @@ class virtual  manager_base () : manager_base_type =
     method file_delete
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id) :
-      unit Api_types_j.file_result Api.result Lwt.t =
+      (unit, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
       self#message (`FileDelete (project_id,file_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -174,13 +181,13 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
 
-    method file_info
+    method file_catalog
       (project_id : Api_types_j.project_id) :
-      Api_types_j.file_info Api.result Lwt.t =
-      self#message (`FileInfo project_id) >>=
+      Api_types_j.file_catalog Api.result Lwt.t =
+      self#message (`FileCatalog project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `FileInfo result ->
+            | `FileCatalog result ->
               Lwt.return result
             | response ->
               Lwt.return
@@ -192,7 +199,7 @@ class virtual  manager_base () : manager_base_type =
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id)
         (file_modification : Api_types_j.file_modification) :
-      Api_types_j.file_metadata Api_types_j.file_result Api.result Lwt.t =
+      (Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
       self#message (`FileUpdate (project_id,file_id,file_modification)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -202,7 +209,6 @@ class virtual  manager_base () : manager_base_type =
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
-
 
     method project_create
       (project_parameter : Api_types_j.project_parameter) :
@@ -216,6 +222,29 @@ class virtual  manager_base () : manager_base_type =
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
+
+    method project_get (project_id : Api_types_j.project_id) : Api_types_j.project Api.result Lwt.t =
+      self#message (`ProjectGet project_id) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `ProjectGet result ->
+              Lwt.return result
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
+    method project_parse (project_id : Api_types_j.project_id) : Api_types_j.project_parse Api.result Lwt.t =
+      self#message (`ProjectParse project_id) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `ProjectParse result ->
+              Lwt.return result
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
 
 
     method project_delete
@@ -234,11 +263,11 @@ class virtual  manager_base () : manager_base_type =
           )
 
 
-    method project_info () : Api_types_j.project_info Api.result Lwt.t =
-      self#message (`ProjectInfo ()) >>=
+    method project_catalog () : Api_types_j.project_catalog Api.result Lwt.t =
+      self#message (`ProjectCatalog ()) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `ProjectInfo result ->
+            | `ProjectCatalog result ->
               Lwt.return result
             | response ->
               Lwt.return
@@ -373,58 +402,58 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_info_file_line
+    method simulation_catalog_file_line
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.file_line_info Api.result Lwt.t =
-      self#message (`SimulationInfoFileLine
+      Api_types_j.file_line_catalog Api.result Lwt.t =
+      self#message (`SimulationCatalogFileLine
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationInfoFileLine info ->
+            | `SimulationCatalogFileLine info ->
               Lwt.return info
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_info_flux_map
+    method simulation_catalog_flux_map
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.flux_map_info Api.result Lwt.t =
-      self#message (`SimulationInfoFluxMap
+      Api_types_j.flux_map_catalog Api.result Lwt.t =
+      self#message (`SimulationCatalogFluxMap
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationInfoFluxMap info ->
+            | `SimulationCatalogFluxMap info ->
               Lwt.return info
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_info_snapshot
+    method simulation_catalog_snapshot
       (project_id : Api_types_j.project_id)
       (simulation_id : Api_types_j.simulation_id) :
-      Api_types_j.snapshot_info Api.result Lwt.t =
-      self#message (`SimulationInfoSnapshot
+      Api_types_j.snapshot_catalog Api.result Lwt.t =
+      self#message (`SimulationCatalogSnapshot
                       (project_id,simulation_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationInfoSnapshot info ->
+            | `SimulationCatalogSnapshot info ->
               Lwt.return info
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_list
+    method simulation_catalog
       (project_id : Api_types_j.project_id)
       : Api_types_j.simulation_catalog Api.result Lwt.t =
-      self#message (`SimulationList project_id) >>=
+      self#message (`SimulationCatalog project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationList list ->
+            | `SimulationCatalog list ->
               Lwt.return list
             | response ->
               Lwt.return

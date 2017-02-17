@@ -77,15 +77,7 @@ class manager
       Mpi_message_j.request ->
       Mpi_message_j.response Api.result Lwt.t =
     function
-    | `ProjectInfo () ->
-      send
-        timeout
-        (Format.sprintf "%s/v2/projects" url)
-        `GET
-        None
-        Mpi_message_j.project_info_of_string
-        (fun result -> `ProjectInfo result)
-    | `EnvironmentInfo () ->
+    | `EnvironmentInfo  () ->
       send
         timeout
         ""
@@ -99,9 +91,12 @@ class manager
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `POST
         (Some (Api_types_j.string_of_file file))
-        (fun result -> Mpi_message_j.file_result_of_string
-            Mpi_message_j.read_file_metadata
-            result)
+        (fun result ->
+           (Mpi_message_j.file_result_of_string
+              Mpi_message_j.read_file_metadata
+              Mpi_message_j.read_project_parse
+           )
+             result)
         (fun result -> `FileCreate result)
     | `FileDelete (project_id,file_id) ->
       send
@@ -109,9 +104,11 @@ class manager
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
         None
-        (fun result -> Mpi_message_j.file_result_of_string
-            Api_types_j.read_unit_t
-            result)
+        (fun result ->
+           (Mpi_message_j.file_result_of_string
+              Api_types_j.read_unit_t
+              Mpi_message_j.read_project_parse)
+             result)
         (fun result -> `FileDelete result)
     | `FileGet (project_id,file_id) ->
       send
@@ -121,24 +118,34 @@ class manager
         None
         Mpi_message_j.file_of_string
         (fun result -> `FileGet result)
-    | `FileInfo project_id ->
+    | `FileCatalog project_id ->
       send
         timeout
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
         None
-        Mpi_message_j.file_info_of_string
-        (fun result -> `FileInfo result)
+        Mpi_message_j.file_catalog_of_string
+        (fun result -> `FileCatalog result)
     | `FileUpdate (project_id,file_id,file_modification) ->
       send
         timeout
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
         (Some (Api_types_j.string_of_file_modification file_modification))
-        (fun result -> Mpi_message_j.file_result_of_string
-            Mpi_message_j.read_file_metadata
+        (fun result ->
+           (Mpi_message_j.file_result_of_string
+              Mpi_message_j.read_file_metadata
+              Mpi_message_j.read_project_parse)
             result)
         (fun result -> `FileUpdate result)
+    | `ProjectCatalog () ->
+      send
+        timeout
+        (Format.sprintf "%s/v2/projects" url)
+        `GET
+        None
+        Mpi_message_j.project_catalog_of_string
+        (fun result -> `ProjectCatalog result)
     | `ProjectCreate project_parameter ->
       send
         timeout
@@ -155,6 +162,25 @@ class manager
         None
         (fun _ -> ())
         (fun result -> `ProjectDelete result)
+
+    | `ProjectParse project_id ->
+      send
+        timeout
+        (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
+        `GET
+        None
+        Mpi_message_j.project_parse_of_string
+        (fun result -> `ProjectParse result)
+
+    | `ProjectGet project_id ->
+      send
+        timeout
+        (Format.sprintf "%s/v2/projects/%s" url project_id)
+        `GET
+        None
+        Mpi_message_j.project_of_string
+        (fun result -> `ProjectGet result)
+
     | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
       send
         timeout
@@ -260,7 +286,7 @@ class manager
            snapshot_id)
         `GET
         None
-        Mpi_message_j.snapshot_of_string
+        Mpi_message_j.snapshot_detail_of_string
         (fun result -> `SimulationDetailSnapshot result)
     | `SimulationInfo (project_id,simulation_id) ->
       send
@@ -272,9 +298,9 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.simulation_info_of_string
-        (fun result -> `SimulationInfo result)
-    | `SimulationInfoFileLine (project_id,simulation_id) ->
+        Mpi_message_j.simulation_catalog_of_string
+        (fun result -> `SimulationCatalog result)
+    | `SimulationCatalogFileLine (project_id,simulation_id) ->
       send
         timeout
         (Format.sprintf
@@ -284,9 +310,9 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.file_line_info_of_string
-        (fun result -> `SimulationInfoFileLine result)
-    | `SimulationInfoFluxMap (project_id,simulation_id) ->
+        Mpi_message_j.file_line_catalog_of_string
+        (fun result -> `SimulationCatalogFileLine result)
+    | `SimulationCatalogFluxMap (project_id,simulation_id) ->
       send
         timeout
         (Format.sprintf
@@ -296,9 +322,9 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.flux_map_info_of_string
-        (fun result -> `SimulationInfoFluxMap result)
-    | `SimulationInfoSnapshot (project_id,simulation_id) ->
+        Mpi_message_j.flux_map_catalog_of_string
+        (fun result -> `SimulationCatalogFluxMap result)
+    | `SimulationCatalogSnapshot (project_id,simulation_id) ->
       send
         timeout
         (Format.sprintf
@@ -308,9 +334,9 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.snapshot_info_of_string
-        (fun result -> `SimulationInfoSnapshot result)
-    | `SimulationList project_id ->
+        Mpi_message_j.snapshot_catalog_of_string
+        (fun result -> `SimulationCatalogSnapshot result)
+    | `SimulationCatalog project_id ->
       send
         timeout
         (Format.sprintf
@@ -320,7 +346,7 @@ class manager
         `GET
         None
         Mpi_message_j.simulation_catalog_of_string
-        (fun result -> `SimulationList result)
+        (fun result -> `SimulationCatalog result)
     | `SimulationPause (project_id,simulation_id) ->
       send
         timeout

@@ -18,12 +18,12 @@ let assemble_file_line
     (project_id : Api_types_j.project_id)
     (simulation_id : Api_types_j.simulation_id)
     : Api_types_v1_j.file_line list Api.result Lwt.t =
-  (manager#simulation_info_file_line
+  (manager#simulation_catalog_file_line
      project_id
      simulation_id
   ) >>=
     Api_common.result_bind_lwt
-      ~ok:(fun (file_line_info : Api_types_j.file_line_info) ->
+      ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
           Api_common.result_fold_lwt
             ~f:(fun result (file_line_id : Api_types_j.file_line_id) ->
                 Api_common.result_bind_lwt
@@ -56,12 +56,12 @@ let assemble_flux_map
     (project_id : Api_types_j.project_id)
     (simulation_id : Api_types_j.simulation_id) :
      Api_types_v1_j.flux_map list Api.result Lwt.t =
-    (manager#simulation_info_flux_map
+    (manager#simulation_catalog_flux_map
        project_id
        simulation_id
     ) >>=
     Api_common.result_bind_lwt
-      ~ok:(fun (flux_map_info : Api_types_j.flux_map_info) ->
+      ~ok:(fun (flux_map_info : Api_types_j.flux_map_catalog) ->
           Api_common.result_fold_lwt
             ~f:(fun result (flux_map_id : Api_types_j.flux_map_id) ->
                 Api_common.result_bind_lwt
@@ -118,12 +118,12 @@ let assemble_snapshot
     (project_id : Api_types_j.project_id)
     (simulation_id : Api_types_j.simulation_id) :
   Api_types_v1_j.snapshot list Api.result Lwt.t =
-    (manager#simulation_info_snapshot
+    (manager#simulation_catalog_snapshot
        project_id
        simulation_id
     ) >>=
     Api_common.result_bind_lwt
-      ~ok:(fun (snapshot_info : Api_types_j.snapshot_info) ->
+      ~ok:(fun (snapshot_info : Api_types_j.snapshot_catalog) ->
           Api_common.result_fold_lwt
             ~f:(fun result (snapshot_id : Api_types_j.snapshot_id) ->
                 Api_common.result_bind_lwt
@@ -318,6 +318,7 @@ end = struct
         Api_types_j.file_metadata_hash = None;
         Api_types_j.file_metadata_id = parse_file_id;
         Api_types_j.file_metadata_position = 0;
+        Api_types_j.file_metadata_version = File_version.empty;
       }
 
       val mutable _manager : Api.manager option = None
@@ -333,7 +334,7 @@ end = struct
             (new Api_runtime.manager
               (self#system_process ()) :> Api.manager) in
           (manager#project_create
-             { Api_types_j.project_id = parse_project_id ; })
+             { Api_types_j.project_parameter_project_id = parse_project_id ; })
           >>=
           (Api_common.result_bind_lwt
              ~ok:(fun (project_id : Api_types_j.project_id) ->
@@ -376,50 +377,41 @@ end = struct
              { Api_types_v1_j.version_build = Version.version_msg ;
                Api_types_v1_j.version_id = "v1" })
 
-      method parse
-          (code : Api_types_v1_j.code) :
-        Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
-        self#manager () >>=
-           (Api_common.result_bind_lwt
-              ~ok:(fun manager ->
-                  let file_modification : Api_types_j.file_modification = {
-                    Api_types_j.file_modification_compile = None ;
-                    Api_types_j.file_modification_id = None ;
-                    Api_types_j.file_modification_position = None ;
-                    Api_types_j.file_modification_patch = Some {
-                      Api_types_j.file_patch_start = None ;
-                      Api_types_j.file_patch_end = None;
-                      Api_types_j.file_patch_content =  code;
-                    };
-                    Api_types_j.file_modification_hash = None;
-                  } in
-                  (manager#file_update
-                     parse_project_id
-                     parse_file_id
-                     file_modification
-                   >>=
-                   (Api_common.result_bind_lwt
-                        ~ok:(fun (result : Api_types_j.file_metadata Api_types_j.file_result) ->
-                            let () = ignore (result) in
-                            Lwt.return (Api_common.result_ok result.Api_types_j.file_status_contact_map)
-                        )
-                   )
-                  )
-                )
-
-        ) >>=
-        (Api_common.result_map
-             ~ok:(fun _ (contact_map : Api_types_j.contact_map) ->
-                 Lwt.return
-                   (`Right
-                      { Api_types_v1_j.contact_map =
-                          Api_data_v1.api_contact_map contact_map })
+      method parse (code : Api_types_v1_j.code) : Api_types_v1_j.parse Api_types_v1_j.result Lwt.t =
+        (self#manager ())>>=
+        (Api_common.result_bind_lwt
+           ~ok:(fun (manager : Api.manager) ->
+               let file_patch : Api_types_j.file_patch =
+                 { Api_types_j.file_patch_start = None ;
+                   Api_types_j.file_patch_end = None ;
+                   Api_types_j.file_patch_content = code ; }
+               in
+               let file_modification : Api_types_j.file_modification =
+                 { Api_types_j.file_modification_version = File_version.empty ;
+                   Api_types_j.file_modification_compile = None ;
+                   Api_types_j.file_modification_id = None ;
+                   Api_types_j.file_modification_position = None ;
+                   Api_types_j.file_modification_patch = Some file_patch ;
+                   Api_types_j.file_modification_hash = None ; }
+               in
+               manager#file_update
+                 parse_project_id
+                 parse_file_id
+                 file_modification
+               >>=
+               (Api_common.result_bind_lwt
+                  ~ok:(fun (result : (Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result) ->
+                      let project_parse : Api_types_j.project_parse = result.Api_types_j.file_status_summary in
+                      let contact_map = project_parse.Api_types_j.project_parse_contact_map in
+                      Lwt.return (Api_common.result_ok contact_map))
                )
-             ~error:(fun _ errors  ->
-                 Lwt.return
-                   (`Left
-                      (Api_data_v1.api_errors errors)))
+             )
         )
+        >>=
+        (Api_common.result_map
+           ~ok:(fun _ (contact_map : Api_types_j.contact_map) -> Lwt.return (`Right { Api_types_v1_j.contact_map = Api_data_v1.api_contact_map contact_map }))
+           ~error:(fun _ errors  -> Lwt.return (`Left (Api_data_v1.api_errors errors))))
+
       method private new_id () : int =
         let result = context.id + 1 in
         let () = context <- { context with id = context.id + 1 } in
@@ -438,14 +430,18 @@ end = struct
                 Api_types_j.file_metadata_compile = true ;
                 Api_types_j.file_metadata_hash = None ;
                 Api_types_j.file_metadata_id = file_id ;
-                Api_types_j.file_metadata_position = 0 ; } ;
+                Api_types_j.file_metadata_position = 0 ;
+                Api_types_j.file_metadata_version = File_version.empty;
+              } ;
             Api_types_j.file_content = parameter.Api_types_v1_j.code ; }
         in
         self#manager () >>=
         (Api_common.result_bind_lwt
              ~ok:(fun manager ->
                  (manager#project_create
-                    { Api_types_j.project_id = project_id; })
+                    { Api_types_j.project_parameter_project_id = project_id;
+
+                    })
                  >>=
                  (Api_common.result_bind_lwt
                       ~ok:(fun (project_id : Api_types_j.project_id) ->
@@ -524,35 +520,37 @@ end = struct
          )
 
       method list () : Api_types_v1_j.catalog Api_types_v1_j.result Lwt.t =
-        self#manager () >>=
+        (self#manager ()) >>=
         (Api_common.result_bind_lwt
              ~ok:(fun manager ->
-                 (manager#project_info ())
+                 (manager#project_catalog ())
                  >>=
                  (Api_common.result_bind_lwt
-                      ~ok:(fun (project_info : Api_types_j.project_info) ->
+                      ~ok:(fun (project_catalog : Api_types_j.project_catalog) ->
                           Api_common.result_fold_lwt
                             ~f:(fun result (project_id : Api_types_j.project_id) ->
                                 Api_common.result_bind_lwt
                                   ~ok:(fun result ->
-                                      (manager#simulation_list
+                                      (manager#simulation_catalog
                                          project_id)
                                       >>=
-                                      (fun result_simulation_list ->
+                                      (
                                    Api_common.result_bind_lwt
-                                     ~ok:(fun (simulation_list : Api_types_j.simulation_catalog) ->
+                                     ~ok:(fun (simulation_catalog : Api_types_j.simulation_catalog) ->
                                          Lwt.return
                                            (Api_common.result_ok
                                               (result@
-                                               (List.map int_of_string simulation_list))))
-                                     result_simulation_list))
+                                               (List.map int_of_string simulation_catalog.Api_types_j.simulation_ids))))
+                                      )
+                                    )
                                   result
                               )
                             ~id:(Api_common.result_ok [])
-                            project_info
+                            (List.map (fun project -> project.Api_types_j.project_id)
+                               project_catalog.Api_types_j.project_list)
                       )
                  )
-               )
+             )
         ) >>=
         (Api_common.result_map
              ~ok:(fun _ state -> Lwt.return (`Right state))
@@ -561,6 +559,7 @@ end = struct
                        (`Left
                           (Api_data_v1.api_errors errors)))
          )
+
 
       method pause (token : Api_types_v1_j.token) :
         unit Api_types_v1_j.result Lwt.t =

@@ -10,6 +10,10 @@ open Js
 open Codemirror
 
 open Lwt.Infix
+
+
+let editor_full , set_editor_full = React.S.create (false : bool)
+
 let document = Dom_html.window##.document
 let has_been_modified = ref (false)
 
@@ -111,13 +115,9 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
 
 
 let setup_lint _ _ _ =
-  match React.S.value Ui_state.model_error with
+  match React.S.value State_error.errors with
   | None -> Js.array [||]
-  | Some e ->
-    let () =
-      Common.debug (Js.string e.Ui_state.model_error_location) in
-    let e : Api_types_j.errors = e.Ui_state.model_error_messages in
-    error_lint e
+  | Some (e : Api_types_j.errors) -> error_lint e
 
 let initialize codemirror () =
   let args = Url.Current.arguments in
@@ -179,7 +179,7 @@ let onload () : unit =
   let () = codemirror##setValue(Js.string "") in
   let _ =
     React.S.map (fun _ -> codemirror##performLint)
-      Ui_state.model_error in
+      State_error.errors in
   let _ = Common.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
@@ -192,7 +192,7 @@ let onload () : unit =
     let delay : float =
       if (((Js.str_array (change##.text ))##.length) > 1)
          ||
-         (Ui_state.has_model_error ())
+         (State_error.has_errors ())
       then
         1.0 *. 1000.0
       else
@@ -226,8 +226,8 @@ let onload () : unit =
     toggle_button_dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let editor_full = React.S.value Ui_state.editor_full in
-           let () = Ui_state.set_editor_full (not editor_full) in
+           let editor_full = React.S.value editor_full in
+           let () = set_editor_full (not editor_full) in
            Js._true) in
   let file_select_handler () =
     Js.Optdef.case (file_select_dom##.files)
@@ -248,7 +248,11 @@ let onload () : unit =
                       ) >>=
                       (fun  (va : Js.js_string Js.t) ->
                          let () = codemirror##setValue(va) in
-                         Ui_simulation.flush_simulation ())))
+                         let () = Subpanel_editor_controller.stop_simulation () in
+                         Lwt.return_unit
+                      )
+                    )
+                  )
               in
               let () = has_been_modified := false in
               Lwt.return_unit)) in

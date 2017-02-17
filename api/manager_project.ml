@@ -1,23 +1,56 @@
 open Lwt
+let to_project (project : Api_environment.project) =
+  { Api_types_j.project_id = project#get_project_id () ;
+    Api_types_j.project_version = project#get_version () ; }
 
 class manager_project
     (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process) : Api.manager_project =
 object
-  method project_info () :
-    Api_types_j.project_info Api.result Lwt.t =
-    let project_info : Api_types_j.project_info =
-      List.map
-         (fun project -> project#get_project_id ())
-         (environment#get_projects ())
+  method project_catalog () :
+    Api_types_j.project_catalog Api.result Lwt.t =
+    let project_catalog : Api_types_j.project_catalog =
+      { Api_types_j.project_list =
+          List.map to_project (environment#get_projects ()) }
     in
-    Lwt.return (Api_common.result_ok project_info)
+    Lwt.return (Api_common.result_ok project_catalog)
+
+  method project_get
+      (project_id : Api_types_j.project_id) : Api_types_j.project Api.result Lwt.t =
+    Api_common.ProjectOperations.bind
+      project_id
+      environment
+      (fun (project : Api_environment.project) ->
+         Lwt.return (Api_common.result_ok (to_project project))
+      )
+
+  method project_parse
+      (project_id : Api_types_j.project_id) : Api_types_j.project_parse Api.result Lwt.t =
+    Api_common.ProjectOperations.bind
+      project_id
+      environment
+      (fun (project : Api_environment.project) ->
+         let project_version = project#get_version () in
+         let state = project#get_state () in
+         Lwt.return
+           (match state with
+            | `Ok kappa_facade ->
+              Api_common.result_ok
+                { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade;
+                  Api_types_j.project_parse_project_version = project_version;
+                }
+            | `Error error ->
+              Api_common.result_messages error)
+      )
+
+
+
 
   method project_create
       (project_parameter : Api_types_j.project_parameter) :
     Api_types_j.project_id Api.result Lwt.t =
     let project_id : Api_types_j.project_id =
-      project_parameter.Api_types_j.project_id
+      project_parameter.Api_types_j.project_parameter_project_id
     in
     if Api_common.ProjectOperations.exists project_id environment
     then
@@ -38,7 +71,7 @@ object
              let project =
                environment#create_project
                  project_id
-                 t
+                 (`Ok t)
              in
              let () =
                Api_common.ProjectCollection.update

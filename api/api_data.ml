@@ -140,3 +140,7 @@ let plot_values
            (Pp.list (fun f -> Format.pp_print_string f separator)
               (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e")))))
     (List.rev plot.Api_types_j.plot_time_series)
+
+(* return the agent count *)
+let agent_count (contact_map : Api_types_j.contact_map) : int =
+    Array.length contact_map

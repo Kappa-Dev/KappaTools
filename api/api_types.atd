@@ -2,6 +2,8 @@
    this should be replaced by.  It is expected than non error
    message will decide how best to relay its messages.
 *)
+type unit_t = unit
+
 type ('ok,'error) result_data <ocaml_biniou t="result"> =
      [ Ok of 'ok
      | Error of 'error ] <json repr="object">
@@ -48,9 +50,13 @@ type workspace_parameter = { workspace_id : workspace_id }
 type workspace_info = unit
 
 type project_id = string
-type project_info = project_id list
-type project_parameter = { project_id : project_id }
-type unit_t = unit
+type project_version = int
+
+type project = { project_id : project_id ;
+                 project_version : project_version ; }
+type project_catalog = { project_list : project list }
+type project_parameter = { project_parameter_project_id : project_id <json name="project_id"> ; }
+
 
 type site = {
      site_name: string;
@@ -62,13 +68,16 @@ type site_node = {
      site_node_name: string;
      site_node_sites: site list <ocaml repr="array">;
 }
+
 type site_graph = site_node list <ocaml repr="array">
 type contact_map = site_graph
-type project_parse = { contact_map : contact_map }
+type project_parse = { project_parse_contact_map  : contact_map <json name="contact_map"> ;
+                       project_parse_project_version : project_version <json name="project_version"> ;
+                     }
 type kappa_code = string
 
 type simulation_id = string
-type simulation_catalog = simulation_id list
+type simulation_catalog = { simulation_ids : simulation_id list }
 type simulation_parameter = {
   simulation_plot_period : float <json name="plot_period"> ;
   simulation_pause_condition : string <json name="pause_condition"> ;
@@ -110,14 +119,14 @@ type flux_map <ocaml predef module="Data"> =
        flux_data : flux_data;
        flux_end : float;
      }
-type flux_map_info = { flux_map_ids : flux_map_id list }
+type flux_map_catalog = { flux_map_ids : flux_map_id list }
 
 (* file line *)
 type file_line_id = string nullable <json name="name">
 type file_line <ocaml predef module="Data"> =
      { file_line_name : file_line_id;
        file_line_text : string <json name="text"> }
-type file_line_info = { file_line_ids : file_line_id list }
+type file_line_catalog = { file_line_ids : file_line_id list }
 type file_line_detail = file_line list
 
 (* snapshot *)
@@ -128,8 +137,10 @@ type ('agent,'token) generic_snapshot <ocaml predef module="Data"> = {
     snapshot_time : float;
     snapshot_agents : 'agent list;
     snapshot_tokens : 'token list <ocaml repr="array">; }
+
 type snapshot = ((int * site_graph),(float * string)) generic_snapshot
-type snapshot_info = { snapshot_ids : snapshot_id list }
+type snapshot_detail = snapshot
+type snapshot_catalog = { snapshot_ids : snapshot_id list }
 
 (* log message *)
 type log_message = string
@@ -176,28 +187,36 @@ type simulation_detail_output =
 type simulation_detail = { simulation_detail_progress : simulation_progress ;
                            simulation_detail_output : simulation_detail_output ; }
 
-(* file *)
-type file_id = string
-type file_metadata = { file_metadata_compile <ocaml mutable> : bool <json name="compile"> ;
-                       file_metadata_hash <ocaml mutable> : string nullable <json name="hash"> ;
-                       file_metadata_id <ocaml mutable> : file_id <json name="id"> ;
-                       file_metadata_position <ocaml mutable> : int <json name="position"> ; }
 
-type ('data) file_result = { file_status_data : 'data ;
-                             file_status_contact_map : contact_map ; }
-type file_info = file_metadata list
+(* file *)
+type client_id     = string
+type local_version = { local_version_client_id : client_id <json name="client_id"> ;
+                       local_version_file_version : int ;
+                     }
+type file_version = local_version list
+type file_id = string
+type file_metadata = { file_metadata_compile <ocaml mutable>  : bool <json name="compile"> ;
+                       file_metadata_hash <ocaml mutable>     : string nullable <json name="hash"> ;
+                       file_metadata_id <ocaml mutable>       : file_id <json name="id"> ;
+                       file_metadata_position <ocaml mutable> : int <json name="position"> ;
+		       file_metadata_version <ocaml mutable>  : file_version <json name="version"> ; }
+
+type ('data, 'summary) file_result = { file_status_data       : 'data ;
+     	               	               file_status_summary    : 'summary ; }
+type file_catalog = { file_metadata_list : file_metadata list }
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
-              file_content <ocaml mutable> : string <json name="content"> }
+              file_content <ocaml mutable>  : string <json name="content"> ; }
 type file_patch = {
-     file_patch_start : int nullable ; (* if not provided assume begining *)
-     file_patch_end : int nullable   ; (* if not provided assume end of file *)
-     file_patch_content : string     ; (* content to fill region with *)
+     file_patch_start   : int nullable ; (* if not provided assume begining *)
+     file_patch_end     : int nullable ; (* if not provided assume end of file *)
+     file_patch_content : string       ; (* content to fill region with *)
      (* Replacing a file can be encoded by giving the content with out
         specifying a start or end. *)
 }
-type file_modification = { file_modification_compile : bool nullable  <json name="compile"> ;
-                           file_modification_id : string nullable <json name="id"> ;
-                           file_modification_position : int nullable <json name="position"> ;
-                           file_modification_patch : file_patch nullable <json name="content"> ;
+type file_modification = { file_modification_version              : file_version ; (* version for update *)
+                           file_modification_compile              : bool nullable  <json name="compile"> ;
+                           file_modification_id                   : string nullable <json name="id"> ;
+                           file_modification_position             : int nullable <json name="position"> ;
+                           file_modification_patch                : file_patch nullable <json name="content"> ;
                            file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
 }

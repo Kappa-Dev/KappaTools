@@ -9,6 +9,7 @@
 module UIState = Ui_state
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
+open Lwt.Infix
 
 module ButtonPerturbation : Ui_common.Div = struct
   let id = "panel_settings_perturbation_button"
@@ -21,11 +22,7 @@ module ButtonPerturbation : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ Html.div [ button ] ]
 
-  let run_perturbation () : unit =
-    Common.async
-      (fun _ ->
-         let code = React.S.value State_perturbation.model_perturbation in
-         Ui_simulation.perturb_simulation ~code:code)
+  let run_perturbation () : unit = Subpanel_editor_controller.perturb_simulation ()
 
   let onload () : unit =
     let button_dom = Tyxml_js.To_dom.of_button button in
@@ -209,12 +206,19 @@ end
 
 module DivErrorMessage : Ui_common.Div = struct
   let id = "configuration_error_div"
+  (* TODO : [%html {|<div class="alert-sm alert alert-danger"> « 1/2 » [abc.ka] Malformed agent 'adfsa' </div>|}] *)
+  let message_label (message : Api_types_j.message) (index : int) (length : int) : string =
+    (Format.sprintf  "%d/%d %s %s" index length
+       (match message.Api_types_j.message_range with
+        | None -> ""
+        | Some range -> Format.sprintf "[ %s ]" range.Api_types_j.file)
+       message.Api_types_j.message_text)
   let alert_messages =
   Html.div
     ~a:[Html.a_id id;
         Tyxml_js.R.Html.a_class
           (React.S.bind
-             UIState.model_error
+             State_error.errors
              (fun error ->
                 React.S.const
                   (match error with
@@ -226,15 +230,15 @@ module DivErrorMessage : Ui_common.Div = struct
        ]
     [Tyxml_js.R.Html.pcdata
        (React.S.bind
-          UIState.model_error
+          State_error.errors
           (fun error ->
              React.S.const
                (match error with
                 | None -> ""
-                | Some localized_errors ->
-                  (match localized_errors.Ui_state.model_error_messages with
+                | Some errors ->
+                  (match errors with
                    | [] -> ""
-                   | h::_ -> h.Api_types_j.message_text)
+                   | h::_ -> message_label h 1 (List.length errors))
                )
           )
        )
@@ -262,7 +266,7 @@ module ButtonStart : Ui_common.Div = struct
     let () = start_button_dom##.onclick :=
         Dom.handler
           (fun _ ->
-             let () = Common.async (fun _ -> Ui_simulation.start_simulation ()) in
+             let () = Subpanel_editor_controller.start_simulation () in
              Js._true)
     in
 
@@ -286,10 +290,7 @@ module ButtonClear : Ui_common.Div = struct
     let () = dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () =
-             Common.async
-               (fun _ -> Ui_simulation.stop_simulation ())
-           in
+           let () = Subpanel_editor_controller.stop_simulation () in
            Js._true)
     in
     ()
@@ -313,9 +314,7 @@ module ButtonPause : Ui_common.Div = struct
     let () = button_dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () =
-             Common.async
-               (fun _ -> Ui_simulation.pause_simulation ()) in
+           let () = Subpanel_editor_controller.pause_simulation () in
            Js._true)
   in
     ()
@@ -339,9 +338,7 @@ module ButtonContinue : Ui_common.Div = struct
     let () = button_dom##.onclick :=
         Dom.handler
           (fun _ ->
-             let () =
-               Common.async
-                 (fun _ -> Ui_simulation.continue_simulation ()) in
+             let () = Subpanel_editor_controller.continue_simulation () in
              Js._true)
     in
     ()
@@ -351,96 +348,92 @@ end
 module SelectRuntime : Ui_common.Div = struct
 
 let id ="settings_select_runtime"
-  let select_default_runtime = [ UIState.WebWorker ;
-                                 UIState.Embedded ; ]
-  let select_runtime_options, select_runtime_options_handle =
-    ReactiveData.RList.create select_default_runtime
+  let select_options, select_options_handle = ReactiveData.RList.create []
   let select =
     Tyxml_js.R.Html.select
       ~a:[Html.a_id id]
-      (ReactiveData.RList.map
-         (fun runtime -> Html.option
-             ~a:[Html.a_value
-                   (UIState.runtime_value runtime)]
-             (Html.pcdata (UIState.runtime_label runtime)))
-         select_runtime_options)
+      select_options
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [select]
 
   let onload () =
-    let args = Url.Current.arguments in
-    let select_dom = Tyxml_js.To_dom.of_select select in
-    let set_runtime (runtime : Ui_state.runtime) (continuation : unit -> unit) =
-      let r_val = Ui_state.runtime_value runtime in
-      Ui_state.set_runtime_url
-        r_val
-        (fun success ->
-           if success then
-             select_dom##.value := Js.string r_val
-           else
-             continuation ())
+    let _ =
+      React.S.bind
+        State_runtime.model
+        (fun model ->
+           let options =
+             let current_id =
+               State_runtime.spec_id  model.State_runtime.model_current in
+             List.map
+               (fun spec ->
+                  let spec_id = State_runtime.spec_id spec in
+                  let selected =
+                    if current_id = spec_id  then
+                      [Html.a_selected () ;]
+                    else [] in
+                  Html.option
+                      ~a:([Html.a_value spec_id ;
+                         ]@ selected)
+                      (Html.pcdata spec_id)
+               )
+               model.State_runtime.model_runtimes in
+           let () = ReactiveData.RList.set select_options_handle options in
+           React.S.const ())
     in
-    let default_runtime () =
-      set_runtime  UIState.default_runtime (fun _ -> ()) in
-    let () =
-      try
-        let hosts = List.filter (fun (key,_) -> key = "host") args in
-        let hosts : Ui_state.remote option list =
-          List.map (fun (_,url) -> Ui_state.parse_remote url) hosts in
-        let () = List.iter
-            (fun value ->
-               match value
-               with
-               | Some remote ->
-                 ReactiveData.RList.cons
-                   (Ui_state.Remote remote)
-                   select_runtime_options_handle
-               | None -> ())
-            hosts
-        in
-        match ReactiveData.RList.value select_runtime_options
-        with
-        | head::_ -> set_runtime head (default_runtime)
-        | _ -> default_runtime ()
-      with _ -> default_runtime () in
+    let select_dom = Tyxml_js.To_dom.of_select select in
     let () = select_dom##.onchange :=
         Dom.handler
           (fun _ ->
-             let () = UIState.set_runtime_url
-                 (Js.to_string select_dom##.value)
-                 (fun success ->
-                    if success then
-                      ()
-                    else
-                      select_dom##.value :=
-                        Js.string
-                          (UIState.runtime_value UIState.default_runtime)
+             let () =
+               Common.async
+                 (fun () ->
+                    (State_runtime.set_manager (Js.to_string select_dom##.value)) >>=
+                    (fun _ -> Lwt.return_unit)
                  ) in
              Js._true
           )
     in
+
     ()
+
 end
 
 module DivStatusIndicator : Ui_common.Div = struct
   let id = "setting_status_indicator"
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [  Html.div
-         ~a:[Html.a_id id]
-         (Ui_common.level
-            ~debug:(Tyxml_js.R.Html.pcdata
-                      (React.S.bind
-                         (Ui_simulation.simulation_status ())
-                         (fun status ->
-                            React.S.const
-                              (match status with
-                               | Ui_simulation.STOPPED -> "stopped"
-                               | Ui_simulation.INITALIZING -> "initalizing"
-                               | Ui_simulation.RUNNING -> "running"
-                               | Ui_simulation.PAUSED -> "paused"
-                              )
-                         )
-                      )) ())]
+    let debug =
+      Html.div
+        [ Tyxml_js.R.Html.pcdata
+            (React.S.bind
+               State_simulation.model
+               (fun model ->
+                  let option =
+                    Utility.option_map
+                      State_simulation.model_state_to_string
+                      (State_simulation.model_simulation_state
+                     model.State_simulation.model_current)
+                  in
+                  let label = match option with None -> "None" | Some l -> l in
+                  React.S.const label
+               )
+            );
+          Tyxml_js.R.Html.pcdata
+            (React.S.bind
+               State_simulation.model
+               (function model ->
+                React.S.const
+                  (match model.State_simulation.model_current with
+                   | None -> "None"
+                   | Some _ -> "Some"
+                  )
+               )
+            )
+        ]
+    in
+    [ Html.div
+        ~a:[ Html.a_id id ]
+        (Ui_common.level ~debug ()) ]
+
   let onload () = ()
 end
 
@@ -469,49 +462,53 @@ module RunningPanelLayout : Ui_common.Div = struct
     ]
 
   let time_progress_bar  () =
-    let simulation_output = (Ui_simulation.simulation_output ()) in
     progress_bar
-      (React.S.map (fun state ->
-           let time_percent : int option =
-             lift
-             (fun (status : Api_types_j.simulation_info) ->
-               status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage )
-             state
-           in
-           let time_percent : int = Tools.unsome 100 time_percent in
-           time_percent
+      (React.S.map
+         (fun model ->
+            let simulation_info = State_simulation.model_simulation_info model in
+            let time_percent : int option =
+              lift
+                (fun (status : Api_types_j.simulation_info) ->
+                   status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage )
+                simulation_info
+            in
+            let time_percent : int = Tools.unsome 100 time_percent in
+            time_percent
          )
-          simulation_output)
-    (React.S.map (fun state ->
-          let time : float option =
-            lift (fun (status : Api_types_j.simulation_info) ->
-                Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) state in
-         let time : float = Tools.unsome 0.0 time in
-          Printf.sprintf "%.4g" time
-        )
-       simulation_output)
+         State_simulation.model)
+      (React.S.map (fun model ->
+           let simulation_info = State_simulation.model_simulation_info model in
+           let time : float option =
+             lift (fun (status : Api_types_j.simulation_info) ->
+                 Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) simulation_info in
+           let time : float = Tools.unsome 0.0 time in
+           string_of_float time
+         )
+          State_simulation.model)
+
 
   let event_progress_bar () =
-    let simulation_output = (Ui_simulation.simulation_output ()) in
     progress_bar
-    (React.S.map (fun state ->
-          let event_percentage : int option =
-            lift (fun (status : Api_types_j.simulation_info) ->
-                status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage) state in
-         let event_percentage : int = Tools.unsome 100 event_percentage in
-          event_percentage
-        )
-       simulation_output)
-    (React.S.map (fun status ->
-         let event : int option =
-           lift (fun (status : Api_types_j.simulation_info) ->
-               Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
-             status
-         in
-         let event : int = Tools.unsome 0 event in
-         string_of_int event
-       )
-        simulation_output)
+      (React.S.map (fun model ->
+           let simulation_info = State_simulation.model_simulation_info model in
+           let event_percentage : int option =
+             lift (fun (status : Api_types_j.simulation_info) ->
+                 status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage) simulation_info in
+           let event_percentage : int = Tools.unsome 100 event_percentage in
+           event_percentage
+         )
+          State_simulation.model)
+      (React.S.map (fun model ->
+           let simulation_info = State_simulation.model_simulation_info model in
+           let event : int option =
+             lift (fun (status : Api_types_j.simulation_info) ->
+                 Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
+               simulation_info
+           in
+           let event : int = Tools.unsome 0 event in
+           string_of_int event
+         )
+          State_simulation.model)
 
   let tracked_events state =
     let tracked_events : int option =
@@ -528,22 +525,26 @@ module RunningPanelLayout : Ui_common.Div = struct
       None
 
   let tracked_events_count () =
-    let simulation_output = (Ui_simulation.simulation_output ()) in
     Tyxml_js.R.Html.pcdata
-    (React.S.map (fun state -> match tracked_events state with
-            Some tracked_events -> string_of_int tracked_events
-          | None -> " "
-        )
-        simulation_output)
+      (React.S.map
+         (fun model ->
+            let simulation_info = State_simulation.model_simulation_info model in
+            match tracked_events simulation_info with
+            | Some tracked_events -> string_of_int tracked_events
+            | None -> " "
+         )
+         State_simulation.model)
 
   let tracked_events_label () =
-    let simulation_output = (Ui_simulation.simulation_output ()) in
     Tyxml_js.R.Html.pcdata
-      (React.S.map (fun state -> match tracked_events state with
-             Some _ -> "tracked events"
-           | None -> " "
-       )
-        simulation_output)
+      (React.S.map
+         (fun model ->
+            let simulation_info = State_simulation.model_simulation_info model in
+            match tracked_events simulation_info with
+              Some _ -> "tracked events"
+            | None -> " "
+         )
+         State_simulation.model)
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ [%html {|
@@ -581,19 +582,24 @@ end
 
 let hidden_class = "hidden"
 let visible_class = "visible"
+
 let visible_on_states
     ?(a_class=[])
-    (state : Ui_simulation.ui_status list) : string list React.signal =
-  (React.S.bind
-     (Ui_simulation.simulation_status ())
-     (fun run_state ->
-        React.S.const
-          ((if List.mem run_state state then
-             visible_class
-           else
-             hidden_class)::a_class)
-     )
-  )
+    (state : State_simulation.model_state list) : string list React.signal =
+  let hidden_class = ["hidden"] in
+  let visible_class = ["visible"] in
+  React.S.bind
+    State_simulation.model
+    (fun model ->
+       let current_state = State_simulation.model_simulation_state model.State_simulation.model_current in
+       React.S.const
+         (match current_state with
+          | None -> a_class@hidden_class
+          | Some current_state ->
+            if List.mem current_state state then
+              a_class@visible_class
+            else
+              a_class@hidden_class))
 
 let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
   let stopped_row =
@@ -601,7 +607,7 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "form-group"; "form-group-sm" ]
-                [ Ui_simulation.STOPPED ; ]) ]
+                [ State_simulation.STOPPED ; ]) ]
     [%html {|
             <label class="col-lg-1 col-md-2 col-xs-2 control-label" for="|}InputPlotPeriod.id{|">Plot period</label>
             <div class="col-md-2 col-xs-3">|}(InputPlotPeriod.content ()){|</div>
@@ -612,7 +618,7 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "form-group" ]
-                [ Ui_simulation.PAUSED ; ]) ]
+                [ State_simulation.PAUSED ; ]) ]
       [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-9" ] ] (InputPerturbation.content ()) ;
         Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-3" ] ] (ButtonPerturbation.content ()) ]
     in
@@ -620,8 +626,8 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "panel-body" ; "panel-controls" ]
-                [ Ui_simulation.STOPPED ;
-                  Ui_simulation.PAUSED ;]) ]
+                [ State_simulation.STOPPED ;
+                  State_simulation.PAUSED ;]) ]
       [[%html {|
          <form class="form-horizontal">
           <div class="form-group">
@@ -638,7 +644,7 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "panel-body" ; "panel-controls" ]
-                [ Ui_simulation.INITALIZING ; ]) ]
+                [ State_simulation.INITALIZING ; ]) ]
       [ Html.entity "nbsp" ]
 
   let running_body () =
@@ -646,7 +652,7 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "panel-body" ; "panel-controls" ]
-                [ Ui_simulation.RUNNING ; ]) ]
+                [ State_simulation.RUNNING ; ]) ]
       (RunningPanelLayout.content ())
 let footer () =
   [%html {|
@@ -656,26 +662,26 @@ let footer () =
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
-                     [ Ui_simulation.STOPPED ; ]) ]
+                     [ State_simulation.STOPPED ; ]) ]
                (ButtonStart.content ());
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
-                     [ Ui_simulation.PAUSED ; ]) ]
+                     [ State_simulation.PAUSED ; ]) ]
                (ButtonContinue.content ());
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-4" ]
-                     [ Ui_simulation.RUNNING ; ]) ]
+                     [ State_simulation.RUNNING ; ]) ]
                (ButtonPause.content ());
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
                     ~a_class:[ "col-md-2"; "col-xs-3" ]
-                    [ Ui_simulation.PAUSED ;
-                      Ui_simulation.RUNNING ; ]) ]
+                    [ State_simulation.PAUSED ;
+                      State_simulation.RUNNING ; ]) ]
                (ButtonClear.content ());
              Html.div
                ~a:[ Html.a_class [ "col-md-1"; "col-xs-5" ] ]

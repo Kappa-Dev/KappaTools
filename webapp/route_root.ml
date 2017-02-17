@@ -72,9 +72,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let () = ignore(context) in
-            (manager#project_info ()) >>=
+            (manager#project_catalog ()) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_project_info ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_project_catalog ?len:None)
             )
          )
      };
@@ -107,6 +107,30 @@ let route
          )
      };
      { Webapp_common.path =
+         "/v2/projects/{projectid}" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#project_get project_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:(Mpi_message_j.string_of_project ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/parse" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#project_parse project_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:(Mpi_message_j.string_of_project_parse ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
          "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
@@ -119,7 +143,8 @@ let route
             (manager#file_create project_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_file_metadata)
+                                     Mpi_message_j.write_file_metadata
+                                     Mpi_message_j.write_project_parse)
             )
          )
      };
@@ -129,9 +154,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#file_info project_id) >>=
+            (manager#file_catalog project_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_info ?len:None))
+               ~string_of_success:(Mpi_message_j.string_of_file_catalog ?len:None))
          )
      };
      { Webapp_common.path =
@@ -143,7 +168,8 @@ let route
             (manager#file_delete project_id file_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_unit_t)
+                                     Mpi_message_j.write_unit_t
+                                     Mpi_message_j.write_project_parse)
             )
          )
      };
@@ -172,7 +198,8 @@ let route
             (manager#file_update project_id file_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_file_metadata)
+                                     Mpi_message_j.write_file_metadata
+                                     Mpi_message_j.write_project_parse)
             )
          )
      };
@@ -272,7 +299,7 @@ let route
             let (project_id,simulation_id,snapshot_id) = field_ref context "snapshotid" in
             (manager#simulation_detail_snapshot project_id simulation_id snapshot_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_snapshot ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_snapshot_detail ?len:None)
             )
          )
      };
@@ -294,9 +321,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_info_file_line project_id simulation_id) >>=
+            (manager#simulation_catalog_file_line project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_line_info ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_file_line_catalog ?len:None)
             )
          )
      };
@@ -306,9 +333,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_info_flux_map project_id simulation_id) >>=
+            (manager#simulation_catalog_flux_map project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_flux_map_info ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog ?len:None)
             )
          )
      };
@@ -318,9 +345,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,simulation_id) = simulation_ref context in
-            (manager#simulation_info_snapshot project_id simulation_id) >>=
+            (manager#simulation_catalog_snapshot project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_snapshot_info ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog ?len:None)
             )
          )
      };
@@ -330,7 +357,7 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_list project_id) >>=
+            (manager#simulation_catalog project_id) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_catalog ?len:None)
             )

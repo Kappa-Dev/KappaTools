@@ -16,10 +16,10 @@ let content () =
   let state_log , set_state_log =
     React.S.create ("" : string)
   in
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let _ = React.S.l1
       (fun _ ->
-         Ui_simulation.manager_operation
+         State_simulation.when_ready
+           ~label:__LOC__
            (fun
              manager
              project_id
@@ -27,17 +27,14 @@ let content () =
              (manager#simulation_detail_log_message
                 project_id simulation_id)
              >>=
-             (Api_common.result_map
-                ~ok:(fun _ (log_messages : Api_types_j.log_message) ->
+             (Api_common.result_bind_lwt
+                ~ok:(fun (log_messages : Api_types_j.log_message) ->
                     let () = set_state_log log_messages in
-                    Lwt.return_unit)
-                ~error:(fun _ errors  ->
-                    let () = Ui_state.set_model_error __LOC__ errors in
-                    Lwt.return_unit)
+                    Lwt.return (Api_common.result_ok ()))
              )
            )
       )
-      simulation_output
+      State_simulation.model
   in
     [ Html.div
       ~a:[Html.a_class ["panel-pre" ]]

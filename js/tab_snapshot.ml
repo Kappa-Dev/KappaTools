@@ -41,7 +41,6 @@ let display_id = "snapshot-map-display"
 let configuration_template
   id
   additional_handlers : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let json_handler = Widget_export.export_json
         ~serialize_json:(fun () ->
             (match
@@ -91,10 +90,12 @@ let configuration_template
   in
   { Widget_export.id = id ;
     Widget_export.handlers = default_handlers @ additional_handlers ;
-    Widget_export.show = React.S.map
-        (fun state -> snapshot_count state > 0)
-        simulation_output
-
+    Widget_export.show =
+      React.S.map
+        (fun model ->
+           let simulation_info = State_simulation.model_simulation_info model in
+           snapshot_count simulation_info > 0)
+        State_simulation.model
   }
 
 (* Only allow the export of non-graphical data. *)
@@ -114,7 +115,6 @@ let configuration_graph () : Widget_export.configuration =
 let format_select_id = "format_select_id"
 
 let xml () =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let list, handle = ReactiveData.RList.create [] in
   let select (snapshots : Api_types_j.snapshot_id list) =
     List.mapi
@@ -134,26 +134,24 @@ let xml () =
   (* populate select *)
   let _ = React.S.map
       (fun _ ->
-         Ui_simulation.manager_operation
+         State_simulation.when_ready
+           ~label:__LOC__
            (fun
              manager
              project_id
              simulation_id ->
-             (manager#simulation_info_snapshot
+             (manager#simulation_catalog_snapshot
                 project_id
                 simulation_id
              ) >>=
-             (Api_common.result_map
-                ~ok:(fun _ (data : Api_types_t.snapshot_info) ->
+             (Api_common.result_bind_lwt
+                ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
                     let () = ReactiveData.RList.set handle (select data.Api_types_t.snapshot_ids) in
-                    Lwt.return_unit)
-                ~error:(fun _ errors  ->
-                    let () = Ui_state.set_model_error __LOC__ errors in
-                    Lwt.return_unit)
+                    Lwt.return (Api_common.result_ok ()))
              )
            )
       )
-      simulation_output
+      State_simulation.model
   in
   let snapshot_class :
     empty:(unit -> 'a) ->
@@ -164,12 +162,13 @@ let xml () =
       ~single
       ~multiple ->
     React.S.map
-      (fun state ->
-         match snapshot_count state with
+      (fun model ->
+         let simulation_info = State_simulation.model_simulation_info model in
+         match snapshot_count simulation_info with
          | 0 -> empty ()
          | 1 -> single ()
          | _ -> multiple ())
-      simulation_output
+      State_simulation.model
   in
   let snapshot_label =
     Html.h4
@@ -301,7 +300,6 @@ let render_snapshot_graph
   | Kappa -> ()
 
 let select_snapshot () =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let snapshot_js : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
@@ -315,23 +313,26 @@ let select_snapshot () =
       )
   in
   let () = Common.debug index in
-    match (React.S.value simulation_output) with
+  let model = React.S.value State_simulation.model in
+  let simulation_output = State_simulation.model_simulation_info model in
+  match simulation_output with
   | None -> ()
   | Some state ->
     let index = Js.Opt.get index (fun _ -> 0) in
     if snapshot_count (Some state) > 0 then
       let () =
-        Ui_simulation.manager_operation
+        State_simulation.when_ready
+          ~label:__LOC__
           (fun
             manager
             project_id
             simulation_id ->
-            (manager#simulation_info_snapshot
+            (manager#simulation_catalog_snapshot
                project_id
                simulation_id
             ) >>=
             (Api_common.result_bind_lwt
-               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_info) ->
+               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
                    try
                      let snapshot_id : string =
                        List.nth snapshot_info.Api_types_t.snapshot_ids index in
@@ -350,18 +351,14 @@ let select_snapshot () =
 
                  )
             ) >>=
-            (Api_common.result_map
-               ~ok:(fun _ (snapshot : Api_types_j.snapshot) ->
+            (Api_common.result_bind_lwt
+               ~ok:(fun (snapshot : Api_types_j.snapshot) ->
                    let () = set_current_snapshot (Some snapshot) in
                    let () = render_snapshot_graph
                      snapshot_js
                      snapshot
                    in
-                   Lwt.return_unit)
-               ~error:(fun _ errors  ->
-                   let () = set_current_snapshot None in
-                   let () = Ui_state.set_model_error __LOC__ errors in
-                   Lwt.return_unit)
+                   Lwt.return (Api_common.result_ok ()))
             )
           )
       in
@@ -370,7 +367,6 @@ let select_snapshot () =
 
 
 let onload () : unit =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Ui_common.id_dom select_id in
   let format_select_dom : Dom_html.inputElement Js.t =
@@ -415,7 +411,9 @@ let onload () : unit =
       "#navsnapshot"
       "shown.bs.tab"
       (fun _ ->
-         match (React.S.value simulation_output) with
+         let model = React.S.value State_simulation.model in
+         let simulation_output = State_simulation.model_simulation_info model in
+         match simulation_output with
            None -> ()
          | Some _state -> select_snapshot ())
   in

@@ -40,7 +40,6 @@ let serialize_json : (unit -> string) ref = ref (fun _ -> "null")
 let serialize_csv : (unit -> string) ref = ref (fun _ -> "")
 
 let configuration () : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
@@ -59,7 +58,10 @@ let configuration () : Widget_export.configuration =
                 ~filename:filename
         }
       ];
-    show = React.S.map has_plot simulation_output
+    show =
+      React.S.map
+        (fun model -> has_plot (State_simulation.model_simulation_info model))
+        State_simulation.model
   }
 
 let plot_points_input_id = "plot_points_input"
@@ -187,7 +189,9 @@ let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
   max 0 (plot_size - (React.S.value point))
 
 let update_offset (update_offset_input : bool) : unit =
-  match React.S.value (Ui_simulation.simulation_output ()) with
+  let simulation_model = React.S.value State_simulation.model in
+  let simulation_info = Utility.option_bind State_simulation.t_simulation_info simulation_model.State_simulation.model_current in
+  match simulation_info with
   | None -> ()
   | Some simulation_info ->
     if simulation_info.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running then
@@ -219,7 +223,9 @@ let update_offset (update_offset_input : bool) : unit =
 let plot_limit_offset () : int =
   match React.S.value offset with
   | None ->
-    (match React.S.value (Ui_simulation.simulation_output ()) with
+    let simulation_model = React.S.value State_simulation.model in
+    let simulation_info = Utility.option_bind State_simulation.t_simulation_info simulation_model.State_simulation.model_current in
+    (match simulation_info with
      | None -> 0
      | Some t -> simulation_info_offset_max t)
   | Some offset -> offset.offset_current
@@ -233,7 +239,8 @@ let plot_parameter () : Api_types_j.plot_parameter =
 
 
 let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
-  Ui_simulation.manager_operation
+  State_simulation.when_ready
+    ~label:__LOC__
     (fun
       manager
       project_id
@@ -243,19 +250,16 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
          project_id
          simulation_id
          (plot_parameter ())) >>=
-      (Api_common.result_map
-         ~ok:(fun _ (plot_detail : Api_types_t.plot_detail)  ->
+      (Api_common.result_bind_lwt
+         ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
              let plot = plot_detail.Api_types_j.plot_detail_plot in
              let () = serialize_json := (fun _ -> Api_types_j.string_of_plot plot) in
              let () = js_plot##setDimensions(get_dimension ()) in
              let () = serialize_csv := fun _ -> Api_data.plot_values plot in
              let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
              let () = js_plot##setPlot(data) in
-             Lwt.return_unit
+             Lwt.return (Api_common.result_ok ())
            )
-         ~error:(fun _ errors  ->
-             let () = Ui_state.set_model_error __LOC__ errors in
-             Lwt.return_unit)
       )
     )
 
@@ -294,7 +298,6 @@ let plot_ref = ref None
 
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let () = Widget_export.onload (configuration ()) in
   let configuration : Js_plot.plot_configuration Js.t =
     Js_plot.create_configuration
@@ -317,16 +320,22 @@ let onload () =
       "#navplot"
       "shown.bs.tab"
       (fun _ ->
-         match (React.S.value simulation_output) with
-         | None -> ()
-         | Some _ -> update_plot plot)
+         let simulation_model = React.S.value State_simulation.model in
+         let simulation_info = State_simulation.model_simulation_info simulation_model in
+         if has_plot simulation_info then
+           update_plot plot
+         else
+           ())
   in
   let _ =
     React.S.l1
-      (fun state -> match state with
-         | None -> ()
-         | Some _ -> update_plot plot)
-      simulation_output
+      (fun simulation_model ->
+         let simulation_info = State_simulation.model_simulation_info simulation_model in
+         if has_plot simulation_info then
+           update_plot plot
+         else
+           ())
+      State_simulation.model
   in
   let () =
     Ui_common.input_change
@@ -348,13 +357,13 @@ let navli () = []
 
 let onresize () =
   (* recalcuate size *)
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let _ = calculate_dimension () in
   let () =
     match !plot_ref with
     | None -> ()
     | Some plot ->
-      (match React.S.value simulation_output with
+      (let model = React.S.value State_simulation.model in
+       match State_simulation.model_simulation_info model with
        | None -> ()
        | Some _ -> update_plot plot)
   in

@@ -6,5 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val editor_full : bool React.signal
-include Ui_common.Panel
+val continue_simulation : unit -> unit
+val pause_simulation : unit -> unit
+val stop_simulation : unit -> unit
+val start_simulation : unit -> unit
+val perturb_simulation : unit -> unit

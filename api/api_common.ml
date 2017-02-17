@@ -240,7 +240,10 @@ struct
   let update
       (project : Api_environment.project)
       (files : Api_types_j.file list) : unit =
-    project#set_files files
+    (* WARNING : DONT CALL THIS IT WILL SKEW THE VERSIONING
+       SEE : file_manager.update_file
+    *)
+    ignore(project#set_files files)
   let identifier (file : Api_types_j.file) =
     file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
   let id_to_string (file_id : Api_types_j.file_id) : string =

@@ -28,7 +28,6 @@ let has_fluxmap
 let serialize_json : (string -> unit) ref = ref (fun _ -> ())
 
 let configuration () : Widget_export.configuration =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg
@@ -42,8 +41,12 @@ let configuration () : Widget_export.configuration =
         }
       ];
     show = React.S.map
-        has_fluxmap
-        simulation_output
+        (fun model ->
+           has_fluxmap
+             (Utility.option_bind
+                State_simulation.t_simulation_info
+                model.State_simulation.model_current))
+        State_simulation.model ;
   }
 
 let xml () =
@@ -54,17 +57,18 @@ let xml () =
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
            (fun _ ->
-              Ui_simulation.manager_operation
+              State_simulation.when_ready
+                ~label:__LOC__
                 (fun
                   manager
                   project_id
                   simulation_id ->
-                  (manager#simulation_info_flux_map
+                  (manager#simulation_catalog_flux_map
                      project_id
                      simulation_id
                   ) >>=
-                  (Api_common.result_map
-                     ~ok:(fun _ (data : Api_types_t.flux_map_info) ->
+                  (Api_common.result_bind_lwt
+                     ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
                          let () = ReactiveData.RList.set
                              flux_handle
                              (List.mapi
@@ -75,15 +79,11 @@ let xml () =
                                 data.Api_types_t.flux_map_ids
                              )
                          in
-                         Lwt.return_unit
+                         Lwt.return (Api_common.result_ok ()))
                        )
-                     ~error:(fun _ errors  ->
-                         let () = Ui_state.set_model_error __LOC__ errors in
-                         Lwt.return_unit)
                   )
                 )
-           )
-           in
+       in
        flux_list
       )
   in
@@ -93,17 +93,18 @@ let xml () =
       (let flux_list, flux_handle = ReactiveData.RList.create [] in
        let _ = React.S.map
            (fun _ ->
-              Ui_simulation.manager_operation
+              State_simulation.when_ready
+                ~label:__LOC__
                 (fun
                   manager
                   project_id
                   simulation_id ->
-                  (manager#simulation_info_flux_map
+                  (manager#simulation_catalog_flux_map
                      project_id
                      simulation_id
                   ) >>=
-                  (Api_common.result_map
-                     ~ok:(fun _ (data : Api_types_t.flux_map_info) ->
+                  (Api_common.result_bind_lwt
+                     ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
                          let () =
                            ReactiveData.RList.set
                              flux_handle
@@ -115,11 +116,7 @@ let xml () =
                             | _ -> [flux_select]
                            )
                          in
-                         Lwt.return_unit
-                       )
-                     ~error:(fun _ errors  ->
-                         let () = Ui_state.set_model_error __LOC__ errors in
-                         Lwt.return_unit)
+                         Lwt.return (Api_common.result_ok ()))
                   )
                 )
            )
@@ -186,17 +183,18 @@ let content () =
 let update_flux_map
     (flux_js : Js_flux.flux_map Js.t)
     (index : int ): unit =
-  Ui_simulation.manager_operation
+  State_simulation.when_ready
+    ~label:__LOC__
     (fun
       manager
       project_id
       simulation_id ->
-      (manager#simulation_info_flux_map
+      (manager#simulation_catalog_flux_map
          project_id
          simulation_id
       ) >>=
       (Api_common.result_bind_lwt
-         ~ok:(fun  (flux_map_info : Api_types_j.flux_map_info) ->
+         ~ok:(fun  (flux_map_info : Api_types_j.flux_map_catalog) ->
              try
                let fluxmap_id : string =
                  List.nth flux_map_info.Api_types_t.flux_map_ids index in
@@ -215,8 +213,8 @@ let update_flux_map
 
            )
       ) >>=
-      (Api_common.result_map
-         ~ok:(fun _ (flux_map : Api_types_j.flux_map) ->
+      (Api_common.result_bind_lwt
+         ~ok:(fun (flux_map : Api_types_j.flux_map) ->
              let flux_data : Js_flux.flux_data Js.t =
                Js_flux.create_data
                  ~flux_begin_time:flux_map.Api_types_j.flux_data.Data.flux_start
@@ -226,15 +224,11 @@ let update_flux_map
                  ~flux_hits:flux_map.Api_types_j.flux_data.Api_types_j.flux_hits
                  ~flux_fluxs:flux_map.Data.flux_data.Data.flux_fluxs in
              let () = flux_js##setFlux(flux_data) in
-            Lwt.return_unit)
-        ~error:(fun _ errors  ->
-            let () = Ui_state.set_model_error __LOC__ errors in
-            Lwt.return_unit)
-     )
+            Lwt.return (Api_common.result_ok ())))
     )
 
+
 let select_fluxmap flux_map =
-  let simulation_output = (Ui_simulation.simulation_output ()) in
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom -> let select_dom : Dom_html.inputElement Js.t =
@@ -244,15 +238,18 @@ let select_fluxmap flux_map =
           _ -> Js.null
       )
   in
-  match (React.S.value simulation_output) with
-    None -> ()
-  | Some state -> let index = Js.Opt.get index (fun _ -> 0) in
-    if state.Api_types_j.simulation_info_output.Api_types_j.simulation_output_flux_maps > 0 then
-      update_flux_map
-        flux_map
-        index
-    else
-      ()
+  let o : Api_types_t.simulation_info option =
+    Utility.option_bind
+      State_simulation.t_simulation_info
+      (React.S.value State_simulation.model).State_simulation.model_current
+  in
+  if has_fluxmap o then
+    let index = Js.Opt.get index (fun _ -> 0) in
+    update_flux_map
+      flux_map
+      index
+  else
+    ()
 
 let navli () =
   Ui_common.badge

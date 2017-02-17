@@ -14,7 +14,7 @@ let rightsubpanel () =
   Html.div
     ~a:[ Tyxml_js.R.Html.a_class
            (React.S.bind
-              Ui_state.editor_full
+              Subpanel_editor.editor_full
               (fun editor_full ->
                  React.S.const
                    (if editor_full then
@@ -38,7 +38,7 @@ let content () =
      [Html.div
         ~a:[ Tyxml_js.R.Html.a_class
                (React.S.bind
-                  Ui_state.editor_full
+                  Subpanel_editor.editor_full
                   (fun editor_full ->
                      React.S.const
                        (if editor_full then

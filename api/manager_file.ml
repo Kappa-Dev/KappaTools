@@ -37,8 +37,7 @@ let update_file
          file.Api_types_j.
            file_metadata.Api_types_j.
            file_metadata_compile
-       | Some file_content ->
-         file_content)
+       | Some file_content -> file_content)
   in
   let () = file.Api_types_j.file_metadata.Api_types_j.file_metadata_hash <-
       (match file_modification.Api_types_j.
@@ -85,6 +84,11 @@ let update_file
                patch
                file.Api_types_j.file_content;
   in
+  let () = file.Api_types_j.file_metadata.Api_types_j.file_metadata_version <-
+      File_version.merge
+         file.Api_types_j.file_metadata.Api_types_j.file_metadata_version
+         file_modification.Api_types_j.file_modification_version
+  in
   ()
 
 type file_index = { file_index_file_id : Api_types_j.file_id ;
@@ -97,19 +101,30 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 let parse_text :
   Api_environment.project ->
   Kappa_facade.system_process ->
-  (Kappa_facade.t -> 'a Api.result Lwt.t) ->
+  Api_types_j.file list ->
+  (Api_types_j.project_version -> Kappa_facade.t -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t =
   fun
     (project : Api_environment.project)
     (system_process : Kappa_facade.system_process)
-    (f : Kappa_facade.t -> 'a Api.result Lwt.t)
+    (new_files : Api_types_j.file list)
+    (f : Api_types_j.project_version -> Kappa_facade.t -> 'a Api.result Lwt.t)
     ->
+      let orginal_version : Api_types_j.project_version = project#set_files new_files in
       ((Kappa_facade.parse
           ~system_process:system_process
           ~kappa_files:(project#get_files ()))
        >>=
        (Api_common.result_data_map
-          ~ok:((fun (kappa_facade : Kappa_facade.t) -> f kappa_facade))
+          ~ok:((fun (kappa_facade : Kappa_facade.t) ->
+              let new_version = project#get_version () in
+              (* if someone was working while we were busy update *)
+              let project_version = if orginal_version = new_version then
+                  project#set_state (`Ok kappa_facade)
+                else
+                  new_version
+              in
+              f project_version kappa_facade))
           ~error:((fun (errors : Api_types_j.errors) ->
               Lwt.return (Api_common.result_messages errors)) :
                     Api_types_j.errors -> 'a Api.result Lwt.t)
@@ -118,25 +133,28 @@ let parse_text :
 class manager_file
     (environment : Api_environment.environment)
     (system_process : Kappa_facade.system_process)
-  : Api.manager_file =
+  : [Api_types_j.project_parse] Api.manager_file =
   object
-    method file_info
+    method file_catalog
         (project_id : Api_types_j.project_id) :
-      Api_types_j.file_info Api.result Lwt.t =
+      Api_types_j.file_catalog Api.result Lwt.t =
     Api_common.ProjectOperations.bind
       project_id
       environment
       (fun (project : Api_environment.project) ->
          let files : Api_types_j.file list = (project#get_files ()) in
-         let file_info : Api_types_j.file_info =
-           List.map (fun file -> file.Api_types_j.file_metadata) files in
-         Lwt.return (Api_common.result_ok file_info)
+         let file_catalog : Api_types_j.file_catalog =
+           { Api_types_j.file_metadata_list =
+               List.map (fun file -> file.Api_types_j.file_metadata) files }
+         in
+         Lwt.return (Api_common.result_ok file_catalog)
       )
 
     method file_create
         (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
-      Api_types_j.file_metadata Api_types_j.file_result Api.result Lwt.t =
+      ((Api_types_j.file_metadata, Api_types_j.project_parse)
+         Api_types_j.file_result) Api.result Lwt.t =
       Api_common.ProjectOperations.bind
         project_id
         environment
@@ -154,23 +172,31 @@ class manager_file
                (Api_common.result_error_msg
                   ~result_code:`CONFLICT message)
            else
-             let file_list : Api_types_j.file list = (project#get_files ()) in
-             let () =  project#set_files (file::file_list) in
+             let file_list : Api_types_j.file list = project#get_files () in
+             let version =
+               file.Api_types_j.file_metadata.Api_types_j.file_metadata_version in
+             let file =
+               { file with
+                 Api_types_j.file_metadata =
+                   { file.Api_types_j.file_metadata
+                     with Api_types_j.file_metadata_version = version } } in
              parse_text
                project
                system_process
+               (file::file_list)
                (fun
+                 (project_version : Api_types_j.project_version)
                  (kappa_facade : Kappa_facade.t) ->
-                 let () = project#set_state kappa_facade in
                  Lwt.return
                    (Api_common.result_ok
-                      { Api_types_j.file_status_data =
-                          file.Api_types_j.file_metadata ;
-          		Api_types_j.file_status_contact_map = Kappa_facade.get_contact_map kappa_facade ; }
+                      { Api_types_j.file_status_data = file.Api_types_j.file_metadata ;
+          		Api_types_j.file_status_summary =
+                        { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade ;
+                          Api_types_j.project_parse_project_version = project_version }
+                      }
                    )
                )
         )
-
 
     method file_get
       (project_id : Api_types_j.project_id)
@@ -187,7 +213,7 @@ class manager_file
       (project_id : Api_types_j.project_id)
       (file_id : Api_types_j.file_id)
       (file_modification : Api_types_j.file_modification) :
-      Api_types_j.file_metadata Api_types_j.file_result Api.result Lwt.t =
+      ((Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result) Api.result Lwt.t =
       Api_common.bind_file
         environment
         project_id
@@ -197,19 +223,23 @@ class manager_file
           (file : Api_types_j.file) ->
           let () = update_file file file_modification in
           let file_list : Api_types_j.file list = (project#get_files ()) in
-          let () = project#set_files file_list in
           parse_text
             project
             system_process
+            file_list
             (fun
+              (project_version : Api_types_j.project_version)
               (kappa_facade : Kappa_facade.t) ->
-              let () = project#set_state kappa_facade in
+              let summary =
+                { Api_types_j.project_parse_contact_map =
+                    Kappa_facade.get_contact_map kappa_facade ;
+                  Api_types_j.project_parse_project_version = project_version ; }
+              in
               Lwt.return
                 (Api_common.result_ok
-                   { Api_types_j.file_status_data =
-                       file.Api_types_j.file_metadata ;
-                     Api_types_j.file_status_contact_map =
-                       Kappa_facade.get_contact_map kappa_facade ; }
+                   { Api_types_j.file_status_data = file.Api_types_j.file_metadata ;
+          	     Api_types_j.file_status_summary = summary ;
+                   }
                 )
             )
         )
@@ -217,7 +247,7 @@ class manager_file
     method file_delete
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id) :
-      unit Api_types_j.file_result Api.result Lwt.t =
+      ((unit, Api_types_j.project_parse) Api_types_j.file_result) Api.result Lwt.t =
       Api_common.bind_file
         environment
         project_id
@@ -226,18 +256,25 @@ class manager_file
            let file_list : Api_types_j.file list = (project#get_files ()) in
            let file_ne : Api_types_j.file -> bool =
              fun file -> (get_file_id file) <> file_id in
-           let () =  project#set_files (List.filter file_ne file_list) in
+           let updated_directory = List.filter file_ne file_list in
            parse_text
             project
             system_process
+            updated_directory
             (fun
+              (project_version : Api_types_j.project_version)
               (kappa_facade : Kappa_facade.t) ->
-              let () = project#set_state kappa_facade in
+              let summary =
+                { Api_types_j.project_parse_contact_map =
+                    Kappa_facade.get_contact_map kappa_facade ;
+                  Api_types_j.project_parse_project_version =
+                    project_version ;
+                }
+              in
               Lwt.return
                 (Api_common.result_ok
                    { Api_types_j.file_status_data = ();
-          	     Api_types_j.file_status_contact_map =
-                     Kappa_facade.get_contact_map kappa_facade ; }
+          	     Api_types_j.file_status_summary = summary ; }
                 )
             )
         )
