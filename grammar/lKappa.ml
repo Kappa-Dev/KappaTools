@@ -20,10 +20,12 @@ type rule_agent =
   {
     ra_type: int;
     ra_erased: bool;
-    ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
+    ra_ports:
+      ((int,int*int) Ast.link Locality.annot * switching) array;
     ra_ints: rule_internal array;
-    ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
-                rule_internal array) option;
+    ra_syntax:
+      (((int,int*int) Ast.link Locality.annot * switching) array *
+       rule_internal array) option;
   }
 
 type rule_mixture = rule_agent list
@@ -35,8 +37,10 @@ type rule =
     r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
-    r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
-                 * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
+    r_un_rate :
+      ((rule_mixture,int) Alg_expr.e Locality.annot
+       * (rule_mixture,int) Alg_expr.e Locality.annot
+         option) option;
   }
 
 let print_link_annot ~ltypes sigs f (s,a) =
@@ -206,6 +210,17 @@ let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
         aux false (succ i)
       else aux empty (succ i) in
   aux true 0
+
+(*get information of agent in the lhs*)
+let get_agent_lhs ag =
+  ag.ra_type,
+  (ag.ra_ports, ag.ra_ints)
+
+(*let get_agent_rhs ag =
+  if not ag.ra_erased
+  then
+    ag.ra_type*)
+
 
 let print_agent_lhs ~ltypes sigs f ag =
   Format.fprintf

@@ -1911,14 +1911,26 @@ automorphisms in the site graph E.
   let print_list_array log list_array =
     Array.iter (fun l -> print_list log l) list_array
 
+  let print_agent_lhs_list log fmt sigs l =
+    List.iter (fun (i, s, t) ->
+        let () = Loggers.fprintf log "agent:%i\n" i in
+        let () =
+          let ltypes = false in
+          LKappa.print_intf_lhs ~ltypes sigs i fmt (s, t)
+        in
+        ()
+      ) l
+
 (******************************************************)
 (*compute symmetries with syntactic_rule*)
 (******************************************************)
 
   let print_cannonic_form_from_syntactic_rules
-      ~compil log rule_id rule
+      ~compil sigs log rule_id rule
       nbr_auto_in_lhs
-      nbr_auto_in_rule rate_opt_list gamma_list =
+      nbr_auto_in_rule rate_opt_list gamma_list
+      agent_lhs_list
+    =
     match Loggers.formatter_of_logger log with
     | None -> ()
     | Some fmt ->
@@ -1936,12 +1948,15 @@ automorphisms in the site graph E.
       let () = Loggers.print_newline log in
       let () = Loggers.fprintf log " Gamma: " in
       let () = print_gamma_list log fmt gamma_list in
+      let () = Loggers.fprintf log "agent lhs : " in
+      let () = print_agent_lhs_list log fmt sigs agent_lhs_list in
       let () = print_line_stars log in
       ()
 
   let cannonic_form_from_syntactic_rules ?env log compil =
     let empty_cache = I.empty_lkappa_cache () in
     let cache,
+        agent_lhs_list,
         rate_list,
         gamma_list,
         nbr_lhs_list,
@@ -1949,6 +1964,7 @@ automorphisms in the site graph E.
         pair_hash_rule_id_list =
       List.fold_left
         (fun (cache,
+              agent_lhs_list,
               store_gamma_lists,
               rate_list,
               nbr_lhs_list,
@@ -1960,9 +1976,18 @@ automorphisms in the site graph E.
              I.divide_rule_rate_by cache compil rule
            in
            (* identifiers of rule up to isomorphism*)
-           let lkappa_rule, rule_id, rate_opt_list, lhs_rule_list,
+           let sigs, lkappa_rule, rule_id, rate_opt_list,
+               lhs_rule_list,
                cache, nbr_auto_in_rule =
              I.cannonic_form_from_syntactic_rule cache compil rule
+           in
+           let agent_lhs_list =
+             List.fold_left (fun agent_lhs_list rule_agent ->
+                 let agent_lhs, (ra_ports, ra_ints) =
+                   LKappa.get_agent_lhs rule_agent
+                 in
+                 (agent_lhs, ra_ports, ra_ints) :: agent_lhs_list
+               ) agent_lhs_list lkappa_rule.LKappa.r_mix
            in
            (*test rule lhs*)
            (*let () =
@@ -1970,14 +1995,39 @@ automorphisms in the site graph E.
              | None -> ()
              | Some fmt ->
                let ltypes = false in
-             LKappa.print_rhs ~ltypes
-               lkappa_rule.LKappa.r_mix
-               fmt
-               lkappa_rule.LKappa.r_created
+               let () =
+                 LKappa.print_rhs ~ltypes sigs
+                   lkappa_rule.LKappa.r_created
+                   fmt
+                   lkappa_rule.LKappa.r_mix
+               in
+               let () =
+                 List.iter (fun rule_agent ->
+                     let () = Loggers.fprintf log "Rule_agent:\n" in
+                     let () =
+                       LKappa.print_rule_agent sigs
+                         ~ltypes fmt
+                         rule_agent
+                     in
+                     let () = Loggers.fprintf log "agent_lhs:\n" in
+                     let () =
+                       LKappa.print_agent_lhs ~ltypes sigs
+                         fmt
+                         rule_agent
+                     in
+                     let () = Loggers.fprintf log "agent_rhs:\n" in
+                     let () =
+                       LKappa.print_agent_rhs ~ltypes sigs
+                         fmt
+                         rule_agent
+                     in
+                     ()
+                   ) lkappa_rule.LKappa.r_mix
+               in
+               ()
            in*)
-
            (*get a pair of (cc_id, cc) in the lhs of rule*)
-           let valid_modes =
+           (*let valid_modes =
              I.valid_modes compil rule rule_id
            in
            let pair_cc_list =
@@ -2005,7 +2055,7 @@ automorphisms in the site graph E.
                    in
                  ()
                ) valid_modes
-           in
+           in*)
            (*compute gamma(r)= k(r)/convention(r)*)
            let gamma_list =
              compute_gamma nbr_auto_in_lhs rate_opt_list
@@ -2022,23 +2072,27 @@ automorphisms in the site graph E.
            (*PRINT*)
            let () =
              print_cannonic_form_from_syntactic_rules
-             ~compil
+             ~compil sigs
                log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule
                rate_opt_list
                store_gamma_list
+               agent_lhs_list
            in
            (*return values*)
            cache,
+           agent_lhs_list,
            store_gamma_list,
            rate_list,
            nbr_lhs_list,
            nbr_rule_list,
            pair_hash_rule_id
         )
-        (empty_cache, [], [], [], [], [])
+        (empty_cache, [], [], [], [], [], [])
         (I.get_rules compil)
     in
-    cache, gamma_list,
+    cache,
+    agent_lhs_list,
+    gamma_list,
     rate_list,
     nbr_lhs_list,
     nbr_rule_list,
@@ -2107,10 +2161,12 @@ automorphisms in the site graph E.
       ) l
 
   let print_list_of_rule_id_with_its_hashes log (l1, l2) =
-    let () = Loggers.fprintf log "List of rule_id has the same hashes: " in
+    let () = Loggers.fprintf log
+        "List of rule_id has the same hashes: " in
     let () = print_pair_hash_rule_id_list log l1 in
     let () = Loggers.print_newline log in
-    let () = Loggers.fprintf log "List of rule_id has different hashes: " in
+    let () = Loggers.fprintf log
+        "List of rule_id has different hashes: " in
     let () = print_pair_hash_rule_id_list log l2 in
     Loggers.print_newline log
 
@@ -2250,7 +2306,7 @@ automorphisms in the site graph E.
 
   let compute_symmetries_from_syntactic_rules log compil (*agent site1 site2*) =
     (*let contact_map = I.contact_map compil in*)
-    let cache, gamma_list, rate_list,
+    let cache, agent_lhs_list, gamma_list, rate_list,
         nbr_lhs_list, nbr_rule_list,
         pair_hash_rule_id_list =
       cannonic_form_from_syntactic_rules log compil

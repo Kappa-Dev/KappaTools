@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 17 2017>
+  * Last modification: Time-stamp: <Feb 18 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -352,6 +352,7 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
+  let sigs = Model.signatures compil.environment in
   (*get rule_id_with_mode*)
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
   let rate_opt_list, lhs_rule_list =
@@ -373,5 +374,6 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       lkappa_rule.LKappa.r_mix
       lkappa_rule.LKappa.r_created
   in
+  sigs,
   lkappa_rule,
   rule_id, rate_opt_list, lhs_rule_list, cache, hash_list
