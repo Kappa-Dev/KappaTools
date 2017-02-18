@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 16 2017>
+  * Last modification: Time-stamp: <Feb 18 2017>
 *)
 
 let local_trace = false
@@ -1818,16 +1818,28 @@ automorphisms in the site graph E.
   the number of automorphisms in the left hand side of the rule r,
   is the same for any pair of symmetric rules.*)
 
-  let compute_gamma log connected_components nbr_auto_in_lhs =
-    List.fold_left (fun current_list l ->
-        List.fold_left (fun current_list' arr ->
-            Array.fold_left (fun current_array i ->
-                let k = Pattern.int_of_id i in
-                let g = k / nbr_auto_in_lhs in
-                g :: current_array
-              ) current_list' arr
-          ) current_list l
-      ) [] (List.flatten connected_components)
+  let compute_gamma nbr_auto_in_lhs rate_opt_list =
+    let gamma_list =
+      List.fold_left (fun current_list rate_opt ->
+          match rate_opt with
+          | None -> current_list
+          | Some rate ->
+            let gamma =
+              Alg_expr_extra.divide_expr_by_int
+                rate
+                nbr_auto_in_lhs
+            in
+            gamma :: current_list
+        ) [] rate_opt_list
+    in
+    gamma_list
+
+  let print_gamma_list ?env log fmt l =
+    List.iter (fun gamma_list ->
+        List.iter (fun (alg,_l) ->
+            Kappa_printer.alg_expr ?env fmt alg
+          ) gamma_list
+      ) l
 
 (*compute isomorphism rule: rules are isomorphism when they have
   the same number in hash: for example:
@@ -1903,19 +1915,15 @@ automorphisms in the site graph E.
 (*compute symmetries with syntactic_rule*)
 (******************************************************)
 
-  let print_gamma_list ?env log fmt l =
-    List.iter (fun gamma_list ->
-        List.iter (fun (alg,l) ->
-            Loggers.fprintf log " Gamma: ";
-            Kappa_printer.alg_expr ?env fmt alg
-          ) gamma_list
-      ) l
-
-  let print_general_information ~compil log rule_id rule nbr_auto_in_lhs
+  let print_cannonic_form_from_syntactic_rules
+      ~compil log rule_id rule
+      nbr_auto_in_lhs
       nbr_auto_in_rule rate_opt_list gamma_list =
     match Loggers.formatter_of_logger log with
     | None -> ()
     | Some fmt ->
+      (*let () = Loggers.fprintf log "rule: \n" in
+      let () = I.print_rule ~compil fmt rule in*)
       let () = Loggers.fprintf log " rule_name: " in
       let () = I.print_rule_name ~compil fmt rule in
       let () = Loggers.print_newline log in
@@ -1926,66 +1934,115 @@ automorphisms in the site graph E.
       let () = Loggers.print_newline log in
       let () = print_hash log nbr_auto_in_rule in
       let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log " Gamma: " in
       let () = print_gamma_list log fmt gamma_list in
       let () = print_line_stars log in
       ()
 
-  let compute_general_information ?env log compil =
+  let cannonic_form_from_syntactic_rules ?env log compil =
     let empty_cache = I.empty_lkappa_cache () in
     let cache,
-        rate_list, gamma_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list =
+        rate_list,
+        gamma_list,
+        nbr_lhs_list,
+        nbr_rule_list,
+        pair_hash_rule_id_list =
       List.fold_left
-        (fun (cache,store_gamma_list,
-                rate_list, nbr_lhs_list, current_list, pair_list) rule ->
+        (fun (cache,
+              store_gamma_lists,
+              rate_list,
+              nbr_lhs_list,
+              current_list,
+              pair_list) rule ->
            (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
            let cache, nbr_auto_in_lhs =
              I.divide_rule_rate_by cache compil rule
            in
            (* identifiers of rule up to isomorphism*)
-           let rule_id, rate_opt_list, cache, nbr_auto_in_rule =
+           let lkappa_rule, rule_id, rate_opt_list, lhs_rule_list,
+               cache, nbr_auto_in_rule =
              I.cannonic_form_from_syntactic_rule cache compil rule
+           in
+           (*test rule lhs*)
+           (*let () =
+             match Loggers.formatter_of_logger log with
+             | None -> ()
+             | Some fmt ->
+               let ltypes = false in
+             LKappa.print_rhs ~ltypes
+               lkappa_rule.LKappa.r_mix
+               fmt
+               lkappa_rule.LKappa.r_created
+           in*)
+
+           (*get a pair of (cc_id, cc) in the lhs of rule*)
+           let valid_modes =
+             I.valid_modes compil rule rule_id
+           in
+           let pair_cc_list =
+             List.iter (fun rule_id_with_mode ->
+                 let cache, enrich_rule =
+                   enrich_rule cache compil rule rule_id_with_mode
+                 in
+                 let pair_lhs_cc =
+                   get_lhs_cc enrich_rule
+                 in
+                 let () =
+                   List.iter (fun (cc_id, cc) ->
+                       let () = Loggers.fprintf log
+                           "connected_components id:%i\n" cc_id
+                       in
+                       let () =
+                         match Loggers.formatter_of_logger log with
+                         | None -> ()
+                         | Some fmt ->
+                         I.print_connected_component
+                           ~compil fmt cc
+                       in
+                       ()
+                     ) pair_lhs_cc
+                   in
+                 ()
+               ) valid_modes
            in
            (*compute gamma(r)= k(r)/convention(r)*)
            let gamma_list =
-             List.fold_left (fun current_list rate_opt ->
-                 match rate_opt with
-                 | None -> current_list
-                 | Some rate ->
-                   let gamma =
-                     Alg_expr_extra.divide_expr_by_int
-                       rate
-                       nbr_auto_in_lhs
-                   in
-                   let () =
-                     match Loggers.formatter_of_logger log with
-                     | None -> ()
-                     | Some fmt ->
-                       Loggers.fprintf log " Gamma: ";
-                       Kappa_printer.alg_expr ?env fmt (fst gamma)
-                   in
-                   gamma :: current_list
-               ) [] rate_opt_list
+             compute_gamma nbr_auto_in_lhs rate_opt_list
            in
            (*****************************************************)
-           let store_gamma_list = gamma_list :: store_gamma_list in
+           let store_gamma_list = gamma_list :: store_gamma_lists in
            let rate_list = rate_opt_list :: rate_list  in
            let nbr_lhs_list = nbr_auto_in_lhs :: nbr_lhs_list in
            let nbr_rule_list = nbr_auto_in_rule :: current_list in
-           let pair_hash_rule_id = (rule_id, nbr_auto_in_rule) :: pair_list in
+           let pair_hash_rule_id =
+             (rule_id, nbr_auto_in_rule) :: pair_list
+           in
            (*****************************************************)
            (*PRINT*)
-           let () = print_general_information ~compil
-               log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule rate_opt_list
+           let () =
+             print_cannonic_form_from_syntactic_rules
+             ~compil
+               log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule
+               rate_opt_list
                store_gamma_list
            in
            (*return values*)
-           cache, store_gamma_list,
-           rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id
-        ) (empty_cache, [[]],[], [], [],[]) (I.get_rules compil)
+           cache,
+           store_gamma_list,
+           rate_list,
+           nbr_lhs_list,
+           nbr_rule_list,
+           pair_hash_rule_id
+        )
+        (empty_cache, [], [], [], [], [])
+        (I.get_rules compil)
     in
     cache, gamma_list,
-  rate_list, nbr_lhs_list, nbr_rule_list, pair_hash_rule_id_list
+    rate_list,
+    nbr_lhs_list,
+    nbr_rule_list,
+    pair_hash_rule_id_list
 
 (******************************************************)
 (*Build array for symmetries*)
@@ -2191,11 +2248,12 @@ automorphisms in the site graph E.
 (******************************************************)
 (*main function computing symmetries with syntactic_rule*)
 
-  let cannonic_form_from_syntactic_rules log compil =
-    let contact_map = I.contact_map compil in
-    let cache, gamma_list, rate_list, nbr_lhs_list, nbr_rule_list,
+  let compute_symmetries_from_syntactic_rules log compil (*agent site1 site2*) =
+    (*let contact_map = I.contact_map compil in*)
+    let cache, gamma_list, rate_list,
+        nbr_lhs_list, nbr_rule_list,
         pair_hash_rule_id_list =
-      compute_general_information log compil
+      cannonic_form_from_syntactic_rules log compil
     in
     (*****************************************************)
     (*compute the isomorphism of rules:
@@ -2246,7 +2304,6 @@ automorphisms in the site graph E.
         rule_id_same_hash_list
         list_of_rule_id_has_different_hashes
     in
-    let () = Loggers.fprintf log "CONTACT MAP\n" in
     (*****************************************************)
     (*a set of /the list of the positions (of all agents:
       both in the lhs/rhs, degraded agents (deleted),
@@ -2254,26 +2311,6 @@ automorphisms in the site graph E.
       site x or y in the rule.
       - The positions are the agent_id of agents of type A
       with at least a site x or y.*)
-    let l =
-      Array.fold_left (fun current_list pair_array ->
-          Array.fold_left (fun current_list (state_list, pair_list) ->
-              List.fold_left (fun current_list state ->
-                  List.fold_left (fun current_list (agent_name, site_name) ->
-                      let l = (agent_name, site_name, state) ::
-                              current_list
-                      in
-                      let () = Loggers.fprintf log
-                          "agent_name:%i, site_name:%i, state:%i\n"
-                          agent_name
-                          site_name
-                          state
-                      in
-                      l
-                    ) current_list pair_list
-                ) current_list state_list
-            ) current_list pair_array
-        ) [] contact_map
-    in
     cache, ()
 
 (*

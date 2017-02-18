@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 15 2017>
+  * Last modification: Time-stamp: <Feb 18 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -45,7 +45,7 @@ sig
 
   val get_divide_rate_by : enriched_rule -> int
 
-  val cannonic_form_from_syntactic_rules :
+  val compute_symmetries_from_syntactic_rules :
     Loggers.t ->
     I.compil ->
     I.nauto_in_rules_cache * unit

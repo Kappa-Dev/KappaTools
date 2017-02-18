@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 16 2017>
+  * Last modification: Time-stamp: <Feb 17 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -354,14 +354,18 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   in
   (*get rule_id_with_mode*)
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
-  let rate_opt_list =
-    List.fold_left (fun current_list rule_id_with_mode ->
+  let rate_opt_list, lhs_rule_list =
+    List.fold_left (fun (current_list, lhs_list) rule_id_with_mode ->
         let rate_opt =
           rate compil rule rule_id_with_mode
         in
-        let l = rate_opt :: current_list in
-        l
-      ) [] rule_id_with_mode_list
+        let rate_list = rate_opt :: current_list in
+        let get_lhs =
+          lhs compil rule_id_with_mode rule
+        in
+        let lhs_list = get_lhs :: lhs_list in
+        rate_list, lhs_list
+      ) ([], []) rule_id_with_mode_list
   in
   let cache, hash_list =
     LKappa_auto.cannonic_form
@@ -369,4 +373,5 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       lkappa_rule.LKappa.r_mix
       lkappa_rule.LKappa.r_created
   in
-  rule_id, rate_opt_list, cache, hash_list
+  lkappa_rule,
+  rule_id, rate_opt_list, lhs_rule_list, cache, hash_list
