@@ -1835,19 +1835,21 @@ automorphisms in the site graph E.
     gamma_list
 
   let print_gamma_list ?env log fmt l =
-    List.iter (fun gamma_list ->
+    List.iter (fun (rule_id, gamma_list) ->
         List.iter (fun (alg,_l) ->
-            Kappa_printer.alg_expr ?env fmt alg
+            let () = Loggers.fprintf log " rule_id:%i " rule_id in
+            let () = Kappa_printer.alg_expr ?env fmt alg in
+            Loggers.print_newline log
           ) gamma_list
       ) l
 
-(*compute isomorphism rule: rules are isomorphism when they have
+ (*compute isomorphism rule: rules are isomorphism when they have
   the same number in hash: for example:
   r1: hash: 6
   r2: hash : 6
   r3: hash : 7
   ==> r1, r2 are isomorphism rules
-*)
+  *)
   let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
     let rec aux acc l =
     match l with
@@ -1918,7 +1920,7 @@ automorphisms in the site graph E.
   let print_cannonic_form_from_syntactic_rules
       ~compil sigs log rule_id rule
       nbr_auto_in_lhs
-      nbr_auto_in_rule rate_opt_list gamma_list
+      nbr_auto_in_rule rate_opt_list
     =
     match Loggers.formatter_of_logger log with
     | None -> ()
@@ -1934,10 +1936,10 @@ automorphisms in the site graph E.
       let () = I.print_rule_id fmt rule_id in
       let () = Loggers.print_newline log in
       let () = print_hash log nbr_auto_in_rule in
-      let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log " Gamma: " in
-      let () = print_gamma_list log fmt gamma_list in
       let () = print_line_stars log in
+      (*let () = Loggers.fprintf log " Gamma: " in
+      let () = print_gamma_list log fmt gamma_list in
+      let () = print_line_stars log in*)
       ()
 
   let cannonic_form_from_syntactic_rules ?env log compil =
@@ -1950,27 +1952,32 @@ automorphisms in the site graph E.
         pair_hash_rule_id_list =
       List.fold_left
         (fun (cache,
-              store_gamma_lists,
               rate_list,
+              store_gamma_list,
               nbr_lhs_list,
               current_list,
               pair_list) rule ->
+          (*****************************************************)
            (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
            let cache, nbr_auto_in_lhs =
              I.divide_rule_rate_by cache compil rule
            in
+           (*****************************************************)
            (* identifiers of rule up to isomorphism*)
            let sigs, rule_id, rate_opt_list,
                cache, nbr_auto_in_rule =
              I.cannonic_form_from_syntactic_rule cache compil rule
            in
+           (*****************************************************)
            (*compute gamma(r)= k(r)/convention(r)*)
            let gamma_list =
              compute_gamma nbr_auto_in_lhs rate_opt_list
            in
            (*****************************************************)
-           let store_gamma_list = gamma_list :: store_gamma_lists in
+           let pair_rule_id_gamma_list =
+             (rule_id, gamma_list) ::store_gamma_list
+           in
            let rate_list = rate_opt_list :: rate_list  in
            let nbr_lhs_list = nbr_auto_in_lhs :: nbr_lhs_list in
            let nbr_rule_list = nbr_auto_in_rule :: current_list in
@@ -1984,12 +1991,12 @@ automorphisms in the site graph E.
              ~compil sigs
                log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule
                rate_opt_list
-               store_gamma_list
            in
+           (*****************************************************)
            (*return values*)
            cache,
-           store_gamma_list,
            rate_list,
+           pair_rule_id_gamma_list,
            nbr_lhs_list,
            nbr_rule_list,
            pair_hash_rule_id
@@ -1998,8 +2005,8 @@ automorphisms in the site graph E.
         (I.get_rules compil)
     in
     cache,
-    gamma_list,
     rate_list,
+    gamma_list,
     nbr_lhs_list,
     nbr_rule_list,
     pair_hash_rule_id_list
@@ -2060,18 +2067,18 @@ automorphisms in the site graph E.
 
   let print_pair_hash_rule_id_list log l =
     List.iter (fun (i, hash) ->
-        let () = Loggers.fprintf log " rule_id: %i ++ " i in
+        let () = Loggers.fprintf log " rule_id: %i " i in
         let () = print_hash log hash in
         ()
       ) l
 
   let print_list_of_rule_id_with_its_hashes log (l1, l2) =
     let () = Loggers.fprintf log
-        "List of rule_id has the same hashes: " in
+        "List of rule_id has the same hashes: \n" in
     let () = print_pair_hash_rule_id_list log l1 in
     let () = Loggers.print_newline log in
     let () = Loggers.fprintf log
-        "List of rule_id has different hashes: " in
+        "List of rule_id has different hashes: \n" in
     let () = print_pair_hash_rule_id_list log l2 in
     Loggers.print_newline log
 
@@ -2128,11 +2135,11 @@ automorphisms in the site graph E.
       let () = print_list_array log update_hash_rule_list_array in
       Loggers.print_newline log
     in
-  (*
-   update to_check_array:
-   Hash : 0     1     2      3
-   Bool:  T     T     T      F
-  *)
+    (*
+     update to_check_array:
+     Hash : 0     1     2      3
+     Bool:  T     T     T      F
+    *)
     let cache, update_to_check_array =
       List.fold_left (fun (cache, hash_array) same_hash ->
           let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
@@ -2163,12 +2170,12 @@ automorphisms in the site graph E.
       let () = print_bool_array log update_to_check_array in
       Loggers.print_newline log
     in
-  (*
-   update hit_array:
-   Hash :     0    1    2   3
-   counter :  2    1    1   0
-   counter : the length of the list of rule_id in the hash_rule_list_array
-  *)
+    (*
+     update hit_array:
+     Hash :     0    1    2   3
+     counter :  2    1    1   0
+     counter : the length of the list of rule_id in the hash_rule_list_array
+    *)
     let length_rule_id_same_hash =
       List.length rule_id_same_hash_list
     in
@@ -2181,7 +2188,7 @@ automorphisms in the site graph E.
             hash_array.(int_hash_array) <- length_rule_id_same_hash;
             hash_array
           in
-        (*different hash*)
+         (*different hash*)
           let cache, hash_array =
             List.fold_left (fun (cache, hash_array) different_hash ->
                 let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
@@ -2219,11 +2226,18 @@ automorphisms in the site graph E.
 *)
 
   let compute_symmetries_from_syntactic_rules log compil (*agent site1 site2*) =
-    (*let contact_map = I.contact_map compil in*)
-    let cache, gamma_list, rate_list,
-        nbr_lhs_list, nbr_rule_list,
+    let cache, rate_list, gamma_list, nbr_lhs_list, nbr_rule_list,
         pair_hash_rule_id_list =
       cannonic_form_from_syntactic_rules log compil
+    in
+    let () =
+      match Loggers.formatter_of_logger log with
+      | None -> ()
+      | Some fmt ->
+        let () = Loggers.fprintf log "Pair of rule_id and its gamma: \n" in
+        let () = print_gamma_list log fmt gamma_list in
+        let () = Loggers.print_newline log in
+        ()
     in
     (*****************************************************)
     (*compute the isomorphism of rules:

@@ -1403,7 +1403,7 @@ let compute_symmetries
   state,
   symmetries
 
-let get_symmetries ?accuracy_level:(accuracy_level=Remanent_state.Low) =
+let get_symmetric_sites ?accuracy_level:(accuracy_level=Remanent_state.Low) =
   get_gen
     (Remanent_state.get_symmetries accuracy_level)
     (compute_symmetries ~accuracy_level )

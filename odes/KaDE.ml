@@ -167,7 +167,7 @@ let main () =
         Kappa_files.open_out "my_logger.txt"
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
-    (*let errors = Exception.empty_error_handler in
+    let errors = Exception.empty_error_handler in
     let _, parameters, _  = Get_option.get_option errors in
     let module B =
       (val Domain_selection.select_domain
@@ -180,6 +180,10 @@ let main () =
       (val export_to_kade : Export_to_KaDE.Type)
     in
     let state = Export_to_kade.init () in
+    (*let state, symmetries =
+      Export_to_kade.get_symmetric_sites
+        ~accuracy_level:Remanent_state.High state
+    in
     let cache, () =
       A.compute_symmetries_from_syntactic_rules my_logger compil
     in*)

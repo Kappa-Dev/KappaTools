@@ -122,7 +122,7 @@ let main () =
   let state, symmetries =
     if Remanent_parameters.get_compute_symmetries parameters
     then
-      let state, symmetries = Export_to_KaSa.get_symmetries state in
+      let state, symmetries = Export_to_KaSa.get_symmetric_sites state in
       state, Some symmetries
     else
       state, None

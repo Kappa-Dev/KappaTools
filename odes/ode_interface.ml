@@ -52,6 +52,7 @@ let dummy_chemical_species compil =
   Pattern.empty_cc (Pattern.Env.signatures (domain compil))
 
 let rate_convention compil = compil.rate_convention
+
 let what_do_we_count compil = compil.count
 
 let do_we_count_in_embeddings compil =

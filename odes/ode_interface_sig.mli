@@ -20,9 +20,6 @@ sig
   type init =
     ((connected_component array list,int) Alg_expr.e * hidden_init * Locality.t) list
 
-  (*contact map*)
-  val contact_map : compil -> (int list * (int * int) list) array array
-
   val empty_cache: compil -> cache
   val empty_lkappa_cache: unit -> nauto_in_rules_cache
   val get_init: compil -> init

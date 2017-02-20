@@ -67,7 +67,7 @@ sig
 
   val get_ode_flow: state -> state * ode_flow
 
-  val get_symmetries:
+  val get_symmetric_sites:
     ?accuracy_level:Remanent_state.accuracy_level ->
     state -> state * Symmetries.symmetries
 
