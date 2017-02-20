@@ -168,7 +168,13 @@ let main () =
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
     let errors = Exception.empty_error_handler in
-    let _, parameters, _  = Get_option.get_option errors in
+    let parameters =
+      (* TO DO *)
+      (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY ANALYSIS *)
+      Remanent_parameters.get_parameters
+        ~called_from:Remanent_parameters_sig.Server
+        ()
+    in
     let module B =
       (val Domain_selection.select_domain
           ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
@@ -179,7 +185,13 @@ let main () =
     let module Export_to_kade =
       (val export_to_kade : Export_to_KaDE.Type)
     in
-    let state = Export_to_kade.init () in
+    let kasa_compil =
+      List.fold_left
+        (KappaLexer.compile Format.std_formatter)
+        Ast.empty_compil
+        cli_args.Run_cli_args.inputKappaFileNames
+    in
+    let state = Export_to_kade.init ~compil:kasa_compil () in
     (*let state, symmetries =
       Export_to_kade.get_symmetric_sites
         ~accuracy_level:Remanent_state.High state
