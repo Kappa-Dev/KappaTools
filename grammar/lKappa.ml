@@ -211,16 +211,6 @@ let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
       else aux empty (succ i) in
   aux true 0
 
-(*get information of agent in the lhs*)
-let get_agent_lhs ag =
-  ag.ra_type,
-  (ag.ra_ports, ag.ra_ints)
-
-(*let get_agent_rhs ag =
-  if not ag.ra_erased
-  then
-    ag.ra_type*)
-
 
 let print_agent_lhs ~ltypes sigs f ag =
   Format.fprintf

@@ -1,13 +1,13 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 18 2017>
+  * Last modification: Time-stamp: <Feb 20 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
 
 let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
-let main () =
 
+let main () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE [-i] input_file [--ode-backend Matlab | Octave | SBML]
@@ -136,7 +136,8 @@ let main () =
     let ignore_obs =
       match backend with
       | Loggers.SBML -> true
-      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML |
+        Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> true
       | Loggers.Octave
@@ -161,7 +162,7 @@ let main () =
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
     in
     (*********************************************************************)
-    (*TEST*)
+    (*TEST-symmetries*)
     let my_out_channel =
         Kappa_files.open_out "my_logger.txt"
     in

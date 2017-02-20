@@ -57,34 +57,6 @@ type rule =
                  * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
   }
 
-val print_intf_lhs :
-  ltypes:bool -> Signature.s ->
-  int -> Format.formatter ->
-  (((int, int * int) Ast.link Locality.annot * switching) array *
-   rule_internal array) -> unit
-
-val get_agent_lhs : rule_agent ->
-  int *
-  (((int, int * int) Ast.link Locality.annot * switching) array *
-   rule_internal array)
-
-val print_agent_lhs :
-  ltypes:bool -> Signature.s -> Format.formatter ->
-  rule_agent -> unit
-
-val print_agent_rhs :
-  ltypes:bool -> Signature.s -> Format.formatter ->
-  rule_agent -> unit
-
-val print_rule_agent :
-  Signature.s -> ltypes:bool -> Format.formatter ->
-  rule_agent -> unit
-
-val print_rhs :
-  ltypes:bool ->
-  Signature.s ->
-  Raw_mixture.t -> Format.formatter -> rule_agent list -> unit
-
 val print_rates : Signature.s -> (Format.formatter -> int -> unit)
   -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
