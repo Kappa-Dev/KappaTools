@@ -573,9 +573,7 @@ type internal_constraints_list =
   Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 (*******************************************************************)
-
-type symmetric_sites = unit
-
+type symmetric_sites = Symmetries.symmetries
 (*******************************************************************)
 
 type ('static,'dynamic) state =
@@ -923,3 +921,14 @@ let get_constraints_list state = state.constraints_list
 
 let set_constraints_list list state =
   {state with constraints_list = Some list}
+
+
+let get_symmetries accuracy state =
+  AccuracyMap.find_option accuracy state.symmetric_sites
+
+let set_symmetries accuracy partition state =
+  {
+    state
+    with symmetric_sites =
+           AccuracyMap.add accuracy partition state.symmetric_sites
+  }

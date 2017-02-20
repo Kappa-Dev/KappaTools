@@ -116,9 +116,7 @@ val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
 
 (*******************************************************************)
-
-type symmetric_sites = unit
-
+type symmetric_sites = Symmetries.symmetries
 (*******************************************************************)
 
 type ('static, 'dynamic) state
@@ -247,3 +245,8 @@ val get_constraints_list : ('static, 'compile) state ->
 
 val set_constraints_list : constraints_list -> ('static, 'compile) state ->
   ('static, 'compile) state
+
+val get_symmetries : accuracy_level -> ('static, 'compile) state -> symmetric_sites option
+
+val set_symmetries : accuracy_level -> symmetric_sites
+  -> ('static, 'compile) state -> ('static, 'compile) state
