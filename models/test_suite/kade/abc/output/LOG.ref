@@ -18,6 +18,8 @@ done
 	 -variables 
 	 -observables 
 	 -check time homogeneity 
+Parsing ../../cflows/abc/abc.ka...
+done
 + exporting the network... 
 	 -main function 
 	 -initial state 
@@ -43,6 +45,8 @@ done
 	 -variables 
 	 -observables 
 	 -check time homogeneity 
+Parsing ../../cflows/abc/abc.ka...
+done
 + exporting the network... 
 	 -main function 
 	 -initial state 
@@ -68,6 +72,8 @@ done
 	 -variables 
 	 -observables 
 	 -check time homogeneity 
+Parsing ../../cflows/abc/abc.ka...
+done
 + exporting the network... 
 	 -main function 
 	 -initial state 
@@ -93,6 +99,8 @@ done
 	 -variables 
 	 -observables 
 	 -check time homogeneity 
+Parsing ../../cflows/abc/abc.ka...
+done
 + exporting the network... 
 	 -main function 
 	 -initial state 
