@@ -167,7 +167,20 @@ let main () =
         Kappa_files.open_out "my_logger.txt"
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
-    (*let cache, () =
+    (*let errors = Exception.empty_error_handler in
+    let _, parameters, _  = Get_option.get_option errors in
+    let module B =
+      (val Domain_selection.select_domain
+          ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
+    in
+    let export_to_kade =
+      (module Export_to_KaDE.Export(B) : Export_to_KaDE.Type)
+    in
+    let module Export_to_kade =
+      (val export_to_kade : Export_to_KaDE.Type)
+    in
+    let state = Export_to_kade.init () in
+    let cache, () =
       A.compute_symmetries_from_syntactic_rules my_logger compil
     in*)
     let () = Loggers.flush_logger my_logger in

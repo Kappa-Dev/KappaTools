@@ -30,8 +30,6 @@ module type Type =
       ?accuracy_level:Remanent_state.accuracy_level ->
       state -> state * Remanent_state.symmetric_sites
 
-
-
   end
 
 module Export:

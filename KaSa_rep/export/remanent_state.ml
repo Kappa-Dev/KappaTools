@@ -25,7 +25,6 @@ type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string,
    Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
-
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -86,12 +85,10 @@ module AccuracyMap = AccuracySetMap.Map
 
 (******************************************************************)
 
-
 type quark_map = Quark_type.quarks
 
 type rule_id = int
 type var_id =  int
-
 
 (**************)
 (* JSon labels*)
@@ -163,7 +160,6 @@ type location =
   | Direct of int
   | Side_effect of int
 
-
 let location_to_json a =
   match a with
   | Direct i -> `Assoc [direct,JsonUtil.of_int i]
@@ -177,7 +173,6 @@ let location_of_json
   | `Assoc [s,json] when s=side_effect -> Side_effect (JsonUtil.to_int json)
   | x ->
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
-
 
 module InfluenceNodeSetMap =
   SetMap.Make
@@ -472,7 +467,6 @@ let pair_of_json (json:Yojson.Basic.json) : string * string  =
   (agent_name,site_name)
 
 
-
 type 'site_graph lemma =
   {
     hyp : 'site_graph ;
@@ -579,7 +573,9 @@ type internal_constraints_list =
   Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 (*******************************************************************)
+
 type symmetric_sites = unit
+
 (*******************************************************************)
 
 type ('static,'dynamic) state =
@@ -695,12 +691,9 @@ let get_map empty add of_json label json =
     (fun map (x,y) -> add x (snd y) map)
     empty l
 
-
-
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
-
 
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
@@ -911,8 +904,6 @@ let set_ctmc_flow flow state = {state with ctmc_flow = Some flow}
 let get_ctmc_flow state = state.ctmc_flow
 
 let get_influence_map_map state = state.influence_map
-
-
 
 let get_internal_contact_map_map state = state.internal_contact_map
 

@@ -116,7 +116,9 @@ val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
 
 (*******************************************************************)
+
 type symmetric_sites = unit
+
 (*******************************************************************)
 
 type ('static, 'dynamic) state

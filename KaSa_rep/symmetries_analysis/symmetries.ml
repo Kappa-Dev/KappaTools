@@ -13,38 +13,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-(***************************************************************)
-
-let add_link_in_contact_map parameters error (agent,site) (agent',site')
-    store_result =
-  let error, store_result_a =
-    Ckappa_sig.Agent_map_and_set.Map.find_default
-      parameters error
-      Ckappa_sig.Site_map_and_set.Map.empty
-      agent
-      store_result
-  in
-  let error, (l, old) =
-    Ckappa_sig.Site_map_and_set.Map.find_default
-      parameters error
-      ([], [])
-      site
-      store_result_a
-  in
-  let error, store_result'_a =
-    Ckappa_sig.Site_map_and_set.Map.overwrite
-      parameters error
-      site
-      (l, ((agent', site') :: old))
-      store_result_a
-  in
-  Ckappa_sig.Agent_map_and_set.Map.overwrite
-    parameters error
-    agent
-    store_result'_a
-    store_result
-
-
 (***************************************************************************)
 (*TYPE*)
 (***************************************************************************)
@@ -274,7 +242,3 @@ let detect_symmetries parameters error handler contact_map =
       store_result.store_contact_map
     in*)
   error, store_result
-
-(***************************************************************************)
-(*FROM CHEMICAL SPECIES IN CANONIC FORM UP TO SYMMETRIES*)
-(***************************************************************************)
