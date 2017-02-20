@@ -192,6 +192,18 @@ let main () =
         cli_args.Run_cli_args.inputKappaFileNames
     in
     let state = Export_to_kade.init ~compil:kasa_compil () in
+    let parameters =
+      Export_to_kade.get_parameters state in
+    let parameters =
+      Remanent_parameters.set_logger parameters my_logger
+    in
+    let parameters =
+      Remanent_parameters.set_trace parameters true
+    (* This should be tuned according to a command line option *)
+    in
+    let state =
+      Export_to_kade.set_parameters parameters state
+    in
     (*let state, symmetries =
       Export_to_kade.get_symmetric_sites
         ~accuracy_level:Remanent_state.High state

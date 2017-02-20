@@ -1389,6 +1389,10 @@ let compute_symmetries
   let state, handler = get_handler state in
   let parameters = get_parameters state in
   let errors = get_errors state in
+  (*get the information of compil => get the information of the position of
+    agent_id in a list of rules
+  *)
+  let state, c_compil = get_c_compilation state in
   let state, contact_map =
     get_internal_contact_map
       ~accuracy_level

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2015, the 13th of March
-  * Last modification: Time-stamp: <Oct 13 2016>
+  * Last modification: Time-stamp: <Feb 20 2017>
   *
   * Compute the relations between sites in an agent.
   *
@@ -14,7 +14,7 @@
 
 let trace = false
 
-(************************************************************************************)
+(**************************************************************************)
 (*TYPE*)
 
 type stochastic_class =
@@ -22,7 +22,7 @@ type stochastic_class =
     stochastic_class : Ckappa_sig.c_site_name list Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
   }
 
-(************************************************************************************)
+(****************************************************************************)
 (*RULE*)
 
 let scan_rule parameters error _handler rule _classes =
@@ -114,10 +114,10 @@ let scan_rule parameters error _handler rule _classes =
     stochastic_class = stochastic_classes;
   }
 
-(************************************************************************************)
+(**************************************************************************)
 (*RULES*)
 
-(*------------------------------------------------------------------------------*)
+(*--------------------------------------------------------------------*)
 (*return a number of site in each agent.
   For example: A(x,y,z,t) => the number of site of A is: 4*)
 
@@ -145,7 +145,7 @@ let get_nsites parameters error key handler =
   in
   error, Ckappa_sig.next_site_name nsites
 
-(*------------------------------------------------------------------------------*)
+(*---------------------------------------------------------------------*)
 (*RULES*)
 
 let scan_rule_set parameters error handler rules =
@@ -154,19 +154,20 @@ let scan_rule_set parameters error handler rules =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create_biggest_key parameters error nagents
   in
   let error, init =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0
   in
   let init_stochastic =
     {
       stochastic_class = init_stochastic_class
     }
   in
-  (*------------------------------------------------------------------------------*)
+  (*----------------------------------------------------------------------*)
   let error, stochastic_class =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameters error
       (fun parameters error _rule_id rule stochastic_class ->
-         (*------------------------------------------------------------------------*)
+         (*-----------------------------------------------------------------*)
          let error, map =
            scan_rule
              parameters
@@ -175,7 +176,7 @@ let scan_rule_set parameters error handler rules =
              rule.Cckappa_sig.e_rule_c_rule
              init_stochastic
          in
-         (*------------------------------------------------------------------------*)
+         (*----------------------------------------------------------------*)
          let error, store_result =
            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
              parameters error
@@ -200,7 +201,9 @@ let scan_rule_set parameters error handler rules =
                   in
                   let error, array =
                     match get_array with
-                    | None -> Ckappa_sig.Site_union_find.create parameters error (Ckappa_sig.int_of_site_name nsites)
+                    | None ->
+                      Ckappa_sig.Site_union_find.create parameters error
+                        (Ckappa_sig.int_of_site_name nsites)
                     | Some a -> error, a
                   in
                   (*compute the union for the list of site*)
@@ -225,7 +228,7 @@ let scan_rule_set parameters error handler rules =
       ) rules init
   in error, stochastic_class
 
-(************************************************************************************)
+(************************************************************************)
 (*PRINT*)
 
 let sprintf_array parameters error handler agent_type array =
@@ -245,7 +248,8 @@ let sprintf_array parameters error handler agent_type array =
          in
          let _ =
            acc := !acc ^ (* avoid this, this is very slow, Use Printf.fprintf directly *)
-                  if Ckappa_sig.compare_site_name i Ckappa_sig.dummy_site_name <> 0
+                  if Ckappa_sig.compare_site_name i Ckappa_sig.dummy_site_name
+                     <> 0
                   then Printf.sprintf "; %s:%s"
                       (Ckappa_sig.string_of_site_name site_type)
                       site_string
@@ -305,7 +309,7 @@ let print_stochastic_class parameters error handler result =
        error)
     result
 
-(************************************************************************************)
+(***************************************************************************)
 (*MAIN*)
 
 let stochastic_classes parameters error handler cc_compil =

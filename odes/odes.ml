@@ -1970,6 +1970,9 @@ automorphisms in the site graph E.
              I.cannonic_form_from_syntactic_rule cache compil rule
            in
            (*****************************************************)
+           (*position of agent_id in a rule*)
+
+           (*****************************************************)
            (*compute gamma(r)= k(r)/convention(r)*)
            let gamma_list =
              compute_gamma nbr_auto_in_lhs rate_opt_list

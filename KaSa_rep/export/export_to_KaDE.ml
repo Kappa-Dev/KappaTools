@@ -21,6 +21,7 @@ sig
   val init: ?compil:Ast.parsing_compil -> unit -> state
 
   val get_parameters: state -> parameters
+  val set_parameters: parameters -> state -> state
 
   val get_handler: state -> state * handler
 

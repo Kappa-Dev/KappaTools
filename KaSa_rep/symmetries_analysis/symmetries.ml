@@ -40,6 +40,7 @@ let init_symmetries =
 (***************************************************************************)
 (*PARTITION THE CONTACT MAP*)
 (***************************************************************************)
+(*TODO:it needs to be in a same class*)
 
 let collect_partition_contact_map parameters error contact_map store_result =
   let error, store_result =
@@ -187,6 +188,73 @@ let print_partition_with_predicate parameters error store_result =
     ) store_result error
 
 (***************************************************************************)
+(*Get a position of agent_id in the lhs and rhs of a rules *)
+
+(*let collect_views_aux parameters error rule_id views store_result =
+  Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.fold
+    parameters error
+    (fun parameters error agent_id agent store_result ->
+       match agent with
+       | Cckappa_sig.Unknown_agent _ ->
+         Exception.warn parameters error __POS__ Exit store_result
+       | Cckappa_sig.Ghost -> error, store_result
+       | Cckappa_sig.Dead_agent (agent,_,_,_)
+       | Cckappa_sig.Agent agent ->
+         let agent_position = agent.Cckappa_sig.agent_position in
+         let error, store_result =
+           Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+             parameters error
+             rule_id
+             (agent_id, agent_position)
+             store_result
+         in
+         error, store_result
+    ) views store_result
+
+let collect_position_agent_id_lhs parameters error rule_id rule store_result =
+  collect_views_aux
+    parameters
+    error
+    rule_id
+    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    store_result
+
+let collect_position_agent_id_rhs parameters error rule_id rule store_result =
+  collect_views_aux
+    parameters
+    error
+    rule_id
+    rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+    store_result
+
+let scan_rule parameters error rule_id rule store_result =
+  let error, store_position_agent_id_lhs =
+    collect_position_agent_id_lhs
+  in
+  let error, store_position_agent_id_rhs =
+    collect_position_agent_id_rhs
+  in
+  error,
+  store_position_agent_id_lhs, store_position_agent_id_rhs
+
+
+let scan_rule_set parameters error compil =
+  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+    parameters error
+    (fun parameters error rule_id rule store_result ->
+       let _ =
+         scan_rule
+           parameters error
+           rule_id
+           rule.Cckappa_sig.e_rule_c_rule
+           store_result
+       in
+
+
+    ) compil.Cckappa_sig.rules _
+  *)
+
+(***************************************************************************)
 (*DETECT SYMMETRIES*)
 (***************************************************************************)
 
@@ -219,10 +287,18 @@ let detect_symmetries parameters error handler contact_map =
   in
   (*-------------------------------------------------------------*)
   (*PRINT*)
-  let error =
+    let error =
     if Remanent_parameters.get_trace parameters
     then
       let error =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "Contact map\n";
+        print_contact_map parameters error
+          store_result.store_contact_map
+      in
+      let error =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "Partition contact map\n";
         print_partition_contact_map parameters error
           store_result.store_partition_contact_map
       in
@@ -237,8 +313,4 @@ let detect_symmetries parameters error handler contact_map =
     else
       error
   in
-  (*let error =
-    print_contact_map parameters error
-      store_result.store_contact_map
-    in*)
   error, store_result

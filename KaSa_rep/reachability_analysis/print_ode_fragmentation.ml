@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 9th of Apirl
-    * Last modification: Time-stamp: <Oct 13 2016>
+    * Last modification: Time-stamp: <Feb 20 2017>
     * *
     * ODE fragmentation
     *
@@ -15,7 +15,7 @@
 
 let trace = false
 
-(************************************************************************************)
+(****************************************************************************)
 (*Print sites that modified*)
 
 let print_sites_modified_set parameters error handler_kappa result =
@@ -62,7 +62,7 @@ let print_sites_modified_set parameters error handler_kappa result =
        error
     ) result
 
-(************************************************************************************)
+(**************************************************************************)
 
 let cartesian_prod_eq i a b =
   let rec loop a acc =
@@ -113,7 +113,7 @@ let print_internal_flow parameters _error _handler_kappa result =
            ()
         ) store_result1
 
-(************************************************************************************)
+(**************************************************************************)
 (*MAIN*)
 
 let print_result parameters error handler_kappa result =
