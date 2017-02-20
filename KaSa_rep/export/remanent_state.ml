@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Feb 20 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -576,9 +576,10 @@ type flow =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
 
 type internal_constraints_list =
-      Ckappa_backend.Ckappa_backend.t poly_constraints_list
+  Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 (*******************************************************************)
+type symmetric_sites = unit
 (*******************************************************************)
 
 type ('static,'dynamic) state =
@@ -607,6 +608,7 @@ type ('static,'dynamic) state =
     errors        : Exception.method_handler ;
     internal_constraints_list : internal_constraints_list option;
     constraints_list : constraints_list option;
+    symmetric_sites : symmetric_sites AccuracyMap.t;
   }
 
 let create_state ?errors parameters init =
@@ -642,7 +644,8 @@ let create_state ?errors parameters init =
     dead_agents = None ;
     errors = error ;
     internal_constraints_list = None;
-    constraints_list = None
+    constraints_list = None;
+    symmetric_sites = AccuracyMap.empty;
   }
 
 (**************)

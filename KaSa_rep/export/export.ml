@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Dec 26 2016>
+  * Last modification: Time-stamp: <Feb 20 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1384,13 +1384,18 @@ let get_constraints_list_to_json state =
     state,
     Remanent_state.lemmas_list_to_json constraints_list
 
-let get_symmetries state =
+let get_symmetries ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
   let state, handler = get_handler state in
   let parameters = get_parameters state in
   let errors = get_errors state in
+  let state, contact_map =
+    get_internal_contact_map
+      ~accuracy_level
+      state
+  in
   let errors, symmetries =
     Symmetries.detect_symmetries
-      parameters errors handler
+      parameters errors handler contact_map
   in
   let state = set_errors errors state in
   state,

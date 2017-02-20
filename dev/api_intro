@@ -35,7 +35,7 @@ The code specific to the command line backend is in main/. It consists in file h
 {!modules: Outputs Kappa_files}
 
 Some APIs for KaSa can be found in KaSa_rep/export/
-{!modules: Export_to_KaSa Export_to_KaSim}
+{!modules: Export_to_KaDE Export_to_KaSa Export_to_KaSim}
 
 Some data_structures used in KaSa.
 This library that proposes different implementations for arrays can be found in KaSa_rep/data_structures/

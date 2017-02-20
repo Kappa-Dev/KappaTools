@@ -1,10 +1,10 @@
 (**
    * symmetries.ml
    * openkappa
-   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Feb 08 2017>
+   * Last modification: Time-stamp: <Feb 20 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -12,36 +12,6 @@
    * en Informatique et en Automatique.
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
-
-(***************************************************************)
-
-let declare_agent parameters error agent store_result =
-  Ckappa_sig.Agent_map_and_set.Map.add
-    parameters error
-    agent
-    Ckappa_sig.Site_map_and_set.Map.empty
-    store_result
-
-let declare_site parameters error agent site store_result =
-  let error, store_result_a =
-    Ckappa_sig.Agent_map_and_set.Map.find_default
-      parameters error
-      Ckappa_sig.Site_map_and_set.Map.empty
-      agent
-      store_result
-  in
-  let error, store_result_a =
-    Ckappa_sig.Site_map_and_set.Map.add
-      parameters error
-      site
-      ([], [])
-      store_result_a
-  in
-  Ckappa_sig.Agent_map_and_set.Map.overwrite
-    parameters error
-    agent
-    store_result_a
-    store_result
 
 (***************************************************************)
 
@@ -74,122 +44,6 @@ let add_link_in_contact_map parameters error (agent,site) (agent',site')
     store_result'_a
     store_result
 
-(*----------------------------------------------------------------*)
-
-let get_old_result_in_contact_map parameters error agent_type site_name
-    store_result  =
-  let error, store_result_a =
-    Common_map.get_agent_type
-      parameters error
-      agent_type
-      Ckappa_sig.Site_map_and_set.Map.empty
-      store_result
-  in
-  let error, (old, l) =
-    Ckappa_sig.Site_map_and_set.Map.find_default_without_logs
-      parameters error
-      ([],[])
-      site_name
-      store_result_a
-  in
-  error, store_result_a, (l, old)
-
-let add_internal_state_in_contact_map parameters error
-    (agent_type,site_name) state store_result =
-  let error, store_result_a, (l, old) =
-    get_old_result_in_contact_map
-      parameters error
-      agent_type
-      site_name
-      store_result
-  in
-  let error, store_result'_a =
-    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters error
-      site_name
-      (state::old, l) (*store state, l is a pair of (agent, site)*)
-      store_result_a
-  in
-  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite parameters error
-    agent_type
-    store_result'_a
-    store_result
-
-(***************************************************************)
-(*EXPORT A CONTACT MAP*)
-(***************************************************************)
-
-let init_contact_map = Ckappa_sig.Agent_map_and_set.Map.empty
-
-let export_contact_map parameters error handler store_result =
-  let error, store_result =
-    Ckappa_sig.Dictionary_of_agents.fold
-      (fun _ _ agent_id (error,store_result) ->
-         declare_agent parameters error agent_id store_result)
-      handler.Cckappa_sig.agents_dic
-      (error, store_result)
-  in
-  (*----------------------------------------------------------------*)
-  let error, store_result =
-    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.fold
-      parameters error
-      (fun parameters error agent_id site_dic store_result ->
-         Ckappa_sig.Dictionary_of_sites.fold
-           (fun _ _ site_id (error, store_result) ->
-              declare_site parameters error agent_id site_id store_result)
-           site_dic
-           (error, store_result))
-      handler.Cckappa_sig.sites
-      store_result
-  in
-  (*----------------------------------------------------------------*)
-  let error, store_result =
-    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.fold
-      parameters error
-      (fun parameters error (agent_type, site_name) state_dic store_result ->
-         let error,site =
-           Handler.translate_site parameters error handler agent_type site_name
-         in
-         match site with
-         | Ckappa_sig.Binding _ -> error, store_result
-         | Ckappa_sig.Internal _ ->
-           Ckappa_sig.Dictionary_of_States.fold
-             (fun _ ((),()) state (error,store_result) ->
-                add_internal_state_in_contact_map parameters error
-                  (agent_type, site_name)
-                  state
-                  store_result
-             )
-             state_dic
-             (error,store_result)
-      )
-      handler.Cckappa_sig.states_dic
-      store_result
-  in
-  (*----------------------------------------------------------------*)
-  let error, store_result =
-    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
-      parameters error
-      (fun parameters error (agent, (site , _state))
-        (agent', site', _state')store_result ->
-        add_link_in_contact_map parameters error
-          (agent, site)
-          (agent', site')
-          store_result)
-      handler.Cckappa_sig.dual
-      store_result
-  in
-  (*----------------------------------------------------------------*)
-  let store_result =
-    Ckappa_sig.Agent_map_and_set.Map.map
-      (Ckappa_sig.Site_map_and_set.Map.map
-         (fun (state_list, pair_agent_site_list) ->
-            List.rev state_list, List.rev pair_agent_site_list
-         )
-      )
-      store_result
-  in
-  error, store_result
 
 (***************************************************************************)
 (*TYPE*)
@@ -368,20 +222,14 @@ let print_partition_with_predicate parameters error store_result =
 (*DETECT SYMMETRIES*)
 (***************************************************************************)
 
-let detect_symmetries parameters error handler =
+let detect_symmetries parameters error handler contact_map =
   let store_result = init_symmetries in
-  (*-------------------------------------------------------------*)
-  (*EXPORT A CONTACT MAP*)
-  let error, store_contact_map =
-    export_contact_map parameters error handler
-      store_result.store_contact_map
-  in
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
   let error, store_partition_contact_map =
     collect_partition_contact_map
       parameters error
-      store_contact_map
+      contact_map
       store_result.store_partition_contact_map
   in
   (*-------------------------------------------------------------*)
@@ -396,7 +244,7 @@ let detect_symmetries parameters error handler =
   (*-------------------------------------------------------------*)
   let store_result =
     {
-      store_contact_map = store_contact_map;
+      store_contact_map = contact_map;
       store_partition_contact_map = store_partition_contact_map;
       store_partition_with_predicate = store_partition_with_predicate
     }
