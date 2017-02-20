@@ -14,6 +14,9 @@
 module type Type =
 sig
   type state
+  type parameters = Remanent_parameters_sig.parameters
+  type errors = Exception.method_handler
+  type handler = Cckappa_sig.kappa_handler
 
   val init: ?compil:Ast.parsing_compil -> unit -> state
 
