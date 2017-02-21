@@ -1985,7 +1985,8 @@ automorphisms in the site graph E.
              I.cannonic_form_from_syntactic_rule cache compil rule
            in
            (*****************************************************)
-           (*position of agent_id in a rule*)
+           (*position of agent_id in a rule has at least site_x,
+             or site_y*)
 
            (*****************************************************)
            (*compute gamma(r)= k(r)/convention(r)*)
@@ -2075,13 +2076,50 @@ automorphisms in the site graph E.
 
 (******************************************************)
 
+  let pair_of_rule_id_same_hashes pair_list =
+    let rec aux l =
+      match l with
+      | [] -> []
+      | [(r, h)] -> (r::[], h) :: []
+      | (r, h) :: tl ->
+        match tl with
+        | [] -> (r:: [], h) :: []
+        | [(r', h')] ->
+          if h = h'
+          then ((r :: r' :: []), h) :: []
+          else aux tl
+        | (r', h') :: tl' ->
+          if h = h' then
+            ((r :: r' :: []), h) :: aux tl'
+          else aux tl
+    in
+    aux pair_list
+
   let list_of_rule_id_with_its_hashes pair_hash_rule_id_list
       isomorphism_rule_hash_list =
-    List.fold_left (fun (same_list, different_list) (rule_id, hash) ->
-        if List.mem hash isomorphism_rule_hash_list
-        then (rule_id, hash) :: same_list, different_list
-        else same_list, (rule_id, hash) :: different_list
-      ) ([], []) pair_hash_rule_id_list
+    let same_list, different_list =
+      List.fold_left (fun (same_list, different_list) (rule_id, hash) ->
+          if List.mem hash isomorphism_rule_hash_list
+          then
+            (rule_id, hash) :: same_list, different_list
+          else
+            same_list,
+            (rule_id, hash) :: different_list
+        ) ([], []) pair_hash_rule_id_list
+    in
+    let pair_of_rule_id_same_hashes =
+      pair_of_rule_id_same_hashes same_list
+    in
+    pair_of_rule_id_same_hashes, different_list
+
+  let print_pair_rule_id_same_hash_list log l =
+    List.iter (fun (l, hash) ->
+        let () = print_hash log hash in
+        List.iter (fun i ->
+            let () = Loggers.fprintf log " rule_id: %i " i in
+            ()
+          ) l
+      ) l
 
   let print_pair_hash_rule_id_list log l =
     List.iter (fun (i, hash) ->
@@ -2093,7 +2131,7 @@ automorphisms in the site graph E.
   let print_list_of_rule_id_with_its_hashes log (l1, l2) =
     let () = Loggers.fprintf log
         "List of rule_id has the same hashes: \n" in
-    let () = print_pair_hash_rule_id_list log l1 in
+    let () = print_pair_rule_id_same_hash_list log l1 in
     let () = Loggers.print_newline log in
     let () = Loggers.fprintf log
         "List of rule_id has different hashes: \n" in
@@ -2106,8 +2144,8 @@ automorphisms in the site graph E.
   let update_array log cache hash_rule_list_array
       to_check_array
       hit_array
-      same_hash_list different_hash_list
-      rule_id_same_hash_list
+      pair_of_rule_id_same_hashes
+      different_hash_list
       list_of_rule_id_has_different_hashes
     =
     (*update the array hash_rule_list_array: for example
@@ -2120,30 +2158,31 @@ automorphisms in the site graph E.
       rule_id:  [r1;r3] [r2]  [r4]  []
     *)
     let cache, update_hash_rule_list_array =
-      List.fold_left (fun (cache, hash_array) same_hash ->
+      List.fold_left (fun (cache, hash_array) (rule_id_list, same_hash) ->
           let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
               same_hash
           in
           (*put the list of rules that has the same hash*)
           let hash_array =
-            hash_array.(int_hash_array) <- rule_id_same_hash_list;
+            hash_array.(int_hash_array) <- rule_id_list;
             hash_array
           in
-          (*put rule id that does not has the same hashes*)
-          let cache, hash_array =
-            List.fold_left (fun (cache, hash_array) (rule_id, different_hash) ->
-                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
-                    different_hash
-                in
-                let hash_array =
-                  hash_array.(int_hash_array) <- [rule_id];
-                  hash_array
-                in
-                cache, hash_array
-              ) (cache, hash_array) list_of_rule_id_has_different_hashes
+          cache, hash_array
+        ) (cache, hash_rule_list_array) pair_of_rule_id_same_hashes
+    in
+    (*put rule id that does not has the same hashes*)
+    let cache, update_hash_rule_list_array =
+      List.fold_left (fun (cache, hash_array) (rule_id, different_hash) ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              different_hash
+          in
+          let hash_array =
+            hash_array.(int_hash_array) <- [rule_id];
+            hash_array
           in
           cache, hash_array
-        ) (cache, hash_rule_list_array) same_hash_list
+        ) (cache, update_hash_rule_list_array)
+        list_of_rule_id_has_different_hashes
     in
     let () =
       let () = print_line_stars log in
@@ -2159,7 +2198,7 @@ automorphisms in the site graph E.
      Bool:  T     T     T      F
     *)
     let cache, update_to_check_array =
-      List.fold_left (fun (cache, hash_array) same_hash ->
+      List.fold_left (fun (cache, hash_array) (rule_id_list, same_hash) ->
           let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
               same_hash
           in
@@ -2167,20 +2206,20 @@ automorphisms in the site graph E.
             hash_array.(int_hash_array) <- true;
             hash_array
           in
-          let cache, hash_array =
-            List.fold_left (fun (cache, hash_array) different_hash ->
-                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
-                    different_hash
-                in
-                let hash_array =
-                  hash_array.(int_hash_array) <- true;
-                  hash_array
-                in
-                cache, hash_array
-              ) (cache, hash_array) different_hash_list
+          cache, hash_array
+        ) (cache, to_check_array) pair_of_rule_id_same_hashes
+    in
+    let cache, update_to_check_array =
+      List.fold_left (fun (cache, hash_array) different_hash ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              different_hash
+          in
+          let hash_array =
+            hash_array.(int_hash_array) <- true;
+            hash_array
           in
           cache, hash_array
-        ) (cache, to_check_array) same_hash_list
+        ) (cache, update_to_check_array) different_hash_list
     in
     let () =
       let () = Loggers.fprintf log "Update to_check_array:"
@@ -2194,34 +2233,32 @@ automorphisms in the site graph E.
      counter :  2    1    1   0
      counter : the length of the list of rule_id in the hash_rule_list_array
     *)
-    let length_rule_id_same_hash =
-      List.length rule_id_same_hash_list
-    in
     let cache, update_hit_array =
-      List.fold_left (fun (cache, hash_array) same_hash ->
+      List.fold_left (fun (cache, hash_array) (rule_id_list, same_hash) ->
           let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
               same_hash
           in
+          let l = List.length rule_id_list in
           let hash_array =
-            hash_array.(int_hash_array) <- length_rule_id_same_hash;
+            hash_array.(int_hash_array) <- l;
             hash_array
           in
-         (*different hash*)
-          let cache, hash_array =
-            List.fold_left (fun (cache, hash_array) different_hash ->
-                let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
-                    different_hash
-                in
-                (*it is a singleton in the case of different_hash hash*)
-                let hash_array =
-                  hash_array.(int_hash_array) <- 1; (*singleton*)
-                  hash_array
-                in
-                cache, hash_array
-              ) (cache, hash_array) different_hash_list
+          cache, hash_array
+        ) (cache, hit_array) pair_of_rule_id_same_hashes
+    in
+    (*different hash*)
+    let cache, update_hit_array =
+      List.fold_left (fun (cache, hash_array) different_hash ->
+          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+              different_hash
+          in
+          (*it is a singleton in the case of different_hash hash*)
+          let hash_array =
+            hash_array.(int_hash_array) <- 1; (*singleton*)
+            hash_array
           in
           cache, hash_array
-        ) (cache, hit_array) same_hash_list
+        ) (cache, update_hit_array) different_hash_list
     in
     let () =
       let () = Loggers.fprintf log "Update hit_array: " in
@@ -2243,7 +2280,11 @@ automorphisms in the site graph E.
   where A(x) : has position 1(0), A(y): has position 2(or 1)
 *)
 
-  let compute_symmetries_from_syntactic_rules log compil (*agent site1 site2*) =
+  type kind = Internal | Binding
+
+  let compute_symmetries_from_syntactic_rules log compil
+  (*partition_contact_map kind*)
+  (*agent kind site1 site2*) =
     let cache, rate_list, gamma_list, nbr_lhs_list, nbr_rule_list,
         pair_hash_rule_id_list =
       cannonic_form_from_syntactic_rules log compil
@@ -2275,7 +2316,7 @@ automorphisms in the site graph E.
       print_list_of_rule_id_with_its_hashes log
         list_of_rule_id_with_its_hashes
     in
-    let list_of_rule_id_has_the_same_hashes,
+    let pair_of_rule_id_same_hashes,
         list_of_rule_id_has_different_hashes =
       list_of_rule_id_with_its_hashes
     in
@@ -2283,10 +2324,6 @@ automorphisms in the site graph E.
     (*array*)
     let to_check_array, hit_array, hash_rule_list_array =
       build_array_for_symmetries log nbr_rule_list
-    in
-    let rule_id_same_hash_list, same_hash_list =
-      List.split
-        list_of_rule_id_has_the_same_hashes
     in
     let rule_id_different_hash_list, different_hash_list =
       List.split
@@ -2301,9 +2338,8 @@ automorphisms in the site graph E.
         hash_rule_list_array
         to_check_array
         hit_array
-        same_hash_list
+        pair_of_rule_id_same_hashes
         different_hash_list
-        rule_id_same_hash_list
         list_of_rule_id_has_different_hashes
     in
     (*****************************************************)

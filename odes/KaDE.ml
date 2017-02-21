@@ -155,7 +155,7 @@ let main () =
           (* TO DO *)
           (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY
             ANALYSIS *)
-          Ode_args.build_kasa_parameters ode_args common_args 
+          Ode_args.build_kasa_parameters ode_args common_args
         in
         let module B =
           (val Domain_selection.select_domain
@@ -233,7 +233,6 @@ let main () =
       | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
     in
-
     let () = A.export_network
             ~command_line
             ~command_line_quotes

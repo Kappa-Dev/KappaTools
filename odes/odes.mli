@@ -48,6 +48,8 @@ sig
 
   val get_divide_rate_by : enriched_rule -> int
 
+  type kind
+
   val compute_symmetries_from_syntactic_rules :
     Loggers.t ->
     I.compil ->

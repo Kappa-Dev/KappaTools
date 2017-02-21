@@ -20,6 +20,7 @@
 type contact_map =
   ((string list) * (string*string) list)
     Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
+
 type partitioned_contact_map =
   ((string list list) * (string list list))
     Mods.StringSetMap.Map.t
@@ -31,11 +32,10 @@ type symmetries =
     store_partition_with_predicate : partitioned_contact_map
   }
 
-
 (***************************************************************************)
 (*PARTITION THE CONTACT MAP*)
 (***************************************************************************)
-(*TODO:it needs to be in a same class*)
+
 let add k data map =
   let old =
     match
@@ -105,8 +105,8 @@ let collect_partition_contact_map contact_map =
     )
     contact_map
 
-
 (***************************************************************************)
+
 let refine_class p l result =
   let rec aux to_do classes =
     match to_do
@@ -123,7 +123,7 @@ let refine_class p l =
     (fun result l -> refine_class p l result)
     [] l
 
-let collect_partition_with_predicate parameters
+let collect_partition_with_predicate
     p_internal_state
     p_binding_state
     partitioned_contact_map =
@@ -236,73 +236,6 @@ let print_contact_map parameters contact_map =
     contact_map
 
 (***************************************************************************)
-(*Get a position of agent_id in the lhs and rhs of a rules *)
-
-(*let collect_views_aux parameters error rule_id views store_result =
-  Ckappa_sig.Agent_id_nearly_Inf_Int_storage_Imperatif.fold
-    parameters error
-    (fun parameters error agent_id agent store_result ->
-       match agent with
-       | Cckappa_sig.Unknown_agent _ ->
-         Exception.warn parameters error __POS__ Exit store_result
-       | Cckappa_sig.Ghost -> error, store_result
-       | Cckappa_sig.Dead_agent (agent,_,_,_)
-       | Cckappa_sig.Agent agent ->
-         let agent_position = agent.Cckappa_sig.agent_position in
-         let error, store_result =
-           Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-             parameters error
-             rule_id
-             (agent_id, agent_position)
-             store_result
-         in
-         error, store_result
-    ) views store_result
-
-let collect_position_agent_id_lhs parameters error rule_id rule store_result =
-  collect_views_aux
-    parameters
-    error
-    rule_id
-    rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-    store_result
-
-let collect_position_agent_id_rhs parameters error rule_id rule store_result =
-  collect_views_aux
-    parameters
-    error
-    rule_id
-    rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-    store_result
-
-let scan_rule parameters error rule_id rule store_result =
-  let error, store_position_agent_id_lhs =
-    collect_position_agent_id_lhs
-  in
-  let error, store_position_agent_id_rhs =
-    collect_position_agent_id_rhs
-  in
-  error,
-  store_position_agent_id_lhs, store_position_agent_id_rhs
-
-
-let scan_rule_set parameters error compil =
-  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-    parameters error
-    (fun parameters error rule_id rule store_result ->
-       let _ =
-         scan_rule
-           parameters error
-           rule_id
-           rule.Cckappa_sig.e_rule_c_rule
-           store_result
-       in
-
-
-    ) compil.Cckappa_sig.rules _
-  *)
-
-(***************************************************************************)
 (*DETECT SYMMETRIES*)
 (***************************************************************************)
 
@@ -317,7 +250,6 @@ let detect_symmetries parameters (contact_map:contact_map) =
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES WITH A PREDICATE*)
   let store_partition_with_predicate =
     collect_partition_with_predicate
-      parameters
       (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
       (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
       store_partition_contact_map
@@ -328,7 +260,6 @@ let detect_symmetries parameters (contact_map:contact_map) =
       store_contact_map = contact_map;
       store_partition_contact_map = store_partition_contact_map;
       store_partition_with_predicate = store_partition_with_predicate
-        (*store_partition_with_predicate*)
     }
   in
   (*-------------------------------------------------------------*)
