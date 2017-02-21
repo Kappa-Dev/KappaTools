@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 20 2017>
+  * Last modification: Time-stamp: <Feb 21 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -163,7 +163,7 @@ let main () =
     in
     (*********************************************************************)
     (*TEST-symmetries*)
-    let my_out_channel =
+    (*let my_out_channel =
         Kappa_files.open_out "my_logger.txt"
     in
     let my_logger = Loggers.open_logger_from_channel my_out_channel in
@@ -204,15 +204,15 @@ let main () =
     let state =
       Export_to_kade.set_parameters parameters state
     in
-    (*let state, symmetries =
+    let state, symmetries =
       Export_to_kade.get_symmetric_sites
         ~accuracy_level:Remanent_state.High state
     in
     let cache, () =
       A.compute_symmetries_from_syntactic_rules my_logger compil
-    in*)
+    in
     let () = Loggers.flush_logger my_logger in
-    let () = close_out my_out_channel in
+      let () = close_out my_out_channel in*)
     (*********************************************************************)
     let () = A.export_network
         ~command_line

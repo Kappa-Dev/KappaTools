@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Feb 20 2017>
+  * Last modification: Time-stamp: <Feb 21 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1394,13 +1394,12 @@ let compute_symmetries
   *)
   let state, c_compil = get_c_compilation state in
   let state, contact_map =
-    get_internal_contact_map
+    get_contact_map
       ~accuracy_level
       state
   in
-  let errors, symmetries =
-    Symmetries.detect_symmetries
-      parameters errors handler contact_map
+  let symmetries =
+    Symmetries.detect_symmetries parameters contact_map
   in
   let state = Remanent_state.set_symmetries accuracy_level symmetries state in
   let state = set_errors errors state in
