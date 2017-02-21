@@ -146,7 +146,79 @@ let main () =
     let compil =
       A.get_compil
         ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
-    let network = A.network_from_compil ~ignore_obs compil in
+    (*********************************************************************)
+    (*TEST-symmetries*)
+    let cache, p =
+      if ode_args.Ode_args.with_symmetries
+      then
+        let parameters =
+          (* TO DO *)
+          (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY
+            ANALYSIS *)
+          Ode_args.build_kasa_parameters ode_args common_args 
+        in
+        let module B =
+          (val Domain_selection.select_domain
+              ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
+        in
+        let export_to_kade =
+          (module Export_to_KaDE.Export(B) : Export_to_KaDE.Type)
+        in
+        let module Export_to_kade =
+          (val export_to_kade : Export_to_KaDE.Type)
+        in
+        let kasa_compil =
+          List.fold_left
+            (KappaLexer.compile Format.std_formatter)
+            Ast.empty_compil
+            cli_args.Run_cli_args.inputKappaFileNames
+        in
+        let state =
+          Export_to_kade.init ~compil:kasa_compil ()
+        in
+        let parameters =
+          Export_to_kade.get_parameters state
+        in
+        let file_opt,parameters,my_logger =
+          if
+            Remanent_parameters.get_trace parameters
+          then
+            let file = open_out "my_logger.txt" in
+            let my_logger = Loggers.open_logger_from_channel file in
+            Some (file,my_logger),
+            Remanent_parameters.set_logger parameters my_logger,
+            my_logger
+          else
+            None,
+            parameters,
+            Loggers.dummy_txt_logger
+        in
+        let state =
+          Export_to_kade.set_parameters parameters state
+        in
+        let state, symmetries =
+          Export_to_kade.get_symmetric_sites
+            ~accuracy_level:Remanent_state.High state
+        in
+        let _, () =
+          A.compute_symmetries_from_syntactic_rules my_logger compil
+        in
+        let () =
+          match file_opt with
+            None -> ()
+          | Some (file,logger) ->
+            let () = Loggers.flush_logger logger in
+            let () = close_out file in
+            ()
+        in
+        let _ = state, symmetries in
+        (), (fun cache a -> cache, a) (* TO DO: to provide the initial cache and the function that maps a species to its representant up to symmetries *)
+      else
+        (),(fun () a -> (), a)
+    in
+
+(*********************************************************************)
+    let network = A.network_from_compil ~ignore_obs compil (cache,p) in
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
@@ -161,62 +233,10 @@ let main () =
       | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
     in
-    (*********************************************************************)
-    (*TEST-symmetries*)
-    (*let my_out_channel =
-        Kappa_files.open_out "my_logger.txt"
-    in
-    let my_logger = Loggers.open_logger_from_channel my_out_channel in
-    let errors = Exception.empty_error_handler in
-    let parameters =
-      (* TO DO *)
-      (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY ANALYSIS *)
-      Remanent_parameters.get_parameters
-        ~called_from:Remanent_parameters_sig.Server
-        ()
-    in
-    let module B =
-      (val Domain_selection.select_domain
-          ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
-    in
-    let export_to_kade =
-      (module Export_to_KaDE.Export(B) : Export_to_KaDE.Type)
-    in
-    let module Export_to_kade =
-      (val export_to_kade : Export_to_KaDE.Type)
-    in
-    let kasa_compil =
-      List.fold_left
-        (KappaLexer.compile Format.std_formatter)
-        Ast.empty_compil
-        cli_args.Run_cli_args.inputKappaFileNames
-    in
-    let state = Export_to_kade.init ~compil:kasa_compil () in
-    let parameters =
-      Export_to_kade.get_parameters state in
-    let parameters =
-      Remanent_parameters.set_logger parameters my_logger
-    in
-    let parameters =
-      Remanent_parameters.set_trace parameters true
-    (* This should be tuned according to a command line option *)
-    in
-    let state =
-      Export_to_kade.set_parameters parameters state
-    in
-    let state, symmetries =
-      Export_to_kade.get_symmetric_sites
-        ~accuracy_level:Remanent_state.High state
-    in
-    let cache, () =
-      A.compute_symmetries_from_syntactic_rules my_logger compil
-    in
-    let () = Loggers.flush_logger my_logger in
-      let () = close_out my_out_channel in*)
-    (*********************************************************************)
+
     let () = A.export_network
-        ~command_line
-        ~command_line_quotes
+            ~command_line
+            ~command_line_quotes
         ?data_file:cli_args.Run_cli_args.outputDataFile
         ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)

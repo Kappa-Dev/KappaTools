@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 20 2017>
+  * Last modification: Time-stamp: <Feb 21 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)

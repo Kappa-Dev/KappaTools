@@ -1,11 +1,11 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 18 2017>
+  * Last modification: Time-stamp: <Feb 21 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
   type ode_var_id
-  type ('a,'b) network
+  type ('a,'b,'c) network
   type enriched_rule
   type rule_id
   type connected_component_id
@@ -16,10 +16,12 @@ sig
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
   val network_from_compil:
-    ignore_obs:bool -> I.compil -> (int,int) network
+    ignore_obs:bool -> I.compil ->
+    ('a * ('a -> I.chemical_species  -> ('a * I.chemical_species)))
+    -> (int,int,'a) network
 
   val get_reactions:
-    ('a,'b) network ->
+    ('a,'b,'c) network ->
     (ode_var_id list * ode_var_id list *
      (('a,'b) Alg_expr.e Locality.annot *
       ode_var_id  Locality.annot) list  * I.rule) list
@@ -27,10 +29,11 @@ sig
   val export_network:
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
-    Loggers.t -> Loggers.t -> I.compil -> (int,int) network -> unit
+    Loggers.t -> Loggers.t -> I.compil -> (int,int,unit) network ->
+    unit
 
   val species_of_species_id:
-    (int,int) network -> ode_var_id -> I.chemical_species * int
+    (int,int,unit) network -> ode_var_id -> I.chemical_species * int
 
   val get_comment: enriched_rule -> string
 

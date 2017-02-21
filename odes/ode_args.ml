@@ -14,6 +14,10 @@ type t = {
   mutable octave_output : string option ;
   mutable matlab_output : string option ;
   mutable sbml_output : string option ;
+  mutable with_symmetries : bool ;
+  mutable views : bool ;
+  mutable dbonds : bool ;
+  mutable site_accross : bool ;
 }
 
 let default : t =
@@ -26,6 +30,10 @@ let default : t =
     octave_output = None  ;
     matlab_output = None ;
     sbml_output = None ;
+    with_symmetries = false ;
+    views = true ;
+    dbonds = true ;
+    site_accross = true ;
   }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -52,5 +60,27 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   "Annotate ODEs by the corresponding chemical reactions" ;
   "--compute-jacobian",
   Arg.Bool (fun compute_jacobian -> t.compute_jacobian <- compute_jacobian),
-  "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)"
+  "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)" ;
+  "--with-symmetries",
+  Arg.Bool (fun with_symmetries -> t.with_symmetries <- with_symmetries),
+  "Enable/disable the quotient of the set of species up to permutation of symmetric sites" ;
+  "--views-domain",
+  Arg.Bool (fun views -> t.views <- views),
+  "Enable/disable views analysis when detecting symmetric sites" ;
+  "--double-bonds-domain",
+  Arg.Bool (fun dbonds -> t.dbonds <- dbonds),
+  "Enable/disable double bonds analysis when detecting symmetric sites" ;
+  "--site-accross-bonds-domain",
+  Arg.Bool (fun site_accross -> t.site_accross <- site_accross),
+  "Enable/disable the analysis of the relation amond the states of sites in
+      connected agents";
 ]
+
+let build_kasa_parameters t t_common =
+  Config.with_views_analysis := t.views ;
+  Config.with_parallel_bonds_analysis := t.dbonds ;
+  Config.with_site_accross_bonds_analysis := t.site_accross ;
+  Config.trace := t_common.Common_args.debug ;
+  Remanent_parameters.get_parameters
+    ~called_from:Remanent_parameters_sig.Server
+    ()

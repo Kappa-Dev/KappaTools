@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 20 2017>
+  * Last modification: Time-stamp: <Feb 21 2017>
 *)
 
 let local_trace = false
@@ -137,7 +137,7 @@ struct
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
 
-  type ('a,'b) network =
+  type ('a,'b,'symcache) network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
@@ -153,6 +153,7 @@ struct
       species_tab: (I.chemical_species*int) Mods.DynArray.t ;
 
       cc_cache: I.cache ;
+      sym_cache: 'symcache ;
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
 
@@ -166,7 +167,12 @@ struct
       time_homogeneous_obs: bool option ;
       time_homogeneous_vars: bool option ;
       time_homogeneous_rates: bool option ;
+      rep: 'symcache -> I.chemical_species -> ('symcache * I.chemical_species) ;
     }
+
+  let rep network canonic =
+    let cache, canonic_up_to_sym = network.rep network.sym_cache canonic in
+    {network with sym_cache = cache}, canonic_up_to_sym
 
   let may_be_time_homogeneous_gen a =
     match
@@ -218,7 +224,7 @@ struct
 
   let get_compil = I.get_compil
 
-  let init compil =
+  let init compil (cache_sym,rep) =
     {
       rules = [] ;
       reactions = [] ;
@@ -238,7 +244,10 @@ struct
       n_obs = 1 ;
       time_homogeneous_vars = None ;
       time_homogeneous_obs = None ;
-      time_homogeneous_rates = None  }
+      time_homogeneous_rates = None ;
+      sym_cache = cache_sym ;
+      rep = rep;
+    }
 
   let from_nembed_correct compil nauto =
     if I.do_we_count_in_embeddings compil then
@@ -380,6 +389,8 @@ struct
       remanent,i
 
   let translate_species compil species remanent =
+    let network, species = rep (snd remanent) species in
+    let remanent = fst remanent, network in
     translate_canonic_species compil
       (I.canonic_form species) species remanent
 
@@ -567,7 +578,8 @@ struct
          | _::_ -> remanent
       )
       (List.fold_left
-         (fun remanent species -> fst (translate_species compil species remanent))
+         (fun remanent species ->
+            fst (translate_species compil species remanent))
          ([],network)
          initial_states) rules
 
@@ -951,15 +963,21 @@ struct
      obs = List.rev network.obs;
      n_obs = network.n_obs - 1}
 
-  let species_of_initial_state compil cc_cache =
-    List.fold_left
-      (fun (cc_cache,list) (_,r,_) ->
-         let b = I.mixture_of_init compil r in
-         let cc_cache',acc =
-           I.connected_components_of_mixture compil cc_cache b
-         in
-         cc_cache',List.rev_append acc list)
-      (cc_cache,[])
+  let species_of_initial_state compil network list =
+    let cc_cache = network.cc_cache in
+    let cc_cache, list =
+      List.fold_left
+        (fun (cc_cache,list) (_,r,_) ->
+           let b = I.mixture_of_init compil r in
+           let cc_cache',acc =
+             I.connected_components_of_mixture compil cc_cache b
+           in
+           cc_cache',List.rev_append acc list)
+        (cc_cache,[])
+        list
+    in
+    {network with cc_cache = cc_cache},
+    list
 
   type ('a,'b) rate = ('a,'b) Alg_expr.e Locality.annot
 
@@ -1106,25 +1124,22 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ~ignore_obs compil =
+  let network_from_compil ~ignore_obs compil (cache_sym, representant)=
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
-    let network = init compil in
+    let network = init compil (cache_sym, representant) in
     let () = Format.printf "\t -initial states @." in
-    let cc_cache,initial_state =
-      species_of_initial_state compil network.cc_cache
-        (I.get_init compil)
+    let network,initial_state =
+      species_of_initial_state compil network (I.get_init compil)
     in
-    let network = {network with cc_cache = cc_cache} in
     let () = Format.printf "\t -saturating the set of molecular species @." in
-    let network =
-      compute_reactions compil network rules initial_state in
+    let network = compute_reactions compil network rules initial_state in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
     let network = convert_var_defs compil network in
     let () = Format.printf "\t -observables @." in
-    let network = convert_obs compil network in
+    let network = convert_obs compil network  in
     let () = Format.printf "\t -check time homogeneity @." in
     let network = check_time_homogeneity ~ignore_obs compil network in
     network

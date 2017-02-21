@@ -1053,21 +1053,18 @@ A(x!A.y)=> [A(x!A.y,y)]
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+Compute the contact map...
 Contact map
-agent_type:0:site_type:1
-agent_type:0:site_type:0
-agent_type:0:site_type:1
-agent_type:0:site_type:0
-Partition contact map
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:0
-agent_type:0:site_type:0
-agent_type:0:site_type:1
-agent_type:0:site_type:0
+agent:A
+  site:x
+binding_states:A.x;A.y;
+  site:y
+binding_states:A.x;A.y;
+Partitioned contact map
+Agent: A
+internal sites:binding sites:y,x,
 With predictate
-agent_type:0:site_type:0
-agent_type:0:site_type:1
-agent_type:0:site_type:1
-agent_type:0:site_type:0
+Agent: A
+internal sites:binding sites:x,
+y,
 execution finished without any exception
