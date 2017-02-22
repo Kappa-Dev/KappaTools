@@ -137,40 +137,6 @@ let setup_lint _ _ _ =
   | None -> Js.array [||]
   | Some (e : Api_types_j.errors) -> error_lint e
 
-let initialize codemirror () =
-  let args = Url.Current.arguments in
-  try
-    let url = List.assoc "model" args in
-    XmlHttpRequest.get url >>=
-    (fun content ->
-       if content.XmlHttpRequest.code <> 200 then Lwt.return_unit
-       else
-         let () =
-           match Url.url_of_string content.XmlHttpRequest.url with
-           | None -> ()
-           | Some u ->
-             let filename =
-               List_util.last
-                 (match u with
-                  | (Url.Http h | Url.Https h) -> h.Url.hu_path
-                  | Url.File f -> f.Url.fu_path) in
-             let filecontent : string =
-               content.XmlHttpRequest.content
-             in
-             let () = Ui_state.set_file filename filecontent in
-             let () = codemirror##setValue(Js.string filecontent) in
-             ()  in
-         Lwt.return_unit)
-  with Not_found ->
-    let filename = "default.ka" in
-    let filecontent =
-      try List.assoc "model_text" args
-      with Not_found -> ""
-    in
-    let () = Ui_state.set_file filename filecontent in
-    let () = codemirror##setValue(Js.string filecontent) in
-    Lwt.return_unit
-
 let onload () : unit =
   let () = Menu_editor_settings.onload () in
   let () = Menu_editor_project.onload () in
@@ -199,10 +165,9 @@ let onload () : unit =
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration in
   let () = codemirror##setValue(Js.string "") in
-  let _ =
-    React.S.map (fun _ -> codemirror##performLint)
-      State_error.errors in
-  let _ = Common.async (initialize codemirror) in
+  let _ = React.S.map (fun _ -> codemirror##performLint) State_error.errors in
+  let _ = Subpanel_editor_controller.with_file
+            (fun content -> codemirror##setValue(Js.string content)) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let text : string = Js.to_string codemirror##getValue in
@@ -222,7 +187,7 @@ let onload () : unit =
     let handle_timeout () =
       let () = Common.info "handle_timeout" in
       let () = Common.info text in
-      Ui_state.set_filecontent
+      Subpanel_editor_controller.set_content
         (Js.to_string codemirror##getValue) in
     let () = timeout := Some
           (Dom_html.window ## setTimeout

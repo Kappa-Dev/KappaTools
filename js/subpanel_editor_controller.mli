@@ -13,7 +13,7 @@ val set_project : string -> unit
 val close_project : unit -> unit
 
 
-val create_file : string -> unit
+val create_file : string -> ?content:string -> unit
 val set_file : string -> unit
 val close_file : unit -> unit
 val set_file_compile : string -> bool -> unit
@@ -28,3 +28,5 @@ val pause_simulation : unit -> unit
 val stop_simulation : unit -> unit
 val start_simulation : unit -> unit
 val perturb_simulation : unit -> unit
+
+val with_file : (string -> unit) -> unit

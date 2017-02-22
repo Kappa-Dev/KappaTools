@@ -302,17 +302,9 @@ let onload () =
       "click"
       (Dom_html.handler
          (fun _ ->
-            let filename : string =
-              Js.to_string file_new_input_dom##.value
-            in
-            let () =
-              Subpanel_editor_controller.create_file filename
-            in
-            let () =
-              Common.modal
-                ~id:("#"^file_new_modal_id)
-                ~action:"hide"
-            in
+            let filename : string = Js.to_string file_new_input_dom##.value in
+            let () = Subpanel_editor_controller.create_file filename ?content:None in
+            let () = Common.modal ~id:("#"^file_new_modal_id) ~action:"hide" in
             Js._false)) in
   let () =
     Common.jquery_on

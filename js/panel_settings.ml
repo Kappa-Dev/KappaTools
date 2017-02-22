@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module UIState = Ui_state
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 open Lwt.Infix

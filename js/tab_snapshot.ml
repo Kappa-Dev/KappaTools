@@ -290,14 +290,15 @@ let render_snapshot_graph
   in
   let site_graph : Api_types_v1_j.site_graph =
     Api_data_v1.api_snapshot_site_graph snapshot in
-  match React.S.value display_format with
-  | Graph ->
-    let json : string = Api_types_v1_j.string_of_site_graph site_graph
-    in
-    snapshot_js##setData
-      (Js.string json)
-      (Js.Opt.option (Ui_state.agent_count ()))
-  | Kappa -> ()
+    match React.S.value display_format with
+    | Graph ->
+      let json : string = Api_types_v1_j.string_of_site_graph site_graph in
+      let model = React.S.value State_project.model in
+      let contact_map = model.State_project.model_contact_map in
+      snapshot_js##setData
+        (Js.string json)
+        (Js.Opt.option (Utility.option_map Api_data.agent_count contact_map))
+    | Kappa -> ()
 
 let select_snapshot () =
   let snapshot_js : Js_contact.contact_map Js.t =

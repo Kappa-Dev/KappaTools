@@ -21,21 +21,21 @@ let configuration : Widget_export.configuration =
       ; Widget_export.export_png ~svg_div_id:display_id ()
       ; Widget_export.export_json
           ~serialize_json:(fun () ->
-              (match
-                 React.S.value Ui_state.model_parse
-               with
+              let model = React.S.value State_project.model in
+                let contact_map = model.State_project.model_contact_map in
+              (match contact_map with
                | None -> "null"
                | Some parse -> Api_types_j.string_of_contact_map parse
               )
             )
       ];
     show = React.S.map
-        (fun model_parse ->
-           match model_parse with
-           | None -> false
-           | Some data -> Array.length data > 0
+        (fun model ->
+           match model.State_project.model_contact_map with
+             | None -> false
+             | Some data -> Array.length data > 0
         )
-        Ui_state.model_parse
+        State_project.model
   }
 
 
@@ -63,10 +63,12 @@ let update
   (* quick cheat to get the count of the agents *)
   let json : string =
     Api_types_v1_j.string_of_site_graph site_graph in
+      let model = React.S.value State_project.model in
+  let contact_map = model.State_project.model_contact_map in
   let () = Common.debug (Js.string json) in
-  contactmap##setData
-    (Js.string json)
-    (Js.Opt.option (Ui_state.agent_count ()))
+    contactmap##setData
+      (Js.string json)
+      (Js.Opt.option (Utility.option_map Api_data.agent_count contact_map))
 
 let onload () =
   let () = Widget_export.onload configuration in
@@ -74,22 +76,21 @@ let onload () =
     Js_contact.create_contact_map display_id false in
   let _ =
     React.S.map
-      (fun data ->
-         match data with
+      (fun model->
+         match model.State_project.model_contact_map with
          | None -> (contactmap##clearData)
          | Some data ->
            if Array.length data > 0 then
              update data contactmap
-           else
-             contactmap##clearData)
-      Ui_state.model_parse
-
+             else
+               contactmap##clearData)
+      State_project.model
   in
   Common.jquery_on
     "#navcontact"
     "shown.bs.tab"
     (fun _ ->
-       match (React.S.value Ui_state.model_parse) with
+       match (React.S.value State_project.model).State_project.model_contact_map with
        | None -> (contactmap##clearData)
        | Some data -> update data contactmap)
 

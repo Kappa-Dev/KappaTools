@@ -189,14 +189,14 @@ let rec index_simulation
 let augment_simulation_list
     (simulation_index : Api_types_j.simulation_info StringMap.t)
     (simulation_list : t list) : t list =
+  (* simulation id's currently available *)
   let new_simulation_ids = List.map fst (StringMap.bindings simulation_index) in
-  let add_simulation_ids =
-    List.filter
-      (fun simulation_id ->
-         List.mem simulation_id
-           (List.map t_simulation_id simulation_list))
-      new_simulation_ids
-  in
+  (* simulation id's in the current state *)
+  let state_simulation_ids = List.map t_simulation_id simulation_list in
+  (* predicate that checks if id is not in state id's *)
+  let not_in_state_ids = fun simulation_id -> not (List.mem simulation_id state_simulation_ids) in
+  (* add simulations that currently not part of the state *)
+  let add_simulation_ids = List.filter not_in_state_ids new_simulation_ids in
   (List.map
      (fun simulation_id ->
         let simulation_info =
@@ -217,6 +217,19 @@ let restrict_simulation_list
        StringMap.mem t.simulation_id simulation_index)
     simulation_list
 
+let refresh_simulation_list
+    (simulation_index : Api_types_j.simulation_info StringMap.t)
+    (simulation_list : t list) : t list =
+  List.map
+    (fun t -> let simulation_id = t_simulation_id t in
+      if StringMap.mem simulation_id simulation_index then
+        { t with
+          simulation_state = SIMULATION_STATE_READY (StringMap.find simulation_id simulation_index) }
+      else
+        t
+    )
+    simulation_list
+
 let update_simulation_list
     (manager : Api.manager)
     (simulation_list : t list)
@@ -226,11 +239,14 @@ let update_simulation_list
   (Api_common.result_bind_lwt
      ~ok:(fun (simulation_index : Api_types_j.simulation_info StringMap.t) ->
          Lwt.return (Api_common.result_ok
-                       (augment_simulation_list
+                       (refresh_simulation_list
                           simulation_index
-                          (restrict_simulation_list
+                          (augment_simulation_list
                              simulation_index
-                             simulation_list
+                             (restrict_simulation_list
+                                simulation_index
+                                simulation_list
+                             )
                           )
                        )
                     )

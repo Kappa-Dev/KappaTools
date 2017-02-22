@@ -59,12 +59,12 @@ let close_project () : unit =
        (fun _ -> Lwt.return_unit)
     )
 
-let create_file (file_id : string) : unit =
+let create_file (file_id : string) ?(content:string = "") : unit =
   Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.create_file ~filename:file_id ~content:"")
+         (State_file.create_file ~filename:file_id ~content)
        >>= (fun _ -> State_project.sync ()) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
@@ -75,6 +75,16 @@ let set_file (file_id : string) : unit =
        State_error.wrap
          __LOC__
          (State_file.select_file file_id)
+       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
+       >>= (fun _ -> Lwt.return_unit)
+    )
+
+let set_content (content : string) : unit =
+  Common.async
+    (fun () ->
+       State_error.wrap
+         __LOC__
+         (State_file.set_content content)
        >>= (fun _ -> State_project.sync ()) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
@@ -203,5 +213,20 @@ let perturb_simulation () =
             (fun _ _ _ ->
                let model_perturbation = React.S.value State_perturbation.model_perturbation in
                State_simulation.perturb_simulation model_perturbation))
+       >>= (fun _ -> Lwt.return_unit)
+    )
+
+let with_file (handler : string -> unit) : unit =
+    Common.async
+    (fun () ->
+       State_error.wrap
+         __LOC__
+         ((State_file.get_file ()) >>=
+          (Api_common.result_bind_lwt
+             ~ok:(fun (file : Api_types_j.file) ->
+                 let () = handler file.Api_types_j.file_content in
+                 Lwt.return (Api_common.result_ok ())
+               )
+              ))
        >>= (fun _ -> Lwt.return_unit)
     )

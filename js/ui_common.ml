@@ -8,7 +8,6 @@
 
 module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
-module UIState = Ui_state
 
 let toggle_element
   (projection : Api_types_j.simulation_info option -> bool)
