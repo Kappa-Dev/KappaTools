@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val set_manager : string -> unit
-val set_content : string -> unit
-
-val with_file : (Api_types_j.file Api.result -> unit Api.result Lwt.t) -> unit
+val close_simulation : unit -> unit
+val create_simulation : Api_types_j.simulation_id -> unit
+val set_simulation : Api_types_j.simulation_id -> unit

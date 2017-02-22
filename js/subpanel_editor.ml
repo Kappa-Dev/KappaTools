@@ -167,7 +167,16 @@ let onload () : unit =
   let () = codemirror##setValue(Js.string "") in
   let _ = React.S.map (fun _ -> codemirror##performLint) State_error.errors in
   let _ = Subpanel_editor_controller.with_file
-            (fun content -> codemirror##setValue(Js.string content)) in
+      (Api_common.result_map
+         ~ok:(fun _ file ->
+             let file_content = file.Api_types_j.file_content in
+             let () = codemirror##setValue(Js.string file_content) in
+                 Lwt.return (Api_common.result_ok ())
+           )
+         ~error:(fun _ _ ->
+             (* ignore if missing file *)
+             Lwt.return (Api_common.result_ok ())))
+  in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let text : string = Js.to_string codemirror##getValue in

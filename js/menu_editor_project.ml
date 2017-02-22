@@ -145,7 +145,7 @@ let onload () =
       "click"
       (Dom_html.handler
          (fun _ ->
-            let () = Subpanel_editor_controller.close_project () in
+            let () = Menu_editor_project_controller.close_project () in
             Js._false)) in
   let () =
     Common.jquery_on
@@ -157,7 +157,7 @@ let onload () =
               Js.to_string project_id_input_dom##.value
             in
             let () =
-              Subpanel_editor_controller.create_project settings_client_id
+              Menu_editor_project_controller.create_project settings_client_id
             in
             let () =
               Common.modal
@@ -183,7 +183,7 @@ let onload () =
                 runtime_id
                 (fun _ -> ())
                 (fun runtime_id ->
-                   Subpanel_editor_controller.set_project
+                   Menu_editor_project_controller.set_project
                      (Js.to_string runtime_id))
             in
             Js._false))

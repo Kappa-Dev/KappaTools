@@ -8,33 +8,29 @@
 
 open Lwt.Infix
 
-let set_content (filecontent : string) : unit =
+let close_simulation () : unit =
   Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.set_content filecontent)
+         (State_simulation.remove_simulation ())
        >>= (fun _ -> Lwt.return_unit)
     )
 
-
-let set_manager (runtime_id : string) : unit =
+let create_simulation (simulation_id : Api_types_j.simulation_id) : unit =
   Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_runtime.set_manager runtime_id) >>=
-       (fun _ -> State_project.sync ()) >>=
-       (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
-       (fun _ -> Lwt.return_unit)
+         (State_simulation.create_simulation simulation_id)
+       >>= (fun _ -> Lwt.return_unit)
     )
 
-let with_file (handler : Api_types_j.file Api.result -> unit Api.result Lwt.t) : unit =
-    Common.async
+let set_simulation (simulation_id : Api_types_j.simulation_id) : unit =
+  Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         ((State_file.get_file ()) >>=
-          handler)
+         (State_simulation.set_simulation simulation_id)
        >>= (fun _ -> Lwt.return_unit)
     )

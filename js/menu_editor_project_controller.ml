@@ -8,33 +8,32 @@
 
 open Lwt.Infix
 
-let set_content (filecontent : string) : unit =
+let create_project (project_id : string) : unit =
   Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.set_content filecontent)
-       >>= (fun _ -> Lwt.return_unit)
-    )
-
-
-let set_manager (runtime_id : string) : unit =
-  Common.async
-    (fun () ->
-       State_error.wrap
-         __LOC__
-         (State_runtime.set_manager runtime_id) >>=
-       (fun _ -> State_project.sync ()) >>=
+         (State_project.create_project project_id) >>=
        (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
        (fun _ -> Lwt.return_unit)
     )
 
-let with_file (handler : Api_types_j.file Api.result -> unit Api.result Lwt.t) : unit =
-    Common.async
+let set_project (project_id : string) : unit =
+  Common.async
     (fun () ->
        State_error.wrap
          __LOC__
-         ((State_file.get_file ()) >>=
-          handler)
-       >>= (fun _ -> Lwt.return_unit)
+         (State_project.set_project project_id) >>=
+       (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
+       (fun _ -> Lwt.return_unit)
+    )
+
+let close_project () : unit =
+  Common.async
+    (fun () ->
+       State_error.wrap
+         __LOC__
+         (State_project.remove_project ()) >>=
+       (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
+       (fun _ -> Lwt.return_unit)
     )

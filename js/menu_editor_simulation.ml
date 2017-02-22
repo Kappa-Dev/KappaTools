@@ -159,7 +159,7 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
         "click"
         (Dom_html.handler
            (fun _ ->
-              let () = Subpanel_editor_controller.close_simulation () in
+              let () = Menu_editor_simulation_controller.close_simulation () in
               Js._false)) in
     let () =
       Common.jquery_on
@@ -171,7 +171,7 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
                 Js.to_string simulation_new_input_dom##.value
               in
               let () =
-                Subpanel_editor_controller.create_simulation simulation_id
+                Menu_editor_simulation_controller.create_simulation simulation_id
               in
               let () =
                 Common.modal
@@ -198,7 +198,7 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
                   simulation_id
                   (fun _ -> ())
                   (fun simulation_id ->
-                     Subpanel_editor_controller.set_simulation
+                     Menu_editor_simulation_controller.set_simulation
                        (Js.to_string simulation_id))
               in
               Js._false))

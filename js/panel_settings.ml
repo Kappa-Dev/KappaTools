@@ -21,7 +21,7 @@ module ButtonPerturbation : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ Html.div [ button ] ]
 
-  let run_perturbation () : unit = Subpanel_editor_controller.perturb_simulation ()
+  let run_perturbation () : unit = Panel_settings_controller.perturb_simulation ()
 
   let onload () : unit =
     let button_dom = Tyxml_js.To_dom.of_button button in
@@ -265,7 +265,7 @@ module ButtonStart : Ui_common.Div = struct
     let () = start_button_dom##.onclick :=
         Dom.handler
           (fun _ ->
-             let () = Subpanel_editor_controller.start_simulation () in
+             let () = Panel_settings_controller.start_simulation () in
              Js._true)
     in
 
@@ -289,7 +289,7 @@ module ButtonClear : Ui_common.Div = struct
     let () = dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () = Subpanel_editor_controller.stop_simulation () in
+           let () = Panel_settings_controller.stop_simulation () in
            Js._true)
     in
     ()
@@ -313,7 +313,7 @@ module ButtonPause : Ui_common.Div = struct
     let () = button_dom##.onclick :=
       Dom.handler
         (fun _ ->
-           let () = Subpanel_editor_controller.pause_simulation () in
+           let () = Panel_settings_controller.pause_simulation () in
            Js._true)
   in
     ()
@@ -337,7 +337,7 @@ module ButtonContinue : Ui_common.Div = struct
     let () = button_dom##.onclick :=
         Dom.handler
           (fun _ ->
-             let () = Subpanel_editor_controller.continue_simulation () in
+             let () = Panel_settings_controller.continue_simulation () in
              Js._true)
     in
     ()

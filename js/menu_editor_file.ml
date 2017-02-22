@@ -215,7 +215,7 @@ let order_files (element : Dom_html.element Js.t) =
            Js.to_string
       )
   in
-  let () = Subpanel_editor_controller.order_files filenames in
+  let () = Menu_editor_file_controller.order_files filenames in
   ()
 
 let file_select_handler _ _ : unit Lwt.t =
@@ -267,7 +267,7 @@ let onload () =
       "click"
       (Dom_html.handler
          (fun _ ->
-            let () = Subpanel_editor_controller.close_file () in
+            let () = Menu_editor_file_controller.close_file () in
             Js._false)) in
   let () =
     Common.jquery_on
@@ -303,7 +303,7 @@ let onload () =
       (Dom_html.handler
          (fun _ ->
             let filename : string = Js.to_string file_new_input_dom##.value in
-            let () = Subpanel_editor_controller.create_file filename ?content:None in
+            let () = Menu_editor_file_controller.create_file filename ?content:None in
             let () = Common.modal ~id:("#"^file_new_modal_id) ~action:"hide" in
             Js._false)) in
   let () =
@@ -325,7 +325,7 @@ let onload () =
                 file_id
                 (fun _ -> ())
                 (fun file_id ->
-                   Subpanel_editor_controller.set_file
+                   Menu_editor_file_controller.set_file
                      (Js.to_string file_id))
             in
             Js._false))
@@ -377,7 +377,7 @@ let onload () =
                 (fun file_id ->
                    let () = Common.debug file_id in
                    let () =
-                     Subpanel_editor_controller.set_file_compile
+                     Menu_editor_file_controller.set_file_compile
                        (Js.to_string file_id)
                        is_checked
                    in

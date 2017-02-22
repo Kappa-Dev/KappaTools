@@ -6,7 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val set_manager : string -> unit
-val set_content : string -> unit
-
-val with_file : (Api_types_j.file Api.result -> unit Api.result Lwt.t) -> unit
+val create_file : string -> ?content:string -> unit
+val set_file : string -> unit
+val close_file : unit -> unit
+val set_file_compile : string -> bool -> unit
+val order_files : string list -> unit
