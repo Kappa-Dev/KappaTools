@@ -34,7 +34,7 @@
 \usepackage{fancyhdr} %to insert logo on the left head of each page
 \pagestyle{fancy}
 \begin{titlepage}
-\rhead{\includegraphics[width=35mm,natwidth=375pt,natheight=200pt]{\KaSimLogo}}
+\rhead{\includegraphics[width=35mm,bb=0 0 375 200]{\KaSimLogo}}
 \end{titlepage}
 
 \def\KaSim{\textsf{KaSim}}
@@ -764,7 +764,7 @@ and that we give Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=15cm,natwidth=2171pt,natheight=581pt]{generated_img/poly.png}
+\includegraphics[width=15cm,bb=0 0 2380 677]{generated_img/poly.png}
 \caption{Final mixture%\index{mixture}
   obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
@@ -893,7 +893,7 @@ or
 where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \begin{lstlisting}[language=kappa]
 %var: 'n' 1000
-%init: 'n' A(),A(y\intstate p
+%init: 'n' A(),A(y~p)
 %init: ca2+ <- 0.39 #mM
 \end{lstlisting}
 will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
@@ -955,7 +955,7 @@ Argument & Description \\ \hline
 \ttt{-initial $min$} & starts the simulation at $min$ $unit$ (data outputs convienience only)\\
 \ttt{-p $x$} & plot a line in the data file every $x$ $unit$\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
-&Use the extension to determine the format ('.tsv', '.svg' or comma separeted value else)\\
+&Use the extension to determine format ('.tsv', '.svg' or csv else)\\
 \ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
 & (for compatibility with \KaSim <= 3 and filenames starting by -)\\
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
@@ -1252,7 +1252,7 @@ will ask \KaSim~to output 3 versions of each computed causal flow, with all poss
 
 \begin{figure}[p] %  figure placement: here, top, bottom, or page
    \centering
-\includegraphics[width=15cm,natwidth=921pt,natheight=793pt]{generated_img/flux.png}
+\includegraphics[width=15cm,bb=0 0 921 793]{generated_img/flux.png}
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
    \label{fig:flux}
 \end{figure}
@@ -1403,7 +1403,7 @@ without any option.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_0.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{0\_Actions}}
 \label{fig:kasa:0}
 \end{figure}
@@ -1449,7 +1449,7 @@ The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main ac
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_1.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_1.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{1\_output}}
 \label{fig:kasa:1}
 \end{figure}
@@ -1476,7 +1476,7 @@ When a file already exists, it is overwritten without any warning.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_2.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_2.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{2\_Reachability\_analysis}}
 \label{fig:kasa:2}
 \end{figure}
@@ -1658,7 +1658,7 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_3.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_3.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{3\_Trace\_analysis}}
 \label{fig:kasa:3}
 \end{figure}
@@ -1696,7 +1696,7 @@ The transition system that describes the local traces for the agents of kind $P$
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=10cm,natwidth=1939pt,natheight=1027pt]{generated_img/trace_raw.png}
+\includegraphics[width=10cm,bb=0 0 1939 1027]{generated_img/trace_raw.png}
 \caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}}
 \label{fig:trace-raw}
 \end{figure}
@@ -1725,7 +1725,7 @@ moreover a transition between two microstates $v$ and $v'$ can be described by a
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=10cm,natwidth=1155pt,natheight=453pt]{generated_img/trace_macro.png}
+\includegraphics[width=10cm,bb=0 0 1155 453]{generated_img/trace_macro.png}
 \caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}}
 \label{fig:trace-macro}
 \end{figure}
@@ -1743,7 +1743,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_4.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_4.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{4\_Contact\_map}}
 \label{fig:kasa:4}
 \end{figure}
@@ -1771,7 +1771,7 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{generated_img/abc_contact.png}
+\includegraphics[width=8cm,bb=0 0 452 247]{generated_img/abc_contact.png}
 \caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
 \label{fig:abc-contact}
 \end{figure}
@@ -1792,7 +1792,7 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_5.png}
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_5.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{5\_Influence\_map}}
 \label{fig:kasa:4}
 \end{figure}
@@ -1818,7 +1818,7 @@ In Fig.~\ref{fig:imbis}, we illustrate the construction of positive influences d
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-\includegraphics[width=8cm,natwidth=1462pt,natheight=756pt]{img/im.png}
+\includegraphics[width=8cm,bb=0 0 1462 756]{img/im.png}
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:imbis}
 \end{figure}
