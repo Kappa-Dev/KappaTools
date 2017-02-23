@@ -127,6 +127,12 @@ and print_bool pr_mix pr_tok pr_var f = function
       Operator.print_compare_op op
       (print pr_mix pr_tok pr_var) b
 
+let const n = Locality.dummy_annot (CONST n)
+let add e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.SUM,e1,e2))
+let minus e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MINUS,e1,e2))
+let mult e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MULT,e1,e2))
+let div e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.DIV,e1,e2))
+
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
   | UN_ALG_OP (_, a), _ -> add_dep x d a

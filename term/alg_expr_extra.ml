@@ -13,21 +13,6 @@ type 'id corrected_rate_const =
     var: 'id option
   }
 
-let divide_expr_by_int e i =
-  Locality.dummy_annot
-    (Alg_expr.BIN_ALG_OP
-       (Operator.DIV, e, Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))))
-
-let mult_expr_by_int e i =
-  Locality.dummy_annot
-    (Alg_expr.BIN_ALG_OP
-       (Operator.MULT, Locality.dummy_annot (Alg_expr.CONST (Nbr.I i)), e))
-
-let add e1 e2 =
-  Locality.dummy_annot
-    (Alg_expr.BIN_ALG_OP
-       (Operator.SUM,e1,e2))
-
 let rec get_corrected_rate e =
   match e with
     Alg_expr.BIN_ALG_OP
@@ -79,7 +64,9 @@ let rec get_corrected_rate e =
           | None | Some _ -> None
         end
     end
-  | Alg_expr.BIN_ALG_OP _,_
+  | Alg_expr.BIN_ALG_OP
+      ((Operator.MULT | Operator.DIV | Operator.MINUS |
+        Operator.POW | Operator.MODULO | Operator.MAX | Operator.MIN),_,_),_
   | Alg_expr.UN_ALG_OP _,_
   | Alg_expr.STATE_ALG_OP _,_
   | Alg_expr.KAPPA_INSTANCE _,_

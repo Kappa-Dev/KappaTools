@@ -13,8 +13,6 @@ type t = cc (**type for domain points*)
 
 type id
 
-val int_of_id : id -> int
-
 module ObsMap : sig
   (** Maps from patterns to something *)
 

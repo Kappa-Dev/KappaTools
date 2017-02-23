@@ -55,6 +55,22 @@ val print_bool :
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ('a,'b) bool -> unit
 
+
+(** {6 Smart constructor } *)
+val const : Nbr.t -> ('a,'b) e Locality.annot
+val add :
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot ->
+  ('a,'b) e Locality.annot
+val minus :
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot ->
+  ('a,'b) e Locality.annot
+val mult :
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot ->
+  ('a,'b) e Locality.annot
+val div :
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot ->
+  ('a,'b) e Locality.annot
+
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->

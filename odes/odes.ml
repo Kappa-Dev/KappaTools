@@ -15,12 +15,6 @@ module Make(I:Ode_interface_sig.Interface) =
 
 struct
 
-  let alg_of_int i =
-    Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))
-
-  let alg_of_float f =
-    Locality.dummy_annot (Alg_expr.CONST (Nbr.F f))
-
   module SpeciesSetMap =
     SetMap.Make
       (struct
@@ -278,11 +272,9 @@ struct
     match f compil nauto with
     | Ode_loggers.Nil -> expr
     | Ode_loggers.Div n ->
-      Alg_expr.BIN_ALG_OP
-        (Operator.DIV,Locality.dummy_annot expr,alg_of_int n)
+      Alg_expr.div expr (Alg_expr.const (Nbr.I n))
     | Ode_loggers.Mul n ->
-      Alg_expr.BIN_ALG_OP
-        (Operator.MULT,alg_of_int n,Locality.dummy_annot expr)
+      Alg_expr.mult (Alg_expr.const (Nbr.I n)) expr
 
   let to_nembed = lift to_nembed_correct
   let to_nocc = lift to_nocc_correct
@@ -459,27 +451,22 @@ struct
                (I.find_embeddings compil connected_component species) in
            if n_embs = 0 then alg
            else
-             let species = Alg_expr.KAPPA_INSTANCE id in
+             let species = Locality.dummy_annot (Alg_expr.KAPPA_INSTANCE id) in
              let term =
                if n_embs = 1 then species
                else
                  to_nembed compil
                    (from
-                      (Alg_expr.BIN_ALG_OP
-                         (Operator.MULT,
-                          alg_of_int n_embs,
-                          Locality.dummy_annot species)) nauto)
+                      (Alg_expr.mult
+                          (Alg_expr.const (Nbr.I n_embs))
+                          species) nauto)
                    nauto
              in
-             if alg = Alg_expr.CONST (Nbr.zero) then term
-             else
-               Alg_expr.BIN_ALG_OP
-                 (Operator.SUM,
-                  Locality.dummy_annot alg,
-                  Locality.dummy_annot term)
+             if fst alg = Alg_expr.CONST (Nbr.zero) then term
+             else Alg_expr.add alg term
       )
       network.id_of_ode_var
-      (Alg_expr.CONST (Nbr.zero))
+      (Alg_expr.const Nbr.zero)
 
   let rec convert_alg_expr compil network alg =
     match
@@ -497,26 +484,22 @@ struct
         let f x =
           Array.fold_left
             (fun expr h ->
-               Alg_expr.BIN_ALG_OP
-                 (Operator.MULT,
-                  Locality.dummy_annot expr,
-                  Locality.dummy_annot
-                    (nembed_of_connected_component compil network  h)))
-            (Alg_expr.CONST Nbr.one)
+               Alg_expr.mult
+                 expr
+                 (nembed_of_connected_component compil network  h))
+            (Alg_expr.const Nbr.one)
             x
         in
         match cc with
-        | [] -> alg_of_int 0
+        | [] -> Alg_expr.const Nbr.zero
         | head::tail ->
           List.fold_left
             (fun acc l ->
-               Alg_expr.BIN_ALG_OP
-                 (Operator.SUM,
-                  Locality.dummy_annot acc,
-                  Locality.dummy_annot @@
-                  f l))
+               Alg_expr.add
+                  acc
+                  (f l))
             (f head)
-            tail, loc
+            tail
       end
     | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
       |Alg_expr.STATE_ALG_OP _),_ as a -> a
@@ -1162,7 +1145,7 @@ struct
     }
 
   let increment
-      is_zero ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var logger logger_buffer x =
+      is_zero ?(init_mode=false) ?(comment="") string_of_var logger logger_buffer x =
     if is_zero x
     then
       Ode_loggers.associate ~init_mode ~comment string_of_var logger logger_buffer  (Ode_loggers_sig.Init x)
@@ -1179,10 +1162,7 @@ struct
         | [] -> ()
         | [a] ->
           let species, n = species_of_species_id network a in
-          let expr =
-            Locality.dummy_annot
-              (to_nembed compil (from_nocc compil (fst expr) n) n)
-          in
+          let expr = to_nembed compil (from_nocc compil expr n) n in
           let comment =
             Format.asprintf "%a"
               (fun log  ->
@@ -1204,10 +1184,9 @@ struct
                  snd (species_of_species_id network id)
                in
                let expr =
-                 Locality.dummy_annot
-                   (to_nembed compil
-                      (from_nocc compil (Alg_expr.ALG_VAR id') n) n)
-               in
+                 to_nembed compil
+                   (from_nocc compil
+                      (Locality.dummy_annot (Alg_expr.ALG_VAR id')) n) n in
                increment
                  is_zero (I.string_of_var_id ~compil)
                  logger logger_buffer ~init_mode id expr handler_init)
@@ -1274,23 +1253,23 @@ struct
     let () = Sbml_backend.open_box logger_buffer "listOfParameters" in
     let () = Sbml_backend.line_sbml logger_buffer in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (alg_of_float init_t) handler_expr in
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (Alg_expr.const (Nbr.F init_t)) handler_expr in
     let () =
       Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tend
-        (alg_of_float max_t)
+        (Alg_expr.const (Nbr.F max_t))
         handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer Ode_loggers_sig.InitialStep
-        (alg_of_float  0.000001) handler_expr
+        (Alg_expr.const (Nbr.F 0.000001)) handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer Ode_loggers_sig.Period_t_points
-        (alg_of_float plot_period) handler_expr
+        (Alg_expr.const (Nbr.F  plot_period)) handler_expr
     in
     let () = Ode_loggers.print_newline logger_buffer in
     let () =
@@ -1301,7 +1280,7 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_ode_var
-        (alg_of_int (get_last_ode_var_id network))
+        (Alg_expr.const (Nbr.I (get_last_ode_var_id network)))
         handler_expr
     in
     let () =
@@ -1309,7 +1288,7 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_var
-        (alg_of_int (get_last_var_id network))
+        (Alg_expr.const (Nbr.I (get_last_var_id network)))
         handler_expr
     in
     let () =
@@ -1317,14 +1296,14 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_obs
-        (alg_of_int network.n_obs)
+        (Alg_expr.const (Nbr.I network.n_obs))
         handler_expr in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_rules
-        (alg_of_int network.n_rules)
+        (Alg_expr.const (Nbr.I network.n_rules))
         handler_expr
     in
     let () = Ode_loggers.print_newline logger_buffer in
@@ -1600,7 +1579,7 @@ struct
           Ode_loggers.associate
             (I.string_of_var_id ~compil) logger logger
             (Ode_loggers_sig.Deriv
-               (get_last_ode_var_id network)) (alg_of_int 1) (handler_expr network)
+               (get_last_ode_var_id network)) (Alg_expr.const Nbr.one) (handler_expr network)
         in
         let () = Ode_loggers.print_newline logger in
         let () = Sbml_backend.time_advance logger in
@@ -1841,9 +1820,9 @@ automorphisms in the site graph E.
           | None -> current_list
           | Some rate ->
             let gamma =
-              Alg_expr_extra.divide_expr_by_int
+              Alg_expr.div
                 rate
-                nbr_auto_in_lhs
+                (Alg_expr.const (Nbr.I nbr_auto_in_lhs))
             in
             gamma :: current_list
         ) [] rate_opt_list

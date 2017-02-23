@@ -7,26 +7,7 @@
 (******************************************************************************)
 
 
-(* Primitives for handling rule rates when detecting symmetries*)
-
-(* divide a rule rate by an int constant *)
-(* to account for rate conventions and the cardinal of the stabiliser *)
-val divide_expr_by_int:
-  ('a,'b) Alg_expr.e Locality.annot ->
-  int -> ('a,'b) Alg_expr.e Locality.annot
-
-(* muiltiplu a rule rate by an int constant *)
-val mult_expr_by_int:
-    ('a,'b) Alg_expr.e Locality.annot ->
-    int -> ('a,'b) Alg_expr.e Locality.annot
-
-(* add to rule rate *)
-(* to gather rule by isomorphic-class*)
-
-val add:
-  ('a,'b) Alg_expr.e Locality.annot ->
-  ('a,'b) Alg_expr.e Locality.annot ->
-  ('a,'b) Alg_expr.e Locality.annot
+(** Primitives for handling rule rates when detecting symmetries *)
 
 (* Partial normal form for expressions *)
 (* We only deal with constant, single alg_var multiplied/divided by a constant,
