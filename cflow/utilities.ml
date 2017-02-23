@@ -104,7 +104,7 @@ let print_pretrace parameter _handler =
   Loggers.fprintf
     (S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
     "@[<v>%a@]@."
-    (Pp.list Pp.space (Trace.print_step))
+    (Pp.list Pp.space (Trace.print_step ~compact:true ?env:None))
 
 let print_trace parameter handler trace = print_pretrace parameter handler (get_pretrace_of_trace trace)
 
@@ -353,8 +353,8 @@ let remove_obs_before parameter handler log_info error last_info trace =
 
 let remove_obs_before
     parameter
-    ?shall_we_compute:(shall_we_compute=we_shall)  ?shall_we_compute_profiling_information:(shall_we_compute_profiling_information=we_shall)
-    ?print_if_zero:(print_if_zero=we_shall)
+    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
+    ?(print_if_zero=we_shall)
     handler log_info error last_info trace =
   match last_info
   with
@@ -565,15 +565,15 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 
 let fold_story_table_with_progress_bar
     parameter
-    ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
+    ?shall_we_compute ?shall_we_compute_profiling_information
     ?(print_if_zero=we_shall)
     handler profiling_info error s
     f l a =
   fold_story_table_gen
     (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
     parameter
-    ~shall_we_compute:shall_we_compute
-    ~shall_we_compute_profiling_information:shall_we_compute_profiling_information
+    ?shall_we_compute
+    ?shall_we_compute_profiling_information
     handler profiling_info error s f l a
 
 let fold_story_table_without_progress_bar
@@ -993,7 +993,8 @@ module Event =
 
     let key_of_event event =
       if
-        Trace.step_is_event event && not (Trace.has_creation_of_step event)
+        (Trace.step_is_rule event || Trace.step_is_pert event)
+        && not (Trace.has_creation_of_step event)
       then
         get_id_of_event event
       else

@@ -5,11 +5,13 @@ type quark_lists = {
   internal_state_modified : (int * int) list;
 }
 
+type event_kind = OBS of string | EVENT of Trace.event_kind
+
 type atom =
   {
     causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
     eid:int ; (*event identifier*)
-    kind:Trace.event_kind ;
+    kind:event_kind ;
     (*      observation: string list*)
   }
 
@@ -26,7 +28,7 @@ type grid =
   }
 type config =
   {
-    events_kind: Trace.event_kind Mods.IntMap.t ;
+    events_kind: event_kind Mods.IntMap.t ;
     prec_1: Mods.IntSet.t Mods.IntMap.t ;
     conflict : Mods.IntSet.t Mods.IntMap.t ;
   }
@@ -50,7 +52,7 @@ val record :
    Instantiation.concrete Instantiation.event * unit Trace.Simulation_info.t) ->
   int -> Model.t -> grid -> grid
 val record_obs :
-  (Trace.event_kind *
+  (string *
    Instantiation.concrete Instantiation.test list list
    * unit Trace.Simulation_info.t) ->
   Instantiation.concrete Instantiation.site list -> int -> grid -> grid

@@ -60,7 +60,6 @@ module Simulation_info = struct
 end
 
 type event_kind =
-  | OBS of string
   | RULE of int
   | INIT of int list (* the agents *)
   | PERT of string (* the rule *)
@@ -69,14 +68,12 @@ let print_event_kind ?env f x =
   match env with
   | None ->
     (match x with
-     | OBS i -> Format.fprintf f "OBS(%s)" i
      | RULE i -> Format.fprintf f "RULE(%i)" i
      | INIT l ->
        Format.fprintf f "INIT(%a)" (Pp.list Pp.comma Format.pp_print_int) l
      | PERT s -> Format.fprintf f "PERT(%s)" s)
   | Some env ->
     match x with
-    | OBS name -> Format.pp_print_string f name
     | PERT s -> Format.pp_print_string f s
     | RULE r_id -> Model.print_ast_rule ~env f r_id
     | INIT s ->
@@ -84,27 +81,11 @@ let print_event_kind ?env f x =
         f "Intro @[<h>%a@]"
         (Pp.list Pp.comma (Model.print_agent ~env)) s
 
-let event_kind_to_json = function
-  | OBS s -> `List [`String "OBS"; `String s]
-  | RULE i -> `List [`String "RULE"; `Int i]
-  | INIT l -> `List [`String "INIT"; `List (List.map (fun x -> `Int x) l)]
-  | PERT s -> `List [`String "PERT"; `String s]
-let event_kind_of_json = function
-  | `List [`String "OBS"; `String s] -> OBS s
-  | `List [`String "RULE"; `Int i] -> RULE i
-  | `List [`String "INIT"; `List l] ->
-    INIT (List.map Yojson.Basic.Util.to_int l)
-  | `List [`String "PERT"; `String s] -> PERT s
-  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid event_kind",x))
-
 let print_event_kind_dot_annot env f = function
   | RULE r_id  ->
     Format.fprintf
       f "[label=\"%a\", shape=%s, style=%s, fillcolor = %s]"
       (Model.print_ast_rule ~env) r_id "invhouse" "filled" "lightblue"
-  | OBS name  ->
-    Format.fprintf
-      f "[label=\"%s\", style=filled, fillcolor=red]" name
   | INIT s ->
     Format.fprintf
       f "[label=\"Intro @[<h>%a@]\", shape=%s, style=%s, fillcolor=green]"
@@ -114,19 +95,21 @@ let print_event_kind_dot_annot env f = function
       f "[label=\"%s\", shape=%s, style=%s, fillcolor = %s]"
       s "invhouse" "filled" "green"
 
-type event =
-  event_kind *
-  Instantiation.concrete Instantiation.event *
-  unit Simulation_info.t
-type obs =
-  event_kind *
-  Instantiation.concrete Instantiation.test list list *
-  unit Simulation_info.t
 type step =
   | Subs of int * int
-  | Event of event
+  | Rule of
+      int *
+      Instantiation.concrete Instantiation.event *
+      unit Simulation_info.t
+  | Pert of
+      string *
+      Instantiation.concrete Instantiation.event *
+      unit Simulation_info.t
   | Init of Instantiation.concrete Instantiation.action list
-  | Obs of obs
+  | Obs of
+      string *
+      Instantiation.concrete Instantiation.test list list *
+      unit Simulation_info.t
   | Dummy  of string
 
 type t = step list
@@ -189,26 +172,32 @@ let print_obs ~compact ?env f (ev_kind,tests,_) =
     | None -> None
     | Some env -> Some (Model.signatures env) in
   if compact then
-    Format.fprintf f "OBS %a" (print_event_kind ?env) ev_kind
+    Format.fprintf f "OBS %s" ev_kind
   else
     Format.fprintf
-      f "***@[<1>OBS %a:%a@]***" (print_event_kind ?env) ev_kind
+      f "***@[<1>OBS %s:%a@]***" ev_kind
       (Pp.list Pp.space
          (Pp.list Pp.space (Instantiation.print_concrete_test ?sigs)))
       tests
 
 let print_step ?(compact=false) ?env f = function
   | Subs (a,b) -> print_subs f (a,b)
-  | Event (x,y,_z) -> print_event ~compact ?env f (x,y)
+  | Rule (x,y,_z) -> print_event ~compact ?env f (RULE x,y)
+  | Pert (x,y,_z) -> print_event ~compact ?env f (PERT x,y)
   | Init a -> print_init ~compact ?env f a
-  | Obs a -> print_obs ~compact ?env f a
+  | Obs (a,b,c) -> print_obs ~compact ?env f (a,b,c)
   | Dummy _  -> ()
 
 let step_to_yojson = function
   | Subs (a,b) -> `List [`String "Subs"; `Int a; `Int b]
-  | Event (x,y,z) ->
-    `List [`String "Event";
-           event_kind_to_json x;
+  | Rule (x,y,z) ->
+    `List [`String "Rule";
+           `Int x;
+           Instantiation.event_to_json Agent.to_json y;
+           Simulation_info.to_json (fun () -> `Null) z]
+  | Pert (x,y,z) ->
+    `List [`String "Pert";
+           `String x;
            Instantiation.event_to_json Agent.to_json y;
            Simulation_info.to_json (fun () -> `Null) z]
   | Init a ->
@@ -217,7 +206,7 @@ let step_to_yojson = function
        `List (List.map (Instantiation.action_to_json Agent.to_json) a)]
   | Obs (x,y,z) ->
     `List [`String "Obs";
-           event_kind_to_json x;
+           `String x;
            `List
              (List.map (fun z ->
                   `List (List.map (Instantiation.test_to_json Agent.to_json)
@@ -226,14 +215,18 @@ let step_to_yojson = function
   | Dummy _ -> `Null
 let step_of_yojson = function
   | `List [`String "Subs"; `Int a; `Int b] -> Subs (a,b)
-  | `List [`String "Event";x;y;z] ->
-    Event (event_kind_of_json x,
-           Instantiation.event_of_json Agent.of_json y,
-           Simulation_info.of_json (function _ -> ()) z)
+  | `List [`String "Rule";`Int x;y;z] ->
+    Rule (x,
+          Instantiation.event_of_json Agent.of_json y,
+          Simulation_info.of_json (function _ -> ()) z)
+  | `List [`String "Pert";`String x;y;z] ->
+    Pert (x,
+          Instantiation.event_of_json Agent.of_json y,
+          Simulation_info.of_json (function _ -> ()) z)
   | `List [`String "Init"; `List l ] ->
     Init (List.map (Instantiation.action_of_json Agent.of_json) l)
-  | `List [`String "Obs"; x; `List l; z] ->
-    Obs (event_kind_of_json x,
+  | `List [`String "Obs"; `String x; `List l; z] ->
+    Obs (x,
          (List.map (function  `List ccl ->
               List.map (Instantiation.test_of_json Agent.of_json) ccl
                             | _ as x ->
@@ -250,19 +243,22 @@ let of_yojson = function
 
 let step_is_obs = function
   | Obs _ -> true
-  | Event _ | Subs _ | Dummy _ | Init _ -> false
+  | Rule _ | Pert _ | Subs _ | Dummy _ | Init _ -> false
 let step_is_init = function
   | Init _ -> true
-  | Event _ | Subs _ | Dummy _ | Obs _ -> false
+  | Rule _ | Pert _ | Subs _ | Dummy _ | Obs _ -> false
 let step_is_subs = function
   | Subs _ -> true
-  | Event _ | Init _ | Dummy _ | Obs _ -> false
-let step_is_event = function
-  | Event _ -> true
-  | Init _ | Subs _ | Dummy _ | Obs _ -> false
+  | Rule _ | Pert _ | Init _ | Dummy _ | Obs _ -> false
+let step_is_rule = function
+  | Rule _ -> true
+  | Pert _ | Init _ | Subs _ | Dummy _ | Obs _ -> false
+let step_is_pert = function
+  | Pert _ -> true
+  | Rule _ | Init _ | Subs _ | Dummy _ | Obs _ -> false
 
 let simulation_info_of_step = function
-  | Obs (_,_,info) | Event (_,_,info) -> Some info
+  | Obs (_,_,info) | Rule (_,_,info) | Pert (_,_,info) -> Some info
   | Init _ -> Some (Simulation_info.dummy ())
   | Subs _ | Dummy _ -> None
 
@@ -274,14 +270,15 @@ let creation_of_actions op actions =
          | Instantiation.Bind_to _ | Instantiation.Free _
          | Instantiation.Remove _) -> l) [] actions
 let creation_of_step = function
-  | (Event (_,{ Instantiation.actions = ac; _ },_)
+  | (Rule (_,{ Instantiation.actions = ac; _ },_)
+    | Pert (_,{ Instantiation.actions = ac; _ },_)
     | Init ac) -> creation_of_actions fst ac
   | Obs _ | Dummy _ | Subs _ -> []
 let has_creation_of_step x = creation_of_step x <> []
 
 let tests_of_step = function
   | Subs _ -> []
-  | Event (_,e,_) ->
+  | Rule (_,e,_) | Pert (_,e,_) ->
     List.fold_right
       List.append e.Instantiation.tests e.Instantiation.connectivity_tests
   | Init _ -> []
@@ -290,116 +287,13 @@ let tests_of_step = function
 
 let actions_of_step = function
   | Subs _ -> ([],[])
-  | Event (_,e,_) -> (e.Instantiation.actions,e.Instantiation.side_effects_src)
+  | Rule (_,e,_) | Pert (_,e,_) ->
+    (e.Instantiation.actions,e.Instantiation.side_effects_src)
   | Init y -> (y,[])
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
 
-let check_create_quarks aid sites quarks =
-  List.for_all
-    (fun (site,internal) ->
-      match internal with
-      | Some _ -> ((List.mem (2,(aid,site,0)) quarks)&&
-                     (List.mem (2,(aid,site,1)) quarks))
-      | None -> (List.mem (2,(aid,site,1)) quarks)) sites
+let side_effects_of_step = function
+  | Rule ((_,e,_)) | Pert ((_,e,_)) -> e.Instantiation.side_effects_dst
+  | Subs _ | Obs _ | Dummy _ | Init _ -> []
 
-let check_modified_quarks ((aid,_),site) modif quarks =
-  List.exists
-    (fun (c,(n,s,m)) ->
-      ((c=2)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
-
-let check_tested_quarks ((aid,_),site) modif quarks =
-  List.exists
-    (fun (c,(n,s,m)) ->
-      ((c=1)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
-
-let check_event_quarks actions tests quarks =
-  (List.for_all
-    (function
-     | Instantiation.Create ((aid,_),sites) ->
-        check_create_quarks aid sites quarks
-     | Instantiation.Free asite ->
-        check_modified_quarks asite 1 quarks
-     | Instantiation.Bind_to (asite1,asite2)
-       | Instantiation.Bind (asite1,asite2) ->
-        (check_modified_quarks asite1 1 quarks)&&
-          (check_modified_quarks asite2 1 quarks)
-     | Instantiation.Mod_internal (asite,_) ->
-        check_modified_quarks asite 0 quarks
-     | Instantiation.Remove (aid,_) ->
-        List.exists
-          (fun (c,(n,_,_)) ->
-            ((c=2)||(c=3))&&(n=aid)) quarks)
-    actions)&&
-  (List.for_all (List.for_all
-    (function
-     | Instantiation.Is_Here (aid,_) ->
-        List.exists
-          (fun (c,(n,_,_)) ->
-            ((c=1)||(c=3))&&(n=aid)) quarks
-     | Instantiation.Has_Internal (asite,_) ->
-        check_tested_quarks asite 0 quarks
-     | Instantiation.Is_Free asite | Instantiation.Is_Bound asite
-       | Instantiation.Has_Binding_type (asite,_) ->
-        check_tested_quarks asite 1 quarks
-     | Instantiation.Is_Bound_to (asite1,asite2) ->
-        (check_tested_quarks asite1 1 quarks)&&
-          (check_tested_quarks asite2 1 quarks)))
-    tests)
-
-let log_event id quarks event_kind steps =
-  match event_kind with
-  | INIT _ ->
-     let stp =
-       List.find
-         (function
-          | Init actions ->
-             List.for_all
-               (function
-                | Instantiation.Create ((aid,_),sites) ->
-                   check_create_quarks aid sites quarks
-                | Instantiation.Free _ | Instantiation.Bind_to _
-                  | Instantiation.Bind _-> true
-                | Instantiation.Mod_internal _ | Instantiation.Remove _ ->
-                   raise (ExceptionDefn.Internal_Error
-                            (Locality.dummy_annot
-                               "init event has actions not allowed"))) actions
-          | Event _ | Obs _ | Subs _ | Dummy _ -> false) steps in
-     `List [`Int id; step_to_yojson stp ]
-  | RULE rid ->
-     let stp =
-       List.find
-         (function
-          | Event (ekind,e,_) ->
-             (match ekind with
-              | RULE rid' ->
-                ((rid=rid')&&
-                 (check_event_quarks
-                    e.Instantiation.actions
-                    (e.Instantiation.connectivity_tests::e.Instantiation.tests)
-                    quarks))
-             | PERT _ | OBS _ | INIT _ -> false)
-          | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
-     `List [`Int id; step_to_yojson stp]
-  | OBS _ ->
-     let stp =
-       List.find
-         (function
-          |  Obs _ -> true
-          | Subs _ | Dummy _ | Init _ | Event _ -> false) steps in
-     `List [`Int id; step_to_yojson stp]
-  | PERT pert ->
-     let stp =
-       List.find
-         (function
-          | Event (ekind,e,_) ->
-             (match ekind with
-               | PERT pert' ->
-                 ((pert=pert')&&
-                  (check_event_quarks
-                     e.Instantiation.actions
-                     (e.Instantiation.connectivity_tests::e.Instantiation.tests)
-                     quarks))
-              | OBS _ | INIT _ | RULE _ -> false)
-          | Obs _ | Subs _ | Dummy _ | Init _ -> false) steps in
-     `List [`Int id; step_to_yojson stp]

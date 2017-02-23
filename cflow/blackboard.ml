@@ -1312,7 +1312,8 @@ module Blackboard =
             let bool =
               try
                 let cand = PB.A.get blackboard.event eid in
-                Trace.step_is_event cand ||
+                Trace.step_is_rule cand ||
+                Trace.step_is_pert cand ||
                 Trace.step_is_obs cand ||
                 Trace.step_is_init cand
               with Not_found -> false in

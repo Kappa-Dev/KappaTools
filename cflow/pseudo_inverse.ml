@@ -405,7 +405,7 @@ module type Cut_pseudo_inverse =
      let pre_event = blackboard.event in
      let test_list = Trace.tests_of_step step in
      let (action_list,_) = Trace.actions_of_step step in
-     let side_effect = Po.K.get_kasim_side_effects step in
+     let side_effect = Trace.side_effects_of_step step in
      let build_map list map =
        List.fold_left
          (fun map (id,value) -> Predicate_maps.PredicateMap.add id value map)

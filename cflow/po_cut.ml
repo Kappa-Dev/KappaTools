@@ -150,12 +150,13 @@ module Po_cut =
       let (actions,_) = Trace.actions_of_step event in
       if (Trace.step_is_obs event)
       || (keep actions)
-      || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
+      || (keep2 (predicates_of_side_effects (Trace.side_effects_of_step event)))
       then
         begin
           let kept = event::kept in
           let tests = Trace.tests_of_step event in
-          let tests' = predicates_of_side_effects (K.get_kasim_side_effects event) in
+          let tests' =
+            predicates_of_side_effects (Trace.side_effects_of_step event) in
           let seen =
             List.fold_left
               (fun seen test ->

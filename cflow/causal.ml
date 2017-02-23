@@ -5,6 +5,8 @@ type quark_lists = {
   internal_state_modified : (int * int) list;
 }
 
+type event_kind = OBS of string | EVENT of Trace.event_kind
+
 let atom_tested = 1
 let atom_modified = 2
 let atom_testedmodified = 3
@@ -12,7 +14,7 @@ type atom =
   {
     causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
     eid:int ; (*event identifier*)
-    kind:Trace.event_kind ;
+    kind:event_kind ;
     (*observation: string list*)
   }
 
@@ -29,7 +31,7 @@ type grid =
   }
 type config =
   {
-    events_kind: Trace.event_kind Mods.IntMap.t ;
+    events_kind: event_kind Mods.IntMap.t ;
     prec_1: Mods.IntSet.t Mods.IntMap.t ;
     conflict : Mods.IntSet.t Mods.IntMap.t ;
   }
@@ -51,6 +53,13 @@ let empty_config =
     conflict = Mods.IntMap.empty;
     prec_1 = Mods.IntMap.empty }
 
+let print_event_kind ?env f = function
+  | EVENT e -> Trace.print_event_kind ?env f e
+  | OBS i ->
+    match env with
+    | None -> Format.fprintf f "OBS(%s)" i
+    | Some _ -> Format.pp_print_string f i
+
 let debug_print_causal f i =
   Format.pp_print_string
     f (if i = atom_tested then "tested"
@@ -60,7 +69,7 @@ let debug_print_causal f i =
 
 let debug_print_atom f a =
   Format.fprintf f "{#%i: %a %a}" a.eid debug_print_causal a.causal_impact
-    (Trace.print_event_kind ?env:None) a.kind
+    (print_event_kind ?env:None) a.kind
 
 let debug_print_grid f g =
   let () =
@@ -245,25 +254,27 @@ let add_tests grid event_number kind tests =
     grid tests
 
 let record (kind,event,_) event_number env grid =
-  let grid = add_tests grid event_number kind event.Instantiation.tests in
+  let grid = add_tests grid event_number (EVENT kind) event.Instantiation.tests in
   let grid =
-    add_tests grid event_number kind [event.Instantiation.connectivity_tests] in
+    add_tests grid event_number (EVENT kind) [event.Instantiation.connectivity_tests] in
   let grid =
-    add_actions env grid event_number kind event.Instantiation.actions in
+    add_actions env grid event_number (EVENT kind) event.Instantiation.actions in
   List.fold_left
     (fun grid site ->
        add (fst site,-1) true atom_tested
-         (add site true atom_modified grid event_number kind) event_number kind)
+         (add site true atom_modified grid event_number (EVENT kind))
+         event_number (EVENT kind))
     grid event.Instantiation.side_effects_dst
 
 let record_obs (kind,tests,_) side_effects event_number grid =
   let grid = add_obs_eid event_number grid in
-  let grid = add_tests grid event_number kind tests in
+  let grid = add_tests grid event_number (OBS kind) tests in
   List.fold_left
-    (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
+    (fun grid site -> add site true atom_modified grid event_number (OBS kind))
+    grid side_effects
 
 let record_init (lbl,actions) event_number env grid =
-  add_actions env grid event_number (Trace.INIT lbl)  actions
+  add_actions env grid event_number (EVENT (Trace.INIT lbl))  actions
 
 let add_pred eid atom config =
   let events_kind = Mods.IntMap.add atom.eid atom.kind config.events_kind in
@@ -435,6 +446,12 @@ let fold_over_causal_past_of_obs parameter handler log_info error config_closure
   let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in
   Graph_closure.closure_bottom_up_with_fold parameter handler log_info error (Some StoryProfiling.Collect_traces) config_closure config.prec_1 to_keep f a
 
+let print_event_kind_dot_annot env f = function
+  | OBS name ->
+    Format.fprintf
+      f "[label=\"%s\", style=filled, fillcolor=red]" name
+  | EVENT e -> Trace.print_event_kind_dot_annot env f e
+
 let dot_of_grid profiling env enriched_grid form =
   let t = Sys.time () in
   let config = enriched_grid.config in
@@ -458,7 +475,7 @@ let dot_of_grid profiling env enriched_grid form =
               if eid <> 0 then
                 Format.fprintf
                   form "node_%d %a ;@," eid
-                  (Trace.print_event_kind_dot_annot env) atom_kind
+                  (print_event_kind_dot_annot env) atom_kind
                   (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*)
          ) eids_at_d ;
        Format.fprintf form "}@]@," ;
@@ -516,11 +533,11 @@ let js_of_grid env enriched_grid f =
       (fun f (eid,atom_kind) ->
          Format.fprintf
            f "g.setNode(%i, { label: \"%a\", style: \"fill: %s\" });"
-           eid (Trace.print_event_kind ~env) atom_kind
+           eid (print_event_kind ~env) atom_kind
            (match atom_kind with
-            | Trace.OBS _ -> "#f77"
-            | (Trace.INIT _ | Trace.PERT _) -> "#7f7"
-            | Trace.RULE _ -> "#77f"))
+            | OBS _ -> "#f77"
+            | EVENT (Trace.INIT _ | Trace.PERT _) -> "#7f7"
+            | EVENT (Trace.RULE _) -> "#77f"))
       f enriched_grid.config.events_kind in
   let () =
     Pp.set
@@ -578,6 +595,115 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
          f "@[<v 2><script>@,%t@]@,</script>"
          (js_of_grid env enriched_grid))
 
+
+let check_create_quarks aid sites quarks =
+  List.for_all
+    (fun (site,internal) ->
+      match internal with
+      | Some _ -> ((List.mem (2,(aid,site,0)) quarks)&&
+                     (List.mem (2,(aid,site,1)) quarks))
+      | None -> (List.mem (2,(aid,site,1)) quarks)) sites
+
+let check_modified_quarks ((aid,_),site) modif quarks =
+  List.exists
+    (fun (c,(n,s,m)) ->
+      ((c=2)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+
+let check_tested_quarks ((aid,_),site) modif quarks =
+  List.exists
+    (fun (c,(n,s,m)) ->
+      ((c=1)||(c=3))&&(n=aid)&&(s=site)&&(m=modif)) quarks
+
+let check_event_quarks actions tests quarks =
+  (List.for_all
+    (function
+     | Instantiation.Create ((aid,_),sites) ->
+        check_create_quarks aid sites quarks
+     | Instantiation.Free asite ->
+        check_modified_quarks asite 1 quarks
+     | Instantiation.Bind_to (asite1,asite2)
+       | Instantiation.Bind (asite1,asite2) ->
+        (check_modified_quarks asite1 1 quarks)&&
+          (check_modified_quarks asite2 1 quarks)
+     | Instantiation.Mod_internal (asite,_) ->
+        check_modified_quarks asite 0 quarks
+     | Instantiation.Remove (aid,_) ->
+        List.exists
+          (fun (c,(n,_,_)) ->
+            ((c=2)||(c=3))&&(n=aid)) quarks)
+    actions)&&
+  (List.for_all (List.for_all
+    (function
+     | Instantiation.Is_Here (aid,_) ->
+        List.exists
+          (fun (c,(n,_,_)) ->
+            ((c=1)||(c=3))&&(n=aid)) quarks
+     | Instantiation.Has_Internal (asite,_) ->
+        check_tested_quarks asite 0 quarks
+     | Instantiation.Is_Free asite | Instantiation.Is_Bound asite
+       | Instantiation.Has_Binding_type (asite,_) ->
+        check_tested_quarks asite 1 quarks
+     | Instantiation.Is_Bound_to (asite1,asite2) ->
+        (check_tested_quarks asite1 1 quarks)&&
+          (check_tested_quarks asite2 1 quarks)))
+    tests)
+
+
+let log_event id quarks event_kind steps =
+  match event_kind with
+  | EVENT (Trace.INIT _) ->
+     let stp =
+       List.find
+         (function
+          | Trace.Init actions ->
+             List.for_all
+               (function
+                | Instantiation.Create ((aid,_),sites) ->
+                   check_create_quarks aid sites quarks
+                | Instantiation.Free _ | Instantiation.Bind_to _
+                  | Instantiation.Bind _-> true
+                | Instantiation.Mod_internal _ | Instantiation.Remove _ ->
+                   raise (ExceptionDefn.Internal_Error
+                            (Locality.dummy_annot
+                               "init event has actions not allowed"))) actions
+          | Trace.Rule _ | Trace.Pert _ | Trace.Obs _
+          | Trace.Subs _ | Trace.Dummy _ -> false) steps in
+     `List [`Int id; Trace.step_to_yojson stp ]
+  | EVENT (Trace.RULE rid) ->
+     let stp =
+       List.find
+         (function
+          | Trace.Rule (rid',e,_) ->
+            ((rid=rid')&&
+             (check_event_quarks
+                e.Instantiation.actions
+                (e.Instantiation.connectivity_tests::e.Instantiation.tests)
+                quarks))
+          | Trace.Pert _ | Trace.Obs _ | Trace.Subs _
+          | Trace.Dummy _ | Trace.Init _ -> false) steps in
+     `List [`Int id; Trace.step_to_yojson stp]
+  | OBS _ ->
+     let stp =
+       List.find
+         (function
+          | Trace.Obs _ -> true
+          | Trace.Subs _ | Trace.Dummy _ | Trace.Init _
+          | Trace.Rule _ | Trace.Pert _ -> false) steps in
+     `List [`Int id; Trace.step_to_yojson stp]
+  | EVENT (Trace.PERT pert) ->
+     let stp =
+       List.find
+         (function
+          | Trace.Pert (pert',e,_) ->
+            ((pert=pert')&&
+             (check_event_quarks
+                e.Instantiation.actions
+                (e.Instantiation.connectivity_tests::e.Instantiation.tests)
+                quarks))
+          | Trace.Rule _ | Trace.Obs _ | Trace.Subs _
+          | Trace.Dummy _ | Trace.Init _ -> false) steps in
+     `List [`Int id; Trace.step_to_yojson stp]
+
 let json_of_grid enriched_grid grid_story steps =
   let config = enriched_grid.config in
   let prec_star = enriched_grid.prec_star in
@@ -601,7 +727,7 @@ let json_of_grid enriched_grid grid_story steps =
     | Some atom_kind ->
        if eid <> 0 then
          let quarks = Hashtbl.find_all tbl eid in
-         Trace.log_event eid quarks atom_kind steps
+         log_event eid quarks atom_kind steps
        else `Null in
   let nodes_to_list =
     Mods.IntMap.fold

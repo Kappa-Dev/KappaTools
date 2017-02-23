@@ -30,7 +30,7 @@ type t =
 
     random_state : Random.State.t;
     story_machinery :
-       (Trace.event_kind * Pattern.id array *
+      (string (*obs name*) * Pattern.id array *
         Instantiation.abstract Instantiation.test list list)
          list Pattern.ObsMap.t (*currently tracked ccs *) option;
   }
@@ -348,9 +348,10 @@ let path_tests path tests =
 
 let step_of_event counter = function
   | Trace.INIT _,e -> (Trace.Init e.Instantiation.actions)
-  | Trace.OBS _,_ -> assert false
-  | (Trace.RULE _ | Trace.PERT _ as k),x ->
-    (Trace.Event (k,x,Counter.current_simulation_info counter))
+  | Trace.RULE r,x ->
+    (Trace.Rule (r,x,Counter.current_simulation_info counter))
+  | Trace.PERT p,x ->
+    (Trace.Pert (p,x,Counter.current_simulation_info counter))
 
 let store_event counter inj2graph new_tracked_obs_instances event_kind
     ?path extra_side_effects rule outputs = function
@@ -903,7 +904,7 @@ let add_tracked patterns name tests state =
         (fun pattern ->
            let acc = Pattern.ObsMap.get tpattern pattern in
            Pattern.ObsMap.set tpattern
-             pattern ((Trace.OBS name,patterns,tests)::acc))
+             pattern ((name,patterns,tests)::acc))
         patterns in
     { state with outdated = false }
 let remove_tracked patterns state =

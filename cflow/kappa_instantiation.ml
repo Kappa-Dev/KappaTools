@@ -54,7 +54,6 @@ sig
   val print_side_effect: Loggers.t -> side_effect -> unit
   val side_effect_of_list: Instantiation.concrete Instantiation.site list -> side_effect
 
-  val get_kasim_side_effects: Trace.step -> side_effect
   val get_id_of_refined_step: Trace.step -> int option
   val get_time_of_refined_step: Trace.step -> float option
 
@@ -83,10 +82,6 @@ module Cflow_linker =
     module SiteMap = Mods.IntMap
     module SiteSet = Mods.IntSet
     type internal_state  = int
-
-    let get_kasim_side_effects = function
-      | Trace.Event ((_,e,_)) -> e.Instantiation.side_effects_dst
-      | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _ | Trace.Init _ -> []
 
     let empty_side_effect = []
 
@@ -128,13 +123,30 @@ module Cflow_linker =
                else fun _ -> List.rev_append side_effect side in
              let translate y = Mods.IntMap.find_default y y subs in
              match k with
-             | Trace.Event (id,event,info) ->
+             | Trace.Rule (id,event,info) ->
                let event' =
                  PI.subst_map_agent_in_concrete_event translate event in
                let side_effects_dst =
                  maybe_side_effect event'.Instantiation.side_effects_dst in
                Causal.record
-                 (id,{
+                 (Trace.RULE id,{
+                     Instantiation.tests = event'.Instantiation.tests;
+                     Instantiation.actions = event'.Instantiation.actions;
+                     Instantiation.side_effects_src =
+                       event'.Instantiation.side_effects_src;
+                     Instantiation.side_effects_dst;
+                     Instantiation.connectivity_tests =
+                       event'.Instantiation.connectivity_tests;
+                   },info)
+                 counter env grid,
+               empty_set,counter+1,Mods.IntMap.empty
+             | Trace.Pert (id,event,info) ->
+               let event' =
+                 PI.subst_map_agent_in_concrete_event translate event in
+               let side_effects_dst =
+                 maybe_side_effect event'.Instantiation.side_effects_dst in
+               Causal.record
+                 (Trace.PERT id,{
                      Instantiation.tests = event'.Instantiation.tests;
                      Instantiation.actions = event'.Instantiation.actions;
                      Instantiation.side_effects_src =
@@ -170,7 +182,7 @@ module Cflow_linker =
 
     let clean_events =
       List.filter
-        (function Trace.Event _ | Trace.Obs _ | Trace.Init _ -> true
+        (function Trace.Rule _ | Trace.Pert _ | Trace.Obs _ | Trace.Init _ -> true
                 | Trace.Dummy _ | Trace.Subs _ -> false)
 
     let print_side_effect log =
@@ -184,7 +196,7 @@ module Cflow_linker =
       | Some priorities,_ | None,Some priorities ->
         match e with
         | Trace.Obs _ -> error,log_info,priorities.Priority.other_events
-        | Trace.Event _ ->
+        | Trace.Rule _ | Trace.Pert _ ->
           begin
             let actions = Trace.actions_of_step e in
             let priority =
@@ -212,8 +224,16 @@ module Cflow_linker =
           error,log_info,priorities.Priority.substitution
 
     let subs_agent_in_event mapping mapping' = function
-      | Trace.Event (a,event,info) ->
-        Trace.Event
+      | Trace.Rule (a,event,info) ->
+        Trace.Rule
+          (a,
+           PI.subst_map2_agent_in_concrete_event
+             (fun x -> AgentIdMap.find_default x x mapping)
+             (fun x -> AgentIdMap.find_default x x mapping')
+             event,
+           info)
+      | Trace.Pert (a,event,info) ->
+        Trace.Pert
           (a,
            PI.subst_map2_agent_in_concrete_event
              (fun x -> AgentIdMap.find_default x x mapping)
@@ -423,7 +443,8 @@ module Cflow_linker =
                 match refined_step
                 with
                 | Trace.Init init -> convert_init remanent step_list init
-                | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _ | Trace.Event _ ->
+                | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _
+                | Trace.Rule _ | Trace.Pert _ ->
                   (refined_step::step_list,remanent))
              ([],remanent)
              (List.rev refined_step_list))
@@ -435,7 +456,7 @@ module Cflow_linker =
           (fun (step_list,remanent) refined_step ->
              match refined_step with
              | Trace.Init init -> convert_init remanent step_list init
-             | Trace.Event (_,event,_) ->
+             | Trace.Rule (_,event,_) | Trace.Pert (_,event,_) ->
                let remanent,set =
                  List.fold_left
                    (fun recur ->
@@ -466,8 +487,8 @@ module Cflow_linker =
       List.rev a
 
     let agent_id_in_obs _parameter _handler info error = function
-      | (Trace.Subs _ | Trace.Event _ | Trace.Init _ | Trace.Dummy _) ->
-        error,info,AgentIdSet.empty
+      | (Trace.Subs _ | Trace.Rule _ | Trace.Pert _
+        | Trace.Init _ | Trace.Dummy _) -> error,info,AgentIdSet.empty
       | Trace.Obs (_,tests,_) ->
         error, info,
         List.fold_left

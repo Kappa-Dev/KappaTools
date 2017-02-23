@@ -761,7 +761,7 @@ module Preblackboard =
     let type_of_step x =
       if Trace.step_is_obs x then Observable
       else if Trace.step_is_init x then Init
-      else if Trace.step_is_event x then Rule
+      else if Trace.step_is_rule x then Rule
       else if Trace.step_is_subs x then Subs
       else Dummy
 

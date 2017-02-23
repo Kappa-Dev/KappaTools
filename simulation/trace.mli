@@ -31,7 +31,6 @@ module Simulation_info : sig
 end
 
 type event_kind =
-  | OBS of string
   | RULE of int
   | INIT of int list (** the agents *)
   | PERT of string (** the rule *)
@@ -41,19 +40,21 @@ val print_event_kind :
 val print_event_kind_dot_annot :
   Model.t -> Format.formatter -> event_kind -> unit
 
-type event =
-  event_kind *
-  Instantiation.concrete Instantiation.event *
-  unit Simulation_info.t
-type obs =
-  event_kind *
-  Instantiation.concrete Instantiation.test list list *
-  unit Simulation_info.t
 type step =
   | Subs of int * int
-  | Event of event
+  | Rule of
+      int *
+      Instantiation.concrete Instantiation.event *
+      unit Simulation_info.t
+  | Pert of
+      string *
+      Instantiation.concrete Instantiation.event *
+      unit Simulation_info.t
   | Init of Instantiation.concrete Instantiation.action list
-  | Obs of obs
+  | Obs of
+      string *
+      Instantiation.concrete Instantiation.test list list *
+      unit Simulation_info.t
   | Dummy  of string
 
 type t = step list
@@ -64,7 +65,8 @@ val subs_step : int -> int -> step
 val step_is_obs : step -> bool
 val step_is_init : step -> bool
 val step_is_subs : step -> bool
-val step_is_event : step -> bool
+val step_is_rule : step -> bool
+val step_is_pert : step -> bool
 val has_creation_of_step: step -> bool
 
 val tests_of_step :
@@ -74,7 +76,10 @@ val actions_of_step :
   (Instantiation.concrete Instantiation.action list *
    (Instantiation.concrete Instantiation.site *
     Instantiation.concrete Instantiation.binding_state) list)
+val side_effects_of_step :
+  step -> Instantiation.concrete Instantiation.site list
 val simulation_info_of_step: step -> unit Simulation_info.t option
+
 val creation_of_actions :
   ('a -> 'b) -> 'a Instantiation.action list -> 'b list
 val creation_of_step : step -> int list
@@ -87,6 +92,3 @@ val step_of_yojson : Yojson.Basic.json -> step
 
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
-
-val log_event :
-  int -> (int * (int *int*int)) list -> event_kind -> t -> Yojson.Basic.json

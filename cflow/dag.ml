@@ -198,20 +198,19 @@ let print_prehash parameter _handler error representation =
   let _ = Loggers.print_newline (H.get_debugging_channel parameter) in
   error
 
-let label handler x =
-  match x with
-  | Trace.RULE i -> H.string_of_rule_id handler i
-  | Trace.INIT [i] -> H.string_of_agent_id handler i
-  | (Trace.INIT _ | Trace.OBS _ | Trace.PERT _) ->
+let label handler = function
+  | Causal.EVENT (Trace.RULE i) -> H.string_of_rule_id handler i
+  | Causal.EVENT (Trace.INIT [i]) -> H.string_of_agent_id handler i
+  | Causal.EVENT (Trace.INIT _ | Trace.PERT _ as x) ->
     Format.asprintf "%a" (Trace.print_event_kind ~env:handler.H.env) x
-
+  | Causal.OBS name -> name
 let kind node =
   match node
   with
-  | Trace.INIT _ -> INIT
-  | Trace.RULE _ -> RULE
-  | Trace.PERT _ -> PERT
-  | Trace.OBS _ -> OBS
+  | Causal.EVENT (Trace.INIT _) -> INIT
+  | Causal.EVENT (Trace.RULE _) -> RULE
+  | Causal.EVENT (Trace.PERT _) -> PERT
+  | Causal.OBS _ -> OBS
 
 let compare_elt x y =
   match x,y with
