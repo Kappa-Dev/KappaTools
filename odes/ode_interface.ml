@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 21 2017>
+  * Last modification: Time-stamp: <Feb 23 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -371,5 +371,4 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       lkappa_rule.LKappa.r_mix
       lkappa_rule.LKappa.r_created
   in
-  sigs,
-  rule_id, rate_opt_list, cache, hash_list
+  cache, sigs, lkappa_rule, rule_id, rate_opt_list, hash_list

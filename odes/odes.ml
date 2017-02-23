@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 21 2017>
+  * Last modification: Time-stamp: <Feb 23 2017>
 *)
 
 let local_trace = false
@@ -12,6 +12,7 @@ let debug s =
   else Format.ifprintf Format.err_formatter s
 
 module Make(I:Ode_interface_sig.Interface) =
+
 struct
 
   let alg_of_int i =
@@ -1925,6 +1926,14 @@ automorphisms in the site graph E.
     print_elements l;
     Loggers.fprintf log "]"
 
+  let print_list_of_agent_id log l =
+    List.iter (fun (rule_id, agent_id) ->
+        Loggers.fprintf log
+          "rule_id:%i:agent_id:%i\n"
+          rule_id
+          agent_id
+      ) l
+
   let print_list_array log list_array =
     Array.iter (fun l -> print_list log l) list_array
 
@@ -1933,9 +1942,10 @@ automorphisms in the site graph E.
 (******************************************************)
 
   let print_cannonic_form_from_syntactic_rules
-      ~compil sigs log rule_id rule
+      ~compil log rule_id rule
       nbr_auto_in_lhs
       nbr_auto_in_rule rate_opt_list
+      (*list_of_agent_id*)
     =
     match Loggers.formatter_of_logger log with
     | None -> ()
@@ -1951,27 +1961,26 @@ automorphisms in the site graph E.
       let () = I.print_rule_id fmt rule_id in
       let () = Loggers.print_newline log in
       let () = print_hash log nbr_auto_in_rule in
+      let () = Loggers.print_newline log in
+      (*let () = print_list_of_agent_id log list_of_agent_id in*)
       let () = print_line_stars log in
       (*let () = Loggers.fprintf log " Gamma: " in
       let () = print_gamma_list log fmt gamma_list in
       let () = print_line_stars log in*)
       ()
 
-  let cannonic_form_from_syntactic_rules ?env log compil =
-    let empty_cache = I.empty_lkappa_cache () in
-    let cache,
-        rate_list,
-        gamma_list,
-        nbr_lhs_list,
-        nbr_rule_list,
-        pair_hash_rule_id_list =
+  type kind = Internal | Binding
+
+  let cannonic_form_from_syntactic_rules log compil cache =
+    let empty_sigs = Signature.create [||] in
+    let cache, sigs, rate_list, gamma_list, nbr_lhs_list,
+        nbr_rule_list, pair_hash_rule_id_list,
+        pair_rule_id_lkappa_rule_list =
       List.fold_left
-        (fun (cache,
-              rate_list,
-              store_gamma_list,
-              nbr_lhs_list,
-              current_list,
-              pair_list) rule ->
+        (fun (cache, _, rate_list, store_gamma_list,
+              nbr_lhs_list, current_list, pair_list,
+              pair_rule_id_lkappa_rule_list
+             ) rule ->
           (*****************************************************)
            (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
@@ -1980,14 +1989,17 @@ automorphisms in the site graph E.
            in
            (*****************************************************)
            (* identifiers of rule up to isomorphism*)
-           let sigs, rule_id, rate_opt_list,
-               cache, nbr_auto_in_rule =
+           let cache, sigs, lkappa_rule, rule_id, rate_opt_list,
+               nbr_auto_in_rule =
              I.cannonic_form_from_syntactic_rule cache compil rule
            in
            (*****************************************************)
-           (*position of agent_id in a rule has at least site_x,
-             or site_y*)
-
+           (*position of agent id that has at least site_x
+             or site_y
+           *)
+           let pair_rule_id_lkappa_rule =
+             (rule_id, lkappa_rule) :: pair_rule_id_lkappa_rule_list
+           in
            (*****************************************************)
            (*compute gamma(r)= k(r)/convention(r)*)
            let gamma_list =
@@ -1995,7 +2007,7 @@ automorphisms in the site graph E.
            in
            (*****************************************************)
            let pair_rule_id_gamma_list =
-             (rule_id, gamma_list) ::store_gamma_list
+             (rule_id, gamma_list) :: store_gamma_list
            in
            let rate_list = rate_opt_list :: rate_list  in
            let nbr_lhs_list = nbr_auto_in_lhs :: nbr_lhs_list in
@@ -2007,37 +2019,32 @@ automorphisms in the site graph E.
            (*PRINT*)
            let () =
              print_cannonic_form_from_syntactic_rules
-             ~compil sigs
+             ~compil
                log rule_id rule nbr_auto_in_lhs nbr_auto_in_rule
                rate_opt_list
            in
            (*****************************************************)
            (*return values*)
-           cache,
-           rate_list,
-           pair_rule_id_gamma_list,
-           nbr_lhs_list,
-           nbr_rule_list,
-           pair_hash_rule_id
+           cache, sigs, rate_list, pair_rule_id_gamma_list,
+           nbr_lhs_list, nbr_rule_list, pair_hash_rule_id,
+           pair_rule_id_lkappa_rule
         )
-        (empty_cache, [], [], [], [], [])
+        (cache, empty_sigs, [], [], [], [], [], [])
         (I.get_rules compil)
     in
-    cache,
-    rate_list,
-    gamma_list,
-    nbr_lhs_list,
-    nbr_rule_list,
-    pair_hash_rule_id_list
+    cache, sigs, rate_list, gamma_list, nbr_lhs_list,
+    nbr_rule_list, pair_hash_rule_id_list,
+    pair_rule_id_lkappa_rule_list
 
 (******************************************************)
 (*Build array for symmetries*)
 
-  let print_array_for_symmetries log max_hash to_check_array hit_array
-      hash_rule_list_array =
+  let print_array_for_symmetries log max_hash to_check_array
+      hit_array hash_rule_list_array =
     let () = print_max_hash log max_hash in
     let i = Array.length to_check_array in
-    let () = Loggers.fprintf log "The length of array to_check: %i\n" i in
+    let () = Loggers.fprintf log
+        "The length of array to_check: %i\n" i in
     let () = Loggers.fprintf log "\nHash_rule_list_array: " in
     let () = Loggers.fprintf log "\nTo_check_array: " in
     let () = print_bool_array log to_check_array in
@@ -2065,13 +2072,13 @@ automorphisms in the site graph E.
       Array.make size_hash_plus_1 []
     in
     (*PRINT*)
-    let () =
+    (*let () =
       print_array_for_symmetries log
         max_hash
         to_check_array
         hit_array
         hash_rule_list_array
-    in
+    in*)
     to_check_array, hit_array, hash_rule_list_array
 
 (******************************************************)
@@ -2139,7 +2146,22 @@ automorphisms in the site graph E.
     Loggers.print_newline log
 
   (******************************************************)
-  (*update array*)
+(*update array*)
+
+  let print_update_array log update_hash_rule_list_array
+      update_to_check_array update_hit_array  =
+    let () = print_line_stars log in
+    let () = Loggers.fprintf log
+        "\nUpdate Hash_rule_list_array: \n"
+    in
+    let () = print_list_array log update_hash_rule_list_array in
+    let () = Loggers.print_newline log in
+    let () = Loggers.fprintf log "Update to_check_array:" in
+    let () = print_bool_array log update_to_check_array in
+    let () = Loggers.print_newline log in
+    let () = Loggers.fprintf log "Update hit_array: " in
+    let () = print_int_array log update_hit_array in
+    Loggers.print_newline log
 
   let update_array log cache hash_rule_list_array
       to_check_array
@@ -2158,40 +2180,37 @@ automorphisms in the site graph E.
       rule_id:  [r1;r3] [r2]  [r4]  []
     *)
     let cache, update_hash_rule_list_array =
-      List.fold_left (fun (cache, hash_array) (rule_id_list, same_hash) ->
-          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
-              same_hash
-          in
-          (*put the list of rules that has the same hash*)
-          let hash_array =
-            hash_array.(int_hash_array) <- rule_id_list;
-            hash_array
-          in
-          cache, hash_array
+      List.fold_left
+        (fun (cache, hash_array) (rule_id_list, same_hash) ->
+           let int_hash_array =
+             LKappa_auto.RuleCache.int_of_hashed_list
+               same_hash
+           in
+           (*put the list of rules that has the same hash*)
+           let hash_array =
+             hash_array.(int_hash_array) <- rule_id_list;
+             hash_array
+           in
+           cache, hash_array
         ) (cache, hash_rule_list_array) pair_of_rule_id_same_hashes
     in
     (*put rule id that does not has the same hashes*)
     let cache, update_hash_rule_list_array =
-      List.fold_left (fun (cache, hash_array) (rule_id, different_hash) ->
-          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
-              different_hash
-          in
-          let hash_array =
-            hash_array.(int_hash_array) <- [rule_id];
-            hash_array
-          in
-          cache, hash_array
+      List.fold_left
+        (fun (cache, hash_array) (rule_id, different_hash) ->
+           let int_hash_array =
+             LKappa_auto.RuleCache.int_of_hashed_list
+               different_hash
+           in
+           let hash_array =
+             hash_array.(int_hash_array) <- [rule_id];
+             hash_array
+           in
+           cache, hash_array
         ) (cache, update_hash_rule_list_array)
         list_of_rule_id_has_different_hashes
     in
-    let () =
-      let () = print_line_stars log in
-      let () = Loggers.fprintf log
-          "\nUpdate Hash_rule_list_array: \n"
-      in
-      let () = print_list_array log update_hash_rule_list_array in
-      Loggers.print_newline log
-    in
+    (******************************************************)
     (*
      update to_check_array:
      Hash : 0     1     2      3
@@ -2221,12 +2240,7 @@ automorphisms in the site graph E.
           cache, hash_array
         ) (cache, update_to_check_array) different_hash_list
     in
-    let () =
-      let () = Loggers.fprintf log "Update to_check_array:"
-      in
-      let () = print_bool_array log update_to_check_array in
-      Loggers.print_newline log
-    in
+    (******************************************************)
     (*
      update hit_array:
      Hash :     0    1    2   3
@@ -2249,7 +2263,8 @@ automorphisms in the site graph E.
     (*different hash*)
     let cache, update_hit_array =
       List.fold_left (fun (cache, hash_array) different_hash ->
-          let int_hash_array = LKappa_auto.RuleCache.int_of_hashed_list
+          let int_hash_array =
+            LKappa_auto.RuleCache.int_of_hashed_list
               different_hash
           in
           (*it is a singleton in the case of different_hash hash*)
@@ -2260,10 +2275,12 @@ automorphisms in the site graph E.
           cache, hash_array
         ) (cache, update_hit_array) different_hash_list
     in
+    (******************************************************)
+    (*PRINT*)
     let () =
-      let () = Loggers.fprintf log "Update hit_array: " in
-      let () = print_int_array log update_hit_array in
-      Loggers.print_newline log
+      print_update_array log
+        update_hash_rule_list_array update_to_check_array
+        update_hit_array
     in
     cache, update_hash_rule_list_array, update_to_check_array,
     update_hit_array
@@ -2280,20 +2297,89 @@ automorphisms in the site graph E.
   where A(x) : has position 1(0), A(y): has position 2(or 1)
 *)
 
-  type kind = Internal | Binding
+  let print_site_list fmt sigs agent_id l =
+    List.iter (fun site ->
+        Signature.print_site sigs agent_id fmt
+          site
+      ) l
 
-  let compute_symmetries_from_syntactic_rules log compil
-  (*partition_contact_map kind*)
-  (*agent kind site1 site2*) =
-    let cache, rate_list, gamma_list, nbr_lhs_list, nbr_rule_list,
-        pair_hash_rule_id_list =
-      cannonic_form_from_syntactic_rules log compil
+  let print_convert_agent_and_its_sigs log sigs converted_map =
+    match Loggers.formatter_of_logger log with
+    | None -> ()
+    | Some fmt ->
+      Mods.IntMap.iter
+        (fun agent_id (l1,l2) ->
+           let () =
+             Loggers.fprintf log "Agent_type: ";
+             Signature.print_agent sigs fmt agent_id
+           in
+           let () =
+             Loggers.fprintf log " internal_site list: ";
+             print_site_list fmt sigs agent_id l1
+           in
+           let () =
+             Loggers.fprintf log " binding_site list: ";
+             print_site_list fmt sigs agent_id l2
+           in
+           let () = Loggers.print_newline log in
+           ()
+        ) converted_map
+
+  let convert_agent_and_its_sites log sigs agent
+      internal_site_list binding_site_list =
+    let agent_annot = Locality.dummy_annot agent in
+    let agent_id = Signature.num_of_agent agent_annot sigs in
+    (* a list of site has an internal state*)
+    let site_int_internal_list =
+      List.fold_left (fun current_list site_inter ->
+          let site_annot = Locality.dummy_annot site_inter in
+          let site_int =
+            Signature.id_of_site agent_annot site_annot sigs
+          in
+          site_int :: current_list
+        ) [] internal_site_list
+    in
+    let site_int_binding_list =
+      List.fold_left (fun current_list site_bind ->
+          let site_annot = Locality.dummy_annot site_bind in
+          let site_int =
+            Signature.id_of_site agent_annot site_annot sigs
+          in
+          site_int :: current_list
+        ) [] binding_site_list
+    in
+    (*store_as_map*)
+    let converted_map =
+      Mods.IntMap.add
+        agent_id
+        (site_int_internal_list, site_int_binding_list)
+        Mods.IntMap.empty
+    in
+    (*PRINT*)
+    let () = print_convert_agent_and_its_sigs
+        log sigs converted_map
+    in
+    (*  agent_id, site_int_internal_list, site_int_binding_list*)
+    converted_map
+
+  (******************************************************)
+
+  let compute_symmetries_from_syntactic_rules_aux
+      cache log compil kind1 kind2
+      agent internal_site_list binding_site_list
+    =
+    (*****************************************************)
+    let cache, sigs, rate_list, gamma_list, nbr_lhs_list,
+        nbr_rule_list, pair_hash_rule_id_list,
+        pair_rule_id_lkappa_rule =
+      cannonic_form_from_syntactic_rules log compil cache
     in
     let () =
       match Loggers.formatter_of_logger log with
       | None -> ()
       | Some fmt ->
-        let () = Loggers.fprintf log "Pair of rule_id and its gamma: \n" in
+        let () = Loggers.fprintf log
+            "Pair of rule_id and its gamma: \n" in
         let () = print_gamma_list log fmt gamma_list in
         let () = Loggers.print_newline log in
         ()
@@ -2307,25 +2393,26 @@ automorphisms in the site graph E.
     let isomorphism_rule_hash_list =
       compute_isomorphism_in_hashes nbr_rule_list
     in
+    (*PRINT*)
     let () = print_isomorphism log isomorphism_rule_hash_list in
     let list_of_rule_id_with_its_hashes =
       list_of_rule_id_with_its_hashes pair_hash_rule_id_list
         isomorphism_rule_hash_list
     in
-    let ()  =
-      print_list_of_rule_id_with_its_hashes log
+    let () = print_list_of_rule_id_with_its_hashes log
         list_of_rule_id_with_its_hashes
     in
+    (*****************************************************)
     let pair_of_rule_id_same_hashes,
-        list_of_rule_id_has_different_hashes =
-      list_of_rule_id_with_its_hashes
+        list_of_rule_id_has_different_hashes
+      = list_of_rule_id_with_its_hashes
     in
     (*****************************************************)
     (*array*)
     let to_check_array, hit_array, hash_rule_list_array =
       build_array_for_symmetries log nbr_rule_list
     in
-    let rule_id_different_hash_list, different_hash_list =
+    let _, different_hash_list =
       List.split
         list_of_rule_id_has_different_hashes
     in
@@ -2343,13 +2430,120 @@ automorphisms in the site graph E.
         list_of_rule_id_has_different_hashes
     in
     (*****************************************************)
+    (*convert agent, sites from
+      Ckappa_sig signatures -> LKappa signatures*)
+    let converted_map =
+      convert_agent_and_its_sites log sigs agent
+        internal_site_list binding_site_list
+    in
     (*a set of /the list of the positions (of all agents:
       both in the lhs/rhs, degraded agents (deleted),
       created agents) of the agent A with at least a
       site x or y in the rule.
-      - The positions are the agent_id of agents of type A
-      with at least a site x or y.*)
+      - getting the position of agent_id of type A, with at least a
+      site x or y*)
+    let _ =
+      List.fold_left (fun _ (rule_id, lkappa_rule) ->
+          let rule_mixture = lkappa_rule.LKappa.r_mix in
+          let _ =
+            if kind1 = Internal
+            then
+              List.mapi (fun i rule_agent ->
+                  let lagent_id = rule_agent.LKappa.ra_type in
+                  let (l1, l2) =
+                    match Mods.IntMap.find_option
+                            lagent_id
+                            converted_map
+                    with
+                    | None -> ([], [])
+                    | Some (l1, l2) -> (l1, l2)
+                  in
+
+                  let () =
+                    Loggers.fprintf log
+                      " rule_id:%i:index:%i:agent_id:%i \n"
+                      rule_id
+                      i
+                      (rule_agent.LKappa.ra_type)
+                  in
+                  (*get a list of site with internal states*)
+                  (*let _ =
+                    let rec aux empty i =
+                      if i < Array.length ports
+                      then
+                        if (match ports.(i) with
+                            | (((Ast.LNK_SOME | Ast.FREE |
+                                 Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
+                            | (Ast.LNK_ANY, _), _ ->
+                              match ints.(i) with
+                              | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> false
+                              | ( I_VAL_CHANGED _ | I_VAL_ERASED _) -> true) then
+                          let _ =
+                            if empty
+                            then
+                            else
+
+                          in
+
+                    in
+
+                  in*)
+
+                  let _ =
+                    Array.iter (fun rule_internal ->
+                        match rule_internal with
+                        | LKappa.I_ANY ->
+                          Loggers.fprintf log " I_ANY \n"
+                        | LKappa.I_ANY_CHANGED i ->
+                          Loggers.fprintf log
+                            " I_ANY_CHANGED:%i\n"
+                            i
+                        | LKappa.I_ANY_ERASED ->
+                          Loggers.fprintf log " I_ANY_ERASED "
+                        | LKappa.I_VAL_CHANGED (i, i') ->
+                          Loggers.fprintf log
+                            " I_VAL_CHANGED (%i, %i)\n"
+                            i i'
+                        | LKappa.I_VAL_ERASED i ->
+                          Loggers.fprintf log " I_ANY_ERASED:%i\n"
+                            i
+                      ) rule_agent.LKappa.ra_ints
+                  in
+                  []
+                ) rule_mixture
+            else
+            if kind2 = Binding
+            then []
+            else []
+          in
+          []
+        ) [] pair_rule_id_lkappa_rule
+    in
     cache, ()
+
+  let compute_symmetries_from_syntactic_rules
+      log compil kind1 kind2
+      partitioned_contact_map =
+    let cache, () =
+      Mods.StringMap.fold
+        (fun agent (l1, l2) (cache, ())->
+           let internal_site_list = List.flatten l1 in
+           let binding_site_list = List.flatten l2 in
+           (*FIXME: this function prints twice the information*)
+           let cache, () =
+             compute_symmetries_from_syntactic_rules_aux
+               cache
+               log compil
+               kind1 kind2
+               agent
+               internal_site_list
+               binding_site_list
+           in
+           cache, ()
+        ) partitioned_contact_map (I.empty_lkappa_cache (), ())
+    in
+    cache, ()
+
 
 (*
 2) Now we have a list of rules, with a hash.

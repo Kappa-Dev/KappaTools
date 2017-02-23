@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 21 2017>
+  * Last modification: Time-stamp: <Feb 23 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -48,11 +48,15 @@ sig
 
   val get_divide_rate_by : enriched_rule -> int
 
-  type kind
+  type kind = Internal | Binding
 
   val compute_symmetries_from_syntactic_rules :
     Loggers.t ->
+    (*  Remanent_parameters_sig.parameters ->*)
     I.compil ->
+    kind ->
+    kind ->
+    Symmetries.partitioned_contact_map ->
     I.nauto_in_rules_cache * unit
 
   (*val compute_symmetries_from_syntactic_rules : Loggers.t ->

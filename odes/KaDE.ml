@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 21 2017>
+  * Last modification: Time-stamp: <Feb 23 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -145,8 +145,10 @@ let main () =
     in
     let compil =
       A.get_compil
-        ~rate_convention ~show_reactions ~count ~compute_jacobian cli_args in
-    (*********************************************************************)
+        ~rate_convention ~show_reactions ~count ~compute_jacobian
+        cli_args
+    in
+    (*************************************************************)
     (*TEST-symmetries*)
     let cache, p =
       if ode_args.Ode_args.with_symmetries
@@ -201,7 +203,12 @@ let main () =
             ~accuracy_level:Remanent_state.High state
         in
         let _, () =
-          A.compute_symmetries_from_syntactic_rules my_logger compil
+          A.compute_symmetries_from_syntactic_rules
+            my_logger
+            compil
+            A.Internal
+            A.Binding
+            (symmetries.Symmetries.store_partition_contact_map)
         in
         let () =
           match file_opt with
