@@ -271,10 +271,8 @@ struct
   let lift f compil expr nauto =
     match f compil nauto with
     | Ode_loggers.Nil -> expr
-    | Ode_loggers.Div n ->
-      Alg_expr.div expr (Alg_expr.const (Nbr.I n))
-    | Ode_loggers.Mul n ->
-      Alg_expr.mult (Alg_expr.const (Nbr.I n)) expr
+    | Ode_loggers.Div n -> Alg_expr.div expr (Alg_expr.int n)
+    | Ode_loggers.Mul n -> Alg_expr.mult (Alg_expr.int n) expr
 
   let to_nembed = lift to_nembed_correct
   let to_nocc = lift to_nocc_correct
@@ -457,12 +455,11 @@ struct
                else
                  to_nembed compil
                    (from
-                      (Alg_expr.mult
-                          (Alg_expr.const (Nbr.I n_embs))
-                          species) nauto)
+                      (Alg_expr.mult (Alg_expr.int n_embs) species)
+                      nauto)
                    nauto
              in
-             if fst alg = Alg_expr.CONST (Nbr.zero) then term
+             if fst alg = Alg_expr.CONST Nbr.zero then term
              else Alg_expr.add alg term
       )
       network.id_of_ode_var
@@ -836,7 +833,7 @@ struct
     in
     let dec_tab =
       Mods.DynArray.create network.fresh_var_id
-        (Dummy_decl,None,Locality.dummy_annot (Alg_expr.CONST Nbr.zero))
+        (Dummy_decl,None,Alg_expr.const Nbr.zero)
     in
     let add_succ i j =
       let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
@@ -1253,23 +1250,23 @@ struct
     let () = Sbml_backend.open_box logger_buffer "listOfParameters" in
     let () = Sbml_backend.line_sbml logger_buffer in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (Alg_expr.const (Nbr.F init_t)) handler_expr in
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t) handler_expr in
     let () =
       Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tend
-        (Alg_expr.const (Nbr.F max_t))
+        (Alg_expr.float max_t)
         handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer Ode_loggers_sig.InitialStep
-        (Alg_expr.const (Nbr.F 0.000001)) handler_expr
+        (Alg_expr.float 0.000001) handler_expr
     in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer Ode_loggers_sig.Period_t_points
-        (Alg_expr.const (Nbr.F  plot_period)) handler_expr
+        (Alg_expr.float plot_period) handler_expr
     in
     let () = Ode_loggers.print_newline logger_buffer in
     let () =
@@ -1280,7 +1277,7 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_ode_var
-        (Alg_expr.const (Nbr.I (get_last_ode_var_id network)))
+        (Alg_expr.int (get_last_ode_var_id network))
         handler_expr
     in
     let () =
@@ -1288,7 +1285,7 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_var
-        (Alg_expr.const (Nbr.I (get_last_var_id network)))
+        (Alg_expr.int (get_last_var_id network))
         handler_expr
     in
     let () =
@@ -1296,14 +1293,14 @@ struct
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_obs
-        (Alg_expr.const (Nbr.I network.n_obs))
+        (Alg_expr.int network.n_obs)
         handler_expr in
     let () =
       Ode_loggers.associate
         (I.string_of_var_id ~compil)
         logger logger_buffer
         Ode_loggers_sig.N_rules
-        (Alg_expr.const (Nbr.I network.n_rules))
+        (Alg_expr.int network.n_rules)
         handler_expr
     in
     let () = Ode_loggers.print_newline logger_buffer in
@@ -1820,10 +1817,7 @@ automorphisms in the site graph E.
           | None -> current_list
           | Some rate ->
             let gamma =
-              Alg_expr.div
-                rate
-                (Alg_expr.const (Nbr.I nbr_auto_in_lhs))
-            in
+              Alg_expr.div rate (Alg_expr.int nbr_auto_in_lhs) in
             gamma :: current_list
         ) [] rate_opt_list
     in

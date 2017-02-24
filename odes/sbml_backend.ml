@@ -185,7 +185,7 @@ let of_bool_op op =
 let unsome expr_opt =
   match expr_opt
   with
-  | None -> Locality.dummy_annot (Alg_expr.CONST Nbr.zero)
+  | None -> Alg_expr.const Nbr.zero
   | Some expr -> expr
 
 let rec eval_init_alg_expr logger network_handler alg_expr =
@@ -642,7 +642,7 @@ let dump_initial_species ?units loggers network_handler k name species =
   let expr =
     match Loggers.get_expr loggers (Ode_loggers_sig.Init k) with
     | Some a -> a
-    | None -> Locality.dummy_annot (Alg_expr.CONST Nbr.zero)
+    | None -> Alg_expr.const Nbr.zero
   in
   let units =
     match units with
@@ -765,11 +765,7 @@ let dump_kinetic_law
         if correct = 1
         then expr
         else
-          Locality.dummy_annot
-            (Alg_expr.BIN_ALG_OP
-               (Operator.DIV,
-                expr,
-                Locality.dummy_annot (Alg_expr.CONST (Nbr.I correct))))
+          Alg_expr.div expr (Alg_expr.int correct)
       in
       print_alg_expr_in_sbml string_of_var_id logger expr network
   in

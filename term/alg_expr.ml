@@ -128,6 +128,8 @@ and print_bool pr_mix pr_tok pr_var f = function
       (print pr_mix pr_tok pr_var) b
 
 let const n = Locality.dummy_annot (CONST n)
+let int i = const (Nbr.I i)
+let float f = const (Nbr.F f)
 let add e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.SUM,e1,e2))
 let minus e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MINUS,e1,e2))
 let mult e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MULT,e1,e2))

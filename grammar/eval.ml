@@ -201,7 +201,7 @@ let rule_effect
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
-      LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
+      LKappa.r_rate = Alg_expr.const Nbr.zero;
     } in
   let (domain',alg_pos) =
     compile_alg contact_map domain alg_expr in
@@ -233,7 +233,7 @@ let effects_of_modif
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
   | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
     rule_effect contact_map domain
-      (Locality.dummy_annot (Alg_expr.CONST (Nbr.one)))
+      (Alg_expr.const Nbr.one)
       ([],[],
        [Locality.dummy_annot
           (Alg_expr.BIN_ALG_OP
@@ -339,11 +339,7 @@ let inits_of_result ?rescale contact_map env preenv res =
                    snd alg)) in
          let alg = match rescale with
            | None -> alg
-           | Some r ->
-             Locality.dummy_annot
-               (Alg_expr.BIN_ALG_OP
-                  (Operator.MULT,alg,
-                   Locality.dummy_annot (Alg_expr.CONST (Nbr.F r)))) in
+           | Some r -> Alg_expr.mult alg (Alg_expr.float r) in
          match init_t with
          | INIT_MIX ast,mix_pos ->
            let sigs = Model.signatures env in
@@ -352,7 +348,7 @@ let inits_of_result ?rescale contact_map env preenv res =
              { LKappa.r_mix = [];
                LKappa.r_created = LKappa.to_raw_mixture sigs ast;
                LKappa.r_delta_tokens = [];
-               LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
+               LKappa.r_rate = Alg_expr.const Nbr.zero;
                LKappa.r_un_rate = None; } in
            let preenv'',state' =
              match
@@ -372,7 +368,7 @@ let inits_of_result ?rescale contact_map env preenv res =
            let fake_rule =
              { LKappa.r_mix = []; LKappa.r_created = [];
                LKappa.r_delta_tokens = [(alg, tk_id)];
-               LKappa.r_rate = Locality.dummy_annot (Alg_expr.CONST Nbr.zero);
+               LKappa.r_rate = Alg_expr.const Nbr.zero;
                LKappa.r_un_rate = None; } in
            match
              rules_of_ast
@@ -380,7 +376,7 @@ let inits_of_result ?rescale contact_map env preenv res =
                (Locality.dummy_annot fake_rule)
            with
            | domain'',_,_,[ compiled_rule ] ->
-             (Alg_expr.CONST (Nbr.I 1),compiled_rule,pos_tk),domain''
+             (Alg_expr.CONST Nbr.one,compiled_rule,pos_tk),domain''
            | _,_,_,_ -> assert false
       ) res.Ast.init preenv in
   (preenv',init_l)

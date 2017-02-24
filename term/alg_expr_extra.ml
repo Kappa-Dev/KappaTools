@@ -90,7 +90,7 @@ let print pr_var f corrected_rate_const =
   | Some a ->
     begin
       match a.var with
-      | Some v ->
+      | Some _ ->
         (Format.fprintf f "(%a/%a).%a"
            Nbr.print a.num Nbr.print a.den pr_var a.var)
       | None ->

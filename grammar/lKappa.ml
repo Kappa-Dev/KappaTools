@@ -1338,7 +1338,7 @@ let compil_of_ast overwrite c =
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x,
-                     Locality.dummy_annot (Alg_expr.CONST v))) overwrite
+                     Alg_expr.const v)) overwrite
       (List.filter
          (fun ((x,_),_) ->
             List.for_all (fun (x',_) -> x <> x') overwrite)

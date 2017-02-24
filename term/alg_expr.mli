@@ -58,6 +58,8 @@ val print_bool :
 
 (** {6 Smart constructor } *)
 val const : Nbr.t -> ('a,'b) e Locality.annot
+val int : int -> ('a,'b) e Locality.annot
+val float : float -> ('a,'b) e Locality.annot
 val add :
   ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot ->
   ('a,'b) e Locality.annot
