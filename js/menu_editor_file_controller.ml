@@ -8,7 +8,7 @@
 
 open Lwt.Infix
 
-let create_file (file_id : string) ?(content:string = "") : unit =
+let create_file ?(content:string = "") (file_id : string) : unit =
   Common.async
     (fun () ->
        State_error.wrap
