@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 23 2017>
+  * Last modification: Time-stamp: <Feb 24 2017>
 *)
 
 let local_trace = false
@@ -2503,11 +2503,21 @@ automorphisms in the site graph E.
   let compute_symmetries_from_syntactic_rules
       log compil kind1 kind2
       partitioned_contact_map =
+    let symmetries =
+      I.translate_symmetries compil partitioned_contact_map
+    in
+    let () =
+      I.print_partitioned_contact_map_in_lkappa
+        log
+        compil symmetries
+    in
     let cache, () =
       Mods.StringMap.fold
         (fun agent (l1, l2) (cache, ())->
            let internal_site_list = List.flatten l1 in
            let binding_site_list = List.flatten l2 in
+           (** JF: I do not really see the point in computing a partition
+               if this is to flatten it *)
            (*FIXME: this function prints twice the information*)
            let cache, () =
              compute_symmetries_from_syntactic_rules_aux

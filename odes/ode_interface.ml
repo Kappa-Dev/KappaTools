@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 23 2017>
+  * Last modification: Time-stamp: <Feb 24 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -372,3 +372,14 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       lkappa_rule.LKappa.r_created
   in
   cache, sigs, lkappa_rule, rule_id, rate_opt_list, hash_list
+
+let print_partitioned_contact_map_in_lkappa
+    log compil symmetries =
+  Symmetries.print_partitioned_contact_map_in_lkappa
+    log (Model.signatures compil.environment) symmetries 
+
+
+let translate_symmetries compil symmetries =
+  Symmetries.translate_to_lkappa_representation
+    compil.environment
+    symmetries

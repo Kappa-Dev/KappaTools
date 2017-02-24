@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Feb 21 2017>
+   * Last modification: Time-stamp: <Feb 24 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -25,11 +25,15 @@ type partitioned_contact_map =
   ((string list list) * (string list list))
     Mods.StringSetMap.Map.t
 
+type lkappa_partitioned_contact_map =
+  ((int list list) * (int list list))
+    array
+
 type symmetries =
   {
     store_contact_map : contact_map ;
-    store_partition_contact_map : partitioned_contact_map ;
-    store_partition_with_predicate : partitioned_contact_map
+    store_partitioned_contact_map : partitioned_contact_map ;
+    store_partitioned_with_predicate : partitioned_contact_map
   }
 
 (***************************************************************************)
@@ -86,7 +90,7 @@ struct
 end
 module BindingTypeList = Hashed_list.Make (BindingType)
 
-let collect_partition_contact_map contact_map =
+let collect_partitioned_contact_map contact_map =
   Mods.StringMap.map
     (fun sitemap ->
        let cache1 = StateList.init () in
@@ -123,7 +127,7 @@ let refine_class p l =
     (fun result l -> refine_class p l result)
     [] l
 
-let collect_partition_with_predicate
+let collect_partitioned_with_predicate
     p_internal_state
     p_binding_state
     partitioned_contact_map =
@@ -152,7 +156,7 @@ let print_l parameters l =
       ())
       l
 
-let print_partition_contact_map parameters partitioned_contact_map =
+let print_partitioned_contact_map parameters partitioned_contact_map =
   Mods.StringMap.iter
     (fun agent (l1,l2) ->
        let () =
@@ -242,24 +246,24 @@ let print_contact_map parameters contact_map =
 let detect_symmetries parameters (contact_map:contact_map) =
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
-  let store_partition_contact_map =
-    collect_partition_contact_map
+  let store_partitioned_contact_map =
+    collect_partitioned_contact_map
       contact_map
   in
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES WITH A PREDICATE*)
-  let store_partition_with_predicate =
-    collect_partition_with_predicate
+  let store_partitioned_with_predicate =
+    collect_partitioned_with_predicate
       (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
       (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
-      store_partition_contact_map
+      store_partitioned_contact_map
       in
   (*-------------------------------------------------------------*)
   let store_result =
     {
       store_contact_map = contact_map;
-      store_partition_contact_map = store_partition_contact_map;
-      store_partition_with_predicate = store_partition_with_predicate
+      store_partitioned_contact_map = store_partitioned_contact_map;
+      store_partitioned_with_predicate = store_partitioned_with_predicate
     }
   in
   (*-------------------------------------------------------------*)
@@ -275,15 +279,87 @@ let detect_symmetries parameters (contact_map:contact_map) =
       let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameters)
         "Partitioned contact map\n";
-      print_partition_contact_map
-        parameters store_result.store_partition_contact_map
+      print_partitioned_contact_map
+        parameters store_result.store_partitioned_contact_map
       in
       let _ =
         Loggers.fprintf (Remanent_parameters.get_logger parameters)
           "With predictate\n";
-        print_partition_contact_map
-          parameters store_result.store_partition_with_predicate
+        print_partitioned_contact_map
+          parameters store_result.store_partitioned_with_predicate
       in
       ()
   in
-   store_result
+  store_result
+
+  (****************************************************************************)
+  let translate_list l agent_interface =
+    List.rev_map
+      (fun equ_class ->
+         List.rev_map
+           (fun site_string ->
+              Signature.num_of_site
+                (Locality.dummy_annot site_string)
+                agent_interface)
+           equ_class)
+      (List.rev l)
+
+let translate_to_lkappa_representation env partitioned_contact_map =
+    let signature = Model.signatures env in
+    let nagents = Signature.size signature in
+    let array = Array.make nagents ([],[]) in
+    let () =
+      Mods.StringMap.iter
+        (fun agent_string (l1,l2) ->
+           let ag_id =
+             Signature.num_of_agent
+               (Locality.dummy_annot agent_string)
+               signature
+           in
+           let interface = Signature.get signature ag_id in
+           let l1 = translate_list l1 interface in
+           let l2 = translate_list l2 interface in
+           array.(ag_id)<-(l1,l2))
+        partitioned_contact_map
+    in
+    array
+
+(***************************************************************************)
+
+let print_l logger fmt signature agent l =
+  if l <> []
+  then
+    List.iter
+      (fun equ_class ->
+         let () =
+           List.iter
+             (fun site ->
+                let () = Signature.print_site signature agent fmt site in
+                let () = Loggers.fprintf logger "," in
+                ())
+             equ_class
+         in
+         let () =
+           Loggers.print_newline logger
+         in
+         ())
+      l
+
+let print_partitioned_contact_map_in_lkappa logger signature partitioned_contact_map =
+  let fmt = Loggers.formatter_of_logger logger in
+  match fmt with
+  | None -> ()
+  | Some fmt ->
+    let () = Loggers.fprintf logger "From LKAPPA:" in
+    let () = Loggers.print_newline logger in
+    Array.iteri
+      (fun agent (l1,l2) ->
+         let () = Loggers.fprintf logger "Agent: " in
+         let () = Signature.print_agent signature fmt agent in
+         let () = Loggers.print_newline logger in
+         let () = Loggers.fprintf logger "internal sites:" in
+         let () = print_l logger fmt signature agent l1 in
+         let () = Loggers.fprintf logger "binding sites:" in
+         let () = print_l logger fmt signature agent l2 in
+         ()
+      ) partitioned_contact_map

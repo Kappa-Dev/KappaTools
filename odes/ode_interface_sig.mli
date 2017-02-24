@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 23 2017>
+  * Last modification: Time-stamp: <Feb 24 2017>
 *)
 
 module type Interface =
@@ -145,4 +145,13 @@ sig
     int * (*rule_id*)
     Alg_expr.t Locality.annot option list *
     LKappa_auto.RuleCache.hashed_list
+
+  val translate_symmetries :
+    compil ->
+    Symmetries.partitioned_contact_map ->
+    Symmetries.lkappa_partitioned_contact_map
+
+  val print_partitioned_contact_map_in_lkappa :
+    Loggers.t -> compil -> Symmetries.lkappa_partitioned_contact_map -> unit
+
 end

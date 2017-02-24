@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 23 2017>
+  * Last modification: Time-stamp: <Feb 24 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -208,7 +208,7 @@ let main () =
             compil
             A.Internal
             A.Binding
-            (symmetries.Symmetries.store_partition_contact_map)
+            symmetries.Symmetries.store_partitioned_contact_map
         in
         let () =
           match file_opt with
