@@ -6,9 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Js
 open Codemirror
-open Lwt.Infix
 module Html = Tyxml_js.Html5
 
 let editor_full , set_editor_full = React.S.create (false : bool)
@@ -54,19 +52,13 @@ let panel_heading =
     Menu_editor_simulation.content ()
   in
   let buttons =
-    Html.div
-      ~a:[ Html.a_id panel_heading_group_id ;
-           Html.a_class [ "btn-group" ] ;
-           Html.Unsafe.string_attrib "role" "group" ; ]
-      (menu_editor_settings_content @
+      menu_editor_settings_content @
        menu_editor_project_content @
        menu_editor_file_content @
        menu_editor_simulation_content @
-       [toggle_button]
-      )
-  in
+       [toggle_button] in
   [%html {|<div class="row">
-             <div class="col-md-8">|}[ buttons ]{|</div>
+             <div id="|}panel_heading_group_id{|" class="col-md-10 btn-group">|} buttons{|</div>
              <div class="col-md-2">
                 <label class="filename">|}[ file_label ]{|</label>
              </div>
