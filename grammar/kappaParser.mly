@@ -111,7 +111,7 @@ instruction:
     | OBS variable_declaration {Ast.OBS $2}
     | PLOT alg_expr {Ast.PLOT $2}
     | PLOT error {raise (ExceptionDefn.Syntax_Error
-			   (add_pos "Malformed plot instruction, I was expecting an algebraic expression of variables"))}
+			   (add_pos "Malformed plot instruction, an algebraic expression is expected"))}
     | PERT perturbation_declaration
 	   {let (bool_expr,mod_expr_list) = $2 in
 	    Ast.PERT (add_pos (bool_expr,mod_expr_list,None))}
@@ -134,6 +134,9 @@ instruction:
 			  Format.pp_print_string
 			    f "Perturbation need not be applied repeatedly") in
 	    Ast.PERT (add_pos (bool_expr,mod_expr_list,Some $5))}
+    | PERT REPEAT perturbation_declaration error
+	{ raise (ExceptionDefn.Syntax_Error
+		   (add_pos "Expect \"until\" statement"))}
     | CONFIG STRING value_list
 	     {Ast.CONFIG (($2,rhs_pos 2),$3)}
     | PERT bool_expr DO effect_list UNTIL bool_expr
