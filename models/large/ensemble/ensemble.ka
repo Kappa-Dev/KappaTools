@@ -363,6 +363,3 @@
   $FLUX "flux_ensemble2_t1000_p3000.dot" [false]
 #%mod: repeat [T]= do $SNAPSHOT "autodrift_ensemble" until [false]
 %mod: [true] do $FLUX "flux_ensemble2_t1000_p3000.dot" [true]
-%def: "influenceMapFileName" "im_ensemble2_t1000_p3000"
-
-
