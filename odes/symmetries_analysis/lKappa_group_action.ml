@@ -89,10 +89,23 @@ let swap_binding_state_created ag_type site1 site2 ag =
   ()
 
 (******************************************************************************)
-
+let of_rule rule = (rule.LKappa.r_mix,rule.LKappa.r_created)
 
 let is_empty (rule_tail,created_tail) =
   rule_tail = [] && created_tail = []
+
+let p_head p p_raw (rule_tail,created_tail) =
+  match
+    rule_tail, created_tail
+  with
+  | h::t,_ ->
+    p h,(t,created_tail)
+  | _,h::t ->
+    p_raw h,(rule_tail, t)
+  | [],[] ->
+    let s1,i1,i2,i3 = __POS__ in
+    let s = Printf.sprintf "%s %i %i %i" s1 i1 i2 i3 in
+    raise (invalid_arg s)
 
 let apply_head sigma sigma_raw (rule_tail,created_tail) =
   match
@@ -111,6 +124,35 @@ let apply_head sigma sigma_raw (rule_tail,created_tail) =
 
 let shift tail = apply_head ignore ignore tail
 
+(******************************************************************************)
+let filter_positions p p_raw  rule =
+  let rec aux pos_id rule_tail accu =
+    if is_empty rule_tail
+    then List.rev accu
+    else
+      let b,rule_tail = p_head p p_raw rule_tail in
+      if b then
+        aux (pos_id+1) rule_tail (pos_id::accu)
+      else
+        aux (pos_id+1) rule_tail accu
+  in
+  aux 0 (of_rule rule) []
+
+let potential_positions_for_swapping_internal_states
+    agent_type site1 site2 rule =
+  filter_positions
+    (may_swap_internal_state_regular agent_type site1 site2)
+    (may_swap_internal_state_created agent_type site1 site2)
+    rule
+
+let potential_positions_for_swapping_binding_states
+    agent_type site1 site2 rule =
+  filter_positions
+    (may_swap_binding_state_regular agent_type site1 site2)
+    (may_swap_binding_state_created agent_type site1 site2)
+    rule
+
+(******************************************************************************)
 let backtrack sigma_inv sigma_raw_inv counter positions rule =
   let rec aux agent_id rule_tail pos_id positions_tail =
     match positions_tail with
@@ -133,7 +175,7 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
         aux (agent_id+1) rule_tail (pos_id+1) pos_tail
       end
   in
-  aux 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions
+  aux 0 (of_rule rule) 0 positions
 
 let fold_over_orbit
     (positions:int list)
@@ -146,13 +188,13 @@ let fold_over_orbit
     (init:'a)  =
   let n = List.length positions in
   let counter = Array.make n false in
-  let rec next agent_id rule_tail pos_id positions_tail residue =
+  let rec next agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
-    | [] -> Some residue
+    | [] -> Some accu
     | pos_head::_
       when agent_id < pos_head ->
       let rule_tail = shift rule_tail in
-      next (agent_id+1) rule_tail pos_id positions_tail residue
+      next (agent_id+1) rule_tail pos_id positions_tail accu
     | pos_head::pos_tail
       when agent_id = pos_head ->
       begin
@@ -161,14 +203,14 @@ let fold_over_orbit
         then
           let () = counter.(pos_id)<-false in
           let rule_tail = apply_head sigma_inv sigma_raw_inv rule_tail in
-          next (agent_id+1) rule_tail (pos_id+1) pos_tail residue
+          next (agent_id+1) rule_tail (pos_id+1) pos_tail accu
         else
           let () = counter.(pos_id)<-true in
           let _ = apply_head sigma sigma_raw rule_tail in
-          match f rule residue with
+          match f rule accu with
           | None -> None
-          | Some residue ->
-          next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions residue
+          | Some accu ->
+          next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions accu
       end
     | pos_head::_
       when agent_id > pos_head ->
@@ -180,4 +222,4 @@ let fold_over_orbit
       let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
       None
   in
-  next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions init
+  next 0 (of_rule rule) 0 positions init

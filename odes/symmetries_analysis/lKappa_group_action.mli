@@ -1,19 +1,12 @@
-(** Primitives to test whether it is worth applying a transposition of states
-   on a given agent *)
+(** Primitives to detect where a permutation of states may be applied in a rule *)
 
-val may_swap_internal_state_regular:
-  int -> int -> int -> LKappa.rule_agent -> bool
+val potential_positions_for_swapping_internal_states:
+  int -> int -> int -> LKappa.rule -> int list
 
-val may_swap_binding_state_regular:
-  int -> int -> int -> LKappa.rule_agent -> bool
+val potential_positions_for_swapping_binding_states:
+    int -> int -> int -> LKappa.rule -> int list
 
-val may_swap_internal_state_created:
-  int -> int -> int -> Raw_mixture.agent -> bool
-
-val may_swap_binding_state_created:
-  int -> int -> int -> Raw_mixture.agent -> bool
-
-(** Primitives to apply a transposition of states on a given agent *) 
+(** Primitives to apply a transposition of states on a given agent *)
 val swap_internal_state_regular:
   int -> int -> int -> LKappa.rule_agent -> unit
 
