@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 24 2017>
+  * Last modification: Time-stamp: <Feb 26 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -264,3 +264,4 @@ let main () =
 
 let () = main ()
 let _ = Alg_expr_extra.print
+let _ = LKappa_group_action.fold_over_orbit

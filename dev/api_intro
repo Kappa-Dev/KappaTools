@@ -47,3 +47,6 @@ The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Communication Analyzer_domain_sig Product Usual_domains}
 Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain Parallel_bonds Site_accross_bonds_domain}
+
+Primivites to deal with symmetries in rules and species
+{!modules: LKappa_group_action}
