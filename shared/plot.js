@@ -585,9 +585,8 @@ function observable_plot(configuration){
                 var label =
                     "Plot between t = "
                     +that.formatTime(that.start_time)
-                    +"s and t = "
-                    +that.formatTime(that.end_time)
-                    +"s";
+                    +" and t = "
+                    +that.formatTime(that.end_time);
                 d3.select("#"+configuration.plotLabelDivId)
                   .html(label);
             }
