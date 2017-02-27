@@ -112,3 +112,6 @@ let rec fold_left2 f x l1 l2 =
   | h1::t1, h2::t2 -> fold_left2 f (f x h1 h2) t1 t2
 
 let random rs l = List.nth l (Random.State.int rs (List.length l))
+
+let find_option (p : ('a -> bool)) (l : 'a list) : 'a option  =
+  try Some (List.find p l) with Not_found -> None

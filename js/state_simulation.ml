@@ -31,7 +31,7 @@ type state = { state_current : string option ;
                state_simulations : t list ; }
 
 let current_simulation (state : state) : t option =
-  Utility.find
+  List_util.find_option
     (fun simulation -> Some simulation.simulation_id = state.state_current)
     state.state_simulations
 
@@ -47,9 +47,9 @@ let model_state_to_string =
          | PAUSED -> "Paused"
 
 let model_simulation_info model : Api_types_j.simulation_info option=
-  Utility.option_bind t_simulation_info model.model_current
+  Tools.option_bind t_simulation_info model.model_current
 let model_simulation_state model : model_state option =
-  Utility.option_map
+  Tools.option_map
     (function
       | SIMULATION_STATE_STOPPED -> STOPPED
       | SIMULATION_STATE_INITALIZING -> INITALIZING
@@ -58,7 +58,7 @@ let model_simulation_state model : model_state option =
           RUNNING
         else
           PAUSED)
-    (Utility.option_map t_simulation_state model)
+    (Tools.option_map t_simulation_state model)
 
 
 let state , set_state =
@@ -101,8 +101,11 @@ let with_simulation :
     let project_handler manager project_id =
       let current_state = React.S.value state in
       match
-        Utility.option_bind
-          (fun simulation_id -> Utility.find (fun t -> simulation_id =  t_simulation_id t) current_state.state_simulations)
+        Tools.option_bind
+          (fun simulation_id ->
+             List_util.find_option
+               (fun t -> simulation_id =  t_simulation_id t)
+               current_state.state_simulations)
           current_state.state_current
       with
       | None ->
@@ -189,23 +192,20 @@ let rec index_simulation
 let augment_simulation_list
     (simulation_index : Api_types_j.simulation_info StringMap.t)
     (simulation_list : t list) : t list =
-  (* simulation id's currently available *)
-  let new_simulation_ids = List.map fst (StringMap.bindings simulation_index) in
   (* simulation id's in the current state *)
   let state_simulation_ids = List.map t_simulation_id simulation_list in
   (* predicate that checks if id is not in state id's *)
-  let not_in_state_ids = fun simulation_id -> not (List.mem simulation_id state_simulation_ids) in
+  let not_in_state_ids simulation_id _ =
+    not (List.mem simulation_id state_simulation_ids) in
   (* add simulations that currently not part of the state *)
-  let add_simulation_ids = List.filter not_in_state_ids new_simulation_ids in
-  (List.map
-     (fun simulation_id ->
-        let simulation_info =
-          StringMap.find simulation_id simulation_index in
-        { is_pinned = false ;
-          simulation_id = simulation_id ;
-          simulation_state = SIMULATION_STATE_READY simulation_info })
-     add_simulation_ids)
-  @ simulation_list
+  let add_simulation_ids =
+    StringMap.filter not_in_state_ids simulation_index in
+  StringMap.fold
+     (fun simulation_id simulation_info acc ->
+       { is_pinned = false ;
+         simulation_id = simulation_id ;
+         simulation_state = SIMULATION_STATE_READY simulation_info } :: acc)
+     add_simulation_ids simulation_list
 
 (* Remove simulation from state if it not pinned or available. *)
 let restrict_simulation_list
@@ -234,7 +234,8 @@ let update_simulation_list
     (manager : Api.manager)
     (simulation_list : t list)
     (project_id : Api_types_j.project_id)
-    (simulation_ids : Api_types_j.simulation_id list) : t list Api.result Lwt.t =
+    (simulation_ids : Api_types_j.simulation_id list) :
+  t list Api.result Lwt.t =
   index_simulation ?map:None manager project_id simulation_ids >>=
   (Api_common.result_bind_lwt
      ~ok:(fun (simulation_index : Api_types_j.simulation_info StringMap.t) ->

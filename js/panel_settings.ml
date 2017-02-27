@@ -407,7 +407,7 @@ module DivStatusIndicator : Ui_common.Div = struct
                State_simulation.model
                (fun model ->
                   let option =
-                    Utility.option_map
+                    Tools.option_map
                       State_simulation.model_state_to_string
                       (State_simulation.model_simulation_state
                      model.State_simulation.model_current)

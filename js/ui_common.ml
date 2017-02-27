@@ -17,7 +17,9 @@ let toggle_element
           (React.S.bind
              State_simulation.model
              (fun model -> React.S.const
-                 (if projection (Utility.option_bind State_simulation.t_simulation_info model.State_simulation.model_current) then
+                 (if projection (Tools.option_bind
+                                   State_simulation.t_simulation_info
+                                   model.State_simulation.model_current) then
                     ["show"]
                   else
                     ["hidden"])
@@ -185,7 +187,9 @@ let badge
   [ Tyxml_js.R.Html.span
       (let _ = React.S.map
            (fun model ->
-              let simulation_info = Utility.option_bind State_simulation.t_simulation_info model.State_simulation.model_current in
+              let simulation_info =
+                Tools.option_bind State_simulation.t_simulation_info
+                  model.State_simulation.model_current in
               let count = counter simulation_info in
               if count > 0  then
                 ReactiveData.RList.set
@@ -205,11 +209,11 @@ let badge
   ]
 
 let arguments (key : string) : string list =
-    List.map
-      snd
-      (List.filter
-	 (fun (k,_) -> key = k)
-	 Url.Current.arguments)
+  List.map
+    snd
+    (List.filter
+       (fun (k,_) -> key = k)
+       Url.Current.arguments)
 
 let version
     ?(test:'a option = None)

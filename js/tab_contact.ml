@@ -68,7 +68,7 @@ let update
   let () = Common.debug (Js.string json) in
     contactmap##setData
       (Js.string json)
-      (Js.Opt.option (Utility.option_map Api_data.agent_count contact_map))
+      (Js.Opt.option (Tools.option_map Api_data.agent_count contact_map))
 
 let onload () =
   let () = Widget_export.onload configuration in

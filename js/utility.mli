@@ -7,7 +7,4 @@
 (******************************************************************************)
 
 val split : string -> char -> string * string option
-val find : ('a -> bool) -> 'a list -> 'a option
-val option_map : ('a -> 'b) -> 'a option -> 'b option
-val option_bind : ('a -> 'b option) -> 'a option -> 'b option
 val input_float_string : float -> string

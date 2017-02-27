@@ -118,8 +118,10 @@ let sync () : unit Api.result Lwt.t =
            let current_project =
              match old_state.project_id with
              | None -> None
-             | Some project_id -> Utility.find (fun p -> p.Api_types_j.project_id = project_id) current_project_list
-           in
+             | Some project_id ->
+               List_util.find_option
+                 (fun p -> p.Api_types_j.project_id = project_id)
+                 current_project_list in
            match current_project with
            | None ->
              Lwt.return
