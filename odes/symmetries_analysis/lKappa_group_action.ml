@@ -177,20 +177,20 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
   in
   aux 0 (of_rule rule) 0 positions
 
-let fold_over_orbit
+let for_all_over_orbit
     (positions:int list)
     (sigma:LKappa.rule_agent -> unit)
     (sigma_inv:LKappa.rule_agent -> unit)
     (sigma_raw:Raw_mixture.agent -> unit)
     (sigma_raw_inv:Raw_mixture.agent -> unit)
-    (f:LKappa.rule -> 'a -> 'a option)
+    (f:LKappa.rule -> 'a -> 'a * bool)
     (rule:LKappa.rule)
     (init:'a)  =
   let n = List.length positions in
   let counter = Array.make n false in
   let rec next agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
-    | [] -> Some accu
+    | [] -> accu, true
     | pos_head::_
       when agent_id < pos_head ->
       let rule_tail = shift rule_tail in
@@ -207,10 +207,13 @@ let fold_over_orbit
         else
           let () = counter.(pos_id)<-true in
           let _ = apply_head sigma sigma_raw rule_tail in
-          match f rule accu with
-          | None -> None
-          | Some accu ->
-          next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions accu
+          let accu, b = f rule accu in
+          if b
+          then
+            next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions accu
+          else
+            let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
+            accu, false
       end
     | pos_head::_
       when agent_id > pos_head ->
@@ -220,6 +223,6 @@ let fold_over_orbit
           "Internal bug: %s %i %i %i" s1 i1 i2 i3
       in
       let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
-      None
+      accu, false
   in
   next 0 (of_rule rule) 0 positions init
