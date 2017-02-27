@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 24 2017>
+  * Last modification: Time-stamp: <Feb 27 2017>
 *)
 
 module type Interface =
@@ -138,11 +138,10 @@ sig
 
   (*symmetries*)
   val cannonic_form_from_syntactic_rule :
-    nauto_in_rules_cache -> compil -> rule ->
-    nauto_in_rules_cache *
-    Signature.s *
+    LKappa_auto.cache -> compil -> rule ->
+    LKappa_auto.cache *
     LKappa.rule *
-    int * (*rule_id*)
+    int *
     Alg_expr.t Locality.annot option list *
     LKappa_auto.RuleCache.hashed_list
 

@@ -12,13 +12,14 @@ val check_orbit_internal_state_permutation:
   site1:int ->
   site2:int ->
   LKappa.rule ->
-  correct:(int array) ->
+  correct:(int array) -> (*what i have to divide to get gamma *)
   ('a, 'b) Alg_expr.e Locality.annot array ->
   LKappa_auto.cache ->
-  counter:(int array) ->
+  counter:(int array) -> (*counter the number of array of orbit*)
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
 
-(** check_orbit_binding_state_permutation ~agent_type ~site1 ~site2 rule
+(**
+   check_orbit_binding_state_permutation ~agent_type ~site1 ~site2 rule
     ~correct rates cache ~counter to_be_checked
     will visit the orbit of rule when swapping the binding states of site1 and site2 in agents of type agent_type;
     rates contains the rate of each rule (stored according to their hash)

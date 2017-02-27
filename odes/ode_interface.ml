@@ -352,8 +352,6 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
-  let sigs = Model.signatures compil.environment in
-  (*get rule_id_with_mode*)
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
   let rate_opt_list =
     List.fold_left (fun current_list rule_id_with_mode ->
@@ -364,14 +362,15 @@ let cannonic_form_from_syntactic_rule cache compil rule =
         rate_list
       ) [] rule_id_with_mode_list
   in
-  let cache, hash_list = LKappa_auto.cannonic_form cache lkappa_rule in
-  cache, sigs, lkappa_rule, rule_id, rate_opt_list, hash_list
+  let cache, hash_list =
+    LKappa_auto.cannonic_form cache lkappa_rule
+  in
+  cache, lkappa_rule, rule_id, rate_opt_list, hash_list
 
 let print_partitioned_contact_map_in_lkappa
     log compil symmetries =
   Symmetries.print_partitioned_contact_map_in_lkappa
     log (Model.signatures compil.environment) symmetries
-
 
 let translate_symmetries compil symmetries =
   Symmetries.translate_to_lkappa_representation

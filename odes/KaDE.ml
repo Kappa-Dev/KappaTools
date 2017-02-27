@@ -206,8 +206,6 @@ let main () =
           A.compute_symmetries_from_syntactic_rules
             my_logger
             compil
-            A.Internal
-            A.Binding
             symmetries.Symmetries.store_partitioned_contact_map
         in
         let () =

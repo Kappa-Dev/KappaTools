@@ -639,7 +639,9 @@ let nauto rate_convention cache rule =
 
 let cannonic_form cache rule =
   (*compute this map only in the case of Biochemist*)
-  let cache, map = mixture_to_species_map Ode_args.Biochemist cache rule in
+  let cache, map =
+    mixture_to_species_map Ode_args.Biochemist cache rule
+  in
   let pair_list =
     CannonicMap.fold
       (fun cannonic (nocc, _nauto) current_list ->
