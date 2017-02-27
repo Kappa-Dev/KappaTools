@@ -1952,10 +1952,7 @@ automorphisms in the site graph E.
     let correct =
       Array.make size_hash_plus_1 0
     in
-    let rate =
-      Array.make size_hash_plus_1 [||]
-    in
-    to_be_checked, counter, correct, rate
+    to_be_checked, counter, correct
 
   let compute_symmetries_from_syntactic_rules
       log compil symmetries =
@@ -1968,7 +1965,7 @@ automorphisms in the site graph E.
     let translate_symmetries =
       I.translate_symmetries compil symmetries
     in
-    let to_be_checked, counter, correct, rate =
+    let to_be_checked, counter, correct =
       build_array_for_symmetries
         hash_lists
     in
@@ -1976,7 +1973,7 @@ automorphisms in the site graph E.
     (*for each rule*)
     let _  =
       List.fold_left
-        (fun (rate, correct, counter, to_be_checked)
+        (fun (correct, counter, to_be_checked)
           (rule_id, lkappa_rule, hash_list, rate_array,
            convention_rule) ->
           let i =
@@ -1993,8 +1990,8 @@ automorphisms in the site graph E.
             to_be_checked.(i) <- true;
             to_be_checked
           in
-          rate, correct, counter, to_be_checked
-        ) (rate, correct, counter, to_be_checked) cannonic_list
+          correct, counter, to_be_checked
+        ) (correct, counter, to_be_checked) cannonic_list
     in
     cache, ()
 
