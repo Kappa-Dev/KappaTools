@@ -1898,7 +1898,7 @@ automorphisms in the site graph E.
         (fun (ncache, cache, current_list, hash_lists) rule ->
           (*****************************************************)
           (* identifiers of rule up to isomorphism*)
-          let ncache, lkappa_rule, rule_id, rate_opt_list,
+          let ncache, lkappa_rule, rule_id, rate_array,
               hash_list =
             I.cannonic_form_from_syntactic_rule ncache compil rule
           in
@@ -1911,7 +1911,7 @@ automorphisms in the site graph E.
           (*****************************************************)
           let current_list =
             (rule_id, lkappa_rule, hash_list,
-             rate_opt_list, convention_rule) ::
+             rate_array, convention_rule) ::
             current_list
           in
           let hash_lists = hash_list :: hash_lists in
@@ -1949,7 +1949,13 @@ automorphisms in the site graph E.
     let counter =
       Array.make size_hash_plus_1 0
     in
-    to_be_checked, counter
+    let correct =
+      Array.make size_hash_plus_1 0
+    in
+    let rate =
+      Array.make size_hash_plus_1 [||]
+    in
+    to_be_checked, counter, correct, rate
 
   let compute_symmetries_from_syntactic_rules
       log compil symmetries =
@@ -1962,7 +1968,7 @@ automorphisms in the site graph E.
     let translate_symmetries =
       I.translate_symmetries compil symmetries
     in
-    let to_be_checked, counter =
+    let to_be_checked, counter, correct, rate =
       build_array_for_symmetries
         hash_lists
     in
@@ -1971,7 +1977,7 @@ automorphisms in the site graph E.
     let _  =
       List.fold_left
         (fun (rate, correct, counter, to_be_checked)
-          (rule_id, lkappa_rule, hash_list, rate_opt_list,
+          (rule_id, lkappa_rule, hash_list, rate_array,
            convention_rule) ->
           let i =
             LKappa_auto.RuleCache.int_of_hashed_list
@@ -1982,25 +1988,13 @@ automorphisms in the site graph E.
             correct.(i) <- convention_rule;
             correct
           in
-          let rate =
-            List.fold_left (fun rate rate_opt ->
-                match rate_opt with
-                | None -> rate
-                | Some (alg, loc) ->
-                  let array =
-                    rate.(i) <- (alg, loc);
-                    rate
-                  in
-                  array
-              ) rate rate_opt_list
-          in
           (*to be check at the current rule*)
           let to_be_checked =
             to_be_checked.(i) <- true;
             to_be_checked
           in
           rate, correct, counter, to_be_checked
-        ) ([||], [||], counter, to_be_checked) cannonic_list
+        ) (rate, correct, counter, to_be_checked) cannonic_list
     in
     cache, ()
 

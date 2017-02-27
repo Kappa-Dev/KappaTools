@@ -142,7 +142,7 @@ sig
     LKappa_auto.cache *
     LKappa.rule *
     int *
-    Alg_expr.t Locality.annot option list *
+    Alg_expr.t Locality.annot array *
     LKappa_auto.RuleCache.hashed_list
 
   val translate_symmetries :
