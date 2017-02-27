@@ -569,20 +569,20 @@ struct
   let compute_reactions compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
-    let cache = I.empty_lkappa_cache () in
-    let rules =
-      List.rev
-        (snd
-           (List.fold_left
-              (fun ((id, cache), list) rule ->
-                 let modes = I.valid_modes compil rule id in
-                 List.fold_left
-                   (fun ((id,cache), list) mode ->
-                      let cache, elt = enrich_rule cache compil rule mode in
-                      (id,cache), elt::list)
-                   ((next_id id,cache),list) modes)
-              ((fst_id,cache),[]) (List.rev rules)))
+    let cache = network.rule_cache in
+    let cache, rules_rev =
+      List.fold_left
+        (fun ((id, cache), list) rule ->
+           let modes = I.valid_modes compil rule id in
+           List.fold_left
+             (fun ((id,cache), list) mode ->
+                let cache, elt = enrich_rule cache compil rule mode in
+                (id,cache), elt::list)
+             ((next_id id,cache),list) modes)
+        ((fst_id,cache),[]) (List.rev rules)
     in
+    let network = {network with rule_cache = snd cache} in 
+    let rules = List.rev rules_rev in
     let to_be_visited, network =
       initial_network
         compil network initial_states rules
