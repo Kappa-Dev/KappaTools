@@ -6,6 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let divide_expr_by_int e i =
+  Locality.dummy_annot
+      (Alg_expr.BIN_ALG_OP
+              (Operator.DIV, e, Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))))
+
 type 'id corrected_rate_const =
   {
     num: Nbr.t ;

@@ -9,6 +9,9 @@
 
 (** Primitives for handling rule rates when detecting symmetries *)
 
+val divide_expr_by_int:
+ ('a,'b) Alg_expr.e Locality.annot ->
+ int -> ('a,'b) Alg_expr.e Locality.annot
 (* Partial normal form for expressions *)
 (* We only deal with constant, single alg_var multiplied/divided by a constant,
    sum of two expr either both constant or dealing with the same alg_var *)

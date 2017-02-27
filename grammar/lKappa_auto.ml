@@ -118,7 +118,9 @@ let id =
 (* If the rhs is taken into account, deleted agents have a special site (-1)
    with internal state 0 *)
 (* The state of this site shall be preserved by autos *)
-let translate rate_convention cache lkappa_mixture ag_created =
+let translate rate_convention cache rule  =
+  let lkappa_mixture = rule.LKappa.r_mix in
+  let ag_created = rule.LKappa.r_created in
   let add_map rate_convention i j map =
     match rate_convention, i  with
     | Ode_args.KaSim, _  -> assert false
@@ -550,12 +552,10 @@ let keep_this_cc rate_convention n_agents cc =
     end
   | Ode_args.Divide_by_nbr_of_autos_in_lhs -> true
 
-let mixture_to_species_map rate_convention cache lkappa_mixture created =
+let mixture_to_species_map rate_convention cache rule =
   let map = CannonicMap.empty in
-  let n_agents = List.length lkappa_mixture in
-  let cache, array, bonds_map =
-    translate rate_convention cache lkappa_mixture created
-  in
+  let n_agents = List.length rule.LKappa.r_mix  in
+  let cache, array, bonds_map = translate rate_convention cache rule in
   let cc_list = decompose bonds_map array in
   let cannonic_cache, map =
     List.fold_left
@@ -627,9 +627,9 @@ let nauto_of_map map =
     map
     1
 
-let nauto rate_convention cache lkappa_mixture created =
+let nauto rate_convention cache rule =
   let cache, map =
-    mixture_to_species_map rate_convention cache lkappa_mixture created
+    mixture_to_species_map rate_convention cache rule
   in
   cache, nauto_of_map map
 
@@ -637,15 +637,12 @@ let nauto rate_convention cache lkappa_mixture created =
 (*cannonic form for symmetries*)
 (****************************************************************)
 
-let cannonic_form cache lkappa_mixture created =
+let cannonic_form cache rule =
   (*compute this map only in the case of Biochemist*)
-  let cache, map =
-    mixture_to_species_map Ode_args.Biochemist cache
-      lkappa_mixture created
-  in
+  let cache, map = mixture_to_species_map Ode_args.Biochemist cache rule in
   let pair_list =
     CannonicMap.fold
-      (fun cannonic (nocc, nauto) current_list ->
+      (fun cannonic (nocc, _nauto) current_list ->
          let pair_list =
            (cannonic, nocc) :: current_list
          in

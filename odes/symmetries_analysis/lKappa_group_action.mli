@@ -1,39 +1,38 @@
-(** Primitives to detect where a permutation of states may be applied in a rule *)
+(** check_orbit_internal_state_permutation ~agent_type ~site1 ~site2 rule
+    ~correct rates cache ~counter to_be_checked
+    will visit the orbit of rule when swapping the internal states of site1 and site2 in agents of type agent_type;
+    rates contains the rate of each rule (stored according to their hash)
+    to be divided by the respecive integer in correct.
+    counter is an array of 0 (after the call, the array is reset to 0.
+    to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
+     true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
-val potential_positions_for_swapping_internal_states:
-  int -> int -> int -> LKappa.rule -> int list
+val check_orbit_internal_state_permutation:
+  agent_type:int ->
+  site1:int ->
+  site2:int ->
+  LKappa.rule ->
+  correct:(int array) ->
+  ('a, 'b) Alg_expr.e Locality.annot array ->
+  LKappa_auto.cache ->
+  counter:(int array) ->
+  bool array -> (LKappa_auto.cache * int array * bool array) * bool
 
-val potential_positions_for_swapping_binding_states:
-    int -> int -> int -> LKappa.rule -> int list
-
-(** Primitives to apply a transposition of states on a given agent *)
-val swap_internal_state_regular:
-  int -> int -> int -> LKappa.rule_agent -> unit
-
-val swap_binding_state_regular:
-  int -> int -> int -> LKappa.rule_agent -> unit
-
-val swap_internal_state_created:
-  int -> int -> int -> Raw_mixture.agent -> unit
-
-val swap_binding_state_created:
-  int -> int -> int -> Raw_mixture.agent -> unit
-
-(** for_all_over_orbit positions sigma sigma_inv sigma_raw sigma_raw_inv f rule init iterates the function f over the orbit of rule by a subgroup of transformations.
-If one execution returns false, then the iteration is interrupted, and the result is false.
-sigma and sigma_inv apply a transformation and its inverse to tested/modified/deleted agents.
-sigma_raw and sigma_raw_inv apply a transformatio and its inverse to created agents.
-These four functions operate by side-effects (LKappa agents are imperatif).
-The subgroup is defined by these transformations on agents and the list of  agents positions, where the transformation may be applied.  Positions starts at 0 with the agents that may be tested/modified/deleted, followed by the ones that may be created.
-At the end of the itteration, the rule has the same value as before the iteration.*)
-
-val for_all_over_orbit:
-    int list ->
-    (LKappa.rule_agent -> unit) ->
-    (LKappa.rule_agent -> unit) ->
-    (Raw_mixture.agent -> unit) ->
-    (Raw_mixture.agent -> unit) ->
-    (LKappa.rule -> 'a -> 'a * bool) ->
+(** check_orbit_binding_state_permutation ~agent_type ~site1 ~site2 rule
+    ~correct rates cache ~counter to_be_checked
+    will visit the orbit of rule when swapping the binding states of site1 and site2 in agents of type agent_type;
+    rates contains the rate of each rule (stored according to their hash)
+    to be divided by the respecive integer in correct.
+    counter is an array of 0 (after the call, the array is reset to 0.
+    to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
+     true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
+val check_orbit_binding_state_permutation:
+    agent_type:int ->
+    site1:int ->
+    site2:int ->
     LKappa.rule ->
-    'a ->
-    'a * bool
+    correct:(int array) ->
+    ('a, 'b) Alg_expr.e Locality.annot array ->
+    LKappa_auto.cache ->
+    counter:(int array) ->
+    bool array -> (LKappa_auto.cache * int array * bool array) * bool

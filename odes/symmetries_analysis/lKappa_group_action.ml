@@ -174,6 +174,8 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
         in
         aux (agent_id+1) rule_tail (pos_id+1) pos_tail
       end
+    | _::pos_tail ->
+      aux agent_id rule_tail (pos_id+1) pos_tail
   in
   aux 0 (of_rule rule) 0 positions
 
@@ -190,7 +192,7 @@ let for_all_over_orbit
   let counter = Array.make n false in
   let rec next agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
-    | [] -> accu, true
+    | [] -> f rule accu
     | pos_head::_
       when agent_id < pos_head ->
       let rule_tail = shift rule_tail in
@@ -215,8 +217,8 @@ let for_all_over_orbit
             let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
             accu, false
       end
-    | pos_head::_
-      when agent_id > pos_head ->
+    | _::_
+      (*when agent_id > pos_head*) ->
       let s1,i1,i2,i3 = __POS__ in
       let () =
         Format.fprintf Format.err_formatter
@@ -226,3 +228,99 @@ let for_all_over_orbit
       accu, false
   in
   next 0 (of_rule rule) 0 positions init
+
+let check_orbit
+    (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
+    weight agent site1 site2 rule correct rates cache counter to_be_checked =
+  let accu = cache, [], counter, to_be_checked in
+  let f rule (cache, l, counter, to_be_checked) =
+    let cache, hash = LKappa_auto.cannonic_form cache rule in
+    let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
+    if
+      to_be_checked.(i)
+    then
+      begin
+        let n = counter.(i) in
+        let () = counter.(i) <- n+1 in
+        if n = 0
+        then
+          (cache, hash::l, counter, to_be_checked), true
+        else
+          (cache, l, counter, to_be_checked), true
+      end
+    else
+      (cache, l, counter, to_be_checked), false
+  in
+  let (cache, l, counter, to_be_checked),b  =
+    for_all_over_orbit
+      (get_positions agent site1 site2 rule)
+      (sigma agent site1 site2)
+      (sigma_inv agent site1 site2)
+      (sigma_raw agent site1 site2)
+      (sigma_raw_inv agent site1 site2)
+      f rule accu
+  in
+  let get_weight hash =
+    let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
+    weight
+      ~correct:(correct.(i))
+      ~card_stabilizer:(counter.(i))
+      ~rate:(rates.(i))
+  in
+  let rec aux w_ref l =
+    match l
+    with
+    | [] -> true
+    | h::t ->
+      if Alg_expr_extra.necessarily_equal w_ref (get_weight h)
+      then
+        aux w_ref t
+      else
+        false
+  in
+  let good_rates =
+    b &&
+    begin
+      match l with
+        | [] -> true
+        | h::t ->
+          aux (get_weight h) t
+    end
+  in
+  let () =
+    List.iter
+      (fun h ->
+         let i = LKappa_auto.RuleCache.int_of_hashed_list h in
+         counter.(i)<-0; to_be_checked.(i)<-true) l
+  in
+  if good_rates then
+    (cache,counter,to_be_checked), true
+  else
+    (cache, counter, to_be_checked), false
+
+let weight ~correct ~card_stabilizer ~rate =
+  Alg_expr_extra.get_corrected_rate
+    (Alg_expr_extra.divide_expr_by_int
+       rate
+       (correct * card_stabilizer))
+
+let check_orbit_internal_state_permutation
+    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked
+  =
+check_orbit
+  (potential_positions_for_swapping_internal_states,
+   swap_internal_state_regular,
+   swap_internal_state_regular,
+   swap_internal_state_created,
+   swap_internal_state_created)
+  weight agent_type site1 site2 rule correct rates cache counter to_be_checked
+
+let check_orbit_binding_state_permutation
+    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
+  check_orbit
+    (potential_positions_for_swapping_binding_states,
+     swap_binding_state_regular,
+     swap_binding_state_regular,
+     swap_binding_state_created,
+     swap_binding_state_created)
+    weight agent_type site1 site2 rule correct rates cache counter to_be_checked

@@ -264,4 +264,4 @@ let main () =
 
 let () = main ()
 let _ = Alg_expr_extra.print
-let _ = LKappa_group_action.for_all_over_orbit
+let _ = LKappa_group_action.check_orbit_internal_state_permutation
