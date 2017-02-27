@@ -168,6 +168,19 @@ type direction = Direct | Op
 type rule_name = string
 type rule_id_with_mode = rule_id * arity * direction
 
+
+module RuleModeS:
+          SetMap.S with type elt = arity * direction
+  =
+  SetMap.Make
+    (struct
+      type t = arity * direction
+      let compare = compare
+      let print _ _ = ()
+    end)
+
+module RuleModeMap = RuleModeS.Map
+
 let lhs _compil _rule_id r = r.Primitives.connected_components
 
 let add x y list  =
@@ -357,31 +370,27 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   in
   let i = LKappa_auto.RuleCache.int_of_hashed_list hash_list in
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
-  let rate_array =
-    List.fold_left (fun array rule_id_with_mode ->
-      let rate_opt =
-        rate compil rule rule_id_with_mode
-      in
-      match rate_opt with
-      | None -> array
-      | Some (x, y) ->
-        let array =
-          array.(i) <- (x, y);
-          array
-        in
-        array
-      ) [||] rule_id_with_mode_list
-  in
-  (*let rate_opt_list =
-    List.fold_left (fun current_list rule_id_with_mode ->
+  let rate_map =
+    List.fold_left (fun rate_map rule_id_with_mode ->
         let rate_opt =
           rate compil rule rule_id_with_mode
         in
-        let rate_list = rate_opt :: current_list in
-        rate_list
-      ) [] rule_id_with_mode_list
-  in*)
-  cache, lkappa_rule, rule_id, rate_array, hash_list
+        let _,a,b = rule_id_with_mode in
+        let rate_map =
+          match rate_opt with
+          | None -> rate_map
+          | Some rate ->
+            RuleModeMap.add (a,b) rate rate_map
+        in
+        rate_map
+      )
+      RuleModeMap.empty
+      rule_id_with_mode_list
+  in
+  let cache, hashed_list =
+    LKappa_auto.cannonic_form cache lkappa_rule
+  in
+  cache, lkappa_rule, rule_id, rate_map, hashed_list
 
 let print_partitioned_contact_map_in_lkappa
     log compil symmetries =

@@ -149,6 +149,7 @@ struct
 
       cc_cache: I.cache ;
       sym_cache: 'symcache ;
+      rule_cache: I.nauto_in_rules_cache ;
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
 
@@ -219,7 +220,7 @@ struct
 
   let get_compil = I.get_compil
 
-  let init compil (cache_sym,rep) =
+  let init compil cc_cache nauto_cache (cache_sym,rep) =
     {
       rules = [] ;
       reactions = [] ;
@@ -228,7 +229,8 @@ struct
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0
           (I.dummy_chemical_species compil,1) ;
-      cc_cache = I.empty_cache compil ;
+      cc_cache = cc_cache ;
+      rule_cache = nauto_cache ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
       varmap = Mods.IntMap.empty ;
@@ -1105,10 +1107,11 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ~ignore_obs compil (cache_sym, representant)=
+  let network_from_compil ~ignore_obs compil rule_cache (cache_sym, representant)=
+    let cc_cache = I.empty_cache compil in
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
-    let network = init compil (cache_sym, representant) in
+    let network = init compil cc_cache rule_cache (cache_sym, representant) in
     let () = Format.printf "\t -initial states @." in
     let network,initial_state =
       species_of_initial_state compil network (I.get_init compil)
@@ -1738,6 +1741,9 @@ struct
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
 
+  let init_cc_cache  = I.empty_cache
+  let init_rule_cache = I.empty_lkappa_cache
+
 (***************************************************************)
 (*SYMMETRIES*)
 (***************************************************************)
@@ -1892,33 +1898,33 @@ automorphisms in the site graph E.
 
   type kind = Internal | Binding
 
-  let cannonic_form_from_syntactic_rules log ncache cache compil =
-    let ncache, cache, cannonic_list, hash_lists =
+  let cannonic_form_from_syntactic_rules log rule_cache compil =
+    let rule_cache, cannonic_list, hashed_lists =
       List.fold_left
-        (fun (ncache, cache, current_list, hash_lists) rule ->
+        (fun (rule_cache, current_list, hashed_lists) rule ->
           (*****************************************************)
           (* identifiers of rule up to isomorphism*)
-          let ncache, lkappa_rule, rule_id, rate_array,
-              hash_list =
-            I.cannonic_form_from_syntactic_rule ncache compil rule
+        let rule_cache, lkappa_rule, rule_id, rate_opt_list,
+              hashed_list =
+            I.cannonic_form_from_syntactic_rule rule_cache compil rule
           in
           (*****************************************************)
           (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
-          let cache, convention_rule =
-            I.divide_rule_rate_by cache compil rule
+          let rule_cache, convention_rule =
+            I.divide_rule_rate_by rule_cache compil rule
           in
           (*****************************************************)
           let current_list =
-            (rule_id, lkappa_rule, hash_list,
-             rate_array, convention_rule) ::
+          (rule_id, lkappa_rule, hashed_list,
+             rate_opt_list, convention_rule) ::
             current_list
           in
-          let hash_lists = hash_list :: hash_lists in
-          ncache, cache, current_list, hash_lists
-        ) (ncache, cache, [], []) (I.get_rules compil)
+          let hashed_lists = hashed_list :: hashed_lists in
+          rule_cache, current_list, hashed_lists
+        ) (rule_cache, [], []) (I.get_rules compil)
     in
-    ncache, cache, cannonic_list, hash_lists
+    rule_cache, cannonic_list, hashed_lists
 
   (******************************************************)
 
@@ -1949,51 +1955,73 @@ automorphisms in the site graph E.
     let counter =
       Array.make size_hash_plus_1 0
     in
-    let correct =
-      Array.make size_hash_plus_1 0
+    let rate =
+      Array.make size_hash_plus_1 I.RuleModeMap.empty
     in
-    to_be_checked, counter, correct
+    let correct =
+      Array.make size_hash_plus_1 1
+    in
+    to_be_checked, counter, rate, correct
+
+(* You are right, there are to caches. *)
+(* One from LKappa_auto *)
+(* One from I *)
+(* Please give a better name to them *)
+(* Moreover, pass them as an argument, since this is not the only computation that you do with them *)
+  let add_map map1 map2 =
+    snd
+      (I.RuleModeMap.monadic_fold2 () ()
+         (fun () () key a1 a2 map ->
+            (),I.RuleModeMap.add
+              key (Alg_expr.add a1 a2) map)
+         (fun () () key a1 map ->
+            (),I.RuleModeMap.add key a1 map)
+         (fun () () _ _ map -> (),map)
+         map1
+         map2
+         map2)
 
   let compute_symmetries_from_syntactic_rules
-      log compil symmetries =
-    let ncache, cache, cannonic_list, hash_lists =
+      log compil rule_cache symmetries =
+    let rule_cache, cannonic_list, hash_lists =
       cannonic_form_from_syntactic_rules log
-        (LKappa_auto.init_cache ())
-        (I.empty_lkappa_cache ())
+        rule_cache
         compil
     in
     let translate_symmetries =
       I.translate_symmetries compil symmetries
     in
-    let to_be_checked, counter, correct =
+  let to_be_checked, counter, rates, correct =
       build_array_for_symmetries
         hash_lists
     in
     (*TODO*)
     (*for each rule*)
     let _  =
-      List.fold_left
-        (fun (correct, counter, to_be_checked)
-          (rule_id, lkappa_rule, hash_list, rate_array,
+      List.iter
+        (fun
+          (rule_id, lkappa_rule, hash_list, rate_map,
            convention_rule) ->
           let i =
             LKappa_auto.RuleCache.int_of_hashed_list
               hash_list
           in
           (*of the current hash*)
-          let correct =
-            correct.(i) <- convention_rule;
-            correct
+          let () =
+            correct.(i) <- convention_rule
+          in
+          let () =
+            rates.(i) <-
+              (add_map (rates.(i)) rate_map)
           in
           (*to be check at the current rule*)
-          let to_be_checked =
-            to_be_checked.(i) <- true;
-            to_be_checked
+          let () =
+            to_be_checked.(i) <- true
           in
-          correct, counter, to_be_checked
-        ) (correct, counter, to_be_checked) cannonic_list
+        ()
+        )  cannonic_list
     in
-    cache, ()
+    symmetries, rule_cache
 
 (*
 2) Now we have a list of rules, with a hash.

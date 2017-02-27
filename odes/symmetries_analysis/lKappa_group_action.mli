@@ -28,12 +28,12 @@ val check_orbit_internal_state_permutation:
     to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 val check_orbit_binding_state_permutation:
-    agent_type:int ->
-    site1:int ->
-    site2:int ->
-    LKappa.rule ->
-    correct:(int array) ->
-    ('a, 'b) Alg_expr.e Locality.annot array ->
-    LKappa_auto.cache ->
-    counter:(int array) ->
-    bool array -> (LKappa_auto.cache * int array * bool array) * bool
+  agent_type:int ->
+  site1:int ->
+  site2:int ->
+  LKappa.rule ->
+  correct:(int array) ->
+  ('a, 'b) Alg_expr.e Locality.annot array ->
+  LKappa_auto.cache ->
+  counter:(int array) ->
+  bool array -> (LKappa_auto.cache * int array * bool array) * bool

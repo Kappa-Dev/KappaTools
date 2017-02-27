@@ -79,6 +79,9 @@ sig
   type rule_id = int
   type rule_id_with_mode = rule_id * arity * direction
 
+  module RuleModeMap:
+    SetMap.Map with type elt = arity * direction
+
   val divide_rule_rate_by:
     nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
 
@@ -138,11 +141,11 @@ sig
 
   (*symmetries*)
   val cannonic_form_from_syntactic_rule :
-    LKappa_auto.cache -> compil -> rule ->
-    LKappa_auto.cache *
+    nauto_in_rules_cache -> compil -> rule ->
+    nauto_in_rules_cache *
     LKappa.rule *
     int *
-    Alg_expr.t Locality.annot array *
+    Alg_expr.t Locality.annot RuleModeMap.t *
     LKappa_auto.RuleCache.hashed_list
 
   val translate_symmetries :

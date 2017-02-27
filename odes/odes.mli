@@ -16,7 +16,7 @@ sig
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
   val network_from_compil:
-    ignore_obs:bool -> I.compil ->
+    ignore_obs:bool -> I.compil -> I.nauto_in_rules_cache ->
     ('a * ('a -> I.chemical_species  -> ('a * I.chemical_species)))
     -> (int,int,'a) network
 
@@ -53,7 +53,12 @@ sig
   val compute_symmetries_from_syntactic_rules :
     Loggers.t ->
     I.compil ->
+    I.nauto_in_rules_cache ->
     Symmetries.partitioned_contact_map ->
-    I.nauto_in_rules_cache * unit
+    Symmetries.partitioned_contact_map *
+    I.nauto_in_rules_cache
+
+  val init_cc_cache : I.compil -> I.cache
+  val init_rule_cache : unit -> I.nauto_in_rules_cache
 
 end

@@ -150,7 +150,8 @@ let main () =
     in
     (*************************************************************)
     (*TEST-symmetries*)
-    let cache, p =
+    let rule_cache = A.init_rule_cache () in
+    let rule_cache, sym_cache, p =
       if ode_args.Ode_args.with_symmetries
       then
         let parameters =
@@ -202,10 +203,11 @@ let main () =
           Export_to_kade.get_symmetric_sites
             ~accuracy_level:Remanent_state.High state
         in
-        let _, () =
+        let symmetries, rule_cache =
           A.compute_symmetries_from_syntactic_rules
             my_logger
             compil
+            rule_cache
             symmetries.Symmetries.store_partitioned_contact_map
         in
         let () =
@@ -217,13 +219,16 @@ let main () =
             ()
         in
         let _ = state, symmetries in
-        (), (fun cache a -> cache, a) (* TO DO: to provide the initial cache and the function that maps a species to its representant up to symmetries *)
+        rule_cache, (), (fun cache a -> cache, a) (* TO DO: to provide the initial cache and the function that maps a species to its representant up to symmetries *)
       else
-        (),(fun () a -> (), a)
+        rule_cache, (),(fun () a -> (), a)
     in
 
 (*********************************************************************)
-    let network = A.network_from_compil ~ignore_obs compil (cache,p) in
+    let network =
+      A.network_from_compil
+        ~ignore_obs compil rule_cache (sym_cache,p)
+    in
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
