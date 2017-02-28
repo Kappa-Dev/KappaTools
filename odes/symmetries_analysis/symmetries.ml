@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Feb 24 2017>
+   * Last modification: Time-stamp: <Feb 28 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -16,7 +16,6 @@
 (***************************************************************************)
 (*TYPE*)
 (***************************************************************************)
-
 type contact_map =
   ((string list) * (string*string) list)
     Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
@@ -363,3 +362,7 @@ let print_partitioned_contact_map_in_lkappa logger signature partitioned_contact
          let () = print_l logger fmt signature agent l2 in
          ()
       ) partitioned_contact_map
+
+type cache = unit (* to do *)
+let empty_cache ()  = () (* to do *)
+let representant cache symmetries species = cache, species (* to do *)

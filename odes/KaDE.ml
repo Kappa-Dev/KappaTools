@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 27 2017>
+  * Last modification: Time-stamp: <Feb 28 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -150,8 +150,10 @@ let main () =
     in
     (*************************************************************)
     (*TEST-symmetries*)
-    let rule_cache = A.init_rule_cache () in
-    let rule_cache, sym_cache, p =
+    let network =
+      A.init compil
+    in
+    let network =
       if ode_args.Ode_args.with_symmetries
       then
         let parameters =
@@ -199,15 +201,17 @@ let main () =
         let state =
           Export_to_kade.set_parameters parameters state
         in
-        let state, symmetries =
+        let _state, symmetries =
           Export_to_kade.get_symmetric_sites
             ~accuracy_level:Remanent_state.High state
         in
-        let symmetries, rule_cache =
+        (* Here define the cache for equivalence classes of species *)
+      (* Fill with the function that maps a species to its representant *)
+        let network =
           A.compute_symmetries_from_syntactic_rules
             my_logger
             compil
-            rule_cache
+            network
             symmetries.Symmetries.store_partitioned_contact_map
         in
         let () =
@@ -218,17 +222,15 @@ let main () =
             let () = close_out file in
             ()
         in
-        let _ = state, symmetries in
-        rule_cache, (), (fun cache a -> cache, a) (* TO DO: to provide the initial cache and the function that maps a species to its representant up to symmetries *)
+        network
       else
-        rule_cache, (),(fun () a -> (), a)
+        network
+    in
+    let network =
+      A.network_from_compil ~ignore_obs compil network
     in
 
 (*********************************************************************)
-    let network =
-      A.network_from_compil
-        ~ignore_obs compil rule_cache (sym_cache,p)
-    in
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in

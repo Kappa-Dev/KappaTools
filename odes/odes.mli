@@ -1,11 +1,11 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 27 2017>
+  * Last modification: Time-stamp: <Feb 28 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
   type ode_var_id
-  type ('a,'b,'c) network
+  type ('a,'b) network
   type enriched_rule
   type rule_id
   type connected_component_id
@@ -15,25 +15,29 @@ sig
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
+  val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
+
   val network_from_compil:
-    ignore_obs:bool -> I.compil -> I.nauto_in_rules_cache ->
-    ('a * ('a -> I.chemical_species  -> ('a * I.chemical_species)))
-    -> (int,int,'a) network
+    ignore_obs:bool ->
+    I.compil ->
+    (ode_var_id,Ode_loggers_sig.ode_var_id) network -> 
+    (ode_var_id,Ode_loggers_sig.ode_var_id) network
 
   val get_reactions:
-    ('a,'b,'c) network ->
+    ('a,'b) network ->
     (ode_var_id list * ode_var_id list *
      (('a,'b) Alg_expr.e Locality.annot *
-      ode_var_id  Locality.annot) list  * I.rule) list
+      ode_var_id Locality.annot) list  * I.rule) list
 
   val export_network:
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
-    Loggers.t -> Loggers.t -> I.compil -> (int,int,unit) network ->
+    Loggers.t -> Loggers.t -> I.compil ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     unit
 
   val species_of_species_id:
-    (int,int,unit) network -> ode_var_id -> I.chemical_species * int
+    ('a,'b) network -> ode_var_id -> I.chemical_species * int
 
   val get_comment: enriched_rule -> string
 
@@ -53,12 +57,8 @@ sig
   val compute_symmetries_from_syntactic_rules :
     Loggers.t ->
     I.compil ->
-    I.nauto_in_rules_cache ->
+    ('a,'b) network  ->
     Symmetries.partitioned_contact_map ->
-    Symmetries.partitioned_contact_map *
-    I.nauto_in_rules_cache
-
-  val init_cc_cache : I.compil -> I.cache
-  val init_rule_cache : unit -> I.nauto_in_rules_cache
+    ('a,'b) network
 
 end

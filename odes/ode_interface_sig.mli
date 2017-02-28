@@ -1,14 +1,12 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 27 2017>
+  * Last modification: Time-stamp: <Feb 28 2017>
 *)
 
 module type Interface =
 sig
   type compil
   type cache
-  type nauto_in_rules_cache
-
 
   type mixture              (* not necessarily connected, fully specified *)
   type chemical_species     (* connected, fully specified *)
@@ -21,7 +19,6 @@ sig
     ((connected_component array list,int) Alg_expr.e * hidden_init * Locality.t) list
 
   val empty_cache: compil -> cache
-  val empty_lkappa_cache: unit -> nauto_in_rules_cache
   val get_init: compil -> init
   val mixture_of_init: compil -> hidden_init -> mixture
   val dummy_chemical_species: compil -> chemical_species
@@ -54,7 +51,7 @@ sig
 
   val connected_components_of_mixture:
     compil -> cache ->
-    mixture -> cache * chemical_species list
+    mixture -> cache  * chemical_species list
 
   type embedding (* the domain is connected *)
   type embedding_forest (* the domain may be not connected *)
@@ -83,7 +80,7 @@ sig
     SetMap.Map with type elt = arity * direction
 
   val divide_rule_rate_by:
-    nauto_in_rules_cache -> compil -> rule -> nauto_in_rules_cache * int
+    cache -> compil -> rule -> cache * int
 
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
 
@@ -141,8 +138,8 @@ sig
 
   (*symmetries*)
   val cannonic_form_from_syntactic_rule :
-    nauto_in_rules_cache -> compil -> rule ->
-    nauto_in_rules_cache *
+    cache -> compil -> rule ->
+    cache *
     LKappa.rule *
     int *
     Alg_expr.t Locality.annot RuleModeMap.t *
@@ -155,5 +152,19 @@ sig
 
   val print_partitioned_contact_map_in_lkappa :
     Loggers.t -> compil -> Symmetries.lkappa_partitioned_contact_map -> unit
+
+(*  val get_cc_cache: cache -> Pattern.PreEnv.t
+  val set_cc_cache: Pattern.PreEnv.t -> cache -> cache
+
+  val get_rule_cache: cache -> LKappa_auto.cache
+  val set_rule_cache: LKappa_auto.cache -> cache -> cache
+
+  val get_sym_cache: cache -> Symmetries.cache
+  val set_sym_cache: Symmetries.cache -> cache -> cache
+*)
+
+  val get_representant:
+    cache -> Symmetries.partitioned_contact_map ->
+    chemical_species -> cache * chemical_species 
 
 end

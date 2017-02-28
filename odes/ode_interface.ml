@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 27 2017>
+  * Last modification: Time-stamp: <Feb 28 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -17,8 +17,32 @@ type compil =
     compute_jacobian: bool
   }
 
-type cache = Pattern.PreEnv.t
+type cc_cache = Pattern.PreEnv.t
 type nauto_in_rules_cache = LKappa_auto.cache
+type sym_cache = unit (* to do *)
+
+type cache =
+  {
+    cc_cache: cc_cache ;
+    rule_cache: nauto_in_rules_cache;
+    representant_cache: sym_cache
+  }
+
+let get_representant cache symmetries species =
+  let rep_cache = cache.representant_cache in
+  let rep_cache, species =
+    Symmetries.representant rep_cache symmetries species
+  in
+  {cache with representant_cache = rep_cache},
+  species
+
+let get_cc_cache cache = cache.cc_cache
+let set_cc_cache cc_cache cache = {cache with cc_cache = cc_cache}
+let get_rule_cache cache = cache.rule_cache
+let set_rule_cache rule_cache cache = {cache with rule_cache = rule_cache}
+let get_sym_cache cache = cache.representant_cache
+let set_sym_cache sym_cache cache = {cache with representant_cache = sym_cache}
+
 type hidden_init = Primitives.elementary_rule
 type init = (Alg_expr.t * hidden_init * Locality.t) list
 
@@ -92,17 +116,21 @@ let canonic_form x = x
 let connected_components_of_patterns = Array.to_list
 
 let connected_components_of_mixture compil cache e =
+  let cc_cache = cache.cc_cache in
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
   let snap = Edges.build_snapshot sigs e in
-  List.fold_left
-    (fun (cache,acc) (i,m) ->
-       match Snip.connected_components_sum_of_ambiguous_mixture
-               contact_map cache (LKappa.of_raw_mixture m) with
-       | cache',[[|_,x|],_] ->
-         cache',Tools.recti (fun a _ -> x::a) acc i
-       | _ -> assert false)
-    (cache,[]) snap
+  let cc_cache, acc =
+    List.fold_left
+      (fun (cc_cache,acc) (i,m) ->
+         match Snip.connected_components_sum_of_ambiguous_mixture
+                 contact_map cc_cache (LKappa.of_raw_mixture m) with
+         | cc_cache',[[|_,x|],_] ->
+           cc_cache',Tools.recti (fun a _ -> x::a) acc i
+         | _ -> assert false)
+      (cc_cache,[]) snap
+  in
+  {cache with cc_cache = cc_cache}, acc
 
 type embedding = Renaming.t (* the domain is connected *)
 type embedding_forest = Matching.t
@@ -333,11 +361,18 @@ let get_compil
     compute_jacobian = compute_jacobian
   }
 
-let empty_cache compil =
+let empty_cc_cache compil =
   Pattern.PreEnv.of_env (Model.domain compil.environment)
 
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
+let empty_sym_cache () = () (* to be filled *)
+let empty_cache compil =
+  {
+    cc_cache  = empty_cc_cache compil ;
+    rule_cache = empty_lkappa_cache () ;
+    representant_cache = empty_sym_cache () ;
+  }
 let mixture_of_init compil c =
   let _,emb,m = disjoint_union compil [] in
   let m = apply compil c emb m in
@@ -355,7 +390,10 @@ let divide_rule_rate_by cache compil rule =
     let lkappa_rule =
       Model.get_ast_rule compil.environment rule_id
     in
-    LKappa_auto.nauto compil.rate_convention cache lkappa_rule
+    let rule_cache, output =
+      LKappa_auto.nauto compil.rate_convention cache.rule_cache lkappa_rule
+    in
+    {cache with rule_cache = rule_cache}, output
 
 (****************************************************************)
 (*cannonic form per rule*)
@@ -365,8 +403,9 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
-  let cache, hash_list =
-    LKappa_auto.cannonic_form cache lkappa_rule
+  let rule_cache = cache.rule_cache in
+  let rule_cache, hash_list =
+    LKappa_auto.cannonic_form rule_cache lkappa_rule
   in
   let i = LKappa_auto.RuleCache.int_of_hashed_list hash_list in
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
@@ -387,10 +426,11 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       RuleModeMap.empty
       rule_id_with_mode_list
   in
-  let cache, hashed_list =
-    LKappa_auto.cannonic_form cache lkappa_rule
+  let rule_cache, hashed_list =
+    LKappa_auto.cannonic_form rule_cache lkappa_rule
   in
-  cache, lkappa_rule, rule_id, rate_map, hashed_list
+  let cache = {cache with rule_cache = rule_cache } in
+  cache, lkappa_rule, i , rate_map, hashed_list
 
 let print_partitioned_contact_map_in_lkappa
     log compil symmetries =

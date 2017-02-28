@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 27 2017>
+  * Last modification: Time-stamp: <Feb 28 2017>
 *)
 
 let local_trace = false
@@ -132,7 +132,7 @@ struct
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
 
-  type ('a,'b,'symcache) network =
+  type ('a,'b) network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
@@ -147,9 +147,8 @@ struct
 
       species_tab: (I.chemical_species*int) Mods.DynArray.t ;
 
-      cc_cache: I.cache ;
-      sym_cache: 'symcache ;
-      rule_cache: I.nauto_in_rules_cache ;
+      cache: I.cache ;
+
       varmap: var_id Mods.IntMap.t ;
       tokenmap: ode_var_id Mods.IntMap.t ;
 
@@ -163,12 +162,8 @@ struct
       time_homogeneous_obs: bool option ;
       time_homogeneous_vars: bool option ;
       time_homogeneous_rates: bool option ;
-      rep: 'symcache -> I.chemical_species -> ('symcache * I.chemical_species) ;
+      symmetries: Symmetries.partitioned_contact_map option ;
     }
-
-  let rep network canonic =
-    let cache, canonic_up_to_sym = network.rep network.sym_cache canonic in
-    {network with sym_cache = cache}, canonic_up_to_sym
 
   let may_be_time_homogeneous_gen a =
     match
@@ -220,7 +215,7 @@ struct
 
   let get_compil = I.get_compil
 
-  let init compil cc_cache nauto_cache (cache_sym,rep) =
+  let init compil =
     {
       rules = [] ;
       reactions = [] ;
@@ -229,8 +224,7 @@ struct
       id_of_ode_var = VarMap.empty ;
       species_tab = Mods.DynArray.create 0
           (I.dummy_chemical_species compil,1) ;
-      cc_cache = cc_cache ;
-      rule_cache = nauto_cache ;
+      cache = I.empty_cache compil ;
       fresh_ode_var_id = fst_id ;
       fresh_var_id = fst_id ;
       varmap = Mods.IntMap.empty ;
@@ -242,8 +236,7 @@ struct
       time_homogeneous_vars = None ;
       time_homogeneous_obs = None ;
       time_homogeneous_rates = None ;
-      sym_cache = cache_sym ;
-      rep = rep;
+      symmetries = None ;
     }
 
   let from_nembed_correct compil nauto =
@@ -381,8 +374,16 @@ struct
           (I.print_chemical_species ~compil) species in
       remanent,i
 
+  let representant network species =
+    match network.symmetries with
+    | None -> network, species
+    | Some symmetries ->
+      let cache = network.cache in
+      let cache, species = I.get_representant cache symmetries species in
+      {network with cache = cache}, species
+
   let translate_species compil species remanent =
-    let network, species = rep (snd remanent) species in
+    let network, species = representant (snd remanent) species in
     let remanent = fst remanent, network in
     translate_canonic_species compil
       (I.canonic_form species) species remanent
@@ -414,10 +415,11 @@ struct
       (remanent,[])
 
   let petrify_mixture compil mixture (acc,network) =
-    let cc_cache',species =
+    let cache,species =
       I.connected_components_of_mixture
-        compil network.cc_cache mixture in
-    petrify_species_list compil species (acc,{network with cc_cache = cc_cache'})
+        compil network.cache mixture
+    in
+    petrify_species_list compil species (acc,{network with cache = cache})
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -569,7 +571,7 @@ struct
   let compute_reactions compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
-    let cache = network.rule_cache in
+    let cache = network.cache in
     let cache, rules_rev =
       List.fold_left
         (fun ((id, cache), list) rule ->
@@ -581,7 +583,7 @@ struct
              ((next_id id,cache),list) modes)
         ((fst_id,cache),[]) (List.rev rules)
     in
-    let network = {network with rule_cache = snd cache} in 
+    let network = {network with cache = snd cache} in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
       initial_network
@@ -767,10 +769,10 @@ struct
     match I.token_vector_of_init c with
     | [] ->
       let m = I.mixture_of_init compil c in
-      let cc_cache',cc =
-        I.connected_components_of_mixture compil network.cc_cache m
+      let cache',cc =
+        I.connected_components_of_mixture compil network.cache m
       in
-      let network = {network with cc_cache = cc_cache'} in
+      let network = {network with cache = cache'} in
       List.fold_left
         (fun (network,acc) x ->
            let (_,n'),v = translate_species compil x ([],network) in n',v::acc)
@@ -947,19 +949,19 @@ struct
      n_obs = network.n_obs - 1}
 
   let species_of_initial_state compil network list =
-    let cc_cache = network.cc_cache in
-    let cc_cache, list =
+    let cache = network.cache in
+    let cache, list =
       List.fold_left
-        (fun (cc_cache,list) (_,r,_) ->
+        (fun (cache,list) (_,r,_) ->
            let b = I.mixture_of_init compil r in
-           let cc_cache',acc =
-             I.connected_components_of_mixture compil cc_cache b
+           let cache',acc =
+             I.connected_components_of_mixture compil cache b
            in
-           cc_cache',List.rev_append acc list)
-        (cc_cache,[])
+           cache',List.rev_append acc list)
+        (cache,[])
         list
     in
-    {network with cc_cache = cc_cache},
+    {network with cache = cache},
     list
 
   type ('a,'b) rate = ('a,'b) Alg_expr.e Locality.annot
@@ -1107,11 +1109,9 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ~ignore_obs compil rule_cache (cache_sym, representant)=
-    let cc_cache = I.empty_cache compil in
+  let network_from_compil ~ignore_obs compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
-    let network = init compil cc_cache rule_cache (cache_sym, representant) in
     let () = Format.printf "\t -initial states @." in
     let network,initial_state =
       species_of_initial_state compil network (I.get_init compil)
@@ -1741,9 +1741,7 @@ struct
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
 
-  let init_cc_cache  = I.empty_cache
-  let init_rule_cache = I.empty_lkappa_cache
-
+  (* JF-> LKQ: Please move this code in symmetries.ml or a fresh file *)
 (***************************************************************)
 (*SYMMETRIES*)
 (***************************************************************)
@@ -1982,16 +1980,17 @@ automorphisms in the site graph E.
          map2)
 
   let compute_symmetries_from_syntactic_rules
-      log compil rule_cache symmetries =
-    let rule_cache, cannonic_list, hash_lists =
+      log compil network symmetries =
+    let cache = network.cache in
+    let cache, cannonic_list, hash_lists =
       cannonic_form_from_syntactic_rules log
-        rule_cache
+        cache
         compil
     in
     let translate_symmetries =
       I.translate_symmetries compil symmetries
     in
-  let to_be_checked, counter, rates, correct =
+    let to_be_checked, counter, rates, correct =
       build_array_for_symmetries
         hash_lists
     in
@@ -2021,7 +2020,8 @@ automorphisms in the site graph E.
         ()
         )  cannonic_list
     in
-    symmetries, rule_cache
+    {network with cache = cache ;
+                  symmetries = Some symmetries }
 
 (*
 2) Now we have a list of rules, with a hash.
