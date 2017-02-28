@@ -15,4 +15,4 @@
 %init: 1000 B(x)
 %init: 1 A(x)
 
-%mod: [E] = 100 do $STOP
+%mod: [E] = 75 do $STOP

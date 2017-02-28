@@ -18,4 +18,4 @@ A(z~u/~p!1), K(x!1) @ 1
 %init: 10 A(y~u, z~u)
 %init: 10 K(x)
 
-%mod: [E] = 1000 do $STOP
+%mod: [E] = 250 do $STOP

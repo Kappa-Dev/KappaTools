@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state
 Done
-+ Command line to rerun is: 'KaSim' 'weak_events.ka' '-seed' '924556145' '-u' 'e' '-l' '100' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'weak_events.ka' '-seed' '924556145' '-u' 'e' '-l' '75' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace
@@ -22,34 +22,34 @@ ____________________________________________________________
 	- splitting initial events: nothing has changed 
 	 - blackboard generation
 	- alpha-conversion
-	 - computing causal past of each observed events (32)
+	 - computing causal past of each observed events (25)
 Stats:
- number of step   : 1131
- longest story    : 97
- average length   : 49.67
- geometric mean   : 56.74
+ number of step   : 1099
+ longest story    : 76
+ average length   : 39.18
+ geometric mean   : 44.62
 
-	 - causal flow compression (32)
+	 - causal flow compression (25)
 
 ____________________________________________________________
 ############################################################
 
-	- simplify the trace, 1130 events 
-		- start iteration 1, 1130 events remaining 
+	- simplify the trace, 1098 events 
+		- start iteration 1, 1098 events remaining 
 				- alpha-conversion
-				- detecting siphons: +31 events 
+				- detecting siphons: +24 events 
 				- alpha-conversion
-				- cutting concurrent events: -1033 events 
+				- cutting concurrent events: -1022 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 2, 128 events remaining 
+		- start iteration 2, 100 events remaining 
 				- alpha-conversion
 				- detecting siphons: nothing has changed 
 				- alpha-conversion
 				- cutting concurrent events: nothing has changed 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 128 events remaining 
+	- a fixpoint has been reached, 100 events remaining 
 	- blackboard generation 
-	- computing causal past of each observed events (32)
+	- computing causal past of each observed events (25)
 
 
 	 - weak flow compression (1)
@@ -57,6 +57,6 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 32 flows
++ Pretty printing 25 flows
 + Pretty printing 1 weakly compressed flow
 Simulation ended

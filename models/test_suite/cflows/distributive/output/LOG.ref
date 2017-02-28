@@ -13,49 +13,49 @@ done
 	 -initial conditions
 + Building initial state
 Done
-+ Command line to rerun is: 'KaSim' 'distributive.ka' '-seed' '240056667' '-u' 'event' '-l' '1000' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'distributive.ka' '-seed' '240056667' '-u' 'event' '-l' '250' '-d' 'output' '--time-independent'
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -1 events 
+	- removing events occurring after the last observable: -13 events 
 + Producing causal compressions
 	- splitting initial events: nothing has changed 
 	 - blackboard generation
 	- alpha-conversion
-	 - computing causal past of each observed events (106)
+	 - computing causal past of each observed events (13)
 Stats:
- number of step   : 1126
- longest story    : 504
- average length   : 242.1
- geometric mean   : 282.4
+ number of step   : 271
+ longest story    : 128
+ average length   : 51.54
+ geometric mean   : 62.54
 
-	 - causal flow compression (106)
+	 - causal flow compression (13)
 
 ____________________________________________________________
 ############################################################
 
-	- simplify the trace, 1125 events 
-		- start iteration 1, 1125 events remaining 
+	- simplify the trace, 270 events 
+		- start iteration 1, 270 events remaining 
 				- alpha-conversion
-				- detecting siphons: +281 events 
+				- detecting siphons: +97 events 
 				- alpha-conversion
-				- cutting concurrent events: -565 events 
-				- detecting pseudo inverse events: -430 events 
-		- start iteration 2, 411 events remaining 
+				- cutting concurrent events: -216 events 
+				- detecting pseudo inverse events: -56 events 
+		- start iteration 2, 95 events remaining 
 				- alpha-conversion
-				- detecting siphons: +20 events 
+				- detecting siphons: +12 events 
 				- alpha-conversion
-				- cutting concurrent events: -235 events 
+				- cutting concurrent events: -40 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 196 events remaining 
+		- start iteration 3, 67 events remaining 
 				- alpha-conversion
-				- detecting siphons: +20 events 
+				- detecting siphons: +12 events 
 				- alpha-conversion
-				- cutting concurrent events: -20 events 
+				- cutting concurrent events: -12 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 196 events remaining 
+	- a fixpoint has been reached, 67 events remaining 
 	- blackboard generation 
-	- computing causal past of each observed events (106)
+	- computing causal past of each observed events (13)
 
 
 	 - weak flow compression (1)
@@ -68,7 +68,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 106 flows
++ Pretty printing 13 flows
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
 Simulation ended
