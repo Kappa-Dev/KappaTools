@@ -229,6 +229,8 @@ let for_all_over_orbit
   in
   next 0 (of_rule rule) 0 positions init
 
+exception False
+
 let check_orbit
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter to_be_checked =
@@ -262,17 +264,38 @@ let check_orbit
   in
   let get_weight hash =
     let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
-    weight
-      ~correct:(correct.(i))
-      ~card_stabilizer:(counter.(i))
-      ~rate:(rates.(i))
+    Rule_modes.RuleModeMap.map
+      (fun rate ->
+         weight
+           ~correct:(correct.(i))
+           ~card_stabilizer:(counter.(i))
+           ~rate)
+      (rates.(i))
   in
   let rec aux w_ref l =
     match l
     with
     | [] -> true
     | h::t ->
-      if Alg_expr_extra.necessarily_equal w_ref (get_weight h)
+      if
+        begin
+          try
+            let (),() =
+              Rule_modes.RuleModeMap.monadic_fold2
+                () ()
+                (fun () () _ w_ref w () ->
+                   if Alg_expr_extra.necessarily_equal w_ref w
+                   then (),()
+                   else raise False)
+                (fun () () _ _ () -> raise False)
+                (fun () () _ _ () -> raise False)
+                w_ref
+                (get_weight h)
+                ()
+            in true
+          with
+          | False -> false
+        end
       then
         aux w_ref t
       else

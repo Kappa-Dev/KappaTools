@@ -191,23 +191,12 @@ let disjoint_union compil l =
 
 type rule = Primitives.elementary_rule
 type rule_id = int
-type arity = Usual | Unary
-type direction = Direct | Op
+type arity = Rule_modes.arity
+type direction = Rule_modes.direction
 type rule_name = string
 type rule_id_with_mode = rule_id * arity * direction
 
 
-module RuleModeS:
-          SetMap.S with type elt = arity * direction
-  =
-  SetMap.Make
-    (struct
-      type t = arity * direction
-      let compare = compare
-      let print _ _ = ()
-    end)
-
-module RuleModeMap = RuleModeS.Map
 
 let lhs _compil _rule_id r = r.Primitives.connected_components
 
@@ -226,24 +215,24 @@ let mode_of_rule compil rule =
     (* and Op for the rule A(x!1),B(x!1) -> A(x),B(x) @ 3(4) *)
     true
   then
-    Direct
+    Rule_modes.Direct
   else
-    Op
+    Rule_modes.Op
 
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
   List.rev_map
     (fun x -> id,x,mode)
     (List.rev
-       (Usual::
-        (add Unary rule.Primitives.unary_rate [])))
+       (Rule_modes.Usual::
+        (add Rule_modes.Unary rule.Primitives.unary_rate [])))
 
 let rate _compil rule (_,arity,_) =
   match
     arity
   with
-  | Usual -> Some rule.Primitives.rate
-  | Unary -> Tools.option_map fst rule.Primitives.unary_rate
+  | Rule_modes.Usual -> Some rule.Primitives.rate
+  | Rule_modes.Unary -> Tools.option_map fst rule.Primitives.unary_rate
 
 let token_vector a = a.Primitives.delta_tokens
 
@@ -274,13 +263,13 @@ let rate_name compil rule rule_id =
   let (_kade_id,arity,direction) = rule_id in
   let arity_tag =
     match arity with
-    | Usual -> ""
-    | Unary -> "(unary context)"
+    | Rule_modes.Usual -> ""
+    | Rule_modes.Unary -> "(unary context)"
   in
   let direction_tag =
     match direction with
-    | Direct -> ""
-    | Op -> "(op)"
+    | Rule_modes.Direct -> ""
+    | Rule_modes.Op -> "(op)"
   in
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
@@ -419,11 +408,11 @@ let cannonic_form_from_syntactic_rule cache compil rule =
           match rate_opt with
           | None -> rate_map
           | Some rate ->
-            RuleModeMap.add (a,b) rate rate_map
+            Rule_modes.RuleModeMap.add (a,b) rate rate_map
         in
         rate_map
       )
-      RuleModeMap.empty
+      Rule_modes.RuleModeMap.empty
       rule_id_with_mode_list
   in
   let rule_cache, hashed_list =

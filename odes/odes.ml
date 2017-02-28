@@ -42,8 +42,8 @@ struct
             Format.fprintf a
               "Component_wise:(%a,%s,%s,%i,%a)"
               I.print_rule_id r
-              (match ar with I.Usual -> "@" | I.Unary -> "(1)")
-              (match dir with I.Direct -> "->" | I.Op -> "<-")
+              (match ar with Rule_modes.Usual -> "@" | Rule_modes.Unary -> "(1)")
+              (match dir with Rule_modes.Direct -> "->" | Rule_modes.Op -> "<-")
               cc_id
               (I.print_connected_component ?compil:None) cc
           in
@@ -99,7 +99,7 @@ struct
   type enriched_rule =
     {
       comment: string;
-      rule_id_with_mode: (rule_id*I.arity*I.direction);
+      rule_id_with_mode: (rule_id*Rule_modes.arity*Rule_modes.direction);
       rule: I.rule ;
       lhs: I.pattern ;
       lhs_cc: (connected_component_id * I.connected_component) list ;
@@ -124,10 +124,10 @@ struct
 
   let var_of_rate (rule_id,arity,direction) =
     match arity,direction with
-    | I.Usual,I.Direct -> Ode_loggers_sig.Rate rule_id
-    | I.Unary,I.Direct -> Ode_loggers_sig.Rateun rule_id
-    | I.Usual,I.Op -> Ode_loggers_sig.Rated rule_id
-    | I.Unary,I.Op -> Ode_loggers_sig.Rateund rule_id
+    | Rule_modes.Usual,Rule_modes.Direct -> Ode_loggers_sig.Rate rule_id
+    | Rule_modes.Unary,Rule_modes.Direct -> Ode_loggers_sig.Rateun rule_id
+    | Rule_modes.Usual,Rule_modes.Op -> Ode_loggers_sig.Rated rule_id
+    | Rule_modes.Unary,Rule_modes.Op -> Ode_loggers_sig.Rateund rule_id
 
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
@@ -617,7 +617,7 @@ struct
                   enriched_rule.divide_rate_by
                   (I.print_rule ~compil) enriched_rule.rule in
               match arity_of enriched_rule  with
-              | I.Usual ->
+              | Rule_modes.Usual ->
                 begin
                   let () = debug "regular case" in
                   let store_new_embeddings =
@@ -654,10 +654,10 @@ struct
                       StoreMap.iter
                         (fun ((a,ar,dir),id,b) c ->
                            let () = debug "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
-                               (match ar with I.Usual -> "@"
-                                            | I.Unary -> "(1)")
-                               (match dir with I.Direct -> "->"
-                                             | I.Op -> "<-")
+                               (match ar with Rule_modes.Usual -> "@"
+                                            | Rule_modes.Unary -> "(1)")
+                               (match dir with Rule_modes.Direct -> "->"
+                                             | Rule_modes.Op -> "<-")
                                id
                                (I.print_connected_component ~compil) b
                            in
@@ -722,7 +722,7 @@ struct
                   store_all_embeddings,to_be_visited,network
                 end
 
-              | I.Unary ->
+              | Rule_modes.Unary ->
                 begin
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
@@ -1954,7 +1954,7 @@ automorphisms in the site graph E.
       Array.make size_hash_plus_1 0
     in
     let rate =
-      Array.make size_hash_plus_1 I.RuleModeMap.empty
+      Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
     in
     let correct =
       Array.make size_hash_plus_1 1
@@ -1968,12 +1968,12 @@ automorphisms in the site graph E.
 (* Moreover, pass them as an argument, since this is not the only computation that you do with them *)
   let add_map map1 map2 =
     snd
-      (I.RuleModeMap.monadic_fold2 () ()
+      (Rule_modes.RuleModeMap.monadic_fold2 () ()
          (fun () () key a1 a2 map ->
-            (),I.RuleModeMap.add
+            (),Rule_modes.RuleModeMap.add
               key (Alg_expr.add a1 a2) map)
          (fun () () key a1 map ->
-            (),I.RuleModeMap.add key a1 map)
+            (),Rule_modes.RuleModeMap.add key a1 map)
          (fun () () _ _ map -> (),map)
          map1
          map2

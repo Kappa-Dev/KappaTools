@@ -20,7 +20,7 @@ sig
   val network_from_compil:
     ignore_obs:bool ->
     I.compil ->
-    (ode_var_id,Ode_loggers_sig.ode_var_id) network -> 
+    (ode_var_id,Ode_loggers_sig.ode_var_id) network ->
     (ode_var_id,Ode_loggers_sig.ode_var_id) network
 
   val get_reactions:
@@ -41,7 +41,7 @@ sig
 
   val get_comment: enriched_rule -> string
 
-  val get_rule_id_with_mode: enriched_rule -> rule_id * I.arity * I.direction
+  val get_rule_id_with_mode: enriched_rule -> rule_id * Rule_modes.arity * Rule_modes.direction
 
   val get_rule : enriched_rule -> I.rule
 

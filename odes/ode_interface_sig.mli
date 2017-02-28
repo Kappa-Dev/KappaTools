@@ -71,13 +71,8 @@ sig
 
   type rule
   type rule_name = string
-  type arity = Usual | Unary
-  type direction = Direct | Op
   type rule_id = int
-  type rule_id_with_mode = rule_id * arity * direction
-
-  module RuleModeMap:
-    SetMap.Map with type elt = arity * direction
+  type rule_id_with_mode = rule_id * Rule_modes.arity * Rule_modes.direction
 
   val divide_rule_rate_by:
     cache -> compil -> rule -> cache * int
@@ -142,7 +137,7 @@ sig
     cache *
     LKappa.rule *
     int *
-    Alg_expr.t Locality.annot RuleModeMap.t *
+    Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t *
     LKappa_auto.RuleCache.hashed_list
 
   val translate_symmetries :
@@ -165,6 +160,6 @@ sig
 
   val get_representant:
     cache -> Symmetries.partitioned_contact_map ->
-    chemical_species -> cache * chemical_species 
+    chemical_species -> cache * chemical_species
 
 end

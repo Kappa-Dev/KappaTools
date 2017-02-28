@@ -13,7 +13,7 @@ val check_orbit_internal_state_permutation:
   site2:int ->
   LKappa.rule ->
   correct:(int array) -> (*what i have to divide to get gamma *)
-  ('a, 'b) Alg_expr.e Locality.annot array ->
+  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
   counter:(int array) -> (*counter the number of array of orbit*)
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
@@ -33,7 +33,7 @@ val check_orbit_binding_state_permutation:
   site2:int ->
   LKappa.rule ->
   correct:(int array) ->
-  ('a, 'b) Alg_expr.e Locality.annot array ->
+  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
   counter:(int array) ->
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
