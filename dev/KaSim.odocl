@@ -64,6 +64,7 @@ Kappa_files
 Ode_interface_sig
 Ode_interface
 Odes
+Rule_modes
 
 Analyzer
 Analyzer_headers
