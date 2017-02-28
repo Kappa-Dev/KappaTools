@@ -22,7 +22,7 @@ val add_cc : t -> int -> Renaming.t -> t option
 
 val is_root_of : Pattern.Env.t -> Edges.t -> Agent.t -> Pattern.id -> bool
 
-val roots_of : Pattern.Env.t -> Edges.t -> Pattern.id -> Mods.IntSet.t
+val roots_of : Pattern.Env.t -> Edges.t -> Pattern.id -> IntCollection.t
 
 val elements_with_types :
   Pattern.Env.t -> Pattern.id array -> t -> Agent.t list array

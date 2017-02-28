@@ -13,6 +13,7 @@ List_util
 Tools
 Renaming
 Random_tree
+IntCollection
 
 Nbr
 Operator
@@ -26,7 +27,9 @@ Signature
 NamedDecls
 Agent
 Instantiation
+Contact_map
 Alg_expr
+Pattern
 Primitives
 Model
 Kappa_printer
@@ -36,7 +39,6 @@ Version
 Raw_mixture
 Edges
 Navigation
-Pattern
 Matching
 Snip
 Edges

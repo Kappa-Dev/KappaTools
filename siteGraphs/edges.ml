@@ -389,11 +389,13 @@ let link_destination ag s graph =
   (Mods.DynArray.get graph.connect ag).(s)
 
 let all_agents_where f graph =
-  Mods.DynArray.fold_lefti
-    (fun id acc -> function
-       | Some ty when f (id,ty) -> Mods.IntSet.add id acc
-       | _ -> acc)
-    Mods.IntSet.empty graph.sort
+  let out = IntCollection.create 0 in
+  let () = Mods.DynArray.iteri
+      (fun id -> function
+         | Some ty when f (id,ty) -> IntCollection.add id out
+         | _ -> ())
+      graph.sort in
+  out
 
 let in_same_connected_component ag ag' graph =
   match graph.connected_component with

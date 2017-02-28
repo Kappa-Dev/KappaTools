@@ -4,7 +4,7 @@ The main entry point of KaSim executable is main/KaSim.ml but let's
 describe the API bottom-up.
 
 The folder dataStructures/ has a transparent name. You can find there:
-{!modules: DynamicArray SetMap Operator Nbr NamedDecls Locality}
+{!modules: DynamicArray SetMap IntCollection Operator Nbr NamedDecls Locality}
 Some pretty printing utilities are here too:
 {!modules: Pp Pp_svg Pp_html Progress_report}
 Including the KaSa machinery:
@@ -12,7 +12,7 @@ Including the KaSa machinery:
 
 
 In term/ directory stands all definitions the simulator works on.
-{!modules: Agent Signature Pattern
+{!modules: Agent Signature Contact_map Pattern
 Instantiation Alg_expr Raw_mixture Primitives Model Kappa_printer }
 
 In grammar/ are the parser and the compilers

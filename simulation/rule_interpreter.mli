@@ -89,7 +89,7 @@ val remove_tracked : Pattern.id array -> t -> t
 
 val print_injections :
   ?domain:Pattern.Env.t -> Format.formatter ->
-  Mods.IntSet.t Pattern.ObsMap.t -> unit
+  IntCollection.t Pattern.ObsMap.t -> unit
 val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)

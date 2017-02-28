@@ -9,6 +9,7 @@ SetMap
 Mods
 List_util
 Tools
+IntCollection
 Int_storage
 
 Buffers
@@ -26,6 +27,7 @@ Locality
 Operator
 Agent
 Signature
+Contact_map
 Pattern
 Matching
 Instantiation

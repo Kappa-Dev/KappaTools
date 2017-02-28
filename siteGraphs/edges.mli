@@ -59,7 +59,7 @@ val get_connected_component : int -> t -> int option
 
 val in_same_connected_component : int -> int -> t -> bool
 
-val all_agents_where : (Agent.t -> bool) -> t -> Mods.IntSet.t
+val all_agents_where : (Agent.t -> bool) -> t -> IntCollection.t
 
 type path = ((Agent.t * int) * (Agent.t * int)) list
 val empty_path : path

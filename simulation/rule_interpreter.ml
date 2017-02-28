@@ -11,7 +11,7 @@ type t =
     mutable outdated : bool;
 
     (* With rectangular approximation *)
-    roots_of_patterns: Mods.IntSet.t Pattern.ObsMap.t;
+    roots_of_patterns: IntCollection.t Pattern.ObsMap.t;
     roots_of_unary_patterns:
       Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t;
 
@@ -43,7 +43,7 @@ let raw_get_alg env overwr i =
   | Some expr -> expr
 
 let size_rin state pattern =
-  Mods.IntSet.size (Pattern.ObsMap.get state.roots_of_patterns pattern)
+  IntCollection.size (Pattern.ObsMap.get state.roots_of_patterns pattern)
 let raw_instance_number state patterns_l =
   let rect_approx patterns =
     Array.fold_left
@@ -81,7 +81,7 @@ let empty ~with_trace random_state env counter =
     {
       outdated = false;
       roots_of_patterns = Pattern.Env.new_obs_map
-          (Model.domain env) (fun _ -> Mods.IntSet.empty);
+          (Model.domain env) (fun _ -> IntCollection.create 64);
       roots_of_unary_patterns = Pattern.Env.new_obs_map
           (Model.domain env) (fun _ -> Mods.IntMap.empty);
       matchings_of_rule = Mods.IntMap.empty;
@@ -108,7 +108,7 @@ let print_injections ?domain f roots_of_patterns =
           Format.fprintf
             f "@[# @[%a@] ==>@ @[%a@]@]"
             (Pattern.print ?domain ~with_id:true) pattern
-            Mods.IntSet.print roots
+            IntCollection.print roots
        )
     ) roots_of_patterns
 let print_unary_injections ?domain f roots_of_patterns =
@@ -132,8 +132,8 @@ let add_intset_in_intmap id set map =
 
 let update_roots is_add unary_ccs edges map unary_map pattern root =
   let va = Pattern.ObsMap.get map pattern in
-  let () = Pattern.ObsMap.set map pattern
-      ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) in
+  let () =
+    (if is_add then IntCollection.add else IntCollection.remove) root va in
   if Pattern.Set.mem pattern unary_ccs then
     let cc_map =
       Pattern.ObsMap.get unary_map pattern in
@@ -164,10 +164,12 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
            match excp with
            | Some (cc',root)
              when Pattern.is_equal_canonicals pattern cc' ->
-             Mods.IntSet.add root Mods.IntSet.empty,None
+             let foo = IntCollection.create 1 in
+             let () = IntCollection.add root foo in
+             foo,None
            | (Some _ | None) -> Pattern.ObsMap.get roots pattern, excp in
          (excp',
-          Mods.IntSet.fold
+          IntCollection.fold
             (fun root new_injs ->
                List.fold_left
                  (fun corrects (inj,roots) ->
@@ -687,7 +689,7 @@ let apply_rule
          | None -> None
          | Some (inj,rev_roots) ->
            match
-             Mods.IntSet.random state.random_state
+             IntCollection.random state.random_state
                (Pattern.ObsMap.get state.roots_of_patterns pattern) with
            | None -> None
            | Some root ->
@@ -843,7 +845,7 @@ let incorporate_extra_pattern domain state pattern =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
   let () =
-    if Mods.IntSet.is_empty
+    if IntCollection.is_empty
         (Pattern.ObsMap.get state.roots_of_patterns pattern) then
       Pattern.ObsMap.set
         state.roots_of_patterns
