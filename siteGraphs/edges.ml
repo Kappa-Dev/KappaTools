@@ -18,29 +18,53 @@ module Edge = struct
 end
 
 module Cache = struct
-  type t = int Mods.DynArray.t
-  let int_l = 30
+  type t = {
+    tests : int Mods.DynArray.t;
+    bag : int Mods.DynArray.t;
+    mutable limit : int;
+  }
 
-  let create () = Mods.DynArray.make 1 0
+  let int_l = 31 (*Sys.int_size*)
+
+  let create () = {
+    tests = Mods.DynArray.make 1 0;
+    bag = Mods.DynArray.make 1 0;
+    limit = 0;
+  }
 
   let mark t i =
-    Mods.DynArray.set t (i / int_l)
-      ((Mods.DynArray.get t (i / int_l)) lor (1 lsl (i mod int_l)))
+    let x = i / int_l in
+    let old = Mods.DynArray.get t.tests x in
+    let () = if old = 0 then
+        let () = Mods.DynArray.set t.bag t.limit x in
+        t.limit <- succ t.limit in
+    Mods.DynArray.set t.tests x (old lor (1 lsl (i mod int_l)))
+
   let test t i =
-    (Mods.DynArray.get t (i / int_l)) land (1 lsl (i mod int_l)) <> 0
+    (Mods.DynArray.get t.tests (i / int_l)) land (1 lsl (i mod int_l)) <> 0
 
-  let reset t = Mods.DynArray.fill t 0 (Mods.DynArray.length t) 0
+  let reset t =
+    let () =
+      Tools.iteri
+        (fun i -> Mods.DynArray.set t.tests (Mods.DynArray.get t.bag i) 0)
+        t.limit in
+    t.limit <- 0
 
-  let iteri f t =
-    ignore @@
-    Mods.DynArray.fold_lefti
-      (fun _ acc v ->
-         let () =
-           if v <> 0 then
+  let iteri_reset f t =
+    let () =
+    Tools.iteri
+      (fun k ->
+         let i = Mods.DynArray.get t.bag k in
+         let v = Mods.DynArray.get t.tests i in
+         if v <> 0 then
+           let acc = int_l * i in
+           let () =
              Tools.iteri
                (fun j -> if v land (1 lsl j) <> 0 then f (acc+j))
                int_l in
-         acc + int_l) 0 t
+           Mods.DynArray.set t.tests i 0)
+      t.limit in
+    t.limit <- 0
 end
 
 let glue_connected_component links cache ccs node1 node2 =
@@ -62,9 +86,7 @@ let glue_connected_component links cache ccs node1 node2 =
         todos
     | [] -> match next with
       | [] ->
-        let () =
-          Cache.iteri (fun i -> Mods.DynArray.set ccs i cc_id_op) cache in
-        Cache.reset cache
+        Cache.iteri_reset (fun i -> Mods.DynArray.set ccs i cc_id_op) cache
       | _ -> is_in_cc [] next in
   let () = Cache.mark cache node1 in
   is_in_cc [] [node1]
@@ -96,9 +118,8 @@ let separate_connected_component links cache ccs node1 node2 =
           in_same_cc node2 node1 [] [node2]
         else
           let () =
-            Cache.iteri
+            Cache.iteri_reset
               (fun i -> Mods.DynArray.set ccs i (Some orig)) cache in
-          let () = Cache.reset cache in
           Some (old_cc_id,orig)
       | _ -> in_same_cc orig dst [] next in
   let () = Cache.mark cache node1 in
