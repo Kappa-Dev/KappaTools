@@ -134,7 +134,7 @@ sig
   (*symmetries*)
   val cannonic_form_from_syntactic_rule :
     cache -> compil -> rule ->
-    cache *
+    cache * Signature.s *
     LKappa.rule *
     int *
     Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t *
@@ -150,11 +150,11 @@ sig
 
 (*  val get_cc_cache: cache -> Pattern.PreEnv.t
   val set_cc_cache: Pattern.PreEnv.t -> cache -> cache
-
+*)
   val get_rule_cache: cache -> LKappa_auto.cache
   val set_rule_cache: LKappa_auto.cache -> cache -> cache
 
-  val get_sym_cache: cache -> Symmetries.cache
+  (*val get_sym_cache: cache -> Symmetries.cache
   val set_sym_cache: Symmetries.cache -> cache -> cache
 *)
 

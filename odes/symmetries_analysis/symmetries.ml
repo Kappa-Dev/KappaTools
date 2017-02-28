@@ -35,9 +35,9 @@ type symmetries =
     store_partitioned_with_predicate : partitioned_contact_map
   }
 
-(***************************************************************************)
+(***************************************************************)
 (*PARTITION THE CONTACT MAP*)
-(***************************************************************************)
+(***************************************************************)
 
 let add k data map =
   let old =
@@ -108,37 +108,42 @@ let collect_partitioned_contact_map contact_map =
     )
     contact_map
 
-(***************************************************************************)
+(****************************************************************)
 
 let refine_class p l result =
   let rec aux to_do classes =
-    match to_do
-    with
+    match to_do with
     | [] -> classes
     | h::_ ->
-      let newclass,others = List.partition (p h) to_do in
-      aux others (newclass::classes)
+      let newclass, others =
+        List.partition (p h) to_do
+      in
+      aux others (newclass :: classes)
   in
   aux l result
 
 let refine_class p l =
   List.fold_left
-    (fun result l -> refine_class p l result)
-    [] l
+      (fun result l ->
+        refine_class p l result
+      ) [] l
 
 let collect_partitioned_with_predicate
     p_internal_state
     p_binding_state
     partitioned_contact_map =
     Mods.StringMap.mapi
-      (fun agent_type (internal_sites_partition,binding_sites_partition) ->
-    refine_class (p_internal_state agent_type) internal_sites_partition,
-    refine_class (p_binding_state agent_type) binding_sites_partition)
-      partitioned_contact_map
+      (fun agent_type
+        (internal_sites_partition,binding_sites_partition) ->
+          refine_class (p_internal_state agent_type)
+            internal_sites_partition,
+         refine_class (p_binding_state agent_type)
+           binding_sites_partition
+      ) partitioned_contact_map
 
-(***************************************************************************)
+(*****************************************************************)
 (*PRINT*)
-(***************************************************************************)
+(*****************************************************************)
 
 let print_l parameters l =
   if l <> []
@@ -238,9 +243,9 @@ let print_contact_map parameters contact_map =
          sitemap)
     contact_map
 
-(***************************************************************************)
+(*****************************************************************)
 (*DETECT SYMMETRIES*)
-(***************************************************************************)
+(*****************************************************************)
 
 let detect_symmetries parameters (contact_map:contact_map) =
   (*-------------------------------------------------------------*)
@@ -291,39 +296,94 @@ let detect_symmetries parameters (contact_map:contact_map) =
   in
   store_result
 
-  (****************************************************************************)
-  let translate_list l agent_interface =
-    List.rev_map
-      (fun equ_class ->
-         List.rev_map
-           (fun site_string ->
-              Signature.num_of_site
-                (Locality.dummy_annot site_string)
-                agent_interface)
-           equ_class)
-      (List.rev l)
+(****************************************************************)
+
+let translate_list l agent_interface =
+  List.rev_map
+    (fun equ_class ->
+       List.rev_map
+         (fun site_string ->
+            Signature.num_of_site
+              (Locality.dummy_annot site_string)
+              agent_interface)
+         equ_class)
+    (List.rev l)
 
 let translate_to_lkappa_representation env partitioned_contact_map =
-    let signature = Model.signatures env in
-    let nagents = Signature.size signature in
-    let array = Array.make nagents ([],[]) in
-    let () =
-      Mods.StringMap.iter
-        (fun agent_string (l1,l2) ->
-           let ag_id =
-             Signature.num_of_agent
-               (Locality.dummy_annot agent_string)
-               signature
-           in
-           let interface = Signature.get signature ag_id in
-           let l1 = translate_list l1 interface in
-           let l2 = translate_list l2 interface in
-           array.(ag_id)<-(l1,l2))
-        partitioned_contact_map
-    in
-    array
+  let signature = Model.signatures env in
+  let nagents = Signature.size signature in
+  let array = Array.make nagents ([],[]) in
+  let () =
+    Mods.StringMap.iter
+      (fun agent_string (l1,l2) ->
+         let ag_id =
+           Signature.num_of_agent
+             (Locality.dummy_annot agent_string)
+             signature
+         in
+         let interface = Signature.get signature ag_id in
+         let l1 = translate_list l1 interface in
+         let l2 = translate_list l2 interface in
+         array.(ag_id)<-(l1,l2))
+      partitioned_contact_map
+  in
+  array
 
-(***************************************************************************)
+let partition_pair cache p l =
+  let rec part cache yes no = function
+    | [] -> cache, (List.rev yes, List.rev no)
+    | x :: l ->
+      if p x
+      then part cache (x :: yes) no l
+      else part cache yes (x :: no) l in
+  part cache [] [] l
+
+let refine_class' cache p l result =
+  let rec aux cache to_do classes =
+    match to_do with
+    | [] -> cache, classes
+    | h::_ ->
+      let cache, (newclass, others) =
+        partition_pair cache (p h) to_do
+      in
+      aux cache others (newclass :: classes)
+  in
+  aux cache l result
+
+let refine_class' cache p l =
+  if l <> [] then
+    List.fold_left
+      (fun (cache, result) l ->
+         let cache, result =
+           refine_class' cache p l result
+         in
+         cache, result
+      ) (cache, []) l
+  else (cache, [])
+
+let collect_partitioned_with_predicate_lkappa
+    cache
+    p_internal_state
+    p_binding_state
+    translate_to_lkappa_representation =
+  let array =
+    Array.mapi
+      (fun agent_type
+        (internal_sites_partition,binding_sites_partition) ->
+        let cache, a =
+        refine_class' cache (p_internal_state agent_type)
+          internal_sites_partition
+        in
+        let cache, b =
+        refine_class' cache (p_binding_state agent_type)
+          binding_sites_partition
+        in
+        cache, (a,b)
+      ) translate_to_lkappa_representation
+  in
+  array
+
+(******************************************************************)
 
 let print_l logger fmt signature agent l =
   if l <> []
@@ -344,7 +404,8 @@ let print_l logger fmt signature agent l =
          ())
       l
 
-let print_partitioned_contact_map_in_lkappa logger signature partitioned_contact_map =
+let print_partitioned_contact_map_in_lkappa logger signature
+    partitioned_contact_map =
   let fmt = Loggers.formatter_of_logger logger in
   match fmt with
   | None -> ()

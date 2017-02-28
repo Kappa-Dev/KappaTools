@@ -1896,33 +1896,34 @@ automorphisms in the site graph E.
 
   type kind = Internal | Binding
 
-  let cannonic_form_from_syntactic_rules log rule_cache compil =
-    let rule_cache, cannonic_list, hashed_lists =
+  let cannonic_form_from_syntactic_rules cache compil =
+    let cache, cannonic_list, hashed_lists =
       List.fold_left
-        (fun (rule_cache, current_list, hashed_lists) rule ->
+        (fun (cache, current_list, hashed_lists) rule ->
           (*****************************************************)
           (* identifiers of rule up to isomorphism*)
-        let rule_cache, lkappa_rule, rule_id, rate_opt_list,
-              hashed_list =
-            I.cannonic_form_from_syntactic_rule rule_cache compil rule
+        let cache, sigs, lkappa_rule, i, rate_map,
+            hashed_list =
+          I.cannonic_form_from_syntactic_rule cache compil
+            rule
           in
           (*****************************************************)
           (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
-          let rule_cache, convention_rule =
-            I.divide_rule_rate_by rule_cache compil rule
+          let cache, convention_rule =
+            I.divide_rule_rate_by cache compil rule
           in
           (*****************************************************)
           let current_list =
-          (rule_id, lkappa_rule, hashed_list,
-             rate_opt_list, convention_rule) ::
-            current_list
+            (i, rate_map, convention_rule) :: current_list
           in
-          let hashed_lists = hashed_list :: hashed_lists in
-          rule_cache, current_list, hashed_lists
-        ) (rule_cache, [], []) (I.get_rules compil)
+          let hashed_lists =
+            (hashed_list, (lkappa_rule,sigs)) :: hashed_lists
+          in
+          cache, current_list, hashed_lists
+        ) (cache, [], []) (I.get_rules compil)
     in
-    rule_cache, cannonic_list, hashed_lists
+    cache, cannonic_list, hashed_lists
 
   (******************************************************)
 
@@ -1961,11 +1962,6 @@ automorphisms in the site graph E.
     in
     to_be_checked, counter, rate, correct
 
-(* You are right, there are to caches. *)
-(* One from LKappa_auto *)
-(* One from I *)
-(* Please give a better name to them *)
-(* Moreover, pass them as an argument, since this is not the only computation that you do with them *)
   let add_map map1 map2 =
     snd
       (Rule_modes.RuleModeMap.monadic_fold2 () ()
@@ -1979,32 +1975,54 @@ automorphisms in the site graph E.
          map2
          map2)
 
+  let print_array_int log array =
+    Array.iter (fun i ->
+        Loggers.fprintf log " %i " i
+      ) array
+
+  let print_array_bool log array =
+    Array.iter (fun b ->
+        Loggers.fprintf log " %b " b
+      ) array
+
+  let translate_signatures sigs agent site1 site2 =
+    let agent_id = Signature.num_of_agent
+        (Locality.dummy_annot agent)
+        sigs
+    in
+    let interface = Signature.get sigs agent_id in
+    let site1_i =
+      Signature.num_of_site
+        (Locality.dummy_annot site1)
+        interface
+    in
+    let site2_i =
+      Signature.num_of_site
+        (Locality.dummy_annot site2)
+        interface
+    in
+    agent_id, site1_i, site2_i
+
   let compute_symmetries_from_syntactic_rules
       log compil network symmetries =
     let cache = network.cache in
-    let cache, cannonic_list, hash_lists =
-      cannonic_form_from_syntactic_rules log
+    let cache, cannonic_list, pair_list =
+      cannonic_form_from_syntactic_rules
         cache
         compil
     in
     let translate_symmetries =
       I.translate_symmetries compil symmetries
     in
+    let hash_lists, lkappa_rule = List.split pair_list in
     let to_be_checked, counter, rates, correct =
       build_array_for_symmetries
         hash_lists
     in
-    (*TODO*)
     (*for each rule*)
-    let _  =
+    let () =
       List.iter
-        (fun
-          (rule_id, lkappa_rule, hash_list, rate_map,
-           convention_rule) ->
-          let i =
-            LKappa_auto.RuleCache.int_of_hashed_list
-              hash_list
-          in
+        (fun (i, rate_map, convention_rule) ->
           (*of the current hash*)
           let () =
             correct.(i) <- convention_rule
@@ -2017,11 +2035,96 @@ automorphisms in the site graph E.
           let () =
             to_be_checked.(i) <- true
           in
-        ()
-        )  cannonic_list
+          ()
+        ) cannonic_list
     in
-    {network with cache = cache ;
-                  symmetries = Some symmetries }
+    let () = Loggers.fprintf log "\nCorrect:\n" in
+    let () = print_array_int log correct in
+    let () = Loggers.print_newline log in
+    let () = Loggers.fprintf log "To be check:\n" in
+    let () = print_array_bool log to_be_checked in
+    let () = Loggers.print_newline log in
+    (*fold over all the rule hash*)
+    let array =
+      List.fold_left
+        (fun array (hash_list, (lkappa_rule, sigs)) ->
+          let i =
+            LKappa_auto.RuleCache.int_of_hashed_list
+              hash_list
+          in
+          if to_be_checked.(i)
+          then
+            let array =
+              Symmetries.collect_partitioned_with_predicate_lkappa
+                cache
+                (fun agent site1 site2 ->
+                   let (cache, counter, to_be_checked), bool =
+                     LKappa_group_action.check_orbit_internal_state_permutation
+                       agent
+                       site1
+                       site2
+                       lkappa_rule
+                       correct
+                       rates
+                       (I.get_rule_cache cache)
+                       counter
+                       to_be_checked
+                   in
+                   let () = Loggers.fprintf log "\nInternal\n" in
+                   let () =
+                     Loggers.fprintf log "counter:\n ";
+                     print_array_int log counter;
+                     Loggers.print_newline log
+                   in
+                   let () =
+                     Loggers.fprintf log "to_be_checked:\n ";
+                     print_array_bool log to_be_checked;
+                     Loggers.print_newline log
+                   in
+                   bool
+                )
+                (fun agent site1 site2 ->
+                  let (cache, counter, to_be_checked), bool =
+                    LKappa_group_action.check_orbit_binding_state_permutation
+                      agent
+                      site1
+                      site2
+                      lkappa_rule
+                      correct
+                      rates
+                      (I.get_rule_cache cache)
+                      counter
+                      to_be_checked
+                  in
+                  let () = Loggers.fprintf log "\nBinding\n" in
+                  let () =
+                    Loggers.fprintf log "counter:\n ";
+                    print_array_int log counter;
+                    Loggers.print_newline log
+                  in
+                  let () =
+                    Loggers.fprintf log "to_be_checked:\n ";
+                    print_array_bool log to_be_checked;
+                    Loggers.print_newline log
+                  in
+                  bool
+                ) translate_symmetries
+            in
+            array
+          else
+            (*nothing*)
+            let () =
+              Loggers.fprintf log "To be Check is false\n:i:%i"  i
+            in
+            array
+        ) [||] pair_list
+    in
+    {
+      network with
+      cache = cache;
+      symmetries = Some symmetries
+    }
+
 
 (*
 2) Now we have a list of rules, with a hash.

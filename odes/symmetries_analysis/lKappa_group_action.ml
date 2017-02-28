@@ -339,7 +339,8 @@ check_orbit
   weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
-    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked =
+    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    to_be_checked =
   check_orbit
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,

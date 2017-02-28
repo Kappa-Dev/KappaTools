@@ -392,6 +392,7 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
   in
+  let sigs = Model.signatures compil.environment in
   let rule_cache = cache.rule_cache in
   let rule_cache, hash_list =
     LKappa_auto.cannonic_form rule_cache lkappa_rule
@@ -419,7 +420,7 @@ let cannonic_form_from_syntactic_rule cache compil rule =
     LKappa_auto.cannonic_form rule_cache lkappa_rule
   in
   let cache = {cache with rule_cache = rule_cache } in
-  cache, lkappa_rule, i , rate_map, hashed_list
+  cache, sigs, lkappa_rule, i , rate_map, hashed_list
 
 let print_partitioned_contact_map_in_lkappa
     log compil symmetries =
