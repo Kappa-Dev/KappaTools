@@ -25,9 +25,15 @@ ____________________________________________________________
 				- alpha-conversion
 				- detecting siphons: +12 events 
 				- alpha-conversion
-				- cutting concurrent events: -10 events 
+				- cutting concurrent events: -13 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 122 events remaining 
+		- start iteration 2, 121 events remaining 
+				- alpha-conversion
+				- detecting siphons: +12 events 
+				- alpha-conversion
+				- cutting concurrent events: -12 events 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 121 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (19)
 

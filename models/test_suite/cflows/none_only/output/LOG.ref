@@ -17,17 +17,17 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -852 events 
+	- removing events occurring after the last observable: -837 events 
 + Producing causal traces
 	- splitting initial events: +10 events 
 	 - blackboard generation
 	- alpha-conversion
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 10179
- longest story    : 96
- average length   : 36.21
- geometric mean   : 44.02
+ number of step   : 10194
+ longest story    : 136
+ average length   : 43.43
+ geometric mean   : 56.69
 
 	 - causal flow compression (10)
 

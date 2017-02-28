@@ -17,34 +17,28 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -81547 events 
+	- removing events occurring after the last observable: -81433 events 
 + Producing causal compressions
 	- splitting initial events: +1000 events 
-	- simplify the trace, 30463 events 
-		- start iteration 1, 30463 events remaining 
+	- simplify the trace, 30577 events 
+		- start iteration 1, 30577 events remaining 
 				- alpha-conversion
-				- detecting siphons: +3820 events 
+				- detecting siphons: +3865 events 
 				- alpha-conversion
-				- cutting concurrent events: -34072 events 
-				- detecting pseudo inverse events: -4 events 
-		- start iteration 2, 207 events remaining 
-				- alpha-conversion
-				- detecting siphons: +11 events 
-				- alpha-conversion
-				- cutting concurrent events: -13 events 
+				- cutting concurrent events: -34243 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 205 events remaining 
+		- start iteration 2, 199 events remaining 
 				- alpha-conversion
-				- detecting siphons: +11 events 
+				- detecting siphons: +10 events 
 				- alpha-conversion
-				- cutting concurrent events: -11 events 
+				- cutting concurrent events: -10 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 205 events remaining 
+	- a fixpoint has been reached, 199 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (10)
 
 
-	 - weak flow compression (7)
+	 - weak flow compression (5)
 
 ____________________________________________________________
 ############################################################

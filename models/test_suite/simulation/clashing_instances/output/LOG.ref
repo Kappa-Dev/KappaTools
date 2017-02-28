@@ -118,7 +118,7 @@ Done
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 50 9
+On roots: 47 9
 Rule rule has now 9801 instances.
 Obtained
 %init: 99 A(x)
@@ -127,7 +127,7 @@ ____________________________________________________________
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 35 34
+On roots: 36 31
 Rule rule has now 9604 instances.
 Obtained
 %init: 98 A(x)
@@ -135,7 +135,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 81 91
+On roots: 78 94
 Rule rule has now 9409 instances.
 Obtained
 %init: 97 A(x)
@@ -143,7 +143,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 30 5
+On roots: 25 5
 Rule rule has now 9216 instances.
 Obtained
 %init: 96 A(x)
@@ -151,7 +151,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 20 98
+On roots: 16 89
 Rule rule has now 9025 instances.
 Obtained
 %init: 95 A(x)
@@ -159,7 +159,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 15 4
+On roots: 28 3
 Rule rule has now 8836 instances.
 Obtained
 %init: 94 A(x)
@@ -167,7 +167,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 20 44
+On roots: 15 37
 Rule rule has now 8649 instances.
 Obtained
 %init: 93 A(x)
@@ -175,7 +175,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 27 57
+On roots: 25 50
 Rule rule has now 8464 instances.
 Obtained
 %init: 92 A(x)
@@ -183,7 +183,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 32 25
+On roots: 28 21
 Rule rule has now 8281 instances.
 Obtained
 %init: 91 A(x)
@@ -191,7 +191,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 12 27
+On roots: 7 24
 Rule rule has now 8100 instances.
 Obtained
 %init: 90 A(x)
@@ -199,7 +199,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 7 99
+On roots: 11 83
 Rule rule has now 7921 instances.
 Obtained
 %init: 89 A(x)
@@ -210,7 +210,7 @@ Applied 0:
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 65 86
+On roots: 57 74
 Rule rule has now 7744 instances.
 Obtained
 %init: 88 A(x)
@@ -218,7 +218,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 19 51
+On roots: 18 45
 Rule rule has now 7569 instances.
 Obtained
 %init: 87 A(x)
@@ -226,7 +226,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 54
+On roots: 63 42
 Rule rule has now 7396 instances.
 Obtained
 %init: 86 A(x)
@@ -234,7 +234,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 31 67
+On roots: 52 59
 Rule rule has now 7225 instances.
 Obtained
 %init: 85 A(x)
@@ -242,7 +242,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 56
+On roots: 43 44
 Rule rule has now 7056 instances.
 Obtained
 %init: 84 A(x)
@@ -250,7 +250,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 97 41
+On roots: 78 34
 Rule rule has now 6889 instances.
 Obtained
 %init: 83 A(x)
@@ -258,7 +258,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 68 42
+On roots: 56 33
 Rule rule has now 6724 instances.
 Obtained
 %init: 82 A(x)
@@ -266,7 +266,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 20 96
+On roots: 15 75
 Rule rule has now 6561 instances.
 Obtained
 %init: 81 A(x)
@@ -274,7 +274,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 15 36
+On roots: 25 28
 Rule rule has now 6400 instances.
 Obtained
 %init: 80 A(x)
@@ -282,7 +282,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 94 72
+On roots: 72 55
 Rule rule has now 6241 instances.
 Obtained
 %init: 79 A(x)
@@ -290,7 +290,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 60 26
+On roots: 86 20
 Rule rule has now 6084 instances.
 Obtained
 %init: 78 A(x)
@@ -298,7 +298,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 90 92
+On roots: 68 88
 Rule rule has now 5929 instances.
 Obtained
 %init: 77 A(x)
@@ -306,7 +306,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 33 82
+On roots: 26 62
 Rule rule has now 5776 instances.
 Obtained
 %init: 76 A(x)
@@ -314,7 +314,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 3 88
+On roots: 4 66
 Rule rule has now 5625 instances.
 Obtained
 %init: 75 A(x)
@@ -322,7 +322,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 11 59
+On roots: 10 84
 Rule rule has now 5476 instances.
 Obtained
 %init: 74 A(x)
@@ -330,7 +330,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 30 13
+On roots: 78 99
 Rule rule has now 5329 instances.
 Obtained
 %init: 73 A(x)
@@ -338,7 +338,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 64 31
+On roots: 46 87
 Rule rule has now 5184 instances.
 Obtained
 %init: 72 A(x)
@@ -346,7 +346,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 47 85
+On roots: 43 61
 Rule rule has now 5041 instances.
 Obtained
 %init: 71 A(x)
@@ -354,7 +354,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 61 76
+On roots: 40 53
 Rule rule has now 4900 instances.
 Obtained
 %init: 70 A(x)
@@ -362,7 +362,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 68 37
+On roots: 92 26
 Rule rule has now 4761 instances.
 Obtained
 %init: 69 A(x)
@@ -370,7 +370,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 58 60
+On roots: 93 40
 Rule rule has now 4624 instances.
 Obtained
 %init: 68 A(x)
@@ -378,7 +378,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 33 74
+On roots: 90 49
 Rule rule has now 4489 instances.
 Obtained
 %init: 67 A(x)
@@ -386,7 +386,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 66 61
+On roots: 77 39
 Rule rule has now 4356 instances.
 Obtained
 %init: 66 A(x)
@@ -394,7 +394,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 62
+On roots: 48 38
 Rule rule has now 4225 instances.
 Obtained
 %init: 65 A(x)
@@ -402,7 +402,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 40 7
+On roots: 27 10
 Rule rule has now 4096 instances.
 Obtained
 %init: 64 A(x)
@@ -410,7 +410,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 80 70
+On roots: 51 43
 Rule rule has now 3969 instances.
 Obtained
 %init: 63 A(x)
@@ -418,7 +418,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 3 87
+On roots: 4 60
 Rule rule has now 3844 instances.
 Obtained
 %init: 62 A(x)
@@ -426,7 +426,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 46 65
+On roots: 27 86
 Rule rule has now 3721 instances.
 Obtained
 %init: 61 A(x)
@@ -434,7 +434,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 48 29
+On roots: 98 19
 Rule rule has now 3600 instances.
 Obtained
 %init: 60 A(x)
@@ -442,7 +442,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 18 32
+On roots: 11 65
 Rule rule has now 3481 instances.
 Obtained
 %init: 59 A(x)
@@ -450,7 +450,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 38 3
+On roots: 22 4
 Rule rule has now 3364 instances.
 Obtained
 %init: 58 A(x)
@@ -458,7 +458,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 39 17
+On roots: 27 11
 Rule rule has now 3249 instances.
 Obtained
 %init: 57 A(x)
@@ -466,7 +466,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 75 49
+On roots: 63 29
 Rule rule has now 3136 instances.
 Obtained
 %init: 56 A(x)
@@ -474,7 +474,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 66 83
+On roots: 36 47
 Rule rule has now 3025 instances.
 Obtained
 %init: 55 A(x)
@@ -482,7 +482,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 12 66
+On roots: 96 36
 Rule rule has now 2916 instances.
 Obtained
 %init: 54 A(x)
@@ -490,7 +490,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 58 94
+On roots: 98 79
 Rule rule has now 2809 instances.
 Obtained
 %init: 53 A(x)
@@ -498,7 +498,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 64 33
+On roots: 35 95
 Rule rule has now 2704 instances.
 Obtained
 %init: 52 A(x)
@@ -506,7 +506,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 48
+On roots: 56 69
 Rule rule has now 2601 instances.
 Obtained
 %init: 51 A(x)
@@ -517,7 +517,7 @@ Applied 0:
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 45 2
+On roots: 23 1
 Rule rule has now 2500 instances.
 Obtained
 %init: 50 A(x)
@@ -525,7 +525,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 81 6
+On roots: 41 2
 Rule rule has now 2401 instances.
 Obtained
 %init: 49 A(x)
@@ -533,7 +533,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 97 80
+On roots: 63 81
 Rule rule has now 2304 instances.
 Obtained
 %init: 48 A(x)
@@ -541,7 +541,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 63 12
+On roots: 70 97
 Rule rule has now 2209 instances.
 Obtained
 %init: 47 A(x)
@@ -549,7 +549,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 68 75
+On roots: 32 54
 Rule rule has now 2116 instances.
 Obtained
 %init: 46 A(x)
@@ -557,7 +557,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 95 19
+On roots: 41 57
 Rule rule has now 2025 instances.
 Obtained
 %init: 45 A(x)
@@ -565,7 +565,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 0 81
+On roots: 0 46
 Rule rule has now 1936 instances.
 Obtained
 %init: 44 A(x)
@@ -573,7 +573,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 18 14
+On roots: 7 70
 Rule rule has now 1849 instances.
 Obtained
 %init: 43 A(x)
@@ -581,7 +581,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 55 45
+On roots: 25 18
 Rule rule has now 1764 instances.
 Obtained
 %init: 42 A(x)
@@ -589,7 +589,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 50 46
+On roots: 78 17
 Rule rule has now 1681 instances.
 Obtained
 %init: 41 A(x)
@@ -597,7 +597,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 71
+On roots: 91 32
 Rule rule has now 1600 instances.
 Obtained
 %init: 40 A(x)
@@ -605,7 +605,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 28 43
+On roots: 12 41
 Rule rule has now 1521 instances.
 Obtained
 %init: 39 A(x)
@@ -613,7 +613,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 23 79
+On roots: 13 93
 Rule rule has now 1444 instances.
 Obtained
 %init: 38 A(x)
@@ -621,7 +621,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 50 64
+On roots: 71 25
 Rule rule has now 1369 instances.
 Obtained
 %init: 37 A(x)
@@ -632,7 +632,7 @@ Applied 0:
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 38 53
+On roots: 15 76
 Rule rule has now 1296 instances.
 Obtained
 %init: 36 A(x)
@@ -640,7 +640,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 40 22
+On roots: 16 7
 Rule rule has now 1225 instances.
 Obtained
 %init: 35 A(x)
@@ -648,7 +648,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 50 21
+On roots: 48 35
 Rule rule has now 1156 instances.
 Obtained
 %init: 34 A(x)
@@ -656,7 +656,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 55 58
+On roots: 77 71
 Rule rule has now 1089 instances.
 Obtained
 %init: 33 A(x)
@@ -664,7 +664,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 8 39
+On roots: 58 15
 Rule rule has now 1024 instances.
 Obtained
 %init: 32 A(x)
@@ -672,7 +672,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 68 10
+On roots: 91 67
 Rule rule has now 961 instances.
 Obtained
 %init: 31 A(x)
@@ -680,7 +680,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 78 77
+On roots: 91 22
 Rule rule has now 900 instances.
 Obtained
 %init: 30 A(x)
@@ -688,7 +688,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 90 24
+On roots: 23 52
 Rule rule has now 841 instances.
 Obtained
 %init: 29 A(x)
@@ -696,7 +696,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 35 0
+On roots: 48 0
 Rule rule has now 784 instances.
 Obtained
 %init: 28 A(x)
@@ -704,7 +704,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 68
+On roots: 13 82
 Rule rule has now 729 instances.
 Obtained
 %init: 27 A(x)
@@ -712,7 +712,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 11 90
+On roots: 92 78
 Rule rule has now 676 instances.
 Obtained
 %init: 26 A(x)
@@ -720,7 +720,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 16 50
+On roots: 63 12
 Rule rule has now 625 instances.
 Obtained
 %init: 25 A(x)
@@ -728,7 +728,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 95
+On roots: 27 91
 Rule rule has now 576 instances.
 Obtained
 %init: 24 A(x)
@@ -736,7 +736,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 1 55
+On roots: 80 13
 Rule rule has now 529 instances.
 Obtained
 %init: 23 A(x)
@@ -744,7 +744,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 78 89
+On roots: 68 48
 Rule rule has now 484 instances.
 Obtained
 %init: 22 A(x)
@@ -752,7 +752,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 63 93
+On roots: 51 27
 Rule rule has now 441 instances.
 Obtained
 %init: 21 A(x)
@@ -760,7 +760,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 35 20
+On roots: 51 96
 Rule rule has now 400 instances.
 Obtained
 %init: 20 A(x)
@@ -768,7 +768,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 63 35
+On roots: 90 77
 Rule rule has now 361 instances.
 Obtained
 %init: 19 A(x)
@@ -776,7 +776,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 30 15
+On roots: 51 8
 Rule rule has now 324 instances.
 Obtained
 %init: 18 A(x)
@@ -784,7 +784,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 28 84
+On roots: 51 68
 Rule rule has now 289 instances.
 Obtained
 %init: 17 A(x)
@@ -792,7 +792,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 1 63
+On roots: 80 30
 Rule rule has now 256 instances.
 Obtained
 %init: 16 A(x)
@@ -800,7 +800,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 11 30
+On roots: 92 58
 Rule rule has now 225 instances.
 Obtained
 %init: 15 A(x)
@@ -808,7 +808,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 1 16
+On roots: 80 6
 Rule rule has now 196 instances.
 Obtained
 %init: 14 A(x)
@@ -816,7 +816,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 8 28
+On roots: 98 63
 Rule rule has now 169 instances.
 Obtained
 %init: 13 A(x)
@@ -824,7 +824,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 47
+On roots: 14 56
 Rule rule has now 144 instances.
 Obtained
 %init: 12 A(x)
@@ -832,7 +832,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 23
+On roots: 90 23
 Rule rule has now 121 instances.
 Obtained
 %init: 11 A(x)
@@ -840,7 +840,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 73 18
+On roots: 85 72
 Rule rule has now 100 instances.
 Obtained
 %init: 10 A(x)
@@ -848,7 +848,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 1 8
+On roots: 80 98
 Rule rule has now 81 instances.
 Obtained
 %init: 9 A(x)
@@ -856,7 +856,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 11 78
+On roots: 92 16
 Rule rule has now 64 instances.
 Obtained
 %init: 8 A(x)
@@ -864,7 +864,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 40 38
+On roots: 73 85
 Rule rule has now 49 instances.
 Obtained
 %init: 7 A(x)
@@ -872,7 +872,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 97 11
+On roots: 90 92
 Rule rule has now 36 instances.
 Obtained
 %init: 6 A(x)
@@ -887,7 +887,7 @@ Rule rule has now 30 instances.
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 69 73
+On roots: 73 14
 Rule rule has now 25 instances.
 Obtained
 %init: 5 A(x)
@@ -895,7 +895,7 @@ Obtained
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 40 97
+On roots: 90 73
 Rule rule has now 16 instances.
 Obtained
 %init: 4 A(x)
@@ -903,7 +903,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 69
+On roots: 51 90
 Rule rule has now 9 instances.
 Obtained
 %init: 3 A(x)
@@ -914,7 +914,7 @@ Applied 0:
 Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 1
+On roots: 51 80
 Rule rule has now 4 instances.
 Obtained
 %init: 2 A(x)
@@ -922,7 +922,7 @@ Obtained
 #Applied 0:
 0: /*cc2*/ A/*1*/(), 1: /*cc1*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1
-On roots: 52 40
+On roots: 64 51
 Rule rule has now 1 instances.
 Obtained
 %init: 1 A(x)

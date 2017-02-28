@@ -36,16 +36,16 @@ ____________________________________________________________
 
 
 
-	 - weak flow compression (65)
+	 - weak flow compression (64)
 
 ____________________________________________________________
 ############################################################
 
-	 - strong flow compression (16)
+	 - strong flow compression (21)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 16 weakly compressed flows
++ Pretty printing 21 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended

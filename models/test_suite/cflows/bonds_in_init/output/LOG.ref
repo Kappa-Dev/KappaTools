@@ -17,58 +17,58 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -534 events 
+	- removing events occurring after the last observable: -583 events 
 + Producing causal compressions
 	- splitting initial events: +30 events 
 	 - blackboard generation
 	- alpha-conversion
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 206
- longest story    : 95
- average length   : 29.67
- geometric mean   : 38.56
+ number of step   : 154
+ longest story    : 42
+ average length   : 13.27
+ geometric mean   : 16.34
 
 	 - causal flow compression (10)
 
 ____________________________________________________________
 ############################################################
 
-	- simplify the trace, 205 events 
-		- start iteration 1, 205 events remaining 
+	- simplify the trace, 153 events 
+		- start iteration 1, 153 events remaining 
 				- alpha-conversion
-				- detecting siphons: +3 events 
+				- detecting siphons: +4 events 
 				- alpha-conversion
-				- cutting concurrent events: -101 events 
-				- detecting pseudo inverse events: -14 events 
-		- start iteration 2, 93 events remaining 
+				- cutting concurrent events: -54 events 
+				- detecting pseudo inverse events: -6 events 
+		- start iteration 2, 97 events remaining 
 				- alpha-conversion
 				- detecting siphons: nothing has changed 
 				- alpha-conversion
-				- cutting concurrent events: -5 events 
+				- cutting concurrent events: -3 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 88 events remaining 
+		- start iteration 3, 94 events remaining 
 				- alpha-conversion
 				- detecting siphons: nothing has changed 
 				- alpha-conversion
 				- cutting concurrent events: nothing has changed 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 88 events remaining 
+	- a fixpoint has been reached, 94 events remaining 
 	- blackboard generation 
 	- computing causal past of each observed events (10)
 
 
-	 - weak flow compression (3)
+	 - weak flow compression (6)
 
 ____________________________________________________________
 ############################################################
 
-	 - strong flow compression (2)
+	 - strong flow compression (3)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 7 flows
-+ Pretty printing 2 weakly compressed flows
++ Pretty printing 6 flows
++ Pretty printing 3 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended

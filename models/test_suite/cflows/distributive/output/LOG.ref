@@ -17,45 +17,45 @@ Done
 ____________________________________________________________
 ############################################################
 + Loading trace
-	- removing events occurring after the last observable: -13 events 
+	- removing events occurring after the last observable: nothing has changed 
 + Producing causal compressions
 	- splitting initial events: nothing has changed 
 	 - blackboard generation
 	- alpha-conversion
-	 - computing causal past of each observed events (13)
+	 - computing causal past of each observed events (17)
 Stats:
- number of step   : 271
- longest story    : 128
- average length   : 51.54
- geometric mean   : 62.54
+ number of step   : 288
+ longest story    : 151
+ average length   : 58.17
+ geometric mean   : 70.13
 
-	 - causal flow compression (13)
+	 - causal flow compression (17)
 
 ____________________________________________________________
 ############################################################
 
-	- simplify the trace, 270 events 
-		- start iteration 1, 270 events remaining 
+	- simplify the trace, 287 events 
+		- start iteration 1, 287 events remaining 
 				- alpha-conversion
-				- detecting siphons: +97 events 
+				- detecting siphons: +96 events 
 				- alpha-conversion
-				- cutting concurrent events: -216 events 
-				- detecting pseudo inverse events: -56 events 
-		- start iteration 2, 95 events remaining 
+				- cutting concurrent events: -198 events 
+				- detecting pseudo inverse events: -70 events 
+		- start iteration 2, 115 events remaining 
 				- alpha-conversion
-				- detecting siphons: +12 events 
+				- detecting siphons: +14 events 
 				- alpha-conversion
-				- cutting concurrent events: -40 events 
+				- cutting concurrent events: -49 events 
 				- detecting pseudo inverse events: nothing has changed 
-		- start iteration 3, 67 events remaining 
+		- start iteration 3, 80 events remaining 
 				- alpha-conversion
-				- detecting siphons: +12 events 
+				- detecting siphons: +14 events 
 				- alpha-conversion
-				- cutting concurrent events: -12 events 
+				- cutting concurrent events: -14 events 
 				- detecting pseudo inverse events: nothing has changed 
-	- a fixpoint has been reached, 67 events remaining 
+	- a fixpoint has been reached, 80 events remaining 
 	- blackboard generation 
-	- computing causal past of each observed events (13)
+	- computing causal past of each observed events (17)
 
 
 	 - weak flow compression (1)
@@ -68,7 +68,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 13 flows
++ Pretty printing 17 flows
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
 Simulation ended

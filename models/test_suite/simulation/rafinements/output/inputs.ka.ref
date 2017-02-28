@@ -46,4 +46,4 @@
 
 %init: 10000 A(b, d), B(a, c), C(b, d), D(c, a)
 
-%mod: [E] = 189301 do $STOP
+%mod: [E] = 188787 do $STOP
