@@ -7,4 +7,5 @@
 (******************************************************************************)
 
 val editor_full : bool React.signal
+val is_paused : bool React.signal
 include Ui_common.Panel

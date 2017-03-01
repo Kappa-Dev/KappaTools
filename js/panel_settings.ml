@@ -254,8 +254,15 @@ module ButtonStart : Ui_common.Div = struct
     Html.button
       ~a:([ Html.a_id id ;
             Html.Unsafe.string_attrib "type" "button" ;
-            Html.a_class [ "btn" ;
-                           "btn-default" ; ] ; ])
+            Tyxml_js.R.Html.a_class
+              (React.S.bind
+                 Subpanel_editor.is_paused
+                 (function
+                   | true -> React.S.const [ "hide" ]
+                   | false -> React.S.const [ "btn" ; "btn-default" ; ]
+                 )
+              ) ]
+         )
       [ Html.cdata "start" ]
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]

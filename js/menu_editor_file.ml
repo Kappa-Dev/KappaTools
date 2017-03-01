@@ -232,7 +232,8 @@ let file_select_handler _ _ : unit Lwt.t =
      (fun  (content : Js.js_string Js.t) ->
         State_file.create_file ~filename ~content:(Js.to_string content)
      )) >>=
-  (Api_common.result_map
+  (let () = open_input_dom##.value := Js.string "" in
+    Api_common.result_map
      ~ok:(fun _ () -> Lwt.return_unit)
      ~error:(fun _ (_ : Api_types_j.errors) -> Lwt.return_unit))
 

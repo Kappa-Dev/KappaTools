@@ -10,6 +10,7 @@ open Codemirror
 module Html = Tyxml_js.Html5
 
 let editor_full , set_editor_full = React.S.create (false : bool)
+let is_paused , set_is_paused = React.S.create (false : bool)
 
 
 let file_label_signal, set_file_label = React.S.create ""
@@ -171,6 +172,7 @@ let onload () : unit =
   in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
+    let () = set_is_paused true in
     let text : string = Js.to_string codemirror##getValue in
     let () = match !timeout with
         None -> ()
@@ -186,6 +188,7 @@ let onload () : unit =
         5.0 *. 1000.0
     in
     let handle_timeout () =
+      let () = set_is_paused false in
       let () = Common.info "handle_timeout" in
       let () = Common.info text in
       Subpanel_editor_controller.set_content
@@ -193,7 +196,8 @@ let onload () : unit =
     let () = timeout := Some
           (Dom_html.window ## setTimeout
              (Js.wrap_callback
-                (fun _ -> handle_timeout ())) delay) in
+                (fun _ ->
+                   handle_timeout ())) delay) in
     ()
   in
   let () = codemirror##onChange(handler) in

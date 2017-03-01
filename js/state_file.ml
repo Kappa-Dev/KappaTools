@@ -79,6 +79,7 @@ let send_refresh () : unit Api.result Lwt.t =
   get_file () >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (file : Api_types_j.file) ->
+           let () = Common.debug (Js.string file.Api_types_j.file_content) in
            let () = set_refresh_file (Some file.Api_types_j.file_content) in
            Lwt.return (Api_common.result_ok ()))
     )
@@ -161,15 +162,45 @@ let create_file
     ~(content:string) : unit Api.result Lwt.t =
   State_project.with_project ~label:"create_file"
     (fun manager project_id ->
-       (manager#file_create project_id (new_file filename content)) >>=
-       (fun _ ->
-          let () = set_directory_state
-              { (React.S.value directory_state) with
-                state_current = Some filename } in
-                (* we need to update the directory *)
-          update_directory manager project_id >>=
-          (Api_common.result_bind_lwt
-             ~ok:(fun () -> send_refresh ()))
+       (manager#file_catalog project_id) >>=
+       (Api_common.result_bind_lwt
+          ~ok:(fun (catalog : Api_types_j.file_catalog) ->
+              (let matching_file : Api_types_j.file_metadata list =
+                 List.filter
+                   (fun file_metadata ->
+                      filename = file_metadata.Api_types_j.file_metadata_id)
+                   catalog.Api_types_j.file_metadata_list
+              in
+              match matching_file with
+              | [] ->
+                (manager#file_create project_id (new_file filename content))
+                >>=
+                (Api_common.result_bind_lwt
+                   ~ok:(fun _ -> Lwt.return (Api_common.result_ok ())))
+              | metadata::_ ->
+                let file_modification : Api_types_t.file_modification =
+                  file_patch
+                    metadata
+                    ?content:(Some content)
+                    ?compile:None
+                    ?position:None
+                    ()
+                in
+                (manager#file_update project_id filename file_modification)
+                >>=
+                (Api_common.result_bind_lwt
+                   ~ok:(fun _ ->
+                       let () = set_directory_state
+                           { (React.S.value directory_state) with
+                             state_current = Some filename } in
+                       (* we need to update the directory *)
+                       update_directory manager project_id >>=
+                       (Api_common.result_bind_lwt
+                          ~ok:(fun () -> send_refresh ()))
+                     )
+                )
+            )
+       )
        )
     )
 

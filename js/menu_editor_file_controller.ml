@@ -8,14 +8,19 @@
 
 open Lwt.Infix
 
-let create_file ?(content:string = "") (file_id : string) : unit =
+let create_file
+    ?(content:string = "")
+    (file_id : string) : unit =
   Common.async
     (fun () ->
-       State_error.wrap
-         __LOC__
-         (State_file.create_file ~filename:file_id ~content)
-       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
-       >>= (fun _ -> Lwt.return_unit)
+       (State_error.wrap
+          __LOC__
+          (State_file.create_file ~filename:file_id ~content))
+       >>=
+       (* get new contact map *)
+       (fun _ -> State_project.sync ())
+       >>=
+       (fun _ -> Lwt.return_unit)
     )
 
 let set_file (file_id : string) : unit =
