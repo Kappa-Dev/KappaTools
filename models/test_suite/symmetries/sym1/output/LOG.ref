@@ -1797,21 +1797,4 @@ A()=> [
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Compute the contact map...
-Contact map
-agent:A
-  site:x
-internal_states:p;u;
-  site:y
-internal_states:p;u;
-  site:z
-internal_states:p;u;
-Partitioned contact map
-Agent: A
-internal sites:z,y,x,
-binding sites:With predictate
-Agent: A
-internal sites:x,
-y,
-z,
-binding sites:execution finished without any exception
+execution finished without any exception
