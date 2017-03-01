@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Feb 28 2017>
+   * Last modification: Time-stamp: <Mar 01 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -351,15 +351,13 @@ let refine_class' cache p l result =
   aux cache l result
 
 let refine_class' cache p l =
-  if l <> [] then
-    List.fold_left
-      (fun (cache, result) l ->
-         let cache, result =
-           refine_class' cache p l result
-         in
-         cache, result
-      ) (cache, []) l
-  else (cache, [])
+  List.fold_left
+    (fun (cache, result) l ->
+       let cache, result =
+         refine_class' cache p l result
+       in
+       cache, result
+    ) (cache, []) l
 
 let collect_partitioned_with_predicate_lkappa
     cache

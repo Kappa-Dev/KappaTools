@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Feb 28 2017>
+  * Last modification: Time-stamp: <Mar 01 2017>
 *)
 
 let local_trace = false
@@ -1902,7 +1902,7 @@ automorphisms in the site graph E.
         (fun (cache, current_list, hashed_lists) rule ->
           (*****************************************************)
           (* identifiers of rule up to isomorphism*)
-        let cache, sigs, lkappa_rule, i, rate_map,
+        let cache, lkappa_rule, i, rate_map,
             hashed_list =
           I.cannonic_form_from_syntactic_rule cache compil
             rule
@@ -1918,7 +1918,7 @@ automorphisms in the site graph E.
             (i, rate_map, convention_rule) :: current_list
           in
           let hashed_lists =
-            (hashed_list, (lkappa_rule,sigs)) :: hashed_lists
+            (hashed_list, lkappa_rule) :: hashed_lists
           in
           cache, current_list, hashed_lists
         ) (cache, [], []) (I.get_rules compil)
@@ -1985,24 +1985,6 @@ automorphisms in the site graph E.
         Loggers.fprintf log " %b " b
       ) array
 
-  let translate_signatures sigs agent site1 site2 =
-    let agent_id = Signature.num_of_agent
-        (Locality.dummy_annot agent)
-        sigs
-    in
-    let interface = Signature.get sigs agent_id in
-    let site1_i =
-      Signature.num_of_site
-        (Locality.dummy_annot site1)
-        interface
-    in
-    let site2_i =
-      Signature.num_of_site
-        (Locality.dummy_annot site2)
-        interface
-    in
-    agent_id, site1_i, site2_i
-
   let compute_symmetries_from_syntactic_rules
       log compil network symmetries =
     let cache = network.cache in
@@ -2047,7 +2029,7 @@ automorphisms in the site graph E.
     (*fold over all the rule hash*)
     let array =
       List.fold_left
-        (fun array (hash_list, (lkappa_rule, sigs)) ->
+        (fun array (hash_list, lkappa_rule) ->
           let i =
             LKappa_auto.RuleCache.int_of_hashed_list
               hash_list
@@ -2119,11 +2101,16 @@ automorphisms in the site graph E.
             array
         ) [||] pair_list
     in
-    {
-      network with
-      cache = cache;
-      symmetries = Some symmetries
-    }
+    let network =
+      Array.fold_left (fun network (cache, _) ->
+          {
+            network with
+            cache = cache;
+            symmetries = Some symmetries
+          }
+        ) network array
+    in
+    network
 
 
 (*

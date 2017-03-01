@@ -65,7 +65,6 @@ let swap_binding_state_regular ag_type site1 site2 ag =
 
 (** Swapping sites in created agents *)
 
-
 let may_swap_internal_state_created ag_type site1 site2 ag =
   ag_type = ag.Raw_mixture.a_type
   &&
@@ -88,7 +87,8 @@ let swap_binding_state_created ag_type site1 site2 ag =
   let () = ag.Raw_mixture.a_ports.(site2) <- tmp in
   ()
 
-(******************************************************************************)
+(*******************************************************************)
+
 let of_rule rule = (rule.LKappa.r_mix,rule.LKappa.r_created)
 
 let is_empty (rule_tail,created_tail) =
@@ -124,7 +124,8 @@ let apply_head sigma sigma_raw (rule_tail,created_tail) =
 
 let shift tail = apply_head ignore ignore tail
 
-(******************************************************************************)
+(***************************************************************)
+
 let filter_positions p p_raw  rule =
   let rec aux pos_id rule_tail accu =
     if is_empty rule_tail
@@ -152,7 +153,8 @@ let potential_positions_for_swapping_binding_states
     (may_swap_binding_state_created agent_type site1 site2)
     rule
 
-(******************************************************************************)
+(******************************************************************)
+
 let backtrack sigma_inv sigma_raw_inv counter positions rule =
   let rec aux agent_id rule_tail pos_id positions_tail =
     match positions_tail with
@@ -204,7 +206,9 @@ let for_all_over_orbit
           counter.(pos_id)
         then
           let () = counter.(pos_id)<-false in
-          let rule_tail = apply_head sigma_inv sigma_raw_inv rule_tail in
+          let rule_tail =
+            apply_head sigma_inv sigma_raw_inv rule_tail
+          in
           next (agent_id+1) rule_tail (pos_id+1) pos_tail accu
         else
           let () = counter.(pos_id)<-true in
@@ -212,9 +216,12 @@ let for_all_over_orbit
           let accu, b = f rule accu in
           if b
           then
-            next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0 positions accu
+            next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
+              positions accu
           else
-            let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
+            let () = backtrack sigma_inv sigma_raw_inv counter
+                positions rule
+            in
             accu, false
       end
     | _::_
@@ -224,7 +231,9 @@ let for_all_over_orbit
         Format.fprintf Format.err_formatter
           "Internal bug: %s %i %i %i" s1 i1 i2 i3
       in
-      let () = backtrack sigma_inv sigma_raw_inv counter positions rule in
+      let () =
+        backtrack sigma_inv sigma_raw_inv counter positions rule
+      in
       accu, false
   in
   next 0 (of_rule rule) 0 positions init
@@ -233,7 +242,8 @@ exception False
 
 let check_orbit
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
-    weight agent site1 site2 rule correct rates cache counter to_be_checked =
+    weight agent site1 site2 rule correct rates cache counter
+    to_be_checked =
   let accu = cache, [], counter, to_be_checked in
   let f rule (cache, l, counter, to_be_checked) =
     let cache, hash = LKappa_auto.cannonic_form cache rule in
@@ -253,7 +263,7 @@ let check_orbit
     else
       (cache, l, counter, to_be_checked), false
   in
-  let (cache, l, counter, to_be_checked),b  =
+  let (cache, l, counter, to_be_checked), b =
     for_all_over_orbit
       (get_positions agent site1 site2 rule)
       (sigma agent site1 site2)
@@ -273,8 +283,7 @@ let check_orbit
       (rates.(i))
   in
   let rec aux w_ref l =
-    match l
-    with
+    match l with
     | [] -> true
     | h::t ->
       if
@@ -328,8 +337,8 @@ let weight ~correct ~card_stabilizer ~rate =
        (correct * card_stabilizer))
 
 let check_orbit_internal_state_permutation
-    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked
-  =
+    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    to_be_checked =
 check_orbit
   (potential_positions_for_swapping_internal_states,
    swap_internal_state_regular,
