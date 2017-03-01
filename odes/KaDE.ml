@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Feb 28 2017>
+  * Last modification: Time-stamp: <Mar 01 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -201,18 +201,18 @@ let main () =
         let state =
           Export_to_kade.set_parameters parameters state
         in
-        let _state, symmetries =
-          Export_to_kade.get_symmetric_sites
+        let _state, contact_map =
+          Export_to_kade.get_contact_map
             ~accuracy_level:Remanent_state.High state
         in
         (* Here define the cache for equivalence classes of species *)
       (* Fill with the function that maps a species to its representant *)
         let network =
-          A.compute_symmetries_from_syntactic_rules
-            my_logger
+          A.compute_symmetries_from_model
+            parameters
             compil
             network
-            symmetries.Symmetries.store_partitioned_contact_map
+            contact_map
         in
         let () =
           match file_opt with

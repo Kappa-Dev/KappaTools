@@ -134,19 +134,16 @@ sig
   (*symmetries*)
   val cannonic_form_from_syntactic_rule :
     cache -> compil -> rule ->
-    cache *
-    LKappa.rule *
+    cache * LKappa.rule *
     int *
     Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t *
     LKappa_auto.RuleCache.hashed_list
 
-  val translate_symmetries :
-    compil ->
-    Symmetries.partitioned_contact_map ->
-    Symmetries.lkappa_partitioned_contact_map
-
-  val print_partitioned_contact_map_in_lkappa :
-    Loggers.t -> compil -> Symmetries.lkappa_partitioned_contact_map -> unit
+  val detect_symmetries :
+    Remanent_parameters_sig.parameters ->
+    compil -> cache -> (bool array * int array * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t array * int array * (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list) ->
+    (string list * (string * string) list) Mods.StringMap.t Mods.StringMap.t ->
+    cache * Symmetries.symmetries
 
 (*  val get_cc_cache: cache -> Pattern.PreEnv.t
   val set_cc_cache: Pattern.PreEnv.t -> cache -> cache
@@ -159,7 +156,7 @@ sig
 *)
 
   val get_representant:
-    cache -> Symmetries.partitioned_contact_map ->
+    cache -> Symmetries.symmetries ->
     chemical_species -> cache * chemical_species
 
 end

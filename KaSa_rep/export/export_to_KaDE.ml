@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Feb 20 2017>
+  * Last modification: Time-stamp: <Mar 01 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -27,10 +27,13 @@ sig
 
   val get_errors: state -> errors
 
-  val get_symmetric_sites:
+      (*  val get_symmetric_sites:
     ?accuracy_level:Remanent_state.accuracy_level ->
-    state -> state * Remanent_state.symmetric_sites
+          state -> state * Remanent_state.symmetric_sites*)
 
+  val get_contact_map:
+    ?accuracy_level:Remanent_state.accuracy_level ->
+    state -> state * Remanent_state.contact_map
 end
 
 module Export =

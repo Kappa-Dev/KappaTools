@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Feb 21 2017>
+  * Last modification: Time-stamp: <Mar 01 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1384,31 +1384,10 @@ let get_constraints_list_to_json state =
     state,
     Remanent_state.lemmas_list_to_json constraints_list
 
-let compute_symmetries
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title state =
-  let state, handler = get_handler state in
-  let parameters = get_parameters state in
-  let errors = get_errors state in
-  (*get the information of compil => get the information of the position of
-    agent_id in a list of rules
-  *)
-  let state, c_compil = get_c_compilation state in
-  let state, contact_map =
-    get_contact_map
-      ~accuracy_level
-      state
-  in
-  let symmetries =
-    Symmetries.detect_symmetries parameters contact_map
-  in
-  let state = Remanent_state.set_symmetries accuracy_level symmetries state in
-  let state = set_errors errors state in
-  state,
-  symmetries
 
-let get_symmetric_sites ?accuracy_level:(accuracy_level=Remanent_state.Low) =
+(*let get_symmetric_sites ?accuracy_level:(accuracy_level=Remanent_state.Low) =
   get_gen
     (Remanent_state.get_symmetries accuracy_level)
     (compute_symmetries ~accuracy_level )
-
+*)
   end

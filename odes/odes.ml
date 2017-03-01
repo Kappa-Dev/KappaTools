@@ -162,7 +162,7 @@ struct
       time_homogeneous_obs: bool option ;
       time_homogeneous_vars: bool option ;
       time_homogeneous_rates: bool option ;
-      symmetries: Symmetries.partitioned_contact_map option ;
+      symmetries: Symmetries.symmetries option
     }
 
   let may_be_time_homogeneous_gen a =
@@ -1904,8 +1904,7 @@ automorphisms in the site graph E.
           (* identifiers of rule up to isomorphism*)
         let cache, lkappa_rule, i, rate_map,
             hashed_list =
-          I.cannonic_form_from_syntactic_rule cache compil
-            rule
+          I.cannonic_form_from_syntactic_rule cache compil rule
           in
           (*****************************************************)
           (* convention of r:
@@ -1985,7 +1984,76 @@ automorphisms in the site graph E.
         Loggers.fprintf log " %b " b
       ) array
 
-  let compute_symmetries_from_syntactic_rules
+  let translate_signatures sigs agent site1 site2 =
+    let agent_id = Signature.num_of_agent
+        (Locality.dummy_annot agent)
+        sigs
+    in
+    let interface = Signature.get sigs agent_id in
+    let site1_i =
+      Signature.num_of_site
+        (Locality.dummy_annot site1)
+        interface
+    in
+    let site2_i =
+      Signature.num_of_site
+        (Locality.dummy_annot site2)
+        interface
+    in
+    agent_id, site1_i, site2_i
+
+  let compute_symmetries_from_model
+      parameters compil network contact_map  =
+    let log = Remanent_parameters.get_logger parameters in
+    let cache = network.cache in
+    let cache, cannonic_list, pair_list =
+      cannonic_form_from_syntactic_rules
+        cache
+        compil
+    in
+    let hash_lists, lkappa_rule = List.split pair_list in
+      let to_be_checked, counter, rates, correct =
+        build_array_for_symmetries
+          hash_lists
+      in
+      (*for each rule*)
+      let () =
+        List.iter
+          (fun (i, rate_map, convention_rule) ->
+            (*of the current hash*)
+            let () =
+              correct.(i) <- convention_rule
+            in
+            let () =
+              rates.(i) <-
+                (add_map (rates.(i)) rate_map)
+            in
+            (*to be check at the current rule*)
+            let () =
+              to_be_checked.(i) <- true
+            in
+            ()
+          ) cannonic_list
+      in
+      let () = Loggers.fprintf log "\nCorrect:\n" in
+      let () = print_array_int log correct in
+      let () = Loggers.print_newline log in
+      let () = Loggers.fprintf log "To be check:\n" in
+      let () = print_array_bool log to_be_checked in
+      let () = Loggers.print_newline log in
+      let cache, symmetries =
+        I.detect_symmetries
+          parameters
+          compil
+          cache
+          (to_be_checked, counter, rates, correct, pair_list)
+          contact_map
+      in
+      let network = {network with cache = cache ;
+                                  symmetries = Some symmetries }
+      in
+      network
+  (*let compute_symmetries_from_syntactic_rules
       log compil network symmetries =
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
@@ -2101,17 +2169,13 @@ automorphisms in the site graph E.
             array
         ) [||] pair_list
     in
-    let network =
-      Array.fold_left (fun network (cache, _) ->
-          {
-            network with
-            cache = cache;
-            symmetries = Some symmetries
-          }
-        ) network array
-    in
-    network
 
+    {
+      network with
+      cache = cache;
+      symmetries = Some symmetries
+    }
+  *)
 
 (*
 2) Now we have a list of rules, with a hash.

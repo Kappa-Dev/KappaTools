@@ -28,12 +28,7 @@ type lkappa_partitioned_contact_map =
   ((int list list) * (int list list))
     array
 
-type symmetries =
-  {
-    store_contact_map : contact_map ;
-    store_partitioned_contact_map : partitioned_contact_map ;
-    store_partitioned_with_predicate : partitioned_contact_map
-  }
+type symmetries = lkappa_partitioned_contact_map
 
 (***************************************************************)
 (*PARTITION THE CONTACT MAP*)
@@ -74,19 +69,26 @@ let partition cache hash int_of_hash f map =
        map
        [])
 
-module State =
+module State:  SetMap.OrderedType
+  with type t = string
+  =
 struct
   type t = string
   let compare = compare
   let print f s = Format.fprintf f "%s" s
 end
+
 module StateList = Hashed_list.Make (State)
-module BindingType =
+
+module BindingType: SetMap.OrderedType
+  with type t = string * string
+ =
 struct
   type t = string*string
   let compare = compare
   let print f (s1,s2) = Format.fprintf f "%s.%s" s1 s2
 end
+
 module BindingTypeList = Hashed_list.Make (BindingType)
 
 let collect_partitioned_contact_map contact_map =
@@ -159,6 +161,7 @@ let print_l parameters l =
       in
       ())
       l
+  else Loggers.print_newline (Remanent_parameters.get_logger parameters)
 
 let print_partitioned_contact_map parameters partitioned_contact_map =
   Mods.StringMap.iter
@@ -243,58 +246,7 @@ let print_contact_map parameters contact_map =
          sitemap)
     contact_map
 
-(*****************************************************************)
-(*DETECT SYMMETRIES*)
-(*****************************************************************)
 
-let detect_symmetries parameters (contact_map:contact_map) =
-  (*-------------------------------------------------------------*)
-  (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
-  let store_partitioned_contact_map =
-    collect_partitioned_contact_map
-      contact_map
-  in
-  (*-------------------------------------------------------------*)
-  (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES WITH A PREDICATE*)
-  let store_partitioned_with_predicate =
-    collect_partitioned_with_predicate
-      (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
-      (fun a b c -> b = c) (*REPLACE THIS PREDICATE*)
-      store_partitioned_contact_map
-      in
-  (*-------------------------------------------------------------*)
-  let store_result =
-    {
-      store_contact_map = contact_map;
-      store_partitioned_contact_map = store_partitioned_contact_map;
-      store_partitioned_with_predicate = store_partitioned_with_predicate
-    }
-  in
-  (*-------------------------------------------------------------*)
-  (*PRINT*)
-  let () =
-    if Remanent_parameters.get_trace parameters
-    then
-      let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "Contact map\n";
-        print_contact_map parameters store_result.store_contact_map
-      in
-      let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        "Partitioned contact map\n";
-      print_partitioned_contact_map
-        parameters store_result.store_partitioned_contact_map
-      in
-      let _ =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters)
-          "With predictate\n";
-        print_partitioned_contact_map
-          parameters store_result.store_partitioned_with_predicate
-      in
-      ()
-  in
-  store_result
 
 (****************************************************************)
 
@@ -333,7 +285,8 @@ let partition_pair cache p l =
   let rec part cache yes no = function
     | [] -> cache, (List.rev yes, List.rev no)
     | x :: l ->
-      if p x
+      let cache, b = p cache x in
+      if b
       then part cache (x :: yes) no l
       else part cache yes (x :: no) l in
   part cache [] [] l
@@ -344,7 +297,7 @@ let refine_class' cache p l result =
     | [] -> cache, classes
     | h::_ ->
       let cache, (newclass, others) =
-        partition_pair cache (p h) to_do
+        partition_pair cache (fun cache -> p cache h) to_do
       in
       aux cache others (newclass :: classes)
   in
@@ -359,27 +312,38 @@ let refine_class' cache p l =
        cache, result
     ) (cache, []) l
 
-let collect_partitioned_with_predicate_lkappa
+let refine_partitioned_contact_map_in_lkappa_representation
     cache
     p_internal_state
     p_binding_state
-    translate_to_lkappa_representation =
-  let array =
-    Array.mapi
-      (fun agent_type
-        (internal_sites_partition,binding_sites_partition) ->
-        let cache, a =
-        refine_class' cache (p_internal_state agent_type)
+    partitioned_contact_map
+  =
+  Tools.array_fold_lefti
+    (fun
+      agent_type
+      cache
+      (internal_sites_partition,binding_sites_partition)
+      ->
+      let cache, a =
+        refine_class'
+          cache
+          (fun cache -> p_internal_state cache agent_type)
           internal_sites_partition
-        in
-        let cache, b =
-        refine_class' cache (p_binding_state agent_type)
+      in
+      let cache, b =
+        refine_class'
+          cache
+          (fun cache -> p_binding_state cache agent_type)
           binding_sites_partition
-        in
-        cache, (a,b)
-      ) translate_to_lkappa_representation
-  in
-  array
+      in
+      let () =
+        partitioned_contact_map.(agent_type) <- (a,b)
+      in
+      cache
+    )
+    cache
+    partitioned_contact_map,
+  partitioned_contact_map
 
 (******************************************************************)
 
@@ -401,9 +365,12 @@ let print_l logger fmt signature agent l =
          in
          ())
       l
+  else
+     Loggers.print_newline logger
 
-let print_partitioned_contact_map_in_lkappa logger signature
-    partitioned_contact_map =
+let print_partitioned_contact_map_in_lkappa
+    logger env partitioned_contact_map =
+  let signature = Model.signatures env in
   let fmt = Loggers.formatter_of_logger logger in
   match fmt with
   | None -> ()
@@ -421,6 +388,69 @@ let print_partitioned_contact_map_in_lkappa logger signature
          let () = print_l logger fmt signature agent l2 in
          ()
       ) partitioned_contact_map
+
+      (*****************************************************************)
+      (*DETECT SYMMETRIES*)
+      (*****************************************************************)
+
+
+let detect_symmetries parameters env cache arrays contact_map =
+  (*-------------------------------------------------------------*)
+  (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
+  let partitioned_contact_map =
+    collect_partitioned_contact_map contact_map
+  in
+  (*-------------------------------------------------------------*)
+  (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES WITH A PREDICATE*)
+  let partitioned_contact_map_in_lkappa =
+    translate_to_lkappa_representation env partitioned_contact_map
+  in
+  let cache, refined_partitioned_contact_map =
+    refine_partitioned_contact_map_in_lkappa_representation
+      cache
+      (fun cache a b c -> cache, b=c) (*REPLACE THIS PREDICATE*)
+      (fun cache a b c -> cache, b=c) (*REPLACE THIS PREDICATE*)
+      partitioned_contact_map_in_lkappa
+  in
+  (*-------------------------------------------------------------*)
+  (*PRINT*)
+  let () =
+    if Remanent_parameters.get_trace parameters
+    then
+      let logger = Remanent_parameters.get_logger parameters in
+      let () =
+        Loggers.fprintf logger "Contact map"
+      in
+      let () =
+        Loggers.print_newline logger
+      in
+      let () =
+        print_contact_map parameters contact_map
+      in
+      let () =
+        Loggers.fprintf logger "Partitioned contact map"
+      in
+      let () =
+        Loggers.print_newline logger
+      in
+      let () =
+        print_partitioned_contact_map parameters partitioned_contact_map
+      in
+      let () =
+        Loggers.fprintf logger "With predictate"
+      in
+      let () =
+        Loggers.print_newline logger
+      in
+      let () =
+        print_partitioned_contact_map_in_lkappa
+          logger env
+          refined_partitioned_contact_map
+      in
+      ()
+  in
+  cache, refined_partitioned_contact_map
+
 
 type cache = unit (* to do *)
 let empty_cache ()  = () (* to do *)

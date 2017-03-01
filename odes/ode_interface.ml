@@ -19,7 +19,7 @@ type compil =
 
 type cc_cache = Pattern.PreEnv.t
 type nauto_in_rules_cache = LKappa_auto.cache
-type sym_cache = unit (* to do *)
+type sym_cache = Symmetries.cache
 
 type cache =
   {
@@ -355,7 +355,8 @@ let empty_cc_cache compil =
 
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
-let empty_sym_cache () = () (* to be filled *)
+let empty_sym_cache () =
+  Symmetries.empty_cache ()
 let empty_cache compil =
   {
     cc_cache  = empty_cc_cache compil ;
@@ -394,10 +395,10 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   in
   (*let sigs = Model.signatures compil.environment in*)
   let rule_cache = cache.rule_cache in
-  let rule_cache, hash_list =
+  let rule_cache, hashed_list =
     LKappa_auto.cannonic_form rule_cache lkappa_rule
   in
-  let i = LKappa_auto.RuleCache.int_of_hashed_list hash_list in
+  let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
   let rate_map =
     List.fold_left (fun rate_map rule_id_with_mode ->
@@ -416,18 +417,9 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       Rule_modes.RuleModeMap.empty
       rule_id_with_mode_list
   in
-  let rule_cache, hashed_list =
-    LKappa_auto.cannonic_form rule_cache lkappa_rule
-  in
   let cache = {cache with rule_cache = rule_cache } in
   cache, lkappa_rule, i , rate_map, hashed_list
 
-let print_partitioned_contact_map_in_lkappa
-    log compil symmetries =
-  Symmetries.print_partitioned_contact_map_in_lkappa
-    log (Model.signatures compil.environment) symmetries
-
-let translate_symmetries compil symmetries =
-  Symmetries.translate_to_lkappa_representation
-    compil.environment
-    symmetries
+let detect_symmetries parameter compil cache arrays contact_map =
+  Symmetries.detect_symmetries
+    parameter compil.environment cache arrays contact_map
