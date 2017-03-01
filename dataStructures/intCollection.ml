@@ -14,7 +14,7 @@ type t = {
 
 let create size = {
   size = 0;
-  bag = Mods.DynArray.create size 0;
+  bag = Mods.DynArray.create size (-1);
   dict = Hashtbl.create size;
 }
 
@@ -32,9 +32,10 @@ let print f s =
 let is_empty s = s.size = 0
 
 let add x s =
-  let () = Mods.DynArray.set s.bag s.size x in
-  let () = Hashtbl.replace s.dict x s.size in
-  s.size <- succ s.size
+  if not (Hashtbl.mem s.dict x) then
+    let () = Mods.DynArray.set s.bag s.size x in
+    let () = Hashtbl.replace s.dict x s.size in
+    s.size <- succ s.size
 
 let remove x s =
   try

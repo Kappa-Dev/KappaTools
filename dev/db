@@ -18,6 +18,7 @@ install_printer Raw_printers.print_ast_alg
 install_printer Raw_printers.print_alg
 install_printer Raw_printers.print_bool
 install_printer Raw_printers.print_cc
+install_printer Raw_printers.print_cc_id
 install_printer Raw_printers.print_place
 install_printer Raw_printers.print_transformation
 install_printer Raw_printers.print_rule
