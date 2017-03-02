@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 01 2017>
+   * Last modification: Time-stamp: <Mar 02 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -181,12 +181,20 @@ let print_partitioned_contact_map parameters partitioned_contact_map =
            (Remanent_parameters.get_logger parameters) "internal sites:"
        in
        let () =
+         Loggers.print_newline
+           (Remanent_parameters.get_logger parameters)
+       in
+       let () =
          print_l parameters l1
        in
        let () =
          Loggers.fprintf
-           (Remanent_parameters.get_logger parameters) "binding sites:" in
-
+           (Remanent_parameters.get_logger parameters) "binding sites:"
+       in
+       let () =
+         Loggers.print_newline
+           (Remanent_parameters.get_logger parameters)
+       in
        let () =
          print_l parameters l2
        in ()
@@ -304,13 +312,15 @@ let refine_class' cache p l result =
   aux cache l result
 
 let refine_class' cache p l =
-  List.fold_left
-    (fun (cache, result) l ->
-       let cache, result =
-         refine_class' cache p l result
-       in
-       cache, result
-    ) (cache, []) l
+  if l <> [] then
+    List.fold_left
+      (fun (cache, result) l ->
+         let cache, result =
+           refine_class' cache p l result
+         in
+         cache, result
+      ) (cache, []) l
+  else (cache, [])
 
 let refine_partitioned_contact_map_in_lkappa_representation
     cache
@@ -383,8 +393,10 @@ let print_partitioned_contact_map_in_lkappa
          let () = Signature.print_agent signature fmt agent in
          let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "internal sites:" in
+         let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l1 in
          let () = Loggers.fprintf logger "binding sites:" in
+         let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l2 in
          ()
       ) partitioned_contact_map
@@ -394,7 +406,56 @@ let print_partitioned_contact_map_in_lkappa
       (*****************************************************************)
 
 
-let detect_symmetries parameters env cache arrays contact_map =
+let check_invariance_gen
+    p ~to_be_checked ~counter ~correct ~rates
+    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list) cache agent_type site1 site2 =
+  let rec aux hash_and_rule_list (cache, to_be_checked, counter) =
+    match hash_and_rule_list with
+    | [] -> (cache, to_be_checked, counter), true
+    | (hash,rule)::tail ->
+      let id = LKappa_auto.RuleCache.int_of_hashed_list hash in
+      if
+        to_be_checked.(id)
+      then
+        let (cache, counter, to_be_checked), b =
+          p ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+            to_be_checked
+        in
+        if b then
+          aux tail (cache, to_be_checked, counter)
+        else
+          (cache, to_be_checked, counter), false
+      else
+        aux tail (cache, to_be_checked, counter)
+  in
+  aux hash_and_rule_list (cache, to_be_checked, counter)
+
+let check_invariance_internal_states
+    ~correct ~rates (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
+    (cache, to_be_checked, counter)
+    agent_type site1 site2
+  =
+  check_invariance_gen
+    LKappa_group_action.check_orbit_internal_state_permutation
+    ~to_be_checked ~counter ~correct ~rates
+    hash_and_rule_list cache agent_type site1 site2
+
+let check_invariance_binding_states
+    ~correct ~rates hash_and_rule_list
+    (cache, to_be_checked, counter)
+    agent_type site1 site2
+      =
+      check_invariance_gen
+        LKappa_group_action.check_orbit_binding_state_permutation
+        ~to_be_checked ~counter ~correct ~rates
+        hash_and_rule_list cache agent_type site1 site2
+
+
+
+let detect_symmetries parameters env cache
+    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
+    arrays
+    (contact_map:(string list * (string * string) list) Mods.StringMap.t Mods.StringMap.t) =
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
   let partitioned_contact_map =
@@ -405,11 +466,14 @@ let detect_symmetries parameters env cache arrays contact_map =
   let partitioned_contact_map_in_lkappa =
     translate_to_lkappa_representation env partitioned_contact_map
   in
-  let cache, refined_partitioned_contact_map =
+  let to_be_checked, counter, rates, correct = arrays in
+  let (cache,_,_), refined_partitioned_contact_map =
     refine_partitioned_contact_map_in_lkappa_representation
-      cache
-      (fun cache a b c -> cache, b=c) (*REPLACE THIS PREDICATE*)
-      (fun cache a b c -> cache, b=c) (*REPLACE THIS PREDICATE*)
+      (cache, to_be_checked, counter)
+      (check_invariance_internal_states
+         ~correct ~rates hash_and_rule_list)
+      (check_invariance_binding_states
+         ~correct ~rates hash_and_rule_list)
       partitioned_contact_map_in_lkappa
   in
   (*-------------------------------------------------------------*)
@@ -437,7 +501,16 @@ let detect_symmetries parameters env cache arrays contact_map =
         print_partitioned_contact_map parameters partitioned_contact_map
       in
       let () =
-        Loggers.fprintf logger "With predictate"
+        Loggers.fprintf logger "Partitioned contact map (LKAPPA)"
+      in
+      let () =
+        Loggers.print_newline logger
+      in
+      let () =
+        print_partitioned_contact_map_in_lkappa logger env  partitioned_contact_map_in_lkappa
+      in
+      let () =
+        Loggers.fprintf logger "With predicate"
       in
       let () =
         Loggers.print_newline logger

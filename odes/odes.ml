@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
 *)
 
 let local_trace = false
@@ -1932,6 +1932,7 @@ automorphisms in the site graph E.
     else h2
 
   let rec max_hashes nbr_auto_in_rule_list =
+    (* Please use rather tail recursion*)
     match nbr_auto_in_rule_list with
     | [] -> LKappa_auto.RuleCache.empty
     | x :: [] -> x
@@ -2046,7 +2047,8 @@ automorphisms in the site graph E.
           parameters
           compil
           cache
-          (to_be_checked, counter, rates, correct, pair_list)
+          pair_list
+          (to_be_checked, counter, rates, correct)
           contact_map
       in
       let network = {network with cache = cache ;

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
 *)
 
 module type Interface =
@@ -141,7 +141,9 @@ sig
 
   val detect_symmetries :
     Remanent_parameters_sig.parameters ->
-    compil -> cache -> (bool array * int array * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t array * int array * (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list) ->
+    compil -> cache ->
+    (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
+    (bool array * int array * ('a,'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array * int array) ->
     (string list * (string * string) list) Mods.StringMap.t Mods.StringMap.t ->
     cache * Symmetries.symmetries
 

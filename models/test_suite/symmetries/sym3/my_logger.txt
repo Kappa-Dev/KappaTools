@@ -1,0 +1,695 @@
++ Refine the contact map
+Scan rules!
+Signature:
+Signature:agents:
+Signature:agents:agent_type:0:A
+Signature:sites:
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(internal state)
+Signature:sites:0:site_type:1->y(internal state)
+Signature:sites:0:site_type:2->w(internal state)
+Signature:sites:0:site_type:3->t(internal state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->u
+Signature:states:0:0:state_id:1->p
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->u
+Signature:states:0:1:state_id:1->p
+Signature:states:0:2:
+Signature:states:0:2:state_id:0->u
+Signature:states:0:2:state_id:1->p
+Signature:states:0:3:
+Signature:states:0:3:state_id:0->u
+Signature:states:0:3:state_id:1->p
+Signature:duals: 
++ Reachability analysis
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(w~u,t~u)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x~u,y~u)
+
+
+	Applying rule 0:
+		the precondition is satisfied
+
+		rule 0 is applied for the first time
+
+		Updating the views for A(x~,y~)
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x~p,y~u)
+
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		rule 1 is applied for the first time
+
+		Updating the views for A(x~,y~)
+
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x~u,y~p)
+
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for A(x~,y~)
+
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(x~p,y~p)
+
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		rule 3 is applied for the first time
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 4:
+		the precondition is satisfied
+
+		rule 4 is applied for the first time
+
+		Updating the views for A(w~,t~)
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(w~p,t~u)
+
+
+	Applying rule 5:
+		the precondition is satisfied
+
+		rule 5 is applied for the first time
+
+		Updating the views for A(w~,t~)
+
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(w~u,t~p)
+
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		rule 6 is applied for the first time
+
+		Updating the views for A(w~,t~)
+
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(w~p,t~p)
+
+
+	Applying rule 7:
+		the precondition is satisfied
+
+		rule 7 is applied for the first time
+
+		Updating the views for A(w~,t~)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 4:
+		the precondition is satisfied
+
+		Updating the views for A(w~,t~)
+
+	Applying rule 5:
+		the precondition is satisfied
+
+		Updating the views for A(w~,t~)
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		Updating the views for A(w~,t~)
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=23
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+agent_type:0:A:cv_id:1
+Id=23
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=28
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(y~u) v A(y~p) ]
+A() => [ A(w~u) v A(w~p) ]
+A() => [ A(t~u) v A(t~p) ]
+A() => [ A(x~u) v A(x~p) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=28
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=28
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:3<0)
+  Id=0
+   Leaf False 
+
+  Id=25
+   Node(site_type:3<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=28
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+
+Correct:
+ 1  1  1  1  1  1  1  1  1 
+To be check:
+ false  true  true  true  true  true  true  true  true 
+Contact map
+agent:A
+  site:t
+internal_states:u;p;
+  site:w
+internal_states:u;p;
+  site:x
+internal_states:u;p;
+  site:y
+internal_states:u;p;
+Partitioned contact map
+Agent: A
+internal sites:
+y,x,w,t,
+binding sites:
+
+Partitioned contact map (LKAPPA)
+From LKAPPA:
+Agent: A
+internal sites:
+x,y,
+t,w,
+binding sites:
+
+With predicate
+From LKAPPA:
+Agent: A
+internal sites:
+x,y,
+t,w,
+binding sites:
+

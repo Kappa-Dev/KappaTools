@@ -244,12 +244,14 @@ let check_orbit
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
     to_be_checked =
+  let size = Array.length to_be_checked in
   let accu = cache, [], counter, to_be_checked in
   let f rule (cache, l, counter, to_be_checked) =
     let cache, hash = LKappa_auto.cannonic_form cache rule in
     let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
     if
-      to_be_checked.(i)
+      i<size
+      && to_be_checked.(i)
     then
       begin
         let n = counter.(i) in
