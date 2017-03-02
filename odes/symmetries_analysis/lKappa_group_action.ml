@@ -181,6 +181,35 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
   in
   aux 0 (of_rule rule) 0 positions
 
+(***************************************************************)
+(*SYMMETRIES*)
+(***************************************************************)
+  (*
+  [Strongly symmetric model]:
+  iff
+  1. for any element i,j in I such that i different than j,
+   we have ri different than rj;
+  2. for any element i in I and any pair of permutation sigma in
+  Gri , there exists an element j in I, such that:
+  (a) sigma.ri = rj.
+  (b) ki/[Li,Li] = kj/ [Lj ,Lj]
+  where:
+  i. Li is the left hand side of the rule ri,
+  ii. Lj is the left hand side of the rule rj,
+  iii. and for any site graph [E, E] denotes the number of
+  automorphisms in the site graph E.
+  *)
+
+
+
+(***************************************************************)
+(*We say that the rules have a symmetric action over the site x
+  and the site y, whenever the the product between the number of
+  automorphisms of the rule r and its kinetic rate k(r), divided by
+  the number of automorphisms in the left hand side of the rule r,
+  is the same for any pair of symmetric rules.*)
+
+
 let for_all_over_orbit
     (positions:int list)
     (sigma:LKappa.rule_agent -> unit)

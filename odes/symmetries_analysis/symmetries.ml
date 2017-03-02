@@ -450,8 +450,6 @@ let check_invariance_binding_states
         ~to_be_checked ~counter ~correct ~rates
         hash_and_rule_list cache agent_type site1 site2
 
-
-
 let detect_symmetries parameters env cache
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list)
     arrays
@@ -523,6 +521,108 @@ let detect_symmetries parameters env cache
       ()
   in
   cache, refined_partitioned_contact_map
+
+(***************************************************************************)
+
+let max_hash h1 h2 =
+  if compare h1 h2 >= 0
+  then h1
+  else h2
+
+let max_hashes hash_list =
+  let rec aux tail best =
+    match
+      tail
+    with
+    | [] -> best
+    | head::tail ->
+      aux tail (max_hash best head)
+  in
+  aux hash_list LKappa_auto.RuleCache.empty
+
+let build_array_for_symmetries nbr_rule_list =
+  let max_hash = max_hashes nbr_rule_list in
+  let size_hash_plus_1 =
+    (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
+  in
+  let to_be_checked = Array.make size_hash_plus_1 false in
+  let counter = Array.make size_hash_plus_1 0 in
+  let rate = Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty in
+  let correct = Array.make size_hash_plus_1 1 in
+  to_be_checked, counter, rate, correct
+
+let print_line_stars log =
+  Loggers.fprintf log "\n***************\n"
+
+let print_hash log hash =
+  Loggers.fprintf log " Hash-:%a\n"
+    LKappa_auto.RuleCache.print hash;
+  Loggers.print_newline log
+
+let print_hash_list log hash_list =
+  List.iter (fun hash ->
+      let () = print_line_stars log in
+      let () = print_hash log hash in
+      let () = print_line_stars log in ()
+    ) hash_list
+
+let print_kinetic_rate_list ?env log fmt l =
+  List.iter (fun rate_opt ->
+      match rate_opt with
+      | None -> ()
+      | Some (alg, loc) ->
+        (*let () = Locality.print fmt loc in*)
+        let () = Loggers.fprintf log " Rate: " in
+        let () = Kappa_printer.alg_expr ?env fmt alg in
+        let () = Loggers.print_newline log in
+        ()
+    ) l
+
+let print_map log map =
+  let () = print_line_stars log in
+  let () = Loggers.print_newline log in
+  let () =
+    LKappa_auto.CannonicMap.fold (fun cannonic (nocc, nauto) () ->
+        let () = Loggers.fprintf log "nocc:%i - " nocc in
+        let () = Loggers.fprintf log "nauto:%i - " nauto in
+        let () = Loggers.fprintf log "cannonic:%a"
+            LKappa_auto.CannonicCache.print cannonic
+        in
+        let () = Loggers.print_newline log in ()
+      ) map ()
+  in
+  let () = print_line_stars log in
+  ()
+
+let print_divide_rule_rate_by log i =
+  Loggers.fprintf log " Divide_rule_rate_by:%i\n" i
+
+let print_cannonic_form_from_syntactic_rules
+    ~compil log print_rule_name print_rule_id rule_id rule
+    nbr_auto_in_lhs
+    nbr_auto_in_rule rate_opt_list
+  =
+  match Loggers.formatter_of_logger log with
+  | None -> ()
+  | Some fmt ->
+    (*let () = Loggers.fprintf log "rule: \n" in
+      let () = I.print_rule ~compil fmt rule in*)
+    let () = Loggers.fprintf log " rule_name: " in
+    let () = print_rule_name ~compil fmt rule in
+    let () = Loggers.print_newline log in
+    let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
+    let () = print_kinetic_rate_list log fmt rate_opt_list in
+    let () = Loggers.fprintf log " rule_id: " in
+    let () = print_rule_id fmt rule_id in
+    let () = Loggers.print_newline log in
+    let () = print_hash log nbr_auto_in_rule in
+    let () = Loggers.print_newline log in
+    (*let () = print_list_of_agent_id log list_of_agent_id in*)
+    let () = print_line_stars log in
+    (*let () = Loggers.fprintf log " Gamma: " in
+      let () = print_gamma_list log fmt gamma_list in
+      let () = print_line_stars log in*)
+    ()
 
 
 type cache = unit (* to do *)

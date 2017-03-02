@@ -1741,158 +1741,10 @@ struct
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
 
-  (* JF-> LKQ: Please move this code in symmetries.ml or a fresh file *)
-(***************************************************************)
-(*SYMMETRIES*)
-(***************************************************************)
-(*
-[Strongly symmetric model]:
-iff
-1. for any element i,j in I such that i different than j,
- we have ri different than rj;
-2. for any element i in I and any pair of permutation sigma in
-Gri , there exists an element j in I, such that:
-(a) sigma.ri = rj.
-(b) ki/[Li,Li] = kj/ [Lj ,Lj]
-where:
-i. Li is the left hand side of the rule ri,
-ii. Lj is the left hand side of the rule rj,
-iii. and for any site graph [E, E] denotes the number of
-automorphisms in the site graph E.
-*)
 
-  let print_hash log hash =
-    Loggers.fprintf log " Hash-:%a\n"
-      LKappa_auto.RuleCache.print hash;
-    Loggers.print_newline log
-
-  let print_line_stars log =
-    Loggers.fprintf log "\n***************\n"
-
-  let print_hash_list log hash_list =
-    List.iter (fun hash ->
-        let () = print_line_stars log in
-        let () = print_hash log hash in
-        let () = print_line_stars log in ()
-      ) hash_list
-
-  let print_map log map =
-    let () = print_line_stars log in
-    let () = Loggers.print_newline log in
-    let () =
-      LKappa_auto.CannonicMap.fold (fun cannonic (nocc, nauto) () ->
-          let () = Loggers.fprintf log "nocc:%i - " nocc in
-          let () = Loggers.fprintf log "nauto:%i - " nauto in
-          let () = Loggers.fprintf log "cannonic:%a"
-              LKappa_auto.CannonicCache.print cannonic
-          in
-          let () = Loggers.print_newline log in ()
-        ) map ()
-    in
-    let () = print_line_stars log in
-    ()
-
-  let print_divide_rule_rate_by log i =
-    Loggers.fprintf log " Divide_rule_rate_by:%i\n" i
-
-  let print_kinetic_rate_list ?env log fmt l =
-    List.iter (fun rate_opt ->
-        match rate_opt with
-        | None -> ()
-        | Some (alg, loc) ->
-          (*let () = Locality.print fmt loc in*)
-          let () = Loggers.fprintf log " Rate: " in
-          let () = Kappa_printer.alg_expr ?env fmt alg in
-          let () = Loggers.print_newline log in
-          ()
-      ) l
-
-(***************************************************************)
-(*We say that the rules have a symmetric action over the site x
-  and the site y, whenever the the product between the number of
-  automorphisms of the rule r and its kinetic rate k(r), divided by
-  the number of automorphisms in the left hand side of the rule r,
-  is the same for any pair of symmetric rules.*)
-
-  let compute_gamma nbr_auto_in_lhs rate_opt_list =
-    let gamma_list =
-      List.fold_left (fun current_list rate_opt ->
-          match rate_opt with
-          | None -> current_list
-          | Some rate ->
-            let gamma =
-              Alg_expr.div rate (Alg_expr.int nbr_auto_in_lhs) in
-            gamma :: current_list
-        ) [] rate_opt_list
-    in
-    gamma_list
-
-  let print_gamma_list ?env log fmt l =
-    List.iter (fun (rule_id, gamma_list) ->
-        List.iter (fun (alg,_l) ->
-            let () = Loggers.fprintf log " rule_id:%i " rule_id in
-            let () = Kappa_printer.alg_expr ?env fmt alg in
-            Loggers.print_newline log
-          ) gamma_list
-      ) l
-
- (*compute isomorphism rule: rules are isomorphism when they have
-  the same number in hash: for example:
-  r1: hash: 6
-  r2: hash : 6
-  r3: hash : 7
-  ==> r1, r2 are isomorphism rules
-  *)
-  let compute_isomorphism_in_hashes nbr_auto_in_rule_list =
-    let rec aux acc l =
-    match l with
-    | [] | [_] -> acc
-    | x :: tl ->
-      if List.mem x tl
-      then aux (x::x::acc) tl
-      else aux acc tl
-    in
-    aux [] nbr_auto_in_rule_list
-
-  let print_isomorphism log list =
-    List.iter (fun hash ->
-        let () =
-          Loggers.fprintf log
-            "List of hashes that are equals: "
-        in
-        print_hash log hash
-      ) list
-
-(******************************************************)
-(*compute symmetries with syntactic_rule*)
-(******************************************************)
-
-  let print_cannonic_form_from_syntactic_rules
-      ~compil log rule_id rule
-      nbr_auto_in_lhs
-      nbr_auto_in_rule rate_opt_list
-    =
-    match Loggers.formatter_of_logger log with
-    | None -> ()
-    | Some fmt ->
-      (*let () = Loggers.fprintf log "rule: \n" in
-      let () = I.print_rule ~compil fmt rule in*)
-      let () = Loggers.fprintf log " rule_name: " in
-      let () = I.print_rule_name ~compil fmt rule in
-      let () = Loggers.print_newline log in
-      let () = print_divide_rule_rate_by log nbr_auto_in_lhs in
-      let () = print_kinetic_rate_list log fmt rate_opt_list in
-      let () = Loggers.fprintf log " rule_id: " in
-      let () = I.print_rule_id fmt rule_id in
-      let () = Loggers.print_newline log in
-      let () = print_hash log nbr_auto_in_rule in
-      let () = Loggers.print_newline log in
-      (*let () = print_list_of_agent_id log list_of_agent_id in*)
-      let () = print_line_stars log in
-      (*let () = Loggers.fprintf log " Gamma: " in
-      let () = print_gamma_list log fmt gamma_list in
-      let () = print_line_stars log in*)
-      ()
+(*********************)
+(*compute symmetries *)
+(*********************)
 
   type kind = Internal | Binding
 
@@ -1926,86 +1778,9 @@ automorphisms in the site graph E.
 
   (******************************************************)
 
-  let max_hash h1 h2 =
-    if h1 >= h2
-    then h1
-    else h2
-
-  let rec max_hashes nbr_auto_in_rule_list =
-    (* Please use rather tail recursion*)
-    match nbr_auto_in_rule_list with
-    | [] -> LKappa_auto.RuleCache.empty
-    | x :: [] -> x
-    | x :: xs ->
-      max_hash x (max_hashes xs)
-
-  let build_array_for_symmetries nbr_rule_list =
-    (*a) compute the biggest hash*)
-    let max_hash = max_hashes nbr_rule_list in
-    (*b. create a size for an array: hash+1*)
-    let size_hash_plus_1 =
-      (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
-    in
-    (*b. create an array of size: hash+1, false*)
-    let to_be_checked =
-      Array.make size_hash_plus_1 false
-    in
-    (*b. create an array of size: hash+1, 0*)
-    let counter =
-      Array.make size_hash_plus_1 0
-    in
-    let rate =
-      Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
-    in
-    let correct =
-      Array.make size_hash_plus_1 1
-    in
-    to_be_checked, counter, rate, correct
-
-  let add_map map1 map2 =
-    snd
-      (Rule_modes.RuleModeMap.monadic_fold2 () ()
-         (fun () () key a1 a2 map ->
-            (),Rule_modes.RuleModeMap.add
-              key (Alg_expr.add a1 a2) map)
-         (fun () () key a1 map ->
-            (),Rule_modes.RuleModeMap.add key a1 map)
-         (fun () () _ _ map -> (),map)
-         map1
-         map2
-         map2)
-
-  let print_array_int log array =
-    Array.iter (fun i ->
-        Loggers.fprintf log " %i " i
-      ) array
-
-  let print_array_bool log array =
-    Array.iter (fun b ->
-        Loggers.fprintf log " %b " b
-      ) array
-
-  let translate_signatures sigs agent site1 site2 =
-    let agent_id = Signature.num_of_agent
-        (Locality.dummy_annot agent)
-        sigs
-    in
-    let interface = Signature.get sigs agent_id in
-    let site1_i =
-      Signature.num_of_site
-        (Locality.dummy_annot site1)
-        interface
-    in
-    let site2_i =
-      Signature.num_of_site
-        (Locality.dummy_annot site2)
-        interface
-    in
-    agent_id, site1_i, site2_i
 
   let compute_symmetries_from_model
       parameters compil network contact_map  =
-    let log = Remanent_parameters.get_logger parameters in
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
       cannonic_form_from_syntactic_rules
@@ -2014,34 +1789,26 @@ automorphisms in the site graph E.
     in
     let hash_lists, lkappa_rule = List.split pair_list in
       let to_be_checked, counter, rates, correct =
-        build_array_for_symmetries
+        Symmetries.build_array_for_symmetries
           hash_lists
       in
       (*for each rule*)
       let () =
         List.iter
           (fun (i, rate_map, convention_rule) ->
-            (*of the current hash*)
             let () =
               correct.(i) <- convention_rule
             in
             let () =
               rates.(i) <-
-                (add_map (rates.(i)) rate_map)
+                (Rule_modes.add_map (rates.(i)) rate_map)
             in
-            (*to be check at the current rule*)
             let () =
               to_be_checked.(i) <- true
             in
             ()
           ) cannonic_list
       in
-      let () = Loggers.fprintf log "\nCorrect:\n" in
-      let () = print_array_int log correct in
-      let () = Loggers.print_newline log in
-      let () = Loggers.fprintf log "To be check:\n" in
-      let () = print_array_bool log to_be_checked in
-      let () = Loggers.print_newline log in
       let cache, symmetries =
         I.detect_symmetries
           parameters
@@ -2055,190 +1822,6 @@ automorphisms in the site graph E.
                                   symmetries = Some symmetries }
       in
       network
-  (*let compute_symmetries_from_syntactic_rules
-      log compil network symmetries =
-    let cache = network.cache in
-    let cache, cannonic_list, pair_list =
-      cannonic_form_from_syntactic_rules
-        cache
-        compil
-    in
-    let translate_symmetries =
-      I.translate_symmetries compil symmetries
-    in
-    let hash_lists, lkappa_rule = List.split pair_list in
-    let to_be_checked, counter, rates, correct =
-      build_array_for_symmetries
-        hash_lists
-    in
-    (*for each rule*)
-    let () =
-      List.iter
-        (fun (i, rate_map, convention_rule) ->
-          (*of the current hash*)
-          let () =
-            correct.(i) <- convention_rule
-          in
-          let () =
-            rates.(i) <-
-              (add_map (rates.(i)) rate_map)
-          in
-          (*to be check at the current rule*)
-          let () =
-            to_be_checked.(i) <- true
-          in
-          ()
-        ) cannonic_list
-    in
-    let () = Loggers.fprintf log "\nCorrect:\n" in
-    let () = print_array_int log correct in
-    let () = Loggers.print_newline log in
-    let () = Loggers.fprintf log "To be check:\n" in
-    let () = print_array_bool log to_be_checked in
-    let () = Loggers.print_newline log in
-    (*fold over all the rule hash*)
-    let array =
-      List.fold_left
-        (fun array (hash_list, lkappa_rule) ->
-          let i =
-            LKappa_auto.RuleCache.int_of_hashed_list
-              hash_list
-          in
-          if to_be_checked.(i)
-          then
-            let array =
-              Symmetries.collect_partitioned_with_predicate_lkappa
-                cache
-                (fun agent site1 site2 ->
-                   let (cache, counter, to_be_checked), bool =
-                     LKappa_group_action.check_orbit_internal_state_permutation
-                       agent
-                       site1
-                       site2
-                       lkappa_rule
-                       correct
-                       rates
-                       (I.get_rule_cache cache)
-                       counter
-                       to_be_checked
-                   in
-                   let () = Loggers.fprintf log "\nInternal\n" in
-                   let () =
-                     Loggers.fprintf log "counter:\n ";
-                     print_array_int log counter;
-                     Loggers.print_newline log
-                   in
-                   let () =
-                     Loggers.fprintf log "to_be_checked:\n ";
-                     print_array_bool log to_be_checked;
-                     Loggers.print_newline log
-                   in
-                   bool
-                )
-                (fun agent site1 site2 ->
-                  let (cache, counter, to_be_checked), bool =
-                    LKappa_group_action.check_orbit_binding_state_permutation
-                      agent
-                      site1
-                      site2
-                      lkappa_rule
-                      correct
-                      rates
-                      (I.get_rule_cache cache)
-                      counter
-                      to_be_checked
-                  in
-                  let () = Loggers.fprintf log "\nBinding\n" in
-                  let () =
-                    Loggers.fprintf log "counter:\n ";
-                    print_array_int log counter;
-                    Loggers.print_newline log
-                  in
-                  let () =
-                    Loggers.fprintf log "to_be_checked:\n ";
-                    print_array_bool log to_be_checked;
-                    Loggers.print_newline log
-                  in
-                  bool
-                ) translate_symmetries
-            in
-            array
-          else
-            (*nothing*)
-            let () =
-              Loggers.fprintf log "To be Check is false\n:i:%i"  i
-            in
-            array
-        ) [||] pair_list
-    in
-
-    {
-      network with
-      cache = cache;
-      symmetries = Some symmetries
-    }
-  *)
-
-(*
-2) Now we have a list of rules, with a hash.
-
-a) compute the biggest hash.
-
-We want to check whether the rule set if symmetric w.r.t the sites x
-and y in A.
-
-b) make an array (named to_check) of size hash+1, with the value
-false everywhere. and another array (named hit) of size hash+1, with
-the value 0 everywhere
-
-- Put true for the rules of the models.
-- When visiting a rule turns the true into a false.
-- At the end, if everything is set to false, this is a success.
-
-c) for each rule, put true in the corresponding element of the
-array.
-
-- I meant the element i in the array, where i is the normal
-form of the rule.
-
-d) take your list of rule
-     -> if the corresponding element is false in the array to_check
-         Ignore this rule
-     -> otherwise
-  Compute the list of the positions (of all agents: both in
-the lhs/rhs, degraded agents (deleted), created agents)
-of the agent A with at least a site x or y in the rule.
-
-- The positions are the agent_id of agents of type A with at least a
-site x or y.
-
-- Compute the powerset of this list (the list of sublist)
-
-- Each element of the result is a list, encoding a
-transformation as the list of the agent position in which we swap x
-and y.
-
-- For each transformation, apply the following transformation,
-and compute the hash of the result.
-
-- Count how many time you obtain each hash, by incrementing
-the corresponding element in the array hit.
-
-- Once you have done that, for all the potential
-transformations, check that:
-gamma(hash)/nbr of time you get the hash is the same for all
-the hashs that you have obtained.
-
--> if yes, mark all the hash that you have found as false (to_check)
-(they do not have to be checked anymore) and as 0
-(hit).
-
--> if no, the final result is « false » abort the iteration with
-this value.
-
-- If you can do that for all rules, then output true.
-
-*)
 
 
 end
