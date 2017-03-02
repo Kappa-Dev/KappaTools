@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'sym3.ka' '--with-symmetries' 'true''--debug'
+%      'KaDE''sym3.ka'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -105,7 +105,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE sym3.ka --with-symmetries true --debug\n')
+fprintf(fid,'# KaDE sym3.ka\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')

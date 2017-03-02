@@ -1,5 +1,18 @@
 Parsing sym2.ka...
 done
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 10 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing sym2.ka...
+done
 Scan rules!
 Signature:
 Signature:agents:
@@ -1053,4 +1066,34 @@ A(x!A.y)=> [A(x!A.y,y)]
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+Compute the contact map...
+Contact map
+agent:A
+  site:x
+binding_states:A.x;A.y;
+  site:y
+binding_states:A.x;A.y;
+Partitioned contact map
+Agent: A
+internal sites:
+
+binding sites:
+y,x,
+Partitioned contact map (LKAPPA)
+Agent: A
+internal sites:
+
+binding sites:
+x,y,
+With predicate (LKAPPA)
+Agent: A
+internal sites:
+
+binding sites:
+x,y,
+Symmetries:Agent: A
+internal sites:
+
+binding sites:
+x,y,
 execution finished without any exception

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 03 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -307,7 +307,7 @@ let compute_env
     let (_,env, _, _, _, _, _, _), _ =
       Cli_init.get_compilation cli
     in
-    state, Some (env:Model.t)
+    Remanent_state.set_env (Some env) state, Some (env:Model.t)
 
 let get_env =
   get_gen
@@ -1444,5 +1444,26 @@ let get_symmetric_sites
   get_gen
     (Remanent_state.get_symmetries accuracy_level)
     (compute_symmetries ~accuracy_level )
+
+let output_symmetries
+    ?logger
+    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    state
+  =
+  let parameters = Remanent_state.get_parameters state in
+  let parameters =
+    match logger with
+    | None -> parameters
+    | Some logger -> Remanent_parameters.set_logger parameters logger
+  in
+  let state, sym = get_symmetric_sites ~accuracy_level state in
+  let state, env = get_env state in
+  match
+    sym,env
+  with
+  | None,_ | _,None -> state
+  | Some sym,Some env ->
+    let () = Symmetries.print_symmetries parameters env sym in
+    state
 
   end

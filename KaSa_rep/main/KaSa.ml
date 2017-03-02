@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Mar 01 2017>
+ * Last modification: Time-stamp: <Mar 03 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -24,6 +24,13 @@ let main () =
     (val export_to_kasa : Export_to_KaSa.Type)
   in
   let state = Export_to_KaSa.init () in
+  let state =
+    if (Remanent_parameters.get_compute_symmetries parameters)
+    then
+      fst (Export_to_KaSa.get_env state)
+    else
+      state
+  in
   let parameters = Export_to_KaSa.get_parameters state in
   let state =
     let bool, state  =
@@ -98,6 +105,25 @@ let main () =
       | Remanent_parameters_sig.None
       | Remanent_parameters_sig.Low -> state
     else state
+  in
+  let state =
+    if (Remanent_parameters.get_compute_symmetries parameters)
+    then
+    match Remanent_parameters.get_contact_map_accuracy_level parameters
+    with
+    | Remanent_parameters_sig.Medium
+    | Remanent_parameters_sig.High
+    | Remanent_parameters_sig.Full ->
+      Export_to_KaSa.output_symmetries
+        ~accuracy_level:Remanent_state.Medium
+        state
+    | Remanent_parameters_sig.None
+    | Remanent_parameters_sig.Low ->
+      Export_to_KaSa.output_symmetries
+        ~accuracy_level:Remanent_state.Low
+        state
+    else
+      state
   in
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)

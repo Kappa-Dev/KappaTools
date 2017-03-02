@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 03 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -49,6 +49,8 @@ sig
 
   val get_errors: state -> errors
 
+  val get_env: state -> state * Model.t option 
+
   val get_c_compilation: state -> state * c_compilation
 
   val get_contact_map:
@@ -79,6 +81,11 @@ sig
 
   val output_constraints_list: ?logger:Loggers.t ->
     state -> state
+
+  val output_symmetries:
+    ?logger:Loggers.t ->
+    ?accuracy_level:Remanent_state.accuracy_level ->
+      state -> state
 end
 
 module Export =

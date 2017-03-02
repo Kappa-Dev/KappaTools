@@ -46,6 +46,8 @@ val print_cannonic_form_from_syntactic_rules:
   (Alg_expr.t * 'd) option list ->
   unit
 
+val print_symmetries:
+  Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit 
 type cache
 val empty_cache: unit -> cache
 val representant: cache -> symmetries -> Pattern.cc ->  cache * Pattern.cc

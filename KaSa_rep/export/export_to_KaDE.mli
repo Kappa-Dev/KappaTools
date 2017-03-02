@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et

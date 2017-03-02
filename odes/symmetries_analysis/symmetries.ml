@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 02 2017>
+   * Last modification: Time-stamp: <Mar 03 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -385,8 +385,6 @@ let print_partitioned_contact_map_in_lkappa
   match fmt with
   | None -> ()
   | Some fmt ->
-    let () = Loggers.fprintf logger "From LKAPPA:" in
-    let () = Loggers.print_newline logger in
     Array.iteri
       (fun agent (l1,l2) ->
          let () = Loggers.fprintf logger "Agent: " in
@@ -508,7 +506,7 @@ let detect_symmetries parameters env cache
         print_partitioned_contact_map_in_lkappa logger env  partitioned_contact_map_in_lkappa
       in
       let () =
-        Loggers.fprintf logger "With predicate"
+        Loggers.fprintf logger "With predicate (LKAPPA)"
       in
       let () =
         Loggers.print_newline logger
@@ -628,3 +626,12 @@ let print_cannonic_form_from_syntactic_rules
 type cache = unit (* to do *)
 let empty_cache ()  = () (* to do *)
 let representant cache symmetries species = cache, species (* to do *)
+
+let print_symmetries parameters env symmetries =
+  let () =
+    Loggers.fprintf (Remanent_parameters.get_logger parameters)
+      "Symmetries:"
+  in
+  print_partitioned_contact_map_in_lkappa
+    (Remanent_parameters.get_logger parameters)
+    env symmetries
