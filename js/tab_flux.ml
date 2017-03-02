@@ -219,7 +219,7 @@ let update_flux_map
                Js_flux.create_data
                  ~flux_begin_time:flux_map.Api_types_j.flux_data.Data.flux_start
                  ~flux_end_time:flux_map.Api_types_j.flux_end
-                 ~normalized:flux_map.Api_types_j.flux_data.Data.flux_normalized
+                 ~normalized:(flux_map.Api_types_j.flux_data.Data.flux_kind <> Primitives.ABSOLUTE)
                  ~flux_rules:flux_map.Api_types_j.flux_rules
                  ~flux_hits:flux_map.Api_types_j.flux_data.Api_types_j.flux_hits
                  ~flux_fluxs:flux_map.Data.flux_data.Data.flux_fluxs in
