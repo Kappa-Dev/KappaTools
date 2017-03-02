@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -116,7 +116,7 @@ val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
 
 (*******************************************************************)
-type symmetric_sites = Symmetries.symmetries
+type symmetric_sites = Symmetries.symmetries option
 (*******************************************************************)
 
 type ('static, 'dynamic) state
@@ -132,7 +132,7 @@ val of_json: Yojson.Basic.json ->
   constraints_list option
 
 val create_state:
-  ?errors:Exception.method_handler -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
+  ?errors:Exception.method_handler -> ?env:Model.t option -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
 
 val set_parameters: Remanent_parameters_sig.parameters -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
@@ -144,6 +144,10 @@ val add_event: StoryProfiling.step_kind -> (unit -> int) option -> ('static, 'dy
 val close_event: StoryProfiling.step_kind -> (unit -> int) option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
 val get_init: ('static, 'dynamic) state -> init
+
+val get_env: ('static, 'dynamic) state -> Model.t option option
+
+val set_env: Model.t option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
 val set_compilation: compilation -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 

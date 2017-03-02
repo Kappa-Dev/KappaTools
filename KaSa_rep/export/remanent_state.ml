@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -573,7 +573,7 @@ type internal_constraints_list =
   Ckappa_backend.Ckappa_backend.t poly_constraints_list
 
 (*******************************************************************)
-type symmetric_sites = Symmetries.symmetries
+type symmetric_sites = Symmetries.symmetries option
 (*******************************************************************)
 
 type ('static,'dynamic) state =
@@ -583,6 +583,7 @@ type ('static,'dynamic) state =
     prehandler: Cckappa_sig.kappa_handler option ;
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
+    env : Model. t option option ;
     compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
@@ -605,7 +606,7 @@ type ('static,'dynamic) state =
     symmetric_sites : symmetric_sites AccuracyMap.t;
   }
 
-let create_state ?errors parameters init =
+let create_state ?errors ?env parameters init =
   let error =
     match
       errors
@@ -620,6 +621,7 @@ let create_state ?errors parameters init =
     prehandler = None ;
     handler = None ;
     init = init ;
+    env = env ;
     compilation = None ;
     refined_compilation = None ;
     c_compil = None ;
@@ -801,6 +803,10 @@ let set_parameters parameters state = {state with parameters = parameters}
 let get_parameters state = state.parameters
 
 let get_init state = state.init
+
+let set_env model state = {state with env = Some model}
+
+let get_env state = state.env
 
 let set_compilation compilation state =
   {state with compilation = Some compilation}

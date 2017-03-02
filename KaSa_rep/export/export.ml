@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 02 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -289,6 +289,31 @@ let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
 
 let flush_errors state =
   Remanent_state.set_errors Exception.empty_error_handler state
+
+
+let compute_env
+    show_title
+    (state:
+       (Reachability.static_information,
+        Reachability.dynamic_information)
+         Remanent_state.state)
+  =
+  match Remanent_state.get_init state with
+  | Remanent_state.Compil compil -> state, None
+  | Remanent_state.Files files ->
+    let () = show_title state in
+    let cli = Run_cli_args.default in
+    let () = cli.Run_cli_args.inputKappaFileNames <- files in
+    let (_,env, _, _, _, _, _, _), _ =
+      Cli_init.get_compilation cli
+    in
+    state, Some (env:Model.t)
+
+let get_env =
+  get_gen
+    ~phase:StoryProfiling.LKappa_signature
+    Remanent_state.get_env
+    compute_env
 
 (******************************************************************)
 (*compilation*)
@@ -1385,9 +1410,39 @@ let get_constraints_list_to_json state =
     Remanent_state.lemmas_list_to_json constraints_list
 
 
-(*let get_symmetric_sites ?accuracy_level:(accuracy_level=Remanent_state.Low) =
+let compute_symmetries
+    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    _show_title state =
+  let state, env = get_env state in
+  match
+    env
+  with
+  | None -> state, None
+  | Some env ->
+    begin
+      let state, contact_map =
+        get_contact_map ~accuracy_level state
+      in
+      let parameters = get_parameters state in
+      let cache =
+        LKappa_auto.init_cache ()
+      in
+      let cache, symmetries =
+        Symmetries.detect_symmetries
+          parameters
+          env
+          cache
+          [] (* to do *)
+          ([||],[||],[||],[||]) (* to do *)
+          contact_map
+      in
+      state, Some symmetries
+    end
+
+let get_symmetric_sites
+    ?accuracy_level:(accuracy_level=Remanent_state.Low) =
   get_gen
     (Remanent_state.get_symmetries accuracy_level)
     (compute_symmetries ~accuracy_level )
-*)
+
   end
