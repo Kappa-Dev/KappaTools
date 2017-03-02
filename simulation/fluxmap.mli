@@ -8,7 +8,7 @@
 
 (** Flux map *)
 val create_flux :
-  Model.t -> Counter.t -> bool -> string -> Data.flux_data
+  Model.t -> Counter.t -> Primitives.flux_kind -> string -> Data.flux_data
 val stop_flux : Model.t -> Counter.t -> Data.flux_data -> Data.flux_map
 
 val incr_flux_flux : int -> int -> float -> Data.flux_data -> unit

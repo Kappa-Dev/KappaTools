@@ -194,10 +194,12 @@ effect:
     | TRACK non_empty_mixture boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX nonempty_print_expr boolean
-	   {if $3 then Ast.FLUX (true,$2) else Ast.FLUXOFF $2}
+	   {if $3 then Ast.FLUX (Primitives.RELATIVE,$2) else Ast.FLUXOFF $2}
     | FLUX nonempty_print_expr STRING boolean
-	   {if $4 && $3 = "absolute" then Ast.FLUX (false,$2)
-	   else if $4 && $3 = "relative" then Ast.FLUX (true,$2)
+	   {if $4 && $3 = "absolute" then Ast.FLUX (Primitives.ABSOLUTE,$2)
+	   else if $4 && $3 = "probability" then
+	     Ast.FLUX (Primitives.PROBABILITY,$2)
+	   else if $4 && $3 = "relative" then Ast.FLUX (Primitives.RELATIVE,$2)
 	     else raise (ExceptionDefn.Syntax_Error
 	       ("Incorrect FLUX expression",rhs_pos 3))}
     | INTRO alg_expr non_empty_mixture {Ast.INTRO ($2,($3, rhs_pos 3))}
@@ -217,10 +219,10 @@ effect:
     ;
 
 nonempty_print_expr:
-    | STRING {[Ast.Str_pexpr (add_pos $1)]}
-    | mid_alg_expr {[Ast.Alg_pexpr $1]}
-    | STRING DOT nonempty_print_expr {Ast.Str_pexpr ($1, rhs_pos 1)::$3}
-    | mid_alg_expr DOT nonempty_print_expr {Ast.Alg_pexpr $1::$3}
+    | STRING {[Primitives.Str_pexpr (add_pos $1)]}
+    | mid_alg_expr {[Primitives.Alg_pexpr $1]}
+    | STRING DOT nonempty_print_expr {Primitives.Str_pexpr ($1, rhs_pos 1)::$3}
+    | mid_alg_expr DOT nonempty_print_expr {Primitives.Alg_pexpr $1::$3}
     ;
 print_expr:
     /*empty*/ {[]}

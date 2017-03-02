@@ -553,10 +553,10 @@ let print_expr_map  f error alg =
   match
     alg
   with
-  | Ast.Str_pexpr(s) -> error,Ast.Str_pexpr(s)
-  | Ast.Alg_pexpr (alg,pos) ->
+  | Primitives.Str_pexpr(s) -> error,Primitives.Str_pexpr(s)
+  | Primitives.Alg_pexpr (alg,pos) ->
     let error,alg' = alg_map f error alg in
-    error,Ast.Alg_pexpr (alg',pos)
+    error,Primitives.Alg_pexpr (alg',pos)
 
 let map_with_pos map =
   (fun f error (x,pos) ->

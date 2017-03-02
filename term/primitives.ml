@@ -147,20 +147,52 @@ type elementary_rule = {
   instantiations : Instantiation.abstract Instantiation.event;
 }
 
+type 'alg_expr print_expr =
+    Str_pexpr of string Locality.annot
+  | Alg_pexpr of 'alg_expr Locality.annot
+
+let print_expr_to_yojson f_mix f_var = function
+  | Str_pexpr s -> Locality.annot_to_json JsonUtil.of_string s
+  | Alg_pexpr a -> Locality.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) a
+
+let print_expr_of_yojson f_mix f_var x =
+  try Str_pexpr (Locality.annot_of_json (JsonUtil.to_string ?error_msg:None) x)
+  with Yojson.Basic.Util.Type_error _ ->
+  try Alg_pexpr (Locality.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) x)
+  with Yojson.Basic.Util.Type_error _ ->
+    raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
+
+let map_expr_print f x =
+  List.map (function
+      | Str_pexpr _ as x -> x
+      | Alg_pexpr e -> Alg_pexpr (f e)) x
+
+type flux_kind = ABSOLUTE | RELATIVE | PROBABILITY
+
+let flux_kind_to_yojson = function
+  | ABSOLUTE -> `String "ABSOLUTE"
+  | RELATIVE -> `String "RELATIVE"
+  | PROBABILITY -> `String "PROBABILITY"
+
+let flux_kind_of_yojson = function
+  | `String "ABSOLUTE" -> ABSOLUTE
+  | `String "RELATIVE" -> RELATIVE
+  | `String "PROBABILITY" -> PROBABILITY
+  | x -> raise
+           (Yojson.Basic.Util.Type_error ("Incorrect flux_kind",x))
+
 type modification =
     ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
   | UPDATE of int * Alg_expr.t Locality.annot
-  | SNAPSHOT of Alg_expr.t Ast.print_expr list
-  | STOP of Alg_expr.t Ast.print_expr list
+  | SNAPSHOT of Alg_expr.t print_expr list
+  | STOP of Alg_expr.t print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | FLUX of bool * Alg_expr.t Ast.print_expr list
-  | FLUXOFF of Alg_expr.t Ast.print_expr list
+  | FLUX of flux_kind * Alg_expr.t print_expr list
+  | FLUXOFF of Alg_expr.t print_expr list
   | CFLOWOFF of Pattern.id array
   | PLOTENTRY
-  | PRINT of
-      (Alg_expr.t Ast.print_expr list *
-       Alg_expr.t Ast.print_expr list)
+  | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
 
 type perturbation =
   { precondition:
@@ -196,8 +228,8 @@ let extract_connected_components_rule acc r =
 
 let extract_connected_components_print acc x =
   List.fold_left (fun acc -> function
-      | Ast.Str_pexpr _ -> acc
-      | Ast.Alg_pexpr e -> extract_connected_components_expr acc e)
+      | Str_pexpr _ -> acc
+      | Alg_pexpr e -> extract_connected_components_expr acc e)
     acc x
 
 let extract_connected_components_modification acc = function
@@ -227,11 +259,6 @@ let map_expr_rule f x = {
   syntactic_rule = x.syntactic_rule;
   instantiations = x.instantiations;
 }
-
-let map_expr_print f x =
-  List.map (function
-      | Ast.Str_pexpr _ as x -> x
-      | Ast.Alg_pexpr e -> Ast.Alg_pexpr (f e)) x
 
 let map_expr_modification f = function
   | ITER_RULE (e,r) -> ITER_RULE (f e, map_expr_rule f r)

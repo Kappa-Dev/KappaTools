@@ -8,7 +8,7 @@
 
 type flux_data = {
     flux_name : string;
-    flux_normalized : bool;
+    flux_kind : Primitives.flux_kind;
     flux_start : float;
     flux_hits : int array;
     flux_fluxs : float array array;

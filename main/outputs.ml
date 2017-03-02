@@ -56,7 +56,7 @@ let print_json_of_flux f flux =
       flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () = Format.fprintf
       f "@[<v>\"normalized\" : %b,@ \"uuid\" : \"%i\",@,"
-      flux.Data.flux_data.Data.flux_normalized uuid in
+      (flux.Data.flux_data.Data.flux_kind <> Primitives.ABSOLUTE) uuid in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "

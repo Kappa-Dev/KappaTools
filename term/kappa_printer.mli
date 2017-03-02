@@ -14,7 +14,7 @@ val bool_expr : ?env:Model.t -> Format.formatter ->
   (Pattern.id array list,int) Alg_expr.bool -> unit
 
 val print_expr_val :
-  ('a -> Nbr.t) -> Format.formatter -> 'a Ast.print_expr list -> unit
+  ('a -> Nbr.t) -> Format.formatter -> 'a Primitives.print_expr list -> unit
 
 val elementary_rule :
   ?env:Model.t -> Format.formatter -> Primitives.elementary_rule -> unit

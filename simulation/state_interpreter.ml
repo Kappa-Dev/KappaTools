@@ -125,7 +125,7 @@ let do_modification ~outputs env counter graph state extra modification =
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =
       if List.exists
-          (fun x -> Fluxmap.flux_has_name file x && x.Data.flux_normalized = rel)
+          (fun x -> Fluxmap.flux_has_name file x && x.Data.flux_kind = rel)
           state.flux
       then ExceptionDefn.warning
           (fun f ->
@@ -239,6 +239,8 @@ let one_rule ~outputs dt env counter graph state =
       (Rule_interpreter.get_random_state graph) state.activities in
   let rule_id = choice/2 in
   let rule = Model.get_rule env rule_id in
+  let prev_activity = Random_tree.total state.activities in
+  let act_stack = ref [] in
   let register_new_activity rd_id syntax_rd_id new_act =
     let () =
       match state.flux with
@@ -251,12 +253,17 @@ let one_rule ~outputs dt env counter graph state =
                rule.Primitives.syntactic_rule syntax_rd_id
                (
                  let cand =
-                   if fl.Data.flux_normalized &&
-                      (match classify_float old_act with
-                       | (FP_zero | FP_nan | FP_infinite) -> false
-                       | (FP_normal | FP_subnormal) -> true)
-                   then (new_act -. old_act) /. old_act
-                   else (new_act -. old_act) in
+                   match fl.Data.flux_kind with
+                   | Primitives.ABSOLUTE -> new_act -. old_act
+                   | Primitives.PROBABILITY ->
+                     let () = act_stack := (syntax_rd_id,new_act)::!act_stack in
+                    -. (old_act /. prev_activity)
+                   | Primitives.RELATIVE ->
+                     if (match classify_float old_act with
+                         | (FP_zero | FP_nan | FP_infinite) -> false
+                         | (FP_normal | FP_subnormal) -> true)
+                     then (new_act -. old_act) /. old_act
+                     else (new_act -. old_act) in
                  match classify_float cand with
                  | (FP_nan | FP_infinite) ->
                    let () =
@@ -268,6 +275,34 @@ let one_rule ~outputs dt env counter graph state =
                  | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
           l
     in Random_tree.add rd_id new_act state.activities in
+  let finalize_registration () =
+    match state.flux with
+    | [] -> ()
+    | l ->
+      let n_activity = Random_tree.total state.activities in
+      let () =
+        List.iter
+          (fun fl ->
+             let () = Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl in
+             match fl.Data.flux_kind with
+             | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
+             | Primitives.PROBABILITY ->
+               List.iter
+                 (fun (syntax_rd_id,new_act) ->
+                    Fluxmap.incr_flux_flux
+                      rule.Primitives.syntactic_rule syntax_rd_id
+                      (let cand = new_act /.n_activity in
+                       match classify_float cand with
+                       | (FP_nan | FP_infinite) ->
+                         let () =
+                           let ct = Counter.current_time counter in
+                           ExceptionDefn.warning
+                             (fun f -> Format.fprintf
+                                 f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                                 ct) in 0.
+                       | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
+                 !act_stack) l in
+      act_stack := [] in
   let () =
     if !Parameter.debugModeOn then
       Format.printf
@@ -290,15 +325,12 @@ let one_rule ~outputs dt env counter graph state =
     let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
+    let () = finalize_registration () in
     let actives = state.active_perturbations in
     let () = state.active_perturbations <- [] in
     let (stop,graph''',state') =
       perturbate ~outputs env counter graph'' state
         (List.rev_append actives extra_pert) in
-    let () =
-      List.iter
-        (fun fl -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
-        state.flux in
     let () =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
@@ -317,6 +349,8 @@ let one_rule ~outputs dt env counter graph state =
     if Counter.consecutive_null_event counter < !Parameter.maxConsecutiveClash
     then (not continue,graph,state)
     else
+      let register_new_activity rd_id _ new_act =
+        Random_tree.add rd_id new_act state.activities in
       (not continue,
        (if choice mod 2 = 1
         then Rule_interpreter.adjust_unary_rule_instances

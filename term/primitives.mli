@@ -57,21 +57,35 @@ type elementary_rule = {
       concretize *)
 }
 
+type 'alg_expr print_expr =
+    Str_pexpr of string Locality.annot
+  | Alg_pexpr of 'alg_expr Locality.annot
+
+val print_expr_to_yojson :
+  ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
+  ('a,'b) Alg_expr.e print_expr -> Yojson.Basic.json
+val print_expr_of_yojson :
+  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
+  Yojson.Basic.json -> ('a,'b) Alg_expr.e print_expr
+
+type flux_kind = ABSOLUTE | RELATIVE | PROBABILITY
+
+val flux_kind_to_yojson : flux_kind -> Yojson.Basic.json
+val flux_kind_of_yojson : Yojson.Basic.json -> flux_kind
+
 type modification =
   | ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
   | UPDATE of int * Alg_expr.t Locality.annot
-  | SNAPSHOT of Alg_expr.t Ast.print_expr list
-  | STOP of Alg_expr.t Ast.print_expr list
+  | SNAPSHOT of Alg_expr.t print_expr list
+  | STOP of Alg_expr.t print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
   (** First string is the named used by the user *)
-  | FLUX of bool * Alg_expr.t Ast.print_expr list
-  | FLUXOFF of Alg_expr.t Ast.print_expr list
+  | FLUX of flux_kind * Alg_expr.t print_expr list
+  | FLUXOFF of Alg_expr.t print_expr list
   | CFLOWOFF of Pattern.id array
   | PLOTENTRY
-  | PRINT of
-      (Alg_expr.t Ast.print_expr list *
-       Alg_expr.t Ast.print_expr list)
+  | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
 
 type perturbation =
   { precondition:

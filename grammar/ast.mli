@@ -63,10 +63,6 @@ type rule = {
 
 val flip_label : string -> string
 
-type 'alg_expr print_expr =
-  | Str_pexpr of string Locality.annot
-  | Alg_pexpr of 'alg_expr Locality.annot
-
 type ('mixture,'id) modif_expr =
   | INTRO of
       (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
@@ -78,17 +74,18 @@ type ('mixture,'id) modif_expr =
   | UPDATE_TOK of
       ('id Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
-  | STOP of ('mixture,'id) Alg_expr.e print_expr list
-  | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
+  | STOP of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | SNAPSHOT of ('mixture,'id) Alg_expr.e Primitives.print_expr list
   (*maybe later of mixture too*)
   | PRINT of
-      ((('mixture,'id) Alg_expr.e print_expr list) *
-       (('mixture,'id) Alg_expr.e print_expr list))
+      (('mixture,'id) Alg_expr.e Primitives.print_expr list) *
+       (('mixture,'id) Alg_expr.e Primitives.print_expr list)
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Locality.annot)
   | CFLOWMIX of (bool * 'mixture Locality.annot)
-  | FLUX of bool * ('mixture,'id) Alg_expr.e print_expr list
-  | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
+  | FLUX of
+      Primitives.flux_kind * ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | FLUXOFF of ('mixture,'id) Alg_expr.e Primitives.print_expr list
 
 type ('mixture,'id) perturbation =
   (('mixture,'id) Alg_expr.bool Locality.annot *

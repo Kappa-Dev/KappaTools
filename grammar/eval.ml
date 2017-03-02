@@ -161,11 +161,11 @@ let compile_print_expr contact_map domain ex =
   List.fold_right
     (fun el (domain,out) ->
        match el with
-       | Ast.Str_pexpr s -> (domain,Ast.Str_pexpr s::out)
-       | Ast.Alg_pexpr ast_alg ->
+       | Primitives.Str_pexpr s -> (domain,Primitives.Str_pexpr s::out)
+       | Primitives.Alg_pexpr ast_alg ->
          let (domain', alg) =
            compile_alg contact_map domain ast_alg in
-         (domain',(Ast.Alg_pexpr alg::out)))
+         (domain',(Primitives.Alg_pexpr alg::out)))
     ex (domain,[])
 
 let cflows_of_label

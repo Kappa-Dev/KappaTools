@@ -17,5 +17,5 @@ digraph G{ label="Flux map" ; labelloc="t" ; node [shape=box,style=filled,fillco
 "a.c" -> "a.c" [weight=0,label="-0.012",color=red3,arrowhead=tee];
 "a.c" -> "mod x2" [weight=0,label="0.167",color=green3,arrowhead=normal];
 "mod x2" -> "a.c" [weight=0,label="0.001",color=green3,arrowhead=normal];
-"mod x2" -> "mod x2" [weight=0,label="-0.118",color=red3,arrowhead=tee];
+"mod x2" -> "mod x2" [weight=0,label="-0.116",color=red3,arrowhead=tee];
 }

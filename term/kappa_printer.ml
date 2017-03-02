@@ -31,14 +31,14 @@ let bool_expr ?env =
 
 let print_expr ?env f e =
   let aux f = function
-    | Ast.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
-    | Ast.Alg_pexpr (alg,_) -> alg_expr ?env f alg
+    | Primitives.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
+    | Primitives.Alg_pexpr (alg,_) -> alg_expr ?env f alg
   in Pp.list (fun f -> Format.fprintf f ".") aux f e
 
 let print_expr_val alg_val f e =
   let aux f = function
-    | Ast.Str_pexpr (str,_) -> Format.pp_print_string f str
-    | Ast.Alg_pexpr (alg,_) ->
+    | Primitives.Str_pexpr (str,_) -> Format.pp_print_string f str
+    | Primitives.Alg_pexpr (alg,_) ->
       Nbr.print f (alg_val alg)
   in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 
@@ -146,10 +146,13 @@ let modification ?env f m =
     Format.fprintf f "$SNAPSHOT %a" (print_expr ?env) fn
   | Primitives.STOP fn ->
     Format.fprintf f "$STOP %a" (print_expr ?env) fn
-  | Primitives.FLUX (relative,fn) ->
+  | Primitives.FLUX (kind,fn) ->
     Format.fprintf
       f "$FLUX %a %t[true]" (print_expr ?env) fn
-      (fun f -> if not relative then Format.fprintf f "\"absolute\" ")
+      (fun f -> match kind with
+         | Primitives.ABSOLUTE -> Format.fprintf f "\"absolute\" "
+         | Primitives.RELATIVE -> ()
+         | Primitives.PROBABILITY -> Format.fprintf f "\"probability\" ")
   | Primitives.FLUXOFF fn ->
     Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
   | Primitives.CFLOW (_name,cc,_) ->

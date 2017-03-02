@@ -62,10 +62,6 @@ type rule = {
 
 let flip_label str = str^"_op"
 
-type 'alg_expr print_expr =
-    Str_pexpr of string Locality.annot
-  | Alg_pexpr of 'alg_expr Locality.annot
-
 type ('mixture,'id) modif_expr =
   | INTRO of
       (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
@@ -77,16 +73,17 @@ type ('mixture,'id) modif_expr =
   | UPDATE_TOK of
       ('id Locality.annot *
        ('mixture,'id) Alg_expr.e Locality.annot)
-  | STOP of ('mixture,'id) Alg_expr.e print_expr list
-  | SNAPSHOT of ('mixture,'id) Alg_expr.e print_expr list
+  | STOP of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | SNAPSHOT of ('mixture,'id) Alg_expr.e Primitives.print_expr list
   | PRINT of
-      ((('mixture,'id) Alg_expr.e print_expr list) *
-       (('mixture,'id)  Alg_expr.e print_expr list))
+      (('mixture,'id) Alg_expr.e Primitives.print_expr list) *
+       (('mixture,'id)  Alg_expr.e Primitives.print_expr list)
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Locality.annot)
   | CFLOWMIX of (bool * 'mixture Locality.annot)
-  | FLUX of bool * ('mixture,'id) Alg_expr.e print_expr list
-  | FLUXOFF of ('mixture,'id) Alg_expr.e print_expr list
+  | FLUX of
+      Primitives.flux_kind * ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | FLUXOFF of ('mixture,'id) Alg_expr.e Primitives.print_expr list
 
 type ('mixture,'id) perturbation =
   (('mixture,'id) Alg_expr.bool Locality.annot *
@@ -546,16 +543,6 @@ let edit_rule_of_yojson r =
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect AST edit rule",x))
-let print_expr_to_json f_mix f_var = function
-  | Str_pexpr s -> string_annot_to_json s
-  | Alg_pexpr a -> Locality.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) a
-
-let print_expr_of_json f_mix f_var x =
-  try Str_pexpr (string_annot_of_json x)
-  with Yojson.Basic.Util.Type_error _ ->
-  try Alg_pexpr (Locality.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) x)
-  with Yojson.Basic.Util.Type_error _ ->
-    raise (Yojson.Basic.Util.Type_error ("Incorrect print expr",x))
 
 let modif_to_json f_mix f_var = function
   | INTRO (alg,mix) ->
@@ -575,23 +562,26 @@ let modif_to_json f_mix f_var = function
             Locality.annot_to_json f_var id;
             Locality.annot_to_json (Alg_expr.e_to_yojson f_mix f_var) alg ]
   | STOP l ->
-    `List (`String "STOP" :: List.map (print_expr_to_json f_mix f_var) l)
+    `List (`String "STOP" ::
+           List.map (Primitives.print_expr_to_yojson f_mix f_var) l)
   | SNAPSHOT l ->
-    `List (`String "SNAPSHOT" :: List.map (print_expr_to_json f_mix f_var) l)
+    `List (`String "SNAPSHOT" ::
+           List.map (Primitives.print_expr_to_yojson f_mix f_var) l)
   | PRINT (file,expr) ->
     `List [ `String "PRINT";
-            JsonUtil.of_list (print_expr_to_json f_mix f_var) file;
-            JsonUtil.of_list (print_expr_to_json f_mix f_var) expr ]
+            JsonUtil.of_list (Primitives.print_expr_to_yojson f_mix f_var) file;
+            JsonUtil.of_list (Primitives.print_expr_to_yojson f_mix f_var) expr ]
   | PLOTENTRY -> `String "PLOTENTRY"
   | CFLOWLABEL (b,id) ->
     `List [ `String "CFLOWLABEL"; `Bool b; string_annot_to_json id ]
   | CFLOWMIX (b,m) ->
     `List [ `String "CFLOW"; `Bool b; Locality.annot_to_json f_mix m ]
   | FLUX (b,file) ->
-    `List [ `String "FLUX"; `Bool b;
-            JsonUtil.of_list (print_expr_to_json f_mix f_var) file ]
+    `List [ `String "FLUX"; Primitives.flux_kind_to_yojson b;
+            JsonUtil.of_list (Primitives.print_expr_to_yojson f_mix f_var) file]
   | FLUXOFF file ->
-    `List (`String "FLUXOFF" :: List.map (print_expr_to_json f_mix f_var) file)
+    `List (`String "FLUXOFF" ::
+           List.map (Primitives.print_expr_to_yojson f_mix f_var) file)
 
 let modif_of_json f_mix f_var = function
   | `List [ `String "INTRO"; alg; mix ] ->
@@ -611,22 +601,23 @@ let modif_of_json f_mix f_var = function
        (Locality.annot_of_json f_var id,
         Locality.annot_of_json (Alg_expr.e_of_yojson f_mix f_var) alg)
   | `List (`String "STOP" :: l) ->
-    STOP (List.map (print_expr_of_json f_mix f_var) l)
+    STOP (List.map (Primitives.print_expr_of_yojson f_mix f_var) l)
   | `List (`String "SNAPSHOT" :: l) ->
-    SNAPSHOT (List.map (print_expr_of_json f_mix f_var) l)
+    SNAPSHOT (List.map (Primitives.print_expr_of_yojson f_mix f_var) l)
   | `List [ `String "PRINT"; file; expr ] ->
      PRINT
-       (JsonUtil.to_list (print_expr_of_json f_mix f_var) file,
-        JsonUtil.to_list (print_expr_of_json f_mix f_var) expr)
+       (JsonUtil.to_list (Primitives.print_expr_of_yojson f_mix f_var) file,
+        JsonUtil.to_list (Primitives.print_expr_of_yojson f_mix f_var) expr)
   | `String "PLOTENTRY" -> PLOTENTRY
   | `List [ `String "CFLOWLABEL"; `Bool b; id ] ->
      CFLOWLABEL (b, string_annot_of_json id)
   | `List [ `String "CFLOW"; `Bool b; m ] ->
      CFLOWMIX (b, Locality.annot_of_json f_mix m)
-  | `List [ `String "FLUX"; `Bool b; file ] ->
-     FLUX (b, JsonUtil.to_list (print_expr_of_json f_mix f_var) file)
+  | `List [ `String "FLUX"; b; file ] ->
+    FLUX (Primitives.flux_kind_of_yojson b,
+          JsonUtil.to_list (Primitives.print_expr_of_yojson f_mix f_var) file)
   | `List (`String "FLUXOFF" :: file) ->
-     FLUXOFF (List.map (print_expr_of_json f_mix f_var) file)
+     FLUXOFF (List.map (Primitives.print_expr_of_yojson f_mix f_var) file)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid modification",x))
 
 let merge_internals =

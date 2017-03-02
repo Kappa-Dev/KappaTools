@@ -1196,9 +1196,9 @@ and bool_expr_of_ast sigs tok algs ?max_allowed_var = function
        alg_expr_of_ast sigs tok algs ?max_allowed_var y),pos
 
 let print_expr_of_ast sigs tok algs = function
-  | Ast.Str_pexpr _ as x -> x
-  | Ast.Alg_pexpr x ->
-    Ast.Alg_pexpr (alg_expr_of_ast sigs tok algs x)
+  | Primitives.Str_pexpr _ as x -> x
+  | Primitives.Alg_pexpr x ->
+    Primitives.Alg_pexpr (alg_expr_of_ast sigs tok algs x)
 
 let modif_expr_of_ast sigs tok algs contact_map modif acc =
   match modif with
