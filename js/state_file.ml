@@ -464,11 +464,23 @@ let remove_file () : unit Api.result Lwt.t =
        )
     )
 
+let load_default () : unit Lwt.t =
+ (create_file ~filename:"model.ka" ~content:"") >>=
+ (Api_common.result_map
+    ~ok:(fun _ () -> Lwt.return_unit)
+    ~error:(fun _ (errors : Api_types_j.errors) ->
+        let msg =
+          Format.sprintf
+            "State_file.load_default : creating default file error %s"
+            (Api_types_j.string_of_errors errors) in
+        let () = Common.debug (Js.string msg) in
+        Lwt.return_unit))
+
 let load_files () : unit Lwt.t =
   let files = Common_state.url_args "files" in
   let rec add_files files load_file : unit Lwt.t =
     match files with
-    | [] -> Lwt.return_unit
+    | [] -> load_default ()
     | filename::files ->
       let content = "" in
       (create_file ~filename ~content) >>=
