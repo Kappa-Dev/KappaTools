@@ -13,10 +13,10 @@ function main=main()
 %% rule rates are corrected by the number of automorphisms in the lhs of rules
 
 
-tinit=0.000000;
-tend=1.000000;
-initialstep=0.000001;
-period_t_point=0.100000;
+tinit=0;
+tend=1;
+initialstep=1e-06;
+period_t_point=0.1;
 
 global nodevar
 nodevar=3;
@@ -164,8 +164,8 @@ dydt(1)=dydt(1)+k(1)*y(1);
 % rule    : expo3
 % reaction:  ->  | 2.2:t + (- 1.1):t 
 
-dydt(2)=dydt(2)+k(3)*((-1.100000));
-dydt(2)=dydt(2)+k(3)*(2.200000);
+dydt(2)=dydt(2)+k(3)*((-1.1));
+dydt(2)=dydt(2)+k(3)*(2.2);
 
 % rule    : expo2
 % reaction:  ->  | 2:t + (- |t|):t 

@@ -402,7 +402,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
       | Alg_expr.CONST (Nbr.I64 n) ->
         Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
       | Alg_expr.CONST (Nbr.F f) ->
-        Loggers.fprintf logger "<cn type=\"real\"> %f </cn>" f
+        Loggers.fprintf logger "<cn type=\"real\"> %g </cn>" f
       | Alg_expr.ALG_VAR x ->
         begin
           let id =

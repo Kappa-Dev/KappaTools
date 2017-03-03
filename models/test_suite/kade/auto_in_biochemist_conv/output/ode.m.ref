@@ -13,10 +13,10 @@ function main=main()
 %% rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well
 
 
-tinit=0.000000;
-tend=1.000000;
-initialstep=0.000001;
-period_t_point=0.010000;
+tinit=0;
+tend=1;
+initialstep=1e-06;
+period_t_point=0.01;
 
 global nodevar
 nodevar=7;
@@ -33,7 +33,7 @@ t = 0.000000;
 
 init(7)=t;
 init(1)=(1*6); % B()
-init(2)=(1*4.500000); % A()
+init(2)=(1*4.5); % A()
 init(4)=(1*10); % E(r)
 init(3)=(1*100); % R(e, r)
 var(2)=(1*(init(3)+init(5)));

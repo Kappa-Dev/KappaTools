@@ -312,7 +312,7 @@ let rec print_alg_expr ?init_mode string_of_var_id logger alg_expr network_handl
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
       | Alg_expr.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
-      | Alg_expr.CONST (Nbr.F f) -> Loggers.fprintf logger "%f" f
+      | Alg_expr.CONST (Nbr.F f) -> Loggers.fprintf logger "%g" f
       | Alg_expr.ALG_VAR x ->
         Loggers.fprintf
           logger "var(%i)"

@@ -13,10 +13,10 @@ function main=main()
 %% rule rates are corrected by the number of automorphisms in the lhs of rules
 
 
-tinit=0.000000;
-tend=1.000000;
-initialstep=0.000001;
-period_t_point=0.010000;
+tinit=0;
+tend=1;
+initialstep=1e-06;
+period_t_point=0.01;
 
 global nodevar
 nodevar=6;
@@ -33,7 +33,7 @@ t = 0.000000;
 
 init(6)=t;
 init(1)=(1*6); % B(x, y)
-init(2)=(1*4.500000); % A(x)
+init(2)=(1*4.5); % A(x)
 var(1)=((1*(((init(2)+init(3))+init(4))+(2*init(5))))*t);
 
 global k
