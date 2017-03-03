@@ -178,3 +178,9 @@ class type manager =
     inherit manager_project
     inherit manager_simulation
   end;;
+
+class type concrete_manager =
+  object
+    inherit manager
+    method terminate : unit -> unit
+  end

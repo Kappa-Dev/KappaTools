@@ -8,6 +8,7 @@
 
 (** An implementation of the the simulation
     of the simulation runtime. *)
+
 type spec
 
 (** Get the label of t.  This is useful when
@@ -25,15 +26,14 @@ val read_spec : string -> spec option
 (** Given a string specification of t (e.g. read_t or t_id)
     configure the current manager.
 *)
-val set_manager : string -> unit Api.result Lwt.t
+val create_spec : load:bool -> string -> unit Api.result Lwt.t
 (** Create a runtime to be used by the system *)
-val create_manager : string -> spec Api.result
+val create_manager : spec -> Api.concrete_manager Api.result Lwt.t
 (** Get the current manager.  It is assumed that
     when the system is initalized this is set to a
     default, which is currently default web worker
     as it is provides the fastest simulation. *)
-val get_manager : unit -> Api.manager
-(** Get the t which currently serves as the runtime. *)
+
 type model = { model_current : spec ; model_runtimes : spec list ; }
 (** List available runtimes *)
 val model : model React.signal

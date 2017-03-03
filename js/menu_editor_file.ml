@@ -187,7 +187,7 @@ let content () : [> Html_types.div ] Tyxml_js.Html5.elt list =
                   (Html.a_disabled ())
                   (React.S.map
                      (fun model ->
-                        match model.State_project.model_current with
+                        match model.State_project.model_project_id with
                         | Some _ -> false
                         | None -> true)
                      State_project.model

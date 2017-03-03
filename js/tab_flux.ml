@@ -49,81 +49,42 @@ let configuration () : Widget_export.configuration =
         State_simulation.model ;
   }
 
-let xml () =
-  let flux_select =
-    Tyxml_js.R.Html.select
-      ~a:[ Html.a_class ["form-control"]
-         ; Html.a_id select_id ]
-      (let flux_list, flux_handle = ReactiveData.RList.create [] in
-       let _ = React.S.map
-           (fun _ ->
-              State_simulation.when_ready
-                ~label:__LOC__
-                (fun
-                  manager
-                  project_id
-                  simulation_id ->
-                  (manager#simulation_catalog_flux_map
-                     project_id
-                     simulation_id
-                  ) >>=
-                  (Api_common.result_bind_lwt
-                     ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
-                         let () = ReactiveData.RList.set
-                             flux_handle
+let flux_list, flux_handle = ReactiveData.RList.create []
+let _ = React.S.map
+    (fun _ ->
+       State_simulation.when_ready
+         ~label:__LOC__
+         (fun manager project_id simulation_id ->
+           (manager#simulation_catalog_flux_map project_id simulation_id) >>=
+           (Api_common.result_bind_lwt
+              ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
+                  let () = ReactiveData.RList.set
+                      flux_handle
+                      (match data.Api_types_t.flux_map_ids with
+                       | [] -> []
+                       | head::[] -> [Html.h4
+                                        [ Html.pcdata
+                                            (Ui_common.option_label
+                                               head)]]
+                       |_::_::_ as l -> [
+                           Html.select
+                             ~a:[ Html.a_class ["form-control"]
+                                ; Html.a_id select_id ]
                              (List.mapi
                                 (fun i id -> Html.option
-                                  ~a:[ Html.a_value (string_of_int i) ]
-                                  (Html.pcdata
-                                     (Ui_common.option_label id)))
-                                data.Api_types_t.flux_map_ids
-                             )
-                         in
-                         Lwt.return (Api_common.result_ok ()))
-                       )
-                  )
+                                    ~a:[ Html.a_value (string_of_int i) ]
+                                    (Html.pcdata
+                                       (Ui_common.option_label id))) l) ])
+                  in
+                  Lwt.return (Api_common.result_ok ()))
            )
-       State_simulation.model in
-       flux_list
-      )
-  in
+         )
+    )
+    State_simulation.model
+
+let xml () =
   let flux_label =
-    Tyxml_js.R.Html.li
-      ~a:[ Html.a_class ["list-group-item"] ]
-      (let flux_list, flux_handle = ReactiveData.RList.create [] in
-       let _ = React.S.map
-           (fun _ ->
-              State_simulation.when_ready
-                ~label:__LOC__
-                (fun
-                  manager
-                  project_id
-                  simulation_id ->
-                  (manager#simulation_catalog_flux_map
-                     project_id
-                     simulation_id
-                  ) >>=
-                  (Api_common.result_bind_lwt
-                     ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
-                         let () =
-                           ReactiveData.RList.set
-                             flux_handle
-                           (match data.Api_types_t.flux_map_ids with
-                              head::[] -> [Html.h4
-                                             [ Html.pcdata
-                                                 (Ui_common.option_label
-                                                    head)]]
-                            | _ -> [flux_select]
-                           )
-                         in
-                         Lwt.return (Api_common.result_ok ()))
-                  )
-                )
-           )
-       in
-       flux_list
-      )
-  in
+    Tyxml_js.R.Html.li ~a:[ Html.a_class ["list-group-item"] ] flux_list in
   let checkbox =
     Html.input ~a:[ Html.a_id "checkbox_self_influence"
                   ; Html.a_class ["checkbox-control"]

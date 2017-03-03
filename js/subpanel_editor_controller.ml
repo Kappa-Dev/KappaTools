@@ -23,7 +23,7 @@ let set_manager (runtime_id : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_runtime.set_manager runtime_id) >>=
+         (State_runtime.create_spec ~load:true runtime_id) >>=
        (fun _ -> State_project.sync ()) >>=
        (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
        (fun _ -> Lwt.return_unit)

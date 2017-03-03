@@ -8,173 +8,126 @@
 
 open Lwt.Infix
 
-type state = { project_id : Api_types_j.project_id option ;
-               project_catalog : Api_types_j.project_catalog ;
-               project_contact_map : Api_types_j.contact_map option ;
-             }
+type a_project = {
+  project_id : Api_types_j.project_id;
+  project_manager : Api.concrete_manager;
+}
 
-type model = { model_current : Api_types_j.project_id option ;
-               model_project_ids : Api_types_j.project_id list ;
-               model_contact_map : Api_types_j.contact_map option ;
-             }
+type state = {
+  project_current : a_project option;
+  project_catalog : a_project list;
+  project_contact_map : Api_types_j.contact_map option;
+}
+
+type model = {
+  model_project_id : Api_types_j.project_id option ;
+  model_project_ids : Api_types_j.project_id list ;
+  model_contact_map : Api_types_j.contact_map option ;
+}
+
+let project_equal a b = a.project_id = b.project_id
+let catalog_equal = List.for_all2 project_equal
+let state_equal a b =
+  Option_util.equal project_equal a.project_current b.project_current &&
+  catalog_equal a.project_catalog b.project_catalog &&
+  Option_util.equal (=) a.project_contact_map b.project_contact_map
 
 let state , set_state =
-  React.S.create
-    { project_id = None ;
-      project_catalog = { Api_types_j.project_list = [] ; } ;
-      project_contact_map = None ; }
+  React.S.create ~eq:state_equal
+    {
+    project_current = None;
+    project_catalog = [];
+    project_contact_map = None;
+  }
 
-let update_state
-  (manager : Api.manager)
-  (project_id : Api_types_j.project_id)
-  (project_catalog : Api_types_j.project_catalog) : unit Api.result Lwt.t =
-  (manager#project_parse project_id) >>=
-  (Api_common.result_map
-     ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
-         let () = set_state { project_id = Some project_id ;
-                              project_catalog = project_catalog ;
-                              project_contact_map = Some project_parse.Api_types_j.project_parse_contact_map ;
-                            } in
-
-         Lwt.return (Api_common.result_ok ()))
-     ~error:(fun _ errors ->
-         let () = set_state { project_id = Some project_id ;
-                              project_catalog = project_catalog ;
-                              project_contact_map = None ;
-                            } in
-                Lwt.return (Api_common.result_messages errors))
-  )
+let update_state project_id project_catalog : unit Api.result Lwt.t =
+  try
+    let me = List.find (fun x -> x.project_id = project_id) project_catalog in
+    me.project_manager#project_parse project_id >>=
+    (Api_common.result_map
+       ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
+           let () =
+             set_state {
+               project_current = Some me;
+               project_catalog;
+               project_contact_map =
+                 Some project_parse.Api_types_j.project_parse_contact_map ;
+             } in
+           Lwt.return (Api_common.result_ok ()))
+       ~error:(fun _ errors ->
+           let () = set_state { project_current = Some me ;
+                                project_catalog = project_catalog ;
+                                project_contact_map = None ;
+                              } in
+           Lwt.return (Api_common.result_messages errors))
+    )
+  with Not_found ->
+    Lwt.return (Api_common.result_error_msg
+                  ("Project "^project_id^" does not exists"))
 
 let create_project (project_id : Api_types_j.project_id) : unit Api.result Lwt.t =
-  let manager = State_runtime.get_manager () in
-  (manager#project_catalog ())
-  >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (project_catalog : Api_types_j.project_catalog) ->
-         if List.mem project_id
-             (List.map
-                (fun project -> project.Api_types_j.project_id)
-                project_catalog.Api_types_j.project_list) then
-           Lwt.return (Api_common.result_ok project_catalog)
-         else
-           (manager#project_create
-              { Api_types_j.project_parameter_project_id = project_id })
-           >>=
+  let catalog = (React.S.value state).project_catalog in
+  if List.exists (fun x -> x.project_id = project_id) catalog then
+    Lwt.return (Api_common.result_ok ())
+  else
+    let spec = (React.S.value (State_runtime.model)).State_runtime.model_current in
+    State_runtime.create_manager spec >>=
+    (Api_common.result_bind_lwt
+       ~ok:(fun project_manager ->
+           project_manager#project_create
+             { Api_types_j.project_parameter_project_id = project_id } >>=
            (Api_common.result_bind_lwt
-              ~ok:(fun (_ : Api_types_j.project_id) ->
-                  (manager#project_catalog ())
-                )
-           )
-       )
-  )
-  >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (project_catalog : Api_types_j.project_catalog) ->
-         update_state manager project_id project_catalog
-       )
-  )
+              ~ok:(fun project_id ->
+                  update_state project_id ({project_id; project_manager;}::catalog)
+                ))))
 
 let model : model React.signal =
   React.S.map
     (fun state ->
        let model_project_ids =
-         List.map (fun p -> p.Api_types_j.project_id)
-           state.project_catalog.Api_types_j.project_list
-       in
-       { model_current = state.project_id ;
+         List.map (fun p -> p.project_id) state.project_catalog in
+       { model_project_id =
+           Option_util.map (fun x -> x.project_id) state.project_current;
          model_project_ids = model_project_ids ;
          model_contact_map = state.project_contact_map ;
        })
     state
 
 let set_project (project_id : Api_types_j.project_id) : unit Api.result Lwt.t =
-  let manager = State_runtime.get_manager () in
-  (manager#project_catalog ())
-  >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (project_catalog : Api_types_j.project_catalog) ->
-         if List.mem project_id
-             (List.map
-                (fun project -> project.Api_types_j.project_id)
-                (React.S.value state).project_catalog.Api_types_j.project_list)
-         then
-           update_state manager project_id project_catalog
-         else
-           let error_msg : string =
-             Format.sprintf "Project %s does not exist" project_id in
-           Lwt.return (Api_common.result_error_msg error_msg)
-       )
-  )
+  update_state project_id (React.S.value state).project_catalog
 
 let sync () : unit Api.result Lwt.t =
-  let manager = State_runtime.get_manager () in
-  let old_state = React.S.value state in
-  (manager#project_catalog ()) >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (catalog : Api_types_j.project_catalog) ->
-         let new_state (* (new_state,error) *) =
-           let current_project_list = catalog.Api_types_j.project_list in
-           (* Use the current file's metadata if it is still in the directory. *)
-           let current_project =
-             match old_state.project_id with
-             | None -> None
-             | Some project_id ->
-               List_util.find_option
-                 (fun p -> p.Api_types_j.project_id = project_id)
-                 current_project_list in
-           match current_project with
-           | None ->
-             Lwt.return
-               (Api_common.result_ok
-                  ({ project_id = None ;
-                     project_catalog = catalog ;
-                     project_contact_map = None ;
-                   },None))
-           | Some project ->
-             (* need to fetch contact map here *)
-             (manager#project_parse project.Api_types_j.project_id) >>=
-             (Api_common.result_map
-                ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
-                    Lwt.return
-                      (Api_common.result_ok
-                         ({ project_id = Some project.Api_types_j.project_id ;
-                            project_catalog = catalog ;
-                            project_contact_map = Some project_parse.Api_types_j.project_parse_contact_map ;
-                          },None))
-                  )
-                ~error:(fun _ (errors : Api_types_j.errors) ->
-                    Lwt.return
-                      (Api_common.result_ok
-                         ({ project_id = Some project.Api_types_j.project_id ;
-                            project_catalog = catalog ;
-                            project_contact_map = None ;
-                          },Some errors))
-                  )
-             )
-         in
-         new_state >>=
-         (Api_common.result_bind_lwt
-            ~ok:(fun (new_state,error) ->
-                let () = set_state new_state in
-                match error with
-                | None -> Lwt.return (Api_common.result_ok ())
-                | Some error -> Lwt.return (Api_common.result_messages error)
-              )
-         )
-       )
-  )
+  match (React.S.value state).project_current with
+  | None -> Lwt.return (Api_common.result_ok ())
+  | Some current ->
+    current.project_manager#project_parse current.project_id >>=
+    (Api_common.result_bind_lwt
+       ~ok:(fun (project_parse : Api_types_j.project_parse) ->
+           let () =
+             set_state { (React.S.value state) with
+                         project_contact_map =
+                           Some project_parse.Api_types_j.project_parse_contact_map; } in
+           Lwt.return (Api_common.result_ok ())))
 
-
-let remove_project() : unit Api.result Lwt.t =
-  let manager = State_runtime.get_manager () in
-  match (React.S.value state).project_id with
+let remove_project () : unit Api.result Lwt.t =
+  match (React.S.value state).project_current with
   | None ->
     let error_msg : string =
       Format.sprintf "Unable to remove project as none is selected" in
     Lwt.return (Api_common.result_error_msg error_msg)
-  | Some project_id ->
-    (manager#project_delete project_id) >>=
-    (Api_common.result_bind_lwt ~ok:(fun _-> sync ())
+  | Some current ->
+    (current.project_manager#project_delete current.project_id) >>=
+    (Api_common.result_bind_lwt ~ok:(fun () ->
+         let project_catalog =
+           List.filter (fun x -> x.project_id <> current.project_id)
+             (React.S.value state).project_catalog in
+         let project_current = match project_catalog with
+           | [] -> None
+           | h :: _ -> Some h in
+         let () =
+           set_state
+             { project_current; project_catalog; project_contact_map = None } in
+         sync ())
     )
 
 let init () : unit Lwt.t =
@@ -220,16 +173,15 @@ let with_project :
   (Api.manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t  =
   fun ~label handler ->
-    let manager = State_runtime.get_manager () in
-    match (React.S.value model).model_current with
+    match (React.S.value state).project_current with
     | None ->
       let error_msg : string =
         Format.sprintf
           "Failed %s due to unavailable project."
-          label
-      in
+          label in
       Lwt.return (Api_common.result_error_msg error_msg)
-    | Some project_id -> handler manager project_id
+    | Some current ->
+      handler (current.project_manager :> Api.manager) current.project_id
 
 let close_all () : unit Api.result Lwt.t =
-  failwith ""
+  failwith "State_project.close_all"

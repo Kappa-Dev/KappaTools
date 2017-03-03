@@ -26,4 +26,5 @@ class manager
     method post_message (message_text : string) : unit =
       worker##postMessage(message_text)
     inherit Mpi_api.manager ~timeout:timeout ()
+    method terminate () = worker##terminate
   end

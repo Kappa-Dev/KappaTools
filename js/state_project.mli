@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 val create_project : Api_types_j.project_id -> unit Api.result Lwt.t
-type model = { model_current : Api_types_j.project_id option ;
+type model = { model_project_id : Api_types_j.project_id option ;
                model_project_ids : Api_types_j.project_id list ;
                model_contact_map : Api_types_j.contact_map option ;
              }
@@ -18,5 +18,7 @@ val remove_project : unit -> unit Api.result Lwt.t
 val init : unit -> unit Lwt.t
 (* to synch state of application with runtime *)
 val sync : unit -> unit Api.result Lwt.t
-val with_project : label:string -> (Api.manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) -> 'a  Api.result Lwt.t
+val with_project : label:string ->
+  (Api.manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) ->
+  'a  Api.result Lwt.t
 val close_all : unit -> unit Api.result Lwt.t

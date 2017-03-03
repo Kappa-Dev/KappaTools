@@ -6,8 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
-
 module Html = Tyxml_js.Html5
 
 let project_id_modal_id = "menu-editor-project-id-modal"
@@ -43,9 +41,10 @@ let dropdown (model : State_project.model) =
   let project_li =
     List.map
       (fun (project_id : Api_types_j.project_id) ->
-         let current_project_id = model.State_project.model_current in
          let li_class =
-           if current_project_id = Some project_id  then
+           if match model.State_project.model_project_id with
+             | Some current_project_id -> current_project_id = project_id
+             | None -> false then
              [ "active" ]
            else
              []

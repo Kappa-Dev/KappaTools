@@ -389,4 +389,5 @@ class manager
         (fun result -> `SimulationStart result)
 
   inherit Mpi_api.manager_base ()
+  method terminate () = () (*TODO*)
   end

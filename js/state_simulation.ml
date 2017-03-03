@@ -203,7 +203,7 @@ let augment_simulation_list
            simulation_id = simulation_id ;
            simulation_state = SIMULATION_STATE_READY simulation_info } :: acc
        else acc)
-    simulation_index simulation_list
+     simulation_index simulation_list
 
 (* Remove simulation from state if it not pinned or available. *)
 let restrict_simulation_list

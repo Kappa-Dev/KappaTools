@@ -508,7 +508,6 @@ class virtual  manager_base () : manager_base_type =
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
-
   end
 
 module IntMap = Mods.IntMap

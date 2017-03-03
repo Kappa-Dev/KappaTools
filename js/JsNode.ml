@@ -118,7 +118,7 @@ class manager
       | Some _ -> true
       | None -> false
 
-    method shutdown () : unit =
+    method terminate () : unit =
       match process with
       | Some process -> process##kill
       | None -> ()
