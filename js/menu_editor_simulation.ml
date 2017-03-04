@@ -181,11 +181,10 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
               Js._false)) in
     let () =
       Common.jquery_on
-        ("span[data-simulation-id]")
+        ("li[data-simulation-id]")
         "click"
         (Dom_html.handler
            (fun (event : Dom_html.event Js.t)  ->
-              (* let () = Common.debug event in *)
               let target : Dom_html.element Js.t Js.opt = event##.target in
               let simulation_id : Js.js_string Js.t Js.opt =
                 Js.Opt.bind
