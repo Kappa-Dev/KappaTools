@@ -551,26 +551,45 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
         (manager : Api.manager)
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) ->
-        let simulation_parameter = { simulation_parameter with Api_types_j.simulation_id = simulation_id } in
-        (* set state to initalize *)
-        let () = update_simulation_state simulation_id SIMULATION_STATE_INITALIZING in
-        manager#simulation_start
-          project_id
-          simulation_parameter
-        >>=
-        (Api_common.result_map
-           ~ok:(fun _ _ ->
-               let () = update_simulation_state simulation_id SIMULATION_STATE_INITALIZING in
-               Lwt.return (Api_common.result_ok ()))
-           ~error:(fun _ error_msg ->
-               let () = update_simulation_state simulation_id SIMULATION_STATE_STOPPED in
-               Lwt.return (Api_common.result_messages error_msg)))
-        >>=
-        (Api_common.result_bind_lwt ~ok:sync)
+        let on_error (error_msgs : Api_types_j.errors) : unit Api.result Lwt.t =
+          let () = update_simulation_state simulation_id SIMULATION_STATE_STOPPED in
+          (* turn the lights off *)
+          (manager#simulation_delete project_id simulation_id)>>=
+          (fun _ -> Lwt.return (Api_common.result_messages error_msgs))
+        in
+        Lwt.catch
+          (fun () ->
+             let simulation_parameter = { simulation_parameter with Api_types_j.simulation_id = simulation_id } in
+             (* set state to initalize *)
+             let () = update_simulation_state simulation_id SIMULATION_STATE_INITALIZING in
+             (manager#simulation_start project_id simulation_parameter)
+             >>=
+             (Api_common.result_bind_lwt
+                ~ok:(fun _ -> manager#simulation_info project_id simulation_id))
+             >>=
+             (Api_common.result_bind_lwt
+                ~ok:(fun simulation_status ->
+                    let simulation_state = SIMULATION_STATE_READY simulation_status in
+                    let () = update_simulation_state simulation_id simulation_state in
+                    Lwt.return (Api_common.result_ok ())
+                  )
+             )
+             >>=
+             (Api_common.result_map
+                ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
+                ~error:(fun _ error_msg ->
+                    let () = update_simulation_state simulation_id SIMULATION_STATE_STOPPED in
+                    on_error error_msg))
+             >>=
+             (Api_common.result_bind_lwt ~ok:sync)
+          )
+          (function
+            | Invalid_argument error ->
+              let msg = Format.sprintf "Runtime error %s" error in
+              on_error [(Api_common.error_msg msg)]
+            | Sys_error message -> on_error [(Api_common.error_msg message)]
+            | _ -> on_error [(Api_common.error_msg "Initialization error")])
       )
-
-
-          (* Api_common.result_bind_lwt ~ok:(fun (_ : Api_types_j.simulation_id) -> sync ()))) *)
     ~initializing:
       (fun _ _ _ ->
          let error_msg : string =
