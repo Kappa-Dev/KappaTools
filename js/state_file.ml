@@ -76,6 +76,10 @@ let get_file () : Api_types_j.file Api.result Lwt.t =
     )
 
 let send_refresh () : unit Api.result Lwt.t =
+  (* only send refresh if there is a current file *)
+  match (React.S.value directory_state).state_current with
+  | None -> Lwt.return (Api_common.result_ok ())
+  | Some _ ->
   get_file () >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (file : Api_types_j.file) ->
