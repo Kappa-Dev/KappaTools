@@ -84,6 +84,7 @@ let send_refresh () : unit Api.result Lwt.t =
     (Api_common.result_bind_lwt
        ~ok:(fun (file : Api_types_j.file) ->
            let () = Common.debug (Js.string file.Api_types_j.file_content) in
+           let () = set_refresh_file None in
            let () = set_refresh_file (Some file.Api_types_j.file_content) in
            Lwt.return (Api_common.result_ok ()))
     )
