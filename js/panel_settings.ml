@@ -254,14 +254,13 @@ module ButtonStart : Ui_common.Div = struct
     Html.button
       ~a:([ Html.a_id id ;
             Html.Unsafe.string_attrib "type" "button" ;
-            Tyxml_js.R.Html.a_class
-              (React.S.bind
-                 Subpanel_editor.is_paused
-                 (function
-                   | true -> React.S.const [ "hide" ]
-                   | false -> React.S.const [ "btn" ; "btn-default" ; ]
-                 )
-              ) ]
+            Html.a_class [ "btn" ; "btn-default" ; ];
+            (Tyxml_js.R.filter_attrib
+               (Html.a_disabled ())
+               Subpanel_editor.is_paused
+            );
+
+          ]
          )
       [ Html.cdata "start" ]
 
@@ -698,14 +697,22 @@ let footer () =
          </div>
   |}]
 let content () =
-  [[%html {|
-      <div class="panel panel-default">
-         |}[stopped_body ()]{|
-         |}[initializing_body ()]{|
-         |}[running_body ()]{|
-         |}[footer ()]{|
-     </div>
-  |}]]
+  [Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (React.S.bind
+               State_project.model
+               (fun model ->
+                  match model.State_project.model_current with
+                 | None -> React.S.const [ "hide" ]
+                 | Some _ -> React.S.const [ "panel"; "panel-default" ]
+               )
+            )
+        ]
+     [(stopped_body ());
+      (initializing_body ());
+      (running_body ());
+      (footer ()); ]
+  ]
 
 let onload () : unit =
   let () = ButtonPerturbation.onload () in

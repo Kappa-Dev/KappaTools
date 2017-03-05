@@ -183,6 +183,16 @@ let content () : [> Html_types.div ] Tyxml_js.Html5.elt list =
                Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
                Html.Unsafe.string_attrib "aria-haspopup" "true" ;
                Html.Unsafe.string_attrib "aria-expanded" "false" ;
+               (Tyxml_js.R.filter_attrib
+                  (Html.a_disabled ())
+                  (React.S.map
+                     (fun model ->
+                        match model.State_project.model_current with
+                        | Some _ -> false
+                        | None -> true)
+                     State_project.model
+                  )
+               );
              ]
           [ Html.pcdata "File" ;
             Html.span ~a:[ Html.a_class ["caret"]] [ ]
@@ -196,8 +206,7 @@ let content () : [> Html_types.div ] Tyxml_js.Html5.elt list =
           ~title_label:"New File"
           ~buttons:[file_button]
           ~body:[[%html
-                  {|<div class="input-group">|}[file_new_input]{|</div>
-                                                               |}] ;
+                  {|<div class="input-group">|}[file_new_input]{|</div>|}] ;
                 ]
       ]
   ]

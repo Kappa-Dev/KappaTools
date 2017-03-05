@@ -1,4 +1,26 @@
 open Lwt
+
+let rec stop_simulations (system_process:Kappa_facade.system_process) :
+  Api_environment.simulation list -> unit Api.result Lwt.t =
+  function
+  | [] -> Lwt.return (Api_common.result_ok ())
+  | current::sumulations ->
+    let t : Kappa_facade.t = current#get_runtime_state () in
+    (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
+    (fun result_l ->
+      (stop_simulations system_process sumulations)>>=
+      (fun result_r ->
+         match (result_l) with
+         | (`Ok _) -> Lwt.return result_r
+         | (`Error errors_l) ->
+           (Api_common.result_map
+              ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
+              ~error:(fun _ errors_r ->
+                  let errors = errors_l@errors_r in
+                  Lwt.return (Api_common.result_messages errors))
+              result_r)
+      )
+    )
 let to_project (project : Api_environment.project) =
   { Api_types_j.project_id = project#get_project_id () ;
     Api_types_j.project_version = project#get_version () ; }
@@ -86,28 +108,32 @@ object
                    Api_types_j.project_id Api.result Lwt.t)
       )
 
-  method project_delete
-      (project_id : Api_types_j.project_id) :
+  method project_delete (project_id : Api_types_j.project_id) :
     unit Api.result Lwt.t =
     Api_common.ProjectOperations.bind
       project_id
       environment
-      (fun _ ->
-         let not_project =
-           (fun project ->
-              not (Api_common.ProjectOperations.refs project_id project))
-         in
-         let projects =
-           List.filter
-             not_project
-             (Api_common.ProjectCollection.list environment)
-         in
-         let () =
-           Api_common.ProjectCollection.update
-             environment
-             projects
-         in
-         Lwt.return (Api_common.result_ok ())
+      (fun project ->
+         (stop_simulations system_process (project#get_simulations ()))>>=
+         (Api_common.result_bind_lwt
+            ~ok:(fun () ->
+                let not_project =
+                  (fun project ->
+                     not (Api_common.ProjectOperations.refs project_id project))
+                in
+                let projects =
+                  List.filter
+                    not_project
+                    (Api_common.ProjectCollection.list environment)
+                in
+                let () =
+                  Api_common.ProjectCollection.update
+                    environment
+                    projects
+                in
+                Lwt.return (Api_common.result_ok ())
+              )
+         )
       )
 
 end;;

@@ -230,3 +230,6 @@ let with_project :
       in
       Lwt.return (Api_common.result_error_msg error_msg)
     | Some project_id -> handler manager project_id
+
+let close_all () : unit Api.result Lwt.t =
+  failwith ""

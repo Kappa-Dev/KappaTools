@@ -106,6 +106,24 @@ let rec result_fold_lwt :
       (f id h)>>=
       (fun result -> result_fold_lwt ~f:f ~id:result t)
 
+let rec result_combine : unit Api.result list -> unit Api.result =
+  function
+  | [] -> result_ok ()
+  | l::t ->
+    let r = result_combine t in
+    result_map
+      ~ok:(fun _ _-> r)
+      ~error:(fun _ (data_1 : Api_types_j.errors) ->
+          result_map
+            ~ok:(fun _ _-> result_ok ())
+            ~error:(fun result_code (data_r : Api_types_j.errors) ->
+                { Api_types_j.result_data = `Error (data_1@data_r);
+                  Api_types_j.result_code = result_code }
+              )
+            r
+        )
+      l
+
 
 let md5sum text = Digest.to_hex (Digest.string text)
 

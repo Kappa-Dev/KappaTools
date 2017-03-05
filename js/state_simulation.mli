@@ -57,3 +57,4 @@ val pause_simulation : unit -> unit Api.result Lwt.t
 val stop_simulation : unit -> unit Api.result Lwt.t
 val start_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t
 val perturb_simulation : string -> unit Api.result Lwt.t
+val close_all : unit -> unit Api.result Lwt.t

@@ -175,7 +175,7 @@ let create_file
                       filename = file_metadata.Api_types_j.file_metadata_id)
                    catalog.Api_types_j.file_metadata_list
               in
-              match matching_file with
+              (match matching_file with
               | [] ->
                 (manager#file_create project_id (new_file filename content))
                 >>=
@@ -193,7 +193,10 @@ let create_file
                 (manager#file_update project_id filename file_modification)
                 >>=
                 (Api_common.result_bind_lwt
-                   ~ok:(fun _ ->
+                   ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))))
+                >>=
+                (Api_common.result_bind_lwt
+                   ~ok:(fun () ->
                        let () = set_directory_state
                            { (React.S.value directory_state) with
                              state_current = Some filename } in
@@ -484,7 +487,7 @@ let load_files () : unit Lwt.t =
   let files = Common_state.url_args "files" in
   let rec add_files files load_file : unit Lwt.t =
     match files with
-    | [] -> load_default ()
+    | [] -> Lwt.return_unit
     | filename::files ->
       let content = "" in
       (create_file ~filename ~content) >>=
@@ -571,10 +574,35 @@ let load_models () : unit Lwt.t =
              let () = Common.debug (Js.string (Format.sprintf "State_file.load_model %s" msg)) in
              add_models models load_file)
       )
-   in
-  add_models models true
+  in
+  match models with
+  [] -> load_default ()
+  |_::_ -> add_models models true
 
 let init () : unit Lwt.t =
   Lwt.return_unit >>=
   load_files >>=
   load_models
+
+let rec close_file_ids
+    (manager : Api.manager)
+    (project_id : Api_types_j.project_id) :
+  Api_types_j.simulation_id list -> unit Api.result Lwt.t =
+  function
+  | [] -> Lwt.return (Api_common.result_ok ())
+  | file_id::t ->
+    (manager#file_delete project_id file_id)>>=
+    (fun _ -> close_file_ids manager project_id t)
+
+
+let close_all () : unit Api.result Lwt.t =
+    State_project.with_project ~label:"close_all."
+      (fun manager project_id ->
+         (* get current directory *)
+         (manager#file_catalog project_id) >>=
+         (Api_common.result_bind_lwt
+            ~ok:(fun (catalog : Api_types_j.file_catalog) ->
+                let file_metadata_list = catalog.Api_types_j.file_metadata_list in
+                let file_ids = List.map (fun m -> m.Api_types_j.file_metadata_id) file_metadata_list in
+                close_file_ids manager project_id file_ids)))
+      >>= (fun _ -> sync ())

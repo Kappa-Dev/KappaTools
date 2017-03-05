@@ -118,6 +118,16 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
                  Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
                  Html.Unsafe.string_attrib "aria-haspopup" "true" ;
                  Html.Unsafe.string_attrib "aria-expanded" "false" ;
+                 (Tyxml_js.R.filter_attrib
+                    (Html.a_disabled ())
+                    (React.S.map
+                       (fun model ->
+                          match model.State_project.model_current with
+                          | Some _ -> false
+                          | None -> true)
+                       State_project.model
+                    )
+                 );
                ]
             [ Html.pcdata "Simulation" ;
               Html.span ~a:[ Html.a_class ["caret"]] [ ]

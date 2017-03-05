@@ -33,7 +33,9 @@ let close_project () : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_project.remove_project ()) >>=
+         (State_simulation.close_all())>>=
+         (fun _ -> State_file.close_all())>>=
+         (fun _ -> State_project.remove_project ()) >>=
        (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
        (fun _ -> Lwt.return_unit)
     )
