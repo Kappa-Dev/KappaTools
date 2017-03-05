@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 05 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -268,5 +268,4 @@ let main () =
     let () = Format.pp_print_flush Format.err_formatter () in raise e
 
 let () = main ()
-let _ = Alg_expr_extra.print
-let _ = LKappa_group_action.check_orbit_internal_state_permutation
+let _ = Raw_mixture_extra.pattern_to_raw_mixture

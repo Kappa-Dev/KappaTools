@@ -8,7 +8,7 @@
 
 (** Domain to navigate in the graph *)
 
-type link
+type link = UnSpec | Free | Link of int * int
 type cc
 type t = cc (**type for domain points*)
 
