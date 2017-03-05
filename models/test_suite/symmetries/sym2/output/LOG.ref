@@ -1081,19 +1081,20 @@ binding sites:
 y,x,
 Partitioned contact map (LKAPPA)
 Agent: A
-internal sites:
-
-binding sites:
-x,y,
+Partition of the sites for internal states:
+{}
+Partition of the sites for bindings states:
+{{x,y}}
 With predicate (LKAPPA)
 Agent: A
-internal sites:
-
-binding sites:
-x,y,
-Symmetries:Agent: A
-internal sites:
-
-binding sites:
-x,y,
+Partition of the sites for internal states:
+{}
+Partition of the sites for bindings states:
+{{x,y}}
+Symmetries:
+Agent: A
+Partition of the sites for internal states:
+{}
+Partition of the sites for bindings states:
+{{x,y}}
 execution finished without any exception

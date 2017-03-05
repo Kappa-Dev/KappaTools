@@ -358,25 +358,37 @@ let refine_partitioned_contact_map_in_lkappa_representation
 (******************************************************************)
 
 let print_l logger fmt signature agent l =
-  if l <> []
-  then
-    List.iter
-      (fun equ_class ->
-         let () =
-           List.iter
-             (fun site ->
+  let () = Loggers.fprintf logger "{" in
+  let size_1 =
+    match l with [l] -> true
+               | [] | _::_ -> false
+  in
+
+  let b =
+    List.fold_left
+      (fun b equ_class ->
+         let () = if b then Loggers.fprintf logger "," in
+         let () = if not size_1 then Loggers.print_newline logger in
+         let () = if not size_1 then Loggers.fprintf logger "  " in
+         let () = Loggers.fprintf logger "{" in
+         let _ =
+           List.fold_left
+             (fun b site ->
+                let () = if b then Loggers.fprintf logger "," in
                 let () = Signature.print_site signature agent fmt site in
-                let () = Loggers.fprintf logger "," in
-                ())
+                true)
+             false
              equ_class
          in
-         let () =
-           Loggers.print_newline logger
-         in
-         ())
+         let () = Loggers.fprintf logger "}" in
+         true)
+      false
       l
-  else
-     Loggers.print_newline logger
+  in
+  let () = if b && not size_1 then Loggers.print_newline logger in
+  let () = Loggers.fprintf logger "}" in
+  let () = Loggers.print_newline logger in
+  ()
 
 let print_partitioned_contact_map_in_lkappa
     logger env partitioned_contact_map =
@@ -390,10 +402,10 @@ let print_partitioned_contact_map_in_lkappa
          let () = Loggers.fprintf logger "Agent: " in
          let () = Signature.print_agent signature fmt agent in
          let () = Loggers.print_newline logger in
-         let () = Loggers.fprintf logger "internal sites:" in
+         let () = Loggers.fprintf logger "Partition of the sites for internal states:" in
          let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l1 in
-         let () = Loggers.fprintf logger "binding sites:" in
+         let () = Loggers.fprintf logger "Partition of the sites for bindings states:" in
          let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l2 in
          ()
@@ -632,6 +644,7 @@ let print_symmetries parameters env symmetries =
     Loggers.fprintf (Remanent_parameters.get_logger parameters)
       "Symmetries:"
   in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
   print_partitioned_contact_map_in_lkappa
     (Remanent_parameters.get_logger parameters)
     env symmetries
