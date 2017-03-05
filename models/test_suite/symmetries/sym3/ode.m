@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' '--with-symmetries' 'true''sym3.ka'
+%      'KaDE' 'sym3.ka' '--with-symmetries''true'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -19,7 +19,7 @@ initialstep=1e-06;
 period_t_point=1;
 
 global nodevar
-nodevar=10;
+nodevar=2;
 nvar=1;
 nobs=1;
 nrules=8;
@@ -31,8 +31,8 @@ init=sparse(nodevar,1);
 
 t = 0.000000;
 
-init(10)=t;
-init(1)=(1*10); % A(x~u?, y~u?, w~u?, t~u?)
+init(2)=t;
+init(1)=(1*10); % A(x~p?, y~p?, w~p?, t~p?)
 
 global k
 global kd
@@ -105,7 +105,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE --with-symmetries true sym3.ka\n')
+fprintf(fid,'# KaDE sym3.ka --with-symmetries true\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')
@@ -128,16 +128,8 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % A(x~u?, y~u?, w~u?, t~u?)
-Init(2) = init(2); % A(x~u?, y~p?, w~u?, t~u?)
-Init(3) = init(3); % A(x~u?, y~u?, w~p?, t~u?)
-Init(4) = init(4); % A(x~u?, y~p?, w~p?, t~u?)
-Init(5) = init(5); % A(x~u?, y~u?, w~p?, t~p?)
-Init(6) = init(6); % A(x~u?, y~p?, w~p?, t~p?)
-Init(7) = init(7); % A(x~p?, y~p?, w~p?, t~p?)
-Init(8) = init(8); % A(x~p?, y~p?, w~p?, t~u?)
-Init(9) = init(9); % A(x~p?, y~p?, w~u?, t~u?)
-Init(10) = init(10); % t
+Init(1) = init(1); % A(x~p?, y~p?, w~p?, t~p?)
+Init(2) = init(2); % t
 end
 
 
@@ -153,115 +145,7 @@ global kdun
 
 
 dydt=zeros(nodevar,1);
-
-% rule    : A(w~u,t~u) -> A(w~u,t~p)
-% reaction: A(x~p?, y~p?, w~u?, t~u?) -> A(x~p?, y~p?, w~p?, t~u?) 
-
-dydt(9)=dydt(9)-k(6)*y(9);
-dydt(8)=dydt(8)+k(6)*y(9);
-
-% rule    : A(w~u,t~u) -> A(w~p,t~u)
-% reaction: A(x~p?, y~p?, w~u?, t~u?) -> A(x~p?, y~p?, w~p?, t~u?) 
-
-dydt(9)=dydt(9)-k(5)*y(9);
-dydt(8)=dydt(8)+k(5)*y(9);
-
-% rule    : A(w~u,t~u) -> A(w~u,t~p)
-% reaction: A(x~u?, y~p?, w~u?, t~u?) -> A(x~u?, y~p?, w~p?, t~u?) 
-
-dydt(2)=dydt(2)-k(6)*y(2);
-dydt(4)=dydt(4)+k(6)*y(2);
-
-% rule    : A(w~u,t~u) -> A(w~p,t~u)
-% reaction: A(x~u?, y~p?, w~u?, t~u?) -> A(x~u?, y~p?, w~p?, t~u?) 
-
-dydt(2)=dydt(2)-k(5)*y(2);
-dydt(4)=dydt(4)+k(5)*y(2);
-
-% rule    : A(x~u,y~p) -> A(x~p,y~p)
-% reaction: A(x~u?, y~p?, w~u?, t~u?) -> A(x~p?, y~p?, w~u?, t~u?) 
-
-dydt(2)=dydt(2)-k(3)*y(2);
-dydt(9)=dydt(9)+k(3)*y(2);
-
-% rule    : A(w~p,t~u) -> A(w~p,t~p)
-% reaction: A(x~p?, y~p?, w~p?, t~u?) -> A(x~p?, y~p?, w~p?, t~p?) 
-
-dydt(8)=dydt(8)-k(8)*y(8);
-dydt(7)=dydt(7)+k(8)*y(8);
-
-% rule    : A(w~p,t~u) -> A(w~p,t~p)
-% reaction: A(x~u?, y~p?, w~p?, t~u?) -> A(x~u?, y~p?, w~p?, t~p?) 
-
-dydt(4)=dydt(4)-k(8)*y(4);
-dydt(6)=dydt(6)+k(8)*y(4);
-
-% rule    : A(x~u,y~p) -> A(x~p,y~p)
-% reaction: A(x~u?, y~p?, w~p?, t~u?) -> A(x~p?, y~p?, w~p?, t~u?) 
-
-dydt(4)=dydt(4)-k(3)*y(4);
-dydt(8)=dydt(8)+k(3)*y(4);
-
-% rule    : A(x~u,y~p) -> A(x~p,y~p)
-% reaction: A(x~u?, y~p?, w~p?, t~p?) -> A(x~p?, y~p?, w~p?, t~p?) 
-
-dydt(6)=dydt(6)-k(3)*y(6);
-dydt(7)=dydt(7)+k(3)*y(6);
-
-% rule    : A(x~u,y~u) -> A(x~u,y~p)
-% reaction: A(x~u?, y~u?, w~p?, t~p?) -> A(x~u?, y~p?, w~p?, t~p?) 
-
-dydt(5)=dydt(5)-k(2)*y(5);
-dydt(6)=dydt(6)+k(2)*y(5);
-
-% rule    : A(x~u,y~u) -> A(x~p,y~u)
-% reaction: A(x~u?, y~u?, w~p?, t~p?) -> A(x~u?, y~p?, w~p?, t~p?) 
-
-dydt(5)=dydt(5)-k(1)*y(5);
-dydt(6)=dydt(6)+k(1)*y(5);
-
-% rule    : A(w~p,t~u) -> A(w~p,t~p)
-% reaction: A(x~u?, y~u?, w~p?, t~u?) -> A(x~u?, y~u?, w~p?, t~p?) 
-
-dydt(3)=dydt(3)-k(8)*y(3);
-dydt(5)=dydt(5)+k(8)*y(3);
-
-% rule    : A(x~u,y~u) -> A(x~u,y~p)
-% reaction: A(x~u?, y~u?, w~p?, t~u?) -> A(x~u?, y~p?, w~p?, t~u?) 
-
-dydt(3)=dydt(3)-k(2)*y(3);
-dydt(4)=dydt(4)+k(2)*y(3);
-
-% rule    : A(x~u,y~u) -> A(x~p,y~u)
-% reaction: A(x~u?, y~u?, w~p?, t~u?) -> A(x~u?, y~p?, w~p?, t~u?) 
-
-dydt(3)=dydt(3)-k(1)*y(3);
-dydt(4)=dydt(4)+k(1)*y(3);
-
-% rule    : A(w~u,t~u) -> A(w~u,t~p)
-% reaction: A(x~u?, y~u?, w~u?, t~u?) -> A(x~u?, y~u?, w~p?, t~u?) 
-
-dydt(1)=dydt(1)-k(6)*y(1);
-dydt(3)=dydt(3)+k(6)*y(1);
-
-% rule    : A(w~u,t~u) -> A(w~p,t~u)
-% reaction: A(x~u?, y~u?, w~u?, t~u?) -> A(x~u?, y~u?, w~p?, t~u?) 
-
-dydt(1)=dydt(1)-k(5)*y(1);
-dydt(3)=dydt(3)+k(5)*y(1);
-
-% rule    : A(x~u,y~u) -> A(x~u,y~p)
-% reaction: A(x~u?, y~u?, w~u?, t~u?) -> A(x~u?, y~p?, w~u?, t~u?) 
-
-dydt(1)=dydt(1)-k(2)*y(1);
-dydt(2)=dydt(2)+k(2)*y(1);
-
-% rule    : A(x~u,y~u) -> A(x~p,y~u)
-% reaction: A(x~u?, y~u?, w~u?, t~u?) -> A(x~u?, y~p?, w~u?, t~u?) 
-
-dydt(1)=dydt(1)-k(1)*y(1);
-dydt(2)=dydt(2)+k(1)*y(1);
-dydt(10)=1;
+dydt(2)=1;
 
 end
 
@@ -272,7 +156,7 @@ global nobs
 global var
 obs = zeros(nobs,1);
 
-t = y(10);
+t = y(2);
 
 obs(1)=t;
 

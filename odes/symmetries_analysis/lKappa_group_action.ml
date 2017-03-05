@@ -324,6 +324,17 @@ let check_orbit
               Rule_modes.RuleModeMap.monadic_fold2
                 () ()
                 (fun () () _ w_ref w () ->
+                   (* let () =
+                     Alg_expr_extra.print
+                       (fun fmt a_opt ->
+                          match a_opt
+                          with
+                            None -> ()
+                          | Some s -> ())
+                       Format.std_formatter
+                       w
+                   in
+                      let () = Format.fprintf Format.std_formatter "\n" in*)
                    if Alg_expr_extra.necessarily_equal w_ref w
                    then (),()
                    else raise False)

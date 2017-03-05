@@ -474,6 +474,7 @@ let detect_symmetries parameters env cache
   let partitioned_contact_map_in_lkappa =
     translate_to_lkappa_representation env partitioned_contact_map
   in
+  let p' = Array.copy partitioned_contact_map_in_lkappa in
   let to_be_checked, counter, rates, correct = arrays in
   let (cache,_,_), refined_partitioned_contact_map =
     refine_partitioned_contact_map_in_lkappa_representation
@@ -482,7 +483,7 @@ let detect_symmetries parameters env cache
          ~correct ~rates hash_and_rule_list)
       (check_invariance_binding_states
          ~correct ~rates hash_and_rule_list)
-      partitioned_contact_map_in_lkappa
+      p'
   in
   (*-------------------------------------------------------------*)
   (*PRINT*)

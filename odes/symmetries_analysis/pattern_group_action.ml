@@ -8,7 +8,7 @@ let normalize_internal_states_in_raw_mixture signature cache symmetries cc =
         symmetries raw_mixture
     in
     let a,b,_ =
-      Raw_mixture_extra.raw_mixture_to_pattern cache raw_mixture unspec
+      Raw_mixture_extra.raw_mixture_to_pattern signature cache raw_mixture unspec
     in
     a,b
   | None ->

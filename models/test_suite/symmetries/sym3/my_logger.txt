@@ -656,11 +656,6 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-
-Correct:
- 1  1  1  1  1  1  1  1  1 
-To be check:
- false  true  true  true  true  true  true  true  true 
 Contact map
 agent:A
   site:t
@@ -678,18 +673,17 @@ y,x,w,t,
 binding sites:
 
 Partitioned contact map (LKAPPA)
-From LKAPPA:
 Agent: A
-internal sites:
-x,y,
-t,w,
-binding sites:
-
-With predicate
-From LKAPPA:
+Partition of the sites for internal states:
+{{t,w,x,y}}
+Partition of the sites for bindings states:
+{}
+With predicate (LKAPPA)
 Agent: A
-internal sites:
-x,y,
-t,w,
-binding sites:
-
+Partition of the sites for internal states:
+{
+  {x,y},
+  {t,w}
+}
+Partition of the sites for bindings states:
+{}

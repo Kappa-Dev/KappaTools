@@ -11,12 +11,44 @@ let divide_expr_by_int e i =
       (Alg_expr.BIN_ALG_OP
               (Operator.DIV, e, Locality.dummy_annot (Alg_expr.CONST (Nbr.I i))))
 
-type 'id corrected_rate_const =
+type ('a,'b) corrected_rate_const =
   {
     num: Nbr.t ;
     den: Nbr.t ;
-    var: 'id option
+    var: ('a,'b) Alg_expr.e Locality.annot option
   }
+
+let rec clean expr =
+  let expr = fst expr in
+  match expr
+  with
+  | Alg_expr.BIN_ALG_OP (op,a,b) ->
+    Locality.dummy_annot
+      (Alg_expr.BIN_ALG_OP
+         (op, clean a, clean b))
+  | Alg_expr.UN_ALG_OP (op,a) ->
+    Locality.dummy_annot
+      (Alg_expr.UN_ALG_OP (op, clean a))
+  | Alg_expr.STATE_ALG_OP _
+  | Alg_expr.ALG_VAR _
+  | Alg_expr.KAPPA_INSTANCE _
+  | Alg_expr.TOKEN_ID _
+  | Alg_expr.CONST _ ->
+    Locality.dummy_annot expr
+  | Alg_expr.IF (cond,yes,no) ->
+    Locality.dummy_annot
+      (Alg_expr.IF (clean_bool cond, clean yes, clean no))
+and clean_bool expr_bool=
+  let expr = fst expr_bool in
+  match expr with
+  | Alg_expr.TRUE
+  | Alg_expr.FALSE ->
+    Locality.dummy_annot expr
+  | Alg_expr.BOOL_OP (op,a,b) ->
+    Locality.dummy_annot (Alg_expr.BOOL_OP (op,clean_bool a,clean_bool b))
+  | Alg_expr.COMPARE_OP (op,a,b) ->
+    Locality.dummy_annot (Alg_expr.COMPARE_OP (op,clean a,clean b))
+
 
 let rec get_corrected_rate e =
   match e with
@@ -77,9 +109,9 @@ let rec get_corrected_rate e =
   | Alg_expr.KAPPA_INSTANCE _,_
   | Alg_expr.TOKEN_ID _,_
   | Alg_expr.IF _,_ -> None
-  | Alg_expr.ALG_VAR id,_ -> Some
+  | Alg_expr.ALG_VAR _,_ -> Some
                     {
-                      var = Some id ;
+                      var = Some e ;
                       num = Nbr.one ;
                       den = Nbr.one }
   | Alg_expr.CONST cst,_ ->
@@ -88,6 +120,9 @@ let rec get_corrected_rate e =
         num = cst ;
         den = Nbr.one
       }
+
+let get_corrected_rate e =
+  get_corrected_rate (clean e)
 
 let print pr_var f corrected_rate_const =
   match corrected_rate_const with

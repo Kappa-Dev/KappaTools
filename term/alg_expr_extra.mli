@@ -18,20 +18,20 @@ val divide_expr_by_int:
 (* I think this is enough to deal with symmetries *)
 (* We may be more complete later *)
 
-type 'a corrected_rate_const
+type ('a,'b) corrected_rate_const
 
 (* printer *)
 val print :
-  (Format.formatter -> 'a option -> unit) ->
-  Format.formatter -> 'a corrected_rate_const option -> unit
+  (Format.formatter -> ('a, 'b) Alg_expr.e Locality.annot option -> unit)
+  -> Format.formatter -> ('a,'b) corrected_rate_const option -> unit
 
 (* conversion *)
 val get_corrected_rate:
-  ('a,'b) Alg_expr.e Locality.annot -> 'b corrected_rate_const option
+  ('a,'b) Alg_expr.e Locality.annot -> ('a,'b) corrected_rate_const option
 
 (* partial equality test *)
 (* true means "yes they are equal" *)
 (* false means "either equal, or not"*)
 
 val necessarily_equal:
-  'a corrected_rate_const option -> 'a corrected_rate_const option -> bool
+  ('a,'b) corrected_rate_const option -> ('a,'b) corrected_rate_const option -> bool

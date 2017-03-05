@@ -1,7 +1,8 @@
 val raw_mixture_to_pattern:
+  Signature.s -> 
   Pattern.PreEnv.t ->
   Raw_mixture.t ->
-  (int * int) list -> 
+  (int * int) list ->
   Pattern.PreEnv.t * Pattern.cc * Pattern.id
 
 val pattern_to_raw_mixture:
