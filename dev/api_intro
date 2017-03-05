@@ -13,7 +13,7 @@ Including the KaSa machinery:
 
 In term/ directory stands all definitions the simulator works on.
 {!modules: Agent Signature Contact_map Pattern
-Instantiation Alg_expr Raw_mixture Primitives Model Kappa_printer }
+Instantiation Alg_expr Alg_expr_extra Raw_mixture Raw_mixture_extra Primitives Model Kappa_printer }
 
 In grammar/ are the parser and the compilers
 {!modules:Ast LKappa Snip Eval}
@@ -49,4 +49,4 @@ Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain Parallel_bonds Site_accross_bonds_domain}
 
 Primivites to deal with symmetries in rules and species
-{!modules: LKappa_group_action Symmetries}
+{!modules: LKappa_group_action Pattern_group_action Raw_mixture_group_action Symmetries}

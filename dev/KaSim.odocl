@@ -34,6 +34,7 @@ Instantiation
 Alg_expr
 Alg_expr_extra
 Raw_mixture
+Raw_mixture_extra
 Primitives
 Model
 Kappa_printer
@@ -85,6 +86,8 @@ Site_accross_bonds_domain
 Mvbdu_wrapper
 
 LKappa_group_action
+Raw_mixture_group_action
+Pattern_group_action
 Symmetries
 
 Export_to_KaSim
