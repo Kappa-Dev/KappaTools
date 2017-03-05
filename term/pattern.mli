@@ -8,6 +8,7 @@
 
 (** Domain to navigate in the graph *)
 
+type link
 type cc
 type t = cc (**type for domain points*)
 
@@ -119,5 +120,12 @@ val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
 
 val add_fully_specified_to_graph :
   Signature.s -> Edges.t -> cc -> Edges.t * Renaming.t
+
+val fold:
+  (pos:int -> agent_type:int -> 'a -> 'a) ->
+  (pos:int -> site:int -> link * int -> 'a -> 'a) ->
+  cc ->
+  'a ->
+  'a
 
 module Set : SetMap.Set with type elt=id

@@ -1364,3 +1364,25 @@ let minimal_env sigs contact_map =
                  else out) acc'' links
          ))
     (PreEnv.empty sigs) contact_map
+
+let fold f_agent f_site cc acc =
+  let acc =
+    Tools.array_fold_lefti
+      (fun agent_type acc list_pos ->
+        List.fold_left
+          (fun acc pos -> f_agent ~pos ~agent_type acc)
+          acc
+          list_pos
+      )
+      acc
+      cc.nodes_by_type
+  in
+  Mods.IntMap.fold
+    (fun pos intf acc ->
+       Tools.array_fold_lefti
+         (fun site acc state -> f_site ~pos ~site state acc)
+         acc
+         intf
+    )
+    cc.nodes
+    acc
