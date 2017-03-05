@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 01 2017>
+  * Last modification: Time-stamp: <Mar 05 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -55,7 +55,7 @@ sig
   type kind = Internal | Binding
 
   val compute_symmetries_from_model:
-    Remanent_parameters_sig.parameters -> 
+    Remanent_parameters_sig.parameters ->
     I.compil ->
     ('a,'b) network  ->
     Remanent_state.contact_map ->

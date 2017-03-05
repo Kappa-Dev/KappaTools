@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 03 2017>
+   * Last modification: Time-stamp: <Mar 05 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -487,7 +487,7 @@ let detect_symmetries parameters env cache
   (*-------------------------------------------------------------*)
   (*PRINT*)
   let () =
-    if Remanent_parameters.get_trace parameters
+    if true (*Remanent_parameters.get_trace parameters*)
     then
       let logger = Remanent_parameters.get_logger parameters in
       let () =
@@ -635,16 +635,44 @@ let print_cannonic_form_from_syntactic_rules
     ()
 
 
-type cache = unit (* to do *)
-let empty_cache ()  = () (* to do *)
-let representant cache symmetries species = cache, species (* to do *)
+module Cc =
+struct
+  type t = Pattern.cc
+  let compare = compare
+  let print _ _ = ()
+end
+
+module CcSetMap =
+  SetMap.Make(Cc)
+
+module CcMap = CcSetMap.Map
+
+type cache = Pattern.cc CcMap.t
+
+let empty_cache () = CcMap.empty
+
+let representant signature cache preenv_cache symmetries species =
+  match
+    CcMap.find_option species cache
+  with
+  | Some species -> cache, preenv_cache, species
+  | None ->
+    let preenv_cache, species' =
+      Pattern_group_action.normalize_internal_states_in_raw_mixture
+        signature
+        preenv_cache
+        symmetries
+        species
+    in
+    let cache  = CcMap.add species species' cache in
+    cache, preenv_cache, species'
 
 let print_symmetries parameters env symmetries =
   let () =
     Loggers.fprintf (Remanent_parameters.get_logger parameters)
       "Symmetries:"
   in
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in 
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   print_partitioned_contact_map_in_lkappa
     (Remanent_parameters.get_logger parameters)
     env symmetries

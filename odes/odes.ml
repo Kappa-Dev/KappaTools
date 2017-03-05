@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 05 2017>
 *)
 
 let local_trace = false
@@ -374,16 +374,18 @@ struct
           (I.print_chemical_species ~compil) species in
       remanent,i
 
-  let representant network species =
+  let representant compil network species =
     match network.symmetries with
     | None -> network, species
     | Some symmetries ->
       let cache = network.cache in
-      let cache, species = I.get_representant cache symmetries species in
+      let cache, species =
+        I.get_representant compil cache symmetries species
+      in
       {network with cache = cache}, species
 
   let translate_species compil species remanent =
-    let network, species = representant (snd remanent) species in
+    let network, species = representant compil (snd remanent) species in
     let remanent = fst remanent, network in
     translate_canonic_species compil
       (I.canonic_form species) species remanent
@@ -400,9 +402,11 @@ struct
       (to_be_visited, network), id
     | Some i -> remanent, i
 
-  let petrify_species compil species =
+  let petrify_species compil species remanent =
+  let network, species = representant compil (snd remanent) species in
+  let remanent = fst remanent, network in
     translate_canonic_species compil
-      (I.canonic_form species) species
+      (I.canonic_form species) species remanent 
 
   let petrify_species_list compil l remanent =
     fold_left_swap

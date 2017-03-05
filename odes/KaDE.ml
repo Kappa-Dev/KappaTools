@@ -229,7 +229,6 @@ let main () =
     let network =
       A.network_from_compil ~ignore_obs compil network
     in
-
 (*********************************************************************)
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)

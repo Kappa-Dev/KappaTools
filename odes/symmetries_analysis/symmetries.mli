@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 02 2017>
+   * Last modification: Time-stamp: <Mar 05 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -47,7 +47,8 @@ val print_cannonic_form_from_syntactic_rules:
   unit
 
 val print_symmetries:
-  Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit 
+  Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
 type cache
 val empty_cache: unit -> cache
-val representant: cache -> symmetries -> Pattern.cc ->  cache * Pattern.cc
+val representant:
+  Signature.s -> cache -> Pattern.PreEnv.t -> symmetries -> Pattern.cc ->  cache * Pattern.PreEnv.t * Pattern.cc

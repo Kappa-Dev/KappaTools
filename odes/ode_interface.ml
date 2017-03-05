@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 05 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -28,12 +28,18 @@ type cache =
     representant_cache: sym_cache
   }
 
-let get_representant cache symmetries species =
-  let rep_cache = cache.representant_cache in
-  let rep_cache, species =
-    Symmetries.representant rep_cache symmetries species
+let get_representant compil cache symmetries species =
+  let rep_cache, cc_cache, species =
+    Symmetries.representant
+      (Model.signatures compil.environment)
+      cache.representant_cache
+      cache.cc_cache
+      symmetries species
   in
-  {cache with representant_cache = rep_cache},
+  {cache with
+   representant_cache = rep_cache;
+              cc_cache = cc_cache
+  },
   species
 
 let get_cc_cache cache = cache.cc_cache
