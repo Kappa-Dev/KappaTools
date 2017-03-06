@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 
 let toggle_element

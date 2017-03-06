@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module ApiTypes = Api_types_v1_j
 module Html = Tyxml_js.Html5
 
 let navli () = []
@@ -58,12 +57,10 @@ let update
     (data : Api_types_j.contact_map)
     (contactmap : Js_contact.contact_map Js.t) : unit =
   let () = Common.debug (Js.string "updating") in
-  let site_graph : Api_types_v1_j.site_graph =
-    Api_data_v1.api_contact_map data in
   (* quick cheat to get the count of the agents *)
   let json : string =
-    Api_types_v1_j.string_of_site_graph site_graph in
-      let model = React.S.value State_project.model in
+    Api_types_j.string_of_site_graph data in
+  let model = React.S.value State_project.model in
   let contact_map = model.State_project.model_contact_map in
   let () = Common.debug (Js.string json) in
     contactmap##setData

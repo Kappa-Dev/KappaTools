@@ -58,9 +58,7 @@ let configuration_template
           let data = match
               (React.S.value current_snapshot : Api_types_j.snapshot option) with
           | None -> ""
-          | Some s ->
-            Api_data_v1.api_snapshot_kappa (Api_data_v1.api_snapshot s)
-          in
+          | Some s -> Api_data.api_snapshot_kappa s in
           Common.saveFile
             ~data:data
             ~mime:"application/json"
@@ -75,8 +73,7 @@ let configuration_template
           let data = match
               (React.S.value current_snapshot : Api_types_j.snapshot option) with
           | None -> ""
-          | Some s -> Api_data_v1.api_snapshot_dot (Api_data_v1.api_snapshot s)
-          in
+          | Some s -> Api_data.api_snapshot_dot s in
           Common.saveFile
             ~data:data
             ~mime:"text/vnd.graphviz"
@@ -234,8 +231,7 @@ let xml () =
                 match snapshot with
                 | None -> ""
                 | Some snapshot ->
-                  Api_data_v1.api_snapshot_kappa
-                    (Api_data_v1.api_snapshot snapshot))
+                  Api_data.api_snapshot_kappa snapshot)
              current_snapshot)
       ]
   in
@@ -281,18 +277,16 @@ let content () =
 let render_snapshot_graph
     (snapshot_js : Js_contact.contact_map Js.t)
     (snapshot : Api_types_j.snapshot) : unit =
-  let snapshot : Api_types_v1_j.snapshot =
-    Api_data_v1.api_snapshot snapshot in
   let () =
     Common.debug
       (Js.string
-         (Api_types_v1_j.string_of_snapshot snapshot))
+         (Api_types_j.string_of_snapshot snapshot))
   in
-  let site_graph : Api_types_v1_j.site_graph =
-    Api_data_v1.api_snapshot_site_graph snapshot in
+  let site_graph : Api_types_j.site_graph =
+    Api_data.api_snapshot_site_graph snapshot in
   match React.S.value display_format with
   | Graph ->
-    let json : string = Api_types_v1_j.string_of_site_graph site_graph in
+    let json : string = Api_types_j.string_of_site_graph site_graph in
     let model = React.S.value State_project.model in
     let contact_map = model.State_project.model_contact_map in
     snapshot_js##setData

@@ -205,8 +205,8 @@ function SiteEdge(targetNode,sourceNode){
  * DTO for Node
  */
 function Node(nodeData){
-    var that = new D3Object(nodeData.node_name);
-    that.sites = nodeData.node_sites.map(function(siteData){
+    var that = new D3Object(nodeData.site_node_name);
+    that.sites = nodeData.site_node_sites.map(function(siteData){
         return Site(siteData,that);
     });
 
