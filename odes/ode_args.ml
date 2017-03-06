@@ -76,11 +76,11 @@ let options (t :t)  : (string * Arg.spec * string) list = [
       connected agents";
 ]
 
-let build_kasa_parameters t t_common =
+let build_kasa_parameters ~called_from t t_common =
   Config.with_views_analysis := t.views ;
   Config.with_parallel_bonds_analysis := t.dbonds ;
   Config.with_site_accross_bonds_analysis := t.site_accross ;
   Config.trace := t_common.Common_args.debug ;
   Remanent_parameters.get_parameters
-    ~called_from:Remanent_parameters_sig.Server
+    ~called_from
     ()

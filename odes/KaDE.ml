@@ -7,7 +7,7 @@ module A = Odes.Make (Ode_interface)
 
 let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
 
-let main () =
+let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
@@ -154,10 +154,7 @@ let main () =
       A.init compil
     in
     let parameters =
-      (* TO DO *)
-      (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY
-        ANALYSIS *)
-      Ode_args.build_kasa_parameters ode_args common_args
+      Ode_args.build_kasa_parameters ~called_from ode_args common_args
     in
     let network =
       if ode_args.Ode_args.with_symmetries
@@ -184,20 +181,6 @@ let main () =
         let parameters =
           Export_to_kade.get_parameters state
         in
-        let file_opt,parameters,my_logger =
-          if
-            Remanent_parameters.get_trace parameters
-          then
-            let file = open_out "my_logger.txt" in
-            let my_logger = Loggers.open_logger_from_channel file in
-            Some (file,my_logger),
-            Remanent_parameters.set_logger parameters my_logger,
-            my_logger
-          else
-            None,
-            parameters,
-            Loggers.dummy_txt_logger
-        in
         let state =
           Export_to_kade.set_parameters parameters state
         in
@@ -213,14 +196,6 @@ let main () =
             compil
             network
             contact_map
-        in
-        let () =
-          match file_opt with
-            None -> ()
-          | Some (file,logger) ->
-            let () = Loggers.flush_logger logger in
-            let () = close_out file in
-            ()
         in
         network
       else
@@ -266,4 +241,4 @@ let main () =
   | e ->
     let () = Format.pp_print_flush Format.err_formatter () in raise e
 
-let () = main ()
+let () = main ~called_from:Remanent_parameters_sig.KaSa ()

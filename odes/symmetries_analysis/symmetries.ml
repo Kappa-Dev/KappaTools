@@ -530,6 +530,8 @@ let detect_symmetries parameters env cache
           refined_partitioned_contact_map
       in
       ()
+    else
+      ()
   in
   cache, refined_partitioned_contact_map
 

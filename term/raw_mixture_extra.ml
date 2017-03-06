@@ -7,22 +7,21 @@ let do_trace parameters =
      | Some p -> Remanent_parameters.get_trace p)
 
 let trace_print ?parameters x =
-  if trace then
-    let get_trace, fmt_opt =
-      match parameters with
-      | None -> false, Some Format.err_formatter
-      | Some parameters ->
-        Remanent_parameters.get_trace parameters,
-        Loggers.formatter_of_logger (Remanent_parameters.get_logger parameters)
-    in
-    if get_trace
+  let get_trace, fmt_opt =
+    match parameters with
+    | None -> false, Some Format.err_formatter
+    | Some parameters ->
+      Remanent_parameters.get_trace parameters,
+      Loggers.formatter_of_logger (Remanent_parameters.get_logger parameters)
+  in
+  if trace || get_trace
     then
       match fmt_opt with
       | Some fmt ->
         Format.fprintf fmt "%s\n" x
       | None -> ()
 
-let safe_print_str (i,j,k,l) parameters print =
+let safe_print_str (i,j,k,l) parameters print print2 =
   if do_trace parameters
   then
     try
@@ -35,8 +34,11 @@ let safe_print_str (i,j,k,l) parameters print =
       let () =
         Format.fprintf
           Format.str_formatter
-          "An error has been encountered (%s,%i,%i,%i)" i j k l
+          "An error has been encountered (%s,%i,%i,%i)\n Dumping while ignoring the signature\n" i j k l
       in
+      let s = Format.flush_str_formatter () in
+      let () = trace_print ?parameters s in
+      let () = print2 Format.str_formatter in
       let s = Format.flush_str_formatter () in
       let () = trace_print ?parameters s in
       ()
@@ -67,6 +69,9 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
         parameters
         (fun fmt ->
            Raw_mixture.print ~compact:false ~created:false ~sigs
+             fmt mix)
+        (fun fmt ->
+           Raw_mixture.print ~compact:false ~created:false
              fmt mix)
   in
   let unspec =
@@ -128,6 +133,10 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
           (fun fmt ->
              Pattern.print_cc
                ~sigs
+               fmt
+               b)
+          (fun fmt ->
+             Pattern.print_cc
                fmt
                b)
       in ()
@@ -193,13 +202,14 @@ let top_sort list =
 
 
 let pattern_to_raw_mixture ?parameters sigs pattern =
-  let () = trace_print "Translation from patten to raw_mixture" in
+  let () = trace_print ?parameters "Translation from patten to raw_mixture" in
   let () =
     let () = trace_print ?parameters "INPUT:" in
     let () =
       safe_print_str
         __POS__ parameters
         (fun fmt -> Pattern.print_cc ~sigs fmt pattern)
+        (fun fmt -> Pattern.print_cc fmt pattern)
       in ()
   in
   let agent_list, site_list =
@@ -262,6 +272,12 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
     match tail with
     | [] -> Some (agent_map, unspec)
     | (pos,site,(binding_state,int_state))::tail ->
+      let int_state =
+        if int_state = -1
+        then
+          None
+        else Some int_state
+      in
       match
         binding_state
       with
@@ -278,9 +294,12 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           with
           | None -> raise Exit
           | Some array ->
-            array.(site)<-(Raw_mixture.FREE, Some int_state)
+            array.(site)<-(Raw_mixture.FREE, int_state)
         in
-        aux tail ((pos,site)::unspec)
+        let agent_type =
+          Mods.IntMap.find_default (-1) pos agent_type_map
+        in
+        aux tail ((agent_type,site)::unspec)
       | Pattern.Free  ->
         let () =
           trace_print (string_of_int pos)
@@ -294,7 +313,7 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           with
           | None -> raise Exit
           | Some array ->
-            array.(site)<-(Raw_mixture.FREE, Some int_state)
+            array.(site)<-(Raw_mixture.FREE, int_state)
         in
         aux tail unspec
       | Pattern.Link _ ->
@@ -311,7 +330,7 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
               with
               | None -> raise Exit
               | Some array ->
-                array.(site) <- (Raw_mixture.VAL i, Some int_state)
+                array.(site) <- (Raw_mixture.VAL i, int_state)
             in
             aux tail unspec
         end
@@ -334,13 +353,13 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit)
-             in
+                 __POS__ parameters (fun fmt -> raise Exit) (fun fmt -> ())
+                 in
              (), agent_list)
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit)
+                 __POS__ parameters (fun fmt -> raise Exit) (fun fmt -> ())
              in
              (), agent_list)
           agent_type_map agent_map []
@@ -352,6 +371,9 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           __POS__ parameters
           (fun fmt ->
              Raw_mixture.print ~compact:false ~created:false ~sigs
+               fmt output)
+          (fun fmt ->
+             Raw_mixture.print ~compact:false ~created:false
                fmt output)
       in
       Some (output, unspec)
