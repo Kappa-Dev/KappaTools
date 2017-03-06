@@ -204,7 +204,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let network =
       A.network_from_compil ~ignore_obs parameters compil network
     in
-(*********************************************************************)
+(****************************************************************)
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in

@@ -1784,7 +1784,6 @@ struct
 
   (******************************************************)
 
-
   let compute_symmetries_from_model
       parameters compil network contact_map  =
     let cache = network.cache in
@@ -1824,8 +1823,12 @@ struct
           (to_be_checked, counter, rates, correct)
           contact_map
       in
-      let network = {network with cache = cache ;
-                                  symmetries = Some symmetries }
+      let network =
+        {
+          network with
+          cache = cache;
+          symmetries = Some symmetries
+        }
       in
       network
 
