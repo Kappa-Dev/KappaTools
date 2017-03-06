@@ -66,12 +66,6 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 generated:
 	mkdir -p generated
 
-generated/api_types_v1_t.ml: api/api_types_v1.atd generated
-	atdgen -t -o generated/api_types_v1 api/api_types_v1.atd
-
-generated/api_types_v1_j.ml: api/api_types_v1.atd generated
-	atdgen -j -j-std -o generated/api_types_v1 api/api_types_v1.atd
-
 generated/api_types_t.ml: api/api_types.atd generated
 	atdgen -t -o generated/api_types api/api_types.atd
 
@@ -81,14 +75,8 @@ generated/api_types_j.ml: api/api_types.atd generated
 generated/mpi_message_t.ml: api/mpi_message.atd generated
 	atdgen -t -o generated/mpi_message api/mpi_message.atd
 
-generated/mpi_message_v1_t.ml: api/mpi_message_v1.atd generated
-	atdgen -t -o generated/mpi_message_v1 api/mpi_message_v1.atd
-
 generated/mpi_message_j.ml: api/mpi_message.atd generated
 	atdgen -j -j-std -o generated/mpi_message api/mpi_message.atd
-
-generated/mpi_message_v1_j.ml: api/mpi_message_v1.atd generated
-	atdgen -j -j-std -o generated/mpi_message_v1 api/mpi_message_v1.atd
 
 $(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/test_message.json
 	./dev/generate-string.sh $^  > $@
