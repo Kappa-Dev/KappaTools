@@ -6,11 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module ApiTypes = Api_types_v1_j
-
 open Lwt.Infix
-open Cohttp_lwt_unix.Request
-open Unix
 
 let logger (handler : Cohttp_lwt_unix.Server.conn ->
             Cohttp.Request.t ->
@@ -42,7 +38,7 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
      in
      let t = Unix.localtime (Unix.time ()) in
      let request_method : string =
-       Cohttp.Code.string_of_method request.meth
+       Cohttp.Code.string_of_method request.Cohttp_lwt_unix.Request.meth
      in
      let uri : Uri.t = Cohttp_lwt_unix.Request.uri request in
      let request_path : string = Uri.path uri in
@@ -53,7 +49,8 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
      (Lwt_log_core.info_f
         "%s\t[%02d/%02d/%04d:%02d:%02d:%02d]\t\"%s %s\"\t%s"
         ip
-        t.tm_mday t.tm_mon t.tm_year t.tm_hour t.tm_min t.tm_sec
+        t.Unix.tm_mday t.Unix.tm_mon t.Unix.tm_year
+        t.Unix.tm_hour t.Unix.tm_min t.Unix.tm_sec
         request_method
         request_path
         response_code)
@@ -94,8 +91,6 @@ let server =
        ~callback:
        (logger
           (match app_args.App_args.api with
-           | App_args.V1 -> Webapp_v1.handler
-              ~shutdown_key:websim_args.Websim_args.shutdown_key
            | App_args.V2 -> route_handler
           )
        )

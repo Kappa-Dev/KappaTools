@@ -134,7 +134,7 @@ class KappaStd(kappa_common.StdBase):
         kappa_common.StdBase.__init__(self ,
                                       path ,
                                       delimiter ,
-                                      args = ["--development"],)
+                                      args = [],)
 
     def projection(self,response):
         result_data = response["data"][1]["result_data"]

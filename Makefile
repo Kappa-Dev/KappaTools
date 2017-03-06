@@ -39,10 +39,8 @@ VERSION=generated/version.ml
 RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
 	  $(RESOURCE) \
-	  generated/api_types_v1_t.ml generated/api_types_v1_j.ml \
 	  generated/api_types_t.ml generated/api_types_j.ml \
-	  generated/mpi_message_t.ml generated/mpi_message_j.ml \
-	  generated/mpi_message_v1_t.ml generated/mpi_message_v1_j.ml
+	  generated/mpi_message_t.ml generated/mpi_message_j.ml
 
 RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
 		$(wildcard js/*.css) js/favicon.ico js/package.json

@@ -6,13 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type api_version = V1 | V2;;
+type api_version = V2;;
 
 type t = { mutable seed_value : int option ;
            mutable api : api_version ; }
 
 let default : t = { seed_value = None;
-                    api = V1; }
+                    api = V2; }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
   ("--development",

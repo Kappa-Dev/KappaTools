@@ -184,8 +184,7 @@ let set_manager (id : string) : unit Api.result Lwt.t =
         let () = Common.debug (Format.sprintf "set_runtime_url: %s" cli.url) in
         let js_node_runtime =
           new JsNode.manager
-            cli.command
-            (["--development"]@cli.args )in
+            cli.command cli.args in
         if js_node_runtime#is_running () then
           let () = Common.debug (Js.string "set_runtime_url:sucess") in
           let () = set_state { current_state with

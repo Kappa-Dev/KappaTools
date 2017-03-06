@@ -7,28 +7,6 @@
 (******************************************************************************)
 
 open Lwt.Infix
-(* runtime for v1 *)
-class runtime ()  = object
-  method yield () = Lwt_main.yield ()
-  method log ?exn (msg : string) =
-    Lwt_log_core.log
-      ~level:Lwt_log_core.Info
-      ?exn
-      msg
-  inherit Api_v1.Base.base_runtime 0.1
-end
-
-(* set up handlers for v1 *)
-let process_comand_v1
-    (message_delimter : char) :
-    string -> unit Lwt.t =
-  Api_mpi_v1.on_message
-    (new runtime () :> Api_v1.api_runtime)
-    (fun message ->
-       Lwt_io.write Lwt_io.stdout message >>=
-       (fun () ->
-          Lwt_io.write Lwt_io.stdout (String.make 1 message_delimter)))
-
 (* system process for v2 *)
 class system_process () : Kappa_facade.system_process =
   object
@@ -80,7 +58,6 @@ let serve () : unit Lwt.t =
   (* set protocol version *)
   let process_comand : string -> unit Lwt.t =
     (match app_args.App_args.api with
-     | App_args.V1 -> process_comand_v1
      | App_args.V2 -> process_comand_v2
     ) message_delimter in
   (* read and handle messages *)

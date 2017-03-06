@@ -144,7 +144,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
         self.websim = "../WebSim.native"
         self.key = self.generate_key()
         self.port = 6666
-        command_format = "{0} --development --shutdown-key {1} --port {2} --level debug"
+        command_format = "{0} --shutdown-key {1} --port {2} --level debug"
         subprocess.Popen(command_format.format(self.websim, self.key, self.port).split())
         time.sleep(1)
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
