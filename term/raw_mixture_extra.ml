@@ -48,13 +48,13 @@ let declare_bond work ag_pos site bond_id map =
   | None ->
     work, Mods.IntMap.add bond_id [ag_pos,site] map
   | Some old ->
-    let site1 = ag_pos,site in
+    let site1 = ag_pos, site in
     begin
       match old with
         [site2] ->
         Pattern.new_link work site1 site2,
         Mods.IntMap.add bond_id ((ag_pos,site)::old) map
-      | [] | _::_::_ -> assert false
+      | [] | _ :: _ :: _ -> assert false
     end
 
 let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
@@ -85,7 +85,8 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
     match tail with
     | [] -> work,bond_map
     | mixture_agent::tail ->
-      let () = trace_print (string_of_int mixture_agent.Raw_mixture.a_type) in
+      let () = trace_print
+          (string_of_int mixture_agent.Raw_mixture.a_type) in
       let pattern_agent,work =
         Pattern.new_node work mixture_agent.Raw_mixture.a_type
       in
@@ -95,7 +96,8 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
              match state with
              | None -> work
              | Some state ->
-               Pattern.new_internal_state work (pattern_agent,site) state)
+               Pattern.new_internal_state work
+                 (pattern_agent, site) state)
           work
           mixture_agent.Raw_mixture.a_ints
       in
@@ -113,35 +115,25 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
                else
                  Pattern.new_free work (pattern_agent,site), bond_map
              | Raw_mixture.VAL i ->
-               declare_bond work pattern_agent site i bond_map )
-          (work,bond_map)
+               declare_bond work pattern_agent site i bond_map)
+          (work, bond_map)
           mixture_agent.Raw_mixture.a_ports
       in
-      aux (ag_id+1) tail (work,bond_map)
+      aux (ag_id + 1) tail (work, bond_map)
   in
   let work, bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let (a,_,b,c) = Pattern.finish_new work in
+  let (a, _, b, c) = Pattern.finish_new work in
   let () =
     match signature with
     | None -> ()
     | Some sigs ->
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
-        safe_print_str
-          __POS__
-          parameters
-          (fun fmt ->
-             Pattern.print_cc
-               ~sigs
-               fmt
-               b)
-          (fun fmt ->
-             Pattern.print_cc
-               fmt
-               b)
+        safe_print_str __POS__ parameters
+          (fun fmt -> Pattern.print_cc ~sigs fmt b)
+          (fun fmt -> Pattern.print_cc fmt b)
       in ()
-  in
-  (a,b,c)
+  in (a, b, c)
 
 let add_map i j map =
 let old =
@@ -156,16 +148,15 @@ let top_sort list =
       (fun pos (map1,map2,set) agent ->
        let port = agent.Raw_mixture.a_ports in
        Tools.array_fold_lefti
-         (fun _ (map1,map2,set) value ->
-         match value
-         with
+         (fun _ (map1, map2, set) value ->
+         match value with
            | Raw_mixture.VAL i ->
              add_map i pos map1,
              add_map pos i map2,
-             pos::set
-           | Raw_mixture.FREE -> map1,map2,pos::set)
-         (map1,map2,set)
-         agent.Raw_mixture.a_ports )
+             pos :: set
+           | Raw_mixture.FREE -> map1, map2, pos::set)
+         (map1, map2, set)
+         agent.Raw_mixture.a_ports)
       (Mods.IntMap.empty,Mods.IntMap.empty,[])
       array
   in
@@ -181,28 +172,20 @@ let top_sort list =
       let t =
         List.fold_left
           (fun list link ->
-             List.fold_left
-               (fun list pos -> pos::list)
-               list
+             List.fold_left (fun list pos -> pos :: list) list
                (Mods.IntMap.find_default [] link map1)
-          )
-          t  link_list
+          ) t link_list
       in
       let black_listed = Mods.IntSet.add h black_listed in
       aux t black_listed (array.(h)::list)
   in
   match set with
   | [] -> []
-  | head::_ ->
-    aux [head] Mods.IntSet.empty []
-
-
-
-
-
+  | head :: _ -> aux [head] Mods.IntSet.empty []
 
 let pattern_to_raw_mixture ?parameters sigs pattern =
-  let () = trace_print ?parameters "Translation from patten to raw_mixture" in
+  let () = trace_print ?parameters
+      "Translation from patten to raw_mixture" in
   let () =
     let () = trace_print ?parameters "INPUT:" in
     let () =
@@ -214,41 +197,38 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
   in
   let agent_list, site_list =
     Pattern.fold
-      (fun ~pos ~agent_type (agent_list,site_list) ->
-         (pos,agent_type)::agent_list, site_list)
-      (fun ~pos ~site state (agent_list,site_list) ->
-         agent_list,
-         (pos,site,state)::site_list)
-      pattern
-      ([],[])
+      (fun ~pos ~agent_type (agent_list, site_list) ->
+         (pos, agent_type) :: agent_list, site_list)
+      (fun ~pos ~site state (agent_list, site_list) ->
+         agent_list, (pos, site, state) :: site_list)
+      pattern ([], [])
   in
   let bond_map =
     let rec aux tail fresh_bond_id bond_map =
       match tail with
       | [] -> bond_map
-      | (_,_,((Pattern.Free | Pattern.UnSpec),_))::tail
+      | (_, _, ((Pattern.Free | Pattern.UnSpec), _)) :: tail
          -> aux tail fresh_bond_id bond_map
-      | (pos,site,(Pattern.Link (ag_pos',site'),_))::tail ->
+      | (pos, site, (Pattern.Link (ag_pos', site'), _)) :: tail ->
         match
-          Mods.Int2Map.find_option (ag_pos',site') bond_map
+          Mods.Int2Map.find_option (ag_pos', site') bond_map
         with
         | None ->
             aux tail (succ fresh_bond_id)
-              (Mods.Int2Map.add (pos,site) fresh_bond_id bond_map)
+              (Mods.Int2Map.add (pos, site) fresh_bond_id bond_map)
         | Some i ->
         let () = trace_print (string_of_int i) in
-
           aux
             tail
             fresh_bond_id
-            (Mods.Int2Map.add (pos,site) i bond_map)
+            (Mods.Int2Map.add (pos, site) i bond_map)
     in
     aux site_list 0 Mods.Int2Map.empty
   in
   let agent_type_map = Mods.IntMap.empty in
   let agent_type_map =
     List.fold_left
-      (fun map (pos,agent_type) ->
+      (fun map (pos, agent_type) ->
          Mods.IntMap.add pos agent_type map)
       agent_type_map
       agent_list
@@ -265,55 +245,43 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
              Signature.arity sigs ag_type
          in
          Array.make n_site (Raw_mixture.FREE, None)
-      )
-      agent_type_map
+      ) agent_type_map
   in
   let rec aux tail unspec =
     match tail with
     | [] -> Some (agent_map, unspec)
-    | (pos,site,(binding_state,int_state))::tail ->
+    | (pos, site, (binding_state, int_state)) :: tail ->
       let int_state =
         if int_state = -1
-        then
-          None
+        then None
         else Some int_state
       in
-      match
-        binding_state
-      with
+      match binding_state with
       | Pattern.UnSpec ->
-        let () =
-          trace_print (string_of_int pos)
-        in
-        let () =
-          trace_print (string_of_int site)
-        in
+        let () = trace_print (string_of_int pos) in
+        let () = trace_print (string_of_int site) in
         let () =
           match
             Mods.IntMap.find_option pos agent_map
           with
           | None -> raise Exit
           | Some array ->
-            array.(site)<-(Raw_mixture.FREE, int_state)
+            array.(site) <- (Raw_mixture.FREE, int_state)
         in
         let agent_type =
           Mods.IntMap.find_default (-1) pos agent_type_map
         in
-        aux tail ((agent_type,site)::unspec)
+        aux tail ((agent_type, site) :: unspec)
       | Pattern.Free  ->
-        let () =
-          trace_print (string_of_int pos)
-        in
-        let () =
-          trace_print (string_of_int site)
-        in
+        let () = trace_print (string_of_int pos) in
+        let () = trace_print (string_of_int site) in
         let () =
           match
             Mods.IntMap.find_option pos agent_map
           with
           | None -> raise Exit
           | Some array ->
-            array.(site)<-(Raw_mixture.FREE, int_state)
+            array.(site) <- (Raw_mixture.FREE, int_state)
         in
         aux tail unspec
       | Pattern.Link _ ->
@@ -323,7 +291,6 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           with
           | None -> assert false
           | Some i ->
-
             let () =
               match
                 Mods.IntMap.find_option pos agent_map
@@ -345,21 +312,24 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           (fun () () _ agent_type intf agent_list ->
              let internal = Array.map snd intf in
              let binding = Array.map fst intf in
-             (),({
-                 Raw_mixture.a_type = agent_type ;
-                 a_ports = binding ;
-                 a_ints = internal ;
-               }::agent_list))
+             (),
+             ({
+               Raw_mixture.a_type = agent_type ;
+               a_ports = binding ;
+               a_ints = internal ;
+               } :: agent_list))
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit) (fun fmt -> ())
+                 __POS__ parameters (fun fmt -> raise Exit)
+                 (fun fmt -> ())
                  in
              (), agent_list)
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit) (fun fmt -> ())
+                 __POS__ parameters (fun fmt -> raise Exit)
+                 (fun fmt -> ())
              in
              (), agent_list)
           agent_type_map agent_map []

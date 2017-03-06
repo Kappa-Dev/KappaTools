@@ -15,12 +15,17 @@ sig
   type connected_component  (* connected, maybe partially specified *)
 
   type hidden_init
+
   type init =
-    ((connected_component array list,int) Alg_expr.e * hidden_init * Locality.t) list
+    ((connected_component array list,int) Alg_expr.e * hidden_init
+     * Locality.t) list
 
   val empty_cache: compil -> cache
+
   val get_init: compil -> init
+
   val mixture_of_init: compil -> hidden_init -> mixture
+
   val dummy_chemical_species: compil -> chemical_species
 
   val compare_connected_component :
@@ -47,19 +52,22 @@ sig
 
   val canonic_form: chemical_species -> canonic_species
 
-  val connected_components_of_patterns: pattern -> connected_component list
+  val connected_components_of_patterns:
+    pattern -> connected_component list
 
   val connected_components_of_mixture:
     compil -> cache ->
     mixture -> cache  * chemical_species list
 
   type embedding (* the domain is connected *)
+
   type embedding_forest (* the domain may be not connected *)
 
   val lift_embedding: embedding -> embedding_forest
 
   val find_embeddings:
-    compil -> connected_component -> chemical_species -> embedding list
+    compil -> connected_component -> chemical_species ->
+    embedding list
 
   val find_embeddings_unary_binary:
     compil -> pattern -> chemical_species -> embedding_forest list
@@ -70,9 +78,13 @@ sig
     pattern * embedding_forest * mixture
 
   type rule
+
   type rule_name = string
+
   type rule_id = int
-  type rule_id_with_mode = rule_id * Rule_modes.arity * Rule_modes.direction
+
+  type rule_id_with_mode =
+    rule_id * Rule_modes.arity * Rule_modes.direction
 
   val divide_rule_rate_by:
     cache -> compil -> rule -> cache * int
@@ -83,11 +95,13 @@ sig
 
   val token_vector:
     rule ->
-    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot
+     * int) list
 
   val token_vector_of_init:
     hidden_init ->
-    ((connected_component array list,int) Alg_expr.e Locality.annot * int) list
+    ((connected_component array list,int) Alg_expr.e Locality.annot
+     * int) list
 
   val print_rule_id: Format.formatter -> rule_id -> unit
 
@@ -109,8 +123,6 @@ sig
 
   val apply: compil -> rule -> embedding_forest -> mixture  -> mixture
 
-  val mixture_of_init: compil -> hidden_init -> mixture
-
   val lift_species: compil -> chemical_species -> mixture
 
   val get_compil:
@@ -123,12 +135,14 @@ sig
   val get_variables:
     compil ->
     (string *
-     (connected_component array list,int) Alg_expr.e Locality.annot) array
+     (connected_component array list,int) Alg_expr.e Locality.annot)
+      array
 
   val get_obs:
     compil -> (connected_component array list,int) Alg_expr.e list
 
   val get_obs_titles: compil -> string list
+
   val nb_tokens: compil -> int
 
   (*symmetries*)
@@ -143,8 +157,11 @@ sig
     Remanent_parameters_sig.parameters ->
     compil -> cache ->
     (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
-    (bool array * int array * ('a,'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array * int array) ->
-    (string list * (string * string) list) Mods.StringMap.t Mods.StringMap.t ->
+    (bool array * int array * ('a,'b) Alg_expr.e Locality.annot
+       Rule_modes.RuleModeMap.t array * int array) ->
+    (string list * (string * string) list) Mods.StringMap.t
+      Mods.StringMap.t ->
+    chemical_species list ->
     cache * Symmetries.symmetries
 
 (*  val get_cc_cache: cache -> Pattern.PreEnv.t
@@ -158,7 +175,7 @@ sig
 *)
 
   val get_representant:
-    Remanent_parameters_sig.parameters -> 
+    Remanent_parameters_sig.parameters ->
     compil -> cache -> Symmetries.symmetries ->
     chemical_species -> cache * chemical_species
 

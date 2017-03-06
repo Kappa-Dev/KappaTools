@@ -26,15 +26,18 @@ type t = cc
 type id = int
 
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
+
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 
 let hash_prime = 29
+
 let coarse_hash cc =
   Array.fold_right
     (fun l acc -> List.length l + hash_prime * acc)
     cc.nodes_by_type 0
 
 let id_to_yojson cc = `Int cc
+
 let id_of_yojson = function
   | `Int cc -> cc
   | x ->
@@ -44,7 +47,6 @@ module Set = Mods.IntSet
 
 module ObsMap = struct
   include Mods.DynArray
-
   let dummy x = make 0 x
 end
 
@@ -99,6 +101,7 @@ let raw_find_root nodes_by_type =
         let x = List.fold_left (fun _ x -> x) h t in
         Some(x,ty)
   in aux 0
+
 let find_root cc = raw_find_root cc.nodes_by_type
 
 let weight cc =

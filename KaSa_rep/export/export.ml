@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 05 2017>
+  * Last modification: Time-stamp: <Mar 06 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -15,7 +15,7 @@
 let warn parameters mh pos exn default =
   Exception.warn parameters mh pos exn default
 
-(******************************************************************************)
+(****************************************************************)
 (*module signatures*)
 
 module Export =
@@ -1319,7 +1319,7 @@ let get_dead_rules  =
     compute_dead_rules
 
 
-(*************************************************************************)
+(****************************************************************)
 
 let compute_internal_constraints_list _show_title state =
   let state,_ = get_reachability_analysis state in
@@ -1343,7 +1343,9 @@ let get_internal_constraints_list =
 
 let compute_constraints_list _show_title state =
   let error = Remanent_state.get_errors state in
-  let state, internal_constraints_list = get_internal_constraints_list state in
+  let state, internal_constraints_list =
+    get_internal_constraints_list state
+  in
   let error, constraints_list =
     List.fold_left
       (fun (error, constraints_list) (domain_name, lemma_list) ->
@@ -1356,10 +1358,13 @@ let compute_constraints_list _show_title state =
                   hyp
               in
               let error, site_graph =
-                Ckappa_site_graph.site_graph_to_list error string_version
+                Ckappa_site_graph.site_graph_to_list error
+                  string_version
               in
               let error, refinement =
-                Ckappa_site_graph.site_graph_list_to_list error refine in
+                Ckappa_site_graph.site_graph_list_to_list error
+                  refine
+              in
               let lemma =
                 {Remanent_state.hyp = site_graph;
                  Remanent_state.refinement = refinement}
@@ -1368,13 +1373,15 @@ let compute_constraints_list _show_title state =
               error, current_list
             ) (error, []) lemma_list
         in
-        (*----------------------------------------------------------*)
+        (*------------------------------------------------------*)
         let pair_list =
-          (domain_name, List.rev current_list) :: constraints_list in
+          (domain_name, List.rev current_list) :: constraints_list
+        in
         error, pair_list
       ) (error, []) internal_constraints_list
   in
-  let state = Remanent_state.set_constraints_list constraints_list state in
+  let state =
+    Remanent_state.set_constraints_list constraints_list state in
   let state = Remanent_state.set_errors error state in
   state, constraints_list
 
@@ -1409,14 +1416,11 @@ let get_constraints_list_to_json state =
     state,
     Remanent_state.lemmas_list_to_json constraints_list
 
-
 let compute_symmetries
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     _show_title state =
   let state, env = get_env state in
-  match
-    env
-  with
+  match env with
   | None -> state, None
   | Some env ->
     begin
@@ -1435,6 +1439,7 @@ let compute_symmetries
           [] (* to do *)
           ([||],[||],[||],[||]) (* to do *)
           contact_map
+          [] (*TODO*)
       in
       state, Some symmetries
     end

@@ -47,7 +47,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let rate_convention =
       match lowercase ode_args.Ode_args.rate_convention with
     | "kasim" -> Ode_args.KaSim
-    | "divide_by_nbr_of_autos_in_lhs"  ->
+    | "divide_by_nbr_of_autos_in_lhs" ->
       Ode_args.Divide_by_nbr_of_autos_in_lhs
     | "biochemist" -> Ode_args.Biochemist
     | s ->
@@ -150,11 +150,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     (*************************************************************)
     (*TEST-symmetries*)
-    let network =
-      A.init compil
-    in
+    let network = A.init compil in
     let parameters =
-      Ode_args.build_kasa_parameters ~called_from ode_args common_args
+      Ode_args.build_kasa_parameters ~called_from ode_args
+        common_args
     in
     let network =
       if ode_args.Ode_args.with_symmetries
@@ -188,8 +187,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           Export_to_kade.get_contact_map
             ~accuracy_level:Remanent_state.High state
         in
-        (* Here define the cache for equivalence classes of species *)
-      (* Fill with the function that maps a species to its representant *)
+        (* Here define the cache for equivalence classes
+           of species *)
+        (* Fill with the function that maps a species to its
+           representant *)
         let network =
           A.compute_symmetries_from_model
             parameters
@@ -204,28 +205,34 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let network =
       A.network_from_compil ~ignore_obs parameters compil network
     in
-(****************************************************************)
+    (*************************************************************)
     let out_channel =
       Kappa_files.open_out (Kappa_files.get_ode ~mode:backend)
     in
-    let logger = Loggers.open_logger_from_channel ~mode:backend out_channel in
+    let logger = Loggers.open_logger_from_channel ~mode:backend
+        out_channel
+    in
     let logger_buffer =
       match backend with
-      | Loggers.SBML ->
-        Loggers.open_infinite_buffer ~mode:backend ()
-      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
+      | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> logger
       | Loggers.Octave
       | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
     in
-    let () = A.export_network
-            ~command_line
-            ~command_line_quotes
+    let () =
+      A.export_network
+        ~command_line
+        ~command_line_quotes
         ?data_file:cli_args.Run_cli_args.outputDataFile
         ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Tools.unsome 1. cli_args.Run_cli_args.maxValue)
-        ?plot_period:cli_args.Run_cli_args.plotPeriod logger logger_buffer compil network in
+        ?plot_period:cli_args.Run_cli_args.plotPeriod
+        logger
+        logger_buffer compil network
+    in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in
     ()
@@ -239,6 +246,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let () = Format.eprintf "%s@." msg in
     exit 2
   | e ->
-    let () = Format.pp_print_flush Format.err_formatter () in raise e
+    let () = Format.pp_print_flush Format.err_formatter () in
+    raise e
 
 let () = main ~called_from:Remanent_parameters_sig.KaSa ()

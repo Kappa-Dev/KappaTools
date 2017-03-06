@@ -24,20 +24,28 @@ type symmetries = ((int list list) * (int list list)) array
 (*******************************************************************)
 
 val detect_symmetries:
-  Remanent_parameters_sig.parameters -> Model.t -> LKappa_auto.cache  ->
+  Remanent_parameters_sig.parameters -> Model.t ->
+  LKappa_auto.cache  ->
   (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
-  (bool array  * int array * ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array * int array) ->
-  (string list * (string * string) list) Mods.StringMap.t Mods.StringMap.t ->
+  (bool array  * int array * ('a, 'b) Alg_expr.e Locality.annot
+     Rule_modes.RuleModeMap.t array * int array) ->
+  (string list * (string * string) list) Mods.StringMap.t
+    Mods.StringMap.t -> Pattern.cc list ->
   LKappa_auto.cache * symmetries
 
 val build_array_for_symmetries:
   LKappa_auto.RuleCache.hashed_list list ->
-  bool array * int array * 'a Rule_modes.RuleModeMap.t array * int array
+  bool array * int array * 'a Rule_modes.RuleModeMap.t array * int
+    array
 
 val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
+
 type cache
+
 val empty_cache: unit -> cache
+
 val representant:
   ?parameters:Remanent_parameters_sig.parameters ->
-  Signature.s -> cache -> Pattern.PreEnv.t -> symmetries -> Pattern.cc ->  cache * Pattern.PreEnv.t * Pattern.cc
+  Signature.s -> cache -> Pattern.PreEnv.t -> symmetries -> Pattern.cc
+  ->  cache * Pattern.PreEnv.t * Pattern.cc

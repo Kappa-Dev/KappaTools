@@ -960,15 +960,13 @@ struct
       List.fold_left
         (fun (cache,list) (_,r,_) ->
            let b = I.mixture_of_init compil r in
-           let cache',acc =
+           let cache', acc =
              I.connected_components_of_mixture compil cache b
            in
-           cache',List.rev_append acc list)
-        (cache,[])
-        list
+           cache', List.rev_append acc list)
+        (cache,[]) list
     in
-    {network with cache = cache},
-    list
+    {network with cache = cache}, list
 
   type ('a,'b) rate = ('a,'b) Alg_expr.e Locality.annot
 
@@ -1158,7 +1156,8 @@ struct
     else
       Ode_loggers.increment ~init_mode ~comment string_of_var logger (Ode_loggers_sig.Init x)
 
-  let affect_var is_zero ?init_mode:(init_mode=false) logger logger_buffer compil network decl =
+  let affect_var is_zero ?init_mode:(init_mode=false) logger
+      logger_buffer compil network decl =
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
@@ -1177,12 +1176,14 @@ struct
           in
           increment
             is_zero ~init_mode ~comment
-            (I.string_of_var_id ~compil) logger logger_buffer a expr handler_expr
+            (I.string_of_var_id ~compil) logger logger_buffer a expr
+            handler_expr
         | _ ->
           let () = Ode_loggers.associate
               ~init_mode
               (I.string_of_var_id ~compil)
-              logger logger_buffer (Ode_loggers_sig.Expr id') expr handler_expr
+              logger logger_buffer (Ode_loggers_sig.Expr id') expr
+              handler_expr
           in
           List.iter
             (fun id ->
@@ -1192,10 +1193,12 @@ struct
                let expr =
                  to_nembed compil
                    (from_nocc compil
-                      (Locality.dummy_annot (Alg_expr.ALG_VAR id')) n) n in
+                      (Locality.dummy_annot (Alg_expr.ALG_VAR id'))
+                      n) n in
                increment
                  is_zero (I.string_of_var_id ~compil)
-                 logger logger_buffer ~init_mode id expr handler_init)
+                 logger logger_buffer ~init_mode id expr
+                 handler_init)
             list
       end
     | Var (id,_comment,expr) ->
@@ -1204,7 +1207,8 @@ struct
         (Ode_loggers_sig.Expr id) expr handler_expr
 
   let fresh_is_zero network =
-    let is_zero = Mods.DynArray.create (get_fresh_ode_var_id network) true in
+    let is_zero =
+      Mods.DynArray.create (get_fresh_ode_var_id network) true in
     let is_zero x =
       if Mods.DynArray.get is_zero x
       then
@@ -1228,7 +1232,8 @@ struct
         Ode_loggers.print_newline logger
       | Loggers.Maple | Loggers.SBML | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
-      | Loggers.Matrix | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
+      | Loggers.Matrix | Loggers.DOT | Loggers.HTML
+      | Loggers.HTML_Graph | Loggers.HTML_Tabular
       | Loggers.Json -> ()
     in
     ()
@@ -1236,32 +1241,42 @@ struct
   let breakline = true
 
   (* TODO : if unspecified, data_file, init_t and plot_period should
-     get their value from field [conf] of [compil] before falling back
-     to their default *)
+     get their value from field [conf] of [compil] before falling
+     back to their default *)
   let export_main
-      ~command_line ~command_line_quotes ?(data_file="data.csv") ?(init_t=0.)
-      ~max_t ?(plot_period=1.) logger logger_buffer compil network split =
+      ~command_line ~command_line_quotes ?(data_file="data.csv")
+      ?(init_t=0.)
+      ~max_t ?(plot_period=1.) logger logger_buffer compil network
+      split =
     let is_zero = fresh_is_zero network in
     let handler_expr = handler_expr network in
     let () = Ode_loggers.open_procedure logger "main" "main" [] in
     let command_line_closure logger =
-      let () = Ode_loggers.print_comment ~breakline logger "command line: " in
-      let () = Ode_loggers.print_comment ~breakline logger ("     "^command_line_quotes) in ()
+      let () = Ode_loggers.print_comment ~breakline
+          logger "command line: "
+      in
+      let () = Ode_loggers.print_comment ~breakline logger
+          ("     "^command_line_quotes) in ()
     in
     let count = I.what_do_we_count compil in
     let rate_convention = I.rate_convention compil in
-    let may_be_not_time_homogeneous = may_be_not_time_homogeneous network in
+    let may_be_not_time_homogeneous =
+      may_be_not_time_homogeneous network in
     let () =
       Ode_loggers.print_ode_preamble ~may_be_not_time_homogeneous
         ~count ~rate_convention logger command_line_closure ()
     in
     let () = Ode_loggers.print_newline logger in
-    let () = Sbml_backend.open_box logger_buffer "listOfParameters" in
+    let () =
+      Sbml_backend.open_box logger_buffer "listOfParameters" in
     let () = Sbml_backend.line_sbml logger_buffer in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t) handler_expr in
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger
+        logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t)
+        handler_expr in
     let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil) logger logger_buffer Ode_loggers_sig.Tend
+      Ode_loggers.associate (I.string_of_var_id ~compil) logger
+        logger_buffer Ode_loggers_sig.Tend
         (Alg_expr.float max_t)
         handler_expr
     in
@@ -1313,10 +1328,14 @@ struct
         handler_expr
     in
     let () = Ode_loggers.print_newline logger_buffer in
-    let () = Ode_loggers.declare_global logger_buffer (Ode_loggers_sig.Expr network.fresh_var_id) in
-    let () = Ode_loggers.initialize logger_buffer (Ode_loggers_sig.Expr network.fresh_var_id) in
-    let () = Ode_loggers.declare_global logger_buffer (Ode_loggers_sig.Init network.fresh_ode_var_id) in
-    let () = Ode_loggers.initialize logger_buffer (Ode_loggers_sig.Init network.fresh_ode_var_id) in
+    let () = Ode_loggers.declare_global logger_buffer
+        (Ode_loggers_sig.Expr network.fresh_var_id) in
+    let () = Ode_loggers.initialize logger_buffer
+        (Ode_loggers_sig.Expr network.fresh_var_id) in
+    let () = Ode_loggers.declare_global logger_buffer
+        (Ode_loggers_sig.Init network.fresh_ode_var_id) in
+    let () = Ode_loggers.initialize logger_buffer
+        (Ode_loggers_sig.Init network.fresh_ode_var_id) in
     let () = Ode_loggers.print_newline logger_buffer in
     let () = Ode_loggers.start_time logger_buffer init_t in
     let () = Ode_loggers.print_newline logger_buffer in
@@ -1335,13 +1354,13 @@ struct
             (fun logger ->
                Sbml_backend.print_parameters I.string_of_var_id
                  logger logger_buffer
-                 Ode_loggers_sig.Time_scale_factor Nbr.one
-            )
+                 Ode_loggers_sig.Time_scale_factor Nbr.one)
       else ()
     in
     let () =
       List.iter
-        (affect_var is_zero logger logger_buffer ~init_mode:true compil network)
+        (affect_var is_zero logger logger_buffer ~init_mode:true
+           compil network)
         network.var_declaration
     in
     let () = Ode_loggers.print_newline logger_buffer in
@@ -1355,7 +1374,8 @@ struct
              (var_of_rate rule.rule_id_with_mode) rate handler_expr)
         split.const_rate
     in
-    let () = Sbml_backend.close_box logger_buffer  "listOfParameters" in
+    let () =
+      Sbml_backend.close_box logger_buffer  "listOfParameters" in
     let titles = I.get_obs_titles compil in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
@@ -1369,7 +1389,10 @@ struct
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_interpolate logger in
     let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_dump_plots ~data_file ~command_line ~titles logger in
+    let () =
+      Ode_loggers.print_dump_plots ~data_file ~command_line ~titles
+        logger
+    in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.close_procedure logger in
     let () = Ode_loggers.print_newline logger in
@@ -1495,7 +1518,8 @@ struct
                in
                let () = Ode_loggers.print_newline logger in
                let () =
-                 Ode_loggers.print_comment ~breakline logger ("rule    : "^rule_string)
+                 Ode_loggers.print_comment ~breakline logger
+                   ("rule    : "^rule_string)
                in
                let dump fmt list  =
                  let _ =
@@ -1504,7 +1528,11 @@ struct
                         let prefix = if bool then " + " else "" in
                         let species_string =
                           Format.asprintf "%a"
-                            (fun log id -> I.print_chemical_species ~compil log (fst (Mods.DynArray.get network.species_tab id)))
+                            (fun log id -> I.print_chemical_species
+                                ~compil log
+                                (fst
+                                   (Mods.DynArray.get
+                                      network.species_tab id)))
                             k
                         in
                         let () =
@@ -1517,9 +1545,7 @@ struct
                      (List.rev list)
                  in ()
                in
-               match
-                 Loggers.get_encoding_format logger
-               with
+               match Loggers.get_encoding_format logger with
                | Loggers.Matlab | Loggers.Octave  | Loggers.SBML ->
                  let s = Format.asprintf
                      "reaction: %a -> %a%a "
@@ -1549,7 +1575,7 @@ struct
                (var_of_rule enriched_rule)
                enriched_rule.divide_rate_by
            in
-           let reactants'  =
+           let reactants' =
              List.rev_map
                (fun x ->
                   let nauto = snd
@@ -1561,8 +1587,14 @@ struct
            in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            let () = Ode_loggers.print_newline logger in
-           let () = do_it Ode_loggers.consume reactants reactants' enriched_rule in
-           let () = do_it Ode_loggers.produce products reactants' enriched_rule in
+           let () =
+             do_it Ode_loggers.consume reactants reactants'
+               enriched_rule
+           in
+           let () =
+             do_it Ode_loggers.produce products reactants'
+               enriched_rule
+           in
            let () =
              List.iter
                (fun (expr,(token,_loc)) ->
@@ -1574,8 +1606,7 @@ struct
                     expr reactants' (handler_expr network))
                token_vector
            in ()
-        )
-        network.reactions
+        ) network.reactions
     in
     (* Derivative of time is equal to 1 *)
     let () =
@@ -1585,7 +1616,8 @@ struct
           Ode_loggers.associate
             (I.string_of_var_id ~compil) logger logger
             (Ode_loggers_sig.Deriv
-               (get_last_ode_var_id network)) (Alg_expr.const Nbr.one) (handler_expr network)
+               (get_last_ode_var_id network))
+            (Alg_expr.const Nbr.one) (handler_expr network)
         in
         let () = Ode_loggers.print_newline logger in
         let () = Sbml_backend.time_advance logger in
@@ -1603,15 +1635,20 @@ struct
     let label = "listOfSpecies" in
     let () = Sbml_backend.open_box logger label in
     let () = Sbml_backend.line_sbml logger in
-    let () = Ode_loggers.open_procedure logger "Init" "ode_init" [] in
+    let () =
+      Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Ode_loggers.print_newline logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
     in
     let () =
-      Ode_loggers.declare_global logger (Ode_loggers_sig.Init (get_last_ode_var_id network))
+      Ode_loggers.declare_global logger
+        (Ode_loggers_sig.Init (get_last_ode_var_id network))
     in
-    let () = Ode_loggers.initialize logger (Ode_loggers_sig.Initbis (get_last_ode_var_id network)) in
+    let () =
+      Ode_loggers.initialize logger
+        (Ode_loggers_sig.Initbis (get_last_ode_var_id network))
+    in
     let () = Ode_loggers.print_newline logger in
     let rec aux k =
       if
@@ -1620,12 +1657,12 @@ struct
         ()
       else
         let id, comment, units  =
-          if
-            may_be_not_time_homogeneous network &&
-            k = get_fresh_ode_var_id network - 1
-          then "time","t", Some "substance"
+          if may_be_not_time_homogeneous network &&
+             k = get_fresh_ode_var_id network - 1
+          then "time", "t", Some "substance"
           else
-            let variable = Mods.DynArray.get network.ode_vars_tab k in
+            let variable =
+              Mods.DynArray.get network.ode_vars_tab k in
             begin
               match variable with
               | Dummy -> "dummy", "", None
@@ -1638,8 +1675,9 @@ struct
                 "s"^(string_of_int k),
                 Format.asprintf "%a"
                   (fun log k -> I.print_chemical_species ~compil log
-                      (fst (Mods.DynArray.get network.species_tab k))) k,
-                Some "substance"
+                      (fst
+                         (Mods.DynArray.get network.species_tab k))
+                  ) k, Some "substance"
             end
         in
         let () = Ode_loggers.declare_init ~comment logger k in
@@ -1663,7 +1701,8 @@ struct
 
   let export_obs logger compil network split =
     let is_zero = fresh_is_zero network in
-    let () = Ode_loggers.open_procedure logger "obs" "ode_obs" ["y"] in
+    let () =
+      Ode_loggers.open_procedure logger "obs" "ode_obs" ["y"] in
     (* add t *)
     let () = Ode_loggers.print_newline logger in
     let () =
@@ -1673,28 +1712,28 @@ struct
       Ode_loggers.declare_global logger (Ode_loggers_sig.Expr 1)
     in
     let () =
-      Ode_loggers.initialize logger (Ode_loggers_sig.Obs (network.n_obs))
+      Ode_loggers.initialize logger
+        (Ode_loggers_sig.Obs (network.n_obs))
     in
     let () = Ode_loggers.print_newline logger in
     let () =
-      if
-        obs_may_be_not_time_homogeneous network
-      then
-        Ode_loggers.associate_t logger
+      if obs_may_be_not_time_homogeneous network
+      then Ode_loggers.associate_t logger
           (get_last_ode_var_id network)
-      else
-        ()
+      else ()
     in
     let () =
       List.iter
-        (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl
+        (affect_var is_zero logger logger ~init_mode:false compil
+           network) split.var_decl
     in
     let () = Ode_loggers.print_newline logger in
     let () =
       List.iter
         (fun (id,expr) ->
            Ode_loggers.associate
-             (I.string_of_var_id ~compil) logger logger (Ode_loggers_sig.Obs id) expr (handler_expr network))
+             (I.string_of_var_id ~compil) logger logger
+             (Ode_loggers_sig.Obs id) expr (handler_expr network))
         network.obs
     in
     let () = Ode_loggers.print_newline logger in
@@ -1707,13 +1746,11 @@ struct
       ~command_line ~command_line_quotes ?data_file ?init_t ~max_t
       ?plot_period logger logger_buffer compil network =
     let network =
-      if
-        may_be_not_time_homogeneous network
+      if may_be_not_time_homogeneous network
       then
         (* add a spurious variable for time *)
         inc_fresh_ode_var_id network
-      else
-        network
+      else network
     in
     let sorted_rules_and_decl =
       split_rules_and_decl compil network
@@ -1722,7 +1759,8 @@ struct
     let () = Format.printf "\t -main function @." in
     let () =
       export_main
-        ~command_line ~command_line_quotes ?data_file ?init_t ~max_t ?plot_period
+        ~command_line ~command_line_quotes ?data_file ?init_t
+        ~max_t ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
@@ -1735,9 +1773,11 @@ struct
       | Some fmt -> Loggers.flush_buffer logger_buffer fmt
     in
     let () = Format.printf "\t -ode system @." in
-    let () = export_dydt logger compil network sorted_rules_and_decl in
+    let () =
+      export_dydt logger compil network sorted_rules_and_decl in
     let () = Format.printf "\t -observables @." in
-    let () = export_obs logger compil network sorted_rules_and_decl in
+    let () =
+      export_obs logger compil network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
     ()
 
@@ -1747,37 +1787,33 @@ struct
       (fun (a,b,c,d)-> (a,b,c,d.rule))
       (List.rev list)
 
-
 (*********************)
 (*compute symmetries *)
 (*********************)
-
-  type kind = Internal | Binding
 
   let cannonic_form_from_syntactic_rules cache compil =
     let cache, cannonic_list, hashed_lists =
       List.fold_left
         (fun (cache, current_list, hashed_lists) rule ->
-          (*****************************************************)
-          (* identifiers of rule up to isomorphism*)
-        let cache, lkappa_rule, i, rate_map,
-            hashed_list =
-          I.cannonic_form_from_syntactic_rule cache compil rule
-          in
-          (*****************************************************)
-          (* convention of r:
+           (*****************************************************)
+           (* identifiers of rule up to isomorphism*)
+           let cache, lkappa_rule, i, rate_map, hashed_list =
+             I.cannonic_form_from_syntactic_rule cache compil rule
+           in
+           (*****************************************************)
+           (* convention of r:
               the number of automorphisms in the lhs of the rule r*)
-          let cache, convention_rule =
-            I.divide_rule_rate_by cache compil rule
-          in
-          (*****************************************************)
-          let current_list =
-            (i, rate_map, convention_rule) :: current_list
-          in
-          let hashed_lists =
-            (hashed_list, lkappa_rule) :: hashed_lists
-          in
-          cache, current_list, hashed_lists
+           let cache, convention_rule =
+             I.divide_rule_rate_by cache compil rule
+           in
+           (*****************************************************)
+           let current_list =
+             (i, rate_map, convention_rule) :: current_list
+           in
+           let hashed_lists =
+             (hashed_list, lkappa_rule) :: hashed_lists
+           in
+           cache, current_list, hashed_lists
         ) (cache, [], []) (I.get_rules compil)
     in
     cache, cannonic_list, hashed_lists
@@ -1786,16 +1822,34 @@ struct
 
   let compute_symmetries_from_model
       parameters compil network contact_map  =
+    (*cache, chemical_species:pattern.cc list *)
+    let network, initial_states =
+      species_of_initial_state compil network (I.get_init compil)
+    in
+    (*let () =
+      if Remanent_parameters.get_trace parameters
+      then
+      List.iter (fun chemical_species ->
+          let logger = Remanent_parameters.get_logger parameters in
+          let log = Loggers.formatter_of_logger logger in
+          let () =
+            match log with
+            | None -> ()
+            | Some fmt ->
+              Loggers.fprintf logger "Initial_states\n";
+              I.print_chemical_species ~compil fmt  chemical_species
+          in
+          ()
+          ) initial_states
+      else ()
+    in*)
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
-      cannonic_form_from_syntactic_rules
-        cache
-        compil
+      cannonic_form_from_syntactic_rules cache compil
     in
     let hash_lists, lkappa_rule = List.split pair_list in
       let to_be_checked, counter, rates, correct =
-        Symmetries.build_array_for_symmetries
-          hash_lists
+        Symmetries.build_array_for_symmetries hash_lists
       in
       (*for each rule*)
       let () =
@@ -1822,6 +1876,7 @@ struct
           pair_list
           (to_be_checked, counter, rates, correct)
           contact_map
+          initial_states
       in
       let network =
         {
@@ -1831,6 +1886,5 @@ struct
         }
       in
       network
-
 
 end

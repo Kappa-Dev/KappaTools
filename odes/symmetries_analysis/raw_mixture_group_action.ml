@@ -38,12 +38,16 @@ let normalize_internal_states_in_raw_mixture
        let ag_ints =
          List.fold_left
            (fun agent_ints equiv_class ->
-              normalize_internal_states_in_agent equiv_class agent_ints
+              normalize_internal_states_in_agent equiv_class
+                agent_ints
            )
            agent.Raw_mixture.a_ints
            partition
        in
-       {agent with Raw_mixture.a_ints = ag_ints})
-    (List.rev raw_mixture)
+       {
+         agent with
+         Raw_mixture.a_ints = ag_ints
+       }
+    ) (List.rev raw_mixture)
   in
   raw_mixture

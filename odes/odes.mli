@@ -53,8 +53,6 @@ sig
 
   val get_divide_rate_by : enriched_rule -> int
 
-  type kind = Internal | Binding
-
   val compute_symmetries_from_model:
     Remanent_parameters_sig.parameters ->
     I.compil ->

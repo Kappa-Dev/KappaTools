@@ -10,7 +10,8 @@ type compil =
     (*contact_map: state list * (agent_name * site) list *)
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
-    init: (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
+    init:
+      (Alg_expr.t * Primitives.elementary_rule * Locality.t) list;
     rate_convention: Ode_args.rate_convention ;
     show_reactions: bool ;
     count: Ode_args.count ;
@@ -18,7 +19,9 @@ type compil =
   }
 
 type cc_cache = Pattern.PreEnv.t
+
 type nauto_in_rules_cache = LKappa_auto.cache
+
 type sym_cache = Symmetries.cache
 
 type cache =
@@ -31,7 +34,7 @@ type cache =
 let get_representant parameters compil cache symmetries species =
   let rep_cache, cc_cache, species =
     Symmetries.representant
-      ~parameters 
+      ~parameters
       (Model.signatures compil.environment)
       cache.representant_cache
       cache.cc_cache
@@ -39,18 +42,25 @@ let get_representant parameters compil cache symmetries species =
   in
   {cache with
    representant_cache = rep_cache;
-              cc_cache = cc_cache
-  },
-  species
+   cc_cache = cc_cache
+  }, species
 
 let get_cc_cache cache = cache.cc_cache
+
 let set_cc_cache cc_cache cache = {cache with cc_cache = cc_cache}
+
 let get_rule_cache cache = cache.rule_cache
-let set_rule_cache rule_cache cache = {cache with rule_cache = rule_cache}
+
+let set_rule_cache rule_cache cache =
+  {cache with rule_cache = rule_cache}
+
 let get_sym_cache cache = cache.representant_cache
-let set_sym_cache sym_cache cache = {cache with representant_cache = sym_cache}
+
+let set_sym_cache sym_cache cache =
+  {cache with representant_cache = sym_cache}
 
 type hidden_init = Primitives.elementary_rule
+
 type init = (Alg_expr.t * hidden_init * Locality.t) list
 
 let get_init compil= compil.init
@@ -69,13 +79,19 @@ let environment compil = compil.environment
 let domain compil = Model.domain (environment compil)
 
 let domain_opt = lift_opt domain
+
 let environment_opt = lift_opt environment
+
 type mixture = Edges.t(* not necessarily connected, fully specified *)
+
 type chemical_species = Pattern.cc
 (* connected, fully specified *)
+
 type canonic_species = chemical_species (* chemical species in canonic form *)
+
 type pattern = Pattern.id array
 (* not necessarity connected, maybe partially specified *)
+
 type connected_component = Pattern.id
 (* connected, maybe partially specified *)
 
@@ -202,8 +218,6 @@ type arity = Rule_modes.arity
 type direction = Rule_modes.direction
 type rule_name = string
 type rule_id_with_mode = rule_id * arity * direction
-
-
 
 let lhs _compil _rule_id r = r.Primitives.connected_components
 
@@ -362,21 +376,21 @@ let empty_cc_cache compil =
 
 let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
-let empty_sym_cache () =
-  Symmetries.empty_cache ()
+let empty_sym_cache () = Symmetries.empty_cache ()
+
 let empty_cache compil =
   {
     cc_cache  = empty_cc_cache compil ;
     rule_cache = empty_lkappa_cache () ;
     representant_cache = empty_sym_cache () ;
   }
+
 let mixture_of_init compil c =
-  let _,emb,m = disjoint_union compil [] in
+  let _, emb, m = disjoint_union compil [] in
   let m = apply compil c emb m in
   m
 
-let nb_tokens compil =
-  Model.nb_tokens (environment compil)
+let nb_tokens compil = Model.nb_tokens (environment compil)
 
 let divide_rule_rate_by cache compil rule =
   match compil.rate_convention with
@@ -427,11 +441,14 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let cache = {cache with rule_cache = rule_cache } in
   cache, lkappa_rule, i , rate_map, hashed_list
 
-let detect_symmetries parameter compil cache arrays rules contact_map =
+let detect_symmetries parameter compil cache arrays rules contact_map
+    initial_states =
   let rule_cache = cache.rule_cache in
-  let rule_cache,symmetries =
+  let rule_cache, symmetries =
     Symmetries.detect_symmetries
-      parameter compil.environment rule_cache arrays rules contact_map
+      parameter compil.environment rule_cache arrays rules
+      contact_map
+      initial_states
   in
   {cache with rule_cache = rule_cache},
   symmetries

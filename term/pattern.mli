@@ -27,8 +27,10 @@ module ObsMap : sig
   val fold_lefti : (id -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   val map : ('a -> 'b) -> 'a t -> 'b t
   val print :
-    ?trailing:(Format.formatter -> unit) -> (Format.formatter -> unit) ->
-    (id -> Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+    ?trailing:(Format.formatter -> unit) ->
+    (Format.formatter -> unit) ->
+    (id -> Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a t -> unit
 end
 
 module Env : sig
@@ -51,17 +53,22 @@ module Env : sig
   type t
 
   val get : t -> id -> point
+
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
-  val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option
+  val get_elementary : t -> Navigation.step ->
+    (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
+
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
   val print : Format.formatter -> t -> unit
 
   val to_yojson : t -> Yojson.Basic.json
+
   val of_yojson : Yojson.Basic.json -> t
+
 end
 
 module PreEnv : sig
@@ -72,7 +79,9 @@ module PreEnv : sig
   val sigs : t -> Signature.s
 
   val finalize : max_sharing:bool -> t -> Env.t * stat
+
   val of_env : Env.t -> t
+
 end
 
 (** {6 Create a connected component} *)
@@ -91,23 +100,30 @@ val new_link :
 (** [new_link wk (node, site_id) (node', site_id')] *)
 
 val new_free : work -> (Agent.t * int) -> work
+
 val new_internal_state : work -> (Agent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
-val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*cc*id)
+val finish_new : ?origin:Operator.rev_dep -> work ->
+  (PreEnv.t*Renaming.t*cc*id)
 
 val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
 
 (** {6 Use a connected component } *)
 
 val compare_canonicals : id -> id -> int
+
 val is_equal_canonicals : id -> id -> bool
+
 val print_cc :
   ?sigs:Signature.s -> ?cc_id:id -> Format.formatter -> t -> unit
-val print : ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
+
+val print : ?domain:Env.t -> with_id:bool ->
+  Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 
 val id_to_yojson : id -> Yojson.Basic.json
+
 val id_of_yojson : Yojson.Basic.json -> id
 
 val reconstruction_navigation : t -> Navigation.t

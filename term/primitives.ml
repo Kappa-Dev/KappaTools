@@ -135,7 +135,7 @@ end
 type elementary_rule = {
   rate : Alg_expr.t Locality.annot;
   unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
-  connected_components : Pattern.id array;
+  connected_components : Pattern.id array; (*id -> cc*)
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
