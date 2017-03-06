@@ -1,8 +1,45 @@
 let trace = false
-let trace_print x =
-  if trace
+
+let do_trace parameters =
+  trace ||
+    (match parameters with
+     | None -> false
+     | Some p -> Remanent_parameters.get_trace p)
+
+let trace_print ?parameters x =
+  if trace then
+    let get_trace, fmt_opt =
+      match parameters with
+      | None -> false, Some Format.err_formatter
+      | Some parameters ->
+        Remanent_parameters.get_trace parameters,
+        Loggers.formatter_of_logger (Remanent_parameters.get_logger parameters)
+    in
+    if get_trace
+    then
+      match fmt_opt with
+      | Some fmt ->
+        Format.fprintf fmt "%s\n" x
+      | None -> ()
+
+let safe_print_str (i,j,k,l) parameters print =
+  if do_trace parameters
   then
-    Printf.fprintf stderr "%s\n" x
+    try
+      let () = print Format.str_formatter in
+      let s = Format.flush_str_formatter () in
+      let () = trace_print ?parameters s in
+      ()
+    with
+    | _ ->
+      let () =
+        Format.fprintf
+          Format.str_formatter
+          "An error has been encountered (%s,%i,%i,%i)" i j k l
+      in
+      let s = Format.flush_str_formatter () in
+      let () = trace_print ?parameters s in
+      ()
 
 let declare_bond work ag_pos site bond_id map =
   match Mods.IntMap.find_option bond_id map with
@@ -18,19 +55,20 @@ let declare_bond work ag_pos site bond_id map =
       | [] | _::_::_ -> assert false
     end
 
-let raw_mixture_to_pattern signature preenv mix unspec =
-  let () = trace_print "BEGIN RMIX -> PATTERN" in
+let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
+  let () = trace_print ?parameters "Translation from raw_mixture to pattern" in
+  let () = trace_print ?parameters "INPUT:" in
   let () =
-    Raw_mixture.print
-      ~compact:false
-      ~created:false
-      (*~sigs:signature *)
-        Format.str_formatter
-        mix
+    match signature with
+    | None -> ()
+    | Some sigs ->
+      safe_print_str
+        __POS__
+        parameters
+        (fun fmt ->
+           Raw_mixture.print ~compact:false ~created:false ~sigs
+             fmt mix)
   in
-  let s = Format.flush_str_formatter () in
-  let () = trace_print s in
-
   let unspec =
     List.fold_left
       (fun map k -> Mods.Int2Set.add k map)
@@ -42,12 +80,10 @@ let raw_mixture_to_pattern signature preenv mix unspec =
     match tail with
     | [] -> work,bond_map
     | mixture_agent::tail ->
-      let () = trace_print "AUX" in
       let () = trace_print (string_of_int mixture_agent.Raw_mixture.a_type) in
       let pattern_agent,work =
         Pattern.new_node work mixture_agent.Raw_mixture.a_type
       in
-      let () = trace_print "NEW NODE OK" in
       let work =
         Tools.array_fold_lefti
           (fun site work state ->
@@ -78,12 +114,24 @@ let raw_mixture_to_pattern signature preenv mix unspec =
       in
       aux (ag_id+1) tail (work,bond_map)
   in
-  let () = trace_print "STEP1" in
   let work, bond_map = aux 0 mix (work, Mods.IntMap.empty) in
-  let () = trace_print "STEP2" in
-  let () = trace_print "STEP2'" in
   let (a,_,b,c) = Pattern.finish_new work in
-  let () = trace_print "END RMIX -> PATTERN" in
+  let () =
+    match signature with
+    | None -> ()
+    | Some sigs ->
+      let () = trace_print ?parameters "OUTPUT:" in
+      let () =
+        safe_print_str
+          __POS__
+          parameters
+          (fun fmt ->
+             Pattern.print_cc
+               ~sigs
+               fmt
+               b)
+      in ()
+  in
   (a,b,c)
 
 let add_map i j map =
@@ -144,16 +192,16 @@ let top_sort list =
 
 
 
-let pattern_to_raw_mixture signature pattern =
-  let () = trace_print "BEGIN PATTERN -> RMIX" in
-  (*  let () = Pattern.print_cc
-      ~sigs:signature
-      Format.str_formatter
-      pattern
-      in*)
-  let s = Format.flush_str_formatter () in
-  let () = trace_print s in
-
+let pattern_to_raw_mixture ?parameters sigs pattern =
+  let () = trace_print "Translation from patten to raw_mixture" in
+  let () =
+    let () = trace_print ?parameters "INPUT:" in
+    let () =
+      safe_print_str
+        __POS__ parameters
+        (fun fmt -> Pattern.print_cc ~sigs fmt pattern)
+      in ()
+  in
   let agent_list, site_list =
     Pattern.fold
       (fun ~pos ~agent_type (agent_list,site_list) ->
@@ -175,18 +223,9 @@ let pattern_to_raw_mixture signature pattern =
           Mods.Int2Map.find_option (ag_pos',site') bond_map
         with
         | None ->
-          let () = trace_print "NEW ADDRESS" in
-          let () = trace_print (string_of_int ag_pos') in
-          let () = trace_print (string_of_int site') in
-          let () = trace_print (string_of_int pos) in
-          let () = trace_print (string_of_int site) in
-          let () = trace_print (string_of_int fresh_bond_id) in
-          aux
-            tail
-            (succ fresh_bond_id)
-            (Mods.Int2Map.add (pos,site) fresh_bond_id bond_map)
+            aux tail (succ fresh_bond_id)
+              (Mods.Int2Map.add (pos,site) fresh_bond_id bond_map)
         | Some i ->
-        let () = trace_print "OLD ADDRESS" in
         let () = trace_print (string_of_int i) in
 
           aux
@@ -213,17 +252,13 @@ let pattern_to_raw_mixture signature pattern =
            then
              0
            else
-             Signature.arity signature ag_type
+             Signature.arity sigs ag_type
          in
-         let () = trace_print "OK" in
          Array.make n_site (Raw_mixture.FREE, None)
       )
       agent_type_map
   in
   let rec aux tail unspec =
-    let () =
-      trace_print "OK"
-    in
     match tail with
     | [] -> Some (agent_map, unspec)
     | (pos,site,(binding_state,int_state))::tail ->
@@ -245,9 +280,6 @@ let pattern_to_raw_mixture signature pattern =
           | Some array ->
             array.(site)<-(Raw_mixture.FREE, Some int_state)
         in
-        let () =
-          trace_print "OK"
-        in
         aux tail ((pos,site)::unspec)
       | Pattern.Free  ->
         let () =
@@ -264,34 +296,15 @@ let pattern_to_raw_mixture signature pattern =
           | Some array ->
             array.(site)<-(Raw_mixture.FREE, Some int_state)
         in
-        let () =
-          trace_print "OK"
-        in
         aux tail unspec
       | Pattern.Link _ ->
         begin
           match
-          let () =
-            trace_print (string_of_int pos)
-          in
-          let () =
-            trace_print (string_of_int site)
-          in
-          Mods.Int2Map.find_option
-            (pos,site)
-            bond_map
+            Mods.Int2Map.find_option (pos,site) bond_map
           with
           | None -> assert false
           | Some i ->
-            let () =
-              trace_print "OK LINK"
-            in
-            let () =
-              trace_print (string_of_int pos)
-            in
-            let () =
-              trace_print (string_of_int i)
-            in
+
             let () =
               match
                 Mods.IntMap.find_option pos agent_map
@@ -304,33 +317,42 @@ let pattern_to_raw_mixture signature pattern =
         end
   in
   match aux site_list [] with
-  | None ->
-    let () = trace_print "FAILLURE PATTERN -> RMIX" in
-    None
+  | None -> None
   | Some (agent_map, unspec) ->
     begin
       let (),list =
         Mods.IntMap.monadic_fold2
           () ()
           (fun () () _ agent_type intf agent_list ->
-            let internal =
-              Array.map
-                snd
-                intf
-            in
-            let binding =
-              Array.map
-                fst
-                intf
-            in
-            (),({
-              Raw_mixture.a_type = agent_type ;
-              a_ports = binding ;
-              a_ints = internal ;
-              }::agent_list))
-          (fun () () _ _ _ -> raise Exit)
-          (fun () () _ _ _ -> raise Exit)
+             let internal = Array.map snd intf in
+             let binding = Array.map fst intf in
+             (),({
+                 Raw_mixture.a_type = agent_type ;
+                 a_ports = binding ;
+                 a_ints = internal ;
+               }::agent_list))
+          (fun () () _ _ agent_list ->
+             let () =
+               safe_print_str
+                 __POS__ parameters (fun fmt -> raise Exit)
+             in
+             (), agent_list)
+          (fun () () _ _ agent_list ->
+             let () =
+               safe_print_str
+                 __POS__ parameters (fun fmt -> raise Exit)
+             in
+             (), agent_list)
           agent_type_map agent_map []
       in
-      Some (top_sort list, unspec)
+      let output = top_sort list in
+      let () = trace_print ?parameters "OUTPUT:" in
+      let () =
+        safe_print_str
+          __POS__ parameters
+          (fun fmt ->
+             Raw_mixture.print ~compact:false ~created:false ~sigs
+               fmt output)
+      in
+      Some (output, unspec)
     end

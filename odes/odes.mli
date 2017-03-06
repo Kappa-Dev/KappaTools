@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 05 2017>
+  * Last modification: Time-stamp: <Mar 06 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -19,6 +19,7 @@ sig
 
   val network_from_compil:
     ignore_obs:bool ->
+    Remanent_parameters_sig.parameters ->
     I.compil ->
     (ode_var_id,Ode_loggers_sig.ode_var_id) network ->
     (ode_var_id,Ode_loggers_sig.ode_var_id) network

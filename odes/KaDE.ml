@@ -153,15 +153,15 @@ let main () =
     let network =
       A.init compil
     in
+    let parameters =
+      (* TO DO *)
+      (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY
+        ANALYSIS *)
+      Ode_args.build_kasa_parameters ode_args common_args
+    in
     let network =
       if ode_args.Ode_args.with_symmetries
       then
-        let parameters =
-          (* TO DO *)
-          (* ADD SOME COMMAND LINES PARAMETERS TO TUNE THE REACHEABILITY
-            ANALYSIS *)
-          Ode_args.build_kasa_parameters ode_args common_args
-        in
         let module B =
           (val Domain_selection.select_domain
               ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
@@ -227,7 +227,7 @@ let main () =
         network
     in
     let network =
-      A.network_from_compil ~ignore_obs compil network
+      A.network_from_compil ~ignore_obs parameters compil network
     in
 (*********************************************************************)
     let out_channel =

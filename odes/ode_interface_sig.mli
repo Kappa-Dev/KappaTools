@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 05 2017>
+  * Last modification: Time-stamp: <Mar 06 2017>
 *)
 
 module type Interface =
@@ -158,6 +158,7 @@ sig
 *)
 
   val get_representant:
+    Remanent_parameters_sig.parameters -> 
     compil -> cache -> Symmetries.symmetries ->
     chemical_species -> cache * chemical_species
 

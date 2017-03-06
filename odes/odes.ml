@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 05 2017>
+  * Last modification: Time-stamp: <Mar 06 2017>
 *)
 
 let local_trace = false
@@ -374,18 +374,18 @@ struct
           (I.print_chemical_species ~compil) species in
       remanent,i
 
-  let representant compil network species =
+  let representant parameters compil network species =
     match network.symmetries with
     | None -> network, species
     | Some symmetries ->
       let cache = network.cache in
       let cache, species =
-        I.get_representant compil cache symmetries species
+        I.get_representant parameters compil cache symmetries species
       in
       {network with cache = cache}, species
 
-  let translate_species compil species remanent =
-    let network, species = representant compil (snd remanent) species in
+  let translate_species parameters compil species remanent =
+    let network, species = representant parameters compil (snd remanent) species in
     let remanent = fst remanent, network in
     translate_canonic_species compil
       (I.canonic_form species) species remanent
@@ -402,28 +402,30 @@ struct
       (to_be_visited, network), id
     | Some i -> remanent, i
 
-  let petrify_species compil species remanent =
-  let network, species = representant compil (snd remanent) species in
-  let remanent = fst remanent, network in
+  let petrify_species parameters compil species remanent =
+    let network, species =
+      representant parameters compil (snd remanent) species
+    in
+    let remanent = fst remanent, network in
     translate_canonic_species compil
-      (I.canonic_form species) species remanent 
+      (I.canonic_form species) species remanent
 
-  let petrify_species_list compil l remanent =
+  let petrify_species_list parameters compil l remanent =
     fold_left_swap
       (fun species (remanent,l) ->
          let remanent, i =
-           petrify_species compil species remanent
+           petrify_species parameters compil species remanent
          in
          remanent,(i::l))
       l
       (remanent,[])
 
-  let petrify_mixture compil mixture (acc,network) =
+  let petrify_mixture parameters compil mixture (acc,network) =
     let cache,species =
       I.connected_components_of_mixture
         compil network.cache mixture
     in
-    petrify_species_list compil species (acc,{network with cache = cache})
+    petrify_species_list parameters compil species (acc,{network with cache = cache})
 
   let add_to_prefix_list connected_component key prefix_list store acc =
     let list_embeddings =
@@ -524,16 +526,16 @@ struct
                         convert_bool_expr compil network a,
                         convert_bool_expr compil network b),pos
   let add_reaction
-      compil enriched_rule embedding_forest mixture remanent =
+      parameters compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
     let _  = debug "REACTANTS\n" in
     let remanent, reactants =
-      petrify_mixture compil mixture remanent in
+      petrify_mixture parameters compil mixture remanent in
     let _  = debug "PRODUCT\n" in
     let products = I.apply compil rule embedding_forest mixture in
     let tokens = I.token_vector rule in
     let remanent, products =
-      petrify_mixture compil products remanent in
+      petrify_mixture parameters compil products remanent in
     let remanent, tokens =
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
@@ -554,7 +556,7 @@ struct
     in
     to_be_visited, network
 
-  let initial_network compil network initial_states rules =
+  let initial_network parameters compil network initial_states rules =
     List.fold_left
       (fun remanent enriched_rule ->
          match enriched_rule.lhs_cc with
@@ -562,17 +564,17 @@ struct
            begin
              let _,embed,mixture = I.disjoint_union compil [] in
              let () = debug "add new reaction" in
-             add_reaction compil enriched_rule embed mixture remanent
+             add_reaction parameters compil enriched_rule embed mixture remanent
            end
          | _::_ -> remanent
       )
       (List.fold_left
          (fun remanent species ->
-            fst (translate_species compil species remanent))
+            fst (translate_species parameters compil species remanent))
          ([],network)
          initial_states) rules
 
-  let compute_reactions compil network rules initial_states =
+  let compute_reactions parameters compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
@@ -591,7 +593,7 @@ struct
     let rules = List.rev rules_rev in
     let to_be_visited, network =
       initial_network
-        compil network initial_states rules
+        parameters compil network initial_states rules
     in
     let network =
       {network
@@ -718,7 +720,7 @@ struct
                          let _,embed,mixture = I.disjoint_union compil list in
                          let () = debug "add new reaction" in
                          add_reaction
-                           compil enriched_rule embed mixture remanent)
+                           parameters compil enriched_rule embed mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
                   in
@@ -736,7 +738,7 @@ struct
                     fold_left_swap
                       (fun embed ->
                          add_reaction
-                           compil  enriched_rule embed
+                           parameters compil enriched_rule embed
                            (I.lift_species compil new_species))
                       lembed
                       (to_be_visited, network)
@@ -767,7 +769,7 @@ struct
 
   let get_reactions network = network.reactions
 
-  let convert_initial_state compil intro network =
+  let convert_initial_state parameters compil intro network =
     let b,c,a = intro in
     convert_alg_expr compil network (b,a) ,
     match I.token_vector_of_init c with
@@ -779,7 +781,7 @@ struct
       let network = {network with cache = cache'} in
       List.fold_left
         (fun (network,acc) x ->
-           let (_,n'),v = translate_species compil x ([],network) in n',v::acc)
+           let (_,n'),v = translate_species parameters compil x ([],network) in n',v::acc)
         (network,[]) (List.rev cc)
     | l ->
       List.fold_right (fun (_,token) (network,acc) ->
@@ -792,7 +794,7 @@ struct
     let a,b = variable_def in
     a,convert_alg_expr compil network b
 
-  let convert_var_defs compil network =
+  let convert_var_defs parameters compil network =
     let list_var = I.get_variables compil in
     let init = I.get_init compil in
     let list, network =
@@ -820,7 +822,7 @@ struct
       List.fold_left
         (fun (list,network) def ->
            let b,(network,c) =
-             convert_initial_state compil def network in
+             convert_initial_state parameters compil def network in
            let () =
              List.iter
                (fun id -> add id (get_fresh_var_id network))
@@ -1113,7 +1115,7 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let network_from_compil ~ignore_obs compil network =
+  let network_from_compil ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
@@ -1121,11 +1123,11 @@ struct
       species_of_initial_state compil network (I.get_init compil)
     in
     let () = Format.printf "\t -saturating the set of molecular species @." in
-    let network = compute_reactions compil network rules initial_state in
+    let network = compute_reactions parameters compil network rules initial_state in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
-    let network = convert_var_defs compil network in
+    let network = convert_var_defs parameters compil network in
     let () = Format.printf "\t -observables @." in
     let network = convert_obs compil network  in
     let () = Format.printf "\t -check time homogeneity @." in
