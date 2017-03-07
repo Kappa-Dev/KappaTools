@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 06 2017>
+  * Last modification: Time-stamp: <Mar 07 2017>
 *)
 
 let local_trace = false
@@ -1823,6 +1823,7 @@ struct
   let compute_symmetries_from_model
       parameters compil network contact_map  =
     (*cache, chemical_species:pattern.cc list *)
+    let () = Format.printf "+ compute symmetric sites... @." in
     let network, initial_states =
       species_of_initial_state compil network (I.get_init compil)
     in
@@ -1887,4 +1888,12 @@ struct
       in
       network
 
+  let print_symmetries parameters compil network =
+    match network.symmetries with
+    | None -> ()
+    | Some sym ->
+      I.print_symmetries
+        parameters
+        compil
+        sym
 end

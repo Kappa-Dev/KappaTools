@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 06 2017>
+  * Last modification: Time-stamp: <Mar 07 2017>
 *)
 
 module type Interface =
@@ -164,6 +164,9 @@ sig
     chemical_species list ->
     cache * Symmetries.symmetries
 
+  val print_symmetries:
+  Remanent_parameters_sig.parameters ->
+  compil -> Symmetries.symmetries -> unit
 (*  val get_cc_cache: cache -> Pattern.PreEnv.t
   val set_cc_cache: Pattern.PreEnv.t -> cache -> cache
 *)

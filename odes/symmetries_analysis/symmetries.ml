@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 06 2017>
+   * Last modification: Time-stamp: <Mar 07 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -261,7 +261,6 @@ let refine_partitioned_contact_map_in_lkappa_representation
 (******************************************************************)
 
 let print_l logger fmt signature agent l =
-  let () = Loggers.fprintf logger "{" in
   let size_1 =
     match l with
     | [l] -> true
@@ -272,7 +271,7 @@ let print_l logger fmt signature agent l =
       (fun b equ_class ->
          let () = if b then Loggers.fprintf logger "," in
          let () = if not size_1 then Loggers.print_newline logger in
-         let () = if not size_1 then Loggers.fprintf logger "  " in
+         let () = if not size_1 then Loggers.fprintf logger "       " in
          let () = Loggers.fprintf logger "{" in
          let _ =
            List.fold_left
@@ -289,8 +288,6 @@ let print_l logger fmt signature agent l =
       false
       l
   in
-  let () = if b && not size_1 then Loggers.print_newline logger in
-  let () = Loggers.fprintf logger "}" in
   let () = Loggers.print_newline logger in
   ()
 
@@ -301,19 +298,22 @@ let print_partitioned_contact_map_in_lkappa logger env
   match fmt with
   | None -> ()
   | Some fmt ->
+    let () = Loggers.fprintf logger "************" in
     Array.iteri
       (fun agent (l1,l2) ->
          let () = Loggers.fprintf logger "Agent: " in
          let () = Signature.print_agent signature fmt agent in
          let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger
-             "Partition of the sites for internal states:" in
+             "  -Equivalence classes of sites for internal states:" in
          let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l1 in
          let () = Loggers.fprintf logger
-             "Partition of the sites for bindings states:" in
+             "  -Equivalence classes of sites for bindings states:" in
          let () = Loggers.print_newline logger in
          let () = print_l logger fmt signature agent l2 in
+         let () = Loggers.fprintf logger "************" in
+         let () = Loggers.print_newline logger in
          ()
       ) partitioned_contact_map
 

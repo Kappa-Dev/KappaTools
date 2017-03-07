@@ -1080,21 +1080,24 @@ internal sites:
 binding sites:
 y,x,
 Partitioned contact map (LKAPPA)
-Agent: A
-Partition of the sites for internal states:
-{}
-Partition of the sites for bindings states:
-{{x,y}}
+************Agent: A
+  -Equivalence classes of sites for internal states:
+
+  -Equivalence classes of sites for bindings states:
+{x,y}
+************
 With predicate (LKAPPA)
-Agent: A
-Partition of the sites for internal states:
-{}
-Partition of the sites for bindings states:
-{{x,y}}
+************Agent: A
+  -Equivalence classes of sites for internal states:
+
+  -Equivalence classes of sites for bindings states:
+{x,y}
+************
 Symmetries:
-Agent: A
-Partition of the sites for internal states:
-{}
-Partition of the sites for bindings states:
-{{x,y}}
+************Agent: A
+  -Equivalence classes of sites for internal states:
+
+  -Equivalence classes of sites for bindings states:
+{x,y}
+************
 execution finished without any exception

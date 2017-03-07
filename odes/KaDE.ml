@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 06 2017>
+  * Last modification: Time-stamp: <Mar 07 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -155,6 +155,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       Ode_args.build_kasa_parameters ~called_from ode_args
         common_args
     in
+    let parameters' = parameters in
     let network =
       if ode_args.Ode_args.with_symmetries
       then
@@ -187,16 +188,27 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           Export_to_kade.get_contact_map
             ~accuracy_level:Remanent_state.High state
         in
-        (* Here define the cache for equivalence classes
-           of species *)
-        (* Fill with the function that maps a species to its
-           representant *)
+        let parameters =
+          Remanent_parameters.set_logger
+            parameters
+            (Remanent_parameters.get_logger parameters')
+        in
+        let parameters =
+          Remanent_parameters.set_trace
+            parameters
+            (Remanent_parameters.get_trace parameters')
+        in
         let network =
           A.compute_symmetries_from_model
             parameters
             compil
             network
             contact_map
+        in
+        let () =
+          A.print_symmetries
+            parameters compil
+            network
         in
         network
       else

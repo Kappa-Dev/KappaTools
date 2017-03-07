@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 06 2017>
+  * Last modification: Time-stamp: <Mar 07 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -452,3 +452,7 @@ let detect_symmetries parameter compil cache arrays rules contact_map
   in
   {cache with rule_cache = rule_cache},
   symmetries
+
+let print_symmetries parameters compil symmetries =
+  let env = compil.environment in
+  Symmetries.print_symmetries parameters env symmetries 

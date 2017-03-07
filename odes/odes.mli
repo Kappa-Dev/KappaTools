@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 06 2017>
+  * Last modification: Time-stamp: <Mar 07 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -59,5 +59,9 @@ sig
     ('a,'b) network  ->
     Remanent_state.contact_map ->
     ('a,'b) network
+
+  val print_symmetries:
+    Remanent_parameters_sig.parameters ->
+    I.compil -> ('a,'b) network -> unit
 
 end
