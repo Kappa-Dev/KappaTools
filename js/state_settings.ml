@@ -16,7 +16,7 @@ let set_synch (synch : bool) : unit = _synch := synch
 
 let init () : unit Lwt.t =
   let client_ids = Common_state.url_args "client_id" in
-  let synch = Common_state.url_args "client_id" in
+  let synch = Common_state.url_args "synch" in
   let () =
     match client_ids with
     | client_id::_  -> set_client_id client_id

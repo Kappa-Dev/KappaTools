@@ -12,7 +12,6 @@ module Html = Tyxml_js.Html5
 let editor_full , set_editor_full = React.S.create (false : bool)
 let is_paused , set_is_paused = React.S.create (false : bool)
 
-
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
   Tyxml_js.R.Html.pcdata
@@ -189,8 +188,8 @@ let onload () : unit =
     in
     let handle_timeout () =
       let () = set_is_paused false in
-      let () = Common.info "handle_timeout" in
-      let () = Common.info text in
+      let () = Common.info (Js.string "handle_timeout") in
+      let () = Common.info (Js.string text) in
       Subpanel_editor_controller.set_content
         (Js.to_string codemirror##getValue) in
     let () = timeout := Some

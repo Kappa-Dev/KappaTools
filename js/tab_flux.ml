@@ -82,8 +82,8 @@ let xml () =
                          Lwt.return (Api_common.result_ok ()))
                        )
                   )
-                )
-       in
+           )
+       State_simulation.model in
        flux_list
       )
   in

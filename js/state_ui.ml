@@ -9,10 +9,9 @@
 open Lwt.Infix
 
 let sync () : unit Lwt.t =
-  Lwt.return_unit >>=
-  State_settings.sync >>=
+  State_settings.sync () >>=
   State_runtime.sync >>=
-  (fun _ -> State_project.sync () >>= (fun _ -> Lwt.return_unit)) >>=
+  State_project.sync >>=
   (fun _ -> State_file.sync () >>= (fun _ -> Lwt.return_unit)) >>=
   (fun _ -> State_simulation.sync () >>= (fun _ -> Lwt.return_unit))
 

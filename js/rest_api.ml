@@ -298,8 +298,8 @@ class manager
            simulation_id)
         `GET
         None
-        Mpi_message_j.simulation_catalog_of_string
-        (fun result -> `SimulationCatalog result)
+        Mpi_message_j.simulation_info_of_string
+        (fun result -> `SimulationInfo result)
     | `SimulationCatalogFileLine (project_id,simulation_id) ->
       send
         timeout

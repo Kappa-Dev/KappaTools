@@ -8,8 +8,6 @@
 
 open Lwt.Infix
 
-module StringMap = Map.Make (struct type t = string let compare = compare end)
-
 type state = { state_current : string option ;
                state_directory : Api_types_j.file_metadata list }
 

@@ -8,7 +8,6 @@
 
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
-open Lwt.Infix
 
 let handle_perturbation r _ : bool Js.t =
   let () = Panel_settings_controller.perturb_simulation () in
@@ -354,59 +353,6 @@ module ButtonContinue : Ui_common.Div = struct
 
 end
 
-module SelectRuntime : Ui_common.Div = struct
-
-let id ="settings_select_runtime"
-  let select_options, select_options_handle = ReactiveData.RList.create []
-  let select =
-    Tyxml_js.R.Html.select
-      ~a:[Html.a_id id]
-      select_options
-
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [select]
-
-  let onload () =
-    let _ =
-      React.S.bind
-        State_runtime.model
-        (fun model ->
-           let options =
-             let current_id =
-               State_runtime.spec_id  model.State_runtime.model_current in
-             List.map
-               (fun spec ->
-                  let spec_id = State_runtime.spec_id spec in
-                  let selected =
-                    if current_id = spec_id  then
-                      [Html.a_selected () ;]
-                    else [] in
-                  Html.option
-                      ~a:([Html.a_value spec_id ;
-                         ]@ selected)
-                      (Html.pcdata spec_id)
-               )
-               model.State_runtime.model_runtimes in
-           let () = ReactiveData.RList.set select_options_handle options in
-           React.S.const ())
-    in
-    let select_dom = Tyxml_js.To_dom.of_select select in
-    let () = select_dom##.onchange :=
-        Dom.handler
-          (fun _ ->
-             let () =
-               Common.async
-                 (fun () ->
-                    (State_runtime.set_manager (Js.to_string select_dom##.value)) >>=
-                    (fun _ -> Lwt.return_unit)
-                 ) in
-             Js._true
-          )
-    in
-
-    ()
-
-end
-
 module DivStatusIndicator : Ui_common.Div = struct
   let id = "setting_status_indicator"
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
@@ -729,7 +675,6 @@ let onload () : unit =
   let () = ButtonPause.onload () in
   let () = ButtonContinue.onload () in
   let () = ButtonClear.onload () in
-  let () = SelectRuntime.onload () in
   let () = DivStatusIndicator.onload() in
   ()
 let onresize () : unit = ()

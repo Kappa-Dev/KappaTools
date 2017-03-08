@@ -8,8 +8,6 @@
 
 open Lwt.Infix
 
-module StringMap = Map.Make (struct type t = string let compare = compare end)
-
 type simulation_state =
   | SIMULATION_STATE_STOPPED (* simulation is unavailable *)
   | SIMULATION_STATE_INITALIZING (* simulation is blocked on an operation *)
@@ -166,10 +164,10 @@ let when_ready
       )
 
 let rec index_simulation
-    ?(map : Api_types_j.simulation_info StringMap.t = StringMap.empty)
+    ?(map : Api_types_j.simulation_info Mods.StringMap.t = Mods.StringMap.empty)
     (manager : Api.manager)
     (project_id : Api_types_j.project_id)
-    (simulation_ids : Api_types_j.simulation_id list) : Api_types_j.simulation_info StringMap.t Api.result Lwt.t
+    (simulation_ids : Api_types_j.simulation_id list) : Api_types_j.simulation_info Mods.StringMap.t Api.result Lwt.t
   =
   match simulation_ids with
   | [] -> Lwt.return (Api_common.result_ok map)
@@ -177,7 +175,7 @@ let rec index_simulation
     (manager#simulation_info project_id simulation_id) >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (simulation_info : Api_types_j.simulation_info) ->
-           let new_map = StringMap.add simulation_id simulation_info map in
+           let new_map = Mods.StringMap.add simulation_id simulation_info map in
            index_simulation
              ~map:new_map
              manager
@@ -190,43 +188,46 @@ let rec index_simulation
    simulation.
 *)
 let augment_simulation_list
-    (simulation_index : Api_types_j.simulation_info StringMap.t)
+    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
     (simulation_list : t list) : t list =
   (* simulation id's in the current state *)
   let state_simulation_ids = List.map t_simulation_id simulation_list in
   (* predicate that checks if id is not in state id's *)
-  let not_in_state_ids simulation_id _ =
+  let not_in_state_ids simulation_id =
     not (List.mem simulation_id state_simulation_ids) in
   (* add simulations that currently not part of the state *)
-  let add_simulation_ids =
-    StringMap.filter not_in_state_ids simulation_index in
-  StringMap.fold
-     (fun simulation_id simulation_info acc ->
-       { is_pinned = false ;
-         simulation_id = simulation_id ;
-         simulation_state = SIMULATION_STATE_READY simulation_info } :: acc)
-     add_simulation_ids simulation_list
+  Mods.StringMap.fold
+    (fun simulation_id simulation_info acc ->
+       if not_in_state_ids simulation_id then
+         { is_pinned = false ;
+           simulation_id = simulation_id ;
+           simulation_state = SIMULATION_STATE_READY simulation_info } :: acc
+       else acc)
+    simulation_index simulation_list
 
 (* Remove simulation from state if it not pinned or available. *)
 let restrict_simulation_list
-    (simulation_index : Api_types_j.simulation_info StringMap.t)
+    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
     (simulation_list : t list) : t list =
-  List.filter
-    (fun t ->
-       t.is_pinned ||
-       StringMap.mem t.simulation_id simulation_index)
-    simulation_list
+  List.fold_right
+    (fun t acc ->
+       if Mods.StringMap.mem t.simulation_id simulation_index then t::acc
+       else if t.is_pinned then {
+         is_pinned=true;
+         simulation_id = t.simulation_id;
+         simulation_state = SIMULATION_STATE_STOPPED
+       }::acc
+       else acc)
+    simulation_list []
 
 let refresh_simulation_list
-    (simulation_index : Api_types_j.simulation_info StringMap.t)
+    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
     (simulation_list : t list) : t list =
   List.map
     (fun t -> let simulation_id = t_simulation_id t in
-      if StringMap.mem simulation_id simulation_index then
-        { t with
-          simulation_state = SIMULATION_STATE_READY (StringMap.find simulation_id simulation_index) }
-      else
-        t
+      match Mods.StringMap.find_option simulation_id simulation_index with
+      | Some x -> { t with simulation_state = SIMULATION_STATE_READY x }
+      | None -> t
     )
     simulation_list
 
@@ -238,7 +239,7 @@ let update_simulation_list
   t list Api.result Lwt.t =
   index_simulation ?map:None manager project_id simulation_ids >>=
   (Api_common.result_bind_lwt
-     ~ok:(fun (simulation_index : Api_types_j.simulation_info StringMap.t) ->
+     ~ok:(fun (simulation_index : Api_types_j.simulation_info Mods.StringMap.t) ->
          Lwt.return (Api_common.result_ok
                        (refresh_simulation_list
                           simulation_index
