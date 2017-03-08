@@ -384,37 +384,44 @@ let intersection renaming cc1 cc2 =
     recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
 let print_cc ?sigs ?cc_id f cc =
-  let print_intf (ag_i,_ as ag) link_ids neigh =
+  let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
-         (fun p (not_empty,(free,link_ids as out)) (el,st) ->
+         (fun p (not_empty, (free, link_ids as out)) (el, st) ->
             let () =
               if st >= 0
               then Format.fprintf
-                  f "%t%a" (if not_empty then Pp.comma else Pp.empty)
+                  f "%t%a"
+                  (if not_empty then Pp.comma else Pp.empty)
                   (Agent.print_internal ?sigs ag p) st
               else
               if  el <> UnSpec then
                 Format.fprintf
-                  f "%t%a" (if not_empty then Pp.comma else Pp.empty)
+                  f "%t%a"
+                  (if not_empty then Pp.comma else Pp.empty)
                   (Agent.print_site ?sigs ag) p in
             match el with
             | UnSpec ->
-              if st >= 0 then let () = Format.fprintf f "?" in (true,out)
+              if st >= 0 then
+                let () = Format.fprintf f "?" in (true,out)
               else (not_empty,out)
             | Free -> true,out
             | Link (dst_a,dst_p) ->
               let i,out' =
-                match Mods.Int2Map.find_option (dst_a,dst_p) link_ids with
+                match
+                  Mods.Int2Map.find_option (dst_a,dst_p) link_ids
+                with
                 | Some x -> (x, out)
                 | None ->
                   (free,(succ free, Mods.Int2Map.add (ag_i,p) free link_ids)) in
               let () = Format.fprintf f "!%i" i in
-              true,out') (false,link_ids) neigh) in
+              true, out')
+         (false, link_ids) neigh)
+  in
   let () = match cc_id with
     | None -> ()
     | Some cc_id -> Format.fprintf f "/*cc%i*/@ " cc_id in
-  let (_,_) =
+  let (_, _) =
     Mods.IntMap.fold
       (fun x el (not_empty,link_ids) ->
          let ag_x = (x,find_ty cc x) in
@@ -425,7 +432,9 @@ let print_cc ?sigs ?cc_id f cc =
              (Agent.print ?sigs ~with_id:(cc_id<>None)) ag_x in
          let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in
-         true,out) cc.nodes (false,(1,Mods.Int2Map.empty)) in
+         true, out)
+      cc.nodes (false, (1, Mods.Int2Map.empty))
+  in
   ()
 
 let to_yojson cc =

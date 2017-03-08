@@ -37,9 +37,6 @@ sig
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     unit
 
-  val species_of_species_id:
-    ('a,'b) network -> ode_var_id -> I.chemical_species * int
-
   val get_comment: enriched_rule -> string
 
   val get_rule_id_with_mode: enriched_rule -> rule_id * Rule_modes.arity * Rule_modes.direction
@@ -49,21 +46,62 @@ sig
   val get_lhs : enriched_rule -> I.pattern
 
   val get_lhs_cc :
-    enriched_rule -> (connected_component_id * I.connected_component) list
+    enriched_rule ->
+    (connected_component_id * I.connected_component) list
 
   val get_divide_rate_by : enriched_rule -> int
+
+  val species_of_initial_state :
+    I.compil ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
+    I.init ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network
+    * I.chemical_species list
+
+  val initial_network :
+    Remanent_parameters_sig.parameters ->
+    I.compil ->
+    (ode_var_id,Ode_loggers_sig.ode_var_id) network ->
+    I.chemical_species list ->
+    enriched_rule list ->
+    I.chemical_species list *
+      (ode_var_id, Ode_loggers_sig.ode_var_id) network
+
+  val compute_reactions :
+    Remanent_parameters_sig.parameters ->
+    I.compil ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
+    I.rule list ->
+    I.chemical_species list ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network
+
+  val convert_initial_state :
+    Remanent_parameters_sig.parameters ->
+    I.compil ->
+    (I.connected_component array list, Ode_loggers_sig.ode_var_id)
+      Alg_expr.e * I.hidden_init * Locality.t ->
+    ('a, 'b) network ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
+      Locality.annot *
+    (('a, 'b) network * ode_var_id list)
+
+  val species_of_species_id:
+    ('a,'b) network -> ode_var_id -> I.chemical_species * int
+
+  (*rules*)
 
   val compute_symmetries_from_model:
     Remanent_parameters_sig.parameters ->
     I.compil ->
-    ('a,'b) network  ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     Remanent_state.contact_map ->
-    ('a,'b) network
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network
 
   val print_symmetries:
     Remanent_parameters_sig.parameters ->
-    I.compil -> ('a,'b) network -> unit
+    I.compil -> (ode_var_id, Ode_loggers_sig.ode_var_id) network
+    -> unit
 
   val clean_symmetries:
-    ('a,'b) network -> ('a,'b) network 
+    ('a,'b) network -> ('a,'b) network
 end

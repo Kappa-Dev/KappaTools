@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 07 2017>
+  * Last modification: Time-stamp: <Mar 08 2017>
 *)
 
 module type Interface =
@@ -167,15 +167,15 @@ sig
   val print_symmetries:
   Remanent_parameters_sig.parameters ->
   compil -> Symmetries.symmetries -> unit
+
 (*  val get_cc_cache: cache -> Pattern.PreEnv.t
-  val set_cc_cache: Pattern.PreEnv.t -> cache -> cache
-*)
+    val set_cc_cache: Pattern.PreEnv.t -> cache -> cache*)
+
   val get_rule_cache: cache -> LKappa_auto.cache
   val set_rule_cache: LKappa_auto.cache -> cache -> cache
 
   (*val get_sym_cache: cache -> Symmetries.cache
-  val set_sym_cache: Symmetries.cache -> cache -> cache
-*)
+    val set_sym_cache: Symmetries.cache -> cache -> cache*)
 
   val get_representant:
     Remanent_parameters_sig.parameters ->

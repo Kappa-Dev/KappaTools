@@ -1,3 +1,11 @@
+
+(*intial states*)
+
+let care_binding_regular_init link =
+  match link with
+  | Pattern.UnSpec | Pattern.Free -> false
+  | Pattern.Link _ -> true
+
 (** Swapping sites in regular (tested/modified/deleted) agents *)
 
 let get_binding_precondition x = fst (fst x)

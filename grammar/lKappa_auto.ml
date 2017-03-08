@@ -463,8 +463,10 @@ let decompose bonds_map array =
   in
   aux set []
 
-(* the following function does a depth-first exploration of a cc starting from the root *)
-(* Only a spanning tree is explored, in case of cycles, a pointer to the position of the node in the list is given *)
+(* the following function does a depth-first exploration of a cc
+   starting from the root *)
+(* Only a spanning tree is explored, in case of cycles, a pointer to
+   the position of the node in the list is given *)
 
 let cannonical_of_root bonds_map array ag_id =
   let rec aux node_id stack (acc: 'a list) port_seen agent_seen =
@@ -509,7 +511,9 @@ let cannonical_of_root bonds_map array ag_id =
                    with
                    | None ->
                      (* this is the first time we see ag_id'*)
-                     let agent_name,prop,binding,intf = array.(ag_id') in
+                     let agent_name,prop,binding,intf =
+                       array.(ag_id')
+                     in
                      let intf = Mods.IntSet.remove s' intf in
                      let agent_seen =
                        Mods.IntMap.add ag_id' node_id agent_seen
@@ -555,7 +559,8 @@ let keep_this_cc rate_convention n_agents cc =
 let mixture_to_species_map rate_convention cache rule =
   let map = CannonicMap.empty in
   let n_agents = List.length rule.LKappa.r_mix  in
-  let cache, array, bonds_map = translate rate_convention cache rule in
+  let cache, array, bonds_map =
+    translate rate_convention cache rule in
   let cc_list = decompose bonds_map array in
   let cannonic_cache, map =
     List.fold_left
@@ -651,7 +656,9 @@ let cannonic_form cache rule =
          pair_list
       ) map []
   in
-  let rule_cache, hash = RuleCache.hash cache.rule_cache pair_list in
+  let rule_cache, hash =
+    RuleCache.hash cache.rule_cache pair_list
+  in
   {
     cache with rule_cache = rule_cache
   }, hash

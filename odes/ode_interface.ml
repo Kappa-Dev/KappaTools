@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 07 2017>
+  * Last modification: Time-stamp: <Mar 08 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -213,10 +213,15 @@ let disjoint_union compil l =
   (pat,em,mix)
 
 type rule = Primitives.elementary_rule
+
 type rule_id = int
+
 type arity = Rule_modes.arity
+
 type direction = Rule_modes.direction
+
 type rule_name = string
+
 type rule_id_with_mode = rule_id * arity * direction
 
 let lhs _compil _rule_id r = r.Primitives.connected_components
@@ -455,4 +460,4 @@ let detect_symmetries parameter compil cache arrays rules contact_map
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
-  Symmetries.print_symmetries parameters env symmetries 
+  Symmetries.print_symmetries parameters env symmetries

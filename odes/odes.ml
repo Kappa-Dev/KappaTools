@@ -102,7 +102,8 @@ struct
       rule_id_with_mode: (rule_id*Rule_modes.arity*Rule_modes.direction);
       rule: I.rule ;
       lhs: I.pattern ;
-      lhs_cc: (connected_component_id * I.connected_component) list ;
+      lhs_cc:
+        (connected_component_id * I.connected_component) list ;
       divide_rate_by: int
     }
 
@@ -1822,71 +1823,66 @@ struct
 
   let compute_symmetries_from_model
       parameters compil network contact_map  =
-    (*cache, chemical_species:pattern.cc list *)
     let () = Format.printf "+ compute symmetric sites... @." in
+    let log = Remanent_parameters.get_logger parameters in
+    (*detect symmetries in initial states*)
     let network, initial_states =
       species_of_initial_state compil network (I.get_init compil)
     in
-    (*let () =
-      if Remanent_parameters.get_trace parameters
-      then
-      List.iter (fun chemical_species ->
-          let logger = Remanent_parameters.get_logger parameters in
-          let log = Loggers.formatter_of_logger logger in
-          let () =
-            match log with
-            | None -> ()
-            | Some fmt ->
-              Loggers.fprintf logger "Initial_states\n";
-              I.print_chemical_species ~compil fmt  chemical_species
-          in
-          ()
-          ) initial_states
-      else ()
-    in*)
+    let () =
+      List.iter (fun species ->
+          let fmt = Loggers.formatter_of_logger log in
+          match fmt with
+          | None -> ()
+          | Some fmt ->
+            I.print_chemical_species ~compil fmt species;
+            Loggers.print_newline log
+        ) initial_states
+    in
+    (*detect symmetries for rules*)
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
       cannonic_form_from_syntactic_rules cache compil
     in
     let hash_lists, lkappa_rule = List.split pair_list in
-      let to_be_checked, counter, rates, correct =
-        Symmetries.build_array_for_symmetries hash_lists
-      in
-      (*for each rule*)
-      let () =
-        List.iter
-          (fun (i, rate_map, convention_rule) ->
-            let () =
-              correct.(i) <- convention_rule
-            in
-            let () =
-              rates.(i) <-
-                (Rule_modes.add_map (rates.(i)) rate_map)
-            in
-            let () =
-              to_be_checked.(i) <- true
-            in
-            ()
-          ) cannonic_list
-      in
-      let cache, symmetries =
-        I.detect_symmetries
-          parameters
-          compil
-          cache
-          pair_list
-          (to_be_checked, counter, rates, correct)
-          contact_map
-          initial_states
-      in
-      let network =
-        {
-          network with
-          cache = cache;
-          symmetries = Some symmetries
-        }
-      in
-      network
+    let to_be_checked, counter, rates, correct =
+      Symmetries.build_array_for_symmetries hash_lists
+    in
+    (*for each rule*)
+    let () =
+      List.iter
+        (fun (i, rate_map, convention_rule) ->
+           let () =
+             correct.(i) <- convention_rule
+           in
+           let () =
+             rates.(i) <-
+               (Rule_modes.add_map (rates.(i)) rate_map)
+           in
+           let () =
+             to_be_checked.(i) <- true
+           in
+           ()
+        ) cannonic_list
+    in
+    let cache, symmetries =
+      I.detect_symmetries
+        parameters
+        compil
+        cache
+        pair_list
+        (to_be_checked, counter, rates, correct)
+        contact_map
+        initial_states
+    in
+    let network =
+      {
+        network with
+        cache = cache;
+        symmetries = Some symmetries
+      }
+    in
+    network
 
   let print_symmetries parameters compil network =
     match network.symmetries with
