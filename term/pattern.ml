@@ -413,7 +413,9 @@ let print_cc ?sigs ?cc_id f cc =
                 with
                 | Some x -> (x, out)
                 | None ->
-                  (free,(succ free, Mods.Int2Map.add (ag_i,p) free link_ids)) in
+                  (free, (succ free,
+                          Mods.Int2Map.add (ag_i,p) free link_ids))
+              in
               let () = Format.fprintf f "!%i" i in
               true, out')
          (false, link_ids) neigh)

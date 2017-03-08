@@ -51,6 +51,21 @@ sig
 
   val get_divide_rate_by : enriched_rule -> int
 
+(*initial states*)
+  val translate_species :
+    Remanent_parameters_sig.parameters ->
+    I.compil ->
+    I.chemical_species ->
+    I.chemical_species list * ('a, 'b) network ->
+    (I.chemical_species list * ('a, 'b) network) * ode_var_id
+
+  val translate_canonic_species :
+    I.compil ->
+    I.canonic_species ->
+    I.chemical_species ->
+    I.chemical_species list * ('a, 'b) network ->
+    (I.chemical_species list * ('a, 'b) network) * ode_var_id
+
   val species_of_initial_state :
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
@@ -79,7 +94,7 @@ sig
     Remanent_parameters_sig.parameters ->
     I.compil ->
     (I.connected_component array list, Ode_loggers_sig.ode_var_id)
-      Alg_expr.e * I.hidden_init * Locality.t ->
+      Alg_expr.e * I.rule * Locality.t ->
     ('a, 'b) network ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
       Locality.annot *

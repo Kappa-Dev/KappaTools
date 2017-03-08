@@ -5,13 +5,15 @@
 
 (*type contact_map = (int list * (int * int) list) array array*)
 
+type rule = Primitives.elementary_rule
+
 type compil =
   {
     (*contact_map: state list * (agent_name * site) list *)
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
     init:
-      (Alg_expr.t * Primitives.elementary_rule * Locality.t) list;
+      (Alg_expr.t * rule(*Primitives.elementary_rule*) * Locality.t) list;
     rate_convention: Ode_args.rate_convention ;
     show_reactions: bool ;
     count: Ode_args.count ;
@@ -59,9 +61,9 @@ let get_sym_cache cache = cache.representant_cache
 let set_sym_cache sym_cache cache =
   {cache with representant_cache = sym_cache}
 
-type hidden_init = Primitives.elementary_rule
+(*type hidden_init = Primitives.elementary_rule*)
 
-type init = (Alg_expr.t * hidden_init * Locality.t) list
+type init = (Alg_expr.t * rule * Locality.t) list
 
 let get_init compil= compil.init
 
@@ -212,7 +214,7 @@ let disjoint_union compil l =
       l in
   (pat,em,mix)
 
-type rule = Primitives.elementary_rule
+(*type rule = Primitives.elementary_rule*)
 
 type rule_id = int
 
@@ -413,6 +415,9 @@ let divide_rule_rate_by cache compil rule =
 
 (****************************************************************)
 (*cannonic form per rule*)
+
+(*let test_init init =*)
+
 
 let cannonic_form_from_syntactic_rule cache compil rule =
   let rule_id = rule.Primitives.syntactic_rule in

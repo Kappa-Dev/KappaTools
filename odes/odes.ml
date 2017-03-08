@@ -584,11 +584,12 @@ struct
         (fun ((id, cache), list) rule ->
            let modes = I.valid_modes compil rule id in
            List.fold_left
-             (fun ((id,cache), list) mode ->
-                let cache, elt = enrich_rule cache compil rule mode in
-                (id,cache), elt::list)
-             ((next_id id,cache),list) modes)
-        ((fst_id,cache),[]) (List.rev rules)
+             (fun ((id, cache), list) mode ->
+                let cache, elt =
+                  enrich_rule cache compil rule mode in
+                (id, cache), elt::list)
+             ((next_id id, cache), list) modes)
+        ((fst_id, cache), []) (List.rev rules)
     in
     let network = {network with cache = snd cache} in
     let rules = List.rev rules_rev in
@@ -597,12 +598,16 @@ struct
         parameters compil network initial_states rules
     in
     let network =
-      {network
-       with n_rules = n_rules;
-            rules = rules }
+      {
+        network with
+        n_rules = n_rules;
+        rules = rules
+      }
     in
     let store = StoreMap.empty in
-    (* store maps each cc in the lhs of a rule to the list of embedding between this cc and a pattern in set\to_be_visited *)
+    (* store maps each cc in the lhs of a rule to the list of
+       embedding between this cc and a pattern in set\to_be_visited
+    *)
     let rec aux to_be_visited network store =
       match
         to_be_visited
@@ -612,14 +617,19 @@ struct
       | new_species::to_be_visited ->
         let () = debug "@[<v 2>@[test for the new species:@ %a@]"
             (I.print_chemical_species ~compil) new_species in
-        (* add in store the embeddings from cc of lhs to new_species,
-           for unary application of binary rule, the dictionary of species is updated, and the reaction entered directly *)
+        (* add in store the embeddings from cc of lhs to
+           new_species,
+           for unary application of binary rule, the dictionary of
+           species is updated, and the reaction entered directly *)
         let store, to_be_visited, network  =
           List.fold_left
             (fun
-              (store_old_embeddings, to_be_visited, network)  enriched_rule ->
-              (* regular application of tules, we store the embeddings*)
-              let () = debug "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
+              (store_old_embeddings, to_be_visited, network)
+              enriched_rule ->
+              (* regular application of tules, we store the
+                 embeddings*)
+              let () = debug
+                  "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
                   (rule_id_of enriched_rule)
                   enriched_rule.divide_rate_by
                   (I.print_rule ~compil) enriched_rule.rule in
@@ -1839,6 +1849,18 @@ struct
             Loggers.print_newline log
         ) initial_states
     in
+    (*let () =
+      List.iteri (fun i (_, r, _) ->
+          let fmt = Loggers.formatter_of_logger log in
+          match fmt with
+          | None -> ()
+          | Some fmt ->
+            Loggers.fprintf log "Rule:%i\n" i;
+            I.print_rule ~compil fmt r ;
+            Loggers.print_newline log
+
+        ) (I.get_init compil)
+    in*)
     (*detect symmetries for rules*)
     let cache = network.cache in
     let cache, cannonic_list, pair_list =

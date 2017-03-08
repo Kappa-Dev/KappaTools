@@ -14,17 +14,18 @@ sig
   type pattern              (* not necessarity connected, maybe partially specified *)
   type connected_component  (* connected, maybe partially specified *)
 
-  type hidden_init
+  type rule
+  (*type hidden_init*)
 
   type init =
-    ((connected_component array list,int) Alg_expr.e * hidden_init
+    ((connected_component array list,int) Alg_expr.e * rule
      * Locality.t) list
 
   val empty_cache: compil -> cache
 
   val get_init: compil -> init
 
-  val mixture_of_init: compil -> hidden_init -> mixture
+  val mixture_of_init: compil -> rule(*hidden_init*) -> mixture
 
   val dummy_chemical_species: compil -> chemical_species
 
@@ -77,7 +78,7 @@ sig
     (connected_component * embedding * chemical_species) list ->
     pattern * embedding_forest * mixture
 
-  type rule
+  (*type rule*)
 
   type rule_name = string
 
@@ -99,7 +100,7 @@ sig
      * int) list
 
   val token_vector_of_init:
-    hidden_init ->
+    (*hidden_init*) rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot
      * int) list
 
