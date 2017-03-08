@@ -1802,7 +1802,32 @@ struct
 (*compute symmetries *)
 (*********************)
 
-  let cannonic_form_from_syntactic_rules cache compil =
+  let cannonic_form_from_syntactic_rules log cache compil =
+  let _ =
+    List.fold_left
+      (fun (cache, current_list, hashed_lists) (_, rule,_) ->
+         (*****************************************************)
+         (* identifiers of rule up to isomorphism*)
+         let cache, lkappa_rule, i, rate_map, hashed_list =
+           I.cannonic_form_from_syntactic_rule cache compil rule
+         in
+         let () = Loggers.fprintf log "hash:%i\n" i in
+         (*****************************************************)
+         (* convention of r:
+            the number of automorphisms in the lhs of the rule r*)
+         let cache, convention_rule =
+           I.divide_rule_rate_by cache compil rule
+         in
+         (*****************************************************)
+         let current_list =
+           (i, rate_map, convention_rule) :: current_list
+         in
+         let hashed_lists =
+           (hashed_list, lkappa_rule) :: hashed_lists
+         in
+         cache, current_list, hashed_lists
+      ) (cache, [], []) (I.get_init compil)
+  in
     let cache, cannonic_list, hashed_lists =
       List.fold_left
         (fun (cache, current_list, hashed_lists) rule ->
@@ -1832,7 +1857,7 @@ struct
   (******************************************************)
 
   let compute_symmetries_from_model
-      parameters compil network contact_map  =
+      parameters compil network contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
     let log = Remanent_parameters.get_logger parameters in
     (*detect symmetries in initial states*)
@@ -1864,7 +1889,7 @@ struct
     (*detect symmetries for rules*)
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
-      cannonic_form_from_syntactic_rules cache compil
+      cannonic_form_from_syntactic_rules log cache compil
     in
     let hash_lists, lkappa_rule = List.split pair_list in
     let to_be_checked, counter, rates, correct =
