@@ -991,21 +991,24 @@ y,x,w,t,
 binding sites:
 
 Partitioned contact map (LKAPPA)
-************Agent: A
+************
+Agent: A
   -Equivalence classes of sites for internal states:
 {t,w,x,y}
   -Equivalence classes of sites for bindings states:
 
 ************
 With predicate (LKAPPA)
-************Agent: A
+************
+Agent: A
   -Equivalence classes of sites for internal states:
 {t,w,x,y}
   -Equivalence classes of sites for bindings states:
 
 ************
 Symmetries:
-************Agent: A
+************
+Agent: A
   -Equivalence classes of sites for internal states:
 {t,w,x,y}
   -Equivalence classes of sites for bindings states:

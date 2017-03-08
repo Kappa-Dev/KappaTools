@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 07 2017>
+  * Last modification: Time-stamp: <Mar 08 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -11,7 +11,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--with-symmetries false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false]\n"
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--with-symmetries false | true] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -158,6 +158,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let parameters' = parameters in
     let network =
       if ode_args.Ode_args.with_symmetries
+      || ode_args.Ode_args.show_symmetries
       then
         let module B =
           (val Domain_selection.select_domain
@@ -206,13 +207,21 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             contact_map
         in
         let () =
-          A.print_symmetries
-            parameters compil
-            network
+          if ode_args.Ode_args.show_symmetries
+          then
+            A.print_symmetries
+              parameters compil
+              network
+        in
+        let network =
+          if ode_args.Ode_args.with_symmetries
+          then network
+          else
+            A.clean_symmetries network
         in
         network
       else
-        network
+        network 
     in
     let network =
       A.network_from_compil ~ignore_obs parameters compil network

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 07 2017>
+  * Last modification: Time-stamp: <Mar 08 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -64,4 +64,6 @@ sig
     Remanent_parameters_sig.parameters ->
     I.compil -> ('a,'b) network -> unit
 
+  val clean_symmetries:
+    ('a,'b) network -> ('a,'b) network 
 end

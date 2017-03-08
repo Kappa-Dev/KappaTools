@@ -51,18 +51,24 @@ let may_swap_binding_state_regular ag_type site1 site2 ag =
   &&
   (not (binding_equal ag.LKappa.ra_ports.(site1) ag.LKappa.ra_ports.(site2)))
 
-let swap_internal_state_regular ag_type site1 site2 ag =
-  let tmp = ag.LKappa.ra_ints.(site1) in
-  let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
-  let () = ag.LKappa.ra_ints.(site2) <- tmp in
-  ()
-
 let swap_binding_state_regular ag_type site1 site2 ag =
   let tmp = ag.LKappa.ra_ports.(site1) in
   let () =
     ag.LKappa.ra_ports.(site1) <- ag.LKappa.ra_ports.(site2) in
   let () = ag.LKappa.ra_ports.(site2) <- tmp in
   ()
+
+let swap_internal_state_regular
+    ?necessarily_free ag_type site1 site2 ag =
+  let tmp = ag.LKappa.ra_ints.(site1) in
+  let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
+  let () = ag.LKappa.ra_ints.(site2) <- tmp in
+  let () =
+    match necessarily_free with
+    | Some array when array.(ag_type).(site1) && array.(ag_type).(site2) ->
+        swap_binding_state_regular ag_type site1 site2 ag
+    | None | Some _ -> ()
+  in ()
 
 (** Swapping sites in created agents *)
 
@@ -76,13 +82,6 @@ let may_swap_binding_state_created ag_type site1 site2 ag =
   &&
   (ag.Raw_mixture.a_ports.(site1) <> ag.Raw_mixture.a_ports.(site2))
 
-let swap_internal_state_created ag_type site1 site2 ag =
-  let tmp = ag.Raw_mixture.a_ints.(site1) in
-  let () =
-    ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
-  let () = ag.Raw_mixture.a_ints.(site2) <- tmp in
-  ()
-
 let swap_binding_state_created ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ports.(site1) in
   let () =
@@ -90,6 +89,19 @@ let swap_binding_state_created ag_type site1 site2 ag =
   in
   let () = ag.Raw_mixture.a_ports.(site2) <- tmp in
   ()
+
+let swap_internal_state_created
+    ?necessarily_free ag_type site1 site2 ag =
+  let tmp = ag.Raw_mixture.a_ints.(site1) in
+  let () =
+    ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
+  let () = ag.Raw_mixture.a_ints.(site2) <- tmp in
+  let () =
+    match necessarily_free with
+    | Some array when array.(ag_type).(site1) && array.(ag_type).(site2) ->
+      swap_binding_state_created ag_type site2 site2 ag
+    | None | Some _ -> ()
+  in ()
 
 (*******************************************************************)
 
@@ -242,18 +254,78 @@ let for_all_over_orbit
 
 exception False
 
+let do_print parameters env f =
+  match parameters,env  with
+| Some parameters, Some env ->
+  begin
+    if Remanent_parameters.get_trace parameters
+    then
+      let sigs = Model.signatures env in
+      let logger = Remanent_parameters.get_logger parameters in
+      let fmt_opt = Loggers.formatter_of_logger logger in
+      match fmt_opt with
+      | None -> ()
+      | Some fmt -> f sigs logger fmt
+  end
+| None,_ | _,None -> ()
+
 let check_orbit
+    ?parameters ?env
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
     to_be_checked =
+  let () =
+    do_print parameters env
+      (fun sigs logger fmt ->
+          let () = Loggers.fprintf logger "Check an orbit" in
+          let () = Loggers.print_newline logger in
+          let () = Loggers.fprintf logger "Permutation of the sites " in
+          let () = Signature.print_site sigs agent fmt site1 in
+          let () = Loggers.fprintf logger " and " in
+          let () = Signature.print_site sigs agent fmt site2 in
+          let () = Loggers.fprintf logger " in agent of type  " in
+          let () = Signature.print_agent sigs fmt agent in
+          let () = Loggers.print_newline logger in
+          let () = Loggers.fprintf logger " rule:   " in
+          let () =
+            LKappa.print_rule
+              ~full:true
+              sigs
+              (fun _ _ -> ()) (fun _ _ -> ())
+              fmt rule
+          in
+          let () = Loggers.print_newline logger in
+          ()
+      )
+  in
   let size = Array.length to_be_checked in
   let accu = cache, [], counter, to_be_checked in
   let f rule (cache, l, counter, to_be_checked) =
+    let () =
+      do_print parameters env
+        (fun sigs logger fmt ->
+            let () = Loggers.fprintf logger " rule:   " in
+            let () =
+              LKappa.print_rule
+                ~full:true
+                sigs
+                (fun _ _ -> ()) (fun _ _ -> ())
+                fmt rule
+            in
+            let () = Loggers.print_newline logger in
+            ())
+    in
     let cache, hash = LKappa_auto.cannonic_form cache rule in
     let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
     if i < size && to_be_checked.(i)
     then
       begin
+        let () =
+          do_print parameters env
+            (fun _ logger _ ->
+               let () = Loggers.fprintf logger "Existing rule" in
+               Loggers.print_newline logger)
+        in
         let n = counter.(i) in
         let () = counter.(i) <- n+1 in
         if n = 0
@@ -263,6 +335,12 @@ let check_orbit
           (cache, l, counter, to_be_checked), true
       end
     else
+    let () =
+      do_print parameters env
+        (fun _ logger _ ->
+           let () = Loggers.fprintf logger "Unknown rule" in
+           Loggers.print_newline logger)
+    in
       (cache, l, counter, to_be_checked), false
   in
   let (cache, l, counter, to_be_checked), b =
@@ -338,20 +416,22 @@ let weight ~correct ~card_stabilizer ~rate =
        (correct * card_stabilizer))
 
 let check_orbit_internal_state_permutation
-    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
-    to_be_checked =
-check_orbit
-  (potential_positions_for_swapping_internal_states,
-   swap_internal_state_regular,
-   swap_internal_state_regular,
-   swap_internal_state_created,
-   swap_internal_state_created)
-  weight agent_type site1 site2 rule correct rates cache counter to_be_checked
-
-let check_orbit_binding_state_permutation
-    ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    ?parameters ?env ?necessarily_free ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
     to_be_checked =
   check_orbit
+    ?parameters ?env
+    (potential_positions_for_swapping_internal_states,
+     swap_internal_state_regular ?necessarily_free,
+     swap_internal_state_regular ?necessarily_free,
+     swap_internal_state_created ?necessarily_free,
+     swap_internal_state_created ?necessarily_free)
+    weight agent_type site1 site2 rule correct rates cache counter to_be_checked
+
+let check_orbit_binding_state_permutation
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    to_be_checked =
+  check_orbit
+    ?parameters ?env
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,
      swap_binding_state_regular,

@@ -15,6 +15,7 @@ type t = {
   mutable matlab_output : string option ;
   mutable sbml_output : string option ;
   mutable with_symmetries : bool ;
+  mutable show_symmetries : bool ;
   mutable views : bool ;
   mutable dbonds : bool ;
   mutable site_accross : bool ;
@@ -31,6 +32,7 @@ let default : t =
     matlab_output = None ;
     sbml_output = None ;
     with_symmetries = false ;
+    show_symmetries = false ;
     views = true ;
     dbonds = true ;
     site_accross = true ;
@@ -64,6 +66,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   "--with-symmetries",
   Arg.Bool (fun with_symmetries -> t.with_symmetries <- with_symmetries),
   "Enable/disable the quotient of the set of species up to permutation of symmetric sites" ;
+  "--show-symmetries",
+  Arg.Bool (fun show_symmetries -> t.show_symmetries <- show_symmetries),
+  "Display the equivalence relations over the sites" ;
   "--views-domain",
   Arg.Bool (fun views -> t.views <- views),
   "Enable/disable views analysis when detecting symmetric sites" ;

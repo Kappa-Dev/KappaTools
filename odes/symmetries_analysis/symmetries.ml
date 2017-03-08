@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 07 2017>
+   * Last modification: Time-stamp: <Mar 08 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -199,6 +199,7 @@ let translate_to_lkappa_representation env partitioned_contact_map =
   in
   array
 
+
 let partition_pair cache p l =
   let rec part cache yes no = function
     | [] -> cache, (List.rev yes, List.rev no)
@@ -213,11 +214,11 @@ let refine_class cache p l result =
   let rec aux cache to_do classes =
     match to_do with
     | [] -> cache, classes
-    | h::_ ->
+    | h::tail ->
       let cache, (newclass, others) =
-        partition_pair cache (fun cache -> p cache h) to_do
+        partition_pair cache (fun cache -> p cache h) tail
       in
-      aux cache others (newclass :: classes)
+      aux cache others ((h::newclass) :: classes)
   in
   aux cache l result
 
@@ -266,7 +267,7 @@ let print_l logger fmt signature agent l =
     | [l] -> true
     | [] | _::_ -> false
   in
-  let b =
+  let _b =
     List.fold_left
       (fun b equ_class ->
          let () = if b then Loggers.fprintf logger "," in
@@ -299,6 +300,7 @@ let print_partitioned_contact_map_in_lkappa logger env
   | None -> ()
   | Some fmt ->
     let () = Loggers.fprintf logger "************" in
+    let () = Loggers.print_newline logger in
     Array.iteri
       (fun agent (l1,l2) ->
          let () = Loggers.fprintf logger "Agent: " in
@@ -322,7 +324,7 @@ let print_partitioned_contact_map_in_lkappa logger env
 (*****************************************************************)
 
 let check_invariance_gen
-    p ~to_be_checked ~counter ~correct ~rates
+    p ?parameters ?env ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     cache agent_type site1 site2 =
@@ -335,9 +337,7 @@ let check_invariance_gen
         to_be_checked.(id)
       then
         let (cache, counter, to_be_checked), b =
-          p ~agent_type ~site1 ~site2 rule ~correct
-            rates cache ~counter
-            to_be_checked
+          p ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked
         in
         if b then
           aux tail (cache, to_be_checked, counter)
@@ -349,22 +349,25 @@ let check_invariance_gen
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
 let check_invariance_internal_states
-    ~correct ~rates
+    ~correct ~rates ?parameters ?env ?necessarily_free
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
-    LKappa_group_action.check_orbit_internal_state_permutation
+    (LKappa_group_action.check_orbit_internal_state_permutation ?necessarily_free)
+    ?parameters ?env
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_binding_states
-    ~correct ~rates hash_and_rule_list
+    ~correct ~rates ?parameters ?env
+    hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_binding_state_permutation
+    ?parameters ?env
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
@@ -387,15 +390,62 @@ let detect_symmetries parameters env cache
   let partitioned_contact_map_in_lkappa =
     translate_to_lkappa_representation env partitioned_contact_map
   in
+  let necessarily_free =
+    Array.make
+      (Array.length partitioned_contact_map_in_lkappa)
+      [||]
+  in
+  let signature = Model.signatures env in
+  let () =
+    Mods.StringMap.iter
+      (fun ag m ->
+         let ag_id =
+           Signature.num_of_agent
+             (Locality.dummy_annot ag)
+             signature
+         in
+         let agent_interface = Signature.get signature ag_id in
+         let list, s_max =
+           Mods.StringMap.fold
+             (fun s_string (_,l) (list,s_max) ->
+                let s =
+                  Signature.num_of_site
+                    (Locality.dummy_annot s_string)
+                    agent_interface
+                in
+                let s_max = max s s_max in
+                let list =
+                  match l with [] -> (s_string,s)::list
+                                | _::_ -> list
+                in
+                list,s_max)
+             m
+             ([],-1)
+         in
+         let array = Array.make (s_max+1) false in
+         let () =
+           List.iter
+             (fun (s_string,s) ->
+                array.(s)<-true)
+             list
+         in
+         let () = necessarily_free.(ag_id)<-array in
+         ())
+      contact_map
+  in
   let p' = Array.copy partitioned_contact_map_in_lkappa in
   let to_be_checked, counter, rates, correct = arrays in
+  let necessarily_free = Some necessarily_free in
   let (cache, _, _), refined_partitioned_contact_map =
+    let parameters, env = Some parameters, Some env in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
       (check_invariance_internal_states
-         ~correct ~rates hash_and_rule_list)
+         ?parameters
+         ?env ?necessarily_free ~correct ~rates hash_and_rule_list)
       (check_invariance_binding_states
-         ~correct ~rates hash_and_rule_list)
+         ?parameters
+         ?env ~correct ~rates hash_and_rule_list)
       p'
   in
   (*-------------------------------------------------------------*)

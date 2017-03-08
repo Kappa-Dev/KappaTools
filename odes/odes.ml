@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 07 2017>
+  * Last modification: Time-stamp: <Mar 08 2017>
 *)
 
 let local_trace = false
@@ -1896,4 +1896,8 @@ struct
         parameters
         compil
         sym
+
+  let clean_symmetries network =
+    {network with symmetries = None}
+
 end
