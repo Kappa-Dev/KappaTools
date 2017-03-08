@@ -78,7 +78,7 @@ let dropdown (model : State_runtime.model) =
   ]
 
 
-let content (): [> Html_types.div ] Tyxml_js.Html5.elt list =
+let content () =
   let li_list, li_handle = ReactiveData.RList.create [] in
   let _ =
     React.S.bind
@@ -91,31 +91,26 @@ let content (): [> Html_types.div ] Tyxml_js.Html5.elt list =
          in
          React.S.const ())
   in
-  [ Html.div
-      ~a:[ Html.a_class [ "btn-group" ] ;
-           Html.Unsafe.string_attrib "role" "group" ; ]
-      [ Html.button
-          ~a:[ Html.Unsafe.string_attrib "type" "button" ;
-               Html.a_class [ "btn btn-default"; "dropdown-toggle" ] ;
-               Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
-               Html.Unsafe.string_attrib "aria-haspopup" "true" ;
-               Html.Unsafe.string_attrib "aria-expanded" "false" ;
-             ]
-          [ Html.pcdata "Settings" ;
-            Html.span ~a:[ Html.a_class ["caret"]] [ ]
-          ] ;
-        Tyxml_js.R.Html.ul
-          ~a:[ Html.a_class [ "dropdown-menu" ] ]
-          li_list ;
-        Ui_common.create_modal
-          ~id:settings_client_id_modal_id
-          ~title_label:"Client Id"
-          ~buttons:[settings_client_id_button]
-          ~body:[[%html
-                  {|<div class="input-group">|}[settings_client_id_input]{|</div>
-                                                                         |}] ;
-                ]
-      ]
+  [ Html.a
+      ~a:[ Html.Unsafe.string_attrib "role" "button" ;
+           Html.a_class [ "dropdown-toggle" ] ;
+           Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
+           Html.Unsafe.string_attrib "aria-haspopup" "true" ;
+           Html.Unsafe.string_attrib "aria-expanded" "false" ;
+         ]
+      [ Html.pcdata "Settings" ;
+        Html.span ~a:[ Html.a_class ["caret"]] [ ]
+      ] ;
+    Tyxml_js.R.Html.ul
+      ~a:[ Html.a_class [ "dropdown-menu" ] ]
+      li_list ;
+    Ui_common.create_modal
+      ~id:settings_client_id_modal_id
+      ~title_label:"Client Id"
+      ~buttons:[settings_client_id_button]
+      ~body:[[%html
+              {|<div class="input-group">|}[settings_client_id_input]{|</div>|}] ;
+            ]
   ]
 
 let onload () =

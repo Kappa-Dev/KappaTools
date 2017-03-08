@@ -100,7 +100,7 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
     in
     simulation_li @ separator_li @ new_li @ close_li
 
-  let content () : [> Html_types.div ] Tyxml_js.Html5.elt list =
+  let content () =
     let li_list, li_handle = ReactiveData.RList.create [] in
     let _ =
       React.S.bind
@@ -109,43 +109,37 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
            let () = ReactiveData.RList.set li_handle (dropdown model) in
            React.S.const ())
     in
-    [ Html.div
-        ~a:[ Html.a_class [ "btn-group" ] ;
-             Html.Unsafe.string_attrib "role" "group" ; ]
-        [ Html.button
-            ~a:[ Html.Unsafe.string_attrib "type" "button" ;
-                 Html.a_class [ "btn btn-default"; "dropdown-toggle" ] ;
-                 Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
-                 Html.Unsafe.string_attrib "aria-haspopup" "true" ;
-                 Html.Unsafe.string_attrib "aria-expanded" "false" ;
-                 (Tyxml_js.R.filter_attrib
-                    (Html.a_disabled ())
-                    (React.S.map
-                       (fun model ->
-                          match model.State_project.model_project_id with
-                          | Some _ -> false
-                          | None -> true)
-                       State_project.model
-                    )
-                 );
-               ]
-            [ Html.pcdata "Simulation" ;
-              Html.span ~a:[ Html.a_class ["caret"]] [ ]
-            ] ;
-          Tyxml_js.R.Html.ul
-                ~a:[ Html.a_id simulation_dropdown_menu_id ;
-                     Html.a_class [ "dropdown-menu" ] ]
-                li_list ;
-          Ui_common.create_modal
-            ~id:simulation_new_modal_id
-            ~title_label:"New Simulation"
-            ~buttons:[simulation_button]
-            ~body:[[%html
-                    {|<div class="input-group">|}[simulation_new_input]{|</div>
-                   |}] ;
-                  ] ]
-    ]
-
+    [ Html.button
+        ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+             Html.a_class [ "btn btn-default"; "dropdown-toggle" ] ;
+             Html.Unsafe.string_attrib "data-toggle" "dropdown" ;
+             Html.Unsafe.string_attrib "aria-haspopup" "true" ;
+             Html.Unsafe.string_attrib "aria-expanded" "false" ;
+             (Tyxml_js.R.filter_attrib
+                (Html.a_disabled ())
+                (React.S.map
+                   (fun model ->
+                      match model.State_project.model_project_id with
+                      | Some _ -> false
+                      | None -> true)
+                   State_project.model
+                )
+             );
+           ]
+        [ Html.pcdata "Simulation" ;
+          Html.span ~a:[ Html.a_class ["caret"]] [ ]
+        ] ;
+      Tyxml_js.R.Html.ul
+        ~a:[ Html.a_id simulation_dropdown_menu_id ;
+             Html.a_class [ "dropdown-menu" ] ]
+        li_list ;
+      Ui_common.create_modal
+        ~id:simulation_new_modal_id
+        ~title_label:"New Simulation"
+        ~buttons:[simulation_button]
+        ~body:[[%html
+                {|<div class="input-group">|}[simulation_new_input]{|</div>|}] ;
+              ] ]
 
   let onload () =
     let simulation_new_input_dom =

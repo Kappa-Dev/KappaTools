@@ -24,7 +24,10 @@ let new_project_button =
     [ Html.pcdata "Create Project" ; ]
 
 let li_new =
-  Html.li [ Html.a [ Html.cdata "New" ] ]
+  Html.li [ Html.a [ Html.cdata "New project" ]]
+
+let li_settings =
+  Html.li (Menu_editor_settings.content ())
 
 let content () =
   Html.div
@@ -62,7 +65,7 @@ let content () =
                                 Js._true) in
                        Html.li ~a:[ Html.a_class li_class ] [a_project])
                     model.State_project.model_project_ids in
-                List.rev_append acc [li_new])
+                List.rev_append acc [li_new; li_settings])
              State_project.model));
      Ui_common.create_modal
        ~id:project_id_modal_id
@@ -74,6 +77,7 @@ let content () =
     ]
 
 let onload () =
+  let () = Menu_editor_settings.onload () in
   let project_id_input_dom =
     Tyxml_js.To_dom.of_input project_id_input in
   let () =

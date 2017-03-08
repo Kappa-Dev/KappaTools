@@ -325,7 +325,8 @@ let input_change input_dom signal_handler =
          Js._true)
 
 module type Menu = sig
-  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val content :
+    unit -> [> `Button | `Div | `Ul  | `A of [> `PCDATA | `Span ]] Tyxml_js.Html5.elt list
   val onload : unit -> unit
 end;;
 

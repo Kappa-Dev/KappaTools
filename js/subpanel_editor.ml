@@ -35,22 +35,23 @@ let toggle_button =
 
 let panel_heading_group_id = "panel_heading_group"
 let panel_heading =
-  let menu_editor_settings_content :
-    [> Html_types.div ] Tyxml_js.Html5.elt list =
-    Menu_editor_settings.content ()
-  in
   let menu_editor_file_content :
-    [> Html_types.div ] Tyxml_js.Html5.elt list =
-    Menu_editor_file.content ()
+    [> Html_types.div ] Tyxml_js.Html5.elt =
+  Html.div
+    ~a:[ Html.a_class [ "btn-group" ] ;
+         Html.Unsafe.string_attrib "role" "group" ; ]
+    (Menu_editor_file.content ())
   in
   let menu_editor_simulation_content :
-    [> Html_types.div ] Tyxml_js.Html5.elt list =
-    Menu_editor_simulation.content ()
+    [> Html_types.div ] Tyxml_js.Html5.elt =
+  Html.div
+    ~a:[ Html.a_class [ "btn-group" ] ;
+         Html.Unsafe.string_attrib "role" "group" ; ]
+    (Menu_editor_simulation.content ())
   in
   let buttons =
-      menu_editor_settings_content @
-       menu_editor_file_content @
-       menu_editor_simulation_content @
+       menu_editor_file_content ::
+       menu_editor_simulation_content ::
        [toggle_button] in
   [%html {|<div class="row">
              <div id="|}panel_heading_group_id{|" class="col-md-10 btn-group">|} buttons{|</div>
@@ -123,7 +124,6 @@ let setup_lint _ _ _ =
   | Some (e : Api_types_j.errors) -> error_lint e
 
 let onload () : unit =
-  let () = Menu_editor_settings.onload () in
   let () = Menu_editor_file.onload () in
   let () = Menu_editor_simulation.onload () in
   let lint_config =
