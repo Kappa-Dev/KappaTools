@@ -51,3 +51,27 @@ let normalize_internal_states_in_raw_mixture
     ) (List.rev raw_mixture)
   in
   raw_mixture
+
+
+(*check the states of agent are the same in the initial states*)
+(*let normalize_internal_states_in_raw_mixture_init symmetries
+    raw_mixture =
+  let raw_mixture =
+    List.rev_map (fun agent ->
+        let agent_type = agent.Raw_mixture.a_type in
+        let partition =
+          try fst (symmetries.(agent_type)) with _ -> []
+        in
+        let ag_ints_equal =
+          List.fold_left (fun agent_ints equiv_class ->
+
+            ) agent.Raw_mixture.a_ints
+            partition
+        in
+        {
+          agent with
+          Raw_mixture.ag_ints = ag_ints_equal
+        }
+      ) (List.rev raw_mixture)
+  in
+  raw_mixture *)

@@ -416,9 +416,6 @@ let divide_rule_rate_by cache compil rule =
 (****************************************************************)
 (*cannonic form per rule*)
 
-(*let test_init init =*)
-
-
 let cannonic_form_from_syntactic_rule cache compil rule =
   let rule_id = rule.Primitives.syntactic_rule in
   let lkappa_rule =
