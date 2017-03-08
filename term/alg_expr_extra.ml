@@ -18,6 +18,218 @@ type ('a,'b) corrected_rate_const =
     var: ('a,'b) Alg_expr.e Locality.annot option
   }
 
+
+let rec simplify expr =
+  match expr
+  with
+  | Alg_expr.BIN_ALG_OP (op,a,b),loc ->
+    begin
+      let a,b = simplify a, simplify b in
+      match op with
+      | Operator.SUM ->
+        begin
+          match a,b with
+          | (Alg_expr.CONST a,_), (Alg_expr.CONST b,_) ->
+            Alg_expr.CONST (Nbr.add a b),loc
+          | (Alg_expr.CONST a,_),_ when Nbr.is_zero a -> b
+          | _,(Alg_expr.CONST b,_) when Nbr.is_zero b -> a
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_),
+            ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_)
+            -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+      | Operator.MINUS ->
+        begin
+          match a,b with
+          | (Alg_expr.CONST a,_), (Alg_expr.CONST b,_) ->
+            Alg_expr.CONST (Nbr.sub a b),loc
+          | _,(Alg_expr.CONST b,_) when Nbr.is_zero b -> a
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+                 | Alg_expr.IF _ ),_),
+                ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+                 | Alg_expr.IF _ ),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+      | Operator.MULT ->
+        begin
+          match a,b with
+          | (Alg_expr.CONST a,_), (Alg_expr.CONST b,_) ->
+            Alg_expr.CONST (Nbr.mult a b),loc
+          | (Alg_expr.CONST a,_),_ when Nbr.is_equal a Nbr.one -> b
+          | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+                 | Alg_expr.IF _ ),_),
+                ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+                 | Alg_expr.IF _ ),_)
+            -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+      | Operator.DIV ->
+        begin
+          match a,b with
+          | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_),
+            ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+      | Operator.POW | Operator.MODULO ->
+        begin
+          match a,b with
+          | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_),
+            ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.IF _ ),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+      | Operator.MIN | Operator.MAX ->
+        begin
+          Alg_expr.BIN_ALG_OP(op,a,b),loc
+        end
+    end
+    | Alg_expr.UN_ALG_OP (op,a),loc ->
+      let a = simplify a in
+      begin
+        match op with
+        | Operator.UMINUS ->
+          begin
+            match a with
+              Alg_expr.CONST a,_ -> Alg_expr.CONST (Nbr.neg a),loc
+            | (Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+              | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+              | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+              | Alg_expr.IF _ ),_-> Alg_expr.UN_ALG_OP(op,a),loc
+          end
+        | Operator.COSINUS | Operator.SINUS | Operator.SQRT
+        | Operator.LOG | Operator.EXP | Operator.TAN | Operator.INT
+          -> Alg_expr.UN_ALG_OP(op,a),loc
+      end
+    | Alg_expr.STATE_ALG_OP _,_
+    | Alg_expr.ALG_VAR _,_
+    | Alg_expr.KAPPA_INSTANCE _,_
+    | Alg_expr.TOKEN_ID _,_
+    | Alg_expr.CONST _,_ -> expr
+    | Alg_expr.IF (cond,yes,no),loc ->
+      let cond,yes,no =
+        simplify_bool cond, simplify yes, simplify no
+      in
+      begin
+        match cond with
+        | Alg_expr.TRUE,_ -> yes
+        | Alg_expr.FALSE, _ -> no
+        | Alg_expr.BOOL_OP (_,_,_),_
+        | Alg_expr.COMPARE_OP (_,_,_),_ -> Alg_expr.IF (cond,yes,no),loc
+      end
+and simplify_bool expr_bool =
+  match expr_bool with
+  | Alg_expr.TRUE, _ | Alg_expr.FALSE, _ -> expr_bool
+  | Alg_expr.BOOL_OP (op, a ,b),loc ->
+    begin
+      let a,b = simplify_bool a, simplify_bool b in
+      match
+        op
+      with
+      | Operator.AND ->
+        begin
+          match a,b with
+          | (Alg_expr.TRUE,_),_ -> b
+          | (Alg_expr.FALSE,_),_ -> a
+          | _,(Alg_expr.TRUE,_) -> a
+          | _,(Alg_expr.FALSE,_) -> b
+          | ((Alg_expr.BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)),_),
+            ((Alg_expr.BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)),_)
+            -> Alg_expr.BOOL_OP(op,a,b),loc
+        end
+      | Operator.OR ->
+        begin
+          match a,b with
+          | (Alg_expr.TRUE,_),_ -> a
+          | (Alg_expr.FALSE,_),_ -> b
+          | _,(Alg_expr.TRUE,_) -> b
+          | _,(Alg_expr.FALSE,_) -> a
+          | ((Alg_expr.BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)),_),
+            ((Alg_expr.BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)),_)
+            -> Alg_expr.BOOL_OP(op,a,b),loc
+        end
+    end
+  | Alg_expr.COMPARE_OP (op,a,b),loc ->
+    let a,b = simplify a, simplify b in
+    match a,b with
+    | (Alg_expr.CONST a,_), (Alg_expr.CONST b,_) ->
+      begin
+        match op
+        with
+          Operator.GREATER ->
+          if Nbr.is_greater a b
+          then
+            Alg_expr.TRUE, loc
+          else
+            Alg_expr.FALSE, loc
+        | Operator.SMALLER ->
+        if Nbr.is_smaller a b
+        then
+          Alg_expr.TRUE, loc
+        else
+          Alg_expr.FALSE, loc
+        | Operator.EQUAL ->
+          if Nbr.is_equal a b
+          then
+            Alg_expr.TRUE, loc
+          else
+            Alg_expr.FALSE, loc
+        | Operator.DIFF ->
+        if Nbr.is_equal a b
+        then
+          Alg_expr.FALSE, loc
+        else
+          Alg_expr.TRUE, loc
+      end
+    | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+       | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+       | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+       | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+       | Alg_expr.IF _ ),_),
+      ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+       | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+       | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
+       | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+       | Alg_expr.IF _ ),_) -> Alg_expr.COMPARE_OP(op,a,b),loc
+
+
 let rec clean expr =
   let expr = fst expr in
   match expr
@@ -48,7 +260,6 @@ and clean_bool expr_bool=
     Locality.dummy_annot (Alg_expr.BOOL_OP (op,clean_bool a,clean_bool b))
   | Alg_expr.COMPARE_OP (op,a,b) ->
     Locality.dummy_annot (Alg_expr.COMPARE_OP (op,clean a,clean b))
-
 
 let rec get_corrected_rate e =
   match e with

@@ -18,6 +18,9 @@ val divide_expr_by_int:
 (* I think this is enough to deal with symmetries *)
 (* We may be more complete later *)
 
+val simplify:
+  ('a,'b) Alg_expr.e Locality.annot -> ('a,'b) Alg_expr.e Locality.annot
+
 type ('a,'b) corrected_rate_const
 
 (* printer *)

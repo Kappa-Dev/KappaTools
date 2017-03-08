@@ -121,7 +121,7 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
       in
       aux (ag_id + 1) tail (work, bond_map)
   in
-  let work, bond_map = aux 0 mix (work, Mods.IntMap.empty) in
+  let work, _bond_map = aux 0 mix (work, Mods.IntMap.empty) in
   let (a, _, b, c) = Pattern.finish_new work in
   let () =
     match signature with
@@ -146,7 +146,6 @@ let top_sort list =
   let (map1,map2,set)  =
     Tools.array_fold_lefti
       (fun pos (map1,map2,set) agent ->
-       let port = agent.Raw_mixture.a_ports in
        Tools.array_fold_lefti
          (fun _ (map1, map2, set) value ->
          match value with
@@ -321,15 +320,15 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit)
-                 (fun fmt -> ())
+                 __POS__ parameters (fun _fmt -> raise Exit)
+                 (fun _fmt -> ())
                  in
              (), agent_list)
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ parameters (fun fmt -> raise Exit)
-                 (fun fmt -> ())
+                 __POS__ parameters (fun _fmt -> raise Exit)
+                 (fun _fmt -> ())
              in
              (), agent_list)
           agent_type_map agent_map []

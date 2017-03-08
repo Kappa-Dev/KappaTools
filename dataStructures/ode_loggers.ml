@@ -299,7 +299,86 @@ let is_fun _logger op =
   | Operator.INT-> true
 
 
-let rec print_alg_expr ?init_mode string_of_var_id logger alg_expr network_handler  =
+type parenthesis_mode =
+    Always
+  | Never
+  | In_sum
+  | In_product
+  | In_power
+
+let parenthesis_needed ?parenthesis_mode () =
+  match parenthesis_mode with
+  | Some Never -> false
+  | None | Some (Always | In_sum | In_product | In_power) -> true
+
+let parenthesis_needed_in_sum ?parenthesis_mode () =
+  match parenthesis_mode with
+  | Some (Never | In_sum) -> false
+  | None | Some Always | Some In_product | Some In_power-> true
+
+let parenthesis_needed_in_product ?parenthesis_mode () =
+  match parenthesis_mode with
+  | Some (Never | In_product | In_sum) -> false
+  | None | Some (Always | In_power) -> true
+
+let parenthesis_needed_in_power ?parenthesis_mode () =
+    match parenthesis_mode with
+      | Some (Never | In_product | In_sum | In_power) -> false
+      | None | Some Always -> true
+
+let keep_none a b =
+  match a with None -> None
+             | Some _ -> b
+let parenthesis_needed_in_bin_op ?parenthesis_mode bin_op =
+  let keep_none a = keep_none parenthesis_mode (Some a) in
+  match bin_op with
+  | Operator.MULT ->
+    parenthesis_needed_in_product ?parenthesis_mode (),
+    keep_none In_product,
+    keep_none In_product
+  | Operator.POW ->
+    parenthesis_needed_in_power ?parenthesis_mode (),
+    keep_none In_power,
+    keep_none In_power
+  | Operator.MINUS ->
+    parenthesis_needed_in_sum ?parenthesis_mode (),
+    keep_none In_sum,
+    keep_none Always
+  | Operator.SUM ->
+    parenthesis_needed_in_sum ?parenthesis_mode (),
+    keep_none In_sum,
+    keep_none In_sum
+  | Operator.DIV ->
+    parenthesis_needed_in_product ?parenthesis_mode (),
+    keep_none In_product,
+    keep_none Always
+  | Operator.MIN ->
+    parenthesis_needed ?parenthesis_mode (),
+    keep_none Never,
+    keep_none Never
+  | Operator.MODULO ->
+    true,
+    keep_none Never,
+    keep_none Never
+  | Operator.MAX ->
+    parenthesis_needed ?parenthesis_mode (),
+    keep_none Never,
+    keep_none Never
+
+let parenthesis_needed_in_un_op ?parenthesis_mode logger op =
+  let keep_none a = keep_none parenthesis_mode (Some a) in
+  if is_fun logger op then
+    false, true, keep_none Never
+  else
+    true, false, keep_none Always
+
+let parenthesis_needed_in_bool_op ?parenthesis_mode () =
+  match parenthesis_mode with
+  | None -> true, None
+  | Some Never -> false, Some Always
+  | Some (In_sum | In_product | In_power | Always) -> true, Some Always
+
+let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_expr network_handler  =
   let var = match init_mode with
     | None -> "y"
     | Some init_mode -> if init_mode then "init" else "y" in
@@ -333,50 +412,111 @@ let rec print_alg_expr ?init_mode string_of_var_id logger alg_expr network_handl
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         begin
+          let parenthesis_needed, mode1, mode2 =
+            parenthesis_needed_in_bin_op
+              ?parenthesis_mode
+              op
+          in
           let string_op = string_of_bin_op logger op in
           match bin_op_pos logger op
           with
           | INFIX ->
-            let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
+            let () =
+              if parenthesis_needed
+              then
+                Loggers.fprintf logger "("
+            in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode1
+                ?init_mode
+                string_of_var_id logger a network_handler
+            in
             let () = Loggers.fprintf logger "%s" string_op in
-            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
-            let () = Loggers.fprintf logger ")" in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode2
+                ?init_mode
+                string_of_var_id logger b network_handler
+            in
+            let () =
+              if parenthesis_needed
+              then
+                Loggers.fprintf logger ")" in
             ()
           | PREFIX ->
             let () = Loggers.fprintf logger "%s" string_op in
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode1 ?init_mode
+                string_of_var_id logger a network_handler
+            in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode2 ?init_mode
+                string_of_var_id logger b network_handler
+            in
             let () = Loggers.fprintf logger ")" in
             ()
           | POSTFIX ->
             let () = Loggers.fprintf logger "(" in
-            let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode1 ?init_mode
+                string_of_var_id logger a network_handler
+            in
             let () = Loggers.fprintf logger "," in
-            let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
+            let () =
+              print_alg_expr
+                ?parenthesis_mode:mode2 ?init_mode
+                string_of_var_id logger b network_handler
+            in
             let () = Loggers.fprintf logger ")" in
             let () = Loggers.fprintf logger "%s" string_op in
             ()
         end
 
       | Alg_expr.UN_ALG_OP (op, a) ->
-        let () = Loggers.fprintf logger "(" in
+        let parenthesis_needed_outside,
+            parenthesis_needed_inside,
+            mode
+          =
+          parenthesis_needed_in_un_op
+            ?parenthesis_mode logger
+            op
+        in
+        let () =
+          if parenthesis_needed_outside
+          then
+            Loggers.fprintf logger "("
+        in
         let string_op = Loggers_string_of_op.string_of_un_op logger op in
         let () = Loggers.fprintf logger "%s" string_op in
-        let () = if is_fun logger op then Loggers.fprintf logger "(" in
-        let () = print_alg_expr ?init_mode string_of_var_id logger a network_handler in
-        let () = if is_fun logger op then Loggers.fprintf logger ")" in
-        let () = Loggers.fprintf logger ")" in
+        let () =
+          if parenthesis_needed_inside
+          then Loggers.fprintf logger "("
+        in
+        let () = print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger a network_handler in
+        let () =
+          if parenthesis_needed_inside
+          then Loggers.fprintf logger ")"
+        in
+        let () =
+          if parenthesis_needed_outside
+          then
+            Loggers.fprintf logger ")"
+        in
         ()
       | Alg_expr.IF (cond, yes, no) ->
+        let mode = keep_none parenthesis_mode (Some Never) in
         let () = Loggers.fprintf logger "merge(" in
-        let () = print_bool_expr ?init_mode string_of_var_id logger cond network_handler in
+        let () = print_bool_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger cond network_handler in
         let () = Loggers.fprintf logger "," in
-        let () = print_alg_expr ?init_mode string_of_var_id logger yes network_handler in
+        let () = print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger yes network_handler in
         let () = Loggers.fprintf logger "," in
-        let () = print_alg_expr ?init_mode string_of_var_id logger no network_handler in
+        let () = print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger no network_handler in
         let () = Loggers.fprintf logger ")" in
             ()
     end
@@ -392,7 +532,7 @@ let rec print_alg_expr ?init_mode string_of_var_id logger alg_expr network_handl
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
-and print_bool_expr ?init_mode string_of_var_id logger expr network_handler =
+and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger expr network_handler =
  match Loggers.get_encoding_format logger with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
@@ -400,19 +540,31 @@ and print_bool_expr ?init_mode string_of_var_id logger expr network_handler =
       | Alg_expr.TRUE -> Loggers.fprintf logger "true"
       | Alg_expr.FALSE -> Loggers.fprintf logger "false"
       | Alg_expr.COMPARE_OP (op,a,b) ->
-        let () = Loggers.fprintf logger "(" in
+        let mode = keep_none parenthesis_mode (Some Never) in
         let () =
-          print_alg_expr ?init_mode string_of_var_id logger a network_handler in
+          print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger a network_handler in
         let () = Loggers.fprintf logger "%s" (Loggers_string_of_op.string_of_compare_op logger op) in
-        let () = print_alg_expr ?init_mode string_of_var_id logger b network_handler in
-        let () = Loggers.fprintf logger ")" in
+        let () = print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger b network_handler in
+      let () = Loggers.fprintf logger ")" in
         ()
       | Alg_expr.BOOL_OP (op,a,b) ->
-        let () = Loggers.fprintf logger "(" in
-        let () = print_bool_expr ?init_mode string_of_var_id logger a network_handler in
+        let do_paren, mode =
+          parenthesis_needed_in_bool_op ?parenthesis_mode ()
+        in
+        let () =
+          if do_paren then
+            Loggers.fprintf logger "("
+        in
+        let () =
+          print_bool_expr
+            ?parenthesis_mode:mode ?init_mode string_of_var_id logger a network_handler
+        in
         let () = Loggers.fprintf logger "%s" (Loggers_string_of_op.string_of_bool_op logger op) in
         let () = print_bool_expr ?init_mode string_of_var_id logger b network_handler in
-        let () = Loggers.fprintf logger ")" in
+        let () =
+          if do_paren then
+            Loggers.fprintf logger ")"
+        in
         ()
     end
   | Loggers.SBML ->
@@ -424,6 +576,13 @@ and print_bool_expr ?init_mode string_of_var_id logger expr network_handler =
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let print_alg_expr_few_parenthesis ?init_mode string_of_var_id logger alg_expr network_handler =
+  print_alg_expr
+    ?init_mode ?parenthesis_mode:(Some Never)
+    string_of_var_id logger
+    (Alg_expr_extra.simplify alg_expr)
+    network_handler
 
 let string_of_variable_sbml string_of_var_id variable =
   match variable with
@@ -545,7 +704,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       let () = Loggers.fprintf logger "%s=" (Ode_loggers_sig.string_of_variable variable) in
-      let () = print_alg_expr ~init_mode string_of_var_id logger alg_expr network_handler in
+      let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
       let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
@@ -670,9 +829,9 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       let var = Ode_loggers_sig.string_of_variable variable in
-      let () = Loggers.fprintf logger "%s=%s+(" var var in
-      let () = print_alg_expr ~init_mode string_of_var_id logger alg_expr network in
-      let () = Loggers.fprintf logger ");" in
+      let () = Loggers.fprintf logger "%s=%s+" var var in
+      let () = print_alg_expr ~parenthesis_mode:In_sum ~init_mode string_of_var_id logger alg_expr network in
+      let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
@@ -779,9 +938,13 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
              Loggers.fprintf logger "*%s" (apply_correct correct var))
           var_list
       in
-      let () = Loggers.fprintf logger "*(" in
-      let () = print_alg_expr string_of_var_id logger expr handler in
-      let () = Loggers.fprintf logger ");" in
+      let () = Loggers.fprintf logger "*" in
+      let () =
+        print_alg_expr
+          ~parenthesis_mode:In_product
+          string_of_var_id logger expr handler
+      in
+      let () = Loggers.fprintf logger ";" in
       let () = Loggers.print_newline logger in
       ()
     end

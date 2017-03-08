@@ -32,13 +32,13 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(8)=t;
-init(1)=(1*6); % B(x)
-init(2)=(1*4.5); % A(x)
-init(4)=(1*10); % E(r)
-init(3)=(1*100); % R(e, r)
-var(2)=(1*(init(3)+init(6)));
-init(5)=(2*10); % E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
-var(1)=((1*(2*init(5)))/2);
+init(1)=6; % B(x)
+init(2)=4.5; % A(x)
+init(4)=10; % E(r)
+init(3)=100; % R(e, r)
+var(2)=init(3)+init(6);
+init(5)=20; % E(r!1), R(e!1, r!2), R(e!3, r!2), E(r!3)
+var(1)=2*init(5)/2;
 
 global k
 global kd
@@ -155,8 +155,8 @@ global kd
 global kun
 global kdun
 
-var(2)=(1*(y(3)+y(6)));
-var(1)=((1*(2*y(5)))/2);
+var(2)=y(3)+y(6);
+var(1)=2*y(5)/2;
 
 k(4)=t;
 
@@ -241,8 +241,8 @@ global var
 obs = zeros(nobs,1);
 
 t = y(8);
-var(2)=(1*(y(3)+y(6)));
-var(1)=((1*(2*y(5)))/2);
+var(2)=y(3)+y(6);
+var(1)=2*y(5)/2;
 
 obs(1)=t;
 obs(2)=var(1);

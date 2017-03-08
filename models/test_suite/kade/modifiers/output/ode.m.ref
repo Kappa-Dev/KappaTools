@@ -33,12 +33,12 @@ t = 0.000000;
 
 init(4)=t;
 var(1)=10;
-init(2)=(1*var(1)); % T(x)
-var(5)=(1*init(2));
-var(4)=(1*init(2));
-init(1)=(1*var(1)); % U(x)
-var(3)=(1*init(1));
-var(2)=(1*init(1));
+init(2)=var(1); % T(x)
+var(5)=init(2);
+var(4)=init(2);
+init(1)=var(1); % U(x)
+var(3)=init(1);
+var(2)=init(1);
 
 global k
 global kd
@@ -144,10 +144,10 @@ global kd
 global kun
 global kdun
 
-var(5)=(1*y(2));
-var(4)=(1*y(2));
-var(3)=(1*y(1));
-var(2)=(1*y(1));
+var(5)=y(2);
+var(4)=y(2);
+var(3)=y(1);
+var(2)=y(1);
 
 k(1)=var(2);
 k(2)=var(5);
@@ -179,10 +179,10 @@ global var
 obs = zeros(nobs,1);
 
 t = y(4);
-var(5)=(1*y(2));
-var(4)=(1*y(2));
-var(3)=(1*y(1));
-var(2)=(1*y(1));
+var(5)=y(2);
+var(4)=y(2);
+var(3)=y(1);
+var(2)=y(1);
 
 obs(1)=t;
 obs(2)=var(3);

@@ -32,12 +32,12 @@ init=sparse(nodevar,1);
 t = 0.000000;
 
 init(3)=t;
-init(2)=(1*1);
+init(2)=1;
 var(5)=init(2);
 var(4)=init(2);
 var(1)=10;
-init(1)=(1*var(1)); % T()
-var(3)=(1*init(1));
+init(1)=var(1); % T()
+var(3)=init(1);
 var(2)=init(2);
 
 global k
@@ -146,7 +146,7 @@ global kdun
 
 var(5)=y(2);
 var(4)=y(2);
-var(3)=(1*y(1));
+var(3)=y(1);
 var(2)=y(2);
 
 k(2)=var(4);
@@ -164,14 +164,14 @@ dydt(1)=dydt(1)+k(1)*y(1);
 % rule    : expo3
 % reaction:  ->  | 2.2:t + (- ((|T()| + |t|) + nT)):t 
 
-dydt(2)=dydt(2)+k(3)*((-(((1*y(1))+y(2))+var(1))));
-dydt(2)=dydt(2)+k(3)*(2.2);
+dydt(2)=dydt(2)+k(3)*(-(1*y(1)+y(2)+var(1)));
+dydt(2)=dydt(2)+k(3)*2.2;
 
 % rule    : expo2
 % reaction:  ->  | 2:t + (- |t|):t 
 
-dydt(2)=dydt(2)+k(2)*((-y(2)));
-dydt(2)=dydt(2)+k(2)*(2);
+dydt(2)=dydt(2)+k(2)*(-y(2));
+dydt(2)=dydt(2)+k(2)*2;
 dydt(3)=1;
 
 end
@@ -186,7 +186,7 @@ obs = zeros(nobs,1);
 t = y(3);
 var(5)=y(2);
 var(4)=y(2);
-var(3)=(1*y(1));
+var(3)=y(1);
 var(2)=y(2);
 
 obs(1)=t;
