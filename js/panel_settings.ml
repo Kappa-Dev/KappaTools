@@ -10,6 +10,10 @@ module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 open Lwt.Infix
 
+let handle_perturbation r _ : bool Js.t =
+  let () = Panel_settings_controller.perturb_simulation () in
+  r
+
 module ButtonPerturbation : Ui_common.Div = struct
   let id = "panel_settings_perturbation_button"
   let button =
@@ -21,12 +25,11 @@ module ButtonPerturbation : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [ Html.div [ button ] ]
 
-  let run_perturbation () : unit = Panel_settings_controller.perturb_simulation ()
 
   let onload () : unit =
     let button_dom = Tyxml_js.To_dom.of_button button in
-    let handler = (fun _ -> let () = run_perturbation () in Js._true) in
-    let () = button_dom##.onclick := Dom.handler handler in
+
+    let () = button_dom##.onclick := Dom.handler (handle_perturbation Js._true) in
     ()
 end
 
@@ -58,6 +61,7 @@ module InputPerturbation : Ui_common.Div = struct
                 let () = State_perturbation.set_model_perturbation model_perturbation in
                 Js._true)
      in
+     let () = Common.handle_enter id (handle_perturbation Js._false) in
      let () = input_dom##.onchange := Dom.handler handler in
      ()
 

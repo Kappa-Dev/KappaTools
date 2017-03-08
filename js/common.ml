@@ -205,3 +205,10 @@ let show_codemirror () : unit =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "showCodeMirror")
     [| |]
+
+let handle_enter (id : string) (handler : unit -> bool Js.t) : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "handleEnter")
+    [| Js.Unsafe.inject (Js.string id);
+       Js.Unsafe.inject handler
+    |]
