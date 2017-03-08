@@ -48,7 +48,7 @@ let content () =
                   )
                )
            ]
-        (Subpanel_editor.content ());
+        [Subpanel_editor.content ()];
       (rightsubpanel ()) ]]
 
 let editor_full , set_editor_full =

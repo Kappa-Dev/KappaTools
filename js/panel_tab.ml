@@ -33,9 +33,6 @@ let navcontents () =
     ; "snapshot",  (Tab_snapshot.content ())
     ; "outputs",   (Tab_outputs.content ()) ])
 
-let controls () =
-  Tyxml_js.To_dom.of_div (Html.div (Panel_settings.content ()))
-
 let onload () =
   let () = Tab_editor.onload () in
   let () = Tab_plot.onload () in
@@ -43,7 +40,6 @@ let onload () =
   let () = Tab_snapshot.onload () in
   let () = Tab_outputs.onload () in
   let () = Tab_log.onload () in
-  let () = Panel_settings.onload () in
   ()
 
 let onresize () =
@@ -53,5 +49,4 @@ let onresize () =
   let () = Tab_snapshot.onresize () in
   let () = Tab_outputs.onresize () in
   let () = Tab_log.onresize () in
-  let () = Panel_settings.onresize () in
   ()

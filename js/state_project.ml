@@ -109,26 +109,33 @@ let sync () : unit Api.result Lwt.t =
                            Some project_parse.Api_types_j.project_parse_contact_map; } in
            Lwt.return (Api_common.result_ok ())))
 
-let remove_project () : unit Api.result Lwt.t =
-  match (React.S.value state).project_current with
-  | None ->
-    let error_msg : string =
-      Format.sprintf "Unable to remove project as none is selected" in
-    Lwt.return (Api_common.result_error_msg error_msg)
-  | Some current ->
+let remove_project project_id =
+  let state = React.S.value state in
+  try
+    let current =
+      List.find (fun x -> x.project_id = project_id)
+        state.project_catalog in
     (current.project_manager#project_delete current.project_id) >>=
     (Api_common.result_bind_lwt ~ok:(fun () ->
          let project_catalog =
            List.filter (fun x -> x.project_id <> current.project_id)
-             (React.S.value state).project_catalog in
-         let project_current = match project_catalog with
-           | [] -> None
-           | h :: _ -> Some h in
+             state.project_catalog in
+         let project_current =
+           if (match state.project_current with
+               | None -> false
+               | Some v -> v.project_id = current.project_id) then
+             match project_catalog with
+             | [] -> None
+             | h :: _ -> Some h
+           else state.project_current in
          let () =
            set_state
              { project_current; project_catalog; project_contact_map = None } in
          sync ())
     )
+  with Not_found ->
+    Lwt.return (Api_common.result_error_msg
+                  ("Project "^project_id^" does not exists"))
 
 let init () : unit Lwt.t =
   let projects = Common_state.url_args ~default:["default"] "project" in

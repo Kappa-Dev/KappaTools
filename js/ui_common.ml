@@ -343,7 +343,7 @@ module type Tab = sig
 end;;
 
 module type Panel = sig
-  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val content : unit -> Html_types.div Tyxml_js.Html5.elt
   val onload : unit -> unit
   val onresize : unit -> unit
 end;;

@@ -647,22 +647,21 @@ let footer () =
          </div>
   |}]
 let content () =
-  [Html.div
-     ~a:[ Tyxml_js.R.Html.a_class
-            (React.S.bind
-               State_project.model
-               (fun model ->
-                  match model.State_project.model_project_id with
+  Html.div
+    ~a:[ Tyxml_js.R.Html.a_class
+           (React.S.bind
+              State_project.model
+              (fun model ->
+                 match model.State_project.model_project_id with
                  | None -> React.S.const [ "hide" ]
                  | Some _ -> React.S.const [ "panel"; "panel-default" ]
-               )
-            )
-        ]
-     [(stopped_body ());
-      (initializing_body ());
-      (running_body ());
-      (footer ()); ]
-  ]
+              )
+           )
+       ]
+    [(stopped_body ());
+     (initializing_body ());
+     (running_body ());
+     (footer ()); ]
 
 let onload () : unit =
   let () = ButtonPerturbation.onload () in

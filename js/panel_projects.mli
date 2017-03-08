@@ -6,6 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val create_project : string -> unit
-val set_project : string -> unit
-val close_project : unit -> unit
+include Ui_common.Panel

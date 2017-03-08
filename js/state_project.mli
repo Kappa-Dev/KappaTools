@@ -13,7 +13,7 @@ type model = { model_project_id : Api_types_j.project_id option ;
              }
 val model : model React.signal
 val set_project : Api_types_j.project_id -> unit Api.result Lwt.t
-val remove_project : unit -> unit Api.result Lwt.t
+val remove_project : Api_types_j.project_id -> unit Api.result Lwt.t
 (* run on application init *)
 val init : unit -> unit Lwt.t
 (* to synch state of application with runtime *)

@@ -6,4 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-include Ui_common.Menu
+val create_project : string -> unit
+val set_project : string -> unit
+val close_project : string -> unit

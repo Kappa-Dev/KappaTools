@@ -39,10 +39,6 @@ let panel_heading =
     [> Html_types.div ] Tyxml_js.Html5.elt list =
     Menu_editor_settings.content ()
   in
-  let menu_editor_project_content :
-    [> Html_types.div ] Tyxml_js.Html5.elt list =
-    Menu_editor_project.content ()
-  in
   let menu_editor_file_content :
     [> Html_types.div ] Tyxml_js.Html5.elt list =
     Menu_editor_file.content ()
@@ -53,7 +49,6 @@ let panel_heading =
   in
   let buttons =
       menu_editor_settings_content @
-       menu_editor_project_content @
        menu_editor_file_content @
        menu_editor_simulation_content @
        [toggle_button] in
@@ -74,25 +69,23 @@ let content () =
           ~a:[Html.a_id codemirror_id]
           (Html.pcdata "") ]
   in
-  [Html.div
-     ~a:[Html.a_class ["panel";"panel-default"]]
-     [ Html.div
-         ~a:[Html.a_class ["panel-heading"]]
-         [ panel_heading ] ;
-       Html.div
-         ~a:[ Tyxml_js.R.Html.a_class
-                (React.S.map
-                   (fun model ->
-                      match model.State_file.model_current with
-                      | None -> ["no-panel-body" ; ]
-                      | Some _ -> ["panel-body" ; ])
-                   State_file.model) ;
+  Html.div
+    ~a:[Html.a_class ["panel";"panel-default"]]
+    [ Html.div
+        ~a:[Html.a_class ["panel-heading"]]
+        [ panel_heading ] ;
+      Html.div
+        ~a:[ Tyxml_js.R.Html.a_class
+               (React.S.map
+                  (fun model ->
+                     match model.State_file.model_current with
+                     | None -> ["no-panel-body" ; ]
+                     | Some _ -> ["panel-body" ; ])
+                  State_file.model) ;
              Html.a_id editor_panel_id
-            ]
+           ]
          [ textarea  ] ;
-
-     ]
-  ]
+    ]
 
 let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
   let position p =
@@ -131,7 +124,6 @@ let setup_lint _ _ _ =
 
 let onload () : unit =
   let () = Menu_editor_settings.onload () in
-  let () = Menu_editor_project.onload () in
   let () = Menu_editor_file.onload () in
   let () = Menu_editor_simulation.onload () in
   let lint_config =

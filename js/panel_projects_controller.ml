@@ -34,14 +34,14 @@ let set_project (project_id : string) : unit =
           ~error:(fun _ _ -> Lwt.return_unit)
        ))
 
-let close_project () : unit =
+let close_project project_id : unit =
   Common.async
     (fun () ->
        State_error.wrap
          __LOC__
          ((State_simulation.close_all())>>=
           (fun _ -> State_file.close_all())>>=
-          (fun _ -> State_project.remove_project ()) >>=
+          (fun _ -> State_project.remove_project project_id) >>=
           (Api_common.result_bind_lwt
              ~ok:(fun () ->
                  ((State_file.sync () >>= (fun _ -> Lwt.return_unit)) <&>
