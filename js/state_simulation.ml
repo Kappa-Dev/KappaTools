@@ -633,24 +633,3 @@ let perturb_simulation (code : string) : unit Api.result Lwt.t =
         >>=
         (Api_common.result_bind_lwt ~ok:(fun () -> sync ())))
     ()
-
-let rec close_simulation_ids
-    (manager : Api.manager)
-    (project_id : Api_types_j.project_id) :
-  Api_types_j.simulation_id list -> unit Api.result Lwt.t =
-  function
-  | [] -> Lwt.return (Api_common.result_ok ())
-  | simulation_id::t ->
-    (manager#simulation_delete project_id simulation_id)>>=
-    (fun _ -> close_simulation_ids manager project_id t)
-
-let close_all () : unit Api.result Lwt.t =
-    State_project.with_project ~label:"close_all."
-      (fun manager project_id ->
-         (* get current directory *)
-         (manager#simulation_catalog project_id) >>=
-         (Api_common.result_bind_lwt
-            ~ok:(fun (catalog : Api_types_j.simulation_catalog) ->
-                let simulation_ids : Api_types_j.simulation_id list = catalog.Api_types_j.simulation_ids in
-                close_simulation_ids manager project_id simulation_ids)))
-      >>= (fun _ -> sync ())

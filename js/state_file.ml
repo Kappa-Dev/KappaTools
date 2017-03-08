@@ -582,26 +582,3 @@ let init () : unit Lwt.t =
   Lwt.return_unit >>=
   load_files >>=
   load_models
-
-let rec close_file_ids
-    (manager : Api.manager)
-    (project_id : Api_types_j.project_id) :
-  Api_types_j.simulation_id list -> unit Api.result Lwt.t =
-  function
-  | [] -> Lwt.return (Api_common.result_ok ())
-  | file_id::t ->
-    (manager#file_delete project_id file_id)>>=
-    (fun _ -> close_file_ids manager project_id t)
-
-
-let close_all () : unit Api.result Lwt.t =
-    State_project.with_project ~label:"close_all."
-      (fun manager project_id ->
-         (* get current directory *)
-         (manager#file_catalog project_id) >>=
-         (Api_common.result_bind_lwt
-            ~ok:(fun (catalog : Api_types_j.file_catalog) ->
-                let file_metadata_list = catalog.Api_types_j.file_metadata_list in
-                let file_ids = List.map (fun m -> m.Api_types_j.file_metadata_id) file_metadata_list in
-                close_file_ids manager project_id file_ids)))
-      >>= (fun _ -> sync ())

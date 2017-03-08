@@ -109,13 +109,37 @@ let sync () : unit Api.result Lwt.t =
                            Some project_parse.Api_types_j.project_parse_contact_map; } in
            Lwt.return (Api_common.result_ok ())))
 
+let remove_simulations manager project_id =
+  (manager#simulation_catalog project_id) >>=
+  (Api_common.result_bind_lwt
+     ~ok:(fun (catalog : Api_types_t.simulation_catalog) ->
+         Lwt_list.iter_p
+           (fun simulation_id ->
+              manager#simulation_delete project_id simulation_id >>=
+           (fun _ -> Lwt.return_unit))
+           catalog.Api_types_t.simulation_ids >>=
+         (fun () -> Lwt.return (Api_common.result_ok ()))))
+
+let remove_files manager project_id =
+  (manager#file_catalog project_id) >>=
+  (Api_common.result_bind_lwt
+     ~ok:(fun (catalog : Api_types_t.file_catalog) ->
+         Lwt_list.iter_p
+           (fun m ->
+              manager#file_delete project_id m.Api_types_j.file_metadata_id>>=
+              (fun _ -> Lwt.return_unit))
+           catalog.Api_types_t.file_metadata_list >>=
+         (fun () -> Lwt.return (Api_common.result_ok ()))))
+
 let remove_project project_id =
   let state = React.S.value state in
   try
     let current =
       List.find (fun x -> x.project_id = project_id)
         state.project_catalog in
-    (current.project_manager#project_delete current.project_id) >>=
+    remove_simulations current.project_manager current.project_id >>=
+    fun _ -> remove_files current.project_manager current.project_id >>=
+    fun _ -> current.project_manager#project_delete current.project_id >>=
     (Api_common.result_bind_lwt ~ok:(fun () ->
          let project_catalog =
            List.filter (fun x -> x.project_id <> current.project_id)
@@ -189,6 +213,3 @@ let with_project :
       Lwt.return (Api_common.result_error_msg error_msg)
     | Some current ->
       handler (current.project_manager :> Api.manager) current.project_id
-
-let close_all () : unit Api.result Lwt.t =
-  failwith "State_project.close_all"

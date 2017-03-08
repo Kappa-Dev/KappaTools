@@ -37,4 +37,3 @@ val t_compile : t -> bool
 val init : unit -> unit Lwt.t
 (* to synch state of application with runtime *)
 val sync : unit -> unit Api.result Lwt.t
-val close_all : unit -> unit Api.result Lwt.t
