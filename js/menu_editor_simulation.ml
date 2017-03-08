@@ -54,7 +54,7 @@ let simulation_dropdown_menu_id = "menu-editor-simulation-dropdown-menu"
       List.map
         (fun (simulation_id : Api_types_j.simulation_id) ->
            let current_simulation_id : Api_types_j.simulation_id option =
-             Tools.option_map
+             Option_util.map
                State_simulation.t_simulation_id
                model.State_simulation.model_current in
            let li_class =

@@ -166,8 +166,8 @@ let () =
         | Some _ ->
           let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
           !tmp_trace,None in
-    let plot_file = Tools.unsome
-        (Tools.unsome "data.csv" conf.Eval.outputFileName)
+    let plot_file = Option_util.unsome
+        (Option_util.unsome "data.csv" conf.Eval.outputFileName)
         cli_args.Run_cli_args.outputDataFile in
     let plotPack =
       let head =

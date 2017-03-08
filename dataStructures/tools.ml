@@ -48,18 +48,6 @@ let not_an_id s =
     false
   with Not_found -> true
 
-let unsome default = function
-  | None -> default
-  | Some a -> a
-
-let option_map f = function
-  | Some x -> Some (f x)
-  | None -> None
-
-let option_bind f = function
-  | None -> None
-  | Some o -> f o
-
 let array_fold_left_mapi f x a =
   let y = ref x in
   let o = Array.init (Array.length a)

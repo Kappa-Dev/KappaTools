@@ -117,7 +117,7 @@ let do_we_prompt_reactions compil =
 let print_chemical_species ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Pattern.print_cc
-       ?sigs:(Tools.option_map Model.signatures (environment_opt compil))
+       ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None)
 
 let print_token ?compil fmt k =
@@ -162,7 +162,7 @@ type embedding_forest = Matching.t
 (* the domain may be not connected *)
 
 let lift_embedding x =
-  Tools.unsome
+  Option_util.unsome
     Matching.empty
     (Matching.add_cc Matching.empty 0 x)
 
@@ -205,7 +205,7 @@ let disjoint_union compil l =
            Pattern.add_fully_specified_to_graph sigs mix cc  in
          let r'' = Renaming.compose false r r' in
          (i,
-          Tools.unsome
+          Option_util.unsome
             Matching.empty
             (Matching.add_cc em i r''),
           mix'))
@@ -260,7 +260,7 @@ let rate _compil rule (_,arity,_) =
     arity
   with
   | Rule_modes.Usual -> Some rule.Primitives.rate
-  | Rule_modes.Unary -> Tools.option_map fst rule.Primitives.unary_rate
+  | Rule_modes.Unary -> Option_util.map fst rule.Primitives.unary_rate
 
 let token_vector a = a.Primitives.delta_tokens
 

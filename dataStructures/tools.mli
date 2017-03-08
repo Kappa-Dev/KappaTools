@@ -10,9 +10,6 @@
 
 (** {5 Combinators on primitive types} *)
 
-val option_map : ('a -> 'b) -> 'a option -> 'b option
-val option_bind : ('a -> 'b option) -> 'a option -> 'b option
-val unsome : 'a -> 'a option -> 'a
 val iteri : (int -> unit) -> int -> unit
 val recti : ('a -> int -> 'a) -> 'a -> int -> 'a
 (** [recti f x n] = f (f (f .. (f (f x 0) 1) ..) (n-1) *)

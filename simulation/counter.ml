@@ -217,7 +217,7 @@ let next_point counter dt =
   | DT dT ->
     if dT <= 0. then 0 else
       int_of_float
-        ((min (Tools.unsome infinity (max_time counter))
+        ((min (Option_util.unsome infinity (max_time counter))
             (dt +. current_time counter) -. counter.init_time) /. dT)
   | DE dE ->
     if dE <= 0 then 0 else

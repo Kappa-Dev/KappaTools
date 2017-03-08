@@ -89,7 +89,7 @@ let get_limits l =
        else
          t_max,min va_min 0.,va_max
     | va::q ->
-      aux (max (Tools.unsome 0. (Nbr.to_float va.(0))) t_max)
+      aux (max (Option_util.unsome 0. (Nbr.to_float va.(0))) t_max)
         (Tools.array_fold_lefti (fun i a x -> match Nbr.to_float x with
              | Some x when i <> 0 -> min a x
              | _ -> a) va_min va)
@@ -111,7 +111,7 @@ let draw_in_data ((t_max,va_min,va_max),(zero_w,zero_h,draw_w,draw_h)) =
     match Nbr.to_float y with
     | None -> ()
     | Some y' ->
-      f (zero_w' +. (((Tools.unsome 0. @@ Nbr.to_float x) *. draw_w') /. t_max))
+      f (zero_w' +. (((Option_util.unsome 0. @@ Nbr.to_float x) *. draw_w') /. t_max))
       (zero_h' -. (((y' -. va_min) *. draw_h') /. delta_va))
 
 let graduation_step draw_l min_grad_l va_min va_max =

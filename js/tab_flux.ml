@@ -43,7 +43,7 @@ let configuration () : Widget_export.configuration =
     show = React.S.map
         (fun model ->
            has_fluxmap
-             (Tools.option_bind
+             (Option_util.bind
                 State_simulation.t_simulation_info
                 model.State_simulation.model_current))
         State_simulation.model ;
@@ -239,7 +239,7 @@ let select_fluxmap flux_map =
       )
   in
   let o : Api_types_t.simulation_info option =
-    Tools.option_bind
+    Option_util.bind
       State_simulation.t_simulation_info
       (React.S.value State_simulation.model).State_simulation.model_current
   in

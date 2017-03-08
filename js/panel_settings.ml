@@ -417,7 +417,7 @@ module DivStatusIndicator : Ui_common.Div = struct
                State_simulation.model
                (fun model ->
                   let option =
-                    Tools.option_map
+                    Option_util.map
                       State_simulation.model_state_to_string
                       (State_simulation.model_simulation_state
                      model.State_simulation.model_current)
@@ -481,7 +481,7 @@ module RunningPanelLayout : Ui_common.Div = struct
                    status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage )
                 simulation_info
             in
-            let time_percent : int = Tools.unsome 100 time_percent in
+            let time_percent : int = Option_util.unsome 100 time_percent in
             time_percent
          )
          State_simulation.model)
@@ -490,7 +490,7 @@ module RunningPanelLayout : Ui_common.Div = struct
            let time : float option =
              lift (fun (status : Api_types_j.simulation_info) ->
                  Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) simulation_info in
-           let time : float = Tools.unsome 0.0 time in
+           let time : float = Option_util.unsome 0.0 time in
            string_of_float time
          )
           State_simulation.model)
@@ -503,7 +503,7 @@ module RunningPanelLayout : Ui_common.Div = struct
            let event_percentage : int option =
              lift (fun (status : Api_types_j.simulation_info) ->
                  status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage) simulation_info in
-           let event_percentage : int = Tools.unsome 100 event_percentage in
+           let event_percentage : int = Option_util.unsome 100 event_percentage in
            event_percentage
          )
           State_simulation.model)
@@ -514,7 +514,7 @@ module RunningPanelLayout : Ui_common.Div = struct
                  Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
                simulation_info
            in
-           let event : int = Tools.unsome 0 event in
+           let event : int = Option_util.unsome 0 event in
            string_of_int event
          )
           State_simulation.model)

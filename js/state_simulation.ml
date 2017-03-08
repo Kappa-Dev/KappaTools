@@ -47,9 +47,9 @@ let model_state_to_string =
          | PAUSED -> "Paused"
 
 let model_simulation_info model : Api_types_j.simulation_info option=
-  Tools.option_bind t_simulation_info model.model_current
+  Option_util.bind t_simulation_info model.model_current
 let model_simulation_state model : model_state option =
-  Tools.option_map
+  Option_util.map
     (function
       | SIMULATION_STATE_STOPPED -> STOPPED
       | SIMULATION_STATE_INITALIZING -> INITALIZING
@@ -58,7 +58,7 @@ let model_simulation_state model : model_state option =
           RUNNING
         else
           PAUSED)
-    (Tools.option_map t_simulation_state model)
+    (Option_util.map t_simulation_state model)
 
 
 let state , set_state =
@@ -101,7 +101,7 @@ let with_simulation :
     let project_handler manager project_id =
       let current_state = React.S.value state in
       match
-        Tools.option_bind
+        Option_util.bind
           (fun simulation_id ->
              List_util.find_option
                (fun t -> simulation_id =  t_simulation_id t)

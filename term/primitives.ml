@@ -250,7 +250,7 @@ let extract_connected_components_modifications l =
 
 let map_expr_rule f x = {
   rate = f x.rate;
-  unary_rate = Tools.option_map (fun (x,d) -> (f x,d)) x.unary_rate;
+  unary_rate = Option_util.map (fun (x,d) -> (f x,d)) x.unary_rate;
   connected_components = x.connected_components;
   removed = x.removed;
   inserted = x.inserted;
@@ -273,7 +273,7 @@ let map_expr_modification f = function
 let map_expr_perturbation f_alg f_bool x =
   { precondition = f_bool x.precondition;
     effect = List.map (map_expr_modification f_alg) x.effect;
-    abort = Tools.option_map f_bool x.abort;
+    abort = Option_util.map f_bool x.abort;
   }
 
 let stops_of_perturbation algs_deps x =

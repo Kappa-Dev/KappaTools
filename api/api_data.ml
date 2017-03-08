@@ -74,7 +74,8 @@ let label_snapshot
         snapshot.Data.snapshot_agents
   ; Api_types_t.snapshot_tokens =
       Array.map
-        (fun (token,value) -> (Tools.unsome infinity (Nbr.to_float value),token))
+        (fun (token,value) ->
+           (Option_util.unsome infinity (Nbr.to_float value),token))
         snapshot.Data.snapshot_tokens
   }
 
@@ -131,7 +132,7 @@ let print_site_node ?link_store agid f sn =
                        if agid' < agid || (agid' = agid && sid' <= sid) then
                          let lid,rem = Mods.Int2Map.pop (agid,sid) idm in
                          let () = r:=(fid,rem) in
-                         Tools.unsome (-1) lid
+                         Option_util.unsome (-1) lid
                        else
                          let () =
                            r:=(succ fid, Mods.Int2Map.add (agid',sid') fid idm) in

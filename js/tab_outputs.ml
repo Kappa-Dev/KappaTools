@@ -69,13 +69,13 @@ let xml () =
       List.map
         (fun key ->
            Html.option
-             ~a:([ Html.a_value (Tools.unsome "/dev/stdout" key)]@
+             ~a:([ Html.a_value (Option_util.unsome "/dev/stdout" key)]@
                  (if (key = current_file_id) then
                     [Html.a_selected ()]
                   else  []))
-             (Html.pcdata (Ui_common.option_label (Tools.unsome "" key))))
+             (Html.pcdata (Ui_common.option_label (Option_util.unsome "" key))))
         file_ids in
-    let () = update_outputs (Tools.unsome "/dev/stdout" current_file_id) in
+    let () = update_outputs (Option_util.unsome "/dev/stdout" current_file_id) in
     Tyxml_js.Html.select
       ~a:[ Html.a_class ["form-control"] ; Html.a_id select_id ]
       file_options in
@@ -102,11 +102,12 @@ let xml () =
                              (match file_line_info.Api_types_j.file_line_ids with
                               | [] -> []
                               | key::[] ->
-                                let () = update_outputs (Tools.unsome "/dev/stdout" key) in
+                                let () = update_outputs
+                                    (Option_util.unsome "/dev/stdout" key) in
                                 [Html.h4
                                    [ Html.pcdata
                                        (Ui_common.option_label
-                                          (Tools.unsome "" key)
+                                          (Option_util.unsome "" key)
                                        )]]
                               | _ :: _ :: _ -> [select file_line_info])
                          in

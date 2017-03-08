@@ -92,7 +92,7 @@ let glue_connected_component links cache ccs node1 node2 =
   is_in_cc [] [node1]
 
 let separate_connected_component links cache ccs node1 node2 =
-  let old_cc_id = Tools.unsome (-1) (Mods.DynArray.get ccs node2) in
+  let old_cc_id = Option_util.unsome (-1) (Mods.DynArray.get ccs node2) in
   let rec inspect_site dst id site next =
     if site = 0 then Some next else
       match (Mods.DynArray.get links id).(pred site) with
@@ -254,8 +254,8 @@ let add_link (ag,ty) s (ag',ty') s' graph =
   let out = match graph.connected_component with
     | None -> None
     | Some ccs ->
-      let i = Tools.unsome (-1) (Mods.DynArray.get ccs ag) in
-      let j = Tools.unsome (-2) (Mods.DynArray.get ccs ag') in
+      let i = Option_util.unsome (-1) (Mods.DynArray.get ccs ag) in
+      let j = Option_util.unsome (-2) (Mods.DynArray.get ccs ag') in
       if i = j then None else
         let () =
           glue_connected_component graph.connect graph.cache ccs ag ag' in

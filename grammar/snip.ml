@@ -221,7 +221,7 @@ let define_full_transformation
                  (Signature.print_agent sigs) sort) in
       let links_transf' =
         Mods.IntMap.add
-          i ((place,site),Tools.option_map (fun _ -> pos) cand_pos)
+          i ((place,site),Option_util.map (fun _ -> pos) cand_pos)
           links_transf in
       ((cand::removed,added),links_transf')
     | Some ((place',site' as dst'),risk) ->
@@ -607,7 +607,7 @@ let connected_components_of_mixture created mix (env,origin) =
       ((origin,Tools.array_rev_of_list acc,
         { instantiations with Instantiation.actions = actions'' },
         transformations''),
-       (env,Tools.option_map incr_origin origin))
+       (env,Option_util.map incr_origin origin))
     | h :: t ->
       let wk = Pattern.begin_new env in
       let instantiations' = {

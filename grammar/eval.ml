@@ -106,7 +106,7 @@ let rules_of_ast
   let build deps un_ccs (origin,ccs,syntax,(neg,pos)) =
     let ccs' = Array.map fst ccs in
     let rate,unrate,un_ccs' = unary_infos ccs' un_ccs in
-    Tools.option_map
+    Option_util.map
       (fun x ->
          let origin =
            match origin with Some o -> o | None -> failwith "ugly Eval.rule_of_ast" in

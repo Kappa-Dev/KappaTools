@@ -478,7 +478,7 @@ let copy_rule_agent a =
   { ra_type = a.ra_type; ra_erased = a.ra_erased; ra_ports = p;
     ra_ints = i;
     ra_syntax =
-      Tools.option_map (fun _ -> Array.copy p, Array.copy i)
+      Option_util.map (fun _ -> Array.copy p, Array.copy i)
         a.ra_syntax; }
 
 let to_erased sigs x =
@@ -1114,14 +1114,14 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
       ((Locality.dummy_annot rate_var,k)::acc_un,
-       (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+       (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
         Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
     | true, Some rate ->
       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
       (acc_un,
-       (Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+       (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
         r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
         rate,k_op_un,r_pos)::rules)
     | false, None -> (acc'',rules)
@@ -1286,7 +1286,7 @@ let assemble_rule
     r_un_rate =
       let r_dist d =
         alg_expr_of_ast sigs tok algs ?max_allowed_var:None d in
-      Tools.option_map
+      Option_util.map
         (fun (un_rate',dist) ->
            let un_rate'' =
              alg_expr_of_ast sigs tok algs

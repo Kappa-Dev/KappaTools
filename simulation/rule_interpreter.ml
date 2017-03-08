@@ -629,11 +629,11 @@ let apply_unary_rule
           map1 map2 () in
       let cc_id,_ = Random_tree.random state.random_state rtree in
       let root1 =
-        Tools.unsome (-1)
+        Option_util.unsome (-1)
           (Mods.IntSet.random state.random_state
              (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
       let root2 =
-        Tools.unsome (-1)
+        Option_util.unsome (-1)
           (Mods.IntSet.random state.random_state
              (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
       let () =

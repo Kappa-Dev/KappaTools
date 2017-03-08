@@ -65,20 +65,20 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
     let init_t,max_time,init_e,max_event,plot_period =
     match unit with
     | Time ->
-      Tools.unsome (Tools.unsome 0. conf.Eval.initial)
+      Option_util.unsome (Option_util.unsome 0. conf.Eval.initial)
         cli_args.Run_cli_args.minValue,
       cli_args.Run_cli_args.maxValue,
       None,None,
       (match cli_args.Run_cli_args.plotPeriod with
        | Some a -> Counter.DT a
-       | None -> Tools.unsome (Counter.DT 1.) conf.Eval.plotPeriod)
+       | None -> Option_util.unsome (Counter.DT 1.) conf.Eval.plotPeriod)
     | Event ->
-      Tools.unsome 0. conf.Eval.initial,None,
-      Some (int_of_float (Tools.unsome 0. cli_args.Run_cli_args.minValue)),
-      Tools.option_map int_of_float cli_args.Run_cli_args.maxValue,
+      Option_util.unsome 0. conf.Eval.initial,None,
+      Some (int_of_float (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
+      Option_util.map int_of_float cli_args.Run_cli_args.maxValue,
       match cli_args.Run_cli_args.plotPeriod with
       | Some a -> Counter.DE (int_of_float (ceil a))
-      | None -> Tools.unsome (Counter.DE 1) conf.Eval.plotPeriod in
+      | None -> Option_util.unsome (Counter.DE 1) conf.Eval.plotPeriod in
   let counter =
     Counter.create ~init_t ?init_e ?max_time ?max_event ~plot_period in
   let env =

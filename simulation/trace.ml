@@ -149,7 +149,7 @@ let print_side_effects ?env =
          f "Side_effects(%a,%a)"
          (print_site ?env) site
          (Instantiation.print_concrete_binding_state
-            ?sigs:(Tools.option_map Model.signatures env)) state)
+            ?sigs:(Option_util.map Model.signatures env)) state)
 
 let print_event ~compact ?env log (ev_kind,e) =
   let sigs = match env with

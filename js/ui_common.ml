@@ -16,7 +16,7 @@ let toggle_element
           (React.S.bind
              State_simulation.model
              (fun model -> React.S.const
-                 (if projection (Tools.option_bind
+                 (if projection (Option_util.bind
                                    State_simulation.t_simulation_info
                                    model.State_simulation.model_current) then
                     ["show"]
@@ -187,7 +187,7 @@ let badge
       (let _ = React.S.map
            (fun model ->
               let simulation_info =
-                Tools.option_bind State_simulation.t_simulation_info
+                Option_util.bind State_simulation.t_simulation_info
                   model.State_simulation.model_current in
               let count = counter simulation_info in
               if count > 0  then

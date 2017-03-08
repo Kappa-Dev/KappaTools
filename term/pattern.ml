@@ -284,7 +284,7 @@ let minimize_renaming dst_nbt ref_nbt =
                List_util.smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
              if ids' == dst_nbt.(ty) then r
              else let () = dst_nbt.(ty) <- ids' in
-               Tools.unsome Renaming.empty (Renaming.add id id r)))
+               Option_util.unsome Renaming.empty (Renaming.add id id r)))
       Renaming.empty ref_nbt in
   Tools.array_fold_lefti
     (fun ty r ids -> sub_minimize_renaming r (ids,ref_nbt.(ty))) re dst_nbt
@@ -532,7 +532,7 @@ let add_fully_specified_to_graph sigs graph cc =
       (Mods.IntMap.empty,graph) cc.nodes_by_type in
   let r =
     Mods.IntMap.fold
-      (fun i (a,_) r -> Tools.unsome Renaming.empty (Renaming.add i a r))
+      (fun i (a,_) r -> Option_util.unsome Renaming.empty (Renaming.add i a r))
       e Renaming.empty  in
   (g,r)
 
