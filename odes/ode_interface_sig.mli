@@ -115,6 +115,9 @@ sig
   val string_of_var_id:
     ?compil:compil -> int -> string
 
+  (*val string_of_var_id_jac:
+    ?compil:compil -> int -> int -> string*)
+
   val rate:
     compil -> rule -> rule_id_with_mode ->
     (connected_component array list, int) Alg_expr.e Locality.annot option

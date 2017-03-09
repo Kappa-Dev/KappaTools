@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 10 2017>
+  * Last modification: Time-stamp: <Mar 11 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -286,6 +286,9 @@ let string_of_var_id ?compil r =
       fst (array.(r-1))
     with
       _ -> "var("^(string_of_int r)^")"
+
+let string_of_var_id_jac ?compil r dt =
+  "jacvar("^(string_of_int r)^","^(string_of_int dt)^")"
 
 let rate_name compil rule rule_id =
   let (_kade_id,arity,direction) = rule_id in

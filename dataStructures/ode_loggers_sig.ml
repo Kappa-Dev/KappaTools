@@ -19,6 +19,10 @@ type variable =
   | Rated of int
   | Rateun of int
   | Rateund of int
+  | Jacobian_rate of int * int
+  | Jacobian_rated of int * int
+  | Jacobian_rateun of int * int
+  | Jacobian_rateund of int * int
   | N_rules
   | N_ode_var
   | N_var
@@ -117,7 +121,11 @@ let string_of_array_name var =
   | Concentration _ -> "y"
   | Deriv _ -> "dydt"
   | Jacobian (_,_) -> "jac"
-  | Jacobian_var (_,_)-> "jacvar"
+  | Jacobian_var (_,_) -> "jacvar"
+  | Jacobian_rate (_,_) -> "jack"
+  | Jacobian_rated (_,_) -> "jackd"
+  | Jacobian_rateun (_,_) -> "jackun"
+  | Jacobian_rateund (_,_) -> "jackund"
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
@@ -144,6 +152,10 @@ let string_of_variable var =
   | Initbis int
   | Concentration int
   | Deriv int -> Printf.sprintf "%s(%i)" (string_of_array_name var) int
+  | Jacobian_rate (int1,int2)
+  | Jacobian_rated (int1,int2)
+  | Jacobian_rateun (int1,int2)
+  | Jacobian_rateund (int1,int2)
   | Jacobian (int1,int2)
   | Jacobian_var (int1,int2) ->
     Printf.sprintf "%s(%i,%i)" (string_of_array_name var)  int1 int2
@@ -159,3 +171,34 @@ let string_of_variable var =
   | Tmp
   | Current_time
   | Time_scale_factor -> (string_of_array_name var)
+
+let variable_of_derived_variable var id =
+  match var with
+  | Rate int -> Jacobian_rate (int,id)
+  | Rated int -> Jacobian_rated (int,id)
+  | Rateun int -> Jacobian_rateun (int,id)
+  | Rateund int -> Jacobian_rateund (int,id)
+  | Expr int -> Jacobian_var (int, id)
+  | Concentration int -> Jacobian (int, id)
+  | Obs _
+  | Init _
+  | Initbis _
+  | Deriv _
+  | Jacobian_rate _
+  | Jacobian_rated _
+  | Jacobian_rateun _
+  | Jacobian_rateund _
+  | Jacobian _
+  | Jacobian_var _
+  | Tinit
+  | Tend
+  | InitialStep
+  | Period_t_points
+  | N_ode_var
+  | N_var
+  | N_obs
+  | N_rules
+  | N_rows
+  | Tmp
+  | Current_time
+  | Time_scale_factor -> assert false

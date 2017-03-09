@@ -8,7 +8,7 @@ type variable =
   | Deriv of int
   | Obs of int
   | Jacobian of int * int
-  | Jacobian_var of int * int 
+  | Jacobian_var of int * int
   | Tinit
   | Tend
   | InitialStep
@@ -17,6 +17,10 @@ type variable =
   | Rated of int
   | Rateun of int
   | Rateund of int
+  | Jacobian_rate of int * int
+  | Jacobian_rated of int * int
+  | Jacobian_rateun of int * int
+  | Jacobian_rateund of int * int
   | N_rules
   | N_ode_var
   | N_var
@@ -33,3 +37,4 @@ val is_bool_const: (ode_var_id,int) Alg_expr.bool Locality.annot -> bool
 val int_of_ode_var_id: ode_var_id -> int
 val string_of_variable: variable -> string
 val string_of_array_name: variable -> string
+val variable_of_derived_variable: variable -> int -> variable

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 08 2017>
+  * Last modification: Time-stamp: <Mar 09 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -221,7 +221,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         network
       else
-        network 
+        network
     in
     let network =
       A.network_from_compil ~ignore_obs parameters compil network
@@ -250,6 +250,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ?data_file:cli_args.Run_cli_args.outputDataFile
         ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Option_util.unsome 1. cli_args.Run_cli_args.maxValue)
+        ~compute_jacobian
         ?plot_period:cli_args.Run_cli_args.plotPeriod
         logger
         logger_buffer compil network

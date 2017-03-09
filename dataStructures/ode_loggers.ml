@@ -188,17 +188,17 @@ let initialize logger variable =
     begin
       let () =
         match variable with
-        | Ode_loggers_sig.Rate _ ->
+        | Ode_loggers_sig.Rate _
+        | Ode_loggers_sig.Rated _
+        | Ode_loggers_sig.Rateun _
+        | Ode_loggers_sig.Rateund _ ->
           Loggers.fprintf logger "%s=zeros(nrules,1)"
             (Ode_loggers_sig.string_of_array_name variable)
-        | Ode_loggers_sig.Rated _ ->
-          Loggers.fprintf logger "%s=sparse(nrules,1)"
-            (Ode_loggers_sig.string_of_array_name variable)
-        | Ode_loggers_sig.Rateun _ ->
-          Loggers.fprintf logger "%s=sparse(nrules,1)"
-            (Ode_loggers_sig.string_of_array_name variable)
-        | Ode_loggers_sig.Rateund _ ->
-          Loggers.fprintf logger "%s=sparse(nrules,1)"
+        | Ode_loggers_sig.Jacobian_rate (_,_)
+        | Ode_loggers_sig.Jacobian_rateun (_,_)
+        | Ode_loggers_sig.Jacobian_rated (_,_)
+        | Ode_loggers_sig.Jacobian_rateund (_,_) ->
+          Loggers.fprintf logger "%s=zeros(nrules,nodevar)"
             (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Expr _ ->
           Loggers.fprintf logger "%s=zeros(nvar,1);"
@@ -725,14 +725,18 @@ let print_comment
       | Loggers.TXT_Tabular
       | Loggers.XLS -> ()
 
-let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_id logger logger_buffer variable alg_expr network_handler =
+let associate ?init_mode:(init_mode=false) ?comment:(comment="")
+    string_of_var_id logger logger_buffer variable alg_expr network_handler =
   let () = Loggers.set_expr logger variable alg_expr in
   match
     Loggers.get_encoding_format logger
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
-      let () = Loggers.fprintf logger "%s=" (Ode_loggers_sig.string_of_variable variable) in
+      let () =
+        Loggers.fprintf logger "%s="
+          (Ode_loggers_sig.string_of_variable  variable)
+      in
       let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
       let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in

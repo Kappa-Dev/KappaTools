@@ -14,7 +14,6 @@ let debug s =
 module Make(I:Ode_interface_sig.Interface) =
 
 struct
-
   module SpeciesSetMap =
     SetMap.Make
       (struct
@@ -1283,6 +1282,69 @@ struct
         ~init_mode (I.string_of_var_id ~compil) logger logger_buffer
         (Ode_loggers_sig.Expr id) expr handler_expr
 
+  module MT =
+  struct
+    type t = (ode_var_id,ode_var_id) Alg_expr.mix_token
+    let compare = compare
+    let print _ _ = ()
+  end
+
+  module MTSetMap = SetMap.Make (MT)
+  module MTSET = MTSetMap.Set
+
+  let affect_deriv_var
+      is_zero logger logger_buffer ?time_var compil network decl dep
+    =
+    let handler_expr = handler_expr network in
+    match decl with
+    | Dummy_decl
+    | Init_expr _ -> dep
+    | Var (id,_comment,expr) ->
+      let dep_var =
+        Alg_expr_extra.dep
+          MTSET.empty
+          MTSET.add
+          MTSET.union
+          (fun id ->
+             match
+               Mods.IntMap.find_option (succ id) dep
+             with
+             | Some set -> set
+             | None -> MTSET.empty)
+          expr
+      in
+      let dep = Mods.IntMap.add id dep_var dep in
+      let () =
+        MTSET.iter
+          (fun mix_token ->
+             let dt =
+               match
+                 mix_token
+               with
+               | Alg_expr.Mix id -> id
+               | Alg_expr.Tok id -> id
+             in
+             let expr =
+               Alg_expr_extra.simplify
+                 (Alg_expr_extra.diff ?time_var expr mix_token)
+             in
+             Ode_loggers.associate
+               ~init_mode:false
+               (I.string_of_var_id ~compil)
+               logger logger_buffer
+               (Ode_loggers_sig.variable_of_derived_variable
+                  (Ode_loggers_sig.Expr id) dt)
+               expr handler_expr)
+          dep_var
+      in
+      dep
+(* to do *)
+  let affect_deriv_rate
+      dep_var logger logger_buffer rule rate network dep
+    =
+    let handler_expr = handler_expr network in
+    dep
+
   let fresh_is_zero network =
     let is_zero =
       Mods.DynArray.create (get_fresh_ode_var_id network) true in
@@ -1296,6 +1358,26 @@ struct
     in is_zero
 
   let declare_rates_global logger network =
+    let do_it f =
+      Ode_loggers.declare_global logger (f network.n_rules)
+    in
+    let () = do_it (fun x -> Ode_loggers_sig.Rate x) in
+    let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
+    let () = do_it (fun x -> Ode_loggers_sig.Rateun x) in
+    let () = do_it (fun x -> Ode_loggers_sig.Rateund x) in
+    let () =
+      match Loggers.get_encoding_format logger with
+      | Loggers.Octave | Loggers.Matlab ->
+        Ode_loggers.print_newline logger
+      | Loggers.Maple | Loggers.SBML | Loggers.TXT
+      | Loggers.TXT_Tabular | Loggers.XLS
+      | Loggers.Matrix | Loggers.DOT | Loggers.HTML
+      | Loggers.HTML_Graph | Loggers.HTML_Tabular
+      | Loggers.Json -> ()
+    in
+    ()
+
+  let declare_jacobian_rates_global logger network =
     let do_it f =
       Ode_loggers.declare_global logger (f network.n_rules)
     in
@@ -1708,6 +1790,257 @@ struct
     let () = Ode_loggers.print_newline logger in
     ()
 
+  let export_jac logger compil network split =
+    match Loggers.get_encoding_format logger with
+    | Loggers.Matrix | Loggers.Maple | Loggers.TXT
+    | Loggers.TXT_Tabular | Loggers.XLS
+    | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+    | Loggers.HTML_Tabular | Loggers.Json
+    | Loggers.SBML -> ()
+    | Loggers.Matlab | Loggers.Octave  ->
+      let is_zero = fresh_is_zero network in
+      let label = "listOfReactions" in
+      let () =
+        Ode_loggers.open_procedure logger "jacobian" "ode_jac_aux" ["t";"jac";]
+      in
+      let () = Ode_loggers.print_newline logger in
+      let () =
+        Ode_loggers.declare_global logger (Ode_loggers_sig.Jacobian_var (1,1))
+      in
+      let () =
+        Ode_loggers.declare_global logger (Ode_loggers_sig.Expr 1)
+      in
+      let () =
+        declare_rates_global logger network
+      in
+      let () =
+        List.iter
+          (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl in
+      let () = Ode_loggers.print_newline logger in
+      let () =
+        List.iter
+          (fun (rule,rate) ->
+             Ode_loggers.associate
+               (I.string_of_var_id ~compil)
+               logger logger
+               (var_of_rule rule) rate (handler_expr network))
+          split.var_rate
+      in
+      let () =
+        declare_jacobian_rates_global logger network
+      in
+      let dep_var =
+        List.fold_left
+          (fun dep var ->
+             affect_deriv_var
+               is_zero logger logger compil network var dep)
+          Mods.IntMap.empty
+          split.var_decl
+      in
+      let () = Ode_loggers.print_newline logger in
+      let dep_rates =
+        List.fold_left
+          (fun dep (rule,rate) ->
+             affect_deriv_rate
+               dep_var
+               logger logger
+               rule rate network
+               dep
+          )
+          Mods.IntMap.empty
+          split.var_rate
+      in
+      let () = Ode_loggers.print_newline logger in
+      let () = Ode_loggers.initialize logger (Ode_loggers_sig.Deriv 1) in
+      let do_it f l reactants enriched_rule =
+        List.iter
+          (fun species ->
+             let nauto_in_species =
+               if I.do_we_count_in_embeddings compil
+               then
+                 snd
+                   (species_of_species_id network species)
+               else 1
+             in
+             let nauto_in_lhs = enriched_rule.divide_rate_by in
+             f
+               logger (Ode_loggers_sig.Deriv species)
+               ~nauto_in_species ~nauto_in_lhs
+               (var_of_rule enriched_rule) reactants)
+          l
+      in
+      let () =
+        List.iter
+          (fun (reactants, products, token_vector, enriched_rule) ->
+             let add_factor l  =
+               if I.do_we_count_in_embeddings compil
+               then
+                 List.rev_map
+                   (fun x ->
+                      let nauto = snd
+                          (species_of_species_id network x)
+                      in
+                      (x,
+                       nauto))
+                   (List.rev l)
+               else
+                 List.rev_map
+                   (fun x -> (x,1))
+                   (List.rev l)
+             in
+             let reactants' = add_factor reactants in
+             let products' = add_factor products in
+             let () =
+               if I.do_we_prompt_reactions compil
+               then
+                 let rule_string =
+                   Format.asprintf
+                     "%a" (I.print_rule_name ~compil)
+                     enriched_rule.rule
+                 in
+                 let tokens_prod = I.token_vector enriched_rule.rule in
+                 let dump_token_list fmt list =
+                   let _ =
+                     List.fold_left
+                       (fun bool ((alg,_),k) ->
+                          let prefix = if bool then " + " else " | " in
+                          let () =
+                            Format.fprintf fmt "%s%a:%a"
+                              prefix
+                              (
+                                Alg_expr.print
+                                  (fun fmt mixture ->
+                                     let () = Format.fprintf fmt "|" in
+                                     let
+                                       _  =
+                                       List.fold_left
+                                         (
+                                           Array.fold_left
+                                             (fun bool connected_component ->
+                                                let prefix =
+                                                  if bool then " , "
+                                                  else "" in
+                                                let () =
+                                                  Format.fprintf
+                                                    fmt
+                                                    "%s%a"
+                                                    prefix
+                                                    (I.print_connected_component  ~compil)
+                                                    connected_component
+                                                in true)
+                                         )
+                                         false mixture
+                                     in
+                                     let () = Format.fprintf fmt "|" in
+                                     ())
+                                  (I.print_token ~compil)
+                                  (fun fmt var_id -> Format.fprintf fmt "%s"
+                                    (I.string_of_var_id ~compil (succ var_id)))
+                              )
+                              alg
+                              (I.print_token ~compil)
+                              k
+                          in true
+                       ) false (List.rev list)
+                   in ()
+                 in
+                 let () = Ode_loggers.print_newline logger in
+                 let () =
+                   Ode_loggers.print_comment ~breakline logger
+                     ("rule    : "^rule_string)
+                 in
+                 let dump fmt list  =
+                   let _ =
+                     List.fold_left
+                       (fun bool k ->
+                          let prefix = if bool then " + " else "" in
+                          let species_string =
+                            Format.asprintf "%a"
+                              (fun log id -> I.print_chemical_species
+                                  ~compil log
+                                  (fst
+                                     (Mods.DynArray.get
+                                        network.species_tab id)))
+                              k
+                          in
+                          let () =
+                            Format.fprintf fmt "%s%s"
+                              prefix
+                              species_string
+                          in
+                          true)
+                       false
+                       (List.rev list)
+                   in ()
+                 in
+                 let s =
+                   Format.asprintf
+                     "reaction: %a -> %a%a "
+                     dump reactants
+                     dump products
+                     dump_token_list tokens_prod
+                 in
+                 let () =  Ode_loggers.print_comment ~breakline logger s in
+                 ()
+             in
+             let reactants' =
+               List.rev_map
+                 (fun x ->
+                    let nauto = snd
+                        (species_of_species_id network x)
+                    in
+                    (Ode_loggers_sig.Concentration x,
+                     to_nocc_correct compil nauto))
+                 (List.rev reactants)
+             in
+             let nauto_in_lhs = enriched_rule.divide_rate_by in
+             let () = Ode_loggers.print_newline logger in
+             let () =
+               do_it Ode_loggers.consume reactants reactants'
+                 enriched_rule
+             in
+             let () =
+               do_it Ode_loggers.produce products reactants'
+                 enriched_rule
+             in
+             let () =
+               List.iter
+                 (fun (expr,(token,_loc)) ->
+                    Ode_loggers.update_token
+                      (I.string_of_var_id ~compil)
+                      logger
+                      (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
+                      (var_of_rule enriched_rule)
+                      expr reactants' (handler_expr network))
+                 token_vector
+             in ()
+          ) network.reactions
+      in
+      (* Derivative of time is equal to 1 *)
+      let () =
+        if may_be_not_time_homogeneous network
+        then
+          let () =
+            Ode_loggers.associate
+              (I.string_of_var_id ~compil) logger logger
+              (Ode_loggers_sig.Deriv
+                 (get_last_ode_var_id network))
+              (Alg_expr.const Nbr.one) (handler_expr network)
+          in
+          let () = Ode_loggers.print_newline logger in
+          let () = Sbml_backend.time_advance logger in
+          ()
+        else
+          ()
+      in
+      let () = Ode_loggers.close_procedure logger in
+      let () = Sbml_backend.close_box logger label in
+      let () = Ode_loggers.print_newline logger in
+      let () = Ode_loggers.print_newline logger in
+      ()
+
+
+
   let export_init logger compil network =
     let label = "listOfSpecies" in
     let () = Sbml_backend.open_box logger label in
@@ -1821,7 +2154,9 @@ struct
 
   let export_network
       ~command_line ~command_line_quotes ?data_file ?init_t ~max_t
-      ?plot_period logger logger_buffer compil network =
+      ?plot_period
+      ?compute_jacobian:(compute_jacobian=true)
+      logger logger_buffer compil network =
     let network =
       if may_be_not_time_homogeneous network
       then
@@ -1851,7 +2186,16 @@ struct
     in
     let () = Format.printf "\t -ode system @." in
     let () =
-      export_dydt logger compil network sorted_rules_and_decl in
+      export_dydt logger compil network sorted_rules_and_decl
+    in
+    let () =
+      if compute_jacobian then
+        let () = Format.printf "\t -jacobian @." in
+        let () =
+          export_jac logger compil network sorted_rules_and_decl
+        in
+        ()
+    in
     let () = Format.printf "\t -observables @." in
     let () =
       export_obs logger compil network sorted_rules_and_decl in

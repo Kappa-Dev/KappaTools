@@ -65,6 +65,8 @@ let rec simplify expr =
           match a,b with
           | (Alg_expr.CONST a,_), (Alg_expr.CONST b,_) ->
             Alg_expr.CONST (Nbr.mult a b),loc
+          | (Alg_expr.CONST a',_),_ when Nbr.is_equal a' Nbr.zero -> a
+          | _,(Alg_expr.CONST b',_) when Nbr.is_equal b' Nbr.zero -> b
           | (Alg_expr.CONST a,_),_ when Nbr.is_equal a Nbr.one -> b
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
