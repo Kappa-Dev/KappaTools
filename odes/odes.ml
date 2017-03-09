@@ -1292,6 +1292,16 @@ struct
   module MTSetMap = SetMap.Make (MT)
   module MTSET = MTSetMap.Set
 
+  module V =
+  struct
+    type t = Ode_loggers_sig.variable
+    let compare = compare
+    let print _ _ = ()
+  end
+
+  module VSetMap = SetMap.Make (V)
+  module VMAP = VSetMap.Map
+
   let affect_deriv_var
       is_zero logger logger_buffer ?time_var compil network decl dep
     =
@@ -1340,9 +1350,46 @@ struct
       dep
 (* to do *)
   let affect_deriv_rate
-      dep_var logger logger_buffer rule rate network dep
+      dep_var logger logger_buffer ?time_var compil rule rate network dep
     =
     let handler_expr = handler_expr network in
+    let dep_set =
+      Alg_expr_extra.dep
+        MTSET.empty
+        MTSET.add
+        MTSET.union
+        (fun id ->
+           match
+             Mods.IntMap.find_option (succ id) dep_var
+           with
+           | Some set -> set
+           | None -> MTSET.empty)
+        rate
+    in
+    let dep = VMAP.add (var_of_rule rule) dep_set dep in
+    let () =
+      MTSET.iter
+        (fun mix_token ->
+           let dt =
+             match
+               mix_token
+             with
+             | Alg_expr.Mix id -> id
+             | Alg_expr.Tok id -> id
+           in
+           let expr =
+             Alg_expr_extra.simplify
+               (Alg_expr_extra.diff ?time_var rate mix_token)
+           in
+           Ode_loggers.associate
+             ~init_mode:false
+             (I.string_of_var_id ~compil)
+             logger logger_buffer
+             (Ode_loggers_sig.variable_of_derived_variable
+                (var_of_rule rule) dt)
+              expr handler_expr)
+        dep_set
+    in
     dep
 
   let fresh_is_zero network =
@@ -1843,30 +1890,55 @@ struct
           (fun dep (rule,rate) ->
              affect_deriv_rate
                dep_var
-               logger logger
+               logger logger compil
                rule rate network
                dep
           )
-          Mods.IntMap.empty
+          VMAP.empty
           split.var_rate
       in
       let () = Ode_loggers.print_newline logger in
-      let () = Ode_loggers.initialize logger (Ode_loggers_sig.Deriv 1) in
-      let do_it f l reactants enriched_rule =
+      let do_it f l dep_rates reactants enriched_rule =
+        let dep_set =
+          match
+            VMAP.find_option
+              (var_of_rule enriched_rule) dep_rates
+          with
+          | Some set -> set
+          | None -> MTSET.empty
+        in
+        let dep_set =
+          List.fold_left
+            (fun set species -> MTSET.add (Alg_expr.Mix (Ode_loggers_sig.int_of_ode_var_id (fst species))) set)
+            dep_set
+            reactants
+        in
         List.iter
           (fun species ->
-             let nauto_in_species =
-               if I.do_we_count_in_embeddings compil
-               then
-                 snd
-                   (species_of_species_id network species)
-               else 1
-             in
-             let nauto_in_lhs = enriched_rule.divide_rate_by in
-             f
-               logger (Ode_loggers_sig.Deriv species)
-               ~nauto_in_species ~nauto_in_lhs
-               (var_of_rule enriched_rule) reactants)
+             MTSET.iter
+               (fun dt ->
+                  let dt =
+                    match
+                      dt
+                    with
+                    | Alg_expr.Mix i -> i
+                    | Alg_expr.Tok i -> i
+                  in
+                  let nauto_in_species =
+                    if I.do_we_count_in_embeddings compil
+                    then
+                      snd
+                        (species_of_species_id network species)
+                    else 1
+                  in
+                  let nauto_in_lhs = enriched_rule.divide_rate_by in
+                  f
+                    logger (Ode_loggers_sig.Jacobian (species,dt))
+                    ~nauto_in_species ~nauto_in_lhs
+                    (var_of_rule enriched_rule)
+                    reactants
+                    dt)
+               dep_set)
           l
       in
       let () =
@@ -1989,24 +2061,28 @@ struct
                     let nauto = snd
                         (species_of_species_id network x)
                     in
-                    (Ode_loggers_sig.Concentration x,
+                    (x,
                      to_nocc_correct compil nauto))
                  (List.rev reactants)
              in
              let nauto_in_lhs = enriched_rule.divide_rate_by in
              let () = Ode_loggers.print_newline logger in
              let () =
-               do_it Ode_loggers.consume reactants reactants'
+               do_it
+                 Ode_loggers.consume_jac
+                 reactants
+                 dep_rates
+                 reactants'
                  enriched_rule
              in
              let () =
-               do_it Ode_loggers.produce products reactants'
+               do_it Ode_loggers.produce_jac products dep_rates reactants'
                  enriched_rule
              in
              let () =
                List.iter
                  (fun (expr,(token,_loc)) ->
-                    Ode_loggers.update_token
+                    Ode_loggers.update_token_jac
                       (I.string_of_var_id ~compil)
                       logger
                       (Ode_loggers_sig.Deriv token) ~nauto_in_lhs

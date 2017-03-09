@@ -254,6 +254,10 @@ let initialize logger variable =
         | Ode_loggers_sig.Obs _
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
+        | Ode_loggers_sig.Jacobian_rate (_,_)
+        | Ode_loggers_sig.Jacobian_rateun (_,_)
+        | Ode_loggers_sig.Jacobian_rated (_,_)
+        | Ode_loggers_sig.Jacobian_rateund (_,_)
           -> Loggers.print_newline logger
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
@@ -638,6 +642,10 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
   | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
   | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
+  | Ode_loggers_sig.Jacobian_rate (_,_)
+  | Ode_loggers_sig.Jacobian_rateun (_,_)
+  | Ode_loggers_sig.Jacobian_rated (_,_)
+  | Ode_loggers_sig.Jacobian_rateund (_,_) -> ""
 
 
 
@@ -657,6 +665,10 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.Jacobian _
     | Ode_loggers_sig.Jacobian_var _
     | Ode_loggers_sig.InitialStep
+    | Ode_loggers_sig.Jacobian_rate (_,_)
+    | Ode_loggers_sig.Jacobian_rated (_,_)
+    | Ode_loggers_sig.Jacobian_rateun (_,_)
+    | Ode_loggers_sig.Jacobian_rateund (_,_)
     | Ode_loggers_sig.Rate _
     | Ode_loggers_sig.Rated _
     | Ode_loggers_sig.Rateun _
@@ -786,25 +798,27 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
               logger_buffer
               variable
               (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
-          else
-            ()
-      | Ode_loggers_sig.Expr _ , _
-      | Ode_loggers_sig.Init _, _
-      | Ode_loggers_sig.Initbis _, _
-      | Ode_loggers_sig.Concentration _,_
-      | Ode_loggers_sig.Deriv _,_
-      | Ode_loggers_sig.Obs _,_
-      | Ode_loggers_sig.Jacobian _,_
-      | Ode_loggers_sig.Jacobian_var _,_
-      | Ode_loggers_sig.InitialStep,_
-      | Ode_loggers_sig.N_rules,_
-      | Ode_loggers_sig.N_ode_var,_
-      | Ode_loggers_sig.N_var,_
-      | Ode_loggers_sig.N_obs,_
-      | Ode_loggers_sig.N_rows,_
-      | Ode_loggers_sig.Tmp,_
-      | Ode_loggers_sig.Time_scale_factor,_
-      | Ode_loggers_sig.Current_time,_ -> ()
+        | Ode_loggers_sig.Jacobian_rate (_,_),_
+        | Ode_loggers_sig.Jacobian_rateun (_,_),_
+        | Ode_loggers_sig.Jacobian_rated (_,_),_
+        | Ode_loggers_sig.Jacobian_rateund (_,_),_
+        | Ode_loggers_sig.Expr _ , _
+        | Ode_loggers_sig.Init _, _
+        | Ode_loggers_sig.Initbis _, _
+        | Ode_loggers_sig.Concentration _,_
+        | Ode_loggers_sig.Deriv _,_
+        | Ode_loggers_sig.Obs _,_
+        | Ode_loggers_sig.Jacobian _,_
+        | Ode_loggers_sig.Jacobian_var _,_
+        | Ode_loggers_sig.InitialStep,_
+        | Ode_loggers_sig.N_rules,_
+        | Ode_loggers_sig.N_ode_var,_
+        | Ode_loggers_sig.N_var,_
+        | Ode_loggers_sig.N_obs,_
+        | Ode_loggers_sig.N_rows,_
+        | Ode_loggers_sig.Tmp,_
+        | Ode_loggers_sig.Time_scale_factor,_
+        | Ode_loggers_sig.Current_time,_ -> ()
     end
   | Loggers.Maple
   | Loggers.Json
@@ -886,6 +900,14 @@ let apply_correct correct var  =
   | Div i -> var_string^"/"^(string_of_int i)
   | Mul i -> (string_of_int i)^"*"^var_string
 
+let apply_correct_expr correct expr =
+    match
+      correct
+    with
+    | Nil | Div 1 | Mul 1 -> expr
+    | Div i -> Alg_expr.div expr (Alg_expr.int i)
+    | Mul i -> Alg_expr.mult (Alg_expr.int i) expr
+
 let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
   match
     Loggers.get_encoding_format logger
@@ -942,6 +964,46 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
 let consume = gen "-"
 let produce = gen "+"
 
+let gen_deriv
+    string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list dt = ()
+    (* TO DO *)
+  (*match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab  | Loggers.Octave ->
+    begin
+      let var = Ode_loggers_sig.string_of_variable
+          (Ode_loggers_sig.variable_of_derived_variable var_species dt)
+      in
+      let () = Loggers.fprintf logger "%s=%s%s" var var string in
+      let expr = var_rate in
+      let expr = Alg_expr.mult (Alg_expr.int nauto_in_species) expr in
+      let expr = Alg_expr.div expr (Alg_expr.int nauto_in_lhs) in
+      let expr =
+        List.fold_left
+          (fun expr (var,correct) ->
+             Alg_expr.mult
+               expr
+               (apply_correct_expr correct var))
+          expr
+          var_list
+      in
+      let expr = Alg_expr_extra.simplify expr in
+      let expr = Alg_expr_extra.diff expr (Alg_expr.Mix dt) in
+      let () = () in (* to do print expr *)
+      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Maple
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+    | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()*)
+
+let consume_jac = gen_deriv "-"
+let produce_jac = gen_deriv "+"
 let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler =
   match
     Loggers.get_encoding_format logger
@@ -987,6 +1049,53 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let update_token_jac string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.Matlab  | Loggers.Octave ->
+    begin
+      let var = Ode_loggers_sig.string_of_variable var_token in
+      let () = Loggers.fprintf logger "%s=%s+" var var in
+      let bool =
+        if nauto_in_lhs =1
+        then
+          false
+        else
+          let () =
+            Loggers.fprintf logger "1/%i" nauto_in_lhs
+          in
+          true
+      in
+      let () =
+        if bool
+        then
+          Loggers.fprintf logger "*"
+      in
+      let () = Loggers.fprintf logger "%s" (Ode_loggers_sig.string_of_variable var_rate) in
+        let () =
+        List.iter
+          (fun (var,correct) ->
+             Loggers.fprintf logger "*%s" (apply_correct correct (Ode_loggers_sig.Concentration var)))
+          var_list
+          in (* TO DO *)
+      let () = Loggers.fprintf logger "*" in
+      let () =
+        print_alg_expr
+          ~parenthesis_mode:In_product
+          string_of_var_id logger expr handler
+      in
+      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Maple
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
 
 let print_options logger =
   let format = Loggers.get_encoding_format logger in
