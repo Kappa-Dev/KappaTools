@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 10 2017>
+  * Last modification: Time-stamp: <Mar 11 2017>
 *)
 
 let local_trace = false
@@ -519,6 +519,8 @@ struct
       Alg_expr.IF (convert_bool_expr compil network cond,
                    convert_alg_expr compil network yes,
                    convert_alg_expr compil network no),pos
+    | Alg_expr.DIFF(_,_),_ ->
+      assert false (* TO DO ? *)
 
   and convert_bool_expr compil network = function
     | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> a
@@ -915,9 +917,22 @@ struct
         List.iter (fun id'' -> add_succ id id'') list
       | Alg_expr.ALG_VAR id',_ ->
         let id_opt = Mods.IntMap.find_option id' network.varmap in
-        match id_opt with
+        begin
+          match id_opt with
         | Some id'' -> add_succ id id''
         | None -> ()
+        end
+      | Alg_expr.DIFF (id1,Alg_expr.Tok id2),_ ->
+      let id' = translate_token id2 network in
+      let list = Mods.DynArray.get init_tab id' in
+      let () = List.iter (fun id'' -> add_succ id id'') list in
+      let list = Mods.DynArray.get init_tab id1 in
+      List.iter (fun id'' -> add_succ id id'') list
+      | Alg_expr.DIFF (id1,Alg_expr.Mix id2),_ ->
+      let list = Mods.DynArray.get init_tab id1 in
+      let () = List.iter (fun id'' -> add_succ id id'') list in
+      let list = Mods.DynArray.get init_tab id2 in
+      List.iter (fun id'' -> add_succ id id'') list
     and aux_bool id = function
       | (Alg_expr.TRUE | Alg_expr.FALSE),_ -> ()
       | Alg_expr.COMPARE_OP (_,a,b),_ ->

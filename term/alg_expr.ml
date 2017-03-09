@@ -8,6 +8,7 @@
 
 type pervasives_bool = bool
 
+type ('mix,'id) mix_token = Mix of 'mix | Tok of 'id
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
@@ -19,6 +20,7 @@ type ('mix,'id) e =
   | CONST of Nbr.t
   | IF of ('mix,'id) bool Locality.annot *
           ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
+  | DIFF of ('id * ('mix,'id) mix_token)
 and ('mix,'id) bool =
   | TRUE
   | FALSE
@@ -48,6 +50,11 @@ let rec e_to_yojson f_mix f_id = function
            Locality.annot_to_json (bool_to_yojson f_mix f_id) cond;
            Locality.annot_to_json (e_to_yojson f_mix f_id) yes;
            Locality.annot_to_json (e_to_yojson f_mix f_id) no]
+  | DIFF (id1, Tok id2) ->
+    `List [`String "DIFF_VAR_TOKEN"; f_id id1 ; f_id id2]
+  | DIFF (id, Mix cc) ->
+    `List [`String "DIFF_VAR_MIX"; f_id id ; f_mix cc]
+
 and bool_to_yojson f_mix f_id = function
   | TRUE -> `Bool true
   | FALSE -> `Bool false
@@ -69,6 +76,10 @@ let rec e_of_yojson f_mix f_id = function
   | `List [`String "VAR"; i] -> ALG_VAR (f_id i)
   | `List [`String "TOKEN"; i] -> TOKEN_ID (f_id i)
   | `List [`String "MIX"; cc] -> KAPPA_INSTANCE (f_mix cc)
+  | `List [`String "DIFF_VAR_TOKEN"; id1 ; id2] ->
+    DIFF(f_id id1, Tok (f_id id2))
+  | `List [`String "DIFF_VAR_MIX"; id ; cc] ->
+    DIFF(f_id id,Mix (f_mix cc))
   | `List [op;a] ->
     UN_ALG_OP (Operator.un_alg_op_of_json op,
                Locality.annot_of_json (e_of_yojson f_mix f_id) a)
@@ -115,6 +126,10 @@ let rec print pr_mix pr_tok pr_var f = function
   | IF ((cond,_),(yes,_),(no,_)) ->
     Format.fprintf f "%a [?] %a [:] %a" (print_bool pr_mix pr_tok pr_var) cond
       (print pr_mix pr_tok pr_var) yes (print pr_mix pr_tok pr_var) no
+  | DIFF (id, Mix cc) ->
+    Format.fprintf f "diff(%a,%a)" pr_var id pr_mix cc
+  | DIFF (id1, Tok id2) ->
+    Format.fprintf f "diff(%a,%a)" pr_var id1 pr_tok id2
 and print_bool pr_mix pr_tok pr_var f = function
   | TRUE -> Format.fprintf f "[true]"
   | FALSE -> Format.fprintf f "[false]"
@@ -146,12 +161,17 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
     let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
     x
   | IF (cond,yes,no), _ -> add_dep (add_dep (add_dep_bool x d cond) d yes) d no
+  | DIFF (_,Tok i),_ ->
+  let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
+  x
+  | DIFF (_,_),_ -> x 
   | STATE_ALG_OP op, _ ->
     match op with
     | (Operator.EMAX_VAR | Operator.TMAX_VAR) -> x
     | Operator.TIME_VAR -> (Operator.DepSet.add d in_t,in_e,toks_d,out)
     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
       (in_t,Operator.DepSet.add d in_e,toks_d,out)
+
 and add_dep_bool x d = function
   | (TRUE | FALSE), _ -> x
   | BOOL_OP (_,a, b), _ -> add_dep_bool (add_dep_bool x d a) d b
