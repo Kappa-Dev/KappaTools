@@ -155,8 +155,10 @@ let ln e1 = (* JF: If I rememnber well *)
   div
     (log e1)
     (log (int 10))
+let sin e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SINUS,e1))
+let cos e1 = Locality.dummy_annot (UN_ALG_OP (Operator.COSINUS,e1))
 let uminus e1 = Locality.dummy_annot (UN_ALG_OP (Operator.UMINUS,e1))
-
+let sqrt e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SQRT,e1))
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
   | UN_ALG_OP (_, a), _ -> add_dep x d a

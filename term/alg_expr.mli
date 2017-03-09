@@ -82,6 +82,12 @@ val ln :
   ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot
 val uminus:
   ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot
+val sin:
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot
+val cos:
+  ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot
+val sqrt: 
+    ('a,'b) e Locality.annot -> ('a,'b) e Locality.annot
 
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :

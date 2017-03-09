@@ -435,8 +435,44 @@ let rec diff ?time_var expr dt =
                    (diff ?time_var e1 dt))
                 e1))
     end
-  | Alg_expr.UN_ALG_OP (_,e) ->
-    e (*TO DO*)
+  | Alg_expr.UN_ALG_OP (op,e) ->
+    begin
+      match op with
+      | Operator.UMINUS ->
+        Alg_expr.uminus
+          (diff ?time_var e dt)
+      | Operator.COSINUS ->
+        Alg_expr.mult
+          (diff ?time_var e dt)
+          (Alg_expr.uminus (Alg_expr.sin e))
+      | Operator.SINUS ->
+        Alg_expr.mult
+          (diff ?time_var e dt)
+          (Alg_expr.cos e)
+      | Operator.LOG ->
+        Alg_expr.mult
+          (diff ?time_var e dt)
+          (Alg_expr.div
+             (Alg_expr.int 1)
+             (e))
+      | Operator.SQRT ->
+        Alg_expr.mult
+          (diff ?time_var e dt)
+          (Alg_expr.div
+             (Alg_expr.int (-1))
+             (Alg_expr.sqrt e))
+      | Operator.EXP ->
+        Alg_expr.mult
+          (diff ?time_var e dt)
+          e
+      | Operator.TAN ->
+      Alg_expr.mult
+        (diff ?time_var e dt)
+        (Alg_expr.add
+           (Alg_expr.int 1)
+           (Alg_expr.pow e (Alg_expr.int 2)))
+      | Operator.INT -> Alg_expr.int 0
+    end
   | Alg_expr.STATE_ALG_OP Operator.TIME_VAR ->
     begin
       match time_var with
