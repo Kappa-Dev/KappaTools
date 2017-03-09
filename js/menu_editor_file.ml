@@ -11,7 +11,6 @@ module Html = Tyxml_js.Html5
 
 let file_new_modal_id = "menu-editor-file-new-modal"
 let file_new_input_id = "menu-editor-file-new-input"
-let file_new_button_id = "menu-editor-file-new-button"
 let file_dropdown_menu_id = "menu-editor-file-dropdown-menu"
 let file_new_li_id = "menu-editor-file-new-li"
 let file_open_li_id = "menu-editor-file-open-li"
@@ -40,6 +39,7 @@ let file_new_input =
          Html.a_placeholder "file name" ;
          Html.a_size 40;
        ] ()
+let file_new_input_dom = Tyxml_js.To_dom.of_input file_new_input
 
 let file_checkbox file_id is_checked =
   let checked_attribute =
@@ -52,12 +52,6 @@ let file_checkbox file_id is_checked =
           Html.a_class [ file_compile_checkbox ] ;
           element_set_filename file_id ;
         ]@checked_attribute) ()
-
-let file_button =
-  Html.button
-    ~a:[ Html.a_id file_new_button_id ;
-         Html.a_class [ "btn" ; "btn-primary"; ] ]
-    [ Html.pcdata "Create File" ; ]
 
 let open_input =
   Html.input
@@ -201,10 +195,17 @@ let content () =
       Ui_common.create_modal
         ~id:file_new_modal_id
         ~title_label:"New File"
-        ~buttons:[file_button]
         ~body:[[%html
                 {|<div class="input-group">|}[file_new_input]{|</div>|}] ;
               ]
+        ~submit_label:"Create File"
+        ~submit:
+          (Dom_html.handler
+             (fun _ ->
+                let filename : string = Js.to_string file_new_input_dom##.value in
+                let () = Menu_editor_file_controller.create_file filename ?content:None in
+                let () = Common.modal ~id:("#"^file_new_modal_id) ~action:"hide" in
+                Js._false))
     ]
 
 let order_files (element : Dom_html.element Js.t) =
@@ -245,7 +246,6 @@ let file_select_handler _ _ : unit Lwt.t =
 
 let onload () =
   let open_input_dom = Tyxml_js.To_dom.of_input open_input in
-  let file_new_input_dom = Tyxml_js.To_dom.of_input file_new_input in
   let () =
     Common.jquery_on
       ("#"^file_new_li_id)
@@ -301,16 +301,6 @@ let onload () =
             in
 
 
-            Js._false)) in
-  let () =
-    Common.jquery_on
-      ("#"^file_new_button_id)
-      "click"
-      (Dom_html.handler
-         (fun _ ->
-            let filename : string = Js.to_string file_new_input_dom##.value in
-            let () = Menu_editor_file_controller.create_file filename ?content:None in
-            let () = Common.modal ~id:("#"^file_new_modal_id) ~action:"hide" in
             Js._false)) in
   let () =
     Common.jquery_on

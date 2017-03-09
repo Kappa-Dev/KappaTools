@@ -144,24 +144,31 @@ module ButtonConfiguration : Ui_common.Div = struct
                     Html.a_input_type `Number;
                     Html.a_class ["form-control"];
                   ] ()
-  let configuration_save_button_id = "configuration_save_button"
-  let configuration_save_button =
-    Html.button
-      ~a:[ Html.a_class [ "btn" ; "btn-default" ] ;
-           Html.a_id configuration_save_button_id ;
-         ]
-      [ Html.cdata "Save" ]
   let simulation_configuration_modal_id = "simulation_configuration_modal"
   let configuration_modal = Ui_common.create_modal
       ~id:simulation_configuration_modal_id
       ~title_label:"Simulation Configuration"
-      ~buttons:[ configuration_save_button ]
       ~body:[[%html
               {|<div class="row">
                    <div class="col-md-1"><label for={[configuration_seed_input_id]}>Seed</label></div>
                    <div class="col-md-5">|}
                      [configuration_seed_input]{|</div>
-                </div>|}] ; ]
+                                                 </div>|}] ; ]
+      ~submit_label:"Save"
+      ~submit:
+        (Dom_html.handler
+           (fun (_ : Dom_html.event Js.t)  ->
+              let input : Dom_html.inputElement Js.t =
+                Tyxml_js.To_dom.of_input configuration_seed_input in
+              let value : string = Js.to_string input##.value in
+              let model_seed = try Some (int_of_string value) with Failure _ -> None in
+              let () = State_parameter.set_model_seed model_seed in
+              let () =
+                Common.modal
+                  ~id:("#"^simulation_configuration_modal_id)
+                  ~action:"hide"
+              in
+              Js._false))
 
   let id = "configuration_button"
   let configuration_button =
@@ -174,23 +181,6 @@ module ButtonConfiguration : Ui_common.Div = struct
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
     [configuration_button; configuration_modal]
   let onload () =
-    let () = Common.jquery_on
-      (Format.sprintf "#%s" configuration_save_button_id)
-      ("click")
-      (Dom_html.handler
-         (fun (_ : Dom_html.event Js.t)  ->
-            let input : Dom_html.inputElement Js.t = Tyxml_js.To_dom.of_input configuration_seed_input in
-            let value : string = Js.to_string input##.value in
-            let model_seed = try Some (int_of_string value) with Failure _ -> None in
-            let () = State_parameter.set_model_seed model_seed in
-            let () =
-              Common.modal
-                ~id:("#"^simulation_configuration_modal_id)
-                ~action:"hide"
-            in
-
-            Js._true))
-    in
     let () = Common.jquery_on
       ("#"^id)
       ("click")

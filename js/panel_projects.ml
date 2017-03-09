@@ -18,16 +18,14 @@ let project_id_input =
          Html.a_size 40;
        ] ()
 
-let new_project_button =
-  Html.button
-    ~a:[ Html.a_class [ "btn" ; "btn-primary"; ] ]
-    [ Html.pcdata "Create Project" ; ]
-
 let li_new =
   Html.li [ Html.a [ Html.cdata "New project" ]]
 
 let li_settings =
   Html.li (Menu_editor_settings.content ())
+
+let project_id_input_dom =
+    Tyxml_js.To_dom.of_input project_id_input
 
 let content () =
   Html.div
@@ -48,7 +46,7 @@ let content () =
                          else
                            [] in
                        let span_close = Html.button
-                           ~a:[Html.a_class ["close"]] [ Html.cdata "×" ] in
+                           ~a:[Html.a_class ["close"]] [ Html.entity "times" ] in
                        let () = (Tyxml_js.To_dom.of_button span_close)##.onclick :=
                            Dom.handler
                              (fun _ ->
@@ -70,28 +68,25 @@ let content () =
      Ui_common.create_modal
        ~id:project_id_modal_id
        ~title_label:"New Project"
-       ~buttons:[new_project_button]
        ~body:[[%html
                {|<div class="input-group">|}[project_id_input]{|</div>|}] ;
              ]
+       ~submit_label:"Create Project"
+       ~submit:
+         (Dom.handler
+            (fun _ ->
+               let settings_client_id : string =
+                 Js.to_string project_id_input_dom##.value in
+               let () =
+                 Panel_projects_controller.create_project settings_client_id in
+               let () =
+                 Common.modal
+                   ~id:("#"^project_id_modal_id) ~action:"hide" in
+               Js._false))
     ]
 
 let onload () =
   let () = Menu_editor_settings.onload () in
-  let project_id_input_dom =
-    Tyxml_js.To_dom.of_input project_id_input in
-  let () =
-    (Tyxml_js.To_dom.of_button new_project_button)##.onclick :=
-      Dom.handler
-        (fun _ ->
-           let settings_client_id : string =
-             Js.to_string project_id_input_dom##.value in
-           let () =
-             Panel_projects_controller.create_project settings_client_id in
-           let () =
-             Common.modal
-               ~id:("#"^project_id_modal_id) ~action:"hide" in
-           Js._false) in
   let () = (Tyxml_js.To_dom.of_span li_new)##.onclick :=
       Dom.handler
         (fun _ ->

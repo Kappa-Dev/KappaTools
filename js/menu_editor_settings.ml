@@ -31,11 +31,9 @@ let settings_client_id_input =
          Html.a_placeholder "client id" ;
          Html.a_size 40;
        ] ()
-let settings_client_id_button =
-  Html.button
-    ~a:[ Html.a_id settings_client_id_button_id ;
-         Html.a_class [ "btn" ; "btn-primary"; ] ]
-    [ Html.pcdata "Update" ; ]
+
+let settings_client_id_input_dom =
+  Tyxml_js.To_dom.of_input settings_client_id_input
 
 let dropdown (model : State_runtime.model) =
   let current_id = State_runtime.spec_id  model.State_runtime.model_current in
@@ -107,17 +105,25 @@ let content () =
     Ui_common.create_modal
       ~id:settings_client_id_modal_id
       ~title_label:"Client Id"
-      ~buttons:[settings_client_id_button]
       ~body:[[%html
               {|<div class="input-group">|}[settings_client_id_input]{|</div>|}] ;
             ]
+      ~submit_label:"Update"
+      ~submit:
+        (Dom_html.handler
+           (fun _ ->
+              let settings_client_id : string = Js.to_string settings_client_id_input_dom##.value in
+              let () = State_settings.set_client_id settings_client_id in
+              let () =
+                Common.modal
+                  ~id:("#"^settings_client_id_modal_id)
+                  ~action:"hide"
+              in
+              Js._false))
   ]
 
 let onload () =
   (* client id update functionallity *)
-  let settings_client_id_input_dom =
-    Tyxml_js.To_dom.of_input settings_client_id_input
-  in
   let () =
     Common.jquery_on
       ("#"^settings_client_li_id)
@@ -133,20 +139,6 @@ let onload () =
               settings_client_id_input_dom##.value :=
                 Js.string
                   (State_settings.get_client_id ())
-            in
-            Js._false)) in
-  let () =
-    Common.jquery_on
-      ("#"^settings_client_id_button_id)
-      "click"
-      (Dom_html.handler
-         (fun _ ->
-            let settings_client_id : string = Js.to_string settings_client_id_input_dom##.value in
-            let () = State_settings.set_client_id settings_client_id in
-            let () =
-              Common.modal
-                ~id:("#"^settings_client_id_modal_id)
-                ~action:"hide"
             in
             Js._false)) in
   let () =

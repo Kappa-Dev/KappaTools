@@ -360,9 +360,43 @@ let id_dom (id : string) : 'a Js.t =
 let create_modal
     ~(id : string)
     ~(title_label : string)
-    ~(buttons : [< Html_types.div_content_fun > `Button ] Html.elt list)
-    ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap) :
+    ~(body : [< Html_types.div_content_fun ] Html.elt Html.list_wrap)
+    ~(submit_label: string)
+    ~(submit: ('self Js.t, Dom_html.event Js.t) Dom.event_listener) :
   [> Html_types.div ] Html.elt =
+  let button =
+      Html.button
+    ~a:[ Html.a_button_type `Submit;
+         Html.a_class [ "btn" ; "btn-primary"; ] ]
+    [ Html.pcdata submit_label ] in
+  let form =
+    Html.form
+      ~a:[ Html.a_class [ "modal-content" ] ]
+      [ Html.div
+          ~a:[ Html.a_class [ "modal-header" ] ]
+          [ Html.button
+              ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+                   Html.a_class [ "close" ] ;
+                   Html.Unsafe.string_attrib "data-dismiss" "modal" ;
+                   Html.Unsafe.string_attrib "aria-label" "Close" ; ]
+              [ Html.span
+                  ~a:[ Html.Unsafe.string_attrib "aria-hidden" "true" ]
+                  [ Html.entity "times" ]
+              ] ;
+            Html.h4 [ Html.cdata title_label ] ;
+            Html.div ~a:[ Html.a_class [ "modal-body" ] ] body ;
+            Html.div ~a:[ Html.a_class [ "modal-footer" ] ]
+              ([ Html.button
+                   ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+                        Html.a_class [ "btn" ; "btn-default" ] ;
+                        Html.Unsafe.string_attrib "data-dismiss" "modal" ;
+                      ]
+                   [ Html.cdata "Cancel" ] ;
+               ]@[button])
+          ]
+      ] in
+  let () =
+    (Tyxml_js.To_dom.of_form form)##.onsubmit := submit in
   Html.div
     ~a:[ Html.a_class [ "modal" ; "fade" ] ;
          Html.a_id id ;
@@ -373,30 +407,4 @@ let create_modal
         ~a:[ Html.a_class [ "modal-dialog" ] ;
              Html.Unsafe.string_attrib "role" "document" ;
            ]
-        [ Html.div
-            ~a:[ Html.a_class [ "modal-content" ] ]
-            [ Html.div
-                ~a:[ Html.a_class [ "modal-header" ] ]
-                [ Html.button
-                    ~a:[ Html.Unsafe.string_attrib "type" "button" ;
-                         Html.a_class [ "close" ] ;
-                         Html.Unsafe.string_attrib "data-dismiss" "modal" ;
-                         Html.Unsafe.string_attrib "aria-label" "Close" ; ]
-                    [ Html.span
-                        ~a:[ Html.Unsafe.string_attrib "aria-hidden" "true" ]
-                        [ Html.entity "times" ]
-                    ] ;
-                  Html.h4 [ Html.cdata title_label ] ;
-                  Html.div ~a:[ Html.a_class [ "modal-body" ] ] body ;
-                  Html.div ~a:[ Html.a_class [ "modal-footer" ] ]
-                    ([ Html.button
-                        ~a:[ Html.Unsafe.string_attrib "type" "button" ;
-                             Html.a_class [ "btn" ; "btn-default" ] ;
-                             Html.Unsafe.string_attrib "data-dismiss" "modal" ;
-                           ]
-                        [ Html.cdata "Cancel" ] ;
-                    ]@buttons)
-                ]
-            ]
-        ]
-    ]
+        [ form ] ]

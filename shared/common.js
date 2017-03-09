@@ -314,17 +314,3 @@ function showCodeMirror(){
     var cm = $('.CodeMirror')[0].CodeMirror;
     $(cm.getWrapperElement()).show();
 }
-
-// http://stackoverflow.com/questions/7060750/detect-the-enter-key-in-a-text-input-field
-function handleEnter(id,handler){
-    document.getElementById(id).onkeypress = function(e){
-	if (!e) e = window.event;
-	var keyCode = e.keyCode || e.which;
-	if (keyCode == '13'){
-	    return handler();
-	} else {
-	    return true;
-	}
-    }
-
-}
