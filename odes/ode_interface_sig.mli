@@ -162,7 +162,6 @@ sig
        Rule_modes.RuleModeMap.t array * int array) ->
     (string list * (string * string) list) Mods.StringMap.t
       Mods.StringMap.t ->
-    chemical_species list ->
     cache * Symmetries.symmetries
 
   val print_symmetries:

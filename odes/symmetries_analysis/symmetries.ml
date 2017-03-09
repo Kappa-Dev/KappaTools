@@ -320,6 +320,30 @@ let print_partitioned_contact_map_in_lkappa logger env
          ()
       ) partitioned_contact_map
 
+let print_partitioned_contact_map_init env logger raw_mixture_list =
+  let sigs = Model.signatures env in
+  let fmt = Loggers.formatter_of_logger logger in
+  match fmt with
+  | None -> ()
+  | Some fmt ->
+    List.iter (fun raw_mixture ->
+        let () = Loggers.print_newline logger in
+        let () = Loggers.fprintf logger "************" in
+        let () = Loggers.print_newline logger in
+        let () = Loggers.fprintf logger
+            " -Equivalence classes of sites for internal states equal:" in
+        let () = Loggers.print_newline logger in
+        let compact = true in
+        let created = true in
+        let () =
+          Raw_mixture.print ~compact ~created ~sigs fmt raw_mixture
+        in
+        let () = Loggers.print_newline logger in
+        let () = Loggers.fprintf logger "************" in
+        let () = Loggers.print_newline logger in
+        ()
+      ) raw_mixture_list
+
 (*****************************************************************)
 (*DETECT SYMMETRIES*)
 (*****************************************************************)
@@ -365,7 +389,8 @@ let check_invariance_gen
         to_be_checked.(id)
       then
         let (cache, counter, to_be_checked), b =
-          p ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter to_be_checked
+          p ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct
+            rates cache ~counter to_be_checked
         in
         if b then
           aux tail (cache, to_be_checked, counter)
@@ -404,9 +429,7 @@ let detect_symmetries parameters env cache
                           LKappa.rule) list)
     arrays
     (contact_map:(string list * (string * string) list)
-         Mods.StringMap.t Mods.StringMap.t)
-    initial_states
-  =
+         Mods.StringMap.t Mods.StringMap.t) =
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
   let partitioned_contact_map =
@@ -477,26 +500,6 @@ let detect_symmetries parameters env cache
       p'
   in
   (*-------------------------------------------------------------*)
-  (*initial states*)
-  let init_pattern_to_raw_mixture =
-    List.fold_left (fun current_list cc ->
-        let raw_mixture =
-          Raw_mixture_extra.pattern_to_raw_mixture
-            (Model.signatures env)
-            cc
-        in
-        raw_mixture :: current_list
-      ) [] initial_states
-  in
-  (*-------------------------------------------------------------*)
-  (*refined partition + initial states*)
-  let symmetries = Array.copy refined_partitioned_contact_map in
-  let _ =
-    Raw_mixture_group_action.normalize_internal_states_in_raw_mixture_init
-      symmetries
-  in
-
-  (*-------------------------------------------------------------*)
   (*PRINT*)
   let () =
     if Remanent_parameters.get_trace parameters
@@ -564,6 +567,35 @@ let representant ?parameters signature cache preenv_cache symmetries
     in
     let cache  = CcMap.add species species' cache in
     cache, preenv_cache, species'
+
+let refine_partition_contact_map_init cache env symmetries
+    initial_states =
+  let cache, init_pattern_to_raw_mixture =
+    List.fold_left (fun (cache, current_list) cc ->
+        let raw_mixture =
+          Raw_mixture_extra.pattern_to_raw_mixture
+            (Model.signatures env)
+            cc
+        in
+        cache, raw_mixture :: current_list
+      ) (cache, []) initial_states
+  in
+  (*-------------------------------------------------------------*)
+  (*refined partition + initial states*)
+  let cache, raw_mixture_list =
+    List.fold_left (fun (cache, current_list) pair_op ->
+        match pair_op with
+        | None -> cache, current_list
+        | Some (raw_mixture, _) ->
+          let r =
+            Raw_mixture_group_action.normalize_internal_states_in_raw_mixture
+              symmetries
+              raw_mixture
+          in
+          cache, r :: current_list
+      ) (cache, []) init_pattern_to_raw_mixture
+  in
+  cache, raw_mixture_list
 
 let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in

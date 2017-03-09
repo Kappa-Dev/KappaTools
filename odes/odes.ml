@@ -381,12 +381,15 @@ struct
     | Some symmetries ->
       let cache = network.cache in
       let cache, species =
-        I.get_representant parameters compil cache symmetries species
+        I.get_representant parameters compil cache symmetries
+          species
       in
       {network with cache = cache}, species
 
   let translate_species parameters compil species remanent =
-    let network, species = representant parameters compil (snd remanent) species in
+    let network, species =
+      representant parameters compil (snd remanent) species
+    in
     let remanent = fst remanent, network in
     translate_canonic_species compil
       (I.canonic_form species) species remanent
@@ -563,7 +566,7 @@ struct
          match enriched_rule.lhs_cc with
          | [] ->
            begin
-             let _,embed,mixture = I.disjoint_union compil [] in
+             let _, embed, mixture = I.disjoint_union compil [] in
              let () = debug "add new reaction" in
              add_reaction parameters compil enriched_rule embed mixture remanent
            end
@@ -571,8 +574,9 @@ struct
       )
       (List.fold_left
          (fun remanent species ->
-            fst (translate_species parameters compil species remanent))
-         ([],network)
+            fst (translate_species parameters compil species
+                   remanent))
+         ([], network)
          initial_states) rules
 
   let compute_reactions parameters compil network rules initial_states =
@@ -791,12 +795,17 @@ struct
       in
       let network = {network with cache = cache'} in
       List.fold_left
-        (fun (network,acc) x ->
-           let (_,n'),v = translate_species parameters compil x ([],network) in n',v::acc)
+        (fun (network, acc) x ->
+           let (_, n'), v =
+             translate_species parameters compil x ([],network)
+           in
+           n', v :: acc)
         (network,[]) (List.rev cc)
     | l ->
       List.fold_right (fun (_,token) (network,acc) ->
-          let (_,n'),v = translate_token token ([],network) in n',v::acc) l (network,[])
+          let (_,n'),v =
+            translate_token token ([],network) in
+          n', v :: acc) l (network,[])
 
   let translate_token token network =
     snd (translate_token token ([],network))
@@ -816,7 +825,8 @@ struct
            inc_fresh_var_id
              {network with
               varmap =
-                Mods.IntMap.add i (get_fresh_var_id network) network.varmap})
+                Mods.IntMap.add i
+                  (get_fresh_var_id network) network.varmap})
         ([],network)
         list_var
     in
@@ -1883,8 +1893,8 @@ struct
         pair_list
         (to_be_checked, counter, rates, correct)
         contact_map
-        initial_states
     in
+
     let network =
       {
         network with

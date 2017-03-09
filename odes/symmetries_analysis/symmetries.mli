@@ -30,7 +30,7 @@ val detect_symmetries:
   (bool array  * int array * ('a, 'b) Alg_expr.e Locality.annot
      Rule_modes.RuleModeMap.t array * int array) ->
   (string list * (string * string) list) Mods.StringMap.t
-    Mods.StringMap.t -> Pattern.cc list ->
+    Mods.StringMap.t ->
   LKappa_auto.cache * symmetries
 
 val build_array_for_symmetries:

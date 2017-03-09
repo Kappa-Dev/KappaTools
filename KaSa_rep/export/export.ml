@@ -1439,7 +1439,6 @@ let compute_symmetries
           [] (* to do *)
           ([||],[||],[||],[||]) (* to do *)
           contact_map
-          [] (*TODO*)
       in
       state, Some symmetries
     end

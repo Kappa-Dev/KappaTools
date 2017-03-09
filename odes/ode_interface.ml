@@ -449,14 +449,13 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   cache, lkappa_rule, i , rate_map, hashed_list
 
 let detect_symmetries parameters compil cache arrays rules
-    contact_map initial_states =
+    contact_map =
   let rule_cache = cache.rule_cache in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
       parameters
       compil.environment rule_cache arrays rules
       contact_map
-      initial_states
   in
   {cache with rule_cache = rule_cache},
   symmetries

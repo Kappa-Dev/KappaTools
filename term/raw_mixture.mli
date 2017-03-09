@@ -20,6 +20,7 @@ val output_snapshot : snapshot -> (int * t) list
 val print :
   compact:bool -> created:bool ->
   ?sigs:Signature.s -> Format.formatter -> t -> unit
+
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit
 
 val to_json : t -> Yojson.Basic.json
