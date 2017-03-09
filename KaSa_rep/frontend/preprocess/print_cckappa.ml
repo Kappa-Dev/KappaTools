@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Mar 09 2017>
    * *
    * Pretty printing of token library
    *
@@ -309,6 +309,7 @@ let rec print_short_alg parameters error handler alg =
                           | Operator.CPUTIME
                           ),_
   | Alg_expr.CONST (Nbr.I64 _),_
+  | Alg_expr.DIFF (_,_),_ 
   | Alg_expr.IF _,_
   | Alg_expr.TOKEN_ID _,_
   | Alg_expr.KAPPA_INSTANCE _,_ ->  (*to do*) error

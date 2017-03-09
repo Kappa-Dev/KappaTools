@@ -10,6 +10,7 @@ type variable =
   | Deriv of int
   | Obs of int
   | Jacobian of int * int
+  | Jacobian_var of int * int
   | Tinit
   | Tend
   | InitialStep
@@ -43,7 +44,8 @@ let rec is_expr_const expr = (* constant propagation is already done *)
   | Alg_expr.ALG_VAR _,_
   | Alg_expr.STATE_ALG_OP _,_
   | Alg_expr.TOKEN_ID _,_
-  | Alg_expr.KAPPA_INSTANCE _,_ -> false
+  | Alg_expr.KAPPA_INSTANCE _,_
+  | Alg_expr.DIFF _,_ -> false
 and is_bool_const expr =
   match
     expr
@@ -75,6 +77,7 @@ let rec is_expr_time_homogeneous expr =
       | Alg_expr.ALG_VAR _,_
       | Alg_expr.TOKEN_ID _,_
       | Alg_expr.KAPPA_INSTANCE _,_ -> true
+      | Alg_expr.DIFF _,_
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR),_ -> false
 
 and is_bool_time_homogeneous expr =
@@ -97,34 +100,9 @@ let is_expr_alias expr =
   | Alg_expr.CONST _,_
   | Alg_expr.IF _,_
   | Alg_expr.BIN_ALG_OP _,_
+  | Alg_expr.DIFF _,_
   | Alg_expr.UN_ALG_OP _,_ -> None
   | Alg_expr.ALG_VAR x,_ -> Some x
-
-let string_of_variable var =
-  match var with
-  | Rate int -> Printf.sprintf "k(%i)" int
-  | Rated int -> Printf.sprintf "kd(%i)" int
-  | Rateun int -> Printf.sprintf "kun(%i)" int
-  | Rateund int -> Printf.sprintf "kdun(%i)" int
-  | Expr int -> Printf.sprintf "var(%i)" int
-  | Obs int -> Printf.sprintf "obs(%i)" int
-  | Init int -> Printf.sprintf "init(%i)" int
-  | Initbis int -> Printf.sprintf "Init(%i)" int
-  | Concentration int -> Printf.sprintf "y(%i)" int
-  | Deriv int -> Printf.sprintf "dydt(%i)" int
-  | Jacobian (int1,int2) -> Printf.sprintf "Jac(%i,%i)" int1 int2
-  | Tinit -> "tinit"
-  | Tend -> "tend"
-  | InitialStep -> "initialstep"
-  | Period_t_points -> "period_t_point"
-  | N_ode_var -> "nodevar"
-  | N_var -> "nvar"
-  | N_obs -> "nobs"
-  | N_rules -> "nrules"
-  | N_rows -> "nrows"
-  | Tmp -> "tmp"
-  | Current_time -> "t"
-  | Time_scale_factor -> "t_correct_unit"
 
 let string_of_array_name var =
   match var with
@@ -138,7 +116,8 @@ let string_of_array_name var =
   | Initbis _ -> "Init"
   | Concentration _ -> "y"
   | Deriv _ -> "dydt"
-  | Jacobian _ -> "Jac"
+  | Jacobian (_,_) -> "jac"
+  | Jacobian_var (_,_)-> "jacvar"
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
@@ -151,3 +130,32 @@ let string_of_array_name var =
   | Tmp -> "tmp"
   | Current_time -> "t"
   | Time_scale_factor -> "t_correct_dimmension"
+
+
+let string_of_variable var =
+  match var with
+  | Rate int
+  | Rated int
+  | Rateun int
+  | Rateund int
+  | Expr int
+  | Obs int
+  | Init int
+  | Initbis int
+  | Concentration int
+  | Deriv int -> Printf.sprintf "%s(%i)" (string_of_array_name var) int
+  | Jacobian (int1,int2)
+  | Jacobian_var (int1,int2) ->
+    Printf.sprintf "%s(%i,%i)" (string_of_array_name var)  int1 int2
+  | Tinit
+  | Tend
+  | InitialStep
+  | Period_t_points
+  | N_ode_var
+  | N_var
+  | N_obs
+  | N_rules
+  | N_rows
+  | Tmp
+  | Current_time
+  | Time_scale_factor -> (string_of_array_name var)

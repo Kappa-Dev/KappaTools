@@ -108,6 +108,7 @@ let string_of_variable string_of_var_id variable =
   | Ode_loggers_sig.Deriv _
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Jacobian_var _
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.InitialStep
@@ -141,6 +142,7 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Expr _
   | Ode_loggers_sig.Deriv _
   | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Jacobian_var _
   | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.Rate _
   | Ode_loggers_sig.Rated _
@@ -227,6 +229,7 @@ let rec eval_init_alg_expr logger network_handler alg_expr =
       eval_init_alg_expr logger network_handler yes
     else
       eval_init_alg_expr logger network_handler no
+  | Alg_expr.DIFF _ -> assert false
 and eval_init_bool_expr logger network_handler expr =
   match fst expr with
   | Alg_expr.TRUE -> true
@@ -273,6 +276,7 @@ let rec propagate_def_in_alg_expr logger network_handler alg_expr =
       (propagate_def_in_bool_expr logger network_handler cond,
        propagate_def_in_alg_expr logger network_handler yes,
        propagate_def_in_alg_expr logger network_handler no), loc
+  | Alg_expr.DIFF _,_ -> assert false
 and propagate_def_in_bool_expr logger network_handler expr =
   match expr with
   | Alg_expr.TRUE,_
@@ -343,6 +347,7 @@ let rec eval_const_alg_expr logger network_handler alg_expr =
       | Some false ->
         eval_const_alg_expr logger network_handler no
     end
+  | Alg_expr.DIFF _ -> assert false
 
 and eval_const_bool_expr logger network_handler expr =
   match fst expr with
@@ -467,6 +472,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
         let () = print_alg_expr_in_sbml string_of_var_id logger no network in
         let () = Loggers.fprintf logger "</apply>" in
         ()
+      | Alg_expr.DIFF _ -> assert false
     end
 and
   print_bool_expr_in_sbml string_of_var_id logger cond network =
@@ -555,6 +561,7 @@ let rec substance_expr_in_sbml logger
           (Mods.StringSet.union
              (substance_expr_in_sbml logger yes network)
              (substance_expr_in_sbml logger no network))
+      | Alg_expr.DIFF _ -> assert false
     end
 and
   substance_bool_expr_in_sbml logger cond network =
@@ -604,6 +611,7 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
         end
       | Alg_expr.KAPPA_INSTANCE _
       | Alg_expr.TOKEN_ID _
+      | Alg_expr.DIFF _
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> false
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> true
@@ -620,7 +628,7 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
         ||
         maybe_time_dependent_alg_expr_in_sbml logger yes network
         ||
-          maybe_time_dependent_alg_expr_in_sbml logger no network
+        maybe_time_dependent_alg_expr_in_sbml logger no network
     end
 and
   maybe_time_dependent_bool_expr_in_sbml logger cond network =

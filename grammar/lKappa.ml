@@ -1141,32 +1141,47 @@ let mixture_of_ast sigs ?contact_map pos mix =
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
+let convert_alg_var ?max_allowed_var algs lab pos =
+  let i =
+    match Mods.StringMap.find_option lab algs with
+    | Some x -> x
+    | None ->
+      raise (ExceptionDefn.Malformed_Decl
+               (lab ^" is not a declared variable",pos)) in
+  let () =
+    match max_allowed_var with
+    | Some j when j < i ->
+      raise (ExceptionDefn.Malformed_Decl
+               ("Reference to not yet defined '"^lab ^"' is forbidden.",
+                pos))
+    | None | Some _ -> ()
+  in
+  i
+
+let convert_token_name tk_nme tok pos =
+  match Mods.StringMap.find_option tk_nme tok with
+  | Some x -> x
+  | None ->
+    raise (ExceptionDefn.Malformed_Decl
+             (tk_nme ^ " is not a declared token",pos))
 let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
   ((match alg with
       | Alg_expr.KAPPA_INSTANCE ast ->
         Alg_expr.KAPPA_INSTANCE (mixture_of_ast sigs pos ast)
       | Alg_expr.ALG_VAR lab ->
-        let i =
-          match Mods.StringMap.find_option lab algs with
-          | Some x -> x
-          | None ->
-            raise (ExceptionDefn.Malformed_Decl
-                     (lab ^" is not a declared variable",pos)) in
-        let () = match max_allowed_var with
-          | Some j when j < i ->
-            raise (ExceptionDefn.Malformed_Decl
-                     ("Reference to not yet defined '"^lab ^"' is forbidden.",
-                      pos))
-          | None | Some _ -> ()
-        in Alg_expr.ALG_VAR i
+        Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
       | Alg_expr.TOKEN_ID tk_nme ->
-        let i =
-          match Mods.StringMap.find_option tk_nme tok with
-          | Some x -> x
-          | None ->
-            raise (ExceptionDefn.Malformed_Decl
-                     (tk_nme ^ " is not a declared token",pos))
-        in Alg_expr.TOKEN_ID i
+        Alg_expr.TOKEN_ID (convert_token_name tk_nme tok pos)
+      | Alg_expr.DIFF(lab,tok_mix) ->
+        let i = convert_alg_var ?max_allowed_var algs lab pos in
+        let j =
+          match tok_mix with
+          | Alg_expr.Tok tk_nme ->
+            Alg_expr.Tok (convert_token_name tk_nme tok pos)
+          | Alg_expr.Mix ast ->
+            Alg_expr.Mix (mixture_of_ast sigs pos ast)
+        in
+        Alg_expr.DIFF(i,j)
       | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         Alg_expr.BIN_ALG_OP

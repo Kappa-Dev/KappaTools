@@ -68,6 +68,10 @@ and bool_to_yojson f_mix f_id = function
             Locality.annot_to_json (e_to_yojson f_mix f_id) b ]
 
 let rec e_of_yojson f_mix f_id = function
+  | `List [`String "DIFF_VAR_TOKEN"; id1 ; id2] ->
+    DIFF(f_id id1, Tok (f_id id2))
+  | `List [`String "DIFF_VAR_MIX"; id ; cc] ->
+    DIFF(f_id id,Mix (f_mix cc))
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
@@ -76,10 +80,6 @@ let rec e_of_yojson f_mix f_id = function
   | `List [`String "VAR"; i] -> ALG_VAR (f_id i)
   | `List [`String "TOKEN"; i] -> TOKEN_ID (f_id i)
   | `List [`String "MIX"; cc] -> KAPPA_INSTANCE (f_mix cc)
-  | `List [`String "DIFF_VAR_TOKEN"; id1 ; id2] ->
-    DIFF(f_id id1, Tok (f_id id2))
-  | `List [`String "DIFF_VAR_MIX"; id ; cc] ->
-    DIFF(f_id id,Mix (f_mix cc))
   | `List [op;a] ->
     UN_ALG_OP (Operator.un_alg_op_of_json op,
                Locality.annot_of_json (e_of_yojson f_mix f_id) a)
@@ -149,6 +149,13 @@ let add e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.SUM,e1,e2))
 let minus e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MINUS,e1,e2))
 let mult e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.MULT,e1,e2))
 let div e1 e2 = Locality.dummy_annot (BIN_ALG_OP (Operator.DIV,e1,e2))
+let pow e1 e2  = Locality.dummy_annot (BIN_ALG_OP (Operator.POW,e1,e2))
+let log e1 = Locality.dummy_annot (UN_ALG_OP (Operator.LOG,e1))
+let ln e1 = (* JF: If I rememnber well *)
+  div
+    (log e1)
+    (log (int 10))
+let uminus e1 = Locality.dummy_annot (UN_ALG_OP (Operator.UMINUS,e1))
 
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
@@ -164,7 +171,7 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | DIFF (_,Tok i),_ ->
   let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
   x
-  | DIFF (_,_),_ -> x 
+  | DIFF (_,Mix _),_ -> x
   | STATE_ALG_OP op, _ ->
     match op with
     | (Operator.EMAX_VAR | Operator.TMAX_VAR) -> x
@@ -183,7 +190,7 @@ let rec has_mix :
   | BIN_ALG_OP (_, (a,_), (b,_)) -> has_mix ?var_decls a || has_mix ?var_decls b
   | UN_ALG_OP (_, (a,_))  -> has_mix ?var_decls a
   | STATE_ALG_OP _ | CONST _ -> false
-  | TOKEN_ID _ | KAPPA_INSTANCE _ -> true
+  | TOKEN_ID _ | KAPPA_INSTANCE _ | DIFF (_,_) -> true
   | IF ((cond,_),(yes,_),(no,_)) ->
     has_mix ?var_decls yes || has_mix ?var_decls no
     || bool_has_mix ?var_decls cond
@@ -203,7 +210,7 @@ and bool_has_mix :
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
   | UN_ALG_OP (_, a), _ -> aux_extract_cc acc a
-  | (ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
+  | (DIFF _ | ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
   | KAPPA_INSTANCE i, _ -> i :: acc
   | IF (cond,yes,no), _ ->
     aux_extract_cc (aux_extract_cc (extract_cc_bool acc cond) yes) no
@@ -229,14 +236,14 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
            propagate_constant ?max_time ?max_events updated_vars vars b with
     | (CONST c1,_),(CONST c2,_) -> CONST (Nbr.of_bin_alg_op op c1 c2),pos
     | ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_),
+       | DIFF (_,_) | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_),
       ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
+       | DIFF (_,_) | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
   | UN_ALG_OP (op,a),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
      | CONST c,_ -> CONST (Nbr.of_un_alg_op op c),pos
-     | (BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
+     | (DIFF (_,_) | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
+       | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
   | STATE_ALG_OP (Operator.EMAX_VAR),pos ->
     CONST
       (match max_events with
@@ -264,8 +271,8 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
      else match vars.(i) with
        | _,((CONST _ | ALG_VAR _ as y),_) -> y,pos
        | _,((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-            | TOKEN_ID _ | IF _),_) -> x)
-  | (KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_ as x -> x
+            | TOKEN_ID _ | IF _ | DIFF (_,_) ),_) -> x)
+  | (DIFF (_,_) | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_ as x -> x
   | IF (cond,yes,no),pos ->
     match propagate_constant_bool
             ?max_time ?max_events updated_vars vars cond with
@@ -303,7 +310,7 @@ and propagate_constant_bool
     match a',b' with
     | (CONST n1,_), (CONST n2,_) ->
       (if Nbr.of_compare_op op n1 n2 then TRUE,pos else FALSE,pos)
-    | (( BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
+    | (( DIFF (_,_) | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
        | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_), _ ->
       COMPARE_OP (op,a',b'),pos
 
@@ -316,7 +323,7 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                    Operator.NULL_EVENT_VAR | Operator.EMAX_VAR |
                    Operator.TMAX_VAR),_) -> false
-  | (ALG_VAR i,_) ->
+  | (ALG_VAR i,_) | DIFF (i,_),_ ->
     let rec aux j =
       Operator.DepSet.mem (Operator.ALG j) in_t ||
       Operator.DepSet.exists
@@ -326,6 +333,7 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | IF (cond,yes,no),_ ->
     bool_has_time_dep vars_deps cond ||
     has_time_dep vars_deps yes||has_time_dep vars_deps no
+
 and bool_has_time_dep vars_deps = function
   | (TRUE | FALSE), _ -> false
   | COMPARE_OP (_,a,b),_ ->
@@ -350,7 +358,7 @@ let rec stops_of_bool vars_deps = function
       begin match a1,b1 with
         | STATE_ALG_OP (Operator.TIME_VAR), CONST n
         | CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
-        | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
+        | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _ | DIFF (_,_)
           | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                           Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
                           Operator.EMAX_VAR |Operator.TMAX_VAR)

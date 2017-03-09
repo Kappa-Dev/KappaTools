@@ -189,27 +189,41 @@ let initialize logger variable =
       let () =
         match variable with
         | Ode_loggers_sig.Rate _ ->
-          Loggers.fprintf logger "k=zeros(nrules,1)"
+          Loggers.fprintf logger "%s=zeros(nrules,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Rated _ ->
-          Loggers.fprintf logger "kd=sparse(nrules,1)"
+          Loggers.fprintf logger "%s=sparse(nrules,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Rateun _ ->
-          Loggers.fprintf logger "kun=sparse(nrules,1)"
+          Loggers.fprintf logger "%s=sparse(nrules,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Rateund _ ->
-          Loggers.fprintf logger "kdun=sparse(nrules,1)"
+          Loggers.fprintf logger "%s=sparse(nrules,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Expr _ ->
-          Loggers.fprintf logger "var=zeros(nvar,1);"
+          Loggers.fprintf logger "%s=zeros(nvar,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Init _ ->
-          Loggers.fprintf logger "init=sparse(nodevar,1);"
+          Loggers.fprintf logger "%s=sparse(nodevar,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Initbis _ ->
-          Loggers.fprintf logger "Init=zeros(nodevar,1);"
+          Loggers.fprintf logger "%s=zeros(nodevar,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Concentration _ ->
-          Loggers.fprintf logger "y=zeros(nodevar,1)"
+          Loggers.fprintf logger "%s=zeros(nodevar,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Deriv _ ->
-          Loggers.fprintf logger "dydt=zeros(nodevar,1);"
+          Loggers.fprintf logger "%s=zeros(nodevar,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Jacobian _ ->
-          Loggers.fprintf logger "Jac = sparse(nodevar,nodevar);"
+          Loggers.fprintf logger "%s=sparse(nodevar,nodevar);"
+            (Ode_loggers_sig.string_of_array_name variable)
+        | Ode_loggers_sig.Jacobian_var _ ->
+              Loggers.fprintf logger "%s=sparse(nvar,nodevar);"
+                (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Obs _ ->
-          Loggers.fprintf logger "obs = zeros(nobs,1);"
+          Loggers.fprintf logger "%s=zeros(nobs,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
         | Ode_loggers_sig.InitialStep
@@ -221,8 +235,9 @@ let initialize logger variable =
         | Ode_loggers_sig.Current_time
         | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.N_rules -> ()
-        | Ode_loggers_sig.Tmp -> Loggers.fprintf logger "tmp = zeros(nodevar,1);"
-
+        | Ode_loggers_sig.Tmp ->
+          Loggers.fprintf logger "%s = zeros(nodevar,1);"
+            (Ode_loggers_sig.string_of_array_name variable)
       in
       let () =
         match variable with
@@ -237,7 +252,9 @@ let initialize logger variable =
         | Ode_loggers_sig.Concentration _
         | Ode_loggers_sig.Deriv _
         | Ode_loggers_sig.Obs _
-        | Ode_loggers_sig.Jacobian _ -> Loggers.print_newline logger
+        | Ode_loggers_sig.Jacobian _
+        | Ode_loggers_sig.Jacobian_var _
+          -> Loggers.print_newline logger
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
         | Ode_loggers_sig.InitialStep
@@ -396,6 +413,16 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         Loggers.fprintf
           logger "var(%i)"
           (network_handler.Network_handler.int_of_obs x)
+      | Alg_expr.DIFF(x,Alg_expr.Tok id) ->
+        Loggers.fprintf
+          logger "jac_var(%i,%i)"
+          (network_handler.Network_handler.int_of_obs x)
+          (network_handler.Network_handler.int_of_token_id id)
+      | Alg_expr.DIFF(x,Alg_expr.Mix id) ->
+        Loggers.fprintf
+          logger "jac_var(%i,%i)"
+          (network_handler.Network_handler.int_of_obs x)
+          (network_handler.Network_handler.int_of_kappa_instance id)
       | Alg_expr.KAPPA_INSTANCE x ->
         Loggers.fprintf
           logger "%s(%i)" var
@@ -594,6 +621,7 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Deriv _
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Jacobian_var _
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.InitialStep
@@ -627,6 +655,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.Expr _
     | Ode_loggers_sig.Deriv _
     | Ode_loggers_sig.Jacobian _
+    | Ode_loggers_sig.Jacobian_var _
     | Ode_loggers_sig.InitialStep
     | Ode_loggers_sig.Rate _
     | Ode_loggers_sig.Rated _
@@ -762,6 +791,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
       | Ode_loggers_sig.Deriv _,_
       | Ode_loggers_sig.Obs _,_
       | Ode_loggers_sig.Jacobian _,_
+      | Ode_loggers_sig.Jacobian_var _,_
       | Ode_loggers_sig.InitialStep,_
       | Ode_loggers_sig.N_rules,_
       | Ode_loggers_sig.N_ode_var,_

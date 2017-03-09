@@ -40,6 +40,10 @@ let rec compile_alg domain (alg,pos) =
     let domain'',yes' = compile_alg domain' yes in
     let domain''',no' = compile_alg domain'' no in
     (domain''',(Alg_expr.IF (cond',yes',no'),pos))
+  | Alg_expr.DIFF _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("Theoretically pure alg_expr has no partial derivative",pos))
 and compile_bool domain = function
   | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
   | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
@@ -183,7 +187,7 @@ let cflows_of_label
       match var with
       | Alg_expr.KAPPA_INSTANCE mix -> mix
       | (Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _) ->
+        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _ | Alg_expr.DIFF _ ) ->
         raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl

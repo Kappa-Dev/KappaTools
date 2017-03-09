@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Mar 09 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -211,6 +211,12 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
   | Alg_expr.CONST t ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" (Nbr.to_string t)
     in error
+  | Alg_expr.DIFF(string,Alg_expr.Tok token) ->
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "d%s/d%s" string token
+    in error
+    | Alg_expr.DIFF(string,Alg_expr.Mix token) ->
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "d%s/d" string in
+      print_mixture parameter error token
   | Alg_expr.IF (cond,(yes,_),(no,_)) ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
     let error = print_bool parameter error cond in

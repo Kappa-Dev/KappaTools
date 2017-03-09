@@ -35,13 +35,12 @@ let rec simplify expr =
           | _,(Alg_expr.CONST b,_) when Nbr.is_zero b -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF _ ),_),
             ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF _ ),_)
             -> Alg_expr.BIN_ALG_OP(op,a,b),loc
         end
@@ -52,15 +51,14 @@ let rec simplify expr =
             Alg_expr.CONST (Nbr.sub a b),loc
           | _,(Alg_expr.CONST b,_) when Nbr.is_zero b -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
-                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-                 | Alg_expr.IF _ | Alg_expr.DIFF _ ),_),
-                ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
-                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-                 | Alg_expr.IF _ | Alg_expr.DIFF _ ),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
+             | Alg_expr.IF _ | Alg_expr.DIFF _ ),_),
+            ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
+             | Alg_expr.IF _ | Alg_expr.DIFF _ ),_) ->
+            Alg_expr.BIN_ALG_OP(op,a,b),loc
         end
       | Operator.MULT ->
         begin
@@ -70,15 +68,13 @@ let rec simplify expr =
           | (Alg_expr.CONST a,_),_ when Nbr.is_equal a Nbr.one -> b
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
-                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-                 | Alg_expr.IF _ | Alg_expr.DIFF _),_),
-                ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
-                 | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-                 | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-                 | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-                 | Alg_expr.IF _ | Alg_expr.DIFF _),_)
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
+             | Alg_expr.IF _ | Alg_expr.DIFF _),_),
+            ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+             | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
+             | Alg_expr.IF _ | Alg_expr.DIFF _),_)
             -> Alg_expr.BIN_ALG_OP(op,a,b),loc
         end
       | Operator.DIV ->
@@ -87,14 +83,11 @@ let rec simplify expr =
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF _),_),
             ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-             | Alg_expr.IF _ | Alg_expr.DIFF _),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.IF _ | Alg_expr.DIFF _),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
         end
       | Operator.POW | Operator.MODULO ->
         begin
@@ -102,13 +95,12 @@ let rec simplify expr =
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF _),_),
             ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-             | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-             | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+             | Alg_expr.KAPPA_INSTANCE _
+             | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF _),_) -> Alg_expr.BIN_ALG_OP(op,a,b),loc
         end
       | Operator.MIN | Operator.MAX ->
@@ -126,15 +118,15 @@ let rec simplify expr =
               Alg_expr.CONST a,_ -> Alg_expr.CONST (Nbr.neg a),loc
             | (Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
               | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-              | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-              | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+              | Alg_expr.KAPPA_INSTANCE _
+              | Alg_expr.TOKEN_ID _
               | Alg_expr.IF _ | Alg_expr.DIFF _),_-> Alg_expr.UN_ALG_OP(op,a),loc
           end
         | Operator.COSINUS | Operator.SINUS | Operator.SQRT
         | Operator.LOG | Operator.EXP | Operator.TAN | Operator.INT
           -> Alg_expr.UN_ALG_OP(op,a),loc
       end
-    | Alg_expr.DIFF _,_ 
+    | Alg_expr.DIFF _,_
     | Alg_expr.STATE_ALG_OP _,_
     | Alg_expr.ALG_VAR _,_
     | Alg_expr.KAPPA_INSTANCE _,_
@@ -221,14 +213,14 @@ and simplify_bool expr_bool =
       end
     | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
        | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-       | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-       | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-       | Alg_expr.IF _ ),_),
+       | Alg_expr.KAPPA_INSTANCE _
+       | Alg_expr.TOKEN_ID _
+       | Alg_expr.IF _ | Alg_expr.DIFF (_,_)),_),
       ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
        | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-       | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _
-       | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
-       | Alg_expr.IF _ ),_) -> Alg_expr.COMPARE_OP(op,a,b),loc
+       | Alg_expr.KAPPA_INSTANCE _
+       | Alg_expr.TOKEN_ID _
+       | Alg_expr.IF _ | Alg_expr.DIFF (_,_)),_) -> Alg_expr.COMPARE_OP(op,a,b),loc
 
 
 let rec clean expr =
@@ -246,6 +238,7 @@ let rec clean expr =
   | Alg_expr.ALG_VAR _
   | Alg_expr.KAPPA_INSTANCE _
   | Alg_expr.TOKEN_ID _
+  | Alg_expr.DIFF (_,_)
   | Alg_expr.CONST _ ->
     Locality.dummy_annot expr
   | Alg_expr.IF (cond,yes,no) ->
@@ -320,6 +313,7 @@ let rec get_corrected_rate e =
   | Alg_expr.STATE_ALG_OP _,_
   | Alg_expr.KAPPA_INSTANCE _,_
   | Alg_expr.TOKEN_ID _,_
+  | Alg_expr.DIFF (_,_),_
   | Alg_expr.IF _,_ -> None
   | Alg_expr.ALG_VAR _,_ -> Some
                     {
@@ -370,12 +364,14 @@ let dep empty add union dep_env ?time_var expr =
       | Some id -> add (Alg_expr.Mix id) accu
       | None -> assert false
     end
+  | Alg_expr.STATE_ALG_OP
+      (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR | Operator.TMAX_VAR | Operator.EMAX_VAR) -> accu
   | Alg_expr.ALG_VAR id ->
     union (dep_env id) accu
   | Alg_expr.KAPPA_INSTANCE mix ->
-    add (Mix mix) accu
+    add (Alg_expr.Mix mix) accu
   | Alg_expr.TOKEN_ID id ->
-    add (Tok id) accu
+    add (Alg_expr.Tok id) accu
   | Alg_expr.CONST _ -> accu
   | Alg_expr.DIFF (id, Alg_expr.Tok id_token) ->
     add (Alg_expr.Tok id_token) (union (dep_env id) accu)
@@ -384,18 +380,60 @@ let dep empty add union dep_env ?time_var expr =
   in
   aux add union dep_env expr empty
 
-let rec diff expr dt ?time_var =
+let rec diff ?time_var expr dt =
   match fst expr with
   | Alg_expr.IF(b,e1,e2) ->
     Locality.dummy_annot
-      (Alg_expr.IF(b,diff e1 dt ?time_var,diff e2 dt ?time_var))
+      (Alg_expr.IF(b,diff ?time_var e1 dt ,diff ?time_var e2 dt))
   | Alg_expr.BIN_ALG_OP (op,e1,e2) ->
     begin
       match op with
       | Operator.SUM ->
         Alg_expr.add
-          (diff e1 dt ?time_var)
-          (diff e2 dt ?time_var)
+          (diff ?time_var e1 dt)
+          (diff ?time_var e2 dt)
+      | Operator.MULT ->
+        Alg_expr.add
+          (Alg_expr.mult
+             e1
+             (diff ?time_var e2 dt))
+          (Alg_expr.mult
+             e2
+             (diff ?time_var e1 dt))
+      | Operator.MINUS ->
+        Alg_expr.minus
+          (diff ?time_var e1 dt)
+          (diff ?time_var e2 dt)
+      | Operator.MIN | Operator.MAX ->
+        Alg_expr.int 0
+      | Operator.MODULO ->
+        diff ?time_var e1 dt
+      | Operator.DIV ->
+        Alg_expr.div
+          (Alg_expr.minus
+             (Alg_expr.mult
+                (diff ?time_var e1 dt)
+                e2)
+             (Alg_expr.mult
+                (diff ?time_var e2 dt)
+                e1)
+          )
+          (Alg_expr.pow
+               e2
+               (Alg_expr.int 2)
+          )
+      | Operator.POW ->  (* (u^v)*(v'*ln(u)+v*u'/u) *)
+        Alg_expr.mult
+          (Alg_expr.pow e1 e2)
+          (Alg_expr.add
+             (Alg_expr.mult
+                (diff ?time_var e2 dt)
+                (Alg_expr.ln e1))
+             (Alg_expr.div
+                (Alg_expr.mult
+                   e2
+                   (diff ?time_var e1 dt))
+                e1))
     end
   | Alg_expr.UN_ALG_OP (_,e) ->
     e (*TO DO*)
@@ -406,13 +444,13 @@ let rec diff expr dt ?time_var =
       | Some _ -> Alg_expr.int 0
       | None -> assert false
     end
+    | Alg_expr.STATE_ALG_OP
+        (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR | Operator.TMAX_VAR | Operator.EMAX_VAR) -> Alg_expr.int 0
   | Alg_expr.ALG_VAR id ->
     Locality.dummy_annot
       (Alg_expr.DIFF (id, dt))
   | Alg_expr.KAPPA_INSTANCE mix when dt = Alg_expr.Mix mix ->
     Alg_expr.int 1
-  | Alg_expr.KAPPA_INSTANCE mix  ->
-    Alg_expr.int 0
   | Alg_expr.TOKEN_ID id when dt = Alg_expr.Tok id ->
     Alg_expr.int 1
   | Alg_expr.KAPPA_INSTANCE _

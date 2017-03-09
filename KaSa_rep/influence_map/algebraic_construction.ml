@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Mar 09 2017>
    * *
    * algebraic check for the influence map.
    *
@@ -275,7 +275,9 @@ let filter_influence parameters error handler compilation map bool =
     | Alg_expr.STATE_ALG_OP _, _
     | Alg_expr.ALG_VAR _,_
     | Alg_expr.TOKEN_ID _,_
-    | Alg_expr.CONST _,_     ->
+    | Alg_expr.CONST _,_
+    | Alg_expr.DIFF (_,_),_
+      ->
       let error,() =
         Exception.warn
           parameters error __POS__
@@ -431,6 +433,7 @@ let filter_influence_high maybe_reachable
     | Alg_expr.UN_ALG_OP (_,_),_
     | Alg_expr.STATE_ALG_OP _, _
     | Alg_expr.ALG_VAR _,_
+    | Alg_expr.DIFF (_,_),_
     | Alg_expr.TOKEN_ID _,_
     | Alg_expr.CONST _,_     ->
       let error,() =

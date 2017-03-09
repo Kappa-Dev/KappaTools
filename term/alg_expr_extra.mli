@@ -51,7 +51,7 @@ val dep:
   'set
 
 val diff:
+  ?time_var:'mix ->
   ('mix,'id) Alg_expr.e Locality.annot   ->
   ('mix,'id) Alg_expr.mix_token ->
-  ?time_var:'mix ->
   ('mix,'id) Alg_expr.e Locality.annot
