@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 08 2017>
+  * Last modification: Time-stamp: <Mar 09 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -448,12 +448,13 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let cache = {cache with rule_cache = rule_cache } in
   cache, lkappa_rule, i , rate_map, hashed_list
 
-let detect_symmetries parameter compil cache arrays rules contact_map
-    initial_states =
+let detect_symmetries parameters compil cache arrays rules
+    contact_map initial_states =
   let rule_cache = cache.rule_cache in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
-      parameter compil.environment rule_cache arrays rules
+      parameters
+      compil.environment rule_cache arrays rules
       contact_map
       initial_states
   in

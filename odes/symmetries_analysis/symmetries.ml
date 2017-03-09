@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 08 2017>
+   * Last modification: Time-stamp: <Mar 09 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -25,6 +25,7 @@ type partitioned_contact_map =
   ((string list list) * (string list list))
     Mods.StringSetMap.Map.t
 
+(*internal states * binding states*)
 type lkappa_partitioned_contact_map =
   ((int list list) * (int list list))
     array
@@ -323,6 +324,33 @@ let print_partitioned_contact_map_in_lkappa logger env
 (*DETECT SYMMETRIES*)
 (*****************************************************************)
 
+let max_hash h1 h2 =
+  if compare h1 h2 >= 0
+  then h1
+  else h2
+
+let max_hashes hash_list =
+  let rec aux tail best =
+    match tail with
+    | [] -> best
+    | head :: tail -> aux tail (max_hash best head)
+  in aux hash_list LKappa_auto.RuleCache.empty
+
+let build_array_for_symmetries nbr_rule_list =
+  let max_hash = max_hashes nbr_rule_list in
+  let size_hash_plus_1 =
+    (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
+  in
+  let to_be_checked = Array.make size_hash_plus_1 false in
+  let counter = Array.make size_hash_plus_1 0 in
+  let rate =
+    Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
+  in
+  let correct = Array.make size_hash_plus_1 1 in
+  to_be_checked, counter, rate, correct
+
+(******************************************************************)
+
 let check_invariance_gen
     p ?parameters ?env ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
@@ -449,6 +477,26 @@ let detect_symmetries parameters env cache
       p'
   in
   (*-------------------------------------------------------------*)
+  (*initial states*)
+  let init_pattern_to_raw_mixture =
+    List.fold_left (fun current_list cc ->
+        let raw_mixture =
+          Raw_mixture_extra.pattern_to_raw_mixture
+            (Model.signatures env)
+            cc
+        in
+        raw_mixture :: current_list
+      ) [] initial_states
+  in
+  (*-------------------------------------------------------------*)
+  (*refined partition + initial states*)
+  let symmetries = Array.copy refined_partitioned_contact_map in
+  let _ =
+    Raw_mixture_group_action.normalize_internal_states_in_raw_mixture_init
+      symmetries
+  in
+
+  (*-------------------------------------------------------------*)
   (*PRINT*)
   let () =
     if Remanent_parameters.get_trace parameters
@@ -483,33 +531,6 @@ let detect_symmetries parameters env cache
       ()
   in
   cache, refined_partitioned_contact_map
-
-(******************************************************************)
-
-let max_hash h1 h2 =
-  if compare h1 h2 >= 0
-  then h1
-  else h2
-
-let max_hashes hash_list =
-  let rec aux tail best =
-    match tail with
-    | [] -> best
-    | head :: tail -> aux tail (max_hash best head)
-  in aux hash_list LKappa_auto.RuleCache.empty
-
-let build_array_for_symmetries nbr_rule_list =
-  let max_hash = max_hashes nbr_rule_list in
-  let size_hash_plus_1 =
-    (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
-  in
-  let to_be_checked = Array.make size_hash_plus_1 false in
-  let counter = Array.make size_hash_plus_1 0 in
-  let rate =
-    Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
-  in
-  let correct = Array.make size_hash_plus_1 1 in
-  to_be_checked, counter, rate, correct
 
 (******************************************************)
 

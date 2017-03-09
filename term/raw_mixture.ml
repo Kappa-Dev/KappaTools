@@ -7,7 +7,9 @@
 (******************************************************************************)
 
 type internal = int option
+
 type link = FREE | VAL of int
+
 type agent =
   {
     a_type: int;

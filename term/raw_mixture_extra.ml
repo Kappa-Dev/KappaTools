@@ -305,7 +305,7 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
   | None -> None
   | Some (agent_map, unspec) ->
     begin
-      let (),list =
+      let (), list =
         Mods.IntMap.monadic_fold2
           () ()
           (fun () () _ agent_type intf agent_list ->
