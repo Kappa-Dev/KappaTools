@@ -110,7 +110,7 @@ let rec print pr_mix pr_tok pr_var f = function
       Operator.print_bin_alg_op op
       (print pr_mix pr_tok pr_var) b
   | UN_ALG_OP (op, (a,_)) ->
-    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op
+    Format.fprintf f "%a(%a)" Operator.print_un_alg_op op
       (print pr_mix pr_tok pr_var) a
   | IF ((cond,_),(yes,_),(no,_)) ->
     Format.fprintf f "%a [?] %a [:] %a" (print_bool pr_mix pr_tok pr_var) cond

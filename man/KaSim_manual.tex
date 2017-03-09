@@ -339,10 +339,10 @@ skeletons (describe formaly in fig~\ref{tab:patterns}):
   just write its name to represent its state. If it has a internal
   state, you write it after a '\intstate'. For example, the graph
   TODO is written A(x,y\intstate{}p,z\intstate{}0)
-\item When a site is part of an edge, you assign an arbitrary integer
-  identifier $n$ to this edge and you specify the appartenance of the
-  site to this edge by writing site\_name$!n$. The graph TODO can be
-  reprensented as A(x!23,y\intstate{}u!4,z\intstate{}1),
+\item When a site is part of an edge, you assign an arbitrary positive
+  integer identifier $n$ to this edge and you specify the appartenance
+  of the site to this edge by writing site\_name$!n$. The graph TODO
+  can be reprensented as A(x!23,y\intstate{}u!4,z\intstate{}1),
   A(x!4,y\intstate{}u!95,z\intstate{}1),
   A(x!95,y\intstate{}u!23,z\intstate{}1).
 
@@ -399,7 +399,7 @@ number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x}
 of \ttt{A}. Note that this still includes the case
 \ttt{A(x!1),B(y!1)}.
 
-\Remark{Transformations on semi-links and links type indiuce side
+\Remark{Transformations on semi-links and links type induce side
   effects (effect on unmention agents/unmentionned site of agent) and
   can even don't make sense at all. What would mean to remove the link
   to A but not the link to B in the example above? Be carefull when

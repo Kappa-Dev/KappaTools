@@ -59,7 +59,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
-<!-- reaction:  ->  | 2:t + (- 1):t  -->
+<!-- reaction:  ->  | 2:t + -(1):t  -->
 <reaction id="re2" name="expo2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD12" species="t2"/>
