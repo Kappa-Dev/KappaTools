@@ -9,58 +9,62 @@
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 
-let handle_perturbation r _ : bool Js.t =
-  let () = Panel_settings_controller.perturb_simulation () in
-  r
+let visible_on_states
+    ?(a_class=[])
+    (state : State_simulation.model_state list) : string list React.signal =
+  let hidden_class = ["hidden"] in
+  let visible_class = ["visible"] in
+  React.S.bind
+    State_simulation.model
+    (fun model ->
+       let current_state = State_simulation.model_simulation_state model.State_simulation.model_current in
+       React.S.const
+         (match current_state with
+          | None -> a_class@hidden_class
+          | Some current_state ->
+            if List.mem current_state state then
+              a_class@visible_class
+            else
+              a_class@hidden_class))
 
-module ButtonPerturbation : Ui_common.Div = struct
-  let id = "panel_settings_perturbation_button"
-  let button =
-    Html.button
-      ~a:[ Html.a_id id
-         ; Html.Unsafe.string_attrib "type" "button"
-         ; Html.a_class ["btn" ; "btn-default" ; ] ]
-      [ Html.cdata "perturbation" ]
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [ Html.div [ button ] ]
-
-
-  let onload () : unit =
-    let button_dom = Tyxml_js.To_dom.of_button button in
-
-    let () = button_dom##.onclick := Dom.handler (handle_perturbation Js._true) in
-    ()
-end
-
-module InputPerturbation : Ui_common.Div = struct
-  let id = "panel_settings_perturbation_code"
+module FormPerturbation : Ui_common.Div = struct
+  let id = "panel_settings_perturbation"
   let input =
     Html.input
-      ~a:[Html.a_id id;
-          Html.a_input_type `Text;
+      ~a:[Html.a_input_type `Text;
           Html.a_class ["form-control"];
           Html.a_placeholder "Simulation Perturbation";]
       ()
+  let button =
+    Html.button
+      ~a:[ Html.a_button_type `Submit
+         ; Html.a_class ["btn"; "btn-default" ] ]
+      [ Html.cdata "perturbation" ]
+  let form = Html.form ~a:
+      [Tyxml_js.R.Html.a_class
+         (visible_on_states
+            ~a_class:[ "form-horizontal" ]
+            [ State_simulation.PAUSED ; ])]
+      [ Html.div ~a:[ Html.a_class [ "form-group" ]]
+          [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-9"]] [input];
+            Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-3"]] [button] ] ]
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
-    [ Html.div [ input ] ]
+  let content () = [ form ]
    let onload () : unit =
+     let form_dom = Tyxml_js.To_dom.of_form form in
      let input_dom = Tyxml_js.To_dom.of_input input in
      let handler =
-             (fun (event : Dom_html.event Js.t)  ->
-                let target : Dom_html.element Js.t =
-                  Js.Opt.get
-                    event##.target
-                    (fun () ->
-                   Common.toss
-                     "Panel_settings.InputPerturbation.onload input")
-                in
-                let input : Dom_html.inputElement Js.t = Js.Unsafe.coerce target in
-                let model_perturbation : string = Js.to_string input##.value in
-                let () = State_perturbation.set_model_perturbation model_perturbation in
-                Js._true)
+       (fun _ ->
+          let model_perturbation : string = Js.to_string input_dom##.value in
+          let () =
+            State_perturbation.set_model_perturbation model_perturbation in
+          Js._true)
      in
-     let () = Common.handle_enter id (handle_perturbation Js._false) in
+
+     let () = form_dom##.onsubmit :=
+         Dom.handler (fun _ ->
+             let () = Panel_settings_controller.perturb_simulation () in
+             Js._false) in
      let () = input_dom##.onchange := Dom.handler handler in
      ()
 
@@ -535,27 +539,6 @@ module RunningPanelLayout : Ui_common.Div = struct
 
 end
 
-let hidden_class = "hidden"
-let visible_class = "visible"
-
-let visible_on_states
-    ?(a_class=[])
-    (state : State_simulation.model_state list) : string list React.signal =
-  let hidden_class = ["hidden"] in
-  let visible_class = ["visible"] in
-  React.S.bind
-    State_simulation.model
-    (fun model ->
-       let current_state = State_simulation.model_simulation_state model.State_simulation.model_current in
-       React.S.const
-         (match current_state with
-          | None -> a_class@hidden_class
-          | Some current_state ->
-            if List.mem current_state state then
-              a_class@visible_class
-            else
-              a_class@hidden_class))
-
 let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
   let stopped_row =
     Html.div
@@ -568,31 +551,22 @@ let stopped_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
             <div class="col-md-2 col-xs-3">|}(InputPlotPeriod.content ()){|</div>
             <div class="col-xs-6 col-md-3">|}
         (ButtonConfiguration.content ()){|</div>|}] in
-    let paused_row =
-      Html.div
-      ~a:[ Tyxml_js.R.Html.a_class
-             (visible_on_states
-                ~a_class:[ "form-group" ]
-                [ State_simulation.PAUSED ; ]) ]
-      [ Html.div ~a:[ Html.a_class ["col-md-10"; "col-xs-9" ] ] (InputPerturbation.content ()) ;
-        Html.div ~a:[ Html.a_class ["col-md-2"; "col-xs-3" ] ] (ButtonPerturbation.content ()) ]
-    in
+    let paused_row = FormPerturbation.content () in
     Html.div
       ~a:[ Tyxml_js.R.Html.a_class
              (visible_on_states
                 ~a_class:[ "panel-body" ; "panel-controls" ]
                 [ State_simulation.STOPPED ;
                   State_simulation.PAUSED ;]) ]
-      [[%html {|
+      ([%html {|
          <form class="form-horizontal">
           <div class="form-group">
             <label class="col-lg-1 col-sm-2 hidden-xs control-label" for="|}InputPauseCondition.id{|">Pause if</label>
             <div class="col-md-2 col-sm-3 col-xs-5">|}(InputPauseCondition.content ()){|</div>
             <div class="col-lg-9 col-md-8 col-xs-7">|}(DivErrorMessage.content ()){|</div>
-          </div>
-                                                                       |}
-          [paused_row;stopped_row]
-          {|</form>|}]]
+          </div>|}
+          [stopped_row]
+          {|</form>|}]::paused_row)
 
   let initializing_body () : [> Html_types.div ] Tyxml_js.Html5.elt =
     Html.div
@@ -664,8 +638,7 @@ let content () =
      (footer ()); ]
 
 let onload () : unit =
-  let () = ButtonPerturbation.onload () in
-  let () = InputPerturbation.onload () in
+  let () = FormPerturbation.onload () in
   let () = InputPauseCondition.onload () in
   let () = InputPlotPeriod.onload () in
   let () = ButtonConfiguration.onload () in
