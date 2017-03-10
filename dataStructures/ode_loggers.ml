@@ -1155,44 +1155,176 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let update_token_jac string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler dep =
+let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler dep_rate dep_expr =
   match
     Loggers.get_encoding_format logger
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
-      let var = Ode_loggers_sig.string_of_variable var_token in
-      let () = Loggers.fprintf logger "%s=%s+" var var in
-      let bool =
-        if nauto_in_lhs =1
-        then
-          false
-        else
-          let () =
-            Loggers.fprintf logger "1/%i" nauto_in_lhs
-          in
-          true
-      in
+      (* We differentiate according to the rule rate *)
       let () =
-        if bool
-        then
-          Loggers.fprintf logger "*"
+        Mods.IntSet.iter
+        (fun dt ->
+           let var_dt =
+             Ode_loggers_sig.string_of_variable
+               (Ode_loggers_sig.variable_of_derived_variable
+                  var_token dt)
+           in
+           let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
+           let bool =
+             if nauto_in_lhs =1
+             then
+               false
+             else
+               let () =
+                 Loggers.fprintf logger "1/%i" nauto_in_lhs
+               in
+               true
+           in
+           let () =
+             if bool
+             then
+               Loggers.fprintf logger "*"
+           in
+           let () =
+             Loggers.fprintf logger "%s"
+               (Ode_loggers_sig.string_of_variable
+                  (Ode_loggers_sig.variable_of_derived_variable
+                     var_rate dt))
+           in
+           let () =
+             List.iter
+               (fun (var,correct) ->
+                  Loggers.fprintf logger "*%s"
+                    (apply_correct correct
+                       (Ode_loggers_sig.Concentration var)))
+               var_list
+           in
+           let () = Loggers.fprintf logger "*" in
+           let () =
+             print_alg_expr
+               ~parenthesis_mode:In_product
+               string_of_var_id logger expr handler
+           in
+           let () = Loggers.fprintf logger ";" in
+           let () = Loggers.print_newline logger in
+           ())
+        dep_rate
       in
-      let () = Loggers.fprintf logger "%s" (Ode_loggers_sig.string_of_variable var_rate) in
-        let () =
-        List.iter
-          (fun (var,correct) ->
-             Loggers.fprintf logger "*%s" (apply_correct correct (Ode_loggers_sig.Concentration var)))
-          var_list
-          in (* TO DO *)
-      let () = Loggers.fprintf logger "*" in
-      let () =
-        print_alg_expr
-          ~parenthesis_mode:In_product
-          string_of_var_id logger expr handler
+      let () = (* we differentiate according to the token coefficient *)
+        Mods.IntMap.iter
+          (fun dt_id dt ->
+           let var_dt =
+               Ode_loggers_sig.string_of_variable
+                 (Ode_loggers_sig.variable_of_derived_variable
+                    var_token dt_id)
+             in
+             let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
+             let bool =
+               if nauto_in_lhs =1
+               then
+                 false
+               else
+                 let () =
+                   Loggers.fprintf logger "1/%i" nauto_in_lhs
+                 in
+                 true
+             in
+             let () =
+               if bool
+               then
+                 Loggers.fprintf logger "*"
+             in
+             let () =
+               Loggers.fprintf logger "%s"
+                 (Ode_loggers_sig.string_of_variable
+                    var_rate)
+             in
+             let () =
+               List.iter
+                 (fun (var,correct) ->
+                    Loggers.fprintf logger "*%s"
+                      (apply_correct correct
+                         (Ode_loggers_sig.Concentration var)))
+                 var_list
+             in
+             let () = Loggers.fprintf logger "*" in
+             let () =
+               print_alg_expr
+                 ~parenthesis_mode:In_product
+                 string_of_var_id logger
+                 (Alg_expr_extra.simplify
+                    (Alg_expr_extra.diff ?time_var expr dt))
+                 handler
+             in
+             let () = Loggers.fprintf logger ";" in
+           let () = Loggers.print_newline logger in
+           ())
+        dep_expr
       in
-      let () = Loggers.fprintf logger ";" in
-      let () = Loggers.print_newline logger in
+      let () =  (* we differentiate according to the species *)
+        let rec aux tail suffix =
+          match tail with
+          | [] -> ()
+          | (h,correct)::t ->
+            begin
+              let var_dt =
+                Ode_loggers_sig.string_of_variable
+                  (Ode_loggers_sig.variable_of_derived_variable
+                     var_token h)
+              in
+              let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
+              let bool =
+                if nauto_in_lhs =1
+                then
+                  false
+                else
+                  let () =
+                    Loggers.fprintf logger "1/%i" nauto_in_lhs
+                  in
+                  true
+              in
+              let () =
+                if bool
+                then
+                  Loggers.fprintf logger "*"
+              in
+              let () =
+                Loggers.fprintf logger "%s"
+                  (Ode_loggers_sig.string_of_variable
+                     var_rate)
+              in
+              let () =
+                List.iter
+                  (fun (var,correct) ->
+                     Loggers.fprintf logger "*%s"
+                       (apply_correct correct
+                          (Ode_loggers_sig.Concentration var)))
+                  (List.rev suffix)
+              in
+              let () =
+                List.iter
+                  (fun (var,correct) ->
+                     Loggers.fprintf logger "*%s"
+                       (apply_correct correct
+                          (Ode_loggers_sig.Concentration var)))
+                  (List.rev tail)
+              in
+              let () = Loggers.fprintf logger "*" in
+              let () =
+                print_alg_expr
+                  ~parenthesis_mode:In_product
+                  string_of_var_id logger
+                  (Alg_expr_extra.simplify
+                     expr)
+                  handler
+              in
+              let () = Loggers.fprintf logger ";" in
+              let () = Loggers.print_newline logger in
+              aux t ((h,correct)::suffix)
+            end
+        in aux var_list []
+      in
       ()
     end
   | Loggers.Maple

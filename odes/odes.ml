@@ -1016,6 +1016,14 @@ struct
      obs = List.rev network.obs;
      n_obs = network.n_obs - 1}
 
+
+  let build_time_var network =
+    if may_be_not_time_homogeneous network
+    then
+      Some (get_last_ode_var_id network)
+    else
+      None
+
   let species_of_initial_state compil network list =
     let cache = network.cache in
     let cache, list =
@@ -1292,6 +1300,20 @@ struct
   module MTSetMap = SetMap.Make (MT)
   module MTSET = MTSetMap.Set
 
+  let get_dep ?time_var dep_map expr =
+    Alg_expr_extra.dep
+      ?time_var
+      MTSET.empty
+      MTSET.add
+      MTSET.union
+      (fun id ->
+         match
+           Mods.IntMap.find_option (succ id) dep_map
+         with
+         | Some set -> set
+         | None -> MTSET.empty)
+      expr
+
   module V =
   struct
     type t = Ode_loggers_sig.variable
@@ -1303,26 +1325,15 @@ struct
   module VMAP = VSetMap.Map
 
   let affect_deriv_var
-      is_zero logger logger_buffer ?time_var compil network decl dep
+      is_zero logger logger_buffer compil network decl dep
     =
+    let time_var = build_time_var network in
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl
     | Init_expr _ -> dep
     | Var (id,_comment,expr) ->
-      let dep_var =
-        Alg_expr_extra.dep
-          MTSET.empty
-          MTSET.add
-          MTSET.union
-          (fun id ->
-             match
-               Mods.IntMap.find_option (succ id) dep
-             with
-             | Some set -> set
-             | None -> MTSET.empty)
-          expr
-      in
+      let dep_var = get_dep ?time_var dep expr in
       let dep = Mods.IntMap.add id dep_var dep in
       let () =
         MTSET.iter
@@ -1348,24 +1359,13 @@ struct
           dep_var
       in
       dep
-(* to do *)
+
   let affect_deriv_rate
-      dep_var logger logger_buffer ?time_var compil rule rate network dep
+      dep_var logger logger_buffer compil rule rate network dep
     =
+    let time_var = build_time_var network in
     let handler_expr = handler_expr network in
-    let dep_set =
-      Alg_expr_extra.dep
-        MTSET.empty
-        MTSET.add
-        MTSET.union
-        (fun id ->
-           match
-             Mods.IntMap.find_option (succ id) dep_var
-           with
-           | Some set -> set
-           | None -> MTSET.empty)
-        rate
-    in
+    let dep_set = get_dep ?time_var dep_var rate in
     let dep = VMAP.add (var_of_rule rule) dep_set dep in
     let () =
       MTSET.iter
@@ -1406,7 +1406,8 @@ struct
 
   let declare_rates_global logger network =
     let do_it f =
-      Ode_loggers.declare_global logger (f network.n_rules)
+      Ode_loggers.declare_global logger
+        (Ode_loggers_sig.variable_of_derived_variable (f network.n_rules) 1)
     in
     let () = do_it (fun x -> Ode_loggers_sig.Rate x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
@@ -1838,6 +1839,7 @@ struct
     ()
 
   let export_jac logger compil network split =
+    let time_var = build_time_var network in
     match Loggers.get_encoding_format logger with
     | Loggers.Matrix | Loggers.Maple | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS
@@ -1861,6 +1863,9 @@ struct
         declare_rates_global logger network
       in
       let () =
+        declare_jacobian_rates_global logger network
+      in
+      let () =
         List.iter
           (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl in
       let () = Ode_loggers.print_newline logger in
@@ -1872,9 +1877,6 @@ struct
                logger logger
                (var_of_rule rule) rate (handler_expr network))
           split.var_rate
-      in
-      let () =
-        declare_jacobian_rates_global logger network
       in
       let dep_var =
         List.fold_left
@@ -1928,7 +1930,7 @@ struct
                | Some set -> set
                | None -> MTSET.empty
              in
-             let dep_set =
+             let dep_set_rate =
                MTSET.fold
                  (fun x set ->
                     match x with Alg_expr.Tok id | Alg_expr.Mix id ->
@@ -1936,24 +1938,6 @@ struct
                  dep_set
                  Mods.IntSet.empty
              in
-             let add_factor l  =
-               if I.do_we_count_in_embeddings compil
-               then
-                 List.rev_map
-                   (fun x ->
-                      let nauto = snd
-                          (species_of_species_id network x)
-                      in
-                      (x,
-                       nauto))
-                   (List.rev l)
-               else
-                 List.rev_map
-                   (fun x -> (x,1))
-                   (List.rev l)
-             in
-             let reactants' = add_factor reactants in
-             let products' = add_factor products in
              let () =
                if I.do_we_prompt_reactions compil
                then
@@ -2063,7 +2047,7 @@ struct
                do_it
                  Ode_loggers.consume_jac
                  reactants
-                 dep_set
+                 dep_set_rate
                  reactants'
                  enriched_rule
              in
@@ -2071,20 +2055,31 @@ struct
                do_it
                  Ode_loggers.produce_jac
                  products
-                 dep_set
+                 dep_set_rate
                  reactants'
                  enriched_rule
              in
              let () =
                List.iter
                  (fun (expr,(token,_loc)) ->
+                    let dep_set_token_expr = get_dep ?time_var dep_var expr in
+                    let dep_map_token_expr =
+                      MTSET.fold
+                        (fun x map ->
+                           match x with Alg_expr.Tok id | Alg_expr.Mix id ->
+                             Mods.IntMap.add id x map)
+                        dep_set_token_expr
+                        Mods.IntMap.empty
+                    in
                     Ode_loggers.update_token_jac
+                      ?time_var
                       (I.string_of_var_id ~compil)
                       logger
-                      (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
+                      (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
                       (var_of_rule enriched_rule)
                       expr reactants' (handler_expr network)
-                      dep_set)
+                      dep_set_rate
+                      dep_map_token_expr)
                  token_vector
              in ()
           ) network.reactions

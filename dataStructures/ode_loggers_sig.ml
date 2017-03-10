@@ -180,25 +180,25 @@ let variable_of_derived_variable var id =
   | Rateund int -> Jacobian_rateund (int,id)
   | Expr int -> Jacobian_var (int, id)
   | Concentration int -> Jacobian (int, id)
-  | Obs _
-  | Init _
-  | Initbis _
-  | Deriv _
-  | Jacobian_rate _
-  | Jacobian_rated _
-  | Jacobian_rateun _
-  | Jacobian_rateund _
-  | Jacobian _
-  | Jacobian_var _
-  | Tinit
-  | Tend
-  | InitialStep
-  | Period_t_points
-  | N_ode_var
-  | N_var
-  | N_obs
-  | N_rules
-  | N_rows
-  | Tmp
-  | Current_time
+  | Obs _ -> assert false
+  | Init _ -> assert false
+  | Initbis _ -> assert false
+  | Deriv _ -> assert false
+  | Jacobian_rate _ -> assert false
+  | Jacobian_rated _ -> assert false
+  | Jacobian_rateun _ -> assert false
+  | Jacobian_rateund _ -> assert false
+  | Jacobian _ -> assert false
+  | Jacobian_var _ -> assert false
+  | Tinit -> assert false
+  | Tend -> assert false
+  | InitialStep -> assert false
+  | Period_t_points -> assert false
+  | N_ode_var -> assert false
+  | N_var -> assert false
+  | N_obs -> assert false
+  | N_rules -> assert false
+  | N_rows -> assert false
+  | Tmp -> assert false
+  | Current_time -> assert false
   | Time_scale_factor -> assert false
