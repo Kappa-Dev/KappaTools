@@ -1334,7 +1334,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
-let print_options logger =
+let print_options ~compute_jacobian logger =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -1343,12 +1343,21 @@ let print_options logger =
   | Loggers.Octave ->
     let () =
       print_list logger
-        ["options = odeset('RelTol', 1e-3, ...";
-         "                 'AbsTol', 1e-3, ...";
-         "                 'InitialStep', initialstep, ...";
-         (*     "                 'MaxStep', tend, ...";
-                "                 'Jacobian', @ode_jacobian);"] *)
-         "                 'MaxStep', tend);"]
+        (if compute_jacobian then
+           [
+             "options = odeset('RelTol', 1e-3, ...";
+             "                 'AbsTol', 1e-3, ...";
+             "                 'InitialStep', initialstep, ...";
+             "                 'MaxStep', tend, ...";
+             "                 'Jacobian', @ode_jacobian);"
+           ]
+         else
+           [
+             "options = odeset('RelTol', 1e-3, ...";
+             "                 'AbsTol', 1e-3, ...";
+             "                 'InitialStep', initialstep, ...";
+             "                 'MaxStep', tend);"
+           ])
     in
     let () = Loggers.print_newline logger in
     ()

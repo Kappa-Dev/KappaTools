@@ -1451,6 +1451,7 @@ struct
      get their value from field [conf] of [compil] before falling
      back to their default *)
   let export_main
+      ~compute_jacobian
       ~command_line ~command_line_quotes ?(data_file="data.csv")
       ?(init_t=0.)
       ~max_t ?(plot_period=1.) logger logger_buffer compil network
@@ -1587,7 +1588,7 @@ struct
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_license_check logger in
     let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_options logger in
+    let () = Ode_loggers.print_options ~compute_jacobian logger in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_integrate logger in
     let () = Ode_loggers.print_newline logger in
@@ -1850,7 +1851,7 @@ struct
       let is_zero = fresh_is_zero network in
       let label = "listOfReactions" in
       let () =
-        Ode_loggers.open_procedure logger "jacobian" "ode_jac_aux" ["t";"jac";]
+        Ode_loggers.open_procedure logger "jacobian" "ode_jacobian" ["t";"jac";]
       in
       let () = Ode_loggers.print_newline logger in
       let () =
@@ -2239,7 +2240,7 @@ struct
     let () = Format.printf "\t -main function @." in
     let () =
       export_main
-        ~command_line ~command_line_quotes ?data_file ?init_t
+        ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in

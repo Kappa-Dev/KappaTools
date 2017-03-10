@@ -32,7 +32,7 @@ val print_ode_preamble:
   unit
 
 val declare_global: Loggers.t -> Ode_loggers_sig.variable -> unit
-val print_options: Loggers.t -> unit
+val print_options: compute_jacobian:bool -> Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: Loggers.t -> unit
 val print_interpolate: Loggers.t -> unit
