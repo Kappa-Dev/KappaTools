@@ -1898,52 +1898,44 @@ struct
           split.var_rate
       in
       let () = Ode_loggers.print_newline logger in
-      let do_it f l dep_rates reactants enriched_rule =
-        let dep_set =
-          match
-            VMAP.find_option
-              (var_of_rule enriched_rule) dep_rates
-          with
-          | Some set -> set
-          | None -> MTSET.empty
-        in
-        let dep_set =
-          List.fold_left
-            (fun set species -> MTSET.add (Alg_expr.Mix (Ode_loggers_sig.int_of_ode_var_id (fst species))) set)
-            dep_set
-            reactants
-        in
+      let do_it f l dep_set reactants enriched_rule =
         List.iter
           (fun species ->
-             MTSET.iter
-               (fun dt ->
-                  let dt =
-                    match
-                      dt
-                    with
-                    | Alg_expr.Mix i -> i
-                    | Alg_expr.Tok i -> i
-                  in
-                  let nauto_in_species =
-                    if I.do_we_count_in_embeddings compil
-                    then
-                      snd
-                        (species_of_species_id network species)
-                    else 1
-                  in
-                  let nauto_in_lhs = enriched_rule.divide_rate_by in
-                  f
-                    logger (Ode_loggers_sig.Jacobian (species,dt))
-                    ~nauto_in_species ~nauto_in_lhs
-                    (var_of_rule enriched_rule)
-                    reactants
-                    dt)
+             let nauto_in_species =
+               if I.do_we_count_in_embeddings compil
+               then
+                 snd
+                   (species_of_species_id network species)
+               else 1
+             in
+             let nauto_in_lhs = enriched_rule.divide_rate_by in
+             f
+               logger (Ode_loggers_sig.Concentration species)
+               ~nauto_in_species ~nauto_in_lhs
+               (var_of_rule enriched_rule)
+               reactants
                dep_set)
           l
       in
       let () =
         List.iter
           (fun (reactants, products, token_vector, enriched_rule) ->
+             let dep_set =
+               match
+                 VMAP.find_option
+                   (var_of_rule enriched_rule) dep_rates
+               with
+               | Some set -> set
+               | None -> MTSET.empty
+             in
+             let dep_set =
+               MTSET.fold
+                 (fun x set ->
+                    match x with Alg_expr.Tok id | Alg_expr.Mix id ->
+                      Mods.IntSet.add id set)
+                 dep_set
+                 Mods.IntSet.empty
+             in
              let add_factor l  =
                if I.do_we_count_in_embeddings compil
                then
@@ -2071,12 +2063,16 @@ struct
                do_it
                  Ode_loggers.consume_jac
                  reactants
-                 dep_rates
+                 dep_set
                  reactants'
                  enriched_rule
              in
              let () =
-               do_it Ode_loggers.produce_jac products dep_rates reactants'
+               do_it
+                 Ode_loggers.produce_jac
+                 products
+                 dep_set
+                 reactants'
                  enriched_rule
              in
              let () =
@@ -2087,7 +2083,8 @@ struct
                       logger
                       (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
                       (var_of_rule enriched_rule)
-                      expr reactants' (handler_expr network))
+                      expr reactants' (handler_expr network)
+                      dep_set)
                  token_vector
              in ()
           ) network.reactions

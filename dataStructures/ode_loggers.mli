@@ -58,16 +58,16 @@ val launch_main: Loggers.t -> unit
 
 val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
 val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
-val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id * correct) list -> int -> unit
-val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id * correct) list -> int -> unit
+val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
+val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
 val update_token_jac:
   (int -> string) -> Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id * correct) list ->
-  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
+  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> Mods.IntSet.t -> unit
 val update_token:
     (int -> string) -> Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
     (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.variable * correct) list ->
-    (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
+    (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->  unit
 
 val print_newline:
   Loggers.t -> unit

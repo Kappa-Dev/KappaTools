@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'expr.ka' '--compute-jacobian''true'
+%      'KaDE' 'expr.ka' '--with-symmetries' 'true' '--compute-jacobian''true'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -101,7 +101,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE expr.ka --compute-jacobian true\n')
+fprintf(fid,'# KaDE expr.ka --with-symmetries true --compute-jacobian true\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')
@@ -238,55 +238,86 @@ jack(4,2)=jac_var(2,2);
 jack(4,3)=jac_var(2,3);
 jack(4,4)=jac_var(2,4);
 
-dydt=zeros(nodevar,1);
 
 % rule    : A(y~u) -> A(y~p)
 % reaction: A(x~p?, y~u?) -> A(x~p?, y~p?) 
 
-dydt(2)=dydt(2)-k(3)*y(2);
-dydt(4)=dydt(4)+k(3)*y(2);
+jac(2,2)=jac(2,2)-k(3);
+jac(4,2)=jac(4,2)+k(3);
 
 % rule    : A(x~p) -> A(x~u)
 % reaction: A(x~p?, y~u?) -> A(x~u?, y~u?) 
 
-dydt(2)=dydt(2)-k(2)*y(2);
-dydt(1)=dydt(1)+k(2)*y(2);
+jac(2,1)=jac(2,1)-jack(2,1)*y(2);
+jac(2,2)=jac(2,2)-jack(2,2)*y(2);
+jac(2,3)=jac(2,3)-jack(2,3)*y(2);
+jac(2,4)=jac(2,4)-jack(2,4)*y(2);
+jac(2,2)=jac(2,2)-k(2);
+jac(1,1)=jac(1,1)+jack(2,1)*y(2);
+jac(1,2)=jac(1,2)+jack(2,2)*y(2);
+jac(1,3)=jac(1,3)+jack(2,3)*y(2);
+jac(1,4)=jac(1,4)+jack(2,4)*y(2);
+jac(1,2)=jac(1,2)+k(2);
 
 % rule    : A(y~p) -> A(y~u)
 % reaction: A(x~p?, y~p?) -> A(x~p?, y~u?) 
 
-dydt(4)=dydt(4)-k(4)*y(4);
-dydt(2)=dydt(2)+k(4)*y(4);
+jac(4,1)=jac(4,1)-jack(4,1)*y(4);
+jac(4,2)=jac(4,2)-jack(4,2)*y(4);
+jac(4,3)=jac(4,3)-jack(4,3)*y(4);
+jac(4,4)=jac(4,4)-jack(4,4)*y(4);
+jac(4,4)=jac(4,4)-k(4);
+jac(2,1)=jac(2,1)+jack(4,1)*y(4);
+jac(2,2)=jac(2,2)+jack(4,2)*y(4);
+jac(2,3)=jac(2,3)+jack(4,3)*y(4);
+jac(2,4)=jac(2,4)+jack(4,4)*y(4);
+jac(2,4)=jac(2,4)+k(4);
 
 % rule    : A(x~p) -> A(x~u)
 % reaction: A(x~p?, y~p?) -> A(x~u?, y~p?) 
 
-dydt(4)=dydt(4)-k(2)*y(4);
-dydt(3)=dydt(3)+k(2)*y(4);
+jac(4,1)=jac(4,1)-jack(2,1)*y(4);
+jac(4,2)=jac(4,2)-jack(2,2)*y(4);
+jac(4,3)=jac(4,3)-jack(2,3)*y(4);
+jac(4,4)=jac(4,4)-jack(2,4)*y(4);
+jac(4,4)=jac(4,4)-k(2);
+jac(3,1)=jac(3,1)+jack(2,1)*y(4);
+jac(3,2)=jac(3,2)+jack(2,2)*y(4);
+jac(3,3)=jac(3,3)+jack(2,3)*y(4);
+jac(3,4)=jac(3,4)+jack(2,4)*y(4);
+jac(3,4)=jac(3,4)+k(2);
 
 % rule    : A(y~p) -> A(y~u)
 % reaction: A(x~u?, y~p?) -> A(x~u?, y~u?) 
 
-dydt(3)=dydt(3)-k(4)*y(3);
-dydt(1)=dydt(1)+k(4)*y(3);
+jac(3,1)=jac(3,1)-jack(4,1)*y(3);
+jac(3,2)=jac(3,2)-jack(4,2)*y(3);
+jac(3,3)=jac(3,3)-jack(4,3)*y(3);
+jac(3,4)=jac(3,4)-jack(4,4)*y(3);
+jac(3,3)=jac(3,3)-k(4);
+jac(1,1)=jac(1,1)+jack(4,1)*y(3);
+jac(1,2)=jac(1,2)+jack(4,2)*y(3);
+jac(1,3)=jac(1,3)+jack(4,3)*y(3);
+jac(1,4)=jac(1,4)+jack(4,4)*y(3);
+jac(1,3)=jac(1,3)+k(4);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u?, y~p?) -> A(x~p?, y~p?) 
 
-dydt(3)=dydt(3)-k(1)*y(3);
-dydt(4)=dydt(4)+k(1)*y(3);
+jac(3,3)=jac(3,3)-k(1);
+jac(4,3)=jac(4,3)+k(1);
 
 % rule    : A(y~u) -> A(y~p)
 % reaction: A(x~u?, y~u?) -> A(x~u?, y~p?) 
 
-dydt(1)=dydt(1)-k(3)*y(1);
-dydt(3)=dydt(3)+k(3)*y(1);
+jac(1,1)=jac(1,1)-k(3);
+jac(3,1)=jac(3,1)+k(3);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u?, y~u?) -> A(x~p?, y~u?) 
 
-dydt(1)=dydt(1)-k(1)*y(1);
-dydt(2)=dydt(2)+k(1)*y(1);
+jac(1,1)=jac(1,1)-k(1);
+jac(2,1)=jac(2,1)+k(1);
 dydt(5)=1;
 
 end
