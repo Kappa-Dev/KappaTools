@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 09 2017>
+  * Last modification: Time-stamp: <Mar 10 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -409,7 +409,8 @@ let divide_rule_rate_by cache compil rule =
       Model.get_ast_rule compil.environment rule_id
     in
     let rule_cache, output =
-      LKappa_auto.nauto compil.rate_convention cache.rule_cache lkappa_rule
+      LKappa_auto.nauto compil.rate_convention cache.rule_cache
+        lkappa_rule
     in
     {cache with rule_cache = rule_cache}, output
 

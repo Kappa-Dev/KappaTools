@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 09 2017>
+   * Last modification: Time-stamp: <Mar 10 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -199,7 +199,6 @@ let translate_to_lkappa_representation env partitioned_contact_map =
       partitioned_contact_map
   in
   array
-
 
 let partition_pair cache p l =
   let rec part cache yes no = function
@@ -466,8 +465,9 @@ let detect_symmetries parameters env cache
                 in
                 let s_max = max s s_max in
                 let list =
-                  match l with [] -> (s_string,s)::list
-                                | _::_ -> list
+                  match l with
+                    [] -> (s_string,s)::list
+                  | _::_ -> list
                 in
                 list,s_max)
              m
@@ -568,34 +568,21 @@ let representant ?parameters signature cache preenv_cache symmetries
     let cache  = CcMap.add species species' cache in
     cache, preenv_cache, species'
 
-let refine_partition_contact_map_init cache env symmetries
-    initial_states =
-  let cache, init_pattern_to_raw_mixture =
-    List.fold_left (fun (cache, current_list) cc ->
-        let raw_mixture =
-          Raw_mixture_extra.pattern_to_raw_mixture
-            (Model.signatures env)
-            cc
-        in
-        cache, raw_mixture :: current_list
-      ) (cache, []) initial_states
-  in
-  (*-------------------------------------------------------------*)
-  (*refined partition + initial states*)
-  let cache, raw_mixture_list =
-    List.fold_left (fun (cache, current_list) pair_op ->
-        match pair_op with
-        | None -> cache, current_list
-        | Some (raw_mixture, _) ->
-          let r =
-            Raw_mixture_group_action.normalize_internal_states_in_raw_mixture
-              symmetries
-              raw_mixture
-          in
-          cache, r :: current_list
-      ) (cache, []) init_pattern_to_raw_mixture
-  in
-  cache, raw_mixture_list
+let refine_partition_contact_map_init ?parameters cache preenv_cache
+    signature symmetries species =
+  match CcMap.find_option species cache with
+  | Some species -> cache, preenv_cache, species
+  | None ->
+    let preenv_cache, species' =
+      Pattern_group_action.normalize_internal_states_in_raw_mixture_init
+        ?parameters
+        signature
+        preenv_cache
+        symmetries
+        species
+    in
+    let cache  = CcMap.add species species' cache in
+    cache, preenv_cache, species'
 
 let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in

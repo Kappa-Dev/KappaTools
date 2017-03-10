@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 09 2017>
+  * Last modification: Time-stamp: <Mar 10 2017>
 *)
 
 let local_trace = false
@@ -445,7 +445,8 @@ struct
       )
       acc prefix_list
 
-  let nembed_of_connected_component compil network connected_component =
+  let nembed_of_connected_component compil network
+      connected_component =
     VarMap.fold
       (fun vars id alg ->
          match vars with
@@ -579,7 +580,8 @@ struct
          ([], network)
          initial_states) rules
 
-  let compute_reactions parameters compil network rules initial_states =
+  let compute_reactions parameters compil network rules
+      initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
@@ -613,14 +615,12 @@ struct
        embedding between this cc and a pattern in set\to_be_visited
     *)
     let rec aux to_be_visited network store =
-      match
-        to_be_visited
-      with
-      | []   -> network
-
+      match to_be_visited with
+      | [] -> network
       | new_species::to_be_visited ->
         let () = debug "@[<v 2>@[test for the new species:@ %a@]"
-            (I.print_chemical_species ~compil) new_species in
+            (I.print_chemical_species ~compil) new_species
+        in
         (* add in store the embeddings from cc of lhs to
            new_species,
            for unary application of binary rule, the dictionary of
@@ -636,8 +636,9 @@ struct
                   "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
                   (rule_id_of enriched_rule)
                   enriched_rule.divide_rate_by
-                  (I.print_rule ~compil) enriched_rule.rule in
-              match arity_of enriched_rule  with
+                  (I.print_rule ~compil) enriched_rule.rule
+              in
+              match arity_of enriched_rule with
               | Rule_modes.Usual ->
                 begin
                   let () = debug "regular case" in
@@ -645,16 +646,17 @@ struct
                     List.fold_left
                       (fun store (cc_id,cc) ->
                          let () = debug "find embeddings" in
-                         let lembed = I.find_embeddings compil cc new_species in
+                         let lembed =
+                           I.find_embeddings compil cc new_species
+                         in
                          add_embedding_list
                            (enriched_rule.rule_id_with_mode,cc_id,cc)
-                           (List.rev_map (fun a -> a,new_species) (List.rev lembed))
+                           (List.rev_map (fun a -> a,new_species)
+                              (List.rev lembed))
                            store
-                      )
-                      StoreMap.empty
-                      enriched_rule.lhs_cc
+                      ) StoreMap.empty enriched_rule.lhs_cc
                   in
-                  let (),store_all_embeddings =
+                  let (), store_all_embeddings =
                     StoreMap.map2_with_logs
                       (fun _ a _ _ _ -> a)
                       ()
@@ -662,29 +664,38 @@ struct
                       (fun _ _ b -> (),b)
                       (fun _ _ b -> (),b)
                       (fun _ _ b c ->
-                         (),List.fold_left
-                           (fun list elt -> elt::list)
+                         (),
+                         List.fold_left (fun list elt -> elt::list)
                            b c)
                       store_old_embeddings
                       store_new_embeddings
                   in
-                  (* compute the embedding betwen lhs and tuple of species that contain at least one occurence of new_species *)
+                  (* compute the embedding betwen lhs and tuple of
+                     species that contain at least one occurence of
+                     new_species *)
                   let dump_store store =
                     if local_trace || !Parameter.debugModeOn
                     then
                       StoreMap.iter
                         (fun ((a,ar,dir),id,b) c ->
-                           let () = debug "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
-                               (match ar with Rule_modes.Usual -> "@"
-                                            | Rule_modes.Unary -> "(1)")
-                               (match dir with Rule_modes.Direct -> "->"
-                                             | Rule_modes.Op -> "<-")
+                           let () =
+                             debug
+                               "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
+                               (match ar with
+                                  Rule_modes.Usual -> "@"
+                                | Rule_modes.Unary -> "(1)")
+                               (match dir with
+                                  Rule_modes.Direct -> "->"
+                                | Rule_modes.Op -> "<-")
                                id
-                               (I.print_connected_component ~compil) b
+                               (I.print_connected_component ~compil)
+                               b
                            in
                            let () =
-                             List.iter (fun (_,b) -> debug "%a"
-                                           (I.print_chemical_species ~compil) b) c
+                             List.iter (fun (_, b) ->
+                                 debug "%a"
+                                   (I.print_chemical_species
+                                      ~compil) b) c
                            in
                            let () = debug "@]" in
                            ()
@@ -692,64 +703,77 @@ struct
                         store
                   in
                   let () = debug "new embeddings" in
-                  let () = dump_store   store_new_embeddings in
+                  let () = dump_store store_new_embeddings in
                   (*  let () = debug "old embeddings" in
                       let () = dump_store   store_old_embeddings in
 
                       let () = debug "all embeddings" in
                       let () = dump_store   store_all_embeddings in*)
-
                   let _,new_embedding_list =
                     List.fold_left
-                      (fun (partial_emb_list,partial_emb_list_with_new_species) (cc_id,cc) ->
-                         (* First case, we complete with an embedding towards the new_species *)
+                      (fun (partial_emb_list,
+                            partial_emb_list_with_new_species)
+                        (cc_id,cc) ->
+                        (* First case, we complete with an
+                           embedding towards the new_species *)
                          let label =
                            enriched_rule.rule_id_with_mode,cc_id,cc
                          in
                          let partial_emb_list_with_new_species =
-                           add_to_prefix_list cc label   partial_emb_list
+                           add_to_prefix_list cc label
+                             partial_emb_list
                              store_new_embeddings
-                             (add_to_prefix_list cc label partial_emb_list_with_new_species
+                             (add_to_prefix_list cc label
+                                partial_emb_list_with_new_species
                                 store_all_embeddings [])
                          in
                          let partial_emb_list =
                            add_to_prefix_list cc
-                             label partial_emb_list store_old_embeddings []
+                             label partial_emb_list
+                             store_old_embeddings []
                          in
-
-                         partial_emb_list, partial_emb_list_with_new_species
+                         partial_emb_list,
+                         partial_emb_list_with_new_species
                       )
-                      ([[]],[])
-                      enriched_rule.lhs_cc
+                      ([[]], []) enriched_rule.lhs_cc
                   in
-                  (* compute the corresponding rhs, and put the new species in the working list, and store the corrsponding reactions *)
+                  (* compute the corresponding rhs, and put the new
+                     species in the working list, and store the
+                     corrsponding reactions *)
                   let to_be_visited, network =
                     List.fold_left
                       (fun remanent list ->
                          let () = debug "compute one refinement" in
                          let () = debug "disjoint union @[<v>%a@]"
-                             (Pp.list Pp.space (fun f (_,_,s) ->
-                                  I.print_chemical_species ~compil f s))
+                             (Pp.list Pp.space
+                                (fun f (_,_,s) ->
+                                   I.print_chemical_species ~compil
+                                     f s))
                              list
                          in
-                         let _,embed,mixture = I.disjoint_union compil list in
-                         let () = debug "add new reaction" in
+                         let _, embed,mixture =
+                           I.disjoint_union compil list in
+                         let () =
+                           debug "add new reaction"
+                         in
                          add_reaction
-                           parameters compil enriched_rule embed mixture remanent)
+                           parameters compil enriched_rule embed
+                           mixture remanent)
                       (to_be_visited,network)
                       new_embedding_list
                   in
                   let () = debug "@]" in
                   store_all_embeddings,to_be_visited,network
                 end
-
               | Rule_modes.Unary ->
                 begin
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
                   let to_be_visited, network =
                     let lembed =
-                      I.find_embeddings_unary_binary compil enriched_rule.lhs new_species in
+                      I.find_embeddings_unary_binary compil
+                        enriched_rule.lhs new_species
+                    in
                     fold_left_swap
                       (fun embed ->
                          add_reaction
@@ -790,7 +814,7 @@ struct
     match I.token_vector_of_init c with
     | [] ->
       let m = I.mixture_of_init compil c in
-      let cache',cc =
+      let cache', cc =
         I.connected_components_of_mixture compil network.cache m
       in
       let network = {network with cache = cache'} in
@@ -803,8 +827,9 @@ struct
         (network,[]) (List.rev cc)
     | l ->
       List.fold_right (fun (_,token) (network,acc) ->
-          let (_,n'),v =
-            translate_token token ([],network) in
+          let (_,n'), v =
+            translate_token token ([],network)
+          in
           n', v :: acc) l (network,[])
 
   let translate_token token network =
@@ -867,8 +892,10 @@ struct
         (Dummy_decl,None,Alg_expr.const Nbr.zero)
     in
     let add_succ i j =
-      let () = Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
-      let () = Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
+      let () =
+        Mods.DynArray.set npred j (1+(Mods.DynArray.get npred j)) in
+      let () =
+        Mods.DynArray.set lsucc i (j::(Mods.DynArray.get lsucc i)) in
       ()
     in
     let rec aux_alg id expr =
@@ -1088,16 +1115,20 @@ struct
           var_rate = List.rev sort.var_rate}
 
   let split_rules_and_decl compil network =
-    split_rules compil network (split_var_declaration network init_sort_rules_and_decl)
+    split_rules compil network
+      (split_var_declaration network init_sort_rules_and_decl)
 
   let time_homogeneity_of_rates compil network =
     let rules = network.rules in
     List.for_all
       (fun rule ->
-        let rate_opt = I.rate compil rule.rule rule.rule_id_with_mode in
-        match rate_opt with
-        | None -> true
-        | Some rate -> Ode_loggers_sig.is_expr_time_homogeneous rate)
+         let rate_opt =
+           I.rate compil rule.rule rule.rule_id_with_mode
+         in
+         match rate_opt with
+         | None -> true
+         | Some rate ->
+           Ode_loggers_sig.is_expr_time_homogeneous rate)
       rules
 
   let time_homogeneity_of_vars network =
@@ -1106,7 +1137,8 @@ struct
       (fun decl ->
          match decl with
          | Dummy_decl | Init_expr _ -> true
-         | Var (_,_,expr) -> Ode_loggers_sig.is_expr_time_homogeneous expr)
+         | Var (_,_,expr) ->
+           Ode_loggers_sig.is_expr_time_homogeneous expr)
       vars_decl
 
   let time_homogeneity_of_obs network =
@@ -1118,13 +1150,15 @@ struct
   let check_time_homogeneity ~ignore_obs compil network =
     {network
      with
-      time_homogeneous_vars = Some (time_homogeneity_of_vars network) ;
+      time_homogeneous_vars =
+        Some (time_homogeneity_of_vars network) ;
       time_homogeneous_obs =
         Some (
           if ignore_obs then true
           else
             time_homogeneity_of_obs network) ;
-      time_homogeneous_rates = Some (time_homogeneity_of_rates compil network) }
+      time_homogeneous_rates =
+        Some (time_homogeneity_of_rates compil network) }
 
   let string_of_bool b =
     if b then "true" else "false"
@@ -1141,8 +1175,13 @@ struct
     let network,initial_state =
       species_of_initial_state compil network (I.get_init compil)
     in
-    let () = Format.printf "\t -saturating the set of molecular species @." in
-    let network = compute_reactions parameters compil network rules initial_state in
+    let () =
+      Format.printf "\t -saturating the set of molecular species @."
+    in
+    let network =
+      compute_reactions parameters compil network rules
+        initial_state
+    in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
@@ -1150,7 +1189,9 @@ struct
     let () = Format.printf "\t -observables @." in
     let network = convert_obs compil network  in
     let () = Format.printf "\t -check time homogeneity @." in
-    let network = check_time_homogeneity ~ignore_obs compil network in
+    let network =
+      check_time_homogeneity ~ignore_obs compil network
+    in
     network
 
   let handler_init =
