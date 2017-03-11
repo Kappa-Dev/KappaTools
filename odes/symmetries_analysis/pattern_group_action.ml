@@ -17,14 +17,14 @@
     a, b
   | None -> cache, cc*)
 
-let normalize_internal_states
+let normalize
     ?parameters signature cache symmetries cc =
   match
     Raw_mixture_extra.pattern_to_raw_mixture ?parameters signature cc
   with
   | Some (raw_mixture, unspec) ->
     let raw_mixture =
-      Raw_mixture_group_action.normalize_internal_states
+      Raw_mixture_group_action.normalize
          symmetries raw_mixture
     in
     let a, b, _ =

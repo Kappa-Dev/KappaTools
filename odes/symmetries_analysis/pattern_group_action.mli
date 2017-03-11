@@ -1,4 +1,4 @@
-val normalize_internal_states:
+val normalize:
   ?parameters:Remanent_parameters_sig.parameters ->
   Signature.s ->
   Pattern.PreEnv.t ->

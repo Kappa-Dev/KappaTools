@@ -558,7 +558,7 @@ let representant ?parameters signature cache preenv_cache symmetries
   | Some species -> cache, preenv_cache, species
   | None ->
     let preenv_cache, species' =
-      Pattern_group_action.normalize_internal_states
+      Pattern_group_action.normalize
         ?parameters
         signature
         preenv_cache
