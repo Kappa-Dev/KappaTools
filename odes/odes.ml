@@ -2317,8 +2317,11 @@ struct
       species_of_initial_state compil network (I.get_init compil)
     in
     let () =
-      List.iter (fun species ->
-          let fmt = Loggers.formatter_of_logger log in
+      if Remanent_parameters.get_trace parameters then
+        let fmt = Loggers.formatter_of_logger log in
+        let () = Loggers.fprintf log "Initial species:" in
+        let () = Loggers.print_newline log in 
+        List.iter (fun species ->
           match fmt with
           | None -> ()
           | Some fmt ->
