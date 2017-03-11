@@ -1,4 +1,4 @@
-val normalize_internal_states_in_raw_mixture:
+val normalize_internal_states:
   ?parameters:Remanent_parameters_sig.parameters ->
   Signature.s ->
   Pattern.PreEnv.t ->
@@ -6,10 +6,12 @@ val normalize_internal_states_in_raw_mixture:
   Pattern.cc ->
   Pattern.PreEnv.t * Pattern.cc
 
-val normalize_internal_states_in_raw_mixture_init:
+(* Please pick an appropriate name and correct the type *)
+(*val normalize_internal_states_in_raw_mixture_init:
   ?parameters:Remanent_parameters_sig.parameters ->
   Signature.s ->
   Pattern.PreEnv.t ->
   ((int list list) * (int list list)) array ->
   Pattern.cc ->
   Pattern.PreEnv.t * Pattern.cc
+*)

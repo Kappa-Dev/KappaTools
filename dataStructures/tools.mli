@@ -35,3 +35,5 @@ val not_an_id : string -> bool
 val read_input : unit -> string
 val min_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
 val max_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
+
+val fold_over_permutations: (int list -> 'a -> 'a) -> int list -> 'a -> 'a

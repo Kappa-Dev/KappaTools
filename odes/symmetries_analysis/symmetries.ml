@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 10 2017>
+   * Last modification: Time-stamp: <Mar 11 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -558,7 +558,7 @@ let representant ?parameters signature cache preenv_cache symmetries
   | Some species -> cache, preenv_cache, species
   | None ->
     let preenv_cache, species' =
-      Pattern_group_action.normalize_internal_states_in_raw_mixture
+      Pattern_group_action.normalize_internal_states
         ?parameters
         signature
         preenv_cache
@@ -568,7 +568,7 @@ let representant ?parameters signature cache preenv_cache symmetries
     let cache  = CcMap.add species species' cache in
     cache, preenv_cache, species'
 
-let refine_partition_contact_map_init ?parameters cache preenv_cache
+(*let refine_partition_contact_map_init ?parameters cache preenv_cache
     signature symmetries species =
   match CcMap.find_option species cache with
   | Some species -> cache, preenv_cache, species
@@ -582,7 +582,7 @@ let refine_partition_contact_map_init ?parameters cache preenv_cache
         species
     in
     let cache  = CcMap.add species species' cache in
-    cache, preenv_cache, species'
+    cache, preenv_cache, species'*)
 
 let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in

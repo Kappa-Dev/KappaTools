@@ -1,9 +1,8 @@
 let normalize_internal_states_in_agent equiv_class agent_ints =
-  let equiv_class_rev = List.rev equiv_class in
   let asso =
     List.rev_map
       (fun x -> x, agent_ints.(x))
-      equiv_class_rev
+      equiv_class
   in
   let asso =
     List.sort
@@ -13,7 +12,7 @@ let normalize_internal_states_in_agent equiv_class agent_ints =
   let asso' =
     List.rev_map2
       (fun k (_,value) -> (k,value))
-      equiv_class_rev
+      equiv_class
       asso
   in
   let () =
@@ -23,7 +22,7 @@ let normalize_internal_states_in_agent equiv_class agent_ints =
   in
   agent_ints
 
-let normalize_internal_states_in_raw_mixture
+let normalize_internal_states
     symmetries raw_mixture =
   let raw_mixture =
     List.rev_map
@@ -53,12 +52,15 @@ let normalize_internal_states_in_raw_mixture
   raw_mixture
 
 (**************************************************************)
-(*check the states of agent are the same in the initial states*)
+(*check for each agent, that each pair of sites in a same equivalence
+  class carry the same internal state *)
+(* The function shall output a Boolean *)
+(* The function shall have no side effect *)
 
-let normalize_equal_internal_states_in_agent equiv_class
-    agent_ints =
+
+let check_symmetries_of_internal_states_in_agent equiv_class agent_ints =
   (*reverse the equivalence classes*)
-  let equiv_class_rev = List.rev equiv_class in
+  (*  let equiv_class_rev = List.rev equiv_class in
   let asso =
     List.rev_map (fun x -> x, agent_ints.(x)) equiv_class_rev
   in
@@ -82,12 +84,12 @@ let normalize_equal_internal_states_in_agent equiv_class
     List.iter
       (fun (k,value) -> agent_ints.(k)<-(Some value))
       asso'
-  in
-  agent_ints
+  in *)
+  true (* to do *)
 
-let normalize_internal_states_in_raw_mixture_init symmetries
-    init_raw_mixture =
-  let raw_mixture =
+
+let check_symmetries_of_internal_states partition  init_raw_mixture =
+  (*  let raw_mixture =
     List.rev_map (fun agent ->
         let agent_type = agent.Raw_mixture.a_type in
         (*get the internal states in the symmetries*)
@@ -108,5 +110,5 @@ let normalize_internal_states_in_raw_mixture_init symmetries
           Raw_mixture.a_ints = ag_ints_equal
         }
       ) (List.rev init_raw_mixture)
-  in
-  raw_mixture
+  in*)
+  true (* to do *)

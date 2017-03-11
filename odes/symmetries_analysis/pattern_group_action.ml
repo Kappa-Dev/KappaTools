@@ -1,4 +1,6 @@
-let normalize_internal_states_in_raw_mixture_init
+(* Please correct the name and the body of this function *)
+
+(*let normalize_internal_states_in_raw_mixture_init
     ?parameters signature cache symmetries cc =
   match
     Raw_mixture_extra.pattern_to_raw_mixture ?parameters signature cc
@@ -13,16 +15,16 @@ let normalize_internal_states_in_raw_mixture_init
         ?parameters ~signature cache raw_mixture unspec
     in
     a, b
-  | None -> cache, cc
+  | None -> cache, cc*)
 
-let normalize_internal_states_in_raw_mixture
+let normalize_internal_states
     ?parameters signature cache symmetries cc =
   match
     Raw_mixture_extra.pattern_to_raw_mixture ?parameters signature cc
   with
   | Some (raw_mixture, unspec) ->
     let raw_mixture =
-      Raw_mixture_group_action.normalize_internal_states_in_raw_mixture
+      Raw_mixture_group_action.normalize_internal_states
          symmetries raw_mixture
     in
     let a, b, _ =

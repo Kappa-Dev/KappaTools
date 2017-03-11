@@ -1,6 +1,6 @@
-val normalize_internal_states_in_raw_mixture:
+val normalize_internal_states:
   ((int list list) * (int list list)) array -> Raw_mixture.t -> Raw_mixture.t
 
-val normalize_internal_states_in_raw_mixture_init :
+val check_symmetries_of_internal_states:
   ((int list list) * (int list list)) array -> Raw_mixture.t ->
-  Raw_mixture.t
+  bool
