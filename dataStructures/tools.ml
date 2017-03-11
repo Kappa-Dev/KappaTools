@@ -133,3 +133,22 @@ let min_pos_int_not_zero (keya,dataa) (keyb,datab) =
 
 let max_pos_int_not_zero (keya,dataa) (keyb,datab) =
   if compare keya keyb > 0 then keya,dataa else keyb,datab
+
+let fold_over_permutations
+    f l accu =
+  let rec aux to_do discarded permutation accu =
+    match to_do,discarded
+    with
+    | [],[]   -> f permutation accu
+    | [],_::_ -> accu
+    | h::t,_ ->
+      let to_do1 =
+        List.fold_left
+          (fun list a -> a::list)
+          t discarded
+      in
+      let accu = aux to_do1 [] (h::permutation) accu in
+      let accu = aux t (h::discarded) permutation accu in
+      accu
+  in
+  aux l [] [] accu
