@@ -28,6 +28,15 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
+global k
+global kd
+global kun
+global kdun
+
+k=zeros(nrules,1);
+kd=zeros(nrules,1);
+kun=zeros(nrules,1);
+kdun=zeros(nrules,1);
 
 t = 0.000000;
 
@@ -36,11 +45,6 @@ init(2)=10; % E(r, s)
 init(1)=100; % R(e, r)
 var(2)=init(1)+init(4)+init(3);
 var(1)=(2*init(7)+2*init(5)+2*init(6))/2;
-
-global k
-global kd
-global kun
-global kdun
 
 k(1)=1; % E(r,s), R(e) -> E(r!1,s), R(e!1)
 k(2)=1; % E(r,s), R(e) -> E(r,s!1), R(e!1)

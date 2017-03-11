@@ -192,13 +192,13 @@ let initialize logger variable =
         | Ode_loggers_sig.Rated _
         | Ode_loggers_sig.Rateun _
         | Ode_loggers_sig.Rateund _ ->
-          Loggers.fprintf logger "%s=zeros(nrules,1)"
+          Loggers.fprintf logger "%s=zeros(nrules,1);"
             (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Jacobian_rate (_,_)
         | Ode_loggers_sig.Jacobian_rateun (_,_)
         | Ode_loggers_sig.Jacobian_rated (_,_)
         | Ode_loggers_sig.Jacobian_rateund (_,_) ->
-          Loggers.fprintf logger "%s=zeros(nrules,nodevar)"
+          Loggers.fprintf logger "%s=zeros(nrules,nodevar);"
             (Ode_loggers_sig.string_of_array_name variable)
         | Ode_loggers_sig.Expr _ ->
           Loggers.fprintf logger "%s=zeros(nvar,1);"
@@ -419,12 +419,12 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
           (network_handler.Network_handler.int_of_obs x)
       | Alg_expr.DIFF_TOKEN((Alg_expr.ALG_VAR x,_),id) ->
         Loggers.fprintf
-          logger "jac_var(%i,%i)"
+          logger "jacvar(%i,%i)"
           (network_handler.Network_handler.int_of_obs x)
           (network_handler.Network_handler.int_of_token_id id)
       | Alg_expr.DIFF_KAPPA_INSTANCE((Alg_expr.ALG_VAR x,_),id) ->
         Loggers.fprintf
-          logger "jac_var(%i,%i)"
+          logger "jacvar(%i,%i)"
           (network_handler.Network_handler.int_of_obs x)
           (network_handler.Network_handler.int_of_kappa_instance id)
       | Alg_expr.DIFF_TOKEN _

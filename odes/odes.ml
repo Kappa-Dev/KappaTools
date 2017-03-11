@@ -1551,6 +1551,57 @@ struct
         (Ode_loggers_sig.Init network.fresh_ode_var_id) in
     let () = Ode_loggers.initialize logger_buffer
         (Ode_loggers_sig.Init network.fresh_ode_var_id) in
+    let () = declare_rates_global logger_buffer network in
+    let () =
+      Ode_loggers.initialize
+        logger_buffer
+        (Ode_loggers_sig.Rate network.n_rules)
+    in
+    let () =
+      Ode_loggers.initialize logger_buffer
+        (Ode_loggers_sig.Rated network.n_rules) in
+    let () = Ode_loggers.initialize logger_buffer
+        (Ode_loggers_sig.Rateun network.n_rules) in
+    let () = Ode_loggers.initialize logger_buffer
+        (Ode_loggers_sig.Rateund network.n_rules) in
+    let () =
+      if compute_jacobian
+      then
+        let () =
+          Ode_loggers.declare_global
+            logger_buffer
+            (Ode_loggers_sig.Jacobian_var
+               (network.fresh_ode_var_id,network.fresh_ode_var_id))
+        in
+        let () =
+          Ode_loggers.initialize
+            logger_buffer
+            (Ode_loggers_sig.Jacobian_var
+               (network.fresh_ode_var_id,network.fresh_ode_var_id))
+        in
+        let () = declare_jacobian_rates_global logger_buffer network in
+        let () =
+          Ode_loggers.initialize logger_buffer
+            (Ode_loggers_sig.Jacobian_rate
+               (network.n_rules,network.fresh_ode_var_id))
+        in
+        let () =
+          Ode_loggers.initialize logger_buffer
+            (Ode_loggers_sig.Jacobian_rated
+               (network.n_rules,network.fresh_ode_var_id))
+        in
+        let () =
+          Ode_loggers.initialize logger_buffer
+            (Ode_loggers_sig.Jacobian_rateun
+               (network.n_rules,network.fresh_ode_var_id))
+        in
+        let () =
+          Ode_loggers.initialize logger_buffer
+            (Ode_loggers_sig.Jacobian_rateund
+               (network.n_rules,network.fresh_ode_var_id))
+        in
+        ()
+    in
     let () = Ode_loggers.print_newline logger_buffer in
     let () = Ode_loggers.start_time logger_buffer init_t in
     let () = Ode_loggers.print_newline logger_buffer in
@@ -1579,7 +1630,6 @@ struct
         network.var_declaration
     in
     let () = Ode_loggers.print_newline logger_buffer in
-    let () = declare_rates_global logger_buffer network in
     let () =
       List.iter
         (fun (rule,rate) ->
@@ -1858,9 +1908,12 @@ struct
       let is_zero = fresh_is_zero network in
       let label = "listOfReactions" in
       let () =
-        Ode_loggers.open_procedure logger "jacobian" "ode_jacobian" ["t";"y";]
+        Ode_loggers.open_procedure logger "jac" "ode_jacobian" ["t";"y";]
       in
       let () = Ode_loggers.print_newline logger in
+      let () =
+        Ode_loggers.declare_global logger (Ode_loggers_sig.N_ode_var)
+      in
       let () =
         Ode_loggers.declare_global logger (Ode_loggers_sig.Jacobian_var (1,1))
       in
@@ -1926,6 +1979,12 @@ struct
                reactants
                dep_set)
           l
+      in
+      let () =
+        Ode_loggers.initialize
+          logger
+          (Ode_loggers_sig.Jacobian
+             (network.fresh_ode_var_id,network.fresh_ode_var_id))
       in
       let () =
         List.iter
@@ -2084,22 +2143,6 @@ struct
           ) network.reactions
       in
       (* Derivative of time is equal to 1 *)
-      let () =
-        if may_be_not_time_homogeneous network
-        then
-          let () =
-            Ode_loggers.associate
-              (I.string_of_var_id ~compil) logger logger
-              (Ode_loggers_sig.Deriv
-                 (get_last_ode_var_id network))
-              (Alg_expr.const Nbr.one) (handler_expr network)
-          in
-          let () = Ode_loggers.print_newline logger in
-          let () = Sbml_backend.time_advance logger in
-          ()
-        else
-          ()
-      in
       let () = Ode_loggers.close_procedure logger in
       let () = Sbml_backend.close_box logger label in
       let () = Ode_loggers.print_newline logger in
@@ -2320,7 +2363,7 @@ struct
       if Remanent_parameters.get_trace parameters then
         let fmt = Loggers.formatter_of_logger log in
         let () = Loggers.fprintf log "Initial species:" in
-        let () = Loggers.print_newline log in 
+        let () = Loggers.print_newline log in
         List.iter (fun species ->
           match fmt with
           | None -> ()

@@ -28,6 +28,15 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
+global k
+global kd
+global kun
+global kdun
+
+k=zeros(nrules,1);
+kd=zeros(nrules,1);
+kun=zeros(nrules,1);
+kdun=zeros(nrules,1);
 
 t = 0.000000;
 
@@ -45,11 +54,6 @@ var(4)=init(4)+init(5)+init(9);
 var(3)=1;
 var(2)=0.1;
 var(1)=0.001;
-
-global k
-global kd
-global kun
-global kdun
 
 
 uiIsOctave = false;
