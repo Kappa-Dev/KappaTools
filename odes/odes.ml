@@ -1858,7 +1858,7 @@ struct
       let is_zero = fresh_is_zero network in
       let label = "listOfReactions" in
       let () =
-        Ode_loggers.open_procedure logger "jacobian" "ode_jacobian" ["t";"jac";]
+        Ode_loggers.open_procedure logger "jacobian" "ode_jacobian" ["t";"y";]
       in
       let () = Ode_loggers.print_newline logger in
       let () =
