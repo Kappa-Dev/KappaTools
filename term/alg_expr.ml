@@ -72,6 +72,14 @@ and bool_to_yojson f_mix f_id = function
             Locality.annot_to_json (e_to_yojson f_mix f_id) b ]
 
 let rec e_of_yojson f_mix f_id = function
+  | `List [`String "DIFF_MIXTURE"; expr ; mixture] ->
+    DIFF_KAPPA_INSTANCE
+      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+       f_mix mixture)
+  | `List [`String "DIFF_TOKEN"; expr ; tok] ->
+    DIFF_TOKEN
+      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+       f_id tok)
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
@@ -87,14 +95,6 @@ let rec e_of_yojson f_mix f_id = function
     IF (Locality.annot_of_json (bool_of_yojson f_mix f_id) cond,
         Locality.annot_of_json (e_of_yojson f_mix f_id) yes,
         Locality.annot_of_json (e_of_yojson f_mix f_id) no)
-  | `List [`String "DIFF_MIXTURE"; expr ; mixture] ->
-    DIFF_KAPPA_INSTANCE
-      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
-       f_mix mixture)
-  | `List [`String "DIFF_TOKEN"; expr ; tok] ->
-    DIFF_TOKEN
-      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
-       f_id tok)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
@@ -261,17 +261,17 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
        | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
        | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
   (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
-  | DIFF_TOKEN (a,token),pos as x ->
+  | DIFF_TOKEN (a,_),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
-     | CONST c,_ ->
+     | CONST _,_ ->
        (* the derivative of a constant is zero *)
        CONST (Nbr.zero),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
        | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
   (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
-  | DIFF_KAPPA_INSTANCE (a,token),pos as x ->
+  | DIFF_KAPPA_INSTANCE (a,_),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
-     | CONST c,_ ->
+     | CONST _,_ ->
        (* the derivative of a constant is zero *)
        CONST (Nbr.zero),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _

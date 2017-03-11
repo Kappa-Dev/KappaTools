@@ -914,14 +914,6 @@ let apply_empty correct =
   | Div i -> "/"^(string_of_int i)
   | Mul i -> "*"^(string_of_int i)
 
-let apply_correct_expr correct expr =
-    match
-      correct
-    with
-    | Nil | Div 1 | Mul 1 -> expr
-    | Div i -> Alg_expr.div expr (Alg_expr.int i)
-    | Mul i -> Alg_expr.mult (Alg_expr.int i) expr
-
 let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
   match
     Loggers.get_encoding_format logger
@@ -1274,7 +1266,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
             dep_mixture
         in
         let () =
-          Mods.IntSet.iter 
+          Mods.IntSet.iter
             (aux_deriv Alg_expr_extra.diff_token)
             dep_token
         in ()
