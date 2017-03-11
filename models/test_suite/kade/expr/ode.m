@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'expr.ka' '--compute-jacobian''true'
+%      'KaDE' '--compute-jacobian' 'true''expr.ka'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
 %% 
 %% init - the initial abundances of each species and token
@@ -36,10 +36,10 @@ init(1)=10; % A(x~u?, y~u?)
 var(1)=init(1)+init(3)+init(2)+init(5);
 var(2)=var(1)*var(1)*var(1)*t;
 
-global k
-global kd
-global kun
-global kdun
+global jack
+global jackd
+global jackun
+global jackund
 
 k(1)=1; % A(x~u) -> A(x~p)
 k(3)=1; % A(y~u) -> A(y~p)
@@ -65,7 +65,8 @@ end
 options = odeset('RelTol', 1e-3, ...
                  'AbsTol', 1e-3, ...
                  'InitialStep', initialstep, ...
-                 'MaxStep', tend);
+                 'MaxStep', tend, ...
+                 'Jacobian', @ode_jacobian);
 
 
 if uiIsMatlab
@@ -101,7 +102,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE expr.ka --compute-jacobian true\n')
+fprintf(fid,'# KaDE --compute-jacobian true expr.ka\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')
@@ -137,10 +138,10 @@ function dydt=ode_aux(t,y)
 
 global nodevar
 global var
-global k
-global kd
-global kun
-global kdun
+global jack
+global jackd
+global jackun
+global jackund
 
 var(1)=y(1)+y(3)+y(2)+y(5);
 var(2)=var(1)*var(1)*var(1)*t;
@@ -231,10 +232,15 @@ dydt(6)=1;
 end
 
 
-function jacobian=ode_jac_aux(t,jac)
+function jacobian=ode_jacobian(t,jac)
 
 global jacvar
 global var
+global jack
+global jackd
+global jackun
+global jackund
+
 global k
 global kd
 global kun
@@ -246,11 +252,6 @@ var(2)=var(1)*var(1)*var(1)*t;
 k(2)=var(1);
 k(4)=var(2);
 k(5)=var(2);
-global k
-global kd
-global kun
-global kdun
-
 jacvar(1,1)=1;
 jacvar(1,2)=1;
 jacvar(1,3)=1;

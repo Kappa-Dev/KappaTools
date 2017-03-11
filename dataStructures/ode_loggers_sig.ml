@@ -43,13 +43,14 @@ let rec is_expr_const expr = (* constant propagation is already done *)
     is_bool_const a && is_expr_const b && is_expr_const c
   | Alg_expr.BIN_ALG_OP (_,a,b),_ ->
     is_expr_const a && is_expr_const b
-  | Alg_expr.UN_ALG_OP (_,a),_ ->
+  | (Alg_expr.UN_ALG_OP (_,a)
+    | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
+    | Alg_expr.DIFF_TOKEN (a,_)),_ ->
     is_expr_const a
   | Alg_expr.ALG_VAR _,_
   | Alg_expr.STATE_ALG_OP _,_
   | Alg_expr.TOKEN_ID _,_
-  | Alg_expr.KAPPA_INSTANCE _,_
-  | Alg_expr.DIFF _,_ -> false
+  | Alg_expr.KAPPA_INSTANCE _,_  -> false
 and is_bool_const expr =
   match
     expr
@@ -70,7 +71,9 @@ let rec is_expr_time_homogeneous expr =
         is_bool_time_homogeneous a && is_expr_time_homogeneous b && is_expr_time_homogeneous c
       | Alg_expr.BIN_ALG_OP (_,a,b),_ ->
         is_expr_time_homogeneous a && is_expr_time_homogeneous b
-      | Alg_expr.UN_ALG_OP (_,a),_ ->
+      | (Alg_expr.UN_ALG_OP (_,a)
+        | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
+        | Alg_expr.DIFF_TOKEN (a,_)), _ ->
         is_expr_time_homogeneous a
       | Alg_expr.STATE_ALG_OP
           ( Operator.EVENT_VAR
@@ -81,7 +84,6 @@ let rec is_expr_time_homogeneous expr =
       | Alg_expr.ALG_VAR _,_
       | Alg_expr.TOKEN_ID _,_
       | Alg_expr.KAPPA_INSTANCE _,_ -> true
-      | Alg_expr.DIFF _,_
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR),_ -> false
 
 and is_bool_time_homogeneous expr =
@@ -98,14 +100,10 @@ let is_expr_alias expr =
   match
     expr
   with
-  | Alg_expr.STATE_ALG_OP _,_
-  | Alg_expr.TOKEN_ID _,_
-  | Alg_expr.KAPPA_INSTANCE _,_
-  | Alg_expr.CONST _,_
-  | Alg_expr.IF _,_
-  | Alg_expr.BIN_ALG_OP _,_
-  | Alg_expr.DIFF _,_
-  | Alg_expr.UN_ALG_OP _,_ -> None
+  | (Alg_expr.STATE_ALG_OP _ | Alg_expr.TOKEN_ID _ | Alg_expr.KAPPA_INSTANCE _
+    | Alg_expr.CONST _ | Alg_expr.IF _ | Alg_expr.BIN_ALG_OP _
+    | Alg_expr.DIFF_KAPPA_INSTANCE _ | Alg_expr.DIFF_TOKEN _
+    | Alg_expr.UN_ALG_OP _),_ -> None
   | Alg_expr.ALG_VAR x,_ -> Some x
 
 let string_of_array_name var =

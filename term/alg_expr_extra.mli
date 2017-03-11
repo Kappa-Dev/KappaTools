@@ -43,15 +43,21 @@ val necessarily_equal:
 
 val dep:
   'set ->
-  (('mix,'id) Alg_expr.mix_token -> 'set -> 'set) ->
+  ('mix -> 'set -> 'set) ->
+  ('id -> 'set -> 'set) ->
   ('set -> 'set -> 'set) ->
   ('id -> 'set) ->
   ?time_var:'mix ->
   ('mix,'id) Alg_expr.e Locality.annot ->
   'set
 
-val diff:
-  ?time_var:'mix ->
+val diff_token:
   ('mix,'id) Alg_expr.e Locality.annot   ->
-  ('mix,'id) Alg_expr.mix_token ->
+  'id  ->
   ('mix,'id) Alg_expr.e Locality.annot
+
+val diff_mixture:
+    ?time_var:'mix ->
+    ('mix,'id) Alg_expr.e Locality.annot   ->
+    'mix ->
+    ('mix,'id) Alg_expr.e Locality.annot

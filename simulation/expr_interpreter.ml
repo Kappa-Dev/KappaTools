@@ -64,8 +64,8 @@ let rec exec_alg :
   | Alg_expr.IF ((cond,_),(yes,_),(no,_)) ->
     exec_bool counter ?time ~get_alg ~get_mix ~get_tok
       cond (TO_EXEC_IF (yes,no,sk))
-  | Alg_expr.DIFF _ ->
-    assert false
+  | Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _ ->
+    raise (ExceptionDefn.Internal_Error ("Cannot evalutate derivatives in expression",Locality.dummy))
 and exec_bool :
   type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
   get_mix:(Pattern.id array list -> Nbr.t) ->

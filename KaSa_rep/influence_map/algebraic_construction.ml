@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Mar 09 2017>
+   * Last modification: Time-stamp: <Mar 11 2017>
    * *
    * algebraic check for the influence map.
    *
@@ -269,14 +269,10 @@ let filter_influence parameters error handler compilation map bool =
       snd (v.Cckappa_sig.e_variable)
     with
     | Alg_expr.KAPPA_INSTANCE(mixture), _ -> error,mixture
-    | Alg_expr.IF _,_
-    | Alg_expr.BIN_ALG_OP (_,_,_),_
-    | Alg_expr.UN_ALG_OP (_,_),_
-    | Alg_expr.STATE_ALG_OP _, _
-    | Alg_expr.ALG_VAR _,_
-    | Alg_expr.TOKEN_ID _,_
-    | Alg_expr.CONST _,_
-    | Alg_expr.DIFF (_,_),_
+    | (Alg_expr.IF _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _
+      | Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _
+      | Alg_expr.CONST _
+      | Alg_expr.DIFF_KAPPA_INSTANCE _ | Alg_expr.DIFF_TOKEN _ ),_
       ->
       let error,() =
         Exception.warn
@@ -428,14 +424,11 @@ let filter_influence_high maybe_reachable
       snd (v.Cckappa_sig.e_variable)
     with
     | Alg_expr.KAPPA_INSTANCE(mixture), _ -> error,mixture
-    | Alg_expr.IF _,_
-    | Alg_expr.BIN_ALG_OP (_,_,_),_
-    | Alg_expr.UN_ALG_OP (_,_),_
-    | Alg_expr.STATE_ALG_OP _, _
-    | Alg_expr.ALG_VAR _,_
-    | Alg_expr.DIFF (_,_),_
-    | Alg_expr.TOKEN_ID _,_
-    | Alg_expr.CONST _,_     ->
+    | (Alg_expr.IF _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _
+      | Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _
+      | Alg_expr.DIFF_KAPPA_INSTANCE _ | Alg_expr.DIFF_TOKEN _
+      | Alg_expr.TOKEN_ID _
+      | Alg_expr.CONST _) ,_     ->
       let error,() =
         Exception.warn
           parameters error __POS__

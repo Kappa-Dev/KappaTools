@@ -1172,16 +1172,14 @@ let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
         Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
       | Alg_expr.TOKEN_ID tk_nme ->
         Alg_expr.TOKEN_ID (convert_token_name tk_nme tok pos)
-      | Alg_expr.DIFF(lab,tok_mix) ->
-        let i = convert_alg_var ?max_allowed_var algs lab pos in
-        let j =
-          match tok_mix with
-          | Alg_expr.Tok tk_nme ->
-            Alg_expr.Tok (convert_token_name tk_nme tok pos)
-          | Alg_expr.Mix ast ->
-            Alg_expr.Mix (mixture_of_ast sigs pos ast)
-        in
-        Alg_expr.DIFF(i,j)
+      | Alg_expr.DIFF_KAPPA_INSTANCE(expr,ast) ->
+        Alg_expr.DIFF_KAPPA_INSTANCE
+          (alg_expr_of_ast sigs tok algs ?max_allowed_var expr,
+           mixture_of_ast sigs pos ast)
+      | Alg_expr.DIFF_TOKEN(expr,tk_nme) ->
+        Alg_expr.DIFF_TOKEN
+          (alg_expr_of_ast sigs tok algs ?max_allowed_var expr,
+           convert_token_name tk_nme tok pos)
       | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         Alg_expr.BIN_ALG_OP

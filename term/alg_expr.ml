@@ -8,7 +8,6 @@
 
 type pervasives_bool = bool
 
-type ('mix,'id) mix_token = Mix of 'mix | Tok of 'id
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
@@ -20,7 +19,8 @@ type ('mix,'id) e =
   | CONST of Nbr.t
   | IF of ('mix,'id) bool Locality.annot *
           ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
-  | DIFF of ('id * ('mix,'id) mix_token)
+  | DIFF_TOKEN of (('mix,'id) e Locality.annot * 'id)
+  | DIFF_KAPPA_INSTANCE of (('mix,'id) e Locality.annot * 'mix)
 and ('mix,'id) bool =
   | TRUE
   | FALSE
@@ -50,10 +50,14 @@ let rec e_to_yojson f_mix f_id = function
            Locality.annot_to_json (bool_to_yojson f_mix f_id) cond;
            Locality.annot_to_json (e_to_yojson f_mix f_id) yes;
            Locality.annot_to_json (e_to_yojson f_mix f_id) no]
-  | DIFF (id1, Tok id2) ->
-    `List [`String "DIFF_VAR_TOKEN"; f_id id1 ; f_id id2]
-  | DIFF (id, Mix cc) ->
-    `List [`String "DIFF_VAR_MIX"; f_id id ; f_mix cc]
+  | DIFF_TOKEN (expr,token) ->
+    `List [`String "DIFF_TOKEN";
+           Locality.annot_to_json (e_to_yojson f_mix f_id) expr;
+           f_id token]
+  | DIFF_KAPPA_INSTANCE (expr,mixture) ->
+    `List [`String "DIFF_MIXTURE";
+           Locality.annot_to_json (e_to_yojson f_mix f_id) expr;
+           f_mix mixture]
 
 and bool_to_yojson f_mix f_id = function
   | TRUE -> `Bool true
@@ -68,10 +72,6 @@ and bool_to_yojson f_mix f_id = function
             Locality.annot_to_json (e_to_yojson f_mix f_id) b ]
 
 let rec e_of_yojson f_mix f_id = function
-  | `List [`String "DIFF_VAR_TOKEN"; id1 ; id2] ->
-    DIFF(f_id id1, Tok (f_id id2))
-  | `List [`String "DIFF_VAR_MIX"; id ; cc] ->
-    DIFF(f_id id,Mix (f_mix cc))
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
@@ -87,6 +87,14 @@ let rec e_of_yojson f_mix f_id = function
     IF (Locality.annot_of_json (bool_of_yojson f_mix f_id) cond,
         Locality.annot_of_json (e_of_yojson f_mix f_id) yes,
         Locality.annot_of_json (e_of_yojson f_mix f_id) no)
+  | `List [`String "DIFF_MIXTURE"; expr ; mixture] ->
+    DIFF_KAPPA_INSTANCE
+      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+       f_mix mixture)
+  | `List [`String "DIFF_TOKEN"; expr ; tok] ->
+    DIFF_TOKEN
+      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+       f_id tok)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
@@ -126,10 +134,10 @@ let rec print pr_mix pr_tok pr_var f = function
   | IF ((cond,_),(yes,_),(no,_)) ->
     Format.fprintf f "%a [?] %a [:] %a" (print_bool pr_mix pr_tok pr_var) cond
       (print pr_mix pr_tok pr_var) yes (print pr_mix pr_tok pr_var) no
-  | DIFF (id, Mix cc) ->
-    Format.fprintf f "diff(%a,%a)" pr_var id pr_mix cc
-  | DIFF (id1, Tok id2) ->
-    Format.fprintf f "diff(%a,%a)" pr_var id1 pr_tok id2
+  | DIFF_TOKEN ((expr,_), tok) ->
+    Format.fprintf f "diff(%a,%a)" (print pr_mix pr_tok pr_var) expr pr_tok tok
+  | DIFF_KAPPA_INSTANCE ((expr,_), mixture) ->
+      Format.fprintf f "diff(%a,%a)" (print pr_mix pr_tok pr_var) expr pr_mix mixture
 and print_bool pr_mix pr_tok pr_var f = function
   | TRUE -> Format.fprintf f "[true]"
   | FALSE -> Format.fprintf f "[false]"
@@ -159,9 +167,12 @@ let sin e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SINUS,e1))
 let cos e1 = Locality.dummy_annot (UN_ALG_OP (Operator.COSINUS,e1))
 let uminus e1 = Locality.dummy_annot (UN_ALG_OP (Operator.UMINUS,e1))
 let sqrt e1 = Locality.dummy_annot (UN_ALG_OP (Operator.SQRT,e1))
+
 let rec add_dep (in_t,in_e,toks_d,out as x) d = function
   | BIN_ALG_OP (_, a, b), _ -> add_dep (add_dep x d a) d b
-  | UN_ALG_OP (_, a), _ -> add_dep x d a
+  | (UN_ALG_OP (_, a) | DIFF_TOKEN (a,_) | DIFF_KAPPA_INSTANCE (a,_)), _
+(* when we differentiate against a variable, the result may depend on this variable only if the variable occurs in the differntiated expression *)
+    -> add_dep x d a
   | ALG_VAR j, _ ->
     let () = out.(j) <- Operator.DepSet.add d out.(j) in
     x
@@ -170,10 +181,6 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
     let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
     x
   | IF (cond,yes,no), _ -> add_dep (add_dep (add_dep_bool x d cond) d yes) d no
-  | DIFF (_,Tok i),_ ->
-  let () = toks_d.(i) <- Operator.DepSet.add d toks_d.(i) in
-  x
-  | DIFF (_,Mix _),_ -> x
   | STATE_ALG_OP op, _ ->
     match op with
     | (Operator.EMAX_VAR | Operator.TMAX_VAR) -> x
@@ -190,9 +197,12 @@ let rec has_mix :
   type a. ?var_decls:('b -> ('c,'b) e) -> (a,'b) e -> pervasives_bool =
   fun ?var_decls -> function
   | BIN_ALG_OP (_, (a,_), (b,_)) -> has_mix ?var_decls a || has_mix ?var_decls b
-  | UN_ALG_OP (_, (a,_))  -> has_mix ?var_decls a
+  | UN_ALG_OP (_, (a,_))
+  | DIFF_TOKEN ((a,_),_) | DIFF_KAPPA_INSTANCE ((a,_),_)  ->
+    (* when we differentiate against a variable, the result may depend on this variable only if the variable occurs in the differntiated expression *)
+    has_mix ?var_decls a
   | STATE_ALG_OP _ | CONST _ -> false
-  | TOKEN_ID _ | KAPPA_INSTANCE _ | DIFF (_,_) -> true
+  | TOKEN_ID _ | KAPPA_INSTANCE _ -> true
   | IF ((cond,_),(yes,_),(no,_)) ->
     has_mix ?var_decls yes || has_mix ?var_decls no
     || bool_has_mix ?var_decls cond
@@ -211,8 +221,9 @@ and bool_has_mix :
 
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
-  | UN_ALG_OP (_, a), _ -> aux_extract_cc acc a
-  | (DIFF _ | ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
+  | (UN_ALG_OP (_, a) | DIFF_TOKEN (a,_) | DIFF_KAPPA_INSTANCE (a,_)),_ ->
+    aux_extract_cc acc a
+  | (ALG_VAR _ | CONST _ | TOKEN_ID _ | STATE_ALG_OP _), _ -> acc
   | KAPPA_INSTANCE i, _ -> i :: acc
   | IF (cond,yes,no), _ ->
     aux_extract_cc (aux_extract_cc (extract_cc_bool acc cond) yes) no
@@ -238,14 +249,34 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
            propagate_constant ?max_time ?max_events updated_vars vars b with
     | (CONST c1,_),(CONST c2,_) -> CONST (Nbr.of_bin_alg_op op c1 c2),pos
     | ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | DIFF (_,_) | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_),
+       | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _
+       | CONST _ | IF _),_),
       ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | DIFF (_,_) | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
+       | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _  | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
+(* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
   | UN_ALG_OP (op,a),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
      | CONST c,_ -> CONST (Nbr.of_un_alg_op op c),pos
-     | (DIFF (_,_) | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
+     | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
+       | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
        | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
+  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
+  | DIFF_TOKEN (a,token),pos as x ->
+    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+     | CONST c,_ ->
+       (* the derivative of a constant is zero *)
+       CONST (Nbr.zero),pos
+     | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
+       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
+  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
+  | DIFF_KAPPA_INSTANCE (a,token),pos as x ->
+    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+     | CONST c,_ ->
+       (* the derivative of a constant is zero *)
+       CONST (Nbr.zero),pos
+     | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
+       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
+  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
   | STATE_ALG_OP (Operator.EMAX_VAR),pos ->
     CONST
       (match max_events with
@@ -273,8 +304,9 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
      else match vars.(i) with
        | _,((CONST _ | ALG_VAR _ as y),_) -> y,pos
        | _,((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-            | TOKEN_ID _ | IF _ | DIFF (_,_) ),_) -> x)
-  | (DIFF (_,_) | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_ as x -> x
+            | TOKEN_ID _ | IF _ | DIFF_KAPPA_INSTANCE _ | DIFF_TOKEN _),_) -> x)
+  | (KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_ as x -> x
+
   | IF (cond,yes,no),pos ->
     match propagate_constant_bool
             ?max_time ?max_events updated_vars vars cond with
@@ -312,20 +344,22 @@ and propagate_constant_bool
     match a',b' with
     | (CONST n1,_), (CONST n2,_) ->
       (if Nbr.of_compare_op op n1 n2 then TRUE,pos else FALSE,pos)
-    | (( DIFF (_,_) | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
+    | (( DIFF_KAPPA_INSTANCE _ | DIFF_TOKEN _
+       | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
        | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _),_), _ ->
       COMPARE_OP (op,a',b'),pos
 
 let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | (BIN_ALG_OP (_, a, b),_) ->
     has_time_dep vars_deps a||has_time_dep vars_deps b
-  | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a
+  | ((UN_ALG_OP (_, a) | DIFF_TOKEN (a,_) | DIFF_KAPPA_INSTANCE (a,_)),_) ->
+    has_time_dep vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
   | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                    Operator.NULL_EVENT_VAR | Operator.EMAX_VAR |
                    Operator.TMAX_VAR),_) -> false
-  | (ALG_VAR i,_) | DIFF (i,_),_ ->
+  | (ALG_VAR i,_) ->
     let rec aux j =
       Operator.DepSet.mem (Operator.ALG j) in_t ||
       Operator.DepSet.exists
@@ -360,7 +394,8 @@ let rec stops_of_bool vars_deps = function
       begin match a1,b1 with
         | STATE_ALG_OP (Operator.TIME_VAR), CONST n
         | CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
-        | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _ | DIFF (_,_)
+        | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
+          | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
           | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
                           Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
                           Operator.EMAX_VAR |Operator.TMAX_VAR)

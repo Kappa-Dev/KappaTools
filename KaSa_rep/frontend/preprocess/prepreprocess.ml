@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Mar 09 2017>
+ * Last modification: Time-stamp: <Mar 11 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -506,14 +506,16 @@ let rec alg_map f error alg =
   | Alg_expr.UN_ALG_OP (op,(m1,pos1)) ->
     let error,m1' = alg_map f error m1 in
     error,Alg_expr.UN_ALG_OP (op,(m1',pos1))
-        | Alg_expr.DIFF (a,Alg_expr.Mix b) ->
-    let error, mixture' = f error b in
-          error,Alg_expr.DIFF (a,Alg_expr.Mix mixture')
+  | Alg_expr.DIFF_KAPPA_INSTANCE ((m1,pos1),pattern) ->
+    let error,m1' = alg_map f error m1 in
+    let error, pattern' = f error pattern in
+    error,Alg_expr.DIFF_KAPPA_INSTANCE ((m1',pos1),pattern')
+  | Alg_expr.DIFF_TOKEN ((m1,pos1),token) ->
+    let error,m1' = alg_map f error m1 in
+    error,Alg_expr.DIFF_TOKEN ((m1',pos1),token)
   | Alg_expr.STATE_ALG_OP s -> error,Alg_expr.STATE_ALG_OP s
   | Alg_expr.ALG_VAR s -> error,Alg_expr.ALG_VAR s
   | Alg_expr.TOKEN_ID s -> error,Alg_expr.TOKEN_ID s
-  | Alg_expr.DIFF (a,Alg_expr.Tok b) ->
-    error, Alg_expr.DIFF (a,Alg_expr.Tok b)
   | Alg_expr.KAPPA_INSTANCE mixture ->
     let error,mixture' = f error mixture in
     error,Alg_expr.KAPPA_INSTANCE mixture'

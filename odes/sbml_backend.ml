@@ -125,7 +125,13 @@ let string_of_variable string_of_var_id variable =
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
   | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
   | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
-
+  | Ode_loggers_sig.Jacobian_rate _
+  | Ode_loggers_sig.Jacobian_rated _
+  | Ode_loggers_sig.Jacobian_rateun _
+  | Ode_loggers_sig.Jacobian_rateund _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",Locality.dummy))
 
 
 let unit_of_variable variable =
@@ -148,6 +154,10 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Rated _
   | Ode_loggers_sig.Rateun _
   | Ode_loggers_sig.Rateund _
+  | Ode_loggers_sig.Jacobian_rate _
+  | Ode_loggers_sig.Jacobian_rated _
+  | Ode_loggers_sig.Jacobian_rateun _
+  | Ode_loggers_sig.Jacobian_rateund _
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_ode_var
   | Ode_loggers_sig.N_var
@@ -229,7 +239,11 @@ let rec eval_init_alg_expr logger network_handler alg_expr =
       eval_init_alg_expr logger network_handler yes
     else
       eval_init_alg_expr logger network_handler no
-  | Alg_expr.DIFF _ -> assert false
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _) ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",snd alg_expr))
 and eval_init_bool_expr logger network_handler expr =
   match fst expr with
   | Alg_expr.TRUE -> true
@@ -276,7 +290,11 @@ let rec propagate_def_in_alg_expr logger network_handler alg_expr =
       (propagate_def_in_bool_expr logger network_handler cond,
        propagate_def_in_alg_expr logger network_handler yes,
        propagate_def_in_alg_expr logger network_handler no), loc
-  | Alg_expr.DIFF _,_ -> assert false
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _),pos ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",pos))
 and propagate_def_in_bool_expr logger network_handler expr =
   match expr with
   | Alg_expr.TRUE,_
@@ -347,8 +365,11 @@ let rec eval_const_alg_expr logger network_handler alg_expr =
       | Some false ->
         eval_const_alg_expr logger network_handler no
     end
-  | Alg_expr.DIFF _ -> assert false
-
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _) ->
+    raise
+      (ExceptionDefn.Internal_Error
+         ("SBML does not support differentiation",snd alg_expr))
 and eval_const_bool_expr logger network_handler expr =
   match fst expr with
   | Alg_expr.TRUE -> Some true
@@ -472,7 +493,11 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
         let () = print_alg_expr_in_sbml string_of_var_id logger no network in
         let () = Loggers.fprintf logger "</apply>" in
         ()
-      | Alg_expr.DIFF _ -> assert false
+      | (Alg_expr.DIFF_KAPPA_INSTANCE _
+        | Alg_expr.DIFF_TOKEN _) ->
+        raise
+          (ExceptionDefn.Internal_Error
+             ("SBML does not support differentiation",snd alg_expr))
     end
 and
   print_bool_expr_in_sbml string_of_var_id logger cond network =
@@ -561,7 +586,11 @@ let rec substance_expr_in_sbml logger
           (Mods.StringSet.union
              (substance_expr_in_sbml logger yes network)
              (substance_expr_in_sbml logger no network))
-      | Alg_expr.DIFF _ -> assert false
+      | (Alg_expr.DIFF_KAPPA_INSTANCE _
+        | Alg_expr.DIFF_TOKEN _) ->
+        raise
+          (ExceptionDefn.Internal_Error
+             ("SBML does not support differentiation",snd alg_expr))
     end
 and
   substance_bool_expr_in_sbml logger cond network =
@@ -611,17 +640,18 @@ let rec maybe_time_dependent_alg_expr_in_sbml logger
         end
       | Alg_expr.KAPPA_INSTANCE _
       | Alg_expr.TOKEN_ID _
-      | Alg_expr.DIFF _
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> false
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> true
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR)
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> false
-      | Alg_expr.BIN_ALG_OP (_op, a, b) ->
+      | Alg_expr.BIN_ALG_OP (_, a, b) ->
         maybe_time_dependent_alg_expr_in_sbml logger a network
         || maybe_time_dependent_alg_expr_in_sbml logger b network
-      | Alg_expr.UN_ALG_OP (_op, a) ->
+      | Alg_expr.UN_ALG_OP (_, a)
+      | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
+      | Alg_expr.DIFF_TOKEN (a,_) ->
         maybe_time_dependent_alg_expr_in_sbml logger a network
       | Alg_expr.IF (cond, yes, no) ->
         maybe_time_dependent_bool_expr_in_sbml logger cond network

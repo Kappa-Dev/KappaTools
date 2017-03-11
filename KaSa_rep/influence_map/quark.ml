@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Mar 09 2017>
+ * Last modification: Time-stamp: <Mar 11 2017>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -689,7 +689,8 @@ let scan_var parameter error handler var_id var quarks =
     | Alg_expr.TOKEN_ID _
     | Alg_expr.STATE_ALG_OP _
     | Alg_expr.ALG_VAR _
-    | Alg_expr.DIFF _ 
+    | Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _
     | Alg_expr.IF _
       ->
       begin (* to do *)

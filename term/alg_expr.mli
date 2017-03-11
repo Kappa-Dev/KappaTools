@@ -8,8 +8,6 @@
 
 type pervasives_bool = bool
 
-type ('mix,'id) mix_token = Mix of 'mix | Tok of 'id
-
 type ('mix,'id) e =
     BIN_ALG_OP of Operator.bin_alg_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
@@ -21,7 +19,8 @@ type ('mix,'id) e =
   | CONST of Nbr.t
   | IF of ('mix,'id) bool Locality.annot *
           ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
-  | DIFF of ('id * ('mix,'id) mix_token)
+  | DIFF_TOKEN of (('mix,'id) e Locality.annot * 'id)
+  | DIFF_KAPPA_INSTANCE of (('mix,'id) e Locality.annot * 'mix)
 and ('mix,'id) bool =
   | TRUE
   | FALSE

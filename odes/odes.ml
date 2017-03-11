@@ -507,8 +507,8 @@ struct
           List.fold_left
             (fun acc l ->
                Alg_expr.add
-                  acc
-                  (f l))
+                 acc
+                 (f l))
             (f head)
             tail
       end
@@ -518,8 +518,16 @@ struct
       Alg_expr.IF (convert_bool_expr compil network cond,
                    convert_alg_expr compil network yes,
                    convert_alg_expr compil network no),pos
-    | Alg_expr.DIFF(_,_),_ ->
-      assert false (* TO DO ? *)
+    | Alg_expr.DIFF_TOKEN(expr,dt),pos ->
+      Alg_expr.DIFF_TOKEN
+        (convert_alg_expr compil network expr,
+              dt),pos
+    | Alg_expr.DIFF_KAPPA_INSTANCE(expr,dt),pos ->
+      (* TO DO ??? *)
+      raise
+        (ExceptionDefn.Internal_Error
+           ("Cannot translate partial derivative",pos))
+
 
   and convert_bool_expr compil network = function
     | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> a
@@ -868,7 +876,7 @@ struct
     let list, network =
       List.fold_left
         (fun (list,network) def ->
-           let b,(network,c) =
+           let  b,(network,c) =
              convert_initial_state parameters compil def network in
            let () =
              List.iter
@@ -900,38 +908,29 @@ struct
       ()
     in
     let rec aux_alg id expr =
-      match expr with
-      | Alg_expr.CONST _,_ -> ()
-      | Alg_expr.BIN_ALG_OP (_,a,b),_ -> (aux_alg id a;aux_alg id b)
-      | Alg_expr.UN_ALG_OP (_,a),_ -> aux_alg id a
-      | Alg_expr.STATE_ALG_OP _,_ -> ()
-      | Alg_expr.IF (cond,yes,no),_ ->
+      match fst expr with
+      | Alg_expr.CONST _ -> ()
+      | Alg_expr.BIN_ALG_OP (_,a,b) -> (aux_alg id a;aux_alg id b)
+      | (Alg_expr.UN_ALG_OP (_,a)
+        | Alg_expr.DIFF_KAPPA_INSTANCE (a,_)
+        | Alg_expr.DIFF_TOKEN (a,_)) -> aux_alg id a
+      | Alg_expr.STATE_ALG_OP _ -> ()
+      | Alg_expr.IF (cond,yes,no) ->
         aux_bool id cond; aux_alg id yes; aux_alg id no
-      | Alg_expr.TOKEN_ID s,_ ->
+      | Alg_expr.TOKEN_ID s ->
         let id' = translate_token s network in
         let list = Mods.DynArray.get init_tab id' in
         List.iter (fun id'' -> add_succ id id'') list
-      | Alg_expr.KAPPA_INSTANCE id',_ ->
+      | Alg_expr.KAPPA_INSTANCE (id':ode_var_id) ->
         let list = Mods.DynArray.get init_tab id' in
         List.iter (fun id'' -> add_succ id id'') list
-      | Alg_expr.ALG_VAR id',_ ->
+      | Alg_expr.ALG_VAR id' ->
         let id_opt = Mods.IntMap.find_option id' network.varmap in
         begin
           match id_opt with
         | Some id'' -> add_succ id id''
         | None -> ()
         end
-      | Alg_expr.DIFF (id1,Alg_expr.Tok id2),_ ->
-      let id' = translate_token id2 network in
-      let list = Mods.DynArray.get init_tab id' in
-      let () = List.iter (fun id'' -> add_succ id id'') list in
-      let list = Mods.DynArray.get init_tab id1 in
-      List.iter (fun id'' -> add_succ id id'') list
-      | Alg_expr.DIFF (id1,Alg_expr.Mix id2),_ ->
-      let list = Mods.DynArray.get init_tab id1 in
-      let () = List.iter (fun id'' -> add_succ id id'') list in
-      let list = Mods.DynArray.get init_tab id2 in
-      List.iter (fun id'' -> add_succ id id'') list
     and aux_bool id = function
       | (Alg_expr.TRUE | Alg_expr.FALSE),_ -> ()
       | Alg_expr.COMPARE_OP (_,a,b),_ ->
@@ -950,7 +949,9 @@ struct
              in aux_alg id b
            | Var (id,a,b) ->
              let () = Mods.DynArray.set dec_tab id (decl,a,b) in
-             aux_alg id b) list in
+             aux_alg id b)
+        list
+    in
     let top_sort =
       let clean k to_be_visited =
         let l = Mods.DynArray.get lsucc k in
@@ -1290,28 +1291,24 @@ struct
         ~init_mode (I.string_of_var_id ~compil) logger logger_buffer
         (Ode_loggers_sig.Expr id) expr handler_expr
 
-  module MT =
-  struct
-    type t = (ode_var_id,ode_var_id) Alg_expr.mix_token
-    let compare = compare
-    let print _ _ = ()
-  end
-
-  module MTSetMap = SetMap.Make (MT)
-  module MTSET = MTSetMap.Set
-
   let get_dep ?time_var dep_map expr =
     Alg_expr_extra.dep
       ?time_var
-      MTSET.empty
-      MTSET.add
-      MTSET.union
+      (Mods.IntSet.empty, Mods.IntSet.empty)
+      (fun a (b,c) ->
+         Mods.IntSet.add a b,c)
+      (fun a (b,c) ->
+         b,
+         Mods.IntSet.add a c)
+      (fun (a,b) (c,d) ->
+         Mods.IntSet.union a c,
+         Mods.IntSet.union b d)
       (fun id ->
          match
            Mods.IntMap.find_option (succ id) dep_map
          with
          | Some set -> set
-         | None -> MTSET.empty)
+         | None -> Mods.IntSet.empty,Mods.IntSet.empty)
       expr
 
   module V =
@@ -1336,18 +1333,11 @@ struct
       let dep_var = get_dep ?time_var dep expr in
       let dep = Mods.IntMap.add id dep_var dep in
       let () =
-        MTSET.iter
-          (fun mix_token ->
-             let dt =
-               match
-                 mix_token
-               with
-               | Alg_expr.Mix id -> id
-               | Alg_expr.Tok id -> id
-             in
+        Mods.IntSet.iter
+          (fun dt ->
              let expr =
                Alg_expr_extra.simplify
-                 (Alg_expr_extra.diff ?time_var expr mix_token)
+                 (Alg_expr_extra.diff_mixture ?time_var expr dt)
              in
              Ode_loggers.associate
                ~init_mode:false
@@ -1356,7 +1346,23 @@ struct
                (Ode_loggers_sig.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
-          dep_var
+          (fst dep_var)
+      in
+      let () =
+        Mods.IntSet.iter
+          (fun dt ->
+             let expr =
+               Alg_expr_extra.simplify
+                 (Alg_expr_extra.diff_token expr dt)
+             in
+             Ode_loggers.associate
+               ~init_mode:false
+               (I.string_of_var_id ~compil)
+               logger logger_buffer
+               (Ode_loggers_sig.variable_of_derived_variable
+                  (Ode_loggers_sig.Expr id) dt)
+               expr handler_expr)
+          (snd dep_var)
       in
       dep
 
@@ -1368,18 +1374,11 @@ struct
     let dep_set = get_dep ?time_var dep_var rate in
     let dep = VMAP.add (var_of_rule rule) dep_set dep in
     let () =
-      MTSET.iter
-        (fun mix_token ->
-           let dt =
-             match
-               mix_token
-             with
-             | Alg_expr.Mix id -> id
-             | Alg_expr.Tok id -> id
-           in
+      Mods.IntSet.iter
+        (fun dt ->
            let expr =
              Alg_expr_extra.simplify
-               (Alg_expr_extra.diff ?time_var rate mix_token)
+               (Alg_expr_extra.diff_mixture ?time_var rate dt)
            in
            Ode_loggers.associate
              ~init_mode:false
@@ -1388,8 +1387,25 @@ struct
              (Ode_loggers_sig.variable_of_derived_variable
                 (var_of_rule rule) dt)
               expr handler_expr)
-        dep_set
+        (fst dep_set)
     in
+    let () =
+      Mods.IntSet.iter
+        (fun dt ->
+           let expr =
+             Alg_expr_extra.simplify
+               (Alg_expr_extra.diff_token rate dt)
+           in
+           Ode_loggers.associate
+             ~init_mode:false
+             (I.string_of_var_id ~compil)
+             logger logger_buffer
+             (Ode_loggers_sig.variable_of_derived_variable
+                (var_of_rule rule) dt)
+              expr handler_expr)
+        (snd dep_set)
+    in
+
     dep
 
   let fresh_is_zero network =
@@ -1404,10 +1420,9 @@ struct
         false
     in is_zero
 
-  let declare_rates_global logger network =
+  let declare_rates_global_gen g logger network =
     let do_it f =
-      Ode_loggers.declare_global logger
-        (Ode_loggers_sig.variable_of_derived_variable (f network.n_rules) 1)
+      Ode_loggers.declare_global logger (g (f network.n_rules) 1)
     in
     let () = do_it (fun x -> Ode_loggers_sig.Rate x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
@@ -1425,25 +1440,17 @@ struct
     in
     ()
 
+  let declare_rates_global logger network =
+    declare_rates_global_gen
+      (fun a _ -> a)
+      logger
+      network
+
   let declare_jacobian_rates_global logger network =
-    let do_it f =
-      Ode_loggers.declare_global logger (f network.n_rules)
-    in
-    let () = do_it (fun x -> Ode_loggers_sig.Rate x) in
-    let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
-    let () = do_it (fun x -> Ode_loggers_sig.Rateun x) in
-    let () = do_it (fun x -> Ode_loggers_sig.Rateund x) in
-    let () =
-      match Loggers.get_encoding_format logger with
-      | Loggers.Octave | Loggers.Matlab ->
-        Ode_loggers.print_newline logger
-      | Loggers.Maple | Loggers.SBML | Loggers.TXT
-      | Loggers.TXT_Tabular | Loggers.XLS
-      | Loggers.Matrix | Loggers.DOT | Loggers.HTML
-      | Loggers.HTML_Graph | Loggers.HTML_Tabular
-      | Loggers.Json -> ()
-    in
-    ()
+    declare_rates_global_gen
+      Ode_loggers_sig.variable_of_derived_variable
+      logger network
+
 
   let breakline = true
 
@@ -1929,15 +1936,12 @@ struct
                    (var_of_rule enriched_rule) dep_rates
                with
                | Some set -> set
-               | None -> MTSET.empty
+               | None -> (Mods.IntSet.empty,Mods.IntSet.empty)
              in
              let dep_set_rate =
-               MTSET.fold
-                 (fun x set ->
-                    match x with Alg_expr.Tok id | Alg_expr.Mix id ->
-                      Mods.IntSet.add id set)
-                 dep_set
-                 Mods.IntSet.empty
+               Mods.IntSet.union
+                 (fst dep_set)
+                 (snd dep_set)
              in
              let () =
                if I.do_we_prompt_reactions compil
@@ -2064,14 +2068,6 @@ struct
                List.iter
                  (fun (expr,(token,_loc)) ->
                     let dep_set_token_expr = get_dep ?time_var dep_var expr in
-                    let dep_map_token_expr =
-                      MTSET.fold
-                        (fun x map ->
-                           match x with Alg_expr.Tok id | Alg_expr.Mix id ->
-                             Mods.IntMap.add id x map)
-                        dep_set_token_expr
-                        Mods.IntMap.empty
-                    in
                     Ode_loggers.update_token_jac
                       ?time_var
                       (I.string_of_var_id ~compil)
@@ -2080,7 +2076,9 @@ struct
                       (var_of_rule enriched_rule)
                       expr reactants' (handler_expr network)
                       dep_set_rate
-                      dep_map_token_expr)
+                      ~dep_mixture:(fst dep_set_token_expr)
+                      ~dep_token:(snd dep_set_token_expr)
+                 )
                  token_vector
              in ()
           ) network.reactions
