@@ -37,6 +37,17 @@ k=zeros(nrules,1);
 kd=zeros(nrules,1);
 kun=zeros(nrules,1);
 kdun=zeros(nrules,1);
+global jacvar
+jacvar=sparse(nvar,nodevar);
+global jack
+global jackd
+global jackun
+global jackund
+
+jack=zeros(nrules,nodevar);
+jackd=zeros(nrules,nodevar);
+jackun=zeros(nrules,nodevar);
+jackund=zeros(nrules,nodevar);
 
 t = 0.000000;
 
@@ -66,7 +77,8 @@ end
 options = odeset('RelTol', 1e-3, ...
                  'AbsTol', 1e-3, ...
                  'InitialStep', initialstep, ...
-                 'MaxStep', tend);
+                 'MaxStep', tend, ...
+                 'Jacobian', @ode_jacobian);
 
 
 if uiIsMatlab
@@ -150,6 +162,36 @@ dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
 dydt(2)=1;
 
+end
+
+
+function jac=ode_jacobian(t,y)
+
+global nodevar
+global jacvar
+global var
+global k
+global kd
+global kun
+global kdun
+
+global jack
+global jackd
+global jackun
+global jackund
+
+
+
+
+jac=sparse(nodevar,nodevar);
+
+% rule    : A(), A() -> 
+% reaction: A() + A() ->  
+
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
 end
 
 
