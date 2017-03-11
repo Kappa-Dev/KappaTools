@@ -311,7 +311,7 @@ function obs=ode_obs(y)
 
 global nobs
 global var
-obs = zeros(nobs,1);
+obs=zeros(nobs,1);
 
 t = y(8);
 var(2)=y(1)+y(4)+y(3);

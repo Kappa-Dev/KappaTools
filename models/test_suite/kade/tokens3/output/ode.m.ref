@@ -181,7 +181,7 @@ function obs=ode_obs(y)
 
 global nobs
 global var
-obs = zeros(nobs,1);
+obs=zeros(nobs,1);
 
 t = y(3);
 var(5)=y(2);
