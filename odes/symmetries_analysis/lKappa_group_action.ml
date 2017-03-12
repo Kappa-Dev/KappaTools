@@ -52,6 +52,10 @@ let may_swap_binding_state_regular ag_type site1 site2 ag =
   &&
   (not (binding_equal ag.LKappa.ra_ports.(site1) ag.LKappa.ra_ports.(site2)))
 
+let may_swap_full_regular ag_type site1 site2 ag =
+  may_swap_binding_state_regular ag_type site1 site2 ag
+  || may_swap_internal_state_regular ag_type site1 site2 ag
+
 let swap_binding_state_regular ag_type site1 site2 ag =
   let tmp = ag.LKappa.ra_ports.(site1) in
   let () =
@@ -60,16 +64,15 @@ let swap_binding_state_regular ag_type site1 site2 ag =
   ()
 
 let swap_internal_state_regular
-    ?necessarily_free ag_type site1 site2 ag =
+    ag_type site1 site2 ag =
   let tmp = ag.LKappa.ra_ints.(site1) in
   let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
   let () = ag.LKappa.ra_ints.(site2) <- tmp in
-  let () =
-    match necessarily_free with
-    | Some array when array.(ag_type).(site1) && array.(ag_type).(site2) ->
-        swap_binding_state_regular ag_type site1 site2 ag
-    | None | Some _ -> ()
-  in ()
+  ()
+
+let swap_full_regular ag_type site1 site2 ag =
+  let () = swap_internal_state_regular ag_type site1 site2 ag in
+  swap_binding_state_regular ag_type site1 site2 ag
 
 (** Swapping sites in created agents *)
 
@@ -83,6 +86,10 @@ let may_swap_binding_state_created ag_type site1 site2 ag =
   &&
   (ag.Raw_mixture.a_ports.(site1) <> ag.Raw_mixture.a_ports.(site2))
 
+let may_swap_full_created ag_type site1 site2 ag =
+  may_swap_internal_state_created ag_type site1 site2 ag
+  || may_swap_binding_state_created ag_type site1 site2 ag
+
 let swap_binding_state_created ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ports.(site1) in
   let () =
@@ -92,17 +99,16 @@ let swap_binding_state_created ag_type site1 site2 ag =
   ()
 
 let swap_internal_state_created
-    ?necessarily_free ag_type site1 site2 ag =
+    ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ints.(site1) in
   let () =
     ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
   let () = ag.Raw_mixture.a_ints.(site2) <- tmp in
-  let () =
-    match necessarily_free with
-    | Some array when array.(ag_type).(site1) && array.(ag_type).(site2) ->
-      swap_binding_state_created ag_type site2 site2 ag
-    | None | Some _ -> ()
-  in ()
+  ()
+
+let swap_full_created ag_type site1 site2 ag =
+  let () = swap_internal_state_created ag_type site1 site2 ag in
+      swap_binding_state_created ag_type site1 site2 ag
 
 (*******************************************************************)
 
@@ -162,6 +168,13 @@ let potential_positions_for_swapping_binding_states
   filter_positions
     (may_swap_binding_state_regular agent_type site1 site2)
     (may_swap_binding_state_created agent_type site1 site2)
+    rule
+
+let potential_positions_for_swapping_full
+    agent_type site1 site2 rule =
+  filter_positions
+    (may_swap_full_regular agent_type site1 site2)
+    (may_swap_full_created agent_type site1 site2)
     rule
 
 (******************************************************************)
@@ -417,15 +430,15 @@ let weight ~correct ~card_stabilizer ~rate =
        (correct * card_stabilizer))
 
 let check_orbit_internal_state_permutation
-    ?parameters ?env ?necessarily_free ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
     to_be_checked =
   check_orbit
     ?parameters ?env
     (potential_positions_for_swapping_internal_states,
-     swap_internal_state_regular ?necessarily_free,
-     swap_internal_state_regular ?necessarily_free,
-     swap_internal_state_created ?necessarily_free,
-     swap_internal_state_created ?necessarily_free)
+     swap_internal_state_regular,
+     swap_internal_state_regular,
+     swap_internal_state_created,
+     swap_internal_state_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
@@ -438,4 +451,16 @@ let check_orbit_binding_state_permutation
      swap_binding_state_regular,
      swap_binding_state_created,
      swap_binding_state_created)
+    weight agent_type site1 site2 rule correct rates cache counter to_be_checked
+
+let check_orbit_full_permutation
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
+    to_be_checked =
+  check_orbit
+    ?parameters ?env
+    (potential_positions_for_swapping_full,
+     swap_full_regular,
+     swap_full_regular,
+     swap_full_created,
+     swap_full_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked

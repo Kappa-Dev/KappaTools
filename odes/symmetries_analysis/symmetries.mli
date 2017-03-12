@@ -17,7 +17,7 @@
 (*TYPE*)
 (*******************************************************************)
 
-type symmetries = ((int list list) * (int list list)) array
+type symmetries = int Symmetries_sig.site_partition array
 
 (*******************************************************************)
 (*PARTITION THE CONTACT MAP*)

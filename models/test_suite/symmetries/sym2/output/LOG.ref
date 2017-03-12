@@ -1074,33 +1074,35 @@ binding_states:A.x;A.y;
   site:y
 binding_states:A.x;A.y;
 Partitioned contact map
+************
 Agent: A
-internal sites:
-
-binding sites:
-y,x,
+  -Equivalence classes of sites for bindings states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
 Partitioned contact map (LKAPPA)
 ************
 Agent: A
-  -Equivalence classes of sites for internal states:
-
   -Equivalence classes of sites for bindings states:
-{x,y}
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
 ************
 With predicate (LKAPPA)
 ************
 Agent: A
-  -Equivalence classes of sites for internal states:
-
   -Equivalence classes of sites for bindings states:
-{x,y}
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
 ************
 Symmetries:
 ************
 Agent: A
-  -Equivalence classes of sites for internal states:
-
   -Equivalence classes of sites for bindings states:
-{x,y}
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
 ************
 execution finished without any exception

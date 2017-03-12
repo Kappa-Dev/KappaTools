@@ -1,5 +1,6 @@
-let get_internal_state_partition (a,_) = a
-let get_binding_state_partition (_,a) = a
+let get_internal_state_partition a = a.Symmetries_sig.over_internal_states
+let get_binding_state_partition a = a.Symmetries_sig.over_binding_states
+let get_full_partition a = a.Symmetries_sig.over_full_states
 
 let normalize_in_agent_gen
     (get:int -> 'a -> 'b)
@@ -237,27 +238,20 @@ let copy raw_mixture =
                     Raw_mixture.a_ports = Array.copy agents.Raw_mixture.a_ports })
     (List.rev raw_mixture)
 
-
 let
-  normalize_binding_states rule_cache symmetries raw_mixture
+  normalize_with_binding_states get1 set1 cmp get2 set2 get_partition rule_cache symmetries raw_mixture
   =
   let refined_raw_mixture = enrich_binding_state raw_mixture in
   let refined_raw_mixture =
     normalize_gen
       (fun (agent,_) -> agent.Raw_mixture.a_type)
-      (fun i (agent,agent') ->
-         agent.Raw_mixture.a_ports.(i),
-         agent'.(i))
-      (fun i (data,data') (agent,agent') ->
-         agent.Raw_mixture.a_ports.(i)<-data;
-         agent'.(i)<-data')
-      (fun (_,a) (_,b) -> compare a b)
-      get_binding_state_partition
+      get1 set1 cmp
+      get_partition
       symmetries refined_raw_mixture
   in
   let covering_list =
     refine_partition
-      get_binding_state_partition
+      get_partition
       symmetries
       refined_raw_mixture
   in
@@ -267,8 +261,7 @@ let
   in
   let rule_cache, (_,raw_mixture) =
     fold_symmetries_over_raw_mixture
-      (fun i agent -> agent.Raw_mixture.a_ports.(i))
-      (fun i data agent -> agent.Raw_mixture.a_ports.(i)<-data)
+      get2 set2
       (fun raw_mixture (rule_cache,(best_hash,best_raw_mixture)) ->
          let rule_cache, hash =
            LKappa_auto.cannonic_form
@@ -287,8 +280,52 @@ let
   rule_cache, raw_mixture
 
 
+let
+  normalize_binding_states rule_cache symmetries raw_mixture
+  =
+  normalize_with_binding_states
+    (fun i (agent,agent') ->
+       agent.Raw_mixture.a_ports.(i),
+       agent'.(i))
+    (fun i (data,data') (agent,agent') ->
+       agent.Raw_mixture.a_ports.(i)<-data;
+       agent'.(i)<-data')
+    (fun (_,a) (_,b) -> compare a b)
+    (fun i agent -> agent.Raw_mixture.a_ports.(i))
+    (fun i data agent -> agent.Raw_mixture.a_ports.(i)<-data)
+    get_binding_state_partition
+    rule_cache symmetries raw_mixture
+
+let
+  normalize_full rule_cache symmetries raw_mixture
+  =
+  normalize_with_binding_states
+    (fun i (agent,agent') ->
+       (agent.Raw_mixture.a_ints.(i),
+        agent.Raw_mixture.a_ports.(i)),
+       agent'.(i))
+    (fun i ((data_int,data_port),data') (agent,agent') ->
+       agent.Raw_mixture.a_ints.(i)<-data_int;
+       agent.Raw_mixture.a_ports.(i)<-data_port;
+       agent'.(i)<-data')
+    (fun ((a,_),a') ((b,_),b') -> compare (a,a') (b,b'))
+    (fun i agent ->
+       agent.Raw_mixture.a_ints.(i),
+       agent.Raw_mixture.a_ports.(i))
+    (fun i (data_int,data_port) agent ->
+       agent.Raw_mixture.a_ints.(i)<-data_int;
+       agent.Raw_mixture.a_ports.(i)<-data_port)
+    get_full_partition
+    rule_cache symmetries raw_mixture
+
+
 let normalize rule_cache symmetries raw_mixture =
-  let raw_mixture = normalize_internal_states symmetries raw_mixture in
+  let rule_cache, raw_mixture =
+    normalize_full rule_cache symmetries raw_mixture
+  in
+  let raw_mixture =
+    normalize_internal_states symmetries raw_mixture
+      in
     normalize_binding_states rule_cache symmetries raw_mixture
 
 

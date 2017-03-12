@@ -50,4 +50,4 @@ Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain Parallel_bonds Site_accross_bonds_domain}
 
 Primivites to deal with symmetries in rules and species
-{!modules: LKappa_group_action Pattern_group_action Raw_mixture_group_action Symmetries}
+{!modules: LKappa_group_action Pattern_group_action Raw_mixture_group_action Symmetries_sig Symmetries}

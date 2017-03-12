@@ -3,7 +3,7 @@ val normalize:
   Signature.s ->
   LKappa_auto.cache ->
   Pattern.PreEnv.t ->
-  ((int list list) * (int list list)) array ->
+  int Symmetries_sig.site_partition array ->
   Pattern.cc ->
   LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 

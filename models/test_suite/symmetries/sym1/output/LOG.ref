@@ -1820,33 +1820,35 @@ internal_states:p;u;
   site:z
 internal_states:p;u;
 Partitioned contact map
+************
 Agent: A
-internal sites:
-z,y,x,
-binding sites:
-
+  -Equivalence classes of sites for internal states:
+      {x,y,z}
+  -Equivalence classes of sites (both):
+      {x,y,z}
+************
 Partitioned contact map (LKAPPA)
 ************
 Agent: A
   -Equivalence classes of sites for internal states:
-{x,y,z}
-  -Equivalence classes of sites for bindings states:
-
+      {x,y,z}
+  -Equivalence classes of sites (both):
+      {x,y,z}
 ************
 With predicate (LKAPPA)
 ************
 Agent: A
   -Equivalence classes of sites for internal states:
-{x,y,z}
-  -Equivalence classes of sites for bindings states:
-
+      {x,y,z}
+  -Equivalence classes of sites (both):
+      {x,y,z}
 ************
 Symmetries:
 ************
 Agent: A
   -Equivalence classes of sites for internal states:
-{x,y,z}
-  -Equivalence classes of sites for bindings states:
-
+      {x,y,z}
+  -Equivalence classes of sites (both):
+      {x,y,z}
 ************
 execution finished without any exception

@@ -77,8 +77,7 @@ let print_ode_preamble
                  rate_convention
                with
                | Ode_args.Common ->
-                 "rule rates are corrected by automorphisms of the lhs
-that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
+                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
                | Ode_args.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
                | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
@@ -119,8 +118,7 @@ that induce an automorphism in the rhs as weel; and by the automorphisms of the 
                  rate_convention
                with
                | Ode_args.Common ->
-                 "rule rates are corrected by automorphisms of the lhs
-that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
+                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
                | Ode_args.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
                | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
