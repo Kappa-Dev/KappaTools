@@ -1,3 +1,6 @@
+let get_internal_state_partition (a,_) = a
+let get_binding_state_partition (_,a) = a
+
 let normalize_in_agent_gen
     (get:int -> 'a -> 'b)
     (set:int -> 'b -> 'a -> unit)
@@ -60,7 +63,7 @@ let
     (fun i agent -> agent.Raw_mixture.a_ints.(i))
     (fun i data agent -> agent.Raw_mixture.a_ints.(i)<-data)
     compare
-    fst
+    get_internal_state_partition
     equiv_class raw_mixture
 
 
@@ -78,7 +81,7 @@ let pop i map =
     raise
       (ExceptionDefn.Internal_Error ("Illegal map", Locality.dummy))
   | Some [a;b] ->
-    Mods.IntMap.add i [a] map, b
+    Mods.IntMap.add i [b] map, a
   | Some [a] ->
     Mods.IntMap.remove i map,a
   | Some _ ->
@@ -133,8 +136,110 @@ let enrich_binding_state raw_mixture =
 let remove_binding_state refined_raw_mixture =
   List.rev_map fst (List.rev refined_raw_mixture)
 
+let refine_class equiv_class agent output =
+  match equiv_class with
+  | [] -> output
+  | h::t ->
+    begin
+      let rec aux ref_value to_do current_class output =
+        match to_do with
+        | [] ->
+          begin
+            match ref_value with
+            | None -> output
+            | Some _ -> current_class::output
+          end
+        | h::t ->
+          if agent.(h) = ref_value
+          then
+            aux ref_value t (h::current_class) output
+          else
+            match ref_value with
+              | None -> aux (agent.(h)) t [h] output
+              | Some _ -> aux (agent.(h)) t [h] (current_class::output)
+
+      in
+      aux (agent.(h)) t [h] output
+    end
+
+let refine_partition which symmetries refined_raw_mixture =
+  List.rev_map
+    (fun (agent,agent') ->
+       let ag_type = agent.Raw_mixture.a_type in
+       List.fold_left
+         (fun output equiv_class ->
+            refine_class equiv_class agent' output)
+         [] (which symmetries.(ag_type))
+    )
+    (List.rev refined_raw_mixture)
+
+let apply_permutation get set perm agent =
+  let assign =
+    List.rev_map
+      (fun (i,j) ->
+         (j,get i agent))
+      perm
+  in
+  let () = List.iter (fun (j,data) -> set j data agent) assign in
+  agent
+
+let apply_permutation_inv get set perm agent =
+  let perm_inv =
+    List.rev_map (fun (a,b) -> (b,a)) perm
+  in
+  apply_permutation get set perm_inv agent
+
+let rec fold_symmetries_over_agent get set f covering agent accu =
+  match covering with
+  | h::t ->
+    Tools.fold_over_permutations
+      (fun perm accu ->
+         let perm = List.rev_map2 (fun a b -> (a,b)) h perm in
+         let agent = apply_permutation get set perm agent in
+         let accu = fold_symmetries_over_agent get set f t agent accu  in
+         let _ = apply_permutation_inv get set perm agent in
+         accu)
+      h accu
+  | [] -> f agent accu
+
+let fold_symmetries_over_raw_mixture
+    get set f raw_mixture covering_list accu =
+  let raw_mixture0 = raw_mixture in
+  let rec aux get set f raw_mixture covering_list accu =
+    match raw_mixture,covering_list
+    with
+    | [], [] -> f raw_mixture0 accu
+    | _::_, [] | [],_::_ ->
+      raise
+        (ExceptionDefn.Internal_Error
+           ("Arguments of fold_symmetries_over_rw_mixture shall have the same length",
+            Locality.dummy))
+    | h::t, h'::t' ->
+      fold_symmetries_over_agent
+        get set
+        (fun agent accu -> aux get set f t t' accu)
+        h' h accu
+  in aux get set f raw_mixture covering_list accu
+
+let lkappa_of_raw_mixture raw_mixture =
+  {
+    LKappa.r_mix =  [];
+    LKappa.r_created = raw_mixture ;
+    LKappa.r_delta_tokens = [] ;
+    LKappa.r_rate = Alg_expr.int 0 ;
+    LKappa.r_un_rate = None  ;
+  }
+
+let copy raw_mixture =
+  List.rev_map
+    (fun agents ->
+       {agents with Raw_mixture.a_ints = Array.copy agents.Raw_mixture.a_ints ;
+                    Raw_mixture.a_ports = Array.copy agents.Raw_mixture.a_ports })
+    (List.rev raw_mixture)
+
+
 let
-  normalize_binding_states equiv_class raw_mixture
+  normalize_binding_states rule_cache symmetries raw_mixture
   =
   let refined_raw_mixture = enrich_binding_state raw_mixture in
   let refined_raw_mixture =
@@ -147,15 +252,46 @@ let
          agent.Raw_mixture.a_ports.(i)<-data;
          agent'.(i)<-data')
       (fun (_,a) (_,b) -> compare a b)
-      snd
-      equiv_class refined_raw_mixture 
+      get_binding_state_partition
+      symmetries refined_raw_mixture
   in
-  (* to do *)
-  remove_binding_state refined_raw_mixture
+  let covering_list =
+    refine_partition
+      get_binding_state_partition
+      symmetries
+      refined_raw_mixture
+  in
+  let raw_mixture = remove_binding_state refined_raw_mixture in
+  let rule_cache, hash =
+    LKappa_auto.cannonic_form rule_cache (lkappa_of_raw_mixture raw_mixture)
+  in
+  let rule_cache, (_,raw_mixture) =
+    fold_symmetries_over_raw_mixture
+      (fun i agent -> agent.Raw_mixture.a_ports.(i))
+      (fun i data agent -> agent.Raw_mixture.a_ports.(i)<-data)
+      (fun raw_mixture (rule_cache,(best_hash,best_raw_mixture)) ->
+         let rule_cache, hash =
+           LKappa_auto.cannonic_form
+             rule_cache
+             (lkappa_of_raw_mixture raw_mixture)
+         in
+         if compare hash best_hash < 0
+         then
+           (rule_cache, (hash, copy raw_mixture))
+         else
+           (rule_cache, (best_hash, best_raw_mixture)))
+      raw_mixture
+      covering_list
+      (rule_cache, (hash, copy raw_mixture))
+  in
+  rule_cache, raw_mixture
 
-let normalize equiv_class raw_mixture =
-  let raw_mixture = normalize_binding_states equiv_class raw_mixture in
-  normalize_internal_states equiv_class raw_mixture
+
+let normalize rule_cache symmetries raw_mixture =
+  let raw_mixture = normalize_internal_states symmetries raw_mixture in
+    normalize_binding_states rule_cache symmetries raw_mixture
+
+
 (**************************************************************)
 (*check for each agent, that each pair of sites in a same equivalence
   class carry the same internal state *)
@@ -163,7 +299,7 @@ let normalize equiv_class raw_mixture =
 (* The function shall have no side effect *)
 
 
-let check_symmetries_of_internal_states_in_agent equiv_class agent_ints =
+let check_symmetries_of_internal_states_in_agent partition agent_ints =
   (*reverse the equivalence classes*)
   (*  let equiv_class_rev = List.rev equiv_class in
   let asso =

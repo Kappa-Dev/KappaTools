@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 11 2017>
+  * Last modification: Time-stamp: <Mar 12 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -34,17 +34,19 @@ type cache =
   }
 
 let get_representant parameters compil cache symmetries species =
-  let rep_cache, cc_cache, species =
+  let rep_cache, rule_cache, cc_cache, species =
     Symmetries.representant
       ~parameters
       (Model.signatures compil.environment)
       cache.representant_cache
+      cache.rule_cache
       cache.cc_cache
       symmetries species
   in
-  {cache with
-   representant_cache = rep_cache;
-   cc_cache = cc_cache
+  {
+    representant_cache = rep_cache;
+    cc_cache = cc_cache ;
+    rule_cache = rule_cache ;
   }, species
 
 let get_cc_cache cache = cache.cc_cache
@@ -404,6 +406,9 @@ let nb_tokens compil = Model.nb_tokens (environment compil)
 
 let divide_rule_rate_by cache compil rule =
   match compil.rate_convention with
+  | Ode_args.Common -> assert false
+(* this is not a valid parameterization *)
+(* Common can be used only to compute normal forms *)
   | Ode_args.KaSim -> cache, 1
   | Ode_args.Biochemist
   | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
