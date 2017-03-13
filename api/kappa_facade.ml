@@ -135,7 +135,7 @@ type t =
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
-    has_tracking : (bool * bool * bool) option ;
+    with_trace : bool ;
     mutable lastyield : float ;
     mutable file_indexes : file_index list option;
   }
@@ -150,7 +150,7 @@ let t_range (t : t) (range : Api_types_j.range) =
   | Some indexes ->  localize_range range indexes
 
 let create_t ~log_form ~ log_buffer ~contact_map ~env ~counter ~graph ~state
-    ~init_l ~has_tracking ~lastyield ~file_indexes : t =
+    ~init_l ~with_trace ~lastyield ~file_indexes : t =
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
     pause_condition = Alg_expr.FALSE;
@@ -160,7 +160,7 @@ let create_t ~log_form ~ log_buffer ~contact_map ~env ~counter ~graph ~state
     flux_maps = [];
     files = [];
     error_messages = [];
-    contact_map; env; graph; state; init_l; has_tracking;
+    contact_map; env; graph; state; init_l; with_trace;
     lastyield; file_indexes;
   }
 
@@ -178,7 +178,7 @@ let reinitialize random_state t =
   t.files <- [];
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
-      ~with_trace:(t.has_tracking <>None)
+      ~with_trace:t.with_trace
       random_state t.env t.counter;
   t.state <- State_interpreter.empty t.env []
 
@@ -192,7 +192,7 @@ let clone_t t =
     ~graph:t.graph (* FALSE imperatively modified *)
     ~state:t.state (* FALSE imperatively modified *)
     ~init_l:t.init_l
-    ~has_tracking:t.has_tracking
+    ~with_trace:t.with_trace
     ~lastyield:t.lastyield
     ~file_indexes:t.file_indexes
 
@@ -254,6 +254,8 @@ let build_ast
                   let lastyield = Sys.time () in
                   try (* exception raised by compile must have used Lwt.fail.
                          Something is wrong for now *)
+                    let (conf,_,_,_) =
+                      Configuration.parse result.Ast.configurations in
                   Eval.compile
                     ~pause:(fun f -> Lwt.bind (yield ()) f)
                     ~return:Lwt.return ?rescale_init:None
@@ -266,25 +268,24 @@ let build_ast
                         | Data.TraceStep _
                         | Data.Print _ -> assert false)
                     ~max_sharing:false sig_nd tk_nd contact_map result >>=
-                  (fun (conf,env,has_tracking,_,_,init_l) ->
+                  (fun (env,with_trace,init_l) ->
                      let counter =
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
                          ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
                      let () = ExceptionDefn.flush_warning log_form in
                      let random_state =
-                       match conf.Eval.seed with
+                       match conf.Configuration.seed with
                        | None -> Random.State.make_self_init ()
                        | Some theSeed -> Random.State.make [|theSeed|] in
                      let simulation =
                        create_t
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
                          ~graph:(Rule_interpreter.empty
-                                   ~with_trace:((*TODO conf.Eval.traceFileName*)
-                                     has_tracking <>None)
+                                   ~with_trace(*TODO conf.Eval.traceFileName*)
                                    random_state env counter)
                          ~state:(State_interpreter.empty env [])
-                         ~init_l ~has_tracking ~lastyield
+                         ~init_l ~with_trace ~lastyield
                          ~file_indexes:(Some indexes)
                      in
                      Lwt.return (`Ok simulation))
@@ -437,7 +438,7 @@ let start
                      (time_yield ~system_process:system_process ~t:t) >>=
                      (fun () -> x >>= f))
                  ~return:Lwt.return ~outputs:(outputs t)
-                 ~with_trace:(t.has_tracking <> None)
+                 ~with_trace:t.with_trace
                  t.counter
                  t.env
                  random_state

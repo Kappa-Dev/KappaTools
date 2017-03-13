@@ -6,11 +6,17 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type directive_unit = Time | Event
+type t = {
+  seed : int option;
+  traceFileName : string option;
+  plotPeriod : Counter.period option;
+  outputFileName : string option;
+  initial : float option;
+}
 
-val get_compilation :
-  ?unit:directive_unit -> ?max_sharing:bool -> Run_cli_args.t ->
-  (Configuration.t * Model.t * Contact_map.t * int list *
-   (bool*bool*bool) option * string * string option *
-   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) *
-  Counter.t
+val parse :
+  ((string * Locality.t) * (string * Locality.t) list) list ->
+  t * (bool * bool * bool) *
+  string (*cflowFormat*) * string option (*cflowFile*)
+
+val print : Format.formatter -> t -> unit

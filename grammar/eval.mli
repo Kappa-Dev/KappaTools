@@ -8,14 +8,6 @@
 
 (** Main compilation functions *)
 
-type configuration = {
-  seed : int option;
-  traceFileName : string option;
-  plotPeriod : Counter.period option;
-  outputFileName : string option;
-  initial : float option;
-}
-
 (*val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
   (string Locality.annot * Ast.port list, Ast.mixture, string, Ast.rule)
@@ -35,8 +27,7 @@ val compile_modifications_no_track:
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
-  return:(configuration * Model.t * (bool*bool*bool) option *
-          string (*cflowFormat*) * string option (*cflowFile*) *
+  return:(Model.t * bool (*has_tracking*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Contact_map.t ->

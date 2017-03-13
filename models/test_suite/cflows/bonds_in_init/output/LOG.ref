@@ -1,9 +1,9 @@
 Parsing bonds_in_init.ka...
 done
++ simulation parameters
 + Sanity checks
 + Compiling...
 + Building initial simulation conditions...
-	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations

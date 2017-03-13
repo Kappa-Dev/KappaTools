@@ -131,7 +131,7 @@ let () =
         ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
 
     let theSeed,seed_arg =
-      match kasim_args.Kasim_args.seedValue,conf.Eval.seed with
+      match kasim_args.Kasim_args.seedValue,conf.Configuration.seed with
       | Some seed,_ | None, Some seed -> seed,[||]
       | None, None ->
         let () = Format.printf "+ Self seeding...@." in
@@ -157,7 +157,8 @@ let () =
         (Pp.array Pp.space (fun _ -> Format.pp_print_string)) seed_arg in
 
     let trace_file,user_trace_file =
-      match kasim_args.Kasim_args.traceFile,conf.Eval.traceFileName with
+      match kasim_args.Kasim_args.traceFile,
+            conf.Configuration.traceFileName with
       | Some _ as x,_ -> x,x
       | _, (Some _ as x) -> x,x
       | None, None ->
@@ -167,7 +168,7 @@ let () =
           let () = tmp_trace := Some (Filename.temp_file "trace" ".json") in
           !tmp_trace,None in
     let plot_file = Option_util.unsome
-        (Option_util.unsome "data.csv" conf.Eval.outputFileName)
+        (Option_util.unsome "data.csv" conf.Configuration.outputFileName)
         cli_args.Run_cli_args.outputDataFile in
     let plotPack =
       let head =
@@ -182,12 +183,13 @@ let () =
     let () =
       if not !Parameter.compileModeOn then
         Outputs.initial_inputs
-          {Eval.seed = Some theSeed; Eval.traceFileName = user_trace_file;
-           Eval.initial =
+          {Configuration.seed = Some theSeed;
+           Configuration.traceFileName = user_trace_file;
+           Configuration.initial =
              if Tools.float_is_zero (Counter.init_time counter) then None
              else Some (Counter.init_time counter);
-           Eval.plotPeriod = Some (Counter.plot_period counter);
-           Eval.outputFileName = Some plot_file;}
+           Configuration.plotPeriod = Some (Counter.plot_period counter);
+           Configuration.outputFileName = Some plot_file;}
           env contact_map init_l in
 
     Kappa_files.setCheckFileExists

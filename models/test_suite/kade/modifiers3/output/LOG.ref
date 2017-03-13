@@ -1,9 +1,9 @@
 Parsing modifiers.ka...
 done
++ simulation parameters
 + Sanity checks
 + Compiling...
 + Building initial simulation conditions...
-	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations
@@ -26,10 +26,10 @@ done
 	 -observables 
 Parsing modifiers.ka...
 done
++ simulation parameters
 + Sanity checks
 + Compiling...
 + Building initial simulation conditions...
-	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations

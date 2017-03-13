@@ -1,9 +1,9 @@
 Parsing abc.ka...
 done
++ simulation parameters
 + Sanity checks
 + Compiling...
 + Building initial simulation conditions...
-	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations
@@ -16,10 +16,10 @@ Done
 + Command line to rerun is: 'KaSim' 'abc.ka' '-mode' 'batch' '-seed' '785872661' '--compile' '-d' 'output' '-l' '0'
 Parsing abc.ka...
 done
++ simulation parameters
 + Sanity checks
 + Compiling...
 + Building initial simulation conditions...
-	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations
