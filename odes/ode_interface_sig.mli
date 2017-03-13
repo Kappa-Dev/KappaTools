@@ -150,6 +150,11 @@ sig
   val nb_tokens: compil -> int
 
   (*symmetries*)
+  val cannonic_form_from_syntactic_init:
+    Remanent_parameters_sig.parameters -> cache -> compil ->
+    chemical_species ->
+    cache * LKappa.rule * LKappa_auto.RuleCache.hashed_list
+
   val cannonic_form_from_syntactic_rule :
     cache -> compil -> rule ->
     cache * LKappa.rule *

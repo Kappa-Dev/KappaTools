@@ -2347,34 +2347,47 @@ struct
     in
     cache, cannonic_list, hashed_lists
 
-  (******************************************************)
+  let cannonic_form_from_syntactic_init parameters network compil
+      chemical_species =
+    let cache = network.cache in
+    let cache, pair_list =
+      List.fold_left (fun (cache, current_list) species ->
+          let cache, lkappa_rule, hashed_list =
+            I.cannonic_form_from_syntactic_init parameters cache
+              compil species
+          in
+          cache, (hashed_list, lkappa_rule) :: current_list
+        ) (cache, []) chemical_species
+    in
+    {network with cache = cache}, pair_list
+
+  (************************************************************************)
 
   let compute_symmetries_from_model parameters compil network contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
     let log = Remanent_parameters.get_logger parameters in
-    (*detect symmetries in initial states*)
-    let network, initial_states =
+    (********************************************************)
+    (*initial_states*)
+    let network, chemical_species =
       species_of_initial_state compil network (I.get_init compil)
     in
-    let () =
-      if Remanent_parameters.get_trace parameters then
-        let fmt = Loggers.formatter_of_logger log in
-        let () = Loggers.fprintf log "Initial species:" in
-        let () = Loggers.print_newline log in
-        List.iter (fun species ->
-          match fmt with
-          | None -> ()
-          | Some fmt ->
-            I.print_chemical_species ~compil fmt species;
-            Loggers.print_newline log
-        ) initial_states
+    let network, pair_init_list =
+      cannonic_form_from_syntactic_init parameters network compil
+        chemical_species
     in
+    (*build fresh array for init*)
+    let init_hash_lists, _ = List.split pair_init_list in
+    let to_be_checked_init, counter_init, rates_init, correct_init =
+      Symmetries.build_array_for_symmetries init_hash_lists
+    in
+    (********************************************************)
     (*detect symmetries for rules*)
     let cache = network.cache in
     let cache, cannonic_list, pair_list =
       cannonic_form_from_syntactic_rules cache compil
     in
     let hash_lists, lkappa_rule = List.split pair_list in
+    (*build array for rule*)
     let to_be_checked, counter, rates, correct =
       Symmetries.build_array_for_symmetries hash_lists
     in
@@ -2402,6 +2415,16 @@ struct
         cache
         pair_list
         (to_be_checked, counter, rates, correct)
+        contact_map
+    in
+    (*init*)
+    let cache, symmetries =
+      I.detect_symmetries
+        parameters
+        compil
+        cache
+        pair_init_list
+        (to_be_checked_init, counter_init, rates_init, correct_init)
         contact_map
     in
     let network =

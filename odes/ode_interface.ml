@@ -424,6 +424,39 @@ let divide_rule_rate_by cache compil rule =
 (****************************************************************)
 (*cannonic form per rule*)
 
+let lkappa_init =
+  {
+    LKappa.r_mix =  [];
+    LKappa.r_created = [];
+    LKappa.r_delta_tokens = [] ;
+    LKappa.r_rate = Alg_expr.int 0 ;
+    LKappa.r_un_rate = None  ;
+  }
+
+let cannonic_form_from_syntactic_init parameters cache compil species =
+  let rule_cache = cache.rule_cache in
+  let signature = Model.signatures compil.environment in
+  let some_pair =
+    Raw_mixture_extra.pattern_to_raw_mixture
+      ~parameters
+      signature
+      species
+  in
+  match some_pair with
+  | None ->
+    cache, lkappa_init, LKappa_auto.RuleCache.empty
+  | Some (raw_mixture, _) ->
+  let lkappa_rule =
+    Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
+  in
+  let rule_cache, hashed_list =
+    LKappa_auto.cannonic_form rule_cache
+      lkappa_rule
+  in
+  (*let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in*)
+  let cache = {cache with rule_cache = rule_cache} in
+  cache, lkappa_rule, hashed_list
+
 let cannonic_form_from_syntactic_rule cache compil rule =
   let rule_id = rule.Primitives.syntactic_rule in
   let lkappa_rule =

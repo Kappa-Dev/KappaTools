@@ -59,7 +59,8 @@ let normalize_internal_states equiv_class raw_mixture =
     (fun i data agent -> agent.Raw_mixture.a_ints.(i) <- data)
     compare
     get_internal_state_partition
-    equiv_class raw_mixture
+    equiv_class
+    raw_mixture
 
 let add i j map =
   let old =
@@ -299,8 +300,6 @@ let normalize rule_cache symmetries raw_mixture =
 (* The function shall have no side effect *)
 
 let check_symmetries_of_internal_states_in_agent partition agent_ints =
-
-
   true (* to do *)
 
 

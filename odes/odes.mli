@@ -53,7 +53,7 @@ sig
   val get_divide_rate_by : enriched_rule -> int
 
 (*initial states*)
-  val translate_species :
+  (*val translate_species :
     Remanent_parameters_sig.parameters ->
     I.compil ->
     I.chemical_species ->
@@ -72,18 +72,18 @@ sig
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     I.init ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network
-    * I.chemical_species list
+    * Pattern.cc list*)
 
-  val initial_network :
+  (*val initial_network :
     Remanent_parameters_sig.parameters ->
     I.compil ->
     (ode_var_id,Ode_loggers_sig.ode_var_id) network ->
     I.chemical_species list ->
     enriched_rule list ->
     I.chemical_species list *
-      (ode_var_id, Ode_loggers_sig.ode_var_id) network
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network*)
 
-  val compute_reactions :
+  (*  val compute_reactions :
     Remanent_parameters_sig.parameters ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
@@ -102,7 +102,7 @@ sig
     (('a, 'b) network * ode_var_id list)
 
   val species_of_species_id:
-    ('a,'b) network -> ode_var_id -> I.chemical_species * int
+    ('a,'b) network -> ode_var_id -> I.chemical_species * int*)
 
   (*rules*)
 

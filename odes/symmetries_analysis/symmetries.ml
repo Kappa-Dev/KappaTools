@@ -345,8 +345,8 @@ let max_hashes hash_list =
     | head :: tail -> aux tail (max_hash best head)
   in aux hash_list LKappa_auto.RuleCache.empty
 
-let build_array_for_symmetries nbr_rule_list =
-  let max_hash = max_hashes nbr_rule_list in
+let build_array_for_symmetries hashed_list =
+  let max_hash = max_hashes hashed_list in
   let size_hash_plus_1 =
     (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
   in
@@ -456,7 +456,7 @@ let detect_symmetries parameters env cache
   in
   let refined_partitioned_contact_map =
     Array.map Symmetries_sig.clean refined_partitioned_contact_map
-      in
+  in
   (*-------------------------------------------------------------*)
   (*PRINT*)
   let () =

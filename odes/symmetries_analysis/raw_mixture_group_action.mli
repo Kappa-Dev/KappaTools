@@ -1,3 +1,7 @@
+
+
+val lkappa_of_raw_mixture : Raw_mixture.t -> LKappa.rule
+
 val normalize:
   LKappa_auto.cache ->
   int Symmetries_sig.site_partition array ->
