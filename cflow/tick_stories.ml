@@ -17,10 +17,10 @@
    * under the terms of the GNU Library General Public License *)
 
 
-let tick_stories f save_progress_bar (init,last,counter,n_stories) =
+let tick_stories f conf save_progress_bar (init,last,counter,n_stories) =
   let () =
     if not init then
-      let c = ref !Parameter.progressBarSize in
+      let c = ref conf.Counter.progressSize in
       let () = Loggers.print_newline f in
       while !c > 0 do
         Loggers.fprintf  f "_" ;
@@ -30,18 +30,18 @@ let tick_stories f save_progress_bar (init,last,counter,n_stories) =
   in
   let n =
     if n_stories <=0 && counter = 0
-    then !Parameter.progressBarSize
+    then conf.Counter.progressSize
     else if counter > n_stories
     then 0
     else
-      let nc = (counter * !Parameter.progressBarSize) / n_stories in
-      let nl = (last * !Parameter.progressBarSize) / n_stories in
+      let nc = (counter * conf.Counter.progressSize) / n_stories in
+      let nl = (last * conf.Counter.progressSize) / n_stories in
       nc - nl
   in
   let rec aux n =
     if n<=0 then ()
     else
-      let () = Loggers.fprintf f "%c" (!Parameter.progressBarSymbol) in
+      let () = Loggers.fprintf f "%c" (conf.Counter.progressChar) in
       let () = if !Parameter.eclipseMode then Loggers.print_newline f in
       aux (n-1)
   in

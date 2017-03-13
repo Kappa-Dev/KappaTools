@@ -6,6 +6,16 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type progressBar = {
+  progressSize : int;
+  progressChar : char;
+}
+
+let default_progress = {
+  progressSize = 60;
+  progressChar = '#';
+}
+
 module Stat_null_events :
 sig
   type t
@@ -182,16 +192,17 @@ let reinitialize counter =
   counter.last_point <- 0;
   counter.stat_null <- Stat_null_events.init ()
 
-let rec tick c =
-  match c.progress_report with
-  | None ->
-    let () =
-      c.progress_report <-
-        Some (Progress_report.create
-                !Parameter.progressBarSize !Parameter.progressBarSymbol) in
-    tick c
-  | Some pr ->
-    Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) pr
+let tick conf c =
+  let pr =
+    match c.progress_report with
+    | None ->
+      let pr =
+        Progress_report.create
+          conf.progressSize conf.progressChar in
+      let () = c.progress_report <- Some pr in
+      pr
+    | Some pr -> pr in
+  Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) pr
 
   let current_simulation_info c =
   { Trace.Simulation_info.story_id = current_story c;

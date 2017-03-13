@@ -18,15 +18,16 @@ let rec waitpid_non_intr pid =
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
 
-let batch_loop ~outputs env counter graph state =
+let batch_loop ~outputs progressConf env counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
       State_interpreter.a_loop ~outputs env counter graph state in
     if stop then (graph',state')
-    else let () = Counter.tick counter in iter graph' state'
+    else let () = Counter.tick progressConf counter in iter graph' state'
   in iter graph state
 
-let interactive_loop ~outputs pause_criteria env counter graph state =
+let interactive_loop
+    ~outputs progressConf pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
     Sys.signal
@@ -44,7 +45,7 @@ let interactive_loop ~outputs pause_criteria env counter graph state =
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         out
-      else let () = Counter.tick counter in iter graph' state'
+      else let () = Counter.tick progressConf counter in iter graph' state'
   in iter graph state
 
 let finalize
@@ -124,7 +125,7 @@ let () =
       (!Parameter.debugModeOn || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
-    let (conf, env, contact_map, _, story_compression,
+    let (conf, progressConf, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
         counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
@@ -242,7 +243,8 @@ let () =
           ~outputs formatCflows cflowFile trace_file
           env counter graph state story_compression
       else if cli_args.Run_cli_args.batchmode then
-        let (graph',state') = batch_loop ~outputs env counter graph state in
+        let (graph',state') =
+          batch_loop ~outputs progressConf env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
           env counter graph' state' story_compression
@@ -258,7 +260,8 @@ let () =
                 let env',graph',b'' = Evaluator.get_pause_criteria
                     ~max_sharing:kasim_args.Kasim_args.maxSharing
                     contact_map env graph b in
-                 env',interactive_loop ~outputs b'' env' counter graph' state
+                env',interactive_loop
+                  ~outputs progressConf b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 let e', (env',_ as o) =
@@ -290,7 +293,8 @@ let () =
           toplevel env graph state
         else
           let (stop,graph',state') =
-            interactive_loop ~outputs Alg_expr.FALSE env counter graph state in
+            interactive_loop
+              ~outputs progressConf Alg_expr.FALSE env counter graph state in
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file

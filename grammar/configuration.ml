@@ -44,7 +44,7 @@ let parse result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (conf,story_compression,formatCflow,cflowFile as acc)
+    (fun (conf,progress,story_compression,formatCflow,cflowFile as acc)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -53,7 +53,7 @@ let parse result =
           | ("strong",_)::tl -> parse (a,b,true) tl
           | ("weak",_)::tl -> parse (a,true,c) tl
           | ("none",_)::tl -> parse (true,b,c) tl
-          | [] -> (conf,(a,b,c),formatCflow,cflowFile)
+          | [] -> (conf,progress,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
                      ("Unkown value "^error^" for compression mode", pos))
@@ -61,13 +61,13 @@ let parse result =
         parse story_compression value_list
       | "cflowFileName" ->
         get_value pos_p param value_list
-          (fun x _ -> (conf,story_compression,formatCflow,Some x))
+          (fun x _ -> (conf,progress,story_compression,formatCflow,Some x))
       | "seed" ->
         get_value pos_p param value_list
           (fun s p ->
              try
                ({ conf with seed = Some (int_of_string s) },
-                story_compression,formatCflow,cflowFile)
+                progress,story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be an integer", p)))
@@ -76,7 +76,7 @@ let parse result =
           (fun s p ->
              try
                ({ conf with initial = Some (float_of_string s) },
-                story_compression,formatCflow,cflowFile)
+                progress,story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be a float", p)))
@@ -85,7 +85,7 @@ let parse result =
           | [s,p] ->
             (try
                ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
-                story_compression,formatCflow,cflowFile)
+                progress,story_compression,formatCflow,cflowFile)
              with Failure _ ->
                raise (ExceptionDefn.Malformed_Decl
                         ("Value "^s^" should be a float", p)))
@@ -94,7 +94,7 @@ let parse result =
                u = "Event" || u = "Events" then
               try
                 ({conf with plotPeriod = Some (Counter.DE (int_of_string s))},
-                 story_compression,formatCflow,cflowFile)
+                 progress,story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
                          ("Value "^s^" should be an integer", sp))
@@ -102,7 +102,7 @@ let parse result =
                     u = "time unit" || u = "Time unit" then
               try
                 ({conf with plotPeriod = Some (Counter.DT (float_of_string s))},
-                 story_compression,formatCflow,cflowFile)
+                 progress,story_compression,formatCflow,cflowFile)
               with Failure _ ->
                 raise (ExceptionDefn.Malformed_Decl
                          ("Value "^s^" should be a float", sp))
@@ -118,33 +118,32 @@ let parse result =
         get_value pos_p param value_list
           (fun s _ ->
                ({ conf with outputFileName = Some s },
-                story_compression,formatCflow,cflowFile))
+                progress,story_compression,formatCflow,cflowFile))
       | "traceFileName" ->
         get_value pos_p param value_list
           (fun s _ ->
                ({ conf with traceFileName = Some s },
-                story_compression,formatCflow,cflowFile))
+                progress,story_compression,formatCflow,cflowFile))
 
       | "progressBarSize" ->
-        let () = set_value pos_p param value_list
-            (fun v p ->
-               try int_of_string v
-               with Failure _ ->
-                 raise (ExceptionDefn.Malformed_Decl
-                          ("Value "^v^" should be an integer", p))
-            ) Parameter.progressBarSize in
-        acc
-
+         (conf,{ progress with
+                 Counter.progressSize = get_value pos_p param value_list
+                     (fun v p ->
+                        try int_of_string v
+                        with Failure _ ->
+                          raise (ExceptionDefn.Malformed_Decl
+                                   ("Value "^v^" should be an integer", p)))
+               },story_compression,formatCflow,cflowFile)
       | "progressBarSymbol" ->
-        let () = set_value pos_p param value_list
-            (fun v p ->
-               try
-                 String.unsafe_get v 0
-               with _ ->
-                 raise (ExceptionDefn.Malformed_Decl
-                          ("Value "^v^" should be a character",p))
-            ) Parameter.progressBarSymbol in
-        acc
+         (conf,{ progress with
+                 Counter.progressChar = get_value pos_p param value_list
+                     (fun v p ->
+                        try
+                          String.unsafe_get v 0
+                        with _ ->
+                          raise (ExceptionDefn.Malformed_Decl
+                                   ("Value "^v^" should be a character",p)))
+               },story_compression,formatCflow,cflowFile)
 
       | "dumpIfDeadlocked" ->
         let () =
@@ -161,24 +160,16 @@ let parse result =
         acc
       | "dotCflows" ->
          let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
-         (conf,story_compression,formatCflow,cflowFile)
+         (conf,progress,story_compression,formatCflow,cflowFile)
 (*         if get_bool_value pos_p param value_list then
            (story_compression, Dot) else
            (story_compression, Html)*)
       | "colorDot" ->
-        let () = set_value pos_p param value_list
-            (fun value pos_v ->
-               match value with
-               | "true" | "yes" -> true
-               | "false" | "no" -> false
-               | _ as error ->
-                 raise (ExceptionDefn.Malformed_Decl
-                          ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
-            ) Parameter.useColor in
+        let () = Parameter.useColor := get_bool_value pos_p param value_list in
         acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) (empty, (false,false,false), "dot", None) result
+    ) (empty, Counter.default_progress, (false,false,false), "dot", None) result
 
 let print f conf =
   let () = Format.pp_open_vbox f 0 in

@@ -793,12 +793,18 @@ let open_contact_map_file parameters =
 let get_called_from parameter = parameter.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.called_from
 
  let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
- let get_compression_status_logger parameter = parameter.Remanent_parameters_sig.compression_status
+let get_compression_status_logger parameter =
+  parameter.Remanent_parameters_sig.compression_status
 
  let set_logger parameter logger =
    { parameter with Remanent_parameters_sig.logger = logger}
- let save_error_list parameter error = parameter.Remanent_parameters_sig.save_error_list error
- let save_progress_bar parameter bar = parameter.Remanent_parameters_sig.save_progress_bar bar
- let reset_progress_bar parameter = parameter.Remanent_parameters_sig.reset_progress_bar
- let save_current_phase_title parameter = parameter.Remanent_parameters_sig.save_current_phase_title
- let reset_current_phase_title parameter = parameter.Remanent_parameters_sig.reset_current_phase_title
+let save_error_list parameter error =
+  parameter.Remanent_parameters_sig.save_error_list error
+let save_progress_bar parameter bar =
+  parameter.Remanent_parameters_sig.save_progress_bar bar
+let reset_progress_bar parameter =
+  parameter.Remanent_parameters_sig.reset_progress_bar
+let save_current_phase_title parameter =
+  parameter.Remanent_parameters_sig.save_current_phase_title
+let reset_current_phase_title parameter =
+  parameter.Remanent_parameters_sig.reset_current_phase_title

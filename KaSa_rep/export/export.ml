@@ -304,7 +304,7 @@ let compute_env
     let () = show_title state in
     let cli = Run_cli_args.default in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
-    let (_,env, _, _, _, _, _, _), _ =
+    let (_,_,env, _, _, _, _, _, _), _ =
       Cli_init.get_compilation cli
     in
     Remanent_state.set_env (Some env) state, Some (env:Model.t)

@@ -16,7 +16,7 @@ type t = {
 
 val parse :
   ((string * Locality.t) * (string * Locality.t) list) list ->
-  t * (bool * bool * bool) *
+  t * Counter.progressBar * (bool * bool * bool) *
   string (*cflowFormat*) * string option (*cflowFile*)
 
 val print : Format.formatter -> t -> unit

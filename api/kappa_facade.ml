@@ -254,7 +254,7 @@ let build_ast
                   let lastyield = Sys.time () in
                   try (* exception raised by compile must have used Lwt.fail.
                          Something is wrong for now *)
-                    let (conf,_,_,_) =
+                    let (conf,_,_,_,_) =
                       Configuration.parse result.Ast.configurations in
                   Eval.compile
                     ~pause:(fun f -> Lwt.bind (yield ()) f)

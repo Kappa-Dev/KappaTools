@@ -524,7 +524,11 @@ let tick_opt parameter bar =
     bar
   with
   | None -> bar
-  | Some (logger,bar) -> Some (logger,Tick_stories.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) bar)
+  | Some (logger,bar) ->
+    Some (logger,
+          Tick_stories.tick_stories
+            logger Counter.default_progress
+            (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) bar)
 
 let close_progress_bar_opt logger = Loggers.print_newline logger
 
@@ -546,7 +550,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
   let n_stories_input = count_stories l in
   let progress_bar =
     Some
-      (logger,Tick_stories.tick_stories logger
+      (logger,Tick_stories.tick_stories logger Counter.default_progress
          (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter)  (false,0,0,n_stories_input))
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
@@ -796,6 +800,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
    let progress_bar =
      Tick_stories.tick_stories
        (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+       Counter.default_progress
        (Remanent_parameters.save_progress_bar
           (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
        (false,0,0,n)
@@ -828,6 +833,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
              let bar =
                Tick_stories.tick_stories
                  (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+                 Counter.default_progress
                  (Remanent_parameters.save_progress_bar
                     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))
                  bar

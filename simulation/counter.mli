@@ -8,6 +8,13 @@
 
 (** Simulation progress keeper *)
 
+type progressBar = {
+  progressSize : int;
+  progressChar : char;
+}
+
+val default_progress : progressBar
+
 type period = DE of int | DT of float
 
 type t
@@ -53,5 +60,5 @@ val consecutive_null_event : t -> int
 val print_efficiency : Format.formatter -> t -> unit
 
 (** {5 Output on stdout } *)
-val tick : t -> unit
+val tick : progressBar -> t -> unit
 val complete_progress_bar : t -> unit

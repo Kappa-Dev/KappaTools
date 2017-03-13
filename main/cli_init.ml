@@ -9,7 +9,7 @@
 type directive_unit = Time | Event
 
 let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
-  let (conf, env0, contact_map, updated_vars, story_compression,
+  let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
       alg_overwrite =
     match cli_args.Run_cli_args.marshalizedInFile with
@@ -18,7 +18,8 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
         List.fold_left (KappaLexer.compile Format.std_formatter)
           Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
       let () = Format.printf "+ simulation parameters@." in
-      let conf, (n,w,s as story_compression), formatCflow, cflowFile =
+      let conf, progressConf,
+          (n,w,s as story_compression), formatCflow, cflowFile =
         Configuration.parse result.Ast.configurations in
       let () = Format.printf "+ Sanity checks@." in
       let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
@@ -32,7 +33,7 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
           sigs_nd tk_nd contact_map result' in
       let story_compression =
         if has_tracking && (n||w||s) then Some story_compression else None in
-      (conf, env, contact_map, updated_vars, story_compression,
+      (conf, progressConf, env, contact_map, updated_vars, story_compression,
        formatCflow, cflowFile,init_l),[]
     | marshalized_file ->
       try
@@ -45,9 +46,9 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
                    f "Simulation package loaded, all kappa files are ignored") in
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
-        let _,env,_,_,_,_,_,_ as pack =
+        let _,_,env,_,_,_,_,_,_ as pack =
           (Marshal.from_channel d :
-             Configuration.t*Model.t*Contact_map.t*int list*
+             Configuration.t*Counter.progressBar*Model.t*Contact_map.t*int list*
              (bool*bool*bool) option*string*string option*
              (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) in
         let () = Pervasives.close_in d  in
@@ -94,5 +95,5 @@ let get_compilation ?(unit=Time) ?(max_sharing=false) cli_args =
         ?max_events:(Counter.max_events counter) updated_vars alg_overwrite env0
     else Model.overwrite_vars alg_overwrite env0 in
 
-  (conf, env, contact_map, updated_vars, story_compression,
+  (conf, progressConf, env, contact_map, updated_vars, story_compression,
    formatCflows, cflowFile, init_l),counter
