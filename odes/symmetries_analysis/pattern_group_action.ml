@@ -17,8 +17,7 @@
     a, b
   | None -> cache, cc*)
 
-let normalize
-    ?parameters signature rule_cache cache symmetries cc =
+let normalize ?parameters signature rule_cache cache symmetries cc =
   match
     Raw_mixture_extra.pattern_to_raw_mixture ?parameters signature cc
   with

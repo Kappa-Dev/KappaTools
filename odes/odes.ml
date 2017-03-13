@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 11 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
 *)
 
 let local_trace = false
@@ -2149,8 +2149,6 @@ struct
       let () = Ode_loggers.print_newline logger in
       ()
 
-
-
   let export_init logger compil network =
     let label = "listOfSpecies" in
     let () = Sbml_backend.open_box logger label in
@@ -2351,8 +2349,7 @@ struct
 
   (******************************************************)
 
-  let compute_symmetries_from_model
-      parameters compil network contact_map =
+  let compute_symmetries_from_model parameters compil network contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
     let log = Remanent_parameters.get_logger parameters in
     (*detect symmetries in initial states*)
@@ -2407,7 +2404,6 @@ struct
         (to_be_checked, counter, rates, correct)
         contact_map
     in
-
     let network =
       {
         network with

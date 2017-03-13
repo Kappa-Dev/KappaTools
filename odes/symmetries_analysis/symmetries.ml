@@ -77,16 +77,16 @@ let partition cache hash int_of_hash f map =
     cache hash int_of_hash f map
 
 let partition_pair cache hash int_of_hash f map =
-      partition_gen
-        Mods.Int2Map.empty
-        Mods.Int2Map.add
-        Mods.Int2Map.find_option
-        Mods.Int2Map.fold
-        (fun (a,b) ->
-           List.sort compare a,
-           List.sort compare b)
-        ([],[])
-        cache hash int_of_hash f map
+  partition_gen
+    Mods.Int2Map.empty
+    Mods.Int2Map.add
+    Mods.Int2Map.find_option
+    Mods.Int2Map.fold
+    (fun (a,b) ->
+       List.sort compare a,
+       List.sort compare b)
+    ([],[])
+    cache hash int_of_hash f map
 
 module State:  SetMap.OrderedType
   with type t = string
@@ -297,7 +297,8 @@ let refine_partitioned_contact_map_in_lkappa_representation
   Tools.array_fold_lefti
     (fun agent_type cache partition ->
        let over_binding_states = partition.Symmetries_sig.over_binding_states in
-       let over_internal_states = partition.Symmetries_sig.over_internal_states in
+       let over_internal_states = partition.Symmetries_sig.over_internal_states
+       in
        let over_full_states = partition.Symmetries_sig.over_full_states in
        let cache, a =
         refine_class
@@ -408,16 +409,16 @@ let check_invariance_binding_states
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
-    let check_invariance_both
-        ~correct ~rates ?parameters ?env
-        hash_and_rule_list
-        (cache, to_be_checked, counter)
-        agent_type site1 site2 =
-      check_invariance_gen
-        LKappa_group_action.check_orbit_full_permutation
-        ?parameters ?env
-        ~to_be_checked ~counter ~correct ~rates
-        hash_and_rule_list cache agent_type site1 site2
+let check_invariance_both
+    ~correct ~rates ?parameters ?env
+    hash_and_rule_list
+    (cache, to_be_checked, counter)
+    agent_type site1 site2 =
+  check_invariance_gen
+    LKappa_group_action.check_orbit_full_permutation
+    ?parameters ?env
+    ~to_be_checked ~counter ~correct ~rates
+    hash_and_rule_list cache agent_type site1 site2
 
 let detect_symmetries parameters env cache
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
@@ -522,22 +523,6 @@ let representant ?parameters signature cache rule_cache preenv_cache symmetries
     in
     let cache  = CcMap.add species species' cache in
     cache, rule_cache, preenv_cache, species'
-
-(*let refine_partition_contact_map_init ?parameters cache preenv_cache
-    signature symmetries species =
-  match CcMap.find_option species cache with
-  | Some species -> cache, preenv_cache, species
-  | None ->
-    let preenv_cache, species' =
-      Pattern_group_action.normalize_internal_states_in_raw_mixture_init
-        ?parameters
-        signature
-        preenv_cache
-        symmetries
-        species
-    in
-    let cache  = CcMap.add species species' cache in
-    cache, preenv_cache, species'*)
 
 let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in

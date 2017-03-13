@@ -216,8 +216,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         let network =
           if ode_args.Ode_args.with_symmetries
           then network
-          else
-            A.clean_symmetries network
+          else A.clean_symmetries network
         in
         network
       else

@@ -1,7 +1,22 @@
+(**
+   * LKappa_group_action.ml
+   * openkappa
+   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
+   *
+   * Creation: 2016, the 5th of December
+   * Last modification: Time-stamp: <Mar 13 2017>
+   *
+   * Abstract domain to record relations between pair of sites in connected agents.
+   *
+   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+   * en Informatique et en Automatique.
+   * All rights reserved.  This file is distributed
+   * under the terms of the GNU Library General Public License *)
 
 (** Swapping sites in regular (tested/modified/deleted) agents *)
 
 let get_binding_precondition x = fst (fst x)
+
 let get_binding_mod x = snd x
 
 let care_binding_regular binding =
@@ -63,8 +78,7 @@ let swap_binding_state_regular ag_type site1 site2 ag =
   let () = ag.LKappa.ra_ports.(site2) <- tmp in
   ()
 
-let swap_internal_state_regular
-    ag_type site1 site2 ag =
+let swap_internal_state_regular ag_type site1 site2 ag =
   let tmp = ag.LKappa.ra_ints.(site1) in
   let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
   let () = ag.LKappa.ra_ints.(site2) <- tmp in
@@ -98,8 +112,7 @@ let swap_binding_state_created ag_type site1 site2 ag =
   let () = ag.Raw_mixture.a_ports.(site2) <- tmp in
   ()
 
-let swap_internal_state_created
-    ag_type site1 site2 ag =
+let swap_internal_state_created ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ints.(site1) in
   let () =
     ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
@@ -108,11 +121,11 @@ let swap_internal_state_created
 
 let swap_full_created ag_type site1 site2 ag =
   let () = swap_internal_state_created ag_type site1 site2 ag in
-      swap_binding_state_created ag_type site1 site2 ag
+  swap_binding_state_created ag_type site1 site2 ag
 
 (*******************************************************************)
 
-let of_rule rule = (rule.LKappa.r_mix,rule.LKappa.r_created)
+let of_rule rule = (rule.LKappa.r_mix, rule.LKappa.r_created)
 
 let is_empty (rule_tail,created_tail) =
   rule_tail = [] && created_tail = []
@@ -247,7 +260,8 @@ let for_all_over_orbit
             next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
               positions accu
           else
-            let () = backtrack sigma_inv sigma_raw_inv counter
+            let () =
+              backtrack sigma_inv sigma_raw_inv counter
                 positions rule
             in
             accu, false
@@ -269,7 +283,7 @@ let for_all_over_orbit
 exception False
 
 let do_print parameters env f =
-  match parameters,env  with
+  match parameters, env  with
 | Some parameters, Some env ->
   begin
     if Remanent_parameters.get_trace parameters
@@ -281,7 +295,7 @@ let do_print parameters env f =
       | None -> ()
       | Some fmt -> f sigs logger fmt
   end
-| None,_ | _,None -> ()
+| None, _ | _, None -> ()
 
 let check_orbit
     ?parameters ?env
@@ -419,7 +433,7 @@ let check_orbit
          counter.(i) <- 0; to_be_checked.(i) <- true) l
   in
   if good_rates then
-    (cache,counter,to_be_checked), true
+    (cache, counter, to_be_checked), true
   else
     (cache, counter, to_be_checked), false
 
@@ -430,8 +444,8 @@ let weight ~correct ~card_stabilizer ~rate =
        (correct * card_stabilizer))
 
 let check_orbit_internal_state_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
-    to_be_checked =
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ~counter to_be_checked =
   check_orbit
     ?parameters ?env
     (potential_positions_for_swapping_internal_states,
@@ -442,8 +456,8 @@ let check_orbit_internal_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
-    to_be_checked =
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ~counter to_be_checked =
   check_orbit
     ?parameters ?env
     (potential_positions_for_swapping_binding_states,
@@ -454,8 +468,8 @@ let check_orbit_binding_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache ~counter
-    to_be_checked =
+    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ~counter to_be_checked =
   check_orbit
     ?parameters ?env
     (potential_positions_for_swapping_full,
