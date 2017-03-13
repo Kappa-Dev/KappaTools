@@ -250,33 +250,34 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
     | (CONST c1,_),(CONST c2,_) -> CONST (Nbr.of_bin_alg_op op c1 c2),pos
     | ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
        | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _
-       | CONST _ | IF _),_),
+       | CONST _ | IF _),_ as a'),
       ((BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | KAPPA_INSTANCE _
-       | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _  | TOKEN_ID _ | ALG_VAR _ | CONST _ | IF _),_) -> x)
-(* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
+       | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _  | TOKEN_ID _ | ALG_VAR _
+       | CONST _ | IF _),_ as b') ->
+      if a == a' && b == b' then x else (BIN_ALG_OP (op,a',b'),pos))
   | UN_ALG_OP (op,a),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
      | CONST c,_ -> CONST (Nbr.of_un_alg_op op c),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
        | BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _
-       | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
-  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
-  | DIFF_TOKEN (a,_),pos as x ->
+       | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ as a' ->
+    if a == a' then x else (UN_ALG_OP (op,a'),pos))
+  | DIFF_TOKEN (a,t),pos as x ->
+    (match propagate_constant ?max_time ?max_events updated_vars vars a with
+     | CONST _,_ ->
+       (* the derivative of a constant is zero *)
+       CONST (Nbr.zero),pos
+     | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _ | IF _
+       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _),_ as a' ->
+       if a == a' then x else (DIFF_TOKEN (a',t),pos))
+  | DIFF_KAPPA_INSTANCE (a,m),pos as x ->
     (match propagate_constant ?max_time ?max_events updated_vars vars a with
      | CONST _,_ ->
        (* the derivative of a constant is zero *)
        CONST (Nbr.zero),pos
      | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
-       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
-  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
-  | DIFF_KAPPA_INSTANCE (a,_),pos as x ->
-    (match propagate_constant ?max_time ?max_events updated_vars vars a with
-     | CONST _,_ ->
-       (* the derivative of a constant is zero *)
-       CONST (Nbr.zero),pos
-     | (DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _ | BIN_ALG_OP _ | UN_ALG_OP _
-       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ -> x)
-  (* JF: ??? why do we throw away the result of constant propagation when subexpr are not constant *)
+       | STATE_ALG_OP _ | KAPPA_INSTANCE _ | TOKEN_ID _ | ALG_VAR _ | IF _),_ as a' ->
+       if a == a' then x else (DIFF_KAPPA_INSTANCE (a',m),pos))
   | STATE_ALG_OP (Operator.EMAX_VAR),pos ->
     CONST
       (match max_events with
@@ -313,7 +314,7 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
     | TRUE, _ ->
       propagate_constant ?max_time ?max_events updated_vars vars yes
     | FALSE,_ ->
-            propagate_constant ?max_time ?max_events updated_vars vars no
+      propagate_constant ?max_time ?max_events updated_vars vars no
     | (BOOL_OP _ | COMPARE_OP _),_ as cond' ->
       (IF (cond', propagate_constant ?max_time ?max_events updated_vars vars yes,
            propagate_constant ?max_time ?max_events updated_vars vars no),pos)
