@@ -76,13 +76,13 @@ let print_ode_preamble
               (match
                  rate_convention
                with
-               | Ode_args.Common ->
+               | Remanent_parameters_sig.Common ->
                  "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
-               | Ode_args.Biochemist ->
+               | Remanent_parameters_sig.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
-               | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+               | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
-               | Ode_args.KaSim ->
+               | Remanent_parameters_sig.No_correction ->
                  "no correcion is applied on rule rates")]
             in
         let () = Loggers.print_newline logger in
@@ -117,13 +117,13 @@ let print_ode_preamble
               (match
                  rate_convention
                with
-               | Ode_args.Common ->
+               | Remanent_parameters_sig.Common ->
                  "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
-               | Ode_args.Biochemist ->
+               | Remanent_parameters_sig.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
-               | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+               | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
-               | Ode_args.KaSim ->
+               | Remanent_parameters_sig.No_correction ->
                  "no correcion is applied on rule rates");
               "-->";
               "<listOfUnitDefinitions>";

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 09 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
 *)
 
 module type Interface =
@@ -44,7 +44,7 @@ sig
   val print_canonic_species:
     ?compil:compil -> Format.formatter -> canonic_species -> unit
 
-  val rate_convention: compil -> Ode_args.rate_convention
+  val rate_convention: compil -> Remanent_parameters_sig.rate_convention
   val what_do_we_count: compil -> Ode_args.count
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
@@ -130,7 +130,7 @@ sig
   val lift_species: compil -> chemical_species -> mixture
 
   val get_compil:
-    rate_convention:Ode_args.rate_convention ->
+    rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> compil
 

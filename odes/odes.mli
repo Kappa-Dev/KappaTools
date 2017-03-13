@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 10 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -11,7 +11,7 @@ sig
   type connected_component_id
 
   val get_compil :
-    rate_convention:Ode_args.rate_convention ->
+    rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 

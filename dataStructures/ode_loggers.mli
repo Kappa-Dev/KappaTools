@@ -26,7 +26,7 @@ val print_ode_preamble:
   (Loggers.t -> unit) ->
   may_be_not_time_homogeneous:bool ->
   count:Ode_args.count ->
-  rate_convention:Ode_args.rate_convention ->
+  rate_convention:Remanent_parameters_sig.rate_convention ->
   ?filter_in:Loggers.encoding list option ->
   ?filter_out:Loggers.encoding list -> unit ->
   unit

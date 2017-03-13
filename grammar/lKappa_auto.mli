@@ -18,10 +18,10 @@ module RuleCache : Hashed_list.Hash
 
 val init_cache: unit -> cache
 
-val mixture_to_species_map : Ode_args.rate_convention -> cache ->
+val mixture_to_species_map : Remanent_parameters_sig.rate_convention -> cache ->
   LKappa.rule -> cache * (int * int) CannonicMap.t
 
-val nauto: Ode_args.rate_convention -> cache ->
+val nauto: Remanent_parameters_sig.rate_convention -> cache ->
   LKappa.rule -> cache * int
 
 val cannonic_form: cache -> LKappa.rule ->

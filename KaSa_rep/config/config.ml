@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Dec 26 2016>
+  * Last modification: Time-stamp: <Mar 13 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -118,3 +118,4 @@ let contact_map_accuracy_level = ref "Low"
 
 (* Symmetries *)
 let do_symmetries = ref false
+let rate_convention = ref "biochemist"

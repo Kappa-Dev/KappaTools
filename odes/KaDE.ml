@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 11 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -46,10 +46,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let rate_convention =
       match lowercase ode_args.Ode_args.rate_convention with
-    | "kasim" -> Ode_args.KaSim
+    | "kasim" -> Remanent_parameters_sig.No_correction
     | "divide_by_nbr_of_autos_in_lhs" ->
-      Ode_args.Divide_by_nbr_of_autos_in_lhs
-    | "biochemist" -> Ode_args.Biochemist
+      Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
+    | "biochemist" -> Remanent_parameters_sig.Biochemist
     | s ->
       begin
         Arg.usage options usage_msg;

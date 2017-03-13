@@ -123,27 +123,27 @@ let translate rate_convention cache rule  =
   let ag_created = rule.LKappa.r_created in
   let add_map rate_convention i j map =
     match rate_convention, i  with
-    | Ode_args.KaSim, _  -> assert false
-    | Ode_args.Common,_
-    | Ode_args.Divide_by_nbr_of_autos_in_lhs , Lhs _
-    | Ode_args.Biochemist, _  ->
+    | Remanent_parameters_sig.No_correction, _  -> assert false
+    | Remanent_parameters_sig.Common,_
+    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs , Lhs _
+    | Remanent_parameters_sig.Biochemist, _  ->
       Binding_idMap.add
         i (j::(Binding_idMap.find_default [] i map)) map
-    | Ode_args.Divide_by_nbr_of_autos_in_lhs, Rhs _ -> map
+    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs, Rhs _ -> map
   in
   let ag_created =
     match rate_convention with
-    | Ode_args.KaSim
-    | Ode_args.Divide_by_nbr_of_autos_in_lhs -> []
-    | Ode_args.Common
-    | Ode_args.Biochemist -> ag_created
+    | Remanent_parameters_sig.No_correction
+    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> []
+    | Remanent_parameters_sig.Common
+    | Remanent_parameters_sig.Biochemist -> ag_created
   in
   let n_agents_wo_creation = List.length lkappa_mixture in
   let n_agents =
     match rate_convention with
-    | Ode_args.KaSim -> assert false
-    | Ode_args.Divide_by_nbr_of_autos_in_lhs -> n_agents_wo_creation
-    | Ode_args.Common | Ode_args.Biochemist -> n_agents_wo_creation + (List.length ag_created)
+    | Remanent_parameters_sig.No_correction -> assert false
+    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> n_agents_wo_creation
+    | Remanent_parameters_sig.Common | Remanent_parameters_sig.Biochemist -> n_agents_wo_creation + (List.length ag_created)
   in
   let array_name = Array.make n_agents 0 in
   let state_of_internal x =
@@ -231,19 +231,19 @@ let translate rate_convention cache rule  =
            in
            let list =
              match rate_convention, snd_opt with
-             | (Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs) , _
+             | (Remanent_parameters_sig.No_correction | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs) , _
              | _ , None -> list
-             | (Ode_args.Biochemist | Ode_args.Common) ,  Some x -> (site_id + n_sites,x)::list
+             | (Remanent_parameters_sig.Biochemist | Remanent_parameters_sig.Common) ,  Some x -> (site_id + n_sites,x)::list
            in
            list, site_id+1)
         ([],0) agent.LKappa.ra_ints
     in
     let rule_internal = (* Here we add the fictitious site for the agents that are degraded  *)
       match rate_convention with
-      | Ode_args.KaSim -> assert false
-      | Ode_args.Divide_by_nbr_of_autos_in_lhs -> rule_internal
-      | Ode_args.Common
-      | Ode_args.Biochemist ->
+      | Remanent_parameters_sig.No_correction -> assert false
+      | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> rule_internal
+      | Remanent_parameters_sig.Common
+      | Remanent_parameters_sig.Biochemist ->
         if agent.LKappa.ra_erased then
           (-1,0)::rule_internal
         else rule_internal
@@ -276,9 +276,9 @@ let translate rate_convention cache rule  =
            in
            let list, interface =
              match rate_convention with
-             | Ode_args.KaSim | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+             | Remanent_parameters_sig.No_correction | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                list, interface
-             | Ode_args.Common | Ode_args.Biochemist ->
+             | Remanent_parameters_sig.Common | Remanent_parameters_sig.Biochemist ->
                begin
                  match port, switch with
                  | _, LKappa.Linked _ ->
@@ -553,12 +553,12 @@ let cannonical_of_root bonds_map array ag_id =
 (* The cc that contains created agents only shall be ignored *)
 let keep_this_cc rate_convention n_agents cc =
   match rate_convention with
-  | Ode_args.KaSim -> assert false
-  | Ode_args.Biochemist ->
+  | Remanent_parameters_sig.No_correction -> assert false
+  | Remanent_parameters_sig.Biochemist ->
     begin
       List.exists (fun i -> i<n_agents) cc
     end
-  | Ode_args.Common | Ode_args.Divide_by_nbr_of_autos_in_lhs -> true
+  | Remanent_parameters_sig.Common | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> true
 
 let mixture_to_species_map rate_convention cache rule =
   let map = CannonicMap.empty in
@@ -649,7 +649,7 @@ let nauto rate_convention cache rule =
 let cannonic_form cache rule =
   (*compute this map only in the case of Biochemist*)
   let cache, map =
-    mixture_to_species_map Ode_args.Common cache rule
+    mixture_to_species_map Remanent_parameters_sig.Common cache rule
   in
   let pair_list =
     CannonicMap.fold

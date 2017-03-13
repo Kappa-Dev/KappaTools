@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -68,6 +68,17 @@ let fetch_graph_format f =
     let () = Printf.eprintf "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
+
+let fetch_rate_convention f =
+  match
+    String.lowercase !f
+  with
+  | "kasim" -> Remanent_parameters_sig.No_correction
+  | "divide_by_nbr_of_autos_in_lhs" ->
+    Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
+  | "biochemist" -> Remanent_parameters_sig.Biochemist
+  | x ->
+    let () = Printf.eprintf "%s is not a valid rate convention !!!" x in raise Exit
 
 let get_symbols () =
   {
@@ -329,6 +340,8 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         Remanent_parameters_sig.do_site_dependencies =
           !Config.do_site_dependencies ;
         Remanent_parameters_sig.do_symmetries_analysis = !Config.do_symmetries ;
+        Remanent_parameters_sig.rate_convention =
+          fetch_rate_convention Config.rate_convention ;
         Remanent_parameters_sig.dump_site_dependencies =
           !Config.dump_site_dependencies ;
         (*different reachability output*)
@@ -494,6 +507,8 @@ let get_dynamic_contact_map_1 r = r.Remanent_parameters_sig.dynamic_contact_map
 
 let get_compute_symmetries_1 marshalisable =
   marshalisable.Remanent_parameters_sig.do_symmetries_analysis
+let get_rate_convention_1 marshalisable =
+  marshalisable.Remanent_parameters_sig.rate_convention
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
@@ -569,6 +584,7 @@ let get_dump_site_dependencies = upgrade_from_marshal_field get_dump_site_depend
 let get_symbols = upgrade_from_marshal_field get_symbols_1
 let get_file = upgrade_from_marshal_field get_file_1
 let get_compute_symmetries = upgrade_from_marshal_field get_compute_symmetries_1
+let get_rate_convention = upgrade_from_marshal_field get_rate_convention_1
 let get_influence_map = upgrade_from_marshal_field get_influence_map_1
 let get_contact_map = upgrade_from_marshal_field get_contact_map_1
 (*add reachability*)

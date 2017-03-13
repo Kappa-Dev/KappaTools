@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 12 2017>
+  * Last modification: Time-stamp: <Mar 13 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -9,12 +9,11 @@ type rule = Primitives.elementary_rule
 
 type compil =
   {
-    (*contact_map: state list * (agent_name * site) list *)
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
     init:
       (Alg_expr.t * rule(*Primitives.elementary_rule*) * Locality.t) list;
-    rate_convention: Ode_args.rate_convention ;
+    rate_convention: Remanent_parameters_sig.rate_convention ;
     show_reactions: bool ;
     count: Ode_args.count ;
     compute_jacobian: bool
@@ -406,12 +405,12 @@ let nb_tokens compil = Model.nb_tokens (environment compil)
 
 let divide_rule_rate_by cache compil rule =
   match compil.rate_convention with
-  | Ode_args.Common -> assert false
+  | Remanent_parameters_sig.Common -> assert false
 (* this is not a valid parameterization *)
 (* Common can be used only to compute normal forms *)
-  | Ode_args.KaSim -> cache, 1
-  | Ode_args.Biochemist
-  | Ode_args.Divide_by_nbr_of_autos_in_lhs ->
+  | Remanent_parameters_sig.No_correction -> cache, 1
+  | Remanent_parameters_sig.Biochemist
+  | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
     let rule_id = rule.Primitives.syntactic_rule in
     let lkappa_rule =
       Model.get_ast_rule compil.environment rule_id
