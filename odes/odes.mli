@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 14 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -51,58 +51,6 @@ sig
     (connected_component_id * I.connected_component) list
 
   val get_divide_rate_by : enriched_rule -> int
-
-(*initial states*)
-  (*val translate_species :
-    Remanent_parameters_sig.parameters ->
-    I.compil ->
-    I.chemical_species ->
-    I.chemical_species list * ('a, 'b) network ->
-    (I.chemical_species list * ('a, 'b) network) * ode_var_id
-
-  val translate_canonic_species :
-    I.compil ->
-    I.canonic_species ->
-    I.chemical_species ->
-    I.chemical_species list * ('a, 'b) network ->
-    (I.chemical_species list * ('a, 'b) network) * ode_var_id
-
-  val species_of_initial_state :
-    I.compil ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
-    I.init ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id) network
-    * Pattern.cc list*)
-
-  (*val initial_network :
-    Remanent_parameters_sig.parameters ->
-    I.compil ->
-    (ode_var_id,Ode_loggers_sig.ode_var_id) network ->
-    I.chemical_species list ->
-    enriched_rule list ->
-    I.chemical_species list *
-    (ode_var_id, Ode_loggers_sig.ode_var_id) network*)
-
-  (*  val compute_reactions :
-    Remanent_parameters_sig.parameters ->
-    I.compil ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
-    I.rule list ->
-    I.chemical_species list ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id) network
-
-  val convert_initial_state :
-    Remanent_parameters_sig.parameters ->
-    I.compil ->
-    (I.connected_component array list, Ode_loggers_sig.ode_var_id)
-      Alg_expr.e * I.rule * Locality.t ->
-    ('a, 'b) network ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e
-      Locality.annot *
-    (('a, 'b) network * ode_var_id list)
-
-  val species_of_species_id:
-    ('a,'b) network -> ode_var_id -> I.chemical_species * int*)
 
   (*rules*)
 

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 14 2017>
 *)
 
 module type Interface =
@@ -149,11 +149,17 @@ sig
 
   val nb_tokens: compil -> int
 
-  (*symmetries*)
+  (*symmetries for initial states*)
+
   val cannonic_form_from_syntactic_init:
     Remanent_parameters_sig.parameters -> cache -> compil ->
     chemical_species ->
-    cache * LKappa.rule * LKappa_auto.RuleCache.hashed_list
+    cache * LKappa.rule * int * LKappa_auto.RuleCache.hashed_list
+
+  val divide_rule_rate_by_init :
+    cache -> compil -> LKappa.rule -> cache * int
+
+  (*symmetries for rules*)
 
   val cannonic_form_from_syntactic_rule :
     cache -> compil -> rule ->

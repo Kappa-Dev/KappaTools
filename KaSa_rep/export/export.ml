@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 14 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1522,7 +1522,6 @@ let compute_symmetries
              cache, current_list, hashed_lists
           ) (cache, [], []) rules
       in
-
       let to_be_checked, counter, rates, correct =
         Symmetries.build_array_for_symmetries
           (List.rev_map fst (List.rev hashed_lists))
@@ -1544,14 +1543,14 @@ let compute_symmetries
              ()
           ) cannonic_list
       in
-      let cache, symmetries =
-        Symmetries.detect_symmetries
+      let cache, symmetries = (*TODO*)
+        Symmetries.detect_symmetries_for_rules
           parameters
           env
           cache
           hashed_lists
           (to_be_checked, counter, rates, correct)
-              contact_map
+          contact_map
       in
       state, Some symmetries
     end

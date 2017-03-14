@@ -211,7 +211,6 @@ let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
       else aux empty (succ i) in
   aux true 0
 
-
 let print_agent_lhs ~ltypes sigs f ag =
   Format.fprintf
     f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 13 2017>
+   * Last modification: Time-stamp: <Mar 14 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -225,10 +225,7 @@ let translate_list l agent_interface =
 let translate_to_lkappa_representation env partitioned_contact_map =
   let signature = Model.signatures env in
   let nagents = Signature.size signature in
-  let array =
-    Array.make nagents
-      Symmetries_sig.empty
-  in
+  let array = Array.make nagents Symmetries_sig.empty in
   let () =
     Mods.StringMap.iter
       (fun agent_string partition ->
@@ -345,17 +342,23 @@ let max_hashes hash_list =
     | head :: tail -> aux tail (max_hash best head)
   in aux hash_list LKappa_auto.RuleCache.empty
 
+let build_array_for_symmetries_gen size_hash_plus_1 hashed_list =
+  let to_be_checked = Array.make size_hash_plus_1 false in
+  let counter = Array.make size_hash_plus_1 0 in
+  let correct = Array.make size_hash_plus_1 1 in
+  to_be_checked, counter, correct
+
 let build_array_for_symmetries hashed_list =
   let max_hash = max_hashes hashed_list in
   let size_hash_plus_1 =
     (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
   in
-  let to_be_checked = Array.make size_hash_plus_1 false in
-  let counter = Array.make size_hash_plus_1 0 in
+  let to_be_checked, counter, correct =
+    build_array_for_symmetries_gen size_hash_plus_1 hashed_list
+  in
   let rate =
     Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
   in
-  let correct = Array.make size_hash_plus_1 1 in
   to_be_checked, counter, rate, correct
 
 (******************************************************************)
@@ -420,7 +423,74 @@ let check_invariance_both
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
-let detect_symmetries parameters env cache
+let print_symmetries_for_rules parameters env contact_map
+    partitioned_contact_map partitioned_contact_map_in_lkappa
+    refined_partitioned_contact_map =
+  let () =
+    if Remanent_parameters.get_trace parameters
+    then
+      let logger = Remanent_parameters.get_logger parameters in
+      let () = Loggers.fprintf logger "Contact map" in
+      let () = Loggers.print_newline logger in
+      let () = print_contact_map parameters contact_map in
+      let () = Loggers.fprintf logger "Partitioned contact map" in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map parameters partitioned_contact_map in
+      let () = Loggers.fprintf logger
+          "Partitioned contact map (LKAPPA)"
+      in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map_in_lkappa logger env
+          partitioned_contact_map_in_lkappa
+      in
+      let () = Loggers.fprintf logger "With predicate (LKAPPA)" in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map_in_lkappa
+          logger env
+          refined_partitioned_contact_map
+      in
+      ()
+    else
+      ()
+  in
+  ()
+
+let print_symmetries_for_init parameters env
+    partitioned_contact_map partitioned_contact_map_in_lkappa
+    refined_partitioned_contact_map =
+  let () =
+    if Remanent_parameters.get_trace parameters
+    then
+      let logger = Remanent_parameters.get_logger parameters in
+      let () = Loggers.fprintf logger "Partitioned contact map initial" in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map parameters partitioned_contact_map in
+      let () = Loggers.fprintf logger
+          "Partitioned contact map (LKAPPA) initial"
+      in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map_in_lkappa logger env
+          partitioned_contact_map_in_lkappa
+      in
+      let () = Loggers.fprintf logger "With predicate (LKAPPA) initial" in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map_in_lkappa
+          logger env
+          refined_partitioned_contact_map
+      in
+      ()
+    else
+      ()
+  in
+  ()
+
+let detect_symmetries_gen parameters env cache
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     arrays
@@ -457,38 +527,48 @@ let detect_symmetries parameters env cache
   let refined_partitioned_contact_map =
     Array.map Symmetries_sig.clean refined_partitioned_contact_map
   in
-  (*-------------------------------------------------------------*)
-  (*PRINT*)
+  cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
+  refined_partitioned_contact_map
+
+let detect_symmetries_for_rules parameters env cache
+    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
+                          LKappa.rule) list)
+    arrays
+    (contact_map:(string list * (string * string) list)
+         Mods.StringMap.t Mods.StringMap.t) =
+  let cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
+      refined_partitioned_contact_map =
+    detect_symmetries_gen parameters env cache
+      hash_and_rule_list
+      arrays
+      contact_map
+  in
   let () =
-    if Remanent_parameters.get_trace parameters
-    then
-      let logger = Remanent_parameters.get_logger parameters in
-      let () = Loggers.fprintf logger "Contact map" in
-      let () = Loggers.print_newline logger in
-      let () = print_contact_map parameters contact_map in
-      let () = Loggers.fprintf logger "Partitioned contact map" in
-      let () = Loggers.print_newline logger in
-      let () = print_partitioned_contact_map parameters partitioned_contact_map in
-      let () = Loggers.fprintf logger
-          "Partitioned contact map (LKAPPA)"
-      in
-      let () = Loggers.print_newline logger in
-      let () =
-        print_partitioned_contact_map_in_lkappa logger env
-          partitioned_contact_map_in_lkappa
-      in
-      let () = Loggers.fprintf logger "With predicate (LKAPPA)" in
-      let () = Loggers.print_newline logger in
-      let () =
-        print_partitioned_contact_map_in_lkappa
-          logger env
-          refined_partitioned_contact_map
-      in
-      ()
-    else
-      ()
+    print_symmetries_for_rules parameters env contact_map
+      partitioned_contact_map partitioned_contact_map_in_lkappa
+      refined_partitioned_contact_map
   in
   cache, refined_partitioned_contact_map
+
+let detect_symmetries_for_init parameters env cache
+    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
+                          LKappa.rule) list)
+    arrays
+    (contact_map:(string list * (string * string) list)
+         Mods.StringMap.t Mods.StringMap.t) =
+  let cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
+      refine_partitioned_contact_map =
+    detect_symmetries_gen parameters env cache
+      hash_and_rule_list
+      arrays
+      contact_map
+  in
+  let () =
+    print_symmetries_for_init parameters env
+      partitioned_contact_map partitioned_contact_map_in_lkappa
+      refine_partitioned_contact_map
+  in
+  cache, refine_partitioned_contact_map
 
 (******************************************************)
 
