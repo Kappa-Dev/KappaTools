@@ -1,4 +1,6 @@
 %def: "seed" "56235278"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "0.84" "t.u."
 %def: "outputFileName" "data.svg"
 

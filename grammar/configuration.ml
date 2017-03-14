@@ -7,19 +7,23 @@
 (******************************************************************************)
 
 type t = {
+  dumpIfDeadlocked : bool;
+  initial : float option;
+  maxConsecutiveClash : int;
+  outputFileName : string option;
+  plotPeriod : Counter.period option;
   seed : int option;
   traceFileName : string option;
-  plotPeriod : Counter.period option;
-  outputFileName : string option;
-  initial : float option;
 }
 
 let empty = {
+  dumpIfDeadlocked = true;
+  initial = None;
+  maxConsecutiveClash = 2;
   seed = None;
   traceFileName = None;
   plotPeriod = None;
   outputFileName = None;
-  initial = None;
 }
 
 let parse result =
@@ -30,8 +34,6 @@ let parse result =
       raise
         (ExceptionDefn.Malformed_Decl
            ("Wrong number of arguments for parameter "^param,pos_p)) in
-  let set_value pos_p param value_list f ass =
-    get_value pos_p param value_list (fun x p -> ass := f x p) in
   let get_bool_value pos_p param value_list =
     get_value pos_p param value_list
       (fun value pos_v ->
@@ -146,18 +148,17 @@ let parse result =
                },story_compression,formatCflow,cflowFile)
 
       | "dumpIfDeadlocked" ->
-        let () =
-          Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list in
-        acc
+        ({ conf with dumpIfDeadlocked = get_bool_value pos_p param value_list },
+         progress,story_compression,formatCflow,cflowFile)
       | "maxConsecutiveClash" ->
-        let () = set_value pos_p param value_list
-            (fun v p ->
-               try int_of_string v
-               with _ ->
-                 raise (ExceptionDefn.Malformed_Decl
-                          ("Value "^v^" should be an integer",p))
-            ) Parameter.maxConsecutiveClash in
-        acc
+        get_value pos_p param value_list
+          (fun v p ->
+             try
+               ({ conf with maxConsecutiveClash = int_of_string v },
+                progress,story_compression,formatCflow,cflowFile)
+             with _ ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Value "^v^" should be an integer",p)))
       | "dotCflows" ->
          let formatCflow = get_value pos_p param value_list (fun v _ -> v) in
          (conf,progress,story_compression,formatCflow,cflowFile)
@@ -175,6 +176,10 @@ let print f conf =
   let () = Format.pp_open_vbox f 0 in
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"seed\" \"%i\"@,") f conf.seed in
+  let () = Format.fprintf
+      f "%%def: \"dumpIfDeadlocked\" \"%b\"@," conf.dumpIfDeadlocked in
+  let () = Format.fprintf
+      f "%%def: \"maxConsecutiveClash\" \"%i\"@," conf.maxConsecutiveClash in
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"T0\" \"%g\"@,")
       f conf.initial in

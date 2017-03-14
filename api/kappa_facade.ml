@@ -122,6 +122,8 @@ type t =
   { mutable is_running : bool ;
     mutable run_finalize : bool ;
     mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
+    dumpIfDeadlocked : bool;
+    maxConsecutiveClash : int;
     counter : Counter.t ;
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
@@ -149,11 +151,12 @@ let t_range (t : t) (range : Api_types_j.range) =
   | None -> range
   | Some indexes ->  localize_range range indexes
 
-let create_t ~log_form ~ log_buffer ~contact_map ~env ~counter ~graph ~state
+let create_t ~log_form ~log_buffer ~contact_map ~dumpIfDeadlocked
+    ~maxConsecutiveClash ~env ~counter ~graph ~state
     ~init_l ~with_trace ~lastyield ~file_indexes : t =
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
-    pause_condition = Alg_expr.FALSE;
+    pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
     snapshots = [];
@@ -187,6 +190,8 @@ let clone_t t =
     ~log_form:t.log_form ~log_buffer:t.log_buffer
     (* TODO pirbo: Should I create a new buffer? *)
     ~contact_map:t.contact_map
+    ~maxConsecutiveClash:t.maxConsecutiveClash
+    ~dumpIfDeadlocked:t.dumpIfDeadlocked
     ~env:t.env
     ~counter:t.counter (* FALSE imperatively modified *)
     ~graph:t.graph (* FALSE imperatively modified *)
@@ -272,7 +277,8 @@ let build_ast
                      let counter =
                        Counter.create
                          ~init_t:(0. : float) ~init_e:(0 : int)
-                         ?max_time:None ?max_event:None ~plot_period:(Counter.DT 1.) in
+                         ?max_time:None ?max_event:None
+                         ~plot_period:(Counter.DT 1.) in
                      let () = ExceptionDefn.flush_warning log_form in
                      let random_state =
                        match conf.Configuration.seed with
@@ -281,6 +287,8 @@ let build_ast
                      let simulation =
                        create_t
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
+                         ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
+                         ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace(*TODO conf.Eval.traceFileName*)
                                    random_state env counter)
@@ -363,7 +371,8 @@ let run_simulation
              do
                let (stop,graph',state') =
                  State_interpreter.a_loop
-                   ~outputs:(outputs t)
+                   ~outputs:(outputs t) ~dumpIfDeadlocked:t.dumpIfDeadlocked
+                   ~maxConsecutiveClash:t.maxConsecutiveClash
                    t.env t.counter t.graph t.state in
                rstop := stop || Rule_interpreter.value_bool
                           t.counter graph' t.pause_condition;

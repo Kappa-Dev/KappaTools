@@ -18,16 +18,21 @@ let rec waitpid_non_intr pid =
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
 
-let batch_loop ~outputs progressConf env counter graph state =
+let batch_loop
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+    progressConf env counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
-      State_interpreter.a_loop ~outputs env counter graph state in
+      State_interpreter.a_loop
+        ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+        env counter graph state in
     if stop then (graph',state')
     else let () = Counter.tick progressConf counter in iter graph' state'
   in iter graph state
 
 let interactive_loop
-    ~outputs progressConf pause_criteria env counter graph state =
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash progressConf
+    pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
     Sys.signal
@@ -41,7 +46,8 @@ let interactive_loop
       (false,graph,state)
     else
       let stop,graph',state' as out =
-        State_interpreter.a_loop ~outputs env counter graph state in
+        State_interpreter.a_loop ~outputs
+          ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state in
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         out
@@ -180,11 +186,13 @@ let () =
         let title = "Output of " ^ command_line in
         Some (plot_file,title,head)
       else None in
-
+    let dumpIfDeadlocked = conf.Configuration.dumpIfDeadlocked in
+    let maxConsecutiveClash = conf.Configuration.maxConsecutiveClash in
     let () =
       if not !Parameter.compileModeOn then
         Outputs.initial_inputs
           {Configuration.seed = Some theSeed;
+           Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
            Configuration.traceFileName = user_trace_file;
            Configuration.initial =
              if Tools.float_is_zero (Counter.init_time counter) then None
@@ -244,7 +252,9 @@ let () =
           env counter graph state story_compression
       else if cli_args.Run_cli_args.batchmode then
         let (graph',state') =
-          batch_loop ~outputs progressConf env counter graph state in
+          batch_loop
+            ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+            progressConf env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
           env counter graph' state' story_compression
@@ -261,7 +271,8 @@ let () =
                     ~max_sharing:kasim_args.Kasim_args.maxSharing
                     contact_map env graph b in
                 env',interactive_loop
-                  ~outputs progressConf b'' env' counter graph' state
+                  ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+                  progressConf b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
                 let e', (env',_ as o) =
@@ -294,7 +305,8 @@ let () =
         else
           let (stop,graph',state') =
             interactive_loop
-              ~outputs progressConf Alg_expr.FALSE env counter graph state in
+              ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+              progressConf Alg_expr.FALSE env counter graph state in
           if stop then
             finalize
               ~outputs formatCflows cflowFile trace_file

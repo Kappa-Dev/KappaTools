@@ -234,7 +234,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
            state0.perturbations_not_done_yet in
        return out)
 
-let one_rule ~outputs dt env counter graph state =
+let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
   let choice,_ = Random_tree.random
       (Rule_interpreter.get_random_state graph) state.activities in
   let rule_id = choice/2 in
@@ -346,7 +346,7 @@ let one_rule ~outputs dt env counter graph state =
       else if choice mod 2 = 1
       then Counter.one_no_more_unary_event counter dt
       else Counter.one_no_more_binary_event counter dt in
-    if Counter.consecutive_null_event counter < !Parameter.maxConsecutiveClash
+    if Counter.consecutive_null_event counter < maxConsecutiveClash
     then (not continue,graph,state)
     else
       let register_new_activity rd_id _ new_act =
@@ -361,7 +361,8 @@ let one_rule ~outputs dt env counter graph state =
 
 let activity state = Random_tree.total state.activities
 
-let a_loop ~outputs env counter graph state =
+let a_loop
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state =
   let activity = activity state in
   let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in
@@ -372,7 +373,7 @@ let a_loop ~outputs env counter graph state =
       match state.stopping_times with
       | [] ->
         let () =
-          if !Parameter.dumpIfDeadlocked then
+          if dumpIfDeadlocked then
             outputs
               (Data.Snapshot
                  (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
@@ -408,7 +409,7 @@ let a_loop ~outputs env counter graph state =
         let () =
           Counter.fill ~outputs counter ~dt (observables_values env graph) in
 
-        one_rule ~outputs dt env counter graph state in
+        one_rule ~outputs ~maxConsecutiveClash dt env counter graph state in
   out
 
 let end_of_simulation ~outputs form env counter graph state =

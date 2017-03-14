@@ -35,7 +35,8 @@ val activity : t -> float
 (** Returns the current activity *)
 
 val a_loop :
-  outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
+  outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->
+  maxConsecutiveClash:int -> Model.t -> Counter.t ->
   Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
 (** One event loop *)
 

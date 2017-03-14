@@ -1,4 +1,6 @@
 %def: "seed" "16602"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "0.008" "t.u."
 %def: "outputFileName" "data.tsv"
 

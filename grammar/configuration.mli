@@ -7,11 +7,13 @@
 (******************************************************************************)
 
 type t = {
+  dumpIfDeadlocked : bool;
+  initial : float option;
+  maxConsecutiveClash : int;
+  outputFileName : string option;
+  plotPeriod : Counter.period option;
   seed : int option;
   traceFileName : string option;
-  plotPeriod : Counter.period option;
-  outputFileName : string option;
-  initial : float option;
 }
 
 val parse :

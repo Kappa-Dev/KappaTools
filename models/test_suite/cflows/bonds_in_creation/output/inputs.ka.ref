@@ -1,4 +1,6 @@
 %def: "seed" "611463625"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "0.4" "t.u."
 %def: "outputFileName" "data.csv"
 
