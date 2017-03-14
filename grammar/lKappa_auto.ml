@@ -30,6 +30,7 @@ struct
     Format.fprintf log "%i:%a" a
       (fun log  ->
          Ast.print_link
+           ~new_syntax:true
            (fun _ f x -> Format.pp_print_int f x)
            (fun f x -> Format.pp_print_int f x)
            (fun _ () -> ()) log)
@@ -103,7 +104,8 @@ let init_cache () =
 let id =
   function
   | Ast.LNK_VALUE (i,_) -> Ast.LNK_VALUE (i,())
-  | Ast.FREE -> Ast.FREE
+  | Ast.LNK_FREE -> Ast.LNK_FREE
+  | Ast.ANY_FREE -> Ast.ANY_FREE
   | Ast.LNK_ANY -> Ast.LNK_ANY
   | Ast.LNK_SOME -> Ast.LNK_SOME
   | Ast.LNK_TYPE (a,b) -> Ast.LNK_TYPE (a,b)
@@ -173,7 +175,8 @@ let translate rate_convention cache rule  =
                   add_map rate_convention (Lhs i) (agent_id, site_id) map, site_id + 1
                 | _, LKappa.Linked (j,_) ->
                   add_map rate_convention (Rhs j) (agent_id, site_id+n_site) map, site_id + 1
-                | (Ast.FREE | Ast.LNK_SOME | Ast.LNK_ANY | Ast.LNK_TYPE _),
+                | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_SOME |
+                   Ast.LNK_ANY | Ast.LNK_TYPE _),
                   (LKappa.Maintained | LKappa.Freed | LKappa.Erased ) -> map, site_id+1
 
              )
@@ -269,8 +272,7 @@ let translate rate_convention cache rule  =
                    ag_partner))
                ::list,
                Mods.IntSet.add site_id interface
-             | Ast.FREE
-             | Ast.LNK_ANY
+             | Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY
              | Ast.LNK_SOME | Ast.LNK_TYPE _ ->
                (site_id,id port)::list, interface
            in
@@ -313,11 +315,12 @@ let translate rate_convention cache rule  =
                        ag_partner))
                    ::list,
                    Mods.IntSet.add site_id interface
-                 | (Ast.LNK_VALUE _ | Ast.FREE | Ast.LNK_ANY | Ast.LNK_SOME | Ast.LNK_TYPE _),
+                 | (Ast.LNK_VALUE _ | Ast.LNK_FREE | Ast.ANY_FREE |  Ast.LNK_ANY |
+                    Ast.LNK_SOME | Ast.LNK_TYPE _),
                    (LKappa.Maintained | LKappa.Erased) -> list, interface
                  | _, LKappa.Freed ->
                    let site_id = site_id + n_sites in
-                   (site_id,Ast.FREE)::list, interface
+                   (site_id,Ast.LNK_FREE)::list, interface
                end
            in
            list, interface, site_id + 1
@@ -374,7 +377,7 @@ let translate rate_convention cache rule  =
                ::list,
                Mods.IntSet.add site_id interface
              | Raw_mixture.FREE ->
-               (site_id, Ast.FREE)::list, interface
+               (site_id, Ast.LNK_FREE)::list, interface
            in
            list, interface, site_id + 1
         )

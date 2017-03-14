@@ -26,7 +26,8 @@ let care_binding_regular binding =
   ||
   (match get_binding_precondition binding with
    | Ast.LNK_VALUE _
-   | Ast.FREE
+   | Ast.LNK_FREE
+   | Ast.ANY_FREE
    | Ast.LNK_SOME
    | Ast.LNK_TYPE _ -> true
    | Ast.LNK_ANY -> false

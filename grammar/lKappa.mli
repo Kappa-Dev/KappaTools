@@ -68,18 +68,18 @@ val rule_to_json : rule -> Yojson.Basic.json
 val rule_of_json : Yojson.Basic.json -> rule
 
 val bool_expr_of_ast :
-  Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
-  ?max_allowed_var: int ->
+  new_syntax:bool ->  Signature.s -> int Mods.StringMap.t ->
+  int Mods.StringMap.t -> ?max_allowed_var: int ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (rule_agent list, int) Alg_expr.bool Locality.annot
 
 val modif_expr_of_ast :
-  Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+  new_syntax:bool -> Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   Contact_map.t -> (Ast.mixture, string) Ast.modif_expr -> int list ->
   (rule_agent list, int) Ast.modif_expr * int list
 
 val compil_of_ast :
-  (string * Nbr.t) list -> Ast.parsing_compil ->
+  new_syntax:bool -> (string * Nbr.t) list -> Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int list *
   (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
@@ -103,4 +103,7 @@ val compil_of_ast :
     - either absolute or unary rates are provided;
     - if the algebraic expression of the rate contains a mixture then
     a new variable is declared called rulelabel_un_rate; it is
-    necessary in the update phase.*)
+    necessary in the update phase.
+
+    After this step, [Ast.ANY_FREE] is a synonym of "an [Ast.LNK_ANY]
+    explicitely given by the user". *)

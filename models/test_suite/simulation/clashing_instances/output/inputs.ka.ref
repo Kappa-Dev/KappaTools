@@ -1,4 +1,5 @@
 %def: "seed" "923639563"
+%def: "newSyntax" "true"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "1" "events"
@@ -7,7 +8,7 @@
 %agent: A(x)
 
 %plot: [T]
-'rule' A(x), -A(x) @ 1
+'rule' A(x!.), -A(x!.) @ 1
 
 %init: 100 A(x)
 

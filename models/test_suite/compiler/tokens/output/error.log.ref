@@ -16,7 +16,7 @@ Polymers:
   
 Domain:
   /*cc0*/  -> ()
-  /*cc1*/ A/*1*/(x) -> ()
+  /*cc1*/ A/*1*/(x!.) -> ()
 Intial graph;
   
   %init: tt <- 33

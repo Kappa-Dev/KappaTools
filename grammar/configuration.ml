@@ -10,6 +10,7 @@ type t = {
   dumpIfDeadlocked : bool;
   initial : float option;
   maxConsecutiveClash : int;
+  newSyntax : bool;
   outputFileName : string option;
   plotPeriod : Counter.period option;
   seed : int option;
@@ -20,6 +21,7 @@ let empty = {
   dumpIfDeadlocked = true;
   initial = None;
   maxConsecutiveClash = 2;
+  newSyntax = false;
   seed = None;
   traceFileName = None;
   plotPeriod = None;
@@ -147,6 +149,9 @@ let parse result =
                                    ("Value "^v^" should be a character",p)))
                },story_compression,formatCflow,cflowFile)
 
+      | "newSyntax" ->
+        ({ conf with newSyntax = get_bool_value pos_p param value_list },
+         progress,story_compression,formatCflow,cflowFile)
       | "dumpIfDeadlocked" ->
         ({ conf with dumpIfDeadlocked = get_bool_value pos_p param value_list },
          progress,story_compression,formatCflow,cflowFile)
@@ -176,6 +181,7 @@ let print f conf =
   let () = Format.pp_open_vbox f 0 in
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"seed\" \"%i\"@,") f conf.seed in
+  let () = Format.fprintf f "%%def: \"newSyntax\" \"%b\"@," conf.newSyntax in
   let () = Format.fprintf
       f "%%def: \"dumpIfDeadlocked\" \"%b\"@," conf.dumpIfDeadlocked in
   let () = Format.fprintf

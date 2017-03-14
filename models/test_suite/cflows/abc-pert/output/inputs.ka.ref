@@ -1,4 +1,5 @@
 %def: "seed" "924556145"
+%def: "newSyntax" "true"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "0" "events"
@@ -12,9 +13,9 @@
 %var:/*1*/ 'off_rate' 0.1
 %var:/*2*/ 'mod_rate' 1
 %var:/*3*/ 'AB' |A(x!1), B(x!1)|
-%var:/*4*/ 'Cuu' |C(x1~u?, x2~u?)|
-%var:/*5*/ 'Cpu' |C(x1~p?, x2~u?)|
-%var:/*6*/ 'Cpp' |C(x1~p?, x2~p?)|
+%var:/*4*/ 'Cuu' |C(x1~u, x2~u)|
+%var:/*5*/ 'Cpu' |C(x1~p, x2~u)|
+%var:/*6*/ 'Cpp' |C(x1~p, x2~p)|
 %var:/*7*/ 'n_ab' 1000
 %var:/*8*/ 'n_c' 0
 %var:/*9*/ 'C' |C()|
@@ -26,17 +27,17 @@
 %plot: Cpp
 %plot: n_c
 
-'a.b' A(x/!1), B(x/!1) @ on_rate
-'a..b' A(x!1/), B(x!1/) @ off_rate
-'ab.c' A(x!_, c/!2), C(x1~u/!2) @ on_rate
-'mod x1' C(x1~u/~p!1/), A(c!1/) @ mod_rate
-'a.c' A(x, c/!1), C(x1~p, x2~u/!1) @ on_rate
-'mod x2' A(x, c!1/), C(x1~p, x2~u/~p!1/) @ mod_rate
+'a.b' A(x!./!1), B(x!./!1) @ on_rate
+'a..b' A(x!1/!.), B(x!1/!.) @ off_rate
+'ab.c' A(x!_, c!./!2), C(x1~u!./!2) @ on_rate
+'mod x1' C(x1~u/~p!1/!.), A(c!1/!.) @ mod_rate
+'a.c' A(x!., c!./!1), C(x1~p!., x2~u!./!1) @ on_rate
+'mod x2' A(x!., c!1/!.), C(x1~p!., x2~u/~p!1/!.) @ mod_rate
 
 /*0*/%mod: [true] do $PRINTF "example" <"first">; $PRINTF "example" <"last">
 /*1*/%mod: ([T] > 10) do $ADD 10000 C(x1~u, x2~u); $UPDATE n_c C
-/*2*/%mod: ([T] > 20) do $TRACK C(x1~p?, x2~p?) [true]; $UPDATE cflow Cpp
-/*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1~p?, x2~p?) [false]
+/*2*/%mod: ([T] > 20) do $TRACK C(x1~p, x2~p) [true]; $UPDATE cflow Cpp
+/*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1~p, x2~p) [false]
 /*4*/%mod: repeat (([E] [mod] 2000.) = 0) do $PLOTENTRY until [false]
 
 %init: n_ab A(x, c), B(x)

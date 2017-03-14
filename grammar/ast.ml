@@ -7,8 +7,9 @@
 (******************************************************************************)
 
 type ('a,'annot) link =
+  | ANY_FREE
   | LNK_VALUE of int * 'annot
-  | FREE
+  | LNK_FREE
   | LNK_ANY
   | LNK_SOME
   | LNK_TYPE of 'a (* port *)
@@ -191,21 +192,24 @@ let empty_compil =
         rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link pr_port pr_type pr_annot f = function
-  | FREE -> ()
+let print_link ~new_syntax pr_port pr_type pr_annot f = function
+  | ANY_FREE -> if not new_syntax then Format.fprintf f "?"
   | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" (pr_port a) p pr_type a
   | LNK_ANY -> Format.fprintf f "?"
+  | LNK_FREE -> if new_syntax then Format.fprintf f "!."
   | LNK_SOME -> Format.fprintf f "!_"
   | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
 
 let link_to_json port_to_json type_to_json annot_to_json = function
-  | FREE -> `String "FREE"
+  | ANY_FREE -> `String "ANY_FREE"
+  | LNK_FREE -> `String "FREE"
   | LNK_TYPE (p, a) -> `List [port_to_json a p; type_to_json a]
   | LNK_ANY -> `Null
   | LNK_SOME -> `String "SOME"
   | LNK_VALUE (i,a) -> `List (`Int i :: annot_to_json a)
 let link_of_json port_of_json type_of_json annot_of_json = function
-  | `String "FREE" -> FREE
+  | `String "ANY_FREE" -> ANY_FREE
+  | `String "FREE" -> LNK_FREE
   | `List [p; a] -> let x = type_of_json a in LNK_TYPE (port_of_json x p, x)
   | `Null -> LNK_ANY
   | `String "SOME" -> LNK_SOME
@@ -229,7 +233,8 @@ let print_ast_port f p =
           x) in
   Format.fprintf f "%s%a%a%a%a" (fst p.port_nme)
     print_ast_internal p.port_int f_mod_i p.port_int_mod
-    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link f x)) p.port_lnk
+    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link ~new_syntax:true f x))
+    p.port_lnk
     f_mod_l p.port_lnk_mod
 
 let string_annot_to_json = Locality.annot_to_json JsonUtil.of_string
@@ -723,7 +728,7 @@ let split_mixture m =
                     port_lnk =
                       (match p.port_lnk_mod with
                        | None -> p.port_lnk
-                       | Some None -> [Locality.dummy_annot FREE]
+                       | Some None -> [Locality.dummy_annot LNK_FREE]
                        | Some (Some (i,pos)) -> [LNK_VALUE (i,()),pos]);
                     port_lnk_mod=None}::r)
                ) ([],[]) intf in

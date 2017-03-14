@@ -383,7 +383,7 @@ let intersection renaming cc1 cc2 =
   { nodes_by_type; nodes;
     recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
-let print_cc ?sigs ?cc_id f cc =
+let print_cc ~new_syntax ?sigs ?cc_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -403,9 +403,12 @@ let print_cc ?sigs ?cc_id f cc =
             match el with
             | UnSpec ->
               if st >= 0 then
-                let () = Format.fprintf f "?" in (true,out)
+                let () = if not new_syntax then Format.fprintf f "?" in
+                (true,out)
               else (not_empty,out)
-            | Free -> true,out
+            | Free ->
+              let () = if new_syntax then Format.fprintf f "!." in
+              (true,out)
             | Link (dst_a,dst_p) ->
               let i,out' =
                 match
@@ -786,7 +789,7 @@ end = struct
     let pp_point p_id f p =
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
-        (print_cc ~sigs:env.sig_decl ~cc_id:p_id) p.content
+        (print_cc ~new_syntax:true ~sigs:env.sig_decl ~cc_id:p_id) p.content
         (fun f -> if p.roots <> None then
             Format.fprintf
               f "@[[%a]@]@ "
@@ -937,12 +940,13 @@ end = struct
 
 end
 
-let print ?domain ~with_id f id =
+let print ~new_syntax ?domain ~with_id f id =
   match domain with
   | None -> Format.pp_print_int f id
   | Some env ->
     let cc_id = if with_id then Some id else None in
-    print_cc ~sigs:(Env.signatures env) ?cc_id f env.Env.domain.(id).Env.content
+    print_cc ~new_syntax ~sigs:(Env.signatures env) ?cc_id
+      f env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified domain a_id b =
   let a = domain.Env.domain.(a_id).Env.content in

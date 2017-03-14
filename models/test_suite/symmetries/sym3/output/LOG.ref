@@ -976,215 +976,215 @@ A()=> [
 Compute the contact map...
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u/~p, y~u) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u, y~u/~p) @ 1
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u/~p, y~p) @ 2
- rule:   A(x~u/~p, y~p) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~p, y~u/~p) @ 2
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~u/~p, t~u) @ 1
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
+ rule:   A(w~u!., t~u/~p!.) @ 1
 Existing rule
- rule:   A(w~u/~p, t~u) @ 1
-Existing rule
-Check an orbit
-Permutation of the sites t and w in agent of type  A
- rule:   A(w~u, t~u/~p) @ 1
- rule:   A(w~u/~p, t~u) @ 1
-Existing rule
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~u/~p, t~p) @ 2
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~p, t~u/~p) @ 2
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites t and w in agent of type  A
+ rule:   A(w~p!., t~u/~p!.) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and x in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x, y~u, t~u/~p?) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x!., y~u!., t~u/~p?) @ 1
 Unknown rule
 Check an orbit
 Permutation of the sites t and y in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u/~p, y, t~u?) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u/~p!., y!., t~u?) @ 1
 Unknown rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
- rule:   A(x~u/~p, y~u) @ 1
-Existing rule
-Check an orbit
-Permutation of the sites x and y in agent of type  A
- rule:   A(x~u, y~u/~p) @ 1
- rule:   A(x~u/~p, y~u) @ 1
-Existing rule
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(x~u/~p, y~p) @ 2
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~u!., y~u/~p!.) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
- rule:   A(x~u/~p, y~p) @ 2
-Existing rule
-Check an orbit
-Permutation of the sites x and y in agent of type  A
- rule:   A(x~p, y~u/~p) @ 2
- rule:   A(x~u/~p, y~p) @ 2
-Existing rule
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u/~p, t~u) @ 1
- rule:   A(w~u/~p, t~u) @ 1
+ rule:   A(x~u/~p!., y~p!.) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
+Existing rule
+ rule:   A(x~u/~p!., y~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u, t~u/~p) @ 1
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(x~p!., y~u/~p!.) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
+Existing rule
+ rule:   A(x~p!., y~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u/~p, t~p) @ 2
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u/~p!., t~u!.) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~p, t~u/~p) @ 2
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
+ rule:   A(w~u!., t~u/~p!.) @ 1
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(w~u/~p!., t~p!.) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(w~p!., t~u/~p!.) @ 2
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u/~p, y~u) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u, y~u/~p) @ 1
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~u/~p, y~p) @ 2
- rule:   A(x~u/~p, y~p) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(x~p, y~u/~p) @ 2
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~u/~p, t~u) @ 1
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
+ rule:   A(w~u!., t~u/~p!.) @ 1
 Existing rule
- rule:   A(w~u/~p, t~u) @ 1
-Existing rule
-Check an orbit
-Permutation of the sites t and w in agent of type  A
- rule:   A(w~u, t~u/~p) @ 1
- rule:   A(w~u/~p, t~u) @ 1
-Existing rule
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~u/~p, t~p) @ 2
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites t and w in agent of type  A
- rule:   A(w~p, t~u/~p) @ 2
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites t and w in agent of type  A
+ rule:   A(w~p!., t~u/~p!.) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites t and x in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(y~u, t~u/~p) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(y~u!., t~u/~p!.) @ 1
 Unknown rule
 Check an orbit
 Permutation of the sites t and y in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u/~p, t~u) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u/~p!., t~u!.) @ 1
 Unknown rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(x~u/~p, y~u) @ 1
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
- rule:   A(x~u/~p, y~u) @ 1
-Existing rule
-Check an orbit
-Permutation of the sites x and y in agent of type  A
- rule:   A(x~u, y~u/~p) @ 1
- rule:   A(x~u/~p, y~u) @ 1
-Existing rule
- rule:   A(x~u, y~u/~p) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(x~u/~p, y~p) @ 2
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~u!., y~u/~p!.) @ 1
+ rule:   A(x~u/~p!., y~u!.) @ 1
 Existing rule
- rule:   A(x~u/~p, y~p) @ 2
-Existing rule
-Check an orbit
-Permutation of the sites x and y in agent of type  A
- rule:   A(x~p, y~u/~p) @ 2
- rule:   A(x~u/~p, y~p) @ 2
-Existing rule
- rule:   A(x~p, y~u/~p) @ 2
+ rule:   A(x~u!., y~u/~p!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u/~p, t~u) @ 1
- rule:   A(w~u/~p, t~u) @ 1
+ rule:   A(x~u/~p!., y~p!.) @ 2
+ rule:   A(x~p!., y~u/~p!.) @ 2
+Existing rule
+ rule:   A(x~u/~p!., y~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u, t~u/~p) @ 1
- rule:   A(w~u, t~u/~p) @ 1
+ rule:   A(x~p!., y~u/~p!.) @ 2
+ rule:   A(x~u/~p!., y~p!.) @ 2
+Existing rule
+ rule:   A(x~p!., y~u/~p!.) @ 2
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~u/~p, t~p) @ 2
- rule:   A(w~u/~p, t~p) @ 2
+ rule:   A(w~u/~p!., t~u!.) @ 1
+ rule:   A(w~u/~p!., t~u!.) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(w~p, t~u/~p) @ 2
- rule:   A(w~p, t~u/~p) @ 2
+ rule:   A(w~u!., t~u/~p!.) @ 1
+ rule:   A(w~u!., t~u/~p!.) @ 1
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(w~u/~p!., t~p!.) @ 2
+ rule:   A(w~u/~p!., t~p!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(w~p!., t~u/~p!.) @ 2
+ rule:   A(w~p!., t~u/~p!.) @ 2
 Existing rule
 Contact map
 agent:A

@@ -167,8 +167,8 @@ let rec scan_interface parameters k agent interface remanent =
               (fst port.Ast.port_nme)
               k
               remanent
-          | [] | ((Ast.LNK_ANY | Ast.FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
-                  | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
+          | [] | ((Ast.LNK_ANY | Ast.LNK_FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
+                  | Ast.ANY_FREE | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
 
 let scan_agent parameters k ((name,_),intf,_modif) remanent =
   fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
@@ -263,7 +263,7 @@ let translate_lnk_state parameters lnk_state remanent =
              pos),
           (error, (map, (snd remanent)))
     end
-  | [Ast.FREE,_] | [] -> Ckappa_sig.FREE,remanent
+  | [(Ast.LNK_FREE|Ast.ANY_FREE),_] | [] -> Ckappa_sig.FREE,remanent
   | [Ast.LNK_ANY,position] -> Ckappa_sig.LNK_ANY position,remanent
   | [Ast.LNK_SOME,position] -> Ckappa_sig.LNK_SOME position,remanent
   | [Ast.LNK_TYPE (x,y),_position] -> Ckappa_sig.LNK_TYPE (y,x),remanent
@@ -282,10 +282,10 @@ let translate_port is_signature parameters int_set port remanent =
   in
   let error',is_free =
     match port.Ast.port_lnk
-    with [Ast.FREE,_] | [] -> error,Some true
+    with [(Ast.LNK_FREE|Ast.ANY_FREE),_] | [] -> error,Some true
           | [Ast.LNK_ANY,_] -> error,None
-          | ((Ast.LNK_SOME | Ast.LNK_TYPE _ | Ast.LNK_VALUE _
-            | Ast.FREE | Ast.LNK_ANY),_) :: _ -> error,Some false in
+          | ((Ast.LNK_SOME | Ast.LNK_TYPE _ | Ast.LNK_VALUE _ | Ast.ANY_FREE
+            | Ast.LNK_FREE | Ast.LNK_ANY),_) :: _ -> error,Some false in
   let lnk,remanent =
     if is_signature then Ckappa_sig.FREE,remanent else
       translate_lnk_state parameters port.Ast.port_lnk (error',map) in

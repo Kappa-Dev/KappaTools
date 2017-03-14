@@ -453,7 +453,7 @@ internal_state:
 
 link_state_mod:
 	| {None}
-	| DIV {Some None}
+	| DIV KAPPA_LNK DOT {Some None}
 	| DIV KAPPA_LNK INT {Some (Some ($3,rhs_pos 3))}
 	| DIV error
 	{raise (ExceptionDefn.Syntax_Error
@@ -461,6 +461,7 @@ link_state_mod:
 
 
 a_link_state:
+    | KAPPA_LNK DOT {(Ast.LNK_FREE,rhs_pos 2)}
     | KAPPA_LNK INT {(Ast.LNK_VALUE ($2,()),rhs_pos 2)}
     | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
     | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE

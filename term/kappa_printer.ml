@@ -18,7 +18,7 @@ let cc_mix ?env =
          (fun _ f cc ->
             Format.fprintf
               f "|%a|"
-              (Pattern.print ?domain ~with_id:false) cc) f ccs)
+              (Pattern.print ~new_syntax:true ?domain ~with_id:false) cc) f ccs)
 
 let alg_expr ?env =
   Alg_expr.print (cc_mix ?env) (Model.print_token ?env) (Model.print_alg ?env)
@@ -57,7 +57,7 @@ let elementary_rule ?env f r =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
-    let () = Pattern.print ?domain ~with_id:true f cc in
+    let () = Pattern.print ~new_syntax:true ?domain ~with_id:true f cc in
     Format.pp_close_box f ()
   in
   let ins_fresh,ins_mixte,ins_existing =
@@ -116,7 +116,7 @@ let modification ?env f m =
         | _ -> assert false
       else
         let boxed_cc _ =
-          Pattern.print ?domain ~with_id:false in
+          Pattern.print ~new_syntax:true ?domain ~with_id:false in
         Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
           (Pp.array Pp.comma boxed_cc)
           rule.Primitives.connected_components
@@ -159,12 +159,14 @@ let modification ?env f m =
     Format.fprintf
       f "$TRACK @[%a@] [true]"
       (Pp.array
-         Pp.comma (fun _ -> Pattern.print ?domain ~with_id:false)) cc
+         Pp.comma
+         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
   | Primitives.CFLOWOFF cc ->
     Format.fprintf
       f "$TRACK %a [false]"
       (Pp.array
-         Pp.comma (fun _ -> Pattern.print ?domain ~with_id:false)) cc
+         Pp.comma
+         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
 
 let perturbation ?env f pert =
   let aux f =

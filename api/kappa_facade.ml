@@ -122,6 +122,7 @@ type t =
   { mutable is_running : bool ;
     mutable run_finalize : bool ;
     mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
+    new_syntax : bool;
     dumpIfDeadlocked : bool;
     maxConsecutiveClash : int;
     counter : Counter.t ;
@@ -151,12 +152,13 @@ let t_range (t : t) (range : Api_types_j.range) =
   | None -> range
   | Some indexes ->  localize_range range indexes
 
-let create_t ~log_form ~log_buffer ~contact_map ~dumpIfDeadlocked
-    ~maxConsecutiveClash ~env ~counter ~graph ~state
+let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
+    ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph ~state
     ~init_l ~with_trace ~lastyield ~file_indexes : t =
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
     pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
+    new_syntax;
     plot = { Api_types_j.plot_legend = [] ;
              Api_types_j.plot_time_series = [] ; } ;
     snapshots = [];
@@ -190,6 +192,7 @@ let clone_t t =
     ~log_form:t.log_form ~log_buffer:t.log_buffer
     (* TODO pirbo: Should I create a new buffer? *)
     ~contact_map:t.contact_map
+    ~new_syntax:t.new_syntax
     ~maxConsecutiveClash:t.maxConsecutiveClash
     ~dumpIfDeadlocked:t.dumpIfDeadlocked
     ~env:t.env
@@ -241,7 +244,10 @@ let build_ast
        (fun raw_ast ->
           (yield ()) >>=
           (fun () ->
-             (Lwt.wrap2 LKappa.compil_of_ast [] raw_ast) >>=
+             let (conf,_,_,_,_) =
+               Configuration.parse raw_ast.Ast.configurations in
+             let new_syntax = conf.Configuration.newSyntax in
+             (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] raw_ast) >>=
              (fun
                (sig_nd,
                 contact_map,
@@ -259,8 +265,6 @@ let build_ast
                   let lastyield = Sys.time () in
                   try (* exception raised by compile must have used Lwt.fail.
                          Something is wrong for now *)
-                    let (conf,_,_,_,_) =
-                      Configuration.parse result.Ast.configurations in
                   Eval.compile
                     ~pause:(fun f -> Lwt.bind (yield ()) f)
                     ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
@@ -289,6 +293,7 @@ let build_ast
                          ~contact_map ~log_form ~log_buffer  ~env ~counter
                          ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                          ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
+                         ~new_syntax
                          ~graph:(Rule_interpreter.empty
                                    ~with_trace(*TODO conf.Eval.traceFileName*)
                                    random_state env counter)
@@ -427,7 +432,8 @@ let start
       let () = reinitialize random_state t in
       Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
       fun pause ->
-      Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
+      Lwt.wrap4 (Evaluator.get_pause_criteria
+                   ~max_sharing:false ~new_syntax:t.new_syntax)
         t.contact_map t.env t.graph pause >>=
       fun (env',graph',b'') ->
       let () = t.env <- env' in
@@ -533,7 +539,7 @@ let perturbation
          fun e ->
          Lwt.wrap6
            (Evaluator.do_interactive_directives
-              ~outputs:(outputs t) ~max_sharing:false)
+              ~outputs:(outputs t) ~max_sharing:false ~new_syntax:t.new_syntax)
            t.contact_map t.env t.counter t.graph t.state e >>=
          fun (_,(env',(_,graph'',state'))) ->
          let () = t.env <- env' in
@@ -556,7 +562,8 @@ let continue
        else
          Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
          fun pause ->
-         Lwt.wrap4 (Evaluator.get_pause_criteria ~max_sharing:false)
+         Lwt.wrap4 (Evaluator.get_pause_criteria
+                      ~max_sharing:false ~new_syntax:t.new_syntax)
            t.contact_map t.env t.graph pause >>=
          fun (env',graph',b'') ->
          let () = t.env <- env' in

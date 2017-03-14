@@ -24,7 +24,10 @@ let get_compilation
         Configuration.parse result.Ast.configurations in
       let () = Format.printf "+ Sanity checks@." in
       let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
-        LKappa.compil_of_ast cli_args.Run_cli_args.alg_var_overwrite result in
+        LKappa.compil_of_ast
+          ~new_syntax:(cli_args.Run_cli_args.newSyntax ||
+                       conf.Configuration.newSyntax)
+          cli_args.Run_cli_args.alg_var_overwrite result in
       let () = Format.printf "+ Compiling...@." in
       let (env, has_tracking,init_l) =
         Eval.compile

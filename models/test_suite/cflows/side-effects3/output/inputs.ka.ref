@@ -1,4 +1,5 @@
 %def: "seed" "501792230"
+%def: "newSyntax" "true"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "1" "events"
@@ -11,9 +12,9 @@
 
 %plot: [T]
 +C() @ 1
-A(x!_/) @ 1
-A(x~0/~1/!1), B(x/!1) @ 1
-A(x~1/~0/!1), B(x/!1) @ 1
+A(x!_/!.) @ 1
+A(x~0/~1!./!1), B(x!./!1) @ 1
+A(x~1/~0!./!1), B(x!./!1) @ 1
 'GOAL' -A(x~1!1), -B(x~1!1) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x~1!1), B(x~1!1) [true]

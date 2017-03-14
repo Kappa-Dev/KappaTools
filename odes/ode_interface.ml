@@ -118,6 +118,7 @@ let do_we_prompt_reactions compil =
 let print_chemical_species ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Pattern.print_cc
+       ~new_syntax:false
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None)
 
@@ -135,7 +136,7 @@ let nbr_automorphisms_in_chemical_species x =
 let compare_connected_component = Pattern.compare_canonicals
 
 let print_connected_component ?compil =
-  Pattern.print ?domain:(domain_opt compil) ~with_id:false
+  Pattern.print ~new_syntax:false ?domain:(domain_opt compil) ~with_id:false
 
 let canonic_form x = x
 

@@ -1,4 +1,5 @@
 %def: "seed" "924556145"
+%def: "newSyntax" "true"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "1" "events"
@@ -9,10 +10,10 @@
 %agent: C(a~p~u!a.B!a.C, b, c)
 
 %plot: [T]
-B(a/!1), C(a~u/~p/!1) @ 1
+B(a!./!1), C(a~u/~p!./!1) @ 1
 'D' -B(a!1, b?, c?), -C(a~p!1, b?, c?) @ 2
--A(a?, b, c?) @ 1
-C(a!_/) @ 2
+-A(a?, b!., c?) @ 1
+C(a!_/!.) @ 2
 +A(a!1, b, c), +B(a!1, b, c) @ 10
 +C(a~p, b, c) @ 10
 

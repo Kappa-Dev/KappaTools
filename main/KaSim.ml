@@ -194,6 +194,7 @@ let () =
           {Configuration.seed = Some theSeed;
            Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
            Configuration.traceFileName = user_trace_file;
+           Configuration.newSyntax = true;
            Configuration.initial =
              if Tools.float_is_zero (Counter.init_time counter) then None
              else Some (Counter.init_time counter);
@@ -271,6 +272,7 @@ let () =
               | Ast.RUN b ->
                 let env',graph',b'' = Evaluator.get_pause_criteria
                     ~max_sharing:kasim_args.Kasim_args.maxSharing
+                    ~new_syntax:cli_args.Run_cli_args.newSyntax
                     contact_map env graph b in
                 env',interactive_loop
                   ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
@@ -280,6 +282,7 @@ let () =
                 let e', (env',_ as o) =
                   Evaluator.do_interactive_directives
                     ~outputs ~max_sharing:kasim_args.Kasim_args.maxSharing
+                    ~new_syntax:cli_args.Run_cli_args.newSyntax
                     contact_map env counter graph state e in
                 let () = Outputs.input_modifications
                     env' (Counter.current_event counter) e' in

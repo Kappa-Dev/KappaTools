@@ -18,6 +18,7 @@ type t = {
   mutable outputDirectory     : string;
   mutable batchmode           : bool;
   mutable interactive         : bool;
+  mutable newSyntax          : bool;
 }
 
 let default : t = {
@@ -32,6 +33,7 @@ let default : t = {
   outputDirectory = ".";
   batchmode  = false;
   interactive = false;
+  newSyntax = false;
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -78,6 +80,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
      (fun m -> if m = "batch" then t.batchmode <- true
        else if m = "interactive" then t.interactive <- true),
    "either \"batch\" to never ask anything to the user or \"interactive\" to ask something before doing anything") ;
+    ("--new-syntax",
+   Arg.Unit (fun () -> t.newSyntax <- true),
+   "Use explicit notation for free site");
   ("-rescale", Arg.Float (fun i -> t.rescale <- Some i),
    "Apply rescaling factor to initial condition")
 ]

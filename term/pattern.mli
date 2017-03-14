@@ -116,9 +116,11 @@ val compare_canonicals : id -> id -> int
 val is_equal_canonicals : id -> id -> bool
 
 val print_cc :
-  ?sigs:Signature.s -> ?cc_id:id -> Format.formatter -> t -> unit
+  new_syntax:bool -> ?sigs:Signature.s -> ?cc_id:id ->
+  Format.formatter -> t -> unit
 
-val print : ?domain:Env.t -> with_id:bool ->
+val print :
+  new_syntax:bool -> ?domain:Env.t -> with_id:bool ->
   Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 

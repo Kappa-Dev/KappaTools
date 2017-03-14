@@ -9,8 +9,9 @@
 (** Kappa AST just after parsing *)
 
 type ('a,'annot) link =
+  | ANY_FREE
   | LNK_VALUE of int * 'annot
-  | FREE
+  | LNK_FREE
   | LNK_ANY
   | LNK_SOME
   | LNK_TYPE of 'a * 'a (** port * agent_type *)
@@ -167,6 +168,7 @@ val implicit_signature : parsing_compil -> parsing_compil
 (** {6 Printers} *)
 
 val print_link :
+  new_syntax:bool ->
   ('a -> Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) ->

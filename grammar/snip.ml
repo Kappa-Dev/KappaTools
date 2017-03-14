@@ -53,17 +53,17 @@ let find_implicit_infos contact_map ags =
           (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
       | (Ast.LNK_VALUE (j,_),_),s ->
         aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
-      | (Ast.FREE, pos), LKappa.Maintained ->
+      | (Ast.LNK_FREE, pos), LKappa.Maintained ->
         let () = (* Do not make test if being free is the only possibility *)
           match ports_from_contact_map contact_map ty_id i with
           | [] -> ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained
           | _ :: _ -> () in
         aux_one ag_tail ty_id max_id ports (succ i)
-      | (Ast.FREE, _), (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
+      | (Ast.LNK_FREE, _), (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
         aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
-      | (Ast.LNK_ANY,_), LKappa.Maintained ->
+      | ((Ast.LNK_ANY|Ast.ANY_FREE),_), LKappa.Maintained ->
         aux_one ag_tail ty_id max_id ports (succ i)
-      | (Ast.LNK_ANY,pos),
+      | ((Ast.LNK_ANY|Ast.ANY_FREE),pos),
         (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
         match ports_from_contact_map contact_map ty_id i with
         | [] when s = LKappa.Freed ->
@@ -107,7 +107,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
     (fun i acc port ->
        if i <> p_id then acc else
          match port with
-         | (Ast.LNK_ANY,_), s ->
+         | ((Ast.LNK_ANY|Ast.ANY_FREE),_), s ->
            if s = LKappa.Maintained then
              let ports' = Array.copy ag.LKappa.ra_ports in
              let () =
@@ -150,7 +150,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              | _ :: _ :: _, _ -> assert false
            end
          | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ |
-             Ast.FREE | Ast.LNK_SOME),_), _ -> acc)
+             Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
     [] ag.LKappa.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
@@ -188,8 +188,8 @@ let add_implicit_infos sigs l =
 
 let is_linked_on_port me i id = function
   | (Ast.LNK_VALUE (j,_),_),_ when i = j -> id <> me
-  | ((Ast.LNK_VALUE _ | Ast.FREE | Ast.LNK_TYPE _ |
-      Ast.LNK_ANY | Ast.LNK_SOME),_),_ -> false
+  | ((Ast.LNK_VALUE _ | Ast.LNK_FREE | Ast.LNK_TYPE _ |
+      Ast.LNK_ANY | Ast.LNK_SOME | Ast.ANY_FREE),_),_ -> false
 
 let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.LKappa.ra_ports <> []
@@ -292,7 +292,8 @@ let add_side_site side_sites bt pl s = function
 let add_freed_side_effect side_effects pl s = function
   | (Ast.LNK_VALUE _,_),LKappa.Freed -> (pl,s)::side_effects
   | (Ast.LNK_VALUE _,_),(LKappa.Maintained | LKappa.Erased | LKappa.Linked _)
-  | ((Ast.FREE | Ast.LNK_ANY | Ast.LNK_SOME | Ast.LNK_TYPE _),_),_ ->
+  | ((Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME |
+      Ast.LNK_TYPE _ | Ast.ANY_FREE),_),_ ->
     side_effects
 let add_extra_side_effects side_effects place refined =
   let rec aux side_effects site_id =
@@ -343,7 +344,7 @@ let make_instantiation place links event ref_ports is_erased =
               actions in
           let tests'',actions'',side_sites',side_effects',links' =
             match ports.(site_id) with
-            | (Ast.LNK_ANY,_), s ->
+            | ((Ast.LNK_ANY|Ast.ANY_FREE),_), s ->
               let side_effects' =
                 match s with
                 | LKappa.Maintained ->
@@ -356,7 +357,7 @@ let make_instantiation place links event ref_ports is_erased =
                 place site_id s,
               side_effects',
               links
-            | (Ast.FREE,_), s ->
+            | (Ast.LNK_FREE,_), s ->
               (Instantiation.Is_Free (place,site_id) :: tests'),
               add_instantiation_free actions' place site_id s,side_effects_src,
               side_effects_dst, links
@@ -435,14 +436,14 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
             Pattern.new_internal_state wk (node,site_id) i
         in
         match ag.LKappa.ra_ports.(site_id) with
-        | (Ast.LNK_ANY,pos), s ->
+        | ((Ast.LNK_ANY|Ast.ANY_FREE),pos), s ->
           let transf',l_t' =
             define_full_transformation
               sigs transf l_t place site_id
               (Primitives.Transformation.NegativeWhatEver
                  (place,site_id),Some pos) s in
           handle_ports wk' r_l c_l transf' l_t' re acc (succ site_id)
-        | (Ast.FREE,_), s ->
+        | (Ast.LNK_FREE,_), s ->
           let wk'' = Pattern.new_free wk' (node,site_id) in
           let transf',l_t' =
             define_full_transformation
