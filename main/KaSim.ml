@@ -117,7 +117,6 @@ let () =
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
-    let () = Parameter.compileModeOn := kasim_args.Kasim_args.compileMode in
     let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent in
 
@@ -135,7 +134,8 @@ let () =
          formatCflows, cflowFile, init_l as init_result),
         counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
-        ~max_sharing:kasim_args.Kasim_args.maxSharing cli_args in
+        ~max_sharing:kasim_args.Kasim_args.maxSharing
+        ~compileModeOn:kasim_args.Kasim_args.compileMode cli_args in
 
     let theSeed,seed_arg =
       match kasim_args.Kasim_args.seedValue,conf.Configuration.seed with
@@ -189,7 +189,7 @@ let () =
     let dumpIfDeadlocked = conf.Configuration.dumpIfDeadlocked in
     let maxConsecutiveClash = conf.Configuration.maxConsecutiveClash in
     let () =
-      if not !Parameter.compileModeOn then
+      if not kasim_args.Kasim_args.compileMode then
         Outputs.initial_inputs
           {Configuration.seed = Some theSeed;
            Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
@@ -204,7 +204,7 @@ let () =
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
       plot_file;
-    if not !Parameter.compileModeOn then
+    if not kasim_args.Kasim_args.compileMode then
       Outputs.initialize trace_file plotPack env;
 
     let outputs = Outputs.go (Model.signatures env) in
@@ -221,7 +221,7 @@ let () =
     Format.printf "+ Command line to rerun is: %s@." command_line;
 
     let () =
-      if !Parameter.compileModeOn || !Parameter.debugModeOn then
+      if kasim_args.Kasim_args.compileMode || !Parameter.debugModeOn then
         Format.eprintf
           "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Polymers:@,%a@]@,\
 @[<v 2>Domain:@,%a@]@,@[<v 2>Intial graph;@,%a@]@]@."
@@ -235,7 +235,9 @@ let () =
         Yojson.Basic.to_file (Kappa_files.path domainOutputFile)
           (Pattern.Env.to_yojson (Model.domain env)) in
     ExceptionDefn.flush_warning Format.err_formatter ;
-    if !Parameter.compileModeOn then let () = remove_trace () in exit 0 else ();
+    (if kasim_args.Kasim_args.compileMode
+     then let () = remove_trace () in exit 0
+     else ());
 
     let () = match plotPack with
       | Some _ ->

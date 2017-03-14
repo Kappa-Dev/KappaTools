@@ -647,12 +647,12 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
             (List.map LKappa.copy_rule_agent precomp_mixs))
 
 let connected_components_sum_of_ambiguous_rule
-    contact_map env ?origin precomp_mixs created =
+   ~compileModeOn contact_map env ?origin precomp_mixs created =
   let sigs = Pattern.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs in
   let () =
-    if !Parameter.compileModeOn then
+    if compileModeOn then
       Format.eprintf "@[<v>_____(%i)@,%a@]@."
         (List.length all_mixs)
         (Pp.list
@@ -668,10 +668,11 @@ let connected_components_sum_of_ambiguous_rule
   List_util.fold_right_map (connected_components_of_mixture created)
     all_mixs (env,origin)
 
-let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
+let connected_components_sum_of_ambiguous_mixture
+    ~compileModeOn contact_map env ?origin mix =
   let rules,(cc_env,_) =
     connected_components_sum_of_ambiguous_rule
-      contact_map env ?origin mix [] in
+      ~compileModeOn contact_map env ?origin mix [] in
   (cc_env, List.map
      (function _, l, event, ([],[]) -> l, event.Instantiation.tests
              | _ -> assert false) rules)

@@ -263,7 +263,7 @@ let build_ast
                       Configuration.parse result.Ast.configurations in
                   Eval.compile
                     ~pause:(fun f -> Lwt.bind (yield ()) f)
-                    ~return:Lwt.return ?rescale_init:None
+                    ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
                     ~outputs:(function
                         | Data.Log s ->
                           Format.fprintf log_form "%s@." s

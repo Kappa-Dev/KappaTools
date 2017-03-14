@@ -150,7 +150,8 @@ let connected_components_of_mixture compil cache e =
     List.fold_left
       (fun (cc_cache,acc) (i,m) ->
          match Snip.connected_components_sum_of_ambiguous_mixture
-                 contact_map cc_cache (LKappa.of_raw_mixture m) with
+                 ~compileModeOn:false contact_map
+                 cc_cache (LKappa.of_raw_mixture m) with
          | cc_cache',[[|_,x|],_] ->
            cc_cache',Tools.recti (fun a _ -> x::a) acc i
          | _ -> assert false)

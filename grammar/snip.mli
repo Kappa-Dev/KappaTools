@@ -9,15 +9,15 @@
 (** Kappa pattern compiler *)
 
 val connected_components_sum_of_ambiguous_mixture :
-  Contact_map.t -> Pattern.PreEnv.t -> ?origin:Operator.rev_dep ->
-  LKappa.rule_mixture ->
+  compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
+  ?origin:Operator.rev_dep -> LKappa.rule_mixture ->
   Pattern.PreEnv.t *
   ((Pattern.id * Pattern.cc) array *
    Instantiation.abstract Instantiation.test list list) list
 
 val connected_components_sum_of_ambiguous_rule :
-  Contact_map.t -> Pattern.PreEnv.t -> ?origin:Operator.rev_dep ->
-  LKappa.rule_mixture -> Raw_mixture.t ->
+  compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
+  ?origin:Operator.rev_dep -> LKappa.rule_mixture -> Raw_mixture.t ->
   (Operator.rev_dep option * (Pattern.id * Pattern.cc) array *
      (Instantiation.abstract Instantiation.event) *
        (Instantiation.abstract Primitives.Transformation.t list *

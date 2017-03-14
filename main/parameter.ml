@@ -43,8 +43,6 @@ let useColor = ref true
   let log_number_of_causal_flows = true
 
 (*User definable values*)
-let compileModeOn = ref false
-
 let time_independent = ref false
 let blacklist_events = ref false
 
