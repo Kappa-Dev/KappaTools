@@ -188,6 +188,38 @@ let print_step ?(compact=false) ?env f = function
   | Obs (a,b,c) -> print_obs ~compact ?env f (a,b,c)
   | Dummy _  -> ()
 
+let get_types_from_init a =
+  List.fold_left
+    (fun acc action ->
+      match action with
+        Instantiation.Create ((_,atype),_) -> atype::acc
+      | Instantiation.Mod_internal _ | Instantiation.Bind _
+        | Instantiation.Bind_to _ | Instantiation.Free _
+        | Instantiation.Remove _ -> acc) [] a
+
+let print_label_of_step ?env f x =  match env with
+  | None ->
+     (match x with
+      | Subs _ -> ()
+      | Rule (x,_,_) -> Format.fprintf f "%i" x
+      | Pert (x,_,_) -> Format.fprintf f "%s" x
+      | Init a ->
+         let l = get_types_from_init a in
+         Format.fprintf f "INIT(%a)" (Pp.list Pp.comma Format.pp_print_int) l
+      | Obs (x,_,_) -> Format.fprintf f "%s" x
+      | Dummy _  -> ())
+  | Some env -> match x with
+      | Subs _ -> ()
+      | Rule (x,_,_) -> Model.print_ast_rule ~env f x
+      | Pert (x,_,_) -> Format.pp_print_string f x
+      | Init a ->
+         let l = get_types_from_init a in
+         Format.fprintf
+           f "Intro @[<h>%a@]"
+           (Pp.list Pp.comma (Model.print_agent ~env)) l
+      | Obs (x,_,_) -> Format.pp_print_string f x
+      | Dummy _  -> ()
+
 let step_to_yojson = function
   | Subs (a,b) -> `List [`String "Subs"; `Int a; `Int b]
   | Rule (x,y,z) ->
@@ -296,4 +328,3 @@ let actions_of_step = function
 let side_effects_of_step = function
   | Rule ((_,e,_)) | Pert ((_,e,_)) -> e.Instantiation.side_effects_dst
   | Subs _ | Obs _ | Dummy _ | Init _ -> []
-

@@ -86,6 +86,8 @@ val creation_of_step : step -> int list
 
 val print_step:
   ?compact:bool -> ?env:Model.t -> Format.formatter -> step -> unit
+val print_label_of_step:
+  ?env:Model.t -> Format.formatter -> step -> unit
 
 val step_to_yojson : step -> Yojson.Basic.json
 val step_of_yojson : Yojson.Basic.json -> step
