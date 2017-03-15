@@ -70,27 +70,6 @@ LKappa_auto.cache *
  (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
   list
 
-  (*Remanent_parameters_sig.parameters ->
-  LKappa_auto.cache ->
-  Model.t ->
-  'a ->
-  Pattern.cc list ->
-  (Primitives.elementary_rule ->
-   int -> ('b * Rule_modes.arity * Rule_modes.direction) list) ->
-  (Primitives.elementary_rule ->
-   'b * Rule_modes.arity * Rule_modes.direction -> 'c option) ->
-  Primitives.elementary_rule list ->
-  (LKappa_auto.cache ->
-   Model.t ->
-   'a -> Primitives.elementary_rule -> LKappa.rule -> 'd * 'e * 'f) ->
-  LKappa_auto.cache *
-  ((int * 'c Rule_modes.RuleModeMap.t * 'e) *
-   (int * 'c Rule_modes.RuleModeMap.t * 'f))
-    list *
-  ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
-   (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-    list*)
-
 val detect_symmetries:
 Remanent_parameters_sig.parameters ->
 Model.t ->

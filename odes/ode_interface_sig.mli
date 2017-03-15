@@ -148,19 +148,6 @@ sig
 
   (*symmetries for initial states*)
 
-  (*val cannonic_form_from_syntactic_init:
-    Remanent_parameters_sig.parameters -> cache -> compil ->
-    chemical_species ->
-    cache * LKappa.rule * int * LKappa_auto.RuleCache.hashed_list*)
-
-  (*val divide_rule_rate_by_init :
-    cache -> compil -> LKappa.rule -> cache * int*)
-
-  (*symmetries for rules*)
-  (*val species_to_lkappa_rule : Remanent_parameters_sig.parameters -> compil ->
-    check_symmetries -> LKappa.rule*)
-
-  (*DELETE*)
   val divide_rule_rate_by: cache -> compil -> rule ->
     cache * int
 

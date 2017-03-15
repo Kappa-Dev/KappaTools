@@ -425,58 +425,6 @@ let divide_rule_rate_by cache compil rule =
 (****************************************************************)
 (*cannonic form per rule*)
 
-(*let species_to_lkappa_rule parameters compil species =
-  let signature = Model.signatures compil.environment in
-  let some_pair =
-    Raw_mixture_extra.pattern_to_raw_mixture
-      ~parameters
-      signature
-      species
-  in
-  match some_pair with
-  | None -> lkappa_init
-  | Some (raw_mixture, _) ->
-  let lkappa_rule =
-    Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
-  in
-  lkappa_rule*)
-
-(*let cannonic_form_from_syntactic_rule cache compil rule lkappa_rule_init =
-  (*DELETE*)
-  let rule_id = rule.Primitives.syntactic_rule in
-  let lkappa_rule =
-    Model.get_ast_rule compil.environment rule_id
-  in
-  let rule_cache = cache.rule_cache in
-  let rule_cache, hashed_list =
-    LKappa_auto.cannonic_form rule_cache lkappa_rule
-  in
-  let rule_cache, hashed_list_init =
-    LKappa_auto.cannonic_form rule_cache lkappa_rule_init
-  in
-  let i' = LKappa_auto.RuleCache.int_of_hashed_list hashed_list_init in
-  let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-  let rule_id_with_mode_list = valid_modes compil rule rule_id in
-  let rate_map =
-    List.fold_left (fun rate_map rule_id_with_mode ->
-        let rate_opt =
-          rate compil rule rule_id_with_mode
-        in
-        let _,a,b = rule_id_with_mode in
-        let rate_map =
-          match rate_opt with
-          | None -> rate_map
-          | Some rate ->
-            Rule_modes.RuleModeMap.add (a,b) rate rate_map
-        in
-        rate_map
-      )
-      Rule_modes.RuleModeMap.empty
-      rule_id_with_mode_list
-  in
-  let cache = {cache with rule_cache = rule_cache } in
-  cache, (lkappa_rule,i , rate_map, hashed_list), (hashed_list_init, i')*)
-
 let cannonic_form_from_syntactic_rules
     parameters
     cache
