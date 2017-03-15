@@ -69,6 +69,26 @@ type flux_kind = ABSOLUTE | RELATIVE | PROBABILITY
 val flux_kind_to_yojson : flux_kind -> Yojson.Basic.json
 val flux_kind_of_yojson : Yojson.Basic.json -> flux_kind
 
+val write_flux_kind :
+  Bi_outbuf.t -> flux_kind -> unit
+  (** Output a JSON value of type {!flux_kind}. *)
+
+val string_of_flux_kind :
+  ?len:int -> flux_kind -> string
+  (** Serialize a value of type {!flux_kind}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_flux_kind :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_kind
+  (** Input JSON data of type {!flux_kind}. *)
+
+val flux_kind_of_string :
+  string -> flux_kind
+  (** Deserialize JSON data of type {!flux_kind}. *)
+
 type modification =
   | ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
   | UPDATE of int * Alg_expr.t Locality.annot

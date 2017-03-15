@@ -105,7 +105,7 @@ type plot_detail = { plot_detail_plot : plot;
 	             plot_detail_size : int ; }
 
 (* flux *)
-type flux_kind <ocaml predef module="Primitives">= [ ABSOLUTE | RELATIVE | PROBABILITY ] <ocaml repr="classic">
+type flux_kind <ocaml from module="Primitives">= abstract
 type flux_map_id = string
 type flux_flux = float list <ocaml repr="array">
 type flux_data <ocaml predef module="Data"> = {

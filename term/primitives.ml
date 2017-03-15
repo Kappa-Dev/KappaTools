@@ -268,6 +268,20 @@ let flux_kind_of_yojson = function
   | x -> raise
            (Yojson.Basic.Util.Type_error ("Incorrect flux_kind",x))
 
+let write_flux_kind ob f =
+  Yojson.Basic.to_outbuf ob (flux_kind_to_yojson f)
+
+let string_of_flux_kind ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_flux_kind ob x;
+  Bi_outbuf.contents ob
+
+let read_flux_kind p lb =
+  flux_kind_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+let flux_kind_of_string s =
+  read_flux_kind (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
 type modification =
     ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
   | UPDATE of int * Alg_expr.t Locality.annot
