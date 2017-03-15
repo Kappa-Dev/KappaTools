@@ -51,15 +51,23 @@ let content () =
         [Subpanel_editor.content ()];
       (rightsubpanel ()) ]]
 
-let editor_full , set_editor_full =
-  React.S.create (false : bool)
-
-
+let childs_hide b =
+  if b then
+    let () = Tab_contact.parent_hide () in
+    Tab_log.parent_hide ()
+  else
+    let () = Tab_contact.parent_shown () in
+    Tab_log.parent_shown ()
 
 let onload () =
   let () = Subpanel_editor.onload () in
   let () = Tab_contact.onload () in
   let () = Tab_log.onload () in
+  let _ = React.S.map childs_hide Subpanel_editor.editor_full in
+  let () = Common.jquery_on
+      "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true) in
+  let () = Common.jquery_on
+      "#naveditor" "shown.bs.tab" (fun _ -> childs_hide false) in
   ()
 
 let onresize () : unit = ()

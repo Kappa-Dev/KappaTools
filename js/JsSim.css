@@ -79,7 +79,8 @@ rect { stroke-width: 2; }
     white-space : pre;
 }
 .filename {
-    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
     padding: 6px 12px;
     margin-bottom: 0;
     font-size: 14px;
@@ -88,9 +89,7 @@ rect { stroke-width: 2; }
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
-    background: rgb(245, 245, 245);
     border : 0px;
-    cursor : default;
 }
 
 .node-rect { stroke-width:2;

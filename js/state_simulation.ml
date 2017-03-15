@@ -44,6 +44,8 @@ let model_state_to_string =
          | RUNNING -> "Running"
          | PAUSED -> "Paused"
 
+let dummy_model = { model_current = None; model_simulations = []; }
+
 let model_simulation_info model : Api_types_j.simulation_info option=
   Option_util.bind t_simulation_info model.model_current
 let model_simulation_state model : model_state option =

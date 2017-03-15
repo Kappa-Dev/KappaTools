@@ -67,6 +67,12 @@ let update
       (Js.string json)
       (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
 
+let tab_is_active, set_tab_is_active = React.S.create false
+let tab_was_active = ref false
+
+let parent_hide () = set_tab_is_active false
+let parent_shown () = set_tab_is_active !tab_was_active
+
 let onload () =
   let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
@@ -79,16 +85,18 @@ let onload () =
          | Some data ->
            if Array.length data > 0 then
              update data contactmap
-             else
-               contactmap##clearData)
+           else
+             contactmap##clearData)
       State_project.model
   in
-  Common.jquery_on
-    "#navcontact"
-    "shown.bs.tab"
-    (fun _ ->
-       match (React.S.value State_project.model).State_project.model_contact_map with
-       | None -> (contactmap##clearData)
-       | Some data -> update data contactmap)
+    let () = Common.jquery_on
+      "#navlog"
+      "hide.bs.tab"
+      (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
+  let () = Common.jquery_on
+      "#navlog"
+      "shown.bs.tab"
+      (fun _ -> let () = tab_was_active := true in set_tab_is_active true) in
+  ()
 
 let onresize () : unit = ()

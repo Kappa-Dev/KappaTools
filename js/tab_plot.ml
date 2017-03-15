@@ -298,6 +298,7 @@ let onload_plot_points_input
   ()
 
 let plot_ref = ref None
+let tab_is_active,set_tab_is_active = React.S.create false
 
 let onload () =
   let plot_offset_input_dom = Tyxml_js.To_dom.of_input plot_offset_input in
@@ -321,8 +322,13 @@ let onload () =
   let () = plot_ref := Some plot in
   let () = Common.jquery_on
       "#navplot"
+      "hide.bs.tab"
+      (fun _ -> set_tab_is_active false) in
+  let () = Common.jquery_on
+      "#navplot"
       "shown.bs.tab"
       (fun _ ->
+         let () = set_tab_is_active true in
          let simulation_model = React.S.value State_simulation.model in
          let simulation_info = State_simulation.model_simulation_info simulation_model in
          if has_plot simulation_info then
@@ -338,8 +344,8 @@ let onload () =
            update_plot plot
          else
            ())
-      State_simulation.model
-  in
+      (React.S.on
+         tab_is_active State_simulation.dummy_model State_simulation.model) in
   let () =
     Ui_common.input_change
       plot_offset_input_dom

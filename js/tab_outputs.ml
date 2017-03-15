@@ -13,6 +13,8 @@ open Lwt.Infix
 let select_id = "output-select-id"
 let export_id = "output-export"
 
+let tab_is_active, set_tab_is_active = React.S.create false
+
 let current_file, set_current_file =
   React.S.create (None : Api_types_j.file_line_detail option)
 
@@ -116,7 +118,9 @@ let xml () =
                   )
                 )
            )
-           State_simulation.model in
+           (React.S.on
+              tab_is_active State_simulation.dummy_model State_simulation.model)
+       in
        list
       )
   in
@@ -149,6 +153,12 @@ let content () =
   [ Ui_common.toggle_element (fun t -> file_count t > 0) (xml ()) ]
 
 let onload () =
+  let () = Common.jquery_on
+      "#navoutputs" "hide.bs.tab"
+      (fun _ -> set_tab_is_active false) in
+  let () = Common.jquery_on
+      "#navoutputs" "shown.bs.tab"
+      (fun _ -> set_tab_is_active true) in
   let () =
     Common.jquery_on
       (Format.sprintf "#%s" select_id)

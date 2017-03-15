@@ -13,6 +13,7 @@ val t_simulation_info : t -> Api_types_j.simulation_info option
 
 type model = { model_current : t option ;
                model_simulations : Api_types_j.simulation_id list ; }
+val dummy_model : model
 val model : model React.signal
 val model_simulation_info : model -> Api_types_j.simulation_info option
 type model_state = STOPPED | INITALIZING | RUNNING | PAUSED

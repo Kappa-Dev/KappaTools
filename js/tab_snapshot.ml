@@ -9,6 +9,7 @@
 open Lwt.Infix
 module Html = Tyxml_js.Html5
 
+let tab_is_active, set_tab_is_active = React.S.create false
 let current_snapshot, set_current_snapshot =
   React.S.create (None : Api_types_j.snapshot option)
 
@@ -111,23 +112,125 @@ let configuration_graph () : Widget_export.configuration =
 
 let format_select_id = "format_select_id"
 
+let render_snapshot_graph
+    (snapshot_js : Js_contact.contact_map Js.t)
+    (snapshot : Api_types_j.snapshot) : unit =
+  let () =
+    Common.debug
+      (Js.string
+         (Api_types_j.string_of_snapshot snapshot))
+  in
+  let site_graph : Api_types_j.site_graph =
+    Api_data.api_snapshot_site_graph snapshot in
+  match React.S.value display_format with
+  | Graph ->
+    let json : string = Api_types_j.string_of_site_graph site_graph in
+    let model = React.S.value State_project.model in
+    let contact_map = model.State_project.model_contact_map in
+    snapshot_js##setData
+      (Js.string json)
+      (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
+  | Kappa -> ()
+
+let select_snapshot () =
+  let snapshot_js : Js_contact.contact_map Js.t =
+    Js_contact.create_contact_map display_id true in
+  let index = Js.Opt.bind
+      (Ui_common.document##getElementById (Js.string select_id))
+      (fun dom ->
+         let snapshot_select_dom : Dom_html.inputElement Js.t =
+           Js.Unsafe.coerce dom in
+         let fileindex = Js.to_string (snapshot_select_dom##.value) in
+         try Js.some (int_of_string fileindex) with
+           _ -> Js.null
+      )
+  in
+  let () = Common.debug index in
+  let model = React.S.value State_simulation.model in
+  let simulation_output = State_simulation.model_simulation_info model in
+  match simulation_output with
+  | None -> ()
+  | Some state ->
+    let index = Js.Opt.get index (fun _ -> 0) in
+    if snapshot_count (Some state) > 0 then
+      let () =
+        State_simulation.when_ready
+          ~label:__LOC__
+          (fun
+            manager
+            project_id
+            simulation_id ->
+            (manager#simulation_catalog_snapshot
+               project_id
+               simulation_id
+            ) >>=
+            (Api_common.result_bind_lwt
+               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
+                   try
+                     let snapshot_id : string =
+                       List.nth snapshot_info.Api_types_t.snapshot_ids index in
+                     (manager#simulation_detail_snapshot
+                        project_id
+                        simulation_id
+                        snapshot_id
+                     )
+                   with
+                   | Failure f ->
+                     Lwt.return
+                       (Api_common.result_error_msg f)
+                   | Invalid_argument f ->
+                     Lwt.return
+                       (Api_common.result_error_msg f)
+                 )
+            ) >>=
+            (Api_common.result_bind_lwt
+               ~ok:(fun (snapshot : Api_types_j.snapshot) ->
+                   let () = set_current_snapshot (Some snapshot) in
+                   let () = render_snapshot_graph
+                       snapshot_js
+                       snapshot
+                   in
+                   Lwt.return (Api_common.result_ok ()))
+            )
+          )
+      in
+      ()
+
+let select (snapshots : Api_types_j.snapshot_id list) =
+  List.mapi
+    (fun i snapshot_id ->
+       Html.option
+         ~a:([ Html.a_value (string_of_int i)]
+             @
+             if (match (React.S.value current_snapshot) with
+                 | None -> false
+                 | Some s -> s.Api_types_j.snapshot_file = snapshot_id)
+             then [Html.a_selected ()]
+             else [])
+         (Html.pcdata
+            (Ui_common.option_label snapshot_id)))
+    snapshots
+
+let snapshot_class :
+  empty:(unit -> 'a) ->
+  single:(unit -> 'a) ->
+  multiple:(unit -> 'a) -> 'a React.signal =
+  fun
+    ~empty
+    ~single
+    ~multiple ->
+    React.S.map
+      (fun model ->
+         let simulation_info = State_simulation.model_simulation_info model in
+         match snapshot_count simulation_info with
+         | 0 -> empty ()
+         | 1 -> single ()
+         | _ -> multiple ())
+      (React.S.on
+         tab_is_active State_simulation.dummy_model State_simulation.model)
+
 let xml () =
   let list, handle = ReactiveData.RList.create [] in
-  let select (snapshots : Api_types_j.snapshot_id list) =
-    List.mapi
-      (fun i snapshot_id ->
-         Html.option
-           ~a:([ Html.a_value (string_of_int i)]
-               @
-               if (match (React.S.value current_snapshot) with
-                   | None -> false
-                   | Some s -> s.Api_types_j.snapshot_file = snapshot_id)
-               then [Html.a_selected ()]
-               else [])
-           (Html.pcdata
-              (Ui_common.option_label snapshot_id)))
-      snapshots
-  in
   (* populate select *)
   let _ = React.S.map
       (fun _ ->
@@ -143,31 +246,15 @@ let xml () =
              ) >>=
              (Api_common.result_bind_lwt
                 ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
+                    let () = select_snapshot () in
                     let () = ReactiveData.RList.set
                         handle (select data.Api_types_t.snapshot_ids) in
                     Lwt.return (Api_common.result_ok ()))
              )
            )
       )
-      State_simulation.model
-  in
-  let snapshot_class :
-    empty:(unit -> 'a) ->
-    single:(unit -> 'a) ->
-    multiple:(unit -> 'a) -> 'a React.signal =
-    fun
-      ~empty
-      ~single
-      ~multiple ->
-      React.S.map
-        (fun model ->
-           let simulation_info = State_simulation.model_simulation_info model in
-           match snapshot_count simulation_info with
-           | 0 -> empty ()
-           | 1 -> single ()
-           | _ -> multiple ())
-        State_simulation.model
-  in
+      (React.S.on
+         tab_is_active State_simulation.dummy_model State_simulation.model) in
   let snapshot_label =
     Html.h4
       ~a:[ Tyxml_js.R.Html.a_class
@@ -274,90 +361,6 @@ let content () =
      (fun state -> snapshot_count state > 0)
      (xml ()) ]
 
-let render_snapshot_graph
-    (snapshot_js : Js_contact.contact_map Js.t)
-    (snapshot : Api_types_j.snapshot) : unit =
-  let () =
-    Common.debug
-      (Js.string
-         (Api_types_j.string_of_snapshot snapshot))
-  in
-  let site_graph : Api_types_j.site_graph =
-    Api_data.api_snapshot_site_graph snapshot in
-  match React.S.value display_format with
-  | Graph ->
-    let json : string = Api_types_j.string_of_site_graph site_graph in
-    let model = React.S.value State_project.model in
-    let contact_map = model.State_project.model_contact_map in
-    snapshot_js##setData
-      (Js.string json)
-      (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
-  | Kappa -> ()
-
-let select_snapshot () =
-  let snapshot_js : Js_contact.contact_map Js.t =
-    Js_contact.create_contact_map display_id true in
-  let index = Js.Opt.bind
-      (Ui_common.document##getElementById (Js.string select_id))
-      (fun dom ->
-         let snapshot_select_dom : Dom_html.inputElement Js.t =
-           Js.Unsafe.coerce dom in
-         let fileindex = Js.to_string (snapshot_select_dom##.value) in
-         try Js.some (int_of_string fileindex) with
-           _ -> Js.null
-      )
-  in
-  let () = Common.debug index in
-  let model = React.S.value State_simulation.model in
-  let simulation_output = State_simulation.model_simulation_info model in
-  match simulation_output with
-  | None -> ()
-  | Some state ->
-    let index = Js.Opt.get index (fun _ -> 0) in
-    if snapshot_count (Some state) > 0 then
-      let () =
-        State_simulation.when_ready
-          ~label:__LOC__
-          (fun
-            manager
-            project_id
-            simulation_id ->
-            (manager#simulation_catalog_snapshot
-               project_id
-               simulation_id
-            ) >>=
-            (Api_common.result_bind_lwt
-               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
-                   try
-                     let snapshot_id : string =
-                       List.nth snapshot_info.Api_types_t.snapshot_ids index in
-                     (manager#simulation_detail_snapshot
-                        project_id
-                        simulation_id
-                        snapshot_id
-                     )
-                   with
-                   | Failure f ->
-                     Lwt.return
-                       (Api_common.result_error_msg f)
-                   | Invalid_argument f ->
-                     Lwt.return
-                       (Api_common.result_error_msg f)
-                 )
-            ) >>=
-            (Api_common.result_bind_lwt
-               ~ok:(fun (snapshot : Api_types_j.snapshot) ->
-                   let () = set_current_snapshot (Some snapshot) in
-                   let () = render_snapshot_graph
-                       snapshot_js
-                       snapshot
-                   in
-                   Lwt.return (Api_common.result_ok ()))
-            )
-          )
-      in
-      ()
-
 let onload () : unit =
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Ui_common.id_dom select_id in
@@ -396,19 +399,16 @@ let onload () : unit =
       onchange := Dom_html.handler
         (fun _ ->
            let () = update_format () in
-           Js._true)
-  in
+           Js._true) in
+  let () = Common.jquery_on
+      "#navsnapshot" "hide.bs.tab"
+      (fun _ -> set_tab_is_active false) in
   let () =
     Common.jquery_on
-      "#navsnapshot"
-      "shown.bs.tab"
+      "#navsnapshot" "shown.bs.tab"
       (fun _ ->
-         let model = React.S.value State_simulation.model in
-         let simulation_output = State_simulation.model_simulation_info model in
-         match simulation_output with
-           None -> ()
-         | Some _state -> select_snapshot ())
-  in
+         let () = set_tab_is_active true in
+         ()) in
   let () = Widget_export.onload (configuration_kappa ()) in
   let () = Widget_export.onload (configuration_graph ()) in
   ()

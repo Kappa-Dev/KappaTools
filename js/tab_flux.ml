@@ -17,6 +17,8 @@ let select_id = "fluxmap-select"
 let rules_checkboxes_id = "fluxmap-rules-checkboxes"
 let checkbox_self_influence_id = "fluxmap-checkbox_self_influence"
 
+let tab_is_active, set_tab_is_active = React.S.create false
+
 let has_fluxmap
     (simulation_info : Api_types_j.simulation_info option) :
   bool =
@@ -80,7 +82,8 @@ let _ = React.S.map
            )
          )
     )
-    State_simulation.model
+    (React.S.on
+       tab_is_active State_simulation.dummy_model State_simulation.model)
 
 let xml () =
   let flux_label =
@@ -206,11 +209,7 @@ let select_fluxmap flux_map =
   in
   if has_fluxmap o then
     let index = Js.Opt.get index (fun _ -> 0) in
-    update_flux_map
-      flux_map
-      index
-  else
-    ()
+    update_flux_map flux_map index
 
 let navli () =
   Ui_common.badge
@@ -255,7 +254,9 @@ let onload () =
          "\" width=\"300\" height=\"300\"><g/></svg>") in
   let () = Common.jquery_on "#navflux"
       "shown.bs.tab"
-      (fun _ -> select_fluxmap flux)
+      (fun _ -> let () = set_tab_is_active true in select_fluxmap flux)
   in
+  let () = Common.jquery_on "#navflux"
+      "hide.bs.tab" (fun _ -> set_tab_is_active false) in
   select_fluxmap flux
 let onresize () : unit = ()
