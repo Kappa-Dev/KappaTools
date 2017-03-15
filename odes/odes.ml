@@ -2417,7 +2417,7 @@ struct
       initial_value_of_arrays cannonic_list
         (to_be_checked, rates, correct)
     in
-    let cache, symmetries, symmetries_init =
+    let cache, symmetries =
       I.detect_symmetries
         parameters
         compil
@@ -2431,7 +2431,7 @@ struct
       {
         network with
         cache = cache;
-        symmetries = Some symmetries (*TODO: change the type*)
+        symmetries = Some symmetries
       }
     in
     network

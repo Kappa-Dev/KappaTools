@@ -420,15 +420,10 @@ let divide_rule_rate_by cache compil rule =
       LKappa_auto.nauto compil.rate_convention cache.rule_cache
         lkappa_rule
     in
-    (*let rule_cache, output2 =
-      LKappa_auto.nauto compil.rate_convention cache.rule_cache
-        lkappa_rule_init
-    in*)
     {cache with rule_cache = rule_cache}, output
 
 (****************************************************************)
 (*cannonic form per rule*)
-
 
 (*let species_to_lkappa_rule parameters compil species =
   let signature = Model.signatures compil.environment in
@@ -504,7 +499,7 @@ let cannonic_form_from_syntactic_rules
 let detect_symmetries parameters compil cache rules
     arrays arrays_init contact_map =
   let rule_cache = cache.rule_cache in
-  let rule_cache, symmetries, symmetries_init =
+  let rule_cache, symmetries =
     Symmetries.detect_symmetries
       parameters
       compil.environment
@@ -515,7 +510,7 @@ let detect_symmetries parameters compil cache rules
       contact_map
   in
   {cache with rule_cache = rule_cache},
-  symmetries, symmetries_init
+  symmetries
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in

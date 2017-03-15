@@ -28,7 +28,12 @@ type partitioned_contact_map =
 type lkappa_partitioned_contact_map =
   int Symmetries_sig.site_partition array
 
-type symmetries = lkappa_partitioned_contact_map
+type symmetries =
+  {
+    rules: lkappa_partitioned_contact_map;
+    rules_and_initial_states:  lkappa_partitioned_contact_map option;
+    rules_and_alg_expr:  lkappa_partitioned_contact_map option
+  }
 
 (***************************************************************)
 (*PARTITION THE CONTACT MAP*)
@@ -404,6 +409,22 @@ let species_to_lkappa_rule parameters env species =
     in
     lkappa_rule
 
+(*compute rate*)
+(*let rate rule (_, arity, _) =
+  match arity with
+  | Rule_modes.Usual -> Some rule.Primitives.rate
+  | Rule_modes.Unary ->
+    Option_util.map fst rule.Primitives.unary_rate
+
+let valid_modes rule id =
+  let mode = Rule_modes.Direct in
+  List.rev_map
+    (fun x -> id,x,mode)
+    (List.rev
+       (Rule_modes.Usual::
+        (add Rule_modes.Unary rule.Primitives.unary_rate [])))
+  *)
+
 (*cannonic form from syntactic rule*)
 let cannonic_form_from_syntactic_rule
     rule_cache
@@ -492,7 +513,7 @@ let cannonic_form_from_syntactic_rules
                  - convention_rule2: the result of convention in the
                  initial states
               *)
-              let cache, convention_rule1, convention_rule2 =
+              let rule_cache, convention_rule1, convention_rule2 =
                 divide_rule_rate_by
                   rule_cache
                   env
@@ -508,10 +529,12 @@ let cannonic_form_from_syntactic_rules
               in
               let hashed_lists =
                 ((hashed_list, lkappa_rule),
-                 (hashed_list_init, lkappa_rule_init)) :: hashed_lists
+                 (hashed_list_init, lkappa_rule_init)) ::
+                hashed_lists
               in
               rule_cache, current_list, hashed_lists
-           ) (rule_cache, current_list, hashed_lists) lkappa_rule_list
+           ) (rule_cache, current_list, hashed_lists)
+           lkappa_rule_list
       ) (rule_cache, [], []) get_rules
   in
   rule_cache, cannonic_list, hashed_lists
@@ -663,9 +686,13 @@ let detect_symmetries parameters env cache pair_list arrays arrays_init
     Array.map Symmetries_sig.clean refined_partitioned_contact_map
   in
   (*-------------------------------------------------------------*)
-  (*init*)
+  (*rule and initial states*)
   let to_be_checked_init, counter_init, rates_init, correct_init =
     arrays_init in
+  (*a copy of refined partition of rules*)
+  let refined_partitioned_contact_map_copy =
+    Array.copy refined_partitioned_contact_map
+  in
   let (cache, _, _), refined_partitioned_contact_map_init =
     let parameters, env = Some parameters, Some env in
     let correct = correct_init in
@@ -681,13 +708,11 @@ let detect_symmetries parameters env cache pair_list arrays arrays_init
       (check_invariance_both
          ?parameters
          ?env ~correct ~rates hash_and_rule_list_init)
-      p'
-  in
-  let refined_partitioned_contact_map_copy =
-    Array.copy refined_partitioned_contact_map
+      (*p'*)refined_partitioned_contact_map_copy
   in
   let refined_partitioned_contact_map_init =
-    Array.map Symmetries_sig.clean refined_partitioned_contact_map_copy
+    Array.map Symmetries_sig.clean
+      refined_partitioned_contact_map_init
   in
   (*-------------------------------------------------------------*)
   (*print*)
@@ -697,8 +722,13 @@ let detect_symmetries parameters env cache pair_list arrays arrays_init
       refined_partitioned_contact_map
       refined_partitioned_contact_map_init
   in
-  cache, refined_partitioned_contact_map,
-  refined_partitioned_contact_map_init
+  cache,
+  {
+    rules = refined_partitioned_contact_map;
+    rules_and_initial_states =
+      Some refined_partitioned_contact_map_init;
+    rules_and_alg_expr = None
+  }
 
 (******************************************************)
 
@@ -717,8 +747,8 @@ type cache = Pattern.cc CcMap.t
 
 let empty_cache () = CcMap.empty
 
-let representant ?parameters signature cache rule_cache preenv_cache symmetries
-    species =
+let representant ?parameters signature cache rule_cache preenv_cache
+    symmetries species =
   match CcMap.find_option species cache with
   | Some species -> cache, rule_cache, preenv_cache, species
   | None ->
@@ -728,7 +758,7 @@ let representant ?parameters signature cache rule_cache preenv_cache symmetries
         signature
         rule_cache
         preenv_cache
-        symmetries
+        symmetries.rules (*TODO*)
         species
     in
     let cache  = CcMap.add species species' cache in
@@ -738,4 +768,21 @@ let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in
   let () = Loggers.fprintf log "Symmetries:" in
   let () = Loggers.print_newline  log in
-  print_partitioned_contact_map_in_lkappa log env symmetries
+  let () = Loggers.fprintf log "In rules:" in
+  let () = Loggers.print_newline  log in
+  let () = print_partitioned_contact_map_in_lkappa log env
+      symmetries.rules
+  in
+  let () =
+    match
+      symmetries.rules_and_initial_states
+    with
+    | None -> ()
+    | Some sym ->
+      let () = Loggers.fprintf log "In rules and initial states:" in
+      let () = Loggers.print_newline log in
+      let () =
+        print_partitioned_contact_map_in_lkappa log env sym
+      in
+      ()
+  in ()

@@ -17,11 +17,22 @@
 (*TYPE*)
 (*******************************************************************)
 
-type symmetries = int Symmetries_sig.site_partition array
+type symmetries =
+  {
+    rules : int Symmetries_sig.site_partition array;
+    rules_and_initial_states :
+      int Symmetries_sig.site_partition array option;
+    rules_and_alg_expr :
+      int Symmetries_sig.site_partition array option;
+  }
 
 (*******************************************************************)
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
+
+(*val rate : Primitives.elementary_rule
+
+val valid_modes : Primitives.elementary_rule*)
 
 val build_array_for_symmetries:
   LKappa_auto.RuleCache.hashed_list list ->
@@ -36,7 +47,30 @@ val divide_rule_rate_by :
   LKappa.rule -> LKappa_auto.cache * int * int
 
 val cannonic_form_from_syntactic_rules :
-  Remanent_parameters_sig.parameters ->
+Remanent_parameters_sig.parameters ->
+LKappa_auto.cache ->
+Model.t ->
+'a ->
+Pattern.cc list ->
+(Primitives.elementary_rule ->
+ int -> ('b * Rule_modes.arity * Rule_modes.direction) list) ->
+(Primitives.elementary_rule ->
+ 'b * Rule_modes.arity * Rule_modes.direction -> 'c option) ->
+Primitives.elementary_rule list ->
+(LKappa_auto.cache ->
+ Model.t ->
+ 'a ->
+ Primitives.elementary_rule ->
+ LKappa.rule -> LKappa_auto.cache * 'd * 'e) ->
+LKappa_auto.cache *
+((int * 'c Rule_modes.RuleModeMap.t * 'd) *
+ (int * 'c Rule_modes.RuleModeMap.t * 'e))
+  list *
+((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
+ (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
+  list
+
+  (*Remanent_parameters_sig.parameters ->
   LKappa_auto.cache ->
   Model.t ->
   'a ->
@@ -55,7 +89,7 @@ val cannonic_form_from_syntactic_rules :
     list *
   ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
    (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-    list
+    list*)
 
 val detect_symmetries:
 Remanent_parameters_sig.parameters ->
@@ -71,9 +105,7 @@ bool array * int array *
 ('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
 int array ->
 (string list * (string * string) list) Mods.StringMap.t
-  Mods.StringMap.t ->
-LKappa_auto.cache * int Symmetries_sig.site_partition array *
-int Symmetries_sig.site_partition array
+  Mods.StringMap.t -> LKappa_auto.cache * symmetries
 
 val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit

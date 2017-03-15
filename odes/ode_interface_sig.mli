@@ -191,9 +191,7 @@ sig
   ('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
   int array ->
   (string list * (string * string) list) Mods.StringMap.t
-    Mods.StringMap.t ->
-  cache * int Symmetries_sig.site_partition array *
-  int Symmetries_sig.site_partition array
+    Mods.StringMap.t -> cache * Symmetries.symmetries
 
   val print_symmetries:
   Remanent_parameters_sig.parameters ->
