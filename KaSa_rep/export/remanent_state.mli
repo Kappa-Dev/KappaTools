@@ -136,7 +136,7 @@ val of_json: Yojson.Basic.json ->
   influence_map AccuracyMap.t *
   Ckappa_sig.c_rule_id list option *
   constraints_list option *
-  (string * Ckappa_sig.c_rule_id * string) list option
+  separating_transitions option
 
 val create_state:
   ?errors:Exception.method_handler -> ?env:Model.t option -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
@@ -236,7 +236,7 @@ val set_dead_agents: dead_agents -> ('static, 'compile) state -> ('static, 'comp
 val get_influence_map_map: ('static, 'compile) state -> influence_map AccuracyMap.t
 
 val set_separating_transitions: separating_transitions -> ('static, 'compile) state -> ('static, 'compile) state
-val get_separating_transitions: ('static, 'compile) state -> separating_transitions option 
+val get_separating_transitions: ('static, 'compile) state -> separating_transitions option
 
 val get_contact_map_map: ('static, 'compile) state -> contact_map AccuracyMap.t
 

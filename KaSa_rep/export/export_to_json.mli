@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Nov 28 2016>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -39,6 +39,7 @@ module type Type =
       Remanent_state.contact_map Remanent_state.AccuracyMap.t *
       Remanent_state.influence_map Remanent_state.AccuracyMap.t *
       Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
+      * Remanent_state.separating_transitions option
 
 
   end
