@@ -1,0 +1,11 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa sym_init1.ka --debugging-mode --output-directory output --compute-symmetries
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(z),A(z)->A(z!1),A(z!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(z),A(z)->A(z!1),A(z!1)" -> "0:A(z),A(z)->A(z!1),A(z!1)" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+}
