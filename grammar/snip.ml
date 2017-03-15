@@ -677,3 +677,18 @@ let connected_components_sum_of_ambiguous_mixture
   (cc_env, List.map
      (function _, l, event, ([],[]) -> l, event.Instantiation.tests
              | _ -> assert false) rules)
+
+let patterns_of_mixture contact_map sigs pre_env e =
+  let snap = Edges.build_snapshot sigs e in
+  let pre_env', acc =
+    List.fold_left
+      (fun (cc_cache,acc) (i,m) ->
+         match connected_components_sum_of_ambiguous_mixture
+                 ~compileModeOn:false contact_map
+                 cc_cache (LKappa.of_raw_mixture m) with
+         | cc_cache',[[|_,x|],_] ->
+           cc_cache',Tools.recti (fun a _ -> x::a) acc i
+         | _ -> assert false)
+      (pre_env,[]) snap
+  in
+   (pre_env', acc)

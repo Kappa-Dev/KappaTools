@@ -145,18 +145,7 @@ let connected_components_of_mixture compil cache e =
   let cc_cache = cache.cc_cache in
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
-  let snap = Edges.build_snapshot sigs e in
-  let cc_cache, acc =
-    List.fold_left
-      (fun (cc_cache,acc) (i,m) ->
-         match Snip.connected_components_sum_of_ambiguous_mixture
-                 ~compileModeOn:false contact_map
-                 cc_cache (LKappa.of_raw_mixture m) with
-         | cc_cache',[[|_,x|],_] ->
-           cc_cache',Tools.recti (fun a _ -> x::a) acc i
-         | _ -> assert false)
-      (cc_cache,[]) snap
-  in
+  let (cc_cache,acc) = Snip.patterns_of_mixture contact_map sigs cc_cache e in
   {cache with cc_cache = cc_cache}, acc
 
 type embedding = Renaming.t (* the domain is connected *)
