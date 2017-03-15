@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Mar 13 2017>
+  * Last modification:  Time-stamp: <Mar 15 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -110,6 +110,7 @@ type reachability_map_output =
     use_natural_language : reachability_output ;
     trace_prefix: string;
     trace_directory: string;
+    compute_separating_transitions : bool; 
   }
 
 type reachability_parameters =

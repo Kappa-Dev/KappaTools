@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1177,6 +1177,13 @@ let print logger parameters compil handler_kappa handler error transition_system
   error
 
 let agent_trace parameters log_info error handler static handler_kappa compil output =
+  let bridges = [] in
+  let error, low =
+    Graphs.Nodearray.create parameters error 1
+  in
+  let error, pre =
+    Graphs.Nodearray.create parameters error 1
+  in
   let () = Ckappa_sig.Views_intbdu.import_handler handler in
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
@@ -1231,11 +1238,11 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let error, log_info =
+  let error, (pre, low, bridges, log_info) =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
-      (fun parameters error agent_type map log_info ->
+      (fun parameters error agent_type map (pre,low,bridges,log_info) ->
          let error, support =
            Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs parameters error
              LabelMap.empty agent_type support
@@ -1257,7 +1264,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
              Exception.warn parameters error error' __POS__ Exit
          in
          Wrapped_modules.LoggedIntMap.fold
-           (fun _ mvbdu (error, log_info) ->
+           (fun _ mvbdu (error, (pre,low,bridges,log_info)) ->
               try
                 begin
                   let sites =
@@ -1553,26 +1560,103 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                   let transition_system =
                     reduce_subframes transition_system
                   in
-                  let format =
-                    match Remanent_parameters.get_local_trace_format parameters with
-                    | Remanent_parameters_sig.DIM -> Loggers.Matrix
-                    | Remanent_parameters_sig.DOT -> Loggers.DOT
-                    | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
+                  let error, log_info =
+                    if Remanent_parameters.get_compute_local_traces parameters
+                    then
+                      begin
+                        let format =
+                          match
+                            Remanent_parameters.get_local_trace_format
+                              parameters
+                          with
+                          | Remanent_parameters_sig.DIM -> Loggers.Matrix
+                          | Remanent_parameters_sig.DOT -> Loggers.DOT
+                          | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
+                        in
+                        let logger =
+                          Loggers.open_logger_from_channel fic
+                            ~mode:format
+                        in
+                        let error =
+                          print
+                            logger parameters compil
+                            handler_kappa () error transition_system
+                        in
+                        let _ = close_out fic in
+                        error, log_info
+                      end
+                    else
+                      error, log_info
                   in
-                  let logger =
-                    Loggers.open_logger_from_channel fic
-                      ~mode:format
+                  let array =
+                    Graphs.NodeMap.empty
                   in
-                  let error = print logger parameters compil handler_kappa () error transition_system in
-                  let _ = close_out fic in
-                  error, log_info
+                  let error, nodes, node_labels =
+                    List.fold_left
+                      (fun (error, l, map) mvbdu ->
+                           let error, node =
+                             hash_of_mvbdu parameters error mvbdu
+                           in
+                           let error, list = build_asso_of_mvbdu parameters error mvbdu in
+                           let error, label =
+                             string_label_of_asso parameters error handler_kappa transition_system list in
+                           let node = Graphs.node_of_int node in
+                           error,
+                           node::l,
+                           Graphs.NodeMap.add node label array)
+                      (error, [], Graphs.NodeMap.empty)
+                      transition_system.nodes
+                  in
+                  let node_label node =
+                    Graphs.NodeMap.find_default "" node array
+                  in
+                  let error, edges =
+                    List.fold_left
+                      (fun (error, edges) (mvbdu1,label,mvbdu2) ->
+                         let error, node1 =
+                           hash_of_mvbdu parameters error mvbdu1
+                         in
+                         let error, node2 =
+                           hash_of_mvbdu parameters error mvbdu2
+                         in
+                           match label with
+                             (Init _,_,_) -> error, edges
+                           | (Rule id,_,_) ->
+                             error,
+                             (Graphs.node_of_int node1,
+                                     id,
+                                     Graphs.node_of_int node2)::edges
+                      )
+                      (error, []) transition_system.edges
+                  in
+                  (* to do deal with hyper edges *)
+                  let graph =
+                    Graphs.create
+                      parameters
+                      error
+                      node_label
+                      nodes
+                      edges
+                  in
+                  let
+                    error, (pre,low,bridges) =
+                    Graphs.add_bridges
+                      ~low ~pre
+                      parameters error
+                      (fun n -> n)
+                      (fun e ->
+                         Ckappa_sig.string_of_rule_id e)
+                      graph bridges
+                  in
+                  error,
+                  (pre,low,bridges,log_info)
                 end
-              with Sys.Break -> error, log_info
+              with Sys.Break -> error, (pre,low,bridges,log_info)
            )
            map
-           (error, log_info))
+           (error, (pre,low,bridges,log_info)))
       output
-      log_info
+      (pre,low,bridges,log_info)
   in
   match
     Ckappa_sig.Views_intbdu.export_handler error

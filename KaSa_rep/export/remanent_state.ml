@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -113,6 +113,7 @@ let contactmaps="contact maps"
 let influencemap="influence map"
 let influencemaps="influence maps"
 let refinement_lemmas="refinement lemmas"
+let separating_transitions = "separating transitions"
 let map = "map"
 let accuracy_string = "accuracy"
 let variable = "variable"
@@ -565,6 +566,28 @@ type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
 
+type separating_transitions =
+  (string * Ckappa_sig.c_rule_id * string) list
+
+let separating_transitions_of_json =
+  JsonUtil.to_list
+    ~error_msg:"separating transitions"
+    (
+      JsonUtil.to_triple
+        ~error_msg:"transition"
+        ~lab1:"s1" ~lab2:"label" ~lab3:"s2"
+        JsonUtil.to_string
+        Ckappa_sig.rule_id_of_json
+        JsonUtil.to_string)
+
+let separating_transitions_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_triple
+       ~lab1:"s1" ~lab2:"label" ~lab3:"s3"
+       JsonUtil.of_string
+       Ckappa_sig.rule_id_to_json
+       JsonUtil.of_string)
+
 type flow =
   Ckappa_sig.Site_union_find.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
@@ -604,6 +627,7 @@ type ('static,'dynamic) state =
     internal_constraints_list : internal_constraints_list option;
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites AccuracyMap.t;
+    separating_transitions : separating_transitions option ;
   }
 
 let create_state ?errors ?env parameters init =
@@ -642,6 +666,7 @@ let create_state ?errors ?env parameters init =
     internal_constraints_list = None;
     constraints_list = None;
     symmetric_sites = AccuracyMap.empty;
+    separating_transitions = None;
   }
 
 (**************)
@@ -694,7 +719,7 @@ let get_map empty add of_json label json =
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
-
+let get_separating_transitions state = state.separating_transitions
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 
@@ -729,6 +754,19 @@ let add_refinements_lemmas_to_json state l =
       refinement_lemmas,
       lemmas_list_to_json constraints)::l
 
+let get_separating_transitions state = state.separating_transitions
+let set_separating_transitions l state =
+  {state with separating_transitions = Some l}
+
+let add_separating_transitions state l =
+  match
+    get_separating_transitions state
+  with
+  | None -> l
+  | Some list ->
+    (separating_transitions,
+     separating_transitions_to_json list)::l
+
 let to_json state =
   let l = [] in
   let l = add_errors state l in
@@ -736,6 +774,7 @@ let to_json state =
   let l = add_dead_rules_to_json state l in
   let l = add_influence_map_to_json state l in
   let l = add_contact_map_to_json state l in
+  let l = add_separating_transitions state l in
   ((`Assoc  l): Yojson.Basic.json)
 
 let of_json =
@@ -779,7 +818,13 @@ let of_json =
       with
       | Not_found -> None
     in
-    errors, contact_maps, influence_maps, dead_rules, constraints
+    let separating_transitions =
+      try
+        Some (separating_transitions_of_json (List.assoc separating_transitions l))
+      with
+      | Not_found -> None
+    in
+    errors, contact_maps, influence_maps, dead_rules, constraints, separating_transitions
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "remanent state",x))
 

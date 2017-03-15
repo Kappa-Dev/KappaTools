@@ -54,6 +54,17 @@ val to_pair:
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> 'a * 'b
 
+val of_triple:
+    ?lab1:string -> ?lab2:string -> ?lab3:string ->
+      ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
+    ('c -> Yojson.Basic.json) ->
+    ('a * 'b * 'c) -> Yojson.Basic.json
+
+val to_triple:
+  ?lab1:string -> ?lab2:string -> ?lab3:string -> ?error_msg:string ->
+  (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
+  (Yojson.Basic.json -> 'c) -> Yojson.Basic.json -> 'a * 'b * 'c
+
 val of_map:
   ?lab_key:string -> ?lab_value:string ->
   fold:(('key -> 'value -> Yojson.Basic.json list -> Yojson.Basic.json list) ->

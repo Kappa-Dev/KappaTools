@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -128,6 +128,7 @@ val get_add_singular_macrostates: Remanent_parameters_sig.parameters -> bool
 val get_add_singular_microstates: Remanent_parameters_sig.parameters -> bool
 val get_local_trace_prefix: Remanent_parameters_sig.parameters -> string
 val get_local_trace_directory: Remanent_parameters_sig.parameters -> string
+val get_compute_separating_transitions: Remanent_parameters_sig.parameters -> bool
 
 val get_compute_symmetries: Remanent_parameters_sig.parameters -> bool
 val get_rate_convention:

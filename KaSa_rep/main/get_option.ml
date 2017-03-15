@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Jan 18 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   * primitive to parse command-line options
   *
@@ -207,6 +207,12 @@ let options =
       "Complete the simplicial complexes with singular intersection of higher-dimension faces",
       ["3_Trace_analysis"],
       Hidden;
+
+      "--compute-separating-transitions",
+      Bool Config.compute_separating_transitions,
+      "Compute the transitions that separates strongly connected set of configurations",
+      ["0_Actions";"3_Trace_analysis"],
+      Normal;
 
       "--output-directory",
       MultiExt

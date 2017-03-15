@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jan 20 2017>
+   * Last modification: Time-stamp: <Mar 15 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -53,6 +53,7 @@ struct
         Ckappa_sig.Views_bdu.mvbdu Wrapped_modules.LoggedIntMap.t
           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t option
     ;
+      separating_edges: (string * Ckappa_sig.c_rule_id * string) list option ;
     }
 
   type dynamic_information =
@@ -449,6 +450,7 @@ struct
             domain_dynamic_information = init_bdu_analysis_dynamic;
             subviews = None ;
             ranges = None ;
+            separating_edges = None ;
           }}
     in
     let error, init_static, init_dynamic =
@@ -4409,6 +4411,16 @@ struct
     in
     error, dynamic, kasa_state
 
+  let export_separating_edges static dynamic error kasa_state =
+    match dynamic.local.separating_edges with
+    | None -> error, dynamic, kasa_state
+    | Some l ->
+      let kasa_state =
+        Remanent_state.set_separating_transitions l
+          kasa_state
+      in
+      error, dynamic, kasa_state
+
   let export static dynamic error kasa_state =
     (*export of contact map*)
     let error, dynamic, kasa_state =
@@ -4417,6 +4429,10 @@ struct
     (*export of (non)relational properties*)
     let error, dynamic, kasa_state =
       export_views_properties
+        static dynamic error kasa_state
+    in
+    let error, dynamic, kasa_state =
+      export_separating_edges
         static dynamic error kasa_state
     in
     error, dynamic, kasa_state

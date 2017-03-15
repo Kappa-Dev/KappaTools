@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -83,6 +83,12 @@ val dead_rules_of_json : Yojson.Basic.json -> dead_rules
 
 type dead_agents = Ckappa_sig.c_agent_name list
 
+type separating_transitions =
+  (string * Ckappa_sig.c_rule_id * string) list
+
+val separating_transitions_to_json: separating_transitions -> Yojson.Basic.json
+val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
+
 type flow =
     Ckappa_sig.Site_union_find.t
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
@@ -129,7 +135,8 @@ val of_json: Yojson.Basic.json ->
   contact_map AccuracyMap.t *
   influence_map AccuracyMap.t *
   Ckappa_sig.c_rule_id list option *
-  constraints_list option
+  constraints_list option *
+  (string * Ckappa_sig.c_rule_id * string) list option
 
 val create_state:
   ?errors:Exception.method_handler -> ?env:Model.t option -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
@@ -227,6 +234,9 @@ val get_dead_agents: ('static, 'compile) state -> dead_agents option
 val set_dead_agents: dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_influence_map_map: ('static, 'compile) state -> influence_map AccuracyMap.t
+
+val set_separating_transitions: separating_transitions -> ('static, 'compile) state -> ('static, 'compile) state
+val get_separating_transitions: ('static, 'compile) state -> separating_transitions option 
 
 val get_contact_map_map: ('static, 'compile) state -> contact_map AccuracyMap.t
 

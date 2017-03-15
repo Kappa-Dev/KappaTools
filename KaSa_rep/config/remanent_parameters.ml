@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -177,6 +177,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;
     Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = false;
     Remanent_parameters_sig.compute_local_traces = false;
+    Remanent_parameters_sig.compute_separating_transitions = false;
     Remanent_parameters_sig.show_rule_names_in_local_traces = false;
     Remanent_parameters_sig.use_macrotransitions_in_local_traces = false;
     Remanent_parameters_sig.ignore_trivial_losanges = false;
@@ -490,6 +491,7 @@ let get_backend_mode_1 r =
 
 let get_local_trace_format_1 r = r.Remanent_parameters_sig.format_for_local_traces
 let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
+let get_compute_separating_transitions_1 r = r.Remanent_parameters_sig.compute_separating_transitions
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
 let get_use_macrotransitions_in_local_traces_1 r = r.Remanent_parameters_sig.use_macrotransitions_in_local_traces
 let get_ignore_trivial_losanges_1 r = r.Remanent_parameters_sig.ignore_trivial_losanges
@@ -673,6 +675,7 @@ let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachab
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
 let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1
 let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_local_traces_1
+let get_compute_separating_transitions = upgrade_from_reachability_map_field get_compute_separating_transitions_1
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
 let get_use_macrotransitions_in_local_traces = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
 let get_ignore_local_losanges = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1

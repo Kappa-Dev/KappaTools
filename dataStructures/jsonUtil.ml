@@ -82,6 +82,27 @@ let to_assoc
 let of_pair ?(lab1="first") ?(lab2="second") to_json1 to_json2 (a,b) =
   `Assoc [ lab1, to_json1 a; lab2, to_json2 b ]
 
+let to_triple
+    ?lab1:(lab1="first") ?lab2:(lab2="second") ?lab3:(lab3="third")
+    ?error_msg:(error_msg=build_msg "triple")
+    of_json1 of_json2 of_json3 =
+  function
+  | `Assoc l as x when List.length l = 2 ->
+    begin
+      try
+        of_json1 (List.assoc lab1 l),
+        of_json2 (List.assoc lab2 l),
+        of_json3 (List.assoc lab3 l)
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (error_msg,x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let of_triple ?(lab1="first") ?(lab2="second") ?(lab3="third")
+      to_json1 to_json2 to_json3 (a,b,c) =
+    `Assoc [ lab1, to_json1 a; lab2, to_json2 b ; lab3, to_json3 c]
+
 let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
     ?error_msg:(error_msg=build_msg "pair") of_json1 of_json2 =
   function
@@ -95,6 +116,7 @@ let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
 
 let of_map
     ?lab_key:(lab_key="key")
