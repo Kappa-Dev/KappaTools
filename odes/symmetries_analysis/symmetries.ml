@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 14 2017>
+   * Last modification: Time-stamp: <Mar 15 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -20,7 +20,6 @@
 type contact_map =
   ((string list) * (string*string) list)
     Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
-
 
 type partitioned_contact_map =
   string Symmetries_sig.site_partition Mods.StringSetMap.Map.t
@@ -342,26 +341,183 @@ let max_hashes hash_list =
     | head :: tail -> aux tail (max_hash best head)
   in aux hash_list LKappa_auto.RuleCache.empty
 
-let build_array_for_symmetries_gen size_hash_plus_1 hashed_list =
-  let to_be_checked = Array.make size_hash_plus_1 false in
-  let counter = Array.make size_hash_plus_1 0 in
-  let correct = Array.make size_hash_plus_1 1 in
-  to_be_checked, counter, correct
-
 let build_array_for_symmetries hashed_list =
   let max_hash = max_hashes hashed_list in
   let size_hash_plus_1 =
     (LKappa_auto.RuleCache.int_of_hashed_list max_hash) + 1
   in
-  let to_be_checked, counter, correct =
-    build_array_for_symmetries_gen size_hash_plus_1 hashed_list
-  in
+  let to_be_checked = Array.make size_hash_plus_1 false in
+  let counter = Array.make size_hash_plus_1 0 in
+  let correct = Array.make size_hash_plus_1 1 in
   let rate =
     Array.make size_hash_plus_1 Rule_modes.RuleModeMap.empty
   in
   to_be_checked, counter, rate, correct
 
 (******************************************************************)
+(*from syntactic_rule to cannonic form *)
+(******************************************************************)
+
+let divide_rule_rate_by rule_cache env rate_convention rule
+    lkappa_rule_init =
+  match rate_convention with
+  | Remanent_parameters_sig.Common -> assert false
+  (* this is not a valid parameterization *)
+  (* Common can be used only to compute normal forms *)
+  | Remanent_parameters_sig.No_correction -> rule_cache, 1, 1
+  | Remanent_parameters_sig.Biochemist
+  | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
+    let rule_id = rule.Primitives.syntactic_rule in
+    let lkappa_rule = Model.get_ast_rule env rule_id in
+    let rule_cache, output1 =
+      LKappa_auto.nauto rate_convention rule_cache
+        lkappa_rule
+    in
+    let rule_cache, output2 =
+      LKappa_auto.nauto rate_convention rule_cache lkappa_rule_init
+    in
+    rule_cache, output1, output2
+
+let lkappa_init =
+  {
+    LKappa.r_mix =  [];
+    LKappa.r_created = [];
+    LKappa.r_delta_tokens = [] ;
+    LKappa.r_rate = Alg_expr.int 0 ;
+    LKappa.r_un_rate = None  ;
+  }
+
+(*convert a species into lkappa rule signature*)
+let species_to_lkappa_rule parameters env species =
+  let signature = Model.signatures env in
+  let some_pair =
+    Raw_mixture_extra.pattern_to_raw_mixture
+      ~parameters
+      signature
+      species
+  in
+  match some_pair with
+  | None -> lkappa_init
+  | Some (raw_mixture, _) ->
+    let lkappa_rule =
+      Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
+    in
+    lkappa_rule
+
+(*cannonic form from syntactic rule*)
+let cannonic_form_from_syntactic_rule
+    rule_cache
+    env
+    rule
+    valid_modes
+    rate
+    lkappa_rule_init =
+  (*over each rule*)
+  let rule_id = rule.Primitives.syntactic_rule in
+  let lkappa_rule = Model.get_ast_rule env rule_id in
+  let rule_cache, hashed_list =
+    LKappa_auto.cannonic_form rule_cache lkappa_rule
+  in
+  let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
+  (*initial state*)
+  let rule_cache, hashed_list_init =
+    LKappa_auto.cannonic_form rule_cache lkappa_rule_init
+  in
+  let i' = LKappa_auto.RuleCache.int_of_hashed_list hashed_list_init in
+  (*get the rate information at each rule*)
+  let rule_id_with_mode_list = valid_modes rule rule_id in
+  let rate_map =
+    List.fold_left (fun rate_map rule_id_with_mode ->
+        let rate_opt = rate rule rule_id_with_mode in
+        let _,a,b = rule_id_with_mode in
+        let rate_map =
+          match rate_opt with
+          | None -> rate_map
+          | Some rate ->
+            Rule_modes.RuleModeMap.add (a,b) rate rate_map
+        in
+        rate_map
+      ) Rule_modes.RuleModeMap.empty rule_id_with_mode_list
+  in
+  rule_cache,
+  (lkappa_rule, i, rate_map, hashed_list),
+  (hashed_list_init, i')
+
+(*cannonic_form_from_syntactic_rules and initial states*)
+let cannonic_form_from_syntactic_rules
+    parameters
+    rule_cache
+    env
+    rate_convention
+    chemical_species
+    valid_modes
+    rate
+    get_rules
+    divide_rule_rate_by =
+  (*convert a list of species to a list of rule in signature lkappa
+    rule*)
+  let lkappa_rule_list =
+    List.fold_left (fun current_list species ->
+        let lkappa = species_to_lkappa_rule parameters env species in
+        lkappa :: current_list
+      ) [] chemical_species
+  in
+  (*cannonic form from syntactic rule*)
+  let rule_cache, cannonic_list, hashed_lists =
+    List.fold_left
+      (*fold over a list of rules*)
+      (fun (rule_cache, current_list, hashed_lists) rule ->
+         (*lkappa rule in the initial states*)
+         List.fold_left
+           (fun (rule_cache, current_list, hashed_lists)
+             lkappa_rule_init ->
+             (*****************************************************)
+             (* identifiers of rule up to isomorphism*)
+             let rule_cache,
+                 (lkappa_rule, i, rate_map, hashed_list),
+                  (hashed_list_init, i') =
+                cannonic_form_from_syntactic_rule
+                  rule_cache
+                  env
+                  rule
+                  valid_modes
+                  rate
+                  lkappa_rule_init
+              in
+              (*****************************************************)
+              (* convention of r:
+                 the number of automorphisms in the lhs of the rule r.
+                 - convention_rule1 : the result of convention for each
+                 rule.
+                 - convention_rule2: the result of convention in the
+                 initial states
+              *)
+              let cache, convention_rule1, convention_rule2 =
+                divide_rule_rate_by
+                  rule_cache
+                  env
+                  rate_convention
+                  rule
+                  lkappa_rule_init
+              in
+              (*****************************************************)
+              (*store result*)
+              let current_list =
+                ((i, rate_map, convention_rule1),
+                 (i', rate_map,  convention_rule2)) :: current_list
+              in
+              let hashed_lists =
+                ((hashed_list, lkappa_rule),
+                 (hashed_list_init, lkappa_rule_init)) :: hashed_lists
+              in
+              rule_cache, current_list, hashed_lists
+           ) (rule_cache, current_list, hashed_lists) lkappa_rule_list
+      ) (rule_cache, [], []) get_rules
+  in
+  rule_cache, cannonic_list, hashed_lists
+
+(******************************************************************)
+(*detect_symmetries*)
 
 let check_invariance_gen
     p ?parameters ?env ~to_be_checked ~counter ~correct ~rates
@@ -423,9 +579,11 @@ let check_invariance_both
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
-let print_symmetries_for_rules parameters env contact_map
+let print_symmetries_gen parameters env contact_map
     partitioned_contact_map partitioned_contact_map_in_lkappa
-    refined_partitioned_contact_map =
+    refined_partitioned_contact_map
+    refined_partitioned_contact_map_init
+  =
   let () =
     if Remanent_parameters.get_trace parameters
     then
@@ -452,37 +610,12 @@ let print_symmetries_for_rules parameters env contact_map
           logger env
           refined_partitioned_contact_map
       in
-      ()
-    else
-      ()
-  in
-  ()
-
-let print_symmetries_for_init parameters env
-    partitioned_contact_map partitioned_contact_map_in_lkappa
-    refined_partitioned_contact_map =
-  let () =
-    if Remanent_parameters.get_trace parameters
-    then
-      let logger = Remanent_parameters.get_logger parameters in
-      let () = Loggers.fprintf logger "Partitioned contact map initial" in
-      let () = Loggers.print_newline logger in
-      let () =
-        print_partitioned_contact_map parameters partitioned_contact_map in
-      let () = Loggers.fprintf logger
-          "Partitioned contact map (LKAPPA) initial"
-      in
-      let () = Loggers.print_newline logger in
-      let () =
-        print_partitioned_contact_map_in_lkappa logger env
-          partitioned_contact_map_in_lkappa
-      in
-      let () = Loggers.fprintf logger "With predicate (LKAPPA) initial" in
+      let () = Loggers.fprintf logger "With predicate (LKAPPA) init" in
       let () = Loggers.print_newline logger in
       let () =
         print_partitioned_contact_map_in_lkappa
           logger env
-          refined_partitioned_contact_map
+          refined_partitioned_contact_map_init
       in
       ()
     else
@@ -490,12 +623,12 @@ let print_symmetries_for_init parameters env
   in
   ()
 
-let detect_symmetries_gen parameters env cache
-    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
-                          LKappa.rule) list)
-    arrays
+let detect_symmetries parameters env cache pair_list arrays arrays_init
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
+  let (hash_and_rule_list, hash_and_rule_list_init) =
+    List.split pair_list
+  in
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
   let partitioned_contact_map =
@@ -508,6 +641,8 @@ let detect_symmetries_gen parameters env cache
     translate_to_lkappa_representation env partitioned_contact_map
   in
   let p' = Array.copy partitioned_contact_map_in_lkappa in
+  (*-------------------------------------------------------------*)
+  (*rules*)
   let to_be_checked, counter, rates, correct = arrays in
   let (cache, _, _), refined_partitioned_contact_map =
     let parameters, env = Some parameters, Some env in
@@ -527,48 +662,43 @@ let detect_symmetries_gen parameters env cache
   let refined_partitioned_contact_map =
     Array.map Symmetries_sig.clean refined_partitioned_contact_map
   in
-  cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
-  refined_partitioned_contact_map
-
-let detect_symmetries_for_rules parameters env cache
-    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
-                          LKappa.rule) list)
-    arrays
-    (contact_map:(string list * (string * string) list)
-         Mods.StringMap.t Mods.StringMap.t) =
-  let cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
-      refined_partitioned_contact_map =
-    detect_symmetries_gen parameters env cache
-      hash_and_rule_list
-      arrays
-      contact_map
+  (*-------------------------------------------------------------*)
+  (*init*)
+  let to_be_checked_init, counter_init, rates_init, correct_init =
+    arrays_init in
+  let (cache, _, _), refined_partitioned_contact_map_init =
+    let parameters, env = Some parameters, Some env in
+    let correct = correct_init in
+    let rates = rates_init in
+    refine_partitioned_contact_map_in_lkappa_representation
+      (cache, to_be_checked_init, counter_init)
+      (check_invariance_internal_states
+         ?parameters
+         ?env ~correct ~rates hash_and_rule_list_init)
+      (check_invariance_binding_states
+         ?parameters
+         ?env ~correct ~rates hash_and_rule_list_init)
+      (check_invariance_both
+         ?parameters
+         ?env ~correct ~rates hash_and_rule_list_init)
+      p'
   in
+  let refined_partitioned_contact_map_copy =
+    Array.copy refined_partitioned_contact_map
+  in
+  let refined_partitioned_contact_map_init =
+    Array.map Symmetries_sig.clean refined_partitioned_contact_map_copy
+  in
+  (*-------------------------------------------------------------*)
+  (*print*)
   let () =
-    print_symmetries_for_rules parameters env contact_map
+    print_symmetries_gen parameters env contact_map
       partitioned_contact_map partitioned_contact_map_in_lkappa
       refined_partitioned_contact_map
+      refined_partitioned_contact_map_init
   in
-  cache, refined_partitioned_contact_map
-
-let detect_symmetries_for_init parameters env cache
-    (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
-                          LKappa.rule) list)
-    arrays
-    (contact_map:(string list * (string * string) list)
-         Mods.StringMap.t Mods.StringMap.t) =
-  let cache, partitioned_contact_map, partitioned_contact_map_in_lkappa,
-      refine_partitioned_contact_map =
-    detect_symmetries_gen parameters env cache
-      hash_and_rule_list
-      arrays
-      contact_map
-  in
-  let () =
-    print_symmetries_for_init parameters env
-      partitioned_contact_map partitioned_contact_map_in_lkappa
-      refine_partitioned_contact_map
-  in
-  cache, refine_partitioned_contact_map
+  cache, refined_partitioned_contact_map,
+  refined_partitioned_contact_map_init
 
 (******************************************************)
 

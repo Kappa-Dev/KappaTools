@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 14 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1432,10 +1432,8 @@ let compute_symmetries
         get_contact_map ~accuracy_level state
       in
       let parameters = get_parameters state in
-      let cache =
-        LKappa_auto.init_cache ()
-      in
-      let cache, cannonic_list, hashed_lists =
+      let cache = LKappa_auto.init_cache () in
+      (*let cache, cannonic_list, hashed_lists =
         List.fold_left
           (fun (cache, current_list, hashed_lists) rule ->
              (*****************************************************)
@@ -1551,8 +1549,8 @@ let compute_symmetries
           hashed_lists
           (to_be_checked, counter, rates, correct)
           contact_map
-      in
-      state, Some symmetries
+      in*)
+      state, None
     end
 
 let get_symmetric_sites

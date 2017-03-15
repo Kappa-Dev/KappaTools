@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 14 2017>
+   * Last modification: Time-stamp: <Mar 15 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -23,30 +23,57 @@ type symmetries = int Symmetries_sig.site_partition array
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
 
-val detect_symmetries_for_rules:
-  Remanent_parameters_sig.parameters -> Model.t ->
-  LKappa_auto.cache  ->
-  (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
-  (bool array  * int array * ('a, 'b) Alg_expr.e Locality.annot
-     Rule_modes.RuleModeMap.t array * int array) ->
-  (string list * (string * string) list) Mods.StringMap.t
-    Mods.StringMap.t ->
-  LKappa_auto.cache * symmetries
-
-val detect_symmetries_for_init:
-  Remanent_parameters_sig.parameters -> Model.t ->
-  LKappa_auto.cache  ->
-  (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
-  (bool array  * int array * ('a, 'b) Alg_expr.e Locality.annot
-     Rule_modes.RuleModeMap.t array * int array) ->
-  (string list * (string * string) list) Mods.StringMap.t
-    Mods.StringMap.t ->
-  LKappa_auto.cache * symmetries
-
 val build_array_for_symmetries:
   LKappa_auto.RuleCache.hashed_list list ->
   bool array * int array * 'a Rule_modes.RuleModeMap.t array * int
     array
+
+val divide_rule_rate_by :
+  LKappa_auto.cache ->
+  Model.t ->
+  Remanent_parameters_sig.rate_convention ->
+  Primitives.elementary_rule ->
+  LKappa.rule -> LKappa_auto.cache * int * int
+
+val cannonic_form_from_syntactic_rules :
+  Remanent_parameters_sig.parameters ->
+  LKappa_auto.cache ->
+  Model.t ->
+  'a ->
+  Pattern.cc list ->
+  (Primitives.elementary_rule ->
+   int -> ('b * Rule_modes.arity * Rule_modes.direction) list) ->
+  (Primitives.elementary_rule ->
+   'b * Rule_modes.arity * Rule_modes.direction -> 'c option) ->
+  Primitives.elementary_rule list ->
+  (LKappa_auto.cache ->
+   Model.t ->
+   'a -> Primitives.elementary_rule -> LKappa.rule -> 'd * 'e * 'f) ->
+  LKappa_auto.cache *
+  ((int * 'c Rule_modes.RuleModeMap.t * 'e) *
+   (int * 'c Rule_modes.RuleModeMap.t * 'f))
+    list *
+  ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
+   (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
+    list
+
+val detect_symmetries:
+Remanent_parameters_sig.parameters ->
+Model.t ->
+LKappa_auto.cache ->
+((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
+ (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
+  list ->
+bool array * int array *
+('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
+int array ->
+bool array * int array *
+('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
+int array ->
+(string list * (string * string) list) Mods.StringMap.t
+  Mods.StringMap.t ->
+LKappa_auto.cache * int Symmetries_sig.site_partition array *
+int Symmetries_sig.site_partition array
 
 val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit

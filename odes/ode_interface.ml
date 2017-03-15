@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 14 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -11,8 +11,7 @@ type compil =
   {
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
-    init:
-      (Alg_expr.t * rule(*Primitives.elementary_rule*) * Locality.t) list;
+    init: (Alg_expr.t * rule * Locality.t) list;
     rate_convention: Remanent_parameters_sig.rate_convention ;
     show_reactions: bool ;
     count: Ode_args.count ;
@@ -421,36 +420,17 @@ let divide_rule_rate_by cache compil rule =
       LKappa_auto.nauto compil.rate_convention cache.rule_cache
         lkappa_rule
     in
+    (*let rule_cache, output2 =
+      LKappa_auto.nauto compil.rate_convention cache.rule_cache
+        lkappa_rule_init
+    in*)
     {cache with rule_cache = rule_cache}, output
 
 (****************************************************************)
 (*cannonic form per rule*)
 
-let lkappa_init =
-  {
-    LKappa.r_mix =  [];
-    LKappa.r_created = [];
-    LKappa.r_delta_tokens = [] ;
-    LKappa.r_rate = Alg_expr.int 0 ;
-    LKappa.r_un_rate = None  ;
-  }
 
-  let divide_rule_rate_by_init cache compil lkappa_rule =
-    match compil.rate_convention with
-    | Remanent_parameters_sig.Common -> assert false
-  (* this is not a valid parameterization *)
-  (* Common can be used only to compute normal forms *)
-    | Remanent_parameters_sig.No_correction -> cache, 1
-    | Remanent_parameters_sig.Biochemist
-    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
-      let rule_cache, output =
-        LKappa_auto.nauto compil.rate_convention cache.rule_cache
-          lkappa_rule
-      in
-      {cache with rule_cache = rule_cache}, output
-
-let cannonic_form_from_syntactic_init parameters cache compil species =
-  let rule_cache = cache.rule_cache in
+(*let species_to_lkappa_rule parameters compil species =
   let signature = Model.signatures compil.environment in
   let some_pair =
     Raw_mixture_extra.pattern_to_raw_mixture
@@ -459,20 +439,15 @@ let cannonic_form_from_syntactic_init parameters cache compil species =
       species
   in
   match some_pair with
-  | None ->
-    cache, lkappa_init, 0, LKappa_auto.RuleCache.empty
+  | None -> lkappa_init
   | Some (raw_mixture, _) ->
   let lkappa_rule =
     Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
   in
-  let rule_cache, hashed_list =
-    LKappa_auto.cannonic_form rule_cache lkappa_rule
-  in
-  let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-  let cache = {cache with rule_cache = rule_cache} in
-  cache, lkappa_rule, i, hashed_list
+  lkappa_rule*)
 
-let cannonic_form_from_syntactic_rule cache compil rule =
+(*let cannonic_form_from_syntactic_rule cache compil rule lkappa_rule_init =
+  (*DELETE*)
   let rule_id = rule.Primitives.syntactic_rule in
   let lkappa_rule =
     Model.get_ast_rule compil.environment rule_id
@@ -481,6 +456,10 @@ let cannonic_form_from_syntactic_rule cache compil rule =
   let rule_cache, hashed_list =
     LKappa_auto.cannonic_form rule_cache lkappa_rule
   in
+  let rule_cache, hashed_list_init =
+    LKappa_auto.cannonic_form rule_cache lkappa_rule_init
+  in
+  let i' = LKappa_auto.RuleCache.int_of_hashed_list hashed_list_init in
   let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
   let rule_id_with_mode_list = valid_modes compil rule rule_id in
   let rate_map =
@@ -501,26 +480,42 @@ let cannonic_form_from_syntactic_rule cache compil rule =
       rule_id_with_mode_list
   in
   let cache = {cache with rule_cache = rule_cache } in
-  cache, lkappa_rule, i , rate_map, hashed_list
+  cache, (lkappa_rule,i , rate_map, hashed_list), (hashed_list_init, i')*)
 
-let detect_symmetries parameters compil cache arrays rules
-    contact_map =
-  let rule_cache = cache.rule_cache in
-  (*init*)
-  let rule_cache, symmetries =
-    Symmetries.detect_symmetries_for_init
+let cannonic_form_from_syntactic_rules
+    parameters
+    cache
+    compil
+    chemical_species  =
+  let rule_cache, cannoic_list, hashed_lists =
+    Symmetries.cannonic_form_from_syntactic_rules
       parameters
-      compil.environment rule_cache arrays rules
-      contact_map
+      cache.rule_cache
+      compil.environment
+      compil.rate_convention
+      chemical_species
+      (valid_modes compil)
+      (rate compil)
+      (get_rules compil)
+      Symmetries.divide_rule_rate_by
   in
-  let rule_cache, symmetries =
-    Symmetries.detect_symmetries_for_rules
+  {cache with rule_cache = rule_cache}, cannoic_list, hashed_lists
+
+let detect_symmetries parameters compil cache rules
+    arrays arrays_init contact_map =
+  let rule_cache = cache.rule_cache in
+  let rule_cache, symmetries, symmetries_init =
+    Symmetries.detect_symmetries
       parameters
-      compil.environment rule_cache arrays rules
+      compil.environment
+      rule_cache
+      rules
+      arrays
+      arrays_init
       contact_map
   in
   {cache with rule_cache = rule_cache},
-  symmetries
+  symmetries, symmetries_init
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 14 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
 *)
 
 let local_trace = false
@@ -2320,58 +2320,44 @@ struct
 (*compute symmetries *)
 (*********************)
 
-  let cannonic_form_from_syntactic_rules cache compil =
+  (*let cannonic_form_from_syntactic_rules cache compil lkappa_rule_list =
     let cache, cannonic_list, hashed_lists =
       List.fold_left
         (fun (cache, current_list, hashed_lists) rule ->
-           (*****************************************************)
-           (* identifiers of rule up to isomorphism*)
-           let cache, lkappa_rule, i, rate_map, hashed_list =
-             I.cannonic_form_from_syntactic_rule cache compil rule
-           in
-           (*****************************************************)
-           (* convention of r:
-              the number of automorphisms in the lhs of the rule r*)
-           let cache, convention_rule =
-             I.divide_rule_rate_by cache compil rule
-           in
-           (*****************************************************)
-           let current_list =
-             (i, rate_map, convention_rule) :: current_list
-           in
-           let hashed_lists =
-             (hashed_list, lkappa_rule) :: hashed_lists
-           in
-           cache, current_list, hashed_lists
+           List.fold_left (fun (cache, current_list, hashed_lists)
+                            lkappa_rule_init ->
+               (*****************************************************)
+               (* identifiers of rule up to isomorphism*)
+               let cache, (lkappa_rule, i, rate_map, hashed_list),
+                   (hashed_list_init, i') =
+                 I.cannonic_form_from_syntactic_rule cache compil rule
+                   lkappa_rule_init
+               in
+               (*****************************************************)
+               (* convention of r:
+                  the number of automorphisms in the lhs of the rule r*)
+               let cache, convention_rule1 =
+                 I.divide_rule_rate_by cache compil rule
+               in
+               (*****************************************************)
+               let current_list =
+                 ((i, rate_map, convention_rule1),
+                  (i', rate_map,  convention_rule2)) ::
+                 current_list
+               in
+               let hashed_lists =
+                 ((hashed_list, lkappa_rule),
+                  (hashed_list_init, lkappa_rule_init)) :: hashed_lists
+               in
+               cache, current_list, hashed_lists
+             ) (cache, current_list, hashed_lists) lkappa_rule_list
         ) (cache, [], []) (I.get_rules compil)
     in
-    cache, cannonic_list, hashed_lists
+    cache, cannonic_list, hashed_lists*)
 
-  let cannonic_form_from_syntactic_init parameters network compil
-      chemical_species =
-    let cache = network.cache in
-    let cache, current_list, pair_list =
-      List.fold_left (fun (cache, current_list, hash_list) species ->
-          let cache, lkappa_rule, i, hashed_list =
-            I.cannonic_form_from_syntactic_init parameters cache
-              compil species
-          in
-          (*compute convention *)
-          let cache, convention_lkappa_rule =
-            I.divide_rule_rate_by_init cache compil lkappa_rule
-          in
-          let rate = Rule_modes.RuleModeMap.empty in
-          let pair_list = (hashed_list, lkappa_rule) :: hash_list in
-          let current_list = (*CHECK ME: rate is empty*)
-            (i, rate, convention_lkappa_rule) :: current_list in
-          cache, current_list, pair_list
-        ) (cache, [], []) chemical_species
-    in
-    {network with cache = cache}, current_list, pair_list
-
-  (************************************************************************)
-
+(************************************************************************)
 (*for each rule*)
+
   let initial_value_of_arrays cannonic_list arrays =
     let to_be_checked, rates, correct = arrays in
     List.iter
@@ -2397,60 +2383,55 @@ struct
     let network, chemical_species =
       species_of_initial_state compil network (I.get_init compil)
     in
-    let network, cannonic_init_list, pair_init_list =
-      cannonic_form_from_syntactic_init parameters network compil
+    let cache = network.cache in
+    let cache, pair_cannonic_list, pair_list =
+      I.cannonic_form_from_syntactic_rules
+        parameters
+        cache
+        compil
         chemical_species
     in
-    (*build fresh array for init*)
-    let init_hash_lists, _ = List.split pair_init_list in
-    let to_be_checked_init, counter_init, rates_init, correct_init =
-      Symmetries.build_array_for_symmetries init_hash_lists
+    let pair_rule_list, pair_init_list = List.split pair_list in
+    (*let (hash_lists, _), (init_hash_lists, _) = pair_list in*)
+    let cannonic_list, init_cannonic_list =
+      List.split pair_cannonic_list
     in
+    let to_be_checked_init, counter_init, rates_init, correct_init =
+      Symmetries.build_array_for_symmetries
+        (fst (List.split pair_init_list))
+      in
     (*for each initial state*)
     let () =
-      initial_value_of_arrays cannonic_init_list
+      initial_value_of_arrays init_cannonic_list
         (to_be_checked_init, rates_init, correct_init)
     in
     (********************************************************)
     (*detect symmetries for rules*)
-    let cache = network.cache in
-    let cache, cannonic_list, pair_list =
-      cannonic_form_from_syntactic_rules cache compil
-    in
-    let hash_lists, _ = List.split pair_list in
     (*build array for rule*)
     let to_be_checked, counter, rates, correct =
-      Symmetries.build_array_for_symmetries hash_lists
+      Symmetries.build_array_for_symmetries
+        (fst (List.split pair_rule_list))
     in
     (*for each rule*)
     let () =
       initial_value_of_arrays cannonic_list
         (to_be_checked, rates, correct)
     in
-    (*init*)
-    let cache, symmetries =
-      I.detect_symmetries
-        parameters
-        compil
-        cache
-        pair_init_list
-        (to_be_checked_init, counter_init, rates_init, correct_init)
-        contact_map
-    in
-    let cache, symmetries =
+    let cache, symmetries, symmetries_init =
       I.detect_symmetries
         parameters
         compil
         cache
         pair_list
         (to_be_checked, counter, rates, correct)
+        (to_be_checked_init, counter_init, rates_init, correct_init)
         contact_map
     in
     let network =
       {
         network with
         cache = cache;
-        symmetries = Some symmetries
+        symmetries = Some symmetries (*TODO: change the type*)
       }
     in
     network

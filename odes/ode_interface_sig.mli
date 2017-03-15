@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 14 2017>
+  * Last modification: Time-stamp: <Mar 15 2017>
 *)
 
 module type Interface =
@@ -87,9 +87,6 @@ sig
   type rule_id_with_mode =
     rule_id * Rule_modes.arity * Rule_modes.direction
 
-  val divide_rule_rate_by:
-    cache -> compil -> rule -> cache * int
-
   val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
 
   val lhs: compil -> rule_id_with_mode -> rule -> pattern
@@ -151,38 +148,58 @@ sig
 
   (*symmetries for initial states*)
 
-  val cannonic_form_from_syntactic_init:
+  (*val cannonic_form_from_syntactic_init:
     Remanent_parameters_sig.parameters -> cache -> compil ->
     chemical_species ->
-    cache * LKappa.rule * int * LKappa_auto.RuleCache.hashed_list
+    cache * LKappa.rule * int * LKappa_auto.RuleCache.hashed_list*)
 
-  val divide_rule_rate_by_init :
-    cache -> compil -> LKappa.rule -> cache * int
+  (*val divide_rule_rate_by_init :
+    cache -> compil -> LKappa.rule -> cache * int*)
 
   (*symmetries for rules*)
+  (*val species_to_lkappa_rule : Remanent_parameters_sig.parameters -> compil ->
+    check_symmetries -> LKappa.rule*)
 
-  val cannonic_form_from_syntactic_rule :
-    cache -> compil -> rule ->
-    cache * LKappa.rule *
-    int *
-    Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t *
-    LKappa_auto.RuleCache.hashed_list
+  (*DELETE*)
+  val divide_rule_rate_by: cache -> compil -> rule ->
+    cache * int
+
+  val cannonic_form_from_syntactic_rules :
+    Remanent_parameters_sig.parameters ->
+    cache ->
+    compil ->
+    chemical_species list ->
+    cache *
+    ((int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int) *
+     (int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int))
+      list *
+    ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
+     (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
+      list
 
   val detect_symmetries :
-    Remanent_parameters_sig.parameters ->
-    compil -> cache ->
-    (LKappa_auto.RuleCache.hashed_list * LKappa.rule) list ->
-    (bool array * int array * ('a,'b) Alg_expr.e Locality.annot
-       Rule_modes.RuleModeMap.t array * int array) ->
-    (string list * (string * string) list) Mods.StringMap.t
-      Mods.StringMap.t ->
-    cache * Symmetries.symmetries
+  Remanent_parameters_sig.parameters ->
+  compil ->
+  cache ->
+  ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
+   (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
+    list ->
+  bool array * int array *
+  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
+  int array ->
+  bool array * int array *
+  ('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
+  int array ->
+  (string list * (string * string) list) Mods.StringMap.t
+    Mods.StringMap.t ->
+  cache * int Symmetries_sig.site_partition array *
+  int Symmetries_sig.site_partition array
 
   val print_symmetries:
   Remanent_parameters_sig.parameters ->
   compil -> Symmetries.symmetries -> unit
 
-(*  val get_cc_cache: cache -> Pattern.PreEnv.t
+  (*val get_cc_cache: cache -> Pattern.PreEnv.t
     val set_cc_cache: Pattern.PreEnv.t -> cache -> cache*)
 
   val get_rule_cache: cache -> LKappa_auto.cache
