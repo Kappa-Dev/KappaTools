@@ -1433,7 +1433,8 @@ let compute_symmetries
       let rules =
         Model.fold_rules (fun _ acc r -> r :: acc) [] env
       in
-      let lkappa_rules_init =
+      let lkappa_rules_init = (*FIXME: is ast_rules is an initial
+                                states?? *)
         Model.fold_ast_rules (fun _ acc r -> r :: acc) [] env
       in
       let state, contact_map =
