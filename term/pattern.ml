@@ -976,8 +976,14 @@ type work = {
   dangling: int; (* node_id *)
 }
 
-module PreEnv : sig
-  type t
+module PreEnv (*: sig
+  type t = {
+    sig_decl: Signature.s;
+    id_by_type: int list array;
+    nb_id: int;
+    domain: prepoint list Mods.IntMap.t Mods.IntMap.t;
+    mutable used_by_a_begin_new: bool;
+  }
 
   type stat = { nodes: int; nav_steps: int }
 
@@ -994,10 +1000,11 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
 
-  val finalize : max_sharing:bool -> t -> Env.t * stat
+  val finalize : max_sharing:bool -> t ->
+                 (int list * (int * int) list) array array -> Env.t * stat
 
   val of_env : Env.t -> t
-end = struct
+end*) = struct
   type t = {
     sig_decl: Signature.s;
     id_by_type: int list array;
@@ -1178,79 +1185,6 @@ end = struct
           domain 0 in
       saturate_level ~max_sharing l l (si,domain)
 
-  let finalize ~max_sharing env =
-    let si,complete_domain = saturate ~max_sharing env.domain in
-    let domain = Array.make (succ si) (empty_point env.sig_decl) in
-    let singles =
-      Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in
-    let elementaries = fill_elem env.sig_decl singles in
-    let () =
-      Mods.IntMap.iter
-        (fun _ -> List.iter
-            (fun x ->
-               domain.(x.p_id) <-
-                 { Env.content = x.element; Env.sons = [];
-                   Env.deps = x.depending; Env.roots = x.roots; }))
-        singles in
-    let nav_steps =
-      Mods.IntMap.fold
-        (fun level domain_level acc_level ->
-           if level <= 1 then acc_level else
-             Mods.IntMap.fold
-               (fun _ l acc ->
-                  List.fold_left (fun acc x ->
-                      let () =  domain.(x.p_id) <-
-                          { Env.content = x.element; Env.sons = [];
-                            Env.roots = x.roots; Env.deps = x.depending;} in
-                      Mods.IntMap.fold (fun _ ll accl->
-                          List.fold_left (fun acc e ->
-                              match matchings e.element x.element with
-                              | [] -> acc
-                              | injs ->
-                                List.fold_left
-                                  (fun acc inj_e_x ->
-                                     let (inj_e2sup,_),sup =
-                                       merge_compatible env.id_by_type env.nb_id
-                                         inj_e_x e.element x.element in
-                                     match equal sup x.element with
-                                     | None -> assert false
-                                     | Some inj_sup2x ->
-                                       let inj =
-                                         Renaming.inverse
-                                           (Renaming.compose
-                                              false inj_e2sup inj_sup2x) in
-                                       let nav = build_navigation_between
-                                           inj e.element x.element in
-                                       insert_navigation domain x.p_id inj e.p_id nav
-                                       + acc
-                                  )
-                                  acc injs
-                            ) accl ll) singles acc) acc l)
-               domain_level acc_level)
-        complete_domain 0 in
-    let level0 = Mods.IntMap.find_default Mods.IntMap.empty 0 complete_domain in
-    let single_agent_points =
-      Array.make (Array.length env.id_by_type) None in
-    let () =
-      Mods.IntMap.iter (fun _ ->
-          List.iter
-            (fun p ->
-               match find_root p.element with
-               | None -> ()
-               | Some (_,ty) ->
-                 let () = domain.(p.p_id) <-
-                     { Env.content = p.element; Env.roots = p.roots;
-                       Env.deps = p.depending; Env.sons = []; } in
-                 single_agent_points.(ty) <- Some (p.p_id,p.depending)))
-        level0 in
-    {
-      Env.sig_decl = env.sig_decl;
-      Env.id_by_type = env.id_by_type;
-      Env.max_obs = fresh_id env;
-      Env.domain;
-      Env.elementaries;
-      Env.single_agent_points;
-    },{ nodes = si; nav_steps }
 
   let of_env env =
     let add_cc acc p =
@@ -1349,7 +1283,7 @@ let new_node wk type_id =
          Mods.IntMap.add wk.free_id (Array.make arity (UnSpec,-1)) wk.cc_nodes;
      })
 
-let minimal_env sigs contact_map =
+let minimal_env env contact_map =
   Tools.array_fold_lefti
     (fun ty ->
        Tools.array_fold_lefti
@@ -1381,7 +1315,7 @@ let minimal_env sigs contact_map =
                    out'
                  else out) acc'' links
          ))
-    (PreEnv.empty sigs) contact_map
+    env contact_map
 
 let fold f_agent f_site cc acc =
   let acc =
@@ -1404,3 +1338,80 @@ let fold f_agent f_site cc acc =
     )
     cc.nodes
     acc
+
+let finalize ~max_sharing env contact_map =
+  let env = minimal_env env contact_map in
+  let si,complete_domain = PreEnv.saturate ~max_sharing env.PreEnv.domain in
+  let domain = Array.make (succ si) (PreEnv.empty_point env.PreEnv.sig_decl) in
+  let singles =
+    Mods.IntMap.find_default Mods.IntMap.empty 1 complete_domain in
+  let elementaries = PreEnv.fill_elem env.PreEnv.sig_decl singles in
+  let () =
+    Mods.IntMap.iter
+      (fun _ -> List.iter
+            (fun x ->
+              domain.(x.p_id) <-
+                { Env.content = x.element; Env.sons = [];
+                  Env.deps = x.depending; Env.roots = x.roots; }))
+      singles in
+  let nav_steps =
+    Mods.IntMap.fold
+      (fun level domain_level acc_level ->
+        if level <= 1 then acc_level else
+          Mods.IntMap.fold
+            (fun _ l acc ->
+              List.fold_left (fun acc x ->
+                      let () =  domain.(x.p_id) <-
+                          { Env.content = x.element; Env.sons = [];
+                            Env.roots = x.roots; Env.deps = x.depending;} in
+                      Mods.IntMap.fold (fun _ ll accl->
+                          List.fold_left (fun acc e ->
+                              match matchings e.element x.element with
+                              | [] -> acc
+                              | injs ->
+                                List.fold_left
+                                  (fun acc inj_e_x ->
+                                     let (inj_e2sup,_),sup =
+                                       merge_compatible env.PreEnv.id_by_type
+                                                        env.PreEnv.nb_id
+                                         inj_e_x e.element x.element in
+                                     match equal sup x.element with
+                                     | None -> assert false
+                                     | Some inj_sup2x ->
+                                       let inj =
+                                         Renaming.inverse
+                                           (Renaming.compose
+                                              false inj_e2sup inj_sup2x) in
+                                       let nav = build_navigation_between
+                                           inj e.element x.element in
+                                       PreEnv.insert_navigation domain x.p_id
+                                                                inj e.p_id nav
+                                       + acc
+                                  )
+                                  acc injs
+                            ) accl ll) singles acc) acc l)
+               domain_level acc_level)
+        complete_domain 0 in
+  let level0 = Mods.IntMap.find_default Mods.IntMap.empty 0 complete_domain in
+  let single_agent_points =
+    Array.make (Array.length env.PreEnv.id_by_type) None in
+  let () =
+    Mods.IntMap.iter (fun _ ->
+          List.iter
+            (fun p ->
+               match find_root p.element with
+               | None -> ()
+               | Some (_,ty) ->
+                 let () = domain.(p.p_id) <-
+                     { Env.content = p.element; Env.roots = p.roots;
+                       Env.deps = p.depending; Env.sons = []; } in
+                 single_agent_points.(ty) <- Some (p.p_id,p.depending)))
+        level0 in
+  {
+    Env.sig_decl = env.PreEnv.sig_decl;
+    Env.id_by_type = env.PreEnv.id_by_type;
+    Env.max_obs = PreEnv.fresh_id env;
+    Env.domain;
+    Env.elementaries;
+    Env.single_agent_points;
+  },{ nodes = si; PreEnv.nav_steps }

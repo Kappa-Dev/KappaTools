@@ -78,9 +78,9 @@ module PreEnv : sig
 
   val sigs : t -> Signature.s
 
-  val finalize : max_sharing:bool -> t -> Env.t * stat
-
   val of_env : Env.t -> t
+
+  val empty : Signature.s -> t
 
 end
 
@@ -107,7 +107,7 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 val finish_new : ?origin:Operator.rev_dep -> work ->
   (PreEnv.t*Renaming.t*cc*id)
 
-val minimal_env : Signature.s -> Contact_map.t -> PreEnv.t
+val minimal_env : PreEnv.t -> Contact_map.t -> PreEnv.t
 
 (** {6 Use a connected component } *)
 
@@ -145,5 +145,8 @@ val fold:
   cc ->
   'a ->
   'a
+
+val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
+               Env.t * PreEnv.stat
 
 module Set : SetMap.Set with type elt=id

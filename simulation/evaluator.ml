@@ -30,7 +30,7 @@ let do_interactive_directives
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
-      let fenv,_ = Pattern.PreEnv.finalize ~max_sharing cc_preenv' in
+      let fenv,_ = Pattern.finalize ~max_sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern fenv)
@@ -52,7 +52,7 @@ let get_pause_criteria ~max_sharing ~new_syntax contact_map env graph b =
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else
-      let fenv,_ = Pattern.PreEnv.finalize ~max_sharing cc_preenv' in
+      let fenv,_ = Pattern.finalize ~max_sharing cc_preenv' contact_map in
       (Model.new_domain fenv env,
        List.fold_left
          (Rule_interpreter.incorporate_extra_pattern fenv)
