@@ -2343,7 +2343,7 @@ struct
   let compute_symmetries_from_model parameters compil network
       contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
-    let log = Remanent_parameters.get_logger parameters in
+    (*let log = Remanent_parameters.get_logger parameters in*)
     (********************************************************)
     (*initial_states*)
     let network, chemical_species =
@@ -2364,7 +2364,7 @@ struct
     let to_be_checked_init, counter_init, rates_init, correct_init =
       Symmetries.build_array_for_symmetries
         (List.rev_map fst (List.rev pair_init_list))
-      in
+    in
     let () =
       initial_value_of_arrays init_cannonic_list
         (to_be_checked_init, rates_init, correct_init)

@@ -31,8 +31,8 @@ type lkappa_partitioned_contact_map =
 type symmetries =
   {
     rules: lkappa_partitioned_contact_map;
-    rules_and_initial_states:  lkappa_partitioned_contact_map option;
-    rules_and_alg_expr:  lkappa_partitioned_contact_map option
+    rules_and_initial_states: lkappa_partitioned_contact_map option;
+    rules_and_alg_expr: lkappa_partitioned_contact_map option
   }
 
 (***************************************************************)
@@ -635,7 +635,8 @@ let print_symmetries_gen parameters env contact_map
   in
   ()
 
-let detect_symmetries parameters env cache pair_list arrays arrays_init
+let detect_symmetries parameters env cache pair_list arrays
+    arrays_init
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
   let (hash_and_rule_list, hash_and_rule_list_init) =
@@ -697,7 +698,7 @@ let detect_symmetries parameters env cache pair_list arrays arrays_init
       (check_invariance_both
          ?parameters
          ?env ~correct ~rates hash_and_rule_list_init)
-      (*p'*)refined_partitioned_contact_map_copy
+      refined_partitioned_contact_map_copy
   in
   let refined_partitioned_contact_map_init =
     Array.map Symmetries_sig.clean

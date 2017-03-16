@@ -1430,7 +1430,9 @@ let compute_symmetries
   | None -> state, None
   | Some env ->
     begin
-      let rules = Model.fold_rules (fun _ acc r -> r::acc) [] env in
+      let rules =
+        Model.fold_rules (fun _ acc r -> r :: acc) [] env
+      in
       let lkappa_rules_init =
         Model.fold_ast_rules (fun _ acc r -> r :: acc) [] env
       in
@@ -1454,6 +1456,7 @@ let compute_symmetries
       let cannonic_list, init_cannonic_list =
         List.split pair_cannonic_list
       in
+      (*init*)
       let to_be_checked_init, counter_init,
           rates_init, correct_init =
         Symmetries.build_array_for_symmetries
@@ -1463,9 +1466,14 @@ let compute_symmetries
         initial_value_of_arrays init_cannonic_list
           (to_be_checked_init, rates_init, correct_init)
       in
+      (*rules*)
       let to_be_checked, counter, rates, correct =
         Symmetries.build_array_for_symmetries
           (List.rev_map fst (List.rev pair_rule_list))
+      in
+      let () =
+        initial_value_of_arrays cannonic_list
+          (to_be_checked, rates, correct)
       in
       let cache, symmetries =
         Symmetries.detect_symmetries
@@ -1490,8 +1498,7 @@ let get_symmetric_sites
 let output_symmetries
     ?logger
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
-    state
-  =
+    state =
   let parameters = Remanent_state.get_parameters state in
   let parameters =
     match logger with
