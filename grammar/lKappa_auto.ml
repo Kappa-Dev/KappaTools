@@ -561,7 +561,8 @@ let keep_this_cc rate_convention n_agents cc =
     begin
       List.exists (fun i -> i<n_agents) cc
     end
-  | Remanent_parameters_sig.Common | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> true
+  | Remanent_parameters_sig.Common
+  | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> true
 
 let mixture_to_species_map rate_convention cache rule =
   let map = CannonicMap.empty in

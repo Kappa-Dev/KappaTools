@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -419,17 +419,22 @@ let cannonic_form_from_syntactic_rules
     cache
     compil
     chemical_species  =
+  let lkappa_rule_list =
+    List.fold_left (fun current_list species ->
+        let lkappa =
+          Symmetries.species_to_lkappa_rule parameters
+            compil.environment species
+        in
+        lkappa :: current_list
+      ) [] chemical_species
+  in
   let rule_cache, cannoic_list, hashed_lists =
     Symmetries.cannonic_form_from_syntactic_rules
-      parameters
       cache.rule_cache
       compil.environment
       compil.rate_convention
-      chemical_species
-      (valid_modes compil)
-      (rate compil)
+      lkappa_rule_list
       (get_rules compil)
-      Symmetries.divide_rule_rate_by
   in
   {cache with rule_cache = rule_cache}, cannoic_list, hashed_lists
 

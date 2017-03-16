@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -606,7 +606,7 @@ type ('static,'dynamic) state =
     prehandler: Cckappa_sig.kappa_handler option ;
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
-    env : Model. t option option ;
+    env : Model.t option option ;
     compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;

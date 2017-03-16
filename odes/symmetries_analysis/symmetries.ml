@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 15 2017>
+   * Last modification: Time-stamp: <Mar 16 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -410,28 +410,30 @@ let species_to_lkappa_rule parameters env species =
     lkappa_rule
 
 (*compute rate*)
-(*let rate rule (_, arity, _) =
+let rate rule (_, arity, _) =
   match arity with
   | Rule_modes.Usual -> Some rule.Primitives.rate
   | Rule_modes.Unary ->
     Option_util.map fst rule.Primitives.unary_rate
 
 let valid_modes rule id =
+  let add x y list  =
+    match y with
+    | None -> list
+    | Some _ -> x::list
+  in
   let mode = Rule_modes.Direct in
   List.rev_map
     (fun x -> id,x,mode)
     (List.rev
        (Rule_modes.Usual::
         (add Rule_modes.Unary rule.Primitives.unary_rate [])))
-  *)
 
 (*cannonic form from syntactic rule*)
 let cannonic_form_from_syntactic_rule
     rule_cache
     env
     rule
-    valid_modes
-    rate
     lkappa_rule_init =
   (*over each rule*)
   let rule_id = rule.Primitives.syntactic_rule in
@@ -444,7 +446,8 @@ let cannonic_form_from_syntactic_rule
   let rule_cache, hashed_list_init =
     LKappa_auto.cannonic_form rule_cache lkappa_rule_init
   in
-  let i' = LKappa_auto.RuleCache.int_of_hashed_list hashed_list_init in
+  let i' =
+    LKappa_auto.RuleCache.int_of_hashed_list hashed_list_init in
   (*get the rate information at each rule*)
   let rule_id_with_mode_list = valid_modes rule rule_id in
   let rate_map =
@@ -466,23 +469,11 @@ let cannonic_form_from_syntactic_rule
 
 (*cannonic_form_from_syntactic_rules and initial states*)
 let cannonic_form_from_syntactic_rules
-    parameters
     rule_cache
     env
     rate_convention
-    chemical_species
-    valid_modes
-    rate
-    get_rules
-    divide_rule_rate_by =
-  (*convert a list of species to a list of rule in signature lkappa
-    rule*)
-  let lkappa_rule_list =
-    List.fold_left (fun current_list species ->
-        let lkappa = species_to_lkappa_rule parameters env species in
-        lkappa :: current_list
-      ) [] chemical_species
-  in
+    lkappa_rule_list
+    get_rules =
   (*cannonic form from syntactic rule*)
   let rule_cache, cannonic_list, hashed_lists =
     List.fold_left
@@ -501,8 +492,6 @@ let cannonic_form_from_syntactic_rules
                   rule_cache
                   env
                   rule
-                  valid_modes
-                  rate
                   lkappa_rule_init
               in
               (*****************************************************)

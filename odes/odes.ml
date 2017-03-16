@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
 *)
 
 let local_trace = false
@@ -2320,43 +2320,8 @@ struct
 (*compute symmetries *)
 (*********************)
 
-  (*let cannonic_form_from_syntactic_rules cache compil lkappa_rule_list =
-    let cache, cannonic_list, hashed_lists =
-      List.fold_left
-        (fun (cache, current_list, hashed_lists) rule ->
-           List.fold_left (fun (cache, current_list, hashed_lists)
-                            lkappa_rule_init ->
-               (*****************************************************)
-               (* identifiers of rule up to isomorphism*)
-               let cache, (lkappa_rule, i, rate_map, hashed_list),
-                   (hashed_list_init, i') =
-                 I.cannonic_form_from_syntactic_rule cache compil rule
-                   lkappa_rule_init
-               in
-               (*****************************************************)
-               (* convention of r:
-                  the number of automorphisms in the lhs of the rule r*)
-               let cache, convention_rule1 =
-                 I.divide_rule_rate_by cache compil rule
-               in
-               (*****************************************************)
-               let current_list =
-                 ((i, rate_map, convention_rule1),
-                  (i', rate_map,  convention_rule2)) ::
-                 current_list
-               in
-               let hashed_lists =
-                 ((hashed_list, lkappa_rule),
-                  (hashed_list_init, lkappa_rule_init)) :: hashed_lists
-               in
-               cache, current_list, hashed_lists
-             ) (cache, current_list, hashed_lists) lkappa_rule_list
-        ) (cache, [], []) (I.get_rules compil)
-    in
-    cache, cannonic_list, hashed_lists*)
-
-(************************************************************************)
-(*for each rule*)
+(****************************************************************)
+(*for each array*)
 
   let initial_value_of_arrays cannonic_list arrays =
     let to_be_checked, rates, correct = arrays in
@@ -2375,7 +2340,8 @@ struct
          ()
       ) cannonic_list
 
-  let compute_symmetries_from_model parameters compil network contact_map =
+  let compute_symmetries_from_model parameters compil network
+      contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
     let log = Remanent_parameters.get_logger parameters in
     (********************************************************)
@@ -2392,27 +2358,23 @@ struct
         chemical_species
     in
     let pair_rule_list, pair_init_list = List.split pair_list in
-    (*let (hash_lists, _), (init_hash_lists, _) = pair_list in*)
     let cannonic_list, init_cannonic_list =
       List.split pair_cannonic_list
     in
     let to_be_checked_init, counter_init, rates_init, correct_init =
       Symmetries.build_array_for_symmetries
-        (fst (List.split pair_init_list))
+        (List.rev_map fst (List.rev pair_init_list))
       in
-    (*for each initial state*)
     let () =
       initial_value_of_arrays init_cannonic_list
         (to_be_checked_init, rates_init, correct_init)
     in
     (********************************************************)
     (*detect symmetries for rules*)
-    (*build array for rule*)
     let to_be_checked, counter, rates, correct =
       Symmetries.build_array_for_symmetries
-        (fst (List.split pair_rule_list))
+        (List.rev_map fst (List.rev pair_rule_list))
     in
-    (*for each rule*)
     let () =
       initial_value_of_arrays cannonic_list
         (to_be_checked, rates, correct)

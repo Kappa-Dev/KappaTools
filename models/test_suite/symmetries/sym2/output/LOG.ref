@@ -1066,5 +1066,3 @@ A(x!A.y)=> [A(x!A.y,y)]
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
-Compute the contact map...
-execution finished without any exception

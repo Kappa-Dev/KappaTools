@@ -44,6 +44,10 @@ val get_ast_rule_rate_pos: unary:bool -> t -> int -> Locality.t
 val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
+
+val fold_ast_rules :
+   (int -> 'a -> LKappa.rule -> 'a) -> 'a -> t -> 'a
+
 val fold_perturbations :
   (int -> 'a -> Primitives.perturbation -> 'a) -> 'a -> t -> 'a
 

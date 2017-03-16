@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -289,7 +289,6 @@ let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
 
 let flush_errors state =
   Remanent_state.set_errors Exception.empty_error_handler state
-
 
 let compute_env
     show_title
@@ -866,8 +865,6 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
 
-
-
 let compute_map_gen
     (get: ?accuracy_level:Remanent_state.accuracy_level ->
      (Reachability.static_information,
@@ -901,7 +898,6 @@ let get_intermediary_internal_influence_map =
     ~phase:(StoryProfiling.Internal_influence_map "medium")
     (Remanent_state.get_internal_influence_map Remanent_state.Medium)
     compute_intermediary_internal_influence_map
-
 
 let compute_reachability_result show_title state =
   let state, c_compil = get_c_compilation state in
@@ -1054,11 +1050,6 @@ let get_influence_map
        (Remanent_state.get_influence_map accuracy_level)
        (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
 
-
-(******************************************************************)
-
-
-
 (******************************************************************)
 
 let compute_dead_agents _show_title state =
@@ -1104,7 +1095,6 @@ let get_internal_contact_map
   | Remanent_state.Medium
   | Remanent_state.High
   | Remanent_state.Full -> get_intermediary_internal_contact_map state
-
 
 let compute_contact_map
     ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
@@ -1318,7 +1308,6 @@ let get_dead_rules  =
     Remanent_state.get_dead_rules
     compute_dead_rules
 
-
 (****************************************************************)
 
 let compute_internal_constraints_list _show_title state =
@@ -1416,6 +1405,23 @@ let get_constraints_list_to_json state =
     state,
     Remanent_state.lemmas_list_to_json constraints_list
 
+let initial_value_of_arrays cannonic_list arrays =
+  let to_be_checked, rates, correct = arrays in
+  List.iter
+    (fun (i, rate_map, convention_rule) ->
+       let () =
+         correct.(i) <- convention_rule
+       in
+       let () =
+         rates.(i) <-
+           (Rule_modes.add_map (rates.(i)) rate_map)
+       in
+       let () =
+         to_be_checked.(i) <- true
+       in
+       ()
+    ) cannonic_list
+
 let compute_symmetries
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     _show_title state =
@@ -1424,133 +1430,55 @@ let compute_symmetries
   | None -> state, None
   | Some env ->
     begin
-      let rules =
-        Model.fold_rules
-        (fun _ acc r -> r::acc) [] env
+      let rules = Model.fold_rules (fun _ acc r -> r::acc) [] env in
+      let lkappa_rules_init =
+        Model.fold_ast_rules (fun _ acc r -> r :: acc) [] env
       in
       let state, contact_map =
         get_contact_map ~accuracy_level state
       in
       let parameters = get_parameters state in
-      let cache = LKappa_auto.init_cache () in
-      (*let cache, cannonic_list, hashed_lists =
-        List.fold_left
-          (fun (cache, current_list, hashed_lists) rule ->
-             (*****************************************************)
-             (* identifiers of rule up to isomorphism*)
-             let cache, lkappa_rule, i, rate_map, hashed_list =
-               let rule_id = rule.Primitives.syntactic_rule in
-               let lkappa_rule = Model.get_ast_rule env rule_id in
-               (*let sigs = Model.signatures compil.environment in*)
-               let cache, hashed_list =
-                 LKappa_auto.cannonic_form cache lkappa_rule
-               in
-               let i = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-               let add x y list  =
-                 match y with
-                 | None -> list
-                 | Some _ -> x::list
-               in
-               let rate rule (_,arity,_) =
-                 match
-                   arity
-                 with
-                 | Rule_modes.Usual -> Some rule.Primitives.rate
-                 | Rule_modes.Unary -> Option_util.map fst
-                                         rule.Primitives.unary_rate
-               in
-               let rule_id_with_mode_list =
-                 let mode = Rule_modes.Direct in
-                 List.rev_map
-                   (fun x -> rule_id,x,mode)
-                   (List.rev
-                      (Rule_modes.Usual::
-                       (add Rule_modes.Unary rule.Primitives.unary_rate [])))
-               in
-               let rate_map =
-                 List.fold_left (fun rate_map rule_id_with_mode ->
-                     let rate_opt =
-                       rate rule rule_id_with_mode
-                     in
-                     let _,a,b = rule_id_with_mode in
-                     let rate_map =
-                       match rate_opt with
-                       | None -> rate_map
-                       | Some rate ->
-                         Rule_modes.RuleModeMap.add (a,b) rate rate_map
-                     in
-                     rate_map
-                   )
-                   Rule_modes.RuleModeMap.empty
-                   rule_id_with_mode_list
-               in
-               cache, lkappa_rule, i , rate_map, hashed_list
-             in
-             (*****************************************************)
-             (* convention of r:
-                the number of automorphisms in the lhs of the rule r*)
-             let rate_convention =
-               Remanent_parameters.get_rate_convention parameters
-             in
-             let cache, convention_rule =
-               match rate_convention with
-               | Remanent_parameters_sig.Common -> assert false
-(* this is not a valid parameterization *)
-(* Common can be used only to compute normal forms *)
-             | Remanent_parameters_sig.No_correction -> cache, 1
-             | Remanent_parameters_sig.Biochemist
-             | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
-               let rule_id = rule.Primitives.syntactic_rule in
-               let lkappa_rule =
-                 Model.get_ast_rule env rule_id
-               in
-               let cache, output =
-                 LKappa_auto.nauto rate_convention cache
-                   lkappa_rule
-               in
-               cache, output
-             in
-             (*****************************************************)
-             let current_list =
-               (i, rate_map, convention_rule) :: current_list
-             in
-             let hashed_lists =
-               (hashed_list, lkappa_rule) :: hashed_lists
-             in
-             cache, current_list, hashed_lists
-          ) (cache, [], []) rules
+      let cache = LKappa_auto.init_cache () in (*FIXME*)
+      let rate_convention =
+        Remanent_parameters.get_rate_convention parameters
+      in
+      let cache, pair_cannonic_list, pair_list =
+        Symmetries.cannonic_form_from_syntactic_rules
+          cache
+          env
+          rate_convention
+          lkappa_rules_init
+          rules
+      in
+      let pair_rule_list, pair_init_list = List.split pair_list in
+      let cannonic_list, init_cannonic_list =
+        List.split pair_cannonic_list
+      in
+      let to_be_checked_init, counter_init,
+          rates_init, correct_init =
+        Symmetries.build_array_for_symmetries
+          (List.rev_map fst (List.rev pair_init_list))
+      in
+      let () =
+        initial_value_of_arrays init_cannonic_list
+          (to_be_checked_init, rates_init, correct_init)
       in
       let to_be_checked, counter, rates, correct =
         Symmetries.build_array_for_symmetries
-          (List.rev_map fst (List.rev hashed_lists))
+          (List.rev_map fst (List.rev pair_rule_list))
       in
-      (*for each rule*)
-      let () =
-        List.iter
-          (fun (i, rate_map, convention_rule) ->
-             let () =
-               correct.(i) <- convention_rule
-             in
-             let () =
-               rates.(i) <-
-                 (Rule_modes.add_map (rates.(i)) rate_map)
-             in
-             let () =
-               to_be_checked.(i) <- true
-             in
-             ()
-          ) cannonic_list
-      in
-      let cache, symmetries = (*TODO*)
-        Symmetries.detect_symmetries_for_rules
+      let cache, symmetries =
+        Symmetries.detect_symmetries
           parameters
           env
           cache
-          hashed_lists
+          pair_list
           (to_be_checked, counter, rates, correct)
+          (to_be_checked_init, counter_init, rates_init,
+           correct_init)
           contact_map
-      in*)
-      state, None
+      in
+      state, Some symmetries
     end
 
 let get_symmetric_sites
@@ -1572,12 +1500,9 @@ let output_symmetries
   in
   let state, sym = get_symmetric_sites ~accuracy_level state in
   let state, env = get_env state in
-  match
-    sym,env
-  with
-  | None,_ | _,None -> state
-  | Some sym,Some env ->
+  match sym, env with
+  | None, _ | _, None -> state
+  | Some sym, Some env ->
     let () = Symmetries.print_symmetries parameters env sym in
     state
-
   end

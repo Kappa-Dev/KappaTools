@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 15 2017>
+   * Last modification: Time-stamp: <Mar 16 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -30,9 +30,17 @@ type symmetries =
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
 
-(*val rate : Primitives.elementary_rule
+val rate : Primitives.elementary_rule ->
+  int * Rule_modes.arity * Rule_modes.direction ->
+  Alg_expr.t Locality.annot option
 
-val valid_modes : Primitives.elementary_rule*)
+val valid_modes :
+  Primitives.elementary_rule -> int ->
+  (int * Rule_modes.arity * Rule_modes.direction) list
+
+val species_to_lkappa_rule :
+  Remanent_parameters_sig.parameters -> Model.t ->
+  Pattern.cc -> LKappa.rule
 
 val build_array_for_symmetries:
   LKappa_auto.RuleCache.hashed_list list ->
@@ -47,24 +55,14 @@ val divide_rule_rate_by :
   LKappa.rule -> LKappa_auto.cache * int * int
 
 val cannonic_form_from_syntactic_rules :
-Remanent_parameters_sig.parameters ->
 LKappa_auto.cache ->
 Model.t ->
-'a ->
-Pattern.cc list ->
-(Primitives.elementary_rule ->
- int -> ('b * Rule_modes.arity * Rule_modes.direction) list) ->
-(Primitives.elementary_rule ->
- 'b * Rule_modes.arity * Rule_modes.direction -> 'c option) ->
+Remanent_parameters_sig.rate_convention ->
+LKappa.rule list ->
 Primitives.elementary_rule list ->
-(LKappa_auto.cache ->
- Model.t ->
- 'a ->
- Primitives.elementary_rule ->
- LKappa.rule -> LKappa_auto.cache * 'd * 'e) ->
 LKappa_auto.cache *
-((int * 'c Rule_modes.RuleModeMap.t * 'd) *
- (int * 'c Rule_modes.RuleModeMap.t * 'e))
+((int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int) *
+ (int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int))
   list *
 ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
  (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
