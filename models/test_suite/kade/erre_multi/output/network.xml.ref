@@ -33,11 +33,11 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <listOfSpecies>
 <species metaid="CMD18" id="s1" name="R(e, r)" compartment="default" initialAmount="100" substanceUnits="substance"/>
 <species metaid="CMD19" id="s2" name="E(r, s)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD20" id="s3" name="E(r!1, s), R(e!1, r)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD21" id="s4" name="E(r, s!1), R(e!1, r)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD22" id="s5" name="E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD23" id="s6" name="E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD24" id="s7" name="E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD20" id="s3" name="R(e!1, r), E(r!1, s)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD21" id="s4" name="R(e!1, r), E(r, s!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD22" id="s5" name="R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD23" id="s6" name="R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD24" id="s7" name="R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -58,7 +58,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s)  -->
 <reaction id="re1" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD25" species="s6" stoichiometry="2"/>
@@ -76,7 +76,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s)  -->
 <reaction id="re2" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD27" species="s6" stoichiometry="2"/>
@@ -94,7 +94,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s)  -->
 <reaction id="re3" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD29" species="s6" stoichiometry="2"/>
@@ -113,7 +113,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s)  -->
 <reaction id="re4" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD32" species="s6" stoichiometry="2"/>
@@ -132,7 +132,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s)  -->
 <reaction id="re5" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD35" species="s7"/>
@@ -149,7 +149,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s)  -->
 <reaction id="re6" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD38" species="s7"/>
@@ -166,7 +166,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r, s!1), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + E(r, s)  -->
 <reaction id="re7" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD41" species="s7"/>
@@ -183,7 +183,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s) -> E(r!1, s), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s)  -->
 <reaction id="re8" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD44" species="s7"/>
@@ -200,7 +200,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
-<!-- reaction: E(r!1, s), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
+<!-- reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s)  -->
 <reaction id="re9" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD47" species="s3"/>
@@ -222,7 +222,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
-<!-- reaction: E(r, s!1), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
+<!-- reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s)  -->
 <reaction id="re10" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD50" species="s3"/>
@@ -244,7 +244,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
-<!-- reaction: E(r!1, s), R(e!1, r) + E(r!1, s), R(e!1, r) -> E(r!1, s), R(e!1, r!2), R(e!3, r!2), E(r!3, s)  -->
+<!-- reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s)  -->
 <reaction id="re11" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD53" species="s3" stoichiometry="2"/>
@@ -265,7 +265,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r) -> R(e,r) -->
-<!-- reaction: E(r!1, s), R(e!1, r) -> R(e, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r), E(r!1, s) -> R(e, r) + E(r, s)  -->
 <reaction id="re12" name="R(e!_,r) -> R(e,r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD55" species="s3"/>
@@ -282,7 +282,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1)  -->
 <reaction id="re13" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD58" species="s5" stoichiometry="2"/>
@@ -300,7 +300,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1)  -->
 <reaction id="re14" name="R(r!_) -> R(r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD60" species="s5" stoichiometry="2"/>
@@ -318,7 +318,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s)  -->
 <reaction id="re15" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD62" species="s5" stoichiometry="2"/>
@@ -337,7 +337,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(r!_) ->  -->
-<!-- reaction: E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3) -> E(r, s!1), R(e!1, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s)  -->
 <reaction id="re16" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD65" species="s5" stoichiometry="2"/>
@@ -356,7 +356,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1) -->
-<!-- reaction: E(r, s!1), R(e!1, r) + E(r, s!1), R(e!1, r) -> E(r, s!1), R(e!1, r!2), R(e!3, r!2), E(r, s!3)  -->
+<!-- reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3)  -->
 <reaction id="re17" name="R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD68" species="s4" stoichiometry="2"/>
@@ -377,7 +377,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : R(e!_,r) -> R(e,r) -->
-<!-- reaction: E(r, s!1), R(e!1, r) -> R(e, r) + E(r, s)  -->
+<!-- reaction: R(e!1, r), E(r, s!1) -> R(e, r) + E(r, s)  -->
 <reaction id="re18" name="R(e!_,r) -> R(e,r)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD70" species="s4"/>
@@ -394,7 +394,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r,s), R(e) -> E(r,s!1), R(e!1) -->
-<!-- reaction: R(e, r) + E(r, s) -> E(r, s!1), R(e!1, r)  -->
+<!-- reaction: R(e, r) + E(r, s) -> R(e!1, r), E(r, s!1)  -->
 <reaction id="re19" name="E(r,s), R(e) -> E(r,s!1), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD73" species="s1"/>
@@ -413,7 +413,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : E(r,s), R(e) -> E(r!1,s), R(e!1) -->
-<!-- reaction: R(e, r) + E(r, s) -> E(r!1, s), R(e!1, r)  -->
+<!-- reaction: R(e, r) + E(r, s) -> R(e!1, r), E(r!1, s)  -->
 <reaction id="re20" name="E(r,s), R(e) -> E(r!1,s), R(e!1)" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD76" species="s1"/>

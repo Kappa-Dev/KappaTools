@@ -482,7 +482,7 @@ let init_kasa called_from sigs result =
 let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
-  let preenv = Pattern.minimal_env (Pattern.PreEnv.empty sigs_nd) contact_map in
+  let preenv = Pattern.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
     compile_alg_vars ~compileModeOn contact_map preenv result.Ast.variables in

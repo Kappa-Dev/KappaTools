@@ -107,8 +107,6 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 val finish_new : ?origin:Operator.rev_dep -> work ->
   (PreEnv.t*Renaming.t*cc*id)
 
-val minimal_env : PreEnv.t -> Contact_map.t -> PreEnv.t
-
 (** {6 Use a connected component } *)
 
 val compare_canonicals : id -> id -> int

@@ -34,8 +34,8 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <species metaid="CMD8" id="s1" name="U(x, y~u?)" compartment="default" initialAmount="10" substanceUnits="substance"/>
 <species metaid="CMD9" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
 <species metaid="CMD10" id="s3" name="U(x, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD11" id="s4" name="T(x!1), U(x!1, y~u?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD12" id="s5" name="T(x!1), U(x!1, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD11" id="s4" name="U(x!1, y~u?), T(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD12" id="s5" name="U(x!1, y~p?), T(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -46,7 +46,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : bind -->
-<!-- reaction: U(x, y~p?) + T(x) -> T(x!1), U(x!1, y~p?)  -->
+<!-- reaction: U(x, y~p?) + T(x) -> U(x!1, y~p?), T(x!1)  -->
 <reaction id="re1" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD13" species="s2"/>
@@ -86,7 +86,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: T(x!1), U(x!1, y~p?) -> U(x, y~p?) + T(x)  -->
+<!-- reaction: U(x!1, y~p?), T(x!1) -> U(x, y~p?) + T(x)  -->
 <reaction id="re3" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s5"/>
@@ -107,7 +107,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: T(x!1), U(x!1, y~p?) -> T(x) + T(x)  -->
+<!-- reaction: U(x!1, y~p?), T(x!1) -> T(x) + T(x)  -->
 <reaction id="re4" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD26" species="s5"/>
@@ -123,7 +123,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: T(x!1), U(x!1, y~u?) -> U(x, y~u?) + T(x)  -->
+<!-- reaction: U(x!1, y~u?), T(x!1) -> U(x, y~u?) + T(x)  -->
 <reaction id="re5" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD28" species="s4"/>
@@ -144,7 +144,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : essai2 -->
-<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x!1), U(x!1, y~p?)  -->
+<!-- reaction: U(x!1, y~u?), T(x!1) -> U(x!1, y~p?), T(x!1)  -->
 <reaction id="re6" name="essai2" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD33" species="s4"/>
@@ -160,7 +160,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: T(x!1), U(x!1, y~u?) -> T(x) + T(x)  -->
+<!-- reaction: U(x!1, y~u?), T(x!1) -> T(x) + T(x)  -->
 <reaction id="re7" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD35" species="s4"/>
@@ -176,7 +176,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x, y~u?) + T(x) -> T(x!1), U(x!1, y~u?)  -->
+<!-- reaction: U(x, y~u?) + T(x) -> U(x!1, y~u?), T(x!1)  -->
 <reaction id="re8" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD37" species="s1"/>
