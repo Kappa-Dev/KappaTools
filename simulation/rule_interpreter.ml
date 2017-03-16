@@ -26,7 +26,8 @@ type t =
 
     edges: Edges.t;
     tokens: Nbr.t array;
-    outdated_elements: Operator.DepSet.t * bool;
+    nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
+    outdated_elements: Operator.DepSet.t * (int,unit) Hashtbl.t;
 
     random_state : Random.State.t;
     story_machinery :
@@ -89,7 +90,8 @@ let empty ~with_trace random_state env counter =
       variables_overwrite; variables_cache;
       edges = Edges.empty ~with_connected_components;
       tokens = Array.make (Model.nb_tokens env) Nbr.zero;
-      outdated_elements = Operator.DepSet.empty,false;
+      outdated_elements = Operator.DepSet.empty,Hashtbl.create 32;
+      nb_rectangular_instances_by_cc = Mods.IntMap.empty;
       random_state;
       story_machinery =
         if with_trace then
@@ -130,7 +132,8 @@ let add_intset_in_intmap id set map =
   then Mods.IntMap.remove id map
   else Mods.IntMap.add id set map
 
-let update_roots is_add unary_ccs edges map unary_map pattern root =
+let update_roots
+    is_add unary_ccs edges map unary_map mod_connectivity pattern root =
   let va = Pattern.ObsMap.get map pattern in
   let () =
     (if is_add then IntCollection.add else IntCollection.remove) root va in
@@ -140,6 +143,7 @@ let update_roots is_add unary_ccs edges map unary_map pattern root =
     let cc_map' =
       match Edges.get_connected_component root edges with
       | Some cc_id ->
+        let () = Hashtbl.replace mod_connectivity cc_id () in
         let set = Mods.IntMap.find_default Mods.IntSet.empty cc_id cc_map in
         let set' =
           (if is_add then Mods.IntSet.add else Mods.IntSet.remove) root set in
@@ -197,9 +201,11 @@ let all_injections ?excp ?unary_rate domain edges roots patterna =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
 
-let break_apart_cc edges roots_of_unary_patterns = function
+let break_apart_cc edges mod_conn roots_of_unary_patterns = function
   | None -> roots_of_unary_patterns
   | Some (origin_cc,new_cc) ->
+    let () = Hashtbl.replace mod_conn origin_cc () in
+    let () = Hashtbl.replace mod_conn new_cc () in
     Pattern.ObsMap.map
       (fun cc_map ->
          let oset =
@@ -215,9 +221,11 @@ let break_apart_cc edges roots_of_unary_patterns = function
       )
       roots_of_unary_patterns
 
-let merge_cc roots_of_unary_patterns = function
+let merge_cc mod_connectivity roots_of_unary_patterns = function
   | None -> roots_of_unary_patterns
   | Some (cc1,cc2) ->
+    let () = Hashtbl.replace mod_connectivity cc1 () in
+    let () = Hashtbl.replace mod_connectivity  cc2 () in
     Pattern.ObsMap.map
       (fun cc_map ->
          let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc1 cc_map in
@@ -228,23 +236,24 @@ let merge_cc roots_of_unary_patterns = function
       roots_of_unary_patterns
 
 let apply_negative_transformation
-    (side_effects,roots_by_cc,edges) = function
+    mod_connectivity (side_effects,stuff4unaries,edges) = function
   | Primitives.Transformation.Agent (id,_) ->
     let edges' = Edges.remove_agent id edges in
-    (side_effects,roots_by_cc,edges')
+    (side_effects,stuff4unaries,edges')
   | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
     let edges' = Edges.remove_free id s edges in
-    (side_effects,roots_by_cc,edges')
+    (side_effects,stuff4unaries,edges')
   | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
     let edges',cc_modif = Edges.remove_link id s id' s' edges in
-    (side_effects,break_apart_cc edges' roots_by_cc cc_modif,edges')
+    (side_effects,break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,edges')
   | Primitives.Transformation.NegativeWhatEver ((id,_),s) ->
     begin
       match Edges.link_destination id s edges with
-      | None -> (side_effects,roots_by_cc,Edges.remove_free id s edges)
+      | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges)
       | Some ((id',_ as nc'),s') ->
         let edges',cc_modif = Edges.remove_link id s id' s' edges in
-        ((nc',s')::side_effects,break_apart_cc edges' roots_by_cc cc_modif,edges')
+        ((nc',s')::side_effects,
+         break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,edges')
     end
   | Primitives.Transformation.PositiveInternalized _ ->
     raise
@@ -252,23 +261,23 @@ let apply_negative_transformation
          (Locality.dummy_annot "PositiveInternalized in negative update"))
   | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
     let _,edges' = Edges.remove_internal id s edges in
-    (side_effects,roots_by_cc,edges')
+    (side_effects,stuff4unaries,edges')
 
 let apply_positive_transformation
-    sigs (inj2graph,side_effects,roots_by_cc,edges) = function
+    sigs mod_connectivity (inj2graph,side_effects,stuff4unaries,edges) = function
   | Primitives.Transformation.Agent n ->
     let nc, inj2graph',edges' =
       let ty = Matching.Agent.get_type n in
       let id,edges' = Edges.add_agent sigs ty edges in
       (id,ty),new_place id inj2graph n,edges' in
-    (inj2graph',side_effects,roots_by_cc,edges'),
+    (inj2graph',side_effects,stuff4unaries,edges'),
     Primitives.Transformation.Agent nc
   | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
     let (id,_ as nc) = Matching.Agent.concretize inj2graph n in (*(A,23)*)
     let edges' = Edges.add_free id s edges in
     let side_effects' =
       List_util.smart_filter (fun x -> x <> (nc,s)) side_effects in
-    (inj2graph,side_effects',roots_by_cc,edges'),
+    (inj2graph,side_effects',stuff4unaries,edges'),
     Primitives.Transformation.Freed (nc,s)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
     let nc = Matching.Agent.concretize inj2graph n in
@@ -276,7 +285,7 @@ let apply_positive_transformation
     let edges',modif_cc = Edges.add_link nc s nc' s' edges in
     let side_effects' = List_util.smart_filter
         (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
-    (inj2graph,side_effects',merge_cc roots_by_cc modif_cc,edges'),
+    (inj2graph,side_effects',merge_cc mod_connectivity stuff4unaries modif_cc,edges'),
     Primitives.Transformation.Linked ((nc,s),(nc',s'))
   | Primitives.Transformation.NegativeWhatEver _ ->
     raise
@@ -285,7 +294,7 @@ let apply_positive_transformation
   | Primitives.Transformation.PositiveInternalized (n,s,i) ->
     let (id,_ as nc) = Matching.Agent.concretize inj2graph n in
     let edges' = Edges.add_internal id s i edges in
-    (inj2graph,side_effects,roots_by_cc,edges'),
+    (inj2graph,side_effects,stuff4unaries,edges'),
     Primitives.Transformation.PositiveInternalized (nc,s,i)
   | Primitives.Transformation.NegativeInternalized _ ->
     raise
@@ -406,6 +415,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
     state event_kind ?path rule =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
+  let former_deps,mod_connectivity  = state.outdated_elements in
   (*Negative update*)
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
@@ -417,13 +427,14 @@ let update_edges outputs counter domain unary_patterns inj_nodes
       concrete_removed in
   let (side_effects,roots_by_cc,edges_after_neg) =
     List.fold_left
-      apply_negative_transformation
-      ([],state.roots_of_unary_patterns,state.edges) concrete_removed in
+      (apply_negative_transformation mod_connectivity)
+      ([],(state.roots_of_unary_patterns),state.edges)
+      concrete_removed in
   let () =
     List.iter
       (fun (pat,(root,_)) ->
          update_roots false unary_patterns edges_after_neg
-           state.roots_of_patterns roots_by_cc pat root)
+           state.roots_of_patterns roots_by_cc mod_connectivity pat root)
       del_obs in
   (*Positive update*)
   let (final_inj2graph,remaining_side_effects,roots_by_cc',edges'),
@@ -432,10 +443,10 @@ let update_edges outputs counter domain unary_patterns inj_nodes
       (fun (x,p) h ->
          let (x', h') =
            apply_positive_transformation
-             (Pattern.Env.signatures domain) x h in
+             (Pattern.Env.signatures domain) mod_connectivity x h in
          (x',h'::p))
-      (((inj_nodes,Mods.IntMap.empty),side_effects,roots_by_cc,
-        edges_after_neg),[])
+      (((inj_nodes,Mods.IntMap.empty),side_effects,
+        roots_by_cc,edges_after_neg),[])
       rule.Primitives.inserted in
   let (edges'',concrete_inserted') =
     List.fold_left
@@ -451,7 +462,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
     List.iter
       (fun (pat,(root,_)) ->
          update_roots true unary_patterns edges''
-           state.roots_of_patterns roots_by_cc' pat root)
+           state.roots_of_patterns roots_by_cc' mod_connectivity pat root)
       new_obs in
   (*Store event*)
   let new_tracked_obs_instances =
@@ -462,16 +473,8 @@ let update_edges outputs counter domain unary_patterns inj_nodes
       counter final_inj2graph new_tracked_obs_instances event_kind
       ?path remaining_side_effects rule outputs state.story_machinery in
 
-  let former_deps,changed_connectivity  = state.outdated_elements in
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
-  let mod_connectivity =
-    changed_connectivity ||
-    Pattern.ObsMap.fold_lefti
-      (fun i b x ->
-         b || x != Pattern.ObsMap.get state.roots_of_unary_patterns i)
-      false roots_by_cc' in
-
   { outdated = false;
     roots_of_patterns = state.roots_of_patterns;
     roots_of_unary_patterns = roots_by_cc';
@@ -481,6 +484,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
     variables_overwrite = state.variables_overwrite;
     edges = edges''; tokens = state.tokens;
     outdated_elements = rev_deps,mod_connectivity;
+    nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
     random_state = state.random_state;
     story_machinery = state.story_machinery;
   }
@@ -514,29 +518,41 @@ let store_activity store env counter state id syntax_id rate cc_va =
 let update_outdated_activities store env counter state =
   let () = assert (not state.outdated) in
   let deps,changed_connectivity = state.outdated_elements in
-  let unary_rule_update i state rule =
+  let unary_rule_update modified_cc i state rule =
     match rule.Primitives.unary_rate with
     | None -> state
     | Some (unrate, _) ->
       let map1 =
         Pattern.ObsMap.get state.roots_of_unary_patterns
-          rule.Primitives.connected_components.(0)in
+          rule.Primitives.connected_components.(0) in
       let map2 =
         Pattern.ObsMap.get state.roots_of_unary_patterns
-          rule.Primitives.connected_components.(1)in
-      let (),va =
-        Mods.IntMap.monadic_fold2_sparse
-          () ()
-          (fun () () _ set1 set2 acc ->
-             (),(Mods.IntSet.size set1 * Mods.IntSet.size set2) + acc)
-          map1 map2 0 in
+          rule.Primitives.connected_components.(1) in
+      let old_pack =
+        Mods.IntMap.find_default
+          ValMap.empty i state.nb_rectangular_instances_by_cc in
+      let new_pack =
+        Hashtbl.fold
+          (fun cc () i_inst ->
+             let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc map1 in
+             let set2 = Mods.IntMap.find_default Mods.IntSet.empty cc map2 in
+             let new_v = Mods.IntSet.size set1 * Mods.IntSet.size set2 in
+             if new_v = 0 then ValMap.remove cc i_inst
+             else ValMap.add cc new_v i_inst)
+          modified_cc old_pack in
+      let va = ValMap.total new_pack in
+      let nb_rectangular_instances_by_cc =
+        if va = 0 then
+          Mods.IntMap.remove i state.nb_rectangular_instances_by_cc
+        else Mods.IntMap.add i new_pack state.nb_rectangular_instances_by_cc in
       let () =
         store_activity
           store env counter state (2*i+1)
           rule.Primitives.syntactic_rule (fst unrate) va in
       match Mods.IntMap.pop i state.unary_candidates with
-           | None,_ -> state
-           | Some _, match' -> { state with unary_candidates = match' } in
+           | None,_ -> { state with nb_rectangular_instances_by_cc }
+           | Some _, unary_candidates ->
+             { state with nb_rectangular_instances_by_cc; unary_candidates; } in
   let rec aux dep acc =
     Operator.DepSet.fold
       (fun dep (state,perts as acc) ->
@@ -554,19 +570,18 @@ let update_outdated_activities store env counter state =
              store_activity store env counter state (2*i)
                rule.Primitives.syntactic_rule
                (fst rule.Primitives.rate) pattern_va in
-           let state' = if changed_connectivity then state
-             else unary_rule_update i state rule in
-           ((match Mods.IntMap.pop i state'.matchings_of_rule with
-               | None,_ -> state'
+           ((match Mods.IntMap.pop i state.matchings_of_rule with
+               | None,_ -> state
                | Some _, match' ->
-                 { state' with matchings_of_rule = match' }),perts))
+                 { state with matchings_of_rule = match' }),perts))
       dep acc in
   let pack = aux (Model.get_always_outdated env) (state,[]) in
   let state',perts = aux deps pack in
   let state'' =
-    if not changed_connectivity then state'
-    else Model.fold_rules unary_rule_update state' env in
-  ({state'' with outdated_elements = Operator.DepSet.empty,false },perts)
+    if Hashtbl.length changed_connectivity = 0 then state'
+    else Model.fold_rules (unary_rule_update changed_connectivity) state' env in
+  ({state'' with
+    outdated_elements = Operator.DepSet.empty,Hashtbl.create 32},perts)
 
 let overwrite_var i counter state expr =
   let rdeps,changed_connectivity = state.outdated_elements in
@@ -614,20 +629,10 @@ let apply_unary_rule
       let map2 =
         Pattern.ObsMap.get state.roots_of_unary_patterns
            rule.Primitives.connected_components.(1) in
-      let rtree = Random_tree.create
-          (min (Mods.IntMap.size map1) (Mods.IntMap.size map2)) in
-      let (),() =
-        Mods.IntMap.monadic_fold2_sparse
-          () ()
-          (fun () () i set1 set2 () ->
-             let () =
-               Random_tree.add
-                 i (float_of_int
-                      (Mods.IntSet.size set1 * Mods.IntSet.size set2))
-                 rtree in
-             (),())
-          map1 map2 () in
-      let cc_id,_ = Random_tree.random state.random_state rtree in
+      let cc_id = ValMap.random
+          state.random_state
+          (Mods.IntMap.find_default
+             ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
       let root1 =
         Option_util.unsome (-1)
           (Mods.IntSet.random state.random_state

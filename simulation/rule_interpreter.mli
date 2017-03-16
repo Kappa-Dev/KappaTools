@@ -94,13 +94,13 @@ val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)
 val apply_negative_transformation :
-  (Instantiation.concrete Instantiation.site) list *
+  (int,unit) Hashtbl.t -> (Instantiation.concrete Instantiation.site) list *
   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
   (Instantiation.concrete Instantiation.site) list *
   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t
 val apply_positive_transformation :
-  Signature.s ->
+  Signature.s -> (int,unit) Hashtbl.t ->
   (Matching.t * int Mods.IntMap.t) *
   (Instantiation.concrete Instantiation.site) list *
   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->

@@ -16,4 +16,4 @@
 
 %init: 2 A(A1!., A2~n!.)
 
-%mod: [E] = 1 do $STOP
+%mod: [E] = 0 do $STOP

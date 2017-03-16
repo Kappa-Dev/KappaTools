@@ -296,6 +296,8 @@ let rate_name compil rule rule_id =
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
 
+let dummy_htbl = Hashtbl.create 0
+
 let apply compil rule inj_nodes mix =
   let sigs = Model.signatures compil.environment in
   let concrete_removed =
@@ -305,7 +307,7 @@ let apply compil rule inj_nodes mix =
   in
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
-      Rule_interpreter.apply_negative_transformation
+      (Rule_interpreter.apply_negative_transformation dummy_htbl)
       ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
       concrete_removed
   in
@@ -313,7 +315,8 @@ let apply compil rule inj_nodes mix =
     List.fold_left
       (fun (x,p) h ->
          let (x',h') =
-           Rule_interpreter.apply_positive_transformation sigs x h in
+           Rule_interpreter.apply_positive_transformation
+             sigs dummy_htbl x h in
          (x', h' :: p))
       (((inj_nodes, Mods.IntMap.empty),
         side_effects, dummy, edges_after_neg), [])
