@@ -35,14 +35,14 @@ val species_to_lkappa_rule :
   Pattern.cc -> LKappa.rule
 
 val detect_symmetries:
-Remanent_parameters_sig.parameters ->
-Model.t ->
-LKappa_auto.cache ->
-Remanent_parameters_sig.rate_convention ->
-LKappa.rule list ->
-Primitives.elementary_rule list ->
-(string list * (string * string) list) Mods.StringMap.t
-  Mods.StringMap.t -> LKappa_auto.cache * symmetries
+  Remanent_parameters_sig.parameters ->
+  Model.t ->
+  LKappa_auto.cache ->
+  Remanent_parameters_sig.rate_convention ->
+  LKappa.rule list ->
+  Primitives.elementary_rule list ->
+  (string list * (string * string) list) Mods.StringMap.t
+    Mods.StringMap.t -> LKappa_auto.cache * symmetries
 
 val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
