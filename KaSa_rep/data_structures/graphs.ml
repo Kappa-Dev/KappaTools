@@ -133,52 +133,30 @@ let add_bridges ?low ?pre parameters error n_to_string e_to_string graph bridges
         let error, low =
           Nodearray.set parameters error v (min low_v low_w) low
         in
-        (*  let error, low_w = get parameters error w low in
+          let error, low_w = get parameters error w low in
         let error, pre_w = get parameters error w pre in
-            if pre_w = low_w && w<>u*)
-        let error, low_w = get parameters error w low in
-        let error, low_v = get parameters error v low in
-        if low_w <> low_v && w<>u
-        then
-          let error, l_v_opt =
-            Fixed_size_array.get parameters error v graph.node_labels
-          in
-          let error, l_w_opt =
-            Fixed_size_array.get parameters error w graph.node_labels
-          in
-          match l_v_opt, l_w_opt
-          with
-          | None,_ | _,None ->
-            Exception.warn
-              parameters error
-              __POS__ Exit (pre, low, counter, bridges)
-          | Some l_v, Some l_w ->
-            error, (pre,low,counter,(l_v,label,l_w)::bridges)
-        else
-          error, (pre, low, counter, bridges)
+            if pre_w = low_w && w<>u
+            then
+              let error, l_v_opt =
+                Fixed_size_array.get parameters error v graph.node_labels
+              in
+              let error, l_w_opt =
+                Fixed_size_array.get parameters error w graph.node_labels
+              in
+              match l_v_opt, l_w_opt
+              with
+              | None,_ | _,None ->
+                Exception.warn
+                  parameters error
+                  __POS__ Exit (pre, low, counter, bridges)
+              | Some l_v, Some l_w ->
+                error, (pre,low,counter,(l_v,label,l_w)::bridges)
+            else
+              error, (pre, low, counter, bridges)
       )
-    (error, (pre, low, counter, bridges))
-    edges_v in
-    let error, low_u = get parameters error u low in
-    let error, low_v = get parameters error v low in
-    if low_u <> low_v
-    then
-      let error, l_u_opt =
-        Fixed_size_array.get parameters error u graph.node_labels
-      in
-      let error, l_v_opt =
-        Fixed_size_array.get parameters error v graph.node_labels
-      in
-      match l_u_opt, label_opt, l_v_opt
-      with
-      | None,_,_ | _,None,_ | _,_,None ->
-        Exception.warn
-          parameters error
-          __POS__ Exit (pre, low, counter, bridges)
-      | Some l_u, Some label, Some l_v ->
-        error, (pre,low,counter,(l_u,label,l_v)::bridges)
-    else
-      error, (pre, low, counter, bridges)
+      (error, (pre, low, counter, bridges))
+      edges_v in
+        error, (pre, low, counter, bridges)
 
   in
   let error, (pre, low, counter, bridges) =
