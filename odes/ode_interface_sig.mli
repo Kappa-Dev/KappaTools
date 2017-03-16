@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
 *)
 
 module type Interface =
@@ -151,34 +151,15 @@ sig
   val divide_rule_rate_by: cache -> compil -> rule ->
     cache * int
 
-  val cannonic_form_from_syntactic_rules :
-    Remanent_parameters_sig.parameters ->
-    cache ->
-    compil ->
-    chemical_species list ->
-    cache *
-    ((int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int) *
-     (int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int))
-      list *
-    ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
-     (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-      list
 
   val detect_symmetries :
   Remanent_parameters_sig.parameters ->
   compil ->
   cache ->
-  ((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
-   (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-    list ->
-  bool array * int array *
-  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
-  int array ->
-  bool array * int array *
-  ('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
-  int array ->
+  chemical_species list ->
   (string list * (string * string) list) Mods.StringMap.t
     Mods.StringMap.t -> cache * Symmetries.symmetries
+
 
   val print_symmetries:
   Remanent_parameters_sig.parameters ->

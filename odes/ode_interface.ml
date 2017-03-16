@@ -414,11 +414,10 @@ let divide_rule_rate_by cache compil rule =
 (****************************************************************)
 (*cannonic form per rule*)
 
-let cannonic_form_from_syntactic_rules
-    parameters
-    cache
-    compil
-    chemical_species  =
+let detect_symmetries parameters compil cache
+    chemical_species
+    contact_map =
+  let rule_cache = cache.rule_cache in
   let lkappa_rule_list =
     List.fold_left (fun current_list species ->
         let lkappa =
@@ -428,31 +427,19 @@ let cannonic_form_from_syntactic_rules
         lkappa :: current_list
       ) [] chemical_species
   in
-  let rule_cache, cannoic_list, hashed_lists =
-    Symmetries.cannonic_form_from_syntactic_rules
-      cache.rule_cache
-      compil.environment
-      compil.rate_convention
-      lkappa_rule_list
-      (get_rules compil)
-  in
-  {cache with rule_cache = rule_cache}, cannoic_list, hashed_lists
-
-let detect_symmetries parameters compil cache rules
-    arrays arrays_init contact_map =
-  let rule_cache = cache.rule_cache in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
       parameters
       compil.environment
       rule_cache
-      rules
-      arrays
-      arrays_init
+      compil.rate_convention
+      lkappa_rule_list
+      (get_rules compil)
       contact_map
   in
   {cache with rule_cache = rule_cache},
   symmetries
+
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in

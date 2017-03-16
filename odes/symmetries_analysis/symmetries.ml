@@ -635,12 +635,60 @@ let print_symmetries_gen parameters env contact_map
   in
   ()
 
-let detect_symmetries parameters env cache pair_list arrays
-    arrays_init
+  let initial_value_of_arrays cannonic_list arrays =
+    let to_be_checked, rates, correct = arrays in
+    List.iter
+      (fun (i, rate_map, convention_rule) ->
+         let () =
+           correct.(i) <- convention_rule
+         in
+         let () =
+           rates.(i) <-
+             (Rule_modes.add_map (rates.(i)) rate_map)
+         in
+         let () =
+           to_be_checked.(i) <- true
+         in
+         ()
+      ) cannonic_list
+
+let detect_symmetries parameters env cache
+    rate_convention
+    lkappa_rule_list
+    get_rules
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
-  let (hash_and_rule_list, hash_and_rule_list_init) =
-    List.split pair_list
+  (*-------------------------------------------------------------*)
+  let cache, pair_cannonic_list, pair_list =
+    cannonic_form_from_syntactic_rules
+      cache
+      env
+      rate_convention
+      lkappa_rule_list
+      get_rules
+  in
+  let hash_and_rule_list, hash_and_rule_list_init =
+    List.split pair_list in
+  let cannonic_list, init_cannonic_list =
+    List.split pair_cannonic_list
+  in
+  let to_be_checked_init, counter_init, rates_init, correct_init =
+    build_array_for_symmetries
+      (List.rev_map fst (List.rev hash_and_rule_list_init))
+  in
+  let () =
+    initial_value_of_arrays init_cannonic_list
+      (to_be_checked_init, rates_init, correct_init)
+  in
+  (********************************************************)
+  (*detect symmetries for rules*)
+  let to_be_checked, counter, rates, correct =
+    build_array_for_symmetries
+      (List.rev_map fst (List.rev hash_and_rule_list))
+  in
+  let () =
+    initial_value_of_arrays cannonic_list
+      (to_be_checked, rates, correct)
   in
   (*-------------------------------------------------------------*)
   (*PARTITION A CONTACT MAP RETURN A LIST OF LIST OF SITES*)
@@ -656,7 +704,6 @@ let detect_symmetries parameters env cache pair_list arrays
   let p' = Array.copy partitioned_contact_map_in_lkappa in
   (*-------------------------------------------------------------*)
   (*rules*)
-  let to_be_checked, counter, rates, correct = arrays in
   let (cache, _, _), refined_partitioned_contact_map =
     let parameters, env = Some parameters, Some env in
     refine_partitioned_contact_map_in_lkappa_representation
@@ -677,8 +724,6 @@ let detect_symmetries parameters env cache pair_list arrays
   in
   (*-------------------------------------------------------------*)
   (*rule and initial states*)
-  let to_be_checked_init, counter_init, rates_init, correct_init =
-    arrays_init in
   (*a copy of refined partition of rules*)
   let refined_partitioned_contact_map_copy =
     Array.copy refined_partitioned_contact_map

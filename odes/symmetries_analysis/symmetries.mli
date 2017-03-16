@@ -30,57 +30,17 @@ type symmetries =
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
 
-val rate : Primitives.elementary_rule ->
-  int * Rule_modes.arity * Rule_modes.direction ->
-  Alg_expr.t Locality.annot option
-
-val valid_modes :
-  Primitives.elementary_rule -> int ->
-  (int * Rule_modes.arity * Rule_modes.direction) list
-
 val species_to_lkappa_rule :
   Remanent_parameters_sig.parameters -> Model.t ->
   Pattern.cc -> LKappa.rule
-
-val build_array_for_symmetries:
-  LKappa_auto.RuleCache.hashed_list list ->
-  bool array * int array * 'a Rule_modes.RuleModeMap.t array * int
-    array
-
-val divide_rule_rate_by :
-  LKappa_auto.cache ->
-  Model.t ->
-  Remanent_parameters_sig.rate_convention ->
-  Primitives.elementary_rule ->
-  LKappa.rule -> LKappa_auto.cache * int * int
-
-val cannonic_form_from_syntactic_rules :
-LKappa_auto.cache ->
-Model.t ->
-Remanent_parameters_sig.rate_convention ->
-LKappa.rule list ->
-Primitives.elementary_rule list ->
-LKappa_auto.cache *
-((int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int) *
- (int * Alg_expr.t Locality.annot Rule_modes.RuleModeMap.t * int))
-  list *
-((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
- (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-  list
 
 val detect_symmetries:
 Remanent_parameters_sig.parameters ->
 Model.t ->
 LKappa_auto.cache ->
-((LKappa_auto.RuleCache.hashed_list * LKappa.rule) *
- (LKappa_auto.RuleCache.hashed_list * LKappa.rule))
-  list ->
-bool array * int array *
-('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
-int array ->
-bool array * int array *
-('c, 'd) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array *
-int array ->
+Remanent_parameters_sig.rate_convention ->
+LKappa.rule list ->
+Primitives.elementary_rule list ->
 (string list * (string * string) list) Mods.StringMap.t
   Mods.StringMap.t -> LKappa_auto.cache * symmetries
 

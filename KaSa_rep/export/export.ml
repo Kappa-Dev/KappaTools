@@ -1444,46 +1444,14 @@ let compute_symmetries
       let rate_convention =
         Remanent_parameters.get_rate_convention parameters
       in
-      let cache, pair_cannonic_list, pair_list =
-        Symmetries.cannonic_form_from_syntactic_rules
-          cache
-          env
-          rate_convention
-          lkappa_rules_init
-          rules
-      in
-      let pair_rule_list, pair_init_list = List.split pair_list in
-      let cannonic_list, init_cannonic_list =
-        List.split pair_cannonic_list
-      in
-      (*init*)
-      let to_be_checked_init, counter_init,
-          rates_init, correct_init =
-        Symmetries.build_array_for_symmetries
-          (List.rev_map fst (List.rev pair_init_list))
-      in
-      let () =
-        initial_value_of_arrays init_cannonic_list
-          (to_be_checked_init, rates_init, correct_init)
-      in
-      (*rules*)
-      let to_be_checked, counter, rates, correct =
-        Symmetries.build_array_for_symmetries
-          (List.rev_map fst (List.rev pair_rule_list))
-      in
-      let () =
-        initial_value_of_arrays cannonic_list
-          (to_be_checked, rates, correct)
-      in
-      let cache, symmetries =
+      let cache, symmetries = (*TODO: store cache?*)
         Symmetries.detect_symmetries
           parameters
           env
           cache
-          pair_list
-          (to_be_checked, counter, rates, correct)
-          (to_be_checked_init, counter_init, rates_init,
-           correct_init)
+          rate_convention
+          lkappa_rules_init
+          rules
           contact_map
       in
       state, Some symmetries

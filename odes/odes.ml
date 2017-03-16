@@ -2320,26 +2320,6 @@ struct
 (*compute symmetries *)
 (*********************)
 
-(****************************************************************)
-(*for each array*)
-
-  let initial_value_of_arrays cannonic_list arrays =
-    let to_be_checked, rates, correct = arrays in
-    List.iter
-      (fun (i, rate_map, convention_rule) ->
-         let () =
-           correct.(i) <- convention_rule
-         in
-         let () =
-           rates.(i) <-
-             (Rule_modes.add_map (rates.(i)) rate_map)
-         in
-         let () =
-           to_be_checked.(i) <- true
-         in
-         ()
-      ) cannonic_list
-
   let compute_symmetries_from_model parameters compil network
       contact_map =
     let () = Format.printf "+ compute symmetric sites... @." in
@@ -2350,43 +2330,12 @@ struct
       species_of_initial_state compil network (I.get_init compil)
     in
     let cache = network.cache in
-    let cache, pair_cannonic_list, pair_list =
-      I.cannonic_form_from_syntactic_rules
-        parameters
-        cache
-        compil
-        chemical_species
-    in
-    let pair_rule_list, pair_init_list = List.split pair_list in
-    let cannonic_list, init_cannonic_list =
-      List.split pair_cannonic_list
-    in
-    let to_be_checked_init, counter_init, rates_init, correct_init =
-      Symmetries.build_array_for_symmetries
-        (List.rev_map fst (List.rev pair_init_list))
-    in
-    let () =
-      initial_value_of_arrays init_cannonic_list
-        (to_be_checked_init, rates_init, correct_init)
-    in
-    (********************************************************)
-    (*detect symmetries for rules*)
-    let to_be_checked, counter, rates, correct =
-      Symmetries.build_array_for_symmetries
-        (List.rev_map fst (List.rev pair_rule_list))
-    in
-    let () =
-      initial_value_of_arrays cannonic_list
-        (to_be_checked, rates, correct)
-    in
     let cache, symmetries =
       I.detect_symmetries
         parameters
         compil
         cache
-        pair_list
-        (to_be_checked, counter, rates, correct)
-        (to_be_checked_init, counter_init, rates_init, correct_init)
+        chemical_species
         contact_map
     in
     let network =
