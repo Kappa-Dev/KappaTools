@@ -1184,6 +1184,12 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
   let error, pre =
     Graphs.Nodearray.create parameters error 1
   in
+  let error, on_stack =
+    Graphs.Nodearray.create parameters error 1
+  in
+  let error, scc =
+    Graphs.Nodearray.create parameters error 1
+  in
   let () = Ckappa_sig.Views_intbdu.import_handler handler in
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
@@ -1238,11 +1244,12 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let error, (pre, low, bridges, log_info) =
+  let error, (pre, low, on_stack, scc, bridges, log_info) =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
-      (fun parameters error agent_type map (pre,low,bridges,log_info) ->
+      (fun parameters error agent_type map
+        (pre,low,on_stack,scc, bridges,log_info) ->
          let error, support =
            Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs parameters error
              LabelMap.empty agent_type support
@@ -1264,7 +1271,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
              Exception.warn parameters error error' __POS__ Exit
          in
          Wrapped_modules.LoggedIntMap.fold
-           (fun _ mvbdu (error, (pre,low,bridges,log_info)) ->
+           (fun _ mvbdu (error, (pre,low,on_stack,scc,bridges,log_info)) ->
               try
                 begin
                   let sites =
@@ -1636,9 +1643,9 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                       edges
                   in
                   let
-                    error, (pre,low,bridges) =
+                    error, (pre,low,on_stack,scc,bridges) =
                     Graphs.add_bridges
-                      ~low ~pre
+                      ~low ~pre ~on_stack ~scc
                       parameters error
                       (fun n -> n)
                       (fun e ->
@@ -1646,14 +1653,14 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                       graph bridges
                   in
                   error,
-                  (pre,low,bridges,log_info)
+                  (pre,low,on_stack,scc,bridges,log_info)
                 end
-              with Sys.Break -> error, (pre,low,bridges,log_info)
+              with Sys.Break -> error, (pre,low,on_stack,scc,bridges,log_info)
            )
            map
-           (error, (pre,low,bridges,log_info)))
+           (error, (pre,low,on_stack,scc,bridges,log_info)))
       output
-      (pre,low,bridges,log_info)
+      (pre,low,on_stack,scc,bridges,log_info)
   in
   let bridges =
     if Remanent_parameters.get_compute_separating_transitions parameters

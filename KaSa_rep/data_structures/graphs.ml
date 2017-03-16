@@ -1,3 +1,5 @@
+let local_trace = false
+
 type node = int
 
 let node_of_int x = x
@@ -75,17 +77,75 @@ let get parameters error i t =
   with error, Some i -> error, i
      | error, None -> error, -1
 
-let add_bridges ?low ?pre parameters error n_to_string e_to_string graph bridges =
-  let error, low, pre =
-    match low,pre with
-    | Some low, Some pre -> error, low,pre
-    | None, _ | _, None  ->
+let get_b parameters error i t =
+  match Nodearray.unsafe_get parameters error i t
+  with error, Some i -> error, i
+     | error, None -> error, false
+
+let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_string graph bridges =
+  let error =
+    if local_trace || Remanent_parameters.get_trace parameters
+    then
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "COMPUTE BRIDGE: \n Graph: \n Nodes: \n"
+      in
+      let error =
+        Fixed_size_array.iter
+          parameters error
+          (fun parameters error i j ->
+             let () =
+               Loggers.fprintf
+               (Remanent_parameters.get_logger parameters)
+               "%i %s;\n"
+               i (n_to_string j) in
+             error)
+          graph.node_labels
+      in
+      let error =
+        Fixed_size_array.iter
+          parameters error
+          (fun parameters error i l ->
+             let () =
+               Loggers.fprintf
+                 (Remanent_parameters.get_logger parameters)
+                 "%i:" i
+              in
+             let error =
+               List.fold_left
+                 (fun error (j,_) ->
+                    let () =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters)
+                        "%i," j
+                    in
+                    error)
+                 error
+                 l
+             in
+             let () =
+               Loggers.print_newline
+                 (Remanent_parameters.get_logger parameters)
+             in
+             error)
+          graph.edges
+      in
+      error
+    else
+      error
+  in
+  let error, low, pre, on_stack, scc =
+    match low, pre, on_stack, scc with
+    | Some low, Some pre, Some on_stack, Some scc ->
+      error, low, pre, on_stack, scc
+    | None, _, _, _| _, None, _, _| _, _, None,_ | _,_,_,None  ->
       let error, max_node =
         Fixed_size_array.fold
           parameters error
           (fun _parameter error i _ j -> error, max (int_of_node i) j)
           graph.node_labels
-          0
+              0
       in
       let error, low =
         match low with
@@ -97,14 +157,28 @@ let add_bridges ?low ?pre parameters error n_to_string e_to_string graph bridges
         | Some pre -> error, pre
         | None -> Nodearray.create parameters error 1
       in
-      error, low, pre
+      let error, on_stack =
+        match on_stack with
+        | Some on_stack -> error, on_stack
+        | None -> Nodearray.create parameters error 1
+      in
+      let error, scc =
+        match scc with
+        | Some scc -> error, scc
+        | None -> Nodearray.create parameters error 1
+      in
+      error, low, pre, on_stack, scc
   in
-  let rec aux parameters error pre low counter bridges label_opt u v =
+  let rec aux parameters error pre low on_stack scc stack counter bridges label_opt u v =
     let error, pre  =
       Nodearray.set parameters error v counter pre
     in
     let error, low  =
       Nodearray.set parameters error v counter low
+    in
+    let stack = v::stack in
+    let error, on_stack =
+      Nodearray.set parameters error v true on_stack
     in
     let counter = succ counter in
     let error, edges_v =
@@ -114,86 +188,125 @@ let add_bridges ?low ?pre parameters error n_to_string e_to_string graph bridges
       | error, Some a ->
         error, a
     in
-    let error, (pre, low, counter, bridges)
+    let error, (pre, low, counter, on_stack, scc, stack, bridges)
       =
       List.fold_left
       (fun
-        (error, (pre, low, counter, bridges))
+        (error, (pre, low, counter, on_stack, scc, stack, bridges))
         (w,label) ->
         let error, pre_w = get parameters error w pre in
-        let error, (pre, low, counter, bridges) =
+        let error, (pre, low, counter, on_stack, scc, stack, bridges) =
           if pre_w = -1
           then
-            aux parameters error pre low counter bridges (Some label) v w
+            aux parameters error pre low on_stack scc stack counter bridges (Some label) v w
           else
-            error, (pre, low, counter, bridges)
+            error, (pre, low, counter, on_stack, scc, stack, bridges)
         in
-        let error, low_v = get parameters error v low in
-        let error, low_w = get parameters error w low in
+        let error, on_stack_w = get_b parameters error w on_stack in
         let error, low =
-          Nodearray.set parameters error v (min low_v low_w) low
+          if pre_w = -1 || on_stack_w
+          then
+            let error, low_v = get parameters error v low in
+            let error, low_w = get parameters error w low in
+              Nodearray.set parameters error v (min low_v low_w) low
+          else
+            error, low
         in
-          let error, low_w = get parameters error w low in
-        let error, pre_w = get parameters error w pre in
-            if pre_w = low_w && w<>u
-            then
-              let error, l_v_opt =
-                Fixed_size_array.get parameters error v graph.node_labels
-              in
-              let error, l_w_opt =
-                Fixed_size_array.get parameters error w graph.node_labels
-              in
-              match l_v_opt, l_w_opt
-              with
-              | None,_ | _,None ->
-                Exception.warn
-                  parameters error
-                  __POS__ Exit (pre, low, counter, bridges)
-              | Some l_v, Some l_w ->
-                error, (pre,low,counter,(l_v,label,l_w)::bridges)
-            else
-              error, (pre, low, counter, bridges)
-      )
-      (error, (pre, low, counter, bridges))
-      edges_v in
-        error, (pre, low, counter, bridges)
+        (error, (pre, low, counter, on_stack, scc, stack, bridges)))
+      (error, (pre, low, counter, on_stack, scc, stack, bridges))
+      edges_v
+    in
+    let error, low_v = get parameters error v low in
+    let error, pre_v = get parameters error v pre in
+    let error, low, on_stack, scc, stack =
+      if low_v = pre_v then
+        match stack
+        with [] ->
+          error, low, on_stack, scc, stack
+           | h::_ ->
+             let error, k = get parameters error h pre in
+             let rec aux error k low on_stack scc stack =
+               match stack with
+               | [] -> error, low, on_stack, scc, stack
+               | h::t ->
 
+                 let error, scc =
+                   Nodearray.set parameters error h k scc
+                 in
+                 let error, on_stack =
+                   Nodearray.set parameters error h false on_stack
+                 in
+                 if h=v
+                 then
+                   error, low, on_stack, scc, stack
+                 else
+                   aux error k low on_stack scc t
+             in
+             aux error k low on_stack scc stack
+      else
+        error, low, on_stack, scc, stack
+    in
+    (error, (pre, low, counter, on_stack, scc, stack, bridges))
   in
-  let error, (pre, low, counter, bridges) =
+  let error, (pre, low, counter, on_stack, scc, stack, bridges) =
     Fixed_size_array.fold
       parameters error
-      (fun parameters error  v _ ( pre, low, counter,bridges) ->
+      (fun parameters error  v _ ( pre, low, counter, on_stack, scc, stack, bridges) ->
          let error, pre_v = get parameters error v pre in
          if pre_v = -1 then
-           aux parameters error pre low counter bridges None v v
+           aux parameters error pre low on_stack scc stack counter bridges None v v
          else
-           error, (pre, low, counter, bridges))
+           error, (pre, low, counter, on_stack, scc, stack, bridges))
       graph.node_labels
-      (pre, low, 1, bridges)
+      (pre, low, 1, on_stack, scc, [], bridges)
   in
   let () =
-    Printf.fprintf stdout "PRE"
+    if local_trace ||
+       Remanent_parameters.get_trace parameters
+    then
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "PRE"
+      in
+      let _ =
+        Nodearray.iter
+          parameters error
+          (fun parameters error i j ->
+             let () =
+               Loggers.fprintf
+                 (Remanent_parameters.get_logger parameters)
+                 "%i,%i;" i j
+             in error)
+          pre
+      in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n"
+    in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "LOW"
+    in
+    let _ =
+      Nodearray.iter
+        parameters error
+        (fun parameters error i j ->
+           let () =
+             Loggers.fprintf (Remanent_parameters.get_logger parameters)
+              "%i,%i;" i j in error)
+        low
+    in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n" in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "SCC"
+    in
+    let _ =
+      Nodearray.iter
+        parameters error
+        (fun parameters error i j ->
+           let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+              "%i,%i;" i j in error)
+        scc
+    in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n" in
+    ()
   in
-  let _ =
-    Nodearray.iter
-      parameters error
-      (fun parameters error i j ->
-         let () = Printf.fprintf stdout "%i,%i," i j in error)
-      pre
-  in
-  let () = Printf.fprintf stdout "\n" in
-  let () =
-    Printf.fprintf stdout "LOW"
-  in
-  let _ =
-    Nodearray.iter
-      parameters error
-      (fun parameters error i j ->
-         let () = Printf.fprintf stdout "%i,%i," i j in error)
-      low
-  in
-  let () = Printf.fprintf stdout "\n" in
-
   let error, (pre, low) =
     Fixed_size_array.fold
       parameters error
@@ -204,4 +317,4 @@ let add_bridges ?low ?pre parameters error n_to_string e_to_string graph bridges
       graph.node_labels
       (pre, low)
   in
-  error, (pre, low, bridges)
+  error, (pre, low, on_stack, scc, bridges)
