@@ -458,14 +458,18 @@ function Render(id,contactMap){
     var node = that.root.node();
     var width = Math.max(400, node.offsetWidth);
     var height = Math.max(2*width/3, node.offsetHeight);
-    that.layout = new Layout(contactMap,new Dimensions( height, width));
+
+    var count = that.contactMap.data && that.contactMap.data.length > 2?that.contactMap.data.length:1;
+    var scale = count/3.0;
+
+    that.layout = new Layout(contactMap,new Dimensions( height*scale, width*scale));
     that.svg = that.root
         .append('svg')
         .attr("class","svg-group")
-        .attr("width", that.layout.dimensions.width +
+        .attr("width", width +
                        that.layout.margin.left +
                        that.layout.margin.right)
-        .attr("height", that.layout.dimensions.height +
+        .attr("height", height +
                         that.layout.margin.top +
                         that.layout.margin.bottom);
     createSVGDefs(that.svg);
@@ -473,19 +477,24 @@ function Render(id,contactMap){
                        .attr("transform",
                              "translate(" + that.layout.margin.left +
                                         "," + that.layout.margin.top +
-                                      ")");
-    that.svg.append("rect")
-	    .attr("width", width)
-	    .attr("height", height)
-	    .style("fill", "none")
-	    .style("pointer-events", "all")
-	    .call(d3.zoom()
-	    .scaleExtent([1 / 2, 4])
-	    .on("zoom", zoomed));
+                             ")");
+    that.zoom = that.svg.append("g");
+    that.svg = that.zoom.append("g");
 
-    function zoomed() {
-	that.svg.attr("transform", d3.event.transform);
+    that.zoom.call(d3.zoom().on("zoom",
+	  		        function () { that.transform = d3.event.transform;
+					      that.svg.attr("transform", d3.event.transform); }));
+
+    if(count > 4){
+	var t = d3.zoomIdentity.scale(3.0/count);
+	d3.zoom().transform(that.zoom,t);
+	that.svg.attr("transform",t);
     }
+
+    that.svg.append("rect")
+	    .attr("width", 100*width)
+	    .attr("height", 100*height)
+         	         .style("fill","#ffffff");
 
     // http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
 //    if (!$(".contact-tooltip").length){
