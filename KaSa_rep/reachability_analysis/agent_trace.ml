@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 16 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1588,12 +1588,9 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                     else
                       error, log_info
                   in
-                  let array =
-                    Graphs.NodeMap.empty
-                  in
-                  let error, nodes, node_labels =
+                    let error, nodes, node_labels =
                     List.fold_left
-                      (fun (error, l, map) mvbdu ->
+                      (fun (error, nodes, node_labels) mvbdu ->
                            let error, node =
                              hash_of_mvbdu parameters error mvbdu
                            in
@@ -1602,13 +1599,13 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                              string_label_of_asso parameters error handler_kappa transition_system list in
                            let node = Graphs.node_of_int node in
                            error,
-                           node::l,
-                           Graphs.NodeMap.add node label array)
+                           node::nodes,
+                           Graphs.NodeMap.add node label node_labels)
                       (error, [], Graphs.NodeMap.empty)
                       transition_system.nodes
                   in
                   let node_label node =
-                    Graphs.NodeMap.find_default "" node array
+                    Graphs.NodeMap.find_default "" node node_labels
                   in
                   let error, edges =
                     List.fold_left
@@ -1658,11 +1655,18 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
       output
       (pre,low,bridges,log_info)
   in
+  let bridges =
+    if Remanent_parameters.get_compute_separating_transitions parameters
+    then
+      Some bridges
+    else
+      None
+  in
   match
     Ckappa_sig.Views_intbdu.export_handler error
   with
-  | error, Some h -> error, log_info, h
+  | error, Some h -> error, log_info, h, bridges
   | error, None ->
     let error, h =
       Exception.warn parameters error __POS__ Exit handler in
-    error, log_info, h
+    error, log_info, h, bridges

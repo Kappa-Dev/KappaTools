@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 15 2017>
+   * Last modification: Time-stamp: <Mar 16 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -79,7 +79,6 @@ struct
 
   let get_domain_static static = static.domain_static_information
 
-  (*TODO*)
   let set_domain_static_pattern domain static =
     {
       static with
@@ -132,19 +131,6 @@ struct
 
   let get_remanent_triple static =
     lift Analyzer_headers.get_remanent_triple static
-
-  (*let get_new_index_pair_map static =
-    lift Analyzer_headers.get_new_index_pair_map static*)
-
-  (*let get_covering_classes static =
-    (get_domain_static static).Bdu_static_views.store_covering_classes*)
-
-  (*let get_list_of_site_type_in_covering_classes static =
-    (get_domain_static
-       static).Bdu_static_views.store_list_of_site_type_in_covering_classes*)
-
-  (*let get_covering_classes_id static =
-    (get_domain_static static).Bdu_static_views.store_covering_classes_id*)
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -204,6 +190,16 @@ struct
       {
         (get_local_dynamic_information dynamic) with
         ranges = Some ranges
+      } dynamic
+
+  let get_separating_transitions dynamic =
+    (get_local_dynamic_information dynamic).separating_edges
+
+  let set_separating_transitions sep_edges dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+        separating_edges = Some sep_edges
       } dynamic
 
   (** bdu analysis dynamic in local dynamic information*)
@@ -4005,6 +4001,40 @@ struct
       parameters handler error handler_kappa
 
   (*****************************************************************)
+  let print_separating_edges
+      parameters handler error compil handler_kappa list =
+    let log = Remanent_parameters.get_logger parameters in
+    let () = Loggers.print_newline log in
+    let () =
+      Loggers.fprintf log
+        "------------------------------------------------------------" in
+    let () = Loggers.print_newline log in
+    let error, handler  =
+      match list with
+      | [] ->
+        let () = Loggers.fprintf log "There is no separating transitions" in
+        error, handler 
+      | _::_ ->
+        let () = Loggers.fprintf log "The following transitions are separating:" in
+        let () = Loggers.print_newline log in
+        let error =
+          List.fold_left
+            (fun error (s1,r_id,s2) ->
+               let error, r =
+                 Handler.string_of_rule parameters error handler_kappa compil
+                  r_id
+               in
+               let () =
+                 Loggers.fprintf log "%s %s %s"
+                   s1 r s2
+               in
+               let () = Loggers.print_newline log in
+               error)
+            error list
+        in
+        let () = Loggers.print_newline log in
+        error, handler
+    in error, handler
 
   let print_result_fixpoint_aux
       parameters handler error handler_kappa
@@ -4102,6 +4132,19 @@ struct
       get_store_remanent_triple static error in*)
     let fixpoint_result = get_fixpoint_result dynamic in
     let handler = get_mvbdu_handler dynamic in
+    let compil = get_compil static in
+    let error, handler =
+      if local_trace
+      || Remanent_parameters.get_compute_separating_transitions parameters
+      then
+        match get_separating_transitions dynamic
+        with
+        | None -> error, handler
+        | Some l ->
+          print_separating_edges parameters handler error compil kappa_handler l
+      else
+        error, handler
+    in
     let error, handler =
       if local_trace
       || Remanent_parameters.get_dump_reachability_analysis_result parameters
@@ -4135,6 +4178,7 @@ struct
     let error, dynamic =
       (* local traces *)
       if Remanent_parameters.get_compute_local_traces parameters
+         || Remanent_parameters.get_compute_separating_transitions parameters
       then
         let handler_kappa = get_kappa_handler static in
         let handler = get_mvbdu_handler dynamic in
@@ -4153,10 +4197,16 @@ struct
             site_correspondence
             (get_fixpoint_result dynamic)
         in
-        let error, log_info, handler =
+        let error, log_info, handler, bridges =
           Agent_trace.agent_trace parameters (get_log_info dynamic) error
             handler (get_global_static_information static) handler_kappa compil
             output
+        in
+        let dynamic =
+          match bridges
+          with
+          | None -> dynamic
+          | Some bridges -> set_separating_transitions bridges dynamic
         in
         error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else

@@ -235,6 +235,8 @@ let add_debugging_parameters_to_reachability_map reachability =
           end;
         Remanent_parameters_sig.compute_local_traces =
           !Config.compute_local_traces;
+        Remanent_parameters_sig.compute_separating_transitions =
+          !Config.compute_separating_transitions;
         Remanent_parameters_sig.ignore_trivial_losanges =
           !Config.do_not_compress_trivial_losanges;
         Remanent_parameters_sig.add_singular_macrostates =

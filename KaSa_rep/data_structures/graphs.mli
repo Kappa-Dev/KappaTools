@@ -26,7 +26,7 @@ val add_bridges:
   ('a -> string) ->
   ('b -> string) ->
   ('a, 'b) graph ->
-  (Nodearray.key * 'b * Nodearray.key) list ->
+  ('a  * 'b * 'a) list ->
   Exception.method_handler *
   (int Nodearray.t * int Nodearray.t *
-   (Nodearray.key * 'b * Nodearray.key) list)
+   ('a * 'b * 'a) list)
