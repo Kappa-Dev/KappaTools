@@ -1633,7 +1633,35 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                       )
                       (error, []) transition_system.edges
                   in
-                  (* to do deal with hyper edges *)
+                  let edges =
+                    Mods.IntMap.fold
+                      (fun key l edges ->
+                         if Mods.IntSet.is_empty l
+                         then
+                           edges
+                         else
+                           let first_last, edges =
+                             Mods.IntSet.fold
+                               (fun next (first_last,edges) ->
+                                  let next = Graphs.node_of_int next in 
+                                  match first_last
+                                  with
+                                  | None -> (Some (next,next),edges)
+                                  | Some (first,last)
+                                    ->
+                                    Some (first, next),
+                                    ((last,Ckappa_sig.dummy_rule_id,next)::edges))
+                               l
+                               (None,edges)
+                           in
+                           match first_last with
+                           | None -> edges
+                           | Some (x,y) when x=y -> edges
+                           | Some (first,last) ->
+                               (last,Ckappa_sig.dummy_rule_id,first)::edges)
+                      transition_system.subframe
+                      edges
+                  in
                   let graph =
                     Graphs.create
                       parameters
