@@ -27,9 +27,9 @@ C(x1~p, x2~p)
 _____(1)
 -C(x1~p, x2~p)
 _____(1)
-+C(x1~u, x2~u)
++C(x1~u!., x2~u!.)
 _____(1)
-+B(x), +A(x, c)
++B(x!.), +A(x!., c!.)
 Environment:
   
   %var:/*0*/ 'on_rate' 0.001

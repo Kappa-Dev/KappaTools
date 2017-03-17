@@ -68,10 +68,10 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
         __POS__
         parameters
         (fun fmt ->
-           Raw_mixture.print ~compact:false ~created:false ~sigs
-             fmt mix)
+           Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+             ~sigs fmt mix)
         (fun fmt ->
-           Raw_mixture.print ~compact:false ~created:false
+           Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
              fmt mix)
   in
   let unspec =
@@ -339,10 +339,10 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
         safe_print_str
           __POS__ parameters
           (fun fmt ->
-             Raw_mixture.print ~compact:false ~created:false ~sigs
-               fmt output)
+             Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+               ~sigs fmt output)
           (fun fmt ->
-             Raw_mixture.print ~compact:false ~created:false
+             Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
                fmt output)
       in
       Some (output, unspec)

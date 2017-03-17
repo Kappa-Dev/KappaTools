@@ -226,7 +226,8 @@ let print_rhs ~ltypes sigs created f mix =
     | [] ->
       Format.fprintf f "%t%a"
         (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~compact:true ~created:false ~sigs) created
+        (Raw_mixture.print ~new_syntax:false ~compact:true ~created:false ~sigs)
+        created
     | h :: t ->
       if h.ra_erased then aux empty t
       else
@@ -269,7 +270,8 @@ let print_rule ~full sigs pr_tok pr_var f r =
          Format.fprintf f "%a%t%a"
            (print_rule_mixture sigs ~ltypes:false) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
-           (Raw_mixture.print ~sigs ~compact:false ~created:true) r.r_created
+           (Raw_mixture.print ~new_syntax:true ~compact:false ~created:true ~sigs)
+           r.r_created
        else Format.fprintf f "%a -> %a"
            (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix
            (print_rhs ~ltypes:false sigs r.r_created) r.r_mix)

@@ -19,8 +19,8 @@ type agent =
 
 type t = agent list
 
-let print_link f = function
-  | FREE -> ()
+let print_link ~new_syntax f = function
+  | FREE -> if new_syntax then Format.pp_print_string f "!."
   | VAL i -> Format.fprintf f "!%i" i
 
 let aux_pp_si sigs a s f i =
@@ -31,7 +31,7 @@ let aux_pp_si sigs a s f i =
     | Some i -> Format.fprintf f "%i~%i" s i
     | None -> Format.pp_print_int f s
 
-let print_intf compact with_link ?sigs ag_ty f (ports,ints) =
+let print_intf ~new_syntax compact with_link ?sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
@@ -39,7 +39,8 @@ let print_intf compact with_link ?sigs ag_ty f (ports,ints) =
           (if empty then Pp.empty
            else if compact then Pp.compact_comma else Pp.comma)
           (aux_pp_si sigs ag_ty i)
-          ints.(i) (if with_link then print_link else (fun _ _ -> ()))
+          ints.(i)
+          (if with_link then print_link ~new_syntax else (fun _ _ -> ()))
           ports.(i) in
       aux false (succ i) in
   aux true 0
@@ -49,14 +50,15 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent compact created link ?sigs f ag =
+let print_agent ~new_syntax compact created link ?sigs f ag =
   Format.fprintf f "%t%a(@[<h>%a@])"
     (fun f -> if created then Format.pp_print_string f "+")
     (aux_pp_ag sigs) ag.a_type
-    (print_intf compact link ?sigs ag.a_type) (ag.a_ports, ag.a_ints)
+    (print_intf ~new_syntax compact link ?sigs ag.a_type)
+    (ag.a_ports, ag.a_ints)
 
-let print ~compact ~created ?sigs f mix =
-  Pp.list Pp.comma (print_agent compact created true ?sigs) f mix
+let print ~new_syntax ~compact ~created ?sigs f mix =
+  Pp.list Pp.comma (print_agent ~new_syntax compact created true ?sigs) f mix
 
 let agent_to_json a =
   `Assoc
@@ -111,7 +113,7 @@ let print_dot sigs nb_cc f mix =
     (fun i f ag ->
        Format.fprintf
          f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-         nb_cc i (print_agent true false false ~sigs) ag
+         nb_cc i (print_agent ~new_syntax:false true false false ~sigs) ag
          (get_color ag.a_type);
        Format.fprintf
          f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;

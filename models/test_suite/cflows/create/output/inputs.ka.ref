@@ -10,11 +10,11 @@
 %plot: [T]
 A(x!./!1), A(y!./!1) @ 0.001
 A(x!_/!.) @ 1
-'x++' A(x~u/~p!1/!.), A(x/~u?/!., y!1/!.), +A(x~u, y) @ 1
+'x++' A(x~u/~p!1/!.), A(x/~u?/!., y!1/!.), +A(x~u!., y!.) @ 1
 'GOAL' -A(x~p!., y?) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x~p!.) [true]
 
-%init: 1000 A(x~u, y)
+%init: 1000 A(x~u!., y!.)
 
 %mod: [E] = 500 do $STOP

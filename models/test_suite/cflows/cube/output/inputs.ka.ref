@@ -18,6 +18,6 @@
 
 /*0*/%mod: [true] do $TRACK A(x~p, y~u, z~p) [true]
 
-%init: 10000 A(x~u, y~u, z~u)
+%init: 10000 A(x~u!., y~u!., z~u!.)
 
 %mod: [E] = 30000 do $STOP

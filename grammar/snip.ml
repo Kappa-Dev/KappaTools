@@ -663,7 +663,8 @@ let connected_components_sum_of_ambiguous_rule
                 f "@[%a%t%a@]"
                 (LKappa.print_rule_mixture sigs ~ltypes:true) x
                 (if x <> [] && created <> [] then Pp.comma else Pp.empty)
-                (Raw_mixture.print ~compact:false ~created:true ~sigs)
+                (Raw_mixture.print
+                   ~new_syntax:true ~compact:false ~created:true ~sigs)
                 (List.rev created)))
         all_mixs in
   List_util.fold_right_map (connected_components_of_mixture created)

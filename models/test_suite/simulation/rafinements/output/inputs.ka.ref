@@ -47,6 +47,6 @@
 
 /*0*/%mod: (([E] = inf) || ([T] = 2.)) do $SNAPSHOT "final.ka"
 
-%init: 10000 A(b, d), B(a, c), C(b, d), D(c, a)
+%init: 10000 A(b!., d!.), B(a!., c!.), C(b!., d!.), D(c!., a!.)
 
 %mod: [E] = 188787 do $STOP

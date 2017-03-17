@@ -37,7 +37,7 @@
 /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
 /*4*/%mod: ([E] = 1999) do $FLUX "flux_map.dot" [false]
 
-%init: n_ab A(x, c), B(x)
-%init: n_c C(x1~u, x2~u)
+%init: n_ab A(x!., c!.), B(x!.)
+%init: n_c C(x1~u!., x2~u!.)
 
 %mod: [E] = 2000 do $STOP

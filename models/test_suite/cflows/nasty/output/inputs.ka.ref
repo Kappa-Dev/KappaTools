@@ -19,7 +19,7 @@
 
 /*0*/%mod: [true] do $TRACK A(x~u, y~p, z~p) [true]
 
-%init: 1 A(x~u, y~u, z~u)
+%init: 1 A(x~u!., y~u!., z~u!.)
 %init: 1 K()
 
 %mod: [E] = 100 do $STOP

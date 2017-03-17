@@ -14,6 +14,6 @@
 /*0*/%mod: ([T] > 1) do $ADD 1 A(A1, A2~n)
 /*1*/%mod: ([T] > 2) do $DEL 1 A()
 
-%init: 2 A(A1, A2~n)
+%init: 2 A(A1!., A2~n!.)
 
 %mod: [E] = 1 do $STOP

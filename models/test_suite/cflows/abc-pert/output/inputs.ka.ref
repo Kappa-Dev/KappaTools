@@ -40,7 +40,7 @@
 /*3*/%mod: (((Cpp - cflow) > 9) && (cflow > 0)) do $TRACK C(x1~p, x2~p) [false]
 /*4*/%mod: repeat (([E] [mod] 2000.) = 0) do $PLOTENTRY until [false]
 
-%init: n_ab A(x, c), B(x)
-%init: n_c C(x1~u, x2~u)
+%init: n_ab A(x!., c!.), B(x!.)
+%init: n_c C(x1~u!., x2~u!.)
 
 %mod: [E] = 100000 do $STOP

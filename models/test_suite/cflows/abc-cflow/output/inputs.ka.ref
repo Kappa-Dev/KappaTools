@@ -39,7 +39,7 @@
 /*2*/%mod: ([T] > 10) do $TRACK C(x1~p, x2~p) [true]; $UPDATE cflow Cpp
 /*3*/%mod: ((Cpp - cflow) = 10) do $TRACK C(x1~p, x2~p) [false]
 
-%init: n_ab A(x, c), B(x)
-%init: n_c C(x1~u, x2~u)
+%init: n_ab A(x!., c!.), B(x!.)
+%init: n_c C(x1~u!., x2~u!.)
 
 %mod: [E] = 100000 do $STOP
