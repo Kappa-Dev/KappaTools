@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -16,6 +16,8 @@ type compilation = Ast.parsing_compil
 type init =
     Compil of compilation
   | Files of string list
+
+type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
 
 type accuracy_level = Low | Medium | High | Full
 
@@ -139,7 +141,9 @@ val of_json: Yojson.Basic.json ->
   separating_transitions option
 
 val create_state:
-  ?errors:Exception.method_handler -> ?env:Model.t option -> Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
+  ?errors:Exception.method_handler -> ?env:Model.t option ->
+  ?init_state:initial_state option ->
+  Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
 
 val set_parameters: Remanent_parameters_sig.parameters -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
@@ -155,6 +159,11 @@ val get_init: ('static, 'dynamic) state -> init
 val get_env: ('static, 'dynamic) state -> Model.t option option
 
 val set_env: Model.t option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+
+val get_init_state: ('static, 'dynamic) state -> initial_state option option
+
+val set_init_state:
+  initial_state option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
 val set_compilation: compilation -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Mar 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -20,6 +20,8 @@ type compilation = Ast.parsing_compil
 type init =
   | Compil of compilation
   | Files of string list
+
+type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string,
@@ -607,6 +609,7 @@ type ('static,'dynamic) state =
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
     env : Model.t option option ;
+    init_state: initial_state option option ;
     compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
@@ -630,7 +633,7 @@ type ('static,'dynamic) state =
     separating_transitions : separating_transitions option ;
   }
 
-let create_state ?errors ?env parameters init =
+let create_state ?errors ?env ?init_state parameters init =
   let error =
     match
       errors
@@ -646,6 +649,7 @@ let create_state ?errors ?env parameters init =
     handler = None ;
     init = init ;
     env = env ;
+    init_state = init_state ;
     compilation = None ;
     refined_compilation = None ;
     c_compil = None ;
@@ -848,6 +852,10 @@ let set_parameters parameters state = {state with parameters = parameters}
 let get_parameters state = state.parameters
 
 let get_init state = state.init
+
+let set_init_state init state = {state with init_state = Some init}
+
+let get_init_state state = state.init_state
 
 let set_env model state = {state with env = Some model}
 

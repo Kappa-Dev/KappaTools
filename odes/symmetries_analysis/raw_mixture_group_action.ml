@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 13 2017>
+   * Last modification: Time-stamp: <Mar 17 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -300,6 +300,7 @@ let normalize rule_cache symmetries raw_mixture =
 (* The function shall output a Boolean *)
 (* The function shall have no side effect *)
 
+    (*
 let check_symmetries_of_internal_states_in_agent partition agent_ints =
   true (* to do *)
 
@@ -332,4 +333,4 @@ let check_symmetries_of_internal_states partition init_raw_mixture =
         }
       ) (List.rev init_raw_mixture)
   in*)
-  true (* to do *)
+  true (* to do *)*)

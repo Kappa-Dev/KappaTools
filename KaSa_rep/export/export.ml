@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Mar 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -290,7 +290,7 @@ let lift_wo_handler f = (fun parameter error _handler x -> f parameter error x)
 let flush_errors state =
   Remanent_state.set_errors Exception.empty_error_handler state
 
-let compute_env
+let compute_env_init
     show_title
     (state:
        (Reachability.static_information,
@@ -298,21 +298,39 @@ let compute_env
          Remanent_state.state)
   =
   match Remanent_state.get_init state with
-  | Remanent_state.Compil compil -> state, None
+  | Remanent_state.Compil compil -> state, None, None
   | Remanent_state.Files files ->
     let () = show_title state in
     let cli = Run_cli_args.default in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
-    let (_,_,env, _, _, _, _, _, _), _ =
+    let (_,_,env, _, _, _, _, _, init), _ =
       Cli_init.get_compilation cli
     in
-    Remanent_state.set_env (Some env) state, Some (env:Model.t)
+    Remanent_state.set_init_state
+      (Some init)
+      (Remanent_state.set_env (Some env) state),
+    Some (env:Model.t),
+    Some (init)
+
+let compute_env show_title state =
+  let state, env, _ = compute_env_init show_title state in
+  state, env
 
 let get_env =
   get_gen
     ~phase:StoryProfiling.LKappa_signature
     Remanent_state.get_env
     compute_env
+
+let compute_init show_title state =
+  let state, _, init = compute_env_init show_title state in
+  state, init
+
+let get_init =
+  get_gen
+    ~phase:StoryProfiling.LKappa_signature
+    Remanent_state.get_init_state
+    compute_init
 
 (******************************************************************)
 (*compilation*)
@@ -1426,17 +1444,23 @@ let compute_symmetries
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     _show_title state =
   let state, env = get_env state in
-  match env with
-  | None -> state, None
-  | Some env ->
+  let state, init = get_init state in
+  match env, init with
+  | None, _ | _, None  -> state, None
+  | Some env, Some init ->
     begin
       let rules =
         Model.fold_rules (fun _ acc r -> r :: acc) [] env
       in
       let lkappa_rules_init = (*FIXME: is ast_rules is an initial
                                 states?? *)
+        (* No *)
+        (* You have to get that from init *)
         Model.fold_ast_rules (fun _ acc r -> r :: acc) [] env
+(* Get the list of LKappa rules from init instead *)
+
       in
+      let _ = init in 
       let state, contact_map =
         get_contact_map ~accuracy_level state
       in
