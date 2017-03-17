@@ -11,6 +11,11 @@ every rule may be applied
 every agent may occur in the model
 
 ------------------------------------------------------------
+The following transitions are separating:
+rule 4: c: A(z~u) -> A(z~p)
+
+
+------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
 A() => [ A(y~u) v A(y~p) ]

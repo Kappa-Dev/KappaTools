@@ -30,5 +30,5 @@ val add_bridges:
   ('a, 'b) graph ->
   ('a  * 'b * 'a) list ->
   Exception.method_handler *
-  (int Nodearray.t * int Nodearray.t * bool Nodearray.t * int Nodearray.t *
-   ('a * 'b * 'a) list)
+  int Nodearray.t * int Nodearray.t * bool Nodearray.t * int Nodearray.t *
+   ('a * 'b * 'a) list

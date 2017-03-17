@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 16 2017>
+   * Last modification: Time-stamp: <Mar 17 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -4012,8 +4012,8 @@ struct
     let error, handler  =
       match list with
       | [] ->
-        let () = Loggers.fprintf log "There is no separating transitions" in
-        error, handler 
+        let () = Loggers.fprintf log "There may be no separating transitions" in
+        error, handler
       | _::_ ->
         let () = Loggers.fprintf log "The following transitions are separating:" in
         let () = Loggers.print_newline log in
@@ -4025,8 +4025,8 @@ struct
                   r_id
                in
                let () =
-                 Loggers.fprintf log "%s %s %s"
-                   s1 r s2
+                 Loggers.fprintf log "%s: %s -> %s"
+                   r s1 s2
                in
                let () = Loggers.print_newline log in
                error)

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Mar 17 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1643,7 +1643,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                       edges
                   in
                   let
-                    error, (pre,low,on_stack,scc,bridges) =
+                    error, pre, low, on_stack, scc, bridges =
                     Graphs.add_bridges
                       ~low ~pre ~on_stack ~scc
                       parameters error

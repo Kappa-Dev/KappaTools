@@ -1,8 +1,8 @@
 %agent: A(x~o~u~p,y~o~u~p,z~o~u~p)
 
-A(x~o,y~o,z~o) <-> A(x~u,y~u,z~u) @1,1
-A(x~u,z~u) <-> A(x~p,z~u) @1,2
-A(y~u,z~p) <-> A(y~p,z~p) @1,2
-A(z~u) -> A(z~p) @1
+'init' A(x~o,y~o,z~o) <-> A(x~u,y~u,z~u) @1,1
+'x' A(x~u,z~u) <-> A(x~p,z~u) @1,2
+'y' A(y~u,z~p) <-> A(y~p,z~p) @1,2
+'z' A(z~u) -> A(z~p) @1
 
 %init: 10 A(x,y,z)

@@ -82,7 +82,9 @@ let get_b parameters error i t =
   with error, Some i -> error, i
      | error, None -> error, false
 
-let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_string graph bridges =
+let compute_scc
+    ?low ?pre ?on_stack ?scc
+    parameters error n_to_string graph =
   let error =
     if local_trace || Remanent_parameters.get_trace parameters
     then
@@ -169,7 +171,7 @@ let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_strin
       in
       error, low, pre, on_stack, scc
   in
-  let rec aux parameters error pre low on_stack scc stack counter bridges label_opt u v =
+  let rec aux parameters error pre low on_stack scc stack counter u v =
     let error, pre  =
       Nodearray.set parameters error v counter pre
     in
@@ -188,19 +190,19 @@ let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_strin
       | error, Some a ->
         error, a
     in
-    let error, (pre, low, counter, on_stack, scc, stack, bridges)
+    let error, (pre, low, counter, on_stack, scc, stack)
       =
       List.fold_left
       (fun
-        (error, (pre, low, counter, on_stack, scc, stack, bridges))
-        (w,label) ->
+        (error, (pre, low, counter, on_stack, scc, stack))
+        (w,_) ->
         let error, pre_w = get parameters error w pre in
-        let error, (pre, low, counter, on_stack, scc, stack, bridges) =
+        let error, (pre, low, counter, on_stack, scc, stack) =
           if pre_w = -1
           then
-            aux parameters error pre low on_stack scc stack counter bridges (Some label) v w
+            aux parameters error pre low on_stack scc stack counter v w
           else
-            error, (pre, low, counter, on_stack, scc, stack, bridges)
+            error, (pre, low, counter, on_stack, scc, stack)
         in
         let error, on_stack_w = get_b parameters error w on_stack in
         let error, low =
@@ -212,8 +214,8 @@ let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_strin
           else
             error, low
         in
-        (error, (pre, low, counter, on_stack, scc, stack, bridges)))
-      (error, (pre, low, counter, on_stack, scc, stack, bridges))
+        (error, (pre, low, counter, on_stack, scc, stack)))
+      (error, (pre, low, counter, on_stack, scc, stack))
       edges_v
     in
     let error, low_v = get parameters error v low in
@@ -246,26 +248,26 @@ let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_strin
       else
         error, low, on_stack, scc, stack
     in
-    (error, (pre, low, counter, on_stack, scc, stack, bridges))
+    (error, (pre, low, counter, on_stack, scc, stack))
   in
-  let error, (pre, low, counter, on_stack, scc, stack, bridges) =
+  let error, (pre, low, counter, on_stack, scc, stack) =
     Fixed_size_array.fold
       parameters error
-      (fun parameters error  v _ ( pre, low, counter, on_stack, scc, stack, bridges) ->
+      (fun parameters error  v _ ( pre, low, counter, on_stack, scc, stack) ->
          let error, pre_v = get parameters error v pre in
          if pre_v = -1 then
-           aux parameters error pre low on_stack scc stack counter bridges None v v
+           aux parameters error pre low on_stack scc stack counter v v
          else
-           error, (pre, low, counter, on_stack, scc, stack, bridges))
+           error, (pre, low, counter, on_stack, scc, stack))
       graph.node_labels
-      (pre, low, 1, on_stack, scc, [], bridges)
+      (pre, low, 1, on_stack, scc, [])
   in
   let () =
     if local_trace ||
        Remanent_parameters.get_trace parameters
     then
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "PRE"
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "SCC"
       in
       let _ =
         Nodearray.iter
@@ -274,47 +276,87 @@ let add_bridges ?low ?pre ?on_stack ?scc parameters error n_to_string e_to_strin
              let () =
                Loggers.fprintf
                  (Remanent_parameters.get_logger parameters)
-                 "%i,%i;" i j
-             in error)
-          pre
-      in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n"
-    in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "LOW"
-    in
-    let _ =
-      Nodearray.iter
-        parameters error
-        (fun parameters error i j ->
-           let () =
-             Loggers.fprintf (Remanent_parameters.get_logger parameters)
-              "%i,%i;" i j in error)
-        low
-    in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n" in
-    let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameters) "SCC"
-    in
-    let _ =
-      Nodearray.iter
-        parameters error
-        (fun parameters error i j ->
-           let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-              "%i,%i;" i j in error)
+                 "%i,%i;" i j in error)
+
         scc
     in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n" in
-    ()
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in ()
   in
-  let error, (pre, low) =
+  let error, pre = Nodearray.free_all parameters error pre in
+  let error, low = Nodearray.free_all parameters error low in
+  let error, on_stack = Nodearray.free_all parameters error on_stack in
+  error, pre, low, on_stack, scc
+
+let detect_bridges parameters error graph string_of_n string_of_e scc bridges =
     Fixed_size_array.fold
-      parameters error
-      (fun parameters error v _ (pre, low) ->
-         let error, pre = Nodearray.set parameters error v (-1) pre in
-         let error, low = Nodearray.set parameters error v (-1) low in
-         error, (pre, low))
-      graph.node_labels
-      (pre, low)
+      parameters
+      error
+      (fun parameters error ni l bridges ->
+         let error, scci =
+           match Nodearray.get parameters error ni scc
+           with
+           | error, Some scci -> error, scci
+           | error, None ->
+             Exception.warn parameters error __POS__ Exit (-1)
+         in
+         List.fold_left
+           (fun (error, bridges) (nj,label) ->
+              let error, sccj =
+                match Nodearray.get parameters error nj scc
+                with
+                | error, Some sccj -> error, sccj
+                | error, None ->
+                  Exception.warn parameters error __POS__ Exit (-2)
+              in
+              if scci=sccj
+              then error, bridges
+              else
+                match
+                  Fixed_size_array.get parameters error ni graph.node_labels
+              with
+              | erro, None ->
+                Exception.warn parameters error __POS__ Exit bridges
+              | error, Some nstringi ->
+                begin
+                  match
+                    Fixed_size_array.get parameters error nj graph.node_labels
+                  with
+                  | error, None ->
+                  Exception.warn parameters error __POS__ Exit bridges
+                  | error, Some nstringj  ->
+                    let () =
+                      if Remanent_parameters.get_trace parameters || local_trace
+                      then
+                        let () =
+                          Loggers.fprintf
+                            (Remanent_parameters.get_logger parameters)
+                            "%s %s %s"
+                            (string_of_n nstringi)
+                            (string_of_e label)
+                            (string_of_n nstringj)
+                        in
+                        Loggers.print_newline
+                          (Remanent_parameters.get_logger parameters)
+                    in
+                    error,(nstringi,label,nstringj)::bridges
+                end)
+           (error, bridges) l)
+      graph.edges
+      bridges
+
+let add_bridges
+    ?low ?pre ?on_stack ?scc
+    parameters error string_of_n string_of_e graph bridges
+  =
+  let error, pre, low, on_stack, scc =
+    compute_scc
+      ?low ?pre ?on_stack ?scc
+      parameters error string_of_n graph
   in
-  error, (pre, low, on_stack, scc, bridges)
+  let error, bridges =
+    detect_bridges parameters error graph string_of_n string_of_e scc bridges
+  in
+  let error, scc =
+    Nodearray.free_all parameters error scc
+  in
+  error, low, pre, on_stack, scc, bridges
