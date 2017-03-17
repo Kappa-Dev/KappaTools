@@ -213,7 +213,7 @@ let rule_effect
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
-      LKappa.r_rate = Alg_expr.const Nbr.zero;
+      LKappa.r_rate = Alg_expr.const Nbr.zero; LKappa.r_editStyle = true;
     } in
   let (domain',alg_pos) =
     compile_alg ~compileModeOn contact_map domain alg_expr in
@@ -362,12 +362,14 @@ let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
            let sigs = Model.signatures env in
            let (preenv',alg') =
              compile_alg ~compileModeOn contact_map preenv alg in
-           let fake_rule =
-             { LKappa.r_mix = [];
-               LKappa.r_created = LKappa.to_raw_mixture sigs ast;
-               LKappa.r_delta_tokens = [];
-               LKappa.r_rate = Alg_expr.const Nbr.zero;
-               LKappa.r_un_rate = None; } in
+           let fake_rule = {
+             LKappa.r_mix = [];
+             LKappa.r_created = LKappa.to_raw_mixture sigs ast;
+             LKappa.r_delta_tokens = [];
+             LKappa.r_rate = Alg_expr.const Nbr.zero;
+             LKappa.r_un_rate = None;
+             LKappa.r_editStyle = true;
+           } in
            let preenv'',state' =
              match
                rules_of_ast ~compileModeOn contact_map
@@ -383,11 +385,12 @@ let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
                          mix_pos)) in
            preenv'',state'
          | INIT_TOK tk_id,pos_tk ->
-           let fake_rule =
-             { LKappa.r_mix = []; LKappa.r_created = [];
-               LKappa.r_delta_tokens = [(alg, tk_id)];
-               LKappa.r_rate = Alg_expr.const Nbr.zero;
-               LKappa.r_un_rate = None; } in
+           let fake_rule = {
+             LKappa.r_mix = []; LKappa.r_created = [];
+             LKappa.r_delta_tokens = [(alg, tk_id)];
+             LKappa.r_rate = Alg_expr.const Nbr.zero;
+             LKappa.r_un_rate = None; LKappa.r_editStyle = false;
+           } in
            match
              rules_of_ast
                ~compileModeOn contact_map preenv ~syntax_ref:0 []

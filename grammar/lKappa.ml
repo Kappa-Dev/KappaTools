@@ -41,6 +41,7 @@ type rule =
       ((rule_mixture,int) Alg_expr.e Locality.annot
        * (rule_mixture,int) Alg_expr.e Locality.annot
          option) option;
+    r_editStyle: bool;
   }
 
 let print_link_annot ~ltypes sigs f (s,a) =
@@ -247,7 +248,7 @@ let print_rates sigs pr_tok pr_var f r =
        | None -> ()
        | Some ((ra,_),max_dist) ->
          Format.fprintf
-           f "(%a%a)"
+           f " {%a%a}"
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|"
                   (print_rule_mixture sigs ~ltypes) m)
@@ -264,7 +265,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
   Format.fprintf
     f "@[<h>%t%t%a%t@]"
     (fun f ->
-       if full then
+       if full || r.r_editStyle then
          Format.fprintf f "%a%t%a"
            (print_rule_mixture sigs ~ltypes:false) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
@@ -335,7 +336,7 @@ let rule_agent_of_json = function
           ra_ports = ports;
           ra_ints = ints;
           ra_erased = Yojson.Basic.Util.to_bool (List.assoc "erased" l);
-          ra_syntax = Some (ports,ints)
+          ra_syntax = Some (ports,ints);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Invalid rule_agent",x))
@@ -368,9 +369,10 @@ let rule_to_json r =
            (Locality.annot_to_json lalg_expr_to_json)
            (JsonUtil.of_option (Locality.annot_to_json lalg_expr_to_json)))
         r.r_un_rate;
+      "editStyle", `Bool r.r_editStyle;
     ]
 let rule_of_json = function
-  | `Assoc l as x when List.length l < 6 ->
+  | `Assoc l as x when List.length l < 7 ->
     begin
       try
         {
@@ -393,6 +395,7 @@ let rule_of_json = function
                                            lalg_expr_of_json)))
                  (List.assoc "unary_rate" l)
              with Not_found -> None);
+           r_editStyle = Yojson.Basic.Util.to_bool (List.assoc "editStyle" l);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
@@ -476,7 +479,7 @@ let copy_rule_agent a =
     ra_ints = i;
     ra_syntax =
       Option_util.map (fun _ -> Array.copy p, Array.copy i)
-        a.ra_syntax; }
+        a.ra_syntax;}
 
 let to_erased sigs x =
   List.map
@@ -565,7 +568,7 @@ let of_raw_mixture x =
            r.Raw_mixture.a_ports in
        { ra_type = r.Raw_mixture.a_type; ra_erased = false;
          ra_ports = ports; ra_ints = internals;
-       ra_syntax = Some (Array.copy ports, Array.copy internals); })
+         ra_syntax = Some (Array.copy ports, Array.copy internals); })
     x
 
 let annotate_dropped_agent
@@ -1304,8 +1307,8 @@ let init_of_ast ~new_syntax sigs tok contact_map = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
-let assemble_rule
-    ~new_syntax sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
+let assemble_rule ~new_syntax ~r_editStyle
+    sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
   let tok = tk_nd.NamedDecls.finder in
   let tks =
     List.rev_map (fun (al,tk) ->
@@ -1318,7 +1321,7 @@ let assemble_rule
           (alg_expr_of_ast ~new_syntax sigs tok algs al,
            NamedDecls.elt_id ~kind:"token" tk_nd tk))
       add_tk tks in
-  { r_mix; r_created;
+  { r_mix; r_created; r_editStyle;
     r_delta_tokens = List.rev tks';
     r_rate = alg_expr_of_ast ~new_syntax sigs tok algs rate;
     r_un_rate =
@@ -1398,7 +1401,8 @@ let compil_of_ast ~new_syntax overwrite c =
           annotate_lhs_with_diff sigs ~contact_map lhs rhs in
         label,
         (assemble_rule
-           ~new_syntax sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
+           ~new_syntax ~r_editStyle:false
+           sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
          r_pos))
       cleaned_rules in
   let edit_rules =
@@ -1408,7 +1412,8 @@ let compil_of_ast ~new_syntax overwrite c =
         (label,
          Locality.dummy_annot
            (assemble_rule
-              ~new_syntax:true  sigs tk_nd algs mix cmix [] r.Ast.delta_token
+              ~new_syntax:true ~r_editStyle:true
+              sigs tk_nd algs mix cmix [] r.Ast.delta_token
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in

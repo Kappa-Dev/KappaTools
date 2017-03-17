@@ -90,7 +90,7 @@ let elementary_rule ?env f r =
        | None -> ()
        | Some (rate, dist) ->
          Format.fprintf
-           f " (%a%a)" pr_alg rate
+           f " {%a%a}" pr_alg rate
            (Pp.option (fun f md ->
                 Format.fprintf f ":%a" (alg_expr ?env) md))
            dist)

@@ -55,6 +55,7 @@ type rule =
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
     r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
                  * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
+    r_editStyle : bool;
   }
 
 val print_rates : Signature.s -> (Format.formatter -> int -> unit)

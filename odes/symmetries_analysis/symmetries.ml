@@ -383,14 +383,14 @@ let divide_rule_rate_by rule_cache env rate_convention rule
     in
     rule_cache, output1, output2
 
-let lkappa_init =
-  {
-    LKappa.r_mix =  [];
-    LKappa.r_created = [];
-    LKappa.r_delta_tokens = [] ;
-    LKappa.r_rate = Alg_expr.int 0 ;
-    LKappa.r_un_rate = None  ;
-  }
+let lkappa_init = {
+  LKappa.r_mix =  [];
+  LKappa.r_created = [];
+  LKappa.r_delta_tokens = [] ;
+  LKappa.r_rate = Alg_expr.int 0 ;
+  LKappa.r_un_rate = None  ;
+  LKappa.r_editStyle = true ;
+}
 
 (*convert a species into lkappa rule signature*)
 let species_to_lkappa_rule parameters env species =

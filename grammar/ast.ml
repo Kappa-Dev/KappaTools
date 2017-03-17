@@ -376,7 +376,7 @@ let print_rates un op f def =
          None -> ()
        | Some ((d,_),max_dist) ->
          Format.fprintf
-           f "(%a:%a)"
+           f " {%a:%a}"
            (Alg_expr.print
               (fun f m ->
                  Format.fprintf f "|%a|" print_ast_mix m)

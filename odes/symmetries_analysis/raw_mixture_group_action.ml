@@ -199,6 +199,7 @@ let lkappa_of_raw_mixture raw_mixture =
     LKappa.r_delta_tokens = [] ;
     LKappa.r_rate = Alg_expr.int 0 ;
     LKappa.r_un_rate = None  ;
+    LKappa.r_editStyle = true ;
   }
 
 let copy raw_mixture =
