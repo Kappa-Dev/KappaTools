@@ -22,15 +22,17 @@ type t = {
   need_update_each_loop : Operator.DepSet.t; (*union of 2 above for perf*)
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
+  contact_map : Contact_map.t;
 }
 
 let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
-    (ast_rules,rules,cc_of_unaries) obs perts =
+    (ast_rules,rules,cc_of_unaries) obs perts contact_map =
   { domain; tokens; ast_rules; rules; cc_of_unaries; algs;
     observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
+    contact_map;
   }
 
 let domain env = env.domain
@@ -38,6 +40,7 @@ let new_domain domain env = {env with domain}
 let signatures env = Pattern.Env.signatures env.domain
 let tokens_finder env = env.tokens.NamedDecls.finder
 let algs_finder env = env.algs.NamedDecls.finder
+let contact_map env = env.contact_map
 
 let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 
@@ -243,6 +246,7 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
     dependencies_in_event = x.dependencies_in_event;
     algs_reverse_dependencies = x.algs_reverse_dependencies;
     tokens_reverse_dependencies = x.tokens_reverse_dependencies;
+    contact_map = x.contact_map;
   }
 
 let kappa_instance_to_yojson =
@@ -270,6 +274,7 @@ let to_yojson env =
       (Array.fold_right (fun (n,(r,_)) l ->
            `List [(match n with None -> `Null | Some (n,_) -> `String n);
               LKappa.rule_to_json r]::l) env.ast_rules []);
+    "contact_map", Contact_map.to_yojson (env.contact_map);
     (* rules : Primitives.elementary_rule array;
        cc_of_unaries : Pattern.Set.t;
        perturbations : Primitives.perturbation array;
@@ -284,7 +289,7 @@ let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
-  | `Assoc l as x when List.length l = 5 ->
+  | `Assoc l as x when List.length l = 6 ->
     begin
       try
         { domain = Pattern.Env.of_yojson (List.assoc "update" l);
@@ -320,6 +325,7 @@ let of_yojson = function
           need_update_each_loop = Operator.DepSet.empty;
           algs_reverse_dependencies = [||];
           tokens_reverse_dependencies = [||];
+          contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))

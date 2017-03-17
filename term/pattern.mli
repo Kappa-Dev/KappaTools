@@ -147,4 +147,8 @@ val fold:
 val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
                Env.t * PreEnv.stat
 
+val pushout : Renaming.t -> t -> t -> t
+val infs : t -> t -> t list
+val matchings : t -> t -> Renaming.t list
+
 module Set : SetMap.Set with type elt=id

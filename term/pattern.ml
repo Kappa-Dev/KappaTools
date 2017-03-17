@@ -305,6 +305,7 @@ let minimize cand_nbt cand_nodes ref_nbt =
     recogn_nav =
       raw_to_navigation false nodes_by_type nodes; }
 
+(* returns a list of cc where each cc is included in cc1*)
 let infs cc1 cc2 =
   let possibilities =
     ref (potential_pairing cc1.nodes_by_type cc2.nodes_by_type) in
@@ -361,7 +362,8 @@ let infs cc1 cc2 =
         for_one_root acc'
   in for_one_root []
 
-let intersection renaming cc1 cc2 =
+(* renaming is a total morphism from cc1' to cc2; cc1' is included in cc1 *)
+let pushout renaming cc1 cc2 =
   let nodes,image =
     Renaming.fold
       (fun i j (accn,l as acc) ->
@@ -1155,7 +1157,7 @@ end*) = struct
         if max_sharing then infs this.element h.element
         else
           List.rev_map
-            (fun r -> intersection r this.element h.element)
+            (fun r -> pushout r this.element h.element)
             (matchings this.element h.element) in
       let acc' =
         List.fold_left

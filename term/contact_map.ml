@@ -1,5 +1,38 @@
 type t = ((int list) * (int*int) list) array array
 
+let to_yojson a =
+  let intls_to_json a = `List (List.map (fun b -> `Int b) a) in
+  let pairls_to_json a =
+    `List (List.map (fun (b,c) -> `List[`Int b;`Int c]) a) in
+  let array_to_json a =
+    `List (Array.fold_left
+             (fun acc (a,b) ->
+               (`List [(intls_to_json a);(pairls_to_json b)])::acc) [] a) in
+  `List (Array.fold_left
+           (fun acc t ->(array_to_json t)::acc) [] a)
+
+let of_yojson (a:Yojson.Basic.json) =
+  let intls_of_json a =
+    List.map (function `Int b -> b
+                     | x -> raise (Yojson.Basic.Util.Type_error("bla1",x))) a in
+  let pairls_of_json a =
+    List.map (function `List [`Int b;`Int c] -> (b,c)
+                     | x -> raise (Yojson.Basic.Util.Type_error("bla2",x))) a in
+  let array_of_json =
+    function `List ls ->
+             (match ls with
+              | [`List a;`List b] -> ((intls_of_json a),(pairls_of_json b))
+              | _ -> raise Not_found)
+            |x -> raise (Yojson.Basic.Util.Type_error("bla3",x)) in
+  match a with
+  | `List array1 -> Tools.array_map_of_list
+                      (function `List array2 ->
+                                Tools.array_map_of_list array_of_json array2
+                               |x ->raise (Yojson.Basic.Util.Type_error("bla4",x)))
+                      array1
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct contact map",x))
+
+
 let print_kappa sigs f c =
   Format.fprintf f "@[<v>%a@]"
     (Pp.array Pp.space

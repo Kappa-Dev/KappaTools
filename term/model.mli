@@ -18,7 +18,8 @@ val init :
   ((string Locality.annot option * LKappa.rule Locality.annot) array *
      Primitives.elementary_rule array *
        Pattern.Set.t) ->
-  Alg_expr.t Locality.annot array -> Primitives.perturbation array -> t
+  Alg_expr.t Locality.annot array -> Primitives.perturbation array ->
+  Contact_map.t -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
 
@@ -34,6 +35,7 @@ val new_domain : Pattern.Env.t -> t -> t
 val signatures : t -> Signature.s
 val tokens_finder : t -> int Mods.StringMap.t
 val algs_finder : t -> int Mods.StringMap.t
+(*val contact_map : t -> Contact_map.t*)
 
 val get_alg : t -> int -> Alg_expr.t
 val get_algs : t -> (string * Alg_expr.t Locality.annot) array

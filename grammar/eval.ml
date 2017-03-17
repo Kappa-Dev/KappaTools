@@ -345,6 +345,7 @@ let pert_of_result
   (domain, out_alg_deps, List.rev lpert,tracking_enabled)
 
 let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
+  (*let contact_map = Model.contact_map env in*)
   let init_l,preenv' =
     List_util.fold_right_map
       (fun (_opt_vol,alg,init_t) preenv -> (*TODO deal with volumes*)
@@ -522,7 +523,7 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
   let env =
     Model.init domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules,rule_nd,cc_unaries)
-      (Array.of_list (List.rev obs)) (Array.of_list pert) in
+      (Array.of_list (List.rev obs)) (Array.of_list pert) contact_map in
 
   outputs (Data.Log "\t -initial conditions");
   pause @@ fun () ->
