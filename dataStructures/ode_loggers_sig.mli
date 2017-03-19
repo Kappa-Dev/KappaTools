@@ -36,5 +36,6 @@ val is_expr_alias: (ode_var_id,int) Alg_expr.e Locality.annot -> ode_var_id opti
 val is_bool_const: (ode_var_id,int) Alg_expr.bool Locality.annot -> bool
 val int_of_ode_var_id: ode_var_id -> int
 val string_of_variable: variable -> string
+val string_of_variable_mathematica: variable -> string
 val string_of_array_name: variable -> string
 val variable_of_derived_variable: variable -> int -> variable

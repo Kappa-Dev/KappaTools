@@ -17,7 +17,10 @@
   * under the terms of the GNU Library General Public License *)
 
 type encoding =
-  | Matrix | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS | Octave | Matlab | Maple | Json | SBML
+  | Matrix | HTML_Graph | HTML | HTML_Tabular
+  | DOT | TXT | TXT_Tabular | XLS
+  | Octave | Matlab | Maple | Mathematica | SBML
+  | Json 
 
 module type FormatMap =
 sig

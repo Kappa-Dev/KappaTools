@@ -9,7 +9,7 @@ with
   ()
 | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-| Loggers.XLS | Loggers.Octave
+| Loggers.XLS | Loggers.Octave | Loggers.Mathematica
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
 let do_not_sbml logger f =
@@ -19,7 +19,7 @@ let do_not_sbml logger f =
   | Loggers.SBML -> ()
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
     let () =
       f logger
@@ -757,7 +757,7 @@ let maybe_time_dependent logger network var_rule =
     maybe_time_dependent_alg_expr_in_sbml logger expr network
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica 
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
 

@@ -8,6 +8,8 @@ type t = {
   mutable compute_jacobian : bool ;
   mutable octave_output : string option ;
   mutable matlab_output : string option ;
+  mutable maple_output : string option ;
+  mutable mathematica_output : string option ;
   mutable sbml_output : string option ;
   mutable with_symmetries : bool ;
   mutable show_symmetries : bool ;
@@ -25,6 +27,8 @@ let default : t =
     compute_jacobian = true ;
     octave_output = None  ;
     matlab_output = None ;
+    maple_output = None ;
+    mathematica_output = None ; 
     sbml_output = None ;
     with_symmetries = false ;
     show_symmetries = false ;
@@ -36,7 +40,13 @@ let default : t =
 let options (t :t)  : (string * Arg.spec * string) list = [
   "--ode-backend",
    Arg.String (fun backend -> t.backend <- backend),
-   "Available backends are Octave and Matlab" ;
+  "Available backends are Octave, Maple (in progress), Matlab, Mathematica (in progress), and SBML " ;
+   "--maple-output",
+   Arg.String (fun backend -> t.maple_output <- Some backend),
+   "ODEs file for maple backend";
+  "--mathematica-output",
+   Arg.String (fun backend -> t.mathematica_output <- Some backend),
+   "ODEs file for mathematica backend";
   "--matlab-output",
   Arg.String (fun backend -> t.matlab_output <- Some backend),
   "ODEs file for matlab backend";

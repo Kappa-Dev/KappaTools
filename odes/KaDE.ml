@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 13 2017>
+  * Last modification: Time-stamp: <Mar 19 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -34,6 +34,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       match lowercase ode_args.Ode_args.backend with
       | "octave" -> Loggers.Octave
       | "matlab" -> Loggers.Matlab
+      | "mathematica" -> Loggers.Mathematica
+      | "maple" -> Loggers.Maple 
       | "sbml" -> Loggers.SBML
       | s ->
         begin
@@ -140,8 +142,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> true
-      | Loggers.Octave
-      | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+      | Loggers.Octave | Loggers.Matlab
+      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> false
     in
     let compil =
       A.get_compil
@@ -239,8 +241,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS -> logger
-      | Loggers.Octave
-      | Loggers.Matlab | Loggers.Maple | Loggers.Json -> logger
+      | Loggers.Octave | Loggers.Matlab
+      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
     in
     let () =
       A.export_network

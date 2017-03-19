@@ -38,7 +38,7 @@ val print_integrate: Loggers.t -> unit
 val print_interpolate: Loggers.t -> unit
 val print_dump_plots: data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
-val initialize: Loggers.t -> Ode_loggers_sig.variable -> unit
+val initialize: nodevar:int -> Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->

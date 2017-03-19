@@ -157,7 +157,76 @@ let print_ode_preamble
               ])
         in ()
       end
-    | Loggers.Maple -> ()
+    | Loggers.Maple ->
+      begin
+        let () = command_line logger in
+        let () = print_list logger
+            [
+              "## THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "## ";
+              "## init - the initial abundances of each species and token";
+              "## tinit - the initial simulation time (likely 0)";
+              "## tend - the final simulation time ";
+              "## initialstep - initial time step at the beginning of numerical integration";
+              "## period_t_point - the time period between points to return";
+              "##" ;
+              "## "^
+              (match
+                 count
+               with
+               | Ode_args.Embeddings -> "variables (initi(t),yi(t)) denote numbers of embeddings "
+               | Ode_args.Occurrences -> "variables (initi(t)),yi(t)) denote numbers occurrences");
+              "## "^
+              (match
+                 rate_convention
+               with
+               | Remanent_parameters_sig.Common ->
+                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
+               | Remanent_parameters_sig.Biochemist ->
+                 "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
+               | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
+                 "rule rates are corrected by the number of automorphisms in the lhs of rules"
+               | Remanent_parameters_sig.No_correction ->
+                 "no correcion is applied on rule rates")]
+        in
+        let () = Loggers.print_newline logger in
+        ()
+      end
+    | Loggers.Mathematica ->
+      begin
+        let () = command_line logger in
+        let () = print_list logger
+            [
+              "(* THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS *)";
+              "(* *) ";
+              "(* init - the initial abundances of each species and token *)";
+              "(* tinit - the initial simulation time (likely 0) *)";
+              "(* tend - the final simulation time *)";
+              "(* initialstep - initial time step at the beginning of numerical integration *)";
+              "(* period_t_point - the time period between points to return *)";
+              "(* *)" ;
+              "(* "^
+              (match
+                 count
+               with
+               | Ode_args.Embeddings -> "variables (initi(t),yi(t)) denote numbers of embeddings *)"
+               | Ode_args.Occurrences -> "variables (initi(t)),yi(t)) denote numbers occurrences *)");
+              "(* "^
+              (match
+                 rate_convention
+               with
+               | Remanent_parameters_sig.Common ->
+                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well *)"
+               | Remanent_parameters_sig.Biochemist ->
+                 "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well *)"
+               | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
+                 "rule rates are corrected by the number of automorphisms in the lhs of rules *)"
+               | Remanent_parameters_sig.No_correction ->
+                 "no correcion is applied on rule rates*)")]
+        in
+        let () = Loggers.print_newline logger in
+        ()
+      end
     | Loggers.Json
     | Loggers.DOT
     | Loggers.Matrix
@@ -176,14 +245,29 @@ let declare_global logger string =
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.SBML | Loggers.Maple -> ()
+  | Loggers.SBML | Loggers.Maple | Loggers.Mathematica -> ()
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix
   | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let initialize logger variable =
+let affect_symbol logger =
+  let format = Loggers.get_encoding_format logger in
+  match
+    format
+  with
+  | Loggers.Matlab  | Loggers.Octave -> "="
+  | Loggers.Maple -> ":="
+  | Loggers.Mathematica -> ":=="
+  | Loggers.Json
+  | Loggers.SBML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.TXT_Tabular | Loggers.XLS -> ""
+
+
+let initialize ~nodevar logger variable =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -258,10 +342,10 @@ let initialize logger variable =
         | Ode_loggers_sig.Obs _
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
-        | Ode_loggers_sig.Jacobian_rate (_,_)
-        | Ode_loggers_sig.Jacobian_rateun (_,_)
-        | Ode_loggers_sig.Jacobian_rated (_,_)
-        | Ode_loggers_sig.Jacobian_rateund (_,_)
+        | Ode_loggers_sig.Jacobian_rate _
+        | Ode_loggers_sig.Jacobian_rateun _
+        | Ode_loggers_sig.Jacobian_rated _
+        | Ode_loggers_sig.Jacobian_rateund _
           -> Loggers.print_newline logger
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
@@ -278,7 +362,60 @@ let initialize logger variable =
       ()
     end
   | Loggers.Json
-  | Loggers.Maple | Loggers.SBML -> ()
+  | Loggers.Maple | Loggers.Mathematica ->
+    begin
+      let () =
+        match variable with
+        | Ode_loggers_sig.Rate _
+        | Ode_loggers_sig.Rated _
+        | Ode_loggers_sig.Rateun _
+        | Ode_loggers_sig.Rateund _
+        | Ode_loggers_sig.Jacobian_rate _
+        | Ode_loggers_sig.Jacobian_rateun _
+        | Ode_loggers_sig.Jacobian_rated _
+        | Ode_loggers_sig.Jacobian_rateund _
+        | Ode_loggers_sig.Expr _
+        | Ode_loggers_sig.Init _
+        | Ode_loggers_sig.Initbis _
+        | Ode_loggers_sig.Concentration _ -> ()
+        | Ode_loggers_sig.Deriv _ ->
+        let rec aux k =
+          if k>nodevar
+          then ()
+          else
+            let () =
+              Loggers.fprintf logger "%s%i(t)%s0;"
+                (Ode_loggers_sig.string_of_array_name variable)
+                k
+                (affect_symbol logger)
+            in
+            let () =
+              Loggers.print_newline logger
+            in
+            aux (k+1)
+        in
+        let () = aux 1 in
+          Loggers.fprintf logger "%s=zeros(nodevar,1)"
+            (Ode_loggers_sig.string_of_array_name variable)
+        | Ode_loggers_sig.Jacobian _
+        | Ode_loggers_sig.Jacobian_var _
+        | Ode_loggers_sig.Obs _
+        | Ode_loggers_sig.Tinit
+        | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.Period_t_points
+        | Ode_loggers_sig.N_ode_var
+        | Ode_loggers_sig.N_var
+        | Ode_loggers_sig.N_rows
+        | Ode_loggers_sig.N_obs
+        | Ode_loggers_sig.Current_time
+        | Ode_loggers_sig.Time_scale_factor
+        | Ode_loggers_sig.Tmp
+        | Ode_loggers_sig.N_rules -> ()
+      in
+      ()
+    end
+  | Loggers.SBML -> ()
   | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -288,17 +425,15 @@ let print_newline logger =
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.Matlab | Loggers.Octave ->
-    Loggers.print_newline logger
+  | Loggers.Matlab | Loggers.Octave | Loggers.Mathematica | Loggers.Maple
+    -> Loggers.print_newline logger
   | Loggers.Json
-  | Loggers.Maple | Loggers.SBML -> ()
+  | Loggers.SBML -> ()
   | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
   | Loggers.Matrix | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 type bin_op_pos = PREFIX | INFIX | POSTFIX
-
-let _ = POSTFIX
 
 let bin_op_pos _logger op =
   match op with
@@ -403,6 +538,27 @@ let parenthesis_needed_in_bool_op ?parenthesis_mode () =
   | Some Never -> false, Some Always
   | Some (In_sum | In_product | In_power | Always) -> true, Some Always
 
+let octave_matlab format =
+  match format with
+  | Loggers.Matlab  | Loggers.Octave -> true
+  | Loggers.Mathematica | Loggers.Maple
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+let mathematica_maple format =
+  match format with
+  | Loggers.Mathematica | Loggers.Maple -> true
+  | Loggers.Matlab | Loggers.Octave
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+
 let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_expr network_handler  =
   let var = match init_mode with
     | None -> "y"
@@ -411,26 +567,35 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
   match
     format
   with
-  | Loggers.Matlab  | Loggers.Octave ->
+  | Loggers.Matlab  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple ->
     begin
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
       | Alg_expr.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
       | Alg_expr.CONST (Nbr.F f) -> Loggers.fprintf logger "%g" f
       | Alg_expr.ALG_VAR x ->
-        Loggers.fprintf
-          logger "var(%i)"
-          (network_handler.Network_handler.int_of_obs x)
+        if octave_matlab format then
+            Loggers.fprintf
+              logger "var(%i)"
+              (network_handler.Network_handler.int_of_obs x)
+        else if mathematica_maple format then
+            Loggers.fprintf
+              logger "var%i(t)"
+              (network_handler.Network_handler.int_of_obs x)
+        else ()
       | Alg_expr.DIFF_TOKEN((Alg_expr.ALG_VAR x,_),id) ->
-        Loggers.fprintf
-          logger "jacvar(%i,%i)"
-          (network_handler.Network_handler.int_of_obs x)
-          (network_handler.Network_handler.int_of_token_id id)
+        if octave_matlab format then
+          Loggers.fprintf
+            logger "jacvar(%i,%i)"
+            (network_handler.Network_handler.int_of_obs x)
+            (network_handler.Network_handler.int_of_token_id id)
+        else ()
       | Alg_expr.DIFF_KAPPA_INSTANCE((Alg_expr.ALG_VAR x,_),id) ->
-        Loggers.fprintf
-          logger "jacvar(%i,%i)"
-          (network_handler.Network_handler.int_of_obs x)
-          (network_handler.Network_handler.int_of_kappa_instance id)
+        if octave_matlab format then
+          Loggers.fprintf
+            logger "jacvar(%i,%i)"
+            (network_handler.Network_handler.int_of_obs x)
+            (network_handler.Network_handler.int_of_kappa_instance id)
       | Alg_expr.DIFF_TOKEN _
       | Alg_expr.DIFF_KAPPA_INSTANCE _ ->
         raise
@@ -438,13 +603,25 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
              ("Differentiation should be pushed to the leaves of the expression!!!",
               snd alg_expr))
       | Alg_expr.KAPPA_INSTANCE x ->
-        Loggers.fprintf
-          logger "%s(%i)" var
-          (network_handler.Network_handler.int_of_kappa_instance x)
+        if octave_matlab format then
+          Loggers.fprintf
+            logger "%s(%i)" var
+            (network_handler.Network_handler.int_of_kappa_instance x)
+        else if mathematica_maple format then
+          Loggers.fprintf
+            logger "%s%i(t)" var
+            (network_handler.Network_handler.int_of_kappa_instance x)
+        else ()
       | Alg_expr.TOKEN_ID x ->
-        Loggers.fprintf
-          logger "%s(%i)" var
-          (network_handler.Network_handler.int_of_token_id x)
+        if octave_matlab format then
+          Loggers.fprintf
+            logger "%s(%i)" var
+            (network_handler.Network_handler.int_of_token_id x)
+        else if mathematica_maple format then
+          Loggers.fprintf
+            logger "%s%i(t)" var
+            (network_handler.Network_handler.int_of_kappa_instance x)
+        else ()
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
@@ -575,7 +752,8 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger expr network_handler =
  match Loggers.get_encoding_format logger with
-  | Loggers.Matlab  | Loggers.Octave ->
+   | Loggers.Matlab  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple
+     ->
     begin
       match fst expr with
       | Alg_expr.TRUE -> Loggers.fprintf logger "true"
@@ -612,7 +790,6 @@ and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger expr ne
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () = Sbml_backend.print_bool_expr_in_sbml string_of_var_id logger expr network_handler in
     let () = Loggers.fprintf logger "</math>" in ()
-  | Loggers.Maple -> ()
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -732,12 +909,17 @@ let print_comment
       | Loggers.Octave ->
         let () = Loggers.fprintf logger "%% %s" string in
         if breakline then Loggers.print_newline logger
+      | Loggers.Maple ->
+      let () = Loggers.fprintf logger "# %s" string in
+      if breakline then Loggers.print_newline logger
+      | Loggers.Mathematica ->
+        let () = Loggers.fprintf logger "(* %s *)" string in
+        if breakline then Loggers.print_newline logger
       | Loggers.SBML ->
         let () = Loggers.fprintf logger "<!-- %s -->" (Sbml_backend.string_in_comment string) in
         if breakline then
           Loggers.print_newline logger
         else Loggers.print_breakable_hint logger
-      | Loggers.Maple
       | Loggers.Json
       | Loggers.DOT
       | Loggers.Matrix | Loggers.HTML_Graph
@@ -757,6 +939,32 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     begin
       let () =
         Loggers.fprintf logger "%s="
+          (Ode_loggers_sig.string_of_variable  variable)
+      in
+      let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
+      let () = Loggers.fprintf logger ";" in
+      let () = if comment = "" then () else Loggers.fprintf logger " " in
+      let () = print_comment logger comment in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Maple   ->
+    begin
+      let () =
+        Loggers.fprintf logger "%s:="
+          (Ode_loggers_sig.string_of_variable  variable)
+      in
+      let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
+      let () = Loggers.fprintf logger ";" in
+      let () = if comment = "" then () else Loggers.fprintf logger " " in
+      let () = print_comment logger comment in
+      let () = Loggers.print_newline logger in
+      ()
+    end
+  | Loggers.Mathematica  ->
+    begin
+      let () =
+        Loggers.fprintf logger "%s:=="
           (Ode_loggers_sig.string_of_variable  variable)
       in
       let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
@@ -842,7 +1050,14 @@ let associate_nrows logger =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "nrows = length(soln.x);" in
     Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica ->
+    let a,b,c,d = __POS__ in
+    let _ =
+      Format.fprintf
+        Format.std_formatter
+        "to do: %s %i %i %i\n" a b c d
+    in
+    ()
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -857,7 +1072,7 @@ let associate_t logger n =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "t = y(%i);" n in
     Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -872,7 +1087,7 @@ let init_time logger n =
   | Loggers.Matlab | Loggers.Octave ->
     let () = Loggers.fprintf logger "y(%i) = t;" n in
     Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -884,10 +1099,11 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.Matlab  | Loggers.Octave ->
+  | Loggers.Matlab  | Loggers.Octave
+  | Loggers.Maple | Loggers.Mathematica ->
     begin
       let var = Ode_loggers_sig.string_of_variable variable in
-      let () = Loggers.fprintf logger "%s=%s+" var var in
+      let () = Loggers.fprintf logger "%s%s%s+" var (affect_symbol logger) var in
       let () = print_alg_expr ~parenthesis_mode:In_sum ~init_mode string_of_var_id logger alg_expr network in
       let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
@@ -895,7 +1111,6 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -922,10 +1137,11 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.Matlab  | Loggers.Octave ->
+  | Loggers.Matlab  | Loggers.Octave
+  | Loggers.Mathematica | Loggers.Maple ->
     begin
       let var = Ode_loggers_sig.string_of_variable var_species in
-      let () = Loggers.fprintf logger "%s=%s%s" var var string in
+      let () = Loggers.fprintf logger "%s%s%s%s" var (affect_symbol logger) var string in
       let bool =
         if nauto_in_species = 1
         then false
@@ -964,7 +1180,6 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -989,7 +1204,7 @@ let gen_deriv
                  (Ode_loggers_sig.variable_of_derived_variable
                     var_species dt)
              in
-             let () = Loggers.fprintf logger "%s=%s%s" var_dt var_dt string in
+             let () = Loggers.fprintf logger "%s%s%s%s" var_dt (affect_symbol logger) var_dt string in
              let bool =
                if nauto_in_species = 1
                then false
@@ -1101,7 +1316,7 @@ let gen_deriv
           end
       in aux var_list []
     end
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1118,7 +1333,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
   | Loggers.Matlab  | Loggers.Octave ->
     begin
       let var = Ode_loggers_sig.string_of_variable var_token in
-      let () = Loggers.fprintf logger "%s=%s+" var var in
+      let () = Loggers.fprintf logger "%s%s%s+" var (affect_symbol logger) var in
       let bool =
         if nauto_in_lhs =1
         then
@@ -1151,7 +1366,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1172,7 +1387,11 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                (Ode_loggers_sig.variable_of_derived_variable
                   var_token dt)
            in
-           let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
+           let () =
+             Loggers.fprintf
+               logger "%s%s%s+"
+               var_dt (affect_symbol logger) var_dt
+           in
            let bool =
              if nauto_in_lhs =1
              then
@@ -1221,7 +1440,12 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
               (Ode_loggers_sig.variable_of_derived_variable
                  var_token dt_id)
           in
-          let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
+          let () =
+            Loggers.fprintf
+              logger "%s%s%s+" var_dt
+              (affect_symbol logger)
+              var_dt
+          in
           let bool =
             if nauto_in_lhs =1
             then
@@ -1340,7 +1564,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
       in
       ()
     end
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1374,7 +1598,7 @@ let print_options ~compute_jacobian logger =
     in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1395,7 +1619,7 @@ let start_time logger float =
     let () = Loggers.fprintf logger "t = %f;" float in
     Loggers.print_newline logger
   | Loggers.SBML
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -1418,7 +1642,7 @@ let declare_init ?comment:(comment="") logger i =
     let () = print_comment logger comment in
     Loggers.print_newline logger
   | Loggers.SBML
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
@@ -1455,7 +1679,7 @@ let print_license_check logger =
           "end";
         ]
     in Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1485,7 +1709,12 @@ let print_integrate logger =
     in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica ->
+    let a,b,c,d = __POS__ in
+    let () =
+      Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
+    in
+    ()
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1525,7 +1754,12 @@ let print_interpolate logger =
           "end"
         ]
     in Loggers.print_newline logger
-  | Loggers.Maple
+    | Loggers.Maple | Loggers.Mathematica ->
+      let a,b,c,d = __POS__ in
+      let () =
+        Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
+      in
+      ()
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1569,7 +1803,12 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
           "end";
           "fclose(fid);"]
     in Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica ->
+      let a,b,c,d = __POS__ in
+      let () =
+        Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
+      in
+      ()
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1600,7 +1839,7 @@ let open_procedure logger name name' arg =
     in
     let () = Loggers.fprintf logger ")" in
     Loggers.print_newline logger
-  | Loggers.Maple
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1621,6 +1860,7 @@ let close_procedure logger =
     let () = Loggers.fprintf logger "end" in
     Loggers.print_newline logger
   | Loggers.Maple
+  | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1645,6 +1885,7 @@ let launch_main logger =
     let () = Loggers.print_newline logger in
     ()
   | Loggers.Matlab
+  | Loggers.Mathematica
   | Loggers.Maple
   | Loggers.Json
   | Loggers.DOT

@@ -149,14 +149,15 @@ let string_of_variable var =
   | Init int
   | Initbis int
   | Concentration int
-  | Deriv int -> Printf.sprintf "%s(%i)" (string_of_array_name var) int
+  | Deriv int ->
+    Printf.sprintf "%s(%i)" (string_of_array_name var) int
   | Jacobian_rate (int1,int2)
   | Jacobian_rated (int1,int2)
   | Jacobian_rateun (int1,int2)
   | Jacobian_rateund (int1,int2)
   | Jacobian (int1,int2)
   | Jacobian_var (int1,int2) ->
-    Printf.sprintf "%s(%i,%i)" (string_of_array_name var)  int1 int2
+      Printf.sprintf "%s(%i,%i)" (string_of_array_name var)  int1 int2
   | Tinit
   | Tend
   | InitialStep
@@ -169,6 +170,39 @@ let string_of_variable var =
   | Tmp
   | Current_time
   | Time_scale_factor -> (string_of_array_name var)
+
+let string_of_variable_mathematica ~init var =
+  match var with
+  | Rate int
+  | Rated int
+  | Rateun int
+  | Rateund int
+  | Expr int
+  | Obs int
+  | Init int
+  | Initbis int
+  | Concentration int
+  | Deriv int ->
+    Printf.sprintf "%s%i(t)" (string_of_array_name var) int
+  | Jacobian_rate _
+  | Jacobian_rated _
+  | Jacobian_rateun _
+  | Jacobian_rateund _
+  | Jacobian _
+  | Jacobian_var _ -> ""
+  | Tinit
+  | Tend
+  | InitialStep
+  | Period_t_points
+  | N_ode_var
+  | N_var
+  | N_obs
+  | N_rules
+  | N_rows
+  | Tmp
+  | Current_time
+  | Time_scale_factor -> (string_of_array_name var)
+
 
 let variable_of_derived_variable var id =
   match var with

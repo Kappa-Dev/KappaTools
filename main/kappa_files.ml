@@ -23,7 +23,9 @@ let odeFileName  =
       [
         Loggers.Octave, "ode.m";
         Loggers.Matlab, "ode.m";
-        Loggers.SBML, "network.xml"
+        Loggers.SBML, "network.xml";
+        Loggers.Maple, "ode.mws";
+        Loggers.Mathematica, "ode.nb" ; 
       ]
   end
 
