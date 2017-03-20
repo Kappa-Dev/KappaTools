@@ -153,7 +153,6 @@ let string_of_compare_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "<"
-      | Loggers.Maple
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
@@ -169,7 +168,6 @@ let string_of_compare_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         ">"
-      | Loggers.Maple
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
@@ -201,7 +199,6 @@ let string_of_bin_op logger op =
       | Loggers.SBML -> "<max/>"
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         -> "max"
-      | Loggers.Maple
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
@@ -217,7 +214,6 @@ let string_of_bin_op logger op =
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "min"
-      | Loggers.Maple
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT

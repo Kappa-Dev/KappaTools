@@ -16,6 +16,173 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+
+let string_of_variable_octave var =
+  match var with
+  | Ode_loggers_sig.Rate int
+  | Ode_loggers_sig.Rated int
+  | Ode_loggers_sig.Rateun int
+  | Ode_loggers_sig.Rateund int
+  | Ode_loggers_sig.Expr int
+  | Ode_loggers_sig.Obs int
+  | Ode_loggers_sig.Init int
+  | Ode_loggers_sig.Initbis int
+  | Ode_loggers_sig.Concentration int
+  | Ode_loggers_sig.Deriv int ->
+    Printf.sprintf "%s(%i)"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Jacobian_rate (int1,int2)
+  | Ode_loggers_sig.Jacobian_rated (int1,int2)
+  | Ode_loggers_sig.Jacobian_rateun (int1,int2)
+  | Ode_loggers_sig.Jacobian_rateund (int1,int2)
+  | Ode_loggers_sig.Jacobian (int1,int2)
+  | Ode_loggers_sig.Jacobian_var (int1,int2) ->
+    Printf.sprintf "%s(%i,%i)"
+      (Ode_loggers_sig.string_of_array_name var)  int1 int2
+  | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.Period_t_points
+  | Ode_loggers_sig.N_ode_var
+  | Ode_loggers_sig.N_var
+  | Ode_loggers_sig.N_obs
+  | Ode_loggers_sig.N_rules
+  | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.Tmp
+  | Ode_loggers_sig.Current_time
+  | Ode_loggers_sig.Time_scale_factor ->
+    (Ode_loggers_sig.string_of_array_name var)
+
+let string_of_variable_mathematica var =
+  match var with
+  | Ode_loggers_sig.Rate int
+  | Ode_loggers_sig.Rated int
+  | Ode_loggers_sig.Rateun int
+  | Ode_loggers_sig.Rateund int
+  | Ode_loggers_sig.Obs int
+  | Ode_loggers_sig.Concentration int
+  | Ode_loggers_sig.Deriv int ->
+    Printf.sprintf "%s%i[t]"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Expr int ->
+    Printf.sprintf "%s%i[t]"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Init int
+  | Ode_loggers_sig.Initbis int ->
+    Printf.sprintf "%s%i"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Jacobian_rate _
+  | Ode_loggers_sig.Jacobian_rated _
+  | Ode_loggers_sig.Jacobian_rateun _
+  | Ode_loggers_sig.Jacobian_rateund _
+  | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.Period_t_points
+  | Ode_loggers_sig.N_ode_var
+  | Ode_loggers_sig.N_var
+  | Ode_loggers_sig.N_obs
+  | Ode_loggers_sig.N_rules
+  | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.Tmp
+  | Ode_loggers_sig.Current_time
+  | Ode_loggers_sig.Time_scale_factor ->
+    (Ode_loggers_sig.string_of_array_name var)
+
+let string_of_variable_maple var =
+  match var with
+  | Ode_loggers_sig.Rate int
+  | Ode_loggers_sig.Rated int
+  | Ode_loggers_sig.Rateun int
+  | Ode_loggers_sig.Rateund int
+  | Ode_loggers_sig.Obs int
+  | Ode_loggers_sig.Concentration int
+  | Ode_loggers_sig.Deriv int ->
+    Printf.sprintf "d%s%i(t)/dt"
+      (Ode_loggers_sig.string_of_array_name var)
+      int
+  | Ode_loggers_sig.Expr int ->
+    Printf.sprintf "%s%i(t)"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Init int
+  | Ode_loggers_sig.Initbis int ->
+    Printf.sprintf "%s%i"
+      (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Jacobian_rate _
+  | Ode_loggers_sig.Jacobian_rated _
+  | Ode_loggers_sig.Jacobian_rateun _
+  | Ode_loggers_sig.Jacobian_rateund _
+  | Ode_loggers_sig.Jacobian _
+  | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.Period_t_points
+  | Ode_loggers_sig.N_ode_var
+  | Ode_loggers_sig.N_var
+  | Ode_loggers_sig.N_obs
+  | Ode_loggers_sig.N_rules
+  | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.Tmp
+  | Ode_loggers_sig.Current_time
+  | Ode_loggers_sig.Time_scale_factor ->
+    (Ode_loggers_sig.string_of_array_name var)
+
+let string_of_variable loggers variable =
+  match
+    Loggers.get_encoding_format loggers
+  with
+  | Loggers.Matlab
+  | Loggers.Octave ->
+    string_of_variable_octave variable
+  | Loggers.Mathematica ->
+    string_of_variable_mathematica variable
+  | Loggers.Maple ->
+    string_of_variable_maple variable
+  | Loggers.Matrix
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.DOT
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS
+  | Loggers.SBML
+  | Loggers.Json -> ""
+
+let variable_of_derived_variable var id =
+  match var with
+  | Ode_loggers_sig.Rate int -> Ode_loggers_sig.Jacobian_rate (int,id)
+  | Ode_loggers_sig.Rated int -> Ode_loggers_sig.Jacobian_rated (int,id)
+  | Ode_loggers_sig.Rateun int -> Ode_loggers_sig.Jacobian_rateun (int,id)
+  | Ode_loggers_sig.Rateund int -> Ode_loggers_sig.Jacobian_rateund (int,id)
+  | Ode_loggers_sig.Expr int -> Ode_loggers_sig.Jacobian_var (int, id)
+  | Ode_loggers_sig.Concentration int -> Ode_loggers_sig.Jacobian (int, id)
+  | Ode_loggers_sig.Obs _ -> assert false
+  | Ode_loggers_sig.Init _ -> assert false
+  | Ode_loggers_sig.Initbis _ -> assert false
+  | Ode_loggers_sig.Deriv _ -> assert false
+  | Ode_loggers_sig.Jacobian_rate _ -> assert false
+  | Ode_loggers_sig.Jacobian_rated _ -> assert false
+  | Ode_loggers_sig.Jacobian_rateun _ -> assert false
+  | Ode_loggers_sig.Jacobian_rateund _ -> assert false
+  | Ode_loggers_sig.Jacobian _ -> assert false
+  | Ode_loggers_sig.Jacobian_var _ -> assert false
+  | Ode_loggers_sig.Tinit -> assert false
+  | Ode_loggers_sig.Tend -> assert false
+  | Ode_loggers_sig.InitialStep -> assert false
+  | Ode_loggers_sig.Period_t_points -> assert false
+  | Ode_loggers_sig.N_ode_var -> assert false
+  | Ode_loggers_sig.N_var -> assert false
+  | Ode_loggers_sig.N_obs -> assert false
+  | Ode_loggers_sig.N_rules -> assert false
+  | Ode_loggers_sig.N_rows -> assert false
+  | Ode_loggers_sig.Tmp -> assert false
+  | Ode_loggers_sig.Current_time -> assert false
+  | Ode_loggers_sig.Time_scale_factor -> assert false
+
 type correct = Div of int | Mul of int | Nil
 
 type options =
@@ -58,7 +225,7 @@ let print_ode_preamble
         let () = command_line logger in
         let () = print_list logger
             [
-              "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
               "%% ";
               "%% init - the initial abundances of each species and token";
               "%% tinit - the initial simulation time (likely 0)";
@@ -99,7 +266,7 @@ let print_ode_preamble
               "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
               "<model name=\"KaDe output:\">";
               "<!--";
-              "THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
               "";
               "init - the initial abundances of each species and token";
               "tinit - the initial simulation time (likely 0)";
@@ -162,7 +329,7 @@ let print_ode_preamble
         let () = command_line logger in
         let () = print_list logger
             [
-              "## THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;";
+              "## THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
               "## ";
               "## init - the initial abundances of each species and token";
               "## tinit - the initial simulation time (likely 0)";
@@ -197,7 +364,7 @@ let print_ode_preamble
         let () = command_line logger in
         let () = print_list logger
             [
-              "(* THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS *)";
+              "(* THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS: *)";
               "(* *) ";
               "(* init - the initial abundances of each species and token *)";
               "(* tinit - the initial simulation time (likely 0) *)";
@@ -209,8 +376,8 @@ let print_ode_preamble
               (match
                  count
                with
-               | Ode_args.Embeddings -> "variables (initi(t),yi(t)) denote numbers of embeddings *)"
-               | Ode_args.Occurrences -> "variables (initi(t)),yi(t)) denote numbers occurrences *)");
+               | Ode_args.Embeddings -> "variables (initi[t],yi[t]) denote numbers of embeddings *)"
+               | Ode_args.Occurrences -> "variables (initi[t]),yi[t]) denote numbers occurrences *)");
               "(* "^
               (match
                  rate_convention
@@ -257,15 +424,50 @@ let affect_symbol logger =
   match
     format
   with
-  | Loggers.Matlab  | Loggers.Octave -> "="
+  | Loggers.Matlab  | Loggers.Octave | Loggers.Mathematica -> "="
   | Loggers.Maple -> ":="
-  | Loggers.Mathematica -> ":=="
   | Loggers.Json
   | Loggers.SBML
   | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ""
 
+let repeat f last =
+  let rec aux f k n =
+    if k>n then ()
+    else
+    if k=1 then
+      let () = f false k in
+      aux f (k+1) n
+    else
+      let () = f true k in
+      aux f (k+1) n
+  in aux f 1 last
+
+let of_t logger s =
+  let format = Loggers.get_encoding_format logger in
+  match format with
+  | Loggers.Maple -> Format.sprintf "(%s)" s
+  | Loggers.Mathematica -> Format.sprintf "[%s]" s
+  | Loggers.Matlab  | Loggers.Octave
+  | Loggers.SBML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.TXT_Tabular | Loggers.XLS
+  | Loggers.Json -> ""
+
+
+
+let instruction_sep logger =
+  let format = Loggers.get_encoding_format logger in
+  match format with
+  | Loggers.Maple -> ":"
+  | Loggers.Mathematica -> ";"
+  | Loggers.Matlab  | Loggers.Octave -> ";"
+  | Loggers.SBML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.HTML_Tabular | Loggers.TXT
+  | Loggers.TXT_Tabular | Loggers.XLS | Loggers.Json -> ""
 
 let initialize ~nodevar logger variable =
   let format = Loggers.get_encoding_format logger in
@@ -280,38 +482,48 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Rated _
         | Ode_loggers_sig.Rateun _
         | Ode_loggers_sig.Rateund _ ->
-          Loggers.fprintf logger "%s=zeros(nrules,1);"
+          Loggers.fprintf logger "%s=zeros(nrules,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Jacobian_rate (_,_)
         | Ode_loggers_sig.Jacobian_rateun (_,_)
         | Ode_loggers_sig.Jacobian_rated (_,_)
         | Ode_loggers_sig.Jacobian_rateund (_,_) ->
-          Loggers.fprintf logger "%s=zeros(nrules,nodevar);"
+          Loggers.fprintf logger "%s=zeros(nrules,nodevar)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Expr _ ->
-          Loggers.fprintf logger "%s=zeros(nvar,1);"
+          Loggers.fprintf logger "%s=zeros(nvar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Init _ ->
-          Loggers.fprintf logger "%s=sparse(nodevar,1);"
+          Loggers.fprintf logger "%s=sparse(nodevar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Initbis _ ->
-          Loggers.fprintf logger "%s=zeros(nodevar,1);"
+          Loggers.fprintf logger "%s=zeros(nodevar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Concentration _ ->
-          Loggers.fprintf logger "%s=zeros(nodevar,1)"
+          Loggers.fprintf logger "%s=zeros(nodevar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Deriv _ ->
-          Loggers.fprintf logger "%s=zeros(nodevar,1);"
+          Loggers.fprintf logger "%s=zeros(nodevar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Jacobian _ ->
-          Loggers.fprintf logger "%s=sparse(nodevar,nodevar);"
+          Loggers.fprintf logger "%s=sparse(nodevar,nodevar)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Jacobian_var _ ->
-              Loggers.fprintf logger "%s=sparse(nvar,nodevar);"
+              Loggers.fprintf logger "%s=sparse(nvar,nodevar)%s"
                 (Ode_loggers_sig.string_of_array_name variable)
+                (instruction_sep logger)
         | Ode_loggers_sig.Obs _ ->
-          Loggers.fprintf logger "%s=zeros(nobs,1);"
+          Loggers.fprintf logger "%s=zeros(nobs,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
         | Ode_loggers_sig.InitialStep
@@ -324,8 +536,9 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.N_rules -> ()
         | Ode_loggers_sig.Tmp ->
-          Loggers.fprintf logger "%s = zeros(nodevar,1);"
+          Loggers.fprintf logger "%s = zeros(nodevar,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
       in
       let () =
         match variable with
@@ -376,26 +589,38 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Jacobian_rateund _
         | Ode_loggers_sig.Expr _
         | Ode_loggers_sig.Init _
-        | Ode_loggers_sig.Initbis _
         | Ode_loggers_sig.Concentration _ -> ()
+        | Ode_loggers_sig.Initbis _ ->
+            repeat
+            (fun _ k ->
+               let () =
+                 Loggers.fprintf logger "%s%i%s0%s"
+                   (Ode_loggers_sig.string_of_array_name variable)
+                   k
+                   (affect_symbol logger)
+                   (instruction_sep logger)
+               in
+               let () =
+                 Loggers.print_newline logger
+               in
+               ())
+            nodevar
         | Ode_loggers_sig.Deriv _ ->
-        let rec aux k =
-          if k>nodevar
-          then ()
-          else
-            let () =
-              Loggers.fprintf logger "%s%i(t)%s0;"
+          repeat
+            (fun _  k ->
+               let () =
+                 Loggers.fprintf logger "%s%i%s%s0%s"
                 (Ode_loggers_sig.string_of_array_name variable)
                 k
+                (of_t logger "t")
                 (affect_symbol logger)
-            in
-            let () =
-              Loggers.print_newline logger
-            in
-            aux (k+1)
-        in
-        let () = aux 1 in
-        ()
+                (instruction_sep logger)
+               in
+               let () =
+                 Loggers.print_newline logger
+               in
+               ())
+            nodevar
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
         | Ode_loggers_sig.Obs _
@@ -433,7 +658,7 @@ let print_newline logger =
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 type bin_op_pos = PREFIX | INFIX | POSTFIX
-
+let _ = POSTFIX
 let bin_op_pos _logger op =
   match op with
   | Operator.MULT | Operator.POW | Operator.MINUS | Operator.SUM | Operator.DIV  -> INFIX
@@ -582,8 +807,8 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
             match
               init_mode
             with
-            | Some true -> "(0)"
-            | Some _ | None -> "(t)"
+            | Some true -> of_t logger "0"
+            | Some _ | None -> of_t logger "t"
           in
             Loggers.fprintf
               logger "var%i%s"
@@ -617,7 +842,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         else if mathematica_maple format then
           let ext =
             match init_mode with Some true -> ""
-                               | None | Some _ ->  "(t)"
+                               | None | Some _ ->  of_t logger "t"
           in
             Loggers.fprintf
             logger "%s%i%s" var
@@ -631,10 +856,10 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         else if mathematica_maple format then
           let ext =
             match init_mode with Some true -> ""
-                               | None | Some _ ->  "(t)"
+                               | None | Some _ ->  of_t logger "t"
           in
           Loggers.fprintf
-            logger "%s%i(t)%s" var
+            logger "%s%i%s" var
             (network_handler.Network_handler.int_of_kappa_instance x) ext
         else ()
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
@@ -836,7 +1061,7 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
-  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_variable variable
+  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable
   | Ode_loggers_sig.Time_scale_factor -> "t_correct_dimmension"
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
@@ -953,10 +1178,10 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     begin
       let () =
         Loggers.fprintf logger "%s="
-          (Ode_loggers_sig.string_of_variable  variable)
+          (string_of_variable logger variable)
       in
       let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
@@ -966,11 +1191,11 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     begin
       let () =
         Loggers.fprintf logger "%s:="
-          (Ode_loggers_sig.string_of_variable_mathematica ~init_mode variable)
+          (string_of_variable logger variable)
       in
       let () =
         print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
@@ -979,11 +1204,11 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
   | Loggers.Mathematica  ->
     begin
       let () =
-        Loggers.fprintf logger "%s:=="
-          (Ode_loggers_sig.string_of_variable_mathematica ~init_mode variable)
+        Loggers.fprintf logger "%s="
+          (string_of_variable logger variable)
       in
       let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
@@ -1062,7 +1287,12 @@ let associate_nrows logger =
     Loggers.get_encoding_format logger
   with
   | Loggers.Matlab | Loggers.Octave ->
-    let () = Loggers.fprintf logger "nrows = length(soln.x);" in
+    let () =
+      Loggers.fprintf
+        logger
+        "nrows = length(soln.x)%s"
+        (instruction_sep logger)
+    in
     Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica ->
     let a,b,c,d = __POS__ in
@@ -1084,7 +1314,7 @@ let associate_t logger n =
     Loggers.get_encoding_format logger
   with
   | Loggers.Matlab | Loggers.Octave ->
-    let () = Loggers.fprintf logger "t = y(%i);" n in
+    let () = Loggers.fprintf logger "t = y(%i)%s" n (instruction_sep logger) in
     Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
@@ -1099,7 +1329,7 @@ let init_time logger n =
     Loggers.get_encoding_format logger
   with
   | Loggers.Matlab | Loggers.Octave ->
-    let () = Loggers.fprintf logger "y(%i) = t;" n in
+    let () = Loggers.fprintf logger "y(%i) = t%s" n (instruction_sep logger) in
     Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
@@ -1116,10 +1346,10 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.Matlab  | Loggers.Octave
   | Loggers.Maple | Loggers.Mathematica ->
     begin
-      let var = Ode_loggers_sig.string_of_variable variable in
+      let var = string_of_variable logger variable in
       let () = Loggers.fprintf logger "%s%s%s+" var (affect_symbol logger) var in
       let () = print_alg_expr ~parenthesis_mode:In_sum ~init_mode string_of_var_id logger alg_expr network in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
@@ -1155,14 +1385,7 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
   | Loggers.Matlab  | Loggers.Octave
   | Loggers.Mathematica | Loggers.Maple ->
     begin
-      let string_of_var v =
-        if mathematica_maple format then
-          let init_mode = false in
-          Ode_loggers_sig.string_of_variable_mathematica ~init_mode v
-        else
-          Ode_loggers_sig.string_of_variable v
-      in
-      let var = string_of_var var_species in
+      let var = string_of_variable logger var_species in
       let () = Loggers.fprintf logger "%s%s%s%s" var (affect_symbol logger) var string in
       let bool =
         if nauto_in_species = 1
@@ -1190,15 +1413,15 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
         then
           Loggers.fprintf logger "*"
       in
-      let () = Loggers.fprintf logger "%s" (string_of_var var_rate) in
+      let () = Loggers.fprintf logger "%s" (string_of_variable logger var_rate) in
       let () =
         List.iter
           (fun (var,correct) ->
              Loggers.fprintf logger "*%s"
-               (apply_correct string_of_var correct var))
+               (apply_correct (string_of_variable logger) correct var))
           var_list
       in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = Loggers.print_newline logger in
       ()
     end
@@ -1222,11 +1445,15 @@ let gen_deriv
         Mods.IntSet.iter
           (fun dt ->
              let var_dt =
-               Ode_loggers_sig.string_of_variable
-                 (Ode_loggers_sig.variable_of_derived_variable
+               string_of_variable
+                 logger
+                 (variable_of_derived_variable
                     var_species dt)
              in
-             let () = Loggers.fprintf logger "%s%s%s%s" var_dt (affect_symbol logger) var_dt string in
+             let () =
+               Loggers.fprintf
+                 logger "%s%s%s%s" var_dt (affect_symbol logger) var_dt string
+             in
              let bool =
                if nauto_in_species = 1
                then false
@@ -1255,20 +1482,20 @@ let gen_deriv
              in
              let () =
                Loggers.fprintf logger "%s"
-                 (Ode_loggers_sig.string_of_variable
-                    (Ode_loggers_sig.variable_of_derived_variable var_rate dt ))
+                 (string_of_variable logger
+                    (variable_of_derived_variable var_rate dt ))
              in
              let () =
                List.iter
                  (fun (var,correct) ->
                     Loggers.fprintf logger "*%s"
                       (apply_correct
-                         Ode_loggers_sig.string_of_variable
+                         (string_of_variable logger)
                          correct
                          (Ode_loggers_sig.Concentration var)))
                  var_list
              in
-             let () = Loggers.fprintf logger ";" in
+             let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
              let () = Loggers.print_newline logger in
              ()
           )
@@ -1280,9 +1507,8 @@ let gen_deriv
         | (h,correct)::t ->
           begin
             let var_dt =
-              Ode_loggers_sig.string_of_variable
-                (Ode_loggers_sig.variable_of_derived_variable
-                   var_species h)
+              string_of_variable logger
+                (variable_of_derived_variable var_species h)
             in
             let () = Loggers.fprintf logger "%s=%s%s" var_dt var_dt string in
             let bool =
@@ -1313,14 +1539,14 @@ let gen_deriv
             in
             let () =
               Loggers.fprintf logger "%s"
-                (Ode_loggers_sig.string_of_variable var_rate)
+                (string_of_variable logger var_rate)
             in
             let () =
               List.iter
                 (fun (var,correct) ->
                    Loggers.fprintf logger "*%s"
                      (apply_correct
-                        Ode_loggers_sig.string_of_variable
+                        (string_of_variable logger)
                         correct
                         (Ode_loggers_sig.Concentration var)))
                 (List.rev suffix)
@@ -1333,11 +1559,11 @@ let gen_deriv
                 (fun (var,correct) ->
                    Loggers.fprintf logger "*%s"
                      (apply_correct
-                        Ode_loggers_sig.string_of_variable
+                        (string_of_variable logger)
                         correct (Ode_loggers_sig.Concentration var)))
                 (List.rev t)
             in
-            let () = Loggers.fprintf logger ";" in
+            let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
             let () = Loggers.print_newline logger in
             aux t ((h,correct)::suffix)
           end
@@ -1359,7 +1585,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
   with
   | Loggers.Matlab  | Loggers.Octave ->
     begin
-      let var = Ode_loggers_sig.string_of_variable var_token in
+      let var = string_of_variable logger var_token in
       let () = Loggers.fprintf logger "%s%s%s+" var (affect_symbol logger) var in
       let bool =
         if nauto_in_lhs =1
@@ -1376,12 +1602,13 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
         then
           Loggers.fprintf logger "*"
       in
-      let () = Loggers.fprintf logger "%s" (Ode_loggers_sig.string_of_variable var_rate) in
+      let () =
+        Loggers.fprintf logger "%s" (string_of_variable logger var_rate) in
       let () =
         List.iter
           (fun (var,correct) ->
              Loggers.fprintf logger "*%s"
-               (apply_correct Ode_loggers_sig.string_of_variable  correct var))
+               (apply_correct (string_of_variable logger) correct var))
           var_list
       in
       let () = Loggers.fprintf logger "*" in
@@ -1390,7 +1617,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
           ~parenthesis_mode:In_product
           string_of_var_id logger expr handler
       in
-      let () = Loggers.fprintf logger ";" in
+      let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = Loggers.print_newline logger in
       ()
     end
@@ -1411,9 +1638,8 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
         Mods.IntSet.iter
         (fun dt ->
            let var_dt =
-             Ode_loggers_sig.string_of_variable
-               (Ode_loggers_sig.variable_of_derived_variable
-                  var_token dt)
+             string_of_variable logger
+               (variable_of_derived_variable var_token dt)
            in
            let () =
              Loggers.fprintf
@@ -1437,16 +1663,15 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
            in
            let () =
              Loggers.fprintf logger "%s"
-               (Ode_loggers_sig.string_of_variable
-                  (Ode_loggers_sig.variable_of_derived_variable
-                     var_rate dt))
+               (string_of_variable logger
+                  (variable_of_derived_variable var_rate dt))
            in
            let () =
              List.iter
                (fun (var,correct) ->
                   Loggers.fprintf logger "*%s"
                     (apply_correct
-                       Ode_loggers_sig.string_of_variable
+                       (string_of_variable logger)
                        correct
                        (Ode_loggers_sig.Concentration var)))
                var_list
@@ -1457,7 +1682,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                ~parenthesis_mode:In_product
                string_of_var_id logger expr handler
            in
-           let () = Loggers.fprintf logger ";" in
+           let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
            let () = Loggers.print_newline logger in
            ())
         dep_rate
@@ -1466,9 +1691,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
         let aux_deriv deriv dt =
           let dt_id = dt in
           let var_dt =
-            Ode_loggers_sig.string_of_variable
-              (Ode_loggers_sig.variable_of_derived_variable
-                 var_token dt_id)
+            string_of_variable
+              logger
+              (variable_of_derived_variable var_token dt_id)
           in
           let () =
             Loggers.fprintf
@@ -1493,15 +1718,14 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
           in
           let () =
             Loggers.fprintf logger "%s"
-              (Ode_loggers_sig.string_of_variable
-                 var_rate)
+              (string_of_variable logger var_rate)
           in
           let () =
             List.iter
               (fun (var,correct) ->
                  Loggers.fprintf logger "*%s"
                    (apply_correct
-                      Ode_loggers_sig.string_of_variable
+                      (string_of_variable logger)
                       correct
                       (Ode_loggers_sig.Concentration var)))
               var_list
@@ -1515,7 +1739,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                  (deriv expr dt))
               handler
           in
-          let () = Loggers.fprintf logger ";" in
+          let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
           let () = Loggers.print_newline logger in
           ()
         in
@@ -1538,9 +1762,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
           | (h,correct)::t ->
             begin
               let var_dt =
-                Ode_loggers_sig.string_of_variable
-                  (Ode_loggers_sig.variable_of_derived_variable
-                     var_token h)
+                string_of_variable
+                  logger
+                  (variable_of_derived_variable var_token h)
               in
               let () = Loggers.fprintf logger "%s=%s+" var_dt var_dt in
               let bool =
@@ -1560,15 +1784,14 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
               in
               let () =
                 Loggers.fprintf logger "%s"
-                  (Ode_loggers_sig.string_of_variable
-                     var_rate)
+                  (string_of_variable logger var_rate)
               in
               let () =
                 List.iter
                   (fun (var,correct) ->
                      Loggers.fprintf logger "*%s"
                        (apply_correct
-                          Ode_loggers_sig.string_of_variable
+                          (string_of_variable logger)
                           correct
                           (Ode_loggers_sig.Concentration var)))
                   (List.rev suffix)
@@ -1578,7 +1801,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                   (fun (var,correct) ->
                      Loggers.fprintf logger "*%s"
                        (apply_correct
-                          Ode_loggers_sig.string_of_variable
+                          (string_of_variable logger)
                           correct
                           (Ode_loggers_sig.Concentration var)))
                   (List.rev tail)
@@ -1592,7 +1815,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                      expr)
                   handler
               in
-              let () = Loggers.fprintf logger ";" in
+              let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
               let () = Loggers.print_newline logger in
               aux t ((h,correct)::suffix)
             end
@@ -1622,14 +1845,14 @@ let print_options ~compute_jacobian logger =
              "                 'AbsTol', 1e-3, ...";
              "                 'InitialStep', initialstep, ...";
              "                 'MaxStep', tend, ...";
-             "                 'Jacobian', @ode_jacobian);"
+             ("                 'Jacobian', @ode_jacobian)"^(instruction_sep logger))
            ]
          else
            [
              "options = odeset('RelTol', 1e-3, ...";
              "                 'AbsTol', 1e-3, ...";
              "                 'InitialStep', initialstep, ...";
-             "                 'MaxStep', tend);"
+             ("                 'MaxStep', tend)"^(instruction_sep logger))
            ])
     in
     let () = Loggers.print_newline logger in
@@ -1652,7 +1875,7 @@ let start_time logger float =
   with
   | Loggers.Matlab
   | Loggers.Octave ->
-    let () = Loggers.fprintf logger "t = %f;" float in
+    let () = Loggers.fprintf logger "t = %f%s" float (instruction_sep logger) in
     Loggers.print_newline logger
   | Loggers.SBML
   | Loggers.Maple | Loggers.Mathematica
@@ -1697,19 +1920,19 @@ let print_license_check logger =
   | Loggers.Octave ->
     let () = print_list logger
         [
-          "uiIsOctave = false;";
-          "uiIsMatlab = false;";
-          "LIC = license('inuse');";
+          "uiIsOctave = false"^(instruction_sep logger);
+          "uiIsMatlab = false"^(instruction_sep logger);
+          "LIC = license('inuse')"^(instruction_sep logger);
           "for elem = 1:numel(LIC)";
           "    envStr = LIC(elem).feature";
           "    if strcmpi(envStr,'octave')";
-          "       LICname=envStr;";
-          "       uiIsOctave = true;";
+          "       LICname=envStr"^(instruction_sep logger);
+          "       uiIsOctave = true"^(instruction_sep logger);
           "       break";
           "    end";
           "    if strcmpi(envStr,'matlab')";
           "       LICname=envStr";
-          "       uiIsMatlab = true;";
+          "       uiIsMatlab = true"^(instruction_sep logger);
           "       break";
           "    end";
           "end";
@@ -1726,7 +1949,7 @@ let print_license_check logger =
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
-let print_integrate logger =
+let print_integrate ~nodevar logger =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -1737,15 +1960,51 @@ let print_integrate logger =
       print_list logger
         [
           "if uiIsMatlab";
-          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);";
-          "   soln.y=soln.y';";
+          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "   soln.y=soln.y'"^(instruction_sep logger);
           "elseif uiIsOctave";
-          "   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);";
+          "   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
           "end";]
     in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.Maple | Loggers.Mathematica ->
+  | Loggers.Maple ->
+    let () =
+      Loggers.fprintf logger
+        "sol = dsolve({"
+    in
+    let () = Loggers.print_newline logger in
+    let () =
+      repeat
+        (fun second_time k ->
+          let sep = if second_time then ", " else "" in
+          let () =
+            Loggers.fprintf logger
+            "%sy%i'(t) = dydt%i(t), y%i(0) = init%i"
+            sep k k k k
+        in
+        let () = Loggers.print_newline logger in
+        ())
+        nodevar
+    in
+    let () = Loggers.fprintf logger "},{" in
+    let () =
+      repeat
+        (fun second_time k ->
+          let sep = if second_time then ", " else "" in
+          let () =
+            Loggers.fprintf logger
+              "%sy%i(t)"
+              sep
+              k
+          in
+          let () = Loggers.print_newline logger in
+          ())
+        nodevar
+    in
+    let () = Loggers.fprintf logger "},t=tinit..tend):" in
+    ()
+  | Loggers.Mathematica ->
     let a,b,c,d = __POS__ in
     let () =
       Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
@@ -1761,7 +2020,7 @@ let print_integrate logger =
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
 
-let print_interpolate logger =
+let print_interpolate ~nodevar logger =
   match
     Loggers.get_encoding_format logger
   with
@@ -1770,23 +2029,23 @@ let print_interpolate logger =
     let () =
       print_list logger
         [
-          "n_points = floor ((tend-tinit)/period_t_point)+1;";
-          "t = linspace(tinit, tend, n_points);";
-          "obs = zeros(nrows,nobs);";
+          "n_points = floor ((tend-tinit)/period_t_point)+1"^(instruction_sep logger);
+          "t = linspace(tinit, tend, n_points)"^(instruction_sep logger);
+          "obs = zeros(nrows,nobs)"^(instruction_sep logger);
           "";
           "for j=1:nrows";
           "    for i=1:nodevar";
-          "        z(i)=soln.y(j,i);";
+          "        z(i)=soln.y(j,i)"^(instruction_sep logger);
           "    end";
-          "    h=ode_obs(z);";
+          "    h=ode_obs(z)"^(instruction_sep logger);
           "    for i=1:nobs";
-          "        obs(j,i)=h(i);";
+          "        obs(j,i)=h(i)"^(instruction_sep logger);
           "    end";
           "end";
           "if nobs==1";
-          "   y = interp1(soln.x, obs, t, 'pchip')';";
+          "   y = interp1(soln.x, obs, t, 'pchip')'"^(instruction_sep logger);
           "else";
-          "   y = interp1(soln.x, obs, t, 'pchip');";
+          "   y = interp1(soln.x, obs, t, 'pchip')"^(instruction_sep logger);
           "end"
         ]
     in Loggers.print_newline logger
@@ -1816,8 +2075,8 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
     let () =
       print_list logger
         [
-          "filename = '"^data_file^"';";
-          "fid = fopen (filename,'w');";
+          "filename = '"^data_file^"'"^(instruction_sep logger);
+          "fid = fopen (filename,'w')"^(instruction_sep logger);
           "fprintf(fid,'# "^command_line^"\\n')";
           "fprintf(fid,'# ')"]
     in
@@ -1833,11 +2092,11 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
           "fprintf(fid,'\\n')";
           "for j=1:n_points";
           "    for i=1:nobs";
-          "        fprintf(fid,'%f,',y(j,i));";
+          "        fprintf(fid,'%f,',y(j,i))"^(instruction_sep logger);
           "    end";
-          "    fprintf(fid,'\\n');";
+          "    fprintf(fid,'\\n')"^(instruction_sep logger);
           "end";
-          "fclose(fid);"]
+          "fclose(fid)"^(instruction_sep logger)]
     in Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica ->
       let a,b,c,d = __POS__ in
@@ -1912,7 +2171,7 @@ let launch_main logger =
     Loggers.get_encoding_format logger
   with
   | Loggers.Octave ->
-    let () = Loggers.fprintf logger "main();" in
+    let () = Loggers.fprintf logger "main()%s" (instruction_sep logger) in
     Loggers.print_newline logger
   | Loggers.SBML ->
     let () = Loggers.fprintf logger "</model>" in

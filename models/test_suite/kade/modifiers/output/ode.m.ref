@@ -1,7 +1,7 @@
 function main=main()
 % command line: 
 %      'KaDE' 'modifiers.ka' '-d' 'output' '-l' '1' '-p''0.1'
-%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
 %% tinit - the initial simulation time (likely 0)
@@ -265,3 +265,4 @@ end
 
 
 main();
+

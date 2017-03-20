@@ -4,7 +4,7 @@
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
 <!--
-THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS;
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 
 init - the initial abundances of each species and token
 tinit - the initial simulation time (likely 0)

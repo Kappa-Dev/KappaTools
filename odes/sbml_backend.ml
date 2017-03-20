@@ -118,7 +118,7 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
-  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_variable variable
+  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable 
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Time_scale_factor -> "t_scale_factor"
   | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
@@ -789,7 +789,7 @@ let dump_kinetic_law
             let () =
               Loggers.fprintf logger "<ci> %s </ci><cn type=\"integer\"> %i </cn>"
                 (string_of_variable
-                   logger 
+                   logger
                    (fun _logger var -> string_of_int
                       (* this line is error prone, check*)
                        (network.Network_handler.int_of_kappa_instance var))

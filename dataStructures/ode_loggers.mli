@@ -20,6 +20,9 @@ type correct = Div of int | Mul of int | Nil
 type options =
   | Comment of string
 
+val string_of_variable: Loggers.t -> Ode_loggers_sig.variable -> string
+val variable_of_derived_variable:
+  Ode_loggers_sig.variable -> int -> Ode_loggers_sig.variable
 
 val print_ode_preamble:
   Loggers.t ->
@@ -34,11 +37,13 @@ val print_ode_preamble:
 val declare_global: Loggers.t -> Ode_loggers_sig.variable -> unit
 val print_options: compute_jacobian:bool -> Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
-val print_integrate: Loggers.t -> unit
-val print_interpolate: Loggers.t -> unit
+val print_integrate: nodevar:int -> Loggers.t -> unit
+val print_interpolate: nodevar:int -> Loggers.t -> unit
 val print_dump_plots: data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
-val initialize: nodevar:int -> Loggers.t -> Ode_loggers_sig.variable -> unit
+val initialize:
+  nodevar:int ->
+  Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->

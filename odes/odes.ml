@@ -1343,7 +1343,7 @@ struct
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
                logger logger_buffer
-               (Ode_loggers_sig.variable_of_derived_variable
+               (Ode_loggers.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
           (fst dep_var)
@@ -1359,7 +1359,7 @@ struct
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
                logger logger_buffer
-               (Ode_loggers_sig.variable_of_derived_variable
+               (Ode_loggers.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
           (snd dep_var)
@@ -1384,7 +1384,7 @@ struct
              ~init_mode:false
              (I.string_of_var_id ~compil logger)
              logger logger_buffer
-             (Ode_loggers_sig.variable_of_derived_variable
+             (Ode_loggers.variable_of_derived_variable
                 (var_of_rule rule) dt)
               expr handler_expr)
         (fst dep_set)
@@ -1400,7 +1400,7 @@ struct
              ~init_mode:false
              (I.string_of_var_id ~compil logger)
              logger logger_buffer
-             (Ode_loggers_sig.variable_of_derived_variable
+             (Ode_loggers.variable_of_derived_variable
                 (var_of_rule rule) dt)
               expr handler_expr)
         (snd dep_set)
@@ -1449,7 +1449,7 @@ struct
 
   let declare_jacobian_rates_global logger network =
     declare_rates_global_gen
-      Ode_loggers_sig.variable_of_derived_variable
+      Ode_loggers.variable_of_derived_variable
       logger network
 
 
@@ -1458,15 +1458,32 @@ struct
   (* TODO : if unspecified, data_file, init_t and plot_period should
      get their value from field [conf] of [compil] before falling
      back to their default *)
-  let export_main
+
+  let good_step ~step logger =
+    match Loggers.get_encoding_format logger
+    with
+    | Loggers.Mathematica | Loggers.Maple -> step = 2
+    | Loggers.Matlab | Loggers.Octave -> step = 1
+    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS | Loggers.SBML | Loggers.Json -> step=1
+
+  let is_step_one ~step = step = 1
+  let is_step_two ~step = step = 2
+
+  let export_main_gen
+      ~step
       ~compute_jacobian
       ~command_line ~command_line_quotes ?(data_file="data.csv")
       ?(init_t=0.)
       ~max_t ?(plot_period=1.) logger logger_buffer compil network
       split =
     let is_zero = fresh_is_zero network in
+    let nodevar = get_last_ode_var_id network in
     let handler_expr = handler_expr network in
-    let () = Ode_loggers.open_procedure logger "main" "main" [] in
+    let () =
+      if good_step ~step logger
+      then
+        Ode_loggers.open_procedure logger "main" "main" []
+    in
     let command_line_closure logger =
       let () = Ode_loggers.print_comment ~breakline
           logger "command line: "
@@ -1479,224 +1496,252 @@ struct
     let may_be_not_time_homogeneous =
       may_be_not_time_homogeneous network in
     let () =
-      Ode_loggers.print_ode_preamble ~may_be_not_time_homogeneous
-        ~count ~rate_convention logger command_line_closure ()
-    in
-    let () = Ode_loggers.print_newline logger in
-    let () =
-      Sbml_backend.open_box logger_buffer "listOfParameters" in
-    let () = Sbml_backend.line_sbml logger_buffer in
-    let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
-        logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t)
-        handler_expr in
-    let () =
-      Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
-        logger_buffer Ode_loggers_sig.Tend
-        (Alg_expr.float max_t)
-        handler_expr
-    in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer Ode_loggers_sig.InitialStep
-        (Alg_expr.float 0.000001) handler_expr
-    in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer Ode_loggers_sig.Period_t_points
-        (Alg_expr.float plot_period) handler_expr
-    in
-    let () = Ode_loggers.print_newline logger_buffer in
-    let () =
-      Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
-    in
-    let nodevar = get_last_ode_var_id network in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer
-        Ode_loggers_sig.N_ode_var
-        (Alg_expr.int nodevar)
-        handler_expr
-    in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer
-        Ode_loggers_sig.N_var
-        (Alg_expr.int (get_last_var_id network))
-        handler_expr
-    in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer
-        Ode_loggers_sig.N_obs
-        (Alg_expr.int network.n_obs)
-        handler_expr in
-    let () =
-      Ode_loggers.associate
-        (I.string_of_var_id ~compil logger)
-        logger logger_buffer
-        Ode_loggers_sig.N_rules
-        (Alg_expr.int network.n_rules)
-        handler_expr
-    in
-    let () = Ode_loggers.print_newline logger_buffer in
-    let () = Ode_loggers.declare_global logger_buffer
-        (Ode_loggers_sig.Expr network.fresh_var_id) in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Expr network.fresh_var_id)
-    in
-    let () = Ode_loggers.declare_global logger_buffer
-        (Ode_loggers_sig.Init network.fresh_ode_var_id) in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Init network.fresh_ode_var_id)
-    in
-    let () = declare_rates_global logger_buffer network in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Rate network.n_rules)
-    in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Rated network.n_rules)
-    in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Rateun network.n_rules)
-    in
-    let () =
-      Ode_loggers.initialize
-        ~nodevar logger_buffer
-        (Ode_loggers_sig.Rateund network.n_rules)
-    in
-    let () =
-      if compute_jacobian
+      if is_step_one ~step
       then
+        let () =
+          Ode_loggers.print_ode_preamble ~may_be_not_time_homogeneous
+        ~count ~rate_convention logger command_line_closure ()
+        in
+        let () = Ode_loggers.print_newline logger in
+        let () =
+          Sbml_backend.open_box logger_buffer "listOfParameters"
+        in
+        let () = Sbml_backend.line_sbml logger_buffer in
+        let () =
+          Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
+            logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t)
+            handler_expr
+        in
+        let () =
+          Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
+            logger_buffer Ode_loggers_sig.Tend
+            (Alg_expr.float max_t)
+            handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer Ode_loggers_sig.InitialStep
+            (Alg_expr.float 0.000001) handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer Ode_loggers_sig.Period_t_points
+            (Alg_expr.float plot_period) handler_expr
+        in
+        let () = Ode_loggers.print_newline logger_buffer in
+        let () =
+          Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer
+            Ode_loggers_sig.N_ode_var
+            (Alg_expr.int nodevar)
+            handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer
+            Ode_loggers_sig.N_var
+            (Alg_expr.int (get_last_var_id network))
+            handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer
+            Ode_loggers_sig.N_obs
+            (Alg_expr.int network.n_obs)
+            handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer
+            Ode_loggers_sig.N_rules
+            (Alg_expr.int network.n_rules)
+            handler_expr
+        in
+        let () = Ode_loggers.print_newline logger_buffer in
         let () =
           Ode_loggers.declare_global
             logger_buffer
-            (Ode_loggers_sig.Jacobian_var
-               (network.fresh_ode_var_id,network.fresh_ode_var_id))
+            (Ode_loggers_sig.Expr network.fresh_var_id)
         in
         let () =
           Ode_loggers.initialize
             ~nodevar logger_buffer
-            (Ode_loggers_sig.Jacobian_var
-               (network.fresh_ode_var_id,network.fresh_ode_var_id))
+            (Ode_loggers_sig.Expr network.fresh_var_id)
         in
-        let () = declare_jacobian_rates_global logger_buffer network in
         let () =
-          Ode_loggers.initialize
-            ~nodevar logger_buffer
-            (Ode_loggers_sig.Jacobian_rate
-               (network.n_rules,network.fresh_ode_var_id))
+          Ode_loggers.declare_global logger_buffer
+            (Ode_loggers_sig.Init network.fresh_ode_var_id)
         in
         let () =
           Ode_loggers.initialize
             ~nodevar logger_buffer
-            (Ode_loggers_sig.Jacobian_rated
-               (network.n_rules,network.fresh_ode_var_id))
+            (Ode_loggers_sig.Init network.fresh_ode_var_id)
+        in
+        let () = declare_rates_global logger_buffer network in
+        let () =
+          Ode_loggers.initialize
+             ~nodevar logger_buffer
+            (Ode_loggers_sig.Rate network.n_rules)
         in
         let () =
           Ode_loggers.initialize
-            ~nodevar logger_buffer
-            (Ode_loggers_sig.Jacobian_rateun
-               (network.n_rules,network.fresh_ode_var_id))
+             ~nodevar logger_buffer
+            (Ode_loggers_sig.Rated network.n_rules)
         in
         let () =
           Ode_loggers.initialize
-            ~nodevar logger_buffer
-            (Ode_loggers_sig.Jacobian_rateund
-               (network.n_rules,network.fresh_ode_var_id))
+             ~nodevar logger_buffer
+            (Ode_loggers_sig.Rateun network.n_rules)
         in
+        let () =
+          Ode_loggers.initialize
+             ~nodevar logger_buffer
+            (Ode_loggers_sig.Rateund network.n_rules)
+        in
+        let () =
+          if compute_jacobian
+          then
+            let () =
+              Ode_loggers.declare_global
+                logger_buffer
+                (Ode_loggers_sig.Jacobian_var
+                   (network.fresh_ode_var_id,network.fresh_ode_var_id))
+            in
+            let () =
+              Ode_loggers.initialize
+                 ~nodevar logger_buffer
+                (Ode_loggers_sig.Jacobian_var
+                   (network.fresh_ode_var_id,network.fresh_ode_var_id))
+            in
+            let () = declare_jacobian_rates_global logger_buffer network in
+            let () =
+              Ode_loggers.initialize
+                 ~nodevar logger_buffer
+                (Ode_loggers_sig.Jacobian_rate
+                   (network.n_rules,network.fresh_ode_var_id))
+            in
+            let () =
+              Ode_loggers.initialize
+                 ~nodevar logger_buffer
+                (Ode_loggers_sig.Jacobian_rated
+                   (network.n_rules,network.fresh_ode_var_id))
+            in
+            let () =
+              Ode_loggers.initialize
+                 ~nodevar logger_buffer
+                (Ode_loggers_sig.Jacobian_rateun
+                   (network.n_rules,network.fresh_ode_var_id))
+            in
+            let () =
+              Ode_loggers.initialize
+                 ~nodevar logger_buffer
+                (Ode_loggers_sig.Jacobian_rateund
+                   (network.n_rules,network.fresh_ode_var_id))
+            in
+            ()
+        in
+        let () = Ode_loggers.print_newline logger_buffer in
+        let () = Ode_loggers.start_time logger_buffer init_t in
+        let () = Ode_loggers.print_newline logger_buffer in
+        let () =
+          if may_be_not_time_homogeneous
+          then
+            match Loggers.get_encoding_format logger
+            with
+            | Loggers.SBML | Loggers.Octave | Loggers.Matlab ->
+              let () =
+                Ode_loggers.associate
+                  (I.string_of_var_id ~compil logger)
+                  logger logger_buffer
+                  (Ode_loggers_sig.Init (get_last_ode_var_id network))
+                  (Locality.dummy_annot
+                     (Alg_expr.STATE_ALG_OP
+                        Operator.TIME_VAR))
+                  handler_init
+              in
+              Sbml_backend.do_sbml logger
+                (fun logger ->
+                   Sbml_backend.print_parameters
+                     I.string_of_var_id
+                     logger logger_buffer
+                     Ode_loggers_sig.Time_scale_factor Nbr.one)
+            | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
+            | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
+            | Loggers.TXT_Tabular
+            | Loggers.XLS| Loggers.Maple| Loggers.Mathematica| Loggers.Json ->
+              ()
+          else ()
+        in
+        let () =
+          List.iter
+            (affect_var is_zero logger logger_buffer ~init_mode:true
+               compil network)
+            network.var_declaration
+        in
+        let () = Ode_loggers.print_newline logger_buffer in
+        let () =
+          List.iter
+            (fun (rule,rate) ->
+               Ode_loggers.associate
+                 (I.string_of_var_id ~compil logger)
+                 ~comment:rule.comment logger logger_buffer
+                 (var_of_rate rule.rule_id_with_mode) rate handler_expr)
+            split.const_rate
+        in
+        let () =
+          Sbml_backend.close_box logger_buffer  "listOfParameters" in
+        let () = Ode_loggers.print_newline logger in
+        let () = Ode_loggers.print_license_check logger in
+        let () = Ode_loggers.print_newline logger in
+        let () = Ode_loggers.print_options ~compute_jacobian logger in
+        let () = Ode_loggers.print_newline logger in
         ()
     in
-    let () = Ode_loggers.print_newline logger_buffer in
-    let () = Ode_loggers.start_time logger_buffer init_t in
-    let () = Ode_loggers.print_newline logger_buffer in
-    let () =
-      if may_be_not_time_homogeneous
-      then
-        match Loggers.get_encoding_format logger
-        with
-        | Loggers.SBML | Loggers.Octave | Loggers.Matlab ->
-          let () =
-            Ode_loggers.associate
-              (I.string_of_var_id ~compil logger)
-              logger logger_buffer
-              (Ode_loggers_sig.Init (get_last_ode_var_id network))
-              (Locality.dummy_annot
-                 (Alg_expr.STATE_ALG_OP
-                    Operator.TIME_VAR))
-              handler_init
-          in
-          Sbml_backend.do_sbml logger
-            (fun logger ->
-               Sbml_backend.print_parameters
-                 I.string_of_var_id
-                 logger logger_buffer
-                 Ode_loggers_sig.Time_scale_factor Nbr.one)
-        | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
-        | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT| Loggers.TXT_Tabular
-        | Loggers.XLS| Loggers.Maple| Loggers.Mathematica| Loggers.Json -> ()
-      else ()
-    in
-    let () =
-      List.iter
-        (affect_var is_zero logger logger_buffer ~init_mode:true
-           compil network)
-        network.var_declaration
-    in
-    let () = Ode_loggers.print_newline logger_buffer in
-    let () =
-      List.iter
-        (fun (rule,rate) ->
-           Ode_loggers.associate
-             (I.string_of_var_id ~compil logger)
-             ~comment:rule.comment logger logger_buffer
-             (var_of_rate rule.rule_id_with_mode) rate handler_expr)
-        split.const_rate
-    in
-    let () =
-      Sbml_backend.close_box logger_buffer  "listOfParameters" in
     let titles = I.get_obs_titles compil in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_license_check logger in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_options ~compute_jacobian logger in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_integrate logger in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.associate_nrows logger in
     let () =
-      Ode_loggers.initialize
-        ~nodevar logger
-        Ode_loggers_sig.Tmp
+      if good_step ~step logger
+      then
+        let () = Ode_loggers.print_integrate ~nodevar logger in
+        let () = Ode_loggers.print_newline logger in
+        let () = Ode_loggers.associate_nrows logger in
+        let () =
+          Ode_loggers.initialize
+             ~nodevar logger
+            Ode_loggers_sig.Tmp
+        in
+        let () = Ode_loggers.print_newline logger in
+        let () = Ode_loggers.print_interpolate ~nodevar logger in
+        let () = Ode_loggers.print_newline logger in
+        let () =
+            Ode_loggers.print_dump_plots ~data_file ~command_line ~titles
+              logger
+        in
+        let () = Ode_loggers.print_newline logger in
+        ()
     in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_interpolate logger in
-    let () = Ode_loggers.print_newline logger in
     let () =
-      Ode_loggers.print_dump_plots ~data_file ~command_line ~titles
-        logger
+      if is_step_one ~step
+      then
+        let () = Ode_loggers.close_procedure logger in
+        let () = Ode_loggers.print_newline logger in
+        let () = Ode_loggers.print_newline logger in
+        ()
     in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.close_procedure logger in
-    let () = Ode_loggers.print_newline logger in
-    let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
     ()
+
+  let export_main = export_main_gen ~step:1
+  let export_main_follow_up = export_main_gen ~step:2
+
 
   let export_dydt logger compil network split =
     let nodevar = get_last_ode_var_id network in
@@ -1729,7 +1774,7 @@ struct
     let () = Ode_loggers.print_newline logger in
     let () =
       Ode_loggers.initialize
-        ~nodevar logger (Ode_loggers_sig.Deriv 1)
+       ~nodevar logger (Ode_loggers_sig.Deriv 1)
     in
     let do_it f l reactants enriched_rule =
       List.iter
@@ -2366,6 +2411,12 @@ struct
     let () =
       export_obs logger compil network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
+    let () =
+      export_main_follow_up
+        ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
+        ~max_t ?plot_period
+        logger logger_buffer compil network sorted_rules_and_decl
+    in
     ()
 
   let get_reactions network =
