@@ -130,8 +130,9 @@ let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str __POS__ parameters
-          (fun fmt -> Pattern.print_cc ~new_syntax:true ~sigs fmt b)
-          (fun fmt -> Pattern.print_cc ~new_syntax:true fmt b)
+          (fun fmt ->
+            Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt b )
+          (fun fmt -> Pattern.print_cc ~new_syntax:true ~with_id:false fmt b)
       in ()
   in (a, b, c)
 
@@ -190,8 +191,10 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
     let () =
       safe_print_str
         __POS__ parameters
-        (fun fmt -> Pattern.print_cc ~new_syntax:true ~sigs fmt pattern)
-        (fun fmt -> Pattern.print_cc ~new_syntax:true fmt pattern)
+        (fun fmt ->
+          Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
+        (fun fmt ->
+          Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
       in ()
   in
   let agent_list, site_list =

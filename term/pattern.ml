@@ -385,7 +385,7 @@ let pushout renaming cc1 cc2 =
   { nodes_by_type; nodes;
     recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
-let print_cc ~new_syntax ?sigs ?cc_id f cc =
+let print_cc ~new_syntax ?sigs ?cc_id ~with_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -436,7 +436,7 @@ let print_cc ~new_syntax ?sigs ?cc_id f cc =
            Format.fprintf
              f "%t@[<h>%a("
              (if not_empty then Pp.comma else Pp.empty)
-             (Agent.print ?sigs ~with_id:(cc_id<>None)) ag_x in
+             (Agent.print ?sigs ~with_id) ag_x in
          let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in
          true, out)
@@ -791,7 +791,8 @@ end = struct
     let pp_point p_id f p =
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
-        (print_cc ~new_syntax:true ~sigs:env.sig_decl ~cc_id:p_id) p.content
+        (print_cc ~new_syntax:true ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true)
+        p.content
         (fun f -> if p.roots <> None then
             Format.fprintf
               f "@[[%a]@]@ "
@@ -947,7 +948,7 @@ let print ~new_syntax ?domain ~with_id f id =
   | None -> Format.pp_print_int f id
   | Some env ->
     let cc_id = if with_id then Some id else None in
-    print_cc ~new_syntax ~sigs:(Env.signatures env) ?cc_id
+    print_cc ~new_syntax ~sigs:(Env.signatures env) ?cc_id ~with_id
       f env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified domain a_id b =

@@ -119,7 +119,7 @@ let print_chemical_species ?compil f =
     (Pattern.print_cc
        ~new_syntax:false
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
-       ?cc_id:None)
+       ?cc_id:None ~with_id:false)
 
 let print_token ?compil fmt k =
   Format.fprintf fmt
