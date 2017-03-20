@@ -246,15 +246,19 @@ let apply_negative_transformation
   | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
     let edges',cc_modif = Edges.remove_link id s id' s' edges in
     (side_effects,break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,edges')
-  | Primitives.Transformation.NegativeWhatEver ((id,_),s) ->
-    begin
-      match Edges.link_destination id s edges with
-      | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges)
-      | Some ((id',_ as nc'),s') ->
-        let edges',cc_modif = Edges.remove_link id s id' s' edges in
-        ((nc',s')::side_effects,
-         break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,edges')
-    end
+  | Primitives.Transformation.NegativeWhatEver ((id,_),s as n) ->
+     begin
+       match (List.partition (fun x -> x =n) side_effects) with
+       | (_::_,side_effects') -> (side_effects',stuff4unaries,edges)
+       | ([],_) ->
+          match Edges.link_destination id s edges with
+          | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges)
+          | Some ((id',_ as nc'),s') ->
+             let edges',cc_modif = Edges.remove_link id s id' s' edges in
+             ((nc',s')::side_effects,
+              break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,
+              edges')
+     end
   | Primitives.Transformation.PositiveInternalized _ ->
     raise
       (ExceptionDefn.Internal_Error
