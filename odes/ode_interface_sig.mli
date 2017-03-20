@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Mar 20 2017>
 *)
 
 module type Interface =
@@ -110,10 +110,7 @@ sig
     ?compil:compil -> Format.formatter -> rule -> unit
 
   val string_of_var_id:
-    ?compil:compil -> int -> string
-
-  (*val string_of_var_id_jac:
-    ?compil:compil -> int -> int -> string*)
+    ?compil:compil -> ?init_mode:bool -> Loggers.t -> int -> string
 
   val rate:
     compil -> rule -> rule_id_with_mode ->

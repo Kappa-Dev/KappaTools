@@ -171,19 +171,24 @@ let string_of_variable var =
   | Current_time
   | Time_scale_factor -> (string_of_array_name var)
 
-let string_of_variable_mathematica ~init var =
+let string_of_variable_mathematica ~init_mode var =
   match var with
   | Rate int
   | Rated int
   | Rateun int
   | Rateund int
-  | Expr int
   | Obs int
-  | Init int
-  | Initbis int
   | Concentration int
   | Deriv int ->
-    Printf.sprintf "%s%i(t)" (string_of_array_name var) int
+    Printf.sprintf "%s%i(%s)"
+      (string_of_array_name var) int (if init_mode then "0" else "t")
+  | Expr int ->
+    Printf.sprintf "%s%i(t)"
+      (string_of_array_name var) int  
+  | Init int
+  | Initbis int ->
+    Printf.sprintf "%s%i"
+      (string_of_array_name var) int
   | Jacobian_rate _
   | Jacobian_rated _
   | Jacobian_rateun _

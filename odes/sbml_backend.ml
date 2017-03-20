@@ -98,10 +98,10 @@ let string_in_comment s =
       aux (k+1) s
   in aux 0 (Bytes.of_string s)
 
-let string_of_variable string_of_var_id variable =
+let string_of_variable logger string_of_var_id variable =
   match variable with
   | Ode_loggers_sig.Expr i ->
-    string_of_var_id i
+    string_of_var_id logger i
   | Ode_loggers_sig.Concentration i -> "s"^(string_of_int i)
   | Ode_loggers_sig.Init _
   | Ode_loggers_sig.Initbis _
@@ -176,7 +176,7 @@ let print_parameters string_of_var_id logger logger_buffer variable expr =
     | None -> ""
     | Some x -> " units=\""^x^"\""
   in
-  let id = string_of_variable string_of_var_id variable in
+  let id = string_of_variable logger string_of_var_id variable in
   let () = Loggers.set_id_of_global_parameter logger variable id  in
   single_box
     logger_buffer
@@ -757,7 +757,7 @@ let maybe_time_dependent logger network var_rule =
     maybe_time_dependent_alg_expr_in_sbml logger expr network
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica 
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
 
@@ -777,7 +777,8 @@ let dump_kinetic_law
       then
         Loggers.fprintf logger "<ci> %s </ci>"
           (string_of_variable
-             (fun var -> string_of_int
+             logger
+             (fun _logger var -> string_of_int
                  (* this line is error prone, check*)
                  (network.Network_handler.int_of_kappa_instance var))
              var_rule)
@@ -788,7 +789,8 @@ let dump_kinetic_law
             let () =
               Loggers.fprintf logger "<ci> %s </ci><cn type=\"integer\"> %i </cn>"
                 (string_of_variable
-                   (fun var -> string_of_int
+                   logger 
+                   (fun _logger var -> string_of_int
                       (* this line is error prone, check*)
                        (network.Network_handler.int_of_kappa_instance var))
                    var_rule)

@@ -395,8 +395,7 @@ let initialize ~nodevar logger variable =
             aux (k+1)
         in
         let () = aux 1 in
-          Loggers.fprintf logger "%s=zeros(nodevar,1)"
-            (Ode_loggers_sig.string_of_array_name variable)
+        ()
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
         | Ode_loggers_sig.Obs _
@@ -579,9 +578,17 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
               logger "var(%i)"
               (network_handler.Network_handler.int_of_obs x)
         else if mathematica_maple format then
+          let ext =
+            match
+              init_mode
+            with
+            | Some true -> "(0)"
+            | Some _ | None -> "(t)"
+          in
             Loggers.fprintf
-              logger "var%i(t)"
+              logger "var%i%s"
               (network_handler.Network_handler.int_of_obs x)
+              ext
         else ()
       | Alg_expr.DIFF_TOKEN((Alg_expr.ALG_VAR x,_),id) ->
         if octave_matlab format then
@@ -608,9 +615,13 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
             logger "%s(%i)" var
             (network_handler.Network_handler.int_of_kappa_instance x)
         else if mathematica_maple format then
-          Loggers.fprintf
-            logger "%s%i(t)" var
-            (network_handler.Network_handler.int_of_kappa_instance x)
+          let ext =
+            match init_mode with Some true -> ""
+                               | None | Some _ ->  "(t)"
+          in
+            Loggers.fprintf
+            logger "%s%i%s" var
+            (network_handler.Network_handler.int_of_kappa_instance x) ext
         else ()
       | Alg_expr.TOKEN_ID x ->
         if octave_matlab format then
@@ -618,9 +629,13 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
             logger "%s(%i)" var
             (network_handler.Network_handler.int_of_token_id x)
         else if mathematica_maple format then
+          let ext =
+            match init_mode with Some true -> ""
+                               | None | Some _ ->  "(t)"
+          in
           Loggers.fprintf
-            logger "%s%i(t)" var
-            (network_handler.Network_handler.int_of_kappa_instance x)
+            logger "%s%i(t)%s" var
+            (network_handler.Network_handler.int_of_kappa_instance x) ext
         else ()
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
@@ -745,7 +760,6 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         network_handler in
     let () = Loggers.fprintf logger "</math>" in
     ()
-  | Loggers.Maple -> ()
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -952,9 +966,10 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     begin
       let () =
         Loggers.fprintf logger "%s:="
-          (Ode_loggers_sig.string_of_variable  variable)
+          (Ode_loggers_sig.string_of_variable_mathematica ~init_mode variable)
       in
-      let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
+      let () =
+        print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
       let () = Loggers.fprintf logger ";" in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
@@ -965,7 +980,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     begin
       let () =
         Loggers.fprintf logger "%s:=="
-          (Ode_loggers_sig.string_of_variable  variable)
+          (Ode_loggers_sig.string_of_variable_mathematica ~init_mode variable)
       in
       let () = print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
       let () = Loggers.fprintf logger ";" in
@@ -1038,7 +1053,6 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.Time_scale_factor,_
         | Ode_loggers_sig.Current_time,_ -> ()
     end
-  | Loggers.Maple
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -1116,8 +1130,8 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let apply_correct correct var  =
-  let var_string = Ode_loggers_sig.string_of_variable var in
+let apply_correct string_of_var correct var  =
+  let var_string = string_of_var var in
   match
     correct
   with
@@ -1134,13 +1148,21 @@ let apply_empty correct =
   | Mul i -> "*"^(string_of_int i)
 
 let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
+  let format = Loggers.get_encoding_format logger in
   match
-    Loggers.get_encoding_format logger
+    format
   with
   | Loggers.Matlab  | Loggers.Octave
   | Loggers.Mathematica | Loggers.Maple ->
     begin
-      let var = Ode_loggers_sig.string_of_variable var_species in
+      let string_of_var v =
+        if mathematica_maple format then
+          let init_mode = false in
+          Ode_loggers_sig.string_of_variable_mathematica ~init_mode v
+        else
+          Ode_loggers_sig.string_of_variable v
+      in
+      let var = string_of_var var_species in
       let () = Loggers.fprintf logger "%s%s%s%s" var (affect_symbol logger) var string in
       let bool =
         if nauto_in_species = 1
@@ -1168,12 +1190,12 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
         then
           Loggers.fprintf logger "*"
       in
-      let () = Loggers.fprintf logger "%s" (Ode_loggers_sig.string_of_variable var_rate) in
+      let () = Loggers.fprintf logger "%s" (string_of_var var_rate) in
       let () =
         List.iter
           (fun (var,correct) ->
              Loggers.fprintf logger "*%s"
-               (apply_correct correct var))
+               (apply_correct string_of_var correct var))
           var_list
       in
       let () = Loggers.fprintf logger ";" in
@@ -1241,6 +1263,7 @@ let gen_deriv
                  (fun (var,correct) ->
                     Loggers.fprintf logger "*%s"
                       (apply_correct
+                         Ode_loggers_sig.string_of_variable
                          correct
                          (Ode_loggers_sig.Concentration var)))
                  var_list
@@ -1296,7 +1319,9 @@ let gen_deriv
               List.iter
                 (fun (var,correct) ->
                    Loggers.fprintf logger "*%s"
-                     (apply_correct correct
+                     (apply_correct
+                        Ode_loggers_sig.string_of_variable
+                        correct
                         (Ode_loggers_sig.Concentration var)))
                 (List.rev suffix)
             in
@@ -1307,7 +1332,9 @@ let gen_deriv
               List.iter
                 (fun (var,correct) ->
                    Loggers.fprintf logger "*%s"
-                     (apply_correct correct (Ode_loggers_sig.Concentration var)))
+                     (apply_correct
+                        Ode_loggers_sig.string_of_variable
+                        correct (Ode_loggers_sig.Concentration var)))
                 (List.rev t)
             in
             let () = Loggers.fprintf logger ";" in
@@ -1353,7 +1380,8 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
       let () =
         List.iter
           (fun (var,correct) ->
-             Loggers.fprintf logger "*%s" (apply_correct correct var))
+             Loggers.fprintf logger "*%s"
+               (apply_correct Ode_loggers_sig.string_of_variable  correct var))
           var_list
       in
       let () = Loggers.fprintf logger "*" in
@@ -1417,7 +1445,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
              List.iter
                (fun (var,correct) ->
                   Loggers.fprintf logger "*%s"
-                    (apply_correct correct
+                    (apply_correct
+                       Ode_loggers_sig.string_of_variable
+                       correct
                        (Ode_loggers_sig.Concentration var)))
                var_list
            in
@@ -1470,7 +1500,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
             List.iter
               (fun (var,correct) ->
                  Loggers.fprintf logger "*%s"
-                   (apply_correct correct
+                   (apply_correct
+                      Ode_loggers_sig.string_of_variable
+                      correct
                       (Ode_loggers_sig.Concentration var)))
               var_list
           in
@@ -1535,7 +1567,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                 List.iter
                   (fun (var,correct) ->
                      Loggers.fprintf logger "*%s"
-                       (apply_correct correct
+                       (apply_correct
+                          Ode_loggers_sig.string_of_variable
+                          correct
                           (Ode_loggers_sig.Concentration var)))
                   (List.rev suffix)
               in
@@ -1543,7 +1577,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
                 List.iter
                   (fun (var,correct) ->
                      Loggers.fprintf logger "*%s"
-                       (apply_correct correct
+                       (apply_correct
+                          Ode_loggers_sig.string_of_variable
+                          correct
                           (Ode_loggers_sig.Concentration var)))
                   (List.rev tail)
               in

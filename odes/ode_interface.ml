@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Mar 20 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -267,16 +267,27 @@ let print_rule_name ?compil f r =
   let id = r.Primitives.syntactic_rule in
   Model.print_ast_rule ?env f id
 
-let string_of_var_id ?compil r =
+let string_of_var_id ?compil ?init_mode logger r =
+  let f logger r =
+    match Loggers.get_encoding_format logger with
+    | Loggers.Mathematica | Loggers.Maple ->
+      "var"^(string_of_int r)^(match init_mode with Some true -> "" | Some _ | None -> "(t)")
+    | Loggers.Octave | Loggers.Matlab ->
+      "var("^(string_of_int r)^")"
+    | Loggers.TXT | Loggers.TXT_Tabular
+    | Loggers.XLS | Loggers.SBML | Loggers.DOT
+    | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
+    | Loggers.Json | Loggers.Matrix -> ""
+  in
   let env = environment_opt compil in
   match env with
-  | None -> "var("^(string_of_int r)^")"
+  | None -> f logger r
   | Some env ->
     try
       let array = Model.get_algs env in
       fst (array.(r-1))
     with
-      _ -> "var("^(string_of_int r)^")"
+      _ -> f logger r
 
 let string_of_var_id_jac ?compil r dt =
   "jacvar("^(string_of_int r)^","^(string_of_int dt)^")"
