@@ -9,14 +9,15 @@ type state = {
   graph : Edges.t;
   time : float;
   event : int;
-  connected_components : Mods.IntSet.t Mods.IntMap.t;
+  connected_components : Mods.IntSet.t Mods.IntMap.t option;
 }
 
-let init_state = {
-  graph = Edges.empty ~with_connected_components:true;
+let init_state ~with_connected_components = {
+  graph = Edges.empty ~with_connected_components;
   time = 0.;
   event = 0;
-  connected_components = Mods.IntMap.empty;
+  connected_components =
+    if with_connected_components then Some Mods.IntMap.empty else None;
 }
 
 let break_apart_cc graph ccs = function
@@ -44,19 +45,23 @@ let do_negative_part ((a,_),s) (graph,ccs) =
   | None -> (Edges.remove_free a s graph,ccs)
   | Some ((a',_),s') ->
     let graph',cc_change = Edges.remove_link a s a' s' graph in
-    (graph',break_apart_cc graph' ccs cc_change)
+    (graph',match ccs with
+      | None -> None
+      |Some ccs -> Some (break_apart_cc graph' ccs cc_change))
 
 let do_action sigs (graph,ccs as pack) = function
   | Instantiation.Create ((id,ty),_graphs) ->
     (snd @@ Edges.add_agent ~id sigs ty graph,
-     Mods.IntMap.add id (Mods.IntSet.singleton id) ccs)
+     Option_util.map (Mods.IntMap.add id (Mods.IntSet.singleton id)) ccs)
   | Instantiation.Mod_internal (((a,_),s),i) ->
     (Edges.add_internal a s i graph,ccs)
   | Instantiation.Bind ((a1,s1 as x1),(a2,s2 as x2))
   | Instantiation.Bind_to ((a1,s1 as x1),(a2,s2 as x2)) ->
     let graph',ccs' = do_negative_part x2 (do_negative_part x1 pack) in
     let graph'',cc_change = Edges.add_link a1 s1 a2 s2 graph' in
-    (graph'',merge_cc ccs' cc_change)
+    (graph'',match ccs' with
+      | None -> None
+      | Some ccs' -> Some (merge_cc ccs' cc_change))
   | Instantiation.Free ((a,_),s as x) ->
     let graph',ccs' =  do_negative_part x pack in
     (Edges.add_free a s graph',ccs')
@@ -64,11 +69,14 @@ let do_action sigs (graph,ccs as pack) = function
     let graph',ccs' =
       Tools.recti (fun st s -> do_negative_part (a,s) st)
         pack (Signature.arity sigs ty) in
-    match Mods.IntMap.pop id ccs' with
-    | None,_ -> assert false
-    | Some x,ccs'' ->
-      let () = assert (Mods.IntSet.is_singleton x) in
-      (Edges.remove_agent id graph',ccs'')
+    match ccs' with
+    | None -> (Edges.remove_agent id graph',None)
+    | Some ccs' ->
+      match Mods.IntMap.pop id ccs' with
+      | None,_ -> assert false
+      | Some x,ccs'' ->
+        let () = assert (Mods.IntSet.is_singleton x) in
+        (Edges.remove_agent id graph',Some ccs'')
 
 let involved_agents l =
   List_util.map_option
