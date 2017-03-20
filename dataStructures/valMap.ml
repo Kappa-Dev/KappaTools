@@ -158,6 +158,7 @@ let rec fold f m accu =
   | Empty -> accu
   | Node(l, v, r, _,_) as x -> fold f r (f v (weight x) (fold f l accu))
 *)
+
 (**Returns (key,value) at random in the tree*)
 let random state m =
   try

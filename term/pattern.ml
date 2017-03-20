@@ -978,35 +978,7 @@ type work = {
   dangling: int; (* node_id *)
 }
 
-module PreEnv (*: sig
-  type t = {
-    sig_decl: Signature.s;
-    id_by_type: int list array;
-    nb_id: int;
-    domain: prepoint list Mods.IntMap.t Mods.IntMap.t;
-    mutable used_by_a_begin_new: bool;
-  }
-
-  type stat = { nodes: int; nav_steps: int }
-
-  val empty : Signature.s -> t
-  val fresh :
-    Signature.s -> int list array -> int ->
-    prepoint list Mods.IntMap.t Mods.IntMap.t -> t
-  val to_work : t -> work
-
-  val add_cc :
-    toplevel:bool -> ?origin:Operator.DepSet.elt ->
-    prepoint list Mods.IntMap.t Mods.IntMap.t -> id -> cc ->
-    prepoint list Mods.IntMap.t Mods.IntMap.t * Renaming.t * cc * id
-
-  val sigs : t -> Signature.s
-
-  val finalize : max_sharing:bool -> t ->
-                 (int list * (int * int) list) array array -> Env.t * stat
-
-  val of_env : Env.t -> t
-end*) = struct
+module PreEnv = struct
   type t = {
     sig_decl: Signature.s;
     id_by_type: int list array;
