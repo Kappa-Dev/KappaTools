@@ -13,6 +13,7 @@ let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
 let influenceFileName = ref ""
+let fluxFileName = ref ""
 let odeFileName  =
   begin
     List.fold_left
@@ -39,46 +40,45 @@ let set_odeFileName backend name =
   let reference = get_odeFileName backend in
   reference:=name
 
-let fluxFileName = ref ""
+let mk_dir_r d =
+  let rec aux d =
+    if not (Sys.file_exists d) then
+      let () = aux (Filename.dirname d) in
+      Unix.mkdir d 0o775 in
+  Unix.handle_unix_error aux d
 
 let path f =
-  if Filename.is_implicit f && Filename.dirname f = Filename.current_dir_name
-  then Filename.concat !outputDirName f
-  else f
-
-let open_out f =
-  open_out (path f)
+  if Filename.is_implicit f then Filename.concat !outputDirName f else f
 
 let find_available_name name facultative ext =
   let base = try Filename.chop_extension name
       with Invalid_argument _ -> name in
-  if Sys.file_exists (base^"."^ext) then
+  if Sys.file_exists (path (base^"."^ext)) then
     let base' = if facultative <> "" then base^"_"^facultative else base in
-    if Sys.file_exists (base'^"."^ext) then
+    if Sys.file_exists (path (base'^"."^ext)) then
       let v = ref 0 in
       let () =
- while Sys.file_exists (base'^"~"^(string_of_int !v)^"."^ext)
- do incr v; done
+        while Sys.file_exists (path (base'^"~"^(string_of_int !v)^"."^ext))
+        do incr v; done
       in base'^"~"^(string_of_int !v)^"."^ext
     else base'^"."^ext
   else base^"."^ext
 
 let get_fresh_filename base_name concat_list facultative ext =
-  let tmp_name =
-    path (try Filename.chop_extension base_name
-  with Invalid_argument _ -> base_name) in
+  let tmp_name = try Filename.chop_extension base_name
+    with Invalid_argument _ -> base_name in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   find_available_name base_name facultative ext
 
-let open_out_fresh base_name facultative ext =
-  open_out (get_fresh_filename base_name [] facultative ext)
+let open_out f =
+  let x = path f in
+  let () = mk_dir_r (Filename.dirname x) in
+  open_out x
 
-let mk_dir_r d =
-  let rec aux d =
-    let par = Filename.dirname d in
-    let () = if not (Sys.file_exists par) then aux par in
-    Unix.mkdir d 0o775 in
-  Unix.handle_unix_error aux d
+let open_out_fresh base_name facultative ext =
+  let x = get_fresh_filename base_name [] facultative ext in
+  let () = mk_dir_r (Filename.dirname x) in
+  open_out x
 
 let set name ext_opt =
   if !name <> "" then
@@ -167,9 +167,11 @@ let with_marshalized f =
   match !marshalizedOutFile with
   | "" -> ()
   | file ->
-     let d = open_out_bin (path file) in
-     let () = f d in
-     close_out d
+    let x = path file in
+    let () = mk_dir_r (Filename.dirname x) in
+    let d = open_out_bin x in
+    let () = f d in
+    close_out d
 
 let set_cflow s = cflowFileName := s
 let get_cflow l e = get_fresh_filename !cflowFileName l "" e
