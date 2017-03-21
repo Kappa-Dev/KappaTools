@@ -1478,7 +1478,7 @@ struct
       split =
     let is_zero = fresh_is_zero network in
     let nodevar = get_last_ode_var_id network in
-    let nobs = get_fresh_obs_id network in 
+    let nobs = get_fresh_obs_id network in
     let handler_expr = handler_expr network in
     let () =
       if good_step ~step logger
@@ -1711,7 +1711,7 @@ struct
     let () =
       if good_step ~step logger
       then
-        let () = Ode_loggers.print_integrate ~nodevar logger in
+        let () = Ode_loggers.print_integrate ~nobs ~nodevar logger in
         let () = Ode_loggers.print_newline logger in
         let () = Ode_loggers.associate_nrows logger in
         let () =
@@ -1720,7 +1720,7 @@ struct
             Ode_loggers_sig.Tmp
         in
         let () = Ode_loggers.print_newline logger in
-        let () = Ode_loggers.print_interpolate ~nodevar logger in
+        let () = Ode_loggers.print_interpolate logger in
         let () = Ode_loggers.print_newline logger in
         let () =
             Ode_loggers.print_dump_plots ~nobs ~data_file ~command_line ~titles

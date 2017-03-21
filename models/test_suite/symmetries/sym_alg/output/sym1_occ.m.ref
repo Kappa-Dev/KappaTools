@@ -7,7 +7,7 @@ function main=main()
 %% tinit - the initial simulation time (likely 0)
 %% tend - the final simulation time 
 %% initialstep - initial time step at the beginning of numerical integration
-%% period_t_point - the time period between points to return
+%% period - the time period between points to return
 %%
 %% variables (init(i),y(i)) denote numbers occurrences
 %% rule rates are corrected by the number of automorphisms in the lhs of rules
@@ -16,7 +16,7 @@ function main=main()
 tinit=0;
 tend=1;
 initialstep=1e-06;
-period_t_point=1;
+period=1;
 
 global nodevar
 nodevar=11;
@@ -97,7 +97,7 @@ end
 nrows = length(soln.x);
 tmp = zeros(nodevar,1);
 
-n_points = floor ((tend-tinit)/period_t_point)+1;
+n_points = floor ((tend-tinit)/period+1;
 t = linspace(tinit, tend, n_points);
 obs = zeros(nrows,nobs);
 

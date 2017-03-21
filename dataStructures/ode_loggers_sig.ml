@@ -127,7 +127,7 @@ let string_of_array_name var =
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
-  | Period_t_points -> "period_t_point"
+  | Period_t_points -> "period"
   | N_ode_var -> "nodevar"
   | N_var -> "nvar"
   | N_obs -> "nobs"
