@@ -1,0 +1,602 @@
+function main=main()
+% command line: 
+%      'KaDE' 'sym_alg.ka' '-d' 'output' '--with-symmetries' 'true''--octave-output' 'sym1_occ.m' '--count''occurrences'
+%% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+%% 
+%% init - the initial abundances of each species and token
+%% tinit - the initial simulation time (likely 0)
+%% tend - the final simulation time 
+%% initialstep - initial time step at the beginning of numerical integration
+%% period_t_point - the time period between points to return
+%%
+%% variables (init(i),y(i)) denote numbers occurrences
+%% rule rates are corrected by the number of automorphisms in the lhs of rules
+
+
+tinit=0;
+tend=1;
+initialstep=1e-06;
+period_t_point=1;
+
+global nodevar
+nodevar=11;
+nvar=4;
+nobs=1;
+nrules=3;
+
+global var
+var=zeros(nvar,1);
+global init
+init=sparse(nodevar,1);
+global k
+global kd
+global kun
+global kdun
+
+k=zeros(nrules,1);
+kd=zeros(nrules,1);
+kun=zeros(nrules,1);
+kdun=zeros(nrules,1);
+global jacvar
+jacvar=sparse(nvar,nodevar);
+global jack
+global jackd
+global jackun
+global jackund
+
+jack=zeros(nrules,nodevar);
+jackd=zeros(nrules,nodevar);
+jackun=zeros(nrules,nodevar);
+jackund=zeros(nrules,nodevar);
+
+t = 0.000000;
+
+init(11)=t;
+init(1)=10; % A(x~u?, y~u?, z)
+var(3)=(2*2*init(2)/2+2*init(5)+2*init(9)+2*2*init(6)/2+2*init(8)+2*2*init(10)/2)*init(9);
+var(2)=init(9);
+var(1)=2*2*init(2)/2+2*init(5)+2*init(9)+2*2*init(6)/2+2*init(8)+2*2*init(10)/2;
+
+k(1)=1; % A(z), A(z) -> A(z!1), A(z!1)
+k(2)=1; % A(x~u) -> A(x~p)
+k(3)=1; % A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+
+uiIsOctave = false;
+uiIsMatlab = false;
+LIC = license('inuse');
+for elem = 1:numel(LIC)
+    envStr = LIC(elem).feature
+    if strcmpi(envStr,'octave')
+       LICname=envStr;
+       uiIsOctave = true;
+       break
+    end
+    if strcmpi(envStr,'matlab')
+       LICname=envStr
+       uiIsMatlab = true;
+       break
+    end
+end
+
+
+options = odeset('RelTol', 1e-3, ...
+                 'AbsTol', 1e-3, ...
+                 'InitialStep', initialstep, ...
+                 'MaxStep', tend, ...
+                 'Jacobian', @ode_jacobian);
+
+
+if uiIsMatlab
+   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+   soln.y=soln.y';
+elseif uiIsOctave
+   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+end
+
+
+nrows = length(soln.x);
+tmp = zeros(nodevar,1);
+
+n_points = floor ((tend-tinit)/period_t_point)+1;
+t = linspace(tinit, tend, n_points);
+obs = zeros(nrows,nobs);
+
+for j=1:nrows
+    for i=1:nodevar
+        z(i)=soln.y(j,i);
+    end
+    h=ode_obs(z);
+    for i=1:nobs
+        obs(j,i)=h(i);
+    end
+end
+if nobs==1
+   y = interp1(soln.x, obs, t, 'pchip')';
+else
+   y = interp1(soln.x, obs, t, 'pchip');
+end
+
+
+filename = 'data.csv';
+fid = fopen (filename,'w');
+fprintf(fid,'# KaDE sym_alg.ka -d output --with-symmetries true --octave-output sym1_occ.m --count occurrences\n')
+fprintf(fid,'# ')
+fprintf(fid,'[T],')
+fprintf(fid,'\n')
+for j=1:n_points
+    for i=1:nobs
+        fprintf(fid,'%f,',y(j,i));
+    end
+    fprintf(fid,'\n');
+end
+fclose(fid);
+
+
+end
+
+
+
+function Init=ode_init()
+
+global nodevar
+global init
+Init=zeros(nodevar,1);
+
+Init(1) = init(1); % A(x~u?, y~u?, z)
+Init(2) = init(2); % A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1)
+Init(3) = init(3); % A(x~u?, y~p?, z)
+Init(4) = init(4); 
+Init(5) = init(5); % A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1)
+Init(6) = init(6); % A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1)
+Init(7) = init(7); % A(x~p?, y~p?, z)
+Init(8) = init(8); % A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1)
+Init(9) = init(9); % A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1)
+Init(10) = init(10); % A(x~p?, y~p?, z!1), A(x~p?, y~p?, z!1)
+Init(11) = init(11); % t
+end
+
+
+function dydt=ode_aux(t,y)
+
+global nodevar
+global var
+global k
+global kd
+global kun
+global kdun
+
+var(3)=(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+var(2)=y(9);
+var(1)=2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2;
+
+
+dydt=zeros(nodevar,1);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+dydt(2)=dydt(2)-k(3)*y(2);
+dydt(5)=dydt(5)+k(3)*y(2);
+dydt(4)=dydt(4)+k(3)*y(2)*1*(2*2*y(2)/2+1*2*y(5)/1+1*2*y(9)/1+2*2*y(6)/2+1*2*y(8)/1+2*2*y(10)/2)*y(9);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+dydt(2)=dydt(2)-k(3)*y(2);
+dydt(5)=dydt(5)+k(3)*y(2);
+dydt(4)=dydt(4)+k(3)*y(2)*1*(2*2*y(2)/2+1*2*y(5)/1+1*2*y(9)/1+2*2*y(6)/2+1*2*y(8)/1+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(2)=dydt(2)-k(2)*y(2);
+dydt(5)=dydt(5)+k(2)*y(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(2)=dydt(2)-k(2)*y(2);
+dydt(5)=dydt(5)+k(2)*y(2);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+dydt(5)=dydt(5)-k(3)*y(5);
+dydt(6)=dydt(6)+k(3)*y(5);
+dydt(4)=dydt(4)+k(3)*y(5)*1*(2*2*y(2)/2+1*2*y(5)/1+1*2*y(9)/1+2*2*y(6)/2+1*2*y(8)/1+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(5)=dydt(5)-k(2)*y(5);
+dydt(9)=dydt(9)+k(2)*y(5);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(5)=dydt(5)-k(2)*y(5);
+dydt(6)=dydt(6)+k(2)*y(5);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(6)=dydt(6)-k(2)*y(6);
+dydt(8)=dydt(8)+k(2)*y(6);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(6)=dydt(6)-k(2)*y(6);
+dydt(8)=dydt(8)+k(2)*y(6);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) -> A(x~p?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(8)=dydt(8)-k(2)*y(8);
+dydt(10)=dydt(10)+k(2)*y(8);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+dydt(9)=dydt(9)-k(3)*y(9);
+dydt(8)=dydt(8)+k(3)*y(9);
+dydt(4)=dydt(4)+k(3)*y(9)*1*(2*2*y(2)/2+1*2*y(5)/1+1*2*y(9)/1+2*2*y(6)/2+1*2*y(8)/1+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(9)=dydt(9)-k(2)*y(9);
+dydt(8)=dydt(8)+k(2)*y(9);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~p?, y~p?, z) -> A(x~p?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(7)=dydt(7)-1/2*k(1)*y(7)*y(7);
+dydt(7)=dydt(7)-1/2*k(1)*y(7)*y(7);
+dydt(10)=dydt(10)+1/2*k(1)*y(7)*y(7);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(7);
+dydt(7)=dydt(7)-1/2*k(1)*y(3)*y(7);
+dydt(8)=dydt(8)+1/2*k(1)*y(3)*y(7);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(7);
+dydt(7)=dydt(7)-1/2*k(1)*y(1)*y(7);
+dydt(9)=dydt(9)+1/2*k(1)*y(1)*y(7);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~p?, y~p?, z) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(7)=dydt(7)-1/2*k(1)*y(7)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(7)*y(1);
+dydt(9)=dydt(9)+1/2*k(1)*y(7)*y(1);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~p?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+dydt(7)=dydt(7)-1/2*k(1)*y(7)*y(3);
+dydt(3)=dydt(3)-1/2*k(1)*y(7)*y(3);
+dydt(8)=dydt(8)+1/2*k(1)*y(7)*y(3);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z) -> A(x~p?, y~p?, z) 
+
+dydt(3)=dydt(3)-k(2)*y(3);
+dydt(7)=dydt(7)+k(2)*y(3);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(3);
+dydt(6)=dydt(6)+1/2*k(1)*y(3)*y(3);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(3);
+dydt(3)=dydt(3)-1/2*k(1)*y(1)*y(3);
+dydt(5)=dydt(5)+1/2*k(1)*y(1)*y(3);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(3)*y(1);
+dydt(5)=dydt(5)+1/2*k(1)*y(3)*y(1);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z) -> A(x~u?, y~p?, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+dydt(1)=dydt(1)-k(3)*y(1);
+dydt(3)=dydt(3)+k(3)*y(1);
+dydt(4)=dydt(4)+k(3)*y(1)*1*2*2*y(2)/2*0;
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z) -> A(x~u?, y~p?, z) 
+
+dydt(1)=dydt(1)-k(2)*y(1);
+dydt(3)=dydt(3)+k(2)*y(1);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) 
+
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+dydt(2)=dydt(2)+1/2*k(1)*y(1)*y(1);
+dydt(11)=1;
+
+end
+
+
+function jac=ode_jacobian(t,y)
+
+global nodevar
+global jacvar
+global var
+global k
+global kd
+global kun
+global kdun
+
+global jack
+global jackd
+global jackun
+global jackund
+
+var(3)=(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+var(2)=y(9);
+var(1)=2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2;
+
+jacvar(3,2)=y(9)*(2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jacvar(3,5)=y(9)*(2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jacvar(3,6)=y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2));
+jacvar(3,8)=y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2));
+jacvar(3,9)=2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2+y(9)*(2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jacvar(3,10)=y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2));
+jacvar(2,9)=1;
+jacvar(1,2)=2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2);
+jacvar(1,5)=2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2);
+jacvar(1,6)=2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2);
+jacvar(1,8)=2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2);
+jacvar(1,9)=2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2);
+jacvar(1,10)=2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2);
+
+
+jac=sparse(nodevar,nodevar);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+jac(2,2)=jac(2,2)-k(3);
+jac(5,2)=jac(5,2)+k(3);
+jac(4,2)=jac(4,2)+k(3)*y(2)*y(9)*(2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,5)=jac(4,5)+k(3)*y(2)*y(9)*(2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,6)=jac(4,6)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,8)=jac(4,8)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2));
+jac(4,9)=jac(4,9)+k(3)*y(2)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2+y(9)*(2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2)));
+jac(4,10)=jac(4,10)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2));
+jac(4,2)=jac(4,2)+k(3)*y(2)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+jac(2,2)=jac(2,2)-k(3);
+jac(5,2)=jac(5,2)+k(3);
+jac(4,2)=jac(4,2)+k(3)*y(2)*y(9)*(2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,5)=jac(4,5)+k(3)*y(2)*y(9)*(2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,6)=jac(4,6)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,8)=jac(4,8)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2));
+jac(4,9)=jac(4,9)+k(3)*y(2)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2+y(9)*(2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2)));
+jac(4,10)=jac(4,10)+k(3)*y(2)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2));
+jac(4,2)=jac(4,2)+k(3)*y(2)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(2,2)=jac(2,2)-k(2);
+jac(5,2)=jac(5,2)+k(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(2,2)=jac(2,2)-k(2);
+jac(5,2)=jac(5,2)+k(2);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+jac(5,5)=jac(5,5)-k(3);
+jac(6,5)=jac(6,5)+k(3);
+jac(4,2)=jac(4,2)+k(3)*y(5)*y(9)*(2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,5)=jac(4,5)+k(3)*y(5)*y(9)*(2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,6)=jac(4,6)+k(3)*y(5)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,8)=jac(4,8)+k(3)*y(5)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2));
+jac(4,9)=jac(4,9)+k(3)*y(5)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2+y(9)*(2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2)));
+jac(4,10)=jac(4,10)+k(3)*y(5)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2));
+jac(4,5)=jac(4,5)+k(3)*y(5)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(5,5)=jac(5,5)-k(2);
+jac(9,5)=jac(9,5)+k(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(5,5)=jac(5,5)-k(2);
+jac(6,5)=jac(6,5)+k(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(6,6)=jac(6,6)-k(2);
+jac(8,6)=jac(8,6)+k(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(6,6)=jac(6,6)-k(2);
+jac(8,6)=jac(8,6)+k(2);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) -> A(x~p?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(8,8)=jac(8,8)-k(2);
+jac(10,8)=jac(10,8)+k(2);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+jac(9,9)=jac(9,9)-k(3);
+jac(8,9)=jac(8,9)+k(3);
+jac(4,2)=jac(4,2)+k(3)*y(9)*y(9)*(2*4/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,5)=jac(4,5)+k(3)*y(9)*y(9)*(2*0/(2**2)+2/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,6)=jac(4,6)+k(3)*y(9)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*4/(2**2)+0/(1**2)+2*0/(2**2));
+jac(4,8)=jac(4,8)+k(3)*y(9)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+2/(1**2)+2*0/(2**2));
+jac(4,9)=jac(4,9)+k(3)*y(9)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2+y(9)*(2*0/(2**2)+0/(1**2)+2/(1**2)+2*0/(2**2)+0/(1**2)+2*0/(2**2)));
+jac(4,10)=jac(4,10)+k(3)*y(9)*y(9)*(2*0/(2**2)+0/(1**2)+0/(1**2)+2*0/(2**2)+0/(1**2)+2*4/(2**2));
+jac(4,9)=jac(4,9)+k(3)*y(9)*(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(9,9)=jac(9,9)-k(2);
+jac(8,9)=jac(8,9)+k(2);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~p?, y~p?, z) -> A(x~p?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(7,7)=jac(7,7)-1/2*k(1)*y(7);
+jac(7,7)=jac(7,7)-1/2*k(1)*y(7);
+jac(7,7)=jac(7,7)-1/2*k(1)*y(7);
+jac(7,7)=jac(7,7)-1/2*k(1)*y(7);
+jac(10,7)=jac(10,7)+1/2*k(1)*y(7);
+jac(10,7)=jac(10,7)+1/2*k(1)*y(7);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(3,3)=jac(3,3)-1/2*k(1)*y(7);
+jac(3,7)=jac(3,7)-1/2*k(1)*y(3);
+jac(7,3)=jac(7,3)-1/2*k(1)*y(7);
+jac(7,7)=jac(7,7)-1/2*k(1)*y(3);
+jac(8,3)=jac(8,3)+1/2*k(1)*y(7);
+jac(8,7)=jac(8,7)+1/2*k(1)*y(3);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~p?, y~p?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(1,1)=jac(1,1)-1/2*k(1)*y(7);
+jac(1,7)=jac(1,7)-1/2*k(1)*y(1);
+jac(7,1)=jac(7,1)-1/2*k(1)*y(7);
+jac(7,7)=jac(7,7)-1/2*k(1)*y(1);
+jac(9,1)=jac(9,1)+1/2*k(1)*y(7);
+jac(9,7)=jac(9,7)+1/2*k(1)*y(1);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~p?, y~p?, z) -> A(x~u?, y~u?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(7,7)=jac(7,7)-1/2*k(1)*y(1);
+jac(7,1)=jac(7,1)-1/2*k(1)*y(7);
+jac(1,7)=jac(1,7)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(7);
+jac(9,7)=jac(9,7)+1/2*k(1)*y(1);
+jac(9,1)=jac(9,1)+1/2*k(1)*y(7);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~p?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~p?, y~p?, z!1) 
+
+jac(7,7)=jac(7,7)-1/2*k(1)*y(3);
+jac(7,3)=jac(7,3)-1/2*k(1)*y(7);
+jac(3,7)=jac(3,7)-1/2*k(1)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(1)*y(7);
+jac(8,7)=jac(8,7)+1/2*k(1)*y(3);
+jac(8,3)=jac(8,3)+1/2*k(1)*y(7);
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~p?, z) -> A(x~p?, y~p?, z) 
+
+jac(3,3)=jac(3,3)-k(2);
+jac(7,3)=jac(7,3)+k(2);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~p?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(1)*y(3);
+jac(6,3)=jac(6,3)+1/2*k(1)*y(3);
+jac(6,3)=jac(6,3)+1/2*k(1)*y(3);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~p?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(1,1)=jac(1,1)-1/2*k(1)*y(3);
+jac(1,3)=jac(1,3)-1/2*k(1)*y(1);
+jac(3,1)=jac(3,1)-1/2*k(1)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(1)*y(1);
+jac(5,1)=jac(5,1)+1/2*k(1)*y(3);
+jac(5,3)=jac(5,3)+1/2*k(1)*y(1);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~u?, y~p?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~p?, z!1) 
+
+jac(3,3)=jac(3,3)-1/2*k(1)*y(1);
+jac(3,1)=jac(3,1)-1/2*k(1)*y(3);
+jac(1,3)=jac(1,3)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(3);
+jac(5,3)=jac(5,3)+1/2*k(1)*y(1);
+jac(5,1)=jac(5,1)+1/2*k(1)*y(3);
+
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% reaction: A(x~u?, y~u?, z) -> A(x~u?, y~p?, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
+
+jac(1,1)=jac(1,1)-k(3);
+jac(3,1)=jac(3,1)+k(3);
+jac(4,2)=jac(4,2)+k(3)*y(1)*0;
+jac(4,1)=jac(4,1)+k(3)*y(1)*0;
+
+% rule    : A(x~u) -> A(x~p)
+% reaction: A(x~u?, y~u?, z) -> A(x~u?, y~p?, z) 
+
+jac(1,1)=jac(1,1)-k(2);
+jac(3,1)=jac(3,1)+k(2);
+
+% rule    : A(z), A(z) -> A(z!1), A(z!1)
+% reaction: A(x~u?, y~u?, z) + A(x~u?, y~u?, z) -> A(x~u?, y~u?, z!1), A(x~u?, y~u?, z!1) 
+
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+jac(2,1)=jac(2,1)+1/2*k(1)*y(1);
+jac(2,1)=jac(2,1)+1/2*k(1)*y(1);
+end
+
+
+function obs=ode_obs(y)
+
+global nobs
+global var
+obs=zeros(nobs,1);
+
+t = y(11);
+var(3)=(2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2)*y(9);
+var(2)=y(9);
+var(1)=2*2*y(2)/2+2*y(5)+2*y(9)+2*2*y(6)/2+2*y(8)+2*2*y(10)/2;
+
+obs(1)=t;
+
+end
+
+
+main();
+
