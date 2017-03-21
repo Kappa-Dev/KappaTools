@@ -10,7 +10,7 @@ init - the initial abundances of each species and token
 tinit - the initial simulation time (likely 0)
 tend - the final simulation time 
 initialstep - initial time step at the beginning of numerical integration
-period_t_point - the time period between points to return
+period - the time period between points to return
 
 variables denote number of embeddings 
 rule rates are corrected by the number of automorphisms in the lhs of rules
@@ -45,7 +45,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
 <parameter metaid="CMD4" id="tend" value="1." units="time"/>
-<parameter metaid="CMD5" id="period_t_point" value="0.1" units="time"/>
+<parameter metaid="CMD5" id="period" value="0.1" units="time"/>
 <parameter metaid="CMD6" id="n_ab" value="1000"/>
 <parameter metaid="CMD7" id="n_c" value="10000"/>
 <parameter metaid="CMD8" id="mod_rate" value="1"/>

@@ -6,7 +6,7 @@
 ## tinit - the initial simulation time (likely 0)
 ## tend - the final simulation time 
 ## initialstep - initial time step at the beginning of numerical integration
-## period_t_point - the time period between points to return
+## period - the time period between points to return
 ##
 ## variables (initi(t),yi(t)) denote numbers of embeddings 
 ## rule rates are corrected by the number of automorphisms in the lhs of rules
@@ -15,7 +15,7 @@
 tinit:=0:
 tend:=1:
 initialstep:=1e-06:
-period_t_point:=0.1:
+period:=0.1:
 
 nodevar:=6:
 nvar:=3:
@@ -171,7 +171,7 @@ fprintf(fid,"# KaDE expr.ka -d output -l 1 -p 0.1 --ode-backend MAPLE\n"):
 fprintf(fid,"# "):
 fprintf(fid,"[T],"):
 fprintf(fid,"\n"):
-for j from tinit to tend by period_t_point do
+for j from tinit to tend by period  do
         fprintf(fid,"%f,",eval(obs1(t),sol(j))):
     fprintf(fid,"\n"):
 end:

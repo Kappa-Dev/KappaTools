@@ -15,12 +15,13 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+type side = LHS | RHS
 type correct = Div of int | Mul of int | Nil
 
 type options =
   | Comment of string
 
-val string_of_variable: Loggers.t -> Ode_loggers_sig.variable -> string
+val string_of_variable: side:side -> Loggers.t -> Ode_loggers_sig.variable -> string
 val variable_of_derived_variable:
   Ode_loggers_sig.variable -> int -> Ode_loggers_sig.variable
 
@@ -37,8 +38,8 @@ val print_ode_preamble:
 val declare_global: Loggers.t -> Ode_loggers_sig.variable -> unit
 val print_options: compute_jacobian:bool -> Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
-val print_integrate: nodevar:int -> Loggers.t -> unit
-val print_interpolate: nodevar:int -> Loggers.t -> unit
+val print_integrate: nobs:int -> nodevar:int -> Loggers.t -> unit
+val print_interpolate: Loggers.t -> unit
 val print_dump_plots: nobs:int -> data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
 val initialize:
