@@ -39,7 +39,7 @@ val print_options: compute_jacobian:bool -> Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: nodevar:int -> Loggers.t -> unit
 val print_interpolate: nodevar:int -> Loggers.t -> unit
-val print_dump_plots: data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
+val print_dump_plots: nobs:int -> data_file:string ->  command_line:string ->  titles:string list -> Loggers.t -> unit
 
 val initialize:
   nodevar:int ->

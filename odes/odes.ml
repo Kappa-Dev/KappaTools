@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 20 2017>
+  * Last modification: Time-stamp: <Mar 21 2017>
 *)
 
 let local_trace = false
@@ -1478,6 +1478,7 @@ struct
       split =
     let is_zero = fresh_is_zero network in
     let nodevar = get_last_ode_var_id network in
+    let nobs = get_fresh_obs_id network in 
     let handler_expr = handler_expr network in
     let () =
       if good_step ~step logger
@@ -1722,7 +1723,7 @@ struct
         let () = Ode_loggers.print_interpolate ~nodevar logger in
         let () = Ode_loggers.print_newline logger in
         let () =
-            Ode_loggers.print_dump_plots ~data_file ~command_line ~titles
+            Ode_loggers.print_dump_plots ~nobs ~data_file ~command_line ~titles
               logger
         in
         let () = Ode_loggers.print_newline logger in

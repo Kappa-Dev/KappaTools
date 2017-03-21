@@ -99,10 +99,7 @@ let string_of_variable_maple var =
   | Ode_loggers_sig.Rateund int
   | Ode_loggers_sig.Obs int
   | Ode_loggers_sig.Concentration int
-  | Ode_loggers_sig.Deriv int ->
-    Printf.sprintf "d%s%i(t)/dt"
-      (Ode_loggers_sig.string_of_array_name var)
-      int
+  | Ode_loggers_sig.Deriv int
   | Ode_loggers_sig.Expr int ->
     Printf.sprintf "%s%i(t)"
       (Ode_loggers_sig.string_of_array_name var) int
@@ -588,23 +585,23 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Jacobian_rated _
         | Ode_loggers_sig.Jacobian_rateund _
         | Ode_loggers_sig.Expr _
-        | Ode_loggers_sig.Init _
-        | Ode_loggers_sig.Concentration _ -> ()
-        | Ode_loggers_sig.Initbis _ ->
-            repeat
-            (fun _ k ->
-               let () =
-                 Loggers.fprintf logger "%s%i%s0%s"
-                   (Ode_loggers_sig.string_of_array_name variable)
-                   k
-                   (affect_symbol logger)
-                   (instruction_sep logger)
-               in
-               let () =
-                 Loggers.print_newline logger
-               in
-               ())
-            nodevar
+        | Ode_loggers_sig.Concentration _
+        | Ode_loggers_sig.Initbis _ -> ()
+        | Ode_loggers_sig.Init _ ->
+                repeat
+                  (fun _ k ->
+                     let () =
+                       Loggers.fprintf logger "%s%i%s0%s"
+                         (Ode_loggers_sig.string_of_array_name variable)
+                         k
+                         (affect_symbol logger)
+                         (instruction_sep logger)
+                     in
+                     let () =
+                       Loggers.print_newline logger
+                     in
+                     ())
+                  (nodevar-1)
         | Ode_loggers_sig.Deriv _ ->
           repeat
             (fun _  k ->
@@ -620,7 +617,7 @@ let initialize ~nodevar logger variable =
                  Loggers.print_newline logger
                in
                ())
-            nodevar
+            (nodevar-1)
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
         | Ode_loggers_sig.Obs _
@@ -1189,17 +1186,76 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
     end
   | Loggers.Maple   ->
     begin
+      match variable with
+      | Ode_loggers_sig.Expr int
+      | Ode_loggers_sig.Concentration int
+      | Ode_loggers_sig.Obs int
+      | Ode_loggers_sig.Deriv int
+      | Ode_loggers_sig.Rate int
+      | Ode_loggers_sig.Rated int
+      | Ode_loggers_sig.Rateun int
+      | Ode_loggers_sig.Rateund int
+          ->
+        begin
+          let () =
+            Loggers.fprintf logger "%s%i:=(t -> "
+              (Ode_loggers_sig.string_of_array_name variable) int
+          in
+          let () =
+            print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger
+              alg_expr network_handler
+          in
+          let () = Loggers.fprintf logger ")%s" (instruction_sep logger) in
+          let () = if comment = "" then () else Loggers.fprintf logger " " in
+          let () = print_comment logger comment in
+          let () = Loggers.print_newline logger in
+          ()
+        end
+      | Ode_loggers_sig.Init int
+      | Ode_loggers_sig.Initbis int ->
+        let () =
+          Loggers.fprintf logger "%s%i:="
+            (Ode_loggers_sig.string_of_array_name variable) int
+        in
+        let () =
+          print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler
+        in
+        let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
+        let () = if comment = "" then () else Loggers.fprintf logger " " in
+        let () = print_comment logger comment in
+        let () = Loggers.print_newline logger in
+        ()
+      | Ode_loggers_sig.Tinit
+      | Ode_loggers_sig.Tend
+      | Ode_loggers_sig.InitialStep
+      | Ode_loggers_sig.Period_t_points
+      | Ode_loggers_sig.N_rules
+      | Ode_loggers_sig.N_ode_var
+      | Ode_loggers_sig.N_var
+      | Ode_loggers_sig.N_obs
+      | Ode_loggers_sig.N_rows
+      | Ode_loggers_sig.Tmp
+      | Ode_loggers_sig.Current_time
+      | Ode_loggers_sig.Time_scale_factor ->
       let () =
         Loggers.fprintf logger "%s:="
-          (string_of_variable logger variable)
+          (Ode_loggers_sig.string_of_array_name variable)
       in
       let () =
-        print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler in
+        print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger alg_expr network_handler
+      in
       let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = if comment = "" then () else Loggers.fprintf logger " " in
       let () = print_comment logger comment in
       let () = Loggers.print_newline logger in
       ()
+      | Ode_loggers_sig.Jacobian _
+      | Ode_loggers_sig.Jacobian_var _
+      | Ode_loggers_sig.Jacobian_rate _
+      | Ode_loggers_sig.Jacobian_rated _
+      | Ode_loggers_sig.Jacobian_rateun _
+      | Ode_loggers_sig.Jacobian_rateund _ ->
+          ()
     end
   | Loggers.Mathematica  ->
     begin
@@ -1294,14 +1350,7 @@ let associate_nrows logger =
         (instruction_sep logger)
     in
     Loggers.print_newline logger
-  | Loggers.Maple | Loggers.Mathematica ->
-    let a,b,c,d = __POS__ in
-    let _ =
-      Format.fprintf
-        Format.std_formatter
-        "to do: %s %i %i %i\n" a b c d
-    in
-    ()
+  | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
@@ -1971,7 +2020,19 @@ let print_integrate ~nodevar logger =
   | Loggers.Maple ->
     let () =
       Loggers.fprintf logger
-        "sol = dsolve({"
+        "sol :="
+    in
+    let () =
+      Loggers.print_newline logger
+    in
+    let () =
+      Loggers.fprintf logger "   dsolve("
+    in
+    let () =
+      Loggers.print_newline logger
+    in
+    let () =
+      Loggers.fprintf logger "      {"
     in
     let () = Loggers.print_newline logger in
     let () =
@@ -1980,29 +2041,44 @@ let print_integrate ~nodevar logger =
           let sep = if second_time then ", " else "" in
           let () =
             Loggers.fprintf logger
-            "%sy%i'(t) = dydt%i(t), y%i(0) = init%i"
-            sep k k k k
-        in
-        let () = Loggers.print_newline logger in
-        ())
-        nodevar
+              "%s" sep
+          in
+          let () =
+            Loggers.print_newline logger
+          in
+          let () =
+            Loggers.fprintf logger
+              "         diff(y%i(t),t) = dydt%i(t)," k k
+          in
+          let () =
+            Loggers.print_newline logger
+          in
+          let () =
+            Loggers.fprintf logger
+              "         y%i(0) = init%i"
+              k k
+          in
+          ())
+        (nodevar-1)
     in
-    let () = Loggers.fprintf logger "},{" in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "      }," in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "      {" in
     let () =
       repeat
         (fun second_time k ->
           let sep = if second_time then ", " else "" in
-          let () =
-            Loggers.fprintf logger
-              "%sy%i(t)"
-              sep
-              k
-          in
+          let () = Loggers.fprintf logger "%s" sep in
           let () = Loggers.print_newline logger in
+          let () = Loggers.fprintf logger "         y%i(t)" k in
           ())
-        nodevar
+        (nodevar-1)
     in
-    let () = Loggers.fprintf logger "},t=tinit..tend):" in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "      }," in
+    let () = Loggers.print_newline logger in
+    let () = Loggers.fprintf logger "      numeric, range=tinit..tend):" in
     ()
   | Loggers.Mathematica ->
     let a,b,c,d = __POS__ in
@@ -2050,22 +2126,18 @@ let print_interpolate ~nodevar logger =
         ]
     in Loggers.print_newline logger
     | Loggers.Maple | Loggers.Mathematica ->
-      let a,b,c,d = __POS__ in
-      let () =
-        Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
-      in
       ()
-  | Loggers.SBML
-  | Loggers.Json
-  | Loggers.DOT
-  | Loggers.HTML_Graph
-  | Loggers.Matrix | Loggers.HTML
-  | Loggers.HTML_Tabular
-  | Loggers.TXT
-  | Loggers.TXT_Tabular
-  | Loggers.XLS -> ()
+    | Loggers.SBML
+    | Loggers.Json
+    | Loggers.DOT
+    | Loggers.HTML_Graph
+    | Loggers.Matrix | Loggers.HTML
+    | Loggers.HTML_Tabular
+    | Loggers.TXT
+    | Loggers.TXT_Tabular
+    | Loggers.XLS -> ()
 
-let print_dump_plots ~data_file ~command_line ~titles logger  =
+let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -2099,11 +2171,43 @@ let print_dump_plots ~data_file ~command_line ~titles logger  =
           "fclose(fid)"^(instruction_sep logger)]
     in Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica ->
-      let a,b,c,d = __POS__ in
-      let () =
-        Loggers.fprintf logger "TO DO %s %i %i %i" a b c d
-      in
-      ()
+  let () =
+    print_list logger
+      [
+        "fid := fopen (\""^data_file^"\",WRITE)"^(instruction_sep logger);
+        "fprintf(fid,\"# "^command_line^"\\n\")"^(instruction_sep logger);
+        "fprintf(fid,\"# \")"^(instruction_sep logger)]
+  in
+  let () =
+    print_list logger
+      (List.rev_map
+         (fun x -> "fprintf(fid,\""^x^",\")"^(instruction_sep logger))
+         (List.rev titles))
+  in
+  let () =
+    print_list logger
+      [
+        "fprintf(fid,\"\\n\")"^(instruction_sep logger);
+        "for j from tinit to tend by period_t_point do";]
+  in
+  let () =
+    repeat
+      (fun _ k ->
+         let () =
+           Loggers.fprintf
+           logger
+           "        fprintf(fid,\"%%f,\",eval(obs%i(t),sol(j)))%s" k (instruction_sep logger) in
+         Loggers.print_newline logger)
+      nobs
+  in
+  let () =
+    print_list logger
+      [
+        "    fprintf(fid,\"\\n\")"^(instruction_sep logger);
+        "end"^(instruction_sep logger);
+        "fclose(fid)"^(instruction_sep logger)]
+  in
+  Loggers.print_newline logger
   | Loggers.SBML
   | Loggers.Json
   | Loggers.DOT
