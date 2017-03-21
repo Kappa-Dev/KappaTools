@@ -2382,7 +2382,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
   let () =
     print_list logger
       [
-        "fid = OpenWrite[\""^data_file^"\"]"^(instruction_sep logger);
+        "fid = OpenWrite[NotebookDirectory[]<>\""^data_file^"\"]"^(instruction_sep logger);
         "Write[fid,\"# "^command_line^"\\n\"]"^(instruction_sep logger);
         "Write[fid,\"# \"]"^(instruction_sep logger)]
   in
