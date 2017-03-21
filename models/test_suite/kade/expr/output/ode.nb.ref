@@ -169,7 +169,7 @@ sol =
 
 
 
-fid = OpenWrite["data.csv"];
+fid = OpenWrite[NotebookDirectory[]<>"data.csv"];
 Write[fid,"# KaDE expr.ka -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
 Write[fid,"# "];
 Write[fid,"[T],"];
