@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 17 2017>
+  * Last modification: Time-stamp: <Mar 22 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -163,9 +163,20 @@ val set_env: Model.t option -> ('static, 'dynamic) state -> ('static, 'dynamic) 
 val get_init_state: ('static, 'dynamic) state -> initial_state option option
 
 val set_init_state:
-  initial_state option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+  initial_state option -> ('static, 'dynamic) state ->
+  ('static, 'dynamic) state
 
-val set_compilation: compilation -> ('static, 'dynamic) state -> ('static, 'dynamic) state
+(*contact map int*)
+
+val get_contact_map_int: ('static, 'dynamic) state ->
+  Contact_map.t option option
+
+val set_contact_map_int:
+  Contact_map.t option -> ('static, 'dynamic) state ->
+  ('static, 'dynamic) state
+
+val set_compilation: compilation -> ('static, 'dynamic) state ->
+  ('static, 'dynamic) state
 
 val get_compilation: ('static, 'dynamic) state -> compilation option
 

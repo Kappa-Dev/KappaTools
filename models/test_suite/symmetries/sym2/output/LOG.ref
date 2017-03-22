@@ -1066,3 +1066,81 @@ A(x!A.y)=> [A(x!A.y,y)]
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+Translation from patten to raw_mixture
+INPUT:
+A(x!., y!.)
+OUTPUT:
+A(x, y)
+Compute the contact map...
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(x!./!1, y!.), A(x!./!1, y!.) @ 2
+ rule:   A(x!., y!./!1), A(x!./!1, y!.) @ 2
+Existing rule
+ rule:   A(x!./!1, y!.), A(x!., y!./!1) @ 2
+Existing rule
+ rule:   A(x!., y!./!1), A(x!., y!./!1) @ 2
+Existing rule
+ rule:   A(x!./!1, y!.), A(x!./!1, y!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(x!1/!., y!.), A(x!1/!., y!.) @ 3
+ rule:   A(x!., y!1/!.), A(x!1/!., y!.) @ 3
+Existing rule
+ rule:   A(x!1/!., y!.), A(x!., y!1/!.) @ 3
+Existing rule
+ rule:   A(x!., y!1/!.), A(x!., y!1/!.) @ 3
+Existing rule
+ rule:   A(x!1/!., y!.), A(x!1/!., y!.) @ 3
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(x!./!1, y!.), A(x!./!1, y!.) @ 2
+ rule:   A(x!., y!./!1), A(x!./!1, y!.) @ 2
+Existing rule
+ rule:   A(x!./!1, y!.), A(x!., y!./!1) @ 2
+Existing rule
+ rule:   A(x!., y!./!1), A(x!., y!./!1) @ 2
+Existing rule
+ rule:   A(x!./!1, y!.), A(x!./!1, y!.) @ 2
+Existing rule
+Check an orbit
+Permutation of the sites x and y in agent of type  A
+ rule:   A(x!1/!., y!.), A(x!1/!., y!.) @ 3
+ rule:   A(x!., y!1/!.), A(x!1/!., y!.) @ 3
+Existing rule
+ rule:   A(x!1/!., y!.), A(x!., y!1/!.) @ 3
+Existing rule
+ rule:   A(x!., y!1/!.), A(x!., y!1/!.) @ 3
+Existing rule
+ rule:   A(x!1/!., y!.), A(x!1/!., y!.) @ 3
+Existing rule
+Contact map
+agent:A
+  site:x
+binding_states:A.x;A.y;
+  site:y
+binding_states:A.x;A.y;
+Partitioned contact map
+************
+Agent: A
+  -Equivalence classes of sites for bindings states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
+Partitioned contact map (LKAPPA)
+************
+Agent: A
+  -Equivalence classes of sites for bindings states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
+With predicate (LKAPPA)
+With predicate (LKAPPA) init
+Symmetries:
+In rules:
+In rules and initial states:
+execution finished without any exception
