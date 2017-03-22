@@ -78,6 +78,15 @@ rect { stroke-width: 2; }
 .panel-pre {
     white-space : pre;
 }
+.panel-scroll {
+	   overflow: scroll;
+}
+.tab-log {
+    height: calc(100% - 350px);
+    height: -webkit-calc(100% - 350px);
+    height: -moz-calc(100vh - 430px);
+
+}
 .filename {
     overflow: hidden;
     text-overflow: ellipsis;
