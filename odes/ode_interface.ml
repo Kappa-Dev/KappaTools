@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 20 2017>
+  * Last modification: Time-stamp: <Mar 22 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -204,8 +204,6 @@ let disjoint_union compil l =
        Edges.empty ~with_connected_components:false)
       l in
   (pat,em,mix)
-
-(*type rule = Primitives.elementary_rule*)
 
 type rule_id = int
 

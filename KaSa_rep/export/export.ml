@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 17 2017>
+  * Last modification: Time-stamp: <Mar 22 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -298,22 +298,25 @@ let compute_env_init
          Remanent_state.state)
   =
   match Remanent_state.get_init state with
-  | Remanent_state.Compil compil -> state, None, None
+  | Remanent_state.Compil compil -> state, None, None, None
   | Remanent_state.Files files ->
     let () = show_title state in
     let cli = Run_cli_args.default in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
-    let (_,_,env, _, _, _, _, _, init), _ =
+    let (_,_,env, contactmap, _, _, _, _, init), _ =
       Cli_init.get_compilation cli
     in
-    Remanent_state.set_init_state
-      (Some init)
-      (Remanent_state.set_env (Some env) state),
-    Some (env:Model.t),
-    Some (init)
+    let state =
+      Remanent_state.set_init_state
+        (Some init)
+        (Remanent_state.set_env (Some env)
+           (Remanent_state.set_contact_map_int
+              (Some contactmap) state))
+    in
+    state, Some (env:Model.t), Some (init), Some (contactmap)
 
 let compute_env show_title state =
-  let state, env, _ = compute_env_init show_title state in
+  let state, env, _, _ = compute_env_init show_title state in
   state, env
 
 let get_env =
@@ -323,7 +326,7 @@ let get_env =
     compute_env
 
 let compute_init show_title state =
-  let state, _, init = compute_env_init show_title state in
+  let state, _, init, _ = compute_env_init show_title state in
   state, init
 
 let get_init =
@@ -331,6 +334,17 @@ let get_init =
     ~phase:StoryProfiling.LKappa_signature
     Remanent_state.get_init_state
     compute_init
+
+let compute_contact_map_int show_title state =
+  let state, _, _, contactmap =
+    compute_env_init show_title state in
+  state, contactmap
+
+let get_contact_map_int =
+    get_gen
+      ~phase:StoryProfiling.LKappa_signature
+      Remanent_state.get_contact_map_int
+      compute_contact_map_int
 
 (******************************************************************)
 (*compilation*)
@@ -1423,59 +1437,53 @@ let get_constraints_list_to_json state =
     state,
     Remanent_state.lemmas_list_to_json constraints_list
 
-let initial_value_of_arrays cannonic_list arrays =
-  let to_be_checked, rates, correct = arrays in
-  List.iter
-    (fun (i, rate_map, convention_rule) ->
-       let () =
-         correct.(i) <- convention_rule
-       in
-       let () =
-         rates.(i) <-
-           (Rule_modes.add_map (rates.(i)) rate_map)
-       in
-       let () =
-         to_be_checked.(i) <- true
-       in
-       ()
-    ) cannonic_list
+(*********************************************************)
+(*symmetries*)
+
+
 
 let compute_symmetries
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     _show_title state =
   let state, env = get_env state in
   let state, init = get_init state in
-  match env, init with
-  | None, _ | _, None  -> state, None
-  | Some env, Some init ->
+  let state, contact_map_int = get_contact_map_int state in
+  match env, init, contact_map_int with
+  | None, _, _ | _, None, None  -> state, None
+  | Some env, Some init, Some contact_map_int ->
     begin
       let rules =
         Model.fold_rules (fun _ acc r -> r :: acc) [] env
       in
-      let lkappa_rules_init = (*FIXME: is ast_rules is an initial
-                                states?? *)
-        (* No *)
-        (* You have to get that from init *)
-        Model.fold_ast_rules (fun _ acc r -> r :: acc) [] env
-(* Get the list of LKappa rules from init instead *)
-
+      let parameters = get_parameters state in
+      let cache = LKappa_auto.init_cache () in
+      let cache', chemical_species =
+        Symmetries.species_of_initial_state
+          (Model.signatures env)
+          contact_map_int
+          init
       in
-      let _ = init in 
+      let lkappa_rule_list =
+        List.fold_left (fun current_list species ->
+            let lkappa = Symmetries.species_to_lkappa_rule
+                parameters env species
+            in
+            lkappa :: current_list
+          ) [] chemical_species
+      in
       let state, contact_map =
         get_contact_map ~accuracy_level state
       in
-      let parameters = get_parameters state in
-      let cache = LKappa_auto.init_cache () in (*FIXME*)
       let rate_convention =
         Remanent_parameters.get_rate_convention parameters
       in
-      let cache, symmetries = (*TODO: store cache?*)
+      let cache, symmetries =
         Symmetries.detect_symmetries
           parameters
           env
           cache
           rate_convention
-          lkappa_rules_init
+          lkappa_rule_list
           rules
           contact_map
       in

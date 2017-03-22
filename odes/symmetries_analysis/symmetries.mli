@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 16 2017>
+   * Last modification: Time-stamp: <Mar 22 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -29,6 +29,12 @@ type symmetries =
 (*******************************************************************)
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
+
+val species_of_initial_state :
+Signature.s ->
+(int list * (int * int) list) array array ->
+('a * Primitives.elementary_rule * 'b) list ->
+Pattern.PreEnv.t * Pattern.cc list
 
 val species_to_lkappa_rule :
   Remanent_parameters_sig.parameters -> Model.t ->

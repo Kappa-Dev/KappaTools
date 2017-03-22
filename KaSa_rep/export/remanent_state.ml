@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Mar 17 2017>
+  * Last modification: Time-stamp: <Mar 22 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -609,6 +609,7 @@ type ('static,'dynamic) state =
     handler       : Cckappa_sig.kappa_handler option ;
     init : init ;
     env : Model.t option option ;
+    contact_map_int : Contact_map.t option option;
     init_state: initial_state option option ;
     compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
@@ -649,6 +650,7 @@ let create_state ?errors ?env ?init_state parameters init =
     handler = None ;
     init = init ;
     env = env ;
+    contact_map_int = None;
     init_state = init_state ;
     compilation = None ;
     refined_compilation = None ;
@@ -860,6 +862,12 @@ let get_init_state state = state.init_state
 let set_env model state = {state with env = Some model}
 
 let get_env state = state.env
+
+(*contact map from kappa*)
+let set_contact_map_int cm state =
+  {state with contact_map_int = Some cm}
+
+let get_contact_map_int state = state.contact_map_int
 
 let set_compilation compilation state =
   {state with compilation = Some compilation}
