@@ -363,7 +363,7 @@ let infs cc1 cc2 =
   in for_one_root []
 
 (* renaming is a total morphism from cc1' to cc2; cc1' is included in cc1 *)
-let pushout renaming cc1 cc2 =
+let intersection renaming cc1 cc2 =
   let nodes,image =
     Renaming.fold
       (fun i j (accn,l as acc) ->
@@ -1130,7 +1130,7 @@ module PreEnv = struct
         if max_sharing then infs this.element h.element
         else
           List.rev_map
-            (fun r -> pushout r this.element h.element)
+            (fun r -> intersection r this.element h.element)
             (matchings this.element h.element) in
       let acc' =
         List.fold_left
@@ -1390,3 +1390,18 @@ let finalize ~max_sharing env contact_map =
     Env.elementaries;
     Env.single_agent_points;
   },{ nodes = si; PreEnv.nav_steps }
+
+let merge_on_inf env m g1 g2 =
+  let m_list = Renaming.to_list m in
+  let (root1,root2) = List.hd m_list in
+  let pairing =
+    List.fold_left
+      (fun acc (a,b) -> Mods.Int2Set.add (a,b) acc)
+      Mods.Int2Set.empty m_list in
+  let possibilities = ref pairing in
+  match (are_compatible ~possibilities ~strict:true root1 g1 root2 g2) with
+  | Some m' ->
+     let (_,pushout) =
+       merge_compatible env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
+     Some pushout
+  | None -> None
