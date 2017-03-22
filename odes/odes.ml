@@ -1195,7 +1195,7 @@ struct
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
-    let network,initial_state =
+    let network, initial_state =
       species_of_initial_state compil network (I.get_init compil)
     in
     let () =

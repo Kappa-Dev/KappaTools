@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 20 2017>
+  * Last modification: Time-stamp: <Mar 22 2017>
 *)
 
 module type Interface =
@@ -97,7 +97,7 @@ sig
      * int) list
 
   val token_vector_of_init:
-    (*hidden_init*) rule ->
+    rule ->
     ((connected_component array list,int) Alg_expr.e Locality.annot
      * int) list
 
@@ -148,6 +148,10 @@ sig
   val divide_rule_rate_by: cache -> compil -> rule ->
     cache * int
 
+  val species_of_initial_state : compil ->
+    cache ->
+    ('b * Primitives.elementary_rule * 'c) list ->
+    cache * Pattern.cc list
 
   val detect_symmetries :
   Remanent_parameters_sig.parameters ->

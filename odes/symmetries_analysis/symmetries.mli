@@ -30,11 +30,24 @@ type symmetries =
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
 
+val disjoint_union : Signature.s ->
+  ('a * Renaming.t * Pattern.cc) list ->
+  'a array * Matching.t * Edges.t
+
+val apply : Signature.s ->
+  Primitives.elementary_rule -> Matching.t -> Edges.t -> Edges.t
+
+val connected_components_of_mixture :
+  Signature.s ->
+  Pattern.PreEnv.t ->
+  (int list * (int * int) list) array array ->
+    Edges.t -> Pattern.PreEnv.t * Pattern.cc list
+
 val species_of_initial_state :
-Signature.s ->
-(int list * (int * int) list) array array ->
-('a * Primitives.elementary_rule * 'b) list ->
-Pattern.PreEnv.t * Pattern.cc list
+  Signature.s ->
+  (int list * (int * int) list) array array ->
+  ('a * Primitives.elementary_rule * 'b) list ->
+  Pattern.PreEnv.t * Pattern.cc list
 
 val species_to_lkappa_rule :
   Remanent_parameters_sig.parameters -> Model.t ->
@@ -45,7 +58,7 @@ val detect_symmetries:
   Model.t ->
   LKappa_auto.cache ->
   Remanent_parameters_sig.rate_convention ->
-  LKappa.rule list ->
+  Pattern.cc list ->
   Primitives.elementary_rule list ->
   (string list * (string * string) list) Mods.StringMap.t
     Mods.StringMap.t -> LKappa_auto.cache * symmetries

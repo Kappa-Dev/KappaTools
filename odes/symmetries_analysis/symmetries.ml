@@ -654,7 +654,6 @@ let print_symmetries_gen parameters env contact_map
 
 (*convert a list of initial states into a mixture*)
 let disjoint_union sigs l =
-  (*let sigs = Model.signatures (compil.environment) in*)
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
   let _,em,mix =
     List.fold_left
@@ -676,7 +675,6 @@ let disjoint_union sigs l =
 let dummy_htbl = Hashtbl.create 0
 
 let apply sigs rule inj_nodes mix =
-  (*let sigs = Model.signatures compil.environment in*)
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
                 (inj_nodes, Mods.IntMap.empty))
@@ -715,9 +713,6 @@ let mixture_of_init sigs c =
 
 (*compute a connected component of mixture*)
 let connected_components_of_mixture sigs cache contact_map_int e =
-  (*let cc_cache = cache.cc_cache in
-  let contact_map = contact_map compil in
-    let sigs = Pattern.Env.signatures (domain compil) in*)
   let (cache,acc) =
     Snip.patterns_of_mixture contact_map_int sigs
       cache e
@@ -743,10 +738,20 @@ let species_of_initial_state sigs contact_map_int list =
 
 let detect_symmetries parameters env cache
     rate_convention
-    lkappa_rule_list
+    chemical_species
     get_rules
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
+  (*-------------------------------------------------------------*)
+  let lkappa_rule_list =
+    List.fold_left (fun current_list species ->
+        let lkappa =
+          species_to_lkappa_rule parameters
+            env species
+        in
+        lkappa :: current_list
+      ) [] chemical_species
+  in
   (*-------------------------------------------------------------*)
   let cache, pair_cannonic_list, pair_list =
     cannonic_form_from_syntactic_rules

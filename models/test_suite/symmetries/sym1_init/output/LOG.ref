@@ -562,6 +562,7 @@ A()=> [
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
 
+Compute the contact map...
 Translation from patten to raw_mixture
 INPUT:
 A(x~p, y~u, z!1),
@@ -600,7 +601,6 @@ INPUT:
 A(x~u, y~p, z!.)
 OUTPUT:
 A(x~u, y~p, z)
-Compute the contact map...
 Check an orbit
 Permutation of the sites x and y in agent of type  A
  rule:   A(z!./!1), A(z!./!1) @ 1
