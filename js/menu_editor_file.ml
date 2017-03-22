@@ -291,7 +291,7 @@ let onload () =
                           let () =
                             Common.saveFile
                               ~data:file.Api_types_j.file_content
-                              ~mime:"text/plain"
+                              ~mime:"application/octet-stream"
                               ~filename:file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
                           in
                           Lwt.return_unit)
