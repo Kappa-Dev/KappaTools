@@ -145,8 +145,20 @@ let connected_components_of_mixture compil cache e =
   let cc_cache = cache.cc_cache in
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
-  let (cc_cache,acc) = Snip.patterns_of_mixture contact_map sigs cc_cache e in
+  let cc_cache, acc =
+    Symmetries.connected_components_of_mixture
+      sigs cc_cache contact_map e
+  in
   {cache with cc_cache = cc_cache}, acc
+
+let species_of_initial_state compil cache list =
+  let sigs = Model.signatures compil.environment in
+  let contact_map = contact_map compil in
+  let cc_cache, list =
+    Symmetries.species_of_initial_state sigs
+      contact_map list
+  in
+  {cache with cc_cache = cc_cache}, list
 
 type embedding = Renaming.t (* the domain is connected *)
 type embedding_forest = Matching.t
@@ -187,23 +199,7 @@ let find_embeddings_unary_binary compil p x =
 
 let disjoint_union compil l =
   let sigs = Model.signatures (compil.environment) in
-  let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
-  let _,em,mix =
-    List.fold_left
-      (fun (i,em,mix) (_,r,cc) ->
-         let i = pred i in
-         let (mix',r') =
-           Pattern.add_fully_specified_to_graph sigs mix cc  in
-         let r'' = Renaming.compose false r r' in
-         (i,
-          Option_util.unsome
-            Matching.empty
-            (Matching.add_cc em i r''),
-          mix'))
-      (List.length l,Matching.empty,
-       Edges.empty ~with_connected_components:false)
-      l in
-  (pat,em,mix)
+  Symmetries.disjoint_union sigs l
 
 type rule_id = int
 
@@ -305,40 +301,9 @@ let rate_name compil rule rule_id =
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
 
-let dummy_htbl = Hashtbl.create 0
-
 let apply compil rule inj_nodes mix =
   let sigs = Model.signatures compil.environment in
-  let concrete_removed =
-    List.map (Primitives.Transformation.concretize
-                (inj_nodes, Mods.IntMap.empty))
-      rule.Primitives.removed
-  in
-  let (side_effects, dummy, edges_after_neg) =
-    List.fold_left
-      (Rule_interpreter.apply_negative_transformation dummy_htbl)
-      ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
-      concrete_removed
-  in
-  let (_, remaining_side_effects, _, edges'), concrete_inserted =
-    List.fold_left
-      (fun (x,p) h ->
-         let (x',h') =
-           Rule_interpreter.apply_positive_transformation
-             sigs dummy_htbl x h in
-         (x', h' :: p))
-      (((inj_nodes, Mods.IntMap.empty),
-        side_effects, dummy, edges_after_neg), [])
-      rule.Primitives.inserted
-  in
-  let (edges'',_) =
-    List.fold_left
-      (fun (e,i)  ((id,_ as nc),s) ->
-         Edges.add_free id s e,
-         Primitives.Transformation.Freed (nc, s) :: i)
-      (edges', concrete_inserted) remaining_side_effects
-  in
-  edges''
+  Symmetries.apply sigs rule inj_nodes mix
 
 let lift_species compil x =
   fst @@
@@ -430,22 +395,13 @@ let detect_symmetries parameters compil cache
     chemical_species
     contact_map =
   let rule_cache = cache.rule_cache in
-  let lkappa_rule_list =
-    List.fold_left (fun current_list species ->
-        let lkappa =
-          Symmetries.species_to_lkappa_rule parameters
-            compil.environment species
-        in
-        lkappa :: current_list
-      ) [] chemical_species
-  in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
       parameters
       compil.environment
       rule_cache
       compil.rate_convention
-      lkappa_rule_list
+      chemical_species
       (get_rules compil)
       contact_map
   in

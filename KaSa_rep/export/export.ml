@@ -1440,8 +1440,6 @@ let get_constraints_list_to_json state =
 (*********************************************************)
 (*symmetries*)
 
-
-
 let compute_symmetries
     ?accuracy_level:(accuracy_level=Remanent_state.Low)
     _show_title state =
@@ -1463,14 +1461,14 @@ let compute_symmetries
           contact_map_int
           init
       in
-      let lkappa_rule_list =
+      (*let lkappa_rule_list =
         List.fold_left (fun current_list species ->
             let lkappa = Symmetries.species_to_lkappa_rule
                 parameters env species
             in
             lkappa :: current_list
           ) [] chemical_species
-      in
+      in*)
       let state, contact_map =
         get_contact_map ~accuracy_level state
       in
@@ -1483,7 +1481,7 @@ let compute_symmetries
           env
           cache
           rate_convention
-          lkappa_rule_list
+          chemical_species
           rules
           contact_map
       in
