@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 13 2017>
+   * Last modification: Time-stamp: <Mar 23 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -153,6 +153,17 @@ let apply_head sigma sigma_raw (rule_tail,created_tail) =
     let s = Printf.sprintf "%s %i %i %i" s1 i1 i2 i3 in
     raise (invalid_arg s)
 
+let apply_head_predicate f f_raw cache (rule_tail,created_tail) rule =
+  match rule_tail, created_tail with
+  | h::t, _ ->
+    f h rule cache
+  | _, h::t ->
+    f_raw h rule cache
+  | [], [] ->
+    let s1,i1,i2,i3 = __POS__ in
+    let s = Printf.sprintf "%s %i %i %i" s1 i1 i2 i3 in
+    raise (invalid_arg s)
+
 let shift tail = apply_head ignore ignore tail
 
 (***************************************************************)
@@ -223,20 +234,15 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
 (*SYMMETRIES*)
 (***************************************************************)
 
-let for_all_over_orbit
+let for_all_elt_permutation
     (positions:int list)
-    (sigma:LKappa.rule_agent -> unit)
-    (sigma_inv:LKappa.rule_agent -> unit)
-    (sigma_raw:Raw_mixture.agent -> unit)
-    (sigma_raw_inv:Raw_mixture.agent -> unit)
-    (f:LKappa.rule -> 'a -> 'a * bool)
+    (f:LKappa.rule_agent -> LKappa.rule -> 'a -> 'a * bool )
+    (f_raw:Raw_mixture.agent -> LKappa.rule -> 'a -> 'a * bool)
     (rule:LKappa.rule)
     (init:'a)  =
-  let n = List.length positions in
-  let counter = Array.make n false in
   let rec next agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
-    | [] -> f rule accu
+    | [] -> accu, true
     | pos_head :: _
       when agent_id < pos_head ->
       let rule_tail = shift rule_tail in
@@ -244,28 +250,17 @@ let for_all_over_orbit
     | pos_head :: pos_tail
       when agent_id = pos_head ->
       begin
-        if
-          counter.(pos_id)
-        then
-          let () = counter.(pos_id) <- false in
-          let rule_tail =
-            apply_head sigma_inv sigma_raw_inv rule_tail
-          in
+        match apply_head_predicate
+                f f_raw
+                accu
+                rule_tail rule
+        with
+
+        | accu, false -> accu, false
+
+        | accu, true ->
+          let rule_tail = shift rule_tail in
           next (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
-        else
-          let () = counter.(pos_id) <- true in
-          let _ = apply_head sigma sigma_raw rule_tail in
-          let accu, b = f rule accu in
-          if b
-          then
-            next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
-              positions accu
-          else
-            let () =
-              backtrack sigma_inv sigma_raw_inv counter
-                positions rule
-            in
-            accu, false
       end
     | _::_
       (*when agent_id > pos_head*) ->
@@ -274,12 +269,67 @@ let for_all_over_orbit
         Format.fprintf Format.err_formatter
           "Internal bug: %s %i %i %i" s1 i1 i2 i3
       in
-      let () =
-        backtrack sigma_inv sigma_raw_inv counter positions rule
-      in
       accu, false
   in
   next 0 (of_rule rule) 0 positions init
+
+let for_all_over_orbit
+    (positions:int list)
+    (sigma:LKappa.rule_agent -> unit)
+    (sigma_inv:LKappa.rule_agent -> unit)
+    (sigma_raw:Raw_mixture.agent -> unit)
+    (sigma_raw_inv:Raw_mixture.agent -> unit)
+    (f: LKappa.rule -> 'a -> 'a * bool)
+      (rule:LKappa.rule)
+      (init:'a)  =
+    let n = List.length positions in
+    let counter = Array.make n false in
+    let rec next agent_id rule_tail pos_id positions_tail accu =
+      match positions_tail with
+      | [] -> f rule accu
+      | pos_head :: _
+        when agent_id < pos_head ->
+        let rule_tail = shift rule_tail in
+        next (agent_id + 1) rule_tail pos_id positions_tail accu
+      | pos_head :: pos_tail
+        when agent_id = pos_head ->
+        begin
+          if
+            counter.(pos_id)
+          then
+            let () = counter.(pos_id) <- false in
+            let rule_tail =
+              apply_head sigma_inv sigma_raw_inv rule_tail
+            in
+            next (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
+          else
+            let () = counter.(pos_id) <- true in
+            let _ = apply_head sigma sigma_raw rule_tail in
+            let accu, b = f rule accu in
+            if b
+            then
+              next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
+                positions accu
+            else
+              let () =
+                backtrack sigma_inv sigma_raw_inv counter
+                  positions rule
+              in
+              accu, false
+        end
+      | _::_
+        (*when agent_id > pos_head*) ->
+        let s1,i1,i2,i3 = __POS__ in
+        let () =
+          Format.fprintf Format.err_formatter
+            "Internal bug: %s %i %i %i" s1 i1 i2 i3
+        in
+        let () =
+          backtrack sigma_inv sigma_raw_inv counter positions rule
+        in
+        accu, false
+    in
+    next 0 (of_rule rule) 0 positions init
 
 exception False
 
@@ -479,3 +529,30 @@ let check_orbit_full_permutation
      swap_full_created,
      swap_full_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
+
+let check_invariance
+    ?parameters ?env
+    (get_positions, is_equal, is_equal_raw, sigma, sigma_inv, sigma_raw, sigma_raw_inv)   agent_type site1 site2 rule cache
+  =
+  for_all_elt_permutation
+    (get_positions agent_type site1 site2 rule)
+    is_equal
+    is_equal_raw
+    rule
+    cache
+
+let is_invariant_full_states_permutation
+    ?parameters
+    ?env
+    ~agent_type ~site1 ~site2 (rule:LKappa.rule) (cache:LKappa_auto.cache) =
+  cache, true
+
+let is_invariant_internal_states_permutation
+    ?parameters
+    ?env
+    ~agent_type ~site1 ~site2 rule cache =
+  cache, true
+
+let is_invariant_binding_states_permutation
+    ?parameters ?env ~agent_type ~site1 ~site2 rule cache =
+  cache, true

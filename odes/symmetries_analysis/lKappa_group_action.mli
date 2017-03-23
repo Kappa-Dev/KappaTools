@@ -63,3 +63,33 @@ val check_orbit_full_permutation:
   LKappa_auto.cache ->
   counter:(int array) ->
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
+
+val is_invariant_internal_states_permutation:
+  ?parameters:Remanent_parameters_sig.parameters ->
+  ?env:Model.t ->
+  agent_type:int ->
+  site1:int ->
+  site2:int ->
+  LKappa.rule ->
+  LKappa_auto.cache ->
+  LKappa_auto.cache * bool
+
+val is_invariant_binding_states_permutation:
+  ?parameters:Remanent_parameters_sig.parameters ->
+  ?env:Model.t ->
+  agent_type:int ->
+  site1:int ->
+  site2:int ->
+  LKappa.rule ->
+  LKappa_auto.cache ->
+  LKappa_auto.cache * bool
+
+val is_invariant_full_states_permutation:
+  ?parameters:Remanent_parameters_sig.parameters ->
+  ?env:Model.t ->
+  agent_type:int ->
+  site1:int ->
+  site2:int ->
+  LKappa.rule ->
+  LKappa_auto.cache ->
+  LKappa_auto.cache * bool
