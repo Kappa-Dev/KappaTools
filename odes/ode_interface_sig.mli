@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 22 2017>
+  * Last modification: Time-stamp: <Mar 23 2017>
 *)
 
 module type Interface =
@@ -119,7 +119,7 @@ sig
   val rate_name:
     compil -> rule -> rule_id_with_mode -> rule_name
 
-  val apply: compil -> rule -> embedding_forest -> mixture  -> mixture
+  val apply: compil -> rule -> embedding_forest -> mixture -> mixture
 
   val lift_species: compil -> chemical_species -> mixture
 
