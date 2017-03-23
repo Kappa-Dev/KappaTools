@@ -245,9 +245,14 @@ module Cflow_handler =
     type ('a,'b,'c,'d,'e) quaternary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'e
 
     let init_handler env =
-      let n_rules = Model.nb_syntactic_rules env in
-      let rule_name_cache = Array.init (n_rules+1)
-          (fun x -> Format.asprintf "%a" (Model.print_ast_rule ~env:env) x) in
+      let n_rules = Model.nb_rules env in
+      let rule_name_cache = Array.make n_rules "" in
+      let () =
+        Model.fold_rules
+          (fun x () r ->
+             rule_name_cache.(x) <-
+               Format.asprintf "%a" (Model.print_ast_rule ~env:env)
+                 r.Primitives.syntactic_rule) () env in
       let n_agents = Signature.size (Model.signatures env) in
       let agent_name_cache = Array.init n_agents
           (fun x -> Format.asprintf "%a" (Model.print_agent ~env:env) x) in
@@ -258,7 +263,7 @@ module Cflow_handler =
        steps_by_column=steps_by_column
       }
 
-    let string_of_exn x = Some ""
+    let string_of_exn _x = Some ""
 
     let get_priorities parameter =
       match parameter.current_compression_mode with

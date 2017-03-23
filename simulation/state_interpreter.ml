@@ -313,7 +313,7 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
         (*Rule_interpreter.print_dist env graph rule_id*) in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-  let cause = Trace.RULE rule.Primitives.syntactic_rule in
+  let cause = Trace.RULE rule_id in
   let apply_rule =
     if choice mod 2 = 1
     then Rule_interpreter.apply_unary_rule ~outputs ~rule_id

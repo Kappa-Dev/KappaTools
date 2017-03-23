@@ -11,6 +11,7 @@ install_printer Mods.StringSetMap.Set.print
 install_printer Mods.CharSetMap.Set.print
 install_printer Random_tree.debug_print
 install_printer IntCollection.print
+install_printer ValMap.print
 install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
 install_printer Operator.DepSet.print
