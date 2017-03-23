@@ -532,7 +532,8 @@ let check_orbit_full_permutation
 
 let check_invariance
     ?parameters ?env
-    (get_positions, is_equal, is_equal_raw, sigma, sigma_inv, sigma_raw, sigma_raw_inv)   agent_type site1 site2 rule cache
+    (get_positions, is_equal, is_equal_raw)
+    agent_type site1 site2 rule cache
   =
   for_all_elt_permutation
     (get_positions agent_type site1 site2 rule)
@@ -541,18 +542,63 @@ let check_invariance
     rule
     cache
 
-let is_invariant_full_states_permutation
-    ?parameters
-    ?env
-    ~agent_type ~site1 ~site2 (rule:LKappa.rule) (cache:LKappa_auto.cache) =
-  cache, true
-
 let is_invariant_internal_states_permutation
     ?parameters
     ?env
     ~agent_type ~site1 ~site2 rule cache =
-  cache, true
+  let positions =
+    potential_positions_for_swapping_internal_states
+      agent_type site1 site2 rule
+  in
+  match positions with
+  | [] -> cache, true
+  | _::_ -> cache, false
+
+
+let check_gen swap agent_type site1 site2 agent rule cache =
+  let cache, hash = LKappa_auto.cannonic_form cache rule in
+  let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
+  let () =
+    swap
+      agent_type site1 site2
+      agent
+  in
+  let cache, hash' = LKappa_auto.cannonic_form cache rule in
+  let i' = LKappa_auto.RuleCache.int_of_hashed_list hash' in
+  let () =
+    swap
+      agent_type site1 site2
+      agent
+  in
+  cache, i=i'
 
 let is_invariant_binding_states_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule cache =
-  cache, true
+    ?parameters ?env ~agent_type ~site1 ~site2
+    rule cache
+  =
+  check_invariance
+    ?parameters ?env
+    (potential_positions_for_swapping_binding_states,
+     (check_gen
+        swap_binding_state_regular
+        agent_type
+        site1
+        site2),
+     (check_gen swap_binding_state_created agent_type site1 site2))
+    agent_type site1 site2 rule cache
+
+let is_invariant_full_states_permutation
+    ?parameters ?env ~agent_type ~site1 ~site2
+    rule cache
+  =
+  let cache, b1 =
+    is_invariant_internal_states_permutation
+      ?parameters ?env ~agent_type ~site1 ~site2
+      rule cache
+  in
+  if b1 then
+    is_invariant_binding_states_permutation
+    ?parameters ?env ~agent_type ~site1 ~site2
+    rule cache
+  else
+    cache, false
