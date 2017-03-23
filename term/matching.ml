@@ -226,6 +226,10 @@ module Agent = struct
     | Existing (n,_) -> Agent.sort n
     | Fresh (i,_) -> i
 
+  let get_id = function
+    | Existing (_,i) -> i
+    | Fresh (_,i) -> i
+
   let same_connected_component p p' =
     match p,p' with
     | (Existing _, Fresh _ | Fresh _, Existing _) -> false

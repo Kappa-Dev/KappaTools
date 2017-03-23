@@ -77,6 +77,8 @@ val concretize_action :
   (Matching.t * int Mods.IntMap.t) -> abstract action -> concrete action
 val concretize_event :
   (Matching.t * int Mods.IntMap.t) -> abstract event -> concrete event
+val matching_abstract_concrete :
+  abstract event -> concrete event -> Renaming.t option
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test

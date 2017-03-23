@@ -69,6 +69,7 @@ module Agent: sig
   val concretize : (matching * int Mods.IntMap.t) -> t -> int * int
 
   val get_type : t -> int
+  val get_id : t -> int
   val same_connected_component : t -> t -> bool
   val is_fresh : t -> bool
 

@@ -104,6 +104,102 @@ let concretize_event inj2graph e =
       List.rev_map (concretize_test inj2graph) e.connectivity_tests;
   }
 
+let map_test f = function
+  | Is_Here a | Has_Internal ((a,_),_) | Is_Free (a,_) | Is_Bound (a,_)
+    | Has_Binding_type ((a,_),_) | Is_Bound_to ((a,_),_) -> f a
+
+let map_action f = function
+  | Create (a,_) | Mod_internal ((a,_),_) | Bind ((a,_),_)
+  | Bind_to ((a,_),_) | Free (a,_) | Remove a -> f a
+
+let match_tests = function
+  (* abstract, concrete*)
+  | (Is_Here a,Is_Here b) -> (Matching.Agent.get_type a) = (Agent.sort b)
+  | (Has_Internal ((a,s),i),Has_Internal ((b,t),j)) ->
+     ((Matching.Agent.get_type a) = (Agent.sort b))&&(s=t)&&(i=j)
+  | (Has_Binding_type ((a,s),c),Has_Binding_type ((b,t),d)) ->
+     ((Matching.Agent.get_type a) = (Agent.sort b))&&(s=t)&&(c=d)
+  | (Is_Free (a,s),Is_Free (b,t)) | (Is_Bound (a,s),Is_Bound (b,t)) ->
+     ((Matching.Agent.get_type a) = (Agent.sort b))&&(s=t)
+  | (Is_Bound_to ((a,s),(c,u)),(Is_Bound_to ((b,t),(d,v)))) ->
+    ((Matching.Agent.get_type a) = (Agent.sort b))&&(s=t)&&
+      ((Matching.Agent.get_type c) = (Agent.sort d))&&(u=v)
+  | (Is_Here _,_) | (Has_Internal _,_) | (Is_Free _,_) | (Is_Bound _,_)
+    | (Is_Bound_to _,_) | (Has_Binding_type _, _) -> false
+
+let match_actions = function
+  (* abstract, concrete*)
+  | (Create (a,als),Create (b,bls)) ->
+     ((Matching.Agent.get_type a)=(Agent.sort b))&&
+       (List.fold_left2 (fun ok (s,i) (t,j) -> ok&&(s=t)&&(i=j)) true als bls)
+  | (Mod_internal ((a,s),i), Mod_internal ((b,t),j)) ->
+     ((Matching.Agent.get_type a)=(Agent.sort b))&&(s=t)&&(i=j)
+  | (Bind ((a,s),(c,u)), Bind ((b,t),(d,v)))
+    | (Bind_to ((a,s),(c,u)), Bind_to ((b,t),(d,v))) ->
+     ((Matching.Agent.get_type a)=(Agent.sort b))&&(s=t)&&
+       ((Matching.Agent.get_type c)=(Agent.sort d))&&(u=v)
+  | (Free (a,s), Free (b,t)) ->
+     ((Matching.Agent.get_type a)=(Agent.sort b))&&(s=t)
+  | (Remove a,Remove b) -> ((Matching.Agent.get_type a)=(Agent.sort b))
+  | (Create _,_) | (Mod_internal _,_)| (Bind _,_)| (Bind_to _,_)| (Free _,_)
+    | (Remove _,_) -> false
+
+let get_ids f =
+  List.fold_left
+    (fun acc a ->
+      let id = f a in
+      if (List.mem id acc) then acc else id::acc) []
+
+let find_match tests actions ctests cactions =
+  let possible_matches abstract_quarks concrete_quarks fmap fmatch id_list =
+    List.fold_left
+      (fun acc aq ->
+        let ids =
+          get_ids (fmap (Agent.id))
+                  (List.find_all
+                     (fun cq -> fmatch (aq,cq)) concrete_quarks) in
+        match acc with
+        | [] -> ids
+        | _ ->
+           List.fold_left
+             (fun acc' i ->
+               if (List.mem i acc) then i::acc' else acc') [] ids)
+      id_list abstract_quarks in
+  let possible_tests = possible_matches tests ctests map_test match_tests [] in
+  let possible_actions =
+    possible_matches actions cactions map_action match_actions possible_tests in
+  let pick = List.hd possible_actions in
+  let remove_quarks fmap =
+    List.filter (fun q -> not((fmap (Agent.id) q) = pick)) in
+  (pick,(remove_quarks map_test ctests),(remove_quarks map_action cactions))
+
+let matching_abstract_concrete ae ce =
+  let ae_tests = List.flatten ae.tests in
+  let ce_tests = List.flatten ce.tests in
+  let abstract_ids =
+    (get_ids (map_action (Matching.Agent.get_id)) ae.actions)@
+      (get_ids (map_test (Matching.Agent.get_id)) ae_tests) in
+  let acc_option f acc = match acc with
+    | Some a -> f a
+    | None -> None in
+  let (matching,_,_,_,_) =
+    List.fold_left
+      (fun (acc,ae_tests,ce_tests,ae_actions,ce_actions) i ->
+        let (curr_tests,tests) =
+          List.partition
+            (fun test -> map_test (fun a -> (Matching.Agent.get_id a) = i) test)
+            ae_tests in
+        let (curr_actions,actions) =
+          List.partition
+            (fun act -> map_action (fun a -> (Matching.Agent.get_id a) = i) act)
+            ae_actions in
+        let (j,tests',actions') =
+          find_match curr_tests curr_actions ce_tests ce_actions in
+        ((acc_option (Renaming.add i j) acc),tests,tests',actions,actions'))
+      (Some (Renaming.empty),ae_tests,ce_tests,ae.actions,ce.actions)
+      abstract_ids in
+  matching
+
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)
   with Not_found -> agent
