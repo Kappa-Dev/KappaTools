@@ -391,10 +391,16 @@ let divide_rule_rate_by cache compil rule =
 (****************************************************************)
 (*cannonic form per rule*)
 
+(* This is not the proper place *)
+(* It should have been in a file in the repository *)
+(* symmetries_analysis *)
 let return_cc_from_alg_expr compil =
   let env = compil.environment in
   let pair_array = get_variables compil in
   let pattern_cc_list =
+    (* These folds are a non sense *)
+    (* You collect a quadratic number of alg_expr *)
+    (* Please fold the function  Alg_expr_extra.fold_over_mix over each alg_expr in the model *)
     Array.fold_left (fun current_list (s, algs) ->
         (*pattern.id array list list*)
         let e = Alg_expr.extract_connected_components algs in
@@ -422,7 +428,7 @@ let return_cc_from_alg_expr compil =
   in
   pattern_cc_list
 
-
+(* Instead, define a function to refine a partition according to the symmetries that are not satsified in a pattern *)
 let convert_cc_to_rule_mixture parameters compil =
   let sigs = Model.signatures compil.environment in
   let pattern_cc_list = return_cc_from_alg_expr compil in
