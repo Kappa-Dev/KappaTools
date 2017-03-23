@@ -607,3 +607,10 @@ let diff_mixture ?time_var expr mixture =
          ("A time-dependent expression cannot be differentiate without specifying a variable for time progress",Locality.dummy))
   in
   diff_gen f_mix f_token f_symb f_time expr
+
+let fold_over_mix f expr accu =
+  let l = Alg_expr.extract_connected_components expr in
+  List.fold_left
+    (fun accu mix -> f mix accu)
+    accu
+    l

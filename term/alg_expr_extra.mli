@@ -61,3 +61,8 @@ val diff_mixture:
     ('mix,'id) Alg_expr.e Locality.annot   ->
     'mix ->
     ('mix,'id) Alg_expr.e Locality.annot
+
+val fold_over_mix:
+  ('mix -> 'a -> 'a) ->
+  ('mix,'id) Alg_expr.e Locality.annot ->
+  'a -> 'a
