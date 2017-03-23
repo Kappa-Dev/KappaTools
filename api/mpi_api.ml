@@ -1,8 +1,6 @@
 open Lwt.Infix
 
-exception TimeOut
 exception BadResponse of Mpi_message_j.response
-
 
 let on_message
     (manager: Api.manager)
@@ -525,7 +523,7 @@ class type virtual manager_mpi_type =
     inherit Api.manager
   end
 
-class virtual manager ?(timeout : float = 10.) () : manager_mpi_type =
+class virtual manager () : manager_mpi_type =
   object(self)
     val mutable context =
       { mailboxes = IntMap.empty ; id = 0 }
@@ -556,12 +554,9 @@ class virtual manager ?(timeout : float = 10.) () : manager_mpi_type =
       let () = context <-
           { context with
             mailboxes = IntMap.add context.id feeder context.mailboxes } in
-      Lwt.pick [self#sleep timeout >>= (fun () -> Lwt.fail TimeOut);
-                (result >>=
-                 (fun (response : Mpi_message_j.response) ->
-                    Lwt.return (Api_common.result_ok response)))]
-
-
+      (result >>=
+       (fun (response : Mpi_message_j.response) ->
+          Lwt.return (Api_common.result_ok response)))
 
     inherit manager_base ()
   end

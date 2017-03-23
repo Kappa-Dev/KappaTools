@@ -56,7 +56,7 @@ class KappaClientTest(object):
         try:
             runtime.project_delete(project_id)
             self.fail()
-        except:
+        except kappa_common.KappaError as exception:
             None
 
     def test_file_crud(self):

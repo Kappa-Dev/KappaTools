@@ -111,18 +111,17 @@ let method_to_string : meth -> string =
   | `PUT -> "PUT"
 
 let ajax_request
-    ~(url : string)
-    ~(meth : meth)
-    ~(timeout:float)
-    ~(data : string option)
-    ~(handler : int -> string -> unit) =
+  ?(timeout: float option = None)
+  ~(url : string)
+  ~(meth : meth)
+  ~(data : string option)
+  ~(handler : int -> string -> unit) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "ajaxRequest")
     [| Js.Unsafe.inject
          (Js.string url);
        Js.Unsafe.inject
          (Js.string (method_to_string meth));
-       Js.Unsafe.inject (1000. *. timeout);
        Js.Unsafe.inject
          (Js.Opt.option
             (match data with
@@ -136,7 +135,12 @@ let ajax_request
                let () = debug response in
                handler
                  status
-                 (Js.to_string response)))
+                 (Js.to_string response)));
+       Js.Unsafe.inject
+         (Js.Opt.option
+            (match timeout with
+             | None -> None
+             | Some timeout -> Some (Js.float timeout)));
     |]
 
 (* This is to handle errors being lost in asyncs

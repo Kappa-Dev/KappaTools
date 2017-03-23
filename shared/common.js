@@ -244,8 +244,11 @@ function hashColor(s){
     return "#"+hashString;
 }
 
-function ajaxRequest(url,type,timeout,data,handler){
-    var parameter = { url : url , type : type, timeout : timeout };
+function ajaxRequest(url,type,data,handler,timeout){
+    var parameter = { url : url , type : type };
+    if(timeout){
+	parameter.timeout = timeout;
+    }
     if(data){ parameter.data = data; }
     debug(parameter);
     $.ajax(parameter)

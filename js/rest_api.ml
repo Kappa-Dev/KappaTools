@@ -13,7 +13,7 @@ exception TimeOut
 
 
 let send
-    (timeout : float)
+    (timeout : float option)
     (url : string)
     (meth : Common.meth)
     (data : string option)
@@ -62,12 +62,7 @@ let send
       ~timeout
       ~data:data
       ~handler:handler in
-  Lwt.pick
-    [ reply ;
-      (Lwt_js.sleep timeout >>=
-       (fun () ->
-          Lwt.return
-            (Api_common.result_error_exception TimeOut)))]
+   reply
 
 class manager
     ?(timeout:float = 30.0)
@@ -79,7 +74,7 @@ class manager
     function
     | `EnvironmentInfo  () ->
       send
-        timeout
+        (Some timeout)
         ""
         `GET
         None
@@ -87,7 +82,7 @@ class manager
         (fun result -> `EnvironmentInfo result)
     | `FileCreate (project_id,file) ->
       send
-        timeout
+        (Some timeout)
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `POST
         (Some (Api_types_j.string_of_file file))
@@ -100,7 +95,7 @@ class manager
         (fun result -> `FileCreate result)
     | `FileDelete (project_id,file_id) ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
         None
@@ -112,7 +107,7 @@ class manager
         (fun result -> `FileDelete result)
     | `FileGet (project_id,file_id) ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `GET
         None
@@ -120,7 +115,7 @@ class manager
         (fun result -> `FileGet result)
     | `FileCatalog project_id ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
         None
@@ -128,7 +123,7 @@ class manager
         (fun result -> `FileCatalog result)
     | `FileUpdate (project_id,file_id,file_modification) ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
         (Some (Api_types_j.string_of_file_modification file_modification))
@@ -140,7 +135,7 @@ class manager
         (fun result -> `FileUpdate result)
     | `ProjectCatalog () ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects" url)
         `GET
         None
@@ -148,7 +143,7 @@ class manager
         (fun result -> `ProjectCatalog result)
     | `ProjectCreate project_parameter ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects" url)
         `POST
         (Some (Api_types_j.string_of_project_parameter project_parameter))
@@ -156,7 +151,7 @@ class manager
         (fun result -> `ProjectCreate result)
     | `ProjectDelete project_id ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
         None
@@ -165,7 +160,7 @@ class manager
 
     | `ProjectParse project_id ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `GET
         None
@@ -174,7 +169,7 @@ class manager
 
     | `ProjectGet project_id ->
       send
-        timeout
+        None
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `GET
         None
@@ -183,7 +178,7 @@ class manager
 
     | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/continue"
            url project_id
@@ -196,7 +191,7 @@ class manager
         (fun result -> `SimulationContinue result)
     | `SimulationDelete (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s"
            url
@@ -208,7 +203,7 @@ class manager
         (fun result -> `SimulationDelete result)
     | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/filelines/%s"
            url
@@ -224,7 +219,7 @@ class manager
         (fun result -> `SimulationDetailFileLine result)
     | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/fluxmaps/%s"
            url
@@ -237,7 +232,7 @@ class manager
         (fun result -> `SimulationDetailFluxMap result)
     | `SimulationDetailLogMessage (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/logmessages"
            url
@@ -265,7 +260,7 @@ class manager
                  | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
              )) in
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/plot"
            url
@@ -277,7 +272,7 @@ class manager
         (fun result -> `SimulationDetailPlot result)
     | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/snapshots/%s"
            url
@@ -290,7 +285,7 @@ class manager
         (fun result -> `SimulationDetailSnapshot result)
     | `SimulationInfo (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s"
            url
@@ -302,7 +297,7 @@ class manager
         (fun result -> `SimulationInfo result)
     | `SimulationCatalogFileLine (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/filelines"
            url
@@ -314,7 +309,7 @@ class manager
         (fun result -> `SimulationCatalogFileLine result)
     | `SimulationCatalogFluxMap (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/fluxmaps"
            url
@@ -326,7 +321,7 @@ class manager
         (fun result -> `SimulationCatalogFluxMap result)
     | `SimulationCatalogSnapshot (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/snapshots"
            url
@@ -338,7 +333,7 @@ class manager
         (fun result -> `SimulationCatalogSnapshot result)
     | `SimulationCatalog project_id ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations"
            url
@@ -349,7 +344,7 @@ class manager
         (fun result -> `SimulationCatalog result)
     | `SimulationPause (project_id,simulation_id) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/pause"
            url
@@ -362,7 +357,7 @@ class manager
     | `SimulationPerturbation
         (project_id,simulation_id,simulation_perturbation) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/perturbation"
            url
@@ -377,7 +372,7 @@ class manager
     | `SimulationStart
         (project_id,simulation_parameter) ->
       send
-        timeout
+        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations"
            url

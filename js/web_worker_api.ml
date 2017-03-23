@@ -7,7 +7,6 @@
 (******************************************************************************)
 
 class manager
-    ?(timeout : float = 10.)
     ()  =
   object(self)
     val worker = Worker.create "WebWorker.js"
@@ -25,6 +24,6 @@ class manager
     method sleep timeout = Lwt_js.sleep timeout
     method post_message (message_text : string) : unit =
       worker##postMessage(message_text)
-    inherit Mpi_api.manager ~timeout:timeout ()
+    inherit Mpi_api.manager ()
     method terminate () = worker##terminate
   end

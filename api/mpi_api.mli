@@ -1,8 +1,6 @@
-exception TimeOut
 exception BadResponse of Mpi_message_j.response
 
-val on_message :
-  Api.manager -> (string -> unit Lwt.t) -> string -> unit Lwt.t
+val on_message : Api.manager -> (string -> unit Lwt.t) -> string -> unit Lwt.t
 
 class type virtual manager_base_type =
   object
@@ -26,6 +24,6 @@ class type virtual manager_mpi_type =
     inherit Api.manager
   end
 
-class virtual manager : ?timeout:float -> unit -> manager_mpi_type
+class virtual manager : unit -> manager_mpi_type
 
 val default_message_delimter : char

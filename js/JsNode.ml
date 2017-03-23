@@ -68,7 +68,6 @@ let kappa_process : process option ref = ref None
 
 class manager
     ?(message_delimiter : char = Mpi_api.default_message_delimter)
-    ?(timeout : float = 10.)
     (command : string)
     (args : string list) =
   object(self)
@@ -123,5 +122,5 @@ class manager
       | Some process -> process##kill
       | None -> ()
 
-    inherit Mpi_api.manager ~timeout ()
+    inherit Mpi_api.manager ()
   end
