@@ -746,7 +746,7 @@ module Env : sig
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
-  val get : t -> int -> point
+  val get : t -> id -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
   val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option

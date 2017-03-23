@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 22 2017>
+  * Last modification: Time-stamp: <Mar 23 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -390,6 +390,56 @@ let divide_rule_rate_by cache compil rule =
 
 (****************************************************************)
 (*cannonic form per rule*)
+
+let return_cc_from_alg_expr compil =
+  let env = compil.environment in
+  let pair_array = get_variables compil in
+  let pattern_cc_list =
+    Array.fold_left (fun current_list (s, algs) ->
+        (*pattern.id array list list*)
+        let e = Alg_expr.extract_connected_components algs in
+        let pattern_cc_array_list =
+          List.fold_left (fun current_list1 array_list ->
+              let array_list =
+                List.fold_left (fun store_list value_array ->
+                    let pattern_cc_list =
+                      Array.fold_left (fun store_list_cc id ->
+                          let point =
+                            Pattern.Env.get (Model.domain env) id
+                          in
+                          let cc = Pattern.Env.content point in
+                          cc :: store_list_cc
+                        ) store_list value_array
+                    in
+                    List.append pattern_cc_list store_list
+                  ) current_list1 array_list
+              in
+              List.append array_list current_list
+            ) current_list e
+        in
+        List.append pattern_cc_array_list current_list
+      ) [] pair_array
+  in
+  pattern_cc_list
+
+
+let convert_cc_to_rule_mixture parameters compil =
+  let sigs = Model.signatures compil.environment in
+  let pattern_cc_list = return_cc_from_alg_expr compil in
+  let r_mixture_list =
+    List.fold_left (fun current_list cc ->
+        let op =
+          Raw_mixture_extra.pattern_to_mixture ~parameters
+            sigs
+            cc
+        in
+        match op with
+        | None -> current_list
+        | Some r_mixture ->
+          r_mixture :: current_list
+      ) [] pattern_cc_list
+  in
+  r_mixture_list
 
 let detect_symmetries parameters compil cache
     chemical_species
