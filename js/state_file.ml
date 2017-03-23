@@ -161,8 +161,7 @@ let new_file filename content : Api_types_t.file =
 
 
 let create_file
-    ~(filename:string)
-    ~(content:string) : unit Api.result Lwt.t =
+    ~(filename:string) ~(content:string) : unit Api.result Lwt.t =
   State_project.with_project ~label:"create_file"
     (fun manager project_id ->
        (manager#file_catalog project_id) >>=
@@ -172,41 +171,33 @@ let create_file
                  List.filter
                    (fun file_metadata ->
                       filename = file_metadata.Api_types_j.file_metadata_id)
-                   catalog.Api_types_j.file_metadata_list
-              in
-              (match matching_file with
-              | [] ->
-                (manager#file_create project_id (new_file filename content))
-                >>=
-                (Api_common.result_bind_lwt
-                   ~ok:(fun _ -> Lwt.return (Api_common.result_ok ())))
-              | metadata::_ ->
-                let file_modification : Api_types_t.file_modification =
-                  file_patch
-                    metadata
-                    ?content:(Some content)
-                    ?compile:None
-                    ?position:None
-                    ()
-                in
-                (manager#file_update project_id filename file_modification)
-                >>=
-                (Api_common.result_bind_lwt
-                   ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))))
-                >>=
-                (Api_common.result_bind_lwt
-                   ~ok:(fun () ->
-                       let () = set_directory_state
-                           { (React.S.value directory_state) with
-                             state_current = Some filename } in
-                       (* we need to update the directory *)
-                       update_directory manager project_id >>=
-                       (Api_common.result_bind_lwt
-                          ~ok:(fun () -> send_refresh ()))
-                     )
-                )
+                   catalog.Api_types_j.file_metadata_list in
+               (match matching_file with
+                | [] ->
+                  manager#file_create project_id (new_file filename content)
+                | metadata::_ ->
+                  let file_modification : Api_types_t.file_modification =
+                    file_patch
+                      metadata
+                      ?content:(Some content)
+                      ?compile:None
+                      ?position:None
+                      ()
+                  in
+                  manager#file_update project_id filename file_modification)
+               >>=
+               (Api_common.result_bind_lwt
+                  ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))) >>=
+               (fun r_create ->
+                  let () = set_directory_state
+                      { (React.S.value directory_state) with
+                        state_current = Some filename } in
+                  let r_dir_t = update_directory manager project_id in
+                  send_refresh () >>= fun r_txt -> r_dir_t >>= fun r_dir ->
+                    Lwt.return (Api_common.result_combine [r_create; r_dir; r_txt])
+               )
+              )
             )
-       )
        )
     )
 
