@@ -9,18 +9,22 @@
 open Lwt.Infix
 
 let create_file
-    ?(content:string = "")
+    ?(text = Lwt.return (Js.string ""))
     (file_id : string) : unit =
   Common.async
     (fun () ->
        (State_error.wrap
           __LOC__
-          (State_file.create_file ~filename:file_id ~content))
-       >>=
-       (* get new contact map *)
-       (fun _ -> State_project.sync ())
-       >>=
-       (fun _ -> Lwt.return_unit)
+          (text >>= fun txt ->
+           let content = Js.to_string txt in
+           State_file.create_file ~filename:file_id ~content
+           >>=
+           (* get new contact map *)
+           (fun r -> State_project.sync () >>=
+             fun r' -> Lwt.return (Api_common.result_combine [r; r'])))
+        >>=
+        (fun _ -> Lwt.return_unit)
+       )
     )
 
 let set_file (file_id : string) : unit =
@@ -28,8 +32,9 @@ let set_file (file_id : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.select_file file_id)
-       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
+         (State_file.select_file file_id
+          >>= (fun r -> State_project.sync () >>=
+                fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
 
@@ -38,8 +43,9 @@ let set_content (content : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.set_content content)
-       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
+         (State_file.set_content content
+          >>= (fun r -> State_project.sync () >>=
+                fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
 
@@ -48,8 +54,9 @@ let close_file () : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.remove_file ())
-       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
+         (State_file.remove_file ()
+          >>= (fun r -> State_project.sync () >>=
+                fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )
 
@@ -60,9 +67,10 @@ let set_file_compile (file_id: string) (compile : bool) : unit =
          __LOC__
          (State_file.set_compile
             file_id
-            compile)
-       >>=
-       (fun _ -> State_project.sync ()) (* get new contact map *)
+            compile
+          >>=
+          (fun r -> State_project.sync () >>=
+            fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>=
        (fun _ -> Lwt.return_unit)
     )
@@ -72,7 +80,8 @@ let order_files (filenames : string list) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.order_files filenames)
-       >>= (fun _ -> State_project.sync ()) (* get new contact map *)
+         (State_file.order_files filenames
+          >>= (fun r -> State_project.sync () >>=
+                fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
     )

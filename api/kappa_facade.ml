@@ -59,7 +59,7 @@ let project_text (files : Api_types_j.file list) :
   let files : Api_types_j.file list =
     (List.stable_sort
        (fun l r ->
-          compare
+          Mods.int_compare
             l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
             r.Api_types_j.file_metadata.Api_types_j.file_metadata_position
        )

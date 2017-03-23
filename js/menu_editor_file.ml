@@ -203,7 +203,7 @@ let content () =
           (Dom_html.handler
              (fun _ ->
                 let filename : string = Js.to_string file_new_input_dom##.value in
-                let () = Menu_editor_file_controller.create_file filename ?content:None in
+                let () = Menu_editor_file_controller.create_file filename in
                 let () = Common.modal ~id:("#"^file_new_modal_id) ~action:"hide" in
                 Js._false))
     ]
@@ -232,17 +232,11 @@ let file_select_handler _ _ : unit Lwt.t =
   let file = Js.Opt.get (files##item (0))
       (fun () -> assert false)
   in
-  let filename = Js.to_string file##.name in
-  State_error.wrap __LOC__
-    (File.readAsText file >>=
-     (fun  (content : Js.js_string Js.t) ->
-        State_file.create_file ~filename ~content:(Js.to_string content)
-     )) >>=
-  (let () = open_input_dom##.value := Js.string "" in
-    Api_common.result_map
-     ~ok:(fun _ () -> Lwt.return_unit)
-     ~error:(fun _ (_ : Api_types_j.errors) -> Lwt.return_unit))
-
+  let file_id = Js.to_string file##.name in
+  let () = Menu_editor_file_controller.create_file
+      ~text:(File.readAsText file) file_id in
+  let () = open_input_dom##.value := Js.string "" in
+  Lwt.return_unit
 
 let onload () =
   let open_input_dom = Tyxml_js.To_dom.of_input open_input in

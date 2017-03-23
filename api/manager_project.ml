@@ -46,20 +46,26 @@ object
          Lwt.return (Api_common.result_ok (to_project project))
       )
 
-  method project_parse
-      (project_id : Api_types_j.project_id) : Api_types_j.project_parse Api.result Lwt.t =
+  method project_parse (project_id : Api_types_j.project_id) :
+    Api_types_j.project_parse Api.result Lwt.t =
     Api_common.ProjectOperations.bind
       project_id
       environment
       (fun (project : Api_environment.project) ->
-         let project_version = project#get_version () in
-         let state = project#get_state () in
+         (match project#get_state () with
+          | Some x -> Lwt.return x
+          | None ->
+            Kappa_facade.parse
+              ~system_process:system_process
+              ~kappa_files:(project#get_files ())
+            >>= fun out -> let _ = project#set_state out in Lwt.return out)
+         >>= fun state ->
          Lwt.return
            (match state with
             | `Ok kappa_facade ->
               Api_common.result_ok
                 { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade;
-                  Api_types_j.project_parse_project_version = project_version;
+                  Api_types_j.project_parse_project_version = project#get_version ();
                 }
             | `Error error ->
               Api_common.result_messages error)

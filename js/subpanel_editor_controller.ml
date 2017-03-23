@@ -13,7 +13,9 @@ let set_content (filecontent : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_file.set_content filecontent)
+         (State_file.set_content filecontent >>=
+          (fun r -> State_project.sync () >>=
+            fun r' -> Lwt.return (Api_common.result_combine [r; r'])))
        >>= (fun _ -> Lwt.return_unit)
     )
 
@@ -23,8 +25,9 @@ let set_manager (runtime_id : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_runtime.create_spec ~load:true runtime_id) >>=
-       (fun _ -> State_project.sync ()) >>=
+         (State_runtime.create_spec ~load:true runtime_id >>=
+          (fun r -> State_project.sync () >>=
+            fun r' -> Lwt.return (Api_common.result_combine [r; r']))) >>=
        (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
        (fun _ -> Lwt.return_unit)
     )

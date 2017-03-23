@@ -202,8 +202,6 @@ type file_metadata = { file_metadata_compile <ocaml mutable>  : bool <json name=
                        file_metadata_position <ocaml mutable> : int <json name="position"> ;
 		       file_metadata_version <ocaml mutable>  : file_version <json name="version"> ; }
 
-type ('data, 'summary) file_result = { file_status_data       : 'data ;
-     	               	               file_status_summary    : 'summary ; }
 type file_catalog = { file_metadata_list : file_metadata list }
 type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
               file_content <ocaml mutable>  : string <json name="content"> ; }

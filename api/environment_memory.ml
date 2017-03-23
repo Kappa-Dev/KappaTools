@@ -21,7 +21,7 @@ class project
   object
     val mutable _simulations = []
     val mutable _files = []
-    val mutable _state : Api_environment.parse_state = state
+    val mutable _state : Api_environment.parse_state option = None
     val mutable _version : Api_types_j.project_version = 0
     method create_simulation
         (simulation_id : Api_types_j.simulation_id)
@@ -42,14 +42,15 @@ class project
     method get_files () = _files
     method set_files (files : Api_types_j.file list) =
       let () = _files <- files in
+      let () = _state <- None in
       _version
 
     method set_state (state : Api_environment.parse_state)
       : Api_types_j.project_version =
       let () = _version <- 1 + _version in
-      let () = _state <- state in
+      let () = _state <- Some state in
       _version
-    method get_state () : Api_environment.parse_state =
+    method get_state () : Api_environment.parse_state option =
       _state
 
   end

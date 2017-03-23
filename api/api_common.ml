@@ -115,7 +115,7 @@ let rec result_combine : unit Api.result list -> unit Api.result =
       ~ok:(fun _ _-> r)
       ~error:(fun _ (data_1 : Api_types_j.errors) ->
           result_map
-            ~ok:(fun _ _-> result_ok ())
+            ~ok:(fun _ _-> l)
             ~error:(fun result_code (data_r : Api_types_j.errors) ->
                 { Api_types_j.result_data = `Error (data_1@data_r);
                   Api_types_j.result_code = result_code }

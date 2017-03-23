@@ -375,9 +375,12 @@ class manager_simulation
                (Api_common.result_error_msg ~result_code:`CONFLICT message)
            else
              match project#get_state () with
-             | `Error errors ->
+             | None ->
+               Lwt.return (Api_common.result_error_msg
+                             "Cannot start simulation: Parse not done")
+             | Some (`Error errors) ->
                Lwt.return (Api_common.result_messages errors)
-             | `Ok facade ->
+             | Some (`Ok facade) ->
                let facade = Kappa_facade.clone_t facade in
                (Kappa_facade.start
 		  ~system_process:system_process

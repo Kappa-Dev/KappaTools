@@ -138,7 +138,7 @@ class virtual  manager_base () : manager_base_type =
     method file_create
         (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
-      (Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
+      Api_types_j.file_metadata Api.result Lwt.t =
       self#message (`FileCreate (project_id,file)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -152,7 +152,7 @@ class virtual  manager_base () : manager_base_type =
     method file_delete
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id) :
-      (unit, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
+      unit Api.result Lwt.t =
       self#message (`FileDelete (project_id,file_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -197,7 +197,7 @@ class virtual  manager_base () : manager_base_type =
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id)
         (file_modification : Api_types_j.file_modification) :
-      (Api_types_j.file_metadata, Api_types_j.project_parse) Api_types_j.file_result Api.result Lwt.t =
+      Api_types_j.file_metadata Api.result Lwt.t =
       self#message (`FileUpdate (project_id,file_id,file_modification)) >>=
       Api_common.result_bind_lwt
         ~ok:(function

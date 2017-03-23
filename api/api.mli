@@ -49,7 +49,7 @@ class type ['file_status_summary] manager_file =
     method file_create :
       Api_types_j.project_id ->
       Api_types_j.file ->
-      ((Api_types_j.file_metadata, 'file_status_summary) Api_types_j.file_result) result Lwt.t
+      Api_types_j.file_metadata result Lwt.t
 
     method file_get :
       Api_types_j.project_id ->
@@ -60,12 +60,12 @@ class type ['file_status_summary] manager_file =
       Api_types_j.project_id ->
       Api_types_j.file_id ->
       Api_types_j.file_modification ->
-      ((Api_types_j.file_metadata, 'file_status_summary) Api_types_j.file_result) result Lwt.t
+      Api_types_j.file_metadata result Lwt.t
 
     method file_delete :
       Api_types_j.project_id ->
       Api_types_j.file_id ->
-      ((unit, 'file_status_summary) Api_types_j.file_result) result Lwt.t
+      unit result Lwt.t
 
   end;;
 

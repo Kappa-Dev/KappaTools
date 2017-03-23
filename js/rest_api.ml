@@ -87,10 +87,7 @@ class manager
         `POST
         (Some (Api_types_j.string_of_file file))
         (fun result ->
-           (Mpi_message_j.file_result_of_string
-              Mpi_message_j.read_file_metadata
-              Mpi_message_j.read_project_parse
-           )
+           Mpi_message_j.file_metadata_of_string
              result)
         (fun result -> `FileCreate result)
     | `FileDelete (project_id,file_id) ->
@@ -100,9 +97,7 @@ class manager
         `DELETE
         None
         (fun result ->
-           (Mpi_message_j.file_result_of_string
-              Api_types_j.read_unit_t
-              Mpi_message_j.read_project_parse)
+           Api_types_j.unit_t_of_string
              result)
         (fun result -> `FileDelete result)
     | `FileGet (project_id,file_id) ->
@@ -128,10 +123,8 @@ class manager
         `PUT
         (Some (Api_types_j.string_of_file_modification file_modification))
         (fun result ->
-           (Mpi_message_j.file_result_of_string
-              Mpi_message_j.read_file_metadata
-              Mpi_message_j.read_project_parse)
-            result)
+           Mpi_message_j.file_metadata_of_string
+             result)
         (fun result -> `FileUpdate result)
     | `ProjectCatalog () ->
       send
