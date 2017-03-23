@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 22 2017>
+  * Last modification: Time-stamp: <Mar 23 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1447,7 +1447,7 @@ let compute_symmetries
   let state, init = get_init state in
   let state, contact_map_int = get_contact_map_int state in
   match env, init, contact_map_int with
-  | None, _, _ | _, None, None  -> state, None
+  | None, _, _ | _, None, _ | _, _, None  -> state, None
   | Some env, Some init, Some contact_map_int ->
     begin
       let rules =

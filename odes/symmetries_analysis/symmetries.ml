@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 22 2017>
+   * Last modification: Time-stamp: <Mar 23 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -396,7 +396,7 @@ let lkappa_init = {
 let species_to_lkappa_rule parameters env species =
   let signature = Model.signatures env in
   let some_pair =
-    Raw_mixture_extra.pattern_to_raw_mixture
+    Raw_mixture_extra.species_to_raw_mixture
       ~parameters
       signature
       species
@@ -406,6 +406,22 @@ let species_to_lkappa_rule parameters env species =
   | Some (raw_mixture, _) ->
     let lkappa_rule =
       Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
+    in
+    lkappa_rule
+
+let pattern_to_lkappa_rule parameters env cc =
+  let signature = Model.signatures env in
+  let some_pair =
+    Raw_mixture_extra.pattern_to_mixture
+      ~parameters
+      signature
+      cc
+  in
+  match some_pair with
+  | None -> lkappa_init
+  | Some rule_mixture ->
+    let lkappa_rule =
+      Raw_mixture_group_action.lkappa_of_rule_mixture rule_mixture
     in
     lkappa_rule
 
