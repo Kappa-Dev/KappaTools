@@ -34,11 +34,6 @@ sig
     (int * Raw_mixture.agent) list *
     (Instantiation.abstract * Instantiation.site_name * int) list *
     Instantiation.abstract t list
-
-  val fresh_bindings :
-    short_branch_agents:int list -> Instantiation.abstract t list ->
-    (Instantiation.abstract Instantiation.site *
-     Instantiation.abstract Instantiation.site) list
 end
 
 type elementary_rule = {
@@ -47,8 +42,6 @@ type elementary_rule = {
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  fresh_bindings :
-    (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list;
   delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)

@@ -117,19 +117,6 @@ module Transformation = struct
       Format.fprintf
         f "@[%a.%a~ =@]" (Matching.Agent.print ?sigs) p
         (Matching.Agent.print_site ?sigs p) s
-
-  let fresh_bindings ~short_branch_agents =
-    List.fold_left
-      (fun unaries_to_expl ->
-         function
-         | (Freed _ | Agent _ | PositiveInternalized _) -> unaries_to_expl
-         | (NegativeWhatEver _ | NegativeInternalized _) -> assert false
-         | Linked ((n,s),(n',s')) ->
-           if Matching.Agent.same_connected_component n n'
-           then unaries_to_expl
-           else (if List.mem (Matching.Agent.get_type n') short_branch_agents
-                 then ((n',s'),(n,s))
-                 else ((n,s),(n',s')))::unaries_to_expl) []
 end
 
 type elementary_rule = {
@@ -138,9 +125,6 @@ type elementary_rule = {
   connected_components : Pattern.id array; (*id -> cc*)
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  fresh_bindings :
-    (Instantiation.abstract Instantiation.site *
-     Instantiation.abstract Instantiation.site) list;
   delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
@@ -254,7 +238,6 @@ let map_expr_rule f x = {
   connected_components = x.connected_components;
   removed = x.removed;
   inserted = x.inserted;
-  fresh_bindings = x.fresh_bindings;
   delta_tokens = List.map (fun (x,t) -> (f x,t)) x.delta_tokens;
   syntactic_rule = x.syntactic_rule;
   instantiations = x.instantiations;
