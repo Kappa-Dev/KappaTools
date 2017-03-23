@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 17 2017>
+   * Last modification: Time-stamp: <Mar 23 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -196,6 +196,16 @@ let lkappa_of_raw_mixture raw_mixture =
   {
     LKappa.r_mix =  [];
     LKappa.r_created = raw_mixture ;
+    LKappa.r_delta_tokens = [] ;
+    LKappa.r_rate = Alg_expr.int 0 ;
+    LKappa.r_un_rate = None  ;
+    LKappa.r_editStyle = true ;
+  }
+
+let lkappa_of_rule_mixture rule_mixture =
+  {
+    LKappa.r_mix =  rule_mixture;
+    LKappa.r_created = [] ;
     LKappa.r_delta_tokens = [] ;
     LKappa.r_rate = Alg_expr.int 0 ;
     LKappa.r_un_rate = None  ;

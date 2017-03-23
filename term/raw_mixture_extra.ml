@@ -57,7 +57,7 @@ let declare_bond work ag_pos site bond_id map =
       | [] | _ :: _ :: _ -> assert false
     end
 
-let raw_mixture_to_pattern ?parameters ?signature preenv mix unspec =
+let raw_mixture_to_species ?parameters ?signature preenv mix unspec =
   let () = trace_print ?parameters "Translation from raw_mixture to pattern" in
   let () = trace_print ?parameters "INPUT:" in
   let () =
@@ -142,21 +142,22 @@ let old =
 in
 Mods.IntMap.add i (j::old) map
 
-let top_sort list =
+let top_sort_gen get_val get_ports list =
   let array = Array.of_list list in
   let (map1,map2,set)  =
     Tools.array_fold_lefti
       (fun pos (map1,map2,set) agent ->
        Tools.array_fold_lefti
          (fun _ (map1, map2, set) value ->
-         match value with
-           | Raw_mixture.VAL i ->
+            match get_val value with
+            | Some i ->
              add_map i pos map1,
              add_map pos i map2,
              pos :: set
-           | Raw_mixture.FREE -> map1, map2, pos::set)
+            | None
+              -> map1, map2, pos::set)
          (map1, map2, set)
-         agent.Raw_mixture.a_ports)
+         (get_ports agent))
       (Mods.IntMap.empty,Mods.IntMap.empty,[])
       array
   in
@@ -183,20 +184,24 @@ let top_sort list =
   | [] -> []
   | head :: _ -> aux [head] Mods.IntSet.empty []
 
-let pattern_to_raw_mixture ?parameters sigs pattern =
-  let () = trace_print ?parameters
-      "Translation from patten to raw_mixture" in
-  let () =
-    let () = trace_print ?parameters "INPUT:" in
-    let () =
-      safe_print_str
-        __POS__ parameters
-        (fun fmt ->
-          Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
-        (fun fmt ->
-          Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
-      in ()
-  in
+let top_sort_raw_mixture list =
+  top_sort_gen
+    (function
+      | Raw_mixture.VAL i -> Some i
+      | Raw_mixture.FREE -> None)
+    (fun x -> x.Raw_mixture.a_ports)
+    list
+
+let top_sort_mixture list =
+  top_sort_gen
+    (function
+      | (Ast.LNK_VALUE (i,_),_),_ -> Some i
+      | ((Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
+        | Ast.LNK_SOME | Ast.LNK_TYPE (_, _)),_),_ -> None)
+    (fun x -> x.LKappa.ra_ports)
+    list
+
+let parse pattern =
   let agent_list, site_list =
     Pattern.fold
       (fun ~pos ~agent_type (agent_list, site_list) ->
@@ -210,16 +215,16 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
       match tail with
       | [] -> bond_map
       | (_, _, ((Pattern.Free | Pattern.UnSpec), _)) :: tail
-         -> aux tail fresh_bond_id bond_map
+        -> aux tail fresh_bond_id bond_map
       | (pos, site, (Pattern.Link (ag_pos', site'), _)) :: tail ->
         match
           Mods.Int2Map.find_option (ag_pos', site') bond_map
         with
         | None ->
-            aux tail (succ fresh_bond_id)
-              (Mods.Int2Map.add (pos, site) fresh_bond_id bond_map)
+          aux tail (succ fresh_bond_id)
+            (Mods.Int2Map.add (pos, site) fresh_bond_id bond_map)
         | Some i ->
-        let () = trace_print (string_of_int i) in
+          let () = trace_print (string_of_int i) in
           aux
             tail
             fresh_bond_id
@@ -234,6 +239,25 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
          Mods.IntMap.add pos agent_type map)
       agent_type_map
       agent_list
+  in
+  agent_list, site_list, agent_type_map, bond_map
+
+let species_to_raw_mixture ?parameters sigs pattern =
+  let () = trace_print ?parameters
+      "Translation from patten to raw_mixture" in
+  let () =
+    let () = trace_print ?parameters "INPUT:" in
+    let () =
+      safe_print_str
+        __POS__ parameters
+        (fun fmt ->
+          Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
+        (fun fmt ->
+          Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
+      in ()
+  in
+  let agent_list, site_list, agent_type_map, bond_map =
+    parse pattern
   in
   let agent_map =
     Mods.IntMap.map
@@ -336,7 +360,7 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
              (), agent_list)
           agent_type_map agent_map []
       in
-      let output = top_sort list in
+      let output = top_sort_raw_mixture list in
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str
@@ -349,4 +373,144 @@ let pattern_to_raw_mixture ?parameters sigs pattern =
                fmt output)
       in
       Some (output, unspec)
+    end
+
+let pattern_to_mixture ?parameters sigs pattern =
+  let () = trace_print ?parameters
+      "Translation from patten to mixture" in
+  let () =
+    let () = trace_print ?parameters "INPUT:" in
+    let () =
+      safe_print_str
+        __POS__ parameters
+        (fun fmt ->
+           Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
+        (fun fmt ->
+           Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
+    in ()
+  in
+  let agent_list, site_list, agent_type_map, bond_map =
+    parse pattern
+  in
+  let agent_map =
+    Mods.IntMap.map
+      (fun ag_type ->
+         let () = trace_print (string_of_int ag_type) in
+         let n_site =
+           if ag_type = -1
+           then
+             0
+           else
+             Signature.arity sigs ag_type
+         in
+         Array.make n_site (Ast.ANY_FREE, None)
+      ) agent_type_map
+  in
+  let rec aux tail =
+    match tail with
+    | [] -> Some agent_map
+    | (pos, site, (binding_state, int_state)) :: tail ->
+      let int_state =
+        if int_state = -1
+        then None
+        else Some int_state
+      in
+      match binding_state with
+      | Pattern.UnSpec ->
+        let () = trace_print (string_of_int pos) in
+        let () = trace_print (string_of_int site) in
+        let () =
+          match
+            Mods.IntMap.find_option pos agent_map
+          with
+          | None -> raise Exit
+          | Some array ->
+            array.(site) <- (Ast.ANY_FREE, int_state)
+        in
+        let agent_type =
+          Mods.IntMap.find_default (-1) pos agent_type_map
+        in
+        aux tail
+      | Pattern.Free  ->
+        let () = trace_print (string_of_int pos) in
+        let () = trace_print (string_of_int site) in
+        let () =
+          match
+            Mods.IntMap.find_option pos agent_map
+          with
+          | None -> raise Exit
+          | Some array ->
+            array.(site) <- (Ast.LNK_FREE, int_state)
+        in
+        aux tail
+      | Pattern.Link _ ->
+        begin
+          match
+            Mods.Int2Map.find_option (pos,site) bond_map
+          with
+          | None -> assert false
+          | Some i ->
+            let () =
+              match
+                Mods.IntMap.find_option pos agent_map
+              with
+              | None -> raise Exit
+              | Some array ->
+                array.(site) <- (Ast.LNK_VALUE (i,(0,0)), int_state)
+            in
+            aux tail
+        end
+  in
+  match aux site_list with
+  | None -> None
+  | Some agent_map ->
+    begin
+      let (), list =
+        Mods.IntMap.monadic_fold2
+          () ()
+          (fun () () _ agent_type intf agent_list ->
+             let fst (a,_) = ((a,Locality.dummy),LKappa.Maintained) in
+             let snd (_,b) =
+               match b with
+               | None -> LKappa.I_ANY
+               | Some b -> LKappa.I_VAL_CHANGED (b,b) in
+             let binding = Array.map fst intf in
+             let internal = Array.map snd intf in
+             (),
+             ({
+               LKappa.ra_erased = false ;
+               LKappa.ra_syntax = None ;
+               LKappa.ra_type = agent_type ;
+               LKappa.ra_ports = binding ;
+               LKappa.ra_ints = internal ;
+             } :: agent_list))
+          (fun () () _ _ agent_list ->
+             let () =
+               safe_print_str
+                 __POS__ parameters (fun _fmt -> raise Exit)
+                 (fun _fmt -> ())
+             in
+             (), agent_list)
+          (fun () () _ _ agent_list ->
+             let () =
+               safe_print_str
+                 __POS__ parameters (fun _fmt -> raise Exit)
+                 (fun _fmt -> ())
+             in
+             (), agent_list)
+          agent_type_map
+          agent_map
+          []
+      in
+      let output = top_sort_mixture list in
+      let () = trace_print ?parameters "OUTPUT:" in
+      let () =
+        safe_print_str
+          __POS__ parameters
+          (fun fmt ->
+             LKappa.print_rule_mixture sigs ~ltypes:false fmt output)
+          (fun fmt ->
+             LKappa.print_rule_mixture sigs ~ltypes:false fmt output)
+      in
+      Some output
     end

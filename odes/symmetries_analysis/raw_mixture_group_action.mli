@@ -1,6 +1,7 @@
 
 
 val lkappa_of_raw_mixture : Raw_mixture.t -> LKappa.rule
+val lkappa_of_rule_mixture: LKappa.rule_mixture -> LKappa.rule
 
 val normalize:
   LKappa_auto.cache ->
