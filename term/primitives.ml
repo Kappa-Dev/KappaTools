@@ -16,6 +16,36 @@ module Transformation = struct
         'a * Instantiation.site_name * Instantiation.internal_state
     | NegativeInternalized of 'a Instantiation.site
 
+  let to_yojson = function
+    | Agent a -> `Assoc ["Agent", Matching.Agent.to_yojson a]
+    | Freed (a,s) ->
+       `Assoc ["Freed", `List [Matching.Agent.to_yojson a; `Int s]]
+    | Linked ((a,s),(b,t)) ->
+       `Assoc ["Linked",
+               `List [Matching.Agent.to_yojson a;`Int s;
+                      Matching.Agent.to_yojson b;`Int t]]
+    | NegativeWhatEver (a,s) ->
+       `Assoc ["NegativeWhatEver", `List [Matching.Agent.to_yojson a; `Int s]]
+    | PositiveInternalized (a,s,i) ->
+       `Assoc ["PositiveInternalized",
+               `List [Matching.Agent.to_yojson a;`Int s;`Int i]]
+    | NegativeInternalized (a,s) ->
+       `Assoc ["NegativeInternalized",`List [Matching.Agent.to_yojson a;`Int s]]
+
+  let of_yojson = function
+    | `Assoc ["Agent", a] -> Agent (Matching.Agent.of_yojson a)
+    | `Assoc ["Freed", `List [a;`Int s]] ->
+       Freed ((Matching.Agent.of_yojson a),s)
+    | `Assoc ["Linked",`List [a;(`Int s); b;(`Int t)]] ->
+       Linked ((Matching.Agent.of_yojson a,s),(Matching.Agent.of_yojson b,t))
+    | `Assoc ["NegativeWhatEver",`List [a;`Int s]] ->
+       NegativeWhatEver (Matching.Agent.of_yojson a,s)
+    | `Assoc ["PositiveInternalized",`List [a;`Int s;`Int i]] ->
+       PositiveInternalized (Matching.Agent.of_yojson a,s,i)
+    | `Assoc ["NegativeInternalized",`List [a;`Int s]] ->
+       NegativeInternalized (Matching.Agent.of_yojson a,s)
+    | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
+
   let rename id inj = function
     | Freed (p,s) as x ->
       let p' = Matching.Agent.rename id inj p in
@@ -130,6 +160,45 @@ type elementary_rule = {
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
 }
+
+let rule_to_yojson r =
+  JsonUtil.smart_assoc [
+      "connected_components",
+      (JsonUtil.of_array Pattern.id_to_yojson) r.connected_components;
+      "removed", JsonUtil.of_list Transformation.to_yojson r.removed;
+      "inserted", JsonUtil.of_list Transformation.to_yojson r.inserted;
+      "syntactic_rule", `Int r.syntactic_rule;
+      "instantiations",
+      Instantiation.event_to_json Matching.Agent.to_yojson r.instantiations;
+    ]
+
+let rule_of_yojson = function
+  | ((`Assoc l):Yojson.Basic.json) as x ->
+     begin
+       try {
+           rate = (Locality.dummy_annot (Alg_expr.CONST Nbr.zero));
+           unary_rate = None;
+           connected_components =
+             (match (List.assoc "connected_components" l) with
+             |`List o ->
+               Tools.array_map_of_list Pattern.id_of_yojson o
+             | _ -> raise Not_found);
+           removed =
+             JsonUtil.to_list Transformation.of_yojson (List.assoc "removed" l);
+           inserted =
+             JsonUtil.to_list Transformation.of_yojson
+                              (List.assoc "inserted" l);
+           delta_tokens = [];
+           syntactic_rule = JsonUtil.to_int (List.assoc "syntactic_rule" l);
+           instantiations =
+             Instantiation.event_of_json Matching.Agent.of_yojson
+                                         (List.assoc "instantiations" l);
+         }
+       with Not_found ->
+         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
+     end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
+
 
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot

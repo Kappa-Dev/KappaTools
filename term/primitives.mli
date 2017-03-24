@@ -50,6 +50,9 @@ type elementary_rule = {
       concretize *)
 }
 
+val rule_to_yojson : elementary_rule -> Yojson.Basic.json
+val rule_of_yojson : Yojson.Basic.json -> elementary_rule
+
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot
   | Alg_pexpr of 'alg_expr Locality.annot

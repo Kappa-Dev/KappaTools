@@ -274,6 +274,7 @@ let to_yojson env =
       (Array.fold_right (fun (n,(r,_)) l ->
            `List [(match n with None -> `Null | Some (n,_) -> `String n);
               LKappa.rule_to_json r]::l) env.ast_rules []);
+    "elementary_rules", JsonUtil.of_array Primitives.rule_to_yojson env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
     (* rules : Primitives.elementary_rule array;
        cc_of_unaries : Pattern.Set.t;
@@ -289,7 +290,7 @@ let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
-  | `Assoc l as x when List.length l = 6 ->
+  | `Assoc l as x when List.length l = 7 ->
     begin
       try
         { domain = Pattern.Env.of_yojson (List.assoc "update" l);
@@ -317,7 +318,10 @@ let of_yojson = function
                        Locality.dummy_annot (LKappa.rule_of_json r))
                     | _ -> raise Not_found) o
               | _ -> raise Not_found);
-          rules = [||];
+          rules = (match (List.assoc "elementary_rules" l) with
+                   | `List o ->
+                      Tools.array_map_of_list Primitives.rule_of_yojson o
+                   | _ -> raise Not_found);
           cc_of_unaries = Pattern.Set.empty;
           perturbations = [||];
           dependencies_in_time = Operator.DepSet.empty;

@@ -246,4 +246,25 @@ module Agent = struct
       match Mods.IntMap.find_option id inj_fresh with
       | Some x -> (x,ty)
       | None -> failwith "Instantiation.from_place"
+
+  let to_yojson = function
+    | Existing (n,ty) ->
+       ((`Assoc ["Existing",
+                 (`List [`Assoc ["agent",(Agent.to_json n)];
+                         `Assoc ["type",`Int ty]])])
+        :Yojson.Basic.json)
+    | Fresh (id,ty) -> `Assoc ["Fresh",(`Assoc [ "id",`Int id; "type",`Int ty])]
+
+  let of_yojson = function
+      |`Assoc ["Existing",`List list] ->
+      (match list with
+       | [`Assoc ["agent", a]; `Assoc ["type", `Int ty]] ->
+          Existing ((Agent.of_json a),ty)
+       | x::_ -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
+       | [] -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",`Null)))
+      |`Assoc ["Fresh",a] ->
+      (match a with
+       | `Assoc ["id", `Int id; "type", `Int ty] -> Fresh (id,ty)
+       | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x)))
+    | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
 end
