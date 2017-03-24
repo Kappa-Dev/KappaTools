@@ -9,6 +9,8 @@
 type t = int * int
 (** agent_id * agent_type *)
 
+type ag = t
+
 let print ?sigs ~with_id f (i,ty) =
   match sigs with
   | Some sigs ->
@@ -40,3 +42,9 @@ let of_json = function
   | `Assoc ["id", `Int id; "type", `Int ty]
   | `Assoc ["type", `Int ty; "id", `Int id] -> (id,ty)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid agent",x))
+
+module SetMap = SetMap.Make (struct
+    type t = ag
+    let compare = compare
+    let print = print ?sigs:None ~with_id:true
+  end)

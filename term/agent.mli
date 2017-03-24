@@ -27,3 +27,5 @@ val rename : Renaming.t -> t -> t
 
 val to_json : t -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> t
+
+module SetMap : SetMap.S with type elt = t
