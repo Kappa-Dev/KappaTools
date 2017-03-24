@@ -63,6 +63,8 @@ var args = function () {
 // https://medium.com/@graeme_boy/how-to-optimize-cpu-intensive-work-in-node-js-cdc09099ed41#.2vhd0cp4g
 // http://www.codingdefined.com/2014/08/difference-between-fork-spawn-and-exec.html
 // param {command,args,onStdout,onStderr,onClose}
+var stdsimProcesses = [];
+
 function spawnProcess(param){
     const spawn = require('child_process').spawn;
     const process = spawn(param.command, param.args);
@@ -103,19 +105,25 @@ function spawnProcess(param){
 	    return failure(param,
 			  `spawned failed ${param.command} ${param.args} pid ${process.pid}`);
 	}
+	stdsimProcesses.push(process);
     } catch(err){
 	return failure(param,err.message);
     }
 }
+function commonUnload(){
+    stdsimProcesses.forEach(function(proccess){	try{ process.kill();  }
+						catch(error){} });
+
+}
+// http://stackoverflow.com/questions/9385778/window-unload-is-not-firing
+// https://api.jquery.com/unload/
+$(window).on('beforeunload', commonUnload);
 
 function jqueryOn(selector,event,handler){
     $(document.body).on(event,
 			selector,
 			function (e) { handler(e); });
-    /*
-    $(selector).on(event, function (e) {
-        handler(e); });
-*/
+
 }
 
 // http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
