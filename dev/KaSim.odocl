@@ -12,6 +12,7 @@ Option_util
 Tools
 IntCollection
 Int_storage
+ValMap
 
 Buffers
 Infinite_buffers
