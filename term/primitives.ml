@@ -162,7 +162,7 @@ type elementary_rule = {
 }
 
 let rule_to_yojson r =
-  JsonUtil.smart_assoc [
+  `Assoc [
       "connected_components",
       (JsonUtil.of_array Pattern.id_to_yojson) r.connected_components;
       "removed", JsonUtil.of_list Transformation.to_yojson r.removed;
@@ -195,9 +195,9 @@ let rule_of_yojson = function
                                          (List.assoc "instantiations" l);
          }
        with Not_found ->
-         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
+         raise (Yojson.Basic.Util.Type_error ("Not a correct elementary rule",x))
      end
-  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
+  | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct elementary rule",x))
 
 
 type 'alg_expr print_expr =
