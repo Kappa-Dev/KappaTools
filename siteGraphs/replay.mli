@@ -2,7 +2,7 @@ type state = {
   graph : Edges.t;
   time : float;
   event : int;
-  connected_components : Mods.IntSet.t Mods.IntMap.t option;
+  connected_components : Agent.SetMap.Set.t Mods.IntMap.t option;
 }
 
 val init_state : with_connected_components:bool -> state
