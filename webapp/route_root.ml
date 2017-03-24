@@ -142,9 +142,7 @@ let route
             >>=
             (manager#file_create project_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_file_metadata
-                                     Mpi_message_j.write_project_parse)
+               ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
             )
          )
      };
@@ -167,9 +165,7 @@ let route
             let (project_id,file_id) = file_ref context in
             (manager#file_delete project_id file_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_unit_t
-                                     Mpi_message_j.write_project_parse)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
          )
      };
@@ -197,9 +193,7 @@ let route
             >>=
             (manager#file_update project_id file_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_result ?len:None
-                                     Mpi_message_j.write_file_metadata
-                                     Mpi_message_j.write_project_parse)
+               ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
             )
          )
      };
