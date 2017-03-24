@@ -608,9 +608,14 @@ let diff_mixture ?time_var expr mixture =
   in
   diff_gen f_mix f_token f_symb f_time expr
 
-let fold_over_mix f expr accu =
+let fold_over_mix_in_alg_expr f expr accu =
   let l = Alg_expr.extract_connected_components expr in
   List.fold_left
     (fun accu mix -> f mix accu)
     accu
     l
+
+let fold_over_mixtures_in_alg_exprs f model accu =
+  (* Quyen: to do / by using Model.ml and fold_over_mix_in_alg_expr *)
+  let _  = f, model in 
+  accu

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 23 2017>
+  * Last modification: Time-stamp: <Mar 24 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -394,7 +394,7 @@ let divide_rule_rate_by cache compil rule =
 (* This is not the proper place *)
 (* It should have been in a file in the repository *)
 (* symmetries_analysis *)
-let return_cc_from_alg_expr compil =
+(*let return_cc_from_alg_expr compil =
   let env = compil.environment in
   let pair_array = get_variables compil in
   let pattern_cc_list =
@@ -426,10 +426,10 @@ let return_cc_from_alg_expr compil =
         List.append pattern_cc_array_list current_list
       ) [] pair_array
   in
-  pattern_cc_list
+  pattern_cc_list*)
 
 (* Instead, define a function to refine a partition according to the symmetries that are not satsified in a pattern *)
-let convert_cc_to_rule_mixture parameters compil =
+(*let convert_cc_to_rule_mixture parameters compil =
   let sigs = Model.signatures compil.environment in
   let pattern_cc_list = return_cc_from_alg_expr compil in
   let r_mixture_list =
@@ -445,7 +445,7 @@ let convert_cc_to_rule_mixture parameters compil =
           r_mixture :: current_list
       ) [] pattern_cc_list
   in
-  r_mixture_list
+  r_mixture_list*)
 
 let detect_symmetries parameters compil cache
     chemical_species

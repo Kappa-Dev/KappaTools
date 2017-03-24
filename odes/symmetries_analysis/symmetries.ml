@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 23 2017>
+   * Last modification: Time-stamp: <Mar 24 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -383,48 +383,6 @@ let divide_rule_rate_by rule_cache env rate_convention rule
     in
     rule_cache, output1, output2
 
-let lkappa_init = {
-  LKappa.r_mix =  [];
-  LKappa.r_created = [];
-  LKappa.r_delta_tokens = [] ;
-  LKappa.r_rate = Alg_expr.int 0 ;
-  LKappa.r_un_rate = None  ;
-  LKappa.r_editStyle = true ;
-}
-
-(*convert a species into lkappa rule signature*)
-let species_to_lkappa_rule parameters env species =
-  let signature = Model.signatures env in
-  let some_pair =
-    Raw_mixture_extra.species_to_raw_mixture
-      ~parameters
-      signature
-      species
-  in
-  match some_pair with
-  | None -> lkappa_init
-  | Some (raw_mixture, _) ->
-    let lkappa_rule =
-      Raw_mixture_group_action.lkappa_of_raw_mixture raw_mixture
-    in
-    lkappa_rule
-
-let pattern_to_lkappa_rule parameters env cc =
-  let signature = Model.signatures env in
-  let some_pair =
-    Raw_mixture_extra.pattern_to_mixture
-      ~parameters
-      signature
-      cc
-  in
-  match some_pair with
-  | None -> lkappa_init
-  | Some rule_mixture ->
-    let lkappa_rule =
-      Raw_mixture_group_action.lkappa_of_rule_mixture rule_mixture
-    in
-    lkappa_rule
-
 (*compute rate*)
 let rate rule (_, arity, _) =
   match arity with
@@ -762,7 +720,7 @@ let detect_symmetries parameters env cache
   let lkappa_rule_list =
     List.fold_left (fun current_list species ->
         let lkappa =
-          species_to_lkappa_rule parameters
+          Patterns_extra.species_to_lkappa_rule parameters
             env species
         in
         lkappa :: current_list
@@ -898,7 +856,7 @@ let representant ?parameters signature cache rule_cache preenv_cache
   | Some species -> cache, rule_cache, preenv_cache, species
   | None ->
     let rule_cache, preenv_cache, species' =
-      Pattern_group_action.normalize
+      Pattern_group_action.normalize_species
         ?parameters
         signature
         rule_cache
