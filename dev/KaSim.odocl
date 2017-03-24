@@ -35,7 +35,7 @@ Instantiation
 Alg_expr
 Alg_expr_extra
 Raw_mixture
-Raw_mixture_extra
+Patterns_extra
 Primitives
 Model
 Kappa_printer
@@ -90,7 +90,7 @@ Mvbdu_wrapper
 LKappa_group_action
 Raw_mixture_group_action
 Pattern_group_action
-Symmetries_sig 
+Symmetries_sig
 Symmetries
 
 Export_to_KaSim
