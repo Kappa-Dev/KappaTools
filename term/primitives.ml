@@ -162,22 +162,51 @@ type elementary_rule = {
 }
 
 let rule_to_yojson r =
+  let alg_expr_to_json =
+    Alg_expr.e_to_yojson
+      (JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson))
+      JsonUtil.of_int in
   `Assoc [
+     "rate", Locality.annot_to_json alg_expr_to_json r.rate;
+     "unary_rate",
+     JsonUtil.of_option
+       (JsonUtil.of_pair
+          (Locality.annot_to_json alg_expr_to_json)
+          (JsonUtil.of_option alg_expr_to_json))
+       r.unary_rate;
       "connected_components",
       (JsonUtil.of_array Pattern.id_to_yojson) r.connected_components;
       "removed", JsonUtil.of_list Transformation.to_yojson r.removed;
       "inserted", JsonUtil.of_list Transformation.to_yojson r.inserted;
+      "delta_tokens",
+      JsonUtil.of_list
+        (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
+                          (Locality.annot_to_json alg_expr_to_json)
+                          JsonUtil.of_int)
+        r.delta_tokens;
       "syntactic_rule", `Int r.syntactic_rule;
       "instantiations",
       Instantiation.event_to_json Matching.Agent.to_yojson r.instantiations;
-    ]
+   ]
 
-let rule_of_yojson = function
+let rule_of_yojson r =
+  let alg_expr_of_json =
+    Alg_expr.e_of_yojson
+      (JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson))
+      (JsonUtil.to_int ?error_msg:None) in
+  match r with
   | ((`Assoc l):Yojson.Basic.json) as x ->
      begin
        try {
-           rate = (Locality.dummy_annot (Alg_expr.CONST Nbr.zero));
-           unary_rate = None;
+           rate = Locality.annot_of_json alg_expr_of_json (List.assoc "rate" l);
+           unary_rate =
+             (try
+                JsonUtil.to_option
+                  (JsonUtil.to_pair
+                     (Locality.annot_of_json alg_expr_of_json)
+                     (JsonUtil.to_option alg_expr_of_json))
+                  (List.assoc "unary_rate" l)
+              with Not_found -> None);
            connected_components =
              (match (List.assoc "connected_components" l) with
              |`List o ->
@@ -188,7 +217,12 @@ let rule_of_yojson = function
            inserted =
              JsonUtil.to_list Transformation.of_yojson
                               (List.assoc "inserted" l);
-           delta_tokens = [];
+           delta_tokens =
+             JsonUtil.to_list
+               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                                 (Locality.annot_of_json alg_expr_of_json)
+                                 (JsonUtil.to_int ?error_msg:None))
+               (List.assoc "delta_tokens" l);
            syntactic_rule = JsonUtil.to_int (List.assoc "syntactic_rule" l);
            instantiations =
              Instantiation.event_of_json Matching.Agent.of_yojson
