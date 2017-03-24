@@ -18,6 +18,8 @@ val set_compile : Api_types_j.file_id  -> bool -> unit Api.result Lwt.t
 val order_files : string list -> unit Api.result Lwt.t
 (* get current file *)
 val get_file : unit -> Api_types_j.file Api.result Lwt.t
+(* resets the internal state of the file manager *)
+val reset : unit -> unit
 
 (* Get current file - the name is not specified to force
    the selection of the file before the fetch.

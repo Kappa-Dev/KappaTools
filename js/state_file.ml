@@ -52,12 +52,16 @@ let directory_gt
        let client_id = State_settings.get_client_id () in
        File_version.gt ~client_id l_version r_version
     )
-
-let directory_state , set_directory_state =
-  React.S.create { state_current = None ;
+let blank_state = { state_current = None ;
                    state_directory = [] }
-
+let directory_state , set_directory_state = React.S.create blank_state
 let refresh_file , set_refresh_file = React.S.create (None : string option)
+
+let reset () =
+  let () = set_directory_state blank_state in
+  ()
+
+
 
 let get_file () : Api_types_j.file Api.result Lwt.t =
   State_project.with_project ~label:"get_file"

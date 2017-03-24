@@ -26,7 +26,9 @@ let set_project (project_id : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_project.set_project project_id) >>=
+
+         (let () = State_file.reset () in
+          State_project.set_project project_id) >>=
        (Api_common.result_map
           ~ok:(fun _ () ->
               (State_file.sync () >>= (fun _ -> Lwt.return_unit)) <&>
