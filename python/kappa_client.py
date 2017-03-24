@@ -156,6 +156,9 @@ class KappaStd(kappa_common.StdBase):
     def project_delete(self,project_id):
         return(self.dispatch("ProjectDelete",project_id))
 
+    def project_parse(self,project_id):
+        return(self.dispatch("ProjectParse",project_id))
+
     def file_create(self,project_id,file_object):
         file_data = file_object.toJSON()
         return(self.dispatch("FileCreate",[project_id,file_data]))
@@ -260,6 +263,12 @@ class KappaRest(kappa_common.RestBase):
     def project_delete(self,project_id):
         method = "DELETE"
         url = "{0}/projects/{1}".format(self.url,project_id)
+        body = None
+        return(self.dispatch(method,url,body))
+
+    def project_parse(self,project_id):
+        method = "GET"
+        url = "{0}/projects/{1}/parse".format(self.url,project_id)
         body = None
         return(self.dispatch(method,url,body))
 
