@@ -14,7 +14,7 @@ Including the KaSa machinery:
 
 In term/ directory stands all definitions the simulator works on.
 {!modules: Agent Signature Contact_map Pattern
-Instantiation Alg_expr Alg_expr_extra Raw_mixture Raw_mixture_extra Primitives Model Kappa_printer }
+Instantiation Alg_expr Alg_expr_extra Raw_mixture Patterns_extra Primitives Model Kappa_printer }
 
 In grammar/ are the parser and the compilers
 {!modules:Configuration Ast LKappa Snip Eval}
