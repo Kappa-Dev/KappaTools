@@ -212,7 +212,7 @@ module DivErrorMessage : Ui_common.Div = struct
                  | None -> [ "hide" ; ]
                  | Some [] -> [ "hide" ; ]
                  | Some (_::[]) -> [ "hide" ; ]
-                 | Some (_::_) -> [ "error-span"; ]
+                 | Some (_::_) -> [ "error-span"; "clickable"]
                 )
            )
         )
@@ -247,7 +247,7 @@ module DivErrorMessage : Ui_common.Div = struct
   let file_label =
     Html.span
       ~a:[Html.a_id message_file_label_id;
-          Html.a_class [ "error-span" ] ;
+          Html.a_class [ "error-span" ; "clickable" ] ;
          ]
           [Tyxml_js.R.Html.pcdata file_label_text]
 
