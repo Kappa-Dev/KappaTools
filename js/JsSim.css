@@ -1,3 +1,4 @@
+.error-span { display: inline; }
 .alert-sm { padding: 5px !important;
 	    margin-bottom: 0px; }
 html { position: relative;

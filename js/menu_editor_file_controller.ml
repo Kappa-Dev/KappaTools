@@ -28,9 +28,11 @@ let create_file
     )
 
 let set_file (file_id : string) : unit =
+  let () = Common.debug (Js.string (Format.sprintf "set_file:%s" file_id)) in
   Common.async
     (fun () ->
        State_error.wrap
+         ~append:true
          __LOC__
          (State_file.select_file file_id
           >>= (fun r -> State_project.sync () >>=

@@ -23,7 +23,8 @@ let onload _ =
   let () = Panel_settings.onload () in
 
   let _ = Dom_html.window##.onresize :=
-      Dom_html.handler (fun _ ->
+      Dom_html.handler
+        (fun _ ->
           let () = Panel_projects.onresize () in
           let () = Panel_tab.onresize () in
           let () = Panel_settings.onresize () in

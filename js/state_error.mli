@@ -20,8 +20,8 @@ val has_errors : unit -> bool
     @param location of error the macro __LOC__ is expected.
     @paramer errors to be saved
  *)
-val set_errors : string -> Api_types_j.errors -> unit
+val set_errors : ?append:bool -> string -> Api_types_j.errors -> unit
 (** Signal containing the error. *)
 val errors : Api_types_j.errors option React.signal
 (** This displays the error *)
-val wrap : string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t
+val wrap : ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t

@@ -138,48 +138,214 @@ let input =
 end
 
 module DivErrorMessage : Ui_common.Div = struct
-  let id = "configuration_error_div"
   (* TODO : [%html {|<div class="alert-sm alert alert-danger"> « 1/2 » [abc.ka] Malformed agent 'adfsa' </div>|}] *)
-  let message_label (message : Api_types_j.message) (index : int) (length : int) : string =
-    (Format.sprintf  "%d/%d %s %s" index length
-       (match message.Api_types_j.message_range with
-        | None -> ""
-        | Some range -> Format.sprintf "[ %s ]" range.Api_types_j.file)
-       message.Api_types_j.message_text)
+  let id = "configuration_error_div"
+  let message_nav_inc_id = "panel_settings_message_nav_inc_id"
+  let message_nav_dec_id = "panel_settings_message_nav_dec_id"
+  let message_file_label_id = "panel_settings_message_file_label"
+  let error_index, set_error_index = React.S.create None
+
+  let _ =
+    React.S.l1
+      (function
+        | None -> ()
+        | Some [] -> ()
+        | Some (_::_) ->
+          (match (React.S.value error_index) with
+           | None -> set_error_index (Some 0)
+           | Some _ -> ())
+      )
+      State_error.errors
+
+
+  (* if there are less or no errors the index needs to be updated *)
+  let sanitize_index (index : int option) (errors : Api_types_j.errors option) : int option =
+    match (index,errors) with
+    | None, None -> None
+    | None,Some [] -> None
+    | None,Some (_::_) -> Some 0
+    | Some _,None -> let () = set_error_index None in None
+    | Some index,Some error ->
+      let length = List.length error in
+      if index > length then
+        let () = set_error_index (Some 0) in
+        Some 0
+      else
+        (if 0 > index then
+           let index = Some ((List.length error) - 1) in
+           let () = set_error_index index in
+           index
+         else
+           Some index)
+
+  let get_message (index : int option) (errors : Api_types_j.errors option) : Api_types_t.message option =
+    Option_util.bind
+      (fun n ->
+         Option_util.bind (fun errors -> Some (List.nth errors n))
+           errors
+      )
+      (sanitize_index index errors)
+
+  let mesage_nav_text =
+    React.S.l2
+      (fun index error  ->
+       match (index,error) with
+       | (None,  None) -> ""
+       | (Some _,None) -> ""
+       | (None, Some _) -> ""
+       | (Some index,Some errors) ->
+         Format.sprintf
+           "%d/%d"
+           (index+1)
+           (List.length errors)
+      )
+      error_index
+      State_error.errors
+
+    let a_class = Tyxml_js.R.Html.a_class
+        (React.S.bind
+           State_error.errors
+           (fun error ->
+              React.S.const
+                (match error with
+                 | None -> [ "hide" ; ]
+                 | Some [] -> [ "hide" ; ]
+                 | Some (_::[]) -> [ "hide" ; ]
+                 | Some (_::_) -> [ "error-span"; ]
+                )
+           )
+        )
+
+    let message_nav_dec =
+      Html.span
+      ~a:[ Html.a_id message_nav_dec_id ; a_class ; ]
+      [ Html.pcdata " « " ]
+    let message_nav_inc =
+      Html.span
+      ~a:[ Html.a_id message_nav_inc_id ; a_class ; ]
+      [ Html.pcdata " » " ]
+    let message_nav =
+    [  message_nav_dec ;
+       Tyxml_js.R.Html.pcdata mesage_nav_text ;
+       message_nav_inc ; ]
+
+  let file_label_text =
+    React.S.l2
+      (fun index error  ->
+         let range =
+           Option_util.bind
+             (fun message -> message.Api_types_j.message_range)
+             (get_message index error)
+         in
+         match range with
+         | None -> ""
+         | Some range -> Format.sprintf  "[%s]" range.Api_types_j.file)
+      error_index
+      State_error.errors
+
+  let file_label =
+    Html.span
+      ~a:[Html.a_id message_file_label_id;
+          Html.a_class [ "error-span" ] ;
+         ]
+          [Tyxml_js.R.Html.pcdata file_label_text]
+
+  let error_message_text =
+    React.S.l2
+      (fun index error  ->
+       match get_message index error with
+       | None -> ""
+       | Some message -> Format.sprintf  " %s " message.Api_types_j.message_text)
+      error_index
+      State_error.errors
+
+  let error_message =
+    Html.span
+      ~a:[Html.a_id id ;
+          Html.a_class [ "error-span" ] ;
+         ]
+      [Tyxml_js.R.Html.pcdata error_message_text]
+
   let alert_messages =
-  Html.div
-    ~a:[Html.a_id id;
-        Tyxml_js.R.Html.a_class
-          (React.S.bind
-             State_error.errors
-             (fun error ->
-                React.S.const
+    Html.div
+      ~a:[Html.a_id id;
+
+          Tyxml_js.R.Html.a_class
+            (React.S.bind
+               State_error.errors
+               (fun error ->
+                  React.S.const
                   (match error with
-                   | None -> [ "alert-sm" ; "alert" ; ]
-                   | Some _ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
+                    | None -> [ "alert-sm" ; "alert" ; ]
+                    | Some _ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
                   )
-             )
-          );
-       ]
-    [Tyxml_js.R.Html.pcdata
-       (React.S.bind
-          State_error.errors
-          (fun error ->
-             React.S.const
-               (match error with
-                | None -> ""
-                | Some errors ->
-                  (match errors with
-                   | [] -> ""
-                   | h::_ -> message_label h 1 (List.length errors))
                )
-          )
-       )
-    ]
+            );
+         ]
+      (message_nav@
+      [ file_label ;
+        error_message ;
+      ])
 
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ alert_messages ]
 
-  let onload () = ()
+  let file_click_handler () =
+    let dom = Tyxml_js.To_dom.of_span file_label in
+    let () = dom##.onclick :=
+        Dom.handler
+          (fun _ ->
+             let () = Common.debug (Js.string "file_click_handler") in
+             let message : Api_types_t.message option =
+               get_message
+                 (React.S.value error_index)
+                 (React.S.value State_error.errors)
+             in
+             let range =
+               Option_util.bind
+                 (fun message -> message.Api_types_j.message_range)
+                 message
+             in
+             let () = match range with
+               | Some range -> Panel_settings_controller.focus_range range
+               | None -> ()
+             in
+             Js._true)
+    in
+    ()
+
+  let index_click_handler dom delta =
+    let () = dom##.onclick := Dom.handler
+          (fun _ ->
+             let () = Common.debug (Js.string "index_click_handler") in
+             let index : int option =
+               sanitize_index
+                 (React.S.value error_index)
+                 (React.S.value State_error.errors)
+             in
+             let index = Option_util.map delta index in
+             let index : int option =
+               sanitize_index
+                 index
+                 (React.S.value State_error.errors) in
+             let () = set_error_index index in
+             Js._true) in
+    ()
+
+  let inc_click_handler () =
+    let dom = Tyxml_js.To_dom.of_span message_nav_dec in
+    let () = index_click_handler dom (fun index -> index + 1) in
+    ()
+
+  let dec_click_handler () =
+    let dom = Tyxml_js.To_dom.of_span message_nav_inc in
+    let () = index_click_handler dom (fun index -> index - 1) in
+    ()
+
+  let onload () =
+    let () = file_click_handler () in
+    let () = inc_click_handler () in
+    let () = dec_click_handler () in
+    ()
 end
 
 module ButtonStart : Ui_common.Div = struct

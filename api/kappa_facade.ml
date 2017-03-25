@@ -53,70 +53,6 @@ let rec count_char c s =
     1 + (count_char c (String.sub s (sp+1) (String.length s - sp - 1)))
   with Not_found -> 0
 
-
-let project_text (files : Api_types_j.file list) :
-  (string * file_index list) =
-  let files : Api_types_j.file list =
-    (List.stable_sort
-       (fun l r ->
-          Mods.int_compare
-            l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-            r.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-       )
-       files) in
-  List.fold_left
-    (fun (buffer,file_indexes) file ->
-       match file_indexes with
-         [] -> (file.Api_types_j.file_content,
-                [{ file_index_file_id = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id ;
-                   file_index_line_offset = 0 ;
-                   file_index_char_offset = 0 ;
-                   file_line_count = count_char '\n' buffer ;
-                 }])
-       | h::_ -> (buffer^"\n"^file.Api_types_j.file_content ,
-                  { file_index_file_id = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id ;
-                    file_index_line_offset = h.file_index_line_offset + h.file_line_count ;
-                    file_index_char_offset = String.length buffer ;
-                    file_line_count = count_char '\n' buffer ;
-                  }::file_indexes)
-    )
-    ("",[])
-    files
-
-let rec localize_range (range : Api_types_j.range) =
-  function
-  | [] -> range
-  | h::t ->
-    let in_position (p : Api_types_j.position) : bool =
-      h.file_index_line_offset <= p.Api_types_j.line &&
-      p.Api_types_j.line <= h.file_index_line_offset + h.file_line_count
-    in
-    let shift_position (p : Api_types_j.position)  =
-      { p with Api_types_j.line =
-                 p.Api_types_j.line - h.file_index_line_offset }
-    in
-    if in_position range.Api_types_j.from_position
-    || in_position range.Api_types_j.to_position
-    then
-      { Api_types_j.file = h.file_index_file_id ;
-        Api_types_j.from_position = shift_position range.Api_types_j.from_position;
-        Api_types_j.to_position = shift_position range.Api_types_j.to_position; }
-    else
-      localize_range range t
-
-let localize_message (message : Api_types_j.message) (indexes : file_index list) =
-  match message.Api_types_j.message_range with
-  | None ->
-    message
-  | Some range ->
-    { message with
-      Api_types_j.message_range =
-        Some (localize_range range indexes) }
-
-let localize_errors (errors : Api_types_j.errors) (indexes : file_index list) =
-  List.map (fun message -> localize_message message indexes) errors
-
-
 (** State of the running simulation. *)
 type t =
   { mutable is_running : bool ;
@@ -140,21 +76,15 @@ type t =
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     with_trace : bool ;
     mutable lastyield : float ;
-    mutable file_indexes : file_index list option;
   }
 
-let t_errors (t : t) (errors : Api_types_j.errors) =
-  match t.file_indexes with
-  | None -> errors
-  | Some indexes ->  localize_errors errors indexes
-let t_range (t : t) (range : Api_types_j.range) =
-  match t.file_indexes with
-  | None -> range
-  | Some indexes ->  localize_range range indexes
-
 let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
-    ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph ~state
-    ~init_l ~with_trace ~lastyield ~file_indexes : t =
+    ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
+    ~state
+    ~init_l
+    ~with_trace
+    ~lastyield
+  : t =
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
     pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
@@ -166,7 +96,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     files = [];
     error_messages = [];
     contact_map; env; graph; state; init_l; with_trace;
-    lastyield; file_indexes;
+    lastyield;
   }
 
 let reinitialize random_state t =
@@ -202,114 +132,142 @@ let clone_t t =
     ~init_l:t.init_l
     ~with_trace:t.with_trace
     ~lastyield:t.lastyield
-    ~file_indexes:t.file_indexes
 
 
-let catch_error : 'a .
-                    (Api_types_j.range -> Api_types_j.range) ->
-  (Api_types_j.errors -> 'a) -> exn -> 'a =
-  fun f handler ->
+
+let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
+  fun handler ->
     (function
       |  ExceptionDefn.Syntax_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Locality.to_range location)))
+             ~region:(Some (Locality.to_range location))
              message)
       | ExceptionDefn.Malformed_Decl ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Locality.to_range location)))
+             ~region:(Some (Locality.to_range location))
              message)
       | ExceptionDefn.Internal_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (f (Locality.to_range location)))
+             ~region:(Some (Locality.to_range location))
              message)
       | Invalid_argument error ->
         handler (Api_data.api_message_errors ("Runtime error "^ error))
       | exn -> handler (Api_data.api_exception_errors exn))
 
-let build_ast
-    (indexes : file_index list)
-    (code : string)
-    (yield : unit -> unit Lwt.t) =
-  let lexbuf : Lexing.lexbuf = Lexing.from_string code in
+type file = { file_id : string ; file_content : string }
+
+let rec compile_file
+    (yield : unit -> unit Lwt.t)
+    (compile : Ast.parsing_compil) : file list -> (Ast.parsing_compil, Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  function
+  | [] -> Lwt.return (`Ok compile)
+  | file::files ->
+    let lexbuf = Lexing.from_string file.file_content in
+    let () = lexbuf.Lexing.lex_curr_p <- { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = file.file_id }  in
+    Lwt.catch
+      (fun () ->
+         (Lwt.wrap3 KappaParser.start_rule KappaLexer.token lexbuf compile) >>=
+         (fun new_compile ->
+            (yield ()) >>=
+            (fun () -> compile_file yield new_compile files))
+      )
+      (catch_error
+         (fun e ->
+            (yield ()) >>=
+            (fun () -> compile_file yield compile files) >>=
+            (fun result ->
+               let r =
+                 Api_common.result_data_map
+                   ~ok:(fun _ -> `Error e)
+                   ~error:(fun error -> `Error (e@error))
+                   result
+                in
+                (Lwt.return r)
+            )
+         )
+      )>>=
+      (fun result -> (yield ()) >>= (fun _ -> Lwt.return result))
+
+let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
-  let log_form =
-    Format.formatter_of_buffer log_buffer in
+  let log_form = Format.formatter_of_buffer log_buffer in
+  let post_parse raw_ast =
+    let (conf,_,_,_,_) =
+      Configuration.parse raw_ast.Ast.configurations in
+    let new_syntax = conf.Configuration.newSyntax in
+    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] raw_ast) >>=
+    (fun
+      (sig_nd,
+       contact_map,
+       tk_nd,
+       _updated_vars,
+       (result :
+          (Ast.agent,
+           LKappa.rule_agent list,
+           int,
+           LKappa.rule, unit) Ast.compil)) ->
+      (yield ()) >>=
+      (fun () ->
+         (* The last yield is updated after the last yield.
+            It is gotten here for the initial last yeild value. *)
+         let lastyield = Sys.time () in
+         try (* exception raised by compile must have used Lwt.fail.
+                Something is wrong for now *)
+           Eval.compile
+             ~pause:(fun f -> Lwt.bind (yield ()) f)
+             ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
+             ~outputs:(function
+                 | Data.Log s ->
+                   Format.fprintf log_form "%s@." s
+                 | Data.Snapshot _
+                 | Data.Flux _
+                 | Data.Plot _
+                 | Data.TraceStep _
+                 | Data.Print _ -> assert false)
+             ~max_sharing:false sig_nd tk_nd contact_map result >>=
+           (fun (env,with_trace,init_l) ->
+              let counter =
+                Counter.create
+                  ~init_t:(0. : float) ~init_e:(0 : int)
+                  ?max_time:None ?max_event:None
+                  ~plot_period:(Counter.DT 1.) in
+              let () = ExceptionDefn.flush_warning log_form in
+              let random_state =
+                match conf.Configuration.seed with
+                | None -> Random.State.make_self_init ()
+                | Some theSeed -> Random.State.make [|theSeed|] in
+              let simulation =
+                create_t
+                  ~contact_map ~log_form ~log_buffer  ~env ~counter
+                  ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
+                  ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
+                  ~new_syntax
+                  ~graph:(Rule_interpreter.empty
+                            ~with_trace(*TODO conf.Eval.traceFileName*)
+                            random_state env counter)
+                  ~state:(State_interpreter.empty env [])
+                  ~init_l ~with_trace ~lastyield
+              in
+              Lwt.return (`Ok simulation))
+         with e ->
+           (catch_error
+              (fun e -> Lwt.return (`Error e))) e
+      ))
+  in
   Lwt.catch
     (fun () ->
-       (Lwt.wrap3 KappaParser.start_rule KappaLexer.token
-          lexbuf Ast.empty_compil) >>=
-       (fun raw_ast ->
-          (yield ()) >>=
-          (fun () ->
-             let (conf,_,_,_,_) =
-               Configuration.parse raw_ast.Ast.configurations in
-             let new_syntax = conf.Configuration.newSyntax in
-             (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] raw_ast) >>=
-             (fun
-               (sig_nd,
-                contact_map,
-                tk_nd,
-                _updated_vars,
-                (result :
-                   (Ast.agent,
-                    LKappa.rule_agent list,
-                    int,
-                    LKappa.rule, unit) Ast.compil)) ->
-               (yield ()) >>=
-               (fun () ->
-                  (* The last yield is updated after the last yield.
-                     It is gotten here for the initial last yeild value. *)
-                  let lastyield = Sys.time () in
-                  try (* exception raised by compile must have used Lwt.fail.
-                         Something is wrong for now *)
-                  Eval.compile
-                    ~pause:(fun f -> Lwt.bind (yield ()) f)
-                    ~return:Lwt.return ?rescale_init:None ~compileModeOn:false
-                    ~outputs:(function
-                        | Data.Log s ->
-                          Format.fprintf log_form "%s@." s
-                        | Data.Snapshot _
-                        | Data.Flux _
-                        | Data.Plot _
-                        | Data.TraceStep _
-                        | Data.Print _ -> assert false)
-                    ~max_sharing:false sig_nd tk_nd contact_map result >>=
-                  (fun (env,with_trace,init_l) ->
-                     let counter =
-                       Counter.create
-                         ~init_t:(0. : float) ~init_e:(0 : int)
-                         ?max_time:None ?max_event:None
-                         ~plot_period:(Counter.DT 1.) in
-                     let () = ExceptionDefn.flush_warning log_form in
-                     let random_state =
-                       match conf.Configuration.seed with
-                       | None -> Random.State.make_self_init ()
-                       | Some theSeed -> Random.State.make [|theSeed|] in
-                     let simulation =
-                       create_t
-                         ~contact_map ~log_form ~log_buffer  ~env ~counter
-                         ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
-                         ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
-                         ~new_syntax
-                         ~graph:(Rule_interpreter.empty
-                                   ~with_trace(*TODO conf.Eval.traceFileName*)
-                                   random_state env counter)
-                         ~state:(State_interpreter.empty env [])
-                         ~init_l ~with_trace ~lastyield
-                         ~file_indexes:(Some indexes)
-                     in
-                     Lwt.return (`Ok simulation))
-                  with e ->
-                   (catch_error
-                      (fun range -> localize_range range indexes)
-                      (fun e -> Lwt.return (`Error e))) e
-               )))))
-    (catch_error
-       (fun range -> localize_range range indexes)
-       (fun e -> Lwt.return (`Error e)))
+       (compile_file yield Ast.empty_compil kappa_files) >>=
+       (Api_common.result_data_map
+          ~ok:(fun raw_ast ->
+              (yield ()) >>=
+              (fun () -> post_parse raw_ast))
+         ~error:(fun e -> Lwt.return (`Error e))
+       )
+    )
+    (catch_error (fun e -> Lwt.return (`Error e)))
 
 let prepare_plot_value x =
   Array.fold_right (fun nbr acc -> Nbr.to_float nbr :: acc) x []
@@ -339,14 +297,18 @@ let parse
     ~(kappa_files : Api_types_t.file list)
   : (t,Api_types_j.errors) Api_types_j.result_data Lwt.t
   =
-  let (kappa_code,indexes) = project_text kappa_files in
+
+  let kappa_files =
+    List.map
+      (fun f -> { file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
+                  file_content = f.Api_types_t.file_content })
+      kappa_files in
   Lwt.bind
     (build_ast
-       indexes
-       kappa_code system_process#yield)
+       kappa_files system_process#yield)
     (function
       | `Ok simulation -> Lwt.return (`Ok simulation)
-      | `Error e -> Lwt.return (`Error (localize_errors e indexes)))
+      | `Error e -> Lwt.return (`Error e))
 
 let time_yield
     ~(system_process : system_process)
@@ -402,7 +364,8 @@ let run_simulation
               ExceptionDefn.flush_warning t.log_form
           in
           Lwt.return_unit))
-    (catch_error (t_range t) (fun e ->
+    (catch_error
+       (fun e ->
            let () = t.is_running <- false in
            let () = t.error_messages <- e in
          Lwt.return_unit))
@@ -479,14 +442,12 @@ let start
                   run_simulation ~system_process:system_process ~t:t stop)
              with e ->
                catch_error
-                 (t_range t)
                  (fun e ->
                     let () = t.error_messages <- e in
                     Lwt.return_unit) e
           ) in
       Lwt.return (`Ok ()))
     (catch_error
-       (t_range t)
        (fun e ->
           let () = t.error_messages <- e in
           Lwt.return (`Error e)))
@@ -517,7 +478,7 @@ let stop
           let () = finalize_simulation ~t:t in
           Lwt.return (`Ok ()))
     )
-    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
+    (catch_error (fun e -> Lwt.return (`Error e)))
 
 let perturbation
     ~(system_process : system_process)
@@ -546,7 +507,7 @@ let perturbation
          let () = t.graph <- graph'' in
          let () = t.state <- state' in
          Lwt.return (`Ok ()))
-    (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
+    (catch_error (fun e -> Lwt.return (`Error e)))
 
 let continue
     ~(system_process : system_process)
@@ -586,7 +547,6 @@ let continue
          Lwt.return (`Ok ())
     )
     (catch_error
-       (t_range t)
        (fun e -> Lwt.return (`Error e)))
 
 let create_info ~(t : t) : Api_types_j.simulation_detail =
@@ -634,7 +594,7 @@ let info
     Lwt.catch
       (fun () ->
          Lwt.return (`Ok (create_info ~t:t)))
-      (catch_error (t_range t) (fun e -> Lwt.return (`Error e)))
+      (catch_error (fun e -> Lwt.return (`Error e)))
   | _ -> Lwt.return (`Error t.error_messages)
 
 let get_contact_map (t : t) : Api_types_j.site_node array =

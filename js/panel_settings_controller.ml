@@ -73,3 +73,14 @@ let perturb_simulation () =
                State_simulation.perturb_simulation model_perturbation))
        >>= (fun _ -> Lwt.return_unit)
     )
+
+let focus_range (range : Api_types_j.range) : unit =
+  let file_id = range.Api_types_j.file in
+  Common.async
+    (fun () ->
+       State_error.wrap
+         ~append:true
+         __LOC__
+         (State_file.select_file file_id)
+       >>= (fun _ -> Lwt.return_unit)
+    )

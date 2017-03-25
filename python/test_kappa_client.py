@@ -81,6 +81,29 @@ class KappaClientTest(object):
         except:
             None
 
+    def parse_multiple_files(self):
+        runtime = self.getRuntime()
+        project_id = str(uuid.uuid1())
+        self.assertEqual(project_id,runtime.project_create(project_id))
+        file_1_id = str(uuid.uuid1())
+        file_2_id = str(uuid.uuid1())
+        test_dir = "../models/test_suite/compiler/file_order/"
+        with open(test_dir+"file2.ka") as file_2:
+            with open(test_dir+"file1.ka") as file_1:
+                data_1 = file_1.read()
+                file_1_metadata = kappa_client.FileMetadata(file_1_id,0)
+                file_1_object = kappa_client.File(file_1_metadata,data_1)
+                runtime.file_create(project_id,file_1_object)
+
+                data_2 = file_2.read()
+                file_2_metadata = kappa_client.FileMetadata(file_2_id,0)
+                file_2_object = kappa_client.File(file_2_metadata,data_2)
+                with self.assertRaises(kappa_common.KappaError):
+                    runtime.file_create(project_id,file_2_object)
+                file_names = list(kappa_client.file_catalog_file_id(runtime.file_info(project_id)))
+                self.assertIn(file_1_id,file_names)
+                self.assertIn(file_2_id,file_names)
+
     def test_run_simulationd(self):
         runtime = self.getRuntime()
         project_id = str(uuid.uuid1())

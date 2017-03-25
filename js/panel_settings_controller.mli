@@ -11,3 +11,4 @@ val pause_simulation : unit -> unit
 val stop_simulation : unit -> unit
 val start_simulation : unit -> unit
 val perturb_simulation : unit -> unit
+val focus_range : Api_types_j.range -> unit

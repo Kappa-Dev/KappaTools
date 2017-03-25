@@ -93,18 +93,26 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
     match error.Api_types_j.message_range with
     | None -> None
     | Some range ->
-      Some (Codemirror.create_lint
-              ~message:error.Api_types_j.message_text
+      let model : State_file.model = React.S.value State_file.model in
+      match model.State_file.model_current with
+      | None -> None
+      | Some file_id ->
+        if range.Api_types_j.file = file_id then
+          Some (Codemirror.create_lint
+                  ~message:error.Api_types_j.message_text
               (* This is a bit of a hack ... i am trying to keep
                    the code mirror code independent of the api code.
               *)
               ~severity:( match error.Api_types_j.message_severity with
-                  | `Error -> Codemirror.Error
-                  | `Warning -> Codemirror.Warning
-                  | `Info -> Codemirror.Warning
-                )
+                      | `Error -> Codemirror.Error
+                      | `Warning -> Codemirror.Warning
+                      | `Info -> Codemirror.Warning
+                    )
               ~from:(position range.Locality.from_position)
-              ~to_:(position range.Locality.to_position)) in
+              ~to_:(position range.Locality.to_position))
+        else
+          None
+  in
   Js.array
     (Array.of_list
        (List.fold_left
