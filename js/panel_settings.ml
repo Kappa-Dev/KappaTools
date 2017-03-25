@@ -164,7 +164,8 @@ module DivErrorMessage : Ui_common.Div = struct
     | None, None -> None
     | None,Some [] -> None
     | None,Some (_::_) -> Some 0
-    | Some _,None -> let () = set_error_index None in None
+    | Some _,None -> None
+    | Some _,Some [] -> None
     | Some index,Some error ->
       let length = List.length error in
       if index > length then
