@@ -312,6 +312,9 @@ let get_internal ag s graph =
   | None ->
     failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
               " has no internal state in the current graph.")
+let get_sites ag graph =
+  let arr = Mods.DynArray.get graph.state ag in
+  Array.length arr
 
 let remove_internal ag s graph =
   let () = assert (not graph.outdated) in

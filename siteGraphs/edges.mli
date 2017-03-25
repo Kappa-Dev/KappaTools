@@ -55,6 +55,8 @@ val link_destination : int -> int -> t -> (Agent.t * int) option
 val get_internal : int -> int -> t -> int
 (** [get_internal ag site graph] *)
 
+val get_sites : int -> t -> int
+
 val get_connected_component : int -> t -> int option
 
 val in_same_connected_component : int -> int -> t -> bool

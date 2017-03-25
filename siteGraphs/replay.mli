@@ -11,3 +11,5 @@ val do_step : Signature.s -> state -> Trace.step -> state * (int * int) option
 (** @return the new state and, if the step was an unary instance of a
     binary rule, the id of the rule and the distance between its 2
     connected patterns. *)
+
+val cc_of_state : Signature.s -> state -> Pattern.cc list

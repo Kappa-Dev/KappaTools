@@ -20,6 +20,18 @@ let init_state ~with_connected_components = {
     if with_connected_components then Some Mods.IntMap.empty else None;
 }
 
+let cc_of_state sigs s=
+  match s.connected_components with
+  | Some cc_maps ->
+     Mods.IntMap.fold
+       (fun _ cc_map acc ->
+         Agent.SetMap.Set.fold
+           (fun agent acc' ->
+             (Pattern.cc_of_edges agent s.graph sigs)::acc') cc_map acc)
+       cc_maps []
+  | None -> []
+
+
 let break_apart_cc graph ccs = function
   | None -> ccs
   | Some (origin_cc,new_cc) ->

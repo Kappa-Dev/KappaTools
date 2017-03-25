@@ -1405,3 +1405,34 @@ let merge_on_inf env m g1 g2 =
        merge_compatible env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
      Some pushout
   | None -> None
+
+let rec build_on_agent a e (visited,cc) =
+  let aid = Agent.id a in
+  let nb_sites = Edges.get_sites aid e in
+  let (nodes_arr,vis) =
+    if (List.mem aid visited) then
+      (Mods.IntMap.find_default [||] aid cc.nodes,visited)
+    else (Array.make nb_sites (UnSpec,-1),aid::visited) in
+  let sort = Agent.sort a in
+  let sort_ls = (cc.nodes_by_type).(sort) in
+  let () = (cc.nodes_by_type).(sort) <- aid::sort_ls in
+  let rec build_on_site x cc =
+    if (x = nb_sites) then (vis,cc)
+    else
+      begin
+        let intern = Edges.get_internal aid x e in
+        match (Edges.link_destination aid x e) with
+        | Some (b,y) ->
+           let () =  nodes_arr.(x) <- (Link (Agent.id b, y), intern) in
+           let nodes = Mods.IntMap.add aid nodes_arr cc.nodes in
+           build_on_agent b e (build_on_site (succ x) {cc with nodes})
+        | None ->
+           let () =  nodes_arr.(x) <- (Free, intern) in
+           let nodes = Mods.IntMap.add aid nodes_arr cc.nodes in
+           build_on_site (succ x) {cc with nodes}
+      end in
+  build_on_site 0 cc
+
+let cc_of_edges a e sigs =
+  let (_,cc) = build_on_agent a e ([],(empty_cc sigs)) in
+  cc
