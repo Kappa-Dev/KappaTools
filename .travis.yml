@@ -65,9 +65,9 @@ script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
+  - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then make WebSim.native StdSim.native && cd python && python3 test_kappa_client.py ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make bin/StdSim site/index.html ; fi"
-  - sh -c "if [ '$USE_TK' = 1 ] ; then make META kappalib ; fi"
 
 after_success:
  sh -c "if [ '$TRAVIS_BRANCH' = master ] ; then dev/update-web.sh $CHECKED ; fi"
