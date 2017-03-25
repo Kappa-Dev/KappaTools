@@ -129,6 +129,18 @@ let setup_lint _ _ _ =
   | None -> Js.array [||]
   | Some (e : Api_types_j.errors) -> error_lint e
 
+(* http://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w *)
+let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =
+  let position : position Js.t = new%js Codemirror.position line 0 in
+  let mode : Js.js_string Js.t Js.opt = Js.some (Js.string "local") in
+  let coords : Codemirror.dimension Js.t  = codemirror##charCoords position mode in
+  let top : int = coords##.top in
+  let element : Dom_html.element Js.t = codemirror##getScrollerElement in
+  let middleHeight : int = element##.offsetHeight/2 in
+  let scrollLine : int = top - middleHeight - 5 in
+  let () = codemirror##scrollTo Js.null (Js.some scrollLine) in
+  ()
+
 let onload () : unit =
   let () = Menu_editor_file.onload () in
   let () = Menu_editor_simulation.onload () in
@@ -219,10 +231,15 @@ let onload () : unit =
   in
   let _ =
     React.S.map
-      (fun refresh_file ->
-         match refresh_file with
+      (fun (refresh : State_file.refresh option) ->
+         match refresh with
          | None -> ()
-         | Some content -> codemirror##setValue(Js.string content)
+         | Some refresh ->
+           let () = codemirror##setValue(Js.string refresh.State_file.content) in
+           let () = match refresh.State_file.line with
+             | None -> ()
+             | Some line -> jump_to_line codemirror line in
+           ()
       )
       State_file.refresh_file
   in

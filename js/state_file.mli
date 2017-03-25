@@ -9,7 +9,7 @@
 (* Create a file *)
 val create_file : filename:string -> content:string -> unit Api.result Lwt.t
 (* Set current file to file with the specified name *)
-val select_file : string -> unit Api.result Lwt.t
+val select_file : string -> int option -> unit Api.result Lwt.t
 (* Update content of current file *)
 val set_content : string -> unit Api.result Lwt.t
 (* Update compile of current file *)
@@ -24,7 +24,8 @@ val reset : unit -> unit
 (* Get current file - the name is not specified to force
    the selection of the file before the fetch.
 *)
-val refresh_file : string option React.signal
+type refresh = { content : string ; line : int option ; }
+val refresh_file : refresh option React.signal
 (* remove current file from project *)
 val remove_file : unit -> unit Api.result Lwt.t
 (* Meta data of current file *)

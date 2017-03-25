@@ -76,11 +76,12 @@ let perturb_simulation () =
 
 let focus_range (range : Api_types_j.range) : unit =
   let file_id = range.Api_types_j.file in
+  let line = range.Api_types_j.from_position.Locality.line in
   Common.async
     (fun () ->
        State_error.wrap
          ~append:true
          __LOC__
-         (State_file.select_file file_id)
+         (State_file.select_file file_id (Some line))
        >>= (fun _ -> Lwt.return_unit)
     )

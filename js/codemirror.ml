@@ -51,6 +51,15 @@ class type position =
     method line : int Js.t Js.readonly_prop
   end
 
+class type dimension =
+  object
+    method left : int Js.readonly_prop
+    method right : int Js.readonly_prop
+    method top : int Js.readonly_prop
+    method bottom : int Js.readonly_prop
+  end
+
+
 let position : (int -> int -> position Js.t) Js.constr =
   (Js.Unsafe.js_expr "CodeMirror")##._Pos
 
@@ -97,6 +106,24 @@ class type codemirror =
     method getValue : Js.js_string Js.t Js.meth
     method setValue : Js.js_string Js.t -> unit Js.meth
     method focus    : unit Js.t Js.meth
+
+    (* Programmatically set the size of the editor (overriding the
+       applicable CSS rules). width and height can be either numbers
+       (interpreted as pixels) or CSS units ("100%", for example).
+       You can pass null for either of them to indicate that that
+       dimension should not be changed.
+    *)
+    method setSize : int Js.t Js.opt -> int Js.t Js.opt -> unit Js.meth
+    (* Scroll the editor to a given (pixel) position. Both arguments
+       may be left as null or undefined to have no effect. *)
+    method scrollTo : int Js.opt -> int Js.opt -> unit Js.meth
+
+    method charCoords :
+      position Js.t ->
+      Js.js_string Js.t Js.opt ->
+      dimension Js.t Js.meth
+
+    method getScrollerElement : Dom_html.element Js.t Js.meth
 
     method on :
       (Js.js_string Js.t) ->

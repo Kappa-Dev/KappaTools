@@ -138,7 +138,7 @@ let input =
 end
 
 module DivErrorMessage : Ui_common.Div = struct
-  (* TODO : [%html {|<div class="alert-sm alert alert-danger"> « 1/2 » [abc.ka] Malformed agent 'adfsa' </div>|}] *)
+
   let id = "configuration_error_div"
   let message_nav_inc_id = "panel_settings_message_nav_inc_id"
   let message_nav_dec_id = "panel_settings_message_nav_dec_id"

@@ -54,7 +54,8 @@ let directory_gt
     )
 let blank_state = { state_current = None ; state_directory = [] }
 let directory_state , set_directory_state = React.S.create blank_state
-let refresh_file , set_refresh_file = React.S.create (None : string option)
+type refresh = { content : string ; line : int option ; }
+let refresh_file , set_refresh_file = React.S.create (None : refresh option)
 
 let reset () =
   let () = set_directory_state blank_state in
@@ -76,7 +77,7 @@ let get_file () : Api_types_j.file Api.result Lwt.t =
        )
     )
 
-let send_refresh () : unit Api.result Lwt.t =
+let send_refresh (line : int option) : unit Api.result Lwt.t =
   (* only send refresh if there is a current file *)
   match (React.S.value directory_state).state_current with
   | None -> Lwt.return (Api_common.result_ok ())
@@ -86,7 +87,11 @@ let send_refresh () : unit Api.result Lwt.t =
        ~ok:(fun (file : Api_types_j.file) ->
            let () = Common.debug (Js.string file.Api_types_j.file_content) in
            let () = set_refresh_file None in
-           let () = set_refresh_file (Some file.Api_types_j.file_content) in
+           let () =
+             set_refresh_file
+               (Some
+                  { content = file.Api_types_j.file_content ;
+                    line = line ; }) in
            Lwt.return (Api_common.result_ok ()))
     )
 
@@ -196,7 +201,7 @@ let create_file
                       { (React.S.value directory_state) with
                         state_current = Some filename } in
                   let r_dir_t = update_directory manager project_id in
-                  send_refresh () >>= fun r_txt -> r_dir_t >>= fun r_dir ->
+                  send_refresh None >>= fun r_txt -> r_dir_t >>= fun r_dir ->
                     Lwt.return (Api_common.result_combine [r_create; r_dir; r_txt])
                )
               )
@@ -215,7 +220,7 @@ let choose_file
          directory)
     with Not_found -> None
 
-let select_file (filename : string) : unit Api.result Lwt.t =
+let select_file (filename : string) (line : int option) : unit Api.result Lwt.t =
   State_project.with_project ~label:"select_file"
     (fun manager project_id ->
        (manager#file_catalog project_id) >>=
@@ -241,7 +246,7 @@ let select_file (filename : string) : unit Api.result Lwt.t =
                 in
                 Lwt.return (Api_common.result_error_msg error_msg)
               | Some _ ->
-                send_refresh ()
+                send_refresh line
             )
        )
     )
@@ -441,7 +446,7 @@ let sync () : unit Api.result Lwt.t =
               in
               let () = set_directory_state new_state in
               if refresh_ui then
-                send_refresh ()
+                send_refresh None
               else
                 Lwt.return (Api_common.result_ok ())
             )
@@ -487,7 +492,7 @@ let load_files () : unit Lwt.t =
       (Api_common.result_map
          ~ok:(fun _ () ->
              if load_file then
-               (select_file filename) >>=
+               (select_file filename None) >>=
                (Api_common.result_map
                   ~ok:(fun _ _ -> add_files files false)
                   ~error:(fun _ _ -> add_files files load_file)
@@ -549,7 +554,7 @@ let load_models () : unit Lwt.t =
       (Api_common.result_map
          ~ok:(fun _ filename ->
              if load_file then
-               (select_file filename) >>=
+               (select_file filename None) >>=
                (Api_common.result_map
                   ~ok:(fun _ _ -> add_models models false)
                   ~error:(fun _ _ -> add_models models load_file)

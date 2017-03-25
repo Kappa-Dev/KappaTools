@@ -34,7 +34,7 @@ let set_file (file_id : string) : unit =
        State_error.wrap
          ~append:true
          __LOC__
-         (State_file.select_file file_id
+         ((State_file.select_file file_id None)
           >>= (fun r -> State_project.sync () >>=
                 fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
        >>= (fun _ -> Lwt.return_unit)
