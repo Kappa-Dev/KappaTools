@@ -300,9 +300,13 @@ let parse
 
   let kappa_files =
     List.map
-      (fun f -> { file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
-                  file_content = f.Api_types_t.file_content })
-      kappa_files in
+      (fun f ->
+         { file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
+           file_content = f.Api_types_t.file_content })
+      (List.filter
+         (fun f -> f.Api_types_t.file_metadata.Api_types_t.file_metadata_compile)
+         kappa_files)
+  in
   Lwt.bind
     (build_ast
        kappa_files system_process#yield)
