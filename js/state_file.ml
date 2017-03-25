@@ -350,10 +350,11 @@ let order_files (filenames : string list) : unit Api.result Lwt.t =
          (* only update directory on the last element *)
          ~skip_directory_update:(match tail with | [] -> false | _::_ -> true)
          file_id index) >>=
-      (Api_common.result_bind_lwt
-         ~ok:(fun _ ->
-             _order_file
-               tail (index + 1)))
+      (fun _ ->
+         (* No bind as intermediate errors are ignored.  Things may
+            be in an incosistent state while files are being rearranged.
+         *)
+         (_order_file tail (index + 1)))
   in
   _order_file filenames 0
 
