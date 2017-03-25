@@ -10,15 +10,17 @@ let rec stop_simulations (system_process:Kappa_facade.system_process) :
     (fun result_l ->
       (stop_simulations system_process sumulations)>>=
       (fun result_r ->
-         match (result_l) with
-         | (`Ok _) -> Lwt.return result_r
-         | (`Error errors_l) ->
-           (Api_common.result_map
-              ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
-              ~error:(fun _ errors_r ->
-                  let errors = errors_l@errors_r in
-                  Lwt.return (Api_common.result_messages errors))
-              result_r)
+         Result_data.map
+           ~ok:(fun _ -> Lwt.return result_r)
+           ~error:(fun errors_l ->
+               (Api_common.result_map
+                  ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
+                  ~error:(fun _ errors_r ->
+                      let errors = errors_l@errors_r in
+                      Lwt.return (Api_common.result_messages errors))
+                  result_r)
+             )
+           result_l
       )
     )
 let to_project (project : Api_environment.project) =
@@ -59,18 +61,20 @@ object
               ~system_process:system_process
               ~kappa_files:(project#get_files ())
             >>= fun out -> let _ = project#set_state out in Lwt.return out)
-         >>= fun state ->
-         Lwt.return
-           (match state with
-            | `Ok kappa_facade ->
-              Api_common.result_ok
-                { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade;
-                  Api_types_j.project_parse_project_version = project#get_version ();
-                }
-            | `Error error ->
-              Api_common.result_messages error)
+         >>=
+         (fun state ->
+            Lwt.return
+              (Result_data.map
+                 ~ok:(fun kappa_facade ->
+                     Api_common.result_ok
+                       { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade;
+                         Api_types_j.project_parse_project_version = project#get_version ();
+                       })
+                 ~error:(fun error -> Api_common.result_messages error)
+                 state
+           )
+         )
       )
-
 
 
 
@@ -94,12 +98,12 @@ object
         ~system_process:system_process
         ~kappa_files:[])
       >>=
-      (Api_common.result_data_map
+      (Result_data.map
          ~ok:((fun (t : Kappa_facade.t) ->
              let project =
                environment#create_project
                  project_id
-                 (`Ok t)
+                 (Result_data.ok t)
              in
              let () =
                Api_common.ProjectCollection.update

@@ -1,6 +1,3 @@
-val result_data_map :
-  ok:('ok -> 'a) ->
-  error:('error -> 'a) -> [< `Error of 'error | `Ok of 'ok ] -> 'a
 val result_ok : ?result_code:Api.manager_code -> 'ok -> 'ok Api.result
 val error_msg :
   ?severity:Api_types_j.severity -> string -> Api_types_j.message

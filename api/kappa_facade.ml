@@ -161,9 +161,9 @@ type file = { file_id : string ; file_content : string }
 
 let rec compile_file
     (yield : unit -> unit Lwt.t)
-    (compile : Ast.parsing_compil) : file list -> (Ast.parsing_compil, Api_types_j.errors) Api_types_j.result_data Lwt.t =
+    (compile : Ast.parsing_compil) : file list -> (Ast.parsing_compil, Api_types_j.errors) Result_data.t Lwt.t =
   function
-  | [] -> Lwt.return (`Ok compile)
+  | [] -> Lwt.return (Result_data.ok compile)
   | file::files ->
     let lexbuf = Lexing.from_string file.file_content in
     let () = lexbuf.Lexing.lex_curr_p <- { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = file.file_id }  in
@@ -180,9 +180,9 @@ let rec compile_file
             (fun () -> compile_file yield compile files) >>=
             (fun result ->
                let r =
-                 Api_common.result_data_map
-                   ~ok:(fun _ -> `Error e)
-                   ~error:(fun error -> `Error (e@error))
+                 Result_data.map
+                   ~ok:(fun _ -> Result_data.error e)
+                   ~error:(fun error -> Result_data.error (e@error))
                    result
                 in
                 (Lwt.return r)
@@ -251,23 +251,23 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                   ~state:(State_interpreter.empty env [])
                   ~init_l ~with_trace ~lastyield
               in
-              Lwt.return (`Ok simulation))
+              Lwt.return (Result_data.ok simulation))
          with e ->
            (catch_error
-              (fun e -> Lwt.return (`Error e))) e
+              (fun e -> Lwt.return (Result_data.error e))) e
       ))
   in
   Lwt.catch
     (fun () ->
        (compile_file yield Ast.empty_compil kappa_files) >>=
-       (Api_common.result_data_map
+       (Result_data.map
           ~ok:(fun raw_ast ->
               (yield ()) >>=
               (fun () -> post_parse raw_ast))
-         ~error:(fun e -> Lwt.return (`Error e))
+         ~error:(fun e -> Lwt.return (Result_data.error e))
        )
     )
-    (catch_error (fun e -> Lwt.return (`Error e)))
+    (catch_error (fun e -> Lwt.return (Result_data.error e)))
 
 let prepare_plot_value x =
   Array.fold_right (fun nbr acc -> Nbr.to_float nbr :: acc) x []
@@ -295,7 +295,7 @@ let outputs (simulation : t) =
 let parse
     ~(system_process : system_process)
     ~(kappa_files : Api_types_t.file list)
-  : (t,Api_types_j.errors) Api_types_j.result_data Lwt.t
+  : (t,Api_types_j.errors) Result_data.t Lwt.t
   =
 
   let kappa_files =
@@ -306,9 +306,9 @@ let parse
   Lwt.bind
     (build_ast
        kappa_files system_process#yield)
-    (function
-      | `Ok simulation -> Lwt.return (`Ok simulation)
-      | `Error e -> Lwt.return (`Error e))
+    (Result_data.map
+       ~ok:(fun simulation -> Lwt.return (Result_data.ok simulation))
+       ~error:(fun e -> Lwt.return (Result_data.error e)))
 
 let time_yield
     ~(system_process : system_process)
@@ -374,7 +374,7 @@ let start
     ~(system_process : system_process)
     ~(parameter : Api_types_j.simulation_parameter)
     ~(t : t)
-  : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  : (unit,Api_types_j.errors) Result_data.t Lwt.t =
   let lexbuf =
     Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
   Lwt.catch (fun () ->
@@ -446,15 +446,15 @@ let start
                     let () = t.error_messages <- e in
                     Lwt.return_unit) e
           ) in
-      Lwt.return (`Ok ()))
+      Lwt.return (Result_data.ok ()))
     (catch_error
        (fun e ->
           let () = t.error_messages <- e in
-          Lwt.return (`Error e)))
+          Lwt.return (Result_data.error e)))
 
 let pause
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+    ~(t : t) : (unit,Api_types_j.errors) Result_data.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   let () = if t.is_running then
@@ -462,11 +462,11 @@ let pause
     else
       ()
   in
-  Lwt.return (`Ok ())
+  Lwt.return (Result_data.ok ())
 
 let stop
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+    ~(t : t) : (unit,Api_types_j.errors) Result_data.t Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   Lwt.catch
@@ -476,15 +476,15 @@ let stop
           pause ~system_process:system_process ~t:t
         else
           let () = finalize_simulation ~t:t in
-          Lwt.return (`Ok ()))
+          Lwt.return (Result_data.ok ()))
     )
-    (catch_error (fun e -> Lwt.return (`Error e)))
+    (catch_error (fun e -> Lwt.return (Result_data.error e)))
 
 let perturbation
     ~(system_process : system_process)
     ~(t : t)
     ~(perturbation:Api_types_j.simulation_perturbation)
-  : (unit, Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  : (unit, Api_types_j.errors) Result_data.t Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
     Lexing.from_string perturbation.Api_types_j.perturbation_code
@@ -493,7 +493,7 @@ let perturbation
     (fun () ->
        if t.is_running then
          Lwt.return
-           (`Error (Api_data.api_message_errors msg_process_not_paused))
+           (Result_data.error (Api_data.api_message_errors msg_process_not_paused))
        else
          Lwt.wrap2
            KappaParser.standalone_effect_list KappaLexer.token lexbuf >>=
@@ -506,20 +506,20 @@ let perturbation
          let () = t.env <- env' in
          let () = t.graph <- graph'' in
          let () = t.state <- state' in
-         Lwt.return (`Ok ()))
-    (catch_error (fun e -> Lwt.return (`Error e)))
+         Lwt.return (Result_data.ok ()))
+    (catch_error (fun e -> Lwt.return (Result_data.error e)))
 
 let continue
     ~(system_process : system_process)
     ~(t : t)
     ~(parameter : Api_types_j.simulation_parameter)
-  : (unit,Api_types_j.errors) Api_types_j.result_data Lwt.t =
+  : (unit,Api_types_j.errors) Result_data.t Lwt.t =
   let lexbuf =
     Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
   Lwt.catch
     (fun () ->
        if t.is_running then
-         Lwt.return (`Ok ())
+         Lwt.return (Result_data.ok ())
        else
          Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
          fun pause ->
@@ -544,10 +544,10 @@ let continue
            Lwt.async
              (fun () ->
                 run_simulation ~system_process:system_process ~t:t false) in
-         Lwt.return (`Ok ())
+         Lwt.return (Result_data.ok ())
     )
     (catch_error
-       (fun e -> Lwt.return (`Error e)))
+       (fun e -> Lwt.return (Result_data.error e)))
 
 let create_info ~(t : t) : Api_types_j.simulation_detail =
   let progress :  Api_types_j.simulation_progress =
@@ -584,8 +584,7 @@ let create_info ~(t : t) : Api_types_j.simulation_detail =
 let info
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_j.simulation_detail,Api_types_j.errors)
-    Api_types_j.result_data
+  (Api_types_j.simulation_detail,Api_types_j.errors)  Result_data.t
     Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
@@ -593,9 +592,9 @@ let info
   | [] ->
     Lwt.catch
       (fun () ->
-         Lwt.return (`Ok (create_info ~t:t)))
-      (catch_error (fun e -> Lwt.return (`Error e)))
-  | _ -> Lwt.return (`Error t.error_messages)
+         Lwt.return (Result_data.ok (create_info ~t:t)))
+      (catch_error (fun e -> Lwt.return (Result_data.error e)))
+  | _ -> Lwt.return (Result_data.error t.error_messages)
 
 let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map

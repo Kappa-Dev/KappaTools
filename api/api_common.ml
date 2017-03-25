@@ -1,14 +1,5 @@
 open Lwt.Infix
 
-(* utility for results *)
-let result_data_map
-    ~(ok:'ok -> 'a)
-    ~(error:'error -> 'a)
-  =
-  function
-  | `Ok o -> ok o
-  | `Error e -> error e
-
 (* Helper functions for result *)
 let result_ok ?(result_code:Api.manager_code = `OK)
     (ok:'ok) : 'ok Api.result =
