@@ -2273,7 +2273,7 @@ let print_interpolate logger =
     let () =
       print_list logger
         [
-          "n_points = floor ((tend-tinit)/"^(Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^"+1"^(instruction_sep logger);
+          "n_points = floor ((tend-tinit)/"^(Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^")+1"^(instruction_sep logger);
           "t = linspace(tinit, tend, n_points)"^(instruction_sep logger);
           "obs = zeros(nrows,nobs)"^(instruction_sep logger);
           "";
