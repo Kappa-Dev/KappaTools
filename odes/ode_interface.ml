@@ -52,8 +52,13 @@ let get_representative parameters compil cache symmetries species =
 let bwd_interpretation parameters bwd_map reduction species =
   Symmetries.bwd_interpretation ~parameters bwd_map reduction species
 
+let fold_bwd_map f map acc =
+  Symmetries.fold_bwd_map f map acc
+
+let class_representative equiv_class = equiv_class.Symmetries.class_representative
+
 let add_equiv_class red bwd_map species =
-  Symmetries.add_equiv_class red bwd_map species 
+  Symmetries.add_equiv_class red bwd_map species
 
 let get_cc_cache cache = cache.cc_cache
 

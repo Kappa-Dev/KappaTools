@@ -186,6 +186,14 @@ sig
     Symmetries.bwd_map -> Symmetries.reduction -> chemical_species ->
     Symmetries.class_description option
 
+  val fold_bwd_map:
+  (chemical_species -> Symmetries.class_description -> 'a -> 'a) ->
+  Symmetries.bwd_map ->
+  'a -> 'a
+
+  val class_representative:
+    Symmetries.class_description -> chemical_species
+
   val add_equiv_class:
     Symmetries.reduction -> Symmetries.bwd_map -> chemical_species -> Symmetries.bwd_map
 end
