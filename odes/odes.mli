@@ -34,6 +34,7 @@ sig
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float
     -> ?compute_jacobian:bool ->
+    Remanent_parameters_sig.parameters -> 
     Loggers.t -> Loggers.t -> I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     unit

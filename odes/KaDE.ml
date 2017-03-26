@@ -275,6 +275,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ~max_t:(Option_util.unsome 1. cli_args.Run_cli_args.maxValue)
         ~compute_jacobian
         ?plot_period:cli_args.Run_cli_args.plotPeriod
+        parameters
         logger
         logger_buffer compil network
     in
