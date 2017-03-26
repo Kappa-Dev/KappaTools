@@ -677,10 +677,21 @@ let bin_op_pos _logger op =
   | Operator.MULT | Operator.POW | Operator.MINUS | Operator.SUM | Operator.DIV  -> INFIX
   | Operator.MIN | Operator.MODULO | Operator.MAX -> PREFIX
 
-let string_of_bin_op _logger op =
+let string_of_bin_op logger op =
   match op with
   | Operator.MULT -> "*"
-  | Operator.POW -> "**"
+  | Operator.POW ->
+    begin
+      match Loggers.get_encoding_format logger with
+      | Loggers.Matlab -> "^"
+      | Loggers.Maple | Loggers.Mathematica | Loggers.Octave -> "**"
+      | Loggers.Matrix | Loggers.HTML | Loggers.HTML_Graph
+      | Loggers.HTML_Tabular
+      | Loggers.DOT 
+      | Loggers.TXT | Loggers.TXT_Tabular
+      | Loggers.XLS| Loggers.SBML| Loggers.Json -> "**"
+    end
+
   | Operator.MINUS -> "-"
   | Operator.SUM -> "+"
   | Operator.DIV -> "/"
