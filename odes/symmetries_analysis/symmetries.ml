@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 24 2017>
+   * Last modification: Time-stamp: <Mar 26 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -626,90 +626,6 @@ let print_symmetries_gen parameters env contact_map
          ()
       ) cannonic_list
 
-(*convert a list of initial states into a mixture*)
-let disjoint_union sigs l =
-  let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
-  let _,em,mix =
-    List.fold_left
-      (fun (i,em,mix) (_,r,cc) ->
-         let i = pred i in
-         let (mix',r') =
-           Pattern.add_fully_specified_to_graph sigs mix cc  in
-         let r'' = Renaming.compose false r r' in
-         (i,
-          Option_util.unsome
-            Matching.empty
-            (Matching.add_cc em i r''),
-          mix'))
-      (List.length l,Matching.empty,
-       Edges.empty ~with_connected_components:false)
-      l in
-  (pat,em,mix)
-
-let dummy_htbl = Hashtbl.create 0
-
-let apply sigs rule inj_nodes mix =
-  let concrete_removed =
-    List.map (Primitives.Transformation.concretize
-                (inj_nodes, Mods.IntMap.empty))
-      rule.Primitives.removed
-  in
-  let (side_effects, dummy, edges_after_neg) =
-    List.fold_left
-      (Rule_interpreter.apply_negative_transformation dummy_htbl)
-      ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
-      concrete_removed
-  in
-  let (_, remaining_side_effects, _, edges'), concrete_inserted =
-    List.fold_left
-      (fun (x,p) h ->
-         let (x',h') =
-           Rule_interpreter.apply_positive_transformation
-             sigs dummy_htbl x h in
-         (x', h' :: p))
-      (((inj_nodes, Mods.IntMap.empty),
-        side_effects, dummy, edges_after_neg), [])
-      rule.Primitives.inserted
-  in
-  let (edges'',_) =
-    List.fold_left
-      (fun (e,i)  ((id,_ as nc),s) ->
-         Edges.add_free id s e,
-         Primitives.Transformation.Freed (nc, s) :: i)
-      (edges', concrete_inserted) remaining_side_effects
-  in
-  edges''
-
-let mixture_of_init sigs c =
-  let _, emb, m = disjoint_union sigs [] in
-  let m = apply sigs c emb m in
-  m
-
-(*compute a connected component of mixture*)
-let connected_components_of_mixture sigs cache contact_map_int e =
-  let (cache,acc) =
-    Snip.patterns_of_mixture contact_map_int sigs
-      cache e
-  in
-    cache, acc
-
-(*convert a list of initial state into a chemical_species*)
-
-let species_of_initial_state sigs contact_map_int list =
-  let cache = Pattern.PreEnv.empty sigs in
-  let cache, list =
-    List.fold_left
-      (fun (cache,list) (_,r,_) ->
-         let b = mixture_of_init sigs r in
-         let cache', acc =
-           connected_components_of_mixture sigs cache
-             contact_map_int b
-         in
-         cache', List.rev_append acc list)
-      (cache,[]) list
-  in
-  cache, list
-
 let detect_symmetries parameters env cache
     rate_convention
     chemical_species
@@ -850,7 +766,7 @@ type cache = Pattern.cc CcMap.t
 
 let empty_cache () = CcMap.empty
 
-let representant ?parameters signature cache rule_cache preenv_cache
+let representative ?parameters signature cache rule_cache preenv_cache
     symmetries species =
   match CcMap.find_option species cache with
   | Some species -> cache, rule_cache, preenv_cache, species

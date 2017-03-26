@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 23 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
 *)
 
 module type Interface =
@@ -148,6 +148,13 @@ sig
   val divide_rule_rate_by: cache -> compil -> rule ->
     cache * int
 
+  val species_of_initial_state_env  :
+    Model.t ->
+    Contact_map.t ->
+    Pattern.PreEnv.t ->
+    ('b * Primitives.elementary_rule * 'c) list ->
+    Pattern.PreEnv.t * Pattern.cc list
+
   val species_of_initial_state : compil ->
     cache ->
     ('b * Primitives.elementary_rule * 'c) list ->
@@ -175,7 +182,7 @@ sig
   (*val get_sym_cache: cache -> Symmetries.cache
     val set_sym_cache: Symmetries.cache -> cache -> cache*)
 
-  val get_representant:
+  val get_representative:
     Remanent_parameters_sig.parameters ->
     compil -> cache -> Symmetries.symmetries ->
     chemical_species -> cache * chemical_species
