@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 23 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1455,10 +1455,12 @@ let compute_symmetries
       in
       let parameters = get_parameters state in
       let cache = LKappa_auto.init_cache () in
-      let cache', chemical_species =
-        Symmetries.species_of_initial_state
-          (Model.signatures env)
+      let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
+      let _cc_cache, chemical_species =
+        Ode_interface.species_of_initial_state_env
+          env
           contact_map_int
+          cc_cache
           init
       in
       (*let lkappa_rule_list =
@@ -1475,7 +1477,7 @@ let compute_symmetries
       let rate_convention =
         Remanent_parameters.get_rate_convention parameters
       in
-      let cache, symmetries =
+      let _cache, symmetries =
         Symmetries.detect_symmetries
           parameters
           env

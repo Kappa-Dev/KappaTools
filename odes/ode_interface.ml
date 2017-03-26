@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 24 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -141,24 +141,21 @@ let canonic_form x = x
 
 let connected_components_of_patterns = Array.to_list
 
+let connected_components_of_mixture_sigs sigs cache contact_map_int e =
+  let (cache,acc) =
+    Snip.patterns_of_mixture contact_map_int sigs
+      cache e
+  in
+    cache, acc
+
 let connected_components_of_mixture compil cache e =
   let cc_cache = cache.cc_cache in
   let contact_map = contact_map compil in
   let sigs = Pattern.Env.signatures (domain compil) in
   let cc_cache, acc =
-    Symmetries.connected_components_of_mixture
-      sigs cc_cache contact_map e
+    Snip.patterns_of_mixture contact_map sigs cc_cache e
   in
   {cache with cc_cache = cc_cache}, acc
-
-let species_of_initial_state compil cache list =
-  let sigs = Model.signatures compil.environment in
-  let contact_map = contact_map compil in
-  let cc_cache, list =
-    Symmetries.species_of_initial_state sigs
-      contact_map list
-  in
-  {cache with cc_cache = cc_cache}, list
 
 type embedding = Renaming.t (* the domain is connected *)
 type embedding_forest = Matching.t
@@ -197,9 +194,28 @@ let find_embeddings_unary_binary compil p x =
     [Matching.empty]
     p
 
+let disjoint_union_sigs  sigs l =
+  let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
+  let _,em,mix =
+    List.fold_left
+      (fun (i,em,mix) (_,r,cc) ->
+         let i = pred i in
+         let (mix',r') =
+           Pattern.add_fully_specified_to_graph sigs mix cc  in
+         let r'' = Renaming.compose false r r' in
+         (i,
+          Option_util.unsome
+            Matching.empty
+            (Matching.add_cc em i r''),
+          mix'))
+      (List.length l,Matching.empty,
+       Edges.empty ~with_connected_components:false)
+      l in
+  (pat,em,mix)
+
 let disjoint_union compil l =
   let sigs = Model.signatures (compil.environment) in
-  Symmetries.disjoint_union sigs l
+  disjoint_union_sigs sigs l
 
 type rule_id = int
 
@@ -301,9 +317,43 @@ let rate_name compil rule rule_id =
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
 
+let dummy_htbl = Hashtbl.create 0
+
+let apply_sigs sigs rule inj_nodes mix =
+  let concrete_removed =
+    List.map (Primitives.Transformation.concretize
+                (inj_nodes, Mods.IntMap.empty))
+      rule.Primitives.removed
+  in
+  let (side_effects, dummy, edges_after_neg) =
+    List.fold_left
+      (Rule_interpreter.apply_negative_transformation dummy_htbl)
+      ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
+      concrete_removed
+  in
+  let (_, remaining_side_effects, _, edges'), concrete_inserted =
+    List.fold_left
+      (fun (x,p) h ->
+         let (x',h') =
+           Rule_interpreter.apply_positive_transformation
+             sigs dummy_htbl x h in
+         (x', h' :: p))
+      (((inj_nodes, Mods.IntMap.empty),
+        side_effects, dummy, edges_after_neg), [])
+      rule.Primitives.inserted
+  in
+  let (edges'',_) =
+    List.fold_left
+      (fun (e,i)  ((id,_ as nc),s) ->
+         Edges.add_free id s e,
+         Primitives.Transformation.Freed (nc, s) :: i)
+      (edges', concrete_inserted) remaining_side_effects
+  in
+  edges''
+
 let apply compil rule inj_nodes mix =
   let sigs = Model.signatures compil.environment in
-  Symmetries.apply sigs rule inj_nodes mix
+  apply_sigs sigs rule inj_nodes mix
 
 let lift_species compil x =
   fst @@
@@ -367,6 +417,33 @@ let mixture_of_init compil c =
   let _, emb, m = disjoint_union compil [] in
   let m = apply compil c emb m in
   m
+
+let mixture_of_init_sigs sigs c =
+  let _, emb, m = disjoint_union_sigs sigs [] in
+  let m = apply_sigs sigs c emb m in
+  m
+
+let species_of_initial_state_env env contact_map_int cache list =
+  let sigs = Model.signatures env in
+  let cache, list =
+    List.fold_left
+      (fun (cache,list) (_,r,_) ->
+         let b = mixture_of_init_sigs sigs r in
+         let cache', acc =
+           connected_components_of_mixture_sigs sigs cache
+             contact_map_int b
+         in
+         cache', List.rev_append acc list)
+      (cache,[]) list
+  in
+  cache, list
+
+let species_of_initial_state compil cache list =
+  let contact_map = contact_map compil in
+  let cc_cache, list =
+    species_of_initial_state_env compil.environment contact_map cache.cc_cache list
+  in
+  {cache with cc_cache = cc_cache}, list
 
 let nb_tokens compil = Model.nb_tokens (environment compil)
 
