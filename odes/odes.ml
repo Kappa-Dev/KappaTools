@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 22 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
 *)
 
 let local_trace = false
@@ -162,7 +162,9 @@ struct
       time_homogeneous_obs: bool option ;
       time_homogeneous_vars: bool option ;
       time_homogeneous_rates: bool option ;
-      symmetries: Symmetries.symmetries option
+      symmetries: Symmetries.symmetries option;
+      sym_reduction: Symmetries.reduction ;
+      bwd_map: Symmetries.bwd_map ;
     }
 
   let may_be_time_homogeneous_gen a =
@@ -237,6 +239,8 @@ struct
       time_homogeneous_obs = None ;
       time_homogeneous_rates = None ;
       symmetries = None ;
+      sym_reduction = Symmetries.Ground ;
+      bwd_map = Symmetries.empty_bwd_map () ;
     }
 
   let from_nembed_correct compil nauto =
@@ -374,20 +378,20 @@ struct
           (I.print_chemical_species ~compil) species in
       remanent,i
 
-  let representant parameters compil network species =
-    match network.symmetries with
-    | None -> network, species
-    | Some symmetries ->
+  let representative parameters compil network species =
+    match network.sym_reduction with
+    | Symmetries.Ground -> network, species
+    | Symmetries.Forward _ | Symmetries.Backward _ ->
       let cache = network.cache in
       let cache, species =
-        I.get_representant parameters compil cache symmetries
+        I.get_representative parameters compil cache network.sym_reduction
           species
       in
       {network with cache = cache}, species
 
   let translate_species parameters compil species remanent =
     let network, species =
-      representant parameters compil (snd remanent) species
+      representative parameters compil (snd remanent) species
     in
     let remanent = fst remanent, network in
     translate_canonic_species compil
@@ -407,7 +411,7 @@ struct
 
   let petrify_species parameters compil species remanent =
     let network, species =
-      representant parameters compil (snd remanent) species
+      representative parameters compil (snd remanent) species
     in
     let remanent = fst remanent, network in
     translate_canonic_species compil
@@ -1191,6 +1195,23 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
+  let compute_equivalence_classes parameters compil network =
+    let red = network.sym_reduction in
+    let bwd_map = Symmetries.empty_bwd_map () in
+    let bwd_map =
+      VarMap.fold
+        (fun _ id bwd_map ->
+           let (species,_) = Mods.DynArray.get network.species_tab id in
+           I.add_equiv_class
+             red
+             bwd_map
+             species
+        )
+        network.id_of_ode_var
+        bwd_map
+    in
+    {network with bwd_map = bwd_map}
+
   let network_from_compil ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
@@ -1204,6 +1225,17 @@ struct
     let network =
       compute_reactions parameters compil network rules
         initial_state
+    in
+    let () =
+      match network.sym_reduction with
+      | Symmetries.Ground | Symmetries.Forward _
+        -> ()
+      | Symmetries.Backward _ ->
+      Format.printf "\t -compute equivalence classes @."
+    in
+    let network =
+      compute_equivalence_classes
+        parameters compil network
     in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
@@ -2430,42 +2462,68 @@ struct
 (*compute symmetries *)
 (*********************)
 
-  let compute_symmetries_from_model parameters compil network
-      contact_map =
-    let () = Format.printf "+ compute symmetric sites... @." in
-    (********************************************************)
-    (*initial_states*)
-    let network, chemical_species =
-      species_of_initial_state compil network (I.get_init compil)
-    in
-    let cache = network.cache in
-    let cache, symmetries =
-      I.detect_symmetries
-        parameters
-        compil
-        cache
-        chemical_species
-        contact_map
-    in
-    let network =
-      {
-        network with
-        cache = cache;
-        symmetries = Some symmetries
-      }
-    in
-    network
+let compute_symmetries_from_model parameters compil network
+    contact_map =
+  let () = Format.printf "+ compute symmetric sites... @." in
+  (********************************************************)
+  (*initial_states*)
+  let network, chemical_species =
+    species_of_initial_state compil network (I.get_init compil)
+  in
+  let cache = network.cache in
+  let cache, symmetries =
+    I.detect_symmetries
+      parameters
+      compil
+      cache
+      chemical_species
+      contact_map
+  in
+  let network =
+    {
+      network with
+      cache = cache;
+      symmetries = Some symmetries }
+  in
+  network
 
-  let print_symmetries parameters compil network =
-    match network.symmetries with
-    | None -> ()
-    | Some sym ->
-      I.print_symmetries
-        parameters
-        compil
-        sym
 
-  let clean_symmetries network =
-    {network with symmetries = None}
+
+let set_to_forward_symmetries_from_model network =
+  match network.symmetries
+  with
+  | None ->
+    {network with sym_reduction = Symmetries.Ground}
+  | Some sym ->
+    begin
+    match sym.Symmetries.rules_and_alg_expr with
+    | None -> {network with sym_reduction = Symmetries.Ground}
+    | Some sym -> {network with sym_reduction = Symmetries.Forward sym}
+    end
+
+
+let set_to_backward_symmetries_from_model network =
+  match network.symmetries
+  with
+  | None ->
+    {network with sym_reduction = Symmetries.Ground }
+  | Some sym ->
+    begin
+      match sym.Symmetries.rules_and_initial_states
+      with
+      | None ->
+        {network with sym_reduction = Symmetries.Ground }
+      | Some sym ->
+        {network with sym_reduction = Symmetries.Backward sym }
+    end
+
+let print_symmetries parameters compil network =
+  match network.symmetries with
+  | None -> ()
+  | Some sym ->
+    I.print_symmetries
+      parameters
+      compil
+      sym
 
 end

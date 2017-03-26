@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 14 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -54,11 +54,19 @@ sig
 
   (*rules*)
 
+
   val compute_symmetries_from_model:
     Remanent_parameters_sig.parameters ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     Remanent_state.contact_map ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network
+  val set_to_backward_symmetries_from_model:
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network
+
+  val set_to_forward_symmetries_from_model:
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network
 
   val print_symmetries:
@@ -66,6 +74,4 @@ sig
     I.compil -> (ode_var_id, Ode_loggers_sig.ode_var_id) network
     -> unit
 
-  val clean_symmetries:
-    ('a,'b) network -> ('a,'b) network
 end
