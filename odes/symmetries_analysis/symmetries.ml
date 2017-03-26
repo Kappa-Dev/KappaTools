@@ -25,15 +25,20 @@ type partitioned_contact_map =
   string Symmetries_sig.site_partition Mods.StringSetMap.Map.t
 
 (*internal states * binding states*)
-type lkappa_partitioned_contact_map =
+type equivalence_classes =
   int Symmetries_sig.site_partition array
 
 type symmetries =
   {
-    rules: lkappa_partitioned_contact_map;
-    rules_and_initial_states: lkappa_partitioned_contact_map option;
-    rules_and_alg_expr: lkappa_partitioned_contact_map option
+    rules: equivalence_classes;
+    rules_and_initial_states: equivalence_classes option;
+    rules_and_alg_expr: equivalence_classes option
   }
+
+type reduction =
+  | Ground
+  | Forward of equivalence_classes
+  | Backward of equivalence_classes
 
 (***************************************************************)
 (*PARTITION THE CONTACT MAP*)
@@ -734,6 +739,24 @@ let detect_symmetries parameters env cache
       refined_partitioned_contact_map_init
   in
   (*-------------------------------------------------------------*)
+  (*rule and alg exprs*)
+  (*a copy of refined partition of rules*)
+  let refined_partitioned_contact_map_copy =
+    Array.copy refined_partitioned_contact_map
+  in
+  let cache, refined_partitioned_contact_map_alg_expr =
+    let parameters, env = Some parameters, Some env in
+    let _ = parameters, env in
+    (* Quyen: TO DO *)
+    (* ford over all the alg_expr of the model *)
+    (* for each such expression refine the partitioned contact map*)
+    cache, refined_partitioned_contact_map_copy
+  in
+  let refined_partitioned_contact_map_init =
+    Array.map Symmetries_sig.clean
+      refined_partitioned_contact_map_init
+  in
+  (*-------------------------------------------------------------*)
   (*print*)
   let () =
     print_symmetries_gen parameters env contact_map
@@ -746,7 +769,8 @@ let detect_symmetries parameters env cache
     rules = refined_partitioned_contact_map;
     rules_and_initial_states =
       Some refined_partitioned_contact_map_init;
-    rules_and_alg_expr = None
+    rules_and_alg_expr =
+      Some refined_partitioned_contact_map_alg_expr ;
   }
 
 (******************************************************)
@@ -766,22 +790,45 @@ type cache = Pattern.cc CcMap.t
 
 let empty_cache () = CcMap.empty
 
+type class_description =
+  {
+    species_weight: int;
+    class_representative: Pattern.cc;
+    class_cardinal: int;
+    class_weight: int
+  }
+
+let dummy_class cc =
+  {species_weight = 1;
+   class_representative = cc ;
+   class_cardinal = 1;
+   class_weight =1 }
+
+type bwd_map = class_description CcMap.t
+
+let empty_bwd_map () = CcMap.empty
+
 let representative ?parameters signature cache rule_cache preenv_cache
     symmetries species =
-  match CcMap.find_option species cache with
-  | Some species -> cache, rule_cache, preenv_cache, species
-  | None ->
-    let rule_cache, preenv_cache, species' =
-      Pattern_group_action.normalize_species
-        ?parameters
-        signature
-        rule_cache
-        preenv_cache
-        symmetries.rules (*TODO*)
-        species
-    in
-    let cache  = CcMap.add species species' cache in
-    cache, rule_cache, preenv_cache, species'
+  match symmetries with
+  | Ground -> cache, rule_cache, preenv_cache, species
+  | Forward sym | Backward sym ->
+    begin
+      match CcMap.find_option species cache with
+      | Some species -> cache, rule_cache, preenv_cache, species
+      | None ->
+        let rule_cache, preenv_cache, species' =
+          Pattern_group_action.normalize_species
+            ?parameters
+            signature
+            rule_cache
+            preenv_cache
+            sym
+            species
+        in
+        let cache  = CcMap.add species species' cache in
+        cache, rule_cache, preenv_cache, species'
+    end
 
 let print_symmetries parameters env symmetries =
   let log = Remanent_parameters.get_logger parameters in
@@ -805,3 +852,42 @@ let print_symmetries parameters env symmetries =
       in
       ()
   in ()
+
+
+let add_equiv_class reduction bwd_map cc =
+  (* TO DO *)
+  let l =
+    match reduction with
+    | Ground | Forward _ -> [cc,1]
+    | Backward _ -> [cc,1]
+(*TO DO: compute the list of elements that are equi to cc
+  with the number of permutations that make them invariant *)
+  in
+  let n = List.length l in
+  let n' =
+    List.fold_left (fun i (_,j) -> i+j) 0 l
+  in
+  List.fold_left
+    (fun map (cc',i) ->
+       CcMap.add cc'
+         {
+           species_weight=i;
+           class_representative=cc;
+           class_cardinal = n;
+           class_weight= n'
+         }
+         map
+    )
+    bwd_map
+    l
+
+let fold_bwd_map f bwd_map accu =
+  CcMap.fold
+    (fun cc cc_rep accu -> f cc cc_rep accu)
+    bwd_map accu
+
+let bwd_interpretation ?parameters bwd_map reduction cc =
+  match reduction
+  with
+  | Ground | Forward _ -> Some (dummy_class cc)
+  | Backward _ ->  CcMap.find_option cc bwd_map

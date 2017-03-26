@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 19 2017>
+  * Last modification: Time-stamp: <Mar 26 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -11,7 +11,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries false | true] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false]\n"
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -35,7 +35,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | "octave" -> Loggers.Octave
       | "matlab" -> Loggers.Matlab
       | "mathematica" -> Loggers.Mathematica
-      | "maple" -> Loggers.Maple 
+      | "maple" -> Loggers.Maple
       | "sbml" -> Loggers.SBML
       | s ->
         begin
@@ -158,8 +158,23 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         common_args
     in
     let parameters' = parameters in
+    let ground, forward, backward = 0,1,2 in
+    let reduction =
+      match ode_args.Ode_args.with_symmetries
+      with
+      | None -> ground
+      | Some string ->
+        begin
+          match lowercase string with
+          | "none" | "ground" | "false" -> ground
+          | "true" | "forward" -> forward
+          | "backward" -> backward
+          | _ -> ground
+        end
+    in
     let network =
-      if ode_args.Ode_args.with_symmetries
+      if
+        (not (reduction = ground))
       || ode_args.Ode_args.show_symmetries
       then
         let module B =
@@ -208,17 +223,24 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             network
             contact_map
         in
+        let network =
+          if reduction = backward
+          then
+            A.set_to_backward_symmetries_from_model
+              network
+          else if reduction = forward
+          then
+            A.set_to_forward_symmetries_from_model
+              network
+          else
+            network
+        in
         let () =
           if ode_args.Ode_args.show_symmetries
           then
             A.print_symmetries
               parameters compil
               network
-        in
-        let network =
-          if ode_args.Ode_args.with_symmetries
-          then network
-          else A.clean_symmetries network
         in
         network
       else

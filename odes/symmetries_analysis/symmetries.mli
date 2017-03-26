@@ -17,14 +17,20 @@
 (*TYPE*)
 (*******************************************************************)
 
+type equivalence_classes =
+  int Symmetries_sig.site_partition array
+
 type symmetries =
   {
-    rules : int Symmetries_sig.site_partition array;
-    rules_and_initial_states :
-      int Symmetries_sig.site_partition array option;
-    rules_and_alg_expr :
-      int Symmetries_sig.site_partition array option;
+    rules: equivalence_classes;
+    rules_and_initial_states: equivalence_classes option;
+    rules_and_alg_expr: equivalence_classes option
   }
+
+type reduction =
+  | Ground
+  | Forward of equivalence_classes
+  | Backward of equivalence_classes
 
 (*******************************************************************)
 (*PARTITION THE CONTACT MAP*)
@@ -44,10 +50,27 @@ val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
 
 type cache
-
 val empty_cache: unit -> cache
 
-val representant:
+
+val representative:
   ?parameters:Remanent_parameters_sig.parameters ->
-  Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> symmetries -> Pattern.cc
+  Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.cc
   ->  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
+type class_description =
+  {
+    species_weight: int;
+    class_representative: Pattern.cc;
+    class_cardinal: int;
+    class_weight: int
+  }
+type bwd_map
+val empty_bwd_map: unit -> bwd_map
+val add_equiv_class: reduction -> bwd_map -> Pattern.cc -> bwd_map
+val bwd_interpretation:
+  ?parameters:Remanent_parameters_sig.parameters ->
+  bwd_map -> reduction -> Pattern.cc -> class_description option
+val fold_bwd_map:
+  (Pattern.cc -> class_description -> 'a -> 'a) ->
+  bwd_map ->
+  'a -> 'a

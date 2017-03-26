@@ -24,28 +24,36 @@ type nauto_in_rules_cache = LKappa_auto.cache
 
 type sym_cache = Symmetries.cache
 
+type equib_class_map = Symmetries.bwd_map
+
 type cache =
   {
     cc_cache: cc_cache ;
     rule_cache: nauto_in_rules_cache;
-    representant_cache: sym_cache
+    representative_cache: sym_cache
   }
 
-let get_representant parameters compil cache symmetries species =
+let get_representative parameters compil cache symmetries species =
   let rep_cache, rule_cache, cc_cache, species =
-    Symmetries.representant
+    Symmetries.representative
       ~parameters
       (Model.signatures compil.environment)
-      cache.representant_cache
+      cache.representative_cache
       cache.rule_cache
       cache.cc_cache
       symmetries species
   in
   {
-    representant_cache = rep_cache;
+    representative_cache = rep_cache;
     cc_cache = cc_cache ;
     rule_cache = rule_cache ;
   }, species
+
+let bwd_interpretation parameters bwd_map reduction species =
+  Symmetries.bwd_interpretation ~parameters bwd_map reduction species
+
+let add_equiv_class red bwd_map species =
+  Symmetries.add_equiv_class red bwd_map species 
 
 let get_cc_cache cache = cache.cc_cache
 
@@ -56,10 +64,10 @@ let get_rule_cache cache = cache.rule_cache
 let set_rule_cache rule_cache cache =
   {cache with rule_cache = rule_cache}
 
-let get_sym_cache cache = cache.representant_cache
+let get_sym_cache cache = cache.representative_cache
 
 let set_sym_cache sym_cache cache =
-  {cache with representant_cache = sym_cache}
+  {cache with representative_cache = sym_cache}
 
 (*type hidden_init = Primitives.elementary_rule*)
 
@@ -410,7 +418,7 @@ let empty_cache compil =
   {
     cc_cache  = empty_cc_cache compil ;
     rule_cache = empty_lkappa_cache () ;
-    representant_cache = empty_sym_cache () ;
+    representative_cache = empty_sym_cache () ;
   }
 
 let mixture_of_init compil c =
@@ -464,65 +472,6 @@ let divide_rule_rate_by cache compil rule =
         lkappa_rule
     in
     {cache with rule_cache = rule_cache}, output
-
-(****************************************************************)
-(*cannonic form per rule*)
-
-(* This is not the proper place *)
-(* It should have been in a file in the repository *)
-(* symmetries_analysis *)
-(*let return_cc_from_alg_expr compil =
-  let env = compil.environment in
-  let pair_array = get_variables compil in
-  let pattern_cc_list =
-    (* These folds are a non sense *)
-    (* You collect a quadratic number of alg_expr *)
-    (* Please fold the function  Alg_expr_extra.fold_over_mix over each alg_expr in the model *)
-    Array.fold_left (fun current_list (s, algs) ->
-        (*pattern.id array list list*)
-        let e = Alg_expr.extract_connected_components algs in
-        let pattern_cc_array_list =
-          List.fold_left (fun current_list1 array_list ->
-              let array_list =
-                List.fold_left (fun store_list value_array ->
-                    let pattern_cc_list =
-                      Array.fold_left (fun store_list_cc id ->
-                          let point =
-                            Pattern.Env.get (Model.domain env) id
-                          in
-                          let cc = Pattern.Env.content point in
-                          cc :: store_list_cc
-                        ) store_list value_array
-                    in
-                    List.append pattern_cc_list store_list
-                  ) current_list1 array_list
-              in
-              List.append array_list current_list
-            ) current_list e
-        in
-        List.append pattern_cc_array_list current_list
-      ) [] pair_array
-  in
-  pattern_cc_list*)
-
-(* Instead, define a function to refine a partition according to the symmetries that are not satsified in a pattern *)
-(*let convert_cc_to_rule_mixture parameters compil =
-  let sigs = Model.signatures compil.environment in
-  let pattern_cc_list = return_cc_from_alg_expr compil in
-  let r_mixture_list =
-    List.fold_left (fun current_list cc ->
-        let op =
-          Raw_mixture_extra.pattern_to_mixture ~parameters
-            sigs
-            cc
-        in
-        match op with
-        | None -> current_list
-        | Some r_mixture ->
-          r_mixture :: current_list
-      ) [] pattern_cc_list
-  in
-  r_mixture_list*)
 
 let detect_symmetries parameters compil cache
     chemical_species

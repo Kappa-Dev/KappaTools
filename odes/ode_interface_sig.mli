@@ -173,18 +173,19 @@ sig
   Remanent_parameters_sig.parameters ->
   compil -> Symmetries.symmetries -> unit
 
-  (*val get_cc_cache: cache -> Pattern.PreEnv.t
-    val set_cc_cache: Pattern.PreEnv.t -> cache -> cache*)
-
   val get_rule_cache: cache -> LKappa_auto.cache
   val set_rule_cache: LKappa_auto.cache -> cache -> cache
 
-  (*val get_sym_cache: cache -> Symmetries.cache
-    val set_sym_cache: Symmetries.cache -> cache -> cache*)
-
   val get_representative:
     Remanent_parameters_sig.parameters ->
-    compil -> cache -> Symmetries.symmetries ->
+    compil -> cache -> Symmetries.reduction ->
     chemical_species -> cache * chemical_species
 
+  val bwd_interpretation:
+    Remanent_parameters_sig.parameters ->
+    Symmetries.bwd_map -> Symmetries.reduction -> chemical_species ->
+    Symmetries.class_description option
+
+  val add_equiv_class:
+    Symmetries.reduction -> Symmetries.bwd_map -> chemical_species -> Symmetries.bwd_map
 end
