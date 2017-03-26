@@ -97,7 +97,7 @@ end
 nrows = length(soln.x);
 tmp = zeros(nodevar,1);
 
-n_points = floor ((tend-tinit)/period+1;
+n_points = floor ((tend-tinit)/period)+1;
 t = linspace(tinit, tend, n_points);
 obs = zeros(nrows,nobs);
 
