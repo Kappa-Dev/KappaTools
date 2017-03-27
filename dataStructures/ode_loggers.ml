@@ -687,7 +687,7 @@ let string_of_bin_op logger op =
       | Loggers.Maple | Loggers.Mathematica | Loggers.Octave -> "**"
       | Loggers.Matrix | Loggers.HTML | Loggers.HTML_Graph
       | Loggers.HTML_Tabular
-      | Loggers.DOT 
+      | Loggers.DOT
       | Loggers.TXT | Loggers.TXT_Tabular
       | Loggers.XLS| Loggers.SBML| Loggers.Json -> "**"
     end
@@ -1974,20 +1974,36 @@ let print_options ~compute_jacobian logger =
     let () =
       print_list logger
         (if compute_jacobian then
+           (*[
+             "options = odeset('RelTol', 1e-3, ...";
+             "                 'AbsTol', 1e-3, ...";
+             "                 'InitialStep', initialstep, ...";
+             "                 'MaxStep', tend, ...";
+             ("                 'Jacobian', @ode_jacobian, ...)"^(instruction_sep logger))
+             ]*)
            [
              "options = odeset('RelTol', 1e-3, ...";
              "                 'AbsTol', 1e-3, ...";
              "                 'InitialStep', initialstep, ...";
              "                 'MaxStep', tend, ...";
-             ("                 'Jacobian', @ode_jacobian)"^(instruction_sep logger))
+             "                 'Jacobian', @ode_jacobian, ...";
+             ("                 'NonNegative', [1:1:nodevar])"^(instruction_sep logger))
            ]
          else
-           [
+           (*[
              "options = odeset('RelTol', 1e-3, ...";
              "                 'AbsTol', 1e-3, ...";
              "                 'InitialStep', initialstep, ...";
              ("                 'MaxStep', tend)"^(instruction_sep logger))
-           ])
+             ]*)
+           [
+             "options = odeset('RelTol', 1e-3, ...";
+             "                 'AbsTol', 1e-3, ...";
+             "                 'InitialStep', initialstep, ...";
+             "                 'MaxStep', tend, ...";
+             ("                 'NonNegative', [1:1:nodevar])"^(instruction_sep logger))
+           ]
+        )
     in
     let () = Loggers.print_newline logger in
     ()
@@ -2090,7 +2106,7 @@ let print_integrate ~nobs ~nodevar logger =
   with
   | Loggers.Matlab
   | Loggers.Octave ->
-    let () =
+    (*let () =
       print_list logger
         [
           "if uiIsMatlab";
@@ -2098,6 +2114,16 @@ let print_integrate ~nobs ~nodevar logger =
           "   soln.y=soln.y'"^(instruction_sep logger);
           "elseif uiIsOctave";
           "   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "end";]
+      in*)
+    let () =
+      print_list logger
+        [
+          "if uiIsMatlab";
+          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "   soln.y=soln.y'"^(instruction_sep logger);
+          "elseif uiIsOctave";
+          "   [vt,soln] = ode23s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
           "end";]
     in
     let () = Loggers.print_newline logger in
@@ -2290,7 +2316,8 @@ let print_interpolate logger =
           "";
           "for j=1:nrows";
           "    for i=1:nodevar";
-          "        z(i)=soln.y(j,i)"^(instruction_sep logger);
+          (*        "        z(i)=solny(j,i)"^(instruction_sep logger);*)
+          "        z(i)=soln(j,i)"^(instruction_sep logger);
           "    end";
           "    h=ode_obs(z)"^(instruction_sep logger);
           "    for i=1:nobs";
@@ -2298,9 +2325,11 @@ let print_interpolate logger =
           "    end";
           "end";
           "if nobs==1";
-          "   y = interp1(soln.x, obs, t, 'pchip')'"^(instruction_sep logger);
+          (*  "   y = interp1(soln.x, obs, t, 'pchip')'"^(instruction_sep logger);*)
+          "   y = interp1(vt, obs, t, 'pchip')'"^(instruction_sep logger);
           "else";
-          "   y = interp1(soln.x, obs, t, 'pchip')"^(instruction_sep logger);
+          (*"   y = interp1(soln.x, obs, t, 'pchip')"^(instruction_sep logger);*)
+          "   y = interp1(vt, obs, t, 'pchip')"^(instruction_sep logger);
           "end"
         ]
     in Loggers.print_newline logger
