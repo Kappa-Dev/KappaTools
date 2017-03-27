@@ -11,7 +11,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--time-advance false | true ] [--initial-step float] [--max-step float]
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--export-time-advance false | true ] [--initial-step float] [--max-step float]
 [--relative-tolerance float] [--absolute-tolerance float]\n"
   in
   let cli_args = Run_cli_args.default in
