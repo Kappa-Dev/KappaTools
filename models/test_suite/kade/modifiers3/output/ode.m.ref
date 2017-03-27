@@ -7,6 +7,9 @@ function main=main()
 %% tinit - the initial simulation time (likely 0)
 %% tend - the final simulation time 
 %% initialstep - initial time step at the beginning of numerical integration
+%% maxstep - maximal time step for numerical integration
+%% reltol - relative error tolerance;
+%% abstol - absolute error tolerance;
 %% period - the time period between points to return
 %%
 %% variables (init(i),y(i)) denote numbers of embeddings 
@@ -15,9 +18,13 @@ function main=main()
 
 tinit=0;
 tend=1;
-initialstep=1e-06;
+initialstep=1e-05;
+maxstep=0.02;
+reltol=0.001;
+abstol=0.001;
 period=0.1;
 
+nonnegative=false;
 global nodevar
 nodevar=6;
 nvar=7;
@@ -80,22 +87,47 @@ for elem = 1:numel(LIC)
 end
 
 
-options = odeset('RelTol', 1e-3, ...
-                 'AbsTol', 1e-3, ...
-                 'InitialStep', initialstep, ...
-                 'MaxStep', tend, ...
-                 'Jacobian', @ode_jacobian);
-
-
-if uiIsMatlab
-   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
-   soln.y=soln.y';
-elseif uiIsOctave
-   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+if nonnegative 
+   options = odeset('RelTol', reltol, ...
+                    'AbsTol', abstol, ...
+                    'InitialStep', initialstep, ...
+                    'MaxStep', maxstep, ...
+                    'Jacobian', @ode_jacobian, ...
+                   'NonNegative', [1:1:nodevar]);
+else
+   options = odeset('RelTol', reltol, ...
+                    'AbsTol', abstol, ...
+                    'InitialStep', initialstep, ...
+                    'MaxStep', maxstep, ...
+                    'Jacobian', @ode_jacobian);
 end
 
 
-nrows = length(soln.x);
+if nonnegative
+   if uiIsMatlab
+      soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+      soln.y=soln.y';
+      vt = soln.x;
+      vy = soln.y;
+   elseif uiIsOctave
+      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+   end
+else
+   if uiIsMatlab
+      soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+      soln.y=soln.y';
+      vt = soln.x;
+      vy = soln.y;
+   elseif uiIsOctave
+      soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+      vt = soln.x;
+      vy = soln.y;
+   end
+end;
+
+
+nrows = length(vt);
+
 tmp = zeros(nodevar,1);
 
 n_points = floor ((tend-tinit)/period)+1;
@@ -104,7 +136,7 @@ obs = zeros(nrows,nobs);
 
 for j=1:nrows
     for i=1:nodevar
-        z(i)=soln.y(j,i);
+        z(i)=vy(j,i);
     end
     h=ode_obs(z);
     for i=1:nobs
@@ -112,9 +144,9 @@ for j=1:nrows
     end
 end
 if nobs==1
-   y = interp1(soln.x, obs, t, 'pchip')';
+   y = interp1(vt, obs, t, 'pchip')';
 else
-   y = interp1(soln.x, obs, t, 'pchip');
+   y = interp1(vt, obs, t, 'pchip');
 end
 
 

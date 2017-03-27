@@ -1613,6 +1613,9 @@ struct
 
   let export_main_gen
       ~initial_step
+      ~max_step
+      ~reltol
+      ~abstol
       ~nonnegative
       ~step
       ~compute_jacobian
@@ -1672,12 +1675,30 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
+            logger logger_buffer Ode_loggers_sig.MaxStep
+            (Alg_expr.float max_step) handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer Ode_loggers_sig.RelTol
+            (Alg_expr.float reltol) handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer Ode_loggers_sig.AbsTol
+            (Alg_expr.float abstol) handler_expr
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
             logger logger_buffer Ode_loggers_sig.Period_t_points
             (Alg_expr.float plot_period) handler_expr
         in
         let () = Ode_loggers.print_newline logger_buffer in
         let () =
-          Ode_loggers.associate_nonnegative logger nonnegative in 
+          Ode_loggers.associate_nonnegative logger nonnegative in
         let () =
           Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
         in
@@ -2522,6 +2543,9 @@ struct
       ?show_time_advance:(show_time_advance=false)
       ?nonnegative:(nonnegative=false)
       ?initial_step:(initial_step=0.000001)
+      ?max_step:(max_step=0.02)
+      ?abstol:(abstol=0.001)
+      ?reltol:(reltol=0.001)
       parameters logger logger_buffer compil network =
     let network =
       if may_be_not_time_homogeneous network
@@ -2538,7 +2562,7 @@ struct
     let () =
       export_main
         ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
-        ~max_t ~nonnegative ~initial_step ?plot_period
+        ~max_t ~nonnegative ~initial_step ~max_step ~abstol ~reltol ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
@@ -2568,7 +2592,7 @@ struct
     let () = Ode_loggers.launch_main logger in
     let () =
       export_main_follow_up
-        ~nonnegative ~initial_step ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
+        ~nonnegative ~initial_step ~max_step ~reltol ~abstol ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in

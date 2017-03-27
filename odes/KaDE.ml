@@ -11,7 +11,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--time-advance false | true ] [--initial-step float]\n"
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--time-advance false | true ] [--initial-step float] [--max-step float]
+[--relative-tolerance float] [--absolute-tolerance float]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -110,6 +111,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let show_time_advance = ode_args.Ode_args.show_time_advance in
     let nonnegative = ode_args.Ode_args.nonnegative in
     let initial_step = ode_args.Ode_args.initial_step in
+    let max_step = ode_args.Ode_args.max_step in
+    let reltol = ode_args.Ode_args.relative_tolerance in
+    let abstol= ode_args.Ode_args.absolute_tolerance in
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
       | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
@@ -279,7 +283,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ~compute_jacobian
         ~show_time_advance
         ~nonnegative
-        ~initial_step 
+        ~initial_step
+        ~max_step
+        ~reltol
+        ~abstol
         ?plot_period:cli_args.Run_cli_args.plotPeriod
         parameters
         logger

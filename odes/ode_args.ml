@@ -18,7 +18,10 @@ type t = {
   mutable site_accross : bool ;
   mutable nonnegative : bool ;
   mutable show_time_advance : bool ;
-  mutable initial_step : float ; 
+  mutable initial_step : float ;
+  mutable max_step : float ;
+  mutable relative_tolerance : float ;
+  mutable absolute_tolerance : float ;
 }
 
 let default : t =
@@ -41,6 +44,9 @@ let default : t =
     nonnegative = false ;
     show_time_advance = false ;
     initial_step = 0.00001 ;
+    max_step = 0.02 ;
+    absolute_tolerance = 0.001 ;
+    relative_tolerance = 0.001 ;
   }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -95,12 +101,20 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   "Enable/disable the correction of negative concentrations in stiff ODE systems";
   "--show-time-advance",
   Arg.Bool (fun timeadv -> t.show_time_advance <- timeadv),
-  "display time advance during numerical integration";
+  "Display time advance during numerical integration";
   "--initial-step",
   Arg.Float (fun step -> t.initial_step <- step),
-  "display time advance during numerical integration";
+  "Initial integration step";
+  "--max-step",
+  Arg.Float (fun step -> t.max_step <- step),
+  "Maximum integration step";
+  "--relative-tolerance",
+  Arg.Float (fun err -> t.relative_tolerance <- err),
+  "tolerance to relative rounding errors";
+  "--absolute-tolerance",
+  Arg.Float (fun err -> t.absolute_tolerance <- err),
+  "tolerance to absolute rounding errors";
 ]
-
 let build_kasa_parameters ~called_from t t_common =
   Config.with_views_analysis := t.views ;
   Config.with_parallel_bonds_analysis := t.dbonds ;

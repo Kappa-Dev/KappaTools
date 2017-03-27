@@ -119,6 +119,9 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.N_rows
   | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.NonNegative
+  | Ode_loggers_sig.MaxStep
+  | Ode_loggers_sig.RelTol
+  | Ode_loggers_sig.AbsTol
   | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Time_scale_factor -> "t_scale_factor"
@@ -140,8 +143,11 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.Tend -> Some "time"
   | Ode_loggers_sig.Current_time
+  | Ode_loggers_sig.RelTol
+  | Ode_loggers_sig.AbsTol 
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Init _
   | Ode_loggers_sig.Concentration _

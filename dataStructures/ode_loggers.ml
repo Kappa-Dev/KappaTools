@@ -39,7 +39,10 @@ let string_of_variable_octave var =
   | Ode_loggers_sig.Jacobian_var (int1,int2) ->
     Printf.sprintf "%s(%i,%i)"
       (Ode_loggers_sig.string_of_array_name var)  int1 int2
+  | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.AbsTol
+  | Ode_loggers_sig.RelTol
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.NonNegative
@@ -89,7 +92,10 @@ let string_of_variable_mathematica ~side var =
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.AbsTol
+  | Ode_loggers_sig.RelTol
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.N_ode_var
   | Ode_loggers_sig.N_var
@@ -126,7 +132,10 @@ let string_of_variable_maple var =
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.AbsTol
+  | Ode_loggers_sig.RelTol
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.N_ode_var
   | Ode_loggers_sig.N_var
@@ -182,7 +191,10 @@ let variable_of_derived_variable var id =
   | Ode_loggers_sig.Jacobian_var _ -> assert false
   | Ode_loggers_sig.Tinit -> assert false
   | Ode_loggers_sig.Tend -> assert false
+  | Ode_loggers_sig.MaxStep -> assert false
   | Ode_loggers_sig.InitialStep -> assert false
+  | Ode_loggers_sig.AbsTol -> assert false
+  | Ode_loggers_sig.RelTol -> assert false
   | Ode_loggers_sig.Period_t_points -> assert false
   | Ode_loggers_sig.N_ode_var -> assert false
   | Ode_loggers_sig.N_var -> assert false
@@ -241,6 +253,9 @@ let print_ode_preamble
               "%% tinit - the initial simulation time (likely 0)";
               "%% tend - the final simulation time ";
               "%% initialstep - initial time step at the beginning of numerical integration";
+              "%% maxstep - maximal time step for numerical integration";
+              "%% reltol - relative error tolerance;";
+              "%% abstol - absolute error tolerance;";
               "%% "^(Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^" - the time period between points to return";
               "%%" ;
               "%% "^
@@ -282,6 +297,9 @@ let print_ode_preamble
               "tinit - the initial simulation time (likely 0)";
               "tend - the final simulation time ";
               "initialstep - initial time step at the beginning of numerical integration";
+              "maxstep - maximal time step for numerical integration";
+              "reltol - relative error tolerance;";
+              "abstol - absolute error tolerance;";
               (Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^" - the time period between points to return";
               "" ;
               ""^
@@ -345,6 +363,9 @@ let print_ode_preamble
               "## tinit - the initial simulation time (likely 0)";
               "## tend - the final simulation time ";
               "## initialstep - initial time step at the beginning of numerical integration";
+              "## maxstep - maximal time step for numerical integration";
+              "## reltol - relative error tolerance;";
+              "## abstol - absolute error tolerance;";
               "## "^(Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^" - the time period between points to return";
               "##" ;
               "## "^
@@ -380,6 +401,9 @@ let print_ode_preamble
               "(* tinit - the initial simulation time (likely 0) *)";
               "(* tend - the final simulation time *)";
               "(* initialstep - initial time step at the beginning of numerical integration *)";
+              "(* maxstep - maximal time step for numerical integration *)";
+              "(* reltol - relative error tolerance *)";
+              "(* abstol - absolute error tolerance *)";
               "(* "^(Ode_loggers_sig.string_of_array_name
                        Ode_loggers_sig.Period_t_points)^" - the time period between points to return *)";
               "(* *)" ;
@@ -544,7 +568,10 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.NonNegative
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.MaxStep
         | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.AbsTol
+        | Ode_loggers_sig.RelTol
         | Ode_loggers_sig.Period_t_points
         | Ode_loggers_sig.N_ode_var
         | Ode_loggers_sig.N_var
@@ -580,7 +607,10 @@ let initialize ~nodevar logger variable =
           -> Loggers.print_newline logger
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.MaxStep
         | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.AbsTol
+        | Ode_loggers_sig.RelTol
         | Ode_loggers_sig.N_ode_var
         | Ode_loggers_sig.N_rows
         | Ode_loggers_sig.N_var
@@ -646,7 +676,10 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Obs _
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.MaxStep
         | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.AbsTol
+        | Ode_loggers_sig.RelTol
         | Ode_loggers_sig.Period_t_points
         | Ode_loggers_sig.N_ode_var
         | Ode_loggers_sig.N_var
@@ -1119,7 +1152,10 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
+  | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.AbsTol
+  | Ode_loggers_sig.RelTol
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_ode_var
@@ -1144,18 +1180,21 @@ let string_of_variable_sbml string_of_var_id variable =
     match variable with
     | Ode_loggers_sig.Current_time
     | Ode_loggers_sig.Period_t_points
+    | Ode_loggers_sig.MaxStep
+    | Ode_loggers_sig.InitialStep
     | Ode_loggers_sig.Tinit
     | Ode_loggers_sig.Tend -> Some "time"
     | Ode_loggers_sig.Time_scale_factor -> Some "time-per-substance"
     | Ode_loggers_sig.Obs _
     | Ode_loggers_sig.Init _
     | Ode_loggers_sig.Concentration _
+    | Ode_loggers_sig.AbsTol
+    | Ode_loggers_sig.RelTol
     | Ode_loggers_sig.Initbis _ -> Some "substance"
     | Ode_loggers_sig.Expr _
     | Ode_loggers_sig.Deriv _
     | Ode_loggers_sig.Jacobian _
     | Ode_loggers_sig.Jacobian_var _
-    | Ode_loggers_sig.InitialStep
     | Ode_loggers_sig.Jacobian_rate (_,_)
     | Ode_loggers_sig.Jacobian_rated (_,_)
     | Ode_loggers_sig.Jacobian_rateun (_,_)
@@ -1297,7 +1336,10 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       | Ode_loggers_sig.Tinit
       | Ode_loggers_sig.NonNegative
       | Ode_loggers_sig.Tend
+      | Ode_loggers_sig.MaxStep
       | Ode_loggers_sig.InitialStep
+      | Ode_loggers_sig.AbsTol
+      | Ode_loggers_sig.RelTol
       | Ode_loggers_sig.Period_t_points
       | Ode_loggers_sig.N_rules
       | Ode_loggers_sig.N_ode_var
@@ -1394,7 +1436,10 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.Obs _,_
         | Ode_loggers_sig.Jacobian _,_
         | Ode_loggers_sig.Jacobian_var _,_
+        | Ode_loggers_sig.MaxStep, _
         | Ode_loggers_sig.InitialStep,_
+        | Ode_loggers_sig.AbsTol,_
+        | Ode_loggers_sig.RelTol,_
         | Ode_loggers_sig.N_rules,_
         | Ode_loggers_sig.N_ode_var,_
         | Ode_loggers_sig.N_var,_
@@ -2018,47 +2063,34 @@ let print_options ~compute_jacobian logger =
     let () =
       print_list logger
         (if compute_jacobian then
-           (*[
-             "options = odeset('RelTol', 1e-3, ...";
-             "                 'AbsTol', 1e-3, ...";
-             "                 'InitialStep', initialstep, ...";
-             "                 'MaxStep', tend, ...";
-             ("                 'Jacobian', @ode_jacobian, ...)"^(instruction_sep logger))
-             ]*)
            [
              "if nonnegative ";
-             "   options = odeset('RelTol', 1e-3, ...";
-             "                    'AbsTol', 1e-3, ...";
+             "   options = odeset('RelTol', reltol, ...";
+             "                    'AbsTol', abstol, ...";
              "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', tend, ...";
+             "                    'MaxStep', maxstep, ...";
              "                    'Jacobian', @ode_jacobian, ...";
              "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
              "else";
-             "   options = odeset('RelTol', 1e-3, ...";
-             "                    'AbsTol', 1e-3, ...";
+             "   options = odeset('RelTol', reltol, ...";
+             "                    'AbsTol', abstol, ...";
              "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', tend, ...";
+             "                    'MaxStep', maxstep, ...";
              "                    'Jacobian', @ode_jacobian)"^(instruction_sep logger);
              "end";
            ]
          else
-           (*[
-             "options = odeset('RelTol', 1e-3, ...";
-             "                 'AbsTol', 1e-3, ...";
-             "                 'InitialStep', initialstep, ...";
-             ("                 'MaxStep', tend)"^(instruction_sep logger))
-             ]*)
-           [ "if nonnegative ";
-             "   options = odeset('RelTol', 1e-3, ...";
-             "                    'AbsTol', 1e-3, ...";
+             [ "if nonnegative ";
+             "   options = odeset('RelTol', reltol, ...";
+             "                    'AbsTol', abstol, ...";
              "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', tend, ...";
+             "                    'MaxStep', maxstep, ...";
              "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
              "else";
-             "   options = odeset('RelTol', 1e-3, ...";
-             "                    'AbsTol', 1e-3, ...";
+             "   options = odeset('RelTol', reltol, ...";
+             "                    'AbsTol', abstol, ...";
              "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', tend)"^(instruction_sep logger);
+             "                    'MaxStep', maxstep)"^(instruction_sep logger);
              "end"]
         )
     in
@@ -2163,16 +2195,6 @@ let print_integrate ~nobs ~nodevar logger =
   with
   | Loggers.Matlab
   | Loggers.Octave ->
-    (*let () =
-      print_list logger
-        [
-          "if uiIsMatlab";
-          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
-          "   soln.y=soln.y'"^(instruction_sep logger);
-          "elseif uiIsOctave";
-          "   soln = ode2r(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
-          "end";]
-      in*)
     let () =
       print_list logger
         [
