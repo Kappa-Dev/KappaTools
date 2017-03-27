@@ -20,17 +20,69 @@ let init_state ~with_connected_components = {
     if with_connected_components then Some Mods.IntMap.empty else None;
 }
 
-let cc_of_state sigs s=
+let cc_of_agent ag e work =
+  let rec fold_arity_list f x arity acc =
+    if (x = arity) then acc
+    else fold_arity_list f (succ x) arity (f acc x) in
+
+  let add_agent a e (work,morphism,todos) =
+    let aid = Agent.id a in
+    let atype = Agent.sort a in
+    let arity = Edges.get_sites aid e in
+    let (w_agent,work') = Pattern.new_node work atype in
+    let todos' = fold_arity_list (fun acc x -> (aid,x)::acc) 0 arity todos in
+    let work'' =
+      fold_arity_list
+        (fun w x ->
+          Pattern.new_internal_state
+            w (w_agent,x) (Edges.get_internal aid x e))
+        0 arity work' in
+    (w_agent,work'',(aid,w_agent)::morphism,todos') in
+
+  let add_links (work,morphism,todos) (aid,x) e =
+    let (_,w_agent) = List.find (fun (id,_) -> id = aid) morphism in
+    match (Edges.link_destination aid x e) with
+    | Some (b,y) ->
+       let bid = Agent.id b in
+       (try
+          let (_,wb_agent) = List.find (fun (id,_) -> id = bid) morphism in
+          let work' = Pattern.new_link work (w_agent,x) (wb_agent,y) in
+          let todos' =
+            List.filter (fun (a,z) -> not((a=bid)&&(z=y))) todos in
+          (work',morphism,todos')
+        with Not_found ->
+             let (wb_agent,work',morphism',todos') =
+               add_agent b e (work,morphism,todos) in
+             let work'' = Pattern.new_link work' (w_agent,x) (wb_agent,y) in
+             let todos'' =
+               List.filter (fun (a,z) -> not((a=(Agent.id b))&&(z=y))) todos' in
+             (work'',morphism',todos''))
+    | None ->
+       let work' = Pattern.new_free work (w_agent,x) in
+       (work',morphism,todos) in
+
+ let rec working_todo (work,morphism,todo) = match todo with
+   | [] -> work
+   | port::ls ->
+      let (work',morphism',todo') = add_links (work,morphism,todo) port e in
+      working_todo (work',morphism',todo') in
+
+  let (_,w,m,t) = add_agent ag e (work,[],[]) in
+  working_todo (w,m,t)
+
+let cc_of_state s env =
   match s.connected_components with
   | Some cc_maps ->
      Mods.IntMap.fold
        (fun _ cc_map acc ->
          Agent.SetMap.Set.fold
            (fun agent acc' ->
-             (Pattern.cc_of_edges agent s.graph sigs)::acc') cc_map acc)
+             let work = Pattern.begin_new env in
+             let work' = cc_of_agent agent s.graph work in
+             let results = Pattern.finish_new work' in
+             results::acc') cc_map acc)
        cc_maps []
   | None -> []
-
 
 let break_apart_cc graph ccs = function
   | None -> ccs

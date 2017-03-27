@@ -107,8 +107,6 @@ val new_internal_state : work -> (Agent.t * int) -> int -> work
 val finish_new : ?origin:Operator.rev_dep -> work ->
   (PreEnv.t*Renaming.t*cc*id)
 
-val cc_of_edges: Agent.t -> Edges.t -> Signature.s -> cc
-
 (** {6 Use a connected component } *)
 
 val compare_canonicals : id -> id -> int
