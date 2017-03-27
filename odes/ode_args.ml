@@ -16,6 +16,9 @@ type t = {
   mutable views : bool ;
   mutable dbonds : bool ;
   mutable site_accross : bool ;
+  mutable nonnegative : bool ;
+  mutable show_time_advance : bool ;
+  mutable initial_step : float ; 
 }
 
 let default : t =
@@ -35,6 +38,9 @@ let default : t =
     views = true ;
     dbonds = true ;
     site_accross = true ;
+    nonnegative = false ;
+    show_time_advance = false ;
+    initial_step = 0.00001 ;
   }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -84,6 +90,15 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   Arg.Bool (fun site_accross -> t.site_accross <- site_accross),
   "Enable/disable the analysis of the relation amond the states of sites in
       connected agents";
+  "--nonnegative",
+  Arg.Bool (fun nonneg -> t.nonnegative <- nonneg),
+  "Enable/disable the correction of negative concentrations in stiff ODE systems";
+  "--show-time-advance",
+  Arg.Bool (fun timeadv -> t.show_time_advance <- timeadv),
+  "display time advance during numerical integration";
+  "--initial-step",
+  Arg.Float (fun step -> t.initial_step <- step),
+  "display time advance during numerical integration";
 ]
 
 let build_kasa_parameters ~called_from t t_common =

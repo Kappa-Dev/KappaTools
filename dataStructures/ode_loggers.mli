@@ -60,6 +60,8 @@ val init_time: Loggers.t -> int -> unit
 val start_time: Loggers.t -> float -> unit
 val declare_init: ?comment:string -> Loggers.t -> int -> unit
 
+val associate_nonnegative: Loggers.t -> bool -> unit 
+val show_time_advance: Loggers.t -> unit
 val launch_main: Loggers.t -> unit
 
 val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit

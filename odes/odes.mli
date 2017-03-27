@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 26 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -32,9 +32,10 @@ sig
 
   val export_network:
     command_line:string -> command_line_quotes:string ->
-    ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float
-    -> ?compute_jacobian:bool ->
-    Remanent_parameters_sig.parameters -> 
+    ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
+    ?compute_jacobian:bool -> ?show_time_advance:bool ->
+    ?nonnegative:bool -> ?initial_step:float -> 
+    Remanent_parameters_sig.parameters ->
     Loggers.t -> Loggers.t -> I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     unit

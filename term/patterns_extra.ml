@@ -256,7 +256,7 @@ let species_to_raw_mixture ?parameters sigs pattern =
           Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
       in ()
   in
-  let agent_list, site_list, agent_type_map, bond_map =
+  let _agent_list, site_list, agent_type_map, bond_map =
     parse pattern
   in
   let agent_map =
@@ -389,7 +389,7 @@ let pattern_to_mixture ?parameters sigs pattern =
            Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
     in ()
   in
-  let agent_list, site_list, agent_type_map, bond_map =
+  let _agent_list, site_list, agent_type_map, bond_map =
     parse pattern
   in
   let agent_map =
@@ -426,9 +426,6 @@ let pattern_to_mixture ?parameters sigs pattern =
           | None -> raise Exit
           | Some array ->
             array.(site) <- (Ast.ANY_FREE, int_state)
-        in
-        let agent_type =
-          Mods.IntMap.find_default (-1) pos agent_type_map
         in
         aux tail
       | Pattern.Free  ->

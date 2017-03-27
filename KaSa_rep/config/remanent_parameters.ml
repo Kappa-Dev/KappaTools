@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -13,6 +13,8 @@
   * under the terms of the GNU Library General Public License *)
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
+
+let lowercase = String.lowercase
 
 let add_extension_if_not_already_mentioned a ext =
   let size_a = String.length a in
@@ -47,7 +49,7 @@ let ext_format x =
 
 let fetch_level_gen s r =
   match
-    String.lowercase !r
+    lowercase !r
   with
   | "mute" | "none"-> Remanent_parameters_sig.None
   | "low" -> Remanent_parameters_sig.Low
@@ -59,7 +61,7 @@ let fetch_level_gen s r =
 
 let fetch_graph_format f =
   match
-    String.lowercase !f
+    lowercase !f
   with
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
@@ -71,7 +73,7 @@ let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
 
 let fetch_rate_convention f =
   match
-    String.lowercase !f
+    lowercase !f
   with
   | "kasim" -> Remanent_parameters_sig.No_correction
   | "divide_by_nbr_of_autos_in_lhs" ->
@@ -290,7 +292,7 @@ let get_reachability_parameters () =
     Remanent_parameters_sig.parallel_bonds =
       !Config.with_parallel_bonds_analysis ;
     Remanent_parameters_sig.dynamic_contact_map =
-      match String.lowercase !Config.with_dynamic_contact_map
+      match lowercase !Config.with_dynamic_contact_map
       with
       | "dynamic" -> true
       | "static" -> false
