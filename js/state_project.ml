@@ -141,6 +141,7 @@ let remove_project project_id =
     fun _ -> remove_files current.project_manager current.project_id >>=
     fun _ -> current.project_manager#project_delete current.project_id >>=
     (Api_common.result_bind_lwt ~ok:(fun () ->
+         let () = current.project_manager#terminate () in
          let project_catalog =
            List.filter (fun x -> x.project_id <> current.project_id)
              state.project_catalog in
