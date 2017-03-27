@@ -14,6 +14,9 @@ type variable =
   | Tinit
   | Tend
   | InitialStep
+  | MaxStep
+  | RelTol
+  | AbsTol
   | Period_t_points
   | Rate of int
   | Rated of int
@@ -129,6 +132,9 @@ let string_of_array_name var =
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
+  | MaxStep -> "maxstep"
+  | RelTol -> "reltol"
+  | AbsTol -> "abstol"
   | Period_t_points -> "period"
   | N_ode_var -> "nodevar"
   | N_var -> "nvar"

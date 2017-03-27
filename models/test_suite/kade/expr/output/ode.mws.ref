@@ -6,6 +6,9 @@
 ## tinit - the initial simulation time (likely 0)
 ## tend - the final simulation time 
 ## initialstep - initial time step at the beginning of numerical integration
+## maxstep - maximal time step for numerical integration
+## reltol - relative error tolerance;
+## abstol - absolute error tolerance;
 ## period - the time period between points to return
 ##
 ## variables (initi(t),yi(t)) denote numbers of embeddings 
@@ -14,7 +17,10 @@
 
 tinit:=0:
 tend:=1:
-initialstep:=1e-06:
+initialstep:=1e-05:
+maxstep:=0.02:
+reltol:=0.001:
+abstol:=0.001:
 period:=0.1:
 
 nodevar:=6:

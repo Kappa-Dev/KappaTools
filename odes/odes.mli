@@ -34,7 +34,8 @@ sig
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
     ?compute_jacobian:bool -> ?show_time_advance:bool ->
-    ?nonnegative:bool -> ?initial_step:float -> 
+    ?nonnegative:bool -> ?initial_step:float -> ?max_step:float ->
+    ?abstol:float -> ?reltol:float -> 
     Remanent_parameters_sig.parameters ->
     Loggers.t -> Loggers.t -> I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
