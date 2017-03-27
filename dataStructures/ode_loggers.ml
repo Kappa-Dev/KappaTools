@@ -39,9 +39,10 @@ let string_of_variable_octave var =
   | Ode_loggers_sig.Jacobian_var (int1,int2) ->
     Printf.sprintf "%s(%i,%i)"
       (Ode_loggers_sig.string_of_array_name var)  int1 int2
+  | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
-  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.N_ode_var
   | Ode_loggers_sig.N_var
@@ -85,6 +86,7 @@ let string_of_variable_mathematica ~side var =
   | Ode_loggers_sig.Jacobian_rateund _
   | Ode_loggers_sig.Jacobian _
   | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.InitialStep
@@ -121,6 +123,7 @@ let string_of_variable_maple var =
   | Ode_loggers_sig.Jacobian_rateund _
   | Ode_loggers_sig.Jacobian _
   | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.InitialStep
@@ -166,6 +169,7 @@ let variable_of_derived_variable var id =
   | Ode_loggers_sig.Rateund int -> Ode_loggers_sig.Jacobian_rateund (int,id)
   | Ode_loggers_sig.Expr int -> Ode_loggers_sig.Jacobian_var (int, id)
   | Ode_loggers_sig.Concentration int -> Ode_loggers_sig.Jacobian (int, id)
+  | Ode_loggers_sig.NonNegative -> assert false
   | Ode_loggers_sig.Obs _ -> assert false
   | Ode_loggers_sig.Init _ -> assert false
   | Ode_loggers_sig.Initbis _ -> assert false
@@ -537,6 +541,7 @@ let initialize ~nodevar logger variable =
           Loggers.fprintf logger "%s=zeros(nobs,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
             (instruction_sep logger)
+        | Ode_loggers_sig.NonNegative
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
         | Ode_loggers_sig.InitialStep
@@ -582,6 +587,7 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.N_obs
         | Ode_loggers_sig.N_rules
         | Ode_loggers_sig.Time_scale_factor
+        | Ode_loggers_sig.NonNegative
         | Ode_loggers_sig.Current_time
         | Ode_loggers_sig.Period_t_points -> ()
       in
@@ -634,6 +640,7 @@ let initialize ~nodevar logger variable =
                in
                ())
             (nodevar-1)
+        | Ode_loggers_sig.NonNegative
         | Ode_loggers_sig.Jacobian _
         | Ode_loggers_sig.Jacobian_var _
         | Ode_loggers_sig.Obs _
@@ -806,6 +813,39 @@ let mathematica_maple format =
   | Loggers.Matrix | Loggers.HTML_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+
+let show_time_advance logger =
+  match Loggers.get_encoding_format logger with
+  | Loggers.Octave | Loggers.Matlab ->
+    let () = Loggers.fprintf logger "t" in
+    Loggers.print_newline logger
+  | Loggers.Maple | Loggers.Mathematica
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let associate_nonnegative logger bool =
+  match Loggers.get_encoding_format logger with
+  | Loggers.Octave | Loggers.Matlab ->
+    let side=LHS in
+    let () =
+      Loggers.fprintf logger "%s%s%s%s"
+        (string_of_variable ~side logger Ode_loggers_sig.NonNegative)
+        (affect_symbol logger)
+        (if bool then "true" else "false")
+        (instruction_sep logger)
+    in
+    Loggers.print_newline logger
+  | Loggers.Maple | Loggers.Mathematica
+  | Loggers.SBML
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_expr network_handler  =
   let var = match init_mode with
@@ -1076,6 +1116,7 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Jacobian _
   | Ode_loggers_sig.Jacobian_var _
+  | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
   | Ode_loggers_sig.InitialStep
@@ -1127,6 +1168,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.N_ode_var
     | Ode_loggers_sig.N_var
     | Ode_loggers_sig.N_obs
+    | Ode_loggers_sig.NonNegative
     | Ode_loggers_sig.N_rows
     | Ode_loggers_sig.Tmp -> None
 
@@ -1253,6 +1295,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         let () = Loggers.print_newline logger in
         ()
       | Ode_loggers_sig.Tinit
+      | Ode_loggers_sig.NonNegative
       | Ode_loggers_sig.Tend
       | Ode_loggers_sig.InitialStep
       | Ode_loggers_sig.Period_t_points
@@ -1359,6 +1402,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.N_rows,_
         | Ode_loggers_sig.Tmp,_
         | Ode_loggers_sig.Time_scale_factor,_
+        | Ode_loggers_sig.NonNegative,_
         | Ode_loggers_sig.Current_time,_ -> ()
     end
   | Loggers.Json
@@ -1371,11 +1415,11 @@ let associate_nrows logger =
   with
   | Loggers.Matlab | Loggers.Octave ->
     let () =
-      Loggers.fprintf
-        logger
-        "nrows = length(soln.x)%s"
-        (instruction_sep logger)
-    in
+      print_list logger
+        [
+          "nrows = length(vt)"^(instruction_sep logger);
+        ]
+      in
     Loggers.print_newline logger
   | Loggers.Maple | Loggers.Mathematica
   | Loggers.SBML
@@ -1982,12 +2026,20 @@ let print_options ~compute_jacobian logger =
              ("                 'Jacobian', @ode_jacobian, ...)"^(instruction_sep logger))
              ]*)
            [
-             "options = odeset('RelTol', 1e-3, ...";
-             "                 'AbsTol', 1e-3, ...";
-             "                 'InitialStep', initialstep, ...";
-             "                 'MaxStep', tend, ...";
-             "                 'Jacobian', @ode_jacobian, ...";
-             ("                 'NonNegative', [1:1:nodevar])"^(instruction_sep logger))
+             "if nonnegative ";
+             "   options = odeset('RelTol', 1e-3, ...";
+             "                    'AbsTol', 1e-3, ...";
+             "                    'InitialStep', initialstep, ...";
+             "                    'MaxStep', tend, ...";
+             "                    'Jacobian', @ode_jacobian, ...";
+             "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
+             "else";
+             "   options = odeset('RelTol', 1e-3, ...";
+             "                    'AbsTol', 1e-3, ...";
+             "                    'InitialStep', initialstep, ...";
+             "                    'MaxStep', tend, ...";
+             "                    'Jacobian', @ode_jacobian)"^(instruction_sep logger);
+             "end";
            ]
          else
            (*[
@@ -1996,13 +2048,18 @@ let print_options ~compute_jacobian logger =
              "                 'InitialStep', initialstep, ...";
              ("                 'MaxStep', tend)"^(instruction_sep logger))
              ]*)
-           [
-             "options = odeset('RelTol', 1e-3, ...";
-             "                 'AbsTol', 1e-3, ...";
-             "                 'InitialStep', initialstep, ...";
-             "                 'MaxStep', tend, ...";
-             ("                 'NonNegative', [1:1:nodevar])"^(instruction_sep logger))
-           ]
+           [ "if nonnegative ";
+             "   options = odeset('RelTol', 1e-3, ...";
+             "                    'AbsTol', 1e-3, ...";
+             "                    'InitialStep', initialstep, ...";
+             "                    'MaxStep', tend, ...";
+             "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
+             "else";
+             "   options = odeset('RelTol', 1e-3, ...";
+             "                    'AbsTol', 1e-3, ...";
+             "                    'InitialStep', initialstep, ...";
+             "                    'MaxStep', tend)"^(instruction_sep logger);
+             "end"]
         )
     in
     let () = Loggers.print_newline logger in
@@ -2119,12 +2176,28 @@ let print_integrate ~nobs ~nodevar logger =
     let () =
       print_list logger
         [
-          "if uiIsMatlab";
-          "   soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
-          "   soln.y=soln.y'"^(instruction_sep logger);
-          "elseif uiIsOctave";
-          "   [vt,soln] = ode23s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
-          "end";]
+          "if nonnegative";
+          "   if uiIsMatlab";
+          "      soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      soln.y=soln.y'"^(instruction_sep logger);
+          "      vt = soln.x"^(instruction_sep logger);
+          "      vy = soln.y"^(instruction_sep logger);
+          "   elseif uiIsOctave";
+          "      [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "   end";
+          "else";
+          "   if uiIsMatlab";
+          "      soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      soln.y=soln.y'"^(instruction_sep logger);
+          "      vt = soln.x"^(instruction_sep logger);
+          "      vy = soln.y"^(instruction_sep logger);
+          "   elseif uiIsOctave";
+          "      soln = ode2r(@ode_aux,[tinit tend],ode_init(),options)"^(instruction_sep logger);
+          "      vt = soln.x"^(instruction_sep logger);
+          "      vy = soln.y"^(instruction_sep logger);
+          "   end";
+          "end"^(instruction_sep logger)
+        ]
     in
     let () = Loggers.print_newline logger in
     ()
@@ -2316,8 +2389,7 @@ let print_interpolate logger =
           "";
           "for j=1:nrows";
           "    for i=1:nodevar";
-          (*        "        z(i)=solny(j,i)"^(instruction_sep logger);*)
-          "        z(i)=soln(j,i)"^(instruction_sep logger);
+          "        z(i)=vy(j,i)"^(instruction_sep logger);
           "    end";
           "    h=ode_obs(z)"^(instruction_sep logger);
           "    for i=1:nobs";
@@ -2325,14 +2397,13 @@ let print_interpolate logger =
           "    end";
           "end";
           "if nobs==1";
-          (*  "   y = interp1(soln.x, obs, t, 'pchip')'"^(instruction_sep logger);*)
           "   y = interp1(vt, obs, t, 'pchip')'"^(instruction_sep logger);
           "else";
-          (*"   y = interp1(soln.x, obs, t, 'pchip')"^(instruction_sep logger);*)
-          "   y = interp1(vt, obs, t, 'pchip')"^(instruction_sep logger);
+            "   y = interp1(vt, obs, t, 'pchip')"^(instruction_sep logger);
           "end"
         ]
-    in Loggers.print_newline logger
+    in
+    Loggers.print_newline logger
     | Loggers.Maple | Loggers.Mathematica ->
       ()
     | Loggers.SBML

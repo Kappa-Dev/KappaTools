@@ -111,14 +111,15 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.Jacobian_var _
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
-  | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_ode_var
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
-  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable 
+  | Ode_loggers_sig.InitialStep
+  | Ode_loggers_sig.NonNegative
+  | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Time_scale_factor -> "t_scale_factor"
   | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
@@ -138,6 +139,7 @@ let unit_of_variable variable =
   match variable with
   | Ode_loggers_sig.Period_t_points
   | Ode_loggers_sig.Tinit
+  | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.Tend -> Some "time"
   | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Obs _
@@ -145,11 +147,11 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Concentration _
   | Ode_loggers_sig.Initbis _ -> Some "substance"
   | Ode_loggers_sig.Time_scale_factor -> Some "time_per_substance"
+  | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Expr _
   | Ode_loggers_sig.Deriv _
   | Ode_loggers_sig.Jacobian _
   | Ode_loggers_sig.Jacobian_var _
-  | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.Rate _
   | Ode_loggers_sig.Rated _
   | Ode_loggers_sig.Rateun _

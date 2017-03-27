@@ -31,6 +31,7 @@ type variable =
   | Tmp
   | Current_time
   | Time_scale_factor
+  | NonNegative
 
 
 let rec is_expr_const expr = (* constant propagation is already done *)
@@ -108,6 +109,7 @@ let is_expr_alias expr =
 
 let string_of_array_name var =
   match var with
+  | NonNegative -> "nonnegative"
   | Rate _ -> "k"
   | Rated _ -> "kd"
   | Rateun _ -> "kun"

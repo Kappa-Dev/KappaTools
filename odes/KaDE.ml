@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 26 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -11,7 +11,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false]\n"
+[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--time-advance false | true ] [--initial-step float]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -107,6 +107,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let show_reactions = ode_args.Ode_args.show_reactions in
     let compute_jacobian = ode_args.Ode_args.compute_jacobian in
+    let show_time_advance = ode_args.Ode_args.show_time_advance in
+    let nonnegative = ode_args.Ode_args.nonnegative in
+    let initial_step = ode_args.Ode_args.initial_step in
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
       | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
@@ -274,6 +277,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Option_util.unsome 1. cli_args.Run_cli_args.maxValue)
         ~compute_jacobian
+        ~show_time_advance
+        ~nonnegative
+        ~initial_step 
         ?plot_period:cli_args.Run_cli_args.plotPeriod
         parameters
         logger

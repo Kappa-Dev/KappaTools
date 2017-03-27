@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 26 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
 *)
 
 let local_trace = false
@@ -1612,6 +1612,8 @@ struct
   let is_step_two ~step = step = 2
 
   let export_main_gen
+      ~initial_step
+      ~nonnegative
       ~step
       ~compute_jacobian
       ~command_line ~command_line_quotes ?(data_file="data.csv")
@@ -1665,7 +1667,7 @@ struct
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
             logger logger_buffer Ode_loggers_sig.InitialStep
-            (Alg_expr.float 0.000001) handler_expr
+            (Alg_expr.float initial_step) handler_expr
         in
         let () =
           Ode_loggers.associate
@@ -1674,6 +1676,8 @@ struct
             (Alg_expr.float plot_period) handler_expr
         in
         let () = Ode_loggers.print_newline logger_buffer in
+        let () =
+          Ode_loggers.associate_nonnegative logger nonnegative in 
         let () =
           Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
         in
@@ -1886,11 +1890,16 @@ struct
   let export_main_follow_up = export_main_gen ~step:2
 
 
-  let export_dydt logger compil network split =
+  let export_dydt ~show_time_advance logger compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let label = "listOfReactions" in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
+    let () =
+      if show_time_advance
+      then
+        Ode_loggers.show_time_advance logger
+    in
     let () = Sbml_backend.open_box logger label in
     let () = Ode_loggers.print_newline logger in
     let () = Sbml_backend.line_sbml logger in
@@ -2510,6 +2519,9 @@ struct
       ~command_line ~command_line_quotes ?data_file ?init_t ~max_t
       ?plot_period
       ?compute_jacobian:(compute_jacobian=true)
+      ?show_time_advance:(show_time_advance=false)
+      ?nonnegative:(nonnegative=false)
+      ?initial_step:(initial_step=0.000001)
       parameters logger logger_buffer compil network =
     let network =
       if may_be_not_time_homogeneous network
@@ -2526,7 +2538,7 @@ struct
     let () =
       export_main
         ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
-        ~max_t ?plot_period
+        ~max_t ~nonnegative ~initial_step ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
@@ -2540,7 +2552,7 @@ struct
     in
     let () = Format.printf "\t -ode system @." in
     let () =
-      export_dydt logger compil network sorted_rules_and_decl
+      export_dydt ~show_time_advance logger compil network sorted_rules_and_decl
     in
     let () =
       if compute_jacobian then
@@ -2556,7 +2568,7 @@ struct
     let () = Ode_loggers.launch_main logger in
     let () =
       export_main_follow_up
-        ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
+        ~nonnegative ~initial_step ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ?plot_period
         logger logger_buffer compil network sorted_rules_and_decl
     in
