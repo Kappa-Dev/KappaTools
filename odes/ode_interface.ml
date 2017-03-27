@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 26 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -480,7 +480,15 @@ let divide_rule_rate_by cache compil rule =
 
 let detect_symmetries parameters compil cache
     chemical_species
+    (*algs_expr*)
     contact_map =
+  (*TODO*)
+  let algs_expr =
+    Alg_expr_extra.fold_over_mixtures_in_alg_exprs
+      (fun pat a -> a)
+      compil.environment
+      []
+  in
   let rule_cache = cache.rule_cache in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
@@ -489,6 +497,7 @@ let detect_symmetries parameters compil cache
       rule_cache
       compil.rate_convention
       chemical_species
+      algs_expr
       (get_rules compil)
       contact_map
   in

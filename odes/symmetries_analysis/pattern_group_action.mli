@@ -18,8 +18,8 @@ val is_pattern_invariant_internal_states_permutation:
   LKappa_auto.cache * bool
 
 val is_pattern_invariant_binding_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  Remanent_parameters_sig.parameters ->
+  Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -28,8 +28,8 @@ val is_pattern_invariant_binding_states_permutation:
   LKappa_auto.cache * bool
 
 val is_pattern_invariant_full_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  Remanent_parameters_sig.parameters ->
+  Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
