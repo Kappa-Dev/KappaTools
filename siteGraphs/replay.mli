@@ -12,4 +12,6 @@ val do_step : Signature.s -> state -> Trace.step -> state * (int * int) option
     binary rule, the id of the rule and the distance between its 2
     connected patterns. *)
 
-val cc_of_state : Signature.s -> state -> Pattern.cc list
+val cc_of_state :
+  state -> Pattern.PreEnv.t ->
+  (Pattern.PreEnv.t * Renaming.t * Pattern.cc * Pattern.id) list

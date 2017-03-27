@@ -63,7 +63,7 @@ let cc_of_agent ag e work =
 
  let rec working_todo (work,morphism,todo) = match todo with
    | [] -> work
-   | port::ls ->
+   | port::_ ->
       let (work',morphism',todo') = add_links (work,morphism,todo) port e in
       working_todo (work',morphism',todo') in
 
