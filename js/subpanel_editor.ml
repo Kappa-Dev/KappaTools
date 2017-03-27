@@ -11,6 +11,7 @@ module Html = Tyxml_js.Html5
 
 let editor_full , set_editor_full = React.S.create (false : bool)
 let is_paused , set_is_paused = React.S.create (false : bool)
+let filename , set_filename = React.S.create (None : string option)
 
 let file_label_signal, set_file_label = React.S.create ""
 let file_label =
@@ -172,9 +173,9 @@ let onload () : unit =
       (Api_common.result_map
          ~ok:(fun _ file ->
              let file_content = file.Api_types_j.file_content in
+             let () = set_filename (Some file.Api_types_j.file_metadata.Api_types_j.file_metadata_id) in
              let () = codemirror##setValue(Js.string file_content) in
-                 Lwt.return (Api_common.result_ok ())
-           )
+                 Lwt.return (Api_common.result_ok ()))
          ~error:(fun _ _ ->
              (* ignore if missing file *)
              Lwt.return (Api_common.result_ok ())))
@@ -200,13 +201,17 @@ let onload () : unit =
       let () = set_is_paused false in
       let () = Common.info (Js.string "handle_timeout") in
       let () = Common.info (Js.string text) in
-      Subpanel_editor_controller.set_content
-        (Js.to_string codemirror##getValue) in
+      match React.S.value filename with
+      | None -> ()
+      | Some filename ->
+        Subpanel_editor_controller.set_content
+        ~filename
+        ~filecontent:(Js.to_string codemirror##getValue)
+    in
     let () = timeout := Some
           (Dom_html.window ## setTimeout
              (Js.wrap_callback
-                (fun _ ->
-                   handle_timeout ())) delay) in
+                (fun _ -> handle_timeout ())) delay) in
     ()
   in
   let () = codemirror##onChange(handler) in
@@ -233,8 +238,9 @@ let onload () : unit =
     React.S.map
       (fun (refresh : State_file.refresh option) ->
          match refresh with
-         | None -> ()
+         | None -> set_filename None
          | Some refresh ->
+           let () = set_filename (Some refresh.State_file.filename) in
            let () = codemirror##setValue(Js.string refresh.State_file.content) in
            let () = match refresh.State_file.line with
              | None -> ()

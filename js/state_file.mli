@@ -24,7 +24,7 @@ val reset : unit -> unit
 (* Get current file - the name is not specified to force
    the selection of the file before the fetch.
 *)
-type refresh = { content : string ; line : int option ; }
+type refresh = { filename : string ; content : string ; line : int option ; }
 val refresh_file : refresh option React.signal
 (* remove current file from project *)
 val remove_file : unit -> unit Api.result Lwt.t

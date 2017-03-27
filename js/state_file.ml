@@ -54,7 +54,7 @@ let directory_gt
     )
 let blank_state = { state_current = None ; state_directory = [] }
 let directory_state , set_directory_state = React.S.create blank_state
-type refresh = { content : string ; line : int option ; }
+type refresh = { filename : string ; content : string ; line : int option ; }
 let refresh_file , set_refresh_file = React.S.create (None : refresh option)
 
 let reset () =
@@ -77,7 +77,9 @@ let get_file () : Api_types_j.file Api.result Lwt.t =
        )
     )
 
-let send_refresh (line : int option) : unit Api.result Lwt.t =
+let send_refresh
+    (filename : string)
+    (line : int option) : unit Api.result Lwt.t =
   (* only send refresh if there is a current file *)
   match (React.S.value directory_state).state_current with
   | None -> Lwt.return (Api_common.result_ok ())
@@ -90,7 +92,8 @@ let send_refresh (line : int option) : unit Api.result Lwt.t =
            let () =
              set_refresh_file
                (Some
-                  { content = file.Api_types_j.file_content ;
+                  { filename = filename ;
+                    content = file.Api_types_j.file_content ;
                     line = line ; }) in
            Lwt.return (Api_common.result_ok ()))
     )
@@ -169,7 +172,9 @@ let new_file filename content : Api_types_t.file =
 
 
 let create_file
-    ~(filename:string) ~(content:string) : unit Api.result Lwt.t =
+    ~(filename:string)
+    ~(content:string) :
+  unit Api.result Lwt.t =
   State_project.with_project ~label:"create_file"
     (fun manager project_id ->
        (manager#file_catalog project_id) >>=
@@ -201,8 +206,9 @@ let create_file
                       { (React.S.value directory_state) with
                         state_current = Some filename } in
                   let r_dir_t = update_directory manager project_id in
-                  send_refresh None >>= fun r_txt -> r_dir_t >>= fun r_dir ->
-                    Lwt.return (Api_common.result_combine [r_create; r_dir; r_txt])
+                  send_refresh filename None >>=
+                  fun r_txt -> r_dir_t >>=
+                  fun r_dir -> Lwt.return (Api_common.result_combine [r_create; r_dir; r_txt])
                )
               )
             )
@@ -246,7 +252,7 @@ let select_file (filename : string) (line : int option) : unit Api.result Lwt.t 
                 in
                 Lwt.return (Api_common.result_error_msg error_msg)
               | Some _ ->
-                send_refresh line
+                send_refresh filename line
             )
        )
     )
@@ -422,7 +428,11 @@ let sync () : unit Api.result Lwt.t =
                       | first::_ -> Some first.Api_types_j.file_metadata_id ) ;
                     state_directory = current_directory },
                     (* And queue an update of the ui. *)
-                    true)
+                    (match current_directory with
+                     | [] -> None
+                     | first::_ -> Some first.Api_types_j.file_metadata_id
+                    )
+                  )
                 | Some current_metadata ->
                   (* Find the metadata of the file in the old state. *)
                   let old_metadata : Api_types_j.file_metadata option =
@@ -431,13 +441,16 @@ let sync () : unit Api.result Lwt.t =
                   (* Check if old metadata it is out of date *)
                   let is_out_of_date =
                     match old_metadata with
-                    | None -> true (* not sure how this would happen but okay *)
+                    | None -> None (* not sure how this would happen but okay *)
                     | Some old_metadata ->
                       let client_id = State_settings.get_client_id () in
-                      File_version.gt
+                      if File_version.gt
                         ~client_id
                         current_metadata.Api_types_j.file_metadata_version
-                        old_metadata.Api_types_j.file_metadata_version
+                        old_metadata.Api_types_j.file_metadata_version then
+                        Some current_metadata.Api_types_j.file_metadata_id
+                      else
+                        None
                   in
                   ({ state_current = Some current_metadata.Api_types_j.file_metadata_id ;
                      state_directory = current_directory },
@@ -446,10 +459,9 @@ let sync () : unit Api.result Lwt.t =
                    is_out_of_date)
               in
               let () = set_directory_state new_state in
-              if refresh_ui then
-                send_refresh None
-              else
-                Lwt.return (Api_common.result_ok ())
+              match refresh_ui with
+              | None -> Lwt.return (Api_common.result_ok ())
+              | Some filename -> send_refresh filename None
             )
        )
     )
