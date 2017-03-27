@@ -40,7 +40,8 @@ object
     Lwt.return (Api_common.result_ok project_catalog)
 
   method project_get
-      (project_id : Api_types_j.project_id) : Api_types_j.project Api.result Lwt.t =
+      (project_id : Api_types_j.project_id) :
+    Api_types_j.project Api.result Lwt.t =
     Api_common.ProjectOperations.bind
       project_id
       environment
@@ -54,21 +55,32 @@ object
       project_id
       environment
       (fun (project : Api_environment.project) ->
-         (match project#get_state () with
-          | Some x -> Lwt.return x
-          | None ->
-            Kappa_facade.parse
-              ~system_process:system_process
-              ~kappa_files:(project#get_files ())
-            >>= fun out -> let _ = project#set_state out in Lwt.return out)
+         (project#get_state () >>= function
+           | Some x -> Lwt.return x
+           | None ->
+             let harakiri,_ = Lwt.task () in
+             let cand =
+               Lwt.pick [
+                 Kappa_facade.parse
+                   ~system_process
+                   ~kappa_files:(project#get_files ());
+                 harakiri >>= fun () ->
+                 Lwt.return (Result_data.error
+                               [Api_common.error_msg
+                                  "Parse cancelled by modified files"])
+               ] in
+             let _ = project#set_state cand in
+             cand)
          >>=
          (fun state ->
             Lwt.return
               (Result_data.map
                  ~ok:(fun kappa_facade ->
                      Api_common.result_ok
-                       { Api_types_j.project_parse_contact_map = Kappa_facade.get_contact_map kappa_facade;
-                         Api_types_j.project_parse_project_version = project#get_version ();
+                       { Api_types_j.project_parse_contact_map =
+                           Kappa_facade.get_contact_map kappa_facade;
+                         Api_types_j.project_parse_project_version =
+                           project#get_version ();
                        })
                  ~error:(fun error -> Api_common.result_messages error)
                  state

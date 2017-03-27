@@ -1,3 +1,5 @@
+open Lwt.Infix
+
 class simulation
     (simulation_id : Api_types_j.simulation_id)
     (runtime_state : Kappa_facade.t) :
@@ -21,7 +23,8 @@ class project
   object
     val mutable _simulations = []
     val mutable _files = []
-    val mutable _state : Api_environment.parse_state option = None
+    val mutable _state : Api_environment.parse_state option Lwt.t =
+      Lwt.return_none
     val mutable _version : Api_types_j.project_version = 0
     method create_simulation
         (simulation_id : Api_types_j.simulation_id)
@@ -42,15 +45,16 @@ class project
     method get_files () = _files
     method set_files (files : Api_types_j.file list) =
       let () = _files <- files in
-      let () = _state <- None in
+      let () = Lwt.cancel _state in
+      let () = _state <- Lwt.return_none in
       _version
 
-    method set_state (state : Api_environment.parse_state)
+    method set_state (state : Api_environment.parse_state Lwt.t)
       : Api_types_j.project_version =
       let () = _version <- 1 + _version in
-      let () = _state <- Some state in
+      let () = _state <- (state >>= fun x -> Lwt.return (Some x)) in
       _version
-    method get_state () : Api_environment.parse_state option =
+    method get_state () : Api_environment.parse_state option Lwt.t =
       _state
 
   end

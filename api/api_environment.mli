@@ -26,8 +26,8 @@ class type project =
     method get_files : unit -> Api_types_j.file list
     method set_files : Api_types_j.file list -> Api_types_j.project_version
 
-    method get_state : unit -> parse_state option
-    method set_state : parse_state -> Api_types_j.project_version
+    method get_state : unit -> parse_state option Lwt.t
+    method set_state : parse_state Lwt.t -> Api_types_j.project_version
 
   end
 

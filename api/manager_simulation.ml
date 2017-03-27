@@ -209,7 +209,7 @@ let select_observables
     let plot_detail_range : Api_types_j.plot_range option =
       if len > 0 then
         Some { Api_types_j.plot_range_begin = start ;
-     	       Api_types_j.plot_range_end = start + len ; }
+               Api_types_j.plot_range_end = start + len ; }
       else
         None
     in
@@ -233,10 +233,10 @@ class manager_plot
           (match  plot_parameter.Api_types_j.plot_parameter_plot_limit with
            | None ->
              { Api_types_j.plot_detail_plot = plot ;
-     	       Api_types_j.plot_detail_range =
+               Api_types_j.plot_detail_range =
                Some { Api_types_j.plot_range_begin = 0 ;
-     		      Api_types_j.plot_range_end = plot_detail_size - 1 ; } ;
-	       Api_types_j.plot_detail_size = plot_detail_size ; }
+                      Api_types_j.plot_range_end = plot_detail_size - 1 ; } ;
+               Api_types_j.plot_detail_size = plot_detail_size ; }
            | Some plot_limit ->
              select_observables
                plot_limit
@@ -369,12 +369,12 @@ class manager_simulation
              let message : string =
                Format.sprintf
                "simulation id %s exists"
-	       (Api_common.SimulationCollection.id_to_string simulation_id)
+               (Api_common.SimulationCollection.id_to_string simulation_id)
              in
              Lwt.return
                (Api_common.result_error_msg ~result_code:`CONFLICT message)
            else
-             match project#get_state () with
+             project#get_state () >>= function
              | None ->
                Lwt.return (Api_common.result_error_msg
                              "Cannot start simulation: Parse not done")
