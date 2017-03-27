@@ -23,12 +23,17 @@ val pattern_id_to_mixture:
   Pattern.id ->
   LKappa.rule_mixture option
 
+val pattern_id_to_cc:
+  Model.t ->
+  Pattern.id ->
+  Pattern.cc option
+
 val raw_mixture_to_lkappa_rule: Raw_mixture.t -> LKappa.rule
 
 val species_to_lkappa_rule:
   Remanent_parameters_sig.parameters ->
   Model.t -> Pattern.t -> LKappa.rule
 
-val pattern_to_lkappa_rule:
+val pattern_to_lkappa_rule :
   Remanent_parameters_sig.parameters ->
-  Model.t -> Pattern.t -> LKappa.rule
+  Model.t -> Pattern.cc -> LKappa.rule

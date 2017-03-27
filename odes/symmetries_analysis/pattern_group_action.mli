@@ -8,8 +8,8 @@ val normalize_species:
   LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 
 val is_pattern_invariant_internal_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  Remanent_parameters_sig.parameters ->
+  Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->

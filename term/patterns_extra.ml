@@ -524,6 +524,17 @@ let pattern_id_to_mixture ?parameters env sigs id =
   | Some point ->
     pattern_to_mixture ?parameters sigs (Pattern.Env.content point)
 
+let pattern_id_to_cc env id =
+  let point_opt  =
+    try
+      Some (Pattern.Env.get (Model.domain env) id)
+    with
+    | _ -> None
+  in
+  match point_opt with
+  | None -> None
+  | Some point -> Some (Pattern.Env.content point)
+
 let lkappa_init = {
   LKappa.r_mix =  [];
   LKappa.r_created = [];
