@@ -17,7 +17,9 @@ let navtabs () =
      ; "plot",      (Tab_plot.navli ())
      ; "flux",      (Tab_flux.navli ())
      ; "snapshot",  (Tab_snapshot.navli ())
-     ; "outputs",   (Tab_outputs.navli ()) ])
+     ; "outputs",   (Tab_outputs.navli ())
+     ; "about",     (Tab_about.navli ())
+     ])
 
 let navcontents_id : string =
   "navcontents"
@@ -28,10 +30,12 @@ let navcontents () =
     ~id:navcontents_id
     []
     ([ "editor",    (Tab_editor.content ())
-    ; "plot",      (Tab_plot.content ())
-    ; "flux",      (Tab_flux.content ())
-    ; "snapshot",  (Tab_snapshot.content ())
-    ; "outputs",   (Tab_outputs.content ()) ])
+     ; "plot",      (Tab_plot.content ())
+     ; "flux",      (Tab_flux.content ())
+     ; "snapshot",  (Tab_snapshot.content ())
+     ; "outputs",   (Tab_outputs.content ())
+     ; "about",     (Tab_about.content ())
+  ])
 
 let onload () =
   let () = Tab_editor.onload () in
@@ -39,7 +43,7 @@ let onload () =
   let () = Tab_flux.onload () in
   let () = Tab_snapshot.onload () in
   let () = Tab_outputs.onload () in
-  let () = Tab_log.onload () in
+  let () = Tab_about.onload () in
   ()
 
 let onresize () =
@@ -48,5 +52,5 @@ let onresize () =
   let () = Tab_flux.onresize () in
   let () = Tab_snapshot.onresize () in
   let () = Tab_outputs.onresize () in
-  let () = Tab_log.onresize () in
+  let () = Tab_about.onresize () in
   ()

@@ -70,4 +70,6 @@ let onload () =
       "#naveditor" "shown.bs.tab" (fun _ -> childs_hide false) in
   ()
 
-let onresize () : unit = ()
+let onresize () : unit =
+  let () = Tab_log.onresize () in
+  ()

@@ -338,7 +338,7 @@ end;;
 
 module type Tab = sig
   val navli : unit -> Html_types.flow5_without_interactive Tyxml_js.Html5.elt list
-  val content : unit -> [> Html_types.div ] Tyxml_js.Html5.elt list
+  val content : unit -> Html_types.div_content_fun Tyxml_js.Html5.elt list
   val onload : unit -> unit
   val onresize : unit -> unit
 end;;
