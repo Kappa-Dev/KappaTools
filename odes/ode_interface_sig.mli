@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 26 2017>
+  * Last modification: Time-stamp: <Mar 27 2017>
 *)
 
 module type Interface =
@@ -44,7 +44,8 @@ sig
   val print_canonic_species:
     ?compil:compil -> Format.formatter -> canonic_species -> unit
 
-  val rate_convention: compil -> Remanent_parameters_sig.rate_convention
+  val rate_convention: compil ->
+    Remanent_parameters_sig.rate_convention
   val what_do_we_count: compil -> Ode_args.count
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
@@ -165,6 +166,9 @@ sig
   compil ->
   cache ->
   chemical_species list ->
+  (*(string *
+   (connected_component array list,int) Alg_expr.e Locality.annot)
+    array ->*)
   (string list * (string * string) list) Mods.StringMap.t
     Mods.StringMap.t -> cache * Symmetries.symmetries
 

@@ -616,6 +616,18 @@ let fold_over_mix_in_alg_expr f expr accu =
     l
 
 let fold_over_mixtures_in_alg_exprs f model accu =
-  (* Quyen: to do / by using Model.ml and fold_over_mix_in_alg_expr *)
-  let _  = f, model in 
+  (* Quyen: to do / by using Model.ml and fold_over_mix_in_alg_expr *
+  *)
+  let algs_expr = Model.get_algs model in
+  let accu =
+    Array.fold_left (fun accu (_, mix) ->
+        let a =
+          fold_over_mix_in_alg_expr
+            f
+            mix
+            accu
+        in a
+      ) accu algs_expr
+  in
+  let _  = f, model in
   accu

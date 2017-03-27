@@ -2616,6 +2616,13 @@ let compute_symmetries_from_model parameters compil network
   let network, chemical_species =
     species_of_initial_state compil network (I.get_init compil)
   in
+  (********************************************************)
+  (*get alg expression:
+  (string *
+   (connected_component array list,int) Alg_expr.e Locality.annot)
+    array
+  *)
+  (********************************************************)
   let cache = network.cache in
   let cache, symmetries =
     I.detect_symmetries
@@ -2632,8 +2639,6 @@ let compute_symmetries_from_model parameters compil network
       symmetries = Some symmetries }
   in
   network
-
-
 
 let set_to_forward_symmetries_from_model network =
   match network.symmetries

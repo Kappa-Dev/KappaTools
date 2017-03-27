@@ -596,3 +596,10 @@ let pattern_to_lkappa_rule parameters env cc =
       rule_mixture_to_lkappa_rule rule_mixture
     in
     lkappa_rule
+
+let pattern_id_to_lkappa_rule parameters env id =
+  match pattern_id_to_cc env id with
+  | None -> lkappa_init
+  | Some cc ->
+    let lkappa_rule = pattern_to_lkappa_rule parameters env cc in
+    lkappa_rule
