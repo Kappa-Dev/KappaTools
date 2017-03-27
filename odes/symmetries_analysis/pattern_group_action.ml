@@ -287,11 +287,26 @@ let normalize_species ?parameters signature rule_cache cache symmetries cc =
   | None -> rule_cache, cache, cc
 
 let is_pattern_invariant_internal_states_permutation
-    ?parameters ?env
+    parameters env
     ~agent_type ~site1 ~site2
     id cache =
   (* Quyen: to do / by using LKappa_group_action and Patterns_extra *)
-  cache, true
+    match
+      Patterns_extra.pattern_id_to_cc env id
+    with
+    | None -> cache, false
+    | Some cc ->
+      let lkappa_rule =
+        Patterns_extra.pattern_to_lkappa_rule parameters env cc
+      in
+      LKappa_group_action.is_invariant_internal_states_permutation
+        ~parameters
+        ~env
+        ~agent_type
+        ~site1
+        ~site2
+        lkappa_rule
+        cache
 
 let is_pattern_invariant_binding_states_permutation
     ?parameters ?env
