@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Mar 28 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1484,7 +1484,7 @@ let compute_symmetries
           cache
           rate_convention
           chemical_species
-          []
+          (*  [] *) (* no need to add an argument everything is in env *)
           rules
           contact_map
       in
