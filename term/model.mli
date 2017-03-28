@@ -31,6 +31,9 @@ val nb_perturbations : t -> int
 val connected_components_of_unary_rules : t -> Pattern.Set.t
 
 val domain : t -> Pattern.Env.t
+val get_obs : t -> Alg_expr.t Locality.annot array
+val get_rules : t -> Primitives.elementary_rule array
+
 val new_domain : Pattern.Env.t -> t -> t
 val signatures : t -> Signature.s
 val tokens_finder : t -> int Mods.StringMap.t

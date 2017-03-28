@@ -703,6 +703,14 @@ Agent: A
       {x,y}
 ************
 With predicate (LKAPPA) init
+With predicate (LKAPPA) algebra expression
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
 Symmetries:
 In rules:
 ************
@@ -713,4 +721,12 @@ Agent: A
       {x,y}
 ************
 In rules and initial states:
+In rules and algebraic expression:
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
 execution finished without any exception

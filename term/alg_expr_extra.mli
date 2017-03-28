@@ -64,4 +64,4 @@ val diff_mixture:
 
 val fold_over_mixtures_in_alg_exprs:
   (Pattern.id -> 'a -> 'a) ->
-  Model.t  -> 'a -> 'a
+  Model.t  -> 'a -> 'a -> 'a -> 'a -> 'a -> 'a * 'a * 'a * 'a * 'a

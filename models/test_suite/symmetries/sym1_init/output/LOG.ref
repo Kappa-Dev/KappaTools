@@ -823,6 +823,14 @@ Agent: A
   -Equivalence classes of sites (both):
       {x,y}
 ************
+With predicate (LKAPPA) algebra expression
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
 Symmetries:
 In rules:
 ************
@@ -833,6 +841,14 @@ Agent: A
       {x,y}
 ************
 In rules and initial states:
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+  -Equivalence classes of sites (both):
+      {x,y}
+************
+In rules and algebraic expression:
 ************
 Agent: A
   -Equivalence classes of sites for internal states:

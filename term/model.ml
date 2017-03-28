@@ -10,11 +10,11 @@ type t = {
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Locality.annot) NamedDecls.t;
-  observables : Alg_expr.t Locality.annot array;
+  observables : Alg_expr.t Locality.annot array; (*todo*)
   ast_rules :
     (string Locality.annot option * LKappa.rule Locality.annot)
       array;
-  rules : Primitives.elementary_rule array;
+  rules : Primitives.elementary_rule array; (*todo*)
   cc_of_unaries : Pattern.Set.t;
   perturbations : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
@@ -36,6 +36,9 @@ let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
   }
 
 let domain env = env.domain
+let get_obs env = env.observables
+let get_rules env = env.rules 
+
 let new_domain domain env = {env with domain}
 let signatures env = Pattern.Env.signatures env.domain
 let tokens_finder env = env.tokens.NamedDecls.finder

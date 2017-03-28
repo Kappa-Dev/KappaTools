@@ -2444,6 +2444,14 @@ Agent: A
   -Equivalence classes of sites (both):
       {y,z}
 ************
+With predicate (LKAPPA) algebra expression
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {y,z}
+  -Equivalence classes of sites (both):
+      {y,z}
+************
 Symmetries:
 In rules:
 ************
@@ -2454,6 +2462,14 @@ Agent: A
       {y,z}
 ************
 In rules and initial states:
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {y,z}
+  -Equivalence classes of sites (both):
+      {y,z}
+************
+In rules and algebraic expression:
 ************
 Agent: A
   -Equivalence classes of sites for internal states:

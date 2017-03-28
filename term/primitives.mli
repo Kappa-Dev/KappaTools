@@ -42,7 +42,7 @@ sig
 end
 
 type elementary_rule = {
-  rate : Alg_expr.t Locality.annot;
+  rate : Alg_expr.t Locality.annot; (*todo*)
   unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
@@ -105,6 +105,7 @@ val extract_connected_components_bool :
 
 val map_expr_rule : (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
   elementary_rule -> elementary_rule
+
 val map_expr_perturbation :
   (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
   ((Pattern.id array list,int) Alg_expr.bool Locality.annot ->

@@ -1140,7 +1140,9 @@ Agent: A
 ************
 With predicate (LKAPPA)
 With predicate (LKAPPA) init
+With predicate (LKAPPA) algebra expression
 Symmetries:
 In rules:
 In rules and initial states:
+In rules and algebraic expression:
 execution finished without any exception
