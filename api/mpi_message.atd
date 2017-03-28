@@ -55,6 +55,8 @@ type snapshot_id <ocaml from="Api_types"> = abstract
 type snapshot_detail <ocaml from="Api_types"> = abstract
 type snapshot_catalog <ocaml from="Api_types"> = abstract
 
+type simulation_artifact <ocaml from="Api_types"> = abstract
+
 type unit_t <ocaml_biniou t="unit"> = unit
 
 type request = [ EnvironmentInfo of unit
@@ -81,6 +83,7 @@ type request = [ EnvironmentInfo of unit
                | SimulationCatalogFluxMap of (project_id * simulation_id)
                | SimulationCatalogSnapshot of (project_id * simulation_id)
                | SimulationCatalog of project_id
+	       | SimulationParameter of (project_id * simulation_id)
                | SimulationPause of (project_id * simulation_id)
                | SimulationPerturbation of (project_id * simulation_id * simulation_perturbation)
                | SimulationStart of (project_id * simulation_parameter)
@@ -110,7 +113,8 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationCatalogFluxMap of flux_map_catalog result
                 | SimulationCatalogSnapshot of snapshot_catalog result
                 | SimulationCatalog of simulation_catalog result
+	        | SimulationParameter of simulation_parameter result
                 | SimulationPause of unit result
                 | SimulationPerturbation of unit result
-                | SimulationStart of simulation_id result
+                | SimulationStart of simulation_artifact result
                 ]

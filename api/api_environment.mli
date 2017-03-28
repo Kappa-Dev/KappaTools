@@ -6,12 +6,14 @@ class type simulation =
     method get_simulation_id : unit -> Api_types_j.simulation_id
     method get_runtime_state : unit -> Kappa_facade.t
     method set_runtime_state : Kappa_facade.t -> unit
+    method get_simulation_parameter : unit -> Api_types_j.simulation_parameter
+    method set_simulation_parameter : Api_types_j.simulation_parameter -> unit
   end
 
 class type project =
   object
     method create_simulation :
-      Api_types_j.simulation_id ->
+      Api_types_j.simulation_parameter ->
       Kappa_facade.t ->
       simulation
     method get_project_id : unit -> Api_types_j.project_id

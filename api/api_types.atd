@@ -75,14 +75,21 @@ type project_parse = { project_parse_contact_map  : contact_map <json name="cont
                        project_parse_project_version : project_version <json name="project_version"> ;
                      }
 type kappa_code = string
+type simulation_seed = int
 
 type simulation_id = string
 type simulation_catalog = { simulation_ids : simulation_id list }
+
+type simulation_artifact = {
+     simulation_artifact_simulation_id : simulation_id ;
+     simulation_artifact_simulation_seed : simulation_seed ;
+}
+
 type simulation_parameter = {
   simulation_plot_period : float <json name="plot_period"> ;
   simulation_pause_condition : string <json name="pause_condition"> ;
   simulation_id : simulation_id <json name="simulation_id"> ;
-  simulation_seed : int nullable <json name="seed"> ;
+  simulation_seed : simulation_seed nullable <json name="seed"> ;
 }
 
 type simulation_perturbation = { perturbation_code : string }

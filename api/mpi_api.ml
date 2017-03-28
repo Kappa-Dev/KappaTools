@@ -97,6 +97,9 @@ let on_message
   | `SimulationCatalog project_id ->
     (manager#simulation_catalog project_id) >>=
     (handler (fun result -> `SimulationCatalog result))
+  | `SimulationParameter (project_id,simulation_id) ->
+    (manager#simulation_parameter project_id simulation_id) >>=
+    (handler (fun result -> `SimulationParameter result))
   | `SimulationPause (project_id,simulation_id) ->
     (manager#simulation_pause project_id simulation_id) >>=
     (handler (fun result -> `SimulationPause result))
@@ -486,7 +489,18 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-
+    method simulation_parameter
+      (project_id : Api_types_j.project_id)
+      (simulation_id : Api_types_j.simulation_id) :
+      Api_types_j.simulation_parameter Api.result Lwt.t =
+      self#message (`SimulationParameter (project_id,simulation_id)) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `SimulationParameter result -> Lwt.return result
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
 
     method simulation_perturbation
       (project_id : Api_types_j.project_id)
@@ -508,7 +522,7 @@ class virtual  manager_base () : manager_base_type =
     method simulation_start
       (project_id : Api_types_j.project_id)
       (simulation_parameter : Api_types_j.simulation_parameter)
-      : Api_types_j.simulation_id Api.result Lwt.t =
+      : Api_types_j.simulation_artifact Api.result Lwt.t =
       self#message (`SimulationStart
                      (project_id,simulation_parameter)) >>=
       Api_common.result_bind_lwt

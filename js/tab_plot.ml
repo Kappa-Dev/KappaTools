@@ -86,7 +86,9 @@ let plot_offset_input =
                        offset
                        (function
                          | None -> React.S.const (`Number 0)
-                         | Some max_offset -> React.S.const (`Number max_offset.offset_max))
+                         | Some max_offset ->
+                           React.S.const
+                             (`Number max_offset.offset_max))
                     );
                   Html.a_id plot_offset_input_id ;
                   Html.a_input_type `Range ;

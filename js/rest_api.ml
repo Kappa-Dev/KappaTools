@@ -356,6 +356,18 @@ class manager
         None
         (fun _ -> ())
         (fun result -> `SimulationPause result)
+    | `SimulationParameter (project_id,simulation_id) ->
+      send
+        None
+        (Format.sprintf
+           "%s/v2/projects/%s/simulations/%s/parameter"
+           url
+           project_id
+           simulation_id)
+        `GET
+        None
+        Mpi_message_j.simulation_parameter_of_string
+        (fun result -> `SimulationParameter result)
     | `SimulationPerturbation
         (project_id,simulation_id,simulation_perturbation) ->
       send
@@ -382,7 +394,7 @@ class manager
         `POST
         (Some
            (Api_types_j.string_of_simulation_parameter simulation_parameter))
-        Mpi_message_j.simulation_id_of_string
+        Mpi_message_j.simulation_artifact_of_string
         (fun result -> `SimulationStart result)
 
   inherit Mpi_api.manager_base ()

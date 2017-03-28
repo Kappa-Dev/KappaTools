@@ -1,19 +1,19 @@
 open Lwt.Infix
 
 class simulation
-    (simulation_id : Api_types_j.simulation_id)
-    (runtime_state : Kappa_facade.t) :
+    (runtime_state : Kappa_facade.t)
+    (simulation_parameter : Api_types_j.simulation_parameter) :
   Api_environment.simulation =
   object
-    val mutable _runtime_state =
-      runtime_state
-    method get_simulation_id () =
-      simulation_id
-    method get_runtime_state () =
-      _runtime_state
+    val mutable _runtime_state = runtime_state
+    val mutable _simulation_parameter = simulation_parameter
+    method get_simulation_id () = _simulation_parameter.Api_types_j.simulation_id
+    method get_runtime_state () = _runtime_state
     method set_runtime_state (runtime_state : Kappa_facade.t) =
       _runtime_state <- runtime_state
-
+    method get_simulation_parameter () = _simulation_parameter
+    method set_simulation_parameter (simulation_parameter : Api_types_j.simulation_parameter) : unit =
+      _simulation_parameter <- simulation_parameter
   end
 
 class project
@@ -27,11 +27,9 @@ class project
       Lwt.return_none
     val mutable _version : Api_types_j.project_version = 0
     method create_simulation
-        (simulation_id : Api_types_j.simulation_id)
-        (state : Kappa_facade.t) : Api_environment.simulation =
-      (new simulation
-        simulation_id
-        state :> Api_environment.simulation)
+        (simulation_parameter : Api_types_j.simulation_parameter)
+        (runtime_state : Kappa_facade.t) : Api_environment.simulation =
+      (new simulation runtime_state simulation_parameter :> Api_environment.simulation)
 
     method get_project_id () : Api_types_j.project_id =
       project_id

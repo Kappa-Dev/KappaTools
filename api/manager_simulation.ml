@@ -1,4 +1,15 @@
 open Lwt.Infix
+(* addd seed to parameter *)
+let patch_parameter (simulation_parameter : Api_types_j.simulation_parameter) :
+  (Api_types_j.simulation_parameter*int) =
+  match simulation_parameter.Api_types_j.simulation_seed with
+  | None ->
+    let () = Random.self_init () in
+    let seed = Random.bits () in
+    ({ simulation_parameter with Api_types_j.simulation_seed = Some seed } ,
+     seed)
+  | Some seed -> (simulation_parameter,seed)
+
 
 let detail_projection :
   environment:Api_environment.environment ->
@@ -356,7 +367,8 @@ class manager_simulation
     method simulation_start
         (project_id : Api_types_j.project_id)
         (simulation_parameter : Api_types_j.simulation_parameter) :
-      Api_types_j.simulation_id Api.result Lwt.t =
+      Api_types_j.simulation_artifact Api.result Lwt.t =
+      let (simulation_parameter,simulation_seed) = patch_parameter simulation_parameter in
       Api_common.ProjectOperations.bind
         project_id
         environment
@@ -392,15 +404,19 @@ class manager_simulation
                       (Result_data.map
                          ~ok:
                            (fun () ->
-                              let simulation =
-                               project#create_simulation simulation_id facade in
-                             let () =
-                               Api_common.SimulationCollection.update
-                                 project
-                                 (simulation::
-                                  (Api_common.SimulationCollection.list project))
-                             in
-                             Lwt.return (Api_common.result_ok simulation_id))
+                              let simulation : Api_environment.simulation =
+                                project#create_simulation simulation_parameter facade in
+                              let () =
+                                Api_common.SimulationCollection.update
+                                  project
+                                  (simulation::
+                                   (Api_common.SimulationCollection.list project))
+                              in
+                              Lwt.return
+                                (Api_common.result_ok
+                                   { Api_types_j.simulation_artifact_simulation_id = simulation_id ;
+                                     Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
+                                   }))
                          ~error:
                            (fun (errors : Api_types_j.errors) ->
                               Lwt.return (Api_common.result_messages errors)))
@@ -410,6 +426,19 @@ class manager_simulation
                       Lwt.return (Api_common.result_messages errors))
                  parse
         )
+
+    method simulation_parameter
+      (project_id : Api_types_j.project_id)
+      (simulation_id : Api_types_j.simulation_id) :
+      Api_types_j.simulation_parameter Api.result Lwt.t =
+      Api_common.bind_simulation
+        environment
+        project_id
+        simulation_id
+        (fun _ simulation(* project simulation *) ->
+           let parameter = simulation#get_simulation_parameter() in
+           Lwt.return (Api_common.result_ok parameter))
+
     method simulation_pause
         (project_id : Api_types_j.project_id)
         (simulation_id : Api_types_j.simulation_id) :

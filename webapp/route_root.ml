@@ -202,10 +202,27 @@ let route
        Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
-            let (project_id,simulation_id) = simulation_ref context in
+            let (project_id,simulation_id) =
+              simulation_ref
+                context in
             (manager#simulation_delete project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t
+                                     ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulations/{simulationid}/parameter" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let (project_id,simulation_id) = simulation_ref context in
+            (manager#simulation_parameter project_id simulation_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:
+                 (Mpi_message_j.string_of_simulation_parameter
+                    ?len:None)
             )
          )
      };
@@ -214,10 +231,18 @@ let route
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
-            let (project_id,simulation_id,filelines_id) = field_ref context "filelinesid" in
-            (manager#simulation_detail_file_line project_id simulation_id (Some filelines_id)) >>=
+            let (project_id,simulation_id,filelines_id) =
+              field_ref
+                context
+                "filelinesid" in
+            (manager#simulation_detail_file_line
+               project_id
+               simulation_id
+               (Some filelines_id)) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_line_detail ?len:None)
+               ~string_of_success:
+                 (Mpi_message_j.string_of_file_line_detail
+                    ?len:None)
             )
          )
      };
@@ -226,10 +251,17 @@ let route
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
-            let (project_id,simulation_id,fluxmaps_id) = field_ref context "fluxmapsid" in
-            (manager#simulation_detail_flux_map project_id simulation_id fluxmaps_id) >>=
+            let (project_id,simulation_id,fluxmaps_id) =
+              field_ref
+                context
+                "fluxmapsid" in
+            (manager#simulation_detail_flux_map
+               project_id
+               simulation_id
+               fluxmaps_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_flux_map ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_flux_map
+                                     ?len:None)
             )
          )
      };
@@ -277,7 +309,10 @@ let route
                   } )) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun plot_parameter ->
-                   manager#simulation_detail_plot project_id simulation_id plot_parameter
+                   manager#simulation_detail_plot
+                     project_id
+                     simulation_id
+                     plot_parameter
                )
             )>>=
             (Webapp_common.result_response
@@ -290,10 +325,17 @@ let route
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
-            let (project_id,simulation_id,snapshot_id) = field_ref context "snapshotid" in
-            (manager#simulation_detail_snapshot project_id simulation_id snapshot_id) >>=
+            let (project_id,simulation_id,snapshot_id) =
+              field_ref
+                context
+                "snapshotid" in
+            (manager#simulation_detail_snapshot
+               project_id
+               simulation_id
+               snapshot_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_snapshot_detail ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_snapshot_detail
+                                     ?len:None)
             )
          )
      };
@@ -305,7 +347,8 @@ let route
             let (project_id,simulation_id) = simulation_ref context in
             (manager#simulation_info project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_simulation_info ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_simulation_info
+                                     ?len:None)
             )
          )
      };
@@ -317,7 +360,8 @@ let route
             let (project_id,simulation_id) = simulation_ref context in
             (manager#simulation_catalog_file_line project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_line_catalog ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_file_line_catalog
+                                     ?len:None)
             )
          )
      };
@@ -329,7 +373,8 @@ let route
             let (project_id,simulation_id) = simulation_ref context in
             (manager#simulation_catalog_flux_map project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
+                                     ?len:None)
             )
          )
      };
@@ -341,7 +386,8 @@ let route
             let (project_id,simulation_id) = simulation_ref context in
             (manager#simulation_catalog_snapshot project_id simulation_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog
+                                     ?len:None)
             )
          )
      };
@@ -353,7 +399,8 @@ let route
             let project_id = project_ref context in
             (manager#simulation_catalog project_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_simulation_catalog ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_simulation_catalog
+                                     ?len:None)
             )
          )
      };
@@ -371,7 +418,8 @@ let route
             (manager#simulation_continue project_id simulation_id)
             >>=
             (Webapp_common.result_response
-                     ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t
+                                     ?len:None)
             )
          )
      };
@@ -384,7 +432,8 @@ let route
             (manager#simulation_pause project_id simulation_id)
             >>=
             (Webapp_common.result_response
-                     ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t
+                                     ?len:None)
             )
          )
      };
@@ -401,7 +450,8 @@ let route
             (manager#simulation_perturbation project_id simulation_id)
             >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t
+                                     ?len:None)
             )
          )
      };
@@ -416,7 +466,8 @@ let route
             >>=
             (manager#simulation_start project_id) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_simulation_id ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
+                                     ?len:None)
             )
          )
      };

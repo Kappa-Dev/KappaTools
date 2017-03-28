@@ -141,7 +141,7 @@ class type  manager_simulation =
     method simulation_start :
       Api_types_j.project_id ->
       Api_types_j.simulation_parameter->
-      Api_types_j.simulation_id result Lwt.t
+      Api_types_j.simulation_artifact result Lwt.t
 
     method simulation_pause :
       Api_types_j.project_id ->
@@ -164,6 +164,11 @@ class type  manager_simulation =
       Api_types_j.project_id ->
       Api_types_j.simulation_id ->
       Api_types_j.simulation_info result Lwt.t
+
+    method simulation_parameter :
+      Api_types_j.project_id ->
+      Api_types_j.simulation_id ->
+      Api_types_j.simulation_parameter result Lwt.t
 
     inherit  manager_file_line
     inherit  manager_flux_map
