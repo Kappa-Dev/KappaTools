@@ -6,8 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
-
 exception BadResponseCode of int
 exception TimeOut
 
@@ -159,6 +157,17 @@ class manager
         None
         Mpi_message_j.project_parse_of_string
         (fun result -> `ProjectParse result)
+
+    | `ProjectDeadRules project_id ->
+      send
+        None
+        (Format.sprintf "%s/v2/projects/%s/dead_rules" url project_id)
+        `GET
+        None
+        (fun s -> Yojson.Safe.read_list
+           Ckappa_sig.read_c_rule_id
+           (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
+        (fun result -> `ProjectDeadRules result)
 
     | `ProjectGet project_id ->
       send

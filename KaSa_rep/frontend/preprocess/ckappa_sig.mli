@@ -33,6 +33,10 @@ type c_agent_id
 
 val rule_id_to_json : c_rule_id -> Yojson.Basic.json
 val rule_id_of_json : Yojson.Basic.json -> c_rule_id
+val write_c_rule_id : Bi_outbuf.t -> c_rule_id -> unit
+val string_of_c_rule_id : ?len:int -> c_rule_id -> string
+val read_c_rule_id : Yojson.Safe.lexer_state -> Lexing.lexbuf -> c_rule_id
+val c_rule_id_of_string : string -> c_rule_id
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name

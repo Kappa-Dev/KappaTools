@@ -43,6 +43,20 @@ let rule_id_of_json json =
   | _ ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id",json))
 
+let write_c_rule_id ob f =
+  Yojson.Basic.to_outbuf ob (rule_id_to_json f)
+
+let string_of_c_rule_id ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_c_rule_id ob x;
+  Bi_outbuf.contents ob
+
+let read_c_rule_id p lb =
+  rule_id_of_json (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+let c_rule_id_of_string s =
+  read_c_rule_id (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
 
 let dummy_agent_name = 0
 let dummy_site_name = 0

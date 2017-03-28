@@ -58,3 +58,5 @@ val info :
     Result_data.t Lwt.t
 
 val get_contact_map : t -> Api_types_j.site_node array
+
+val get_dead_rules : t -> Ckappa_sig.c_rule_id list

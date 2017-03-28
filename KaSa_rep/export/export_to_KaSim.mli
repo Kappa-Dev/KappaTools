@@ -29,6 +29,9 @@ module type Type =
       ?accuracy_level: Remanent_state.accuracy_level
       -> state -> state * contact_map
 
+    val get_dead_rules:
+      state -> state * Ckappa_sig.c_rule_id list
+
     val dump_errors_light: state -> unit
 
     val flush_errors: state -> state

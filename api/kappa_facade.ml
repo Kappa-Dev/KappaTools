@@ -1,4 +1,16 @@
-open Lwt
+open Lwt.Infix
+
+module A =
+  (val Domain_selection.select_domain
+      ~reachability_parameters:{
+        Remanent_parameters_sig.views = true;
+        Remanent_parameters_sig.site_accross_bonds = true;
+        Remanent_parameters_sig.parallel_bonds = false;
+        Remanent_parameters_sig.dynamic_contact_map = true;
+      } ())
+
+module KaSa = Export_to_KaSim.Export(A)
+
 (** Interface to kappa runtime *)
 (* Error messages *)
 let msg_process_not_running =
@@ -76,6 +88,7 @@ type t =
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     with_trace : bool ;
     mutable lastyield : float ;
+    mutable kasa_state : KaSa.state
   }
 
 let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
@@ -84,6 +97,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     ~init_l
     ~with_trace
     ~lastyield
+    ~kasa_state
   : t =
   {
     is_running = false; run_finalize = false; counter; log_buffer; log_form;
@@ -96,7 +110,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     files = [];
     error_messages = [];
     contact_map; env; graph; state; init_l; with_trace;
-    lastyield;
+    lastyield; kasa_state;
   }
 
 let reinitialize random_state t =
@@ -132,6 +146,7 @@ let clone_t t =
     ~init_l:t.init_l
     ~with_trace:t.with_trace
     ~lastyield:t.lastyield
+    ~kasa_state:t.kasa_state
 
 
 
@@ -194,11 +209,11 @@ let rec compile_file
 let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
-  let post_parse raw_ast =
+  let post_parse compil =
     let (conf,_,_,_,_) =
-      Configuration.parse raw_ast.Ast.configurations in
+      Configuration.parse compil.Ast.configurations in
     let new_syntax = conf.Configuration.newSyntax in
-    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] raw_ast) >>=
+    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] compil) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -250,6 +265,8 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                             random_state env counter)
                   ~state:(State_interpreter.empty env [])
                   ~init_l ~with_trace ~lastyield
+                  ~kasa_state:(KaSa.init ~compil
+                                 ~called_from:Remanent_parameters_sig.Server ())
               in
               Lwt.return (Result_data.ok simulation))
          with e ->
@@ -604,3 +621,8 @@ let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map
     (Model.signatures t.env)
     t.contact_map
+
+let get_dead_rules t =
+  let new_state,dr = KaSa.get_dead_rules t.kasa_state in
+  let () = t.kasa_state <- new_state in
+  dr

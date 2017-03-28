@@ -25,13 +25,17 @@ let rightsubpanel () =
            )
        ]
     [Ui_common.navtabs "subnavtab"
-       [ "contact", (Tab_contact.navli ())
-       ; "log",     (Tab_log.navli ()) ];
+       [ "contact",    (Tab_contact.navli ())
+       ; "log",        (Tab_log.navli ())
+       ; "dead_rules", (Tab_dead_rules.navli ())
+       ];
      Ui_common.navcontent
        ~id:rightsubpanel_id
        []
-       [ "contact", (Tab_contact.content ())
-       ; "log",     (Tab_log.content ()) ]]
+       [ "contact",    (Tab_contact.content ())
+       ; "log",        (Tab_log.content ())
+       ; "dead_rules", (Tab_dead_rules.content ())
+       ]]
 
 let content () =
   [Html.div ~a:[Html.a_class ["row"]]
@@ -54,15 +58,18 @@ let content () =
 let childs_hide b =
   if b then
     let () = Tab_contact.parent_hide () in
+    let () = Tab_dead_rules.parent_hide () in
     Tab_log.parent_hide ()
   else
     let () = Tab_contact.parent_shown () in
+    let () = Tab_dead_rules.parent_shown () in
     Tab_log.parent_shown ()
 
 let onload () =
   let () = Subpanel_editor.onload () in
   let () = Tab_contact.onload () in
   let () = Tab_log.onload () in
+  let () = Tab_dead_rules.onload () in
   let _ = React.S.map childs_hide Subpanel_editor.editor_full in
   let () = Common.jquery_on
       "#naveditor" "hide.bs.tab" (fun _ -> childs_hide true) in
@@ -71,5 +78,7 @@ let onload () =
   ()
 
 let onresize () : unit =
+  let () = Tab_contact.onresize () in
   let () = Tab_log.onresize () in
+  let () = Tab_dead_rules.onresize () in
   ()
