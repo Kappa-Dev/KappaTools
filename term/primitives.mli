@@ -37,12 +37,12 @@ sig
 end
 
 type elementary_rule = {
-  rate : Alg_expr.t Locality.annot;
+  rate : Alg_expr.t Locality.annot; (*todo*)
   unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  delta_tokens : (Alg_expr.t Locality.annot * int) list;
+  delta_tokens : (Alg_expr.t Locality.annot * int) list; (*todo*)
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
@@ -50,7 +50,13 @@ type elementary_rule = {
       concretize *)
 }
 
+val get_rate : elementary_rule -> Alg_expr.t Locality.annot
+val get_unary_rate :
+  elementary_rule -> (Alg_expr.t Locality.annot * Alg_expr.t option) option
+val get_delta_tokens : elementary_rule -> (Alg_expr.t Locality.annot * int) list
+
 val rule_to_yojson : elementary_rule -> Yojson.Basic.json
+
 val rule_of_yojson : Yojson.Basic.json -> elementary_rule
 
 type 'alg_expr print_expr =
@@ -121,6 +127,7 @@ val extract_connected_components_bool :
 
 val map_expr_rule : (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
   elementary_rule -> elementary_rule
+
 val map_expr_perturbation :
   (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
   ((Pattern.id array list,int) Alg_expr.bool Locality.annot ->

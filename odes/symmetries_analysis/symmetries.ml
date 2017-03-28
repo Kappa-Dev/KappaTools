@@ -32,7 +32,12 @@ type symmetries =
   {
     rules: equivalence_classes;
     rules_and_initial_states: equivalence_classes option;
-    rules_and_alg_expr: equivalence_classes option
+    rules_and_alg_expr:
+      equivalence_classes option
+      (*
+      (equivalence_classes option * equivalence_classes option *
+       equivalence_classes option * equivalence_classes option *
+       equivalence_classes option)*)
   }
 
 type reduction =
@@ -574,6 +579,7 @@ let print_symmetries_gen parameters env contact_map
     partitioned_contact_map partitioned_contact_map_in_lkappa
     refined_partitioned_contact_map
     refined_partitioned_contact_map_init
+    refined_partitioned_contact_map_alg_expr
   =
   let () =
     if Remanent_parameters.get_trace parameters
@@ -607,6 +613,13 @@ let print_symmetries_gen parameters env contact_map
         print_partitioned_contact_map_in_lkappa
           logger env
           refined_partitioned_contact_map_init
+      in
+      let () = Loggers.fprintf logger "With predicate (LKAPPA) algebra expression" in
+      let () = Loggers.print_newline logger in
+      let () =
+        print_partitioned_contact_map_in_lkappa
+          logger env
+          refined_partitioned_contact_map_alg_expr
       in
       ()
     else
@@ -744,13 +757,16 @@ let detect_symmetries parameters env cache
   let refined_partitioned_contact_map_copy =
     Array.copy refined_partitioned_contact_map
   in
-  let cache, refined_partitioned_contact_map_alg_expr =
-    (*let parameters, env = Some parameters, Some env in*)
-    (* Quyen: TO DO *)
+  let (cache, refined_partitioned_contact_map_alg_expr),
+      (cache1, refined_partitioned_contact_map_alg_obs),
+      (cache2, refined_partitioned_contact_map_alg_rate),
+      (cache3, refined_partitioned_contact_map_alg_unary_rate),
+      (cache4, refined_partitioned_contact_map_alg_delta_tokens)
+    =
     (* ford over all the alg_expr of the model *)
     (* for each such expression refine the partitioned contact map*)
     Alg_expr_extra.fold_over_mixtures_in_alg_exprs
-      (fun pid (cache, a) ->
+      (fun pid (cache, algs) ->
          let cache, refined_partitioned_contact_map_alg_expr =
            refine_partitioned_contact_map_in_lkappa_representation
              cache
@@ -784,12 +800,16 @@ let detect_symmetries parameters env cache
                   pid
                   cache
              )
-             a
+             algs
          in
          cache, refined_partitioned_contact_map_alg_expr
       )
       env
-      (cache, refined_partitioned_contact_map_copy)
+      (cache, refined_partitioned_contact_map_copy) (*algs*)
+      (cache, refined_partitioned_contact_map_copy) (*observation*)
+      (cache, refined_partitioned_contact_map_copy) (*rate*)
+      (cache, refined_partitioned_contact_map_copy) (*unary_rate*)
+      (cache, refined_partitioned_contact_map_copy) (*delta_tokens*)
   in
   let refined_partitioned_contact_map_alg_expr =
     Array.map Symmetries_sig.clean
@@ -799,9 +819,11 @@ let detect_symmetries parameters env cache
   (*print*)
   let () =
     print_symmetries_gen parameters env contact_map
-      partitioned_contact_map partitioned_contact_map_in_lkappa
+      partitioned_contact_map
+      partitioned_contact_map_in_lkappa
       refined_partitioned_contact_map
       refined_partitioned_contact_map_init
+      refined_partitioned_contact_map_alg_expr
   in
   cache,
   {
@@ -885,6 +907,19 @@ let print_symmetries parameters env symmetries =
     | None -> ()
     | Some sym ->
       let () = Loggers.fprintf log "In rules and initial states:" in
+      let () = Loggers.print_newline log in
+      let () =
+        print_partitioned_contact_map_in_lkappa log env sym
+      in
+      ()
+  in
+  let () =
+    match
+      symmetries.rules_and_alg_expr
+    with
+    | None -> ()
+    | Some sym ->
+      let () = Loggers.fprintf log "In rules and algebraic expression:" in
       let () = Loggers.print_newline log in
       let () =
         print_partitioned_contact_map_in_lkappa log env sym

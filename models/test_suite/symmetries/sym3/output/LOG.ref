@@ -1397,6 +1397,16 @@ Agent: A
       {t,w}
       {x,y}
 ************
+With predicate (LKAPPA) algebra expression
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+      {t,w}
+  -Equivalence classes of sites (both):
+      {x,y}
+      {t,w}
+************
 Symmetries:
 In rules:
 ************
@@ -1417,5 +1427,15 @@ Agent: A
   -Equivalence classes of sites (both):
       {t,w}
       {x,y}
+************
+In rules and algebraic expression:
+************
+Agent: A
+  -Equivalence classes of sites for internal states:
+      {x,y}
+      {t,w}
+  -Equivalence classes of sites (both):
+      {x,y}
+      {t,w}
 ************
 execution finished without any exception
