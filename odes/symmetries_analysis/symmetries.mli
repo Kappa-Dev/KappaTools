@@ -36,13 +36,20 @@ type reduction =
 (*PARTITION THE CONTACT MAP*)
 (*******************************************************************)
 
+val refine_partitioned_contact_map_in_lkappa_representation :
+  'a ->
+  ('a -> int -> 'b -> 'b -> 'a * bool) ->
+  ('a -> int -> 'b -> 'b -> 'a * bool) ->
+  ('a -> int -> 'b -> 'b -> 'a * bool) ->
+  'b Symmetries_sig.site_partition array ->
+  'a * 'b Symmetries_sig.site_partition array
+
 val detect_symmetries:
   Remanent_parameters_sig.parameters ->
   Model.t ->
   LKappa_auto.cache ->
   Remanent_parameters_sig.rate_convention ->
   Pattern.cc list ->
-  (*int list ->*)
   Primitives.elementary_rule list ->
   (string list * (string * string) list) Mods.StringMap.t
     Mods.StringMap.t -> LKappa_auto.cache * symmetries
@@ -51,13 +58,14 @@ val print_symmetries:
   Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
 
 type cache
-val empty_cache: unit -> cache
 
+val empty_cache: unit -> cache
 
 val representative:
   ?parameters:Remanent_parameters_sig.parameters ->
   Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.cc
   ->  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
+
 type class_description =
   {
     species_weight: int;
@@ -65,12 +73,17 @@ type class_description =
     class_cardinal: int;
     class_weight: int
   }
+
 type bwd_map
+
 val empty_bwd_map: unit -> bwd_map
+
 val add_equiv_class: reduction -> bwd_map -> Pattern.cc -> bwd_map
+
 val bwd_interpretation:
   ?parameters:Remanent_parameters_sig.parameters ->
   bwd_map -> reduction -> Pattern.cc -> class_description option
+
 val fold_bwd_map:
   (Pattern.cc -> class_description -> 'a -> 'a) ->
   bwd_map ->

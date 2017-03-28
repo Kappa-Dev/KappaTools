@@ -745,17 +745,55 @@ let detect_symmetries parameters env cache
     Array.copy refined_partitioned_contact_map
   in
   let cache, refined_partitioned_contact_map_alg_expr =
-    let parameters, env = Some parameters, Some env in
-    let _ = parameters, env in
+    (*let parameters, env = Some parameters, Some env in*)
     (* Quyen: TO DO *)
     (* ford over all the alg_expr of the model *)
     (* for each such expression refine the partitioned contact map*)
-
-    cache, refined_partitioned_contact_map_copy
+    Alg_expr_extra.fold_over_mixtures_in_alg_exprs
+      (fun pid (cache, a) ->
+         let cache, refined_partitioned_contact_map_alg_expr =
+           refine_partitioned_contact_map_in_lkappa_representation
+             cache
+             (fun cache agent_type site1 site2 ->
+                Pattern_group_action.is_pattern_invariant_internal_states_permutation
+                  parameters
+                  env
+                  agent_type
+                  site1
+                  site2
+                  pid
+                  cache
+             )
+             (fun cache agent_type site1 site2 ->
+                Pattern_group_action.is_pattern_invariant_binding_states_permutation
+                  parameters
+                  env
+                  agent_type
+                  site1
+                  site2
+                  pid
+                  cache
+             )
+             (fun cache agent_type site1 site2 ->
+                Pattern_group_action.is_pattern_invariant_full_states_permutation
+                  parameters
+                  env
+                  agent_type
+                  site1
+                  site2
+                  pid
+                  cache
+             )
+             a
+         in
+         cache, refined_partitioned_contact_map_alg_expr
+      )
+      env
+      (cache, refined_partitioned_contact_map_copy)
   in
-  let refined_partitioned_contact_map_init =
+  let refined_partitioned_contact_map_alg_expr =
     Array.map Symmetries_sig.clean
-      refined_partitioned_contact_map_init
+      refined_partitioned_contact_map_alg_expr
   in
   (*-------------------------------------------------------------*)
   (*print*)

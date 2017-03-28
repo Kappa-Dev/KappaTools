@@ -51,6 +51,7 @@ val check_orbit_binding_state_permutation:
     counter is an array of 0 (after the call, the array is reset to 0.
     to_be_checked is an array of boolean: false means that there is no rule corresponding to this hash, or that this rule is already in an orbit;
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
+
 val check_orbit_full_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
   ?env:Model.t ->
