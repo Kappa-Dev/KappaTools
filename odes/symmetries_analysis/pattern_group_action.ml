@@ -289,7 +289,7 @@ let normalize_species ?parameters signature rule_cache cache symmetries cc =
 (******************************************************)
 
 let is_pattern_invariant_internal_states_permutation
-    parameters env
+    ~parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
   let lkappa_rule =
@@ -305,7 +305,7 @@ let is_pattern_invariant_internal_states_permutation
     cache
 
 let is_pattern_invariant_binding_states_permutation
-    parameters env
+    ~parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
   let lkappa_rule =
@@ -321,7 +321,7 @@ let is_pattern_invariant_binding_states_permutation
     cache
 
 let is_pattern_invariant_full_states_permutation
-    parameters env
+    ~parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
   let lkappa_rule =

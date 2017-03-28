@@ -604,7 +604,7 @@ let diff_mixture ?time_var expr mixture =
     | None ->
     raise
       (ExceptionDefn.Internal_Error
-         ("A time-dependent expression cannot be differentiate without specifying a variable for time progress",Locality.dummy))
+         ("A time-dependent expression cannot be differentiated without specifying a variable for time progress",Locality.dummy))
   in
   diff_gen f_mix f_token f_symb f_time expr
 
@@ -616,18 +616,14 @@ let fold_over_mix_in_alg_expr f expr accu =
     l
 
 let fold_over_mixtures_in_alg_exprs f model accu =
-  (* Quyen: to do / by using Model.ml and fold_over_mix_in_alg_expr *
-  *)
   let algs_expr = Model.get_algs model in
   let accu =
-    Array.fold_left (fun accu (_, mix) ->
-        let a =
+    Array.fold_left
+      (fun accu (_, mix) ->
           fold_over_mix_in_alg_expr
             f
             mix
             accu
-        in a
       ) accu algs_expr
   in
-  let _  = f, model in
   accu

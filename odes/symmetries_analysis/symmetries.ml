@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 27 2017>
+   * Last modification: Time-stamp: <Mar 28 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -634,7 +634,6 @@ let print_symmetries_gen parameters env contact_map
 let detect_symmetries parameters env cache
     rate_convention
     chemical_species
-    algs_expr
     get_rules
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
