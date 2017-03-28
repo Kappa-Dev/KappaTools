@@ -539,13 +539,14 @@ let rec complete_with_creation
         complete_with_creation
           sigs (removed,added) l_t create_actions' actions (succ fresh) ag_l
       else
-        let added',point =
+        let added',actions',point =
           match ag.Raw_mixture.a_ints.(site_id) with
-          | None -> added,(site_id,None)
+          | None -> added,actions,(site_id,None)
           | Some i ->
             Primitives.Transformation.PositiveInternalized (place,site_id,i)::added,
+            Instantiation.Mod_internal((place,site_id),i)::actions,
             (site_id,Some i) in
-        let added'',actions',l_t' =
+        let added'',actions'',l_t' =
           match ag.Raw_mixture.a_ports.(site_id) with
           | Raw_mixture.FREE ->
             Primitives.Transformation.Freed (place,site_id)::added',
@@ -572,8 +573,8 @@ let rec complete_with_creation
               l_t'
             | None,l_t ->
               let l_t' = Mods.IntMap.add i ((place,site_id),None) l_t in
-              (added',actions,l_t') in
-        handle_ports added'' l_t' actions' (point::intf) (succ site_id) in
+              (added',actions',l_t') in
+        handle_ports added'' l_t' actions'' (point::intf) (succ site_id) in
     handle_ports
       (Primitives.Transformation.Agent place::added) links_transf actions [] 0
 
