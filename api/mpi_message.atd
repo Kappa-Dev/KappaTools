@@ -22,7 +22,6 @@ type file_catalog <ocaml from="Api_types"> = abstract
 type file_modification <ocaml from="Api_types"> = abstract
 
 type contact_map <ocaml from="Api_types"> = abstract
-type c_rule_id <ocaml from module="Ckappa_sig"> = abstract
 
 type project_parse <ocaml from="Api_types"> = abstract
 
@@ -99,7 +98,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | ProjectCreate of project_id result
                 | ProjectDelete of unit result
                 | ProjectParse of project_parse result
-                | ProjectDeadRules of c_rule_id list result
+                | ProjectDeadRules of string list result
 		| ProjectGet of project result
                 | SimulationContinue of unit result
                 | SimulationDelete of unit result

@@ -165,7 +165,7 @@ class manager
         `GET
         None
         (fun s -> Yojson.Safe.read_list
-           Ckappa_sig.read_c_rule_id
+           Yojson.Safe.read_string
            (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
         (fun result -> `ProjectDeadRules result)
 

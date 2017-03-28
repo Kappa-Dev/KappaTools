@@ -28,7 +28,7 @@ let content () =
                        let () = ReactiveData.RList.set set_dead_rules
                            (List.rev_map
                               (fun x ->
-                                 Html.p [Html.pcdata (Ckappa_sig.string_of_rule_id x)])
+                                 Html.p [Html.pcdata x])
                               rule_ids) in
                        Lwt.return (Api_common.result_ok ()))
                 )

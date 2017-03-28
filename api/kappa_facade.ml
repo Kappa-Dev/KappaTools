@@ -625,4 +625,7 @@ let get_contact_map (t : t) : Api_types_j.site_node array =
 let get_dead_rules t =
   let new_state,dr = KaSa.get_dead_rules t.kasa_state in
   let () = t.kasa_state <- new_state in
-  dr
+  List.rev_map (fun id ->
+      Format.asprintf "%a"
+        (Model.print_ast_rule ~env:t.env) (Ckappa_sig.int_of_rule_id id + 1))
+    dr
