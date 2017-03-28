@@ -1484,7 +1484,6 @@ let compute_symmetries
           cache
           rate_convention
           chemical_species
-          (*  [] *) (* no need to add an argument everything is in env *)
           rules
           contact_map
       in

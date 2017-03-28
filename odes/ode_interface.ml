@@ -480,7 +480,6 @@ let divide_rule_rate_by cache compil rule =
 
 let detect_symmetries parameters compil cache
     chemical_species
-    (*algs_expr*)
     contact_map =
   let rule_cache = cache.rule_cache in
   let rule_cache, symmetries =

@@ -18,7 +18,6 @@ type ('a,'b) corrected_rate_const =
     var: ('a,'b) Alg_expr.e Locality.annot option
   }
 
-
 let rec simplify expr =
   match expr
   with
@@ -608,10 +607,17 @@ let diff_mixture ?time_var expr mixture =
   in
   diff_gen f_mix f_token f_symb f_time expr
 
+let fold_over_mix_in_list f mix accu =
+  List.fold_left (fun accu array_id ->
+      Array.fold_left (fun accu pid ->
+          f pid accu
+        ) accu array_id
+    ) accu mix
+
 let fold_over_mix_in_alg_expr f expr accu =
   let l = Alg_expr.extract_connected_components expr in
   List.fold_left
-    (fun accu mix -> f mix accu)
+    (fun accu mix -> fold_over_mix_in_list f mix accu)
     accu
     l
 

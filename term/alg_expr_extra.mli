@@ -63,5 +63,5 @@ val diff_mixture:
     ('mix,'id) Alg_expr.e Locality.annot
 
 val fold_over_mixtures_in_alg_exprs:
-  (Pattern.id array list -> 'a -> 'a) ->
+  (Pattern.id -> 'a -> 'a) ->
   Model.t  -> 'a -> 'a

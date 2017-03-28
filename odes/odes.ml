@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Mar 28 2017>
 *)
 
 let local_trace = false
@@ -2616,12 +2616,6 @@ let compute_symmetries_from_model parameters compil network
   let network, chemical_species =
     species_of_initial_state compil network (I.get_init compil)
   in
-  (********************************************************)
-  (*get alg expression:
-  (string *
-   (connected_component array list,int) Alg_expr.e Locality.annot)
-    array
-  *)
   (********************************************************)
   let cache = network.cache in
   let cache, symmetries =
