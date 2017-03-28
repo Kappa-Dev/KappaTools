@@ -16,12 +16,14 @@ type a_project = {
 type state = {
   project_current : a_project option;
   project_catalog : a_project list;
+  project_version : int ;
   project_contact_map : Api_types_j.contact_map option;
 }
 
 type model = {
   model_project_id : Api_types_j.project_id option ;
   model_project_ids : Api_types_j.project_id list ;
+  model_project_version : int ;
   model_contact_map : Api_types_j.contact_map option ;
 }
 
@@ -29,14 +31,15 @@ let project_equal a b = a.project_id = b.project_id
 let catalog_equal = List.for_all2 project_equal
 let state_equal a b =
   Option_util.equal project_equal a.project_current b.project_current &&
-  catalog_equal a.project_catalog b.project_catalog &&
-  Option_util.equal (=) a.project_contact_map b.project_contact_map
+  a.project_version = b.project_version &&
+  catalog_equal a.project_catalog b.project_catalog
 
 let state , set_state =
   React.S.create ~eq:state_equal
     {
     project_current = None;
     project_catalog = [];
+    project_version = -1;
     project_contact_map = None;
   }
 
@@ -52,11 +55,14 @@ let update_state project_id project_catalog : unit Api.result Lwt.t =
                project_catalog;
                project_contact_map =
                  Some project_parse.Api_types_j.project_parse_contact_map ;
+               project_version =
+                 project_parse.Api_types_j.project_parse_project_version ;
              } in
            Lwt.return (Api_common.result_ok ()))
        ~error:(fun _ errors ->
            let () = set_state { project_current = Some me ;
                                 project_catalog = project_catalog ;
+                                project_version = -1;
                                 project_contact_map = None ;
                               } in
            Lwt.return (Api_common.result_messages errors))
@@ -81,6 +87,13 @@ let create_project (project_id : Api_types_j.project_id) : unit Api.result Lwt.t
                   update_state project_id ({project_id; project_manager;}::catalog)
                 ))))
 
+let dummy_model = {
+  model_project_id = None;
+  model_project_ids = [];
+  model_project_version = -1;
+  model_contact_map = None;
+}
+
 let model : model React.signal =
   React.S.map
     (fun state ->
@@ -89,6 +102,7 @@ let model : model React.signal =
        { model_project_id =
            Option_util.map (fun x -> x.project_id) state.project_current;
          model_project_ids = model_project_ids ;
+         model_project_version = state.project_version ;
          model_contact_map = state.project_contact_map ;
        })
     state
@@ -105,6 +119,8 @@ let sync () : unit Api.result Lwt.t =
        ~ok:(fun (project_parse : Api_types_j.project_parse) ->
            let () =
              set_state { (React.S.value state) with
+                         project_version =
+                           project_parse.Api_types_j.project_parse_project_version;
                          project_contact_map =
                            Some project_parse.Api_types_j.project_parse_contact_map; } in
            Lwt.return (Api_common.result_ok ())))
@@ -155,7 +171,8 @@ let remove_project project_id =
            else state.project_current in
          let () =
            set_state
-             { project_current; project_catalog; project_contact_map = None } in
+             { project_current; project_catalog;
+               project_version = -1; project_contact_map = None } in
          sync ())
     )
   with Not_found ->

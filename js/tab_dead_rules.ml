@@ -15,7 +15,7 @@ let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
 let content () =
-  let state_log , set_state_log = React.S.create ("" : string) in
+  let dead_rules,set_dead_rules = ReactiveData.RList.create [] in
   let _ = React.S.l1
       (fun _ ->
          State_project.with_project
@@ -25,19 +25,20 @@ let content () =
                 >>=
                 (Api_common.result_bind_lwt
                    ~ok:(fun rule_ids ->
-                       let () = set_state_log
-                           (String.concat
-                              ", "
-                              (List.map Ckappa_sig.string_of_rule_id rule_ids)
-                           ) in
+                       let () = ReactiveData.RList.set set_dead_rules
+                           (List.rev_map
+                              (fun x ->
+                                 Html.p [Html.pcdata (Ckappa_sig.string_of_rule_id x)])
+                              rule_ids) in
                        Lwt.return (Api_common.result_ok ()))
                 )
              )
       )
-      (React.S.on tab_is_active None State_file.refresh_file) in
-    [ Html.div
+      (React.S.on tab_is_active
+         State_project.dummy_model State_project.model) in
+    [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
-      [ Tyxml_js.R.Html.pcdata state_log ]
+      dead_rules
     ]
 
 let parent_hide () = set_tab_is_active false
