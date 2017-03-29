@@ -12,7 +12,6 @@ let snapshotFileName = ref "snap"
 let cflowFileName = ref "cflow.dot"
 let branch_and_cut_engine_profilingName = ref "compression_status.txt"
 let tasks_profilingName = ref "profiling.html"
-let influenceFileName = ref ""
 let fluxFileName = ref ""
 let odeFileName  =
   begin
@@ -95,7 +94,6 @@ let set name ext_opt =
 
 let setOutputName () =
   set snapshotFileName (Some "dot");
-  set influenceFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
   set (get_odeFileName Loggers.Octave) (Some "m") ;
   set (get_odeFileName Loggers.Matlab) (Some "m") ;
@@ -116,7 +114,6 @@ let setCheckFileExists ~batchmode outputFile =
         if answer<>"y" && answer<>"Y" && answer<>"yes" &&
            answer<>"YES" && answer<>"Yes" then exit 1 in
   let () = setOutputName () in
-  check !influenceFileName ;
   check !fluxFileName ;
   check !marshalizedOutFile ;
   check outputFile
