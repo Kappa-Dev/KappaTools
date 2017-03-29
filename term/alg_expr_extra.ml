@@ -621,55 +621,53 @@ let fold_over_mix_in_alg_expr f expr accu =
     accu
     l
 
-let fold_over_mixtures_in_alg_exprs f model accu_algs accu_obs accu_rate
-    accu_unary_rate accu_delta_tokens =
+let fold_over_mixtures_in_alg_exprs f model accu =
   let algs_expr = Model.get_algs model in
   let observables = Model.get_obs model in
   (*algs*)
-  let accu_algs =
+  let accu =
     Array.fold_left
       (fun accu (_, mix) ->
-         fold_over_mix_in_alg_expr
-           f
-           mix
-           accu
-      ) accu_algs algs_expr
+           fold_over_mix_in_alg_expr
+             f
+             mix
+             accu
+      ) accu algs_expr
   in
   (*observations*)
-  let accu_obs =
+  let accu =
     Array.fold_left
       (fun accu mix ->
          fold_over_mix_in_alg_expr
            f
            mix
            accu
-      ) accu_obs observables
+      ) accu observables
   in
   (*rules*)
   let rules = Model.get_rules model in
   (*rate*)
-  let accu_rate, accu_unary_rate, accu_delta_tokens =
-    Array.fold_left (fun (accu_rate, accu_unary_rate, accu_delta_tokens)
-                      elementary_rule ->
+  let accu =
+    Array.fold_left (fun accu elementary_rule ->
         let rate = elementary_rule.Primitives.rate in
-        let accu_rate =
-          fold_over_mix_in_alg_expr f rate accu_rate
+        let accu =
+          fold_over_mix_in_alg_expr f rate accu
         in
         (*unary_rate*)
         let unary_rate = elementary_rule.Primitives.unary_rate in
-        let accu_unary_rate =
+        let accu =
           match unary_rate with
-          | None -> accu_unary_rate
+          | None -> accu
           | Some (expr, _) ->
-            fold_over_mix_in_alg_expr f expr accu_unary_rate
+            fold_over_mix_in_alg_expr f expr accu
         in
         let delta_tokens = elementary_rule.Primitives.delta_tokens in
-        let accu_delta_tokens =
-          List.fold_left (fun accu_delta_tokens (expr, _) ->
-              fold_over_mix_in_alg_expr f expr accu_delta_tokens
-            ) accu_delta_tokens delta_tokens
+        let accu =
+          List.fold_left (fun accu (expr, _) ->
+              fold_over_mix_in_alg_expr f expr accu
+            ) accu delta_tokens
         in
-        accu_rate, accu_unary_rate, accu_delta_tokens
-      ) (accu_rate, accu_unary_rate, accu_delta_tokens) rules
+        accu
+      ) accu rules
   in
-  accu_algs, accu_obs, accu_rate, accu_unary_rate, accu_delta_tokens
+  accu
