@@ -10,11 +10,11 @@ type t = {
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Locality.annot) NamedDecls.t;
-  observables : Alg_expr.t Locality.annot array; (*todo*)
+  observables : Alg_expr.t Locality.annot array;
   ast_rules :
     (string Locality.annot option * LKappa.rule Locality.annot)
       array;
-  rules : Primitives.elementary_rule array; (*todo*)
+  rules : Primitives.elementary_rule array;
   cc_of_unaries : Pattern.Set.t;
   perturbations : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
@@ -37,7 +37,7 @@ let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
 
 let domain env = env.domain
 let get_obs env = env.observables
-let get_rules env = env.rules 
+let get_rules env = env.rules
 
 let new_domain domain env = {env with domain}
 let signatures env = Pattern.Env.signatures env.domain
@@ -50,7 +50,6 @@ let num_of_agent nme env = Signature.num_of_agent nme (signatures env)
 let fold_rules f x env =
   Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
 
-
 let fold_perturbations f x env =
   Tools.array_fold_lefti (fun i x p -> f i x p) x env.perturbations
 
@@ -59,7 +58,6 @@ let get_rule env i = env.rules.(i)
 let get_ast_rule env i =
   fst (snd (env.ast_rules.(i-1)))
 
-  (*fold ast_rules*)
   let fold_ast_rules f x env =
     Tools.array_fold_lefti (fun i x (_, _rule) ->
         let lkappa_rule = get_ast_rule env i in
