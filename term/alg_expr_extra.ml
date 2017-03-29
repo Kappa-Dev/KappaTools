@@ -649,12 +649,12 @@ let fold_over_mixtures_in_alg_exprs f model accu =
   (*rate*)
   let accu =
     Array.fold_left (fun accu elementary_rule ->
-        let rate = Primitives.get_rate elementary_rule in
+        let rate = elementary_rule.Primitives.rate in
         let accu =
           fold_over_mix_in_alg_expr f rate accu
         in
         (*unary_rate*)
-        let unary_rate = Primitives.get_unary_rate elementary_rule in
+        let unary_rate = elementary_rule.Primitives.unary_rate in
         let accu =
           match unary_rate with
           | None -> accu
@@ -662,7 +662,7 @@ let fold_over_mixtures_in_alg_exprs f model accu =
             fold_over_mix_in_alg_expr f expr accu
         in
         (*delta tokens*)
-        let delta_tokens = Primitives.get_delta_tokens elementary_rule in
+        let delta_tokens = elementary_rule.Primitives.delta_tokens in
         let accu =
           List.fold_left (fun accu (expr, _) ->
               fold_over_mix_in_alg_expr f expr accu

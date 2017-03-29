@@ -50,11 +50,6 @@ type elementary_rule = {
       concretize *)
 }
 
-val get_rate : elementary_rule -> Alg_expr.t Locality.annot
-val get_unary_rate :
-  elementary_rule -> (Alg_expr.t Locality.annot * Alg_expr.t option) option
-val get_delta_tokens : elementary_rule -> (Alg_expr.t Locality.annot * int) list
-
 val rule_to_yojson : elementary_rule -> Yojson.Basic.json
 
 val rule_of_yojson : Yojson.Basic.json -> elementary_rule

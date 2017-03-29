@@ -161,10 +161,6 @@ type elementary_rule = {
   instantiations : Instantiation.abstract Instantiation.event;
 }
 
-let get_rate r = r.rate
-let get_unary_rate r = r.unary_rate
-let get_delta_tokens r = r.delta_tokens
-
 let rule_to_yojson r =
   let alg_expr_to_json =
     Alg_expr.e_to_yojson
