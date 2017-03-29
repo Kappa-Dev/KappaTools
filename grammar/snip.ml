@@ -550,7 +550,7 @@ let rec complete_with_creation
           match ag.Raw_mixture.a_ports.(site_id) with
           | Raw_mixture.FREE ->
             Primitives.Transformation.Freed (place,site_id)::added',
-            (Instantiation.Free (place,site_id) :: actions),
+            (Instantiation.Free (place,site_id) :: actions'),
             l_t
           | Raw_mixture.VAL i ->
             match Mods.IntMap.pop i l_t with
@@ -569,7 +569,7 @@ let rec complete_with_creation
                 | None -> () in
               Primitives.Transformation.Linked((place,site_id),dst)::added',
               (Instantiation.Bind_to((place,site_id),dst)
-               ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
+               ::(Instantiation.Bind_to((dst,(place,site_id))))::actions'),
               l_t'
             | None,l_t ->
               let l_t' = Mods.IntMap.add i ((place,site_id),None) l_t in
