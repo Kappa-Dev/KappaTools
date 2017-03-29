@@ -68,7 +68,8 @@ let elementary_rule ?env f r =
         sigs r.Primitives.inserted
   in
   Format.fprintf
-    f "@[@[%a%t%a@]%t@[%a@]@]@ -- @[%a@]@ ++ @[@[%a%a@]@]@ @@%a%t"
+    f "(ast: %i)@ @[@[%a%t%a@]%t@[%a@]@]@ -- @[%a@]@ ++ @[%a%a@]@ @@%a%t"
+    r.Primitives.syntactic_rule
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (if r.Primitives.connected_components <> [||] && ins_fresh <> []
      then Pp.comma else Pp.empty)
