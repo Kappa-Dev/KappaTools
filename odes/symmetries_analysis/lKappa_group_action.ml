@@ -618,6 +618,9 @@ let fold_over_elt_transformation
     (*acc*)
     (init: 'a) : 'a =
   (*position is a list of agent*)
+  (* DO simple *)
+  (* You want to fold a function over a first list, then over a second list *)
+  (* No need to compute the list of positions *)
   let positions =
     let rec aux pos_id rule_tail accu =
       if is_empty rule_tail
@@ -648,6 +651,8 @@ let fold_over_elt_transformation
       (*partitition of symmetries for internal states*)
       (*TODO*)
       let accu =
+        (* Folding over an empty list does not change your accumulator *)
+        (* This test is redondant *)
         if symmetries_over_internal_states <> []
         then
           List.fold_left (fun accu l ->
