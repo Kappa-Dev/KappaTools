@@ -32,12 +32,7 @@ type symmetries =
   {
     rules: equivalence_classes;
     rules_and_initial_states: equivalence_classes option;
-    rules_and_alg_expr:
-      equivalence_classes option
-      (*
-      (equivalence_classes option * equivalence_classes option *
-       equivalence_classes option * equivalence_classes option *
-       equivalence_classes option)*)
+    rules_and_alg_expr: equivalence_classes option
   }
 
 type reduction =
@@ -826,6 +821,7 @@ let detect_symmetries parameters env cache
   }
 
 (******************************************************)
+(*pattern*)
 
 module Cc =
 struct
@@ -851,10 +847,12 @@ type class_description =
   }
 
 let dummy_class cc =
-  {species_weight = 1;
-   class_representative = cc ;
-   class_cardinal = 1;
-   class_weight =1 }
+  {
+    species_weight = 1;
+    class_representative = cc ;
+    class_cardinal = 1;
+    class_weight =1
+  }
 
 type bwd_map = class_description CcMap.t
 
@@ -918,7 +916,6 @@ let print_symmetries parameters env symmetries =
       ()
   in ()
 
-
 let add_equiv_class reduction bwd_map cc =
   (* TO DO *)
   let l =
@@ -952,7 +949,6 @@ let fold_bwd_map f bwd_map accu =
     bwd_map accu
 
 let bwd_interpretation ?parameters bwd_map reduction cc =
-  match reduction
-  with
+  match reduction with
   | Ground | Forward _ -> Some (dummy_class cc)
   | Backward _ ->  CcMap.find_option cc bwd_map
