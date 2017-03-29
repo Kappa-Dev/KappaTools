@@ -558,7 +558,6 @@ let is_invariant_internal_states_permutation
   | [] -> cache, true
   | _::_ -> cache, false
 
-
 let check_gen swap agent_type site1 site2 agent rule cache =
   let cache, hash = LKappa_auto.cannonic_form cache rule in
   let i = LKappa_auto.RuleCache.int_of_hashed_list hash in
@@ -578,8 +577,7 @@ let check_gen swap agent_type site1 site2 agent rule cache =
 
 let is_invariant_binding_states_permutation
     ?parameters ?env ~agent_type ~site1 ~site2
-    rule cache
-  =
+    rule cache =
   check_invariance
     ?parameters ?env
     (potential_positions_for_swapping_binding_states,
@@ -593,8 +591,7 @@ let is_invariant_binding_states_permutation
 
 let is_invariant_full_states_permutation
     ?parameters ?env ~agent_type ~site1 ~site2
-    rule cache
-  =
+    rule cache =
   let cache, b1 =
     is_invariant_internal_states_permutation
       ?parameters ?env ~agent_type ~site1 ~site2
@@ -606,3 +603,74 @@ let is_invariant_full_states_permutation
     rule cache
   else
     cache, false
+
+(******************************************************************)
+(*fold over each element transformation*)
+
+let fold_over_elt_transformation
+    (sigma: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_raw: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_raw_inv : int -> int -> int -> LKappa.rule_agent -> unit)
+    (symmetries: int Symmetries_sig.site_partition)
+    (rule: LKappa.rule)
+    (f:LKappa.rule -> 'a -> 'a)
+    (*acc*)
+    (init: 'a) : 'a =
+  (*position is a list of agent*)
+  let positions =
+    let rec aux pos_id rule_tail accu =
+      if is_empty rule_tail
+      then List.rev accu
+      else
+        aux (pos_id + 1) rule_tail (pos_id :: accu)
+    in
+    aux 0 (of_rule rule) []
+  in
+  (*let n = List.length positions in*)
+  let rec next agent_id rule_tail pos_id position_tail accu =
+    match position_tail with
+    | [] -> f rule accu
+    | pos_head :: _ when agent_id < pos_head ->
+      (*let rule_tail = _ in*)
+      next (agent_id + 1) rule_tail pos_id position_tail accu
+    | pos_head :: pos_tail when agent_id = pos_head ->
+      (*partition of each symmetries equivalence_class: int list list*)
+      let symmetries_over_internal_states =
+        symmetries.Symmetries_sig.over_internal_states
+      in
+      let symmetries_over_binding_states =
+        symmetries.Symmetries_sig.over_binding_states
+      in
+      let symmetries_over_full_states =
+        symmetries.Symmetries_sig.over_full_states
+      in
+      (*partitition of symmetries for internal states*)
+      (*TODO*)
+      let accu =
+        if symmetries_over_internal_states <> []
+        then
+          List.fold_left (fun accu l ->
+              let rec aux to_do result =
+                match to_do with
+                | [] -> result
+                | h :: tail ->
+
+                  aux tail result
+              in
+              aux l accu
+            ) accu symmetries_over_internal_states
+        else accu
+      in
+      accu
+    | _ :: _ ->
+      (*when agent_id > pos_head*)
+      let s1, i1, i2, i3 = __POS__ in
+      let () =
+        Format.fprintf Format.err_formatter
+          "Internal bug: %s %i %i %i" s1 i1 i2 i3
+      in
+      (*TODO: backtrack?*)
+      accu
+  in
+  next 0 (of_rule rule) 0 positions init
