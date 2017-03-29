@@ -124,29 +124,14 @@ object
       Lwt.return
         (Api_common.result_error_msg ~result_code:`CONFLICT message)
     else
-      (Kappa_facade.parse
-        ~system_process:system_process
-        ~kappa_files:[])
-      >>=
-      (Result_data.map
-         ~ok:((fun (t : Kappa_facade.t) ->
-             let project =
-               environment#create_project
-                 project_id
-                 (Result_data.ok t)
-             in
-             let () =
-               Api_common.ProjectCollection.update
-                 environment
-                 (project::(Api_common.ProjectCollection.list environment))
-             in
-             Lwt.return (Api_common.result_ok project_id) :
-               Kappa_facade.t ->
-             Api_types_j.project_id Api.result Lwt.t))
-         ~error:((fun errors -> Lwt.return (Api_common.result_messages errors)) :
-                   Api_types_t.message list ->
-                   Api_types_j.project_id Api.result Lwt.t)
-      )
+      let project =
+        environment#create_project project_id in
+      let () =
+        Api_common.ProjectCollection.update
+          environment
+          (project::(Api_common.ProjectCollection.list environment))
+      in
+      Lwt.return (Api_common.result_ok project_id)
 
   method project_delete (project_id : Api_types_j.project_id) :
     unit Api.result Lwt.t =

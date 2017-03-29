@@ -9,5 +9,5 @@ class manager
     inherit Manager_environment.manager_environment environment system_process
     inherit Manager_project.manager_project environment system_process
     inherit Manager_simulation.manager_simulation environment system_process
-    inherit Manager_file. manager_file environment system_process
+    inherit Manager_file. manager_file environment
   end;;

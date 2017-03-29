@@ -17,8 +17,7 @@ class simulation
   end
 
 class project
-    (project_id : Api_types_j.project_id)
-    (state : Api_environment.parse_state) :
+    (project_id : Api_types_j.project_id) :
   Api_environment.project =
   object
     val mutable _simulations = []
@@ -43,13 +42,13 @@ class project
     method get_files () = _files
     method set_files (files : Api_types_j.file list) =
       let () = _files <- files in
+      let () = _version <- 1 + _version in
       let () = Lwt.cancel _state in
       let () = _state <- Lwt.return_none in
       _version
 
     method set_state (state : Api_environment.parse_state Lwt.t)
       : Api_types_j.project_version =
-      let () = _version <- 1 + _version in
       let () = _state <- (state >>= fun x -> Lwt.return (Some x)) in
       _version
     method get_state () : Api_environment.parse_state option Lwt.t =
@@ -64,6 +63,5 @@ class environment () : Api_environment.environment =
     method set_projects (projects : Api_environment.project list) =
       _projects <- projects
     method create_project
-        (project_id : Api_types_j.project_id)
-        (state : Api_environment.parse_state) = new project project_id state
+        (project_id : Api_types_j.project_id) = new project project_id
   end;;

@@ -1,6 +1,7 @@
 (* data structures *)
 (* Manager state *)
 type parse_state = (Kappa_facade.t,Api_types_j.errors) Result_data.t
+
 class type simulation =
   object
     method get_simulation_id : unit -> Api_types_j.simulation_id
@@ -37,5 +38,5 @@ class type environment =
   object
     method get_projects : unit -> project list
     method set_projects : project list -> unit
-    method create_project : Api_types_j.project_id -> parse_state -> project
+    method create_project : Api_types_j.project_id -> project
   end

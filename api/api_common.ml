@@ -118,14 +118,6 @@ let rec result_combine : unit Api.result list -> unit Api.result =
 
 let md5sum text = Digest.to_hex (Digest.string text)
 
-let project_kappa_code project : string =
-  String.concat ""
-    (List.map
-       (fun file -> file.Api_types_j.file_content)
-       (List.sort
-          (fun l r -> compare l.Api_types_j.file_metadata.Api_types_j.file_metadata_position
-              r.Api_types_j.file_metadata.Api_types_j.file_metadata_position) project#get_files))
-
 (* functor to deal with collections *)
 module type COLLECTION_TYPE = sig
   type id
@@ -133,7 +125,6 @@ module type COLLECTION_TYPE = sig
   type item
   val label : string
   val list : collection -> item list
-  val update : collection -> item list -> unit
   val identifier : item -> id
   val id_to_string : id -> string
 end
@@ -183,11 +174,7 @@ struct
 
 end;;
 
-module ProjectCollection : COLLECTION_TYPE
-  with type id = Api_types_j.project_id
-  and type collection = Api_environment.environment
-  and type item = Api_environment.project
-=
+module ProjectCollection =
 struct
   type id = Api_types_j.project_id
   type collection = Api_environment.environment
@@ -208,11 +195,7 @@ end;;
 
 module ProjectOperations = CollectionOperations(ProjectCollection)
 
-module SimulationCollection : COLLECTION_TYPE
-  with type id = Api_types_j.simulation_id
-  and type collection = Api_environment.project
-  and type item = Api_environment.simulation
-=
+module SimulationCollection =
 struct
   type id = Api_types_j.simulation_id
   type collection = Api_environment.project
@@ -246,13 +229,6 @@ struct
   let list
       (project : Api_environment.project) =
     project#get_files ()
-  let update
-      (project : Api_environment.project)
-      (files : Api_types_j.file list) : unit =
-    (* WARNING : DONT CALL THIS IT WILL SKEW THE VERSIONING
-       SEE : file_manager.update_file
-    *)
-    ignore(project#set_files files)
   let identifier (file : Api_types_j.file) =
     file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
   let id_to_string (file_id : Api_types_j.file_id) : string =

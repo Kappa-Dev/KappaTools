@@ -1,4 +1,6 @@
-let get_file_id (file : Api_types_j.file) = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
+let get_file_id (file : Api_types_j.file) =
+  file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
+
 let patch_file
     (file_patch : Api_types_j.file_patch)
     (content : string) : string =
@@ -91,8 +93,30 @@ let update_file
   ()
 
 let update_text project new_files handler =
-  let version : Api_types_j.project_version = project#set_files new_files in
+  let sorted_files = List.sort
+      (fun x y -> Mods.int_compare
+          x.Api_types_t.file_metadata.Api_types_t.file_metadata_position
+          y.Api_types_t.file_metadata.Api_types_t.file_metadata_position)
+      new_files in
+  let version : Api_types_j.project_version = project#set_files sorted_files in
    handler version
+
+let excavate file_id file_list =
+  let rec aux decr = function
+    | [] -> []
+    | t :: q when get_file_id t = file_id -> aux true q
+    | t :: q ->
+      (if decr then {
+          Api_types_t.file_content = t.Api_types_t.file_content;
+          Api_types_t.file_metadata = {
+            t.Api_types_t.file_metadata with
+            Api_types_t.file_metadata_position =
+              pred
+                t.Api_types_t.file_metadata.Api_types_t.file_metadata_position
+          };
+        }
+       else t)::aux decr q in
+  aux false file_list
 
 type file_index = { file_index_file_id : Api_types_j.file_id ;
                     file_index_line_offset : int ;
@@ -103,7 +127,6 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 
 class manager_file
     (environment : Api_environment.environment)
-    (system_process : Kappa_facade.system_process)
   : [Api_types_j.project_parse] Api.manager_file =
   object
     method file_catalog
@@ -136,7 +159,7 @@ class manager_file
              let message : string =
                Format.sprintf
                  "file id %s exists"
-	         (Api_common.FileCollection.identifier file)
+                 (Api_common.FileCollection.identifier file)
              in
              Lwt.return
                (Api_common.result_error_msg
@@ -154,7 +177,7 @@ class manager_file
                project
                (file::file_list)
                (fun
-                 (project_version : Api_types_j.project_version) ->
+                 (_project_version : Api_types_j.project_version) ->
                  Lwt.return
                    (Api_common.result_ok
                       file.Api_types_j.file_metadata)
@@ -190,7 +213,7 @@ class manager_file
             project
             file_list
             (fun
-              (project_version : Api_types_j.project_version) ->
+              (_project_version : Api_types_j.project_version) ->
               Lwt.return
                 (Api_common.result_ok file.Api_types_j.file_metadata
                 )
@@ -206,15 +229,12 @@ class manager_file
         project_id
         file_id
         (fun (project : Api_environment.project) _ ->
-           let file_list : Api_types_j.file list = (project#get_files ()) in
-           let file_ne : Api_types_j.file -> bool =
-             fun file -> (get_file_id file) <> file_id in
-           let updated_directory = List.filter file_ne file_list in
+           let updated_directory = excavate file_id (project#get_files ()) in
            update_text
              project
              updated_directory
              (fun
-               (project_version : Api_types_j.project_version) ->
+               (_project_version : Api_types_j.project_version) ->
                Lwt.return (Api_common.result_ok ())
              )
         )

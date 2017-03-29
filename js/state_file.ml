@@ -156,12 +156,12 @@ let file_patch
 
 
 
-let new_file filename content : Api_types_t.file =
+let new_file ~position filename content : Api_types_t.file =
   let client_id = State_settings.get_client_id () in
   let file_metadata = { Api_types_j.file_metadata_compile = true ;
                         Api_types_j.file_metadata_hash = None ;
                         Api_types_j.file_metadata_id = filename ;
-                        Api_types_j.file_metadata_position = 0 ;
+                        Api_types_j.file_metadata_position = position ;
                         Api_types_j.file_metadata_version =
                           File_version.create client_id ;
                     }
@@ -187,7 +187,11 @@ let create_file
                    catalog.Api_types_j.file_metadata_list in
                (match matching_file with
                 | [] ->
-                  manager#file_create project_id (new_file filename content)
+                  manager#file_create project_id
+                    (new_file
+                       ~position:(List.length
+                                    catalog.Api_types_j.file_metadata_list)
+                       filename content)
                 | metadata::_ ->
                   let file_modification : Api_types_t.file_modification =
                     file_patch

@@ -203,8 +203,7 @@ let rec compile_file
                 (Lwt.return r)
             )
          )
-      )>>=
-      (fun result -> (yield ()) >>= (fun _ -> Lwt.return result))
+      )
 
 let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
@@ -316,14 +315,15 @@ let parse
   =
 
   let kappa_files =
-    List.map
-      (fun f ->
-         { file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
-           file_content = f.Api_types_t.file_content })
-      (List.filter
-         (fun f -> f.Api_types_t.file_metadata.Api_types_t.file_metadata_compile)
-         kappa_files)
-  in
+    List.fold_left
+      (fun acc f ->
+         if f.Api_types_t.file_metadata.Api_types_t.file_metadata_compile
+         then {
+           file_id = f.Api_types_t.file_metadata.Api_types_t.file_metadata_id ;
+           file_content = f.Api_types_t.file_content
+         }::acc
+         else acc)
+         [] kappa_files in
   Lwt.bind
     (build_ast
        kappa_files system_process#yield)

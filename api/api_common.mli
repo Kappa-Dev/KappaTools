@@ -27,8 +27,6 @@ val result_fold_lwt :
   'value list -> ('a_ok, 'a_code) Api_types_j.result Lwt.t
 val result_combine : unit Api.result list -> unit Api.result
 val md5sum : string -> string
-val project_kappa_code :
-  < get_files : Api_types_j.file list; .. > -> string
 module type COLLECTION_TYPE =
 sig
   type id
@@ -36,7 +34,6 @@ sig
   type item
   val label : string
   val list : collection -> item list
-  val update : collection -> item list -> unit
   val identifier : item -> id
   val id_to_string : id -> string
 end
@@ -118,7 +115,6 @@ sig
   type item = Api_types_j.file
   val label : string
   val list : collection -> item list
-  val update : collection -> item list -> unit
   val identifier : item -> id
   val id_to_string : id -> string
 end
