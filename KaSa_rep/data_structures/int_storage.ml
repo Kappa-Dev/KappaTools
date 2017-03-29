@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <Dec 06 2016>
+   * Last modification: Time-stamp: <Mar 29 2017>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -74,7 +74,7 @@ module Int_storage_imperatif =
       in aux size []
 
     let rec create parameters error size  =
-      if size < 0
+      if size < -1
       then
         let error,array = create parameters error 0 in
         invalid_arg parameters error __POS__ Exit array
@@ -100,14 +100,14 @@ module Int_storage_imperatif =
     let set parameters error key value array =
       if key>array.size || key<0
       then
-        let () = Printf.fprintf stdout "%i %i" key array.size in 
+        let () = Printf.fprintf stdout "%i %i" key array.size in
         invalid_arg parameters error __POS__ Exit array
       else
         let _ = array.array.(key)<-Some value in
         error, array
 
     let rec init parameters error size f =
-      if size < 0
+      if size < -1
       then
         let error,array = init parameters error 0 f in
         invalid_arg parameters error __POS__ Exit array
