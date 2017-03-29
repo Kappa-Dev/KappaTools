@@ -74,7 +74,7 @@ module Int_storage_imperatif =
       in aux size []
 
     let rec create parameters error size  =
-      if size < -1
+      if size < 0
       then
         let error,array = create parameters error 0 in
         invalid_arg parameters error __POS__ Exit array
@@ -107,9 +107,9 @@ module Int_storage_imperatif =
         error, array
 
     let rec init parameters error size f =
-      if size < -1
+      if size < 0
       then
-        let error,array = init parameters error 0 f in
+        let error, array = create parameters error 0 in
         invalid_arg parameters error __POS__ Exit array
       else
         let error, array = create parameters error size in

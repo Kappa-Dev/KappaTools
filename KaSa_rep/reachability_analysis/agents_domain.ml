@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Mar 29 2017>
    *
    * Abstract domain to record live rules
    *
@@ -272,9 +272,15 @@ struct
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nagents = Ckappa_sig.int_of_agent_name (Handler.nagents parameters error kappa_handler) - 1 in
     let error, init_seen_agents_array =
-      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init
-        parameters error nagents
-        (fun _ error _ -> error, false) in
+      if nagents < 0
+      then
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
+          parameters error 0
+      else
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.init
+          parameters error nagents
+          (fun _ error _ -> error, false)
+    in
     let init_global_dynamic_information =
       {
         global = dynamic;

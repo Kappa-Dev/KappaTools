@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Mar 29 2017>
    *
    * Abstract domain to record live rules
    *
@@ -116,9 +116,14 @@ struct
     let parameters = Analyzer_headers.get_parameter static in
     let nrules = Handler.nrules parameters error kappa_handler in
     let error, init_dead_rule_array =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init
-        parameters error (nrules-1)
-        (fun _ error _ -> error, false)
+      if nrules = 0
+      then
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
+          parameters error 0
+      else
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.init
+          parameters error (nrules-1)
+          (fun _ error _ -> error, false)
     in
     let init_global_dynamic_information =
       {
