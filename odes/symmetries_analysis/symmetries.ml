@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 28 2017>
+   * Last modification: Time-stamp: <Mar 29 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -757,12 +757,7 @@ let detect_symmetries parameters env cache
   let refined_partitioned_contact_map_copy =
     Array.copy refined_partitioned_contact_map
   in
-  let (cache, refined_partitioned_contact_map_alg_expr),
-      (cache1, refined_partitioned_contact_map_alg_obs),
-      (cache2, refined_partitioned_contact_map_alg_rate),
-      (cache3, refined_partitioned_contact_map_alg_unary_rate),
-      (cache4, refined_partitioned_contact_map_alg_delta_tokens)
-    =
+  let (cache, refined_partitioned_contact_map_alg_expr) =
     (* ford over all the alg_expr of the model *)
     (* for each such expression refine the partitioned contact map*)
     Alg_expr_extra.fold_over_mixtures_in_alg_exprs
@@ -805,11 +800,7 @@ let detect_symmetries parameters env cache
          cache, refined_partitioned_contact_map_alg_expr
       )
       env
-      (cache, refined_partitioned_contact_map_copy) (*algs*)
-      (cache, refined_partitioned_contact_map_copy) (*observation*)
-      (cache, refined_partitioned_contact_map_copy) (*rate*)
-      (cache, refined_partitioned_contact_map_copy) (*unary_rate*)
-      (cache, refined_partitioned_contact_map_copy) (*delta_tokens*)
+      (cache, refined_partitioned_contact_map_copy)
   in
   let refined_partitioned_contact_map_alg_expr =
     Array.map Symmetries_sig.clean
