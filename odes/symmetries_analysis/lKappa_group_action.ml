@@ -639,10 +639,10 @@ let fold_over_elt_transformation
       let symmetries_over_internal_states =
         symmetries.Symmetries_sig.over_internal_states
       in
-      let symmetries_over_binding_states =
+      let _symmetries_over_binding_states =
         symmetries.Symmetries_sig.over_binding_states
       in
-      let symmetries_over_full_states =
+      let _symmetries_over_full_states =
         symmetries.Symmetries_sig.over_full_states
       in
       (*partitition of symmetries for internal states*)
