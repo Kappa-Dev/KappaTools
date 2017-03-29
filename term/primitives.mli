@@ -37,12 +37,12 @@ sig
 end
 
 type elementary_rule = {
-  rate : Alg_expr.t Locality.annot; (*todo*)
+  rate : Alg_expr.t Locality.annot;
   unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  delta_tokens : (Alg_expr.t Locality.annot * int) list; (*todo*)
+  delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;

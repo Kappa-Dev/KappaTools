@@ -661,6 +661,7 @@ let fold_over_mixtures_in_alg_exprs f model accu =
           | Some (expr, _) ->
             fold_over_mix_in_alg_expr f expr accu
         in
+        (*delta tokens*)
         let delta_tokens = Primitives.get_delta_tokens elementary_rule in
         let accu =
           List.fold_left (fun accu (expr, _) ->
