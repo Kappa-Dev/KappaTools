@@ -79,7 +79,7 @@ let swap_binding_state_regular ag_type site1 site2 ag =
   let () = ag.LKappa.ra_ports.(site2) <- tmp in
   ()
 
-let swap_internal_state_regular ag_type site1 site2 ag =
+let swap_internal_state_regular ag_type site1 site2 (ag:LKappa.rule_agent) =
   let tmp = ag.LKappa.ra_ints.(site1) in
   let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
   let () = ag.LKappa.ra_ints.(site2) <- tmp in
@@ -182,7 +182,7 @@ let filter_positions p p_raw rule =
   aux 0 (of_rule rule) []
 
 let potential_positions_for_swapping_internal_states
-    agent_type site1 site2 rule =
+    agent_type site1 site2 rule : int list =
   filter_positions
     (may_swap_internal_state_regular agent_type site1 site2)
     (may_swap_internal_state_created agent_type site1 site2)
@@ -280,8 +280,8 @@ let for_all_over_orbit
     (sigma_raw:Raw_mixture.agent -> unit)
     (sigma_raw_inv:Raw_mixture.agent -> unit)
     (f: LKappa.rule -> 'a -> 'a * bool)
-      (rule:LKappa.rule)
-      (init:'a)  =
+    (rule:LKappa.rule)
+    (init:'a) : 'a * bool =
     let n = List.length positions in
     let counter = Array.make n false in
     let rec next agent_id rule_tail pos_id positions_tail accu =
@@ -348,11 +348,14 @@ let do_print parameters env f =
   end
 | None, _ | _, None -> ()
 
+(*
+get_positions: (int -> int -> int -> LKappa.rule -> int list)
+*)
 let check_orbit
     ?parameters ?env
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
-    to_be_checked =
+    to_be_checked : (LKappa_auto.cache * int array * bool array) * bool =
   let () =
     do_print parameters env
       (fun sigs logger fmt ->
@@ -488,7 +491,8 @@ let check_orbit
   else
     (cache, counter, to_be_checked), false
 
-let weight ~correct ~card_stabilizer ~rate =
+let weight ~correct ~card_stabilizer ~rate :
+  ('a, 'b) Alg_expr_extra.corrected_rate_const option =
   Alg_expr_extra.get_corrected_rate
     (Alg_expr_extra.divide_expr_by_int
        rate

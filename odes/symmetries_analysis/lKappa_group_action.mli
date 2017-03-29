@@ -13,53 +13,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-val swap_internal_state_regular :
-  int -> int -> int -> LKappa.rule_agent -> unit
-
-val potential_positions_for_swapping_internal_states :
-  int -> int -> int -> LKappa.rule -> int list
-
-val weight :
-  correct:int ->
-  card_stabilizer:int ->
-  rate:('a, 'b) Alg_expr.e Locality.annot ->
-  ('a, 'b) Alg_expr_extra.corrected_rate_const option
-
-val for_all_over_orbit :
-  int list -> (*potential positions*)
-  (LKappa.rule_agent -> unit) -> (*swap state regular*)
-  (LKappa.rule_agent -> unit) -> (*inverse of state regular*)
-  (Raw_mixture.agent -> unit) -> (*swap state created*)
-  (Raw_mixture.agent -> unit) -> (*inverse of state created*)
-  (LKappa.rule -> 'a -> 'a * bool) -> (*f*)
-  LKappa.rule ->
-  'a ->  (*init*)
-  'a * bool
-
-val check_orbit :
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
-  (int -> int -> int -> LKappa.rule -> int list) * (*positions*)
-  (int -> int -> int -> LKappa.rule_agent -> unit) * (*sigma*)
-  (int -> int -> int -> LKappa.rule_agent -> unit) * (*sigma_inv*)
-  (int -> int -> int -> Raw_mixture.agent -> unit) * (*sigma_raw*)
-  (int -> int -> int -> Raw_mixture.agent -> unit) -> (*sigma_raw_inv*)
-  (correct:'a ->
-   card_stabilizer:int ->
-   rate:'b -> ('c, 'd) Alg_expr_extra.corrected_rate_const option) -> (*weight*)
-  int -> (*agent*)
-  int -> (*site1*)
-  int -> (*site2*)
-  LKappa.rule ->
-  'a array -> (*correct*)
-  'b Rule_modes.RuleModeMap.t array -> (*rate*)
-  LKappa_auto.cache ->
-  int array -> (*counter*)
-  bool array ->  (*to be checked*)
-  (*cache * counter * to_be_checked*)
-  (LKappa_auto.cache * int array * bool array) * bool
-
-
 (** check_orbit_internal_state_permutation ~agent_type ~site1 ~site2 rule
     ~correct rates cache ~counter to_be_checked
     will visit the orbit of rule when swapping the internal states of site1 and site2 in agents of type agent_type;
