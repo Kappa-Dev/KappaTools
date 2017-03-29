@@ -32,6 +32,8 @@ struct
   (* array that indicates whether an agent type is already discovered, or
      not: from the beginning everything will be set to false*)
 
+  (* This array is statically allocated *)
+  (* Why do you use extensive arrays ? *)
   type local_dynamic_information =
     bool Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t
 

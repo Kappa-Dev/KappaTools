@@ -30,6 +30,8 @@ struct
   (*--------------------------------------------------------------------*)
   (* this array indicates whether a rule has already be applied, or not *)
 
+(* This array is statically allocated *)
+(* Why do you use extensive arrays ? *)
   type local_dynamic_information =
     bool Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
 
