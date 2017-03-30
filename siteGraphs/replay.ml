@@ -1,15 +1,20 @@
-(* This file is part of ReConKa
-   Copyright 2017 Harvard Medical School
-
-   ReConKa is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 3 as
-   published by the Free Software Foundation. *)
+(******************************************************************************)
+(*  _  __ * The Kappa Language                                                *)
+(* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
+(* | ' /  *********************************************************************)
+(* | . \  * This file is distributed under the terms of the                   *)
+(* |_|\_\ * GNU Lesser General Public License Version 3                       *)
+(******************************************************************************)
 
 type state = {
   graph : Edges.t;
   time : float;
   event : int;
   connected_components : Agent.SetMap.Set.t Mods.IntMap.t option;
+}
+
+type summary = {
+  unary_distances : (int * int) option
 }
 
 let init_state ~with_connected_components = {
@@ -160,9 +165,10 @@ let store_distances r graph = function
     | Some path -> Some (r,List.length path)
 
 let do_step sigs state = function
-  | Trace.Subs _ -> state,None
+  | Trace.Subs _ -> state,{ unary_distances = None }
   | Trace.Rule (kind,event,info) ->
-    let dist = store_distances kind state.graph event.Instantiation.tests in
+    let unary_distances =
+      store_distances kind state.graph event.Instantiation.tests in
     let pregraph,connected_components =
         List.fold_left
            (do_action sigs) (state.graph,state.connected_components)
@@ -175,7 +181,7 @@ let do_step sigs state = function
       graph; connected_components;
       time = info.Trace.Simulation_info.story_time;
       event = info.Trace.Simulation_info.story_event;
-    },dist
+    },{unary_distances}
   | Trace.Pert (_,event,info) ->
     let pregraph,connected_components =
         List.fold_left
@@ -189,18 +195,18 @@ let do_step sigs state = function
       graph; connected_components;
       time = info.Trace.Simulation_info.story_time;
       event = info.Trace.Simulation_info.story_event;
-    },None
+    },{ unary_distances = None }
   | Trace.Init actions ->
     let graph,connected_components =
       List.fold_left
         (do_action sigs) (state.graph, state.connected_components) actions in
     { graph; connected_components; time = state.time; event = state.event; },
-    None
+    { unary_distances = None }
   | Trace.Obs (_,_,info) ->
     {
       graph = state.graph;
       time = info.Trace.Simulation_info.story_time;
       event = info.Trace.Simulation_info.story_event;
       connected_components = state.connected_components;
-    },None
-  | Trace.Dummy _ -> state,None
+    },{ unary_distances = None }
+  | Trace.Dummy _ -> state,{ unary_distances = None }

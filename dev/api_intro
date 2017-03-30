@@ -21,7 +21,7 @@ In grammar/ are the parser and the compilers
 
 The module to store and manipulate the state of the simulation are in
 siteGraph/
-{!modules: Edges Navigation}
+{!modules: Edges Navigation Replay}
 
 The simulation engine is in simulation/
 The core of the interpreter
