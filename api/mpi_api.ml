@@ -215,8 +215,7 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method project_create
-      (project_parameter : Api_types_j.project_parameter) :
-      Api_types_j.project_id Api.result Lwt.t =
+      (project_parameter : Api_types_j.project_parameter) : unit Api.result Lwt.t =
       self#message (`ProjectCreate project_parameter) >>=
       Api_common.result_bind_lwt
         ~ok:(function

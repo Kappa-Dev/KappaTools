@@ -110,7 +110,7 @@ object
 
   method project_create
       (project_parameter : Api_types_j.project_parameter) :
-    Api_types_j.project_id Api.result Lwt.t =
+    unit Api.result Lwt.t =
     let project_id : Api_types_j.project_id =
       project_parameter.Api_types_j.project_parameter_project_id
     in
@@ -131,7 +131,7 @@ object
           environment
           (project::(Api_common.ProjectCollection.list environment))
       in
-      Lwt.return (Api_common.result_ok project_id)
+      Lwt.return (Api_common.result_ok ())
 
   method project_delete (project_id : Api_types_j.project_id) :
     unit Api.result Lwt.t =

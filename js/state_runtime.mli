@@ -23,22 +23,25 @@ val spec_id : spec -> string
 (** Read t from a string representation. *)
 val read_spec : string -> spec option
 
+type model = { model_current : spec ; model_runtimes : spec list ; }
+
+val model : model React.signal
+
 (** Given a string specification of t (e.g. read_t or t_id)
     configure the current manager.
 *)
-val create_spec : load:bool -> string -> unit Api.result Lwt.t
+val create_spec : load:bool -> string -> unit Api.result
 (** Create a runtime to be used by the system *)
-val create_manager : spec -> Api.concrete_manager Api.result Lwt.t
+
+val create_manager :
+  Api_types_t.project_id -> Api.concrete_manager Api.result Lwt.t
 (** Get the current manager.  It is assumed that
     when the system is initalized this is set to a
     default, which is currently default web worker
     as it is provides the fastest simulation. *)
 
-type model = { model_current : spec ; model_runtimes : spec list ; }
-(** List available runtimes *)
-val model : model React.signal
-
+val init : unit -> Api_types_t.project list Lwt.t
 (* run on application init *)
-val init : unit -> unit Lwt.t
-(* to synch state of application with runtime *)
+
 val sync : unit -> unit Lwt.t
+(* to synch state of application with runtime *)

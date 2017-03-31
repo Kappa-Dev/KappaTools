@@ -95,7 +95,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | FileCatalog of file_catalog result
                 | FileUpdate of file_metadata result
                 | ProjectCatalog of project_catalog result
-                | ProjectCreate of project_id result
+                | ProjectCreate of unit result
                 | ProjectDelete of unit result
                 | ProjectParse of project_parse result
                 | ProjectDeadRules of string list result

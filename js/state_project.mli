@@ -18,7 +18,7 @@ val model : model React.signal
 val set_project : Api_types_t.project_id -> unit Api.result Lwt.t
 val remove_project : Api_types_t.project_id -> unit Api.result Lwt.t
 (* run on application init *)
-val init : unit -> unit Lwt.t
+val init : Api_types_t.project list -> unit Lwt.t
 (* to synch state of application with runtime *)
 val sync : unit -> unit Api.result Lwt.t
 val with_project : label:string ->

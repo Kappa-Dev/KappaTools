@@ -90,7 +90,7 @@ let route
             >>=
             (manager#project_create) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_project_id ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
          )
      };

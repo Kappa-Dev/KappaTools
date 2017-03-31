@@ -30,8 +30,7 @@ class type manager_project =
     method project_dead_rules :
       Api_types_j.project_id -> string list result Lwt.t
     method project_create :
-      Api_types_j.project_parameter ->
-      Api_types_j.project_id result Lwt.t
+      Api_types_j.project_parameter -> unit result Lwt.t
     method project_delete :
       Api_types_j.project_id ->
       unit result Lwt.t

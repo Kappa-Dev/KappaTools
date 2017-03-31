@@ -45,7 +45,8 @@ let rec init_model_seed (arg : string list) : unit =
 
 let init () : unit Lwt.t =
   let arg_plot_period = Common_state.url_args "plot_period" in
-  let arg_pause_condition = Common_state.url_args ~default:["[T] > 100"] "pause_condition" in
+  let arg_pause_condition =
+    Common_state.url_args ~default:["[T] > 100"] "pause_condition" in
   let arg_model_seed = Common_state.url_args "model_seed" in
   let () = init_plot_period arg_plot_period in
   let () = init_pause_condition arg_pause_condition in

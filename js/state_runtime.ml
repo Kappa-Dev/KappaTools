@@ -116,7 +116,8 @@ let state , set_state =
       state_runtimes = [ WebWorker ; Embedded ; ] ;
     }
 
-let create_manager = function
+let create_manager _project_id =
+  match (React.S.value state).state_current with
   | WebWorker ->
     Lwt.return
       (Api_common.result_ok (new Web_worker_api.manager () :> Api.concrete_manager))
@@ -158,21 +159,17 @@ let create_manager = function
 
 let set_spec runtime =
   let current_state = React.S.value state in
-  (create_manager runtime) >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun _ ->
-         let () = set_state
-             { state_current = runtime;
-               state_runtimes = current_state.state_runtimes } in
-         Lwt.return (Api_common.result_ok ())))
+  set_state
+    { state_current = runtime;
+      state_runtimes = current_state.state_runtimes }
 
-let create_spec ~load (id : string): unit Api.result Lwt.t =
+let create_spec ~load (id : string): unit Api.result =
   match read_spec id with
   | None ->
     let error_msg : string =
       Format.sprintf "Failed to create spec: could not parse identifier %s" id
     in
-    Lwt.return (Api_common.result_error_msg error_msg)
+    Api_common.result_error_msg error_msg
   | Some runtime ->
     let current_state = React.S.value state in
     let () =
@@ -180,8 +177,8 @@ let create_spec ~load (id : string): unit Api.result Lwt.t =
         set_state
           { state_current = current_state.state_current;
             state_runtimes = runtime::current_state.state_runtimes } in
-    if load then set_spec runtime
-    else Lwt.return (Api_common.result_ok ())
+    let () = if load then set_spec runtime in
+    Api_common.result_ok ()
 
 let model : model React.signal =
   React.S.map
@@ -193,16 +190,23 @@ let model : model React.signal =
 let init () =
   (* get url of host *)
   let hosts = Common_state.url_args "host" in
-  let rec add_urls urls load : unit Lwt.t =
+  let rec add_urls urls load =
     match urls with
-    | [] -> Lwt.return_unit
+    | [] -> ()
     | url::urls ->
-      (create_spec ~load url) >>=
-      (function
-        | { Api_types_j.result_data = `Ok (); _ } -> add_urls urls false
-        | { Api_types_j.result_data = `Error _; _ } -> add_urls urls load)
+      match create_spec ~load url with
+      | { Api_types_j.result_data = `Ok (); _ } -> add_urls urls false
+      | { Api_types_j.result_data = `Error _; _ } -> add_urls urls load
   in
-  add_urls hosts true
+  let () = add_urls hosts true in
+  create_manager "" >>=
+  Api_common.result_map
+    ~ok:(fun _ manager ->
+        manager#project_catalog () >>=
+        Api_common.result_map
+          ~ok:(fun _ projects -> Lwt.return projects.Api_types_t.project_list)
+          ~error:(fun _ _ -> Lwt.return_nil))
+    ~error:(fun _ _ -> Lwt.return_nil)
 
 (* to sync state of application with runtime *)
 let sync () = Lwt.return_unit

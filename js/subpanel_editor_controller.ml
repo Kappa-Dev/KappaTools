@@ -1,4 +1,3 @@
-
 (******************************************************************************)
 (*  _  __ * The Kappa Language                                                *)
 (* | |/ / * Copyright 2010-2017 CNRS - Harvard Medical School - INRIA - IRIF  *)
@@ -14,9 +13,9 @@ let set_manager (runtime_id : string) : unit =
     (fun () ->
        State_error.wrap
          __LOC__
-         (State_runtime.create_spec ~load:true runtime_id >>=
-          (fun r -> State_project.sync () >>=
-            fun r' -> Lwt.return (Api_common.result_combine [r; r']))) >>=
+         (let r = State_runtime.create_spec ~load:true runtime_id in
+          State_project.sync () >>=
+            fun r' -> Lwt.return (Api_common.result_combine [r; r'])) >>=
        (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
        (fun _ -> Lwt.return_unit)
     )

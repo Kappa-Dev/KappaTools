@@ -73,7 +73,7 @@ class manager
     | `EnvironmentInfo  () ->
       send
         (Some timeout)
-        ""
+        (Format.sprintf "%s/v2" url)
         `GET
         None
         Mpi_message_j.environment_info_of_string
@@ -138,7 +138,7 @@ class manager
         (Format.sprintf "%s/v2/projects" url)
         `POST
         (Some (Api_types_j.string_of_project_parameter project_parameter))
-        Mpi_message_j.project_id_of_string
+        Api_types_j.unit_t_of_string
         (fun result -> `ProjectCreate result)
     | `ProjectDelete project_id ->
       send
