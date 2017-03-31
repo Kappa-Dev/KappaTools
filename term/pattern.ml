@@ -1181,6 +1181,20 @@ module PreEnv = struct
       domain = domain';
       used_by_a_begin_new = false;
     }
+
+  let debug_print f env =
+    Pp.array
+      Pp.comma
+      (fun ty f l ->
+        Format.fprintf f "%d: %t" ty
+                       (fun f ->
+                         Format.fprintf f "[";
+                         Pp.list
+                           Pp.comma
+                           (fun f a -> Format.fprintf f "%d" a) f l;
+                         Format.fprintf f "]"))
+      f env.id_by_type;
+    Format.fprintf f "used_by_a_begin_new = %B@." (env.used_by_a_begin_new)
 end
 
 (** Operation to create cc *)

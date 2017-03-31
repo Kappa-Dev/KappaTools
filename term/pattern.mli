@@ -82,6 +82,7 @@ module PreEnv : sig
 
   val empty : Signature.s -> t
 
+  val debug_print : Format.formatter -> t -> unit
 end
 
 (** {6 Create a connected component} *)
