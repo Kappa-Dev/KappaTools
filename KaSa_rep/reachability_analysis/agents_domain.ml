@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 29 2017>
+   * Last modification: Time-stamp: <Mar 30 2017>
    *
    * Abstract domain to record live rules
    *

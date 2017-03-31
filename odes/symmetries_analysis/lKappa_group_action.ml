@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 29 2017>
+   * Last modification: Time-stamp: <Mar 31 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -608,29 +608,45 @@ let is_invariant_full_states_permutation
 (*fold over each element transformation*)
 
 let fold_over_elt_transformation
-    (sigma: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_raw: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_raw_inv : int -> int -> int -> LKappa.rule_agent -> unit)
+    (*internal states r_mix*)
+    (sigma_int: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_int_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*internal states r_created*)
+    (sigma_int_raw: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_int_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*--------------------*)
+    (*binding states r_mix*)
+    (sigma_bind: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_bind_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*binding states r_created*)
+    (sigma_bind_raw: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_bibd_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*----------*)
+    (*full r_mix*)
+    (sigma_full: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_full_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*full r_created*)
+    (sigma_full_raw: int -> int -> int -> LKappa.rule_agent -> unit)
+    (sigma_full_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
+    (*----------*)
     (symmetries: int Symmetries_sig.site_partition)
     (rule: LKappa.rule)
     (f:LKappa.rule -> 'a -> 'a)
     (*acc*)
     (init: 'a) : 'a =
   (*position is a list of agent*)
-  (* DO simple *)
-  (* You want to fold a function over a first list, then over a second list *)
-  (* No need to compute the list of positions *)
   let positions =
-    let rec aux pos_id rule_tail accu =
-      if is_empty rule_tail
-      then List.rev accu
-      else
-        aux (pos_id + 1) rule_tail (pos_id :: accu)
-    in
-    aux 0 (of_rule rule) []
+    List.fold_left (fun list rule_agent ->
+        let agent_id = rule_agent.LKappa.ra_type in
+        agent_id :: list
+      ) [] rule.LKappa.r_mix
   in
-  (*let n = List.length positions in*)
+  let positions =
+    List.fold_left (fun list ag ->
+        let agent_id = ag.Raw_mixture.a_type in
+        agent_id :: list
+      ) positions rule.LKappa.r_created
+  in
   let rec next agent_id rule_tail pos_id position_tail accu =
     match position_tail with
     | [] -> f rule accu
@@ -642,30 +658,20 @@ let fold_over_elt_transformation
       let symmetries_over_internal_states =
         symmetries.Symmetries_sig.over_internal_states
       in
-      let _symmetries_over_binding_states =
-        symmetries.Symmetries_sig.over_binding_states
-      in
-      let _symmetries_over_full_states =
-        symmetries.Symmetries_sig.over_full_states
-      in
+
       (*partitition of symmetries for internal states*)
       (*TODO*)
       let accu =
-        (* Folding over an empty list does not change your accumulator *)
-        (* This test is redondant *)
-        if symmetries_over_internal_states <> []
-        then
-          List.fold_left (fun accu l ->
-              let rec aux to_do result =
-                match to_do with
-                | [] -> result
-                | h :: tail ->
+        List.fold_left (fun accu l ->
+            let rec aux to_do result =
+              match to_do with
+              | [] -> result
+              | h :: tail ->
 
-                  aux tail result
-              in
-              aux l accu
-            ) accu symmetries_over_internal_states
-        else accu
+                aux tail result
+            in
+            aux l accu
+          ) accu symmetries_over_internal_states
       in
       accu
     | _ :: _ ->

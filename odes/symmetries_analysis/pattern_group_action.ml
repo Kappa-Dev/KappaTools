@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 29 2017>
+   * Last modification: Time-stamp: <Mar 31 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -19,6 +19,11 @@ let get_binding_state_partition a = a.Symmetries_sig.over_binding_states
 
 let get_full_partition a = a.Symmetries_sig.over_full_states
 
+(*
+(int -> 'a -> 'b) ->
+(int -> 'b -> 'a -> unit) ->
+('b -> 'b -> int) -> int list -> 'a -> 'a
+*)
 let normalize_in_agent_gen
     (get:int -> 'a -> 'b)
     (set:int -> 'b -> 'a -> unit)
@@ -30,6 +35,13 @@ let normalize_in_agent_gen
   let () = List.iter (fun (k, value) -> set k value agent) asso' in
   agent
 
+(*
+('a -> int) ->
+(int -> 'a -> 'b) ->
+(int -> 'b -> 'a -> unit) ->
+('b -> 'b -> int) ->
+('c -> int list list) -> 'c array -> 'a list -> 'a list
+*)
 let normalize_gen get_type get set cmp which symmetries raw_mixture =
   let raw_mixture =
     List.rev_map
@@ -50,6 +62,9 @@ let normalize_gen get_type get set cmp which symmetries raw_mixture =
       ) (List.rev raw_mixture)
   in
   raw_mixture
+
+(*int Symmetries_sig.site_partition array ->
+  Raw_mixture.agent list -> Raw_mixture.agent list*)
 
 let normalize_internal_states equiv_class raw_mixture =
   normalize_gen
@@ -78,6 +93,10 @@ let pop i map =
     raise
       (ExceptionDefn.Internal_Error ("Illegal map", Locality.dummy))
 
+(*
+Raw_mixture.agent list ->
+(Raw_mixture.agent * (int * int) option array) list
+*)
 let enrich_binding_state raw_mixture =
   let map =
     List.fold_left
@@ -120,6 +139,9 @@ let enrich_binding_state raw_mixture =
 let remove_binding_state refined_raw_mixture =
   List.rev_map fst (List.rev refined_raw_mixture)
 
+(*
+int list -> 'a option array -> int list list -> int list list
+*)
 let refine_class equiv_class agent output =
   match equiv_class with
   | [] -> output
@@ -145,6 +167,11 @@ let refine_class equiv_class agent output =
       aux (agent.(h)) t [h] output
     end
 
+(*
+('a -> int list list) ->
+'a array ->
+(Raw_mixture.agent * 'b option array) list -> int list list list
+*)
 let refine_partition which symmetries refined_raw_mixture =
   List.rev_map (fun (agent, agent') ->
       let ag_type = agent.Raw_mixture.a_type in
@@ -153,15 +180,29 @@ let refine_partition which symmetries refined_raw_mixture =
         [] (which symmetries.(ag_type))
     ) (List.rev refined_raw_mixture)
 
+(*
+('a -> 'b -> 'c) ->
+('d -> 'c -> 'b -> unit) -> ('a * 'd) list -> 'b -> 'b
+*)
+
 let apply_permutation get set perm agent =
   let assign = List.rev_map (fun (i, j) -> (j, get i agent)) perm in
   let () = List.iter (fun (j, data) -> set j data agent) assign in
   agent
 
+(*
+('a -> 'b -> 'c) ->
+('d -> 'c -> 'b -> unit) -> ('d * 'a) list -> 'b -> 'b
+*)
 let apply_permutation_inv get set perm agent =
   let perm_inv = List.rev_map (fun (a, b) -> (b, a)) perm in
   apply_permutation get set perm_inv agent
 
+(*
+(int -> 'a -> 'b) ->
+(int -> 'b -> 'a -> unit) ->
+('a -> 'c -> 'c) -> int list list -> 'a -> 'c -> 'c
+*)
 let rec fold_symmetries_over_agent get set f covering agent accu =
   match covering with
   | h :: t ->
@@ -174,6 +215,11 @@ let rec fold_symmetries_over_agent get set f covering agent accu =
       h accu
   | [] -> f agent accu
 
+(*
+(int -> 'a -> 'b) ->
+(int -> 'b -> 'a -> unit) ->
+('a list -> 'c -> 'c) -> 'a list -> int list list list -> 'c -> 'c
+*)
 let fold_symmetries_over_raw_mixture get set f raw_mixture covering_list accu =
   let raw_mixture0 = raw_mixture in
   let rec aux get set f raw_mixture covering_list accu =
@@ -191,7 +237,6 @@ let fold_symmetries_over_raw_mixture get set f raw_mixture covering_list accu =
         h' h accu
   in aux get set f raw_mixture covering_list accu
 
-
 let copy raw_mixture =
   List.rev_map
     (fun agents ->
@@ -202,6 +247,19 @@ let copy raw_mixture =
        })
     (List.rev raw_mixture)
 
+(*
+(int ->
+Raw_mixture.agent * (int * int) option array -> 'a) ->
+(int -> 'a -> Raw_mixture.agent * (int * int) option array -> unit) ->
+('a -> 'a -> int) ->
+(int -> Raw_mixture.agent -> 'b) ->
+(int -> 'b -> Raw_mixture.agent -> unit) ->
+('c -> int list list) ->
+LKappa_auto.cache ->
+'c array ->
+Raw_mixture.agent list ->
+LKappa_auto.cache * Raw_mixture.agent list
+*)
 let normalize_with_binding_states get1 set1 cmp get2 set2 get_partition
     rule_cache symmetries raw_mixture =
   let refined_raw_mixture = enrich_binding_state raw_mixture in
@@ -244,6 +302,12 @@ let normalize_with_binding_states get1 set1 cmp get2 set2 get_partition
   in
   rule_cache, raw_mixture
 
+(*
+LKappa_auto.cache ->
+int Symmetries_sig.site_partition array ->
+Raw_mixture.agent list ->
+LKappa_auto.cache * Raw_mixture.agent list
+*)
 let normalize_binding_states rule_cache symmetries raw_mixture =
   normalize_with_binding_states
     (fun i (agent, agent') ->
@@ -258,6 +322,12 @@ let normalize_binding_states rule_cache symmetries raw_mixture =
     get_binding_state_partition
     rule_cache symmetries raw_mixture
 
+(*
+LKappa_auto.cache ->
+int Symmetries_sig.site_partition array ->
+Raw_mixture.agent list ->
+LKappa_auto.cache * Raw_mixture.agent list
+*)
 let normalize_full rule_cache symmetries raw_mixture =
   normalize_with_binding_states
     (fun i (agent, agent') ->
@@ -278,6 +348,12 @@ let normalize_full rule_cache symmetries raw_mixture =
     get_full_partition
     rule_cache symmetries raw_mixture
 
+(*
+LKappa_auto.cache ->
+int Symmetries_sig.site_partition array ->
+Raw_mixture.agent list ->
+LKappa_auto.cache * Raw_mixture.agent list
+*)
 let normalize_raw_mixture rule_cache symmetries raw_mixture =
   let rule_cache, raw_mixture =
     normalize_full rule_cache symmetries raw_mixture
