@@ -46,7 +46,7 @@ class KappaClientTest(object):
     def test_project_crud(self):
         runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        self.assertEqual(project_id,runtime.project_create(project_id))
+        runtime.project_create(project_id)
         print(project_id)
         project_ids = kappa_client.project_catalog_project_id(runtime.project_info())
         self.assertIn(project_id,project_ids)
@@ -62,7 +62,7 @@ class KappaClientTest(object):
     def test_file_crud(self):
         runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        self.assertEqual(project_id,runtime.project_create(project_id))
+        runtime.project_create(project_id)
         file_id = str(uuid.uuid1())
         file_content = str("")
         file_metadata = kappa_client.FileMetadata(file_id,0)
@@ -84,7 +84,7 @@ class KappaClientTest(object):
     def parse_multiple_files(self):
         runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        self.assertEqual(project_id,runtime.project_create(project_id))
+        runtime.project_create(project_id)
         file_1_id = str(uuid.uuid1())
         file_2_id = str(uuid.uuid1())
         test_dir = "../models/test_suite/compiler/file_order/"
@@ -107,7 +107,7 @@ class KappaClientTest(object):
     def test_run_simulationd(self):
         runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        self.assertEqual(project_id,runtime.project_create(project_id))
+        runtime.project_create(project_id)
         file_id = str(uuid.uuid1())
         with open("../models/abc-pert.ka") as kappa_file:
             data = kappa_file.read()
