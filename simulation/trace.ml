@@ -213,7 +213,9 @@ let print_label_of_step ?env f x =  match env with
       | Dummy _  -> ())
   | Some env -> match x with
       | Subs _ -> ()
-      | Rule (x,_,_) -> Model.print_ast_rule ~env f x
+      | Rule (x,_,_) ->
+         let ast_x = Model.get_rule env x in
+         Model.print_ast_rule ~env f ((ast_x).Primitives.syntactic_rule)
       | Pert (x,_,_) -> Format.pp_print_string f x
       | Init a ->
          let l = get_types_from_init a in
