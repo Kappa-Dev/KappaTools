@@ -49,7 +49,7 @@ type elementary_rule = {
   (** In the reverse order on purpose so that we rev_map when we
       concretize *)
 }
-
+val extract_cc_ids : elementary_rule -> Pattern.id array
 val rule_to_yojson : elementary_rule -> Yojson.Basic.json
 
 val rule_of_yojson : Yojson.Basic.json -> elementary_rule

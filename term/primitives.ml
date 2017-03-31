@@ -161,6 +161,8 @@ type elementary_rule = {
   instantiations : Instantiation.abstract Instantiation.event;
 }
 
+let extract_cc_ids r = r.connected_components
+
 let rule_to_yojson r =
   let alg_expr_to_json =
     Alg_expr.e_to_yojson

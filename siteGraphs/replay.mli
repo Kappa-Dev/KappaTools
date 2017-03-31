@@ -28,4 +28,4 @@ val do_step : Signature.s -> state -> Trace.step -> state * summary
 
 val cc_of_state :
   state -> Pattern.PreEnv.t ->
-  (Pattern.PreEnv.t * Renaming.t * Pattern.cc * Pattern.id) list
+  Pattern.PreEnv.t * ((int*int) list * Pattern.cc * Pattern.id) list

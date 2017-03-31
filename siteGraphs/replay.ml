@@ -39,55 +39,65 @@ let cc_of_agent ag e work =
     let work'' =
       fold_arity_list
         (fun w x ->
-          Pattern.new_internal_state
-            w (w_agent,x) (Edges.get_internal aid x e))
+          try
+            (let internal = Edges.get_internal aid x e in
+             Pattern.new_internal_state w (w_agent,x) internal)
+          with Failure _ -> w)
         0 arity work' in
     (w_agent,work'',(aid,w_agent)::morphism,todos') in
 
   let add_links (work,morphism,todos) (aid,x) e =
     let (_,w_agent) = List.find (fun (id,_) -> id = aid) morphism in
+    let not_agent (id,s) = not((id=aid)&&(x=s)) in
     match (Edges.link_destination aid x e) with
-    | Some (b,y) ->
-       let bid = Agent.id b in
-       (try
-          let (_,wb_agent) = List.find (fun (id,_) -> id = bid) morphism in
-          let work' = Pattern.new_link work (w_agent,x) (wb_agent,y) in
-          let todos' =
-            List.filter (fun (a,z) -> not((a=bid)&&(z=y))) todos in
-          (work',morphism,todos')
-        with Not_found ->
-             let (wb_agent,work',morphism',todos') =
-               add_agent b e (work,morphism,todos) in
-             let work'' = Pattern.new_link work' (w_agent,x) (wb_agent,y) in
-             let todos'' =
-               List.filter (fun (a,z) -> not((a=(Agent.id b))&&(z=y))) todos' in
-             (work'',morphism',todos''))
     | None ->
        let work' = Pattern.new_free work (w_agent,x) in
-       (work',morphism,todos) in
+       let todos' = List.filter (not_agent) todos in
+       (work',morphism,todos')
+    | Some (b,y) ->
+       let bid = Agent.id b in
+       let not_agents (id,s) =
+         ((not_agent (id,s)) && not((id=(Agent.id b))&&(s=y))) in
+       try
+         (let (_,wb_agent) = List.find (fun (id,_) -> id = bid) morphism in
+          let work' = Pattern.new_link work (w_agent,x) (wb_agent,y) in
+          let todos' = List.filter (not_agents) todos in
+          (work',morphism,todos'))
+       with Not_found ->
+         (let (wb_agent,work',morphism',todos') =
+            add_agent b e (work,morphism,todos) in
+          let work'' = Pattern.new_link work' (w_agent,x) (wb_agent,y) in
+          let todos'' = List.filter (not_agents) todos' in
+          (work'',morphism',todos'')) in
 
- let rec working_todo (work,morphism,todo) = match todo with
-   | [] -> work
-   | port::_ ->
-      let (work',morphism',todo') = add_links (work,morphism,todo) port e in
-      working_todo (work',morphism',todo') in
+  let rec working_todo (work,morphism,todo) = match todo with
+    | [] -> (morphism,work)
+    | port::_ ->
+       let (work',morphism',todo') = add_links (work,morphism,todo) port e in
+       working_todo (work',morphism',todo') in
 
   let (_,w,m,t) = add_agent ag e (work,[],[]) in
   working_todo (w,m,t)
 
 let cc_of_state s env =
+  let cc_of_root agent e' =
+    let work = Pattern.begin_new e' in
+    let (morphism,work') = cc_of_agent agent s.graph work in
+    let (en,_,c,i) = Pattern.finish_new work' in
+    (en,(List.map (fun (cid,(aid,_)) -> (cid,aid)) morphism),c,i) in
   match s.connected_components with
   | Some cc_maps ->
      Mods.IntMap.fold
-       (fun _ cc_map acc ->
+       (fun root cc_map (e,acc) ->
          Agent.SetMap.Set.fold
-           (fun agent acc' ->
-             let work = Pattern.begin_new env in
-             let work' = cc_of_agent agent s.graph work in
-             let results = Pattern.finish_new work' in
-             results::acc') cc_map acc)
-       cc_maps []
-  | None -> []
+           (fun agent (e',acc') ->
+             if ((Agent.id agent)=root) then
+               let (en,r,c,i) = cc_of_root agent e' in
+               (en,((r,c,i)::acc'))
+             else (e',acc'))
+           cc_map (e,acc))
+       cc_maps (env,[])
+  | None -> (env,[])
 
 let break_apart_cc graph ccs = function
   | None -> ccs
