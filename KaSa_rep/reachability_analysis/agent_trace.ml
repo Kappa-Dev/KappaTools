@@ -488,7 +488,7 @@ let build_support parameters error rules dead_rules =
               in
               error, (map, creation, degradation))
            rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-           (map, creation, degradation) 
+           (map, creation, degradation)
     )
     rules
     (Ckappa_sig.Agent_map_and_set.Map.empty, Ckappa_sig.Agent_map_and_set.Map.empty,
@@ -1440,10 +1440,19 @@ let agent_trace
                   in
                   let transition_system = empty_transition_system file_name agent_string agent_type in
                   let fic =
-                    Remanent_parameters.open_out file_name
-                      (Remanent_parameters.ext_format
-                         (Remanent_parameters.get_local_trace_format
-                            parameters))
+                    if Remanent_parameters.get_compute_local_traces parameters
+                    then
+                      Remanent_parameters.open_out file_name
+                        (Remanent_parameters.ext_format
+                           (Remanent_parameters.get_local_trace_format
+                              parameters))
+                    else
+                      match
+                        Loggers.channel_of_logger
+                          (Remanent_parameters.get_logger parameters)
+                      with
+                      | Some channel -> channel
+                      | None -> stdout
                   in
                   let error', init_list =
                     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
