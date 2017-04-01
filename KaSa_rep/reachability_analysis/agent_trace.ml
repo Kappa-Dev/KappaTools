@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Mar 17 2017>
+  * Last modification: Time-stamp: <Apr 01 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -1428,10 +1428,19 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                   in
                   let transition_system = empty_transition_system file_name agent_string agent_type in
                   let fic =
-                    Remanent_parameters.open_out file_name
-                      (Remanent_parameters.ext_format
-                         (Remanent_parameters.get_local_trace_format
-                            parameters))
+                    if Remanent_parameters.get_compute_local_traces parameters
+                    then
+                      Remanent_parameters.open_out file_name
+                        (Remanent_parameters.ext_format
+                           (Remanent_parameters.get_local_trace_format
+                              parameters))
+                    else
+                      match
+                        Loggers.channel_of_logger
+                          (Remanent_parameters.get_logger parameters)
+                      with
+                      | Some channel -> channel
+                      | None -> stdout   
                   in
                   let error', init_list =
                     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
@@ -1643,7 +1652,7 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
                            let first_last, edges =
                              Mods.IntSet.fold
                                (fun next (first_last,edges) ->
-                                  let next = Graphs.node_of_int next in 
+                                  let next = Graphs.node_of_int next in
                                   match first_last
                                   with
                                   | None -> (Some (next,next),edges)
