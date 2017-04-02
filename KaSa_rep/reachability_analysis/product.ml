@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -344,9 +344,10 @@ module Product
         new_domain_dynamic_information,
       kasa_state
 
-    let print static dynamic error loggers =
+    let print ?dead_rules static dynamic error loggers =
       let error, underlying_domain_dynamic_information, () =
         Underlying_domain.print
+          ?dead_rules
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
           error
@@ -354,6 +355,7 @@ module Product
       in
       let error, new_domain_dynamic_information, () =
         New_domain.print
+          ?dead_rules
           static.new_domain
           (new_domain_dynamic_information
              underlying_domain_dynamic_information
@@ -367,4 +369,21 @@ module Product
         new_domain_dynamic_information,
       ()
 
+    let get_dead_rules static dynamic  =
+      let dead_rules =
+        Underlying_domain.get_dead_rules
+          static.underlying_domain
+          (underlying_domain_dynamic_information dynamic)
+      in
+      let dead_rules' =
+        New_domain.get_dead_rules
+          static.new_domain
+          (new_domain_dynamic_information
+             (underlying_domain_dynamic_information dynamic)
+             dynamic)
+      in
+      (fun parameter error r_id ->
+         let error, b1 = dead_rules parameter error r_id in
+         let error, b2 = dead_rules' parameter error r_id in
+         error, b1||b2)
   end:Analyzer_domain_sig.Domain)

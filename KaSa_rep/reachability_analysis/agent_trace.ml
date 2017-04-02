@@ -4,7 +4,11 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
+<<<<<<< HEAD
   * Last modification: Time-stamp: <Apr 01 2017>
+=======
+  * Last modification: Time-stamp: <Apr 02 2017>
+>>>>>>> aee0cd6... ignore dead rules in local traces
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -395,65 +399,68 @@ let compute_full_support parameters error ag_id rule =
         error, Mod (name,list,list',list'',list''')
     end
 
-let build_support parameters error rules =
+let build_support parameters error rules dead_rules =
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameters error
-    (fun parameters error r_id rule ->
-       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-         parameters error
-         (fun parameters error ag_id _  (map, creation, degradation) ->
-            match
-              compute_full_support parameters error ag_id rule
-            with
-            | error, Nil->
-              error, (map, creation, degradation)
-            | error, Creation (agent_name, _, asso) ->
-              let error', old_list =
-                Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
-                  parameters error [] agent_name creation
-              in
-              let error =
-                Exception.check_point
-                  Exception.warn
-                  parameters error error'
-                  __POS__
-                  Exit
-              in
-              let error, creation =
-                Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
-                  parameters error agent_name
-                  (((Rule r_id,ag_id),asso)::old_list) creation
-              in
-              error, (map, creation, degradation)
-            | error, Degradation (agent_name, _, mvbdu) ->
-              let error', old_map =
-                Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
-                  parameters error LabelMap.empty agent_name degradation
-              in
-              let error =
-                Exception.check_point
-                  Exception.warn
-                  parameters error error'
-                  __POS__
-                  Exit
-              in
-              let error', new_map =
-                LabelMap.add
-                  parameters error
-                  (Rule r_id,ag_id,0) mvbdu old_map
-              in
-              let error =
-                Exception.check_point
-                  Exception.warn
-                  parameters error error'
-                  __POS__
-                  Exit
-              in
-              let error, degradation = Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
-                  parameters error agent_name new_map degradation
-              in
-              error, (map, creation, degradation)
-
+    (fun parameters error r_id rule (map, creation, degradation) ->
+       let error, b = dead_rules parameters error r_id in
+       if b then error, (map, creation, degradation)
+       else
+         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+           parameters error
+           (fun parameters error ag_id _  (map, creation, degradation) ->
+              match
+                compute_full_support parameters error ag_id rule
+              with
+              | error, Nil->
+                error, (map, creation, degradation)
+              | error, Creation (agent_name, _, asso) ->
+                let error', old_list =
+                  Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
+                    parameters error [] agent_name creation
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameters error error'
+                    __POS__
+                    Exit
+                in
+                let error, creation =
+                  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
+                    parameters error agent_name
+                    (((Rule r_id,ag_id),asso)::old_list) creation
+                in
+                error, (map, creation, degradation)
+              | error, Degradation (agent_name, _, mvbdu) ->
+                let error', old_map =
+                  Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
+                    parameters error LabelMap.empty agent_name degradation
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameters error error'
+                    __POS__
+                    Exit
+                in
+                let error', new_map =
+                  LabelMap.add
+                    parameters error
+                    (Rule r_id,ag_id,0) mvbdu old_map
+                in
+                let error =
+                  Exception.check_point
+                    Exception.warn
+                    parameters error error'
+                    __POS__
+                    Exit
+                in
+                let error, degradation =
+                  Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
+                    parameters error agent_name new_map degradation
+                in
+                error, (map, creation, degradation)
             | error,
               Mod (agent_name, set_test, asso_test, set_mod, asso_mod) ->
               let error', old_map =
@@ -470,7 +477,8 @@ let build_support parameters error rules =
               let error', new_map =
                 LabelMap.add
                   parameters error
-                  (Rule r_id,ag_id,0) (set_test, asso_test, set_mod, asso_mod) old_map
+                  (Rule r_id,ag_id,0) (set_test, asso_test, set_mod, asso_mod)
+                  old_map
               in
               let error =
                 Exception.check_point
@@ -483,7 +491,8 @@ let build_support parameters error rules =
                   parameters error agent_name new_map map
               in
               error, (map, creation, degradation))
-         rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+           rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+           (map, creation, degradation) 
     )
     rules
     (Ckappa_sig.Agent_map_and_set.Map.empty, Ckappa_sig.Agent_map_and_set.Map.empty,
@@ -512,28 +521,33 @@ let pw parameters error list =
          acc acc)
     map [[]]
 
-let smash_side_effect parameters error static rules =
+let smash_side_effect parameters error static rules dead_rules =
   let error, init =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
   Ckappa_sig.AgentRule_map_and_set.Map.fold
     (fun (agent_name,rule_id) list (error,map) ->
-       let error, old_asso =
-         match Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
+       let error, b = dead_rules parameters error rule_id in
+       if b then error, map
+       else
+         let error, old_asso =
+           match
+             Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
                  parameters error
                  agent_name map
-         with
-         | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
-         | error, Some set -> error, set
-       in
-       let error, new_asso =
-         Ckappa_sig.Rule_map_and_set.Set.add parameters error rule_id old_asso
-       in
-       Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
-         parameters error
-         agent_name
-         new_asso
-         map)
+           with
+           | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+           | error, Some set -> error, set
+         in
+         let error, new_asso =
+           Ckappa_sig.Rule_map_and_set.Set.add
+             parameters error rule_id old_asso
+         in
+         Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
+           parameters error
+           agent_name
+           new_asso
+           map)
     (snd (Analyzer_headers.get_potential_side_effects static))
     (error, init)
 
@@ -1176,7 +1190,9 @@ let print logger parameters compil handler_kappa handler error transition_system
   let () = Graph_loggers.print_graph_foot logger in
   error
 
-let agent_trace parameters log_info error handler static handler_kappa compil output =
+let agent_trace
+    parameters log_info error dead_rules handler static handler_kappa
+    compil output =
   let bridges = [] in
   let error, low =
     Graphs.Nodearray.create parameters error 1
@@ -1195,10 +1211,10 @@ let agent_trace parameters log_info error handler static handler_kappa compil ou
   let init = compil.Cckappa_sig.init in
   let error, side_effects =
     smash_side_effect
-      parameters error static rules
+      parameters error static rules dead_rules
   in
   let error, (support, creation, degradation) =
-    build_support parameters error rules
+    build_support parameters error rules dead_rules
   in
   let error, init =
     Int_storage.Nearly_inf_Imperatif.fold

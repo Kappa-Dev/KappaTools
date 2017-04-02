@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jan 18 2017>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1783,7 +1783,7 @@ struct
   (*PRINT*)
   (****************************************************************)
 
-  let print static dynamic (error:Exception.method_handler) loggers =
+  let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
     let parameters = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let handler = get_mvbdu_handler dynamic in
@@ -1829,5 +1829,8 @@ struct
 
   let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
+
+  let get_dead_rules _static _dynamic  =
+    Analyzer_headers.dummy_dead_rules
 
 end
