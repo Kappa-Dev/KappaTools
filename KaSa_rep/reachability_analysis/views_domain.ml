@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 17 2017>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -4164,7 +4164,7 @@ struct
 
   (**************************************************************************)
 
-  let print static dynamic error loggers =
+  let print ?dead_rules static dynamic error loggers =
     (*print static information*)
     (*let error, dynamic, () =
       print_static_information static dynamic error loggers
@@ -4174,6 +4174,11 @@ struct
       print_dynamic_information static dynamic error loggers
       in*)
     (*print fixpoint result*)
+    let dead_rules =
+      match dead_rules with
+      | None -> Analyzer_headers.dummy_dead_rules
+      | Some f -> f
+    in
     let parameters = get_parameter static in
     let error, dynamic =
       (* local traces *)
@@ -4199,7 +4204,7 @@ struct
         in
         let error, log_info, handler, bridges =
           Agent_trace.agent_trace parameters (get_log_info dynamic) error
-            handler (get_global_static_information static) handler_kappa compil
+            dead_rules handler (get_global_static_information static) handler_kappa compil
             output
         in
         let dynamic =
@@ -4515,5 +4520,8 @@ struct
 
   let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
+
+  let get_dead_rules _static _dynamic  =
+    Analyzer_headers.dummy_dead_rules
 
 end

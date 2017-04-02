@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Dec 20 2016>
+  * Last modification: Time-stamp: <Apr 02 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -640,7 +640,7 @@ struct
       | Analyzer_headers.Morphisms ->
         List.fold_left
           (fun list (a,b) ->
-             if b 
+             if b
              then (a,b)::list
              else list)
           [] (List.rev list)
@@ -1205,7 +1205,7 @@ struct
 
   let stabilize _static dynamic error = error, dynamic, ()
 
-  let print static dynamic (error:Exception.method_handler) loggers =
+  let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
     let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in
     let log = loggers in
@@ -1774,4 +1774,6 @@ struct
   let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
+  let get_dead_rules _static _dynamic  =
+    Analyzer_headers.dummy_dead_rules
 end

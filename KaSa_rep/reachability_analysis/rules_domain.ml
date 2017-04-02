@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Mar 30 2017>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Abstract domain to record live rules
    *
@@ -337,7 +337,7 @@ struct
     else
       error
 
-  let print static dynamic error _loggers =
+  let print ?dead_rules static dynamic error _loggers =
     let error =
       print_dead_rule
         static
@@ -351,5 +351,19 @@ struct
 
   let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
+
+  let get_dead_rules static dynamic =
+    (fun parameters error r_id ->
+       match
+         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+           parameters error r_id
+           (get_dead_rule dynamic)
+       with
+       | error, None ->
+         Exception.warn
+           parameters error
+           __POS__ Exit false
+       | error, Some b -> error, not b
+    )
 
 end

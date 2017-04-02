@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Dec 20 2016>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Abstract domain to record live rules
    *
@@ -728,18 +728,15 @@ struct
         ) store_result error
     in error
 
-  let print static dynamic error _loggers =
-    (*TEST*)
-    (*let store_contact_map = get_contact_map_dynamic dynamic in
-    let _ =
-      print_contact_map static dynamic error store_contact_map
-    in*)
+  let print ?dead_rules static dynamic error _loggers =
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
+    error, dynamic, Usual_domains.Maybe
 
   let cc_mixture_is_reachable _static dynamic error _lkappa =
-    error, dynamic, Usual_domains.Maybe (* to do *)
+    error, dynamic, Usual_domains.Maybe
 
+  let get_dead_rules _static _dynamic =
+    Analyzer_headers.dummy_dead_rules
 end

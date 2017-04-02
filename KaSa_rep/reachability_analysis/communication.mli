@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Nov 23 2016>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Abstract domain to record live rules
    *
@@ -235,3 +235,7 @@ val fold_sites:
    site_working_list,
    'a,
    'a) Int_storage.ternary
+
+(*val get_dead_rules:
+  'static -> 'dynamic ->
+  (Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.c_rule_id -> Exception.method_handler * bool)*)
