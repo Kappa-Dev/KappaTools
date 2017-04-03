@@ -163,11 +163,9 @@ let gcd_2 a b =
   if a < b then aux b a
   else aux a b
 
-let lcm_2 a b = a*b/(gcd_2 a b)
+let lcm_2 a b = (abs a)*(abs b)/(gcd_2 a b)
 let lcm list =
   match list with
   | [] -> 0
   | h::t ->
     List.fold_left lcm_2 h t
-
-let () = Printf.fprintf stdout "LCM: %i" (lcm [1;-3;12;45])
