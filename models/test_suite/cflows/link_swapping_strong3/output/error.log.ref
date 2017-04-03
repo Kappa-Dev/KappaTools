@@ -23,7 +23,6 @@ Environment:
       -- A/*2*//*0*/.y = A/*1*//*0*/.x
       ++ A/*2*//*0*/.y = ⊥, A/*1*//*0*/.x = ⊥ @1
 Polymers:
-  A.y-x.
   A.x-y.
 Domain:
   /*cc0*/  -> ()

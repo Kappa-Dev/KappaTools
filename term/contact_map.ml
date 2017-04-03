@@ -54,7 +54,7 @@ let cut_at i s' l =
   let rec aux_cut_at o = function
     | [] -> None
     | ((j,s),_ as h) :: t -> if i = j then
-        if s = s' then None else Some (h::o)
+        if s >= s' then None else Some (h::o)
       else aux_cut_at (h::o) t
   in aux_cut_at [] l
 
