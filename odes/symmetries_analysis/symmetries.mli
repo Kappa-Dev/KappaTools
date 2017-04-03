@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 28 2017>
+   * Last modification: Time-stamp: <Apr 03 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -78,7 +78,17 @@ type bwd_map
 
 val empty_bwd_map: unit -> bwd_map
 
-val add_equiv_class: reduction -> bwd_map -> Pattern.cc -> bwd_map
+val add_equiv_class:
+  Remanent_parameters_sig.parameters ->
+  Model.t ->
+  (Pattern.cc -> int) ->
+  bool Mods.DynArray.t ->
+  LKappa_auto.cache ->
+  Pattern.PreEnv.t ->
+  reduction ->
+  bwd_map  ->
+  Pattern.cc  ->
+  bool Mods.DynArray.t * LKappa_auto.cache * Pattern.PreEnv.t * bwd_map
 
 val bwd_interpretation:
   ?parameters:Remanent_parameters_sig.parameters ->

@@ -603,3 +603,15 @@ let pattern_id_to_lkappa_rule parameters env id =
   | Some cc ->
     let lkappa_rule = pattern_to_lkappa_rule parameters env cc in
     lkappa_rule
+
+let copy_agent_in_raw_mixture agent =
+  {
+    agent with
+    Raw_mixture.a_ports = Array.copy agent.Raw_mixture.a_ports;
+    Raw_mixture.a_ints = Array.copy agent.Raw_mixture.a_ints}
+
+let copy_agent_in_lkappa agent =
+  {
+    agent with
+    LKappa.ra_ports = Array.copy agent.LKappa.ra_ports ;
+    LKappa.ra_ints = Array.copy agent.LKappa.ra_ints}

@@ -1,3 +1,18 @@
+(**
+   * LKappa_group_action.ml
+   * openkappa
+   * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
+   *
+   * Creation: 2016, the 5th of December
+   * Last modification: Time-stamp: <Apr 04 2017>
+   *
+   * Abstract domain to record relations between pair of sites in connected agents.
+   *
+   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+   * en Informatique et en Automatique.
+   * All rights reserved.  This file is distributed
+   * under the terms of the GNU Library General Public License *)
+
 (** check_orbit_internal_state_permutation ~agent_type ~site1 ~site2 rule
     ~correct rates cache ~counter to_be_checked
     will visit the orbit of rule when swapping the internal states of site1 and site2 in agents of type agent_type;
@@ -94,3 +109,14 @@ val is_invariant_full_states_permutation:
   LKappa.rule ->
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
+
+val equiv_class:
+  ?parameters:Remanent_parameters_sig.parameters ->
+  ?env:Model.t ->
+  LKappa_auto.cache ->
+  bool Mods.DynArray.t ->
+  LKappa.rule ->
+  partitions_internal_states:(int -> int list list) ->
+  partitions_binding_states:(int -> int list list) ->
+  partitions_full_states:(int -> int list list) ->
+  LKappa_auto.cache * bool Mods.DynArray.t * LKappa.rule list

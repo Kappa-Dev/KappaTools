@@ -41,3 +41,8 @@ val pattern_to_lkappa_rule :
 val pattern_id_to_lkappa_rule :
   Remanent_parameters_sig.parameters ->
   Model.t -> Pattern.id -> LKappa.rule
+
+val copy_agent_in_raw_mixture:
+  Raw_mixture.agent -> Raw_mixture.agent
+val copy_agent_in_lkappa:
+  LKappa.rule_agent -> LKappa.rule_agent
