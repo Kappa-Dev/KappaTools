@@ -342,9 +342,8 @@ let pert_of_result
   in
   (domain, out_alg_deps, List.rev lpert,tracking_enabled)
 
-let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
-  (*let contact_map = Model.contact_map env in*)
-  let init_l,preenv' =
+let compile_inits ?rescale ~compileModeOn contact_map env inits =
+  let init_l,_ =
     List_util.fold_right_map
       (fun (_opt_vol,alg,init_t) preenv -> (*TODO deal with volumes*)
          let () =
@@ -398,8 +397,8 @@ let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
            | domain'',_,_,[ compiled_rule ] ->
              (Alg_expr.CONST Nbr.one,compiled_rule,pos_tk),domain''
            | _,_,_,_ -> assert false
-      ) res.Ast.init preenv in
-  (preenv',init_l)
+      ) inits (Pattern.PreEnv.empty (Model.signatures env)) in
+  init_l
 
 let compile_alg_vars ~compileModeOn contact_map domain vars =
   Tools.array_fold_left_mapi
@@ -465,7 +464,7 @@ let init_kasa called_from sigs result =
   translate_contact_map sigs contact_map,
   Export_to_KaSim.flush_errors kasa_state
 *)
-let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
+let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn ?overwrite_init
     ?rescale_init sigs_nd tk_nd contact_map result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd in
@@ -509,9 +508,10 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
 
   outputs (Data.Log "\t -initial conditions");
   pause @@ fun () ->
-  let _,init_l =
-    inits_of_result
-      ?rescale:rescale_init ~compileModeOn contact_map env preenv result in
+  let init_l =
+    compile_inits
+      ?rescale:rescale_init ~compileModeOn contact_map
+      env (Option_util.unsome result.Ast.init overwrite_init) in
   return (env,has_tracking,init_l)
 
 let build_initial_state

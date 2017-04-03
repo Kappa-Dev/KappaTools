@@ -100,14 +100,19 @@ type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
   | INIT_TOK of 'id
 
+type ('mixture,'id) init_statment =
+  string Locality.annot option *
+  ('mixture,'id) Alg_expr.e Locality.annot *
+  ('mixture,'id) init_t Locality.annot
+
 type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of
-      string Locality.annot option *
+      (string Locality.annot option *
       ('mixture,'id) Alg_expr.e Locality.annot *
-      ('mixture,'id) init_t Locality.annot
+      ('mixture,'id) init_t Locality.annot)
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)

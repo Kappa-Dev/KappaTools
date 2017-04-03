@@ -79,17 +79,22 @@ val modif_expr_of_ast :
   Contact_map.t -> (Ast.mixture, string) Ast.modif_expr -> int list ->
   (rule_agent list, int) Ast.modif_expr * int list
 
+val init_of_ast :
+  new_syntax:bool -> Signature.s -> Contact_map.t -> int Mods.StringMap.t ->
+  int Mods.StringMap.t -> (Ast.mixture,string) Ast.init_statment list ->
+  (rule_agent list, int) Ast.init_statment list
+
 val compil_of_ast :
   new_syntax:bool -> (string * Nbr.t) list -> Ast.parsing_compil ->
-  Signature.s * Contact_map.t * unit NamedDecls.t * int list *
-  (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
+  Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
+  int list * (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
     @return the signature of agent, the contact map, the signature of
-    tokens, algebraic variable on which constant propagation is
-    forbidden, and an Ast.compil where identifiers are integers and
-    not string, syntactic sugar on rules are expansed (syntactic sugar
-    on mixture are not)
+    tokens, an algebraic variable finder, algebraic variable on which
+    constant propagation is forbidden, and an Ast.compil where identifiers
+    are integers and not string, syntactic sugar on rules are expansed
+    (syntactic sugar on mixture are not)
 
     This function sorts out longest prefix convention as well as ensure a
     lot of sanity on mixtures:

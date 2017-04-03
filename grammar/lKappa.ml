@@ -1419,7 +1419,7 @@ let compil_of_ast ~new_syntax overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
-  sigs,contact_map,tk_nd,updated_vars,
+  sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =
       List_util.mapi
@@ -1444,3 +1444,9 @@ let compil_of_ast ~new_syntax overwrite c =
     Ast.signatures = c.Ast.signatures;
     Ast.configurations = c.Ast.configurations;
   }
+
+let init_of_ast ~new_syntax sigs contact_map tok algs inits =
+  List.map (fun (lab,expr,ini) ->
+      lab,alg_expr_of_ast ~new_syntax sigs tok algs expr,
+      init_of_ast ~new_syntax sigs tok contact_map ini)
+    inits

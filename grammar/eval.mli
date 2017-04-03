@@ -25,11 +25,17 @@ val compile_modifications_no_track:
   (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
+val compile_inits:
+  ?rescale:float -> compileModeOn:bool -> Contact_map.t -> Model.t ->
+  (LKappa.rule_mixture, int) Ast.init_statment list ->
+  (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
+
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool -> compileModeOn:bool ->
+  ?overwrite_init:(LKappa.rule_mixture, int) Ast.init_statment list ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Contact_map.t ->
   ('c, LKappa.rule_mixture, int, LKappa.rule, unit) Ast.compil -> 'b

@@ -14,6 +14,7 @@ type t = {
   mutable rescale             : float option;
   mutable marshalizedInFile   : string;
   mutable inputKappaFileNames : string list;
+  mutable initialMix          : string option;
   mutable outputDataFile      : string option;
   mutable outputDirectory     : string;
   mutable batchmode           : bool;
@@ -29,6 +30,7 @@ let default : t = {
   rescale = None;
   marshalizedInFile = "";
   inputKappaFileNames = [];
+  initialMix = None;
   outputDataFile = None;
   outputDirectory = ".";
   batchmode  = false;
@@ -41,6 +43,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.String (fun fic ->
        t.inputKappaFileNames <- fic::t.inputKappaFileNames),
    "name of a kappa file to use as input (can be used multiple times for multiple input files)");
+  ("-mixture",
+   Arg.String (fun fic -> t.initialMix <- Some fic),
+   "Take the initial state from this file (ignore %init from other files)");
   ("-initial",
    Arg.Float (fun time -> t.minValue <- Some time),
    "Min time of simulation (arbitrary time unit)");

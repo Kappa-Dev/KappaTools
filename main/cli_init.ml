@@ -9,7 +9,8 @@
 type directive_unit = Time | Event
 
 let get_compilation
-    ?(unit=Time) ?(max_sharing=false) ?(compileModeOn=false) cli_args =
+    ?(unit=Time) ?(max_sharing=false) ?(compileModeOn=false)
+    cli_args =
   let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
       alg_overwrite =
@@ -23,18 +24,28 @@ let get_compilation
           (n,w,s as story_compression), formatCflow, cflowFile =
         Configuration.parse result.Ast.configurations in
       let () = Format.printf "+ Sanity checks@." in
-      let (sigs_nd,contact_map,tk_nd,updated_vars,result') =
+      let new_syntax =
+        (cli_args.Run_cli_args.newSyntax || conf.Configuration.newSyntax) in
+      let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
         LKappa.compil_of_ast
-          ~new_syntax:(cli_args.Run_cli_args.newSyntax ||
-                       conf.Configuration.newSyntax)
+          ~new_syntax
           cli_args.Run_cli_args.alg_var_overwrite result in
+      let overwrite_init = match cli_args.Run_cli_args.initialMix with
+        | None -> None
+        | Some file ->
+          let compil =
+            KappaLexer.compile Format.std_formatter Ast.empty_compil file in
+          Some
+            (LKappa.init_of_ast
+               ~new_syntax sigs_nd contact_map tk_nd.NamedDecls.finder
+               alg_finder compil.Ast.init) in
       let () = Format.printf "+ Compiling...@." in
       let (env, has_tracking,init_l) =
         Eval.compile
           ~outputs:(Outputs.go (Signature.create [||]))
           ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
           ?rescale_init:cli_args.Run_cli_args.rescale
-          ~compileModeOn
+          ?overwrite_init ~compileModeOn
           sigs_nd tk_nd contact_map result' in
       let story_compression =
         if has_tracking && (n||w||s) then Some story_compression else None in
@@ -51,7 +62,7 @@ let get_compilation
                    f "Simulation package loaded, all kappa files are ignored") in
         let () = Format.printf "+ Loading simulation package %s...@."
             marshalized_file in
-        let _,_,env,_,_,_,_,_,_ as pack =
+        let conf,progress,env,contact,updated,compr,cflow,cflowfile,_ as pack =
           (Marshal.from_channel d :
              Configuration.t*Counter.progressBar*Model.t*Contact_map.t*int list*
              (bool*bool*bool) option*string*string option*
@@ -63,7 +74,20 @@ let get_compilation
                Model.num_of_alg (Locality.dummy_annot s) env,
                Alg_expr.CONST v)
             cli_args.Run_cli_args.alg_var_overwrite in
-        pack,alg_overwrite
+        match cli_args.Run_cli_args.initialMix with
+        | None -> pack,alg_overwrite
+        | Some file ->
+          let compil =
+            KappaLexer.compile Format.std_formatter Ast.empty_compil file in
+          let raw_inits =
+            LKappa.init_of_ast
+              ~new_syntax:cli_args.Run_cli_args.newSyntax
+              (Model.signatures env) contact (Model.tokens_finder env)
+              (Model.algs_finder env) compil.Ast.init in
+          let inits = Eval.compile_inits
+              ~compileModeOn:false contact env raw_inits in
+          (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
+          alg_overwrite
       with
       | ExceptionDefn.Malformed_Decl _ as e -> raise e
       | _exn ->

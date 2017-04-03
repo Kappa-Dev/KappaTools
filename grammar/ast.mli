@@ -103,15 +103,16 @@ type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
   | INIT_TOK of 'id
 
+type ('mixture,'id) init_statment =
+  string Locality.annot option *
+  ('mixture,'id) Alg_expr.e Locality.annot *
+  ('mixture,'id) init_t Locality.annot
+
 type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
-  | INIT     of
-      string Locality.annot option *
-      ('mixture,'id) Alg_expr.e Locality.annot *
-      ('mixture,'id) init_t Locality.annot
-  (*volume, init, position *)
+  | INIT     of ('mixture,'id) init_statment
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
   | PLOT     of ('mixture,'id) Alg_expr.e Locality.annot
@@ -138,10 +139,7 @@ type ('agent,'mixture,'id,'rule,'edit_rule) compil =
     observables :
       ('mixture,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
-    init :
-      (string Locality.annot option *
-       ('mixture,'id) Alg_expr.e Locality.annot *
-       ('mixture,'id) init_t Locality.annot) list;
+    init : ('mixture,'id) init_statment list;
     (*initial graph declaration*)
     perturbations :
       ('mixture,'id) perturbation list;
