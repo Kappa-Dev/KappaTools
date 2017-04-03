@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Apr 03 2017>
 *)
 
 module type Interface =
@@ -199,5 +199,14 @@ sig
     Symmetries.class_description -> chemical_species
 
   val add_equiv_class:
-    Symmetries.reduction -> Symmetries.bwd_map -> chemical_species -> Symmetries.bwd_map
+    Remanent_parameters_sig.parameters ->
+    compil ->
+    cache ->
+    Symmetries.reduction ->
+    Symmetries.bwd_map ->
+    chemical_species ->
+    cache *
+    Symmetries.bwd_map
+
+
 end

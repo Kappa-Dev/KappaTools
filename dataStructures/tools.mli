@@ -37,3 +37,5 @@ val min_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
 val max_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
 
 val fold_over_permutations: (int list -> 'a -> 'a) -> int list -> 'a -> 'a
+
+val lcm: int list -> int

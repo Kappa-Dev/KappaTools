@@ -152,3 +152,22 @@ let fold_over_permutations
       accu
   in
   aux l [] [] accu
+
+let gcd_2 a b =
+  let rec aux a b =
+    if b = 0 then a
+    else aux b (a mod b)
+  in
+  let a = abs a in
+  let b = abs b in
+  if a < b then aux b a
+  else aux a b
+
+let lcm_2 a b = a*b/(gcd_2 a b)
+let lcm list =
+  match list with
+  | [] -> 0
+  | h::t ->
+    List.fold_left lcm_2 h t
+
+let () = Printf.fprintf stdout "LCM: %i" (lcm [1;-3;12;45])

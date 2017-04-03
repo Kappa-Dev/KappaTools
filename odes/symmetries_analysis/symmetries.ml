@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 29 2017>
+   * Last modification: Time-stamp: <Apr 03 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -916,12 +916,60 @@ let print_symmetries parameters env symmetries =
       ()
   in ()
 
-let add_equiv_class reduction bwd_map cc =
-  (* TO DO *)
-  let l =
+let ppmc a b = a*b (*to do*)
+let ppmc =
+  List.fold_left
+    (fun current (_,new_value) -> ppmc new_value current)
+    1
+
+let add_equiv_class
+    parameters env nauto seen rule_cache preenv_cache reduction bwd_map cc =
+  let seen, rule_cache, preenv_cache, l =
     match reduction with
-    | Ground | Forward _ -> [cc,1]
-    | Backward _ -> [cc,1]
+    | Ground | Forward _ -> seen, rule_cache, preenv_cache, [cc,1]
+    | Backward partitions ->
+      let partitions_internal_states a =
+        partitions.(a).Symmetries_sig.over_internal_states
+      in
+      let partitions_binding_states a =
+        partitions.(a).Symmetries_sig.over_binding_states
+      in
+      let partitions_full_states a =
+        partitions.(a).Symmetries_sig.over_full_states
+      in
+      let
+        rule_cache,
+        preenv_cache,
+        seen,
+        equiv_class =
+        Pattern_group_action.equiv_class_of_a_species
+          ~parameters ~env
+          ~partitions_internal_states
+          ~partitions_binding_states
+          ~partitions_full_states
+          rule_cache
+          preenv_cache
+          seen
+          cc
+      in
+      let equiv_class = (*to do compute the number of auto *)
+        List.rev_map
+          (fun cc -> cc,nauto cc)
+          equiv_class
+      in
+      let w_list =
+        List.rev_map
+          snd
+          equiv_class
+      in
+      let lcm = Tools.lcm w_list in
+      let equiv_class =
+        List.rev_map
+          (fun (cc,i) -> (cc,lcm/i))
+          equiv_class
+      in
+      seen, rule_cache, preenv_cache,
+      equiv_class
 (*TO DO: compute the list of elements that are equi to cc
   with the number of permutations that make them invariant *)
   in
@@ -929,6 +977,7 @@ let add_equiv_class reduction bwd_map cc =
   let n' =
     List.fold_left (fun i (_,j) -> i+j) 0 l
   in
+  seen, rule_cache, preenv_cache,
   List.fold_left
     (fun map (cc',i) ->
        CcMap.add cc'

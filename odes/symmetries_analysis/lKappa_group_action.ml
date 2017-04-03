@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 31 2017>
+   * Last modification: Time-stamp: <Apr 02 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -607,81 +607,168 @@ let is_invariant_full_states_permutation
 (******************************************************************)
 (*fold over each element transformation*)
 
+let fold_elt_pair f l accu =
+  match l with
+  | [] -> accu
+  | h::t ->
+    List.fold_left
+      (fun accu s2 -> f h s2 accu)
+      accu
+      t
+
+let fold_one_kind_of_sym_over_an_agent
+    sigma sigma_inv partition f agent_type agent rule accu =
+  List.fold_left
+    (fun accu equ_class ->
+       fold_elt_pair
+         (fun s1 s2 accu ->
+            let () = sigma agent_type s1 s2 agent in
+            let accu  = f rule accu in
+            let () = sigma_inv agent_type s1 s2 agent in
+            accu)
+         equ_class
+         accu)
+    accu
+    partition
+
 let fold_over_elt_transformation
-    (*internal states r_mix*)
-    (sigma_int: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_int_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*internal states r_created*)
-    (sigma_int_raw: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_int_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*--------------------*)
-    (*binding states r_mix*)
-    (sigma_bind: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_bind_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*binding states r_created*)
-    (sigma_bind_raw: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_bibd_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*----------*)
-    (*full r_mix*)
-    (sigma_full: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_full_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*full r_created*)
-    (sigma_full_raw: int -> int -> int -> LKappa.rule_agent -> unit)
-    (sigma_full_raw_inv: int -> int -> int -> LKappa.rule_agent -> unit)
-    (*----------*)
-    (symmetries: int Symmetries_sig.site_partition)
+    get_sym_internal_states
+    get_sym_binding_states
+    get_sym_full_states
     (rule: LKappa.rule)
     (f:LKappa.rule -> 'a -> 'a)
     (*acc*)
-    (init: 'a) : 'a =
+    (accu: 'a) : 'a =
   (*position is a list of agent*)
-  let positions =
-    List.fold_left (fun list rule_agent ->
-        let agent_id = rule_agent.LKappa.ra_type in
-        agent_id :: list
-      ) [] rule.LKappa.r_mix
-  in
-  let positions =
-    List.fold_left (fun list ag ->
-        let agent_id = ag.Raw_mixture.a_type in
-        agent_id :: list
-      ) positions rule.LKappa.r_created
-  in
-  let rec next agent_id rule_tail pos_id position_tail accu =
-    match position_tail with
-    | [] -> f rule accu
-    | pos_head :: _ when agent_id < pos_head ->
-      (*let rule_tail = _ in*)
-      next (agent_id + 1) rule_tail pos_id position_tail accu
-    | pos_head :: pos_tail when agent_id = pos_head ->
-      (*partition of each symmetries equivalence_class: int list list*)
-      let symmetries_over_internal_states =
-        symmetries.Symmetries_sig.over_internal_states
-      in
-
-      (*partitition of symmetries for internal states*)
-      (*TODO*)
-      let accu =
-        List.fold_left (fun accu l ->
-            let rec aux to_do result =
-              match to_do with
-              | [] -> result
-              | h :: tail ->
-
-                aux tail result
-            in
-            aux l accu
-          ) accu symmetries_over_internal_states
-      in
+  let accu =
+    List.fold_left
+      (fun accu agent ->
+         let agent_type = agent.LKappa.ra_type in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_internal_state_regular
+             swap_internal_state_regular
+             (get_sym_internal_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_binding_state_regular
+             swap_binding_state_regular
+             (get_sym_binding_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_full_regular
+             swap_full_regular
+             (get_sym_full_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         accu
+      )
       accu
-    | _ :: _ ->
-      (*when agent_id > pos_head*)
-      let s1, i1, i2, i3 = __POS__ in
-      let () =
-        Format.fprintf Format.err_formatter
-          "Internal bug: %s %i %i %i" s1 i1 i2 i3
-      in
-      (*TODO: backtrack?*)
-      accu
+      rule.LKappa.r_mix
   in
-  next 0 (of_rule rule) 0 positions init
+  let accu =
+    List.fold_left
+      (fun accu (agent:Raw_mixture.agent) ->
+         let agent_type = agent.Raw_mixture.a_type in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_internal_state_created
+             swap_internal_state_created
+             (get_sym_internal_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_binding_state_created
+             swap_binding_state_created
+             (get_sym_binding_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         let accu =
+           fold_one_kind_of_sym_over_an_agent
+             swap_full_created
+             swap_full_created
+             (get_sym_full_states agent_type)
+             f
+             agent_type
+             agent
+             rule
+             accu
+         in
+         accu
+      )
+      accu
+      rule.LKappa.r_created
+  in
+  accu
+
+let copy_lkappa_rule rule =
+  {rule with
+   LKappa.r_mix =
+     List.rev_map Patterns_extra.copy_agent_in_lkappa
+       (List.rev rule.LKappa.r_mix);
+   r_created =
+     List.rev_map Patterns_extra.copy_agent_in_raw_mixture
+       (List.rev rule.LKappa.r_created);
+  }
+
+let equiv_class
+    ?parameters
+    ?env
+    cache
+    seen
+    rule
+    ~partitions_internal_states
+    ~partitions_binding_states
+    ~partitions_full_states
+  =
+  let to_visit = [rule] in
+  let rec aux cache to_visit seen visited =
+    match
+      to_visit
+    with
+    | [] -> cache, seen, visited
+    | h::q ->
+      let cache, hashed_list = LKappa_auto.cannonic_form cache h in
+      let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
+      if Mods.DynArray.get seen hash
+      then aux cache q seen visited
+      else
+        let visited = h::visited in
+        let () = Mods.DynArray.set seen hash true in
+        let to_visit =
+          fold_over_elt_transformation
+            partitions_internal_states
+            partitions_binding_states
+            partitions_full_states
+            h
+            (fun rule list -> (copy_lkappa_rule rule)::list)
+            q
+        in
+        aux cache to_visit seen visited
+  in
+  aux cache to_visit seen []

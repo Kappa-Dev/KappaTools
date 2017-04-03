@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 30 2017>
+   * Last modification: Time-stamp: <Apr 03 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -51,3 +51,15 @@ val is_pattern_invariant_full_states_permutation:
   Pattern.id ->
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
+
+val equiv_class_of_a_species:
+  parameters:Remanent_parameters_sig.parameters ->
+  env:Model.t ->
+  partitions_internal_states:(int -> int list list) ->
+  partitions_binding_states:(int -> int list list) ->
+  partitions_full_states:(int -> int list list) ->
+  LKappa_auto.cache ->
+  Pattern.PreEnv.t ->
+  bool Mods.DynArray.t ->
+  Pattern.cc ->
+  LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t * Pattern.cc list

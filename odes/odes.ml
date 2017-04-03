@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 28 2017>
+  * Last modification: Time-stamp: <Apr 03 2017>
 *)
 
 let local_trace = false
@@ -1305,22 +1305,27 @@ struct
     | None -> "none"
     | Some b -> string_of_bool b
 
-  let compute_equivalence_classes _parameters _compil network =
+  let compute_equivalence_classes parameters compil network =
     let red = network.sym_reduction in
     let bwd_map = Symmetries.empty_bwd_map () in
-    let bwd_map =
+    let cache, bwd_map =
       VarMap.fold
-        (fun _ id bwd_map ->
+        (fun _ id (cache,bwd_map) ->
            let (species,_) = Mods.DynArray.get network.species_tab id in
            I.add_equiv_class
+             parameters
+             compil
+             cache
              red
              bwd_map
              species
         )
         network.id_of_ode_var
-        bwd_map
+        (network.cache, bwd_map)
     in
-    {network with bwd_map = bwd_map}
+    {network with
+     bwd_map = bwd_map ;
+     cache = cache }
 
   let network_from_compil ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in

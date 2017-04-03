@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 29 2017>
+  * Last modification: Time-stamp: <Apr 03 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -26,11 +26,14 @@ type sym_cache = Symmetries.cache
 
 type equib_class_map = Symmetries.bwd_map
 
+type seen_cache = bool Mods.DynArray.t
+
 type cache =
   {
     cc_cache: cc_cache ;
     rule_cache: nauto_in_rules_cache;
-    representative_cache: sym_cache
+    representative_cache: sym_cache ;
+    seen: seen_cache ;
   }
 
 let get_representative parameters compil cache symmetries species =
@@ -43,7 +46,7 @@ let get_representative parameters compil cache symmetries species =
       cache.cc_cache
       symmetries species
   in
-  {
+  {cache with
     representative_cache = rep_cache;
     cc_cache = cc_cache ;
     rule_cache = rule_cache ;
@@ -57,8 +60,7 @@ let fold_bwd_map f map acc =
 
 let class_representative equiv_class = equiv_class.Symmetries.class_representative
 
-let add_equiv_class red bwd_map species =
-  Symmetries.add_equiv_class red bwd_map species
+
 
 let get_cc_cache cache = cache.cc_cache
 
@@ -419,11 +421,15 @@ let empty_lkappa_cache () = LKappa_auto.init_cache ()
 
 let empty_sym_cache () = Symmetries.empty_cache ()
 
+let empty_seen_cache () =
+  Mods.DynArray.create 1 false
+
 let empty_cache compil =
   {
     cc_cache  = empty_cc_cache compil ;
     rule_cache = empty_lkappa_cache () ;
     representative_cache = empty_sym_cache () ;
+    seen = empty_seen_cache () ;
   }
 
 let mixture_of_init compil c =
@@ -496,3 +502,20 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
   Symmetries.print_symmetries parameters env symmetries
+
+let add_equiv_class parameters compil cache red bwd_map species =
+  let rule_cache = cache.rule_cache in
+  let preenv = cache.cc_cache in
+  let seen = cache.seen in
+  let env = compil.environment in 
+  let seen, rule_cache, preenv, bwd_map =
+      Symmetries.add_equiv_class parameters env
+        nbr_automorphisms_in_chemical_species
+        seen rule_cache preenv
+      red bwd_map species
+  in
+  {cache with rule_cache = rule_cache ;
+              cc_cache = preenv ;
+              seen = seen
+  },
+  bwd_map
