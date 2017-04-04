@@ -386,9 +386,9 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         Remanent_parameters_sig.influence_map_accuracy_level =
           begin
             match lowercase !Config.influence_map_accuracy_level with
-            | "indirect" -> Low
-            | "direct" -> Medium
-            | "realisable" | "realizable" -> High
+            | "indirect" -> Remanent_parameters_sig.Low
+            | "direct" -> Remanent_parameters_sig.Medium
+            | "realisable" | "realizable" -> Remanent_parameters_sig.High
             | _ ->
               fetch_accuracy_level Config.influence_map_accuracy_level
           end
