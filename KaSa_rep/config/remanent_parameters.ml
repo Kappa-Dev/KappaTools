@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Apr 04 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -383,8 +383,16 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           Remanent_parameters_sig.short_version=Version.version_string;
           Remanent_parameters_sig.version=Version.version_kasa_full_name;
           Remanent_parameters_sig.tk_interface=Tk_version.tk;
-          Remanent_parameters_sig.influence_map_accuracy_level =
-            fetch_accuracy_level Config.influence_map_accuracy_level ;
+        Remanent_parameters_sig.influence_map_accuracy_level =
+          begin
+            match lowercase !Config.influence_map_accuracy_level with
+            | "indirect" -> Low
+            | "direct" -> Medium
+            | "realisable" | "realizable" -> High
+            | _ ->
+              fetch_accuracy_level Config.influence_map_accuracy_level
+          end
+        ;
           Remanent_parameters_sig.contact_map_accuracy_level =
             fetch_accuracy_level Config.contact_map_accuracy_level ;
           Remanent_parameters_sig.view_accuracy_level =
