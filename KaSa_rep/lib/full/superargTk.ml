@@ -39,7 +39,7 @@ let set_visibility_bis a  =
 let set_visibility (a,b) =
   set_visibility a;
   set_visibility_bis b
-		
+
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
@@ -60,7 +60,7 @@ let widget_update_from_spec (a:Superarg.t) =
       | Superarg.Float r -> set key (string_of_float (!r))
       | Superarg.Float_opt r ->
 	  set key (match !r with None -> "" | Some f -> string_of_float f)
-      | Superarg.Choice (_,r) -> set key !r
+      | Superarg.Choice (_,_,r) -> set key !r
       | Superarg.Choice_list (l,r) ->
 	  List.iter
 	    (fun (k,_) -> set (key^"."^k) (if List.mem k !r then "1" else "0"))
@@ -166,7 +166,7 @@ let cmd_of_widget (a:Superarg.t) short =
 	  if v="" && (!r<>None || not short) then (Superarg.nokey key)::accum
 	  else if v<>"" && (!r<>(Some (float_of_string v)) || not short)
 	  then key::v::accum else accum
-      | Superarg.Choice (ll,r) ->
+      | Superarg.Choice (ll,_,r) ->
 	  let v = get key in
 	  if not (List.exists (fun (k,_) -> v=k) ll)
 	  then failwith "invalid Superarg.Choice"
@@ -185,7 +185,7 @@ let cmd_of_widget (a:Superarg.t) short =
       | Superarg.Multi _ -> accum
       |	Superarg.MultiExt _ -> accum
       with
-	
+
       | Not_found -> accum
       | Failure f -> failwith ("Invalid argument type for option "^key^" in "^(
 			       List.fold_left (fun sol x -> sol^" "^x) "" cat)^": "^f)
@@ -237,7 +237,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg;
       Balloon.put ~on:(coe entry) ~ms:balloon_delay msg;
       map := (*snd*) StringMap.add key v !map
-  | Superarg.Choice (l,_) ->
+  | Superarg.Choice (l,_,_) ->
       let lbl = Label.create ~text:key ~padx:20 f in
       let fff = Frame.create f in
       let ff = Frame.create fff in
@@ -338,7 +338,7 @@ class pager bparent fparent =
   and cur = ref ""                   (* current page name *)
   and pages = ref StringMap.empty  (* all pages *)
   and pages_lvl = ref [] in
-		
+
   object (self)
 
     initializer
