@@ -14,6 +14,7 @@ done
 + generate the network... 
 	 -initial states 
 	 -saturating the set of molecular species 
+	 -compute stochiometric coefficients 
 	 -tokens 
 	 -variables 
 	 -observables 
@@ -40,6 +41,7 @@ done
 + generate the network... 
 	 -initial states 
 	 -saturating the set of molecular species 
+	 -compute stochiometric coefficients 
 	 -tokens 
 	 -variables 
 	 -observables 
@@ -66,6 +68,7 @@ done
 + generate the network... 
 	 -initial states 
 	 -saturating the set of molecular species 
+	 -compute stochiometric coefficients 
 	 -tokens 
 	 -variables 
 	 -observables 
@@ -92,6 +95,7 @@ done
 + generate the network... 
 	 -initial states 
 	 -saturating the set of molecular species 
+	 -compute stochiometric coefficients 
 	 -tokens 
 	 -variables 
 	 -observables 

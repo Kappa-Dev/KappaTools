@@ -20,3 +20,5 @@ B(y~u) -> B(y~p) | |A(z!_)|:d @1
 B(y~u) -> B(y~p) | |A(x~u,y~u,z!1),A(x~p,y~p,z!1)|:d @1
 B(y~u) -> B(y~p) | |A(x~u,y~p,z!1),A(x~p,y~p,z!1)|:d @1
 B(y~u) -> B(y~p) | |A(x~p,y~u,z!1),A(x~p,y~p,z!1)|:d @1
+
+%obs: 'GOAL' |B(y~p)|
