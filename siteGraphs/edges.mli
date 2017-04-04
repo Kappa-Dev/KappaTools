@@ -15,6 +15,10 @@ val empty : with_connected_components : bool -> t
 val copy : t -> t
 (** You'd better NOT use that on the state of a simulation *)
 
+type stats = { nb_agents : int }
+
+val stats : t -> stats
+
 val add_agent : ?id:int ->  Signature.s -> int -> t -> int * t
 (** [add_agent ?id sigs agent_type graph] *)
 

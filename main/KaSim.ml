@@ -17,7 +17,6 @@ let rec waitpid_non_intr pid =
   try Unix.waitpid [] pid
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
-
 let batch_loop
     ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
     progressConf env counter graph state =
@@ -212,12 +211,12 @@ let () =
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
-    let () = Format.printf "+ Building initial state@." in
+    let () = Format.printf "+ Building initial state@?" in
     let (stop,graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x) ~outputs counter env
         ~with_trace:(trace_file<>None) random_state init_l in
-    let () = Format.printf "Done@." in
+    let () = Format.printf " (%a)@.Done@." Rule_interpreter.print_stats graph in
 
     Format.printf "+ Command line to rerun is: %s@." command_line;
 

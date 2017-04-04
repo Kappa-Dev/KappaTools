@@ -171,6 +171,13 @@ let copy graph =
        | Some ccs -> Some (Mods.DynArray.copy ccs));
   }
 
+type stats = { nb_agents : int }
+
+let stats graph = {
+  nb_agents =
+    Mods.DynArray.length graph.sort - List.length (snd graph.free_id);
+}
+
 let add_agent ?id sigs ty graph =
   let ar = Signature.arity sigs ty in
   let al = Array.make ar None in

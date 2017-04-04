@@ -87,6 +87,11 @@ val remove_tracked : Pattern.id array -> t -> t
 
 (** {6 Debugging} *)
 
+type stats = { mixture_stats : Edges.stats }
+
+val stats : t -> stats
+val print_stats : Format.formatter -> t -> unit
+
 val print_injections :
   ?domain:Pattern.Env.t -> Format.formatter ->
   IntCollection.t Pattern.ObsMap.t -> unit

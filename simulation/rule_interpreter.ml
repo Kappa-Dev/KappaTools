@@ -127,6 +127,15 @@ let print_unary_injections ?domain f roots_of_patterns =
        )
     ) roots_of_patterns
 
+type stats = { mixture_stats : Edges.stats }
+
+let stats state = {
+  mixture_stats = Edges.stats state.edges;
+}
+
+let print_stats f state =
+  Format.fprintf f "%i agents" (stats state).mixture_stats.Edges.nb_agents
+
 let add_intset_in_intmap id set map =
   if Mods.IntSet.is_empty set
   then Mods.IntMap.remove id map
