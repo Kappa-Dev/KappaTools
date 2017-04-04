@@ -12,6 +12,7 @@ GENIMG = generated_img
 MANGENREP = $(MANREP)$(GENIMG)/
 
 KASAREP = KaSa_rep/
+KADEREP = odes/
 RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 
 OCAMLBEST := $(shell which `ocamlfind opt -only-show` > /dev/null && echo native || echo byte)
@@ -97,7 +98,7 @@ ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.cmxa %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
+%.cma %.cmxa %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KADEREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site: $(RESOURCES_HTML)

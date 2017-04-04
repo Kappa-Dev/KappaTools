@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 03 2017>
+  * Last modification: Time-stamp: <Apr 04 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -59,8 +59,6 @@ let fold_bwd_map f map acc =
   Symmetries.fold_bwd_map f map acc
 
 let class_representative equiv_class = equiv_class.Symmetries.class_representative
-
-
 
 let get_cc_cache cache = cache.cc_cache
 
@@ -507,7 +505,7 @@ let add_equiv_class parameters compil cache red bwd_map species =
   let rule_cache = cache.rule_cache in
   let preenv = cache.cc_cache in
   let seen = cache.seen in
-  let env = compil.environment in 
+  let env = compil.environment in
   let seen, rule_cache, preenv, bwd_map =
       Symmetries.add_equiv_class parameters env
         nbr_automorphisms_in_chemical_species

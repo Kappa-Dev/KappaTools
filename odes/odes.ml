@@ -521,7 +521,8 @@ struct
                  | None -> assert false
                  | Some id ->
                    let (_,nauto) = Mods.DynArray.get network.species_tab id in
-                   species, id, nauto, 1, 1
+                   species, id, nauto,
+                   1, 1
                end
              | Some class_desc ->
                let species_rep = I.class_representative class_desc in
@@ -582,7 +583,7 @@ struct
                  (Alg_expr.div
                     (Alg_expr.int num)
                     (Alg_expr.int den))
-                 (species)
+                 species
              in
              if fst alg = Alg_expr.CONST Nbr.zero then term
              else Alg_expr.add alg term
@@ -676,8 +677,7 @@ struct
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
            let remanent, id = translate_token b remanent in
-           let a' = (*convert_alg_expr parameters compil (snd remanent)*) a in
-           remanent,(a',(Locality.dummy_annot id))::tokens)
+           remanent,(a,(Locality.dummy_annot id))::tokens)
         (remanent,[])
         tokens
     in
@@ -953,7 +953,7 @@ struct
     in
     reactions
 
-    let species_of_species_id network =
+  let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
 
   let get_reactions network = network.reactions
@@ -1378,6 +1378,9 @@ struct
     let network =
       compute_equivalence_classes
         parameters compil network
+    in
+    let () =
+      Format.printf "\t -compute stochiometric coefficients @."
     in
     let reactions =
       convert_stochiometric_coef
