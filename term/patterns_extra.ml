@@ -565,21 +565,26 @@ let rule_mixture_to_lkappa_rule rule_mixture =
   }
 
 (*convert a species into lkappa rule signature*)
+
+
+let species_to_lkappa_rule_and_unspec parameters env species =
+      let signature = Model.signatures env in
+      let some_pair =
+        species_to_raw_mixture
+          ~parameters
+          signature
+          species
+      in
+      match some_pair with
+      | None -> lkappa_init, []
+      | Some (raw_mixture, unspec) ->
+        let lkappa_rule =
+          raw_mixture_to_lkappa_rule raw_mixture
+        in
+        lkappa_rule, unspec
+
 let species_to_lkappa_rule parameters env species =
-  let signature = Model.signatures env in
-  let some_pair =
-    species_to_raw_mixture
-      ~parameters
-      signature
-      species
-  in
-  match some_pair with
-  | None -> lkappa_init
-  | Some (raw_mixture, _) ->
-    let lkappa_rule =
-      raw_mixture_to_lkappa_rule raw_mixture
-    in
-    lkappa_rule
+  fst (species_to_lkappa_rule_and_unspec parameters env species)
 
 let pattern_to_lkappa_rule parameters env cc =
   let signature = Model.signatures env in

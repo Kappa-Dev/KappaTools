@@ -34,6 +34,10 @@ val species_to_lkappa_rule:
   Remanent_parameters_sig.parameters ->
   Model.t -> Pattern.t -> LKappa.rule
 
+val species_to_lkappa_rule_and_unspec:
+    Remanent_parameters_sig.parameters ->
+    Model.t -> Pattern.t -> LKappa.rule * (int * int) list
+
 val pattern_to_lkappa_rule :
   Remanent_parameters_sig.parameters ->
   Model.t -> Pattern.cc -> LKappa.rule

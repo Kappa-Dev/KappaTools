@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 03 2017>
+  * Last modification: Time-stamp: <Apr 04 2017>
 *)
 
 module type Interface =
@@ -197,7 +197,7 @@ sig
 
   val class_representative:
     Symmetries.class_description -> chemical_species
-
+  
   val add_equiv_class:
     Remanent_parameters_sig.parameters ->
     compil ->

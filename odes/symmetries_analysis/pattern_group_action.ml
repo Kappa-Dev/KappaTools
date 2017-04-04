@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Apr 03 2017>
+   * Last modification: Time-stamp: <Apr 04 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -436,8 +436,8 @@ let equiv_class_of_a_species
     preenv
     seen
     species =
-  let rule =
-    Patterns_extra.species_to_lkappa_rule
+  let rule, unspec =
+      Patterns_extra.species_to_lkappa_rule_and_unspec
       parameters env species
   in
   let cache, seen, rule_class =
@@ -454,7 +454,7 @@ let equiv_class_of_a_species
       (fun (preenv,l) rule ->
          let preenv, species, _ =
            Patterns_extra.raw_mixture_to_species
-             preenv rule.LKappa.r_created []
+             preenv rule.LKappa.r_created unspec
          in
          preenv,(species::l))
       (preenv, [])
