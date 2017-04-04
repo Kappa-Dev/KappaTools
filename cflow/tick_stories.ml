@@ -42,7 +42,6 @@ let tick_stories f conf save_progress_bar (init,last,counter,n_stories) =
     if n<=0 then ()
     else
       let () = Loggers.fprintf f "%c" (conf.Counter.progressChar) in
-      let () = if !Parameter.eclipseMode then Loggers.print_newline f in
       aux (n-1)
   in
   let () = aux n in

@@ -18,7 +18,7 @@ let rec waitpid_non_intr pid =
   with Unix.Unix_error (Unix.EINTR, _, _) -> waitpid_non_intr pid
 
 let batch_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency
     progressConf env counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
@@ -26,11 +26,13 @@ let batch_loop
         ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
         env counter graph state in
     if stop then (graph',state')
-    else let () = Counter.tick progressConf counter in iter graph' state'
+    else
+      let () = Counter.tick ~efficiency progressConf counter in
+      iter graph' state'
   in iter graph state
 
 let interactive_loop
-    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash progressConf
+    ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash ~efficiency progressConf
     pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
@@ -50,7 +52,9 @@ let interactive_loop
       if stop then
         let () = Sys.set_signal Sys.sigint old_sigint_behavior in
         out
-      else let () = Counter.tick progressConf counter in iter graph' state'
+      else
+        let () = Counter.tick ~efficiency progressConf counter in
+        iter graph' state'
   in iter graph state
 
 let finalize
@@ -115,7 +119,6 @@ let () =
         Kappa_files.set_marshalized marshalizeOutFile
     in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
-    let () = Parameter.eclipseMode := kasim_args.Kasim_args.eclipseMode in
     let () =
       Parameter.time_independent := common_args.Common_args.timeIndependent in
 
@@ -129,12 +132,15 @@ let () =
       (!Parameter.debugModeOn || common_args.Common_args.backtrace);
     (*Possible backtrace*)
 
+    let cpu_time = Sys.time () in
     let (conf, progressConf, env, contact_map, _, story_compression,
          formatCflows, cflowFile, init_l as init_result),
         counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing
         ~compileModeOn:kasim_args.Kasim_args.compileMode cli_args in
+    let () = if kasim_args.Kasim_args.showEfficiency then
+        Format.printf " All that took %fs@." (Sys.time () -. cpu_time) in
 
     let theSeed,seed_arg =
       match kasim_args.Kasim_args.seedValue,conf.Configuration.seed with
@@ -211,14 +217,17 @@ let () =
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
+    let cpu_time = Sys.time () in
     let () = Format.printf "+ Building initial state@?" in
     let (stop,graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x) ~outputs counter env
         ~with_trace:(trace_file<>None) random_state init_l in
-    let () = Format.printf " (%a)@.Done@." Rule_interpreter.print_stats graph in
+    let () = Format.printf " (%a)" Rule_interpreter.print_stats graph in
+    let () = if kasim_args.Kasim_args.showEfficiency then
+        Format.printf " took %fs" (Sys.time () -. cpu_time) in
 
-    Format.printf "+ Command line to rerun is: %s@." command_line;
+    Format.printf "@.Done@.+ Command line to rerun is: %s@." command_line;
 
     let () =
       if kasim_args.Kasim_args.compileMode || !Parameter.debugModeOn then
@@ -256,6 +265,7 @@ let () =
         let (graph',state') =
           batch_loop
             ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+            ~efficiency:kasim_args.Kasim_args.showEfficiency
             progressConf env counter graph state in
         finalize
           ~outputs formatCflows cflowFile trace_file
@@ -275,6 +285,7 @@ let () =
                     contact_map env graph b in
                 env',interactive_loop
                   ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+                  ~efficiency:kasim_args.Kasim_args.showEfficiency
                   progressConf b'' env' counter graph' state
               | Ast.QUIT -> env,(true,graph,state)
               | Ast.MODIFY e ->
@@ -310,6 +321,7 @@ let () =
           let (stop,graph',state') =
             interactive_loop
               ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash
+              ~efficiency:kasim_args.Kasim_args.showEfficiency
               progressConf Alg_expr.FALSE env counter graph state in
           if stop then
             finalize

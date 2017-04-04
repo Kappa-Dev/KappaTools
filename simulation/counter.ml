@@ -192,7 +192,7 @@ let reinitialize counter =
   counter.last_point <- 0;
   counter.stat_null <- Stat_null_events.init ()
 
-let tick conf c =
+let tick ~efficiency conf c =
   let pr =
     match c.progress_report with
     | None ->
@@ -202,7 +202,8 @@ let tick conf c =
       let () = c.progress_report <- Some pr in
       pr
     | Some pr -> pr in
-  Progress_report.tick c.time (time_ratio c) c.events (event_ratio c) pr
+  Progress_report.tick
+    ~efficiency c.time (time_ratio c) c.events (event_ratio c) pr
 
   let current_simulation_info c =
   { Trace.Simulation_info.story_id = current_story c;

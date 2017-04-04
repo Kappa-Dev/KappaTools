@@ -48,7 +48,7 @@ let parse result =
                 ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
       ) in
   List.fold_left
-    (fun (conf,progress,story_compression,formatCflow,cflowFile as acc)
+    (fun (conf,progress,story_compression,formatCflow,cflowFile)
       ((param,pos_p),value_list) ->
       match param with
       | "displayCompression" ->
@@ -170,9 +170,6 @@ let parse result =
 (*         if get_bool_value pos_p param value_list then
            (story_compression, Dot) else
            (story_compression, Html)*)
-      | "colorDot" ->
-        let () = Parameter.useColor := get_bool_value pos_p param value_list in
-        acc
       | _ as error ->
         raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) (empty, Counter.default_progress, (false,false,false), "dot", None) result

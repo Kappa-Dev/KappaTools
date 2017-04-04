@@ -13,9 +13,9 @@ type t = {
   mutable marshalizeOutFile : string option;
   mutable domainOutputFile : string option;
   mutable traceFile : string option;
-  mutable eclipseMode : bool;
   mutable compileMode : bool;
   mutable maxSharing : bool;
+  mutable showEfficiency : bool
 }
 
 let default : t = {
@@ -25,9 +25,9 @@ let default : t = {
   marshalizeOutFile = None;
   domainOutputFile = None;
   traceFile = None;
-  eclipseMode = false;
   compileMode = false;
   maxSharing = false;
+  showEfficiency = false;
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
@@ -57,9 +57,9 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    "file name for dumping the simulation trace") ;
   ("-seed", Arg.Int (fun i -> t.seedValue <- Some i),
    "Seed for the random number generator") ;
-  ("--eclipse",
-   Arg.Unit (fun () -> t.eclipseMode <- true),
-   "enable this flag for running KaSim behind eclipse plugin") ;
+  ("--print-efficiency",
+   Arg.Unit (fun () -> t.showEfficiency <- true),
+   "KaSim tells how fast it runs") ;
   ("--max-sharing",
    Arg.Unit (fun () -> t.maxSharing <- true),
    "Initialization is heavier but simulation is faster");

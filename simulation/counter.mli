@@ -60,5 +60,5 @@ val consecutive_null_event : t -> int
 val print_efficiency : Format.formatter -> t -> unit
 
 (** {5 Output on stdout } *)
-val tick : progressBar -> t -> unit
+val tick : efficiency:bool -> progressBar -> t -> unit
 val complete_progress_bar : t -> unit

@@ -11,5 +11,5 @@
 type t
 
 val create : int -> char -> t
-val tick : float -> float -> int -> float -> t -> unit
+val tick : efficiency:bool -> float -> float -> int -> float -> t -> unit
 val complete_progress_bar : float -> int -> t -> unit

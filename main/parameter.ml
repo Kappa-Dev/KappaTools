@@ -12,8 +12,6 @@ let defaultGraphSize = ref 5
 let defaultLiftSetSize = ref 5
 let defaultHeapSize = ref 5
 let debugModeOn = ref false
-let eclipseMode = ref false
-let useColor = ref true
 
 (* expert option for stories *)
   (** Memory **)
