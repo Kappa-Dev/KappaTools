@@ -52,6 +52,7 @@ let options =
          (["Indirect","Ignore gluing compatibility";
            "Direct","Ignore reachable states";
            "Realisable","Take into account reachable states" ],
+          ["Low";"High";"Full";"Medium"],
           Config.influence_map_accuracy_level)),
       "Tune the accuracy level of the influence map",
       ["5_Influence_map"],
@@ -94,6 +95,7 @@ let options =
       Choice
          (["static","Very coarse static abstraction: every bond that occurs in initial states and rhs of rules is considered";
            "dynamic","More accurate abstraction: only the bonds that occur in the initial state or a rule that has already been applied successfully, are considered"],
+          [],
           Config.with_dynamic_contact_map),"contact map domain is used to over-approximate side-effects",
        ["2_Reachability_analysis"],Normal;
        "--views-domain",
@@ -112,19 +114,7 @@ let options =
       "--compute-symmetries",
       Bool Config.do_symmetries,
       "Look up for pairs of symmetric sites",
-      ["0_Actions"],Hidden;
-      (*"--view-analysis",
-      (Choice
-         ([
-           (*"None","No view analysis";*)
-           (*"Low","Non relational site analysis";*)
-           "High","Relational view analysis"],
-           Config.view_accuracy_level)),
-      "Tune the accuracy level of the view analysis",
-      ["2_Reachability_analysis"],
-        Hidden ;*)
-
-
+      ["0_Actions"],Normal;
       "--verbosity-level-for-view-analysis",
       (Choice
          ([
@@ -133,6 +123,7 @@ let options =
            "Medium","Also show which rules are applied";
            "High","Also show when new views are discovered";
            "Full","Also show which rules are put in the working list"],
+           [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the view analysis",
       ["2_Reachability_analysis"],
@@ -146,6 +137,7 @@ let options =
            "Medium","Also show which rules are applied";
            "High","Also show when patterns are discovered";
            "Full","Also show which rules are put in the working list"],
+           [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the reachability analysis",
       ["2_Reachability_analysis"],
@@ -166,7 +158,7 @@ let options =
       (Choice (["raw","no post-processing";
                 "kappa","kappa mode";
                 "english","natural language"
-               ],
+               ],[],
                Config.use_natural_language)),
       "post-process relation and output the result in the chosen format",
       ["2_Reachability_analysis"],
@@ -240,7 +232,7 @@ let options =
 
       "--contact-map-format",
       (Choice (["DOT","dot format";
-                (*"HTML","HTML format"*)],
+                (*"HTML","HTML format"*)],[],
                Config.contact_map_format)),
       "Tune the output format for the contact map",
       ["1_Output";"4_Contact_map"],
@@ -250,7 +242,7 @@ let options =
       (Choice
          (["Low","Collect info from rhs of rules and initial state";
            "High","Only consider reachable rules";
-          ],
+          ],[],
           Config.contact_map_accuracy_level)),
       "Tune the accuracy level of the contact map",
       ["4_Contact_map"],
@@ -282,7 +274,7 @@ let options =
            "DOT","dot format";
            "DIM","DIM format";
            "HTML","HTML format";
-         ],
+         ],[],
            Config.influence_map_format)),
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
@@ -302,7 +294,7 @@ let options =
           [
             "DOT","dot format";
             "HTML","HTML format"
-          ],
+          ],[],
           Config.local_trace_format)),
       "Tune the output format for the local transition systems",
       ["1_Output";"3_Trace_analysis"],
