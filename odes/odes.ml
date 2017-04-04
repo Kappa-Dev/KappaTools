@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 03 2017>
+  * Last modification: Time-stamp: <Apr 04 2017>
 *)
 
 let local_trace = false
@@ -136,6 +136,10 @@ struct
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
+      prereactions :
+        (id list * id list *
+         ((I.connected_component array list, int) Alg_expr.e Locality.annot * id Locality.annot) list
+         * enriched_rule) list ;
       reactions:
         (id list * id list *
          (('a,'b) Alg_expr.e Locality.annot*id Locality.annot) list
@@ -220,6 +224,7 @@ struct
   let init compil =
     {
       rules = [] ;
+      prereactions = [] ;
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
@@ -497,7 +502,7 @@ struct
              (I.find_embeddings compil connected_component species) in
          if n_embs = 0 then alg
          else
-           let _species_rep, species_rep_id, nauto_rep, num,den =
+           let species_rep, species_rep_id, nauto_rep, num,den =
              let class_desc =
                I.bwd_interpretation
                  parameters
@@ -509,7 +514,9 @@ struct
              | None ->
                begin
                  match
-                   VarMap.find_option (cast species) network.id_of_ode_var
+                   VarMap.find_option
+                     (cast species)
+                     network.id_of_ode_var
                  with
                  | None -> assert false
                  | Some id ->
@@ -529,7 +536,7 @@ struct
                | None ->
                  begin
                    match
-                     VarMap.find_option (cast species) network.id_of_ode_var
+                     VarMap.find_option (cast species_rep) network.id_of_ode_var
                    with
                    | None -> assert false
                    | Some id ->
@@ -583,7 +590,8 @@ struct
       network.bwd_map
       (Alg_expr.const Nbr.zero)
 
-  let nembed_of_connected_component parameters compil network
+  let nembed_of_connected_component
+      parameters compil network
       connected_component =
     match network.sym_reduction with
     | Symmetries.Ground | Symmetries.Forward _ ->
@@ -653,7 +661,7 @@ struct
       Alg_expr.BOOL_OP (op,
                         convert_bool_expr parameter compil network a,
                         convert_bool_expr parameter compil network b),pos
-  let add_reaction
+  let add_prereaction
       parameters compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
     let _  = debug "REACTANTS\n" in
@@ -668,7 +676,7 @@ struct
       List.fold_left
         (fun (remanent, tokens) (a,b) ->
            let remanent, id = translate_token b remanent in
-           let a' = convert_alg_expr parameters compil (snd remanent) a in
+           let a' = (*convert_alg_expr parameters compil (snd remanent)*) a in
            remanent,(a',(Locality.dummy_annot id))::tokens)
         (remanent,[])
         tokens
@@ -677,9 +685,9 @@ struct
     let network =
       {
         network with
-        reactions =
+        prereactions =
           (List.rev reactants, List.rev products, List.rev tokens,
-           enriched_rule)::network.reactions
+           enriched_rule)::network.prereactions
       }
     in
     to_be_visited, network
@@ -692,7 +700,7 @@ struct
            begin
              let _, embed, mixture = I.disjoint_union compil [] in
              let () = debug "add new reaction" in
-             add_reaction parameters compil enriched_rule embed mixture remanent
+             add_prereaction parameters compil enriched_rule embed mixture remanent
            end
          | _::_ -> remanent
       )
@@ -703,7 +711,7 @@ struct
          ([], network)
          initial_states) rules
 
-  let compute_reactions parameters compil network rules
+  let compute_prereactions parameters compil network rules
       initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
@@ -879,7 +887,7 @@ struct
                          let () =
                            debug "add new reaction"
                          in
-                         add_reaction
+                         add_prereaction
                            parameters compil enriched_rule embed
                            mixture remanent)
                       (to_be_visited,network)
@@ -899,7 +907,7 @@ struct
                     in
                     fold_left_swap
                       (fun embed ->
-                         add_reaction
+                         add_prereaction
                            parameters compil enriched_rule embed
                            (I.lift_species compil new_species))
                       lembed
@@ -926,7 +934,26 @@ struct
       network
       (I.nb_tokens compil)
 
-  let species_of_species_id network =
+  let convert_stochiometric_coef parameters compil network =
+    let reactions =
+      List.fold_left
+        (fun
+          reactions
+          (reactants, products, tokens, rule) ->
+          let tokens =
+            List.fold_left
+              (fun tokens (a,b) ->
+                 let a' = convert_alg_expr parameters compil network a in
+                 (a', b)::tokens)
+              [] (List.rev tokens)
+          in
+          (reactants,products, tokens, rule)::reactions)
+        []
+        (List.rev network.prereactions)
+    in
+    reactions
+
+    let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
 
   let get_reactions network = network.reactions
@@ -1338,7 +1365,7 @@ struct
       Format.printf "\t -saturating the set of molecular species @."
     in
     let network =
-      compute_reactions parameters compil network rules
+      compute_prereactions parameters compil network rules
         initial_state
     in
     let () =
@@ -1352,6 +1379,11 @@ struct
       compute_equivalence_classes
         parameters compil network
     in
+    let reactions =
+      convert_stochiometric_coef
+        parameters compil network
+    in
+    let network = {network with reactions = reactions} in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
