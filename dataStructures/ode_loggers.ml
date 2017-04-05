@@ -2053,46 +2053,81 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
-let print_options ~compute_jacobian logger =
+let print_options ~compute_jacobian ~pos ~nodevar logger =
   let format = Loggers.get_encoding_format logger in
   match
     format
   with
   | Loggers.Matlab
   | Loggers.Octave ->
+    let get_range () =
+      let _ = Loggers.fprintf logger "                   'NonNegative', [" in
+      let l = Tools.get_interval_list pos 1 nodevar in
+      let _ =
+        List.fold_left
+          (fun bool (a,b) ->
+             let () =
+               if bool then
+                 Loggers.fprintf logger ","
+             in
+             let () = Loggers.fprintf logger "%i:1:%i" a b in
+             true)
+          false l
+      in
+      let () = Loggers.fprintf logger "]" in
+      ()
+    in
     let () =
-      print_list logger
-        (if compute_jacobian then
-           [
-             "if nonnegative ";
-             "   options = odeset('RelTol', reltol, ...";
-             "                    'AbsTol', abstol, ...";
-             "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', maxstep, ...";
-             "                    'Jacobian', @ode_jacobian, ...";
-             "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
-             "else";
-             "   options = odeset('RelTol', reltol, ...";
-             "                    'AbsTol', abstol, ...";
-             "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', maxstep, ...";
-             "                    'Jacobian', @ode_jacobian)"^(instruction_sep logger);
-             "end";
-           ]
-         else
-             [ "if nonnegative ";
-             "   options = odeset('RelTol', reltol, ...";
-             "                    'AbsTol', abstol, ...";
-             "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', maxstep, ...";
-             "                   'NonNegative', [1:1:nodevar])"^(instruction_sep logger);
-             "else";
-             "   options = odeset('RelTol', reltol, ...";
-             "                    'AbsTol', abstol, ...";
-             "                    'InitialStep', initialstep, ...";
-             "                    'MaxStep', maxstep)"^(instruction_sep logger);
-             "end"]
-        )
+      if compute_jacobian
+      then
+        let () =
+          print_list logger
+            [
+              "if nonnegative ";
+              "   options = odeset('RelTol', reltol, ...";
+              "                    'AbsTol', abstol, ...";
+              "                    'InitialStep', initialstep, ...";
+              "                    'MaxStep', maxstep, ...";
+              "                    'Jacobian', @ode_jacobian, ...";
+            ]
+        in
+        let () = get_range () in
+        let () = Loggers.fprintf logger ")%s" (instruction_sep logger) in
+        let () = Loggers.print_newline logger in
+        let () =
+          print_list logger
+            [
+              "else";
+              "   options = odeset('RelTol', reltol, ...";
+              "                    'AbsTol', abstol, ...";
+              "                    'InitialStep', initialstep, ...";
+              "                    'MaxStep', maxstep, ...";
+              "                    'Jacobian', @ode_jacobian)"^(instruction_sep logger);
+              "end";
+            ]
+        in ()
+      else
+        let () =
+          print_list logger
+            [ "if nonnegative ";
+              "   options = odeset('RelTol', reltol, ...";
+              "                    'AbsTol', abstol, ...";
+              "                    'InitialStep', initialstep, ...";
+              "                    'MaxStep', maxstep, ...";]
+        in
+        let () = get_range () in
+        let () = Loggers.fprintf logger ")%s" (instruction_sep logger) in
+        let () = Loggers.print_newline logger in
+        let () =
+          print_list logger
+            [ "else";
+              "   options = odeset('RelTol', reltol, ...";
+              "                    'AbsTol', abstol, ...";
+              "                    'InitialStep', initialstep, ...";
+              "                    'MaxStep', maxstep)"^(instruction_sep logger);
+              "end"
+            ]
+        in ()
     in
     let () = Loggers.print_newline logger in
     ()

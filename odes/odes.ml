@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 04 2017>
+  * Last modification: Time-stamp: <Apr 05 2017>
 *)
 
 let local_trace = false
@@ -1910,7 +1910,14 @@ struct
         let () = Ode_loggers.print_newline logger in
         let () = Ode_loggers.print_license_check logger in
         let () = Ode_loggers.print_newline logger in
-        let () = Ode_loggers.print_options ~compute_jacobian logger in
+        let pos i =
+          match Mods.DynArray.get network.ode_vars_tab i
+          with
+          | Noccurrences _ | Nembed _ -> true
+          | Token _ | Dummy -> false
+        in
+        let nodevar = network.fresh_ode_var_id - 1 in
+        let () = Ode_loggers.print_options ~compute_jacobian ~pos ~nodevar logger in
         let () = Ode_loggers.print_newline logger in
         ()
     in

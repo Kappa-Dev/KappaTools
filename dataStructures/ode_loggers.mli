@@ -36,7 +36,7 @@ val print_ode_preamble:
   unit
 
 val declare_global: Loggers.t -> Ode_loggers_sig.variable -> unit
-val print_options: compute_jacobian:bool -> Loggers.t -> unit
+val print_options: compute_jacobian:bool -> pos:(int -> bool) -> nodevar:int -> Loggers.t -> unit
 val print_license_check: Loggers.t -> unit
 val print_integrate: nobs:int -> nodevar:int -> Loggers.t -> unit
 val print_interpolate: Loggers.t -> unit
@@ -60,7 +60,7 @@ val init_time: Loggers.t -> int -> unit
 val start_time: Loggers.t -> float -> unit
 val declare_init: ?comment:string -> Loggers.t -> int -> unit
 
-val associate_nonnegative: Loggers.t -> bool -> unit 
+val associate_nonnegative: Loggers.t -> bool -> unit
 val show_time_advance: Loggers.t -> unit
 val launch_main: Loggers.t -> unit
 

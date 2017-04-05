@@ -169,3 +169,23 @@ let lcm list =
   | [] -> 0
   | h::t ->
     List.fold_left lcm_2 h t
+
+let get_interval_list p i j =
+  let add current output =
+    match current with
+    | None -> output
+    | Some p -> p::output
+  in
+  let insert k current =
+    match current with
+    | None -> Some (k,k)
+    | Some (i,j) -> Some (k,j)
+  in
+  let rec aux p k current output =
+    if k<i
+    then add current output
+    else if p k
+    then aux p (k-1) (insert k current) output
+    else aux p (k-1) None (add current output)
+  in
+  aux p j None []
