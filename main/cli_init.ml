@@ -13,7 +13,7 @@ let get_compilation
     cli_args =
   let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
-      alg_overwrite =
+      alg_overwrite,overwrite_t0 =
     match cli_args.Run_cli_args.marshalizedInFile with
     | "" ->
       let result =
@@ -30,15 +30,18 @@ let get_compilation
         LKappa.compil_of_ast
           ~new_syntax
           cli_args.Run_cli_args.alg_var_overwrite result in
-      let overwrite_init = match cli_args.Run_cli_args.initialMix with
-        | None -> None
+      let overwrite_init,overwrite_t0 = match cli_args.Run_cli_args.initialMix with
+        | None -> None,None
         | Some file ->
           let compil =
             KappaLexer.compile Format.std_formatter Ast.empty_compil file in
+          let conf, _, _, _, _ =
+            Configuration.parse compil.Ast.configurations in
           Some
             (LKappa.init_of_ast
                ~new_syntax sigs_nd contact_map tk_nd.NamedDecls.finder
-               alg_finder compil.Ast.init) in
+               alg_finder compil.Ast.init),
+          conf.Configuration.initial in
       let () = Format.printf "+ Compiling...@." in
       let (env, has_tracking,init_l) =
         Eval.compile
@@ -50,7 +53,7 @@ let get_compilation
       let story_compression =
         if has_tracking && (n||w||s) then Some story_compression else None in
       (conf, progressConf, env, contact_map, updated_vars, story_compression,
-       formatCflow, cflowFile,init_l),[]
+       formatCflow, cflowFile,init_l),[],overwrite_t0
     | marshalized_file ->
       try
         let d = open_in_bin marshalized_file in
@@ -75,7 +78,7 @@ let get_compilation
                Alg_expr.CONST v)
             cli_args.Run_cli_args.alg_var_overwrite in
         match cli_args.Run_cli_args.initialMix with
-        | None -> pack,alg_overwrite
+        | None -> pack,alg_overwrite,None
         | Some file ->
           let compil =
             KappaLexer.compile Format.std_formatter Ast.empty_compil file in
@@ -84,10 +87,12 @@ let get_compilation
               ~new_syntax:cli_args.Run_cli_args.newSyntax
               (Model.signatures env) contact (Model.tokens_finder env)
               (Model.algs_finder env) compil.Ast.init in
+          let conf', _, _, _, _ =
+            Configuration.parse compil.Ast.configurations in
           let inits = Eval.compile_inits
               ~compileModeOn:false contact env raw_inits in
           (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
-          alg_overwrite
+          alg_overwrite,conf'.Configuration.initial
       with
       | ExceptionDefn.Malformed_Decl _ as e -> raise e
       | _exn ->
@@ -95,12 +100,14 @@ let get_compilation
           Format.std_formatter
           "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
         exit 1 in
-
+  let init_t_from_files =
+    Option_util.unsome
+      (Option_util.unsome 0. conf.Configuration.initial)
+      overwrite_t0 in
     let init_t,max_time,init_e,max_event,plot_period =
     match unit with
     | Time ->
-      Option_util.unsome (Option_util.unsome 0. conf.Configuration.initial)
-        cli_args.Run_cli_args.minValue,
+      Option_util.unsome init_t_from_files cli_args.Run_cli_args.minValue,
       cli_args.Run_cli_args.maxValue,
       None,None,
       (match cli_args.Run_cli_args.plotPeriod with
@@ -108,7 +115,7 @@ let get_compilation
        | None ->
          Option_util.unsome (Counter.DT 1.) conf.Configuration.plotPeriod)
     | Event ->
-      Option_util.unsome 0. conf.Configuration.initial,None,
+      init_t_from_files,None,
       Some (int_of_float (Option_util.unsome 0. cli_args.Run_cli_args.minValue)),
       Option_util.map int_of_float cli_args.Run_cli_args.maxValue,
       match cli_args.Run_cli_args.plotPeriod with
