@@ -216,7 +216,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
     (fun
       (sig_nd,
        contact_map,
-       tk_nd,
+       tk_nd,_algs_nd,
        _updated_vars,
        (result :
           (Ast.agent,

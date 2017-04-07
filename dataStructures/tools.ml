@@ -179,7 +179,7 @@ let get_interval_list p i j =
   let insert k current =
     match current with
     | None -> Some (k,k)
-    | Some (i,j) -> Some (k,j)
+    | Some (_i,j) -> Some (k,j)
   in
   let rec aux p k current output =
     if k<i
