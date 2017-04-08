@@ -396,7 +396,7 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!free)
 
-		Update information about potential sites accross domain
+		Update information about potential sites across domain
 
 		A(t,z!1),B(t,z!1)
 		B(t,z!1),A(t,z!1)
@@ -467,7 +467,7 @@ Id=23
 EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
 
-		Update information about potential sites accross domain
+		Update information about potential sites across domain
 
 		A(t!1,z),B(t!1,z)
 		B(t!1,z),A(t!1,z)

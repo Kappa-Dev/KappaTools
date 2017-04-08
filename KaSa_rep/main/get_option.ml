@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Apr 04 2017>
+  * Last modification: Time-stamp: <Apr 08 2017>
   * *
   * primitive to parse command-line options
   *
@@ -81,7 +81,7 @@ let options =
           "--contact-map-domain";"dynamic";
           "--views-domain";
           "--double-bonds-domain";
-          "--sites-accross-bonds-domain";
+          "--sites-across-bonds-domain";
         ],[]),"enable every abstract domain",["2_Reachability_analysis"],Normal;
       "--disable-every-domain",
       Multi(
@@ -89,7 +89,7 @@ let options =
         "--contact-map-domain";"static";
           "--no-views-domain";
           "--no-double-bonds-domain";
-          "--no-sites-accross-bonds-domain";
+          "--no-sites-across-bonds-domain";
         ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
       "--contact-map-domain",
       Choice
@@ -101,15 +101,19 @@ let options =
        "--views-domain",
       Bool Config.with_views_analysis,
           "enable local views analysis",
-          ["0_Actions";"2_Reachability_analysis"],Normal;
+          ["2_Reachability_analysis"],Normal;
       "--double-bonds-domain",
       Bool Config.with_parallel_bonds_analysis,
       "enable double bonds analysis",
-      ["0_Actions";"2_Reachability_analysis"],Normal;
+      ["2_Reachability_analysis"],Normal;
+      "--sites-across-bonds-domain",
+      Bool Config.with_site_across_bonds_analysis,
+      "enable the analysis of the relation among the states of sites in connected agents",
+      ["2_Reachability_analysis"],Normal;
       "--sites-accross-bonds-domain",
-      Bool Config.with_site_accross_bonds_analysis,
-      "enable the analysis of the relation amond the states of sites in connected agents",
-      ["0_Actions";"2_Reachability_analysis"],Normal;
+      Bool Config.with_site_across_bonds_analysis,
+      "enable the analysis of the relation among the states of sites in connected agents",
+      ["2_Reachability_analysis"],Hidden;
 
       "--compute-symmetries",
       Bool Config.do_symmetries,

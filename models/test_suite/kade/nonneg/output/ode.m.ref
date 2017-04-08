@@ -27,6 +27,8 @@ period=0.1;
 nonnegative=false;
 global nodevar
 nodevar=15;
+global max_stoc_coef
+max_stoc_coef=1;
 nvar=0;
 nobs=1;
 nrules=20;
@@ -35,10 +37,12 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
+stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
@@ -50,6 +54,7 @@ global jack
 global jackd
 global jackun
 global jackund
+global jacstoc
 
 jack=zeros(nrules,nodevar);
 jackd=zeros(nrules,nodevar);
@@ -75,10 +80,13 @@ k(12)=1; % D(x~p) -> D(x~u)
 k(13)=1; % D(y~u) -> D(y~p)
 k(14)=1; % D(y~p) -> D(y~u)
 k(15)=1; %  -> A(x~u,y~u)
+stoc(16,1)=1;
 k(16)=1; % A() -> A() | 1:a
+stoc(17,1)=-1;
 k(17)=1; %  -> B(x~u,y~u) | -(1):a
 k(18)=1; % B() -> C(x~u,y~u)
 k(19)=1; % C() -> D(x~u,y~u)
+stoc(20,1)=1;
 k(20)=1; % D() -> D() | 1:b
 
 uiIsOctave = false;
@@ -208,11 +216,13 @@ end
 function dydt=ode_aux(t,y)
 
 global nodevar
+global max_stoc_coef
 global var
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 
 
@@ -223,7 +233,7 @@ dydt=zeros(nodevar,1);
 
 dydt(14)=dydt(14)-k(16)*y(14);
 dydt(14)=dydt(14)+k(16)*y(14);
-dydt(3)=dydt(3)+k(16)*y(14)*1;
+dydt(3)=dydt(3)+k(16)*y(14)*stoc(16,1);
 
 % rule    : A(x~p) -> A(x~u)
 % reaction: A(x~p?, y~u?) -> A(x~u?, y~u?) 
@@ -236,7 +246,7 @@ dydt(1)=dydt(1)+k(2)*y(14);
 
 dydt(1)=dydt(1)-k(16)*y(1);
 dydt(1)=dydt(1)+k(16)*y(1);
-dydt(3)=dydt(3)+k(16)*y(1)*1;
+dydt(3)=dydt(3)+k(16)*y(1)*stoc(16,1);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u?, y~u?) -> A(x~p?, y~u?) 
@@ -315,7 +325,7 @@ dydt(6)=dydt(6)+k(8)*y(7);
 
 dydt(9)=dydt(9)-k(20)*y(9);
 dydt(9)=dydt(9)+k(20)*y(9);
-dydt(11)=dydt(11)+k(20)*y(9)*1;
+dydt(11)=dydt(11)+k(20)*y(9)*stoc(20,1);
 
 % rule    : D(y~u) -> D(y~p)
 % reaction: D(x~p?, y~u?) -> D(x~p?, y~p?) 
@@ -334,7 +344,7 @@ dydt(8)=dydt(8)+k(12)*y(9);
 
 dydt(12)=dydt(12)-k(20)*y(12);
 dydt(12)=dydt(12)+k(20)*y(12);
-dydt(11)=dydt(11)+k(20)*y(12)*1;
+dydt(11)=dydt(11)+k(20)*y(12)*stoc(20,1);
 
 % rule    : D(y~p) -> D(y~u)
 % reaction: D(x~p?, y~p?) -> D(x~p?, y~u?) 
@@ -353,7 +363,7 @@ dydt(10)=dydt(10)+k(12)*y(12);
 
 dydt(10)=dydt(10)-k(20)*y(10);
 dydt(10)=dydt(10)+k(20)*y(10);
-dydt(11)=dydt(11)+k(20)*y(10)*1;
+dydt(11)=dydt(11)+k(20)*y(10)*stoc(20,1);
 
 % rule    : D(y~p) -> D(y~u)
 % reaction: D(x~u?, y~p?) -> D(x~u?, y~u?) 
@@ -372,7 +382,7 @@ dydt(12)=dydt(12)+k(11)*y(10);
 
 dydt(8)=dydt(8)-k(20)*y(8);
 dydt(8)=dydt(8)+k(20)*y(8);
-dydt(11)=dydt(11)+k(20)*y(8)*1;
+dydt(11)=dydt(11)+k(20)*y(8)*stoc(20,1);
 
 % rule    : D(y~u) -> D(y~p)
 % reaction: D(x~u?, y~u?) -> D(x~u?, y~p?) 
@@ -420,7 +430,7 @@ dydt(4)=dydt(4)+k(3)*y(2);
 % reaction:  -> B(x~u?, y~u?) | -(1):a 
 
 dydt(2)=dydt(2)+k(17);
-dydt(3)=dydt(3)+k(17)*(-1);
+dydt(3)=dydt(3)+k(17)*stoc(17,1);
 
 % rule    :  -> A(x~u,y~u)
 % reaction:  -> A(x~u?, y~u?) 
@@ -434,17 +444,20 @@ end
 function jac=ode_jacobian(t,y)
 
 global nodevar
+global max_stoc_coef
 global jacvar
 global var
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 global jack
 global jackd
 global jackun
 global jackund
+global jacstoc
 
 
 
@@ -456,7 +469,7 @@ jac=sparse(nodevar,nodevar);
 
 jac(14,14)=jac(14,14)-k(16);
 jac(14,14)=jac(14,14)+k(16);
-jac(3,14)=jac(3,14)+k(16)*y(14)*1;
+jac(3,14)=jac(3,14)+k(16)*y(14)*stoc(16,1);
 
 % rule    : A(x~p) -> A(x~u)
 % reaction: A(x~p?, y~u?) -> A(x~u?, y~u?) 
@@ -469,7 +482,7 @@ jac(1,14)=jac(1,14)+k(2);
 
 jac(1,1)=jac(1,1)-k(16);
 jac(1,1)=jac(1,1)+k(16);
-jac(3,1)=jac(3,1)+k(16)*y(1)*1;
+jac(3,1)=jac(3,1)+k(16)*y(1)*stoc(16,1);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u?, y~u?) -> A(x~p?, y~u?) 
@@ -548,7 +561,7 @@ jac(6,7)=jac(6,7)+k(8);
 
 jac(9,9)=jac(9,9)-k(20);
 jac(9,9)=jac(9,9)+k(20);
-jac(11,9)=jac(11,9)+k(20)*y(9)*1;
+jac(11,9)=jac(11,9)+k(20)*y(9)*stoc(20,1);
 
 % rule    : D(y~u) -> D(y~p)
 % reaction: D(x~p?, y~u?) -> D(x~p?, y~p?) 
@@ -567,7 +580,7 @@ jac(8,9)=jac(8,9)+k(12);
 
 jac(12,12)=jac(12,12)-k(20);
 jac(12,12)=jac(12,12)+k(20);
-jac(11,12)=jac(11,12)+k(20)*y(12)*1;
+jac(11,12)=jac(11,12)+k(20)*y(12)*stoc(20,1);
 
 % rule    : D(y~p) -> D(y~u)
 % reaction: D(x~p?, y~p?) -> D(x~p?, y~u?) 
@@ -586,7 +599,7 @@ jac(10,12)=jac(10,12)+k(12);
 
 jac(10,10)=jac(10,10)-k(20);
 jac(10,10)=jac(10,10)+k(20);
-jac(11,10)=jac(11,10)+k(20)*y(10)*1;
+jac(11,10)=jac(11,10)+k(20)*y(10)*stoc(20,1);
 
 % rule    : D(y~p) -> D(y~u)
 % reaction: D(x~u?, y~p?) -> D(x~u?, y~u?) 
@@ -605,7 +618,7 @@ jac(12,10)=jac(12,10)+k(11);
 
 jac(8,8)=jac(8,8)-k(20);
 jac(8,8)=jac(8,8)+k(20);
-jac(11,8)=jac(11,8)+k(20)*y(8)*1;
+jac(11,8)=jac(11,8)+k(20)*y(8)*stoc(20,1);
 
 % rule    : D(y~u) -> D(y~p)
 % reaction: D(x~u?, y~u?) -> D(x~u?, y~p?) 

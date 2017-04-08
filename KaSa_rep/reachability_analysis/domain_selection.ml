@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of June
-  * Last modification: Time-stamp: <Nov 24 2016>
+  * Last modification: Time-stamp: <Apr 08 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -56,25 +56,25 @@ let select_domain
       (module With_cm : Analyzer_domain_sig.Domain)
   in
   let module With_views = (val with_views: Analyzer_domain_sig.Domain) in
-  let with_site_accross =
-    if Remanent_parameters.get_site_accross_bonds_analysis_1 parameters
+  let with_site_across =
+    if Remanent_parameters.get_site_across_bonds_analysis_1 parameters
     then
       (module
-        Product.Product(Site_accross_bonds_domain.Domain)(With_views) : Analyzer_domain_sig.Domain)
+        Product.Product(Site_across_bonds_domain.Domain)(With_views) : Analyzer_domain_sig.Domain)
     else
       (module With_views : Analyzer_domain_sig.Domain)
   in
-  let module With_site_accross =
-    (val with_site_accross: Analyzer_domain_sig.Domain)
+  let module With_site_across =
+    (val with_site_across: Analyzer_domain_sig.Domain)
   in
   let with_parallel_bonds =
     if Remanent_parameters.get_parallel_bonds_analysis_1 parameters
     then
       (module
-        Product.Product(Parallel_bonds.Domain)(With_site_accross) :
+        Product.Product(Parallel_bonds.Domain)(With_site_across) :
         Analyzer_domain_sig.Domain)
     else
-      (module With_site_accross)
+      (module With_site_across)
   in
   let module With_parallel_bonds =
     (val with_parallel_bonds: Analyzer_domain_sig.Domain)

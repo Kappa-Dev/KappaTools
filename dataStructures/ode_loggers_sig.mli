@@ -14,16 +14,19 @@ type variable =
   | InitialStep
   | MaxStep
   | RelTol
-  | AbsTol 
+  | AbsTol
   | Period_t_points
   | Rate of int
   | Rated of int
   | Rateun of int
   | Rateund of int
+  | Stochiometric_coef of int * int
+  | Jacobian_stochiometric_coef of int * int * int
   | Jacobian_rate of int * int
   | Jacobian_rated of int * int
   | Jacobian_rateun of int * int
   | Jacobian_rateund of int * int
+  | N_max_stoc_coef 
   | N_rules
   | N_ode_var
   | N_var

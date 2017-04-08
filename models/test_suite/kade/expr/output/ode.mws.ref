@@ -24,6 +24,7 @@ abstol:=0.001:
 period:=0.1:
 
 nodevar:=6:
+max_stoc_coef:=1:
 nvar:=3:
 nobs:=1:
 nrules:=5:
@@ -57,6 +58,7 @@ var2:=(t -> var1(t)*var1(t)*var1(t)*t):
 
 k2:=(t -> var1(t)):
 k4:=(t -> var2(t)):
+stoc5_1:=(t -> var1(t)*var1(t)*t):
 k5:=(t -> var2(t)):
 
 dydt1(t):=0:

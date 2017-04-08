@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 04 2017>
+  * Last modification: Time-stamp: <Apr 08 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -13,8 +13,6 @@
   * under the terms of the GNU Library General Public License *)
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
-
-let lowercase = String.lowercase
 
 let add_extension_if_not_already_mentioned a ext =
   let size_a = String.length a in
@@ -49,7 +47,7 @@ let ext_format x =
 
 let fetch_level_gen s r =
   match
-    lowercase !r
+    Tools.lowercase !r
   with
   | "mute" | "none"-> Remanent_parameters_sig.None
   | "low" -> Remanent_parameters_sig.Low
@@ -61,7 +59,7 @@ let fetch_level_gen s r =
 
 let fetch_graph_format f =
   match
-    lowercase !f
+    Tools.lowercase !f
   with
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
@@ -73,7 +71,7 @@ let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
 
 let fetch_rate_convention f =
   match
-    lowercase !f
+    Tools.lowercase !f
   with
   | "kasim" -> Remanent_parameters_sig.No_correction
   | "divide_by_nbr_of_autos_in_lhs" ->
@@ -287,12 +285,12 @@ let get_reachability_map () =
 let get_reachability_parameters () =
   {
     Remanent_parameters_sig.views = !Config.with_views_analysis;
-    Remanent_parameters_sig.site_accross_bonds =
-      !Config.with_site_accross_bonds_analysis ;
+    Remanent_parameters_sig.site_across_bonds =
+      !Config.with_site_across_bonds_analysis ;
     Remanent_parameters_sig.parallel_bonds =
       !Config.with_parallel_bonds_analysis ;
     Remanent_parameters_sig.dynamic_contact_map =
-      match lowercase !Config.with_dynamic_contact_map
+      match Tools.lowercase !Config.with_dynamic_contact_map
       with
       | "dynamic" -> true
       | "static" -> false
@@ -385,7 +383,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
           Remanent_parameters_sig.tk_interface=Tk_version.tk;
         Remanent_parameters_sig.influence_map_accuracy_level =
           begin
-            match lowercase !Config.influence_map_accuracy_level with
+            match Tools.lowercase !Config.influence_map_accuracy_level with
             | "indirect" -> Remanent_parameters_sig.Low
             | "direct" -> Remanent_parameters_sig.Medium
             | "realisable" | "realizable" -> Remanent_parameters_sig.High
@@ -514,7 +512,7 @@ let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
 
 
 let get_view_analysis_1 r = r.Remanent_parameters_sig.views
-let get_site_accross_bonds_analysis_1 r = r.Remanent_parameters_sig.site_accross_bonds
+let get_site_across_bonds_analysis_1 r = r.Remanent_parameters_sig.site_across_bonds
 let get_parallel_bonds_analysis_1 r =
   r.Remanent_parameters_sig.parallel_bonds
 let get_dynamic_contact_map_1 r = r.Remanent_parameters_sig.dynamic_contact_map
@@ -706,9 +704,9 @@ let get_view_analysis = upgrade_from_reachability_analysis_parameters_field
 let get_parallel_bonds_analysis =
   upgrade_from_reachability_analysis_parameters_field
     get_parallel_bonds_analysis_1
-let get_site_accross_bonds_analysis =
+let get_site_across_bonds_analysis =
   upgrade_from_reachability_analysis_parameters_field
-    get_site_accross_bonds_analysis_1
+    get_site_across_bonds_analysis_1
 let get_dynamic_contact_map =
   upgrade_from_reachability_analysis_parameters_field get_dynamic_contact_map_1
 

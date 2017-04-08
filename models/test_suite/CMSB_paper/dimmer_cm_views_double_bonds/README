@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa ../dimmer.ka --no-sites-accross-bonds-domain --output-directory output || exit 0
+"${KAPPABIN}"KaSa ../dimer.ka --no-sites-across-bonds-domain --output-directory output || exit 0

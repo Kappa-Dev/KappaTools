@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa ../dimmer.ka --no-views-domain --no-sites-accross-bonds-domain --output-directory output
+#Command line is: KaSa ../dimer.ka --no-views-domain --no-sites-across-bonds-domain --output-directory output
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF

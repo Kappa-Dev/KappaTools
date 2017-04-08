@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Mar 15 2017>
+  * Last modification: Time-stamp: <Apr 08 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -107,13 +107,13 @@ val get_hide_one_d_relations_from_cartesian_decomposition: Remanent_parameters_s
 val get_smash_relations: Remanent_parameters_sig.parameters -> bool
 
 val get_view_analysis:  Remanent_parameters_sig.parameters -> bool
-val get_site_accross_bonds_analysis: Remanent_parameters_sig.parameters -> bool
+val get_site_across_bonds_analysis: Remanent_parameters_sig.parameters -> bool
 val get_parallel_bonds_analysis: Remanent_parameters_sig.parameters -> bool
 val get_dynamic_contact_map: Remanent_parameters_sig.parameters -> bool
 val get_view_analysis_1:  Remanent_parameters_sig.reachability_parameters-> bool
 
 val get_reachability_analysis_parameters: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.reachability_parameters
-val get_site_accross_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
+val get_site_across_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_parallel_bonds_analysis_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_dynamic_contact_map_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_reachability_parameters: unit -> Remanent_parameters_sig.reachability_parameters

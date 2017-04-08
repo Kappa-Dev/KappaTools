@@ -36,6 +36,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <listOfSpecies>
 <species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
 <species metaid="CMD9" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD10" id="t3" name="" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -49,10 +50,10 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction: T() -> T() + T()  -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD10" species="s1"/>
+<speciesReference metaid="CMD11" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD11" species="s1" stoichiometry="2"/>
+<speciesReference metaid="CMD12" species="s1" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -62,13 +63,16 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </kineticLaw>
 </reaction>
 <!-- rule    : expo3 -->
-<!-- reaction:  ->  | 2.2:t + -(((|T()| + |t|) + nT)):t  -->
+<!-- reaction:  ->  | 2.2:t + -(2):u + -(((|T()| + |t|) + nT)):t  -->
 <reaction id="re2" name="expo3" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD13" species="t3" stoichiometry="2"/>
+</listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD12" species="t2" stoichiometry="2.2"/>
+<speciesReference metaid="CMD14" species="t2" stoichiometry="2.2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD13" species="t2"/>
+<modifierSpeciesReference metaid="CMD15" species="t2"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -79,14 +83,15 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <!-- reaction:  ->  | 2:t + -(|t|):t  -->
 <reaction id="re3" name="expo2" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD14" species="t2" stoichiometry="2"/>
+<speciesReference metaid="CMD16" species="t2" stoichiometry="2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD15" species="t2"/>
+<modifierSpeciesReference metaid="CMD17" species="t2"/>
+<modifierSpeciesReference metaid="CMD18" species="t3"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
-<ci>t2</ci></math>
+<apply><plus/><ci>t2</ci><ci>t3</ci></apply></math>
 </kineticLaw>
 </reaction>
 </listOfReactions>

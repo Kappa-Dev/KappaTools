@@ -1,2 +1,0 @@
-#Command-line:
-"${KAPPABIN}"KaSa ../dimmer.ka --disable-every-domain --double-bonds-domain --output-directory output || exit 0

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Apr 07 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -27,15 +27,14 @@ sig
   val get_reactions:
     ('a,'b) network ->
     (ode_var_id list * ode_var_id list *
-     (('a,'b) Alg_expr.e Locality.annot *
-      ode_var_id Locality.annot) list  * I.rule) list
+     ode_var_id Locality.annot  list  * I.rule) list
 
   val export_network:
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
     ?compute_jacobian:bool -> ?show_time_advance:bool ->
     ?nonnegative:bool -> ?initial_step:float -> ?max_step:float ->
-    ?abstol:float -> ?reltol:float -> 
+    ?abstol:float -> ?reltol:float ->
     Remanent_parameters_sig.parameters ->
     Loggers.t -> Loggers.t -> I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->

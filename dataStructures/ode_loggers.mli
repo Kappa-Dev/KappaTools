@@ -75,16 +75,17 @@ val update_token_jac:
   Ode_loggers_sig.variable ->
   nauto_in_lhs:int ->
   Ode_loggers_sig.variable ->
-  (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id * correct) list ->
+  Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id * correct) list ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> Mods.IntSet.t ->
   dep_mixture:Mods.IntSet.t ->
   dep_token:Mods.IntSet.t ->
   unit
 
 val update_token:
-    (int -> string) -> Loggers.t -> Ode_loggers_sig.variable -> nauto_in_lhs:int -> Ode_loggers_sig.variable ->
-    (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.variable * correct) list ->
-    (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->  unit
+  (int -> string) -> Loggers.t -> Ode_loggers_sig.variable ->
+  nauto_in_lhs:int -> Ode_loggers_sig.variable ->
+  Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list ->
+  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->  unit
 
 val print_newline:
   Loggers.t -> unit

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 05 2017>
+  * Last modification: Time-stamp: <Apr 08 2017>
 *)
 
 let local_trace = false
@@ -132,17 +132,17 @@ struct
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
 
+  let var_of_stoch rule n =
+    let rule_id, _, _ = rule.rule_id_with_mode in
+    Ode_loggers_sig.Stochiometric_coef (rule_id, n)
+
   type ('a,'b) network =
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
-      prereactions :
+        reactions:
         (id list * id list *
-         ((I.connected_component array list, int) Alg_expr.e Locality.annot * id Locality.annot) list
-         * enriched_rule) list ;
-      reactions:
-        (id list * id list *
-         (('a,'b) Alg_expr.e Locality.annot*id Locality.annot) list
+         (id Locality.annot) list
          * enriched_rule) list ;
 
       ode_vars_tab: ode_var Mods.DynArray.t ;
@@ -169,6 +169,7 @@ struct
       symmetries: Symmetries.symmetries option;
       sym_reduction: Symmetries.reduction ;
       bwd_map: Symmetries.bwd_map ;
+      max_stoch_coef: int;
     }
 
   let may_be_time_homogeneous_gen a =
@@ -224,7 +225,6 @@ struct
   let init compil =
     {
       rules = [] ;
-      prereactions = [] ;
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
@@ -246,6 +246,7 @@ struct
       symmetries = None ;
       sym_reduction = Symmetries.Ground ;
       bwd_map = Symmetries.empty_bwd_map () ;
+      max_stoch_coef = 0 ;
     }
 
   let from_nembed_correct compil nauto =
@@ -635,8 +636,12 @@ struct
             (f head)
             tail
       end
-    | (Alg_expr.TOKEN_ID _ | Alg_expr.ALG_VAR _ | Alg_expr.CONST _
-      |Alg_expr.STATE_ALG_OP _),_ as a -> a
+    | Alg_expr.TOKEN_ID id, loc ->
+      let id = snd (translate_token id ([],network)) in
+      Alg_expr.TOKEN_ID id, loc
+    |  (  Alg_expr.ALG_VAR _
+      | Alg_expr.CONST _
+      | Alg_expr.STATE_ALG_OP _),_ as a -> a
     | Alg_expr.IF (cond,yes,no),pos ->
       Alg_expr.IF (convert_bool_expr parameter compil network cond,
                    convert_alg_expr parameter compil network yes,
@@ -675,9 +680,9 @@ struct
       petrify_mixture parameters compil products remanent in
     let remanent, tokens =
       List.fold_left
-        (fun (remanent, tokens) (a,b) ->
+        (fun (remanent, tokens) (_,b) ->
            let remanent, id = translate_token b remanent in
-           remanent,(a,(Locality.dummy_annot id))::tokens)
+           remanent,(Locality.dummy_annot id)::tokens)
         (remanent,[])
         tokens
     in
@@ -685,9 +690,9 @@ struct
     let network =
       {
         network with
-        prereactions =
+        reactions =
           (List.rev reactants, List.rev products, List.rev tokens,
-           enriched_rule)::network.prereactions
+           enriched_rule)::network.reactions
       }
     in
     to_be_visited, network
@@ -716,19 +721,27 @@ struct
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
-    let cache, rules_rev =
+    let cache, max_coef, rules_rev =
       List.fold_left
-        (fun ((id, cache), list) rule ->
+        (fun ((id, cache), max_coef, list) rule ->
            let modes = I.valid_modes compil rule id in
-           List.fold_left
+           let max_coef = max max_coef (List.length (I.token_vector rule)) in
+           let a,b =
+             List.fold_left
              (fun ((id, cache), list) mode ->
                 let cache, elt =
                   enrich_rule cache compil rule mode in
                 (id, cache), elt::list)
-             ((next_id id, cache), list) modes)
-        ((fst_id, cache), []) (List.rev rules)
+             ((next_id id, cache),  list) modes
+           in
+           a, max_coef, b)
+        ((fst_id, cache), network.max_stoch_coef, []) (List.rev rules)
     in
-    let network = {network with cache = snd cache} in
+    let network =
+      {network
+       with cache = snd cache ;
+            max_stoch_coef = max_coef}
+    in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
       initial_network
@@ -934,7 +947,7 @@ struct
       network
       (I.nb_tokens compil)
 
-  let convert_stochiometric_coef parameters compil network =
+      (*  let convert_stochiometric_coef parameters compil network =
     let reactions =
       List.fold_left
         (fun
@@ -951,7 +964,7 @@ struct
         []
         (List.rev network.prereactions)
     in
-    reactions
+          reactions*)
 
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
@@ -1058,8 +1071,7 @@ struct
       | Alg_expr.STATE_ALG_OP _ -> ()
       | Alg_expr.IF (cond,yes,no) ->
         aux_bool id cond; aux_alg id yes; aux_alg id no
-      | Alg_expr.TOKEN_ID s ->
-        let id' = translate_token s network in
+      | Alg_expr.TOKEN_ID id' ->
         let list = Mods.DynArray.get init_tab id' in
         List.iter (fun id'' -> add_succ id id'') list
       | Alg_expr.KAPPA_INSTANCE (id':ode_var_id) ->
@@ -1134,7 +1146,7 @@ struct
     then
       {network with var_declaration = top_sort}
     else
-      let () = Printf.fprintf stdout "Circular dependencies\n" in
+      let () = Format.fprintf Format.std_formatter "Circular dependencies\n" in
       assert false
 
   let convert_one_obs parameters obs network =
@@ -1181,6 +1193,8 @@ struct
     {network with cache = cache}, list
 
   type ('a,'b) rate = ('a,'b) Alg_expr.e Locality.annot
+  type ('a,'b) stoc = int * ('a,'b) Alg_expr.e Locality.annot
+  type ('a,'b) coef = R of ('a,'b) rate | S of ('a,'b) stoc
 
   type ('a,'b) sort_rules_and_decl =
     {
@@ -1189,9 +1203,9 @@ struct
       var_decl: 'a decl list ;
       init: 'a decl list ;
       const_rate :
-        (enriched_rule * ('a,'b) rate) list ;
+        (enriched_rule * ('a,'b) coef list) list ;
       var_rate :
-        (enriched_rule * ('a,'b) rate) list ;
+        (enriched_rule * ('a,'b) coef list) list ;
     }
 
   let init_sort_rules_and_decl =
@@ -1252,22 +1266,50 @@ struct
            match rate with
            | None -> sort_rules
            | Some rate ->
+             let const_list = [] in
+             let var_list = [] in
              let rate = convert_alg_expr parameters compil network rate in
-             let sort_rules =
+             let const_list, var_list =
                if Ode_loggers_sig.is_expr_const rate
                then
+                 (R rate)::const_list, var_list
+               else
+                 const_list, (R rate)::var_list
+             in
+             let vector =
+               I.token_vector enriched_rule.rule
+             in
+             let const_list, var_list, _ =
+               List.fold_left
+                 (fun (const_list, var_list, n) (expr,_) ->
+                    let rate = convert_alg_expr parameters compil network expr in
+                    if Ode_loggers_sig.is_expr_const rate
+                    then (S (n,rate))::const_list, var_list, n+1
+                    else const_list, (S (n,rate))::var_list, n+1
+                 )
+                 (const_list, var_list, 1)
+                 vector
+             in
+             let sort_rules =
+               match const_list with
+               | [] -> sort_rules
+               | _::_ ->
                  {
                    sort_rules
                    with const_rate =
                           (enriched_rule,
-                           rate)::sort_rules.const_rate
+                           const_list)::sort_rules.const_rate
                  }
-               else
-                 {
+             in
+             let sort_rules =
+               match var_list with
+               | [] -> sort_rules
+               | _::_ ->
+                  {
                    sort_rules
                    with var_rate =
                           (enriched_rule,
-                           rate)::sort_rules.var_rate
+                           var_list)::sort_rules.var_rate
                  }
              in
              sort_rules)
@@ -1379,14 +1421,6 @@ struct
       compute_equivalence_classes
         parameters compil network
     in
-    let () =
-      Format.printf "\t -compute stochiometric coefficients @."
-    in
-    let reactions =
-      convert_stochiometric_coef
-        parameters compil network
-    in
-    let network = {network with reactions = reactions} in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
     let () = Format.printf "\t -variables @." in
@@ -1411,8 +1445,7 @@ struct
       Network_handler.int_of_obs =
         (fun s -> Mods.IntMap.find_default s s network.varmap) ;
       Network_handler.int_of_kappa_instance = (fun i -> i) ;
-      Network_handler.int_of_token_id =
-        (fun s -> Mods.IntMap.find_default 0 s network.tokenmap) ;
+      Network_handler.int_of_token_id = (fun i -> i);
     }
 
   let increment
@@ -1473,15 +1506,12 @@ struct
         ~init_mode (I.string_of_var_id ~compil ~init_mode logger) logger logger_buffer
         (Ode_loggers_sig.Expr id) expr handler_expr
 
-  let get_dep ?time_var dep_map expr =
+  let get_dep ?time_var dep_map expr network =
     Alg_expr_extra.dep
       ?time_var
       (Mods.IntSet.empty, Mods.IntSet.empty)
-      (fun a (b,c) ->
-         Mods.IntSet.add a b,c)
-      (fun a (b,c) ->
-         b,
-         Mods.IntSet.add a c)
+      (fun a (b,c) -> Mods.IntSet.add a b,c)
+      (fun a (b,c) -> b, Mods.IntSet.add a c)
       (fun (a,b) (c,d) ->
          Mods.IntSet.union a c,
          Mods.IntSet.union b d)
@@ -1512,7 +1542,7 @@ struct
     | Dummy_decl
     | Init_expr _ -> dep
     | Var (id,_comment,expr) ->
-      let dep_var = get_dep ?time_var dep expr in
+      let dep_var = get_dep ?time_var dep expr network in
       let dep = Mods.IntMap.add id dep_var dep in
       let () =
         Mods.IntSet.iter
@@ -1533,10 +1563,10 @@ struct
       let () =
         Mods.IntSet.iter
           (fun dt ->
-             let expr =
+            let expr =
                Alg_expr_extra.simplify
                  (Alg_expr_extra.diff_token expr dt)
-             in
+            in
              Ode_loggers.associate
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
@@ -1548,47 +1578,57 @@ struct
       in
       dep
 
+  let affect_deriv_gen
+      dep_var logger logger_buffer compil var rate network dep =
+      let time_var = build_time_var network in
+      let handler_expr = handler_expr network in
+      let dep_set = get_dep ?time_var dep_var rate network in
+      let dep = VMAP.add var dep_set dep in
+      let () =
+        Mods.IntSet.iter
+          (fun dt ->
+             let expr =
+               Alg_expr_extra.simplify
+                 (Alg_expr_extra.diff_mixture ?time_var rate dt)
+             in
+             Ode_loggers.associate
+               ~init_mode:false
+               (I.string_of_var_id ~compil logger)
+               logger logger_buffer
+               (Ode_loggers.variable_of_derived_variable
+                  var dt)
+                expr handler_expr)
+          (fst dep_set)
+      in
+      let () =
+        Mods.IntSet.iter
+          (fun dt ->
+             let expr =
+               Alg_expr_extra.simplify
+                 (Alg_expr_extra.diff_token rate dt)
+             in
+             Ode_loggers.associate
+               ~init_mode:false
+               (I.string_of_var_id ~compil logger)
+               logger logger_buffer
+               (Ode_loggers.variable_of_derived_variable
+                  var dt)
+                expr handler_expr)
+          (snd dep_set)
+      in
+      dep
+
   let affect_deriv_rate
       dep_var logger logger_buffer compil rule rate network dep
     =
-    let time_var = build_time_var network in
-    let handler_expr = handler_expr network in
-    let dep_set = get_dep ?time_var dep_var rate in
-    let dep = VMAP.add (var_of_rule rule) dep_set dep in
-    let () =
-      Mods.IntSet.iter
-        (fun dt ->
-           let expr =
-             Alg_expr_extra.simplify
-               (Alg_expr_extra.diff_mixture ?time_var rate dt)
-           in
-           Ode_loggers.associate
-             ~init_mode:false
-             (I.string_of_var_id ~compil logger)
-             logger logger_buffer
-             (Ode_loggers.variable_of_derived_variable
-                (var_of_rule rule) dt)
-              expr handler_expr)
-        (fst dep_set)
-    in
-    let () =
-      Mods.IntSet.iter
-        (fun dt ->
-           let expr =
-             Alg_expr_extra.simplify
-               (Alg_expr_extra.diff_token rate dt)
-           in
-           Ode_loggers.associate
-             ~init_mode:false
-             (I.string_of_var_id ~compil logger)
-             logger logger_buffer
-             (Ode_loggers.variable_of_derived_variable
-                (var_of_rule rule) dt)
-              expr handler_expr)
-        (snd dep_set)
-    in
+    affect_deriv_gen
+      dep_var logger logger_buffer compil (var_of_rule rule) rate network dep
 
-    dep
+  let affect_deriv_stoch
+      dep_var logger logger_buffer compil rule n coef network dep
+    =
+    affect_deriv_gen
+      dep_var logger logger_buffer compil (var_of_stoch rule n) coef network dep
 
   let fresh_is_zero network =
     let is_zero =
@@ -1610,6 +1650,7 @@ struct
     let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rateun x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rateund x) in
+    let () = do_it (fun x -> Ode_loggers_sig.Stochiometric_coef (x,network.max_stoch_coef)) in
     let () =
       match Loggers.get_encoding_format logger with
       | Loggers.Octave | Loggers.Matlab ->
@@ -1622,6 +1663,7 @@ struct
       | Loggers.Json -> ()
     in
     ()
+
 
   let declare_rates_global logger network =
     declare_rates_global_gen
@@ -1751,6 +1793,18 @@ struct
             handler_expr
         in
         let () =
+          Ode_loggers.declare_global logger_buffer
+            Ode_loggers_sig.N_max_stoc_coef
+        in
+        let () =
+          Ode_loggers.associate
+            (I.string_of_var_id ~compil logger)
+            logger logger_buffer
+            Ode_loggers_sig.N_max_stoc_coef
+            (Alg_expr.int network.max_stoch_coef)
+            handler_expr
+        in
+        let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
             logger logger_buffer
@@ -1793,6 +1847,12 @@ struct
           Ode_loggers.initialize
             ~nodevar logger_buffer
             (Ode_loggers_sig.Init network.fresh_ode_var_id)
+        in
+        let () =
+          Ode_loggers.initialize
+            ~nodevar logger_buffer
+            (Ode_loggers_sig.Stochiometric_coef
+               (network.n_rules,network.max_stoch_coef))
         in
         let () = declare_rates_global logger_buffer network in
         let () =
@@ -1898,11 +1958,25 @@ struct
         let () = Ode_loggers.print_newline logger_buffer in
         let () =
           List.iter
-            (fun (rule,rate) ->
-               Ode_loggers.associate
-                 (I.string_of_var_id ~compil logger)
-                 ~comment:rule.comment logger logger_buffer
-                 (var_of_rate rule.rule_id_with_mode) rate handler_expr)
+            (fun (rule,coefs) ->
+               List.iter
+                 (fun coef ->
+                    match coef with
+                    | R rate ->
+                      Ode_loggers.associate
+                        (I.string_of_var_id ~compil logger)
+                        ~comment:rule.comment logger logger_buffer
+                        (var_of_rate rule.rule_id_with_mode) rate handler_expr
+                    | S (n,stoc) ->
+                      Ode_loggers.associate
+                        (I.string_of_var_id ~compil logger)
+                        logger logger_buffer
+                        (Ode_loggers_sig.Stochiometric_coef
+                           ((let a,_,_ = rule.rule_id_with_mode in a) , n))
+                        stoc
+                        handler_expr)
+                 coefs
+            )
             split.const_rate
         in
         let () =
@@ -1975,6 +2049,9 @@ struct
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
     in
     let () =
+      Ode_loggers.declare_global logger Ode_loggers_sig.N_max_stoc_coef
+    in
+    let () =
       Ode_loggers.declare_global logger (Ode_loggers_sig.Expr 1)
     in
     let () = declare_rates_global logger network in
@@ -1984,11 +2061,24 @@ struct
     let () = Ode_loggers.print_newline logger in
     let () =
       List.iter
-        (fun (rule,rate) ->
-           Ode_loggers.associate
-             (I.string_of_var_id ~compil logger)
-             logger logger
-             (var_of_rule rule) rate (handler_expr network))
+        (fun (rule,coefs) ->
+           List.iter
+             (fun coef ->
+                match coef with
+                | R rate ->
+                  Ode_loggers.associate
+                    (I.string_of_var_id ~compil logger)
+                    logger logger
+                    (var_of_rule rule) rate (handler_expr network)
+                | S (n,stoc) ->
+                  Ode_loggers.associate
+                    (I.string_of_var_id ~compil logger)
+                    logger logger
+                    (Ode_loggers_sig.Stochiometric_coef
+                       ((let a,_,_ = rule.rule_id_with_mode in a) , n))
+                    stoc
+                    (handler_expr network))
+             coefs)
         split.var_rate
     in
     let () = Ode_loggers.print_newline logger in
@@ -2135,6 +2225,8 @@ struct
              Sbml_backend.dump_sbml_reaction
                (I.string_of_var_id ~compil logger)
                get_rule
+               (fun a ->
+                  let (a,_,_) = a.rule_id_with_mode in a)
                I.print_rule_name
                (Some compil)
                logger
@@ -2166,16 +2258,19 @@ struct
              do_it Ode_loggers.produce products reactants'
                enriched_rule
            in
-           let () =
-             List.iter
-               (fun (expr,(token,_loc)) ->
-                  Ode_loggers.update_token
+           let _ =
+             List.fold_left
+               (fun n (token,_) ->
+                  let () =
+                    Ode_loggers.update_token
                     (I.string_of_var_id ~compil logger)
                     logger
                     (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
                     (var_of_rule enriched_rule)
-                    expr reactants' (handler_expr network))
-               token_vector
+                    (var_of_stoch enriched_rule n)
+                    reactants' (handler_expr network)
+                  in n+1)
+               1 token_vector
            in ()
         ) network.reactions
     in
@@ -2223,6 +2318,9 @@ struct
         Ode_loggers.declare_global logger (Ode_loggers_sig.N_ode_var)
       in
       let () =
+        Ode_loggers.declare_global logger Ode_loggers_sig.N_max_stoc_coef
+      in
+      let () =
         Ode_loggers.declare_global logger (Ode_loggers_sig.Jacobian_var (1,1))
       in
       let () =
@@ -2240,11 +2338,24 @@ struct
       let () = Ode_loggers.print_newline logger in
       let () =
         List.iter
-          (fun (rule,rate) ->
-             Ode_loggers.associate
-               (I.string_of_var_id ~compil logger)
-               logger logger
-               (var_of_rule rule) rate (handler_expr network))
+          (fun (rule,coef_list) ->
+             List.iter
+               (fun coef ->
+                  match coef with
+                  | R rate ->
+                  Ode_loggers.associate
+                    (I.string_of_var_id ~compil logger)
+                    logger logger
+                    (var_of_rule rule)
+                    rate (handler_expr network)
+                  | S (n,rate) ->
+                    Ode_loggers.associate
+                      (I.string_of_var_id ~compil logger)
+                      logger logger
+                      (var_of_stoch rule n)
+                      rate (handler_expr network)
+               )
+               coef_list)
           split.var_rate
       in
       let dep_var =
@@ -2258,12 +2369,23 @@ struct
       let () = Ode_loggers.print_newline logger in
       let dep_rates =
         List.fold_left
-          (fun dep (rule,rate) ->
-             affect_deriv_rate
-               dep_var
-               logger logger compil
-               rule rate network
-               dep
+          (fun dep (rule,coef_list) ->
+             List.fold_left
+               (fun dep coef ->
+                  match coef with
+                  | R rate ->
+                    affect_deriv_rate
+                      dep_var
+                      logger logger compil
+                      rule rate network
+                      dep
+                  | S (n,rate) ->
+                    affect_deriv_stoch
+                      dep_var
+                      logger logger compil
+                      rule n rate network
+                      dep)
+               dep coef_list
           )
           VMAP.empty
           split.var_rate
@@ -2433,22 +2555,32 @@ struct
                  reactants'
                  enriched_rule
              in
-             let () =
-               List.iter
-                 (fun (expr,(token,_loc)) ->
-                    let dep_set_token_expr = get_dep ?time_var dep_var expr in
-                    Ode_loggers.update_token_jac
-                      ?time_var
-                      (I.string_of_var_id ~compil logger)
-                      logger
-                      (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
-                      (var_of_rule enriched_rule)
-                      expr reactants' (handler_expr network)
-                      dep_set_rate
-                      ~dep_mixture:(fst dep_set_token_expr)
-                      ~dep_token:(snd dep_set_token_expr)
+             let _ =
+               List.fold_left
+                 (fun n (token,_loc) ->
+                    let dep_set_token_expr =
+                      match
+                        VMAP.find_option
+                          (var_of_stoch enriched_rule n) dep_rates
+                      with
+                      | Some set -> set
+                      | None -> (Mods.IntSet.empty,Mods.IntSet.empty)
+                    in
+                    let () =
+                      Ode_loggers.update_token_jac
+                        ?time_var
+                        (I.string_of_var_id ~compil logger)
+                        logger
+                        (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
+                        (var_of_rule enriched_rule)
+                        (var_of_stoch enriched_rule n)
+                        reactants' (handler_expr network)
+                        dep_set_rate
+                        ~dep_mixture:(fst dep_set_token_expr)
+                        ~dep_token:(snd dep_set_token_expr)
+                    in n+1
                  )
-                 token_vector
+                 1 token_vector
              in ()
           ) network.reactions
       in
