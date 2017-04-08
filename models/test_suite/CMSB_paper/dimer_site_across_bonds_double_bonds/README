@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa ../dimer.ka  --disable-every-domain --sites-across-bonds-domain --output-directory output || exit 0
