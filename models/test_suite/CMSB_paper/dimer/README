@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa ../dimer.ka --compute-local-traces --output-directory output || exit 0
