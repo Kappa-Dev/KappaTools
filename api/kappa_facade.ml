@@ -4,7 +4,7 @@ module A =
   (val Domain_selection.select_domain
       ~reachability_parameters:{
         Remanent_parameters_sig.views = true;
-        Remanent_parameters_sig.site_accross_bonds = true;
+        Remanent_parameters_sig.site_across_bonds = true;
         Remanent_parameters_sig.parallel_bonds = false;
         Remanent_parameters_sig.dynamic_contact_map = true;
       } ())
