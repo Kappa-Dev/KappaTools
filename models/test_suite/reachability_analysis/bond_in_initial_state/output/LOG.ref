@@ -78,7 +78,7 @@ Reachability analysis...
 
 		B(x!A@x,x~p)
 
-		Update information about potential sites accross domain
+		Update information about potential sites across domain
 
 		B(x~p!1),A(x~u!1)
 		A(x~u!1),B(x~p!1)

@@ -117,6 +117,7 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.MaxStep
@@ -129,6 +130,9 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
   | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
   | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
+  | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
+    Printf.sprintf "stoc%i.%i" int1 int2
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _
   | Ode_loggers_sig.Jacobian_rate _
   | Ode_loggers_sig.Jacobian_rated _
   | Ode_loggers_sig.Jacobian_rateun _
@@ -147,10 +151,11 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Tend -> Some "time"
   | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.RelTol
-  | Ode_loggers_sig.AbsTol 
+  | Ode_loggers_sig.AbsTol
   | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Init _
   | Ode_loggers_sig.Concentration _
+  | Ode_loggers_sig.Stochiometric_coef _
   | Ode_loggers_sig.Initbis _ -> Some "substance"
   | Ode_loggers_sig.Time_scale_factor -> Some "time_per_substance"
   | Ode_loggers_sig.NonNegative
@@ -162,6 +167,7 @@ let unit_of_variable variable =
   | Ode_loggers_sig.Rated _
   | Ode_loggers_sig.Rateun _
   | Ode_loggers_sig.Rateund _
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _
   | Ode_loggers_sig.Jacobian_rate _
   | Ode_loggers_sig.Jacobian_rated _
   | Ode_loggers_sig.Jacobian_rateun _
@@ -171,6 +177,7 @@ let unit_of_variable variable =
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.Tmp -> None
 
 let meta_id_of_logger logger =
@@ -857,58 +864,83 @@ let positive_part expr =
                          Locality.dummy_annot(
                            Alg_expr.CONST (Nbr.zero)),expr))
 
-let dump_token_vector convert logger network_handler token_vector =
-  List.iter
-    (fun (expr,(id,_)) ->
-       let stochiometry_opt =
-         eval_const_alg_expr logger network_handler (convert expr)
-       in
-       match stochiometry_opt with
-       | None ->
+let dump_token_vector convert logger network_handler rule_id token_vector =
+  let _ =
+    List.fold_left
+      (fun n (id,_) ->
+         let expr_opt =
+           Loggers.get_expr logger
+             (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
+         in
+         let expr = unsome expr_opt in
+         let stochiometry_opt =
+           eval_const_alg_expr logger network_handler (convert expr)
+         in
          let () =
-           Printf.printf "%s: Expressions for token consumption/production should be constants \n Cowardly replace it with 0" (Locality.to_string (snd expr))
+           match stochiometry_opt with
+           | None ->
+             Printf.printf
+               "%s: Expressions for token consumption/production  should be constants \n Cowardly replace it with 0"
+               (Locality.to_string (snd expr))
+           | Some x when Nbr.is_zero x -> ()
+           | Some x ->
+             let s =
+               Format.sprintf
+                 "metaid=\"%s\" species=\"t%i\"%s"
+                 (meta_id_of_logger logger)
+                 id
+                 (if Nbr.is_equal x (Nbr.I 1) then "" else " stoichiometry=\""^(Nbr.to_string x)^"\"")
+             in
+             single_box ~options:(fun () -> s) logger "speciesReference"
          in
-         ()
-       | Some x when Nbr.is_zero x -> ()
-       | Some x ->
-         let s =
-           Format.sprintf
-             "metaid=\"%s\" species=\"t%i\"%s"
-             (meta_id_of_logger logger)
-             id
-             (if Nbr.is_equal x (Nbr.I 1) then "" else " stoichiometry=\""^(Nbr.to_string x)^"\"")
-         in
-         let () = single_box ~options:(fun () -> s) logger "speciesReference" in
-         ())
-    token_vector
+         n+1)
+      1
+      token_vector
+  in
+  ()
 
-let has_good_token_token_vector convert logger network_handler token_vector =
-  List.exists
-    (fun (expr,_) ->
-       let stochiometry_opt =
-         eval_const_alg_expr logger network_handler (convert expr)
-       in
-       match stochiometry_opt with
-       | None -> false
-       | Some x when Nbr.is_zero x -> false
-       | Some _ -> true)
-    token_vector
+let has_good_token_token_vector
+    convert logger network_handler rule_id token_vector =
+  let rec aux n l =
+    match l with
+    | [] -> false
+    | _::tail ->
+      begin
+        let expr_opt =
+          Loggers.get_expr logger
+            (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
+        in
+        let stochiometry_opt =
+          eval_const_alg_expr logger network_handler (convert (unsome expr_opt))
+        in
+        match stochiometry_opt with
+        | None -> aux (n+1) tail
+        | Some x when Nbr.is_zero x -> aux (n+1) tail
+        | Some _ -> true
+      end
+  in aux 1 token_vector
 
-let has_reactants_in_token_vector logger network_handler token_vector =
-  has_good_token_token_vector negative_part logger network_handler token_vector
-let has_products_in_token_vector logger network_handler token_vector =
-  has_good_token_token_vector positive_part logger network_handler token_vector
+let has_reactants_in_token_vector logger network_handler rule_id token_vector =
+  has_good_token_token_vector
+    negative_part logger network_handler rule_id token_vector
+let has_products_in_token_vector logger network_handler rule_id token_vector =
+  has_good_token_token_vector
+    positive_part logger network_handler rule_id token_vector
 
-let dump_products_of_token_vector logger network_handler token_vector =
-  dump_token_vector positive_part logger network_handler token_vector
-let dump_reactants_of_token_vector logger network_handler token_vector =
-  dump_token_vector negative_part logger network_handler token_vector
+let dump_products_of_token_vector
+    logger network_handler rule_id token_vector =
+  dump_token_vector
+    positive_part logger network_handler rule_id token_vector
+let dump_reactants_of_token_vector logger network_handler rule_id token_vector =
+  dump_token_vector
+    negative_part logger network_handler rule_id token_vector
 
 
 
 let dump_sbml_reaction
     string_of_var_id
     get_rule
+    get_rule_id
     print_rule_name
     compil
     logger
@@ -925,6 +957,7 @@ let dump_sbml_reaction
   let label_list_of_reactants = "listOfReactants" in
   let label_list_of_products = "listOfProducts" in
   let label_list_of_mods = "listOfModifiers" in
+  let rule_id = get_rule_id enriched_rule in
   let options =
     (fun () -> Format.asprintf
         "id=\"re%i\" name=\"%a\" reversible=\"false\" fast=\"false\"" reaction_id (print_rule_name ?compil) (get_rule enriched_rule))
@@ -934,7 +967,7 @@ let dump_sbml_reaction
       (fun logger ->
          let () =
            if reactants = [] &&
-            not (has_reactants_in_token_vector logger network token_vector)
+            not (has_reactants_in_token_vector logger network rule_id token_vector)
            then ()
            else
              add_box ~break logger label_list_of_reactants
@@ -945,14 +978,14 @@ let dump_sbml_reaction
                   in
                   let () =
                     dump_reactants_of_token_vector
-                      logger network token_vector
+                      logger network rule_id token_vector
                   in
                   ()
                )
          in
          let () =
            if products = [] &&
-              not (has_products_in_token_vector logger network  token_vector)
+              not (has_products_in_token_vector logger network  rule_id token_vector)
            then ()
            else
              add_box ~break logger label_list_of_products
@@ -962,7 +995,7 @@ let dump_sbml_reaction
                       logger products in
                   let () =
                     dump_products_of_token_vector
-                      logger network token_vector
+                      logger network rule_id token_vector
                   in
                   ())
          in

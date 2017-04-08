@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Dec 02 2016>
+ * Last modification: Time-stamp: <Apr 08 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -422,7 +422,7 @@ let rec print ?beginning_of_sentence:(beggining=true)
   let endenumeration = if html_mode then "</UL>\n" else "" in
   let beginenum = if html_mode then "<LI>" else "+" in
   let endenum = if html_mode then "</LI>\n" else "" in
-  let cap s = if beggining then String.capitalize s else s in
+  let cap s = if beggining then Tools.capitalize s else s in
   let in_agent s = if prompt_agent_type then "in agent "^s^" " else "" in
   let in_agent_comma s = if prompt_agent_type then "in agent "^s^", " else "" in
   let log = Remanent_parameters.get_logger parameters in

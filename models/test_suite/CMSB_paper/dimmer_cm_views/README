@@ -1,2 +1,0 @@
-#Command-line:
-"${KAPPABIN}"KaSa ../dimmer.ka --disable-every-domain --views-domain --contact-map-domain dynamic --output-directory output || exit 0

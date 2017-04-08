@@ -27,6 +27,8 @@ period=0.1;
 nonnegative=false;
 global nodevar
 nodevar=2;
+global max_stoc_coef
+max_stoc_coef=0;
 nvar=1;
 nobs=1;
 nrules=0;
@@ -35,10 +37,12 @@ global var
 var=zeros(nvar,1);
 global init
 init=sparse(nodevar,1);
+stoc=zeros(nrules,max_stoc_coef);
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 k=zeros(nrules,1);
 kd=zeros(nrules,1);
@@ -50,6 +54,7 @@ global jack
 global jackd
 global jackun
 global jackund
+global jacstoc
 
 jack=zeros(nrules,nodevar);
 jackd=zeros(nrules,nodevar);
@@ -176,11 +181,13 @@ end
 function dydt=ode_aux(t,y)
 
 global nodevar
+global max_stoc_coef
 global var
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 
 
@@ -193,17 +200,20 @@ end
 function jac=ode_jacobian(t,y)
 
 global nodevar
+global max_stoc_coef
 global jacvar
 global var
 global k
 global kd
 global kun
 global kdun
+global stoc
 
 global jack
 global jackd
 global jackun
 global jackund
+global jacstoc
 
 
 

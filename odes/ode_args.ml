@@ -15,7 +15,7 @@ type t = {
   mutable show_symmetries : bool ;
   mutable views : bool ;
   mutable dbonds : bool ;
-  mutable site_accross : bool ;
+  mutable site_across : bool ;
   mutable nonnegative : bool ;
   mutable show_time_advance : bool ;
   mutable initial_step : float ;
@@ -40,7 +40,7 @@ let default : t =
     show_symmetries = false ;
     views = true ;
     dbonds = true ;
-    site_accross = true ;
+    site_across = true ;
     nonnegative = false ;
     show_time_advance = false ;
     initial_step = 0.00001 ;
@@ -92,8 +92,8 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   "--double-bonds-domain",
   Arg.Bool (fun dbonds -> t.dbonds <- dbonds),
   "Enable/disable double bonds analysis when detecting symmetric sites" ;
-  "--site-accross-bonds-domain",
-  Arg.Bool (fun site_accross -> t.site_accross <- site_accross),
+  "--site-across-bonds-domain",
+  Arg.Bool (fun site_across -> t.site_across <- site_across),
   "Enable/disable the analysis of the relation amond the states of sites in
       connected agents";
   "--nonnegative",
@@ -118,7 +118,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
 let build_kasa_parameters ~called_from t t_common =
   Config.with_views_analysis := t.views ;
   Config.with_parallel_bonds_analysis := t.dbonds ;
-  Config.with_site_accross_bonds_analysis := t.site_accross ;
+  Config.with_site_across_bonds_analysis := t.site_across ;
   Config.trace := t_common.Common_args.debug ;
   Remanent_parameters.get_parameters
     ~called_from

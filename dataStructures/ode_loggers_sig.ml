@@ -22,10 +22,13 @@ type variable =
   | Rated of int
   | Rateun of int
   | Rateund of int
+  | Stochiometric_coef of int * int
+  | Jacobian_stochiometric_coef of int * int * int
   | Jacobian_rate of int * int
   | Jacobian_rated of int * int
   | Jacobian_rateun of int * int
   | Jacobian_rateund of int * int
+  | N_max_stoc_coef
   | N_rules
   | N_ode_var
   | N_var
@@ -117,18 +120,20 @@ let string_of_array_name var =
   | Rated _ -> "kd"
   | Rateun _ -> "kun"
   | Rateund _ -> "kdun"
+  | Stochiometric_coef _ -> "stoc"
   | Expr _ -> "var"
   | Obs _ -> "obs"
   | Init _ -> "init"
   | Initbis _ -> "Init"
   | Concentration _ -> "y"
   | Deriv _ -> "dydt"
-  | Jacobian (_,_) -> "jac"
-  | Jacobian_var (_,_) -> "jacvar"
-  | Jacobian_rate (_,_) -> "jack"
-  | Jacobian_rated (_,_) -> "jackd"
-  | Jacobian_rateun (_,_) -> "jackun"
-  | Jacobian_rateund (_,_) -> "jackund"
+  | Jacobian _ -> "jac"
+  | Jacobian_var _ -> "jacvar"
+  | Jacobian_rate _ -> "jack"
+  | Jacobian_rated _ -> "jackd"
+  | Jacobian_rateun _ -> "jackun"
+  | Jacobian_rateund _ -> "jackund"
+  | Jacobian_stochiometric_coef _ -> "jacstoc"
   | Tinit -> "tinit"
   | Tend -> "tend"
   | InitialStep -> "initialstep"
@@ -141,6 +146,7 @@ let string_of_array_name var =
   | N_obs -> "nobs"
   | N_rows -> "nrows"
   | N_rules -> "nrules"
+  | N_max_stoc_coef -> "max_stoc_coef"
   | Tmp -> "tmp"
   | Current_time -> "t"
   | Time_scale_factor -> "t_correct_dimmension"

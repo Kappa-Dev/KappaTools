@@ -16,7 +16,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-
 let string_of_variable_octave var =
   match var with
   | Ode_loggers_sig.Rate int
@@ -36,9 +35,13 @@ let string_of_variable_octave var =
   | Ode_loggers_sig.Jacobian_rateun (int1,int2)
   | Ode_loggers_sig.Jacobian_rateund (int1,int2)
   | Ode_loggers_sig.Jacobian (int1,int2)
-  | Ode_loggers_sig.Jacobian_var (int1,int2) ->
+  | Ode_loggers_sig.Jacobian_var (int1,int2)
+  | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
     Printf.sprintf "%s(%i,%i)"
       (Ode_loggers_sig.string_of_array_name var)  int1 int2
+  | Ode_loggers_sig.Jacobian_stochiometric_coef (int1,int2,int3) ->
+    Printf.sprintf "%s(%i,%i,%i)"
+      (Ode_loggers_sig.string_of_array_name var) int1 int2 int3
   | Ode_loggers_sig.MaxStep
   | Ode_loggers_sig.InitialStep
   | Ode_loggers_sig.AbsTol
@@ -52,6 +55,7 @@ let string_of_variable_octave var =
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.Tmp
   | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Time_scale_factor ->
@@ -73,12 +77,13 @@ let string_of_variable_mathematica ~side var =
   | Ode_loggers_sig.Rateund int
   | Ode_loggers_sig.Obs int
   | Ode_loggers_sig.Concentration int
-  | Ode_loggers_sig.Deriv int ->
-    Printf.sprintf "%s%i[t%s]"
-      (Ode_loggers_sig.string_of_array_name var) int side_ext
+  | Ode_loggers_sig.Deriv int
   | Ode_loggers_sig.Expr int ->
     Printf.sprintf "%s%i[t%s]"
       (Ode_loggers_sig.string_of_array_name var) int side_ext
+  | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
+    Printf.sprintf "%s%i_%i[t%s]"
+      (Ode_loggers_sig.string_of_array_name var) int1 int2 side_ext
   | Ode_loggers_sig.Init int
   | Ode_loggers_sig.Initbis int ->
     Printf.sprintf "%s%i"
@@ -88,7 +93,8 @@ let string_of_variable_mathematica ~side var =
   | Ode_loggers_sig.Jacobian_rateun _
   | Ode_loggers_sig.Jacobian_rateund _
   | Ode_loggers_sig.Jacobian _
-  | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.Jacobian_var _
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _ -> ""
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
@@ -102,6 +108,7 @@ let string_of_variable_mathematica ~side var =
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.Tmp
   | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Time_scale_factor ->
@@ -123,12 +130,16 @@ let string_of_variable_maple var =
   | Ode_loggers_sig.Initbis int ->
     Printf.sprintf "%s%i"
       (Ode_loggers_sig.string_of_array_name var) int
+  | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
+      Printf.sprintf "%s%i_%i"
+        (Ode_loggers_sig.string_of_array_name var) int1 int2
   | Ode_loggers_sig.Jacobian_rate _
   | Ode_loggers_sig.Jacobian_rated _
   | Ode_loggers_sig.Jacobian_rateun _
   | Ode_loggers_sig.Jacobian_rateund _
   | Ode_loggers_sig.Jacobian _
-  | Ode_loggers_sig.Jacobian_var _ -> ""
+  | Ode_loggers_sig.Jacobian_var _
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _ -> ""
   | Ode_loggers_sig.NonNegative
   | Ode_loggers_sig.Tinit
   | Ode_loggers_sig.Tend
@@ -142,6 +153,7 @@ let string_of_variable_maple var =
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rules
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.Tmp
   | Ode_loggers_sig.Current_time
   | Ode_loggers_sig.Time_scale_factor ->
@@ -178,6 +190,8 @@ let variable_of_derived_variable var id =
   | Ode_loggers_sig.Rateund int -> Ode_loggers_sig.Jacobian_rateund (int,id)
   | Ode_loggers_sig.Expr int -> Ode_loggers_sig.Jacobian_var (int, id)
   | Ode_loggers_sig.Concentration int -> Ode_loggers_sig.Jacobian (int, id)
+  | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
+    Ode_loggers_sig.Jacobian_stochiometric_coef (int1,int2,id)
   | Ode_loggers_sig.NonNegative -> assert false
   | Ode_loggers_sig.Obs _ -> assert false
   | Ode_loggers_sig.Init _ -> assert false
@@ -187,6 +201,7 @@ let variable_of_derived_variable var id =
   | Ode_loggers_sig.Jacobian_rated _ -> assert false
   | Ode_loggers_sig.Jacobian_rateun _ -> assert false
   | Ode_loggers_sig.Jacobian_rateund _ -> assert false
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _ -> assert false
   | Ode_loggers_sig.Jacobian _ -> assert false
   | Ode_loggers_sig.Jacobian_var _ -> assert false
   | Ode_loggers_sig.Tinit -> assert false
@@ -201,6 +216,7 @@ let variable_of_derived_variable var id =
   | Ode_loggers_sig.N_obs -> assert false
   | Ode_loggers_sig.N_rules -> assert false
   | Ode_loggers_sig.N_rows -> assert false
+  | Ode_loggers_sig.N_max_stoc_coef -> assert false
   | Ode_loggers_sig.Tmp -> assert false
   | Ode_loggers_sig.Current_time -> assert false
   | Ode_loggers_sig.Time_scale_factor -> assert false
@@ -526,10 +542,18 @@ let initialize ~nodevar logger variable =
           Loggers.fprintf logger "%s=zeros(nrules,1)%s"
             (Ode_loggers_sig.string_of_array_name variable)
             (instruction_sep logger)
-        | Ode_loggers_sig.Jacobian_rate (_,_)
-        | Ode_loggers_sig.Jacobian_rateun (_,_)
-        | Ode_loggers_sig.Jacobian_rated (_,_)
-        | Ode_loggers_sig.Jacobian_rateund (_,_) ->
+        | Ode_loggers_sig.Stochiometric_coef _ ->
+          Loggers.fprintf logger "%s=zeros(nrules,max_stoc_coef)%s"
+            (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
+        | Ode_loggers_sig.Jacobian_stochiometric_coef _ ->
+          Loggers.fprintf logger "%s=zeros(nrules,max_stoc_coef,nodevar)%s"
+            (Ode_loggers_sig.string_of_array_name variable)
+            (instruction_sep logger)
+        | Ode_loggers_sig.Jacobian_rate _
+        | Ode_loggers_sig.Jacobian_rateun _
+        | Ode_loggers_sig.Jacobian_rated _
+        | Ode_loggers_sig.Jacobian_rateund _ ->
           Loggers.fprintf logger "%s=zeros(nrules,nodevar)%s"
             (Ode_loggers_sig.string_of_array_name variable)
             (instruction_sep logger)
@@ -577,6 +601,7 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.N_var
         | Ode_loggers_sig.N_rows
         | Ode_loggers_sig.N_obs
+        | Ode_loggers_sig.N_max_stoc_coef
         | Ode_loggers_sig.Current_time
         | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.N_rules -> ()
@@ -604,6 +629,8 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Jacobian_rateun _
         | Ode_loggers_sig.Jacobian_rated _
         | Ode_loggers_sig.Jacobian_rateund _
+        | Ode_loggers_sig.Jacobian_stochiometric_coef _
+        | Ode_loggers_sig.Stochiometric_coef _
           -> Loggers.print_newline logger
         | Ode_loggers_sig.Tinit
         | Ode_loggers_sig.Tend
@@ -616,6 +643,7 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.N_var
         | Ode_loggers_sig.N_obs
         | Ode_loggers_sig.N_rules
+        | Ode_loggers_sig.N_max_stoc_coef
         | Ode_loggers_sig.Time_scale_factor
         | Ode_loggers_sig.NonNegative
         | Ode_loggers_sig.Current_time
@@ -638,7 +666,29 @@ let initialize ~nodevar logger variable =
         | Ode_loggers_sig.Jacobian_rateund _
         | Ode_loggers_sig.Expr _
         | Ode_loggers_sig.Concentration _
-        | Ode_loggers_sig.Initbis _ -> ()
+        | Ode_loggers_sig.Initbis _
+        | Ode_loggers_sig.Stochiometric_coef _
+        | Ode_loggers_sig.Jacobian_stochiometric_coef _
+        | Ode_loggers_sig.NonNegative
+        | Ode_loggers_sig.Jacobian _
+        | Ode_loggers_sig.Jacobian_var _
+        | Ode_loggers_sig.Obs _
+        | Ode_loggers_sig.Tinit
+        | Ode_loggers_sig.Tend
+        | Ode_loggers_sig.MaxStep
+        | Ode_loggers_sig.InitialStep
+        | Ode_loggers_sig.AbsTol
+        | Ode_loggers_sig.RelTol
+        | Ode_loggers_sig.Period_t_points
+        | Ode_loggers_sig.N_ode_var
+        | Ode_loggers_sig.N_var
+        | Ode_loggers_sig.N_rows
+        | Ode_loggers_sig.N_obs
+        | Ode_loggers_sig.N_max_stoc_coef
+        | Ode_loggers_sig.Current_time
+        | Ode_loggers_sig.Time_scale_factor
+        | Ode_loggers_sig.Tmp
+        | Ode_loggers_sig.N_rules -> ()
         | Ode_loggers_sig.Init _ ->
                 repeat
                   (fun _ k ->
@@ -670,25 +720,6 @@ let initialize ~nodevar logger variable =
                in
                ())
             (nodevar-1)
-        | Ode_loggers_sig.NonNegative
-        | Ode_loggers_sig.Jacobian _
-        | Ode_loggers_sig.Jacobian_var _
-        | Ode_loggers_sig.Obs _
-        | Ode_loggers_sig.Tinit
-        | Ode_loggers_sig.Tend
-        | Ode_loggers_sig.MaxStep
-        | Ode_loggers_sig.InitialStep
-        | Ode_loggers_sig.AbsTol
-        | Ode_loggers_sig.RelTol
-        | Ode_loggers_sig.Period_t_points
-        | Ode_loggers_sig.N_ode_var
-        | Ode_loggers_sig.N_var
-        | Ode_loggers_sig.N_rows
-        | Ode_loggers_sig.N_obs
-        | Ode_loggers_sig.Current_time
-        | Ode_loggers_sig.Time_scale_factor
-        | Ode_loggers_sig.Tmp
-        | Ode_loggers_sig.N_rules -> ()
       in
       ()
     end
@@ -917,7 +948,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
           Loggers.fprintf
             logger "jacvar(%i,%i)"
             (network_handler.Network_handler.int_of_obs x)
-            (network_handler.Network_handler.int_of_token_id id)
+            id
         else ()
       | Alg_expr.DIFF_KAPPA_INSTANCE((Alg_expr.ALG_VAR x,_),id) ->
         if octave_matlab format then
@@ -1162,6 +1193,7 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.N_var
   | Ode_loggers_sig.N_obs
   | Ode_loggers_sig.N_rows
+  | Ode_loggers_sig.N_max_stoc_coef
   | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable
   | Ode_loggers_sig.Time_scale_factor -> "t_correct_dimmension"
   | Ode_loggers_sig.Current_time -> "t"
@@ -1169,10 +1201,12 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
   | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
   | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
-  | Ode_loggers_sig.Jacobian_rate (_,_)
-  | Ode_loggers_sig.Jacobian_rateun (_,_)
-  | Ode_loggers_sig.Jacobian_rated (_,_)
-  | Ode_loggers_sig.Jacobian_rateund (_,_) -> ""
+  | Ode_loggers_sig.Jacobian_rate _
+  | Ode_loggers_sig.Jacobian_rateun _
+  | Ode_loggers_sig.Jacobian_rated _
+  | Ode_loggers_sig.Jacobian_rateund _
+  | Ode_loggers_sig.Stochiometric_coef _
+  | Ode_loggers_sig.Jacobian_stochiometric_coef _ -> ""
 
 
 
@@ -1188,6 +1222,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.Obs _
     | Ode_loggers_sig.Init _
     | Ode_loggers_sig.Concentration _
+    | Ode_loggers_sig.Stochiometric_coef _
     | Ode_loggers_sig.AbsTol
     | Ode_loggers_sig.RelTol
     | Ode_loggers_sig.Initbis _ -> Some "substance"
@@ -1195,10 +1230,11 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.Deriv _
     | Ode_loggers_sig.Jacobian _
     | Ode_loggers_sig.Jacobian_var _
-    | Ode_loggers_sig.Jacobian_rate (_,_)
-    | Ode_loggers_sig.Jacobian_rated (_,_)
-    | Ode_loggers_sig.Jacobian_rateun (_,_)
-    | Ode_loggers_sig.Jacobian_rateund (_,_)
+    | Ode_loggers_sig.Jacobian_rate _
+    | Ode_loggers_sig.Jacobian_rated _
+    | Ode_loggers_sig.Jacobian_rateun _
+    | Ode_loggers_sig.Jacobian_rateund _
+    | Ode_loggers_sig.Jacobian_stochiometric_coef _
     | Ode_loggers_sig.Rate _
     | Ode_loggers_sig.Rated _
     | Ode_loggers_sig.Rateun _
@@ -1207,6 +1243,7 @@ let string_of_variable_sbml string_of_var_id variable =
     | Ode_loggers_sig.N_ode_var
     | Ode_loggers_sig.N_var
     | Ode_loggers_sig.N_obs
+    | Ode_loggers_sig.N_max_stoc_coef
     | Ode_loggers_sig.NonNegative
     | Ode_loggers_sig.N_rows
     | Ode_loggers_sig.Tmp -> None
@@ -1319,6 +1356,24 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
           let () = Loggers.print_newline logger in
           ()
         end
+      | Ode_loggers_sig.Stochiometric_coef (int1, int2)
+        ->
+        begin
+          let () =
+            Loggers.fprintf logger "%s%i_%i:=(t -> "
+              (Ode_loggers_sig.string_of_array_name variable) int1 int2
+          in
+          let () =
+            print_alg_expr_few_parenthesis ~init_mode string_of_var_id logger
+              alg_expr network_handler
+          in
+          let () = Loggers.fprintf logger ")%s" (instruction_sep logger) in
+          let () = if comment = "" then () else Loggers.fprintf logger " " in
+          let () = print_comment logger comment in
+          let () = Loggers.print_newline logger in
+          ()
+        end
+
       | Ode_loggers_sig.Init int
       | Ode_loggers_sig.Initbis int ->
         let () =
@@ -1346,6 +1401,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       | Ode_loggers_sig.N_var
       | Ode_loggers_sig.N_obs
       | Ode_loggers_sig.N_rows
+      | Ode_loggers_sig.N_max_stoc_coef
       | Ode_loggers_sig.Tmp
       | Ode_loggers_sig.Current_time
       | Ode_loggers_sig.Time_scale_factor ->
@@ -1366,8 +1422,9 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       | Ode_loggers_sig.Jacobian_rate _
       | Ode_loggers_sig.Jacobian_rated _
       | Ode_loggers_sig.Jacobian_rateun _
-      | Ode_loggers_sig.Jacobian_rateund _ ->
-          ()
+      | Ode_loggers_sig.Jacobian_rateund _
+      | Ode_loggers_sig.Jacobian_stochiometric_coef _
+        -> ()
     end
   | Loggers.Mathematica  ->
     begin
@@ -1401,7 +1458,8 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
                  logger
                  network_handler
                  alg_expr)
-          | Some _, _ | _, false -> ()
+          | Some _, _
+          | _, false -> ()
         end
         | (Ode_loggers_sig.Tinit |
          Ode_loggers_sig.Tend |
@@ -1424,10 +1482,12 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
               logger_buffer
               variable
               (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
+        | Ode_loggers_sig.Stochiometric_coef _,_
         | Ode_loggers_sig.Jacobian_rate (_,_),_
         | Ode_loggers_sig.Jacobian_rateun (_,_),_
-        | Ode_loggers_sig.Jacobian_rated (_,_),_
+        | Ode_loggers_sig.Jacobian_rated _,_
         | Ode_loggers_sig.Jacobian_rateund (_,_),_
+        | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
         | Ode_loggers_sig.Expr _ , _
         | Ode_loggers_sig.Init _, _
         | Ode_loggers_sig.Initbis _, _
@@ -1442,6 +1502,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.RelTol,_
         | Ode_loggers_sig.N_rules,_
         | Ode_loggers_sig.N_ode_var,_
+        | Ode_loggers_sig.N_max_stoc_coef,_
         | Ode_loggers_sig.N_var,_
         | Ode_loggers_sig.N_obs,_
         | Ode_loggers_sig.N_rows,_
@@ -1779,7 +1840,7 @@ let gen_deriv
 
 let consume_jac = gen_deriv "-"
 let produce_jac = gen_deriv "+"
-let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler =
+let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate stoc_coef var_list handler =
   match
     Loggers.get_encoding_format logger
   with
@@ -1806,7 +1867,9 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
           Loggers.fprintf logger "*"
       in
       let () =
-        Loggers.fprintf logger "%s" (string_of_variable ~side:RHS logger var_rate) in
+        Loggers.fprintf
+          logger "%s" (string_of_variable ~side:RHS logger var_rate)
+      in
       let () =
         List.iter
           (fun (var,correct) ->
@@ -1816,9 +1879,8 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
       in
       let () = Loggers.fprintf logger "*" in
       let () =
-        print_alg_expr
-          ~parenthesis_mode:In_product
-          string_of_var_id logger expr handler
+        Loggers.fprintf
+          logger "%s" (string_of_variable ~side:RHS logger stoc_coef)
       in
       let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
       let () = Loggers.print_newline logger in
@@ -1830,7 +1892,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate expr v
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs var_rate expr var_list handler dep_rate ~dep_mixture ~dep_token =
+let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs var_rate var_stoc var_list handler dep_rate ~dep_mixture ~dep_token =
   match
     Loggers.get_encoding_format logger
   with
@@ -1887,9 +1949,8 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
            in
            let () = Loggers.fprintf logger "*" in
            let () =
-             print_alg_expr
-               ~parenthesis_mode:In_product
-               string_of_var_id logger expr handler
+             Loggers.fprintf
+               logger "%s" (string_of_variable ~side:RHS logger var_stoc)
            in
            let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
            let () = Loggers.print_newline logger in
@@ -1948,12 +2009,9 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
           in
           let () = Loggers.fprintf logger "*" in
           let () =
-            print_alg_expr
-              ~parenthesis_mode:In_product
-              string_of_var_id logger
-              (Alg_expr_extra.simplify
-                 (deriv expr dt))
-              handler
+            Loggers.fprintf logger "%s"
+              (string_of_variable ~side:RHS logger
+                 (variable_of_derived_variable var_stoc dt))
           in
           let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
           let () = Loggers.print_newline logger in
@@ -2031,12 +2089,8 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
               in
               let () = Loggers.fprintf logger "*" in
               let () =
-                print_alg_expr
-                  ~parenthesis_mode:In_product
-                  string_of_var_id logger
-                  (Alg_expr_extra.simplify
-                     expr)
-                  handler
+                Loggers.fprintf logger "%s"
+                  (string_of_variable ~side:RHS logger var_stoc)
               in
               let () = Loggers.fprintf logger "%s" (instruction_sep logger) in
               let () = Loggers.print_newline logger in

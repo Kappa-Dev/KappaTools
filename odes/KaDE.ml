@@ -1,18 +1,15 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Mar 27 2017>
+  * Last modification: Time-stamp: <Apr 08 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
 
-let lowercase = String.lowercase(*_ascii  : ocaml 4.03*)
-
 let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE input_file [--ode-backend Matlab | Octave | SBML]
-[--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-accross-bonds-domain true | false] [--nonnegative false | true ][--export-time-advance false | true ] [--initial-step float] [--max-step float]
-[--relative-tolerance float] [--absolute-tolerance float]\n"
+    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float]
+    [--relative-tolerance float] [--absolute-tolerance float]\n"
   in
   let cli_args = Run_cli_args.default in
   let common_args = Common_args.default in
@@ -32,7 +29,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let backend =
-      match lowercase ode_args.Ode_args.backend with
+      match Tools.lowercase ode_args.Ode_args.backend with
       | "octave" -> Loggers.Octave
       | "matlab" -> Loggers.Matlab
       | "mathematica" -> Loggers.Mathematica
@@ -48,7 +45,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         end
     in
     let rate_convention =
-      match lowercase ode_args.Ode_args.rate_convention with
+      match Tools.lowercase ode_args.Ode_args.rate_convention with
     | "kasim" -> Remanent_parameters_sig.No_correction
     | "divide_by_nbr_of_autos_in_lhs" ->
       Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
@@ -93,7 +90,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           s
     in
     let count =
-      match lowercase ode_args.Ode_args.count with
+      match Tools.lowercase ode_args.Ode_args.count with
       | "embedding" | "embeddings" -> Ode_args.Embeddings
       | "occurrences" | "occurrence" | "instances" | "instance"->
         Ode_args.Occurrences
@@ -172,7 +169,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | None -> ground
       | Some string ->
         begin
-          match lowercase string with
+          match Tools.lowercase string with
           | "none" | "ground" | "false" -> ground
           | "true" | "forward" -> forward
           | "backward" -> backward

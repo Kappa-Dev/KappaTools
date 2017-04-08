@@ -179,7 +179,7 @@ let get_interval_list p i j =
   let insert k current =
     match current with
     | None -> Some (k,k)
-    | Some (i,j) -> Some (k,j)
+    | Some (_,j) -> Some (k,j)
   in
   let rec aux p k current output =
     if k<i
@@ -189,3 +189,6 @@ let get_interval_list p i j =
     else aux p (k-1) None (add current output)
   in
   aux p j None []
+
+let lowercase = String.lowercase
+let capitalize = String.capitalize
