@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 08 2017>
+  * Last modification: Time-stamp: <Apr 10 2017>
 *)
 
 let local_trace = false
@@ -2263,12 +2263,11 @@ struct
                (fun n (token,_) ->
                   let () =
                     Ode_loggers.update_token
-                    (I.string_of_var_id ~compil logger)
                     logger
                     (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
                     (var_of_rule enriched_rule)
                     (var_of_stoch enriched_rule n)
-                    reactants' (handler_expr network)
+                    reactants'
                   in n+1)
                1 token_vector
            in ()
@@ -2569,12 +2568,11 @@ struct
                     let () =
                       Ode_loggers.update_token_jac
                         ?time_var
-                        (I.string_of_var_id ~compil logger)
                         logger
                         (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
                         (var_of_rule enriched_rule)
                         (var_of_stoch enriched_rule n)
-                        reactants' (handler_expr network)
+                        reactants' 
                         dep_set_rate
                         ~dep_mixture:(fst dep_set_token_expr)
                         ~dep_token:(snd dep_set_token_expr)
