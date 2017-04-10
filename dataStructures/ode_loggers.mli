@@ -70,22 +70,21 @@ val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -
 val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
 val update_token_jac:
   ?time_var:Ode_loggers_sig.ode_var_id ->
-  (int -> string) ->
   Loggers.t ->
   Ode_loggers_sig.variable ->
   nauto_in_lhs:int ->
   Ode_loggers_sig.variable ->
   Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id * correct) list ->
-  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> Mods.IntSet.t ->
+  Mods.IntSet.t ->
   dep_mixture:Mods.IntSet.t ->
   dep_token:Mods.IntSet.t ->
   unit
 
 val update_token:
-  (int -> string) -> Loggers.t -> Ode_loggers_sig.variable ->
+  Loggers.t -> Ode_loggers_sig.variable ->
   nauto_in_lhs:int -> Ode_loggers_sig.variable ->
   Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list ->
-  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t ->  unit
+  unit
 
 val print_newline:
   Loggers.t -> unit

@@ -1840,7 +1840,7 @@ let gen_deriv
 
 let consume_jac = gen_deriv "-"
 let produce_jac = gen_deriv "+"
-let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate stoc_coef var_list handler =
+let update_token logger var_token ~nauto_in_lhs var_rate stoc_coef var_list =
   match
     Loggers.get_encoding_format logger
   with
@@ -1892,7 +1892,7 @@ let update_token string_of_var_id logger var_token ~nauto_in_lhs var_rate stoc_c
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs var_rate var_stoc var_list handler dep_rate ~dep_mixture ~dep_token =
+let update_token_jac ?time_var logger var_token ~nauto_in_lhs var_rate var_stoc var_list dep_rate ~dep_mixture ~dep_token =
   match
     Loggers.get_encoding_format logger
   with
@@ -1958,7 +1958,7 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
         dep_rate
       in
       let () =
-        let aux_deriv deriv dt =
+        let aux_deriv dt =
           let dt_id = dt in
           let var_dt_lhs =
             string_of_variable
@@ -2018,16 +2018,8 @@ let update_token_jac ?time_var string_of_var_id logger var_token ~nauto_in_lhs v
           ()
         in
         (* we differentiate according to the token coefficient *)
-        let () =
-          Mods.IntSet.iter
-            (aux_deriv (Alg_expr_extra.diff_mixture ?time_var))
-            dep_mixture
-        in
-        let () =
-          Mods.IntSet.iter
-            (aux_deriv Alg_expr_extra.diff_token)
-            dep_token
-        in ()
+        let () = Mods.IntSet.iter aux_deriv dep_mixture in
+        Mods.IntSet.iter aux_deriv dep_token         
       in
       let () =  (* we differentiate according to the species *)
         let rec aux tail suffix =
