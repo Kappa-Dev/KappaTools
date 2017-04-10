@@ -16,6 +16,7 @@ matrix:
           - avsm
         packages:
           - ocaml-nox
+          - aspcud
           - opam
   - env: CHECKED=js
     addons:
@@ -24,6 +25,7 @@ matrix:
           - avsm
         packages:
           - ocaml-nox
+          - aspcud
           - opam
   - env: USE_TK=1
     addons:
@@ -32,6 +34,7 @@ matrix:
           - avsm
         packages:
           - ocaml-nox
+          - aspcud
           - opam
           - tk-dev
   - env: CHECKED=native
@@ -41,6 +44,7 @@ matrix:
           - avsm
         packages:
           - ocaml-nox
+          - aspcud
           - opam
           - gnuplot-nox
           - graphviz
