@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Mar 28 2017>
+  * Last modification: Time-stamp: <Apr 10 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -93,6 +93,23 @@ let print_influence_map parameters influence_map =
          y)
     influence_map.Remanent_state.negative;
   Loggers.print_newline log
+
+let query_inhibition_map influence_map r1 r2 =
+  match
+    Remanent_state.InfluenceNodeMap.find_option
+      (Remanent_state.Rule r1) influence_map.Remanent_state.negative
+  with
+  | None -> []
+  | Some map ->
+    begin
+      match
+        Remanent_state.InfluenceNodeMap.find_option
+              (Remanent_state.Rule r2)
+              map
+      with
+      | None -> []
+      | Some l -> l
+    end
 
 let print_contact_map parameters contact_map =
   let log = (Remanent_parameters.get_logger parameters) in
@@ -1082,6 +1099,11 @@ let get_influence_map
        (Remanent_state.get_influence_map accuracy_level)
        (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
 
+
+let query_inhibition_map ?accuracy_level state r1 r2 =
+  let state,inf_map = get_influence_map ?accuracy_level state in
+  let output = query_inhibition_map inf_map r1 r2 in
+  state, output
 (******************************************************************)
 
 let compute_dead_agents _show_title state =

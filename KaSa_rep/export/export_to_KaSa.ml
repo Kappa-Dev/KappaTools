@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Mar 03 2017>
+  * Last modification: Time-stamp: <Apr 10 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -49,7 +49,7 @@ sig
 
   val get_errors: state -> errors
 
-  val get_env: state -> state * Model.t option 
+  val get_env: state -> state * Model.t option
 
   val get_c_compilation: state -> state * c_compilation
 
@@ -85,7 +85,15 @@ sig
   val output_symmetries:
     ?logger:Loggers.t ->
     ?accuracy_level:Remanent_state.accuracy_level ->
-      state -> state
+    state -> state
+
+  val query_inhibition_map:
+    ?accuracy_level:Remanent_state.accuracy_level ->
+    state ->
+    Remanent_state.rule_id ->
+    Remanent_state.rule_id ->
+    state * (Remanent_state.location * Remanent_state.location) list
+
 end
 
 module Export =
@@ -95,11 +103,11 @@ module Export =
       let init () =
         init ~called_from:Remanent_parameters_sig.KaSa ()
 
-    let get_contact_map = get_internal_contact_map
-    let get_influence_map = get_internal_influence_map
-    let get_constraints_list = get_internal_constraints_list
-    let output_contact_map = output_internal_contact_map
-    let output_influence_map = output_internal_influence_map
-    let output_constraints_list = output_internal_constraints_list
-    let empty_constraints_list = []
+      let get_contact_map = get_internal_contact_map
+      let get_influence_map = get_internal_influence_map
+      let get_constraints_list = get_internal_constraints_list
+      let output_contact_map = output_internal_contact_map
+      let output_influence_map = output_internal_influence_map
+      let output_constraints_list = output_internal_constraints_list
+      let empty_constraints_list = []
     end

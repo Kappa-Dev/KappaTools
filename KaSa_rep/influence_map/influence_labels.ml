@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 7th 2011
- * Last modification: Time-stamp: <Dec 05 2016>
+ * Last modification: Time-stamp: <Apr 10 2017>
  * *
  * Labels to be associated with influence relations
  *
