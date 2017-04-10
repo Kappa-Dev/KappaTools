@@ -19,8 +19,8 @@
 type encoding =
   | Matrix | HTML_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
-  | Octave | Matlab | Maple | Mathematica | SBML
-  | Json 
+  | Octave | Matlab | Maple | Mathematica | SBML | DOTNET
+  | Json
 
 module type FormatMap =
 sig
