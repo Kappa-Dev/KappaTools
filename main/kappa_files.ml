@@ -22,6 +22,7 @@ let odeFileName  =
       [
         Loggers.Octave, "ode.m";
         Loggers.Matlab, "ode.m";
+        Loggers.DOTNET, "network.net";
         Loggers.SBML, "network.xml";
         Loggers.Maple, "ode.mws";
         Loggers.Mathematica, "ode.nb" ;
@@ -105,6 +106,7 @@ let setOutputName () =
   set (get_odeFileName Loggers.Octave) (Some "m") ;
   set (get_odeFileName Loggers.Matlab) (Some "m") ;
   set (get_odeFileName Loggers.SBML) (Some "xml") ;
+  set (get_odeFileName Loggers.DOTNET) (Some "net") ;
   set marshalizedOutFile None
 
 let check_not_exists = function

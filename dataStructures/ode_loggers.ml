@@ -180,7 +180,6 @@ let string_of_variable ~side loggers variable =
   | Loggers.TXT_Tabular
   | Loggers.XLS
   | Loggers.SBML
-  | Loggers.DOTNET
   | Loggers.Json -> ""
 
 let variable_of_derived_variable var id =
@@ -297,35 +296,30 @@ let print_ode_preamble
         let () = Loggers.print_newline logger in
         ()
       end
-      (*| Loggers.DOTNET ->
+    | Loggers.DOTNET ->
       begin
-        let () = print_list logger
-            [
-              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";] in
         let () = command_line logger in
-        let () = print_list logger
-            ([
-              "<sbml xmlns=\"http://www.sbml.org/sbml/level2/version4\" xmlns:celldesigner=\"http://www.sbml.org/2001/ns/celldesigner\" level=\"2\" version=\"4\">";
-              "<model name=\"KaDe output:\">";
-              "<!--";
-              "THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
-              "";
-              "init - the initial abundances of each species and token";
-              "tinit - the initial simulation time (likely 0)";
-              "tend - the final simulation time ";
-              "initialstep - initial time step at the beginning of numerical integration";
-              "maxstep - maximal time step for numerical integration";
-              "reltol - relative error tolerance;";
-              "abstol - absolute error tolerance;";
-              (Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^" - the time period between points to return";
-              "" ;
-              ""^
+        let () =
+          print_list logger
+            [
+              "# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
+              "# ";
+              "# init - the initial abundances of each species and token";
+              "# tinit - the initial simulation time (likely 0)";
+              "# tend - the final simulation time ";
+              "# initialstep - initial time step at the beginning of numerical integration";
+              "# maxstep - maximal time step for numerical integration";
+              "# reltol - relative error tolerance;";
+              "# abstol - absolute error tolerance;";
+              "# "^(Ode_loggers_sig.string_of_array_name Ode_loggers_sig.Period_t_points)^" - the time period between points to return";
+              "#" ;
+              "# "^
               (match
                  count
                with
-               | Ode_args.Embeddings -> "variables denote number of embeddings "
-               | Ode_args.Occurrences -> "variables denote numbers occurrences");
-              ""^
+               | Ode_args.Embeddings -> "variables (init(i),y(i)) denote numbers of embeddings "
+               | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
+              "# "^
               (match
                  rate_convention
                with
@@ -336,40 +330,11 @@ let print_ode_preamble
                | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
                | Remanent_parameters_sig.No_correction ->
-                 "no correcion is applied on rule rates");
-              "-->";
-              "<listOfUnitDefinitions>";
-              "<unitDefinition metaid=\"substance\" id=\"substance\" name=\"substance\">";
-              "<listOfUnits>";
-              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\"  kind=\"mole\"/>";
-              "</listOfUnits>";
-              "</unitDefinition>";
-              "<unitDefinition metaid=\"volume\" id=\"volume\" name=\"volume\">";
-              "<listOfUnits>";
-              "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"litre\"/>";
-              "</listOfUnits>";
-              "</unitDefinition>";]@(if may_be_not_time_homogeneous then
-                                       [
-                                         "<unitDefinition metaid=\"time\" id=\"time\" name=\"time\">";
-                                         "<listOfUnits>";
-                                         "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"second\"/>";
-                                         "</listOfUnits>";
-                                         "</unitDefinition>";
-                                         "<unitDefinition metaid=\"time_per_substance\" id=\"time_per_substance\" name=\"time_per_substance\">";
-                                         "<listOfUnits>";
-                                         "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"second\"/>";
-                                         "<unit metaid=\""^(Sbml_backend.meta_id_of_logger logger)^"\" kind=\"mole\" exponent=\"-1\"/>";
-                                         "</listOfUnits>";
-                                         "</unitDefinition>";] else [])@[
-                "</listOfUnitDefinitions>";
-                "<listOfCompartments>";
-                "<compartment metaid=\"default\" id=\"default\" size=\"1\" units=\"volume\"/>";
-                "</listOfCompartments>";
-
-              ])
-        in ()
-        end*)
-    | Loggers.DOTNET
+                 "no correcion is applied on rule rates")]
+              in
+              let () = Loggers.print_newline logger in
+        ()
+      end
     | Loggers.SBML ->
       begin
         let () = print_list logger
@@ -835,7 +800,7 @@ let string_of_bin_op logger op =
       | Loggers.HTML_Tabular
       | Loggers.DOT
       | Loggers.TXT | Loggers.TXT_Tabular
-      | Loggers.XLS| Loggers.SBML | Loggers.DOTNET |
+      | Loggers.XLS| Loggers.SBML |
       Loggers.Json -> "**"
     end
 
@@ -1182,8 +1147,6 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         let () = Loggers.fprintf logger ")" in
             ()
     end
-(*TODO*)
-  | Loggers.DOTNET
   | Loggers.SBML ->
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () =
@@ -1191,6 +1154,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         network_handler in
     let () = Loggers.fprintf logger "</math>" in
     ()
+  | Loggers.DOTNET (*TODO*)
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -1233,15 +1197,15 @@ and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger expr
         in
         ()
     end
-   | Loggers.DOTNET (*todo: do not use the tag times*)
    | Loggers.SBML ->
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () = Sbml_backend.print_bool_expr_in_sbml string_of_var_id logger expr network_handler in
     let () = Loggers.fprintf logger "</math>" in ()
-  | Loggers.Json
-  | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+   | Loggers.DOTNET (*TODO*)
+   | Loggers.Json
+   | Loggers.DOT
+   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_alg_expr_few_parenthesis ?init_mode string_of_var_id logger alg_expr network_handler =
   print_alg_expr
@@ -1377,12 +1341,12 @@ let print_comment
       | Loggers.Mathematica ->
         let () = Loggers.fprintf logger "(* %s *)" string in
         if breakline then Loggers.print_newline logger
-      | Loggers.DOTNET
       | Loggers.SBML ->
         let () = Loggers.fprintf logger "<!-- %s -->" (Sbml_backend.string_in_comment string) in
         if breakline then
           Loggers.print_newline logger
         else Loggers.print_breakable_hint logger
+      | Loggers.DOTNET (*TODO*)
       | Loggers.Json
       | Loggers.DOT
       | Loggers.Matrix | Loggers.HTML_Graph
@@ -1521,7 +1485,6 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.DOTNET
   | Loggers.SBML ->
     begin
       match variable, init_mode with
@@ -1594,6 +1557,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.NonNegative,_
         | Ode_loggers_sig.Current_time,_ -> ()
     end
+  | Loggers.DOTNET (*TODO*)
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -2798,13 +2762,13 @@ let launch_main logger =
   | Loggers.Octave ->
     let () = Loggers.fprintf logger "main()%s" (instruction_sep logger) in
     Loggers.print_newline logger
-  | Loggers.DOTNET
   | Loggers.SBML ->
     let () = Loggers.fprintf logger "</model>" in
     let () = Loggers.print_newline logger in
     let () = Loggers.fprintf logger "</sbml>" in
     let () = Loggers.print_newline logger in
     ()
+  | Loggers.DOTNET (*TODO*)
   | Loggers.Matlab
   | Loggers.Mathematica
   | Loggers.Maple

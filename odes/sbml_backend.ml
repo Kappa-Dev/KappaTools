@@ -1,4 +1,4 @@
-let do_sbml logger f =
+let do_sbml logger f = (*TODO: do_dotnet?*)
 match
   Loggers.get_encoding_format logger
 with
@@ -7,7 +7,7 @@ with
     f logger
   in
   ()
-| Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+| Loggers.DOTNET | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
 | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
@@ -20,7 +20,7 @@ let do_not_sbml logger f =
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET ->
     let () =
       f logger
     in
@@ -773,7 +773,7 @@ let maybe_time_dependent logger network var_rule =
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET -> false
 
 
 

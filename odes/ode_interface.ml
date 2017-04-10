@@ -298,7 +298,7 @@ let string_of_var_id ?compil ?init_mode logger r =
     | Loggers.Octave | Loggers.Matlab ->
       "var("^(string_of_int r)^")"
     | Loggers.TXT | Loggers.TXT_Tabular
-    | Loggers.XLS | Loggers.SBML | Loggers.DOTNET
+    | Loggers.XLS | Loggers.SBML 
     | Loggers.DOT
     | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
     | Loggers.Json | Loggers.Matrix -> ""

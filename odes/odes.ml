@@ -1657,7 +1657,7 @@ struct
         Ode_loggers.print_newline logger
       | Loggers.Mathematica
       | Loggers.Maple | Loggers.SBML | Loggers.DOTNET
-      |  Loggers.TXT
+      | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
       | Loggers.Matrix | Loggers.DOT | Loggers.HTML
       | Loggers.HTML_Graph | Loggers.HTML_Tabular
@@ -1736,6 +1736,7 @@ struct
         ~count ~rate_convention logger command_line_closure ()
         in
         let () = Ode_loggers.print_newline logger in
+        (*TODO*)
         let () =
           Sbml_backend.open_box logger_buffer "listOfParameters"
         in
@@ -1927,8 +1928,8 @@ struct
           if may_be_not_time_homogeneous
           then
             match Loggers.get_encoding_format logger with
-            | Loggers.DOTNET
-            | Loggers.SBML | Loggers.Octave | Loggers.Matlab ->
+            (*TODO*)
+            | Loggers.SBML | Loggers.Octave | Loggers.Matlab | Loggers.DOTNET ->
               let () =
                 Ode_loggers.associate
                   (I.string_of_var_id ~compil logger)
@@ -2210,7 +2211,7 @@ struct
                in
                match Loggers.get_encoding_format logger with
                | Loggers.Matlab | Loggers.Octave
-               | Loggers.SBML | Loggers.DOTNET
+               | Loggers.SBML | Loggers.DOTNET (*TODO*)
                | Loggers.Mathematica | Loggers.Maple ->
                  let s = Format.asprintf
                      "reaction: %a -> %a%a "
@@ -2308,8 +2309,7 @@ struct
     | Loggers.TXT_Tabular | Loggers.XLS
     | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
     | Loggers.HTML_Tabular | Loggers.Json
-    | Loggers.DOTNET
-    | Loggers.SBML -> ()
+    | Loggers.SBML | Loggers.DOTNET -> ()
     | Loggers.Matlab | Loggers.Octave  ->
       let is_zero = fresh_is_zero network in
       let label = "listOfReactions" in
