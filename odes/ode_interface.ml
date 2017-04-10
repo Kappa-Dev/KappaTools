@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 04 2017>
+  * Last modification: Time-stamp: <Apr 10 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -298,7 +298,8 @@ let string_of_var_id ?compil ?init_mode logger r =
     | Loggers.Octave | Loggers.Matlab ->
       "var("^(string_of_int r)^")"
     | Loggers.TXT | Loggers.TXT_Tabular
-    | Loggers.XLS | Loggers.SBML | Loggers.DOT
+    | Loggers.XLS | Loggers.SBML | Loggers.DOTNET
+    | Loggers.DOT
     | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
     | Loggers.Json | Loggers.Matrix -> ""
   in
