@@ -105,7 +105,15 @@ let rules_of_ast
       let unrate = compile_pure_alg ~compileModeOn rate in
       fun ccs uncc ->
         match Array.length ccs with
-        | (0 | 1) -> unrate,None,uncc
+        | (0 | 1) ->
+          let () =
+            ExceptionDefn.warning
+              ~pos
+              (fun f ->
+                 Format.pp_print_text
+                   f "Useless molecular ambiguity, the rules is \
+always considered as unary.") in
+          unrate,None,uncc
         | 2 ->
           crp,Some (unrate, dist'),
           Pattern.Set.add ccs.(0) (Pattern.Set.add ccs.(1) uncc)
@@ -193,8 +201,9 @@ let cflows_of_label
       match var with
       | Alg_expr.KAPPA_INSTANCE mix -> mix
       | (Alg_expr.BIN_ALG_OP _ | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
-        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _ | Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _) ->
-        raise Not_found
+        | Alg_expr.ALG_VAR _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+        | Alg_expr.IF _ | Alg_expr.DIFF_TOKEN _
+        | Alg_expr.DIFF_KAPPA_INSTANCE _) -> raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl
                ("Label '" ^ label ^
@@ -206,8 +215,8 @@ let cflows_of_label
   (domain',
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
-let rule_effect
-    ~compileModeOn contact_map domain alg_expr (mix,created,tks) mix_pos rev_effects =
+let rule_effect ~compileModeOn contact_map domain alg_expr
+    (mix,created,tks) mix_pos rev_effects =
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
