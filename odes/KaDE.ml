@@ -8,8 +8,7 @@ module A = Odes.Make (Ode_interface)
 let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml]
-    [--dotnet-output foo.xml] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float]
+    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--dotnet-output foo.net] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float]
     [--relative-tolerance float] [--absolute-tolerance float]\n"
   in
   let cli_args = Run_cli_args.default in
@@ -84,7 +83,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     (*smbl*)
     let () =
       match
-        ode_args.Ode_args.dotnet_output
+        ode_args.Ode_args.sbml_output
       with
       | None -> ()
       | Some s ->
@@ -95,7 +94,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     (*dotnet*)
     let () =
       match
-        ode_args.Ode_args.sbml_output
+        ode_args.Ode_args.dotnet_output
       with
       | None -> ()
       | Some s ->
@@ -155,7 +154,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let ignore_obs =
       match backend with
-      | Loggers.SBML | Loggers.DOTNET -> true
+      | Loggers.DOTNET -> true
+      | Loggers.SBML -> true
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML |
         Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
@@ -276,7 +276,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let logger_buffer =
       match backend with
-      | Loggers.SBML | Loggers.DOTNET -> Loggers.open_infinite_buffer ~mode:backend ()
+      | Loggers.DOTNET
+      | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
       | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
