@@ -11,6 +11,7 @@ type t = {
   mutable maple_output : string option ;
   mutable mathematica_output : string option ;
   mutable sbml_output : string option ;
+  mutable dotnet_output : string option ;
   mutable with_symmetries : string option ;
   mutable show_symmetries : bool ;
   mutable views : bool ;
@@ -36,6 +37,7 @@ let default : t =
     maple_output = None ;
     mathematica_output = None ;
     sbml_output = None ;
+    dotnet_output = None ;
     with_symmetries = None ;
     show_symmetries = false ;
     views = true ;
@@ -65,9 +67,14 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   "--octave-output",
   Arg.String (fun backend -> t.octave_output <- Some backend),
   "ODEs file for octave backend";
+  (*sbml*)
   "--sbml-output",
   Arg.String (fun backend -> t.sbml_output <- Some backend),
   "ODEs file for sbml backend";
+  (*dotnet*)
+  "--dotnet-output",
+  Arg.String (fun backend -> t.dotnet_output <- Some backend),
+  "ODEs file for dotnet backend";
   "--rate-convention",
   Arg.String (fun rate_convention -> t.rate_convention <- rate_convention),
   "Tune which correction is applied to rule rates \n\t KaSim -> we do not divide; \n\t Divide_by_nbr_of_autos_in_lhs -> we divide by the number of autos in the lhs \n\t Biochemist -> we divide by the number of autos in the lhs that induce an auto in the rhs" ;
