@@ -28,7 +28,7 @@ module VarSet = Set.Make(VarOrd)
 type encoding =
   | Matrix | HTML_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
-  | Octave | Matlab | Maple | Mathematica | SBML
+  | Octave | Matlab | Maple | Mathematica | SBML | DOTNET
   | Json
 
 module type FormatMap =
@@ -58,7 +58,7 @@ let breakable x =
     x
   with
   | HTML_Tabular | HTML | HTML_Graph | TXT -> true
-  | Matrix | Json | Mathematica | Matlab | Octave | Maple | SBML
+  | Matrix | Json | Mathematica | Matlab | Octave | Maple | SBML | DOTNET
   | DOT | TXT_Tabular | XLS -> false
 
 type t =
