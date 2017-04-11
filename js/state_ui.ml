@@ -22,7 +22,6 @@ let init () : unit Lwt.t =
   State_runtime.init >>=
   State_project.init >>=
   State_file.init >>=
-  State_parameter.init >>=
   State_simulation.init >>=
   sync
 

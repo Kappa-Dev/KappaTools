@@ -63,7 +63,7 @@ let options_modal =
               Tyxml_js.To_dom.of_input option_seed_input in
             let value : string = Js.to_string input##.value in
             let model_seed = try Some (int_of_string value) with Failure _ -> None in
-            let () = State_parameter.set_model_seed model_seed in
+            let () = State_project.set_seed model_seed in
             let () =
               Common.modal
                 ~id:("#"^simulation_options_modal_id)
@@ -213,7 +213,8 @@ let onload () =
             let input : Dom_html.inputElement Js.t =
               Tyxml_js.To_dom.of_input option_seed_input in
             let () = input##.value := Js.string
-                  (match React.S.value State_parameter.model_seed with
+                  (match (React.S.value State_project.model).
+                           State_project.model_parameters.State_project.seed with
                    | None -> ""
                    | Some model_seed -> string_of_int model_seed) in
             let () =

@@ -84,7 +84,11 @@ module InputPauseCondition : Ui_common.Div = struct
         Html.a_input_type `Text;
           Html.a_class ["form-control"];
           Html.a_placeholder "[T] > 100" ;
-          Tyxml_js.R.Html.a_value State_parameter.model_pause_condition ]
+          Tyxml_js.R.Html.a_value
+            (React.S.map
+               (fun m ->
+                  m.State_project.model_parameters.State_project.pause_condition)
+               State_project.model) ]
     ()
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [input]
 
@@ -94,7 +98,7 @@ module InputPauseCondition : Ui_common.Div = struct
     let () = signal_change dom
         (fun value ->
            let v' = if value = "" then "[false]" else value in
-           State_parameter.set_model_pause_condition v') in
+           State_project.set_pause_condition v') in
     ()
 end
 
@@ -116,7 +120,11 @@ let input =
         Html.a_placeholder "time units";
         Html.Unsafe.string_attrib "min" (string_of_float epsilon_float);
         Tyxml_js.R.Html.a_value
-          (React.S.l1 format_float_string State_parameter.model_plot_period)]
+          (React.S.map
+             (fun m ->
+                format_float_string
+                  m.State_project.model_parameters.State_project.plot_period)
+               State_project.model) ]
     ()
   let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [input]
 
@@ -124,12 +132,15 @@ let input =
     let input_dom = Tyxml_js.To_dom.of_input input in
     let () = signal_change input_dom
         (fun value ->
-           let old_value = React.S.value State_parameter.model_plot_period in
-           let reset_value () = input_dom##.value := Js.string (string_of_float old_value) in
+           let reset_value () =
+             let old_value =
+               (React.S.value State_project.model).
+                 State_project.model_parameters.State_project.plot_period in
+             input_dom##.value := Js.string (string_of_float old_value) in
            try
              let new_value = (float_of_string value) in
              if new_value > 0.0 then
-               State_parameter.set_model_plot_period new_value
+               State_project.set_plot_period new_value
              else
                reset_value ()
          with | Not_found | Failure _ -> reset_value ()) in

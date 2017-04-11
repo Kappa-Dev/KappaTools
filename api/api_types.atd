@@ -90,6 +90,7 @@ type simulation_parameter = {
   simulation_pause_condition : string <json name="pause_condition"> ;
   simulation_id : simulation_id <json name="simulation_id"> ;
   simulation_seed : simulation_seed nullable <json name="seed"> ;
+  simulation_store_trace : bool <json name="store_trace"> ;
 }
 
 type simulation_perturbation = { perturbation_code : string }

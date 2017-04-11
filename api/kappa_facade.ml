@@ -86,7 +86,6 @@ type t =
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
-    with_trace : bool ;
     mutable lastyield : float ;
     mutable kasa_state : KaSa.state
   }
@@ -95,7 +94,6 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
     ~state
     ~init_l
-    ~with_trace
     ~lastyield
     ~kasa_state
   : t =
@@ -109,7 +107,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     flux_maps = [];
     files = [];
     error_messages = [];
-    contact_map; env; graph; state; init_l; with_trace;
+    contact_map; env; graph; state; init_l;
     lastyield; kasa_state;
   }
 
@@ -127,7 +125,7 @@ let reinitialize random_state t =
   t.files <- [];
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
-      ~with_trace:t.with_trace
+      ~with_trace:false
       random_state t.env t.counter;
   t.state <- State_interpreter.empty t.env []
 
@@ -144,7 +142,6 @@ let clone_t t =
     ~graph:t.graph (* FALSE imperatively modified *)
     ~state:t.state (* FALSE imperatively modified *)
     ~init_l:t.init_l
-    ~with_trace:t.with_trace
     ~lastyield:t.lastyield
     ~kasa_state:t.kasa_state
 
@@ -263,7 +260,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                             ~with_trace(*TODO conf.Eval.traceFileName*)
                             random_state env counter)
                   ~state:(State_interpreter.empty env [])
-                  ~init_l ~with_trace ~lastyield
+                  ~init_l ~lastyield
                   ~kasa_state:(KaSa.init ~compil
                                  ~called_from:Remanent_parameters_sig.Server ())
               in
@@ -437,7 +434,7 @@ let start
                      (time_yield ~system_process:system_process ~t:t) >>=
                      (fun () -> x >>= f))
                  ~return:Lwt.return ~outputs:(outputs t)
-                 ~with_trace:t.with_trace
+                 ~with_trace:parameter.Api_types_t.simulation_store_trace
                  t.counter
                  t.env
                  random_state
