@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Mar 03 2017>
+ * Last modification: Time-stamp: <Apr 11 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -147,5 +147,3 @@ let main () =
   ()
 
 let () = main ()
-
-module A = Export_to_KaSim.Export
