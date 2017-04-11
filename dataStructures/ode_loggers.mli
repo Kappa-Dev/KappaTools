@@ -69,7 +69,6 @@ val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> na
 val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
 val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
 val update_token_jac:
-  ?time_var:Ode_loggers_sig.ode_var_id ->
   Loggers.t ->
   Ode_loggers_sig.variable ->
   nauto_in_lhs:int ->
