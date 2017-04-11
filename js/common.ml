@@ -111,10 +111,10 @@ let method_to_string : meth -> string =
   | `PUT -> "PUT"
 
 let ajax_request
-  ?(timeout: float option = None)
+  ?(timeout: float option)
   ~(url : string)
   ~(meth : meth)
-  ~(data : string option)
+  ?(data : string option)
   ~(handler : int -> string -> unit) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "ajaxRequest")

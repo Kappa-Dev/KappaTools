@@ -61,8 +61,6 @@ let reset () =
   let () = set_directory_state blank_state in
   ()
 
-
-
 let get_file () : Api_types_j.file Api.result Lwt.t =
   State_project.with_project ~label:"get_file"
     (fun manager project_id ->

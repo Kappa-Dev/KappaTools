@@ -6,10 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-(** Clear errors. *)
+(*
 val clear_errors : unit -> unit
-(** Return true if errors are present. *)
-val has_errors : unit -> bool
+(** Clear errors. *)
+
+val set_errors : append:bool -> string -> Api_types_j.errors -> unit
 (** Set errors
 
     Called with the location macro:
@@ -20,8 +21,13 @@ val has_errors : unit -> bool
     @param location of error the macro __LOC__ is expected.
     @paramer errors to be saved
  *)
-val set_errors : ?append:bool -> string -> Api_types_j.errors -> unit
-(** Signal containing the error. *)
+*)
+
+val has_errors : unit -> bool
+(** Return true if errors are present. *)
+
 val errors : Api_types_j.errors option React.signal
-(** This displays the error *)
+(** Signal containing the error. *)
+
 val wrap : ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t
+(** This displays the error *)

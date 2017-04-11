@@ -11,10 +11,10 @@ exception TimeOut
 
 
 let send
-    (timeout : float option)
+    ?(timeout : float option)
     (url : string)
     (meth : Common.meth)
-    (data : string option)
+    ?(data : string option)
     (hydrate : string -> 'a)
     (wrap : 'a Api.result -> Mpi_message_j.response)
   : Mpi_message_j.response Api.result Lwt.t =
@@ -41,7 +41,6 @@ let send
               (Api_types_j.errors_of_string response_text)
           else
             let response = hydrate response_text in
-            let () = Common.debug "response:hydrated" in
             let () = Common.debug response in
             Api_common.result_ok
               ~result_code:result_code
@@ -57,8 +56,8 @@ let send
     Common.ajax_request
       ~url:url
       ~meth:meth
-      ~timeout
-      ~data:data
+      ?timeout
+      ?data
       ~handler:handler in
    reply
 
@@ -72,98 +71,81 @@ class manager
     function
     | `EnvironmentInfo  () ->
       send
-        (Some timeout)
+        ~timeout
         (Format.sprintf "%s/v2" url)
         `GET
-        None
         Mpi_message_j.environment_info_of_string
         (fun result -> `EnvironmentInfo result)
     | `FileCreate (project_id,file) ->
       send
-        (Some timeout)
+        ~timeout
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `POST
-        (Some (Api_types_j.string_of_file file))
+        ~data:(Api_types_j.string_of_file file)
         (fun result ->
            Mpi_message_j.file_metadata_of_string
              result)
         (fun result -> `FileCreate result)
     | `FileDelete (project_id,file_id) ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
-        None
         (fun result ->
            Api_types_j.unit_t_of_string
              result)
         (fun result -> `FileDelete result)
     | `FileGet (project_id,file_id) ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `GET
-        None
         Mpi_message_j.file_of_string
         (fun result -> `FileGet result)
     | `FileCatalog project_id ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
-        None
         Mpi_message_j.file_catalog_of_string
         (fun result -> `FileCatalog result)
     | `FileUpdate (project_id,file_id,file_modification) ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
-        (Some (Api_types_j.string_of_file_modification file_modification))
+        ~data:(Api_types_j.string_of_file_modification file_modification)
         (fun result ->
            Mpi_message_j.file_metadata_of_string
              result)
         (fun result -> `FileUpdate result)
     | `ProjectCatalog () ->
       send
-        None
         (Format.sprintf "%s/v2/projects" url)
         `GET
-        None
         Mpi_message_j.project_catalog_of_string
         (fun result -> `ProjectCatalog result)
     | `ProjectCreate project_parameter ->
       send
-        None
         (Format.sprintf "%s/v2/projects" url)
         `POST
-        (Some (Api_types_j.string_of_project_parameter project_parameter))
+        ~data:(Api_types_j.string_of_project_parameter project_parameter)
         Api_types_j.unit_t_of_string
         (fun result -> `ProjectCreate result)
     | `ProjectDelete project_id ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
-        None
         (fun _ -> ())
         (fun result -> `ProjectDelete result)
 
     | `ProjectParse project_id ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `GET
-        None
         Mpi_message_j.project_parse_of_string
         (fun result -> `ProjectParse result)
 
     | `ProjectDeadRules project_id ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s/dead_rules" url project_id)
         `GET
-        None
         (fun s -> Yojson.Safe.read_list
            Yojson.Safe.read_string
            (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
@@ -171,41 +153,34 @@ class manager
 
     | `ProjectGet project_id ->
       send
-        None
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `GET
-        None
         Mpi_message_j.project_of_string
         (fun result -> `ProjectGet result)
 
     | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/continue"
            url project_id
            simulation_id)
         `PUT
-        (Some
-           (Api_types_j.string_of_simulation_parameter
-              simulation_parameter))
+        ~data:(Api_types_j.string_of_simulation_parameter
+                 simulation_parameter)
         (fun _ -> ())
         (fun result -> `SimulationContinue result)
     | `SimulationDelete (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s"
            url
            project_id
            simulation_id)
         `DELETE
-        None
         (fun _ -> ())
         (fun result -> `SimulationDelete result)
     | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/filelines/%s"
            url
@@ -216,12 +191,10 @@ class manager
             |Some file_line_id -> file_line_id
            ))
         `GET
-        None
         Mpi_message_j.file_line_detail_of_string
         (fun result -> `SimulationDetailFileLine result)
     | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/fluxmaps/%s"
            url
@@ -229,19 +202,16 @@ class manager
            simulation_id
            flux_map_id)
         `GET
-        None
         Mpi_message_j.flux_map_of_string
         (fun result -> `SimulationDetailFluxMap result)
     | `SimulationDetailLogMessage (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/logmessages"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.log_message_of_string
         (fun result -> `SimulationDetailLogMessage result)
     | `SimulationDetailPlot (project_id,simulation_id,plot_parameters) ->
@@ -262,19 +232,17 @@ class manager
                  | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
              )) in
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/plot"
            url
            project_id
            simulation_id)
         `GET
-        (Some args)
+        ~data:args
         Mpi_message_j.plot_detail_of_string
         (fun result -> `SimulationDetailPlot result)
     | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/snapshots/%s"
            url
@@ -282,118 +250,99 @@ class manager
            simulation_id
            snapshot_id)
         `GET
-        None
         Mpi_message_j.snapshot_detail_of_string
         (fun result -> `SimulationDetailSnapshot result)
     | `SimulationInfo (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.simulation_info_of_string
         (fun result -> `SimulationInfo result)
     | `SimulationCatalogFileLine (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/filelines"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.file_line_catalog_of_string
         (fun result -> `SimulationCatalogFileLine result)
     | `SimulationCatalogFluxMap (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/fluxmaps"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.flux_map_catalog_of_string
         (fun result -> `SimulationCatalogFluxMap result)
     | `SimulationCatalogSnapshot (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/snapshots"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.snapshot_catalog_of_string
         (fun result -> `SimulationCatalogSnapshot result)
     | `SimulationCatalog project_id ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations"
            url
            project_id)
         `GET
-        None
         Mpi_message_j.simulation_catalog_of_string
         (fun result -> `SimulationCatalog result)
     | `SimulationPause (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/pause"
            url
            project_id
            simulation_id)
         `PUT
-        None
         (fun _ -> ())
         (fun result -> `SimulationPause result)
     | `SimulationParameter (project_id,simulation_id) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/parameter"
            url
            project_id
            simulation_id)
         `GET
-        None
         Mpi_message_j.simulation_parameter_of_string
         (fun result -> `SimulationParameter result)
     | `SimulationPerturbation
         (project_id,simulation_id,simulation_perturbation) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations/%s/perturbation"
            url
            project_id
            simulation_id)
         `PUT
-        (Some
-           (Api_types_j.string_of_simulation_perturbation
-              simulation_perturbation))
+        ~data:(Api_types_j.string_of_simulation_perturbation
+                 simulation_perturbation)
         (fun _ -> ())
         (fun result -> `SimulationPerturbation result)
     | `SimulationStart
         (project_id,simulation_parameter) ->
       send
-        None
         (Format.sprintf
            "%s/v2/projects/%s/simulations"
            url
            project_id)
         `POST
-        (Some
-           (Api_types_j.string_of_simulation_parameter simulation_parameter))
+        ~data:(Api_types_j.string_of_simulation_parameter simulation_parameter)
         Mpi_message_j.simulation_artifact_of_string
         (fun result -> `SimulationStart result)
 

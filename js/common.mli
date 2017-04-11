@@ -14,9 +14,9 @@ val saveFile : data:string -> mime:string -> filename:string -> unit
 type meth = [ `DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT ]
 val method_to_string : meth -> string
 val ajax_request :
-  ?timeout:float option ->
+  ?timeout:float ->
   url:string ->
-  meth:meth -> data:string option -> handler:(int -> string -> unit) -> 'a
+  meth:meth -> ?data:string -> handler:(int -> string -> unit) -> 'a
 val async : (unit -> unit Lwt.t) -> unit
 val guid : unit -> string
 val modal : id:string -> action:string -> unit

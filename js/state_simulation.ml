@@ -33,7 +33,6 @@ let current_simulation (state : state) : t option =
     (fun simulation -> Some simulation.simulation_id = state.state_current)
     state.state_simulations
 
-
 type model = { model_current : t option ;
                model_simulations : Api_types_j.simulation_id list ; }
 type model_state = STOPPED | INITALIZING | RUNNING | PAUSED

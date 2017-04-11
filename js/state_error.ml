@@ -20,7 +20,7 @@ let has_errors () =
   | [] -> false
   | _::_ -> true
 
-let set_errors ?(append = false) (location : string) (errors : Api_types_j.errors) =
+let set_errors ~append (location : string) (errors : Api_types_j.errors) =
   (* log location and errors if debugging is enabled *)
   let debug =
     Format.sprintf
@@ -51,13 +51,13 @@ let errors : Api_types_j.errors option React.signal =
     state_error
 
 let wrap : 'a . ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t =
-  fun ?append loc r ->
-    let () = clear_errors () in
+  fun ?(append = false) loc r ->
     r >>=
     (Api_common.result_map
        ~ok:(fun _ r ->
+           let () = if not append then clear_errors () in
            Lwt.return (Api_common.result_ok r))
        ~error:(fun _ (errors : Api_types_j.errors) ->
-           let () = set_errors ?append loc errors in
+           let () = set_errors ~append loc errors in
            Lwt.return (Api_common.result_messages errors)
          ))

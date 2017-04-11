@@ -1,4 +1,0 @@
-type manager_code = [ OK | CREATED | ERROR | CONFLICT | NOT_FOUND | ACCEPTED ]
-type result_code = manager_code
-type ('ok,'error) result <ocaml from="Api_types"> = abstract
-type 'ok manager_result  = ('ok,manager_code) result

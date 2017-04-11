@@ -11,7 +11,9 @@ val set_client_id : string -> unit
 
 val get_synch : unit -> bool
 val set_synch : bool -> unit
-(* run on application init *)
+
 val init : unit -> unit Lwt.t
-(* to synch state of application with runtime *)
+(** run on application init *)
+
 val sync : unit -> unit Lwt.t
+(** to synch state of application with runtime *)
