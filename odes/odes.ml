@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 10 2017>
+  * Last modification: Time-stamp: <Apr 11 2017>
 *)
 
 let local_trace = false
@@ -2298,7 +2298,6 @@ struct
 
   let export_jac logger compil network split =
     let nodevar = get_last_ode_var_id network in
-    let time_var = build_time_var network in
     match Loggers.get_encoding_format logger with
     | Loggers.Matrix | Loggers.TXT
     | Loggers.Maple | Loggers.Mathematica
@@ -2567,12 +2566,11 @@ struct
                     in
                     let () =
                       Ode_loggers.update_token_jac
-                        ?time_var
                         logger
                         (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
                         (var_of_rule enriched_rule)
                         (var_of_stoch enriched_rule n)
-                        reactants' 
+                        reactants'
                         dep_set_rate
                         ~dep_mixture:(fst dep_set_token_expr)
                         ~dep_token:(snd dep_set_token_expr)

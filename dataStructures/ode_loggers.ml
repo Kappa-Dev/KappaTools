@@ -1892,7 +1892,7 @@ let update_token logger var_token ~nauto_in_lhs var_rate stoc_coef var_list =
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let update_token_jac ?time_var logger var_token ~nauto_in_lhs var_rate var_stoc var_list dep_rate ~dep_mixture ~dep_token =
+let update_token_jac logger var_token ~nauto_in_lhs var_rate var_stoc var_list dep_rate ~dep_mixture ~dep_token =
   match
     Loggers.get_encoding_format logger
   with
@@ -2019,7 +2019,7 @@ let update_token_jac ?time_var logger var_token ~nauto_in_lhs var_rate var_stoc 
         in
         (* we differentiate according to the token coefficient *)
         let () = Mods.IntSet.iter aux_deriv dep_mixture in
-        Mods.IntSet.iter aux_deriv dep_token         
+        Mods.IntSet.iter aux_deriv dep_token
       in
       let () =  (* we differentiate according to the species *)
         let rec aux tail suffix =
