@@ -30,7 +30,7 @@ type t_gui =
     rescale_gui             : float option ref;
     marshalizedInFile_gui   : string ref;
     inputKappaFileNames_gui : string list ref;
-    initialMix_gui          : string option ref;
+    (*  initialMix_gui          : string option ref;*)
     outputDataFile_gui      : string option ref;
     outputDirectory_gui     : string ref;
     batchmode_gui           : string ref;
@@ -61,7 +61,7 @@ let default_gui =
     rescale_gui = ref None;
     marshalizedInFile_gui = ref "";
     inputKappaFileNames_gui = ref [];
-    initialMix_gui = ref None;
+    (*  initialMix_gui = ref None;*)
     outputDataFile_gui = ref None;
     outputDirectory_gui = ref ".";
     batchmode_gui  = ref "";
@@ -88,7 +88,7 @@ let get_from_gui t_gui =
     rescale = !(t_gui.rescale_gui);
     marshalizedInFile = !(t_gui.marshalizedInFile_gui);
     inputKappaFileNames = !(t_gui.inputKappaFileNames_gui);
-    initialMix = !(t_gui.initialMix_gui);
+    (*initialMix = !(t_gui.initialMix_gui);*)
     outputDataFile = !(t_gui.outputDataFile_gui);
     outputDirectory = !(t_gui.outputDirectory_gui);
     batchmode  = (Tools.lowercase (!(t_gui.batchmode_gui)))="batch" ;
@@ -105,7 +105,7 @@ let copy_from_gui t_gui t =
   t.rescale <- t_tmp.rescale;
   t.marshalizedInFile <- t_tmp.marshalizedInFile;
   t.inputKappaFileNames <- t_tmp.inputKappaFileNames;
-  t.initialMix <- t_tmp.initialMix;
+  (*t.initialMix <- t_tmp.initialMix;*)
   t.outputDataFile <- t_tmp.outputDataFile;
   t.outputDirectory <- t_tmp.outputDirectory;
   t.batchmode  <- t_tmp.batchmode;
@@ -119,11 +119,11 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Superarg.String_list t_gui.inputKappaFileNames_gui,
    "name of a kappa file to use as input (can be used multiple times for multiple input files)",
   [],Superarg.Hidden);
-  ("-mixture",
+  (*  ("-mixture",
    Arg.String (fun fic -> t.initialMix <- Some fic),
    (Superarg.String_opt t_gui.initialMix_gui),
    "Take the initial state from this file (ignore %init from other files)",
-   [],Superarg.Hidden);
+      [],Superarg.Hidden);*)
   ("-initial",
    Arg.Float (fun time -> t.minValue <- Some time),
    (Superarg.Float_opt t_gui.minValue_gui),
