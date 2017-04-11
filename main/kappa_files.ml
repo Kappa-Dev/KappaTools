@@ -24,7 +24,7 @@ let odeFileName  =
         Loggers.Matlab, "ode.m";
         Loggers.SBML, "network.xml";
         Loggers.Maple, "ode.mws";
-        Loggers.Mathematica, "ode.nb" ; 
+        Loggers.Mathematica, "ode.nb" ;
       ]
   end
 
@@ -47,6 +47,8 @@ let mk_dir_r d =
       let () = aux (Filename.dirname d) in
       Unix.mkdir d 0o775 in
   Unix.handle_unix_error aux d
+
+let overwrite_permission = ref false
 
 let path f =
   if Filename.is_implicit f then Filename.concat !outputDirName f else f
@@ -77,7 +79,12 @@ let open_out f =
   open_out x
 
 let open_out_fresh base_name facultative ext =
-  let x = get_fresh_filename base_name [] facultative ext in
+  let x =
+    if !overwrite_permission then
+      let base = try Filename.chop_extension base_name
+        with Invalid_argument _ -> base_name in
+      base^"."^ext
+    else get_fresh_filename base_name [] facultative ext in
   let () = mk_dir_r (Filename.dirname x) in
   open_out x
 
@@ -100,39 +107,30 @@ let setOutputName () =
   set (get_odeFileName Loggers.SBML) (Some "xml") ;
   set marshalizedOutFile None
 
+let check_not_exists = function
+  | "" -> ()
+  | file ->
+    let file = path file in
+    if Sys.file_exists file then
+      let () =
+        Format.eprintf
+          "File '%s' already exists do you want to erase (y/N)?@." file in
+      let answer = Tools.read_input () in
+      if answer<>"y" && answer<>"Y" && answer<>"yes" &&
+         answer<>"YES" && answer<>"Yes" then exit 1
+      else overwrite_permission := true
+
 let setCheckFileExists ~batchmode outputFile =
-  let check file =
-    match file with
-    | "" -> ()
-    | file ->
-      let file = path file in
-      if not batchmode && Sys.file_exists file then
-        let () =
-          Format.eprintf
-            "File '%s' already exists do you want to erase (y/N)?@." file in
-        let answer = Tools.read_input () in
-        if answer<>"y" && answer<>"Y" && answer<>"yes" &&
-           answer<>"YES" && answer<>"Yes" then exit 1 in
   let () = setOutputName () in
-  check !fluxFileName ;
-  check !marshalizedOutFile ;
-  check outputFile
+  if batchmode then overwrite_permission := true
+  else
+    let () = check_not_exists !fluxFileName in
+    let () = check_not_exists !marshalizedOutFile in
+    check_not_exists outputFile
 
 let setCheckFileExistsODE ~batchmode ~mode =
-    let check file =
-      match file with
-      | "" -> ()
-      | file ->
-         let file = path file in
-         if not batchmode && Sys.file_exists file then
-    let () =
-      Format.eprintf
-        "File '%s' already exists do you want to erase (y/N)?@." file in
-    let answer = Tools.read_input () in
-    if answer<>"y" then exit 1
-    in
-    let () = setOutputName () in
-    check !(get_odeFileName mode)
+  let () = setOutputName () in
+  if not batchmode then check_not_exists !(get_odeFileName mode)
 
 let with_channel str f =
   if str <> ""  then
