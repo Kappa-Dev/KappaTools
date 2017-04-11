@@ -33,6 +33,7 @@ val empty_set : formatter -> unit
 val compact_comma : formatter -> unit
 val comma : formatter -> unit
 val colon : formatter -> unit
+val dot : formatter -> unit
 val space : formatter -> unit
 val cut : formatter -> unit
 val empty : formatter -> unit

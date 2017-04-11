@@ -205,7 +205,6 @@ let end_of_line_symbol logger =
   | Matrix | Matlab | Mathematica | Octave | Maple | SBML | DOTNET
   | Json | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
-
 let dump_token f x =
   match
     x
@@ -262,8 +261,6 @@ let print_newline logger =
       let () = logger.current_line <- [] in
       ()
     end
-
-
 
 let print_cell logger s =
   let open_cell_symbol,close_cell_symbol =
@@ -451,10 +448,12 @@ let flush_buffer logger fmt =
   | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
 
 let fprintf logger = fprintf ~fprintnewline:false logger
+
 let fresh_id logger =
   let i = !(logger.fresh_id) in
   let () = logger.fresh_id := i+1 in
   i
+
 let get_fresh_meta_id logger =
   let i = !(logger.fresh_meta_id) in
   let () = logger.fresh_meta_id := i+1 in

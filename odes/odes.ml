@@ -19,7 +19,7 @@ struct
       (struct
         type t = I.chemical_species
         let compare = compare
-        let print = I.print_chemical_species ?compil:None
+        let print x = I.print_chemical_species ?compil:None x
       end)
   module SpeciesSet = SpeciesSetMap.Set
   module SpeciesMap = SpeciesSetMap.Map
@@ -369,9 +369,9 @@ struct
     | None ->
       let () = debug "A NEW SPECIES IS DISCOVERED @." in
       let () = debug "canonic form: %a@."
-          (I.print_canonic_species ~compil) canonic in
+          (fun x -> I.print_canonic_species ~compil x) canonic in
       let () = debug "species: %a@.@."
-          (I.print_chemical_species ~compil) species in
+          (fun x -> I.print_chemical_species ~compil x) species in
       let to_be_visited, network = remanent in
       let network, id = add_new_canonic_species canonic species network
       in
@@ -379,9 +379,9 @@ struct
     | Some i ->
       let () = debug "ALREADY SEEN SPECIES @." in
       let () = debug "canonic form: %a@."
-          (I.print_canonic_species ~compil) canonic in
+          (fun x -> I.print_canonic_species ~compil x) canonic in
       let () = debug "species: %a@.@."
-          (I.print_chemical_species ~compil) species in
+          (fun x -> I.print_chemical_species ~compil x) species in
       remanent,i
 
   let representative parameters compil network species =
@@ -763,7 +763,7 @@ struct
       | [] -> network
       | new_species::to_be_visited ->
         let () = debug "@[<v 2>@[test for the new species:@ %a@]"
-            (I.print_chemical_species ~compil) new_species
+            (fun x -> I.print_chemical_species ~compil x) new_species
         in
         (* add in store the embeddings from cc of lhs to
            new_species,
@@ -838,8 +838,8 @@ struct
                            let () =
                              List.iter (fun (_, b) ->
                                  debug "%a"
-                                   (I.print_chemical_species
-                                      ~compil) b) c
+                                   (fun x -> I.print_chemical_species
+                                      ~compil x) b) c
                            in
                            let () = debug "@]" in
                            ()
@@ -1688,10 +1688,11 @@ struct
     match Loggers.get_encoding_format logger
     with
     | Loggers.Mathematica | Loggers.Maple -> step = 2
-    | Loggers.Matlab | Loggers.Octave -> step = 1
+    | Loggers.Matlab | Loggers.Octave
     | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS
     | Loggers.SBML | Loggers.DOTNET
     | Loggers.Json -> step=1
+
 
   let is_step_one ~step = step = 1
   let is_step_two ~step = step = 2
@@ -1727,7 +1728,9 @@ struct
     let count = I.what_do_we_count compil in
     let rate_convention = I.rate_convention compil in
     let may_be_not_time_homogeneous =
-      may_be_not_time_homogeneous network in
+      may_be_not_time_homogeneous network
+    in
+    (*---------------------------------------------------------------*)
     let () =
       if is_step_one ~step
       then
@@ -1736,11 +1739,16 @@ struct
         ~count ~rate_convention logger command_line_closure ()
         in
         let () = Ode_loggers.print_newline logger in
-        (*TODO*)
+        (*---------------------------------------------------------------*)
         let () =
           Sbml_backend.open_box logger_buffer "listOfParameters"
         in
         let () = Sbml_backend.line_sbml logger_buffer in
+        let () =
+          Dotnet_backend.open_box_dot_net logger_buffer "begin parameters"
+        in
+        let () = Dotnet_backend.line_dotnet logger_buffer in
+        (*---------------------------------------------------------------*)
         let () =
           Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
             logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t)
@@ -1879,6 +1887,7 @@ struct
              ~nodevar logger_buffer
             (Ode_loggers_sig.Rateund network.n_rules)
         in
+        (*---------------------------------------------------------------*)
         let () =
           if compute_jacobian
           then
@@ -1921,15 +1930,16 @@ struct
             in
             ()
         in
+        (*---------------------------------------------------------------*)
         let () = Ode_loggers.print_newline logger_buffer in
         let () = Ode_loggers.start_time logger_buffer init_t in
         let () = Ode_loggers.print_newline logger_buffer in
+        (*---------------------------------------------------------------*)
         let () =
           if may_be_not_time_homogeneous
           then
             match Loggers.get_encoding_format logger with
-            (*TODO*)
-            | Loggers.SBML | Loggers.Octave | Loggers.Matlab | Loggers.DOTNET ->
+            | Loggers.SBML | Loggers.Octave | Loggers.Matlab ->
               let () =
                 Ode_loggers.associate
                   (I.string_of_var_id ~compil logger)
@@ -1946,6 +1956,23 @@ struct
                      I.string_of_var_id
                      logger logger_buffer
                      Ode_loggers_sig.Time_scale_factor Nbr.one)
+            | Loggers.DOTNET ->
+            let () =
+              Ode_loggers.associate
+                (I.string_of_var_id ~compil logger)
+                logger logger_buffer
+                (Ode_loggers_sig.Init (get_last_ode_var_id network))
+                (Locality.dummy_annot
+                   (Alg_expr.STATE_ALG_OP
+                      Operator.TIME_VAR))
+                handler_init
+            in
+            Dotnet_backend.do_dotnet logger
+                (fun logger ->
+                   Dotnet_backend.print_parameters_dot_net
+                     I.string_of_var_id
+                     logger logger_buffer
+                     Ode_loggers_sig.Time_scale_factor Nbr.one)
             | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
             | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
             | Loggers.TXT_Tabular
@@ -1953,6 +1980,7 @@ struct
               ()
           else ()
         in
+        (*---------------------------------------------------------------*)
         let () =
           List.iter
             (affect_var is_zero logger logger_buffer ~init_mode:true
@@ -1983,8 +2011,14 @@ struct
             )
             split.const_rate
         in
+        (*---------------------------------------------------------------*)
         let () =
-          Sbml_backend.close_box logger_buffer  "listOfParameters" in
+          Sbml_backend.close_box logger_buffer  "listOfParameters"
+        in
+        let () =
+          Dotnet_backend.close_box_dot_net logger_buffer  "end parameters"
+        in
+        (*---------------------------------------------------------------*)
         let () = Ode_loggers.print_newline logger in
         let () = Ode_loggers.print_license_check logger in
         let () = Ode_loggers.print_newline logger in
@@ -1999,6 +2033,8 @@ struct
         let () = Ode_loggers.print_newline logger in
         ()
     in
+    (*---------------------------------------------------------------*)
+    (*Get titles*)
     let titles = I.get_obs_titles compil in
     let () =
       if good_step ~step logger
@@ -2021,6 +2057,7 @@ struct
         let () = Ode_loggers.print_newline logger in
         ()
     in
+    (*---------------------------------------------------------------*)
     let () =
       if is_step_one ~step
       then
@@ -2029,17 +2066,18 @@ struct
         let () = Ode_loggers.print_newline logger in
         ()
     in
+    (*---------------------------------------------------------------*)
     let () = Ode_loggers.print_newline logger in
     ()
 
   let export_main = export_main_gen ~step:1
   let export_main_follow_up = export_main_gen ~step:2
 
-
   let export_dydt ~show_time_advance logger compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let label = "listOfReactions" in
+    let label_dotnet = "begin reactions" in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
     let () =
       if show_time_advance
@@ -2049,6 +2087,9 @@ struct
     let () = Sbml_backend.open_box logger label in
     let () = Ode_loggers.print_newline logger in
     let () = Sbml_backend.line_sbml logger in
+    let () = Dotnet_backend.open_box_dot_net logger label_dotnet in
+    let () = Ode_loggers.print_newline logger in
+    let () = Dotnet_backend.line_dotnet logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
     in
@@ -2211,7 +2252,7 @@ struct
                in
                match Loggers.get_encoding_format logger with
                | Loggers.Matlab | Loggers.Octave
-               | Loggers.SBML | Loggers.DOTNET (*TODO*)
+               | Loggers.SBML
                | Loggers.Mathematica | Loggers.Maple ->
                  let s = Format.asprintf
                      "reaction: %a -> %a%a "
@@ -2220,6 +2261,14 @@ struct
                      dump_token_list tokens_prod
                  in
                  Ode_loggers.print_comment ~breakline logger s
+               | Loggers.DOTNET ->
+               let s = Format.asprintf
+                   "%a -> %a%a "
+                   dump reactants
+                   dump products
+                   dump_token_list tokens_prod
+               in
+               Ode_loggers.print_comment ~breakline logger s
                | Loggers.Matrix | Loggers.TXT
                | Loggers.TXT_Tabular | Loggers.XLS
                | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
@@ -2228,6 +2277,23 @@ struct
            in
            let () =
              Sbml_backend.dump_sbml_reaction
+               (I.string_of_var_id ~compil logger)
+               get_rule
+               (fun a ->
+                  let (a,_,_) = a.rule_id_with_mode in a)
+               I.print_rule_name
+               (Some compil)
+               logger
+               (handler_expr network)
+               reactants'
+               products'
+               token_vector
+               enriched_rule
+               (var_of_rule enriched_rule)
+               enriched_rule.divide_rate_by
+           in
+           let () =
+             Dotnet_backend.dump_dotnet_reaction
                (I.string_of_var_id ~compil logger)
                get_rule
                (fun a ->
@@ -2297,6 +2363,8 @@ struct
     in
     let () = Ode_loggers.close_procedure logger in
     let () = Sbml_backend.close_box logger label in
+    let label_close = "end reactions" in
+    let () = Dotnet_backend.close_box_dot_net logger label_close in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
     ()
@@ -2662,6 +2730,77 @@ struct
     let () = Sbml_backend.close_box logger label in
     ()
 
+  let export_init_dotnet logger compil network =
+    let nodevar = get_last_ode_var_id network in
+    let label = "begin species" in
+    let () = Dotnet_backend.open_box_dot_net logger label in
+    let () = Dotnet_backend.line_dotnet logger in
+    let () =
+      Ode_loggers.open_procedure logger "Init" "ode_init" [] in
+    let () = Ode_loggers.print_newline logger in
+    let () =
+      Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
+    in
+    let () =
+      Ode_loggers.declare_global logger
+        (Ode_loggers_sig.Init (get_last_ode_var_id network))
+    in
+    let () =
+      Ode_loggers.initialize
+        ~nodevar logger
+        (Ode_loggers_sig.Initbis (get_last_ode_var_id network))
+    in
+    let () = Ode_loggers.print_newline logger in
+    let rec aux k =
+      if
+        k >= get_fresh_ode_var_id network
+      then
+        ()
+      else
+        let id, comment, units  =
+          if may_be_not_time_homogeneous network &&
+             k = get_fresh_ode_var_id network - 1
+          then "time", "", Some ""
+          else
+            let variable =
+              Mods.DynArray.get network.ode_vars_tab k in
+            begin
+              match variable with
+              | Dummy -> "dummy", "", None
+              | Token id ->
+                (string_of_int k),
+                Format.asprintf "%a"
+                  (fun _log _id -> ()) id ,
+                (Some "")
+              | Noccurrences _ | Nembed _ ->
+                (string_of_int k),
+                Format.asprintf "%a"
+                  (fun log k -> I.print_chemical_species ?agent_sep:(Some Pp.dot) ~compil log
+                      (fst
+                         (Mods.DynArray.get network.species_tab k))
+                  ) k, Some ""
+            end
+        in
+        let () = Ode_loggers.declare_init ~comment logger k in
+        let () =
+          Dotnet_backend.dump_initial_species_dot_net
+            ?units
+            logger
+            (handler_expr network)
+            k
+            comment
+            id
+        in
+        aux (next_id k)
+    in
+    let () = aux fst_id in
+    let () = Ode_loggers.close_procedure logger in
+    let () = Ode_loggers.print_newline logger in
+    let () = Ode_loggers.print_newline logger in
+    let label_end = "end species" in
+    let () = Dotnet_backend.close_box_dot_net logger label_end in
+    ()
+
   let export_obs logger compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
@@ -2749,6 +2888,7 @@ struct
     in
     let () = Format.printf "\t -initial state @." in
     let () = export_init logger compil network in
+    let () = export_init_dotnet logger compil network in
     let () =
       match
         Loggers.formatter_of_logger logger
