@@ -330,10 +330,7 @@ let options =
     ]
 
 let get_option error =
-  let parameters =
-    Remanent_parameters.get_parameters
-      ~called_from:Remanent_parameters_sig.Internalised () in
-  let () = SuperargTk.parse parameters options FileNames.input in
+  let () = SuperargTk.parse options FileNames.input in
   let parameters =
     Remanent_parameters.get_parameters
       ~called_from:Remanent_parameters_sig.KaSa () in

@@ -74,10 +74,10 @@ type t = (key * spec * msg * category list * level) list
 (* ********* *)
 
 let show_level (lvl:level) : bool = match lvl with
-| Normal -> true
-| Expert -> !expert_mode
-| Developper -> !dev_mode && !expert_mode
-| Hidden -> false
+  | Normal -> true
+  | Expert -> !expert_mode
+  | Developper -> !dev_mode && !expert_mode
+  | Hidden -> false
 
 let accept_level_display (lvl:level) : bool = match lvl with
   | Normal | Expert -> true
@@ -103,16 +103,6 @@ let altkey (k:key) =
   else failwith (k^" option does not begin with --")
 
 
-(* concats a string list with a separator *)
-let cat_list (l:string list) (sep:string) : string =
-  let b = Buffer.create 12 in
-  let rec doit = function
-    | [] -> ()
-    | [x] -> Buffer.add_string b x
-    | x::y -> Buffer.add_string b x; Buffer.add_string b sep; doit y
-  in
-  doit l; Buffer.contents b
-
 (* cuts a string into space-separated sub-strings *)
 let cut_list (s:string) : string list =
   let rec doit accum pos =
@@ -129,43 +119,45 @@ let cut_list (s:string) : string list =
 
 (* order by category *)
 let error = Exception.empty_error_handler
-let order parameters (a:t) =
+let order (a:t) =
   let ordered = ref StringMap.empty in
   List.iter
     (fun (a,b,c,cat,lvl) ->
-     if accept_level_display lvl then
-       List.iter
-	 (fun cat ->
-	  let asso,old_lvl =
-	    StringMap.find_default ([],Hidden) cat !ordered in
-	  ordered :=
-	    StringMap.add
-	      cat (((a,b,c,[cat],lvl)::asso), (min_level lvl old_lvl)) (!ordered)
-	 )
-	 cat)
+       if accept_level_display lvl then
+         List.iter
+           (fun cat ->
+              let asso,old_lvl =
+                StringMap.find_default ([],Hidden) cat !ordered in
+              ordered :=
+                StringMap.add
+                  cat (((a,b,c,[cat],lvl)::asso), (min_level lvl old_lvl)) (!ordered)
+           )
+           cat)
     a;
   !ordered
 
 (* sanity checking *)
-let check parameters (a:t) =
+let check (a:t) =
   (* check duplicates & compute option list *)
   let opts = ref StringSet.empty in
   List.iter (fun (key,b,_,_,_) ->
-    if b=Void then ()
-    else if StringSet.mem key !opts || StringSet.mem (nokey key) !opts
-    then failwith ("Duplicate option "^key);
-    opts := StringSet.add key !opts;
-    opts := StringSet.add (nokey key) !opts )
-      a;
+      if b=Void then ()
+      else if StringSet.mem key !opts || StringSet.mem (nokey key) !opts
+      then failwith ("Duplicate option "^key);
+      opts := StringSet.add key !opts;
+      opts := StringSet.add (nokey key) !opts )
+    a;
   (* check sub-options in Muli-options *)
   List.iter (fun (key,t,_,_,_) -> match t with
-    Multi (a,b) ->
-      let f =
-	List.iter (fun s ->
-	if iskey s && not (StringSet.mem s !opts)
-	then failwith ("Unknown option "^s^" in multi-option "^key))
-      in f a; f b
-  | _ -> () ) a
+        Multi (a,b) ->
+        let f =
+          List.iter (fun s ->
+              if iskey s && not (StringSet.mem s !opts)
+              then failwith ("Unknown option "^s^" in multi-option "^key))
+        in f a; f b
+      | Void | Int _ | Float _ | Choice _ | Bool _ | Int_opt _ | String _
+      | String_opt _ | String_list _ | Float_opt _ | Choice_list (_, _)
+      | MultiExt _ -> () ) a
 
 
 
@@ -173,75 +165,63 @@ let check parameters (a:t) =
 (* ********************** *)
 
 
-(* prints a list using p for elements and sep for separator *)
-let rec print_list
-    (p:  Format.formatter -> 'a -> unit)
-    (sep:Format.formatter -> unit -> unit)
-    (f:  Format.formatter)
-    (s:'a list)
-  : unit
-    = match s with
-      [] -> ()
-    | [a] -> p f a
-    | a::b -> p f a; sep f (); print_list p sep f b
-
 (* prints a string with breaks instead of space *)
 let print_msg f (s:string) =
-  print_list Format.pp_print_string Format.pp_print_space f (cut_list s)
+  Pp.list Pp.space Format.pp_print_string f (cut_list s)
 
 (* document the options on the standard output! *)
-let print_option verbose f (key,spec,msg,cat,lvl) =
+let print_option verbose f (key,spec,msg,_cat,_lvl) =
   let key2 = altkey key in
   (match spec with
-    Bool r ->
-      Format.fprintf f "  %s    (default: %s)@." key2
-	(if !r then "enabled" else "disabled")
-  |  Void -> ()
-  | Int r -> Format.fprintf f "  %s <int>   (default: %i)@." key !r
-  | Int_opt r ->
-      (match !r with
+     Bool r ->
+     Format.fprintf f "  %s    (default: %s)@." key2
+       (if !r then "enabled" else "disabled")
+   |  Void -> ()
+   | Int r -> Format.fprintf f "  %s <int>   (default: %i)@." key !r
+   | Int_opt r ->
+     (match !r with
       | None   -> Format.fprintf f "  %s <int>   (default: disabled)@." key2
       | Some i -> Format.fprintf f "  %s <int>   (default: %i)@." key2 i)
-  | String r ->
-      (match !r with
+   | String r ->
+     (match !r with
       | "" -> Format.fprintf f "  %s <name>   (default: disabled)@." key
       | s  -> Format.fprintf f "  %s <name>   (default: %s)@." key s)
-  | String_opt r ->
-      (match !r with
+   | String_opt r ->
+     (match !r with
       | None
       | Some "" -> Format.fprintf f "  %s <name>   (default: disabled)@." key2
       | Some s  -> Format.fprintf f
-	    "  %s <name>   (default %s)@." key2 s)
-  | String_list r ->
-      (match !r with
+                     "  %s <name>   (default %s)@." key2 s)
+   | String_list r ->
+     (match !r with
       | [] -> Format.fprintf f
-	    "  %s <names> ...   (default: disabled)@." key2
+                "  %s <names> ...   (default: disabled)@." key2
       | l  -> Format.fprintf f "  %s <names> ...   (default %a)@." key2
-	    (print_list Format.pp_print_string Format.pp_print_space) l)
-  | Float r -> Format.fprintf f "  %s <float>   (default %f)@." key !r
-  | Float_opt r ->
-      (match !r with
+                (Pp.list Pp.space Format.pp_print_string) l)
+   | Float r -> Format.fprintf f "  %s <float>   (default %f)@." key !r
+   | Float_opt r ->
+     (match !r with
       | None   -> Format.fprintf f "  %s <float>   (default: disabled)@." key2
       | Some v -> Format.fprintf f "  %s <float>   (default: %f)@." key2 v)
-  | Choice (l,_,r) ->
-      Format.fprintf f "  %s @[%a@]    (default: %s)@."
-	key
-	(print_list
-	   (fun f (key,msg) -> Format.pp_print_string f key)
-	   (fun f () -> Format.fprintf f " |@ ")) l
-	!r
-  | Choice_list (l,r) ->
-      Format.fprintf f "  %s @[%a@]@." key2
-	(print_list
-	   (fun f (key,msg) ->
-	     Format.fprintf f "[%s%s]" key
-	       (if List.mem key !r then " (default)" else "")
-	   )
-	   Format.pp_print_space
-	) l
-  | Multi (_,[]) -> Format.fprintf f "  %s@." key
-  | Multi _ -> Format.fprintf f "  %s <value>@." key
-  | MultiExt _ -> Format.fprintf f "  %s <value>@." key
+   | Choice (l,_,r) ->
+     Format.fprintf f "  %s @[%a@]    (default: %s)@."
+       key
+       (Pp.list
+          (fun f -> Format.fprintf f " |@ ")
+          (fun f (key,_msg) -> Format.pp_print_string f key)) l
+       !r
+   | Choice_list (l,r) ->
+     Format.fprintf f "  %s @[%a@]@." key2
+       (Pp.list
+          Pp.space
+          (fun f (key,_msg) ->
+             Format.fprintf f "[%s%s]" key
+               (if List.mem key !r then " (default)" else "")
+          )
+       ) l
+   | Multi (_,[]) -> Format.fprintf f "  %s@." key
+   | Multi _ -> Format.fprintf f "  %s <value>@." key
+   | MultiExt _ -> Format.fprintf f "  %s <value>@." key
   );
 
   (* shows description if in verbose mode *)
@@ -249,7 +229,7 @@ let print_option verbose f (key,spec,msg,cat,lvl) =
 
 
 
-let print_help parameters (header:bool) (verbose:bool) f (a:t) =
+let print_help (header:bool) (verbose:bool) f (a:t) =
   let nb = ref 0 in
 
   (* general options *)
@@ -264,20 +244,20 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
   (* dump *)
   StringMap.iter
     (fun cat (l,lvl) ->
-     if
-       show_level lvl
-     then
-       begin
-	 if header
-	 then
-	   Format.fprintf f "%s@." cat;
-	 List.iter
-	   (fun ((_,_,_,_,lvl) as x) ->
-	    if show_level lvl then (incr nb; print_option verbose f x)
-	   ) l;
-	 if header && verbose then Format.fprintf f "@."
-       end
-    ) (order parameters a);
+       if
+         show_level lvl
+       then
+         begin
+           if header
+           then
+             Format.fprintf f "%s@." cat;
+           List.iter
+             (fun ((_,_,_,_,lvl) as x) ->
+                if show_level lvl then (incr nb; print_option verbose f x)
+             ) l;
+           if header && verbose then Format.fprintf f "@."
+         end
+    ) (order a);
 
   Format.fprintf f "(%i options)@." !nb
 
@@ -286,7 +266,7 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
 (* parse the command-line arguments, given as a list of strings,
    returns the list of non-options (filenames) in reverse order)
  *)
-let parse_list parameters (a:t) (l:string list) : string list =
+let parse_list (a:t) (l:string list) : string list =
   let long_help = ref false
   and short_help = ref false
   and show_version = ref false
@@ -296,106 +276,106 @@ let parse_list parameters (a:t) (l:string list) : string list =
       [] -> accum
     | opt::rem ->
 
-	(* - means no more options: the rest are filenames *)
-	if opt="-" then List.rev_append rem accum
+      (* - means no more options: the rest are filenames *)
+      if opt="-" then List.rev_append rem accum
 
-	(* help options *)
-	else if opt="-help" || opt="--help" then
-	  (long_help := true; doit accum rem)
-	else if opt="-h" then  (* shorter list *)
-	  (short_help := true; doit accum rem)
-	    (* version number *)
-	else if opt="--version" then
-	  (show_version := true ; doit accum rem)
+      (* help options *)
+      else if opt="-help" || opt="--help" then
+        (long_help := true; doit accum rem)
+      else if opt="-h" then  (* shorter list *)
+        (short_help := true; doit accum rem)
+        (* version number *)
+      else if opt="--version" then
+        (show_version := true ; doit accum rem)
         (* expert *)
-	else if opt="--expert" then (expert_mode := true; doit accum rem)
-	else if opt="--no-expert" then (expert_mode := false; doit accum rem)
+      else if opt="--expert" then (expert_mode := true; doit accum rem)
+      else if opt="--no-expert" then (expert_mode := false; doit accum rem)
 
-        (* regular option, starting with "-" *)
-	else if String.length opt > 1 && opt.[0]='-' then
-	  let (key,spec,_,_,_)as aa=
-	    try
-	      List.find
-		(fun (key,spec,msg,cat,lvl) ->
-		  (accept_level_use lvl) &&
-		  (opt=key || (opt=(nokey key)))
-		) a
-	    with Not_found ->
-	      Format.printf "Here is the list of recognized options@.%a@.Unrecognized option: %s@.@." (print_help parameters true false) a opt;
-	      failwith "bad option"
-	  in
-	  let rem =
-	    try match spec,rem with
-	    | Bool r, rem -> r := (opt=key); rem
-	    | Int r, (""::rem) when opt=key -> r := 0; rem
-	    | Int r, (v::rem) when opt=key -> r := int_of_string v; rem
-	    | Int_opt r, (""::rem) when opt=key -> r := None; rem
-	    | Int_opt r, (v::rem) when opt=key ->
-		r := Some (int_of_string v); rem
-	    | Int_opt r, rem -> r := None; rem
-	    | String r, (v::rem) when opt=key -> r := v; rem
-	    | String r, rem -> r := ""; rem
-	    | String_opt r, (""::rem) when opt=key -> r := None; rem
-	    | String_opt r, (v::rem) when opt=key -> r := Some v; rem
-	    | String_opt r, rem -> r := None; rem
-	    | String_list r, (""::rem) when opt=key -> rem
-	    | String_list r, (v::rem) when opt=key -> r := v::(!r); rem
-	    | String_list r, rem -> r := []; rem
-	    | Float r, (""::rem) when opt=key -> r := 0.; rem
-	    | Float r, (v::rem) when opt=key -> r := float_of_string v; rem
-	    | Float_opt r, (""::rem) when opt=key -> r := None; rem
-	    | Float_opt r, (v::rem) when opt=key ->
-		r := Some (float_of_string v); rem
-	    | Float_opt r, rem -> r := None; rem
-	    | Choice (l,l',r), (v::rem) when opt=key ->
-       if not (List.exists (fun (k,_) -> v=k) l) &&
-          not (List.exists (fun k -> v=k) l')
-       then failwith "invalid choice";
-       r := v; rem
-	    | Choice_list (l,r), (v::rem) when opt=key ->
-		if not (List.exists (fun (k,_) -> v=k) l)
-		then failwith "invalid choice";
-		r := v::(!r); rem
-	    | Choice_list (l,r), rem -> r := []; rem
-	    | Multi (x,[]), rem -> ignore (doit [] x); rem
-	    | Multi (x,y), (v::rem) ->
-		ignore (doit [] x);
-		ignore (List.fold_left (fun accum l -> doit [] [l;v])
-			  accum y);
-		rem
-	    | MultiExt l,v::rem when opt=key ->
-		ignore (List.fold_left (fun accum (l,s) -> doit [] [l;v^s])
-			  accum l);rem
-	    | MultiExt l,rem ->
-	      ignore (List.fold_left (fun accum (l,s) -> doit [] [nokey l;s]) accum l);rem
-	    | _ -> failwith "invalid option or argument"
+      (* regular option, starting with "-" *)
+      else if String.length opt > 1 && opt.[0]='-' then
+        let (key,spec,_,_,_)as aa=
+          try
+            List.find
+              (fun (key,_spec,_msg,_cat,lvl) ->
+                 (accept_level_use lvl) &&
+                 (opt=key || (opt=(nokey key)))
+              ) a
+          with Not_found ->
+            Format.printf "Here is the list of recognized options@.%a@.Unrecognized option: %s@.@." (print_help true false) a opt;
+            failwith "bad option"
+        in
+        let rem =
+          try match spec,rem with
+            | Bool r, rem -> r := (opt=key); rem
+            | Int r, (""::rem) when opt=key -> r := 0; rem
+            | Int r, (v::rem) when opt=key -> r := int_of_string v; rem
+            | Int_opt r, (""::rem) when opt=key -> r := None; rem
+            | Int_opt r, (v::rem) when opt=key ->
+              r := Some (int_of_string v); rem
+            | Int_opt r, rem -> r := None; rem
+            | String r, (v::rem) when opt=key -> r := v; rem
+            | String r, rem -> r := ""; rem
+            | String_opt r, (""::rem) when opt=key -> r := None; rem
+            | String_opt r, (v::rem) when opt=key -> r := Some v; rem
+            | String_opt r, rem -> r := None; rem
+            | String_list _, (""::rem) when opt=key -> rem
+            | String_list r, (v::rem) when opt=key -> r := v::(!r); rem
+            | String_list r, rem -> r := []; rem
+            | Float r, (""::rem) when opt=key -> r := 0.; rem
+            | Float r, (v::rem) when opt=key -> r := float_of_string v; rem
+            | Float_opt r, (""::rem) when opt=key -> r := None; rem
+            | Float_opt r, (v::rem) when opt=key ->
+              r := Some (float_of_string v); rem
+            | Float_opt r, rem -> r := None; rem
+            | Choice (l,l',r), (v::rem) when opt=key ->
+              if not (List.exists (fun (k,_) -> v=k) l) &&
+                 not (List.exists (fun k -> v=k) l')
+              then failwith "invalid choice";
+              r := v; rem
+            | Choice_list (l,r), (v::rem) when opt=key ->
+              if not (List.exists (fun (k,_) -> v=k) l)
+              then failwith "invalid choice";
+              r := v::(!r); rem
+            | Choice_list (_l,r), rem -> r := []; rem
+            | Multi (x,[]), rem -> ignore (doit [] x); rem
+            | Multi (x,y), (v::rem) ->
+              ignore (doit [] x);
+              ignore (List.fold_left (fun _ l -> doit [] [l;v])
+                        accum y);
+              rem
+            | MultiExt l,v::rem when opt=key ->
+              ignore (List.fold_left (fun _ (l,s) -> doit [] [l;v^s])
+                        accum l);rem
+            | MultiExt l,rem ->
+              ignore (List.fold_left (fun _ (l,s) -> doit [] [nokey l;s]) accum l);rem
+            | Multi _,[] | (Void | Int _ | Float _ | Choice _), _ -> failwith "invalid option or argument"
 
-	    with _ ->
-	      Format.printf "Wrong option or argument for %s@.%a" opt
-		(print_option false) aa;
-	      failwith "bad option"
-	  in
-	  doit accum rem
+          with _ ->
+            Format.printf "Wrong option or argument for %s@.%a" opt
+              (print_option false) aa;
+            failwith "bad option"
+        in
+        doit accum rem
 
-        (* does not start with - => this is filename *)
-	else doit (opt::accum) rem
+      (* does not start with - => this is filename *)
+      else doit (opt::accum) rem
 
   in
   let filenames = doit [] l in
   if !show_version then (Format.printf "%s @.(with%s Tk interface) @." Version.version_kasa_full_name (if Tk_version.tk then "" else "out"); exit 0)
-  else if !long_help then (Format.printf "%a" (print_help parameters true true) a; exit 0)
-  else if !short_help then (Format.printf "%a" (print_help parameters true false) a; exit 0);
- (* List.concat*) filenames (*(List.map Wordexp.wordexp filenames)*)
+  else if !long_help then (Format.printf "%a" (print_help true true) a; exit 0)
+  else if !short_help then (Format.printf "%a" (print_help true false) a; exit 0);
+  (* List.concat*) filenames (*(List.map Wordexp.wordexp filenames)*)
 
 
 (* MAIN *)
 (* **** *)
 
 
-let parse parameters (a:t) (def:string list ref) =
-  check parameters a;
+let parse (a:t) (def:string list ref) =
+  check a;
   (* drop the first command-line argument: it is the executable name *)
   let args = List.tl (Array.to_list Sys.argv) in
   (* parse options & get remaining fienames *)
-  let rem = parse_list parameters a args in
+  let rem = parse_list a args in
   if rem<>[] then def := rem

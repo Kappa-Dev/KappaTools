@@ -561,13 +561,13 @@ let gui (a:Superarg.t) (args:string list) : string list =
 (* MAIN *)
 (* **** *)
 
-let parse parameters (a:Superarg.t) (def:string list ref) =
-  Superarg.check parameters a;
+let parse (a:Superarg.t) (def:string list ref) =
+  Superarg.check a;
   (* drop the first command-line argument: it is the executable name *)
   let args = List.tl (Array.to_list Sys.argv) in
   (* if no argument or "--gui" given, launch the gui, otherwise, parse args *)
   let rem =
     if args=[] || List.exists ((=) "--gui") args
-    then gui a args else Superarg.parse_list parameters a args
+    then gui a args else Superarg.parse_list a args
   in
   if rem<>[] then def := rem
