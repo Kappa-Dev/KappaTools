@@ -7,7 +7,8 @@ with
     f logger
   in
   ()
-| Loggers.DOTNET | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+| Loggers.DOTNET
+| Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
 | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
@@ -140,7 +141,6 @@ let string_of_variable logger string_of_var_id variable =
     raise
       (ExceptionDefn.Internal_Error
          ("SBML does not support differentiation",Locality.dummy))
-
 
 let unit_of_variable variable =
   match variable with
@@ -923,6 +923,7 @@ let has_good_token_token_vector
 let has_reactants_in_token_vector logger network_handler rule_id token_vector =
   has_good_token_token_vector
     negative_part logger network_handler rule_id token_vector
+
 let has_products_in_token_vector logger network_handler rule_id token_vector =
   has_good_token_token_vector
     positive_part logger network_handler rule_id token_vector
@@ -931,11 +932,10 @@ let dump_products_of_token_vector
     logger network_handler rule_id token_vector =
   dump_token_vector
     positive_part logger network_handler rule_id token_vector
+
 let dump_reactants_of_token_vector logger network_handler rule_id token_vector =
   dump_token_vector
     negative_part logger network_handler rule_id token_vector
-
-
 
 let dump_sbml_reaction
     string_of_var_id

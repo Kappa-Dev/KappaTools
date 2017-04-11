@@ -180,6 +180,7 @@ let string_of_variable ~side loggers variable =
   | Loggers.TXT_Tabular
   | Loggers.XLS
   | Loggers.SBML
+  | Loggers.DOTNET
   | Loggers.Json -> ""
 
 let variable_of_derived_variable var id =
@@ -301,7 +302,7 @@ let print_ode_preamble
         let () = command_line logger in
         let () =
           print_list logger
-            [
+            ([
               "# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:";
               "# ";
               "# init - the initial abundances of each species and token";
@@ -330,10 +331,9 @@ let print_ode_preamble
                | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
                | Remanent_parameters_sig.No_correction ->
-                 "no correcion is applied on rule rates")]
-              in
-              let () = Loggers.print_newline logger in
-        ()
+                 "no correcion is applied on rule rates")
+            ])
+        in ()
       end
     | Loggers.SBML ->
       begin
@@ -800,7 +800,7 @@ let string_of_bin_op logger op =
       | Loggers.HTML_Tabular
       | Loggers.DOT
       | Loggers.TXT | Loggers.TXT_Tabular
-      | Loggers.XLS| Loggers.SBML |
+      | Loggers.XLS| Loggers.SBML | Loggers.DOTNET |
       Loggers.Json -> "**"
     end
 
@@ -908,6 +908,7 @@ let octave_matlab format =
   | Loggers.Matrix | Loggers.HTML_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+
 let mathematica_maple format =
   match format with
   | Loggers.Mathematica | Loggers.Maple -> true
@@ -960,7 +961,8 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
   match
     format
   with
-  | Loggers.Matlab  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple ->
+  | Loggers.Matlab
+  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple ->
     begin
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
@@ -1314,6 +1316,26 @@ let print_sbml_parameters string_of_var_id logger logger_buffer variable expr =
           (Nbr.to_string expr)
           unit_string)
 
+let print_dotnet_parameters string_of_var_id logger logger_buffer variable expr =
+  (*let unit_string =
+    match
+      unit_of_variable_sbml variable
+    with
+    | None -> ""
+    | Some x -> " units=\""^x^"\""
+  in*)
+  let id = string_of_variable_sbml string_of_var_id variable in
+  let () = Loggers.set_id_of_global_parameter logger variable id  in
+  Dotnet_backend.single_box_dot_net
+    logger_buffer
+    ""
+    ~options:(fun () ->
+        Format.sprintf
+          "%s %s %s"
+          (Dotnet_backend.dotnet_id_of_logger logger)
+          id
+          (Nbr.to_string expr))
+
 
 let print_comment
     ?breakline:(breakline=false)
@@ -1346,7 +1368,13 @@ let print_comment
         if breakline then
           Loggers.print_newline logger
         else Loggers.print_breakable_hint logger
-      | Loggers.DOTNET (*TODO*)
+      | Loggers.DOTNET ->
+        (*print comments *)
+        let () = Loggers.fprintf logger "# %s "
+            (Sbml_backend.string_in_comment string) in
+        if breakline then
+          Loggers.print_newline logger
+        else Loggers.print_breakable_hint logger
       | Loggers.Json
       | Loggers.DOT
       | Loggers.Matrix | Loggers.HTML_Graph
@@ -1557,7 +1585,78 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.NonNegative,_
         | Ode_loggers_sig.Current_time,_ -> ()
     end
-  | Loggers.DOTNET (*TODO*)
+  | Loggers.DOTNET (*TODO*) ->
+    begin
+      match variable, init_mode with
+      | Ode_loggers_sig.Expr _ , true ->
+        begin
+          match
+            Ode_loggers_sig.is_expr_alias alg_expr,
+            Ode_loggers_sig.is_expr_const alg_expr
+          with
+          | None, true  ->
+            print_dotnet_parameters
+              string_of_var_id
+              logger
+              logger_buffer
+              variable
+              (Sbml_backend.eval_init_alg_expr
+                 logger
+                 network_handler
+                 alg_expr)
+          | Some _, _
+          | _, false -> ()
+        end
+      | (Ode_loggers_sig.Tinit |
+         Ode_loggers_sig.Tend |
+         Ode_loggers_sig.Period_t_points
+        ) ,_ ->
+        print_dotnet_parameters
+          string_of_var_id
+          logger
+          logger_buffer
+          variable
+          (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
+      | Ode_loggers_sig.Rate _,_
+      | Ode_loggers_sig.Rated _,_
+      | Ode_loggers_sig.Rateun _,_
+      | Ode_loggers_sig.Rateund _,_ ->
+        if Ode_loggers_sig.is_expr_const alg_expr then
+          print_dotnet_parameters
+            string_of_var_id
+            logger
+            logger_buffer
+            variable
+            (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
+      | Ode_loggers_sig.Stochiometric_coef _,_
+      | Ode_loggers_sig.Jacobian_rate (_,_),_
+      | Ode_loggers_sig.Jacobian_rateun (_,_),_
+      | Ode_loggers_sig.Jacobian_rated _,_
+      | Ode_loggers_sig.Jacobian_rateund (_,_),_
+      | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
+      | Ode_loggers_sig.Expr _ , _
+      | Ode_loggers_sig.Init _, _
+      | Ode_loggers_sig.Initbis _, _
+      | Ode_loggers_sig.Concentration _,_
+      | Ode_loggers_sig.Deriv _,_
+      | Ode_loggers_sig.Obs _,_
+      | Ode_loggers_sig.Jacobian _,_
+      | Ode_loggers_sig.Jacobian_var _,_
+      | Ode_loggers_sig.MaxStep, _
+      | Ode_loggers_sig.InitialStep,_
+      | Ode_loggers_sig.AbsTol,_
+      | Ode_loggers_sig.RelTol,_
+      | Ode_loggers_sig.N_rules,_
+      | Ode_loggers_sig.N_ode_var,_
+      | Ode_loggers_sig.N_max_stoc_coef,_
+      | Ode_loggers_sig.N_var,_
+      | Ode_loggers_sig.N_obs,_
+      | Ode_loggers_sig.N_rows,_
+      | Ode_loggers_sig.Tmp,_
+      | Ode_loggers_sig.Time_scale_factor,_
+      | Ode_loggers_sig.NonNegative,_
+      | Ode_loggers_sig.Current_time,_ -> ()
+    end
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
