@@ -89,7 +89,7 @@ let get_compilation
               (Model.algs_finder env) compil.Ast.init in
           let conf', _, _, _, _ =
             Configuration.parse compil.Ast.configurations in
-          let inits = Eval.compile_inits
+          let inits = Eval.compile_inits ?rescale:cli_args.Run_cli_args.rescale
               ~compileModeOn:false contact env raw_inits in
           (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
           alg_overwrite,conf'.Configuration.initial
