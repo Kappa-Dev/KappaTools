@@ -21,8 +21,7 @@ val model_simulation_state : t -> model_state
 
 (* run on application init *)
 val init : unit -> unit Lwt.t
-(* to synch state of application with runtime *)
-val sync : unit -> unit Api.result Lwt.t
+val refresh : unit -> unit Api.result Lwt.t
 
 val with_simulation :
   label:string ->

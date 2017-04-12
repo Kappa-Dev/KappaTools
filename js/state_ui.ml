@@ -13,7 +13,6 @@ let sync () : unit Lwt.t =
   State_runtime.sync >>=
   State_project.sync >>=
   fun _ -> State_file.sync () >>=
-  fun _ -> State_simulation.sync () >>=
   fun _ -> Lwt.return_unit
 
 let init () : unit Lwt.t =
@@ -38,4 +37,4 @@ let loop_sync () : unit Lwt.t =
   sync ()
 
 let onload () : unit =
-  Common.async (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 1.0)
+  Common.async (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 15.0)

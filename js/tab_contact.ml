@@ -13,6 +13,9 @@ let navli () = []
 let display_id = "contact-map-display"
 let export_id = "contact-export"
 
+let tab_is_active, set_tab_is_active = React.S.create true
+let tab_was_active = ref true
+
 let configuration : Widget_export.configuration =
   { Widget_export.id = export_id ;
     Widget_export.handlers =
@@ -34,7 +37,7 @@ let configuration : Widget_export.configuration =
              | None -> false
              | Some data -> Array.length data > 0
         )
-        State_project.model
+        (React.S.on tab_is_active State_project.dummy_model State_project.model)
   }
 
 
@@ -67,9 +70,6 @@ let update
       (Js.string json)
       (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
 
-let tab_is_active, set_tab_is_active = React.S.create false
-let tab_was_active = ref false
-
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
@@ -87,14 +87,14 @@ let onload () =
              update data contactmap
            else
              contactmap##clearData)
-      State_project.model
+      (React.S.on tab_is_active State_project.dummy_model State_project.model)
   in
     let () = Common.jquery_on
-      "#navlog"
+      "#navcontact"
       "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
   let () = Common.jquery_on
-      "#navlog"
+      "#navcontact"
       "shown.bs.tab"
       (fun _ -> let () = tab_was_active := true in set_tab_is_active true) in
   ()

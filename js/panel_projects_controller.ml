@@ -17,7 +17,7 @@ let create_project (project_id : string) : unit =
        (Api_common.result_map
           ~ok:(fun _ () ->
               (State_file.sync () >>= (fun _ -> Lwt.return_unit)) <&>
-              (State_simulation.sync () >>= (fun _ -> Lwt.return_unit)))
+              (State_simulation.refresh () >>= (fun _ -> Lwt.return_unit)))
           ~error:(fun _ _ -> Lwt.return_unit)
        ))
 
@@ -32,7 +32,7 @@ let set_project (project_id : string) : unit =
        (Api_common.result_map
           ~ok:(fun _ () ->
               (State_file.sync () >>= (fun _ -> Lwt.return_unit)) <&>
-              (State_simulation.sync () >>= (fun _ -> Lwt.return_unit)))
+              (State_simulation.refresh () >>= (fun _ -> Lwt.return_unit)))
           ~error:(fun _ _ -> Lwt.return_unit)
        ))
 
@@ -45,7 +45,7 @@ let close_project project_id : unit =
           (Api_common.result_bind_lwt
              ~ok:(fun () ->
                  ((State_file.sync () >>= (fun _ -> Lwt.return_unit)) <&>
-                  (State_simulation.sync () >>= (fun _ -> Lwt.return_unit)))>>=
+                  (State_simulation.refresh () >>= (fun _ -> Lwt.return_unit)))>>=
                  (fun _ -> Lwt.return (Api_common.result_ok ())))
           )) >>=
        (fun _ -> Lwt.return_unit))

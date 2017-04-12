@@ -112,25 +112,49 @@ let when_ready
       )
 
 (* to synch state of application with runtime *)
-let sync () : unit Api.result Lwt.t =
-  State_project.with_project ~label:"synch"
+let sleep_time = 1.0
+let rec sync ~project_id =
+  match (React.S.value state).simulation_state with
+  | SIMULATION_STATE_STOPPED | SIMULATION_STATE_INITALIZING ->
+    Lwt.return (Api_common.result_ok ())
+  | SIMULATION_STATE_READY _ ->
+    State_project.with_project ~label:"sync"
+      (fun manager new_project_id ->
+         (* get current directory *)
+         (manager#simulation_info new_project_id) >>=
+         (Api_common.result_bind_lwt
+            ~ok:(fun simulation_info ->
+                let () = set_state
+                    {simulation_state =
+                       SIMULATION_STATE_READY simulation_info} in
+                if simulation_info.Api_types_t.simulation_info_progress
+                   .Api_types_t.simulation_progress_is_running &&
+                project_id = new_project_id then
+                  Lwt_js.sleep sleep_time >>=
+                  fun  () -> sync ~project_id:new_project_id
+                else Lwt.return (Api_common.result_ok ())
+              )
+         )
+      )
+
+let refresh () =
+  State_project.with_project ~label:"sync"
     (fun manager project_id ->
        (* get current directory *)
        (manager#simulation_info project_id) >>=
        (Api_common.result_map
           ~ok:(fun _ simulation_info ->
               let () = set_state
-                  {simulation_state = SIMULATION_STATE_READY simulation_info} in
-              Lwt.return (Api_common.result_ok ()))
+                  {simulation_state =
+                     SIMULATION_STATE_READY simulation_info} in
+              sync ~project_id)
           ~error:(fun _ _ ->
-              let () =
-                set_state {simulation_state = SIMULATION_STATE_STOPPED} in
-              Lwt.return (Api_common.result_ok ()))
-       )
-    )
+              let () = set_state
+                  {simulation_state = SIMULATION_STATE_STOPPED} in
+              Lwt.return (Api_common.result_ok ())
+            )))
 
-let init () : unit Lwt.t =
-  Lwt.return_unit
+let init () : unit Lwt.t = Lwt.return_unit
 
 let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
   with_simulation_info
@@ -157,8 +181,7 @@ let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter
           project_id
           simulation_parameter
         >>=
-        (Api_common.result_bind_lwt
-           ~ok:(fun () -> sync ())))
+        (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id)))
     ()
 
 let pause_simulation () : unit Api.result Lwt.t =
@@ -180,10 +203,8 @@ let pause_simulation () : unit Api.result Lwt.t =
       (fun
         (manager : Api.manager)
         (project_id : Api_types_j.project_id)
-        (_ : Api_types_j.simulation_info)
-        ->
-          manager#simulation_pause project_id >>=
-          (Api_common.result_bind_lwt ~ok:(fun () -> sync ())))
+        (_ : Api_types_j.simulation_info) ->
+          manager#simulation_pause project_id)
     ()
 
 let stop_simulation () : unit Api.result Lwt.t =
@@ -210,7 +231,7 @@ let stop_simulation () : unit Api.result Lwt.t =
           manager#simulation_delete project_id >>=
           (Api_common.result_bind_lwt ~ok:(fun () ->
                let () = update_simulation_state SIMULATION_STATE_STOPPED in
-               sync ())))
+               Lwt.return (Api_common.result_ok ()))))
     ()
 
 let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
@@ -254,7 +275,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
                       update_simulation_state SIMULATION_STATE_STOPPED in
                     on_error error_msg))
              >>=
-             (Api_common.result_bind_lwt ~ok:sync)
+             (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id))
           )
           (function
             | Invalid_argument error ->
@@ -301,5 +322,5 @@ let perturb_simulation (code : string) : unit Api.result Lwt.t =
           project_id
           { Api_types_j.perturbation_code = code }
         >>=
-        (Api_common.result_bind_lwt ~ok:(fun () -> sync ())))
+        (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id)))
     ()
