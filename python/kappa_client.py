@@ -60,7 +60,7 @@ class SimulationParameter(object):
                  simulation_id,
                  simulation_pause_condition,
                  simulation_seed = None,
-                 simulation_store_trace = false) :
+                 simulation_store_trace = False) :
         self.simulation_plot_period = simulation_plot_period
         self.simulation_id = simulation_id
         self.simulation_pause_condition = simulation_pause_condition

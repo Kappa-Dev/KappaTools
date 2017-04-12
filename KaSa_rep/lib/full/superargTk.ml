@@ -11,7 +11,6 @@ let map = ref StringMap.empty (* key => entry widget *)
 let fmap = ref StringMap.empty  (* key => frame widget *)
 
 let error = Exception.empty_error_handler
-let parameters =  Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised ()
 
 (* show / hide options according to current mode *)
 let set_visibility (a:Superarg.t) =
@@ -56,7 +55,7 @@ let widget_update_from_spec (a:Superarg.t) =
 	  set key (match !r with None -> "" | Some i -> string_of_int i)
       | Superarg.String r -> set key !r
       | Superarg.String_opt r -> set key (match !r with None -> "" | Some s -> s)
-      | Superarg.String_list r -> set key (Superarg.cat_list !r " ")
+      | Superarg.String_list r -> set key (String.concat " " !r)
       | Superarg.Float r -> set key (string_of_float (!r))
       | Superarg.Float_opt r ->
 	  set key (match !r with None -> "" | Some f -> string_of_float f)
@@ -277,7 +276,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       let update () = ignore (widget_update_from_cmd a x) in
       let b = Button.create ~text:key ~padx:20 ~command:update f in
       pack ~side:`Left ~anchor:`W [coe b];
-      let msg2 = msg^"\n(equivalent to "^(Superarg.cat_list x " ")^" )" in
+      let msg2 = msg^"\n(equivalent to "^(String.concat " " x)^" )" in
       Balloon.put ~on:(coe b) ~ms:balloon_delay msg2;
       map := StringMap.add key v !map
    | Superarg.Multi (x,y) ->
@@ -291,7 +290,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       let lbl = Label.create ~text:key ~padx:20 f
       and entry = Entry.create ~textvariable:v f in
       pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl;coe entry];
-      let msg2 = msg^"\n(equivalent to "^(Superarg.cat_list (x@y) " ")^" )" in
+      let msg2 = msg^"\n(equivalent to "^(String.concat " " (x@y))^" )" in
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg2;
       Balloon.put ~on:(coe entry) ~ms:balloon_delay msg2;
       Textvariable.handle v ~callback:update;
@@ -307,7 +306,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
        let lbl = Label.create ~text:key ~padx:20 f
        and entry = Entry.create ~textvariable:v f in
        pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl;coe entry];
-       let msg2 = msg^"\n(equivalent to "^(Superarg.cat_list (List.rev_map snd (List.rev l)) " ")^" )" in
+       let msg2 = msg^"\n(equivalent to "^(String.concat " " (List.rev_map snd (List.rev l)))^" )" in
        Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg2;
        Balloon.put ~on:(coe entry) ~ms:balloon_delay msg2;
        Textvariable.handle v ~callback:update;
@@ -394,7 +393,7 @@ let build_spec (a:Superarg.t) bparent fparent =
 	(fun (key,spec,msg,cat,lvl) ->
 	  List.iter (fun cat ->
 	    widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl)
-             ) cat) l ) (Superarg.order parameters a);
+             ) cat) l ) (Superarg.order a);
   let _ = widget_update_from_spec a in
   opts#get_pages_lvl ()
 
@@ -434,7 +433,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
 	Fileselect.f
 	  ~title:"Add filenames"
 	  ~action:(fun l ->
-	    Textvariable.set v ((Textvariable.get v)^" "^(Superarg.cat_list l " ")))
+	    Textvariable.set v ((Textvariable.get v)^" "^(String.concat " " l)))
 	  ~filter:"*.ka" ~file:"" ~multi:true ~sync:true
 	       ) eframe
 
@@ -453,7 +452,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
   let backup name =
     try
       let f = open_out name in
-      output_string f (Superarg.cat_list (cmd ()) " ");
+      output_string f (String.concat " " (cmd ()));
       close_out f
     with _ -> ()
   in
@@ -489,7 +488,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
 		  backup "autosave_pre_import.options";
 		  let rem = widget_update_from_cmd a x in
 		  Textvariable.set v ((Textvariable.get v)^" "^
-				      (Superarg.cat_list rem " "))
+				      (String.concat " " rem))
 		with exc ->
 		  ignore
 		    (Dialog.create ~parent:(coe top) ~title:"Cannot load!"
@@ -504,7 +503,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
       ~text: "Save options"
       ~command:(fun _ ->
 	try
-	  let result = Superarg.cat_list (cmd ())" " in
+	  let result = String.concat " " (cmd ()) in
 	  Fileselect.f
 	    ~title:"Save file"
 	    ~action:(function
@@ -544,7 +543,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
 
   (* get command-line arguments *)
   let rem = widget_update_from_cmd a args in
-  Textvariable.set v ((Textvariable.get v)^" "^(Superarg.cat_list rem " "));
+  Textvariable.set v ((Textvariable.get v)^" "^(String.concat " " rem));
   Radiobutton.select (if !Superarg.expert_mode then expyes else expno);
   set_visibility (a,pages_lvl);
 
@@ -554,8 +553,8 @@ let gui (a:Superarg.t) (args:string list) : string list =
   (* back from gui *)
   if not !do_launch then (backup "autosave_pre_quit.options"; exit 0);
   backup "autosave_pre_launch.options";
-  Printf.printf "/* The GUI launches the analysis with the options:\n%s\n*/\n" (Superarg.cat_list (cmd ()) " "); flush stdout;
-  Superarg.parse_list parameters a (cmd ())
+  Printf.printf "/* The GUI launches the analysis with the options:\n%s\n*/\n" (String.concat " " (cmd ())); flush stdout;
+  Superarg.parse_list a (cmd ())
 
 
 (* MAIN *)
