@@ -9,8 +9,8 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 2: r2 will never be applied.
-rule 3: r3 will never be applied.
+rule r2 (File "../contact_map.ka", line 10, characters 4-45:) will never be applied.
+rule r3 (File "../contact_map.ka", line 11, characters 4-36:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

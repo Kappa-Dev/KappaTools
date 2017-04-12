@@ -277,21 +277,21 @@ Influence_map:Wake_up_map:rule(2):'' A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2) -
 Influence_map:Inhibition_map:rule(0):'' A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!2) -> rule(2):'' A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)[0->0]
 Reachability analysis...
 
-	Applying rule 0:
+	Applying rule File "influence.ka", line 1, characters 0-52::
 		the precondition is not satisfied yet
 
-	Applying rule 1:
+	Applying rule File "influence.ka", line 2, characters 0-53::
 		the precondition is not satisfied yet
 
-	Applying rule 2:
+	Applying rule File "influence.ka", line 3, characters 0-51::
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0 will never be applied.
-rule 1 will never be applied.
-rule 2 will never be applied.
+rule File "influence.ka", line 1, characters 0-52: will never be applied.
+rule File "influence.ka", line 2, characters 0-53: will never be applied.
+rule File "influence.ka", line 3, characters 0-51: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

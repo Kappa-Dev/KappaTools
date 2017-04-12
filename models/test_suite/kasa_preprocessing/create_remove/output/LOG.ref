@@ -79,17 +79,17 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Reachability analysis...
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "create.ka", line 11, characters 4-18:):
 		the precondition is not satisfied yet
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "create.ka", line 12, characters 4-18:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0: r0 will never be applied.
-rule 1: r1 will never be applied.
+rule r0 (File "create.ka", line 11, characters 4-18:) will never be applied.
+rule r1 (File "create.ka", line 12, characters 4-18:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

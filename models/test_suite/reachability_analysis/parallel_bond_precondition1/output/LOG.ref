@@ -473,10 +473,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule 0: r1:
+	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 4-42:):
 		the precondition is satisfied
 
-		rule 0: r1 is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 7, characters 4-42:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -538,10 +538,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!free)
 
 
-	Applying rule 1: r2:
+	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 4-60:):
 		the precondition is satisfied
 
-		rule 1: r2 is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 8, characters 4-60:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -605,10 +605,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
 
 
-	Applying rule 2: r3:
+	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 4-60:):
 		the precondition is satisfied
 
-		rule 2: r3 is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 9, characters 4-60:) is applied for the first time
 
 		Updating the views for B(z!,t!)
 
@@ -672,17 +672,17 @@ EXTENSIONAL DESCRIPTION:
 		A(z!free,t!B@t)
 
 
-	Applying rule 3: r4:
+	Applying rule r4 (File "parallel_bonds.ka", line 10, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule 0: r1:
+	Applying rule r1 (File "parallel_bonds.ka", line 7, characters 4-42:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t!)
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 1: r2:
+	Applying rule r2 (File "parallel_bonds.ka", line 8, characters 4-60:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t!)
@@ -691,7 +691,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 2: r3:
+	Applying rule r3 (File "parallel_bonds.ka", line 9, characters 4-60:):
 		the precondition is satisfied
 
 		Updating the views for B(z!,t!)
@@ -703,7 +703,7 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 3: r4 will never be applied.
+rule r4 (File "parallel_bonds.ka", line 10, characters 4-32:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

@@ -407,10 +407,10 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Reachability analysis...
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
 		the precondition is satisfied
 
-		rule 1: r1 is applied for the first time
+		rule r1 (File "stochastic_create.ka", line 8, characters 4-26:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -450,10 +450,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
 		the precondition is satisfied
 
-		rule 3: r3 is applied for the first time
+		rule r3 (File "stochastic_create.ka", line 10, characters 4-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -493,43 +493,43 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "stochastic_create.ka", line 13, characters 4-17:):
 		the precondition is not satisfied yet
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "stochastic_create.ka", line 14, characters 4-17:):
 		the precondition is not satisfied yet
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "stochastic_create.ka", line 12, characters 4-24:):
 		the precondition is not satisfied yet
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "stochastic_create.ka", line 11, characters 4-21:):
 		the precondition is not satisfied yet
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "stochastic_create.ka", line 9, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
 		the precondition is satisfied
 
-	Applying rule 8: r8:
+	Applying rule r8 (File "stochastic_create.ka", line 15, characters 4-38:):
 		the precondition is not satisfied yet
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "stochastic_create.ka", line 7, characters 4-41:):
 		the precondition is not satisfied yet
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
 		the precondition is satisfied
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0: r0 will never be applied.
-rule 2: r2 will never be applied.
-rule 4: r4 will never be applied.
-rule 5: r5 will never be applied.
-rule 6: r6 will never be applied.
-rule 7: r7 will never be applied.
-rule 8: r8 will never be applied.
+rule r0 (File "stochastic_create.ka", line 7, characters 4-41:) will never be applied.
+rule r2 (File "stochastic_create.ka", line 9, characters 4-32:) will never be applied.
+rule r4 (File "stochastic_create.ka", line 11, characters 4-21:) will never be applied.
+rule r5 (File "stochastic_create.ka", line 12, characters 4-24:) will never be applied.
+rule r6 (File "stochastic_create.ka", line 13, characters 4-17:) will never be applied.
+rule r7 (File "stochastic_create.ka", line 14, characters 4-17:) will never be applied.
+rule r8 (File "stochastic_create.ka", line 15, characters 4-38:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

@@ -5,13 +5,13 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-			(rule 0) should be investigated
-			(rule 2) should be investigated
-				(rule 1) should be investigated 
+			(rule File "initial_state.ka", line 3, characters 0-23:) should be investigated
+			(rule File "initial_state.ka", line 5, characters 0-26:) should be investigated
+				(rule File "initial_state.ka", line 4, characters 0-12:) should be investigated 
 
-				(rule 3) should be investigated 
-				(rule 3) should be investigated 
-				(rule 2) should be investigated 
+				(rule File "initial_state.ka", line 6, characters 0-37:) should be investigated 
+				(rule File "initial_state.ka", line 6, characters 0-37:) should be investigated 
+				(rule File "initial_state.ka", line 5, characters 0-26:) should be investigated 
 
 	Views in initial state:
 
@@ -27,50 +27,50 @@ Reachability analysis...
 
 
 		A(x~u!1),B(x~u!1)
-		B(x~u!1),A(x~u!1)			(rule 3) should be investigated
-			(rule 1) should be investigated
+		B(x~u!1),A(x~u!1)			(rule File "initial_state.ka", line 6, characters 0-37:) should be investigated
+			(rule File "initial_state.ka", line 4, characters 0-12:) should be investigated
 
-	Applying rule 0:
+	Applying rule File "initial_state.ka", line 3, characters 0-23::
 		the precondition is satisfied
 
-		rule 0 is applied for the first time
+		rule File "initial_state.ka", line 3, characters 0-23: is applied for the first time
 
-	Applying rule 2:
+	Applying rule File "initial_state.ka", line 5, characters 0-26::
 		the precondition is not satisfied yet
 
-	Applying rule 3:
+	Applying rule File "initial_state.ka", line 6, characters 0-37::
 		the precondition is not satisfied yet
 
-	Applying rule 1:
+	Applying rule File "initial_state.ka", line 4, characters 0-12::
 		the precondition is satisfied
 
-		rule 1 is applied for the first time
+		rule File "initial_state.ka", line 4, characters 0-12: is applied for the first time
 
 		Updating the views for A(x!)
 	Dealing with side effects
 
 		B(x!free,x~u)
 
-			(rule 0) should be investigated
-			(rule 1) should be investigated
-			(rule 2) should be investigated
-			(rule 3) should be investigated
+			(rule File "initial_state.ka", line 3, characters 0-23:) should be investigated
+			(rule File "initial_state.ka", line 4, characters 0-12:) should be investigated
+			(rule File "initial_state.ka", line 5, characters 0-26:) should be investigated
+			(rule File "initial_state.ka", line 6, characters 0-37:) should be investigated
 
-	Applying rule 0:
+	Applying rule File "initial_state.ka", line 3, characters 0-23::
 		the precondition is satisfied
 
-	Applying rule 1:
+	Applying rule File "initial_state.ka", line 4, characters 0-12::
 		the precondition is satisfied
 
 		Updating the views for A(x!)
 
-	Applying rule 2:
+	Applying rule File "initial_state.ka", line 5, characters 0-26::
 		the precondition is not satisfied yet
 
-	Applying rule 3:
+	Applying rule File "initial_state.ka", line 6, characters 0-37::
 		the precondition is satisfied
 
-		rule 3 is applied for the first time
+		rule File "initial_state.ka", line 6, characters 0-37: is applied for the first time
 
 		Updating the views for B(x!,x~)
 
@@ -83,15 +83,15 @@ Reachability analysis...
 		B(x~p!1),A(x~u!1)
 		A(x~u!1),B(x~p!1)
 
-			(rule 0) should be investigated
-			(rule 1) should be investigated
-			(rule 2) should be investigated
-			(rule 3) should be investigated
+			(rule File "initial_state.ka", line 3, characters 0-23:) should be investigated
+			(rule File "initial_state.ka", line 4, characters 0-12:) should be investigated
+			(rule File "initial_state.ka", line 5, characters 0-26:) should be investigated
+			(rule File "initial_state.ka", line 6, characters 0-37:) should be investigated
 
-	Applying rule 0:
+	Applying rule File "initial_state.ka", line 3, characters 0-23::
 		the precondition is satisfied
 
-	Applying rule 1:
+	Applying rule File "initial_state.ka", line 4, characters 0-12::
 		the precondition is satisfied
 
 		Updating the views for A(x!)
@@ -99,27 +99,27 @@ Reachability analysis...
 
 		B(x!free,x~p)
 
-			(rule 0) should be investigated
-			(rule 1) should be investigated
+			(rule File "initial_state.ka", line 3, characters 0-23:) should be investigated
+			(rule File "initial_state.ka", line 4, characters 0-12:) should be investigated
 
-	Applying rule 2:
+	Applying rule File "initial_state.ka", line 5, characters 0-26::
 		the precondition is satisfied
 
-		rule 2 is applied for the first time
+		rule File "initial_state.ka", line 5, characters 0-26: is applied for the first time
 
 		Updating the views for B(x!,x~)
 
-	Applying rule 3:
+	Applying rule File "initial_state.ka", line 6, characters 0-37::
 		the precondition is satisfied
 
 		Updating the views for B(x!,x~)
 
 		Updating the views for B(x!,x~)
 
-	Applying rule 0:
+	Applying rule File "initial_state.ka", line 3, characters 0-23::
 		the precondition is satisfied
 
-	Applying rule 1:
+	Applying rule File "initial_state.ka", line 4, characters 0-12::
 		the precondition is satisfied
 
 		Updating the views for A(x!)

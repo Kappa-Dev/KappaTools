@@ -493,10 +493,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
 
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 4-42:):
 		the precondition is satisfied
 
-		rule 0: r0 is applied for the first time
+		rule r0 (File "parallel_bonds.ka", line 8, characters 4-42:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -530,10 +530,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 4-42:):
 		the precondition is satisfied
 
-		rule 1: r1 is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 9, characters 4-42:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -567,10 +567,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "parallel_bonds.ka", line 10, characters 4-50:):
 		the precondition is satisfied
 
-		rule 2: r2 is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 10, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -604,30 +604,30 @@ EXTENSIONAL DESCRIPTION:
 		B(z!A@z,t!A@t)
 
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "parallel_bonds.ka", line 11, characters 4-50:):
 		the precondition is satisfied
 
-		rule 3: r3 is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 11, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 0: r0:
-		the precondition is satisfied
-
-		Updating the views for A(z!,t!)
-
-		Updating the views for B(z!,t!)
-
-	Applying rule 1: r1:
+	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 4-42:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t!)
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 2: r2:
+	Applying rule r1 (File "parallel_bonds.ka", line 9, characters 4-42:):
+		the precondition is satisfied
+
+		Updating the views for A(z!,t!)
+
+		Updating the views for B(z!,t!)
+
+	Applying rule r2 (File "parallel_bonds.ka", line 10, characters 4-50:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t!)

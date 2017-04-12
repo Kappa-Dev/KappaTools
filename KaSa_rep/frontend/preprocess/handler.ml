@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 22 2016>
+   * Last modification: Time-stamp: <Apr 12 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -193,7 +193,9 @@ let complementary_interface
   in
   error, Misc_sa.list_minus l interface
 
-let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
+let string_of_rule
+    ?with_rule:(with_rule=true)
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
@@ -216,7 +218,7 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
         let error, (m1, _) = Misc_sa.unsome (error,label)
             (fun error -> error,Locality.dummy_annot "") in
         let m1 =
-          if m1 = "" then m1
+          if (not with_rule_name) || m1="" then ""
           else
             match
               rule.Cckappa_sig.e_rule_initial_direction
@@ -224,11 +226,30 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
             | Ckappa_sig.Direct -> m1
             | Ckappa_sig.Reverse -> Ast.flip_label m1
         in
-        error,
-        (if m1 = ""
-         then ("rule "^ (Ckappa_sig.string_of_rule_id rule_id))
-         else ("rule "^ Ckappa_sig.string_of_rule_id rule_id)^": "^ m1
-        )
+        let m2 =
+          let pos  = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position in
+          if (not with_loc) || pos = Locality.dummy
+          then ""
+          else Locality.to_string pos
+        in
+        let m3 =
+          if (not with_rule_id) then "" else Ckappa_sig.string_of_rule_id rule_id
+        in
+        let m4 =
+          if with_rule then "rule " else ""
+        in
+        let s =
+          match m1, m2, m3
+          with
+          | "","", s | "",s,_ | s,"",_ -> m4^s
+          | s1,s2, _ -> m4^s1^" ("^s2^")"
+        in
+        let s =
+          if s =  ""
+          then m4^(Ckappa_sig.string_of_rule_id rule_id)
+          else s
+        in
+        error, s
     end
   else
     begin

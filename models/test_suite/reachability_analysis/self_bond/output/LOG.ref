@@ -816,10 +816,10 @@ EXTENSIONAL DESCRIPTION:
 		F(z!free,t!free)
 
 
-	Applying rule 0: r1:
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
 		the precondition is satisfied
 
-		rule 0: r1 is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:) is applied for the first time
 
 		Updating the views for A(z!,t!)
 
@@ -853,10 +853,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!,t!)
 
-	Applying rule 5: r6:
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
 		the precondition is satisfied
 
-		rule 5: r6 is applied for the first time
+		rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:) is applied for the first time
 
 		Updating the views for F(z!,t!)
 
@@ -948,10 +948,10 @@ EXTENSIONAL DESCRIPTION:
 		F(z!F@t,t!free)
 
 
-	Applying rule 4: r5:
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
 		the precondition is satisfied
 
-		rule 4: r5 is applied for the first time
+		rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:) is applied for the first time
 
 		Updating the views for E(z!,t!)
 
@@ -1043,10 +1043,10 @@ EXTENSIONAL DESCRIPTION:
 		E(z!free,t!E@t)
 
 
-	Applying rule 3: r4:
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
 		the precondition is satisfied
 
-		rule 3: r4 is applied for the first time
+		rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:) is applied for the first time
 
 		Updating the views for D(z!,t!)
 
@@ -1138,10 +1138,10 @@ EXTENSIONAL DESCRIPTION:
 		D(z!free,t!D@t)
 
 
-	Applying rule 2: r3:
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
 		the precondition is satisfied
 
-		rule 2: r3 is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:) is applied for the first time
 
 		Updating the views for C(z!,t!)
 
@@ -1233,10 +1233,10 @@ EXTENSIONAL DESCRIPTION:
 		C(z!C@t,t!free)
 
 
-	Applying rule 1: r2:
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
 		the precondition is satisfied
 
-		rule 1: r2 is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:) is applied for the first time
 
 		Updating the views for B(z!,t!)
 
@@ -1270,14 +1270,14 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(z!,t!)
 
-	Applying rule 0: r1:
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t!)
 
 		Updating the views for A(z!,t!)
 
-	Applying rule 5: r6:
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for F(z!,t!)
@@ -1286,7 +1286,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for F(z!,t!)
 
-	Applying rule 4: r5:
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for E(z!,t!)
@@ -1295,7 +1295,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for E(z!,t!)
 
-	Applying rule 3: r4:
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for D(z!,t!)
@@ -1304,7 +1304,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(z!,t!)
 
-	Applying rule 2: r3:
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for C(z!,t!)
@@ -1313,7 +1313,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(z!,t!)
 
-	Applying rule 1: r2:
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
 		the precondition is satisfied
 
 		Updating the views for B(z!,t!)

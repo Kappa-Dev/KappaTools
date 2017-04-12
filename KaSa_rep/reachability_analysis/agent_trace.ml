@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Apr 12 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -168,7 +168,7 @@ let dump_edge logger parameters error handler_kappa compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameters
     then
-      Handler.string_of_rule parameters error handler_kappa compil (fst label)
+      Handler.string_of_rule ~with_loc:false ~with_rule:false parameters error handler_kappa compil (fst label)
     else error,""
   in
   let () =
@@ -1080,6 +1080,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->
                  error, ""
@@ -1116,6 +1117,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->  error, ""
              end
@@ -1151,6 +1153,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->  error, ""
              end

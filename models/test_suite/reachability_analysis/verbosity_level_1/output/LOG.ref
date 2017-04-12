@@ -9,7 +9,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 7: KO will never be applied.
+rule KO (File "../verbosity.ka", line 8, characters 4-32:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

@@ -246,11 +246,11 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0 will never be applied.
-rule 1 will never be applied.
-rule 2 will never be applied.
-rule 3 will never be applied.
-rule 4 will never be applied.
+rule File "side_effect.ka", line 8, characters 0-29: will never be applied.
+rule File "side_effect.ka", line 9, characters 0-17: will never be applied.
+rule File "side_effect.ka", line 10, characters 0-17: will never be applied.
+rule File "side_effect.ka", line 11, characters 0-10: will never be applied.
+rule File "side_effect.ka", line 12, characters 0-10: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 
