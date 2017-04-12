@@ -7,6 +7,6 @@ digraph G{
 "Node_22" [label="C(a!B@x,b~u)"];
 "Init_23" -> "Node_23" [label=""];
 "Init_22" -> "Node_22" [label=""];
-"Node_22" -> "Final_22" [label="rule 0"];
-"Node_23" -> "Final_23" [label="rule 0"];
+"Node_22" -> "Final_22" [label="0"];
+"Node_23" -> "Final_23" [label="0"];
 }

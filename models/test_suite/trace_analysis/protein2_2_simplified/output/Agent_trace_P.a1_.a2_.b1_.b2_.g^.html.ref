@@ -41,19 +41,19 @@
   g.setEdge(13,4,{  });
   g.setEdge(13,3,{  });
   g.setEdge(1,11,{ label: "" });
-  g.setEdge(10,9,{ label: "rule 0: a1+" });
-  g.setEdge(9,10,{ label: "rule 2: a1-" });
-  g.setEdge(9,8,{ label: "rule 1: b1+" });
-  g.setEdge(8,9,{ label: "rule 3: b1-" });
-  g.setEdge(7,6,{ label: "rule 4: a2+" });
-  g.setEdge(6,7,{ label: "rule 5: a2-" });
-  g.setEdge(6,4,{ label: "rule 6: b2+" });
-  g.setEdge(5,7,{ label: "rule 7: b2-" });
-  g.setEdge(5,4,{ label: "rule 4: a2+" });
-  g.setEdge(4,6,{ label: "rule 7: b2-" });
-  g.setEdge(4,5,{ label: "rule 5: a2-" });
-  g.setEdge(3,2,{ label: "rule 8: P.K" });
-  g.setEdge(2,3,{ label: "rule 9: P/K" });
+  g.setEdge(10,9,{ label: "a1+" });
+  g.setEdge(9,10,{ label: "a1-" });
+  g.setEdge(9,8,{ label: "b1+" });
+  g.setEdge(8,9,{ label: "b1-" });
+  g.setEdge(7,6,{ label: "a2+" });
+  g.setEdge(6,7,{ label: "a2-" });
+  g.setEdge(6,4,{ label: "b2+" });
+  g.setEdge(5,7,{ label: "b2-" });
+  g.setEdge(5,4,{ label: "a2+" });
+  g.setEdge(4,6,{ label: "b2-" });
+  g.setEdge(4,5,{ label: "a2-" });
+  g.setEdge(3,2,{ label: "P.K" });
+  g.setEdge(2,3,{ label: "P/K" });
   var svg = d3.select("svg"),inner = svg.select("g");
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {

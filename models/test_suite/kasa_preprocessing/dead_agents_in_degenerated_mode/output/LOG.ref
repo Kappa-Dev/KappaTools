@@ -474,19 +474,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule 8:
+	Applying rule File "dead_agents.ka", line 17, characters 0-18::
 		the precondition is not satisfied yet
 
-	Applying rule 9:
+	Applying rule File "dead_agents.ka", line 18, characters 0-20::
 		the precondition is not satisfied yet
 
-	Applying rule 0:
+	Applying rule File "dead_agents.ka", line 10, characters 0-33::
 		the precondition is not satisfied yet
 
-	Applying rule 3:
+	Applying rule File "dead_agents.ka", line 12, characters 0-25::
 		the precondition is satisfied
 
-		rule 3 is applied for the first time
+		rule File "dead_agents.ka", line 12, characters 0-25: is applied for the first time
 
 		Updating the views for A(x~,x!)
 
@@ -518,24 +518,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,x!free)
 
 
-	Applying rule 4:
+	Applying rule File "dead_agents.ka", line 12, characters 0-25::
 		the precondition is satisfied
 
-		rule 4 is applied for the first time
+		rule File "dead_agents.ka", line 12, characters 0-25: is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 5:
+	Applying rule File "dead_agents.ka", line 13, characters 0-22::
 		the precondition is satisfied
 
-		rule 5 is applied for the first time
+		rule File "dead_agents.ka", line 13, characters 0-22: is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 1:
+	Applying rule File "dead_agents.ka", line 11, characters 0-23::
 		the precondition is satisfied
 
-		rule 1 is applied for the first time
+		rule File "dead_agents.ka", line 11, characters 0-23: is applied for the first time
 
 		Updating the views for B(x~)
 
@@ -557,44 +557,44 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p)
 
 
-	Applying rule 2:
+	Applying rule File "dead_agents.ka", line 11, characters 0-23::
 		the precondition is satisfied
 
-		rule 2 is applied for the first time
+		rule File "dead_agents.ka", line 11, characters 0-23: is applied for the first time
 
 		Updating the views for B(x~)
 
-	Applying rule 6:
+	Applying rule File "dead_agents.ka", line 14, characters 0-22::
 		the precondition is not satisfied yet
 
-	Applying rule 7:
+	Applying rule File "dead_agents.ka", line 15, characters 0-22::
 		the precondition is not satisfied yet
 
-	Applying rule 9:
+	Applying rule File "dead_agents.ka", line 18, characters 0-20::
 		the precondition is not satisfied yet
 
-	Applying rule 0:
+	Applying rule File "dead_agents.ka", line 10, characters 0-33::
 		the precondition is not satisfied yet
 
-	Applying rule 3:
+	Applying rule File "dead_agents.ka", line 12, characters 0-25::
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 8:
+	Applying rule File "dead_agents.ka", line 17, characters 0-18::
 		the precondition is not satisfied yet
 
-	Applying rule 1:
+	Applying rule File "dead_agents.ka", line 11, characters 0-23::
 		the precondition is satisfied
 
 		Updating the views for B(x~)
 
-	Applying rule 4:
+	Applying rule File "dead_agents.ka", line 12, characters 0-25::
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 5:
+	Applying rule File "dead_agents.ka", line 13, characters 0-22::
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
@@ -602,11 +602,11 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0 will never be applied.
-rule 6 will never be applied.
-rule 7 will never be applied.
-rule 8 will never be applied.
-rule 9 will never be applied.
+rule File "dead_agents.ka", line 10, characters 0-33: will never be applied.
+rule File "dead_agents.ka", line 14, characters 0-22: will never be applied.
+rule File "dead_agents.ka", line 15, characters 0-22: will never be applied.
+rule File "dead_agents.ka", line 17, characters 0-18: will never be applied.
+rule File "dead_agents.ka", line 18, characters 0-20: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

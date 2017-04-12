@@ -4,11 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-<<<<<<< HEAD
-  * Last modification: Time-stamp: <Apr 01 2017>
-=======
-  * Last modification: Time-stamp: <Apr 02 2017>
->>>>>>> aee0cd6... ignore dead rules in local traces
+  * Last modification: Time-stamp: <Apr 12 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -172,7 +168,7 @@ let dump_edge logger parameters error handler_kappa compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameters
     then
-      Handler.string_of_rule parameters error handler_kappa compil (fst label)
+      Handler.string_of_rule ~with_loc:false ~with_rule:false parameters error handler_kappa compil (fst label)
     else error,""
   in
   let () =
@@ -492,7 +488,7 @@ let build_support parameters error rules dead_rules =
               in
               error, (map, creation, degradation))
            rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-           (map, creation, degradation) 
+           (map, creation, degradation)
     )
     rules
     (Ckappa_sig.Agent_map_and_set.Map.empty, Ckappa_sig.Agent_map_and_set.Map.empty,
@@ -1084,6 +1080,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->
                  error, ""
@@ -1120,6 +1117,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->  error, ""
              end
@@ -1155,6 +1153,7 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
+                   ~with_loc:false ~with_rule:false
                    parameters error handler_kappa compil r
                | Init _,_,_ ->  error, ""
              end
@@ -1456,7 +1455,7 @@ let agent_trace
                           (Remanent_parameters.get_logger parameters)
                       with
                       | Some channel -> channel
-                      | None -> stdout   
+                      | None -> stdout
                   in
                   let error', init_list =
                     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs

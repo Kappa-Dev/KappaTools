@@ -29,17 +29,17 @@ Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a P
   <script>
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
-  g.setNode(1, { label: "0:A(x~u),B(x~p)->A(x~u),A(x~p)", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(1, { label: "label", shape: "rect", style: "fill: #8ce"  });
   g.setNode(2, { label: "1:A(x~p)->A(x~u)", shape: "rect", style: "fill: #8ce"  });
   g.setNode(3, { label: "2:B(x~u)->B(x~p)", shape: "rect", style: "fill: #8ce"  });
   g.setNode(4, { label: "3:B(x~p)->B(x~u)", shape: "rect", style: "fill: #8ce"  });
+  g.setEdge(2,1,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+  g.setEdge(3,4,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+  g.setEdge(3,1,{ label: "[0->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+  g.setEdge(4,3,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+  g.setEdge(4,1,{ label: "[0->1]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
   g.setEdge(1,2,{ label: "[1->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   g.setEdge(1,4,{ label: "[1->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
-  g.setEdge(2,1,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
-  g.setEdge(3,1,{ label: "[0->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
-  g.setEdge(3,4,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
-  g.setEdge(4,1,{ label: "[0->1]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
-  g.setEdge(4,3,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   var svg = d3.select("svg"),inner = svg.select("g");
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {

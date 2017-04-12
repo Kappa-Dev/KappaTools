@@ -178,25 +178,25 @@ Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
 Reachability analysis...
 
-	Applying rule 0:
+	Applying rule File "empty_agents.ka", line 1, characters 0-13::
 		the precondition is satisfied
 
-		rule 0 is applied for the first time
+		rule File "empty_agents.ka", line 1, characters 0-13: is applied for the first time
 
-	Applying rule 1:
+	Applying rule File "empty_agents.ka", line 2, characters 0-13::
 		the precondition is satisfied
 
-		rule 1 is applied for the first time
+		rule File "empty_agents.ka", line 2, characters 0-13: is applied for the first time
 
-	Applying rule 2:
+	Applying rule File "empty_agents.ka", line 3, characters 0-13::
 		the precondition is satisfied
 
-		rule 2 is applied for the first time
+		rule File "empty_agents.ka", line 3, characters 0-13: is applied for the first time
 
-	Applying rule 3:
+	Applying rule File "empty_agents.ka", line 4, characters 0-16::
 		the precondition is satisfied
 
-		rule 3 is applied for the first time
+		rule File "empty_agents.ka", line 4, characters 0-16: is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -217,16 +217,16 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule 4:
+	Applying rule File "empty_agents.ka", line 5, characters 0-16::
 		the precondition is not satisfied yet
 
-	Applying rule 3:
+	Applying rule File "empty_agents.ka", line 4, characters 0-16::
 		the precondition is satisfied
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 4 will never be applied.
+rule File "empty_agents.ka", line 5, characters 0-16: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

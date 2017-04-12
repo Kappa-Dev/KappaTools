@@ -4,8 +4,8 @@ digraph G{
 "Node_29" [label="A(x!free,y!B@y,z~p)"];
 "Node_28" [label="A(x!C@a,y!B@y,z~p)"];
 "Node_27" [label="A(x!C@a,y!B@y,z~u)"];
-"Node_27" -> "Node_28" [label="rule 2"];
-"Node_27" -> "Node_30" [label="rule 0"];
-"Node_28" -> "Node_29" [label="rule 0"];
+"Node_27" -> "Node_28" [label="2"];
+"Node_27" -> "Node_30" [label="0"];
+"Node_28" -> "Node_29" [label="0"];
 "Init_27" -> "Node_27" [label=""];
 }

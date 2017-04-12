@@ -637,16 +637,16 @@ EXTENSIONAL DESCRIPTION:
 		A(z~u,z!free,t!free)
 
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "product.ka", line 7, characters 4-62:):
 		the precondition is not satisfied yet
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "product.ka", line 8, characters 4-62:):
 		the precondition is not satisfied yet
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "product.ka", line 9, characters 4-29:):
 		the precondition is satisfied
 
-		rule 2: r2 is applied for the first time
+		rule r2 (File "product.ka", line 9, characters 4-29:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -688,17 +688,17 @@ EXTENSIONAL DESCRIPTION:
 		A(z~p,z!free,t!free)
 
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "product.ka", line 10, characters 4-29:):
 		the precondition is satisfied
 
-		rule 3: r3 is applied for the first time
+		rule r3 (File "product.ka", line 10, characters 4-29:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "product.ka", line 11, characters 4-50:):
 		the precondition is satisfied
 
-		rule 4: r4 is applied for the first time
+		rule r4 (File "product.ka", line 11, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -742,10 +742,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "product.ka", line 12, characters 4-50:):
 		the precondition is satisfied
 
-		rule 5: r5 is applied for the first time
+		rule r5 (File "product.ka", line 12, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -789,10 +789,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "product.ka", line 13, characters 4-50:):
 		the precondition is satisfied
 
-		rule 6: r6 is applied for the first time
+		rule r6 (File "product.ka", line 13, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -836,10 +836,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "product.ka", line 14, characters 4-50:):
 		the precondition is satisfied
 
-		rule 7: r7 is applied for the first time
+		rule r7 (File "product.ka", line 14, characters 4-50:) is applied for the first time
 
 		Updating the views for A(z~,z!,t!)
 
@@ -883,47 +883,47 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 8: r8:
+	Applying rule r8 (File "product.ka", line 15, characters 4-58:):
 		the precondition is not satisfied yet
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "product.ka", line 7, characters 4-62:):
 		the precondition is not satisfied yet
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "product.ka", line 8, characters 4-62:):
 		the precondition is not satisfied yet
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "product.ka", line 9, characters 4-29:):
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "product.ka", line 10, characters 4-29:):
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 4: r4:
-		the precondition is satisfied
-
-		Updating the views for A(z~,z!,t!)
-
-		Updating the views for A(z~,z!,t!)
-
-	Applying rule 5: r5:
+	Applying rule r4 (File "product.ka", line 11, characters 4-50:):
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 6: r6:
+	Applying rule r5 (File "product.ka", line 12, characters 4-50:):
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
 
 		Updating the views for A(z~,z!,t!)
 
-	Applying rule 7: r7:
+	Applying rule r6 (File "product.ka", line 13, characters 4-50:):
+		the precondition is satisfied
+
+		Updating the views for A(z~,z!,t!)
+
+		Updating the views for A(z~,z!,t!)
+
+	Applying rule r7 (File "product.ka", line 14, characters 4-50:):
 		the precondition is satisfied
 
 		Updating the views for A(z~,z!,t!)
@@ -933,9 +933,9 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule 0: r0 will never be applied.
-rule 1: r1 will never be applied.
-rule 8: r8 will never be applied.
+rule r0 (File "product.ka", line 7, characters 4-62:) will never be applied.
+rule r1 (File "product.ka", line 8, characters 4-62:) will never be applied.
+rule r8 (File "product.ka", line 15, characters 4-58:) will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

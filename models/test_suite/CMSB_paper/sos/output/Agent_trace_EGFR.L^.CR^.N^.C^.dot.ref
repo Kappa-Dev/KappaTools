@@ -5,15 +5,15 @@ digraph G{
 "Node_62" [label="EGFR(L!EGF@r,CR!EGFR@CR,N!free,C!free)"];
 "Node_60" [label="EGFR(L!EGF@r,CR!free,N!free,C!free)"];
 "Node_59" [label="EGFR(L!free,CR!free,N!free,C!free)"];
-"Node_68" -> "Node_62" [label="rule 13: R/int"];
-"Node_65" -> "Node_62" [label="rule 13: R/int"];
-"Node_62" -> "Node_68" [label="rule 12: R.int"];
-"Node_62" -> "Node_65" [label="rule 12: R.int"];
-"Node_60" -> "Node_59" [label="rule 3: E/R"];
-"Node_59" -> "Node_60" [label="rule 2: E.R"];
-"Node_62" -> "Node_60" [label="rule 1: R/R"];
-"Node_62" -> "Node_60" [label="rule 1: R/R"];
-"Node_60" -> "Node_62" [label="rule 0: R.R"];
-"Node_60" -> "Node_62" [label="rule 0: R.R"];
+"Node_68" -> "Node_62" [label="R/int"];
+"Node_65" -> "Node_62" [label="R/int"];
+"Node_62" -> "Node_68" [label="R.int"];
+"Node_62" -> "Node_65" [label="R.int"];
+"Node_60" -> "Node_59" [label="E/R"];
+"Node_59" -> "Node_60" [label="E.R"];
+"Node_62" -> "Node_60" [label="R/R"];
+"Node_62" -> "Node_60" [label="R/R"];
+"Node_60" -> "Node_62" [label="R.R"];
+"Node_60" -> "Node_62" [label="R.R"];
 "Init_59" -> "Node_59" [label=""];
 }

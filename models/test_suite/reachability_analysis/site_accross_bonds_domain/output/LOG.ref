@@ -620,10 +620,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z~p,z!A@z,t~p)
 
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 4-28:):
 		the precondition is satisfied
 
-		rule 0: r0 is applied for the first time
+		rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 4-28:) is applied for the first time
 
 		Updating the views for A(z!,t~)
 
@@ -655,31 +655,31 @@ EXTENSIONAL DESCRIPTION:
 		A(z!free,t~p)
 
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 4-54:):
 		the precondition is not satisfied yet
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "site_accross_bonds_domain.ka", line 14, characters 4-54:):
 		the precondition is satisfied
 
-		rule 5: r5 is applied for the first time
+		rule r5 (File "site_accross_bonds_domain.ka", line 14, characters 4-54:) is applied for the first time
 
 		Updating the views for A(z!,t~)
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 4-54:):
 		the precondition is satisfied
 
-		rule 6: r6 is applied for the first time
+		rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 4-54:) is applied for the first time
 
 		Updating the views for A(z!,t~)
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 4-34:):
 		the precondition is satisfied
 
-		rule 1: r1 is applied for the first time
+		rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 4-34:) is applied for the first time
 
 		Updating the views for B(z~,z!,t~)
 
@@ -721,10 +721,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z~u,z!free,t~p)
 
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 4-24:):
 		the precondition is satisfied
 
-		rule 3: r3 is applied for the first time
+		rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 4-24:) is applied for the first time
 
 		Updating the views for B(z~,z!,t~)
 
@@ -767,47 +767,47 @@ EXTENSIONAL DESCRIPTION:
 		B(z~p,z!free,t~u)
 
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "site_accross_bonds_domain.ka", line 13, characters 4-24:):
 		the precondition is satisfied
 
-		rule 4: r4 is applied for the first time
+		rule r4 (File "site_accross_bonds_domain.ka", line 13, characters 4-24:) is applied for the first time
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "site_accross_bonds_domain.ka", line 9, characters 4-28:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t~)
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "site_accross_bonds_domain.ka", line 10, characters 4-34:):
 		the precondition is satisfied
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 4-54:):
 		the precondition is satisfied
 
-		rule 2: r2 is applied for the first time
-
-		Updating the views for A(z!,t~)
-
-		Updating the views for B(z~,z!,t~)
-
-	Applying rule 5: r5:
-		the precondition is satisfied
+		rule r2 (File "site_accross_bonds_domain.ka", line 11, characters 4-54:) is applied for the first time
 
 		Updating the views for A(z!,t~)
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 6: r6:
+	Applying rule r5 (File "site_accross_bonds_domain.ka", line 14, characters 4-54:):
 		the precondition is satisfied
 
 		Updating the views for A(z!,t~)
 
 		Updating the views for B(z~,z!,t~)
 
-	Applying rule 3: r3:
+	Applying rule r6 (File "site_accross_bonds_domain.ka", line 15, characters 4-54:):
+		the precondition is satisfied
+
+		Updating the views for A(z!,t~)
+
+		Updating the views for B(z~,z!,t~)
+
+	Applying rule r3 (File "site_accross_bonds_domain.ka", line 12, characters 4-24:):
 		the precondition is satisfied
 
 		Updating the views for B(z~,z!,t~)

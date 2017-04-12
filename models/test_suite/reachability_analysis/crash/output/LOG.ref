@@ -197,10 +197,10 @@ EXTENSIONAL DESCRIPTION:
 		C(z!free,t!free)
 
 
-	Applying rule 0: r3:
+	Applying rule r3 (File "crash.ka", line 4, characters 4-52:):
 		the precondition is satisfied
 
-		rule 0: r3 is applied for the first time
+		rule r3 (File "crash.ka", line 4, characters 4-52:) is applied for the first time
 
 		Updating the views for C(z!,t!)
 
@@ -295,7 +295,7 @@ EXTENSIONAL DESCRIPTION:
 		C(z!free,t!C@z)
 
 
-	Applying rule 0: r3:
+	Applying rule r3 (File "crash.ka", line 4, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for C(z!,t!)

@@ -630,10 +630,10 @@ Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
 Reachability analysis...
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
 		the precondition is satisfied
 
-		rule 0: r0 is applied for the first time
+		rule r0 (File "side_effects.ka", line 1, characters 4-17:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -664,10 +664,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,x!free)
 
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
 		the precondition is satisfied
 
-		rule 1: r1 is applied for the first time
+		rule r1 (File "side_effects.ka", line 2, characters 4-17:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -698,10 +698,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u,x!free)
 
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
 		the precondition is satisfied
 
-		rule 2: r2 is applied for the first time
+		rule r2 (File "side_effects.ka", line 3, characters 4-17:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -732,10 +732,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x~u,x!free)
 
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
 		the precondition is satisfied
 
-		rule 3: r3 is applied for the first time
+		rule r3 (File "side_effects.ka", line 4, characters 4-17:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -766,10 +766,10 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u,x!free)
 
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
 		the precondition is satisfied
 
-		rule 4: r4 is applied for the first time
+		rule r4 (File "side_effects.ka", line 5, characters 4-17:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -800,13 +800,13 @@ EXTENSIONAL DESCRIPTION:
 		E(x~u,x!free)
 
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
 		the precondition is not satisfied yet
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
 		the precondition is satisfied
 
-		rule 6: r6 is applied for the first time
+		rule r6 (File "side_effects.ka", line 7, characters 4-38:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
@@ -868,16 +868,16 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p,x!A@x)
 
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
 		the precondition is not satisfied yet
 
-	Applying rule 8: r8:
+	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
 		the precondition is not satisfied yet
 
-	Applying rule 10: r10:
+	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
-		rule 10: r10 is applied for the first time
+		rule r10 (File "side_effects.ka", line 11, characters 5-43:) is applied for the first time
 
 		Updating the views for D(x~,x!)
 
@@ -939,10 +939,10 @@ EXTENSIONAL DESCRIPTION:
 		E(x~p,x!D@x)
 
 
-	Applying rule 11: r11:
+	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
 		the precondition is satisfied
 
-		rule 11: r11 is applied for the first time
+		rule r11 (File "side_effects.ka", line 12, characters 5-23:) is applied for the first time
 
 		Updating the views for D(x~,x!)
 
@@ -1003,30 +1003,30 @@ EXTENSIONAL DESCRIPTION:
 		E(x~p,x!free)
 
 
-	Applying rule 9: r9:
+	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
 		the precondition is satisfied
 
-		rule 9: r9 is applied for the first time
+		rule r9 (File "side_effects.ka", line 10, characters 4-14:) is applied for the first time
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
 		the precondition is satisfied
 
-		rule 5: r5 is applied for the first time
+		rule r5 (File "side_effects.ka", line 6, characters 4-19:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 	Dealing with side effects
@@ -1059,24 +1059,24 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p,x!free)
 
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
 		Updating the views for B(x~,x!)
 
-	Applying rule 10: r10:
+	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
 
 		Updating the views for E(x~,x!)
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
 		the precondition is satisfied
 
-		rule 7: r7 is applied for the first time
+		rule r7 (File "side_effects.ka", line 8, characters 4-52:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
@@ -1140,10 +1140,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x~p,x!A@x)
 
 
-	Applying rule 8: r8:
+	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
 		the precondition is satisfied
 
-		rule 8: r8 is applied for the first time
+		rule r8 (File "side_effects.ka", line 9, characters 4-46:) is applied for the first time
 
 		Updating the views for C(x~,x!)
 
@@ -1177,21 +1177,21 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,x!C@x)
 
 
-	Applying rule 11: r11:
+	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 9: r9:
+	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
 		the precondition is satisfied
 	Dealing with side effects
 
@@ -1223,25 +1223,25 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,x!free)
 
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 10: r10:
+	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
 
 		Updating the views for E(x~,x!)
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
@@ -1250,7 +1250,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x~,x!)
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
@@ -1285,38 +1285,38 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,x!)
 
-	Applying rule 8: r8:
+	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
 		the precondition is satisfied
 
 		Updating the views for C(x~,x!)
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 4: r4:
+	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 11: r11:
+	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
 
-	Applying rule 3: r3:
+	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 2: r2:
+	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 9: r9:
+	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
 		the precondition is satisfied
 
-	Applying rule 10: r10:
+	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
 		the precondition is satisfied
 
 		Updating the views for D(x~,x!)
 
 		Updating the views for E(x~,x!)
 
-	Applying rule 7: r7:
+	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
@@ -1325,22 +1325,22 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x~,x!)
 
-	Applying rule 0: r0:
+	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
 		the precondition is satisfied
 
-	Applying rule 5: r5:
+	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule 6: r6:
+	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
 		Updating the views for B(x~,x!)
 
-	Applying rule 1: r1:
+	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
 		the precondition is satisfied
 ------------------------------------------------------------
 every rule may be applied

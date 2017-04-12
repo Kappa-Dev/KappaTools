@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jan 12 2017>
+ * Last modification: Time-stamp: <Apr 12 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -321,6 +321,7 @@ val join_mixture:
 
 type 'mixture rule =
   {
+    position: Locality.t;
     prefix: int;
     delta: int;
     lhs   : 'mixture;
