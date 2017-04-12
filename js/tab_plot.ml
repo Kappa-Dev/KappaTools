@@ -193,8 +193,7 @@ let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
 let update_offset (update_offset_input : bool) : unit =
   let simulation_model = React.S.value State_simulation.model in
   let simulation_info =
-    Option_util.bind State_simulation.t_simulation_info
-      simulation_model.State_simulation.model_current in
+    Option_util.bind State_simulation.t_simulation_info simulation_model in
   match simulation_info with
   | None -> ()
   | Some simulation_info ->
@@ -229,7 +228,7 @@ let plot_limit_offset () : int =
   | None ->
     let simulation_model = React.S.value State_simulation.model in
     let simulation_info = Option_util.bind State_simulation.t_simulation_info
-        simulation_model.State_simulation.model_current in
+        simulation_model in
     (match simulation_info with
      | None -> 0
      | Some t -> simulation_info_offset_max t)

@@ -17,7 +17,7 @@ let visible_on_states
   React.S.bind
     State_simulation.model
     (fun model ->
-       let current_state = State_simulation.model_simulation_state model.State_simulation.model_current in
+       let current_state = State_simulation.model_simulation_state model in
        React.S.const
          (match current_state with
           | None -> a_class@hidden_class
@@ -474,9 +474,7 @@ module DivStatusIndicator : Ui_common.Div = struct
                   let option =
                     Option_util.map
                       State_simulation.model_state_to_string
-                      (State_simulation.model_simulation_state
-                     model.State_simulation.model_current)
-                  in
+                      (State_simulation.model_simulation_state model) in
                   let label = match option with None -> "None" | Some l -> l in
                   React.S.const label
                )
@@ -486,10 +484,7 @@ module DivStatusIndicator : Ui_common.Div = struct
                State_simulation.model
                (function model ->
                 React.S.const
-                  (match model.State_simulation.model_current with
-                   | None -> "None"
-                   | Some _ -> "Some"
-                  )
+                  (match model with None -> "None" | Some _ -> "Some")
                )
             )
         ]

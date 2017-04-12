@@ -11,8 +11,8 @@ type t
 val t_simulation_id : t -> Api_types_j.simulation_id
 val t_simulation_info : t -> Api_types_j.simulation_info option
 
-type model = { model_current : t option ;
-               model_simulations : Api_types_j.simulation_id list ; }
+type model = t option
+
 val dummy_model : model
 val model : model React.signal
 val model_simulation_info : model -> Api_types_j.simulation_info option
@@ -20,9 +20,6 @@ type model_state = STOPPED | INITALIZING | RUNNING | PAUSED
 val model_state_to_string : model_state -> string
 val model_simulation_state : t option -> model_state option
 
-val create_simulation : Api_types_j.simulation_id -> unit Api.result Lwt.t
-val set_simulation : Api_types_j.simulation_id -> unit Api.result Lwt.t
-val remove_simulation : unit -> unit Api.result Lwt.t
 (* run on application init *)
 val init : unit -> unit Lwt.t
 (* to synch state of application with runtime *)

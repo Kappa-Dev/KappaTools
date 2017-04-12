@@ -11,10 +11,10 @@ open Lwt.Infix
 type simulation_state =
   | SIMULATION_STATE_STOPPED (* simulation is unavailable *)
   | SIMULATION_STATE_INITALIZING (* simulation is blocked on an operation *)
-  | SIMULATION_STATE_READY of Api_types_j.simulation_info (* the simulation is ready *)
+  | SIMULATION_STATE_READY of Api_types_j.simulation_info
+  (* the simulation is ready *)
 
-type t = { is_pinned : bool ; (* created by ui so it pinned *)
-           simulation_id : Api_types_j.simulation_id ;
+type t = { simulation_id : Api_types_j.simulation_id ;
            simulation_state : simulation_state ; }
 
 let t_simulation_id simulation = simulation.simulation_id
@@ -25,16 +25,9 @@ let t_simulation_info simulation : Api_types_j.simulation_info option =
   | SIMULATION_STATE_INITALIZING -> None
   | SIMULATION_STATE_READY simulation_info -> Some simulation_info
 
-type state = { state_current : string option ;
-               state_simulations : t list ; }
+type state = t option
 
-let current_simulation (state : state) : t option =
-  List_util.find_option
-    (fun simulation -> Some simulation.simulation_id = state.state_current)
-    state.state_simulations
-
-type model = { model_current : t option ;
-               model_simulations : Api_types_j.simulation_id list ; }
+type model = state
 type model_state = STOPPED | INITALIZING | RUNNING | PAUSED
 
 let model_state_to_string =
@@ -43,54 +36,38 @@ let model_state_to_string =
          | RUNNING -> "Running"
          | PAUSED -> "Paused"
 
-let dummy_model = { model_current = None; model_simulations = []; }
+let dummy_model = None
 
 let model_simulation_info model : Api_types_j.simulation_info option=
-  Option_util.bind t_simulation_info model.model_current
+  Option_util.bind t_simulation_info model
 let model_simulation_state model : model_state option =
   Option_util.map
     (function
       | SIMULATION_STATE_STOPPED -> STOPPED
       | SIMULATION_STATE_INITALIZING -> INITALIZING
       | SIMULATION_STATE_READY simulation_info ->
-        if simulation_info.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_is_running then
+        if simulation_info.Api_types_j.simulation_info_progress.
+             Api_types_j.simulation_progress_is_running then
           RUNNING
         else
           PAUSED)
     (Option_util.map t_simulation_state model)
 
 
-let state , set_state =
-  React.S.create { state_current = None ;
-                   state_simulations = [] ; }
+let state, set_state = React.S.create None
 
 let update_simulation_state
     (simulation_id : Api_types_j.simulation_id)
-    (new_state : simulation_state) : unit =
-  let current_state = React.S.value state in
-  let update_t t =
-    if t.simulation_id = simulation_id then
-      { t with simulation_state = new_state }
-    else
-      t
-  in
-  let state_simulations = List.map update_t current_state.state_simulations in
-  let () = set_state { current_state with state_simulations = state_simulations } in
+    (simulation_state : simulation_state) : unit =
+  let () =
+    match React.S.value state with
+    | None -> ()
+    | Some current_state ->
+      assert (current_state.simulation_id = simulation_id) in
+  let () = set_state (Some { simulation_id; simulation_state; }) in
   ()
 
-
-let model : model React.signal =
-  React.S.bind
-    state
-    (fun simulation_state ->
-       React.S.const
-       { model_current = current_simulation simulation_state ;
-         model_simulations =
-           List.map
-             (fun simulation -> simulation.simulation_id)
-             simulation_state.state_simulations
-       }
-    )
+let model : model React.signal = state
 
 let with_simulation :
   'a . label:string ->
@@ -98,15 +75,7 @@ let with_simulation :
   'a  Api.result Lwt.t  =
   fun ~label handler ->
     let project_handler manager project_id =
-      let current_state = React.S.value state in
-      match
-        Option_util.bind
-          (fun simulation_id ->
-             List_util.find_option
-               (fun t -> simulation_id =  t_simulation_id t)
-               current_state.state_simulations)
-          current_state.state_current
-      with
+      match React.S.value state with
       | None ->
         let error_msg : string =
           Format.sprintf
@@ -164,97 +133,23 @@ let when_ready
            () >>= handler
       )
 
-let rec index_simulation
-    ?(map : Api_types_j.simulation_info Mods.StringMap.t = Mods.StringMap.empty)
+let update_simulation
     (manager : Api.manager)
-    (project_id : Api_types_j.project_id)
-    (simulation_ids : Api_types_j.simulation_id list) : Api_types_j.simulation_info Mods.StringMap.t Api.result Lwt.t
-  =
-  match simulation_ids with
-  | [] -> Lwt.return (Api_common.result_ok map)
-  | simulation_id::tail_simulation_ids ->
-    (manager#simulation_info project_id simulation_id) >>=
+    (simulation : t option)
+    (project_id : Api_types_j.project_id) = function
+  | [] -> Lwt.return (Api_common.result_ok (Option_util.map (fun s -> {
+        simulation_id = s.simulation_id;
+        simulation_state = SIMULATION_STATE_STOPPED;
+      }) simulation))
+  | s_id :: _ ->
+    let who = match simulation with None -> s_id | Some s -> s.simulation_id in
+    (manager#simulation_info project_id who) >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (simulation_info : Api_types_j.simulation_info) ->
-           let new_map = Mods.StringMap.add simulation_id simulation_info map in
-           index_simulation
-             ~map:new_map
-             manager
-             project_id
-             tail_simulation_ids
-         )
-    )
-
-(* If simulation is not in state then add it as an unpinned
-   simulation.
-*)
-let augment_simulation_list
-    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
-    (simulation_list : t list) : t list =
-  (* simulation id's in the current state *)
-  let state_simulation_ids = List.map t_simulation_id simulation_list in
-  (* predicate that checks if id is not in state id's *)
-  let not_in_state_ids simulation_id =
-    not (List.mem simulation_id state_simulation_ids) in
-  (* add simulations that currently not part of the state *)
-  Mods.StringMap.fold
-    (fun simulation_id simulation_info acc ->
-       if not_in_state_ids simulation_id then
-         { is_pinned = false ;
-           simulation_id = simulation_id ;
-           simulation_state = SIMULATION_STATE_READY simulation_info } :: acc
-       else acc)
-     simulation_index simulation_list
-
-(* Remove simulation from state if it not pinned or available. *)
-let restrict_simulation_list
-    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
-    (simulation_list : t list) : t list =
-  List.fold_right
-    (fun t acc ->
-       if Mods.StringMap.mem t.simulation_id simulation_index then t::acc
-       else if t.is_pinned then {
-         is_pinned=true;
-         simulation_id = t.simulation_id;
-         simulation_state = SIMULATION_STATE_STOPPED
-       }::acc
-       else acc)
-    simulation_list []
-
-let refresh_simulation_list
-    (simulation_index : Api_types_j.simulation_info Mods.StringMap.t)
-    (simulation_list : t list) : t list =
-  List.map
-    (fun t -> let simulation_id = t_simulation_id t in
-      match Mods.StringMap.find_option simulation_id simulation_index with
-      | Some x -> { t with simulation_state = SIMULATION_STATE_READY x }
-      | None -> t
-    )
-    simulation_list
-
-let update_simulation_list
-    (manager : Api.manager)
-    (simulation_list : t list)
-    (project_id : Api_types_j.project_id)
-    (simulation_ids : Api_types_j.simulation_id list) :
-  t list Api.result Lwt.t =
-  index_simulation ?map:None manager project_id simulation_ids >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (simulation_index : Api_types_j.simulation_info Mods.StringMap.t) ->
-         Lwt.return (Api_common.result_ok
-                       (refresh_simulation_list
-                          simulation_index
-                          (augment_simulation_list
-                             simulation_index
-                             (restrict_simulation_list
-                                simulation_index
-                                simulation_list
-                             )
-                          )
-                       )
-                    )
-       )
-  )
+           Lwt.return (Api_common.result_ok (Some {
+               simulation_id = who;
+               simulation_state = SIMULATION_STATE_READY simulation_info }))
+         ))
 
 (* to synch state of application with runtime *)
 let sync () : unit Api.result Lwt.t =
@@ -265,37 +160,16 @@ let sync () : unit Api.result Lwt.t =
          (manager#simulation_catalog project_id) >>=
          (Api_common.result_bind_lwt
             ~ok:(fun (catalog : Api_types_j.simulation_catalog) ->
-                update_simulation_list
+                update_simulation
                   manager
-                  old_state.state_simulations
+                  old_state
                   project_id
                   catalog.Api_types_j.simulation_ids >>=
                 (Api_common.result_bind_lwt
-                   ~ok:(fun (new_state_simulations : t list) ->
-                       let first_simulation =
-                         (match new_state_simulations with
-                          | [] -> None
-                          | first::_ -> Some first.simulation_id)
-                       in
-                       let new_state_current : string option =
-                         match old_state.state_current with
-                         | None -> first_simulation
-                         | Some simulation_id ->
-                           if List.exists
-                               (fun t -> t.simulation_id = simulation_id)
-                               new_state_simulations
-                           then
-                             Some simulation_id
-                           else
-                             first_simulation
-                       in
-                       let () =
-                         set_state
-                           { state_current = new_state_current ;
-                             state_simulations = new_state_simulations ; }
-                       in
+                   ~ok:(fun (new_state_simulation : t option) ->
+                       let () = set_state new_state_simulation in
                        Lwt.return (Api_common.result_ok ())
-                      )
+                     )
                 )
               )
          )
@@ -303,19 +177,21 @@ let sync () : unit Api.result Lwt.t =
 
 let create_simulation (simulation_id : Api_types_j.simulation_id) : unit Api.result Lwt.t =
   (* add to the list if it is not there *)
-  let current_state : state = React.S.value state in
-  let simulation_ids : Api_types_j.simulation_id list =
-    List.map t_simulation_id current_state.state_simulations in
-  if List.mem simulation_id simulation_ids then
-    Lwt.return (Api_common.result_ok ())
-  else
+  match React.S.value state with
+  | Some simulation ->
+    if simulation.simulation_id = simulation_id then
+      Lwt.return (Api_common.result_ok ())
+    else
+      Lwt.return (Api_common.result_error_msg "simulation_id mismatch")
+  | None ->
     State_project.with_project ~label:"remove_file"
       (fun manager project_id ->
          (manager#simulation_catalog project_id)
          >>=
          (Api_common.result_bind_lwt
             ~ok:(fun (simulation_catalog : Api_types_j.simulation_catalog) ->
-                let simulation_ids = simulation_catalog.Api_types_j.simulation_ids in
+                let simulation_ids =
+                  simulation_catalog.Api_types_j.simulation_ids in
                 let simulation_state : (simulation_state, Api.manager_code) Api_types_j.result Lwt.t =
                   if List.mem simulation_id simulation_ids then
                     (manager#simulation_info project_id simulation_id) >>=
@@ -331,7 +207,7 @@ let create_simulation (simulation_id : Api_types_j.simulation_id) : unit Api.res
                 (Api_common.result_bind_lwt
                    ~ok:(fun simulation_state ->
                        Lwt.return (Api_common.result_ok
-                                     { is_pinned = true ;
+                                     {
                                        simulation_id = simulation_id ;
                                        simulation_state = simulation_state;
                        })
@@ -341,95 +217,12 @@ let create_simulation (simulation_id : Api_types_j.simulation_id) : unit Api.res
          ) >>=
          (Api_common.result_bind_lwt
             ~ok:(fun (simulation : t) ->
-                 let current_state = React.S.value state in
-                 let () = set_state
-                     { current_state with
-                       state_simulations = simulation::current_state.state_simulations}
-                 in
+                 let () = set_state (Some simulation) in
                  Lwt.return (Api_common.result_ok ())
                 )
          ) >>=
          (Api_common.result_bind_lwt ~ok:sync)
       )
-
-let set_simulation (simulation_id : Api_types_j.simulation_id) : unit Api.result Lwt.t =
-  let current_state : state = React.S.value state in
-  let simulation_ids : Api_types_j.simulation_id list =
-    List.map t_simulation_id current_state.state_simulations in
-  (if List.mem simulation_id simulation_ids then
-     let () = set_state
-         { current_state with state_current =  Some simulation_id }
-     in
-     Lwt.return (Api_common.result_ok ())
-   else
-     let error_msg : string =
-       Format.sprintf "Simulation %s does not exist" simulation_id in
-     Lwt.return (Api_common.result_error_msg error_msg))
-  >>=
-  (Api_common.result_bind_lwt ~ok:sync)
-
-let check_simulation_state () : unit Api.result Lwt.t =
-  match (React.S.value state).state_current with
-  | Some _ -> Lwt.return (Api_common.result_ok ())
-  | None ->
-    let error_msg : string = "No simulation selected" in
-    Lwt.return (Api_common.result_error_msg error_msg)
-
-let remove_simulation_manager () : unit Api.result Lwt.t =
-  let handler
-      (manager : Api.manager)
-      (project_id : Api_types_j.project_id)
-      (t : t) : unit Api.result Lwt.t =
-    let simulation_id : Api_types_j.simulation_id = t_simulation_id t in
-    (manager#simulation_catalog project_id)
-    >>=
-    (Api_common.result_bind_lwt
-       ~ok:(fun (simulation_catalog : Api_types_j.simulation_catalog) ->
-           let simulation_ids : Api_types_j.simulation_id list =
-             simulation_catalog.Api_types_j.simulation_ids in
-           if List.mem simulation_id simulation_ids then
-             manager#simulation_delete project_id simulation_id
-           else
-             Lwt.return (Api_common.result_ok ())
-         )
-    )
-  in
-  with_simulation
-    ~label:"remove_simulation_manager"
-    handler
-
-
-let remove_simulation_state () : unit Api.result Lwt.t =
-  let handler
-      (_ : Api.manager)
-      (_ : Api_types_j.project_id)
-      (t : t) : unit Api.result Lwt.t =
-    let simulation_id : Api_types_j.simulation_id = t_simulation_id t in
-    let current_state : state = React.S.value state in
-    let state_current = None in
-    let state_simulations =
-      List.filter
-        (fun t -> simulation_id <> t_simulation_id t)
-        current_state.state_simulations in
-    let () = set_state
-        { state_current = state_current ;
-          state_simulations = state_simulations ; } in
-    Lwt.return (Api_common.result_ok ())
-  in
-  with_simulation
-    ~label:"remove_simulation_manager"
-    handler
-
-let remove_simulation () : unit Api.result Lwt.t =
-  Lwt.return (Api_common.result_ok ()) >>=
-  (* check simulation state *)
-  (Api_common.result_bind_lwt ~ok:check_simulation_state) >>=
-  (* remove_simulation_manager *)
-  (Api_common.result_bind_lwt ~ok:remove_simulation_manager) >>=
-  (* remove_simulation_state_state *)
-  (Api_common.result_bind_lwt ~ok:remove_simulation_state) >>=
-  (* sync *)
-  (Api_common.result_bind_lwt ~ok:sync)
 
 (* run on application init *)
 let load_simulations () : unit Lwt.t =
