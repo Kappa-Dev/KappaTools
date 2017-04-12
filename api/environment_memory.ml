@@ -20,22 +20,23 @@ class project
     (project_id : Api_types_j.project_id) :
   Api_environment.project =
   object
-    val mutable _simulations = []
+    val mutable _simulation = None
     val mutable _files = []
     val mutable _state : Api_environment.parse_state option Lwt.t =
       Lwt.return_none
     val mutable _version : Api_types_j.project_version = 0
-    method create_simulation
-        (simulation_parameter : Api_types_j.simulation_parameter)
-        (runtime_state : Kappa_facade.t) : Api_environment.simulation =
-      (new simulation runtime_state simulation_parameter :> Api_environment.simulation)
 
     method get_project_id () : Api_types_j.project_id =
       project_id
-    method get_simulations () =
-      _simulations
-    method set_simulations (simulation : Api_environment.simulation list) =
-      _simulations <- simulation
+    method get_simulation () = _simulation
+    method unset_simulation () = _simulation <- None
+    method set_simulation
+        (simulation_parameter : Api_types_j.simulation_parameter)
+        (runtime_state : Kappa_facade.t) =
+      _simulation <-
+        Some
+          (new simulation
+            runtime_state simulation_parameter :> Api_environment.simulation)
 
     method get_version () = _version
 

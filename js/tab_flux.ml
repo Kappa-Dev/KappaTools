@@ -45,8 +45,7 @@ let configuration () : Widget_export.configuration =
     show = React.S.map
         (fun model ->
            has_fluxmap
-             (Option_util.bind
-                State_simulation.t_simulation_info model))
+             (State_simulation.t_simulation_info model))
         State_simulation.model ;
   }
 
@@ -55,8 +54,8 @@ let _ = React.S.map
     (fun _ ->
        State_simulation.when_ready
          ~label:__LOC__
-         (fun manager project_id simulation_id ->
-           (manager#simulation_catalog_flux_map project_id simulation_id) >>=
+         (fun manager project_id ->
+           (manager#simulation_catalog_flux_map project_id) >>=
            (Api_common.result_bind_lwt
               ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
                   let () = ReactiveData.RList.set
@@ -148,24 +147,14 @@ let update_flux_map
     (index : int ): unit =
   State_simulation.when_ready
     ~label:__LOC__
-    (fun
-      manager
-      project_id
-      simulation_id ->
-      (manager#simulation_catalog_flux_map
-         project_id
-         simulation_id
-      ) >>=
+    (fun manager project_id ->
+      (manager#simulation_catalog_flux_map project_id) >>=
       (Api_common.result_bind_lwt
          ~ok:(fun  (flux_map_info : Api_types_j.flux_map_catalog) ->
              try
                let fluxmap_id : string =
                  List.nth flux_map_info.Api_types_t.flux_map_ids index in
-               (manager#simulation_detail_flux_map
-                  project_id
-                  simulation_id
-                      fluxmap_id
-               )
+               (manager#simulation_detail_flux_map project_id fluxmap_id)
              with
              | Failure f ->
                Lwt.return
@@ -202,7 +191,6 @@ let select_fluxmap flux_map =
       )
   in
   let o : Api_types_t.simulation_info option =
-    Option_util.bind
       State_simulation.t_simulation_info (React.S.value State_simulation.model)
   in
   if has_fluxmap o then

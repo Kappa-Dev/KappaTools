@@ -119,14 +119,11 @@ let update_state
 
 let add_project is_new (project_id : Api_types_j.project_id) : unit Api.result Lwt.t =
   let catalog = (React.S.value state).project_catalog in
-  let default_parameters = (React.S.value state).default_parameters in
-  let project_parameters =
-    Mods.StringMap.add project_id default_parameters
-      (React.S.value state).project_parameters in
   (try
      Lwt.return (Api_common.result_ok
                    (List.find (fun x -> x.project_id = project_id) catalog,
-                    catalog))
+                    catalog,
+                   (React.S.value state).project_parameters))
    with Not_found ->
      State_runtime.create_manager project_id >>=
      (Api_common.result_bind_lwt
@@ -138,11 +135,16 @@ let add_project is_new (project_id : Api_types_j.project_id) : unit Api.result L
             Api_common.result_bind_lwt
               ~ok:(fun () ->
                   let me = {project_id; project_manager } in
+                  let default_parameters =
+                    (React.S.value state).default_parameters in
+                  let params =
+                    Mods.StringMap.add project_id default_parameters
+                      (React.S.value state).project_parameters in
                   Lwt.return
-                    (Api_common.result_ok (me,me::catalog)))))) >>=
+                    (Api_common.result_ok (me,me::catalog,params)))))) >>=
   Api_common.result_bind_lwt
-    ~ok:(fun (me,catalog) ->
-        update_state project_id me catalog default_parameters project_parameters)
+    ~ok:(fun (me,catalog,params) ->
+        update_state project_id me catalog default_parameters params)
 
 let create_project project_id = add_project true project_id
 let set_project project_id = add_project false project_id
@@ -189,15 +191,7 @@ let sync () : unit Api.result Lwt.t =
            Lwt.return (Api_common.result_ok ())))
 
 let remove_simulations manager project_id =
-  (manager#simulation_catalog project_id) >>=
-  (Api_common.result_bind_lwt
-     ~ok:(fun (catalog : Api_types_t.simulation_catalog) ->
-         Lwt_list.iter_p
-           (fun simulation_id ->
-              manager#simulation_delete project_id simulation_id >>=
-           (fun _ -> Lwt.return_unit))
-           catalog.Api_types_t.simulation_ids >>=
-         (fun () -> Lwt.return (Api_common.result_ok ()))))
+  manager#simulation_delete project_id
 
 let remove_files manager project_id =
   (manager#file_catalog project_id) >>=
@@ -245,7 +239,7 @@ let remove_project project_id =
     Lwt.return (Api_common.result_error_msg
                   ("Project "^project_id^" does not exists"))
 
-let create_simulation_parameter project_id simulation_id :
+let create_simulation_parameter project_id :
   Api_types_j.simulation_parameter =
   let st = React.S.value state in
   let param = Mods.StringMap.find_default
@@ -253,7 +247,7 @@ let create_simulation_parameter project_id simulation_id :
   { Api_types_j.simulation_plot_period = param.plot_period ;
     Api_types_j.simulation_pause_condition = param.pause_condition ;
     Api_types_j.simulation_seed = param.seed;
-    Api_types_j.simulation_id = simulation_id ;
+    Api_types_j.simulation_id = "default" ;
     Api_types_j.simulation_store_trace = param.store_trace ;
   }
 

@@ -1,28 +1,17 @@
 open Lwt
 
-let rec stop_simulations (system_process:Kappa_facade.system_process) :
-  Api_environment.simulation list -> unit Api.result Lwt.t =
+let stop_simulation (system_process:Kappa_facade.system_process) :
+  Api_environment.simulation option -> unit Api.result Lwt.t =
   function
-  | [] -> Lwt.return (Api_common.result_ok ())
-  | current::sumulations ->
+  | None -> Lwt.return (Api_common.result_ok ())
+  | Some current ->
     let t : Kappa_facade.t = current#get_runtime_state () in
     (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
-    (fun result_l ->
-      (stop_simulations system_process sumulations)>>=
-      (fun result_r ->
-         Result_data.map
-           ~ok:(fun _ -> Lwt.return result_r)
-           ~error:(fun errors_l ->
-               (Api_common.result_map
-                  ~ok:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
-                  ~error:(fun _ errors_r ->
-                      let errors = errors_l@errors_r in
-                      Lwt.return (Api_common.result_messages errors))
-                  result_r)
-             )
-           result_l
-      )
-    )
+    (Result_data.map
+       ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))
+       ~error:(fun errors ->
+           Lwt.return (Api_common.result_messages errors)))
+
 let to_project (project : Api_environment.project) =
   { Api_types_j.project_id = project#get_project_id () ;
     Api_types_j.project_version = project#get_version () ; }
@@ -139,7 +128,7 @@ object
       project_id
       environment
       (fun project ->
-         (stop_simulations system_process (project#get_simulations ()))>>=
+         (stop_simulation system_process (project#get_simulation ()))>>=
          (Api_common.result_bind_lwt
             ~ok:(fun () ->
                 let not_project =

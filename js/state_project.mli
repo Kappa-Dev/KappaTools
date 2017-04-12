@@ -30,8 +30,7 @@ val set_seed : int option -> unit
 val set_store_trace : bool -> unit
 
 val create_simulation_parameter :
-  Api_types_t.project_id -> Api_types_j.simulation_id ->
-  Api_types_j.simulation_parameter
+  Api_types_t.project_id -> Api_types_j.simulation_parameter
 
 val set_project : Api_types_t.project_id -> unit Api.result Lwt.t
 

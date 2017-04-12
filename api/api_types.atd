@@ -78,7 +78,6 @@ type kappa_code = string
 type simulation_seed = int
 
 type simulation_id = string
-type simulation_catalog = { simulation_ids : simulation_id list }
 
 type simulation_artifact = {
      simulation_artifact_simulation_id : simulation_id ;
@@ -184,6 +183,8 @@ type simulation_progress = { simulation_progress_time : float;
 
 type simulation_info = { simulation_info_progress : simulation_progress  ;
 			 simulation_info_output : simulation_info_output; }
+
+type simulation = { simulation_info : simulation_info nullable }
 
 type simulation_detail_output =
      (plot nullable,

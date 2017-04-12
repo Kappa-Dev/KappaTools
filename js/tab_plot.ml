@@ -192,8 +192,7 @@ let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) :
 
 let update_offset (update_offset_input : bool) : unit =
   let simulation_model = React.S.value State_simulation.model in
-  let simulation_info =
-    Option_util.bind State_simulation.t_simulation_info simulation_model in
+  let simulation_info = State_simulation.t_simulation_info simulation_model in
   match simulation_info with
   | None -> ()
   | Some simulation_info ->
@@ -227,8 +226,7 @@ let plot_limit_offset () : int =
   match React.S.value offset with
   | None ->
     let simulation_model = React.S.value State_simulation.model in
-    let simulation_info = Option_util.bind State_simulation.t_simulation_info
-        simulation_model in
+    let simulation_info = State_simulation.t_simulation_info simulation_model in
     (match simulation_info with
      | None -> 0
      | Some t -> simulation_info_offset_max t)
@@ -247,12 +245,10 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
     ~label:__LOC__
     (fun
       manager
-      project_id
-      simulation_id ->
+      project_id ->
       let () = update_offset true in
       (manager#simulation_detail_plot
          project_id
-         simulation_id
          (plot_parameter ())) >>=
       (Api_common.result_bind_lwt
          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->

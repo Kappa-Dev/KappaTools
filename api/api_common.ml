@@ -195,27 +195,6 @@ end;;
 
 module ProjectOperations = CollectionOperations(ProjectCollection)
 
-module SimulationCollection =
-struct
-  type id = Api_types_j.simulation_id
-  type collection = Api_environment.project
-  type item = Api_environment.simulation
-  let label : string = "simulation"
-  let list
-      (project : Api_environment.project) =
-    project#get_simulations ()
-  let update
-      (project : Api_environment.project)
-      (simulations : Api_environment.simulation list) : unit =
-    project#set_simulations simulations
-  let identifier (simulation : Api_environment.simulation) =
-    simulation#get_simulation_id ()
-  let id_to_string (simulation_id : Api_types_j.simulation_id) : string =
-    Format.sprintf "%s" simulation_id
-end;;
-
-module SimulationOperations = CollectionOperations(SimulationCollection)
-
 module FileCollection : COLLECTION_TYPE
   with type id = Api_types_j.file_id
   and type collection = Api_environment.project
@@ -240,16 +219,17 @@ module FileOperations = CollectionOperations(FileCollection)
 let bind_simulation
     environment
     (project_id : Api_types_j.project_id)
-    (simulation_id : Api_types_j.simulation_id)
     handler
     =
     ProjectOperations.bind
       (project_id : Api_types_j.project_id)
       environment
-      (fun project -> SimulationOperations.bind simulation_id
-          project
-          (fun simulation -> handler project simulation))
-
+      (fun project ->
+         match project#get_simulation () with
+         | Some simulation -> handler project simulation
+         | None ->
+           let m  = project_id^" : simulation not found" in
+           Lwt.return (result_error_msg ~result_code:`NOT_FOUND m))
 let bind_file
     environment
     (project_id : Api_types_j.project_id)

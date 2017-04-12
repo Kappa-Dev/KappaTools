@@ -15,7 +15,6 @@ let detail_projection :
   environment:Api_environment.environment ->
   system_process:Kappa_facade.system_process ->
   project_id:Api_types_j.project_id ->
-  simulation_id:Api_types_j.simulation_id ->
   projection:(Api_types_j.simulation_detail -> 'a Api.result) ->
   'a Api.result Lwt.t
   =
@@ -23,13 +22,11 @@ let detail_projection :
     ~(environment:Api_environment.environment)
     ~(system_process:Kappa_facade.system_process)
     ~(project_id:Api_types_j.project_id)
-    ~(simulation_id:Api_types_j.simulation_id)
     ~(projection:(Api_types_j.simulation_detail -> 'a Api.result))
     ->
   Api_common.bind_simulation
     environment
     project_id
-    simulation_id
     (fun _ simulation ->
        let t : Kappa_facade.t = simulation#get_runtime_state () in
        (Kappa_facade.info
@@ -87,27 +84,23 @@ class manager_file_line
       | lines -> Api_common.result_ok lines
 
     method simulation_catalog_file_line
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       Api_types_j.file_line_catalog Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:self#info_file_line
 
 
     method simulation_detail_file_line
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (file_line_id : Api_types_j.file_line_id) :
       (Api_types_j.file_line list) Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:(self#get_file_line file_line_id)
 
   end;;
@@ -144,26 +137,22 @@ class manager_flux_map
 
 
     method simulation_catalog_flux_map
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       Api_types_j.flux_map_catalog Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:self#info_flux_map
 
     method simulation_detail_flux_map
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (flux_map_id : Api_types_j.flux_map_id) :
       Api_types_j.flux_map Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:(self#get_flux_map flux_map_id)
 
   end;;
@@ -178,14 +167,12 @@ class manager_log_message
       Api_common.result_ok detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_log_messages
 
     method simulation_detail_log_message
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       Api_types_j.log_message Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:self#log_message
 
   end;;
@@ -258,14 +245,12 @@ class manager_plot
 
     method simulation_detail_plot
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (plot_parameter : Api_types_j.plot_parameter) :
       Api_types_j.plot_detail Api.result Lwt.t =
       detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:(self#get_plot plot_parameter)
   end;;
 
@@ -298,27 +283,23 @@ class manager_snapshot
         Api_common.result_error_msg ~result_code:`NOT_FOUND m
 
     method simulation_catalog_snapshot
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       Api_types_j.snapshot_catalog Api.result Lwt.t =
       (detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:self#info_snapshot
        : Api_types_j.snapshot_catalog Api.result Lwt.t)
 
     method simulation_detail_snapshot
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (snapshot_id : Api_types_j.snapshot_id):
       Api_types_j.snapshot Api.result Lwt.t =
       ((detail_projection
           ~environment:environment
           ~system_process:system_process
           ~project_id:project_id
-          ~simulation_id:simulation_id
           ~projection:(self#get_snapshot snapshot_id))
        : Api_types_j.snapshot Api.result Lwt.t)
 
@@ -329,68 +310,41 @@ class manager_simulation
     (system_process : Kappa_facade.system_process) :
   Api.manager_simulation =
   object(self)
-    method simulation_catalog
-        (project_id : Api_types_j.project_id) :
-      Api_types_j.simulation_catalog Api.result Lwt.t =
-      Api_common.ProjectOperations.bind
-        project_id
-        environment
-        (fun project ->
-           let result : Api_types_j.simulation_catalog =
-             { Api_types_j.simulation_ids =
-             List.map
-               (fun simulation -> simulation#get_simulation_id ())
-               (project#get_simulations ())
-             }
-           in
-           Lwt.return (Api_common.result_ok result))
-
     method simulation_delete
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
-        (fun project _ -> (self#simulation_stop project_id simulation_id) >>=
-           (fun _ -> let simulation_list : Api_environment.simulation list =
-                       (project#get_simulations ()) in
-              let simulation_ne : Api_environment.simulation -> bool =
-                fun simulation ->
-                  (simulation#get_simulation_id ()) <> simulation_id in
-              let () = project#set_simulations
-                  (List.filter simulation_ne simulation_list) in
-              Lwt.return (Api_common.result_ok ()) : (unit, Api.manager_code)
-                  Api_types_t.result -> unit Api.result Lwt.t))
+        (fun project _ -> (self#simulation_stop project_id) >>=
+          (fun _ ->
+             let () = project#unset_simulation () in
+             Lwt.return (Api_common.result_ok ()) : (unit, Api.manager_code)
+                 Api_types_t.result -> unit Api.result Lwt.t))
 
     method simulation_start
         (project_id : Api_types_j.project_id)
         (simulation_parameter : Api_types_j.simulation_parameter) :
       Api_types_j.simulation_artifact Api.result Lwt.t =
-      let (simulation_parameter,simulation_seed) = patch_parameter simulation_parameter in
+      let (simulation_parameter,simulation_seed) =
+        patch_parameter simulation_parameter in
       Api_common.ProjectOperations.bind
         project_id
         environment
         (fun project ->
            let simulation_id = simulation_parameter.Api_types_j.simulation_id in
-           if Api_common.SimulationOperations.exists
-               simulation_parameter.Api_types_j.simulation_id
-               project
-           then
+           match project#get_simulation () with
+           | Some _ ->
              let message : string =
                Format.sprintf
-               "simulation id %s exists"
-               (Api_common.SimulationCollection.id_to_string simulation_id)
-             in
+                 "simulation id %s exists" simulation_id in
              Lwt.return
                (Api_common.result_error_msg ~result_code:`CONFLICT message)
-           else
+           | None ->
              project#get_state () >>= function
              | None ->
                Lwt.return (Api_common.result_error_msg
                              "Cannot start simulation: Parse not done")
-
              | Some parse ->
                Result_data.map
                  ~ok:
@@ -404,14 +358,8 @@ class manager_simulation
                       (Result_data.map
                          ~ok:
                            (fun () ->
-                              let simulation : Api_environment.simulation =
-                                project#create_simulation simulation_parameter facade in
                               let () =
-                                Api_common.SimulationCollection.update
-                                  project
-                                  (simulation::
-                                   (Api_common.SimulationCollection.list project))
-                              in
+                                project#set_simulation simulation_parameter facade in
                               Lwt.return
                                 (Api_common.result_ok
                                    { Api_types_j.simulation_artifact_simulation_id = simulation_id ;
@@ -428,25 +376,21 @@ class manager_simulation
         )
 
     method simulation_parameter
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id) :
       Api_types_j.simulation_parameter Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation(* project simulation *) ->
            let parameter = simulation#get_simulation_parameter() in
            Lwt.return (Api_common.result_ok parameter))
 
     method simulation_pause
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.pause
@@ -456,13 +400,11 @@ class manager_simulation
              Lwt.return (Api_common.result_ok ())))
 
     method private simulation_stop
-        (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id) :
+        (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
@@ -477,13 +419,11 @@ class manager_simulation
 
     method simulation_perturbation
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (simulation_perturbation : Api_types_j.simulation_perturbation) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.perturbation
@@ -500,13 +440,11 @@ class manager_simulation
 
     method simulation_continue
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
         (simulation_parameter : Api_types_j.simulation_parameter) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.continue
@@ -523,12 +461,10 @@ class manager_simulation
 
     method simulation_info
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       : Api_types_j.simulation_info Api.result Lwt.t =
       Api_common.bind_simulation
         environment
         project_id
-        simulation_id
         (fun _ simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.info

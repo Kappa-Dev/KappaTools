@@ -24,11 +24,9 @@ let update_outputs key : unit =
     ~label:__LOC__
     (fun
       manager
-      project_id
-      simulation_id ->
+      project_id ->
       (manager#simulation_detail_file_line
          project_id
-         simulation_id
          file_line_info_id
       ) >>=
       (Api_common.result_bind_lwt
@@ -89,14 +87,8 @@ let xml () =
            (fun _ ->
               State_simulation.when_ready
                 ~label:__LOC__
-                (fun
-                  manager
-                  project_id
-                  simulation_id ->
-                  (manager#simulation_catalog_file_line
-                     project_id
-                     simulation_id
-                  ) >>=
+                (fun manager project_id ->
+                  (manager#simulation_catalog_file_line project_id) >>=
                   (Api_common.result_bind_lwt
                      ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
                          let () = ReactiveData.RList.set

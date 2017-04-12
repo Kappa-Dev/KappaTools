@@ -19,13 +19,10 @@ let visible_on_states
     (fun model ->
        let current_state = State_simulation.model_simulation_state model in
        React.S.const
-         (match current_state with
-          | None -> a_class@hidden_class
-          | Some current_state ->
-            if List.mem current_state state then
-              a_class@visible_class
-            else
-              a_class@hidden_class))
+         (if List.mem current_state state then
+            a_class@visible_class
+          else
+            a_class@hidden_class))
 
 module FormPerturbation : Ui_common.Div = struct
   let id = "panel_settings_perturbation"
@@ -471,20 +468,10 @@ module DivStatusIndicator : Ui_common.Div = struct
             (React.S.bind
                State_simulation.model
                (fun model ->
-                  let option =
-                    Option_util.map
-                      State_simulation.model_state_to_string
+                  let label =
+                    State_simulation.model_state_to_string
                       (State_simulation.model_simulation_state model) in
-                  let label = match option with None -> "None" | Some l -> l in
                   React.S.const label
-               )
-            );
-          Tyxml_js.R.Html.pcdata
-            (React.S.bind
-               State_simulation.model
-               (function model ->
-                React.S.const
-                  (match model with None -> "None" | Some _ -> "Some")
                )
             )
         ]

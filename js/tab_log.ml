@@ -21,8 +21,8 @@ let content () =
          State_simulation.with_simulation_info
            ~label:__LOC__
            ~ready:
-             (fun manager project_id simulation_id _ ->
-                (manager#simulation_detail_log_message project_id simulation_id)
+             (fun manager project_id _ ->
+                (manager#simulation_detail_log_message project_id)
                 >>=
                 (Api_common.result_bind_lwt
                    ~ok:(fun (log_messages : Api_types_j.log_message) ->
@@ -30,7 +30,7 @@ let content () =
                        Lwt.return (Api_common.result_ok ()))
                 )
              )
-           ~stopped:(fun _ _ _ ->
+           ~stopped:(fun _ _ ->
                let () = set_state_log "" in
                Lwt.return (Api_common.result_ok ()))
            ()

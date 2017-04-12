@@ -158,34 +158,31 @@ class manager
         Mpi_message_j.project_of_string
         (fun result -> `ProjectGet result)
 
-    | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
+    | `SimulationContinue (project_id,simulation_parameter) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/continue"
-           url project_id
-           simulation_id)
+           "%s/v2/projects/%s/simulation/continue"
+           url project_id)
         `PUT
         ~data:(Api_types_j.string_of_simulation_parameter
                  simulation_parameter)
         (fun _ -> ())
         (fun result -> `SimulationContinue result)
-    | `SimulationDelete (project_id,simulation_id) ->
+    | `SimulationDelete project_id ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s"
+           "%s/v2/projects/%s/simulation"
            url
-           project_id
-           simulation_id)
+           project_id)
         `DELETE
         (fun _ -> ())
         (fun result -> `SimulationDelete result)
-    | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
+    | `SimulationDetailFileLine (project_id,file_line_id) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/filelines/%s"
+           "%s/v2/projects/%s/simulation/filelines/%s"
            url
            project_id
-           simulation_id
            (match file_line_id with
               None -> ""
             |Some file_line_id -> file_line_id
@@ -193,28 +190,26 @@ class manager
         `GET
         Mpi_message_j.file_line_detail_of_string
         (fun result -> `SimulationDetailFileLine result)
-    | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
+    | `SimulationDetailFluxMap (project_id,flux_map_id) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/fluxmaps/%s"
+           "%s/v2/projects/%s/simulation/fluxmaps/%s"
            url
            project_id
-           simulation_id
            flux_map_id)
         `GET
         Mpi_message_j.flux_map_of_string
         (fun result -> `SimulationDetailFluxMap result)
-    | `SimulationDetailLogMessage (project_id,simulation_id) ->
+    | `SimulationDetailLogMessage project_id ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/logmessages"
+           "%s/v2/projects/%s/simulation/logmessages"
            url
-           project_id
-           simulation_id)
+           project_id)
         `GET
         Mpi_message_j.log_message_of_string
         (fun result -> `SimulationDetailLogMessage result)
-    | `SimulationDetailPlot (project_id,simulation_id,plot_parameters) ->
+    | `SimulationDetailPlot (project_id,plot_parameters) ->
       let args =
         String.concat
           "&"
@@ -233,102 +228,84 @@ class manager
              )) in
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/plot"
+           "%s/v2/projects/%s/simulation/plot"
            url
-           project_id
-           simulation_id)
+           project_id)
         `GET
         ~data:args
         Mpi_message_j.plot_detail_of_string
         (fun result -> `SimulationDetailPlot result)
-    | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
+    | `SimulationDetailSnapshot (project_id,snapshot_id) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/snapshots/%s"
+           "%s/v2/projects/%s/simulation/snapshots/%s"
            url
            project_id
-           simulation_id
            snapshot_id)
         `GET
         Mpi_message_j.snapshot_detail_of_string
         (fun result -> `SimulationDetailSnapshot result)
-    | `SimulationInfo (project_id,simulation_id) ->
+    | `SimulationInfo project_id ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s"
-           url
-           project_id
-           simulation_id)
-        `GET
-        Mpi_message_j.simulation_info_of_string
-        (fun result -> `SimulationInfo result)
-    | `SimulationCatalogFileLine (project_id,simulation_id) ->
-      send
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/filelines"
-           url
-           project_id
-           simulation_id)
-        `GET
-        Mpi_message_j.file_line_catalog_of_string
-        (fun result -> `SimulationCatalogFileLine result)
-    | `SimulationCatalogFluxMap (project_id,simulation_id) ->
-      send
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/fluxmaps"
-           url
-           project_id
-           simulation_id)
-        `GET
-        Mpi_message_j.flux_map_catalog_of_string
-        (fun result -> `SimulationCatalogFluxMap result)
-    | `SimulationCatalogSnapshot (project_id,simulation_id) ->
-      send
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/snapshots"
-           url
-           project_id
-           simulation_id)
-        `GET
-        Mpi_message_j.snapshot_catalog_of_string
-        (fun result -> `SimulationCatalogSnapshot result)
-    | `SimulationCatalog project_id ->
-      send
-        (Format.sprintf
-           "%s/v2/projects/%s/simulations"
+           "%s/v2/projects/%s/simulation"
            url
            project_id)
         `GET
-        Mpi_message_j.simulation_catalog_of_string
-        (fun result -> `SimulationCatalog result)
-    | `SimulationPause (project_id,simulation_id) ->
+        Mpi_message_j.simulation_info_of_string
+        (fun result -> `SimulationInfo result)
+    | `SimulationCatalogFileLine project_id ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/pause"
+           "%s/v2/projects/%s/simulation/filelines"
            url
-           project_id
-           simulation_id)
+           project_id)
+        `GET
+        Mpi_message_j.file_line_catalog_of_string
+        (fun result -> `SimulationCatalogFileLine result)
+    | `SimulationCatalogFluxMap project_id ->
+      send
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/fluxmaps"
+           url
+           project_id)
+        `GET
+        Mpi_message_j.flux_map_catalog_of_string
+        (fun result -> `SimulationCatalogFluxMap result)
+    | `SimulationCatalogSnapshot project_id ->
+      send
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/snapshots"
+           url
+           project_id)
+        `GET
+        Mpi_message_j.snapshot_catalog_of_string
+        (fun result -> `SimulationCatalogSnapshot result)
+    | `SimulationPause project_id ->
+      send
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/pause"
+           url
+           project_id)
         `PUT
         (fun _ -> ())
         (fun result -> `SimulationPause result)
-    | `SimulationParameter (project_id,simulation_id) ->
+    | `SimulationParameter project_id ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/parameter"
+           "%s/v2/projects/%s/simulation/parameter"
            url
-           project_id
-           simulation_id)
+           project_id)
         `GET
         Mpi_message_j.simulation_parameter_of_string
         (fun result -> `SimulationParameter result)
     | `SimulationPerturbation
-        (project_id,simulation_id,simulation_perturbation) ->
+        (project_id,simulation_perturbation) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations/%s/perturbation"
+           "%s/v2/projects/%s/simulation/perturbation"
            url
-           project_id
-           simulation_id)
+           project_id)
         `PUT
         ~data:(Api_types_j.string_of_simulation_perturbation
                  simulation_perturbation)
@@ -338,7 +315,7 @@ class manager
         (project_id,simulation_parameter) ->
       send
         (Format.sprintf
-           "%s/v2/projects/%s/simulations"
+           "%s/v2/projects/%s/simulation"
            url
            project_id)
         `POST

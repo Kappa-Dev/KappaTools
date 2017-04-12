@@ -156,24 +156,15 @@ let select_snapshot () =
       let () =
         State_simulation.when_ready
           ~label:__LOC__
-          (fun
-            manager
-            project_id
-            simulation_id ->
-            (manager#simulation_catalog_snapshot
-               project_id
-               simulation_id
-            ) >>=
+          (fun manager project_id ->
+            (manager#simulation_catalog_snapshot project_id) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
                    try
                      let snapshot_id : string =
                        List.nth snapshot_info.Api_types_t.snapshot_ids index in
                      (manager#simulation_detail_snapshot
-                        project_id
-                        simulation_id
-                        snapshot_id
-                     )
+                        project_id snapshot_id)
                    with
                    | Failure f ->
                      Lwt.return
@@ -236,14 +227,8 @@ let xml () =
       (fun _ ->
          State_simulation.when_ready
            ~label:__LOC__
-           (fun
-             manager
-             project_id
-             simulation_id ->
-             (manager#simulation_catalog_snapshot
-                project_id
-                simulation_id
-             ) >>=
+           (fun manager project_id ->
+             (manager#simulation_catalog_snapshot project_id) >>=
              (Api_common.result_bind_lwt
                 ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
                     let () = select_snapshot () in

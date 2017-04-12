@@ -16,9 +16,8 @@ let continue_simulation () =
          (State_simulation.with_simulation
             ~label:__LOC__
             (fun _ p_id t ->
-               let simulation_id = State_simulation.t_simulation_id t in
                let simulation_parameter =
-                 State_project.create_simulation_parameter p_id simulation_id  in
+                 State_project.create_simulation_parameter p_id in
                State_simulation.continue_simulation simulation_parameter))
        >>= (fun _ -> Lwt.return_unit)
     )
@@ -56,9 +55,8 @@ let start_simulation () =
          (State_simulation.with_simulation
             ~label:__LOC__
             (fun _ p_id t ->
-               let simulation_id = State_simulation.t_simulation_id t in
                let simulation_parameter =
-                 State_project.create_simulation_parameter p_id simulation_id  in
+                 State_project.create_simulation_parameter p_id in
                State_simulation.start_simulation simulation_parameter))
        >>= (fun _ -> Lwt.return_unit)
     )

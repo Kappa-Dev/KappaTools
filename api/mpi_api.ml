@@ -61,50 +61,47 @@ let on_message
   |  `ProjectDeadRules project_id ->
     (manager#project_dead_rules project_id) >>=
     (handler (fun result -> `ProjectDeadRules result))
-  | `SimulationContinue (project_id,simulation_id,simulation_parameter) ->
-    (manager#simulation_continue project_id simulation_id simulation_parameter) >>=
+  | `SimulationContinue (project_id,simulation_parameter) ->
+    (manager#simulation_continue project_id simulation_parameter) >>=
     (handler (fun result -> `SimulationContinue result))
-  | `SimulationDelete (project_id,simulation_id) ->
-    (manager#simulation_delete project_id simulation_id) >>=
+  | `SimulationDelete project_id ->
+    (manager#simulation_delete project_id) >>=
     (handler (fun result -> `SimulationDelete result))
-  | `SimulationDetailFileLine (project_id,simulation_id,file_line_id) ->
-    (manager#simulation_detail_file_line project_id simulation_id file_line_id) >>=
+  | `SimulationDetailFileLine (project_id,file_line_id) ->
+    (manager#simulation_detail_file_line project_id file_line_id) >>=
     (handler (fun result -> `SimulationDetailFileLine result))
-  | `SimulationDetailFluxMap (project_id,simulation_id,flux_map_id) ->
-    (manager#simulation_detail_flux_map project_id simulation_id flux_map_id) >>=
+  | `SimulationDetailFluxMap (project_id,flux_map_id) ->
+    (manager#simulation_detail_flux_map project_id flux_map_id) >>=
     (handler (fun result -> `SimulationDetailFluxMap result))
-  | `SimulationDetailLogMessage (project_id,simulation_id) ->
-    (manager#simulation_detail_log_message project_id simulation_id) >>=
+  | `SimulationDetailLogMessage project_id ->
+    (manager#simulation_detail_log_message project_id) >>=
     (handler (fun result -> `SimulationDetailLogMessage result))
-  | `SimulationDetailPlot (project_id,simulation_id,plot_parameter) ->
-    (manager#simulation_detail_plot project_id simulation_id plot_parameter) >>=
+  | `SimulationDetailPlot (project_id,plot_parameter) ->
+    (manager#simulation_detail_plot project_id plot_parameter) >>=
     (handler (fun result -> `SimulationDetailPlot result))
-  | `SimulationDetailSnapshot (project_id,simulation_id,snapshot_id) ->
-    (manager#simulation_detail_snapshot project_id simulation_id snapshot_id) >>=
+  | `SimulationDetailSnapshot (project_id,snapshot_id) ->
+    (manager#simulation_detail_snapshot project_id snapshot_id) >>=
     (handler (fun result -> `SimulationDetailSnapshot result))
-  | `SimulationInfo (project_id,simulation_id) ->
-    (manager#simulation_info project_id simulation_id) >>=
+  | `SimulationInfo project_id ->
+    (manager#simulation_info project_id) >>=
     (handler (fun result -> `SimulationInfo result))
-  | `SimulationCatalogFileLine (project_id,simulation_id) ->
-    (manager#simulation_catalog_file_line project_id simulation_id) >>=
+  | `SimulationCatalogFileLine project_id ->
+    (manager#simulation_catalog_file_line project_id) >>=
     (handler (fun result -> `SimulationCatalogFileLine result))
-  | `SimulationCatalogFluxMap (project_id,simulation_id) ->
-    (manager#simulation_catalog_flux_map project_id simulation_id) >>=
+  | `SimulationCatalogFluxMap project_id ->
+    (manager#simulation_catalog_flux_map project_id) >>=
     (handler (fun result -> `SimulationCatalogFluxMap result))
-  | `SimulationCatalogSnapshot (project_id,simulation_id) ->
-    (manager#simulation_catalog_snapshot project_id simulation_id) >>=
+  | `SimulationCatalogSnapshot project_id ->
+    (manager#simulation_catalog_snapshot project_id) >>=
     (handler (fun result -> `SimulationCatalogSnapshot result))
-  | `SimulationCatalog project_id ->
-    (manager#simulation_catalog project_id) >>=
-    (handler (fun result -> `SimulationCatalog result))
-  | `SimulationParameter (project_id,simulation_id) ->
-    (manager#simulation_parameter project_id simulation_id) >>=
+  | `SimulationParameter project_id ->
+    (manager#simulation_parameter project_id) >>=
     (handler (fun result -> `SimulationParameter result))
-  | `SimulationPause (project_id,simulation_id) ->
-    (manager#simulation_pause project_id simulation_id) >>=
+  | `SimulationPause project_id ->
+    (manager#simulation_pause project_id) >>=
     (handler (fun result -> `SimulationPause result))
-  | `SimulationPerturbation (project_id,simulation_id,simulation_perturbation) ->
-    (manager#simulation_perturbation project_id simulation_id simulation_perturbation) >>=
+  | `SimulationPerturbation (project_id,simulation_perturbation) ->
+    (manager#simulation_perturbation project_id simulation_perturbation) >>=
     (handler (fun result -> `SimulationPerturbation result))
   | `SimulationStart (project_id,simulation_parameter) ->
     (manager#simulation_start project_id simulation_parameter) >>=
@@ -290,11 +287,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_continue
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       (simulation_parameter :Api_types_j.simulation_parameter) :
       unit Api.result Lwt.t =
       self#message (`SimulationContinue
-                      (project_id,simulation_id,simulation_parameter)) >>=
+                      (project_id,simulation_parameter)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationContinue result ->
@@ -306,10 +302,9 @@ class virtual  manager_base () : manager_base_type =
 
 
     method simulation_delete
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       unit Api.result Lwt.t =
-      self#message (`SimulationDelete (project_id,simulation_id)) >>=
+      self#message (`SimulationDelete project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDelete result ->
@@ -321,11 +316,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_file_line
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       (file_line_id : Api_types_j.file_line_id) :
       Api_types_j.file_line list Api.result Lwt.t =
       self#message (`SimulationDetailFileLine
-                      (project_id,simulation_id,file_line_id)) >>=
+                      (project_id,file_line_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailFileLine file_line_list ->
@@ -338,11 +332,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_flux_map
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       (flux_map_id : Api_types_j.flux_map_id) :
       Api_types_j.flux_map Api.result Lwt.t =
       self#message (`SimulationDetailFluxMap
-                      (project_id,simulation_id,flux_map_id)) >>=
+                      (project_id,flux_map_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailFluxMap flux_map ->
@@ -353,11 +346,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_detail_log_message
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.log_message Api.result Lwt.t =
-      self#message (`SimulationDetailLogMessage
-                      (project_id,simulation_id)) >>=
+      self#message (`SimulationDetailLogMessage project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailLogMessage log_message ->
@@ -369,12 +360,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_plot
         (project_id : Api_types_j.project_id)
-        (simulation_id : Api_types_j.simulation_id)
-        (plot_parameter : Api_types_j.plot_parameter)
-      :
+        (plot_parameter : Api_types_j.plot_parameter):
       Api_types_j.plot_detail Api.result Lwt.t =
       self#message (`SimulationDetailPlot
-                      (project_id,simulation_id,plot_parameter)) >>=
+                      (project_id,plot_parameter)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailPlot plot ->
@@ -386,11 +375,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_snapshot
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       (snapshot_id : Api_types_j.snapshot_id) :
       Api_types_j.snapshot Api.result Lwt.t =
       self#message (`SimulationDetailSnapshot
-                      (project_id,simulation_id,snapshot_id)) >>=
+                      (project_id,snapshot_id)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailSnapshot snapshot ->
@@ -401,11 +389,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_info
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.simulation_info Api.result Lwt.t =
-      self#message (`SimulationInfo
-                      (project_id,simulation_id)) >>=
+      self#message (`SimulationInfo project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationInfo simulation_status ->
@@ -416,11 +402,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_catalog_file_line
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.file_line_catalog Api.result Lwt.t =
-      self#message (`SimulationCatalogFileLine
-                      (project_id,simulation_id)) >>=
+      self#message (`SimulationCatalogFileLine project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogFileLine info ->
@@ -431,11 +415,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_catalog_flux_map
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.flux_map_catalog Api.result Lwt.t =
-      self#message (`SimulationCatalogFluxMap
-                      (project_id,simulation_id)) >>=
+      self#message (`SimulationCatalogFluxMap project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogFluxMap info ->
@@ -446,11 +428,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_catalog_snapshot
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.snapshot_catalog Api.result Lwt.t =
-      self#message (`SimulationCatalogSnapshot
-                      (project_id,simulation_id)) >>=
+      self#message (`SimulationCatalogSnapshot project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogSnapshot info ->
@@ -460,25 +440,10 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_catalog
-      (project_id : Api_types_j.project_id)
-      : Api_types_j.simulation_catalog Api.result Lwt.t =
-      self#message (`SimulationCatalog project_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `SimulationCatalog list ->
-              Lwt.return list
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-
     method simulation_pause
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
-      self#message (`SimulationPause (project_id,simulation_id)) >>=
+      self#message (`SimulationPause project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationPause result ->
@@ -489,10 +454,9 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_parameter
-      (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id) :
+      (project_id : Api_types_j.project_id):
       Api_types_j.simulation_parameter Api.result Lwt.t =
-      self#message (`SimulationParameter (project_id,simulation_id)) >>=
+      self#message (`SimulationParameter project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationParameter result -> Lwt.return result
@@ -503,11 +467,10 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_perturbation
       (project_id : Api_types_j.project_id)
-      (simulation_id : Api_types_j.simulation_id)
       (simulation_perturbation : Api_types_j.simulation_perturbation) :
       unit Api.result Lwt.t =
       self#message (`SimulationPerturbation
-                     (project_id,simulation_id,simulation_perturbation)) >>=
+                     (project_id,simulation_perturbation)) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationPerturbation result ->

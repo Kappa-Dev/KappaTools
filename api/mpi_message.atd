@@ -18,8 +18,8 @@ type project <ocaml from="Api_types"> = abstract
 
 type file_metadata <ocaml from="Api_types"> = abstract
 type file <ocaml from="Api_types"> = abstract
-type file_catalog <ocaml from="Api_types"> = abstract
 type file_modification <ocaml from="Api_types"> = abstract
+type file_catalog <ocaml from="Api_types"> = abstract
 
 type contact_map <ocaml from="Api_types"> = abstract
 
@@ -28,12 +28,9 @@ type project_parse <ocaml from="Api_types"> = abstract
 type project_parameter <ocaml from="Api_types"> = abstract
 type project_catalog <ocaml from="Api_types"> = abstract
 
-type simulation_id <ocaml from="Api_types"> = abstract
 type simulation_parameter <ocaml from="Api_types"> = abstract
 type simulation_perturbation  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
-type simulation_catalog <ocaml from="Api_types"> = abstract
-
 
 type file_line_id <ocaml from="Api_types"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
@@ -70,21 +67,20 @@ type request = [ EnvironmentInfo of unit
 	       | ProjectParse of project_id
 	       | ProjectDeadRules of project_id
 	       | ProjectGet of project_id
-               | SimulationContinue of (project_id * simulation_id * simulation_parameter)
-               | SimulationDelete of (project_id * simulation_id)
-               | SimulationDetailFileLine of (project_id * simulation_id * file_line_id)
-               | SimulationDetailFluxMap of (project_id * simulation_id * flux_map_id)
-               | SimulationDetailLogMessage of (project_id * simulation_id)
-               | SimulationDetailPlot of (project_id * simulation_id * plot_parameter )
-               | SimulationDetailSnapshot of (project_id * simulation_id * snapshot_id)
-               | SimulationInfo of (project_id * simulation_id)
-               | SimulationCatalogFileLine of (project_id * simulation_id)
-               | SimulationCatalogFluxMap of (project_id * simulation_id)
-               | SimulationCatalogSnapshot of (project_id * simulation_id)
-               | SimulationCatalog of project_id
-	       | SimulationParameter of (project_id * simulation_id)
-               | SimulationPause of (project_id * simulation_id)
-               | SimulationPerturbation of (project_id * simulation_id * simulation_perturbation)
+               | SimulationContinue of (project_id * simulation_parameter)
+               | SimulationDelete of project_id
+               | SimulationDetailFileLine of (project_id * file_line_id)
+               | SimulationDetailFluxMap of (project_id * flux_map_id)
+               | SimulationDetailLogMessage of project_id
+               | SimulationDetailPlot of (project_id * plot_parameter)
+               | SimulationDetailSnapshot of (project_id * snapshot_id)
+               | SimulationInfo of project_id
+               | SimulationCatalogFileLine of project_id
+               | SimulationCatalogFluxMap of project_id
+               | SimulationCatalogSnapshot of project_id
+	       | SimulationParameter of project_id
+               | SimulationPause of project_id
+               | SimulationPerturbation of (project_id * simulation_perturbation)
                | SimulationStart of (project_id * simulation_parameter)
                ]
 
@@ -111,8 +107,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationCatalogFileLine of file_line_catalog result
                 | SimulationCatalogFluxMap of flux_map_catalog result
                 | SimulationCatalogSnapshot of snapshot_catalog result
-                | SimulationCatalog of simulation_catalog result
-	        | SimulationParameter of simulation_parameter result
+                | SimulationParameter of simulation_parameter result
                 | SimulationPause of unit result
                 | SimulationPerturbation of unit result
                 | SimulationStart of simulation_artifact result

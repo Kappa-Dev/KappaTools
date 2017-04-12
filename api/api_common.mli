@@ -85,29 +85,6 @@ sig
     id ->
     collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
 end
-module SimulationCollection :
-sig
-  type id = Api_types_j.simulation_id
-  type collection = Api_environment.project
-  type item = Api_environment.simulation
-  val label : string
-  val list : collection -> item list
-  val update : collection -> item list -> unit
-  val identifier : item -> id
-  val id_to_string : id -> string
-end
-module SimulationOperations :
-sig
-  type id = SimulationCollection.id
-  type collection = SimulationCollection.collection
-  type item = SimulationCollection.item
-  val refs : id -> item -> bool
-  val exists : id -> collection -> bool
-  val filter : id -> collection -> item list
-  val bind :
-    id ->
-    collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
-end
 module FileCollection :
 sig
   type id = Api_types_j.file_id
@@ -133,9 +110,8 @@ end
 val bind_simulation :
   ProjectOperations.collection ->
   Api_types_j.project_id ->
-  Api_types_j.simulation_id ->
   (ProjectOperations.item ->
-   SimulationOperations.item -> 'a Api.result Lwt.t) ->
+   Api_environment.simulation -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t
 val bind_file :
   ProjectOperations.collection ->
