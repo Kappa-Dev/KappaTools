@@ -119,13 +119,16 @@ let state , set_state =
 let create_manager _project_id =
   match (React.S.value state).state_current with
   | WebWorker ->
+    let () = State_settings.set_synch false in
     Lwt.return
       (Api_common.result_ok (new Web_worker_api.manager () :> Api.concrete_manager))
   | Embedded ->
+    let () = State_settings.set_synch false in
     Lwt.return (Api_common.result_ok (new embedded () :> Api.concrete_manager))
   | Remote { label = _ ; protocol = HTTP url } ->
     let version_url : string = Format.sprintf "%s/v2" url in
-    let () = Common.debug (Format.sprintf "set_runtime_url: %s" version_url) in
+    let () = Common.debug
+        (Js.string (Format.sprintf "set_runtime_url: %s" version_url)) in
     (XmlHttpRequest.perform_raw
        ~response_type:XmlHttpRequest.Text
        version_url)
@@ -133,6 +136,7 @@ let create_manager _project_id =
     (fun frame ->
        let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
        if is_valid_server then
+         let () = State_settings.set_synch true in
          Lwt.return
            (Api_common.result_ok (new Rest_api.manager url :> Api.concrete_manager))
        else
@@ -149,6 +153,7 @@ let create_manager _project_id =
     let js_node_runtime = new JsNode.manager cli.command cli.args in
     if js_node_runtime#is_running () then
       let () = Common.debug (Js.string "set_runtime_url:sucess") in
+      let () = State_settings.set_synch false in
       Lwt.return (Api_common.result_ok (js_node_runtime :> Api.concrete_manager))
     else
       let () = Common.debug (Js.string "set_runtime_url:failure") in
