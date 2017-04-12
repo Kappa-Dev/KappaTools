@@ -1149,14 +1149,13 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger alg_
         let () = Loggers.fprintf logger ")" in
             ()
     end
-  | Loggers.SBML ->
+  | Loggers.SBML | Loggers.DOTNET -> (*TODO*)
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () =
       Sbml_backend.print_alg_expr_in_sbml string_of_var_id logger alg_expr
         network_handler in
     let () = Loggers.fprintf logger "</math>" in
     ()
-  | Loggers.DOTNET (*TODO*)
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
@@ -1304,38 +1303,32 @@ let print_sbml_parameters string_of_var_id logger logger_buffer variable expr =
     | Some x -> " units=\""^x^"\""
   in
   let id = string_of_variable_sbml string_of_var_id variable in
-  let () = Loggers.set_id_of_global_parameter logger variable id  in
-  Sbml_backend.single_box
-    logger_buffer
-    "parameter"
-    ~options:(fun () ->
-        Format.sprintf
-          "metaid=\"%s\" id=\"%s\" value=\"%s\"%s"
-          (Sbml_backend.meta_id_of_logger logger)
-          id
-          (Nbr.to_string expr)
-          unit_string)
-
-let print_dotnet_parameters string_of_var_id logger logger_buffer variable expr =
-  (*let unit_string =
-    match
-      unit_of_variable_sbml variable
-    with
-    | None -> ""
-    | Some x -> " units=\""^x^"\""
-  in*)
-  let id = string_of_variable_sbml string_of_var_id variable in
-  let () = Loggers.set_id_of_global_parameter logger variable id  in
-  Dotnet_backend.single_box_dot_net
-    logger_buffer
-    ""
-    ~options:(fun () ->
-        Format.sprintf
-          "%s %s %s"
-          (Dotnet_backend.dotnet_id_of_logger logger)
-          id
-          (Nbr.to_string expr))
-
+  let () = Loggers.set_id_of_global_parameter logger variable id in
+  let () =
+    Sbml_backend.do_sbml logger (fun logger ->
+        Sbml_backend.single_box
+          logger_buffer
+          "parameter"
+          ~options:(fun () ->
+              Format.sprintf
+                "metaid=\"%s\" id=\"%s\" value=\"%s\"%s"
+                (Sbml_backend.meta_id_of_logger logger)
+                id
+                (Nbr.to_string expr)
+                unit_string)
+      )
+  in
+  Sbml_backend.do_dotnet logger (fun logger ->
+      Sbml_backend.single_box
+        logger_buffer
+        ""
+        ~options:(fun () ->
+            Format.sprintf
+              "%s %s %s"
+              (Sbml_backend.dotnet_id_of_logger logger)
+              id
+              (Nbr.to_string expr))
+    )
 
 let print_comment
     ?breakline:(breakline=false)
@@ -1513,7 +1506,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.SBML ->
+  | Loggers.SBML | Loggers.DOTNET ->
     begin
       match variable, init_mode with
       | Ode_loggers_sig.Expr _ , true ->
@@ -1584,78 +1577,6 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         | Ode_loggers_sig.Time_scale_factor,_
         | Ode_loggers_sig.NonNegative,_
         | Ode_loggers_sig.Current_time,_ -> ()
-    end
-  | Loggers.DOTNET (*TODO*) ->
-    begin
-      match variable, init_mode with
-      | Ode_loggers_sig.Expr _ , true ->
-        begin
-          match
-            Ode_loggers_sig.is_expr_alias alg_expr,
-            Ode_loggers_sig.is_expr_const alg_expr
-          with
-          | None, true  ->
-            print_dotnet_parameters
-              string_of_var_id
-              logger
-              logger_buffer
-              variable
-              (Sbml_backend.eval_init_alg_expr
-                 logger
-                 network_handler
-                 alg_expr)
-          | Some _, _
-          | _, false -> ()
-        end
-      | (Ode_loggers_sig.Tinit |
-         Ode_loggers_sig.Tend |
-         Ode_loggers_sig.Period_t_points
-        ) ,_ ->
-        print_dotnet_parameters
-          string_of_var_id
-          logger
-          logger_buffer
-          variable
-          (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
-      | Ode_loggers_sig.Rate _,_
-      | Ode_loggers_sig.Rated _,_
-      | Ode_loggers_sig.Rateun _,_
-      | Ode_loggers_sig.Rateund _,_ ->
-        if Ode_loggers_sig.is_expr_const alg_expr then
-          print_dotnet_parameters
-            string_of_var_id
-            logger
-            logger_buffer
-            variable
-            (Sbml_backend.eval_init_alg_expr logger network_handler alg_expr)
-      | Ode_loggers_sig.Stochiometric_coef _,_
-      | Ode_loggers_sig.Jacobian_rate (_,_),_
-      | Ode_loggers_sig.Jacobian_rateun (_,_),_
-      | Ode_loggers_sig.Jacobian_rated _,_
-      | Ode_loggers_sig.Jacobian_rateund (_,_),_
-      | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
-      | Ode_loggers_sig.Expr _ , _
-      | Ode_loggers_sig.Init _, _
-      | Ode_loggers_sig.Initbis _, _
-      | Ode_loggers_sig.Concentration _,_
-      | Ode_loggers_sig.Deriv _,_
-      | Ode_loggers_sig.Obs _,_
-      | Ode_loggers_sig.Jacobian _,_
-      | Ode_loggers_sig.Jacobian_var _,_
-      | Ode_loggers_sig.MaxStep, _
-      | Ode_loggers_sig.InitialStep,_
-      | Ode_loggers_sig.AbsTol,_
-      | Ode_loggers_sig.RelTol,_
-      | Ode_loggers_sig.N_rules,_
-      | Ode_loggers_sig.N_ode_var,_
-      | Ode_loggers_sig.N_max_stoc_coef,_
-      | Ode_loggers_sig.N_var,_
-      | Ode_loggers_sig.N_obs,_
-      | Ode_loggers_sig.N_rows,_
-      | Ode_loggers_sig.Tmp,_
-      | Ode_loggers_sig.Time_scale_factor,_
-      | Ode_loggers_sig.NonNegative,_
-      | Ode_loggers_sig.Current_time,_ -> ()
     end
   | Loggers.Json
   | Loggers.DOT
@@ -2867,7 +2788,7 @@ let launch_main logger =
     let () = Loggers.fprintf logger "</sbml>" in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.DOTNET (*TODO*)
+  | Loggers.DOTNET
   | Loggers.Matlab
   | Loggers.Mathematica
   | Loggers.Maple
