@@ -178,62 +178,54 @@ class KappaStd(kappa_common.StdBase):
         #return(list(map(hydrate_filemetadata,info)))
         return(info)
 
-    def simulation_delete(self,project_id,simulation_id):
-        return(self.dispatch("SimulationDelete",[project_id,simulation_id]))
+    def simulation_delete(self,project_id):
+        return(self.dispatch("SimulationDelete",[project_id]))
 
-    def simulation_detail_file_line(self,project_id,simulation_id,file_line_id):
+    def simulation_detail_file_line(self,project_id,file_line_id):
         return(self.dispatch("SimulationDetailFileLine",
-                             [project_id,simulation_id,file_line_id]))
+                             [project_id,file_line_id]))
 
-    def simulation_detail_flux_map(self,project_id,simulation_id,flux_map_id):
+    def simulation_detail_flux_map(self,project_id,flux_map_id):
         return(self.dispatch("SimulationDetailFluxMap",
-                             [project_id,simulation_id,flux_map_id]))
+                             [project_id,flux_map_id]))
 
-    def simulation_detail_log_message(self,project_id,simulation_id):
+    def simulation_detail_log_message(self,project_id):
         return(self.dispatch("SimulationDetailLogMessage",
-                             [project_id,simulation_id]))
+                             [project_id]))
 
-    def simulation_detail_plot(self,project_id,simulation_id,plot_parameter = None):
+    def simulation_detail_plot(self,project_id,plot_parameter = None):
         if plot_parameter :
             parameter = plot_parameter.toJSON()
         else:
             parameter = PlotParameter().toJSON()
 
         return(self.dispatch("SimulationDetailPlot",
-                             [project_id,simulation_id,parameter]))
+                             [project_id,parameter]))
 
-    def simulation_detail_snapshot(self,project_id,simulation_id,snapshot_id):
+    def simulation_detail_snapshot(self,project_id,snapshot_id):
         return(self.dispatch("SimulationDetailSnapshot",
-                             [project_id,simulation_id,snapshot_id]))
+                             [project_id,snapshot_id]))
 
-    def simulation_info(self,project_id,simulation_id):
-        return(self.dispatch("SimulationInfo",
-                             [project_id,simulation_id]))
+    def simulation_info(self,project_id):
+        return(self.dispatch("SimulationInfo",project_id))
 
-    def simulation_info_file_line(self,project_id,simulation_id):
-        return(self.dispatch("SimulationCatalogFileLine",
-                             [project_id,simulation_id]))
+    def simulation_info_file_line(self,project_id):
+        return(self.dispatch("SimulationCatalogFileLine",project_id))
 
-    def simulation_info_flux_map(self,project_id,simulation_id):
-        return(self.dispatch("SimulationCatalogFluxMap",
-                             [project_id,simulation_id]))
+    def simulation_info_flux_map(self,project_id):
+        return(self.dispatch("SimulationCatalogFluxMap",project_id))
 
-    def simulation_info_snapshot(self,project_id,simulation_id):
+    def simulation_info_snapshot(self,project_id):
         return(self.dispatch("SimulationCatalogSnapshot",
-                             [project_id,simulation_id]))
-
-    def simulation_list(self,project_id):
-        return(self.dispatch("SimulationCatalog",
                              project_id))
 
-    def simulation_pause(self,project_id,simulation_id):
+    def simulation_pause(self,project_id):
         return(self.dispatch("SimulationPause",
-                             [project_id,simulation_id]))
+                             project_id))
 
-    def simulation_perturbation(self,project_id,simulation_id,perturbation_code):
+    def simulation_perturbation(self,project_id,perturbation_code):
         return(self.dispatch("SimulationPause",
                              [project_id ,
-                              simulation_id ,
                               { "perturbation_code" : perturbation_code }]))
 
     def simulation_start(self,project_id,simulation_parameter):
@@ -302,81 +294,73 @@ class KappaRest(kappa_common.RestBase):
         #return(list(map(hydrate_filemetada,info)))
         return(info)
 
-    def simulation_delete(self,project_id,simulation_id):
+    def simulation_delete(self,project_id):
         method = "DELETE"
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id,simulation_id)
+        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
         body = None
         return(self.dispatch(method,url,body))
 
-    def simulation_detail_file_line(self,project_id,simulation_id,file_line_id):
-        url = "{0}/projects/{1}/simulations/{2}/file_lines/{3}".format(self.url,project_id,simulation_id,file_line_id)
+    def simulation_detail_file_line(self,project_id,file_line_id):
+        url = "{0}/projects/{1}/simulation/file_lines/{2}".format(self.url,project_id,file_line_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_flux_map(self,project_id,simulation_id,flux_map_id):
-        url = "{0}/projects/{1}/simulations/{2}/fluxmaps/{3}".format(self.url,project_id,simulation_id,flux_map_id)
+    def simulation_detail_flux_map(self,project_id,flux_map_id):
+        url = "{0}/projects/{1}/simulation/fluxmaps/{2}".format(self.url,project_id,flux_map_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_log_message(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/logmessages".format(self.url,project_id,simulation_id)
+    def simulation_detail_log_message(self,project_id):
+        url = "{0}/projects/{1}/simulation/logmessages".format(self.url,project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_plot(self,project_id,simulation_id,plot_parameter = None):
+    def simulation_detail_plot(self,project_id,plot_parameter = None):
         if plot_parameter :
             parameter = "?{0}".format(plot_parameter.toURL())
         else:
             parameter =  ""
-        url = "{0}/projects/{1}/simulations/{2}/plot{3}".format(self.url,project_id,simulation_id,parameter)
+        url = "{0}/projects/{1}/simulation/plot{2}".format(self.url,project_id,parameter)
         print(url)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_snapshot(self,project_id,simulation_id,snapshot_id):
-        url = "{0}/projects/{1}/simulations/{2}/snapshots/{3}".format(self.url,project_id,snapshot_id)
+    def simulation_detail_snapshot(self,project_id,snapshot_id):
+        url = "{0}/projects/{1}/simulation/snapshots/{2}".format(self.url,project_id,snapshot_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,project_id,simulation_id)
+    def simulation_info(self,project_id):
+        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info_file_line(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/file_lines".format(self.url,project_id,simulation_id)
+    def simulation_info_file_line(self,project_id):
+        url = "{0}/projects/{1}/simulation/file_lines".format(self.url,project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info_flux_map(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/fluxmaps".format(self.url,project_id,simulation_id)
+    def simulation_info_flux_map(self,project_id):
+        url = "{0}/projects/{1}/simulation/fluxmaps".format(self.url,project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info_snapshot(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}/snapshots".format(self.url,
-                                                                  project_id,snapshot_id)
+    def simulation_info_snapshot(self,project_id):
+        url = "{0}/projects/{1}/simulation/snapshots".format(self.url,
+                                                                  project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_list(self,project_id):
-        url = "{0}/projects/{1}/simulations".format(self.url,
-                                                    project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_delete(self,project_id,simulation_id):
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,
-                                                        project_id,
-                                                        snapshot_id)
+    def simulation_delete(self,project_id):
+        url = "{0}/projects/{1}/simulation".format(self.url,
+                                                        project_id)
         return(self.dispatch("DELETE",url,None))
 
-    def simulation_pause(self,project_id,simulation_id):
+    def simulation_pause(self,project_id):
         message = { "action" : "pause" }
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,
-                                                        project_id,
-                                                        snapshot_id)
+        url = "{0}/projects/{1}/simulation".format(self.url,
+                                                        project_id)
         return(self.dispatch("PUT",url,message ))
 
-    def simulation_perturbation(self,project_id,simulation_id,perturbation_code):
-        url = "{0}/projects/{1}/simulations/{2}".format(self.url,
-                                                        project_id,
-                                                        snapshot_id)
+    def simulation_perturbation(self,project_id,perturbation_code):
+        url = "{0}/projects/{1}/simulation".format(self.url,
+                                                        project_id)
         message = { "perturbation_code" : perturbation_code }
         return(self.dispatch("PUT",url,message ))
 
     def simulation_start(self,project_id,simulation_parameter):
-        url = "{0}/projects/{1}/simulations".format(self.url,project_id)
+        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
         message = simulation_parameter.toJSON()
         return(self.dispatch("POST",url,message ))
 
@@ -489,12 +473,11 @@ def main():
 
                 end_time = 10.0
                 simulation_parameter = SimulationParameter(plot_period,
-                                                           simulation_id,
                                                            pause_condition,
                                                            seed)
                 runtime.simulation_start(project_id,simulation_parameter)
 
-                simulation_info = runtime.simulation_info(project_id,simulation_id)
+                simulation_info = runtime.simulation_info(project_id)
 
                 while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
                     time.sleep(1)
@@ -510,12 +493,12 @@ def main():
 
                     sys.stdout.write("..{0}.. ".format(percentage))
                     sys.stdout.flush()
-                    simulation_info = runtime.simulation_info(project_id,simulation_id)
+                    simulation_info = runtime.simulation_info(project_id)
 
                 print("")
                 print("info")
                 print(simulation_info)
-                plot_detail = runtime.simulation_detail_plot(project_id,simulation_id,)
+                plot_detail = runtime.simulation_detail_plot(project_id)
                 print("plot")
                 print(plot_detail)
         else:

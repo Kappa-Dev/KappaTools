@@ -116,19 +116,18 @@ class KappaClientTest(object):
             file_object = kappa_client.File(file_metadata,file_content)
             runtime.file_create(project_id,file_object)
             runtime.project_parse(project_id)
-            simulation_id = str(uuid.uuid1())
             pause_condition = "[T] > 10.0"
-            simulation_parameter = kappa_client.SimulationParameter(0.1,simulation_id,pause_condition)
+            simulation_parameter = kappa_client.SimulationParameter(0.1,"default",pause_condition)
             runtime.simulation_start(project_id,simulation_parameter)
 
-            simulation_info = runtime.simulation_info(project_id,simulation_id)
+            simulation_info = runtime.simulation_info(project_id)
 
             while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
                 time.sleep(1)
-                simulation_info = runtime.simulation_info(project_id,simulation_id)
+                simulation_info = runtime.simulation_info(project_id)
 
             # test that no limit returns all entries
-            last_status = runtime.simulation_detail_plot(project_id,simulation_id)
+            last_status = runtime.simulation_detail_plot(project_id)
             test_count = 101
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
 
@@ -137,7 +136,7 @@ class KappaClientTest(object):
             test_time = 10.0
             test_count = 1
             limit = kappa_client.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_detail_plot(project_id,simulation_id,kappa_client.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(project_id,kappa_client.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
@@ -146,7 +145,7 @@ class KappaClientTest(object):
             test_time = 1.0
             test_count = 1
             limit = kappa_client.PlotLimit(plot_limit_offset,plot_limit_points)
-            last_status = runtime.simulation_detail_plot(project_id,simulation_id,kappa_client.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(project_id,kappa_client.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
@@ -155,7 +154,7 @@ class KappaClientTest(object):
             test_time = 10.0
             test_count = 51
             limit = kappa_client.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_detail_plot(project_id,simulation_id,kappa_client.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(project_id,kappa_client.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
