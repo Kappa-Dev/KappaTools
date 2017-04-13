@@ -17,7 +17,8 @@ let settings_synch_checkbox =
   Html.input
     ~a:[ Html.a_input_type `Checkbox;
          Html.a_id settings_synch_checkbox_id;
-       ] ()
+         Tyxml_js.R.filter_attrib (Html.a_checked ()) State_settings.synch]
+    ()
 
 let settings_client_id_modal_id = "settings-client-id-modal"
 let settings_client_id_button_id = "settings-client-id-button"
@@ -182,7 +183,8 @@ let onload () =
               Js.Opt.case
                 runtime_id
                 (fun _ -> ())
-                (fun runtime_id -> Subpanel_editor_controller.set_manager (Js.to_string runtime_id))
+                (fun runtime_id -> Panel_projects_controller.set_manager
+                    (Js.to_string runtime_id))
             in
             Js._false))
   in

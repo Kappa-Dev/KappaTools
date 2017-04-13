@@ -16,7 +16,7 @@ let tab_was_active = ref false
 
 let content () =
   let state_log , set_state_log = React.S.create ("" : string) in
-  let _ = React.S.l1
+  let _ = Lwt_react.S.map_s
       (fun _ ->
          State_simulation.with_simulation_info
            ~label:__LOC__

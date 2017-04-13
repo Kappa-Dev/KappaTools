@@ -33,10 +33,10 @@ let rec loop
   h () >>= (fun _ -> Lwt_js.sleep t) >>= loop h t
 
 let loop_sync () : unit Lwt.t =
-  if State_settings.get_synch () then
+  if React.S.value State_settings.synch then
     let () = Common.debug (Js.string "loop sync") in
     sync ()
   else Lwt.return_unit
 
 let onload () : unit =
-  Common.async (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 15.0)
+  Common.async (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 20.0)

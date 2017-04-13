@@ -6,6 +6,5 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val set_manager : string -> unit
 val set_content : filename:string -> filecontent:string -> unit
 val with_file : (Api_types_j.file Api.result -> unit Api.result Lwt.t) -> unit

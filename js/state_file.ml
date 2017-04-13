@@ -57,10 +57,6 @@ let directory_state , set_directory_state = React.S.create blank_state
 type refresh = { filename : string ; content : string ; line : int option ; }
 let refresh_file , set_refresh_file = React.S.create (None : refresh option)
 
-let reset () =
-  let () = set_directory_state blank_state in
-  ()
-
 let get_file () : Api_types_j.file Api.result Lwt.t =
   State_project.with_project ~label:"get_file"
     (fun manager project_id ->
@@ -82,7 +78,7 @@ let send_refresh
   match (React.S.value directory_state).state_current with
   | None -> Lwt.return (Api_common.result_ok ())
   | Some _ ->
-  get_file () >>=
+    get_file () >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (file : Api_types_j.file) ->
            let () = Common.debug (Js.string file.Api_types_j.file_content) in
@@ -402,7 +398,7 @@ let get_file () : Api_types_j.file Api.result Lwt.t =
 
 *)
 
-let sync () : unit Api.result Lwt.t =
+let sync ?(reset=false) () : unit Api.result Lwt.t =
   (* Save the current state of the directory.*)
   let old_state = React.S.value directory_state in
   State_project.with_project ~label:"synch"
@@ -413,48 +409,50 @@ let sync () : unit Api.result Lwt.t =
           ~ok:(fun (catalog : Api_types_j.file_catalog) ->
               (* Save the new state of the directory.*)
               let (new_state,refresh_ui) =
-                let current_directory = catalog.Api_types_j.file_metadata_list in
+                let current_directory =
+                  catalog.Api_types_j.file_metadata_list in
                 (* Use the current file's metadata if it is still in the directory. *)
                 let current_metadata : Api_types_j.file_metadata option =
                   match old_state.state_current with
                   | None -> None
-                  | Some current_file_id -> find_metadata current_file_id current_directory
+                  | Some current_file_id ->
+                    find_metadata current_file_id current_directory
                 in
                 match current_metadata with
                 | None ->
-                  ({ (* If current meta data is missing pick the
-                        first file from the directory *)
-                    state_current =
-                      (match current_directory with
-                      | [] -> None
-                      | first::_ -> Some first.Api_types_j.file_metadata_id ) ;
-                    state_directory = current_directory },
-                    (* And queue an update of the ui. *)
-                    (match current_directory with
-                     | [] -> None
-                     | first::_ -> Some first.Api_types_j.file_metadata_id
-                    )
-                  )
+                  (* If current meta data is missing pick the first
+                        file from the directory and queue an update of
+                        the ui. *)
+                  let state_current =
+                    match current_directory with
+                    | [] -> None
+                    | first::_ -> Some first.Api_types_j.file_metadata_id in
+                  ({ state_current; state_directory = current_directory },
+                    state_current)
                 | Some current_metadata ->
                   (* Find the metadata of the file in the old state. *)
                   let old_metadata : Api_types_j.file_metadata option =
-                    find_metadata current_metadata.Api_types_j.file_metadata_id old_state.state_directory
-                  in
+                    find_metadata
+                      current_metadata.Api_types_j.file_metadata_id
+                      old_state.state_directory in
                   (* Check if old metadata it is out of date *)
                   let is_out_of_date =
-                    match old_metadata with
-                    | None -> None (* not sure how this would happen but okay *)
-                    | Some old_metadata ->
-                      let client_id = State_settings.get_client_id () in
-                      if File_version.gt
-                        ~client_id
-                        current_metadata.Api_types_j.file_metadata_version
-                        old_metadata.Api_types_j.file_metadata_version then
-                        Some current_metadata.Api_types_j.file_metadata_id
-                      else
-                        None
+                    if reset ||
+                       match old_metadata with
+                       | None -> true
+                       (* not sure how this would happen but okay *)
+                       | Some old_metadata ->
+                         let client_id = State_settings.get_client_id () in
+                         File_version.gt
+                           ~client_id
+                           current_metadata.Api_types_j.file_metadata_version
+                           old_metadata.Api_types_j.file_metadata_version then
+                      Some current_metadata.Api_types_j.file_metadata_id
+                    else
+                      None
                   in
-                  ({ state_current = Some current_metadata.Api_types_j.file_metadata_id ;
+                  ({ state_current =
+                       Some current_metadata.Api_types_j.file_metadata_id ;
                      state_directory = current_directory },
                    (* If it is not up to date pull the new version and
                         update the ui. *)

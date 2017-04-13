@@ -210,10 +210,9 @@ let remove_project project_id =
     let current =
       List.find (fun x -> x.project_id = project_id)
         state.project_catalog in
-    remove_simulations current.project_manager current.project_id >>=
-    fun out -> remove_files current.project_manager current.project_id >>=
-    fun out' -> current.project_manager#project_delete current.project_id >>=
-    (fun out'' ->
+    remove_files current.project_manager current.project_id >>=
+    fun out -> current.project_manager#project_delete current.project_id >>=
+    (fun out' ->
        let () = current.project_manager#terminate () in
        let project_catalog =
          List.filter (fun x -> x.project_id <> current.project_id)
@@ -233,8 +232,8 @@ let remove_project project_id =
              project_parameters =
                Mods.StringMap.remove project_id state.project_parameters;
              project_version = -1; project_contact_map = None } in
-       Api_common.result_bind_lwt ~ok:(fun () -> sync ())
-         (Api_common.result_combine [out;out';out'']))
+       sync () >>= fun out'' ->
+       Lwt.return (Api_common.result_combine [out;out';out'']))
   with Not_found ->
     Lwt.return (Api_common.result_error_msg
                   ("Project "^project_id^" does not exists"))

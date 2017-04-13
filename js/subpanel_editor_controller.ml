@@ -8,18 +8,6 @@
 
 open Lwt.Infix
 
-let set_manager (runtime_id : string) : unit =
-  Common.async
-    (fun () ->
-       State_error.wrap
-         __LOC__
-         (let r = State_runtime.create_spec ~load:true runtime_id in
-          State_project.sync () >>=
-            fun r' -> Lwt.return (Api_common.result_combine [r; r'])) >>=
-       (Api_common.result_bind_lwt ~ok:State_file.sync) >>=
-       (fun _ -> Lwt.return_unit)
-    )
-
 let with_file (handler : Api_types_j.file Api.result -> unit Api.result Lwt.t) =
     Common.async
     (fun () ->

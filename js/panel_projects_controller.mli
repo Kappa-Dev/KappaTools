@@ -9,3 +9,5 @@
 val create_project : string -> unit
 val set_project : string -> unit
 val close_project : string -> unit
+
+val set_manager : string -> unit

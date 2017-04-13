@@ -87,7 +87,8 @@ let onload () =
              update data contactmap
            else
              contactmap##clearData)
-      (React.S.on tab_is_active State_project.dummy_model State_project.model)
+      (React.S.on
+         tab_is_active State_project.dummy_model State_project.model)
   in
     let () = Common.jquery_on
       "#navcontact"

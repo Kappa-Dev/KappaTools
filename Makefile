@@ -151,7 +151,7 @@ JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(lwt)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(lwt.react)" \
 	-tag-line "<js/*.ml*> : package(js_of_ocaml.ppx), package(tyxml.ppx)" \
 	$@
 
@@ -160,7 +160,7 @@ TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
-	-tag-line "<js/*> : thread, package(qcheck.ounit), package(atdgen), package(js_of_ocaml.ppx), package(lwt)" \
+	-tag-line "<js/*> : thread, package(qcheck.ounit), package(atdgen), package(js_of_ocaml.ppx), package(lwt.react)" \
 	$@
 
 TestWebSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
