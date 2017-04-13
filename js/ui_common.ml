@@ -381,17 +381,16 @@ let create_modal
                   ~a:[ Html.Unsafe.string_attrib "aria-hidden" "true" ]
                   [ Html.entity "times" ]
               ] ;
-            Html.h4 [ Html.cdata title_label ] ;
-            Html.div ~a:[ Html.a_class [ "modal-body" ] ] body ;
-            Html.div ~a:[ Html.a_class [ "modal-footer" ] ]
-              ([ Html.button
-                   ~a:[ Html.Unsafe.string_attrib "type" "button" ;
-                        Html.a_class [ "btn" ; "btn-default" ] ;
-                        Html.Unsafe.string_attrib "data-dismiss" "modal" ;
-                      ]
-                   [ Html.cdata "Cancel" ] ;
-               ]@[button])
-          ]
+            Html.h4 [ Html.cdata title_label ]] ;
+        Html.div ~a:[ Html.a_class [ "modal-body" ] ] body ;
+        Html.div ~a:[ Html.a_class [ "modal-footer" ] ]
+          ([ Html.button
+               ~a:[ Html.Unsafe.string_attrib "type" "button" ;
+                    Html.a_class [ "btn" ; "btn-default" ] ;
+                    Html.Unsafe.string_attrib "data-dismiss" "modal" ;
+                  ]
+               [ Html.cdata "Cancel" ] ;
+           ]@[button])
       ] in
   let () =
     (Tyxml_js.To_dom.of_form form)##.onsubmit := submit in
