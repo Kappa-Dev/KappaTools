@@ -15,7 +15,7 @@ let continue_simulation () =
          __LOC__
          (State_simulation.with_simulation
             ~label:__LOC__
-            (fun _ p_id t ->
+            (fun _ p_id _ ->
                let simulation_parameter =
                  State_project.create_simulation_parameter p_id in
                State_simulation.continue_simulation simulation_parameter))
@@ -85,3 +85,20 @@ let focus_range (range : Locality.t) : unit =
          (State_file.select_file file_id (Some line))
        >>= (fun _ -> Lwt.return_unit)
     )
+
+let simulation_trace () =
+  State_simulation.when_ready
+    ~label:__LOC__
+      (fun manager project_id ->
+         State_error.wrap
+           __LOC__
+           (manager#simulation_raw_trace project_id) >>=
+         (Api_common.result_bind_lwt
+            ~ok:(fun data ->
+                let () =
+                  Common.saveFile
+                    ~data ~mime:"application/octet-stream"
+                    ~filename:"trace.json" in
+                Lwt.return (Api_common.result_ok ()))
+         )
+      )

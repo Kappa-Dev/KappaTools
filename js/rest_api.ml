@@ -262,6 +262,15 @@ class manager
         `GET
         Mpi_message_j.simulation_efficiency_of_string
         (fun result -> `SimulationEfficiency result)
+    | `SimulationTrace project_id ->
+      send
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/trace"
+           url
+           project_id)
+        `GET
+        (fun s -> s)
+        (fun result -> `SimulationTrace result)
     | `SimulationCatalogFileLine project_id ->
       send
         (Format.sprintf

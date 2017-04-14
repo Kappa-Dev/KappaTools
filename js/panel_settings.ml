@@ -438,6 +438,33 @@ module ButtonPause : Ui_common.Div = struct
 
 end
 
+module ButtonTrace : Ui_common.Div = struct
+  let id = "panel_settings_get_trace_button"
+  let button =
+  Html.button
+    ~a:[ Html.a_id id
+       ; Html.Unsafe.string_attrib "type" "button"
+       ; Tyxml_js.R.Html5.a_class
+           (React.S.map (fun model ->
+                (if model.State_project.model_parameters.State_project.store_trace
+                 then [] else ["disabled"])
+                @ ["btn" ; "btn-default" ; ])
+               State_project.model)]
+    [ Html.cdata "get trace" ]
+
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [button]
+
+  let onload () =
+    let button_dom = Tyxml_js.To_dom.of_button button in
+    let () = button_dom##.onclick :=
+        Dom.handler
+          (fun _ ->
+             let () = Panel_settings_controller.simulation_trace () in
+             Js._true)
+    in
+    ()
+end
+
 module ButtonContinue : Ui_common.Div = struct
   let id = "panel_settings_continue_button"
   let button =
@@ -459,7 +486,6 @@ module ButtonContinue : Ui_common.Div = struct
              Js._true)
     in
     ()
-
 end
 
 module DivStatusIndicator : Ui_common.Div = struct
@@ -766,9 +792,15 @@ let footer () =
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2"; "col-xs-4" ]
+                    ~a_class:[ "col-md-2"; "col-xs-3" ]
                      [ State_simulation.PAUSED ; ]) ]
                (ButtonContinue.content ());
+             Html.div
+               ~a:[ Tyxml_js.R.Html.a_class
+                    (visible_on_states
+                    ~a_class:[ "col-md-2"; "col-xs-4" ]
+                     [ State_simulation.PAUSED ; ]) ]
+               (ButtonTrace.content ());
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
@@ -778,12 +810,12 @@ let footer () =
              Html.div
                ~a:[ Tyxml_js.R.Html.a_class
                     (visible_on_states
-                    ~a_class:[ "col-md-2"; "col-xs-3" ]
+                    ~a_class:[ "col-xs-2" ]
                     [ State_simulation.PAUSED ;
                       State_simulation.RUNNING ; ]) ]
                (ButtonClear.content ());
              Html.div
-               ~a:[ Html.a_class [ "col-md-1"; "col-xs-5" ] ]
+               ~a:[ Html.a_class [ "col-md-1"; "col-xs-4" ] ]
                ((DivStatusIndicator.content ())
                 @
                 [ Html.entity "nbsp" ; ]) ]{|
@@ -815,6 +847,7 @@ let onload () : unit =
   let () = ButtonStart.onload () in
   let () = ButtonPause.onload () in
   let () = ButtonContinue.onload () in
+  let () = ButtonTrace.onload () in
   let () = ButtonClear.onload () in
   let () = DivStatusIndicator.onload() in
   ()
