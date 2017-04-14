@@ -100,6 +100,9 @@ let on_message
   | `SimulationParameter project_id ->
     (manager#simulation_parameter project_id) >>=
     (handler (fun result -> `SimulationParameter result))
+  | `SimulationTrace project_id ->
+    (manager#simulation_raw_trace project_id) >>=
+    (handler (fun result -> `SimulationTrace result))
   | `SimulationPause project_id ->
     (manager#simulation_pause project_id) >>=
     (handler (fun result -> `SimulationPause result))
@@ -461,6 +464,18 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationPause result ->
+              Lwt.return (Api_common.result_ok result)
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
+    method simulation_raw_trace
+      (project_id : Api_types_j.project_id): string Api.result Lwt.t =
+      self#message (`SimulationTrace project_id) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `SimulationTrace result ->
               Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return

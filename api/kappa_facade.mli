@@ -50,7 +50,6 @@ val continue :
   parameter:Api_types_j.simulation_parameter ->
   (unit, Api_types_j.errors) Result.result Lwt.t
 
-
 val info :
   system_process:system_process ->
   t:t ->
@@ -58,6 +57,8 @@ val info :
     Result.result Lwt.t
 
 val efficiency : t -> Counter.Efficiency.t
+
+val get_raw_trace : t -> string
 
 val get_contact_map : t -> Api_types_j.site_node array
 

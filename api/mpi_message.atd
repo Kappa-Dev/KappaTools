@@ -79,6 +79,7 @@ type request = [ EnvironmentInfo of unit
                | SimulationCatalogFileLine of project_id
                | SimulationCatalogFluxMap of project_id
                | SimulationCatalogSnapshot of project_id
+	       | SimulationTrace of project_id
 	       | SimulationParameter of project_id
                | SimulationPause of project_id
                | SimulationPerturbation of (project_id * simulation_perturbation)
@@ -110,6 +111,7 @@ type response_content = [
    | SimulationCatalogFileLine of file_line_catalog
    | SimulationCatalogFluxMap of flux_map_catalog
    | SimulationCatalogSnapshot of snapshot_catalog
+   | SimulationTrace of string
    | SimulationParameter of simulation_parameter
    | SimulationPause of unit
    | SimulationPerturbation of unit

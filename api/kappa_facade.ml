@@ -81,6 +81,7 @@ type t =
     mutable flux_maps : Api_types_j.flux_map list ;
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
+    mutable trace : Trace.t ;
     contact_map : Contact_map.t ;
     mutable env : Model.t ;
     mutable graph : Rule_interpreter.t ;
@@ -107,6 +108,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     flux_maps = [];
     files = [];
     error_messages = [];
+    trace = [];
     contact_map; env; graph; state; init_l;
     lastyield; kasa_state;
   }
@@ -258,7 +260,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                   ~new_syntax
                   ~graph:(Rule_interpreter.empty
-                            ~with_trace(*TODO conf.Eval.traceFileName*)
+                            ~with_trace
                             random_state env counter)
                   ~state:(State_interpreter.empty ~with_delta_activities:false env [])
                   ~init_l ~lastyield
@@ -305,7 +307,7 @@ let outputs (simulation : t) =
          (Model.signatures simulation.env)
          snapshot)::simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
-  | Data.TraceStep _ -> () (*TODO*)
+  | Data.TraceStep st -> simulation.trace <- st :: simulation.trace
 
 let parse
     ~(system_process : system_process)
@@ -617,6 +619,13 @@ let info
   | _ -> Lwt.return (Result_util.error t.error_messages)
 
 let efficiency t = Counter.get_efficiency t.counter
+
+let get_raw_trace t =
+  Yojson.Basic.to_string
+    (`Assoc [
+        "env", Model.to_yojson t.env;
+        "trace", `List (List.rev_map Trace.step_to_yojson t.trace);
+      ])
 
 let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map

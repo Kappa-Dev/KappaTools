@@ -92,6 +92,22 @@ val print_label_of_step:
 val step_to_yojson : step -> Yojson.Basic.json
 val step_of_yojson : Yojson.Basic.json -> step
 
+val write_step : Bi_outbuf.t -> step -> unit
+  (** Output a JSON value of type {!step}. *)
+
+val string_of_step : ?len:int -> step -> string
+  (** Serialize a value of type {!step} into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_step :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> step
+  (** Input JSON data of type {!step}. *)
+
+val step_of_string : string -> step
+  (** Deserialize JSON data of type {!step}. *)
+
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 

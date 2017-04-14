@@ -127,6 +127,19 @@ let route
          )
      };
      { Webapp_common.path =
+         "/v2/projects/{projectid}/dead_rules" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#project_dead_rules project_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:(fun out -> Yojson.Safe.to_string
+                                      (`List (List.map (fun x -> `String x) out)))
+            )
+         )
+     };
+     { Webapp_common.path =
          "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
@@ -203,6 +216,18 @@ let route
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
                                      ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/simulation/trace" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context ->
+            let project_id = project_ref context in
+            (manager#simulation_raw_trace project_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:(fun out -> out)
             )
          )
      };

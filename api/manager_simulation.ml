@@ -385,6 +385,16 @@ class manager_simulation
            let parameter = simulation#get_simulation_parameter() in
            Lwt.return (Api_common.result_ok parameter))
 
+    method simulation_raw_trace
+      (project_id : Api_types_j.project_id) : string Api.result Lwt.t =
+      Api_common.bind_simulation
+        environment
+        project_id
+        (fun _ simulation ->
+           let t = simulation#get_runtime_state() in
+           Lwt.return (Api_common.result_ok
+                         (Kappa_facade.get_raw_trace t)))
+
     method simulation_pause
         (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =

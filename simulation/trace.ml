@@ -276,6 +276,20 @@ let of_yojson = function
   | `List l -> List.rev (List.rev_map step_of_yojson l)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a trace",x))
 
+let write_step ob f =
+  Yojson.Basic.to_outbuf ob (step_to_yojson f)
+
+let string_of_step ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_step ob x;
+  Bi_outbuf.contents ob
+
+let read_step p lb =
+  step_of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+let step_of_string s =
+  read_step (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
 let step_is_obs = function
   | Obs _ -> true
   | Rule _ | Pert _ | Subs _ | Dummy _ | Init _ -> false
