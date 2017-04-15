@@ -344,8 +344,7 @@ let of_bool_op op =
   | Operator.OR -> ( || )
 
 let unsome expr_opt =
-  match expr_opt
-  with
+  match expr_opt with
   | None -> Alg_expr.const Nbr.zero
   | Some expr -> expr
 
@@ -973,7 +972,36 @@ let dump_kinetic_law
          let f logger =
            if Ode_loggers_sig.is_expr_const expr
            then
-             () (*TODO: give warning?*)
+             if correct = 1
+             then
+               Loggers.fprintf logger "%s"
+                 (string_of_variable
+                    logger
+                    (fun _logger var -> string_of_int
+                        (* this line is error prone, check*)
+                        (network.Network_handler.int_of_kappa_instance
+                           var))
+                    var_rule)
+             else
+               add_box ~break logger "apply" ""
+                 (fun logger ->
+                    let () =
+                      Loggers.fprintf logger
+                        "%s/%i"
+                        (string_of_variable
+                           logger
+                           (fun _logger var ->
+                              string_of_int
+                               (* this line is error prone, check*)
+                               (network.Network_handler.int_of_kappa_instance
+                                  var))
+                           var_rule)
+                        correct
+
+                    in
+                    let () = Loggers.print_newline logger in
+                    ()
+                 )
            else
              let expr =
                if correct = 1
@@ -1186,7 +1214,8 @@ let dump_sbml_reaction
          in
          let () =
            if reactants = [] &&
-            not (has_reactants_in_token_vector logger network rule_id token_vector)
+              not (has_reactants_in_token_vector logger network rule_id
+                     token_vector)
            then ()
            else
              let () =
@@ -1294,8 +1323,12 @@ let dump_sbml_reaction
                   (fun logger ->
                      dump_kinetic_law
                        string_of_var_id
-                       logger network
-                       reactants var_rule correct)
+                       logger
+                       network
+                       reactants
+                       var_rule
+                       correct
+                  )
              )
          in
          ()

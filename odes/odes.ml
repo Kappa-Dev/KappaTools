@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 12 2017>
+  * Last modification: Time-stamp: <Apr 19 2017>
 *)
 
 let local_trace = false
@@ -140,11 +140,9 @@ struct
     {
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
-        reactions:
-        (id list * id list *
-         (id Locality.annot) list
-         * enriched_rule) list ;
-
+      reactions:
+        (id list * id list * (id Locality.annot) list * enriched_rule)
+          list ;
       ode_vars_tab: ode_var Mods.DynArray.t ;
       id_of_ode_var: ode_var_id VarMap.t ;
       fresh_ode_var_id: ode_var_id ;
@@ -1650,7 +1648,8 @@ struct
     let () = do_it (fun x -> Ode_loggers_sig.Rated x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rateun x) in
     let () = do_it (fun x -> Ode_loggers_sig.Rateund x) in
-    let () = do_it (fun x -> Ode_loggers_sig.Stochiometric_coef (x,network.max_stoch_coef)) in
+    let () = do_it (fun x ->
+        Ode_loggers_sig.Stochiometric_coef (x,network.max_stoch_coef)) in
     let () =
       match Loggers.get_encoding_format logger with
       | Loggers.Octave | Loggers.Matlab ->
@@ -2054,6 +2053,20 @@ struct
   let export_main = export_main_gen ~step:1
   let export_main_follow_up = export_main_gen ~step:2
 
+  (*a list -> a list list*)
+  let pack list =
+    let rec aux current acc = function
+      | [] -> []    (* Can only be reached if original list is empty *)
+      | [x] -> (x :: current) :: acc
+      | a :: (b :: _ as t) ->
+        if a = b then aux (a :: current) acc t
+        else aux [] ((a :: current) :: acc) t  in
+    List.rev (aux [] [] list);;
+
+  (*'a list -> (int * 'a) list*)
+  let encode list =
+    List.map (fun l -> (List.length l, List.hd l)) (pack list)
+
   let export_dydt ~show_time_advance logger compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
@@ -2087,6 +2100,7 @@ struct
         split.var_decl
     in
     let () = Ode_loggers.print_newline logger in
+
     let () =
       List.iter
         (fun (rule, coefs) ->
@@ -2131,9 +2145,11 @@ struct
              (var_of_rule enriched_rule) reactants)
         l
     in
+    (*fold over a list of reactions*)
     let () =
       List.iter
         (fun (reactants, products, token_vector, enriched_rule) ->
+           (*each reaction will be computed here*)
            let add_factor l  =
              if I.do_we_count_in_embeddings compil
              then
@@ -2213,7 +2229,8 @@ struct
                         let prefix = if bool then " + " else "" in
                         let species_string =
                           Format.asprintf "%a"
-                            (fun log id -> I.print_chemical_species
+                            (fun log id ->
+                               I.print_chemical_species
                                 ~compil log
                                 (fst
                                    (Mods.DynArray.get
@@ -2256,6 +2273,8 @@ struct
                | Loggers.HTML_Tabular | Loggers.Json -> ()
 
            in
+           (*------------------------------------------*)
+           (*one reaction*)
            let () =
              Sbml_backend.dump_sbml_reaction
                (I.string_of_var_id ~compil logger)
@@ -2273,6 +2292,7 @@ struct
                (var_of_rule enriched_rule)
                enriched_rule.divide_rate_by
            in
+           (*------------------------------------------*)
            let reactants' =
              List.rev_map
                (fun x ->
@@ -2285,6 +2305,7 @@ struct
            in
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            let () = Ode_loggers.print_newline logger in
+           (*------------------------------------------*)
            let () =
              do_it Ode_loggers.consume reactants reactants'
                enriched_rule
@@ -2293,13 +2314,15 @@ struct
              do_it Ode_loggers.produce products reactants'
                enriched_rule
            in
+           (*------------------------------------------*)
            let _ =
              List.fold_left
                (fun n (token,_) ->
                   let () =
                     Ode_loggers.update_token
                     logger
-                    (Ode_loggers_sig.Deriv token) ~nauto_in_lhs
+                    (Ode_loggers_sig.Deriv token)
+                    ~nauto_in_lhs
                     (var_of_rule enriched_rule)
                     (var_of_stoch enriched_rule n)
                     reactants'
@@ -2309,7 +2332,6 @@ struct
         ) network.reactions
     in
     (*------------------------------------------------------------*)
-    (*Dot net*)
     (* Derivative of time is equal to 1 *)
     let () =
       if may_be_not_time_homogeneous network
