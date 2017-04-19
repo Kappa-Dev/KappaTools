@@ -2035,7 +2035,7 @@ struct
                 I.string_of_var_id
                 logger logger_buffer
                 Ode_loggers_sig.Time_scale_factor Nbr.one;
-              Sbml_backend.line_dotnet_or_sbml logger
+              Sbml_backend.line_dotnet logger
             | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
             | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
             | Loggers.TXT_Tabular
