@@ -192,3 +192,19 @@ let get_interval_list p i j =
 
 let lowercase = String.lowercase
 let capitalize = String.capitalize
+
+let smash_duplicate_in_ordered_list p l =
+
+  let () = Format.fprintf Format.std_formatter "DUPL \n"  in
+
+  let rec aux tail nocc current accu =
+    match tail with
+    | [] -> (current,nocc)::accu
+    | (h,n)::t when p h current = 0 ->
+      (*let () = Format.fprintf Format.std_formatter "DUPL %i\n" (n+nocc) in*)
+        aux t (n+nocc) current accu
+    | (h,n)::t -> aux t n h ((current,nocc)::accu)
+  in
+  match (List.rev l) with
+  | [] -> []
+  | (h,n)::t -> aux t n h []

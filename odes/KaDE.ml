@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 10 2017>
+  * Last modification: Time-stamp: <Apr 18 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -264,8 +264,11 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       else
         network
     in
+    let smash_reactions =
+      Ode_loggers.smash_reactions backend parameters
+    in
     let network =
-      A.network_from_compil ~ignore_obs parameters compil network
+      A.network_from_compil ~smash_reactions ~ignore_obs parameters compil network
     in
     (*************************************************************)
     let out_channel =

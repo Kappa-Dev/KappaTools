@@ -7,6 +7,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<minus/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Maple | Loggers.Mathematica -> "-"
       | Loggers.Json
@@ -20,6 +21,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<log/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Maple | Loggers.Mathematica
         -> "log"
@@ -34,6 +36,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<root/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "sqrt"
@@ -48,6 +51,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<exp/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica ->
         "exp"
       | Loggers.Json
@@ -61,6 +65,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<sin/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         -> "sin"
       | Loggers.Json
@@ -74,6 +79,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<cos/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "cos"
@@ -88,6 +94,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<tan/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica  ->
         "tan"
       | Loggers.Json
@@ -102,6 +109,7 @@ let string_of_un_op logger op =
         format
       with
       | Loggers.SBML -> "<floor/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica ->
         "floor"
       | Loggers.Json
@@ -122,6 +130,7 @@ let string_of_compare_op logger op =
       | Loggers.SBML -> "<eq/>"
       | Loggers.Octave | Loggers.Matlab ->
         "=="
+      | Loggers.DOTNET
       | Loggers.Maple | Loggers.Mathematica -> "="
       | Loggers.Json
       | Loggers.DOT
@@ -135,6 +144,7 @@ let string_of_compare_op logger op =
         format
       with
       | Loggers.SBML -> "<neq/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "!="
@@ -150,6 +160,7 @@ let string_of_compare_op logger op =
         format
       with
       | Loggers.SBML -> "<lt/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "<"
@@ -165,6 +176,7 @@ let string_of_compare_op logger op =
         format
       with
       | Loggers.SBML -> "<gt/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         ">"
@@ -184,7 +196,9 @@ let string_of_bin_op logger op =
         format
       with
       | Loggers.SBML -> "<rem/>"
-      | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica  -> "mod"
+      | Loggers.DOTNET
+      | Loggers.Octave | Loggers.Matlab | Loggers.Maple
+      | Loggers.Mathematica  -> "mod"
       | Loggers.Json
       | Loggers.Matrix
       | Loggers.DOT
@@ -197,6 +211,7 @@ let string_of_bin_op logger op =
         format
       with
       | Loggers.SBML -> "<max/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         -> "max"
       | Loggers.Json
@@ -211,6 +226,7 @@ let string_of_bin_op logger op =
         format
       with
       | Loggers.SBML -> "<min/>"
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab | Loggers.Maple | Loggers.Mathematica
         ->
         "min"
@@ -226,6 +242,7 @@ let string_of_bin_op logger op =
         format
       with
       | Loggers.SBML -> "<divide/>"
+      | Loggers.DOTNET
       | Loggers.Maple | Loggers.Mathematica | Loggers.Octave | Loggers.Matlab -> "/"
       | Loggers.Json
       | Loggers.Matrix
@@ -240,6 +257,7 @@ let string_of_bin_op logger op =
       with
       | Loggers.SBML -> "<plus/>"
       | Loggers.Maple | Loggers.Mathematica
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab -> "+"
       | Loggers.Json
       | Loggers.Matrix
@@ -254,6 +272,7 @@ let string_of_bin_op logger op =
       with
       | Loggers.SBML -> "<minus/>"
       | Loggers.Maple | Loggers.Mathematica
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab -> "-"
       | Loggers.Json
       | Loggers.Matrix
@@ -268,6 +287,7 @@ let string_of_bin_op logger op =
       with
       | Loggers.SBML -> "<times/>"
       | Loggers.Maple | Loggers.Mathematica
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab -> "*"
       | Loggers.Json
       | Loggers.Matrix
@@ -282,6 +302,7 @@ let string_of_bin_op logger op =
       with
       | Loggers.SBML -> "<power/>"
       | Loggers.Maple | Loggers.Mathematica
+      | Loggers.DOTNET
       | Loggers.Octave | Loggers.Matlab -> "**"
       | Loggers.Json
       | Loggers.Matrix
@@ -299,6 +320,7 @@ let string_of_bool_op logger op =
         format
       with
       | Loggers.SBML -> "<and/>"
+      | Loggers.DOTNET
       | Loggers.Maple | Loggers.Mathematica
       | Loggers.Octave | Loggers.Matlab -> "&"
       | Loggers.Json
@@ -313,6 +335,7 @@ let string_of_bool_op logger op =
         format
       with
       | Loggers.SBML -> "<or/>"
+      | Loggers.DOTNET
       | Loggers.Maple | Loggers.Mathematica
       | Loggers.Octave | Loggers.Matlab -> "|"
       | Loggers.Matrix

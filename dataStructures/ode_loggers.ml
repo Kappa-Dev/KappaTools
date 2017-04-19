@@ -1673,7 +1673,7 @@ let apply_correct string_of_var correct var  =
     correct
   with
   | Nil | Div 1 | Mul 1 -> var_string
-  | Div i -> var_string^"/"^(string_of_int i)
+  | Div i -> var_string^"/e1"^(string_of_int i)
   | Mul i -> (string_of_int i)^"*"^var_string
 
 let apply_empty correct =
@@ -1681,10 +1681,45 @@ let apply_empty correct =
     correct
   with
   | Nil | Div 1 | Mul 1 -> ""
-  | Div i -> "/"^(string_of_int i)
+  | Div i -> "/e"^(string_of_int i)
   | Mul i -> "*"^(string_of_int i)
 
-let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list =
+
+let correct_rates logger ~nauto_in_lhs ~nocc bool =
+  if nauto_in_lhs = nocc
+  then
+    bool
+  else
+  if nocc = 1 then
+    let () =
+      if bool
+      then
+        Loggers.fprintf logger "/%i" nauto_in_lhs
+      else
+        Loggers.fprintf logger "1/%i" nauto_in_lhs
+    in
+    true
+  else if nauto_in_lhs = 1
+  then
+    let () =
+      if bool
+      then
+        Loggers.fprintf logger "*%i" nocc
+      else
+        Loggers.fprintf logger "%i" nocc
+    in
+    true
+  else
+    let () =
+      if bool
+      then
+        Loggers.fprintf logger "*%i/%i" nocc nauto_in_lhs
+      else
+        Loggers.fprintf logger "%i/%i" nocc nauto_in_lhs
+    in
+    true
+
+let gen string logger var_species ~nauto_in_species ~nauto_in_lhs ~nocc var_rate var_list =
   let format = Loggers.get_encoding_format logger in
   match
     format
@@ -1703,20 +1738,7 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_l
           let () = Loggers.fprintf logger "%i" nauto_in_species in
           true
       in
-      let bool =
-        if nauto_in_lhs =1
-        then
-          bool
-        else
-          let () =
-            if bool
-            then
-              Loggers.fprintf logger "/%i" nauto_in_lhs
-            else
-              Loggers.fprintf logger "1/%i" nauto_in_lhs
-          in
-          true
-      in
+      let bool = correct_rates logger ~nauto_in_lhs ~nocc bool in
       let () =
         if bool
         then
@@ -1747,7 +1769,7 @@ let consume = gen "-"
 let produce = gen "+"
 
 let gen_deriv
-    string logger var_species ~nauto_in_species ~nauto_in_lhs var_rate var_list dep =
+    string logger var_species ~nauto_in_species ~nauto_in_lhs ~nocc var_rate var_list dep =
   match
     Loggers.get_encoding_format logger
   with
@@ -1781,20 +1803,7 @@ let gen_deriv
                  let () = Loggers.fprintf logger "%i" nauto_in_species in
                  true
              in
-             let bool =
-               if nauto_in_lhs =1
-               then
-                 bool
-               else
-                 let () =
-                   if bool
-                   then
-                     Loggers.fprintf logger "/%i" nauto_in_lhs
-                   else
-                     Loggers.fprintf logger "1/%i" nauto_in_lhs
-                 in
-                 true
-             in
+             let bool = correct_rates logger ~nauto_in_lhs ~nocc bool in
              let () =
                if bool
                then
@@ -1846,20 +1855,7 @@ let gen_deriv
                 let () = Loggers.fprintf logger "%i" nauto_in_species in
                 true
             in
-            let bool =
-              if nauto_in_lhs =1
-              then
-                bool
-              else
-                let () =
-                  if bool
-                  then
-                    Loggers.fprintf logger "/%i" nauto_in_lhs
-                  else
-                    Loggers.fprintf logger "1/%i" nauto_in_lhs
-                in
-                true
-            in
+            let bool = correct_rates logger ~nauto_in_lhs ~nocc bool in
             let () =
               if bool
               then
@@ -1908,7 +1904,7 @@ let gen_deriv
 let consume_jac = gen_deriv "-"
 let produce_jac = gen_deriv "+"
 
-let update_token logger var_token ~nauto_in_lhs var_rate stoc_coef var_list =
+let update_token logger var_token ~nauto_in_lhs ~nocc var_rate stoc_coef var_list =
   match
     Loggers.get_encoding_format logger
   with
@@ -1919,16 +1915,7 @@ let update_token logger var_token ~nauto_in_lhs var_rate stoc_coef var_list =
       let () =
         Loggers.fprintf logger "%s%s%s+" var_lhs (affect_symbol logger) var_rhs
       in
-      let bool =
-        if nauto_in_lhs =1
-        then
-          false
-        else
-          let () =
-            Loggers.fprintf logger "1/%i" nauto_in_lhs
-          in
-          true
-      in
+      let bool = correct_rates logger ~nauto_in_lhs ~nocc false in
       let () =
         if bool
         then
@@ -1960,7 +1947,10 @@ let update_token logger var_token ~nauto_in_lhs var_rate stoc_coef var_list =
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let update_token_jac logger var_token ~nauto_in_lhs var_rate var_stoc var_list dep_rate ~dep_mixture ~dep_token =
+
+let update_token_jac
+    logger var_token ~nauto_in_lhs ~nocc
+    var_rate var_stoc var_list dep_rate ~dep_mixture ~dep_token =
   match
     Loggers.get_encoding_format logger
   with
@@ -1985,16 +1975,7 @@ let update_token_jac logger var_token ~nauto_in_lhs var_rate var_stoc var_list d
                logger "%s%s%s+"
                var_dt_lhs (affect_symbol logger) var_dt_rhs
            in
-           let bool =
-             if nauto_in_lhs =1
-             then
-               false
-             else
-               let () =
-                 Loggers.fprintf logger "1/%i" nauto_in_lhs
-               in
-               true
-           in
+           let bool = correct_rates logger ~nauto_in_lhs ~nocc false in
            let () =
              if bool
              then
@@ -2046,16 +2027,7 @@ let update_token_jac logger var_token ~nauto_in_lhs var_rate var_stoc var_list d
               (affect_symbol logger)
               var_dt_rhs
           in
-          let bool =
-            if nauto_in_lhs =1
-            then
-              false
-            else
-              let () =
-                Loggers.fprintf logger "1/%i" nauto_in_lhs
-              in
-              true
-          in
+          let bool = correct_rates logger ~nauto_in_lhs ~nocc false in
           let () =
             if bool
             then
@@ -2108,16 +2080,7 @@ let update_token_jac logger var_token ~nauto_in_lhs var_rate var_stoc var_list d
                   (variable_of_derived_variable var_token h)
               in
               let () = Loggers.fprintf logger "%s=%s+" var_dt_lhs var_dt_rhs in
-              let bool =
-                if nauto_in_lhs =1
-                then
-                  false
-                else
-                  let () =
-                    Loggers.fprintf logger "1/%i" nauto_in_lhs
-                  in
-                  true
-              in
+              let bool = correct_rates logger ~nauto_in_lhs ~nocc false in
               let () =
                 if bool
                 then
@@ -2800,3 +2763,21 @@ let launch_main logger =
   | Loggers.TXT
   | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
+
+let smash_reactions mode _parameters =
+  match mode with
+  | Loggers.DOTNET -> true
+  | Loggers.Octave
+  | Loggers.SBML
+  | Loggers.Matlab
+  | Loggers.Mathematica
+  | Loggers.Maple
+  | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix
+  | Loggers.HTML_Graph
+  | Loggers.HTML
+  | Loggers.HTML_Tabular
+  | Loggers.TXT
+  | Loggers.TXT_Tabular
+  | Loggers.XLS -> false

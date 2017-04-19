@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 07 2017>
+  * Last modification: Time-stamp: <Apr 18 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -18,6 +18,7 @@ sig
   val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
 
   val network_from_compil:
+    smash_reactions:bool ->
     ignore_obs:bool ->
     Remanent_parameters_sig.parameters ->
     I.compil ->
@@ -26,8 +27,8 @@ sig
 
   val get_reactions:
     ('a,'b) network ->
-    (ode_var_id list * ode_var_id list *
-     ode_var_id Locality.annot  list  * I.rule) list
+    ((ode_var_id list * ode_var_id list *
+      ode_var_id Locality.annot  list  * I.rule)*int) list
 
   val export_network:
     command_line:string -> command_line_quotes:string ->

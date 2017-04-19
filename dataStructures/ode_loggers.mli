@@ -64,14 +64,15 @@ val associate_nonnegative: Loggers.t -> bool -> unit
 val show_time_advance: Loggers.t -> unit
 val launch_main: Loggers.t -> unit
 
-val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
-val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
-val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
-val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
+val consume: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> nocc:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
+val produce: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> nocc:int -> Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list -> unit
+val consume_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> nocc:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
+val produce_jac: Loggers.t -> Ode_loggers_sig.variable -> nauto_in_species:int -> nauto_in_lhs:int -> nocc:int -> Ode_loggers_sig.variable -> (int * correct) list -> Mods.IntSet.t -> unit
 val update_token_jac:
   Loggers.t ->
   Ode_loggers_sig.variable ->
   nauto_in_lhs:int ->
+  nocc:int ->
   Ode_loggers_sig.variable ->
   Ode_loggers_sig.variable -> (Ode_loggers_sig.ode_var_id * correct) list ->
   Mods.IntSet.t ->
@@ -81,7 +82,7 @@ val update_token_jac:
 
 val update_token:
   Loggers.t -> Ode_loggers_sig.variable ->
-  nauto_in_lhs:int -> Ode_loggers_sig.variable ->
+  nauto_in_lhs:int -> nocc:int -> Ode_loggers_sig.variable ->
   Ode_loggers_sig.variable -> (Ode_loggers_sig.variable * correct) list ->
   unit
 
@@ -98,3 +99,5 @@ val print_comment:
 val open_procedure: Loggers.t -> string -> string -> string list -> unit
 val return: Loggers.t -> string -> unit
 val close_procedure: Loggers.t -> unit
+
+val smash_reactions: Loggers.encoding -> Remanent_parameters_sig.parameters -> bool
