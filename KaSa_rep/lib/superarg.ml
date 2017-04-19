@@ -49,6 +49,7 @@ type spec =
   | String of string ref                  (* Sets a string value *)
   | String_opt of string option ref       (* Sets an optional string value *)
   | String_list of string list ref        (* Sets a list of strings *)
+  | StringNbr_list of (string * string) list ref (* Sets a list of pairs of strings *)
   | Float of float ref                    (* Sets a float value *)
   | Float_opt of float option ref         (* Sets an optional  float value *)
 
@@ -160,6 +161,7 @@ let check (a:t) =
               then failwith ("Unknown option "^s^" in multi-option "^key))
         in f a; f b
       | Void | Int _ | Float _ | Choice _ | Bool _ | Int_opt _ | String _
+      | StringNbr_list _
       | String_opt _ | String_list _ | Float_opt _ | Choice_list (_, _)
       | MultiExt _ -> () ) a
 
@@ -196,12 +198,26 @@ let print_option verbose f (key,spec,msg,_cat,_lvl) =
       | Some "" -> Format.fprintf f "  %s <name>   (default: disabled)@." key2
       | Some s  -> Format.fprintf f
                      "  %s <name>   (default %s)@." key2 s)
-   | String_list r ->
+   | String_list r  ->
      (match !r with
       | [] -> Format.fprintf f
                 "  %s <names> ...   (default: disabled)@." key2
       | l  -> Format.fprintf f "  %s <names> ...   (default %a)@." key2
                 (Pp.list Pp.space Format.pp_print_string) l)
+   | StringNbr_list r ->
+       (match !r with
+        | [] -> Format.fprintf f
+                  "  %s <names> <...   (default: disabled)@." key2
+        | l  ->
+          let rec aux list =
+            match list with
+              (h1,h2)::tail ->
+              let () =
+                Format.fprintf f "  %s <names> <value> (default %s %s)" key2
+                  h1 h2
+              in aux tail
+            | [] -> Format.fprintf f "@."
+          in aux l)
    | Float r -> Format.fprintf f "  %s <float>   (default %f)@." key !r
    | Float_opt r ->
      (match !r with
@@ -325,6 +341,11 @@ let parse_list (a:t) (l:string list) : string list =
             | String_list _, (""::rem) when opt=key -> rem
             | String_list r, (v::rem) when opt=key -> r := v::(!r); rem
             | String_list r, rem -> r := []; rem
+            | StringNbr_list _, (""::rem) when opt=key -> rem
+            | StringNbr_list _, ([a]) when opt=key -> failwith "invalid pair"
+            | StringNbr_list r, (v'::v::rem) when opt=key -> r := (v,v')::(!r); rem
+            | StringNbr_list r, rem -> r := []; rem
+
             | Float r, (""::rem) when opt=key -> r := 0.; rem
             | Float r, (v::rem) when opt=key -> r := float_of_string v; rem
             | Float_opt r, (""::rem) when opt=key -> r := None; rem

@@ -39,6 +39,11 @@ let set_visibility (a,b) =
   set_visibility a;
   set_visibility_bis b
 
+let plist_to_list l =
+  List.fold_left
+    (fun l (a,b) -> a::b::l)
+    []
+    (List.rev l)
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
@@ -56,6 +61,7 @@ let widget_update_from_spec (a:Superarg.t) =
       | Superarg.String r -> set key !r
       | Superarg.String_opt r -> set key (match !r with None -> "" | Some s -> s)
       | Superarg.String_list r -> set key (String.concat " " !r)
+      | Superarg.StringNbr_list r -> set key (String.concat " " (plist_to_list !r))
       | Superarg.Float r -> set key (string_of_float (!r))
       | Superarg.Float_opt r ->
 	  set key (match !r with None -> "" | Some f -> string_of_float f)
@@ -91,10 +97,10 @@ let widget_update_from_cmd (a:Superarg.t) l =
 	  | (Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.Float _ |
 	    Superarg.Float_opt _ | Superarg.Choice _ ), (v::rem) when opt=key ->
 	      set key v; rem
-      | Superarg.String_list _,  (v::rem) when opt=key ->
+   | (Superarg.String_list _ | Superarg.StringNbr_list _),  (v::rem) when opt=key ->
 	      set key ((get key)^" "^v); rem
 	  | (Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.Float _ |
-	    Superarg.Float_opt _ | Superarg.Choice _ | Superarg.String_list _), rem ->
+      Superarg.Float_opt _ | Superarg.Choice _ | Superarg.String_list _ | Superarg.StringNbr_list _), rem ->
 	      set key ""; rem
 	  | Superarg.Choice_list _, (v::rem) when opt=key ->
 	      set (key^"."^v) "1"; rem
@@ -156,8 +162,13 @@ let cmd_of_widget (a:Superarg.t) short =
 	  let v = Superarg.cut_list (get key) in
 	  if v = !r && short then accum
 	  else if v = [] then (Superarg.nokey key)::accum
-	  else List.fold_right (fun x accum -> key::x::accum) v accum
-      | Superarg.Float r ->
+   else List.fold_right (fun x accum -> key::x::accum) v accum
+   | Superarg.StringNbr_list r ->
+     let v = Superarg.cut_list (get key) in
+     if v = plist_to_list !r && short then accum
+     else if v = [] then (Superarg.nokey key)::accum
+     else List.fold_right (fun x accum -> key::x::accum) v accum
+   | Superarg.Float r ->
 	  let v = get key in
 	  if !r=(float_of_string v) && short then accum else key::v::accum
       | Superarg.Float_opt r ->
@@ -226,7 +237,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       let ext = match spec with
       | Superarg.Int _ | Superarg.Int_opt _ -> "<Superarg.Int>"
       | Superarg.String _ | Superarg.String_opt _ -> "<name>"
-      | Superarg.String_list _ -> "<names> ..."
+      | Superarg.String_list _ | Superarg.StringNbr_list _ -> "<names> ..."
       | Superarg.Float _ | Superarg.Float_opt _ -> "<float>"
       | _ -> ""
       in

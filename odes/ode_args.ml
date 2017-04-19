@@ -66,31 +66,27 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
       "sbml", "sbml backend"],
     ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
   "Select the backend format",
-  ["2_backend"],Normal;
-  "--dotnet-output",
-  Superarg.String_opt t.dotnet_output,
-  "ODEs file for DOTNET backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--maple-output",
   Superarg.String_opt t.maple_output,
   "ODEs file for maple backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--mathematica-output",
   Superarg.String_opt t.mathematica_output,
   "ODEs file for mathematica backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--matlab-output",
   Superarg.String_opt t.matlab_output,
   "ODEs file for matlab backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--octave-output",
   Superarg.String_opt t.octave_output,
   "ODEs file for octave backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--sbml-output",
   Superarg.String_opt t.sbml_output,
   "ODEs file for sbml backend",
-  ["2_backend"],Normal;
+  ["1_output"],Normal;
   "--rate-convention",
   Superarg.Choice (
     [ "KaSim","do not divide by anything";
@@ -98,22 +94,22 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
       "Biochemist","divide by the number of autos in the lhs of rules that induce an auto also in the rhs"],
     ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rate_convention),
     "convention for dividing constant rates",
-    ["0_semantics"],Normal;
+    ["2_semantics"],Normal;
   "--count",
   Superarg.Choice (
     [ "Embeddings","count the number of embeddings of patterns into species";
       "Occurrences","count the number of occurrences of species"],
     ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
     "tune whether we cound in embeddings or in occurrences",
-    ["0_semantics"],Normal;
+    ["2_semantics"],Normal;
     "--show-reactions",
   Superarg.Bool t.show_reactions,
     "Annotate ODEs by the corresponding chemical reactions",
-    ["2_backend"],Normal ;
+    ["1_output"],Normal ;
   "--compute-jacobian",
   Superarg.Bool t.compute_jacobian,
   "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)",
-  ["1_integration_settings"],Normal  ;
+  ["3_integration_settings"],Normal  ;
   "--with-symmetries",
   Superarg.Choice (
     ["None", "no symmetries reduction";
@@ -122,47 +118,47 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     ["none";"NONE";"BACKWARD";"backward";"forward";"FORWARD";"true";"TRUE";"True";"false";"FALSE";"False"],
     t.with_symmetries),
     "Tune which kind of bisimulation is used to reduce the set of species",
-    ["0_semantics";"3_model_reduction"],Normal;
+    ["2_semantics";"4_model_reduction"],Normal;
   "--show-symmetries",
   Superarg.Bool t.show_symmetries,
   "Display the equivalence relations over the sites",
-    ["3_model_reduction"],Normal;
+    ["4_model_reduction"],Normal;
     "--views-domain",
   Superarg.Bool t.views,
     "Enable/disable views analysis when detecting symmetric sites",
-    ["4_static_analysis"],Expert    ;
+    ["5_static_analysis"],Expert    ;
   "--double-bonds-domain",
   Superarg.Bool t.dbonds,
   "Enable/disable double bonds analysis when detecting symmetric sites",
-  ["4_static_analysis"],Expert   ;
+  ["5_static_analysis"],Expert   ;
   "--site-across-bonds-domain",
   Superarg.Bool t.site_across ,
   "Enable/disable the analysis of the relation amond the states of sites in
-      connected agents",  ["4_static_analysis"],Expert    ;
+      connected agents",  ["5_static_analysis"],Expert    ;
   "--nonnegative",
   Superarg.Bool t.nonnegative,
   "Enable/disable the correction of negative concentrations in stiff ODE systems",
-  ["1_integration_settings"],Normal;
+  ["3_integration_settings"],Normal;
   "--show-time-advance",
   Superarg.Bool t.show_time_advance,
   "Display time advance during numerical integration",
-  ["5_debug_mode"],Expert;
+  ["6_debug_mode"],Expert;
   "--initial-step",
   Superarg.Float t.initial_step,
   "Initial integration step",
-  ["1_integration_settings"],Normal ;
+  ["3_integration_settings"],Normal ;
   "--max-step",
   Superarg.Float t.max_step,
   "Maximum integration step",
-  ["1_integration_settings"],Normal;
+  ["3_integration_settings"],Normal;
   "--relative-tolerance",
   Superarg.Float t.relative_tolerance,
   "tolerance to relative rounding errors",
-  ["1_integration_settings"],Normal;
+  ["3_integration_settings"],Normal;
   "--absolute-tolerance",
   Superarg.Float t.absolute_tolerance,
   "tolerance to absolute rounding errors",
-  ["1_integration_settings"],Normal;
+  ["3_integration_settings"],Normal;
 ]
 
 let get_option options =

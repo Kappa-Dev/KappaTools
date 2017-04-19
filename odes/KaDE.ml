@@ -14,15 +14,16 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let cli_args = Run_cli_args.default in
   let cli_args_gui = Run_cli_args.default_gui in
   let common_args = Common_args.default in
-  (*    let common_args_gui = Common_args.default_gui in*)
+  let common_args_gui = Common_args.default_gui in
   let ode_args = Ode_args.default in
   let options =
     Run_cli_args.options_gui cli_args_gui
       @ Ode_args.options ode_args
-    (* @ Common_args.options_gui common_args_gui*)
+      @ Common_args.options_gui common_args_gui
     in
   try
     let files = Ode_args.get_option options in
+    let () = Common_args.copy_from_gui common_args_gui common_args in
     let () = Run_cli_args.copy_from_gui cli_args_gui cli_args in
     let () = cli_args.Run_cli_args.inputKappaFileNames <- files in
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
