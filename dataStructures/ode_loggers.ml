@@ -403,7 +403,6 @@ let print_ode_preamble
               "<listOfCompartments>";
               "<compartment metaid=\"default\" id=\"default\" size=\"1\" units=\"volume\"/>";
               "</listOfCompartments>";
-
               ])
         in ()
       end
@@ -1673,7 +1672,7 @@ let apply_correct string_of_var correct var  =
     correct
   with
   | Nil | Div 1 | Mul 1 -> var_string
-  | Div i -> var_string^"/e1"^(string_of_int i)
+  | Div i -> var_string^"/"^(string_of_int i)
   | Mul i -> (string_of_int i)^"*"^var_string
 
 let apply_empty correct =
@@ -1681,7 +1680,7 @@ let apply_empty correct =
     correct
   with
   | Nil | Div 1 | Mul 1 -> ""
-  | Div i -> "/e"^(string_of_int i)
+  | Div i -> "/"^(string_of_int i)
   | Mul i -> "*"^(string_of_int i)
 
 

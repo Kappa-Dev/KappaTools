@@ -1828,7 +1828,7 @@ struct
         let () =
           Sbml_backend.open_box_dotnet logger_buffer "begin parameters"
         in
-        let () = Sbml_backend.line_dotnet_or_sbml logger_buffer in
+        let () = Sbml_backend.line_dotnet logger_buffer in
         (*---------------------------------------------------------------*)
         let () =
           Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
@@ -1873,7 +1873,7 @@ struct
         in
         let () = Ode_loggers.print_newline logger_buffer in
         let () =
-          Ode_loggers.associate_nonnegative logger nonnegative in
+          Ode_loggers.associate_nonnegative logger_buffer nonnegative in
         let () =
           Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
         in
@@ -2149,11 +2149,11 @@ struct
         Ode_loggers.show_time_advance logger
     in
     let () = Sbml_backend.open_box logger label in
-    let () = Ode_loggers.print_newline logger in
     let () = Sbml_backend.line_dotnet_or_sbml logger in
+    let () = Sbml_backend.line_dotnet logger in
     let () = Sbml_backend.open_box_dotnet logger label_dotnet in
     let () = Ode_loggers.print_newline logger in
-    let () = Sbml_backend.line_dotnet_or_sbml logger in
+    let () = Sbml_backend.line_dotnet logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
     in
@@ -2741,7 +2741,7 @@ struct
     let () = Sbml_backend.open_box logger label in
     let () = Sbml_backend.line_dotnet_or_sbml logger in
     let () = Sbml_backend.open_box_dotnet logger label_dotnet in
-    let () = Sbml_backend.line_dotnet_or_sbml logger in
+    let () = Sbml_backend.line_dotnet logger in
     let () =
       Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Ode_loggers.print_newline logger in
@@ -2795,7 +2795,11 @@ struct
                           (fst
                              (Mods.DynArray.get network.species_tab k))
                       ) k, Some ""
-                | _ -> "", "", None
+                | _ -> "", Format.asprintf "%a"
+                  (fun log k -> I.print_chemical_species ~compil log
+                      (fst
+                         (Mods.DynArray.get network.species_tab k))
+                  ) k, None
             end
         in
         let () = Ode_loggers.declare_init ~comment logger k in

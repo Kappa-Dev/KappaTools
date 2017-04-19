@@ -106,6 +106,9 @@ let line_dotnet_or_sbml logger =
   do_dotnet_or_sbml logger
     Loggers.print_newline
 
+let line_dotnet logger =
+  do_dotnet logger Loggers.print_newline
+
 let extend s =
   if s="" || String.sub s 0 1 = " "  then s else " "^s
 
@@ -124,7 +127,7 @@ let close_box logger label =
 
 let close_box_dotnet logger label =
   print_dotnet logger label ;
-  line_dotnet_or_sbml logger
+  line_dotnet logger
 
 let single_box ?options:(options=fun () -> "") logger label =
   let () =
@@ -575,7 +578,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
       | Alg_expr.CONST (Nbr.I n)  ->
         let () =
           do_sbml logger (fun loggger ->
-              Loggers.fprintf logger "<cn type=\"integer\"> %i e1 </cn>" n
+              Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
             )
         in
         do_dotnet logger (fun loggger ->
@@ -616,17 +619,17 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
             Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
         end
       | Alg_expr.KAPPA_INSTANCE x ->
-        Loggers.fprintf logger "<ci>s%i </ci>"
+        Loggers.fprintf logger "<ci>s%i</ci>"
           (network.Network_handler.int_of_kappa_instance x)
       | Alg_expr.TOKEN_ID x ->
-        Loggers.fprintf logger "<ci>t%i </ci>"
+        Loggers.fprintf logger "<ci>t%i</ci>"
           (network.Network_handler.int_of_token_id x)
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
         Loggers.fprintf logger "<ci>tend</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
         Loggers.fprintf logger "<ci>0</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-        Loggers.fprintf logger "<apply2>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
+        Loggers.fprintf logger "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
           (Loggers_string_of_op.string_of_bin_op logger Operator.MULT)
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
         Loggers.fprintf logger "<ci>0</ci>"
@@ -1279,7 +1282,7 @@ in
              else
              if correct = 1
              then
-               add_box ~break logger "apply1" ""
+               add_box ~break logger "apply" ""
                  (fun logger ->
                     let () =
                       Loggers.fprintf logger
@@ -1300,7 +1303,7 @@ in
                  )
              else
              if nocc=1 then
-             add_box ~break logger "apply2" ""
+             add_box ~break logger "apply" ""
                (fun logger ->
                   let () =
                     Loggers.fprintf logger
@@ -1320,7 +1323,7 @@ in
                   ()
                )
              else
-               add_box ~break logger "apply3" ""
+               add_box ~break logger "apply" ""
                  (fun logger ->
                     let () =
                       Loggers.fprintf logger
@@ -1403,7 +1406,7 @@ in
                     var_rule)
              else
              if nocc = 1 then
-               add_box ~break logger "apply4" ""
+               add_box ~break logger "apply" ""
                  (fun logger ->
                     let () = Loggers.fprintf logger "<divide/>" in
                     let () =
@@ -1423,7 +1426,7 @@ in
                  )
              else if correct=1
              then
-               add_box ~break logger "apply5" ""
+               add_box ~break logger "apply" ""
                  (fun logger ->
                     let () = Loggers.fprintf logger "<times/>" in
                     let () =
@@ -1442,7 +1445,7 @@ in
                     ()
                  )
              else
-               add_box ~break logger "apply6" ""
+               add_box ~break logger "apply" ""
                  (fun logger ->
                     let () = Loggers.fprintf logger "<times/>" in
                     let () =
@@ -1483,7 +1486,7 @@ in
          | [] ->
            f logger
          | _::_ ->
-           add_box ~break logger "apply7" ""
+           add_box ~break logger "apply" ""
              (fun logger ->
                 let () = Loggers.fprintf logger "<times/>" in
                 let () = f logger in
@@ -1493,7 +1496,7 @@ in
                   | [t] ->
                     dump_pair logger t
                   | t::q ->
-                    add_box ~break logger "apply8" ""
+                    add_box ~break logger "apply" ""
                       (fun logger ->
                          let () = Loggers.fprintf logger "<times/>" in
                          let () = dump_pair logger t in
