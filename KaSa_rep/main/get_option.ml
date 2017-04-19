@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Apr 08 2017>
+  * Last modification: Time-stamp: <Apr 19 2017>
   * *
   * primitive to parse command-line options
   *
@@ -310,18 +310,21 @@ let options =
       "put the log files in this directory",
       ["1_Output";"7_Debugging_info"],
       Expert;
-
-
-
-
-
-
-      "--debugging-mode",
+      "--debug",
       Bool Config.trace,
       "dump debugging information",
       ["7_Debugging_info"],
       Expert;
-
+      "--debug-mode",
+      Bool Config.trace,
+      "dump debugging information",
+      ["7_Debugging_info"],
+      Hidden;
+      "--debugging-mode",
+      Bool Config.trace,
+      "dump debugging information",
+      ["7_Debugging_info"],
+      Hidden;
       "--unsafe-mode",
       Bool Config.unsafe,
       "Exceptions are gathered at the end of the computation, instead of halting it ",

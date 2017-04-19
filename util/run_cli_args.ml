@@ -23,7 +23,7 @@ type t = {
 
 type t_gui =
   {
-    alg_var_overwrite_gui   : string list ref;
+    alg_var_overwrite_gui   : (string * string) list ref;
     minValue_gui            : float option ref;
     maxValue_gui            : float option ref;
     plotPeriod_gui          : float option ref;
@@ -70,14 +70,13 @@ let default_gui =
 
 let rec aux l accu =
   match l with
-  | v::var_val::tail ->
+  | (v,var_val)::tail ->
     aux tail
       ((v,
         (try Nbr.of_string var_val with
            Failure _ ->
            raise (Arg.Bad ("\""^var_val^"\" is not a valid value"))))   ::accu)
   | [] -> accu
-  | _::_ -> raise (Arg.Bad ("Bad number of arguments in -var option"))
 
 let get_from_gui t_gui =
   {
@@ -129,12 +128,12 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Arg.Float (fun time -> t.minValue <- Some time),
    (Superarg.Float_opt t_gui.minValue_gui),
    "Min time of simulation (arbitrary time unit)",
-   ["0_model";"2_integration_settings"],Superarg.Normal);
+   ["0_model";"3_integration_settings"],Superarg.Normal);
   ("-l",
    Arg.Float(fun time -> t.maxValue <- Some time),
    (Superarg.Float_opt t_gui.maxValue_gui),
    "Limit of the simulation",
-   ["0_model";"2_integration_settings"],Superarg.Normal);
+   ["0_model";"3_integration_settings"],Superarg.Normal);
   ("-t",
    Arg.Float (fun f ->
        raise (Arg.Bad ("Option '-t' has been replace by '[-u time] -l "^
@@ -146,7 +145,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Arg.Float (fun pointNumberValue -> t.plotPeriod <- Some pointNumberValue),
    Superarg.Float_opt t_gui.plotPeriod_gui,
    "plot period: time interval between points in plot (default: 1.0)",
-  ["0_model";"2_integration_settings"],Superarg.Normal);
+  ["0_model";"3_integration_settings"],Superarg.Normal);
   ("-var",
    Arg.Tuple
      (let tmp_var_name = ref "" in
@@ -158,7 +157,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
                 Failure _ ->
                 raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
              ::t.alg_var_overwrite)]),
-   Superarg.String_list t_gui.alg_var_overwrite_gui,
+   Superarg.StringNbr_list t_gui.alg_var_overwrite_gui,
    "Set a variable to a given value",
    ["0_model"],Superarg.Hidden);
   ("-o",
@@ -166,12 +165,12 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
      (fun outputDataFile -> t.outputDataFile <- Some outputDataFile),
    Superarg.String_opt t_gui.outputDataFile_gui,
    "file name for data output",
-   ["0_model"; "2_integration_settings"], Superarg.Normal) ;
+   ["0_model"; "3_integration_settings"], Superarg.Normal) ;
   ("-d",
    Arg.String (fun outputDirectory -> t.outputDirectory <- outputDirectory),
    Superarg.String t_gui.outputDirectory_gui,
    "Specifies directory name where output file(s) should be stored",
-   ["0_model"; "2_integration_settings"], Superarg.Normal) ;
+   ["0_model"; "3_integration_settings"], Superarg.Normal) ;
   ("-load-sim",
    Arg.String (fun file -> t.marshalizedInFile <- file),
    Superarg.String t_gui.marshalizedInFile_gui,
@@ -194,7 +193,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
     Arg.Float (fun i -> t.rescale <- Some i),
     Superarg.Float_opt t_gui.rescale_gui,
     "Apply rescaling factor to initial condition",
-    ["0_model"; "2_integration_settings"], Superarg.Normal ;)
+    ["0_model"; "3_integration_settings"], Superarg.Normal ;)
 ]
 
 let options t =
