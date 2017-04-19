@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 18 2017>
+  * Last modification: Time-stamp: <Apr 20 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -12,24 +12,23 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     [--relative-tolerance float] [--absolute-tolerance float]\n"
   in
   let cli_args = Run_cli_args.default in
+  let cli_args_gui = Run_cli_args.default_gui in
   let common_args = Common_args.default in
+  (*    let common_args_gui = Common_args.default_gui in*)
   let ode_args = Ode_args.default in
   let options =
-    Run_cli_args.options cli_args
-    @ Ode_args.options ode_args
-      @ Common_args.options common_args
-  in
+    Run_cli_args.options_gui cli_args_gui
+      @ Ode_args.options ode_args
+    (* @ Common_args.options_gui common_args_gui*)
+    in
   try
-    Arg.parse
-      options
-      (fun fic ->
-         cli_args.Run_cli_args.inputKappaFileNames <-
-           fic::(cli_args.Run_cli_args.inputKappaFileNames))
-      usage_msg;
+    let files = Ode_args.get_option options in
+    let () = Run_cli_args.copy_from_gui cli_args_gui cli_args in
+    let () = cli_args.Run_cli_args.inputKappaFileNames <- files in
     let () = Kappa_files.set_dir cli_args.Run_cli_args.outputDirectory in
     let () = Parameter.debugModeOn := common_args.Common_args.debug in
     let backend =
-      match Tools.lowercase ode_args.Ode_args.backend with
+      match Tools.lowercase !(ode_args.Ode_args.backend) with
       | "octave" -> Loggers.Octave
       | "matlab" -> Loggers.Matlab
       | "mathematica" -> Loggers.Mathematica
@@ -38,22 +37,22 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | "sbml" -> Loggers.SBML
       | s ->
         begin
-          Arg.usage options usage_msg;
+          (*Arg.usage options usage_msg;*)
           Debug.tag
             Format.std_formatter
-            ("Wrong option "^s^".\nOnly Matlab, Octave, DOTNET and SBML backends are supported.");
+            ("Wrong option "^s^".\nOnly DOTNET, Matlab, Mathematica, Maple, Octave, and SBML backends are supported.");
           exit 0
         end
     in
     let rate_convention =
-      match Tools.lowercase ode_args.Ode_args.rate_convention with
+      match Tools.lowercase !(ode_args.Ode_args.rate_convention) with
     | "kasim" -> Remanent_parameters_sig.No_correction
     | "divide_by_nbr_of_autos_in_lhs" ->
       Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
     | "biochemist" -> Remanent_parameters_sig.Biochemist
     | s ->
       begin
-        Arg.usage options usage_msg;
+        (*Arg.usage options usage_msg;*)
         Debug.tag
           Format.std_formatter
           ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
@@ -62,7 +61,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let () =
       match
-        ode_args.Ode_args.matlab_output
+        !(ode_args.Ode_args.matlab_output)
       with
       | None -> ()
       | Some s ->
@@ -72,7 +71,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let () =
       match
-        ode_args.Ode_args.octave_output
+        !(ode_args.Ode_args.octave_output)
       with
       | None -> ()
       | Some s ->
@@ -94,7 +93,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     (*dotnet*)
     let () =
       match
-        ode_args.Ode_args.dotnet_output
+      ode_args.Ode_args.dotnet_output
       with
       | None -> ()
       | Some s ->
@@ -103,27 +102,27 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           s
     in
     let count =
-      match Tools.lowercase ode_args.Ode_args.count with
+      match Tools.lowercase !(ode_args.Ode_args.count) with
       | "embedding" | "embeddings" -> Ode_args.Embeddings
       | "occurrences" | "occurrence" | "instances" | "instance"->
         Ode_args.Occurrences
     | s ->
       begin
-        Arg.usage options usage_msg;
+        (*Arg.usage options usage_msg;*)
         Debug.tag
           Format.std_formatter
           ("Wrong option "^s^".\nOnly Embeddings and Occurrences are supported.");
         exit 0
       end
     in
-    let show_reactions = ode_args.Ode_args.show_reactions in
-    let compute_jacobian = ode_args.Ode_args.compute_jacobian in
-    let show_time_advance = ode_args.Ode_args.show_time_advance in
-    let nonnegative = ode_args.Ode_args.nonnegative in
-    let initial_step = ode_args.Ode_args.initial_step in
-    let max_step = ode_args.Ode_args.max_step in
-    let reltol = ode_args.Ode_args.relative_tolerance in
-    let abstol= ode_args.Ode_args.absolute_tolerance in
+    let show_reactions = !(ode_args.Ode_args.show_reactions) in
+    let compute_jacobian = !(ode_args.Ode_args.compute_jacobian) in
+    let show_time_advance = !(ode_args.Ode_args.show_time_advance) in
+    let nonnegative = !(ode_args.Ode_args.nonnegative) in
+    let initial_step = !(ode_args.Ode_args.initial_step) in
+    let max_step = !(ode_args.Ode_args.max_step) in
+    let reltol = !(ode_args.Ode_args.relative_tolerance) in
+    let abstol= !(ode_args.Ode_args.absolute_tolerance) in
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
       | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
@@ -178,22 +177,17 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let parameters' = parameters in
     let ground, forward, backward = 0,1,2 in
     let reduction =
-      match ode_args.Ode_args.with_symmetries
+      match Tools.lowercase !(ode_args.Ode_args.with_symmetries)
       with
-      | None -> ground
-      | Some string ->
-        begin
-          match Tools.lowercase string with
-          | "none" | "ground" | "false" -> ground
-          | "true" | "forward" -> forward
-          | "backward" -> backward
-          | _ -> ground
-        end
+      | "none" | "ground" | "false" -> ground
+      | "true" | "forward" -> forward
+      | "backward" -> backward
+      | _ -> ground
     in
     let network =
       if
         (not (reduction = ground))
-      || ode_args.Ode_args.show_symmetries
+        || !(ode_args.Ode_args.show_symmetries)
       then
         let module B =
           (val Domain_selection.select_domain
@@ -254,7 +248,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             network
         in
         let () =
-          if ode_args.Ode_args.show_symmetries
+          if !(ode_args.Ode_args.show_symmetries)
           then
             A.print_symmetries
               parameters compil

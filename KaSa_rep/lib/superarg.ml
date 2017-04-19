@@ -94,13 +94,17 @@ let iskey (k:key) = String.length k > 2 && k.[0]='-' && k.[1]='-'
 let nokey (k:key) =
   if String.length k > 2 && k.[0]='-' && k.[1]='-'
   then "--no-"^(String.sub k 2 (String.length k-2))
-  else failwith (k^" option does not begin with --")
+  else if String.length k > 1 && k.[0]='-'
+  then "-no-"^(String.sub k 1 (String.length k-1))
+  else failwith (k^" option (no) does not begin with -- nor -")
 
 (* --XXX => --(no-)XXX *)
 let altkey (k:key) =
   if String.length k > 2 && k.[0]='-' && k.[1]='-'
   then "--(no-)"^(String.sub k 2 (String.length k-2))
-  else failwith (k^" option does not begin with --")
+  else if String.length k > 1 && k.[0]='-'
+  then "-no-"^(String.sub k 1 (String.length k-1))
+  else failwith (k^" option (alt) does not begin with -- not - ")
 
 
 (* concats a string list with a separator *)

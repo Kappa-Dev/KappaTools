@@ -1,131 +1,178 @@
+open Superarg
+
 type count = Embeddings | Occurrences
 
 type t = {
-  mutable backend : string ;
-  mutable rate_convention : string ;
-  mutable count : string ;
-  mutable show_reactions : bool ;
-  mutable compute_jacobian : bool ;
-  mutable octave_output : string option ;
-  mutable matlab_output : string option ;
-  mutable maple_output : string option ;
-  mutable mathematica_output : string option ;
-  mutable sbml_output : string option ;
-  mutable dotnet_output : string option ;
-  mutable with_symmetries : string option ;
-  mutable show_symmetries : bool ;
-  mutable views : bool ;
-  mutable dbonds : bool ;
-  mutable site_across : bool ;
-  mutable nonnegative : bool ;
-  mutable show_time_advance : bool ;
-  mutable initial_step : float ;
-  mutable max_step : float ;
-  mutable relative_tolerance : float ;
-  mutable absolute_tolerance : float ;
+  mutable backend : string ref ;
+  mutable rate_convention : string ref ;
+  mutable count : string ref ;
+  mutable show_reactions : bool ref ;
+  mutable compute_jacobian : bool ref ;
+  mutable octave_output : string option ref ;
+  mutable matlab_output : string option ref ;
+  mutable maple_output : string option ref ;
+  mutable mathematica_output : string option ref ;
+  mutable sbml_output : string option ref ;
+  mutable dotnet_output : string option ref ;
+  mutable with_symmetries : string ref ;
+  mutable show_symmetries : bool ref ;
+  mutable views : bool ref ;
+  mutable dbonds : bool ref ;
+  mutable site_across : bool ref;
+  mutable nonnegative : bool ref ;
+  mutable show_time_advance : bool ref;
+  mutable initial_step : float ref ;
+  mutable max_step : float ref ;
+  mutable relative_tolerance : float ref ;
+  mutable absolute_tolerance : float ref ;
 }
 
 let default : t =
   {
-    backend = "Octave" ;
-    rate_convention = "Divide_by_nbr_of_autos_in_lhs" ;
-    count = "Embeddings" ;
-    show_reactions = true ;
-    compute_jacobian = true ;
-    octave_output = None  ;
-    matlab_output = None ;
-    maple_output = None ;
-    mathematica_output = None ;
-    sbml_output = None ;
-    dotnet_output = None ;
-    with_symmetries = None ;
-    show_symmetries = false ;
-    views = true ;
-    dbonds = true ;
-    site_across = true ;
-    nonnegative = false ;
-    show_time_advance = false ;
-    initial_step = 0.00001 ;
-    max_step = 0.02 ;
-    absolute_tolerance = 0.001 ;
-    relative_tolerance = 0.001 ;
+    backend = ref "Octave" ;
+    rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
+    count = ref "Embeddings" ;
+    show_reactions = ref true ;
+    compute_jacobian = ref true ;
+    dotnet_output = ref None ;
+    octave_output = ref None  ;
+    matlab_output = ref None ;
+    maple_output = ref None ;
+    mathematica_output = ref None ;
+    sbml_output = ref None ;
+    with_symmetries = ref "None" ;
+    show_symmetries = ref false ;
+    views = ref true ;
+    dbonds = ref true ;
+    site_across = ref true ;
+    nonnegative = ref false ;
+    show_time_advance = ref false ;
+    initial_step = ref 0.00001 ;
+    max_step = ref 0.02 ;
+    absolute_tolerance = ref 0.001 ;
+    relative_tolerance = ref 0.001 ;
   }
 
-let options (t :t)  : (string * Arg.spec * string) list = [
+let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
+                       Superarg.category list * Superarg.level) list =
+   [
   "--ode-backend",
-   Arg.String (fun backend -> t.backend <- backend),
-  "Available backends are Octave, Maple (in progress), Matlab, Mathematica (in progress), and SBML " ;
-   "--maple-output",
-   Arg.String (fun backend -> t.maple_output <- Some backend),
-   "ODEs file for maple backend";
-  "--mathematica-output",
-   Arg.String (fun backend -> t.mathematica_output <- Some backend),
-   "ODEs file for mathematica backend";
-  "--matlab-output",
-  Arg.String (fun backend -> t.matlab_output <- Some backend),
-  "ODEs file for matlab backend";
-  "--octave-output",
-  Arg.String (fun backend -> t.octave_output <- Some backend),
-  "ODEs file for octave backend";
-  (*sbml*)
-  "--sbml-output",
-  Arg.String (fun backend -> t.sbml_output <- Some backend),
-  "ODEs file for sbml backend";
-  (*dotnet*)
+  Superarg.Choice (
+    [ "dotnet", "dotnet (BNGL) backend";
+      "octave", "octave backend";
+      "matlab", "matlab backend";
+      "mathematica", "mathematica backend (in progress)";
+      "maple", "maple backend (in progress)";
+      "sbml", "sbml backend"],
+    ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
+  "Select the backend format",
+  ["2_backend"],Normal;
   "--dotnet-output",
-  Arg.String (fun backend -> t.dotnet_output <- Some backend),
-  "ODEs file for dotnet backend";
+  Superarg.String_opt t.dotnet_output,
+  "ODEs file for DOTNET backend",
+  ["2_backend"],Normal;
+  "--maple-output",
+  Superarg.String_opt t.maple_output,
+  "ODEs file for maple backend",
+  ["2_backend"],Normal;
+  "--mathematica-output",
+  Superarg.String_opt t.mathematica_output,
+  "ODEs file for mathematica backend",
+  ["2_backend"],Normal;
+  "--matlab-output",
+  Superarg.String_opt t.matlab_output,
+  "ODEs file for matlab backend",
+  ["2_backend"],Normal;
+  "--octave-output",
+  Superarg.String_opt t.octave_output,
+  "ODEs file for octave backend",
+  ["2_backend"],Normal;
+  "--sbml-output",
+  Superarg.String_opt t.sbml_output,
+  "ODEs file for sbml backend",
+  ["2_backend"],Normal;
   "--rate-convention",
-  Arg.String (fun rate_convention -> t.rate_convention <- rate_convention),
-  "Tune which correction is applied to rule rates \n\t KaSim -> we do not divide; \n\t Divide_by_nbr_of_autos_in_lhs -> we divide by the number of autos in the lhs \n\t Biochemist -> we divide by the number of autos in the lhs that induce an auto in the rhs" ;
+  Superarg.Choice (
+    [ "KaSim","do not divide by anything";
+      "Divide_by_nbr_of_autos_in_lhs","divide by the number of autos in the lhs of rules";
+      "Biochemist","divide by the number of autos in the lhs of rules that induce an auto also in the rhs"],
+    ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rate_convention),
+    "convention for dividing constant rates",
+    ["0_semantics"],Normal;
   "--count",
-  Arg.String (fun count -> t.count <- count),
-  "Tune whether ode variables denote number of occurrences or number of embeddings" ;
-  "--show-reactions",
-  Arg.Bool (fun show_reactions -> t.show_reactions <- show_reactions),
-  "Annotate ODEs by the corresponding chemical reactions" ;
+  Superarg.Choice (
+    [ "Embeddings","count the number of embeddings of patterns into species";
+      "Occurrences","count the number of occurrences of species"],
+    ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
+    "tune whether we cound in embeddings or in occurrences",
+    ["0_semantics"],Normal;
+    "--show-reactions",
+  Superarg.Bool t.show_reactions,
+    "Annotate ODEs by the corresponding chemical reactions",
+    ["2_backend"],Normal ;
   "--compute-jacobian",
-  Arg.Bool (fun compute_jacobian -> t.compute_jacobian <- compute_jacobian),
-  "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)" ;
+  Superarg.Bool t.compute_jacobian,
+  "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)",
+  ["1_integration_settings"],Normal  ;
   "--with-symmetries",
-  Arg.String (fun with_symmetries -> t.with_symmetries <- Some with_symmetries),
-  "Tune which kind of bisimulation is used to reduce the set of species";
+  Superarg.Choice (
+    ["None", "no symmetries reduction";
+     "Backward", "use the symmetries satisfied by the rules and the algebraic expressions";
+     "Forward", "use the symmetries satisfied by the rules and the initial state"],
+    ["none";"NONE";"BACKWARD";"backward";"forward";"FORWARD";"true";"TRUE";"True";"false";"FALSE";"False"],
+    t.with_symmetries),
+    "Tune which kind of bisimulation is used to reduce the set of species",
+    ["0_semantics";"3_model_reduction"],Normal;
   "--show-symmetries",
-  Arg.Bool (fun show_symmetries -> t.show_symmetries <- show_symmetries),
-  "Display the equivalence relations over the sites" ;
-  "--views-domain",
-  Arg.Bool (fun views -> t.views <- views),
-  "Enable/disable views analysis when detecting symmetric sites" ;
+  Superarg.Bool t.show_symmetries,
+  "Display the equivalence relations over the sites",
+    ["3_model_reduction"],Normal;
+    "--views-domain",
+  Superarg.Bool t.views,
+    "Enable/disable views analysis when detecting symmetric sites",
+    ["4_static_analysis"],Expert    ;
   "--double-bonds-domain",
-  Arg.Bool (fun dbonds -> t.dbonds <- dbonds),
-  "Enable/disable double bonds analysis when detecting symmetric sites" ;
+  Superarg.Bool t.dbonds,
+  "Enable/disable double bonds analysis when detecting symmetric sites",
+  ["4_static_analysis"],Expert   ;
   "--site-across-bonds-domain",
-  Arg.Bool (fun site_across -> t.site_across <- site_across),
+  Superarg.Bool t.site_across ,
   "Enable/disable the analysis of the relation amond the states of sites in
-      connected agents";
+      connected agents",  ["4_static_analysis"],Expert    ;
   "--nonnegative",
-  Arg.Bool (fun nonneg -> t.nonnegative <- nonneg),
-  "Enable/disable the correction of negative concentrations in stiff ODE systems";
+  Superarg.Bool t.nonnegative,
+  "Enable/disable the correction of negative concentrations in stiff ODE systems",
+  ["1_integration_settings"],Normal;
   "--show-time-advance",
-  Arg.Bool (fun timeadv -> t.show_time_advance <- timeadv),
-  "Display time advance during numerical integration";
+  Superarg.Bool t.show_time_advance,
+  "Display time advance during numerical integration",
+  ["5_debug_mode"],Expert;
   "--initial-step",
-  Arg.Float (fun step -> t.initial_step <- step),
-  "Initial integration step";
+  Superarg.Float t.initial_step,
+  "Initial integration step",
+  ["1_integration_settings"],Normal ;
   "--max-step",
-  Arg.Float (fun step -> t.max_step <- step),
-  "Maximum integration step";
+  Superarg.Float t.max_step,
+  "Maximum integration step",
+  ["1_integration_settings"],Normal;
   "--relative-tolerance",
-  Arg.Float (fun err -> t.relative_tolerance <- err),
-  "tolerance to relative rounding errors";
+  Superarg.Float t.relative_tolerance,
+  "tolerance to relative rounding errors",
+  ["1_integration_settings"],Normal;
   "--absolute-tolerance",
-  Arg.Float (fun err -> t.absolute_tolerance <- err),
-  "tolerance to absolute rounding errors";
+  Superarg.Float t.absolute_tolerance,
+  "tolerance to absolute rounding errors",
+  ["1_integration_settings"],Normal;
 ]
+
+let get_option options =
+  let () = SuperargTk.parse options FileNames.input in
+  !FileNames.input
+
 let build_kasa_parameters ~called_from t t_common =
-  Config.with_views_analysis := t.views ;
-  Config.with_parallel_bonds_analysis := t.dbonds ;
-  Config.with_site_across_bonds_analysis := t.site_across ;
+  Config.with_views_analysis := !(t.views) ;
+  Config.with_parallel_bonds_analysis := !(t.dbonds) ;
+  Config.with_site_across_bonds_analysis := !(t.site_across) ;
   Config.trace := t_common.Common_args.debug ;
   Remanent_parameters.get_parameters
     ~called_from
