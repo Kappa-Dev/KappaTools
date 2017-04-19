@@ -743,7 +743,6 @@ struct
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
-    let logger = Remanent_parameters.get_logger parameters in
     let cache, max_coef, rules_rev =
       List.fold_left
         (fun ((id, cache), max_coef, list) rule ->
@@ -960,43 +959,13 @@ struct
         aux to_be_visited network store
     in
     let network = aux to_be_visited network store in
-    (*let dump l =
-      List.iter
-        (fun ((r,p,_,e),n) ->
-           let () = Format.fprintf Format.std_formatter "rule:%i occ:%i\n"
-               (rule_id_of e) n
-           in
-
-           let () = Format.fprintf Format.std_formatter "REACT:\n" in
-           let () =
-             List.iter
-               (Format.fprintf Format.std_formatter "%i,")
-               r
-           in
-           let () = Format.fprintf Format.std_formatter "\nPROD:\n" in
-           let () =
-             List.iter
-               (Format.fprintf Format.std_formatter "%i,")
-               p
-           in
-           let () = Format.fprintf Format.std_formatter "\n" in
-           ()) l
-    in
-    let () = dump network.reactions in*)
     let network  =
-      (*let () =
-        Format.fprintf Format.std_formatter "TEST\n"
-      in*)
       if smash_reactions
       then
         begin
-          (*let () =
-            Format.fprintf Format.std_formatter "TEST2\n"
-          in*)
           let normalised_reactions_list =
             List.fold_left
               (fun store_list ((react, products, token_vector ,enrich_rule),nocc) ->
-                 let rule_id = rule_id_of enrich_rule in
                  let sorted_reactants = List.sort compare react in
                  let sorted_products = List.sort compare products in
                  let sorted_token_vector = List.sort compare token_vector in
@@ -1018,7 +987,6 @@ struct
         network
     in
     let () = debug "@]@." in
-    (*let () = dump network.reactions in*)
     network
 
   let convert_tokens compil network =
