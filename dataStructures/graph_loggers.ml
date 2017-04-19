@@ -192,7 +192,7 @@ let print_graph_preamble
 
     | Loggers.Matrix | Loggers.Json
     | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab
-    | Loggers.Octave | Loggers.SBML
+    | Loggers.DOTNET | Loggers.Octave | Loggers.SBML
     | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -480,7 +480,7 @@ let print_graph_foot logger =
     end
   | Loggers.Json
   | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab | Loggers.Octave
-  | Loggers.SBML | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOTNET | Loggers.SBML | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_comment
@@ -499,7 +499,7 @@ let print_comment
     | Loggers.Json
     | Loggers.Matrix
     | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Mathematica
-    | Loggers.Octave
+    | Loggers.DOTNET | Loggers.Octave
     | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -508,14 +508,15 @@ let open_asso logger =
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
   | Loggers.Json
   | Loggers.Mathematica
-  |  Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Octave
+  |  Loggers.SBML | Loggers.Maple | Loggers.Matlab
+  | Loggers.DOTNET | Loggers.Octave
   | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let close_asso logger =
   match Loggers.get_encoding_format logger with
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
   | Loggers.Json
-  | Loggers.Mathematica | Loggers.Maple
+  | Loggers.DOTNET | Loggers.Mathematica | Loggers.Maple
   | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.Matrix | Loggers.HTML | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -525,7 +526,7 @@ let print_asso logger string1 string2 =
   | Loggers.DOT -> Loggers.fprintf logger "/*%s %s*/" string1 string2
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.Json
-  | Loggers.Matrix | Loggers.SBML
+  | Loggers.DOTNET | Loggers.Matrix | Loggers.SBML
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.Mathematica
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS -> ()
@@ -595,7 +596,7 @@ let print_node logger ?directives:(directives=[]) id =
         )
         attributes
         directives
-    | Loggers.Matrix | Loggers.Json
+    | Loggers.DOTNET | Loggers.Matrix | Loggers.Json
     | Loggers.Mathematica| Loggers.Maple | Loggers.Matlab | Loggers.Octave
     | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
@@ -792,7 +793,7 @@ let print_node logger ?directives:(directives=[]) id =
         ()
     end
   | Loggers.Matrix | Loggers.Json -> Loggers.add_node logger id directives
-  | Loggers.Mathematica
+  | Loggers.DOTNET | Loggers.Mathematica
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -820,7 +821,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         attributes
         directives
     | Loggers.Json
-    | Loggers.Mathematica
+    | Loggers.DOTNET | Loggers.Mathematica
     | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
   in
@@ -958,7 +959,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
    ()
 | Loggers.Matrix | Loggers.Json | Loggers.HTML_Graph ->
   Loggers.add_edge logger id1 id2 directives
-| Loggers.Mathematica
+| Loggers.DOTNET | Loggers.Mathematica
 | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
 | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -976,7 +977,8 @@ let print_one_to_n_relation
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))
     | Loggers.Json
     | Loggers.Matrix
-    | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
+    | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab
+    | Loggers.Octave | Loggers.SBML | Loggers.DOTNET
     | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular
     | Loggers.TXT_Tabular | Loggers.XLS ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Invisible)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(List.rev directives))
