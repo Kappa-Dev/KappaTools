@@ -43,4 +43,6 @@ val lcm: int list -> int
 val get_interval_list: (int -> bool) -> int -> int -> (int * int) list
 
 val lowercase: string -> string
-val capitalize: string -> string 
+val capitalize: string -> string
+val smash_duplicate_in_ordered_list:
+  ('a -> 'a -> int) -> ('a * int) list -> ('a * int) list

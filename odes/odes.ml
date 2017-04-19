@@ -141,7 +141,7 @@ struct
       rules : enriched_rule list ;
       ode_variables : VarSet.t ;
       reactions:
-        (id list * id list * (id Locality.annot) list * enriched_rule)
+        ((id list * id list * (id Locality.annot) list * enriched_rule) * int)
           list ;
       ode_vars_tab: ode_var Mods.DynArray.t ;
       id_of_ode_var: ode_var_id VarMap.t ;
@@ -689,8 +689,8 @@ struct
       {
         network with
         reactions =
-          (List.rev reactants, List.rev products, List.rev tokens,
-           enriched_rule)::network.reactions
+          ((List.rev reactants, List.rev products, List.rev tokens,
+            enriched_rule),1)::network.reactions
       }
     in
     to_be_visited, network
@@ -714,11 +714,36 @@ struct
          ([], network)
          initial_states) rules
 
-  let compute_prereactions parameters compil network rules
+  let compare_reaction
+      (react,prod,token,enriched_rule)
+      (react',prod',token',enriched_rule')
+    =
+    let cmp = compare (rule_id_of enriched_rule) (rule_id_of enriched_rule') in
+    if cmp = 0
+    then
+      let cmp = compare react react' in
+      if cmp = 0
+      then
+        let cmp = compare prod prod' in
+        if cmp = 0
+        then
+          compare token token'
+        else
+          cmp
+      else
+        cmp
+    else
+      cmp
+
+  let compare_extended_reaction a b =
+    compare_reaction (fst a) (fst b)
+
+  let compute_prereactions ~smash_reactions parameters compil network rules
       initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
+    let logger = Remanent_parameters.get_logger parameters in
     let cache, max_coef, rules_rev =
       List.fold_left
         (fun ((id, cache), max_coef, list) rule ->
@@ -934,9 +959,67 @@ struct
         let () = debug "@]" in
         aux to_be_visited network store
     in
-    let o = aux to_be_visited network store in
+    let network = aux to_be_visited network store in
+    (*let dump l =
+      List.iter
+        (fun ((r,p,_,e),n) ->
+           let () = Format.fprintf Format.std_formatter "rule:%i occ:%i\n"
+               (rule_id_of e) n
+           in
+
+           let () = Format.fprintf Format.std_formatter "REACT:\n" in
+           let () =
+             List.iter
+               (Format.fprintf Format.std_formatter "%i,")
+               r
+           in
+           let () = Format.fprintf Format.std_formatter "\nPROD:\n" in
+           let () =
+             List.iter
+               (Format.fprintf Format.std_formatter "%i,")
+               p
+           in
+           let () = Format.fprintf Format.std_formatter "\n" in
+           ()) l
+    in
+    let () = dump network.reactions in*)
+    let network  =
+      (*let () =
+        Format.fprintf Format.std_formatter "TEST\n"
+      in*)
+      if smash_reactions
+      then
+        begin
+          (*let () =
+            Format.fprintf Format.std_formatter "TEST2\n"
+          in*)
+          let normalised_reactions_list =
+            List.fold_left
+              (fun store_list ((react, products, token_vector ,enrich_rule),nocc) ->
+                 let rule_id = rule_id_of enrich_rule in
+                 let sorted_reactants = List.sort compare react in
+                 let sorted_products = List.sort compare products in
+                 let sorted_token_vector = List.sort compare token_vector in
+                 ((sorted_reactants, sorted_products, sorted_token_vector,
+                   enrich_rule),nocc) :: store_list
+              ) [] network.reactions
+          in
+          let sorted_reactions_list =
+            List.sort compare_extended_reaction normalised_reactions_list
+          in
+          let smashed_list =
+            Tools.smash_duplicate_in_ordered_list
+              compare_reaction
+              sorted_reactions_list
+          in
+          {network with reactions = smashed_list}
+        end
+      else
+        network
+    in
     let () = debug "@]@." in
-    o
+    (*let () = dump network.reactions in*)
+    network
 
   let convert_tokens compil network =
     Tools.recti
@@ -1394,7 +1477,7 @@ struct
      bwd_map = bwd_map ;
      cache = cache }
 
-  let network_from_compil ~ignore_obs parameters compil network =
+  let network_from_compil ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
@@ -1405,7 +1488,7 @@ struct
       Format.printf "\t -saturating the set of molecular species @."
     in
     let network =
-      compute_prereactions parameters compil network rules
+      compute_prereactions ~smash_reactions parameters compil network rules
         initial_state
     in
     let () =
@@ -2053,26 +2136,13 @@ struct
   let export_main = export_main_gen ~step:1
   let export_main_follow_up = export_main_gen ~step:2
 
-  (*a list -> a list list*)
-  let pack list =
-    let rec aux current acc = function
-      | [] -> []    (* Can only be reached if original list is empty *)
-      | [x] -> (x :: current) :: acc
-      | a :: (b :: _ as t) ->
-        if a = b then aux (a :: current) acc t
-        else aux [] ((a :: current) :: acc) t  in
-    List.rev (aux [] [] list);;
-
-  (*'a list -> (int * 'a) list*)
-  let encode list =
-    List.map (fun l -> (List.length l, List.hd l)) (pack list)
-
   let export_dydt ~show_time_advance logger compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let label = "listOfReactions" in
     let label_dotnet = "begin reactions" in
     let () = Ode_loggers.open_procedure logger "dydt" "ode_aux" ["t";"y"] in
+    (*------------------------------------------------*)
     let () =
       if show_time_advance
       then
@@ -2100,7 +2170,7 @@ struct
         split.var_decl
     in
     let () = Ode_loggers.print_newline logger in
-
+    (*------------------------------------------------*)
     let () =
       List.iter
         (fun (rule, coefs) ->
@@ -2128,7 +2198,8 @@ struct
       Ode_loggers.initialize
        ~nodevar logger (Ode_loggers_sig.Deriv 1)
     in
-    let do_it f l reactants enriched_rule =
+    (*------------------------------------------------*)
+    let do_it f l reactants enriched_rule nocc =
       List.iter
         (fun species ->
            let nauto_in_species =
@@ -2141,14 +2212,13 @@ struct
            let nauto_in_lhs = enriched_rule.divide_rate_by in
            f
              logger (Ode_loggers_sig.Deriv species)
-             ~nauto_in_species ~nauto_in_lhs
+             ~nauto_in_species ~nauto_in_lhs ~nocc
              (var_of_rule enriched_rule) reactants)
         l
     in
-    (*fold over a list of reactions*)
     let () =
       List.iter
-        (fun (reactants, products, token_vector, enriched_rule) ->
+        (fun ((reactants, products, token_vector, enriched_rule),nocc) ->
            (*each reaction will be computed here*)
            let add_factor l  =
              if I.do_we_count_in_embeddings compil
@@ -2180,27 +2250,27 @@ struct
                       let () =
                         Format.fprintf fmt "%s%a:%a"
                           prefix
-                          (
-                             Alg_expr.print
-                               (fun fmt mixture ->
-                                  let () = Format.fprintf fmt "|" in
-                                  let
-                                    _  =
-                                    List.fold_left
-                                    (
-                                      Array.fold_left
-                                         (fun bool connected_component ->
-                                            let prefix = if bool then " , " else "" in
-                                            let () =
-                                              Format.fprintf
+                          (Alg_expr.print
+                             (fun fmt mixture ->
+                                let () = Format.fprintf fmt "|" in
+                                let _  =
+                                  List.fold_left
+                                    (Array.fold_left
+                                       (fun bool connected_component ->
+                                          let prefix =
+                                            if bool
+                                            then " , " else  ""
+                                          in
+                                          let () =
+                                            Format.fprintf
                                               fmt
                                               "%s%a"
                                               prefix
-                                              (I.print_connected_component ~compil)
+                                              (I.print_connected_component
+                                                 ~compil)
                                               connected_component
-                                            in true)
-                                         )
-                                         false mixture
+                                          in true)
+                                    ) false mixture
                                   in
                                   let () = Format.fprintf fmt "|" in
                                   ())
@@ -2217,6 +2287,8 @@ struct
                    ) false (List.rev list)
                  in ()
                in
+               (*----------------------------------------------*)
+               (*print rule in commend format *)
                let () = Ode_loggers.print_newline logger in
                let () =
                  Ode_loggers.print_comment ~breakline logger
@@ -2247,6 +2319,7 @@ struct
                      (List.rev list)
                  in ()
                in
+               (*----------------------------------------------*)
                match Loggers.get_encoding_format logger with
                | Loggers.Matlab | Loggers.Octave
                | Loggers.SBML
@@ -2255,14 +2328,17 @@ struct
                      "reaction: %a -> %a%a "
                      dump reactants
                      dump products
-                     dump_token_list tokens_prod
+                     dump_token_list
+                     tokens_prod
                  in
                  Ode_loggers.print_comment ~breakline logger s
                | Loggers.DOTNET ->
                let s = Format.asprintf
                    "%a -> %a%a "
-                   dump reactants
-                   dump products
+                   dump
+                   reactants
+                   dump
+                   products
                    dump_token_list
                    tokens_prod
                in
@@ -2291,6 +2367,7 @@ struct
                enriched_rule
                (var_of_rule enriched_rule)
                enriched_rule.divide_rate_by
+               nocc
            in
            (*------------------------------------------*)
            let reactants' =
@@ -2308,11 +2385,11 @@ struct
            (*------------------------------------------*)
            let () =
              do_it Ode_loggers.consume reactants reactants'
-               enriched_rule
+               enriched_rule nocc
            in
            let () =
              do_it Ode_loggers.produce products reactants'
-               enriched_rule
+               enriched_rule nocc
            in
            (*------------------------------------------*)
            let _ =
@@ -2322,7 +2399,7 @@ struct
                     Ode_loggers.update_token
                     logger
                     (Ode_loggers_sig.Deriv token)
-                    ~nauto_in_lhs
+                    ~nauto_in_lhs ~nocc
                     (var_of_rule enriched_rule)
                     (var_of_stoch enriched_rule n)
                     reactants'
@@ -2450,7 +2527,7 @@ struct
           split.var_rate
       in
       let () = Ode_loggers.print_newline logger in
-      let do_it f l dep_set reactants enriched_rule =
+      let do_it f l dep_set reactants enriched_rule nocc =
         List.iter
           (fun species ->
              let nauto_in_species =
@@ -2463,7 +2540,7 @@ struct
              let nauto_in_lhs = enriched_rule.divide_rate_by in
              f
                logger (Ode_loggers_sig.Concentration species)
-               ~nauto_in_species ~nauto_in_lhs
+               ~nauto_in_species ~nauto_in_lhs ~nocc
                (var_of_rule enriched_rule)
                reactants
                dep_set)
@@ -2477,7 +2554,7 @@ struct
       in
       let () =
         List.iter
-          (fun (reactants, products, token_vector, enriched_rule) ->
+          (fun ((reactants, products, token_vector, enriched_rule),nocc) ->
              let dep_set =
                match
                  VMAP.find_option
@@ -2547,6 +2624,8 @@ struct
                        ) false (List.rev list)
                    in ()
                  in
+                 (*--------------------------------------------------*)
+                 (*print rule in a comment format*)
                  let () = Ode_loggers.print_newline logger in
                  let () =
                    Ode_loggers.print_comment ~breakline logger
@@ -2579,13 +2658,17 @@ struct
                  let s =
                    Format.asprintf
                      "reaction: %a -> %a%a "
-                     dump reactants
-                     dump products
-                     dump_token_list tokens_prod
+                     dump
+                     reactants
+                     dump
+                     products
+                     dump_token_list
+                     tokens_prod
                  in
                  let () =  Ode_loggers.print_comment ~breakline logger s in
                  ()
              in
+             (*--------------------------------------------------*)
              let reactants' =
                List.rev_map
                  (fun x ->
@@ -2605,6 +2688,7 @@ struct
                  dep_set_rate
                  reactants'
                  enriched_rule
+                 nocc
              in
              let () =
                do_it
@@ -2613,6 +2697,7 @@ struct
                  dep_set_rate
                  reactants'
                  enriched_rule
+                 nocc
              in
              let _ =
                List.fold_left
@@ -2628,7 +2713,8 @@ struct
                     let () =
                       Ode_loggers.update_token_jac
                         logger
-                        (Ode_loggers_sig.Concentration token) ~nauto_in_lhs
+                        (Ode_loggers_sig.Concentration token)
+                        ~nauto_in_lhs ~nocc
                         (var_of_rule enriched_rule)
                         (var_of_stoch enriched_rule n)
                         reactants'
@@ -2855,7 +2941,7 @@ struct
   let get_reactions network =
     let list = get_reactions network in
     List.rev_map
-      (fun (a,b,c,d)-> (a,b,c,d.rule))
+      (fun ((a,b,c,d),n)-> ((a,b,c,d.rule),n))
       (List.rev list)
 
 (*********************)
