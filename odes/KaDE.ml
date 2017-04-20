@@ -260,7 +260,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         network
     in
     let smash_reactions =
-      Ode_loggers.smash_reactions backend parameters
+      !(ode_args.Ode_args.smash_reactions)
     in
     let network =
       A.network_from_compil ~smash_reactions ~ignore_obs parameters compil network

@@ -3,28 +3,29 @@ open Superarg
 type count = Embeddings | Occurrences
 
 type t = {
-  mutable backend : string ref ;
-  mutable rate_convention : string ref ;
-  mutable count : string ref ;
-  mutable show_reactions : bool ref ;
-  mutable compute_jacobian : bool ref ;
-  mutable octave_output : string option ref ;
-  mutable matlab_output : string option ref ;
-  mutable maple_output : string option ref ;
-  mutable mathematica_output : string option ref ;
-  mutable sbml_output : string option ref ;
-  mutable dotnet_output : string option ref ;
-  mutable with_symmetries : string ref ;
-  mutable show_symmetries : bool ref ;
-  mutable views : bool ref ;
-  mutable dbonds : bool ref ;
-  mutable site_across : bool ref;
-  mutable nonnegative : bool ref ;
-  mutable show_time_advance : bool ref;
-  mutable initial_step : float ref ;
-  mutable max_step : float ref ;
-  mutable relative_tolerance : float ref ;
-  mutable absolute_tolerance : float ref ;
+  backend : string ref ;
+  rate_convention : string ref ;
+  count : string ref ;
+  show_reactions : bool ref ;
+  compute_jacobian : bool ref ;
+  octave_output : string option ref ;
+  matlab_output : string option ref ;
+  maple_output : string option ref ;
+  mathematica_output : string option ref ;
+  sbml_output : string option ref ;
+  dotnet_output : string option ref ;
+  with_symmetries : string ref ;
+  show_symmetries : bool ref ;
+  views : bool ref ;
+  dbonds : bool ref ;
+  site_across : bool ref;
+  nonnegative : bool ref ;
+  show_time_advance : bool ref;
+  initial_step : float ref ;
+  max_step : float ref ;
+  relative_tolerance : float ref ;
+  absolute_tolerance : float ref ;
+  smash_reactions : bool ref ;
 }
 
 let default : t =
@@ -51,6 +52,7 @@ let default : t =
     max_step = ref 0.02 ;
     absolute_tolerance = ref 0.001 ;
     relative_tolerance = ref 0.001 ;
+    smash_reactions = ref false ;
   }
 
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
@@ -102,7 +104,11 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
     "tune whether we cound in embeddings or in occurrences",
     ["2_semantics"],Normal;
-    "--show-reactions",
+  "--show-reactions",
+  Superarg.Bool t.smash_reactions,
+  "Gather identical reactions in the ODEs",
+  ["1_output";"3_integration_settings"],Normal ;
+  "--smash-reactions",
   Superarg.Bool t.show_reactions,
     "Annotate ODEs by the corresponding chemical reactions",
     ["1_output"],Normal ;
