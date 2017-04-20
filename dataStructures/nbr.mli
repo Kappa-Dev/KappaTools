@@ -38,8 +38,13 @@ val print_option : Format.formatter -> t -> unit
 (** Prints nothing in case of infinity or Not a Number *)
 
 val iteri : (t -> 'a -> 'a) -> 'a -> t -> 'a
-(** [iter f x n]
+(** [iteri f x n]
 @return f (n - k) (... (f (n - 1) (f n x))) where k < n <= k+1 *)
+
+val maybe_iteri : (t -> 'a -> 'a option) -> 'a -> t -> 'a
+(** [maybe_iteri f x n]
+@return f (n - k) (... (f (n - 1) (f n x))) up to k < n <= k+1
+or [f] returns [None] *)
 
 val to_string : t -> string
 val of_string : string -> t

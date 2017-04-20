@@ -145,6 +145,13 @@ let to_string = function
 let rec iteri f x n =
   if is_strictly_positive n then iteri f (f n x) (pred n) else x
 
+let rec maybe_iteri f x n =
+  if is_strictly_positive n then
+    match f n x with
+    | None -> x
+    | Some x' -> maybe_iteri f x' (pred n)
+  else x
+
 let of_string x =
   try I (int_of_string x)
   with Failure _ -> F (float_of_string x)

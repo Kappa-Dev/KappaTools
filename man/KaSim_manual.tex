@@ -1165,7 +1165,7 @@ will interrupt the simulation after exactly 10 time units.
 Continuing with the ABC model, the perturbation effect\index{effect}:
 \lstinline[language=kappa]*$ADD n C(x1~p)*
 will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
-\lstinline[language=kappa]*$DEL  inf B(x!_)*
+\lstinline[language=kappa]*$DEL |B(x!_)| B(x!_)*
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
 
 There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
