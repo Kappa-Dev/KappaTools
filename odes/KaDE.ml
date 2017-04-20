@@ -83,7 +83,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     (*smbl*)
     let () =
       match
-        ode_args.Ode_args.sbml_output
+        !(ode_args.Ode_args.sbml_output)
       with
       | None -> ()
       | Some s ->
@@ -94,7 +94,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     (*dotnet*)
     let () =
       match
-      ode_args.Ode_args.dotnet_output
+        !(ode_args.Ode_args.dotnet_output)
       with
       | None -> ()
       | Some s ->

@@ -232,7 +232,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       let lbl = Label.create ~text:(" ") ~padx:20 f in
       pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl];
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg;
-  | Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.String_list _
+  | Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.String_list _ | Superarg.StringNbr_list _
   | Superarg.Float _ | Superarg.Float_opt _ ->
       let ext = match spec with
       | Superarg.Int _ | Superarg.Int_opt _ -> "<Superarg.Int>"
