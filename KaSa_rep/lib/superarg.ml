@@ -217,24 +217,12 @@ let print_option verbose f (key,spec,msg,cat,lvl) =
       | None
       | Some "" -> Format.fprintf f "  %s <name>   (default: disabled)@." key2
       | Some s  -> Format.fprintf f
-<<<<<<< HEAD
-	    "  %s <name>   (default %s)@." key2 s)
-  | String_list r ->
-      (match !r with
-=======
                      "  %s <name>   (default %s)@." key2 s)
-   | String_list r  ->
+  | String_list r  ->
      (match !r with
->>>>>>> 8f467a260... Hui for KaDe is ready
       | [] -> Format.fprintf f
 	    "  %s <names> ...   (default: disabled)@." key2
       | l  -> Format.fprintf f "  %s <names> ...   (default %a)@." key2
-<<<<<<< HEAD
-	    (print_list Format.pp_print_string Format.pp_print_space) l)
-  | Float r -> Format.fprintf f "  %s <float>   (default %f)@." key !r
-  | Float_opt r ->
-      (match !r with
-=======
                 (Pp.list Pp.space Format.pp_print_string) l)
    | StringNbr_list r ->
        (match !r with
@@ -253,7 +241,6 @@ let print_option verbose f (key,spec,msg,cat,lvl) =
    | Float r -> Format.fprintf f "  %s <float>   (default %f)@." key !r
    | Float_opt r ->
      (match !r with
->>>>>>> 8f467a260... Hui for KaDe is ready
       | None   -> Format.fprintf f "  %s <float>   (default: disabled)@." key2
       | Some v -> Format.fprintf f "  %s <float>   (default: %f)@." key2 v)
   | Choice (l,_,r) ->
@@ -341,79 +328,6 @@ let parse_list parameters (a:t) (l:string list) : string list =
 	else if opt="--version" then
 	  (show_version := true ; doit accum rem)
         (* expert *)
-<<<<<<< HEAD
-	else if opt="--expert" then (expert_mode := true; doit accum rem)
-	else if opt="--no-expert" then (expert_mode := false; doit accum rem)
-
-        (* regular option, starting with "-" *)
-	else if String.length opt > 1 && opt.[0]='-' then
-	  let (key,spec,_,_,_)as aa=
-	    try
-	      List.find
-		(fun (key,spec,msg,cat,lvl) ->
-		  (accept_level_use lvl) &&
-		  (opt=key || (opt=(nokey key)))
-		) a
-	    with Not_found ->
-	      Format.printf "Here is the list of recognized options@.%a@.Unrecognized option: %s@.@." (print_help parameters true false) a opt;
-	      failwith "bad option"
-	  in
-	  let rem =
-	    try match spec,rem with
-	    | Bool r, rem -> r := (opt=key); rem
-	    | Int r, (""::rem) when opt=key -> r := 0; rem
-	    | Int r, (v::rem) when opt=key -> r := int_of_string v; rem
-	    | Int_opt r, (""::rem) when opt=key -> r := None; rem
-	    | Int_opt r, (v::rem) when opt=key ->
-		r := Some (int_of_string v); rem
-	    | Int_opt r, rem -> r := None; rem
-	    | String r, (v::rem) when opt=key -> r := v; rem
-	    | String r, rem -> r := ""; rem
-	    | String_opt r, (""::rem) when opt=key -> r := None; rem
-	    | String_opt r, (v::rem) when opt=key -> r := Some v; rem
-	    | String_opt r, rem -> r := None; rem
-	    | String_list r, (""::rem) when opt=key -> rem
-	    | String_list r, (v::rem) when opt=key -> r := v::(!r); rem
-	    | String_list r, rem -> r := []; rem
-	    | Float r, (""::rem) when opt=key -> r := 0.; rem
-	    | Float r, (v::rem) when opt=key -> r := float_of_string v; rem
-	    | Float_opt r, (""::rem) when opt=key -> r := None; rem
-	    | Float_opt r, (v::rem) when opt=key ->
-		r := Some (float_of_string v); rem
-	    | Float_opt r, rem -> r := None; rem
-	    | Choice (l,l',r), (v::rem) when opt=key ->
-       if not (List.exists (fun (k,_) -> v=k) l) &&
-          not (List.exists (fun k -> v=k) l')
-       then failwith "invalid choice";
-       r := v; rem
-	    | Choice_list (l,r), (v::rem) when opt=key ->
-		if not (List.exists (fun (k,_) -> v=k) l)
-		then failwith "invalid choice";
-		r := v::(!r); rem
-	    | Choice_list (l,r), rem -> r := []; rem
-	    | Multi (x,[]), rem -> ignore (doit [] x); rem
-	    | Multi (x,y), (v::rem) ->
-		ignore (doit [] x);
-		ignore (List.fold_left (fun accum l -> doit [] [l;v])
-			  accum y);
-		rem
-	    | MultiExt l,v::rem when opt=key ->
-		ignore (List.fold_left (fun accum (l,s) -> doit [] [l;v^s])
-			  accum l);rem
-	    | MultiExt l,rem ->
-	      ignore (List.fold_left (fun accum (l,s) -> doit [] [nokey l;s]) accum l);rem
-	    | _ -> failwith "invalid option or argument"
-
-	    with _ ->
-	      Format.printf "Wrong option or argument for %s@.%a" opt
-		(print_option false) aa;
-	      failwith "bad option"
-	  in
-	  doit accum rem
-
-        (* does not start with - => this is filename *)
-	else doit (opt::accum) rem
-=======
       else if opt="--expert" then (expert_mode := true; doit accum rem)
       else if opt="--no-expert" then (expert_mode := false; doit accum rem)
 
@@ -490,8 +404,6 @@ let parse_list parameters (a:t) (l:string list) : string list =
 
       (* does not start with - => this is filename *)
       else doit (opt::accum) rem
->>>>>>> 8f467a260... Hui for KaDe is ready
-
   in
   let filenames = doit [] l in
   if !show_version then (Format.printf "%s @.(with%s Tk interface) @." Version.version_kasa_full_name (if Tk_version.tk then "" else "out"); exit 0)
