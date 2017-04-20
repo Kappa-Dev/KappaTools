@@ -754,10 +754,10 @@ let force_rule
     ~outputs env unary_patterns counter state event_kind rule =
   match apply_rule
           ~outputs env unary_patterns counter state event_kind rule with
-  | Success out -> out
+  | Success out -> Some out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
-    let max_distance = match rule.Primitives.unary_rate with
+    let unary_rate = match rule.Primitives.unary_rate with
       | None -> None
       | Some (loc, dist_opt) ->
          (match dist_opt with
@@ -765,14 +765,19 @@ let force_rule
           | Some d ->
              Some (loc,Some (max_dist_to_int counter state d))) in
     match all_injections
-            ?unary_rate:max_distance
-            (Model.domain env) state.edges
+            ?unary_rate (Model.domain env) state.edges
             state.roots_of_patterns rule.Primitives.connected_components with
-    | [] -> state
+    | [] ->
+      let () =
+        ExceptionDefn.warning
+          (fun f -> Format.fprintf f "At t=%f, %a does not apply (anymore)"
+              (Counter.current_time counter)
+              (Trace.print_event_kind ~env) event_kind) in
+        None
     | l ->
        let (h,_) = List_util.random state.random_state l in
-       (transform_by_a_rule
-          outputs env unary_patterns counter state event_kind rule h)
+       Some (transform_by_a_rule
+               outputs env unary_patterns counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id store env counter state rule =
   let () = assert (not state.outdated) in

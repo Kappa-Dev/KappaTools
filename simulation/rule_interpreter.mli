@@ -42,7 +42,7 @@ val apply_unary_rule :
 
 val force_rule :
   outputs:(Data.t -> unit) -> Model.t -> Pattern.Set.t -> Counter.t ->
-  t -> Trace.event_kind -> Primitives.elementary_rule -> t
+  t -> Trace.event_kind -> Primitives.elementary_rule -> t option
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)

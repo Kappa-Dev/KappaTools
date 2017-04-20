@@ -62,7 +62,7 @@ let do_modification ~outputs env counter graph state extra modification =
       Format.asprintf
         "@[<h>%a@]" (Kappa_printer.modification ~env) modification in
     let graph' =
-      Nbr.iteri
+      Nbr.maybe_iteri
         (fun _ g ->
            Rule_interpreter.force_rule
              ~outputs env
