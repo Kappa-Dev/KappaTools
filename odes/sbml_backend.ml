@@ -560,11 +560,11 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  ->
         let () =
-          do_sbml logger (fun loggger ->
+          do_sbml logger (fun logger ->
               Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
             )
         in
-        do_dotnet logger (fun loggger -> Loggers.fprintf logger "%i" n)
+        do_dotnet logger (fun logger -> Loggers.fprintf logger "%i" n)
       | Alg_expr.CONST (Nbr.I64 n) ->
         Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
       | Alg_expr.CONST (Nbr.F f) ->
@@ -589,11 +589,24 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
                   Loggers.fprintf logger "%s"
                     (string_of_var_id id))
             else
-              print_alg_expr_in_sbml
-                string_of_var_id
-                logger
-                expr
-                network
+              (*if expr is not a constant in case of
+              DOTNET gives warning*)
+              let () =
+                do_sbml logger (fun logger ->
+                    print_alg_expr_in_sbml
+                      string_of_var_id
+                      logger
+                      expr
+                      network)
+              in
+              let () =
+                do_dotnet logger (fun logger ->
+                    raise
+                      (ExceptionDefn.Malformed_Decl
+                         ("DOTNET backend does not support rate that is not a constant",
+                          Locality.dummy)))
+              in
+              ()
           | None ->
             Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
         end
@@ -612,8 +625,21 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
         Loggers.fprintf logger "<ci>0</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
-        Loggers.fprintf logger "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
-          (Loggers_string_of_op.string_of_bin_op logger Operator.MULT)
+        let () =
+          do_sbml logger (fun logger ->
+              Loggers.fprintf logger
+                "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
+                (Loggers_string_of_op.string_of_bin_op logger
+                   Operator.MULT)
+            )
+        in
+        (*TODO: what should I return here? a warning?*)
+        let () =
+          do_dotnet logger (fun logger ->
+              ()
+            )
+        in
+        ()
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
         Loggers.fprintf logger "<ci>0</ci>"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
@@ -935,7 +961,8 @@ let dump_list_of_species_reference
              do_dotnet loggers
                (fun logger -> Loggers.fprintf logger "%s" dotnet_sep)
          in
-         let () = dump_species_reference loggers s (i*j) in (* check what to do when stochiometric coefficients are bigger than 1 *)
+         let () = dump_species_reference loggers s (i*j) in
+         (* check what to do when stochiometric coefficients are bigger than 1*)
          true
       )
       false
@@ -1256,14 +1283,28 @@ let dump_token_vector convert logger network_handler rule_id token_vector =
                (Locality.to_string (snd expr))
            | Some x when Nbr.is_zero x -> ()
            | Some x ->
-             let s =
-               Format.sprintf
-                 "metaid=\"%s\" species=\"t%i\"%s"
-                 (meta_id_of_logger logger)
-                 id
-                 (if Nbr.is_equal x (Nbr.I 1) then "" else " stoichiometry=\""^(Nbr.to_string x)^"\"")
+             let () =
+               do_sbml logger (fun logger ->
+                   let s =
+                     Format.sprintf
+                       "metaid=\"%s\" species=\"t%i\"%s"
+                       (meta_id_of_logger logger)
+                       id
+                       (if Nbr.is_equal x (Nbr.I 1) then "" else
+                          " stoichiometry=\""^(Nbr.to_string
+                                                 x)^"\"")
+                   in
+                   single_box ~options:(fun () -> s) logger
+                     "speciesReference"
+                 )
              in
-             single_box ~options:(fun () -> s) logger "speciesReference"
+             let () =
+               do_dotnet logger (fun logger ->
+                   ()
+                 )
+             in
+             ()
+
          in
          n+1)
       1
@@ -1386,12 +1427,13 @@ let dump_sbml_reaction
          in
          let () =
            if reactants = [] &&
-              not (has_reactants_in_token_vector logger network rule_id
-                     token_vector)
+              not (has_reactants_in_token_vector logger network
+                     rule_id token_vector)
            then ()
            else
              let () =
-               add_box_in_sbml_only ~break logger label_list_of_reactants
+               add_box_in_sbml_only ~break logger
+                 label_list_of_reactants
                  (fun logger ->
                     let () =
                       dump_list_of_species_reference ~dotnet_sep
@@ -1464,22 +1506,30 @@ let dump_sbml_reaction
              ()
            else
            add_box_in_sbml_only ~break logger label_list_of_mods
-             (fun
-               logger ->
+             (fun logger ->
                Mods.StringSet.iter
                  (fun string ->
-                    let s =
-                 Format.sprintf
-                   "metaid=\"%s\" species=\"%s\""
-                 (meta_id_of_logger logger) string
-               in
-               let () =
-                 single_box ~options:(fun () -> s) logger
-                   "modifierSpeciesReference"
-               in
-               ()) modifiers)
+                    let () =
+                      do_sbml logger (fun logger ->
+                          let s =
+                            Format.sprintf
+                              "metaid=\"%s\" species=\"%s\""
+                              (meta_id_of_logger logger) string
+                          in
+                          let () =
+                            single_box ~options:(fun () -> s) logger
+                              "modifierSpeciesReference"
+                          in
+                          ())
+                    in
+                    let () =
+                      do_dotnet logger (fun _ -> ())
+                  in
+                  ()
+                 )
+                 modifiers
+             )
          in
-
          let () =
            add_box_in_sbml_only ~break logger "kineticLaw"
              (fun logger ->
@@ -1520,13 +1570,23 @@ let time_advance logger  =
          let () =
            add_box ~break logger label_list_of_products label_dotnet
              (fun logger ->
-                let s =
-                  Format.sprintf
-                    "metaid=\"%s\" species=\"time\""
-                    (meta_id_of_logger logger)
+                let () =
+                  do_sbml logger (fun logger ->
+                      let s =
+                        Format.sprintf
+                          "metaid=\"%s\" species=\"time\""
+                          (meta_id_of_logger logger)
+                      in
+                      let () =
+                        single_box ~options:(fun () -> s) logger
+                          "speciesReference"
+                      in
+                      ()
+                    )
                 in
                 let () =
-                  single_box ~options:(fun () -> s) logger "speciesReference" in
+                  do_dotnet logger (fun _logger -> ())
+                in
                 ()
              )
          in
