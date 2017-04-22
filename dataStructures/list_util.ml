@@ -115,3 +115,7 @@ let random rs l = List.nth l (Random.State.int rs (List.length l))
 
 let find_option (p : ('a -> bool)) (l : 'a list) : 'a option  =
   try Some (List.find p l) with Not_found -> None
+
+module Infix = struct
+  let ($$) = cons_option
+end

@@ -17,13 +17,19 @@ let default_progress = {
 }
 
 module Efficiency : sig
-  type t
+  type t = {
+    mutable consecutive : int;
+    mutable no_more_binary : int;
+    mutable no_more_unary : int;
+    mutable clashing_instance : int;
+    mutable time_correction : int
+  }
 
   val init: t
 
   val nb : t -> int
   val nb_consecutive : t -> int
-  val print_detail : Format.formatter -> t -> unit
+  val print_detail : current_event:int -> Format.formatter -> t -> unit
   val reset_consecutive : t -> t
 
   val incr_no_more_binary : t -> t
@@ -75,9 +81,15 @@ end =
       let () = t.consecutive <- succ t.consecutive in
       t
 
-    let print_detail f t =
+    let print_detail ~current_event f t =
       let all = float_of_int (nb t) in
+      let events = float_of_int current_event in
       let () = Format.pp_open_vbox f 0 in
+      let () =
+        if all > 0. then
+          Format.fprintf f
+            "@[%.2f%% of event loops were productive.@ Null event cause:@]@,"
+            (100. *. events /. (all +. events)) in
       let () = if t.no_more_unary > 0 then Format.fprintf
             f "\tValid embedding but no longer unary when required: %.2f%%@,"
             (100. *. (float_of_int t.no_more_unary) /. all) in
@@ -189,7 +201,8 @@ let one_time_correction_event c ti =
     let () = c.stat_null <- Efficiency.incr_time_correction c.stat_null in
     check_time c && check_events c
 let get_efficiency c = c.stat_null
-let print_efficiency f c = Efficiency.print_detail f c.stat_null
+let print_efficiency f c =
+  Efficiency.print_detail ~current_event:(current_event c) f c.stat_null
 let init_time c = c.init_time
 let max_time c = c.max_time
 let max_events c = c.max_event

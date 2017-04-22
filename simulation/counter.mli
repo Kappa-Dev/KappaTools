@@ -9,9 +9,13 @@
 (** Simulation progress keeper *)
 
 module Efficiency : sig
-  type t
-
-  val print_detail : Format.formatter -> t -> unit
+    type t = {
+      mutable consecutive : int;
+      mutable no_more_binary : int;
+      mutable no_more_unary : int;
+      mutable clashing_instance : int;
+      mutable time_correction : int
+    }
 
   val write_t : Bi_outbuf.t -> t -> unit
   (** Output a JSON value of type {!t}. *)

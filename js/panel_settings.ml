@@ -9,6 +9,9 @@
 module Html = Tyxml_js.Html5
 module R = Tyxml_js.R
 
+open Lwt.Infix
+open List_util.Infix
+
 let visible_on_states
     ?(a_class=[])
     (state : State_simulation.model_state list) : string list React.signal =
@@ -485,7 +488,6 @@ end
 
 module RunningPanelLayout : Ui_common.Div = struct
   let id = "settings_runetime_layout"
-  let lift f x = match x with | None -> None | Some x -> f x
   let progress_bar
       (percent_signal : int Tyxml_js.R.Html.wrap)
       (value_signal : string React.signal) =
@@ -513,7 +515,7 @@ module RunningPanelLayout : Ui_common.Div = struct
          (fun model ->
             let simulation_info = State_simulation.model_simulation_info model in
             let time_percent : int option =
-              lift
+              Option_util.bind
                 (fun (status : Api_types_j.simulation_info) ->
                    status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time_percentage )
                 simulation_info
@@ -525,8 +527,9 @@ module RunningPanelLayout : Ui_common.Div = struct
       (React.S.map (fun model ->
            let simulation_info = State_simulation.model_simulation_info model in
            let time : float option =
-             lift (fun (status : Api_types_j.simulation_info) ->
-                 Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) simulation_info in
+             Option_util.map
+               (fun (status : Api_types_j.simulation_info) ->
+                 status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_time) simulation_info in
            let time : float = Option_util.unsome 0.0 time in
            string_of_float time
          )
@@ -537,7 +540,8 @@ module RunningPanelLayout : Ui_common.Div = struct
       (React.S.map (fun model ->
            let simulation_info = State_simulation.model_simulation_info model in
            let event_percentage : int option =
-             lift (fun (status : Api_types_j.simulation_info) ->
+             Option_util.bind
+               (fun (status : Api_types_j.simulation_info) ->
                  status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event_percentage) simulation_info in
            let event_percentage : int = Option_util.unsome 100 event_percentage in
            event_percentage
@@ -546,8 +550,9 @@ module RunningPanelLayout : Ui_common.Div = struct
       (React.S.map (fun model ->
            let simulation_info = State_simulation.model_simulation_info model in
            let event : int option =
-             lift (fun (status : Api_types_j.simulation_info) ->
-                 Some status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
+             Option_util.map
+               (fun (status : Api_types_j.simulation_info) ->
+                  status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event)
                simulation_info
            in
            let event : int = Option_util.unsome 0 event in
@@ -557,8 +562,9 @@ module RunningPanelLayout : Ui_common.Div = struct
 
   let tracked_events state =
     let tracked_events : int option =
-      lift (fun (status : Api_types_j.simulation_info) ->
-        status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_tracked_events)
+      Option_util.bind
+        (fun (status : Api_types_j.simulation_info) ->
+           status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_tracked_events)
         state
     in
     match tracked_events with
@@ -591,35 +597,115 @@ module RunningPanelLayout : Ui_common.Div = struct
          )
          State_simulation.model)
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
+  let efficiency_detail ~current_event t =
+    let all = float_of_int
+        (t.Counter.Efficiency.no_more_binary +
+         t.Counter.Efficiency.no_more_unary +
+         t.Counter.Efficiency.clashing_instance +
+         t.Counter.Efficiency.time_correction) in
+    let events = float_of_int current_event in
+    Html.p
+      [ Html.pcdata
+          (Format.asprintf
+             "@[%.2f%% of event loops were productive.%t@]"
+             (100. *. events /. (all +. events))
+             (fun f -> if all > 0. then
+                 Format.fprintf f "@ Null event cause:")) ]
+    ::
+    ((if t.Counter.Efficiency.no_more_unary > 0 then
+       Some (Html.p
+               [ Html.pcdata
+                   (Format.asprintf
+                      "Valid embedding but no longer unary when required: %.2f%%"
+                      (100. *. (float_of_int t.Counter.Efficiency.no_more_unary) /. all) )])
+     else None)
+    $$
+    ((if t.Counter.Efficiency.no_more_binary > 0 then
+       Some (Html.p
+               [ Html.pcdata
+                   (Format.asprintf
+                      "Valid embedding but not binary when required: %.2f%%"
+                      (100. *. (float_of_int t.Counter.Efficiency.no_more_binary) /. all)) ] )
+     else None)
+    $$
+    ((if t.Counter.Efficiency.clashing_instance > 0 then
+       Some (Html.p
+               [ Html.pcdata
+                   (Format.asprintf
+                      "Clashing instance: %.2f%%"
+                      (100. *. (float_of_int t.Counter.Efficiency.clashing_instance) /. all))])
+     else None)
+    $$
+    ((if t.Counter.Efficiency.time_correction > 0 then
+       Some (Html.p
+               [ Html.pcdata
+                   (Format.asprintf
+                      "Perturbation interrupting time advance: %.2f%%"
+                      (100. *. (float_of_int t.Counter.Efficiency.time_correction) /. all))])
+     else None)
+    $$ []))))
+
+  let content () : Html_types.div_content Tyxml_js.Html.elt list =
+    let state_log , set_state_log = ReactiveData.RList.create [] in
+    let _ = Lwt_react.S.map_s
+        (fun _ ->
+           State_simulation.with_simulation_info
+             ~label:__LOC__
+             ~ready:
+               (fun manager project_id status ->
+                  (manager#simulation_efficiency project_id)
+                  >>=
+                  (Api_common.result_bind_lwt
+                     ~ok:(fun eff ->
+                         let current_event =
+                           status.Api_types_j.simulation_info_progress.Api_types_j.simulation_progress_event in
+                         let () =
+                           ReactiveData.RList.set
+                             set_state_log
+                             (efficiency_detail ~current_event eff) in
+                         Lwt.return (Api_common.result_ok ()))
+                  )
+               )
+             ~stopped:(fun _ _ ->
+                 let () = ReactiveData.RList.set set_state_log [] in
+                 Lwt.return (Api_common.result_ok ()))
+             ()
+        )
+        State_simulation.model in
+
     [ [%html {|
      <div class="row" id="|}id{|">
-        <div class="col-md-4 col-xs-10">
+        <div class="col-md-5">
+     <div class="row">
+        <div class="col-xs-9">
             <div class="progress">
             |}[ event_progress_bar () ]{|
             </div>
         </div>
-        <div class="col-md-2 col-xs-2">events</div>
-     </div>|}] ;
-     [%html {|
+        <div class="col-xs-3">events</div>
+     </div>
      <div class="row">
-        <div class="col-md-4 col-xs-10">
+        <div class="col-xs-9">
             <div class="progress">
             |}[ time_progress_bar () ]{|
             </div>
         </div>
-        <div class="col-md-2 col-xs-2">time</div>
-     </div>|}] ;
-     [%html {|
+        <div class="col-xs-3">time</div>
+     </div>
      <div class="row">
-        <div class="col-md-4 col-xs-10">
+        <div class="col-xs-9">
            |}[ tracked_events_count () ]{|
         </div>
-        <div class="col-md-2 col-xs-2">
+        <div class="col-xs-3">
            |}[ tracked_events_label () ]{|
         </div>
      </div>
-   |}] ; ]
+</div>
+<div class="visible-md-block visible-lg-block">
+|}[ Tyxml_js.R.Html.div state_log ]{|
+</div>
+</div>
+   |}] ]
 
   let onload () = ()
 

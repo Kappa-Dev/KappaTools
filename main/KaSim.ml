@@ -336,15 +336,7 @@ let () =
             toplevel env graph' state' in
     Format.printf "Simulation ended@.";
     remove_trace ();
-    if Counter.nb_null_event counter <> 0 then
-      let () =
-        Format.printf
-          "@[%.2f%% of event loops were productive.@ Null event cause:@]@."
-          (100. *. (float_of_int (Counter.current_event counter)) /.
-           (float_of_int
-              (Counter.nb_null_event counter +
-               Counter.current_event counter))) in
-      Counter.print_efficiency Format.std_formatter counter ;
+    Counter.print_efficiency Format.std_formatter counter ;
   with
   | ExceptionDefn.Malformed_Decl er ->
     let () = Outputs.close () in
