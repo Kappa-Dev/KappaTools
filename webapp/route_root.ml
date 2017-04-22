@@ -343,6 +343,19 @@ let route
          )
      };
      { Webapp_common.path =
+         "/v2/projects/{projectid}/simulation/efficiency" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#simulation_efficiency project_id) >>=
+            (Webapp_common.result_response
+               ~string_of_success:(Counter.Efficiency.string_of_t
+                                     ?len:None)
+            )
+         )
+     };
+     { Webapp_common.path =
          "/v2/projects/{projectid}/simulation/filelines" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =

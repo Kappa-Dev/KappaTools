@@ -147,6 +147,9 @@ class type  manager_simulation =
       Api_types_j.project_id ->
       Api_types_j.simulation_info result Lwt.t
 
+    method simulation_efficiency :
+      Api_types_j.project_id -> Counter.Efficiency.t result Lwt.t
+
     method simulation_parameter :
       Api_types_j.project_id ->
       Api_types_j.simulation_parameter result Lwt.t

@@ -483,6 +483,12 @@ class manager_simulation
            )
         )
 
+    method simulation_efficiency project_id =
+      Api_common.bind_simulation environment project_id
+        (fun _ simulation ->
+           let t : Kappa_facade.t = simulation#get_runtime_state () in
+           Lwt.return (Api_common.result_ok (Kappa_facade.efficiency t)))
+
     inherit  manager_file_line environment system_process
     inherit  manager_flux_map environment system_process
     inherit  manager_log_message environment system_process

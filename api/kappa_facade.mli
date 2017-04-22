@@ -57,6 +57,8 @@ val info :
   (Api_types_j.simulation_detail, Api_types_j.errors)
     Result_data.t Lwt.t
 
+val efficiency : t -> Counter.Efficiency.t
+
 val get_contact_map : t -> Api_types_j.site_node array
 
 val get_dead_rules : t -> string list

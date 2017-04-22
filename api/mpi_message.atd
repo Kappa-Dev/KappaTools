@@ -31,7 +31,7 @@ type project_catalog <ocaml from="Api_types"> = abstract
 type simulation_parameter <ocaml from="Api_types"> = abstract
 type simulation_perturbation  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
-
+type simulation_efficiency <ocaml module="Counter.Efficiency" t="t"> = abstract
 type file_line_id <ocaml from="Api_types"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
 type file_id  <ocaml from="Api_types"> = abstract
@@ -75,6 +75,7 @@ type request = [ EnvironmentInfo of unit
                | SimulationDetailPlot of (project_id * plot_parameter)
                | SimulationDetailSnapshot of (project_id * snapshot_id)
                | SimulationInfo of project_id
+	       | SimulationEfficiency of project_id
                | SimulationCatalogFileLine of project_id
                | SimulationCatalogFluxMap of project_id
                | SimulationCatalogSnapshot of project_id
@@ -104,6 +105,7 @@ type response = [ EnvironmentInfo of environment_info result
                 | SimulationDetailPlot of plot_detail result
                 | SimulationDetailSnapshot of snapshot_detail result
                 | SimulationInfo of simulation_info result
+		| SimulationEfficiency of simulation_efficiency result
                 | SimulationCatalogFileLine of file_line_catalog result
                 | SimulationCatalogFluxMap of flux_map_catalog result
                 | SimulationCatalogSnapshot of snapshot_catalog result

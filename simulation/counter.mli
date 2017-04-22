@@ -8,6 +8,27 @@
 
 (** Simulation progress keeper *)
 
+module Efficiency : sig
+  type t
+
+  val print_detail : Format.formatter -> t -> unit
+
+  val write_t : Bi_outbuf.t -> t -> unit
+  (** Output a JSON value of type {!t}. *)
+
+  val string_of_t : ?len:int -> t -> string
+  (** Serialize a value of type {!t} into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+  val read_t : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
+  (** Input JSON data of type {!t}. *)
+
+  val t_of_string : string -> t
+  (** Deserialize JSON data of type {!t}. *)
+end
+
 type progressBar = {
   progressSize : int;
   progressChar : char;
@@ -57,6 +78,7 @@ val current_story : t -> int
 val nb_null_event : t -> int
 val consecutive_null_event : t -> int
 
+val get_efficiency : t -> Efficiency.t
 val print_efficiency : Format.formatter -> t -> unit
 
 (** {5 Output on stdout } *)

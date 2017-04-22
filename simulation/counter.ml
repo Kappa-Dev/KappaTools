@@ -16,11 +16,10 @@ let default_progress = {
   progressChar = '#';
 }
 
-module Stat_null_events :
-sig
+module Efficiency : sig
   type t
 
-  val init : unit -> t
+  val init: t
 
   val nb : t -> int
   val nb_consecutive : t -> int
@@ -31,48 +30,109 @@ sig
   val incr_no_more_unary : t -> t
   val incr_clashing_instance : t -> t
   val incr_time_correction : t -> t
+
+  val write_t : Bi_outbuf.t -> t -> unit
+  val string_of_t : ?len:int -> t -> string
+  val read_t : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
+  val t_of_string : string -> t
 end =
   struct
-    type t = int array
+    type t = {
+      mutable consecutive : int;
+      mutable no_more_binary : int;
+      mutable no_more_unary : int;
+      mutable clashing_instance : int;
+      mutable time_correction : int
+    }
 
-    let all = 0
-    let consecutive = 1
-    let no_more_binary = 2
-    let no_more_unary = 3
-    let clashing_instance = 4
-    let time_correction = 5
-    let init () = Array.make 6 0
+    let init = {
+      consecutive = 0;
+      no_more_binary = 0;
+      no_more_unary = 0;
+      clashing_instance = 0;
+      time_correction = 0;
+    }
 
-    let nb t = t.(all)
-    let nb_consecutive t = t.(consecutive)
-    let reset_consecutive t = let () = t.(consecutive) <- 0 in t
+    let nb t =
+      t.no_more_binary + t.no_more_unary + t.clashing_instance + t.time_correction
+    let nb_consecutive t = t.consecutive
+    let reset_consecutive t = let () = t.consecutive <- 0 in t
 
-    let incr_t t i = t.(i) <- succ t.(i)
-    let incr_one t i =
-      let () = incr_t t all in
-      let () = incr_t t consecutive in
-      let () = incr_t t i in
+    let incr_no_more_binary t =
+      let () = t.no_more_binary <- succ t.no_more_binary in
+      let () = t.consecutive <- succ t.consecutive in
+      t
+    let incr_no_more_unary t =
+      let () = t.no_more_unary <- succ t.no_more_unary in
+      let () = t.consecutive <- succ t.consecutive in
+      t
+    let incr_clashing_instance t =
+      let () = t.clashing_instance <- succ t.clashing_instance in
+      let () = t.consecutive <- succ t.consecutive in
+      t
+    let incr_time_correction t =
+      let () = t.time_correction <- succ t.time_correction in
+      let () = t.consecutive <- succ t.consecutive in
       t
 
-    let incr_no_more_binary t = incr_one t no_more_binary
-    let incr_no_more_unary t = incr_one t no_more_unary
-    let incr_clashing_instance t = incr_one t clashing_instance
-    let incr_time_correction t = incr_one t time_correction
-
     let print_detail f t =
+      let all = float_of_int (nb t) in
       let () = Format.pp_open_vbox f 0 in
-      let () = if t.(no_more_unary) > 0 then Format.fprintf
+      let () = if t.no_more_unary > 0 then Format.fprintf
             f "\tValid embedding but no longer unary when required: %.2f%%@,"
-            (100. *. (float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
-      let () = if t.(no_more_binary) > 0 then Format.fprintf
+            (100. *. (float_of_int t.no_more_unary) /. all) in
+      let () = if t.no_more_binary > 0 then Format.fprintf
             f "\tValid embedding but not binary when required: %.2f%%@,"
-            (100. *. (float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
-      let () = if t.(clashing_instance) > 0 then Format.fprintf
+            (100. *. (float_of_int t.no_more_binary) /. all) in
+      let () = if t.clashing_instance > 0 then Format.fprintf
             f "\tClashing instance: %.2f%%@,"
-            (100. *. (float_of_int t.(clashing_instance)) /. (float_of_int t.(all))) in
-      if t.(time_correction) > 0 then Format.fprintf
+            (100. *. (float_of_int t.clashing_instance) /. all) in
+      if t.time_correction > 0 then Format.fprintf
           f "\tPerturbation interrupting time advance: %.2f%%@]@."
-          (100. *. (float_of_int t.(time_correction)) /. (float_of_int t.(all)))
+          (100. *. (float_of_int t.time_correction) /. all)
+
+    let to_yojson t = `Assoc [
+        "consecutive", `Int t.consecutive;
+        "no_more_binary", `Int t.no_more_binary;
+        "no_more_unary", `Int t.no_more_unary;
+        "clashing_instance", `Int t.clashing_instance;
+        "time_correction", `Int t.time_correction;
+      ]
+
+    let of_yojson = function
+      | `Assoc l as x when List.length l = 5 -> {
+          consecutive =
+            Yojson.Basic.Util.to_int
+              (Yojson.Basic.Util.member "consecutive" x);
+          no_more_binary =
+            Yojson.Basic.Util.to_int
+              (Yojson.Basic.Util.member "no_more_binary" x);
+          no_more_unary =
+            Yojson.Basic.Util.to_int
+              (Yojson.Basic.Util.member "no_more_unary" x);
+          clashing_instance =
+            Yojson.Basic.Util.to_int
+              (Yojson.Basic.Util.member "clashing_instance" x);
+          time_correction =
+            Yojson.Basic.Util.to_int
+              (Yojson.Basic.Util.member "time_correction" x);
+        }
+      | x ->
+        raise (Yojson.Basic.Util.Type_error ("Invalid simulation efficiency",x))
+
+    let write_t ob f =
+      Yojson.Basic.to_outbuf ob (to_yojson f)
+
+    let string_of_t ?(len = 1024) x =
+      let ob = Bi_outbuf.create len in
+      write_t ob x;
+      Bi_outbuf.contents ob
+
+    let read_t p lb =
+      of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+    let t_of_string s =
+      read_t (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
   end
 
 type period = DE of int | DT of float
@@ -81,7 +141,7 @@ type t = {
     mutable events:int ;
     mutable stories:int ;
     mutable last_point : int;
-    mutable stat_null : Stat_null_events.t ;
+    mutable stat_null : Efficiency.t ;
     init_time : float ;
     init_event : int ;
     mutable progress_report : Progress_report.t option ;
@@ -93,8 +153,8 @@ type t = {
 let current_story c = c.stories
 let current_time c = c.time
 let current_event c = c.events
-let nb_null_event c = Stat_null_events.nb c.stat_null
-let consecutive_null_event c = Stat_null_events.nb_consecutive c.stat_null
+let nb_null_event c = Efficiency.nb c.stat_null
+let consecutive_null_event c = Efficiency.nb_consecutive c.stat_null
 let inc_time c dt = c.time <- (c.time +. dt)
 let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
@@ -105,20 +165,20 @@ let check_output_time c ot =
 let check_events c =
   match c.max_event with None -> true | Some max -> c.events < max
 let one_constructive_event c dt =
-  let () = c.stat_null <- Stat_null_events.reset_consecutive c.stat_null in
+  let () = c.stat_null <- Efficiency.reset_consecutive c.stat_null in
   let () = inc_events c in
   let () = inc_time c dt in
   check_time c && check_events c
 let one_no_more_binary_event c dt =
-  let () = c.stat_null <- Stat_null_events.incr_no_more_binary c.stat_null in
+  let () = c.stat_null <- Efficiency.incr_no_more_binary c.stat_null in
   let () = inc_time c dt in
   check_time c && check_events c
 let one_no_more_unary_event c dt =
-  let () = c.stat_null <- Stat_null_events.incr_no_more_unary c.stat_null in
+  let () = c.stat_null <- Efficiency.incr_no_more_unary c.stat_null in
   let () = inc_time c dt in
   check_time c && check_events c
 let one_clashing_instance_event c dt =
-  let () = c.stat_null <- Stat_null_events.incr_clashing_instance c.stat_null in
+  let () = c.stat_null <- Efficiency.incr_clashing_instance c.stat_null in
   let () = inc_time c dt in
   check_time c && check_events c
 let one_time_correction_event c ti =
@@ -126,9 +186,10 @@ let one_time_correction_event c ti =
   | None -> false
   | Some ti ->
     let () = c.time <- ti in
-    let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
+    let () = c.stat_null <- Efficiency.incr_time_correction c.stat_null in
     check_time c && check_events c
-let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
+let get_efficiency c = c.stat_null
+let print_efficiency f c = Efficiency.print_detail f c.stat_null
 let init_time c = c.init_time
 let max_time c = c.max_time
 let max_events c = c.max_event
@@ -175,7 +236,7 @@ let create ?(init_t=0.) ?(init_e=0) ?max_time ?max_event ~plot_period =
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
-   stat_null = Stat_null_events.init () ;
+   stat_null = Efficiency.init ;
    plot_period = plot_period ;
    init_time = init_t ;
    init_event = init_e ;
@@ -190,7 +251,7 @@ let reinitialize counter =
   counter.events <- counter.init_event;
   counter.stories <- -1;
   counter.last_point <- 0;
-  counter.stat_null <- Stat_null_events.init ()
+  counter.stat_null <- Efficiency.init
 
 let tick ~efficiency conf c =
   let pr =

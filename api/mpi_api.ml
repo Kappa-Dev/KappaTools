@@ -85,6 +85,9 @@ let on_message
   | `SimulationInfo project_id ->
     (manager#simulation_info project_id) >>=
     (handler (fun result -> `SimulationInfo result))
+  | `SimulationEfficiency project_id ->
+    (manager#simulation_efficiency project_id) >>=
+    (handler (fun result -> `SimulationEfficiency result))
   | `SimulationCatalogFileLine project_id ->
     (manager#simulation_catalog_file_line project_id) >>=
     (handler (fun result -> `SimulationCatalogFileLine result))
@@ -396,6 +399,19 @@ class virtual  manager_base () : manager_base_type =
         ~ok:(function
             | `SimulationInfo simulation_status ->
               Lwt.return simulation_status
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
+    method simulation_efficiency
+      (project_id : Api_types_j.project_id):
+      Counter.Efficiency.t Api.result Lwt.t =
+      self#message (`SimulationEfficiency project_id) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `SimulationEfficiency efficiency ->
+              Lwt.return efficiency
             | response ->
               Lwt.return
                 (Api_common.result_error_exception

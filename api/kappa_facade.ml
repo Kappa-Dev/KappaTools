@@ -614,6 +614,8 @@ let info
       (catch_error (fun e -> Lwt.return (Result_data.error e)))
   | _ -> Lwt.return (Result_data.error t.error_messages)
 
+let efficiency t = Counter.get_efficiency t.counter
+
 let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map
     (Model.signatures t.env)
