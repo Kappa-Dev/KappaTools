@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 18 2017>
+  * Last modification: Time-stamp: <Apr 22 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -37,7 +37,8 @@ sig
     ?nonnegative:bool -> ?initial_step:float -> ?max_step:float ->
     ?abstol:float -> ?reltol:float ->
     Remanent_parameters_sig.parameters ->
-    Loggers.t -> Loggers.t -> I.compil ->
+    Loggers.t -> Loggers.t -> Loggers.t ->
+    I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
     unit
 

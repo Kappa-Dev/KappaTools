@@ -34,7 +34,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfSpecies>
-<species metaid="CMD6" id="t1" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD6" id="t1" name="tt" compartment="default" initialAmount="1" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>

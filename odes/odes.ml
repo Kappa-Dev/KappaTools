@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 19 2017>
+  * Last modification: Time-stamp: <Apr 22 2017>
 *)
 
 let local_trace = false
@@ -1498,15 +1498,15 @@ struct
     }
 
   let increment
-      is_zero ?(init_mode=false) ?(comment="") string_of_var logger logger_buffer x =
+      is_zero ?(init_mode=false) ?(comment="") string_of_var logger logger_buffer logger_err x =
     if is_zero x
     then
-      Ode_loggers.associate ~init_mode ~comment string_of_var logger logger_buffer  (Ode_loggers_sig.Init x)
+      Ode_loggers.associate ~init_mode ~comment string_of_var logger logger_buffer logger_err  (Ode_loggers_sig.Init x)
     else
-      Ode_loggers.increment ~init_mode ~comment string_of_var logger (Ode_loggers_sig.Init x)
+      Ode_loggers.increment ~init_mode ~comment string_of_var logger logger_err (Ode_loggers_sig.Init x)
 
   let affect_var is_zero ?init_mode:(init_mode=false) logger
-      logger_buffer compil network decl =
+      logger_buffer logger_err compil network decl =
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
@@ -1525,13 +1525,14 @@ struct
           in
           increment
             is_zero ~init_mode ~comment
-            (I.string_of_var_id ~compil ~init_mode logger) logger logger_buffer a expr
+            (I.string_of_var_id ~compil ~init_mode logger) logger logger_buffer logger_err a expr
             handler_expr
         | _ ->
           let () = Ode_loggers.associate
               ~init_mode
               (I.string_of_var_id ~compil ~init_mode logger)
-              logger logger_buffer (Ode_loggers_sig.Expr id') expr
+              logger logger_buffer logger_err
+              (Ode_loggers_sig.Expr id') expr
               handler_expr
           in
           List.iter
@@ -1546,13 +1547,15 @@ struct
                       n) n in
                increment
                  is_zero (I.string_of_var_id ~compil ~init_mode logger)
-                 logger logger_buffer ~init_mode id expr
+                 logger logger_buffer logger_err
+                 ~init_mode id expr
                  handler_init)
             list
       end
     | Var (id,_comment,expr) ->
       Ode_loggers.associate
-        ~init_mode (I.string_of_var_id ~compil ~init_mode logger) logger logger_buffer
+        ~init_mode (I.string_of_var_id ~compil ~init_mode logger)
+        logger logger_buffer logger_err
         (Ode_loggers_sig.Expr id) expr handler_expr
 
   let get_dep ?time_var dep_map expr network =
@@ -1583,7 +1586,7 @@ struct
   module VMAP = VSetMap.Map
 
   let affect_deriv_var
-      _is_zero logger logger_buffer compil network decl dep
+      _is_zero logger logger_buffer logger_err compil network decl dep
     =
     let time_var = build_time_var network in
     let handler_expr = handler_expr network in
@@ -1603,7 +1606,7 @@ struct
              Ode_loggers.associate
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
-               logger logger_buffer
+               logger logger_buffer logger_err
                (Ode_loggers.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
@@ -1619,7 +1622,7 @@ struct
              Ode_loggers.associate
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
-               logger logger_buffer
+               logger logger_buffer logger_err
                (Ode_loggers.variable_of_derived_variable
                   (Ode_loggers_sig.Expr id) dt)
                expr handler_expr)
@@ -1628,7 +1631,7 @@ struct
       dep
 
   let affect_deriv_gen
-      dep_var logger logger_buffer compil var rate network dep =
+      dep_var logger logger_buffer logger_err compil var rate network dep =
       let time_var = build_time_var network in
       let handler_expr = handler_expr network in
       let dep_set = get_dep ?time_var dep_var rate network in
@@ -1643,7 +1646,7 @@ struct
              Ode_loggers.associate
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
-               logger logger_buffer
+               logger logger_buffer logger_err
                (Ode_loggers.variable_of_derived_variable
                   var dt)
                 expr handler_expr)
@@ -1659,7 +1662,7 @@ struct
              Ode_loggers.associate
                ~init_mode:false
                (I.string_of_var_id ~compil logger)
-               logger logger_buffer
+               logger logger_buffer logger_err
                (Ode_loggers.variable_of_derived_variable
                   var dt)
                 expr handler_expr)
@@ -1668,16 +1671,16 @@ struct
       dep
 
   let affect_deriv_rate
-      dep_var logger logger_buffer compil rule rate network dep
+      dep_var logger logger_buffer logger_err compil rule rate network dep
     =
     affect_deriv_gen
-      dep_var logger logger_buffer compil (var_of_rule rule) rate network dep
+      dep_var logger logger_buffer logger_err compil (var_of_rule rule) rate network dep
 
   let affect_deriv_stoch
-      dep_var logger logger_buffer compil rule n coef network dep
+      dep_var logger logger_buffer logger_err compil rule n coef network dep
     =
     affect_deriv_gen
-      dep_var logger logger_buffer compil (var_of_stoch rule n) coef network dep
+      dep_var logger logger_buffer logger_err compil (var_of_stoch rule n) coef network dep
 
   let fresh_is_zero network =
     let is_zero =
@@ -1756,7 +1759,7 @@ struct
       ~compute_jacobian
       ~command_line ~command_line_quotes ?(data_file="data.csv")
       ?(init_t=0.)
-      ~max_t ?(plot_period=1.) logger logger_buffer compil network
+      ~max_t ?(plot_period=1.) logger logger_buffer logger_err compil network
       split =
     let is_zero = fresh_is_zero network in
     let nodevar = get_last_ode_var_id network in
@@ -1790,53 +1793,53 @@ struct
         let () = Ode_loggers.print_newline logger in
         (*---------------------------------------------------------------*)
         let () =
-          Sbml_backend.open_box logger_buffer "listOfParameters"
+          Sbml_backend.open_box logger_buffer logger_err "listOfParameters"
         in
-        let () = Sbml_backend.line_dotnet_or_sbml logger_buffer in
+        let () = Sbml_backend.line_dotnet_or_sbml logger_buffer logger_err in
         let () =
-          Sbml_backend.open_box_dotnet logger_buffer "begin parameters"
+          Sbml_backend.open_box_dotnet logger_buffer logger_err "begin parameters"
         in
-        let () = Sbml_backend.line_dotnet logger_buffer in
+        let () = Sbml_backend.line_dotnet logger_buffer logger_err in
         (*---------------------------------------------------------------*)
         let () =
           Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
-            logger_buffer Ode_loggers_sig.Tinit (Alg_expr.float init_t)
+            logger_buffer logger_err Ode_loggers_sig.Tinit (Alg_expr.float init_t)
             handler_expr
         in
         let () =
           Ode_loggers.associate (I.string_of_var_id ~compil logger) logger
-            logger_buffer Ode_loggers_sig.Tend
+            logger_buffer logger_err Ode_loggers_sig.Tend
             (Alg_expr.float max_t)
             handler_expr
         in
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer Ode_loggers_sig.InitialStep
+            logger logger_buffer logger_err Ode_loggers_sig.InitialStep
             (Alg_expr.float initial_step) handler_expr
         in
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer Ode_loggers_sig.MaxStep
+            logger logger_buffer logger_err Ode_loggers_sig.MaxStep
             (Alg_expr.float max_step) handler_expr
         in
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer Ode_loggers_sig.RelTol
+            logger logger_buffer logger_err Ode_loggers_sig.RelTol
             (Alg_expr.float reltol) handler_expr
         in
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer Ode_loggers_sig.AbsTol
+            logger logger_buffer logger_err Ode_loggers_sig.AbsTol
             (Alg_expr.float abstol) handler_expr
         in
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer Ode_loggers_sig.Period_t_points
+            logger logger_buffer logger_err Ode_loggers_sig.Period_t_points
             (Alg_expr.float plot_period) handler_expr
         in
         let () = Ode_loggers.print_newline logger_buffer in
@@ -1848,7 +1851,7 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer
+            logger logger_buffer logger_err
             Ode_loggers_sig.N_ode_var
             (Alg_expr.int nodevar)
             handler_expr
@@ -1860,7 +1863,7 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer
+            logger logger_buffer logger_err
             Ode_loggers_sig.N_max_stoc_coef
             (Alg_expr.int network.max_stoch_coef)
             handler_expr
@@ -1868,7 +1871,7 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer
+            logger logger_buffer logger_err
             Ode_loggers_sig.N_var
             (Alg_expr.int (get_last_var_id network))
             handler_expr
@@ -1876,7 +1879,7 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer
+            logger logger_buffer logger_err
             Ode_loggers_sig.N_obs
             (Alg_expr.int network.n_obs)
             handler_expr
@@ -1884,7 +1887,7 @@ struct
         let () =
           Ode_loggers.associate
             (I.string_of_var_id ~compil logger)
-            logger logger_buffer
+            logger logger_buffer logger_err
             Ode_loggers_sig.N_rules
             (Alg_expr.int network.n_rules)
             handler_expr
@@ -1992,7 +1995,7 @@ struct
               let () =
                 Ode_loggers.associate
                   (I.string_of_var_id ~compil logger)
-                  logger logger_buffer
+                  logger logger_buffer logger_err
                   (Ode_loggers_sig.Init (get_last_ode_var_id network))
                   (Locality.dummy_annot
                      (Alg_expr.STATE_ALG_OP
@@ -2001,9 +2004,9 @@ struct
               in
               Sbml_backend.print_parameters
                 I.string_of_var_id
-                logger logger_buffer
+                logger logger_buffer logger_err
                 Ode_loggers_sig.Time_scale_factor Nbr.one;
-              Sbml_backend.line_dotnet logger
+              Sbml_backend.line_dotnet logger logger_err
             | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
             | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
             | Loggers.TXT_Tabular
@@ -2014,7 +2017,7 @@ struct
         (*---------------------------------------------------------------*)
         let () =
           List.iter
-            (affect_var is_zero logger logger_buffer ~init_mode:true
+            (affect_var is_zero logger logger_buffer logger_err ~init_mode:true
                compil network)
             network.var_declaration
         in
@@ -2028,12 +2031,12 @@ struct
                     | R rate ->
                       Ode_loggers.associate
                         (I.string_of_var_id ~compil logger)
-                        ~comment:rule.comment logger logger_buffer
+                        ~comment:rule.comment logger logger_buffer logger_err
                         (var_of_rate rule.rule_id_with_mode) rate handler_expr
                     | S (n,stoc) ->
                       Ode_loggers.associate
                         (I.string_of_var_id ~compil logger)
-                        logger logger_buffer
+                        logger logger_buffer logger_err
                         (Ode_loggers_sig.Stochiometric_coef
                            ((let a,_,_ = rule.rule_id_with_mode in a) , n))
                         stoc
@@ -2042,13 +2045,41 @@ struct
             )
             split.const_rate
         in
+        let () =
+          Sbml_backend.do_dotnet
+            logger logger_err
+            (fun logger logger_err ->
+               List.iter
+                 (fun (rule,coefs) ->
+                    List.iter
+                      (fun coef ->
+                         match coef with
+                         | R rate ->
+                           let () =
+                             Sbml_backend.warn_expr
+                               rate
+                               "DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1"
+                               logger logger_err
+                           in
+                           Ode_loggers.associate
+                             (I.string_of_var_id ~compil logger)
+                             ~comment:rule.comment logger logger_buffer
+                            logger_err
+                            (var_of_rate rule.rule_id_with_mode)
+                            (Alg_expr.CONST Nbr.one,snd rate) handler_expr
+                         | S _ -> ())
+                   coefs
+                 )
+                 split.var_rate)
+          in
         (*---------------------------------------------------------------*)
-        let () =
-          Sbml_backend.close_box logger_buffer  "listOfParameters"
-        in
-        let () =
-          Sbml_backend.close_box_dotnet logger_buffer  "end parameters"
-        in
+          let () =
+            Sbml_backend.close_box logger_buffer logger_err "listOfParameters"
+          in
+          let () =
+            Sbml_backend.close_box_dotnet logger_buffer logger_err
+              "end parameters"
+          in
         (*---------------------------------------------------------------*)
         let () = Ode_loggers.print_newline logger in
         let () = Ode_loggers.print_license_check logger in
@@ -2104,7 +2135,7 @@ struct
   let export_main = export_main_gen ~step:1
   let export_main_follow_up = export_main_gen ~step:2
 
-  let export_dydt ~show_time_advance logger compil network split =
+  let export_dydt ~show_time_advance logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let label = "listOfReactions" in
@@ -2116,12 +2147,12 @@ struct
       then
         Ode_loggers.show_time_advance logger
     in
-    let () = Sbml_backend.open_box logger label in
-    let () = Sbml_backend.line_dotnet_or_sbml logger in
-    let () = Sbml_backend.line_dotnet logger in
-    let () = Sbml_backend.open_box_dotnet logger label_dotnet in
+    let () = Sbml_backend.open_box logger logger_err label in
+    let () = Sbml_backend.line_dotnet_or_sbml logger logger_err in
+    let () = Sbml_backend.line_dotnet logger logger_err in
+    let () = Sbml_backend.open_box_dotnet logger logger_err label_dotnet in
+    let () = Sbml_backend.line_dotnet logger logger_err in
     let () = Ode_loggers.print_newline logger in
-    let () = Sbml_backend.line_dotnet logger in
     let () =
       Ode_loggers.declare_global logger Ode_loggers_sig.N_ode_var
     in
@@ -2134,7 +2165,8 @@ struct
     let () = declare_rates_global logger network in
     let () =
       List.iter
-        (affect_var is_zero logger logger ~init_mode:false compil network)
+        (affect_var
+           is_zero logger logger logger_err ~init_mode:false compil network)
         split.var_decl
     in
     let () = Ode_loggers.print_newline logger in
@@ -2148,12 +2180,12 @@ struct
                 | R rate ->
                   Ode_loggers.associate
                     (I.string_of_var_id ~compil logger)
-                    logger logger
+                    logger logger logger_err
                     (var_of_rule rule) rate (handler_expr network)
                 | S (n, stoc) ->
                   Ode_loggers.associate
                     (I.string_of_var_id ~compil logger)
-                    logger logger
+                    logger logger logger_err
                     (Ode_loggers_sig.Stochiometric_coef
                        ((let a,_,_ = rule.rule_id_with_mode in a), n))
                     stoc
@@ -2328,6 +2360,7 @@ struct
                I.print_rule_name
                (Some compil)
                logger
+               logger_err
                (handler_expr network)
                reactants'
                products'
@@ -2337,7 +2370,16 @@ struct
                enriched_rule.divide_rate_by
                nocc
            in
-           (*------------------------------------------*)
+           let () =
+             match
+               Loggers.formatter_of_logger logger
+             with
+             | None -> ()
+             | Some fmt ->
+               let () =
+                 Loggers.flush_and_clean logger_err fmt
+               in ()
+           in
            let reactants' =
              List.rev_map
                (fun x ->
@@ -2381,28 +2423,45 @@ struct
     let () =
       if may_be_not_time_homogeneous network
       then
-        let () =
-          Ode_loggers.associate
-            (I.string_of_var_id ~compil logger) logger logger
-            (Ode_loggers_sig.Deriv
-               (get_last_ode_var_id network))
-            (Alg_expr.const Nbr.one) (handler_expr network)
-        in
-        let () = Ode_loggers.print_newline logger in
-        let () = Sbml_backend.time_advance logger in
-        ()
+        if Sbml_backend.is_dotnet logger
+        then
+          let s = "DOTNET backend does not support time dependent expressions\n" in
+          let () = Printf.printf "%s" s in
+            Sbml_backend.print_comment
+              logger
+              logger_err
+              s 
+        else
+          let () =
+            Ode_loggers.associate
+              (I.string_of_var_id ~compil logger) logger logger logger_err
+              (Ode_loggers_sig.Deriv
+                 (get_last_ode_var_id network))
+              (Alg_expr.const Nbr.one) (handler_expr network)
+          in
+          let () = Ode_loggers.print_newline logger in
+          let () = Sbml_backend.time_advance logger logger_err in
+          ()
       else
         ()
     in
     let () = Ode_loggers.close_procedure logger in
-    let () = Sbml_backend.close_box logger label in
+    let () = Sbml_backend.close_box logger logger_err label in
     let label_close = "end reactions" in
-    let () = Sbml_backend.close_box_dotnet logger label_close in
+    let () = Sbml_backend.close_box_dotnet logger logger_err label_close in
+    let () =
+      match
+        Loggers.formatter_of_logger logger
+      with
+      | None -> ()
+      | Some fmt ->
+        Loggers.flush_and_clean logger_err fmt
+    in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
     ()
 
-  let export_jac logger compil network split =
+  let export_jac logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
     match Loggers.get_encoding_format logger with
     | Loggers.Matrix | Loggers.TXT
@@ -2438,7 +2497,8 @@ struct
       in
       let () =
         List.iter
-          (affect_var is_zero logger logger ~init_mode:false compil network) split.var_decl in
+          (affect_var is_zero logger logger logger_err
+             ~init_mode:false compil network) split.var_decl in
       let () = Ode_loggers.print_newline logger in
       let () =
         List.iter
@@ -2449,13 +2509,13 @@ struct
                   | R rate ->
                   Ode_loggers.associate
                     (I.string_of_var_id ~compil logger)
-                    logger logger
+                    logger logger logger_err
                     (var_of_rule rule)
                     rate (handler_expr network)
                   | S (n,rate) ->
                     Ode_loggers.associate
                       (I.string_of_var_id ~compil logger)
-                      logger logger
+                      logger logger logger_err
                       (var_of_stoch rule n)
                       rate (handler_expr network)
                )
@@ -2466,7 +2526,7 @@ struct
         List.fold_left
           (fun dep var ->
              affect_deriv_var
-               is_zero logger logger compil network var dep)
+               is_zero logger logger logger_err compil network var dep)
           Mods.IntMap.empty
           split.var_decl
       in
@@ -2480,13 +2540,13 @@ struct
                   | R rate ->
                     affect_deriv_rate
                       dep_var
-                      logger logger compil
+                      logger logger logger_err compil
                       rule rate network
                       dep
                   | S (n,rate) ->
                     affect_deriv_stoch
                       dep_var
-                      logger logger compil
+                      logger logger logger_err compil
                       rule n rate network
                       dep)
                dep coef_list
@@ -2697,19 +2757,19 @@ struct
       in
       (* Derivative of time is equal to 1 *)
       let () = Ode_loggers.close_procedure logger in
-      let () = Sbml_backend.close_box logger label in
+      let () = Sbml_backend.close_box logger logger_err label in
       let () = Ode_loggers.print_newline logger in
       let () = Ode_loggers.print_newline logger in
       ()
 
-  let export_init logger compil network =
+  let export_init logger logger_err compil network =
     let nodevar = get_last_ode_var_id network in
     let label = "listOfSpecies" in
     let label_dotnet = "begin species" in
-    let () = Sbml_backend.open_box logger label in
-    let () = Sbml_backend.line_dotnet_or_sbml logger in
-    let () = Sbml_backend.open_box_dotnet logger label_dotnet in
-    let () = Sbml_backend.line_dotnet logger in
+    let () = Sbml_backend.open_box logger logger_err label in
+    let () = Sbml_backend.line_dotnet_or_sbml logger logger_err in
+    let () = Sbml_backend.open_box_dotnet logger logger_err label_dotnet in
+    let () = Sbml_backend.line_dotnet logger logger_err in
     let () =
       Ode_loggers.open_procedure logger "Init" "ode_init" [] in
     let () = Ode_loggers.print_newline logger in
@@ -2729,6 +2789,8 @@ struct
     let rec aux k =
       if
         k >= get_fresh_ode_var_id network
+        || k = get_fresh_ode_var_id network - 1
+           && Sbml_backend.is_dotnet logger
       then
         ()
       else
@@ -2743,10 +2805,31 @@ struct
               match variable with
               | Dummy -> "dummy", "", None
               | Token id ->
-                "t"^(string_of_int k),
-                Format.asprintf "%a"
-                  (fun _log _id -> ()) id ,
-                (Some "substance")
+                begin
+                  match Loggers.get_encoding_format logger with
+                  | Loggers.SBML ->
+                    "t"^(string_of_int k),
+                    Format.asprintf "%a"
+                      (fun log id ->
+                         I.print_token ~compil log id) id,
+                    (Some "substance")
+                  | Loggers.DOTNET ->
+                    (string_of_int k),
+                    Format.asprintf "%a"
+                      (fun log id ->
+                         I.print_token ~compil log id) id,
+                    (Some "substance")
+                  | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                  | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
+                  | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
+                  | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
+                  | Loggers.XLS
+                      -> "", Format.asprintf "%a"
+                      (fun log k -> I.print_chemical_species ~compil log
+                          (fst
+                             (Mods.DynArray.get network.species_tab k))
+                      ) k, None
+                end
               | Noccurrences _ | Nembed _ ->
                 match Loggers.get_encoding_format logger with
                 | Loggers.SBML ->
@@ -2763,7 +2846,12 @@ struct
                           (fst
                              (Mods.DynArray.get network.species_tab k))
                       ) k, Some ""
-                | _ -> "", Format.asprintf "%a"
+                | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
+                | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
+                | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
+                | Loggers.XLS
+                  -> "", Format.asprintf "%a"
                   (fun log k -> I.print_chemical_species ~compil log
                       (fst
                          (Mods.DynArray.get network.species_tab k))
@@ -2775,6 +2863,7 @@ struct
           Sbml_backend.dump_initial_species
             ?units
             logger
+            logger_err
             (handler_expr network)
             k
             comment
@@ -2786,12 +2875,12 @@ struct
     let () = Ode_loggers.close_procedure logger in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
-    let () = Sbml_backend.close_box logger label in
+    let () = Sbml_backend.close_box logger logger_err label in
     let label_close = "end species" in
-    let () = Sbml_backend.close_box_dotnet logger label_close in
+    let () = Sbml_backend.close_box_dotnet logger logger_err label_close in
     ()
 
-  let export_obs logger compil network split =
+  let export_obs logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let () =
@@ -2822,7 +2911,7 @@ struct
       with
       | Loggers.Matlab | Loggers.Octave ->
         List.iter
-          (affect_var is_zero logger logger ~init_mode:false compil
+          (affect_var is_zero logger logger logger_err ~init_mode:false compil
              network) split.var_decl
       | Loggers.Mathematica | Loggers.Maple
       |  Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
@@ -2837,7 +2926,7 @@ struct
       List.iter
         (fun (id,expr) ->
            Ode_loggers.associate
-             (I.string_of_var_id ~compil logger) logger logger
+             (I.string_of_var_id ~compil logger) logger logger logger_err
              (Ode_loggers_sig.Obs id) expr (handler_expr network))
         network.obs
     in
@@ -2857,7 +2946,7 @@ struct
       ?max_step:(max_step=0.02)
       ?abstol:(abstol=0.001)
       ?reltol:(reltol=0.001)
-      parameters logger logger_buffer compil network =
+      parameters logger logger_buffer logger_err compil network =
     let network =
       if may_be_not_time_homogeneous network
       then
@@ -2874,39 +2963,40 @@ struct
       export_main
         ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ~nonnegative ~initial_step ~max_step ~abstol ~reltol ?plot_period
-        logger logger_buffer compil network sorted_rules_and_decl
+        logger logger_buffer logger_err compil network sorted_rules_and_decl
     in
     let () = Format.printf "\t -initial state @." in
-    let () = export_init logger compil network in
-    (*let () = export_init_dotnet logger compil network in*)
+    let () = export_init logger logger_err compil network in
     let () =
       match
         Loggers.formatter_of_logger logger
       with
       | None -> ()
-      | Some fmt -> Loggers.flush_buffer logger_buffer fmt
+      | Some fmt ->
+        let () = Loggers.flush_buffer logger_buffer fmt in
+              Loggers.flush_and_clean logger_err fmt
     in
     let () = Format.printf "\t -ode system @." in
     let () =
-      export_dydt ~show_time_advance logger compil network sorted_rules_and_decl
+      export_dydt ~show_time_advance logger logger_err compil network sorted_rules_and_decl
     in
     let () =
       if compute_jacobian then
         let () = Format.printf "\t -jacobian @." in
         let () =
-          export_jac logger compil network sorted_rules_and_decl
+          export_jac logger logger_err compil network sorted_rules_and_decl
         in
         ()
     in
     let () = Format.printf "\t -observables @." in
     let () =
-      export_obs logger compil network sorted_rules_and_decl in
+      export_obs logger logger_err compil network sorted_rules_and_decl in
     let () = Ode_loggers.launch_main logger in
     let () =
       export_main_follow_up
         ~nonnegative ~initial_step ~max_step ~reltol ~abstol ~compute_jacobian ~command_line ~command_line_quotes ?data_file ?init_t
         ~max_t ?plot_period
-        logger logger_buffer compil network sorted_rules_and_decl
+        logger logger_buffer logger_err compil network sorted_rules_and_decl
     in
     ()
 

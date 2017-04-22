@@ -48,7 +48,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <species metaid="CMD12" id="s1" name="A(x~u?, y~u?)" compartment="default" initialAmount="10" substanceUnits="substance"/>
 <species metaid="CMD13" id="s2" name="A(x~p?, y~u?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD14" id="s3" name="A(x~u?, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
-<species metaid="CMD15" id="t4" name="" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD15" id="t4" name="tt" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD16" id="s5" name="A(x~p?, y~p?)" compartment="default" initialAmount="0" substanceUnits="substance"/>
 <species metaid="CMD17" id="time" name="t" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
@@ -83,14 +83,40 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A(y~u) -> A(y~p) -->
-<!-- reaction: A(x~p?, y~u?) -> A(x~p?, y~p?)  -->
-<reaction id="re2" name="A(y~u) -> A(y~p)" reversible="false" fast="false">
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- reaction: A(x~p?, y~u?) -> A(x~p?, y~u?) | ((a * a) * [T]):tt  -->
+<reaction id="re2" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD24" species="s2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD25" species="s5"/>
+<speciesReference metaid="CMD25" species="s2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD26" species="s1"/>
+<modifierSpeciesReference metaid="CMD27" species="s3"/>
+<modifierSpeciesReference metaid="CMD28" species="s5"/>
+<modifierSpeciesReference metaid="CMD29" species="time"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s2 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A(y~u) -> A(y~p) -->
+<!-- reaction: A(x~p?, y~u?) -> A(x~p?, y~p?)  -->
+<reaction id="re3" name="A(y~u) -> A(y~p)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD30" species="s2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD31" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -101,17 +127,17 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A(x~p) -> A(x~u) -->
 <!-- reaction: A(x~p?, y~u?) -> A(x~u?, y~u?)  -->
-<reaction id="re3" name="A(x~p) -> A(x~u)" reversible="false" fast="false">
+<reaction id="re4" name="A(x~p) -> A(x~u)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD26" species="s2"/>
+<speciesReference metaid="CMD32" species="s2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD27" species="s1"/>
+<speciesReference metaid="CMD33" species="s1"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD28" species="s1"/>
-<modifierSpeciesReference metaid="CMD29" species="s3"/>
-<modifierSpeciesReference metaid="CMD30" species="s5"/>
+<modifierSpeciesReference metaid="CMD34" species="s1"/>
+<modifierSpeciesReference metaid="CMD35" species="s3"/>
+<modifierSpeciesReference metaid="CMD36" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -122,34 +148,12 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
 <!-- reaction: A(x~p?, y~p?) -> A(x~p?, y~p?) | ((a * a) * [T]):tt  -->
-<reaction id="re4" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD31" species="s5"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD32" species="s5"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD33" species="s1"/>
-<modifierSpeciesReference metaid="CMD34" species="s2"/>
-<modifierSpeciesReference metaid="CMD35" species="s3"/>
-<modifierSpeciesReference metaid="CMD36" species="time"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s5 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : A(y~p) -> A(y~u) -->
-<!-- reaction: A(x~p?, y~p?) -> A(x~p?, y~u?)  -->
-<reaction id="re5" name="A(y~p) -> A(y~u)" reversible="false" fast="false">
+<reaction id="re5" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD37" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD38" species="s2"/>
+<speciesReference metaid="CMD38" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
 <modifierSpeciesReference metaid="CMD39" species="s1"/>
@@ -164,19 +168,67 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A(x~p) -> A(x~u) -->
-<!-- reaction: A(x~p?, y~p?) -> A(x~u?, y~p?)  -->
-<reaction id="re6" name="A(x~p) -> A(x~u)" reversible="false" fast="false">
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- reaction: A(x~p?, y~p?) -> A(x~p?, y~p?) | ((a * a) * [T]):tt  -->
+<reaction id="re6" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD43" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD44" species="s3"/>
+<speciesReference metaid="CMD44" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
 <modifierSpeciesReference metaid="CMD45" species="s1"/>
 <modifierSpeciesReference metaid="CMD46" species="s2"/>
 <modifierSpeciesReference metaid="CMD47" species="s3"/>
+<modifierSpeciesReference metaid="CMD48" species="time"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A(y~p) -> A(y~u) -->
+<!-- reaction: A(x~p?, y~p?) -> A(x~p?, y~u?)  -->
+<reaction id="re7" name="A(y~p) -> A(y~u)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD49" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD50" species="s2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD51" species="s1"/>
+<modifierSpeciesReference metaid="CMD52" species="s2"/>
+<modifierSpeciesReference metaid="CMD53" species="s3"/>
+<modifierSpeciesReference metaid="CMD54" species="time"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : A(x~p) -> A(x~u) -->
+<!-- reaction: A(x~p?, y~p?) -> A(x~u?, y~p?)  -->
+<reaction id="re8" name="A(x~p) -> A(x~u)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD55" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD56" species="s3"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD57" species="s1"/>
+<modifierSpeciesReference metaid="CMD58" species="s2"/>
+<modifierSpeciesReference metaid="CMD59" species="s3"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -187,18 +239,18 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
 <!-- reaction: A(x~u?, y~p?) -> A(x~u?, y~p?) | ((a * a) * [T]):tt  -->
-<reaction id="re7" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re9" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD48" species="s3"/>
+<speciesReference metaid="CMD60" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD49" species="s3"/>
+<speciesReference metaid="CMD61" species="s3"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD50" species="s1"/>
-<modifierSpeciesReference metaid="CMD51" species="s2"/>
-<modifierSpeciesReference metaid="CMD52" species="s5"/>
-<modifierSpeciesReference metaid="CMD53" species="time"/>
+<modifierSpeciesReference metaid="CMD62" species="s1"/>
+<modifierSpeciesReference metaid="CMD63" species="s2"/>
+<modifierSpeciesReference metaid="CMD64" species="s5"/>
+<modifierSpeciesReference metaid="CMD65" species="time"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -207,20 +259,46 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A(y~p) -> A(y~u) -->
-<!-- reaction: A(x~u?, y~p?) -> A(x~u?, y~u?)  -->
-<reaction id="re8" name="A(y~p) -> A(y~u)" reversible="false" fast="false">
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- reaction: A(x~u?, y~p?) -> A(x~u?, y~p?) | ((a * a) * [T]):tt  -->
+<reaction id="re10" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD54" species="s3"/>
+<speciesReference metaid="CMD66" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD55" species="s1"/>
+<speciesReference metaid="CMD67" species="s3"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD56" species="s1"/>
-<modifierSpeciesReference metaid="CMD57" species="s2"/>
-<modifierSpeciesReference metaid="CMD58" species="s5"/>
-<modifierSpeciesReference metaid="CMD59" species="time"/>
+<modifierSpeciesReference metaid="CMD68" species="s1"/>
+<modifierSpeciesReference metaid="CMD69" species="s2"/>
+<modifierSpeciesReference metaid="CMD70" species="s5"/>
+<modifierSpeciesReference metaid="CMD71" species="time"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s3 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A(y~p) -> A(y~u) -->
+<!-- reaction: A(x~u?, y~p?) -> A(x~u?, y~u?)  -->
+<reaction id="re11" name="A(y~p) -> A(y~u)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD72" species="s3"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD73" species="s1"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD74" species="s1"/>
+<modifierSpeciesReference metaid="CMD75" species="s2"/>
+<modifierSpeciesReference metaid="CMD76" species="s5"/>
+<modifierSpeciesReference metaid="CMD77" species="time"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -231,12 +309,12 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A(x~u) -> A(x~p) -->
 <!-- reaction: A(x~u?, y~p?) -> A(x~p?, y~p?)  -->
-<reaction id="re9" name="A(x~u) -> A(x~p)" reversible="false" fast="false">
+<reaction id="re12" name="A(x~u) -> A(x~p)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD60" species="s3"/>
+<speciesReference metaid="CMD78" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD61" species="s5"/>
+<speciesReference metaid="CMD79" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -247,18 +325,18 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
 <!-- reaction: A(x~u?, y~u?) -> A(x~u?, y~u?) | ((a * a) * [T]):tt  -->
-<reaction id="re10" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re13" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD62" species="s1"/>
+<speciesReference metaid="CMD80" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD63" species="s1"/>
+<speciesReference metaid="CMD81" species="s1"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD64" species="s2"/>
-<modifierSpeciesReference metaid="CMD65" species="s3"/>
-<modifierSpeciesReference metaid="CMD66" species="s5"/>
-<modifierSpeciesReference metaid="CMD67" species="time"/>
+<modifierSpeciesReference metaid="CMD82" species="s2"/>
+<modifierSpeciesReference metaid="CMD83" species="s3"/>
+<modifierSpeciesReference metaid="CMD84" species="s5"/>
+<modifierSpeciesReference metaid="CMD85" species="time"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -267,14 +345,40 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A(y~u) -> A(y~p) -->
-<!-- reaction: A(x~u?, y~u?) -> A(x~u?, y~p?)  -->
-<reaction id="re11" name="A(y~u) -> A(y~p)" reversible="false" fast="false">
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- reaction: A(x~u?, y~u?) -> A(x~u?, y~u?) | ((a * a) * [T]):tt  -->
+<reaction id="re14" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD68" species="s1"/>
+<speciesReference metaid="CMD86" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD69" species="s3"/>
+<speciesReference metaid="CMD87" species="s1"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD88" species="s2"/>
+<modifierSpeciesReference metaid="CMD89" species="s3"/>
+<modifierSpeciesReference metaid="CMD90" species="s5"/>
+<modifierSpeciesReference metaid="CMD91" species="time"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><apply><times/><apply><times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><plus/><ci>s1</ci><ci>s3</ci></apply><ci>s2</ci></apply><ci>s5</ci></apply></apply></apply><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply></apply><ci> s1 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : A(y~u) -> A(y~p) -->
+<!-- reaction: A(x~u?, y~u?) -> A(x~u?, y~p?)  -->
+<reaction id="re15" name="A(y~u) -> A(y~p)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD92" species="s1"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD93" species="s3"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -285,12 +389,12 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </reaction>
 <!-- rule    : A(x~u) -> A(x~p) -->
 <!-- reaction: A(x~u?, y~u?) -> A(x~p?, y~u?)  -->
-<reaction id="re12" name="A(x~u) -> A(x~p)" reversible="false" fast="false">
+<reaction id="re16" name="A(x~u) -> A(x~p)" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD70" species="s1"/>
+<speciesReference metaid="CMD94" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD71" species="s2"/>
+<speciesReference metaid="CMD95" species="s2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -299,9 +403,9 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </math>
 </kineticLaw>
 </reaction>
-<reaction id="re13" name="time advance" reversible="false" fast="false">
+<reaction id="re17" name="time advance" reversible="false" fast="false">
 <listOfProducts>
-<speciesReference metaid="CMD72" species="time"/>
+<speciesReference metaid="CMD96" species="time"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

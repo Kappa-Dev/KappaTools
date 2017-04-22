@@ -56,6 +56,7 @@ val redirect: t -> Format.formatter -> t
 val formatter_of_logger: t -> Format.formatter option
 val channel_of_logger: t -> out_channel option
 val flush_buffer: t -> Format.formatter -> unit
+val flush_and_clean: t -> Format.formatter -> unit 
 val int_of_string_id: t -> string -> int
 
 val graph_of_logger: t -> Graph_loggers_sig.graph

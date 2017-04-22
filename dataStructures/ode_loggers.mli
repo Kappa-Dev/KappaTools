@@ -48,10 +48,10 @@ val initialize:
 val associate:
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->
-  Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
+  Loggers.t -> Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val increment:
-  ?init_mode:bool -> ?comment:string -> (int -> string) -> Loggers.t -> Ode_loggers_sig.variable ->
+  ?init_mode:bool -> ?comment:string -> (int -> string) -> Loggers.t -> Loggers.t ->  Ode_loggers_sig.variable ->
   (Ode_loggers_sig.ode_var_id,
    Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Network_handler.t -> unit
 val associate_nrows: Loggers.t -> unit
