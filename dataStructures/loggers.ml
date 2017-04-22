@@ -445,7 +445,19 @@ let flush_buffer logger fmt =
   | DEVNUL
   | Formatter _ -> ()
   | Circular_buffer a -> Circular_buffers.iter (Format.fprintf fmt "%s") !a
-  | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
+  | Infinite_buffer b ->
+      Infinite_buffers.iter (Format.fprintf fmt "%s") !b
+
+let flush_and_clean logger fmt =
+  let () = flush_buffer logger fmt in
+  match logger.logger with
+  | DEVNUL
+  | Formatter _ -> ()
+  | Circular_buffer a ->
+    a:=Circular_buffers.clean !a
+  | Infinite_buffer b ->
+    b:=Infinite_buffers.clean !b
+
 
 let fprintf logger = fprintf ~fprintnewline:false logger
 

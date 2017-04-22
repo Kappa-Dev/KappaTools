@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 20 2017>
+  * Last modification: Time-stamp: <Apr 22 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -283,6 +283,17 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
     in
+    let logger_err =
+      match backend with
+      | Loggers.DOTNET
+      | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
+      | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
+      | Loggers.HTML_Tabular
+      | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+      | Loggers.XLS -> logger
+      | Loggers.Octave | Loggers.Matlab
+      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
+    in
     let () =
       A.export_network
         ~command_line
@@ -300,7 +311,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ?plot_period:cli_args.Run_cli_args.plotPeriod
         parameters
         logger
-        logger_buffer compil network
+        logger_buffer
+        logger_err
+        compil network
     in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in

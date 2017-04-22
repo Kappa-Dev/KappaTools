@@ -1,48 +1,90 @@
-let do_sbml logger f =
+let print_comment logger_fmt logger_buf (s:string) : unit =
+  match Loggers.get_encoding_format logger_fmt
+  with
+  | Loggers.DOTNET ->
+    let () = Loggers.fprintf logger_buf "# %s" s in
+    let () = Loggers.print_newline logger_buf in ()
+  | Loggers.SBML ->
+    let () = Loggers.fprintf logger_buf "<!-- %s -->" s in
+    let () = Loggers.print_newline logger_buf in ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
+    ()
+
+let warn_with_pos __POS__ loc m logger logger_err =
+  let (a,b,c,d) = __POS__ in
+  let s = Printf.sprintf "%s%s %s %i %i %i" loc m  a b c d in
+  let () = Printf.printf "%s\n" s in
+  let () =
+    print_comment
+      logger logger_err s
+  in ()
+
+let warn_without_pos loc m logger logger_err =
+  let s = Printf.sprintf "%s%s" loc m in
+  let () = Printf.printf "%s\n" s in
+  let () =
+    print_comment logger logger_err s
+  in
+  ()
+
+let warn ?pos loc m logger logger_err =
+  match pos with
+  | None -> warn_without_pos loc m logger logger_err
+  | Some pos -> warn_with_pos pos loc m logger logger_err
+
+let warn_expr ?pos expr m logger logger_err =
+  let loc = Locality.to_string (snd expr) in
+  warn ?pos loc m logger logger_err
+
+let do_sbml logger logger_err f =
 match
   Loggers.get_encoding_format logger
 with
 | Loggers.SBML ->
-  let () =
-    f logger
-  in
-  ()
+  f logger logger_err
 | Loggers.DOTNET
 | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
 | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
-let do_dotnet logger f =
+let do_dotnet logger logger_err f =
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.DOTNET ->
-    let () =
-      f logger
-    in
-    ()
+  | Loggers.DOTNET -> f logger logger_err
   | Loggers.SBML
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
-let do_dotnet_or_sbml logger f =
+let is_dotnet logger =
+  match
+    Loggers.get_encoding_format logger
+  with
+  | Loggers.DOTNET -> true
+  | Loggers.SBML
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+
+let do_dotnet_or_sbml logger logger_err f =
   match
     Loggers.get_encoding_format logger
   with
   | Loggers.DOTNET | Loggers.SBML ->
-    let () =
-      f logger
-    in
-    ()
+      f logger logger_err
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
 
-let do_not_sbml logger f =
+let do_not_sbml logger logger_err f =
   match
     Loggers.get_encoding_format logger
   with
@@ -51,12 +93,9 @@ let do_not_sbml logger f =
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET ->
-    let () =
-      f logger
-    in
-    ()
+    f logger logger_err
 
-let do_not_dotnet logger f =
+let do_not_dotnet logger logger_err f =
   match
     Loggers.get_encoding_format logger
   with
@@ -65,12 +104,9 @@ let do_not_dotnet logger f =
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.SBML ->
-    let () =
-      f logger
-    in
-    ()
+      f logger logger_err
 
-let do_neither_dotnet_nor_sbml logger f =
+let do_neither_dotnet_nor_sbml logger logger_err f =
   match
     Loggers.get_encoding_format logger
   with
@@ -79,96 +115,117 @@ let do_neither_dotnet_nor_sbml logger f =
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
-    let () =
-      f logger
-    in
-    ()
+    f logger logger_err
 
-let print_sbml logger s =
-  do_sbml logger (fun logger -> Loggers.fprintf logger "%s" s)
+let lift0 f =
+  (fun logger _ -> f logger)
+let lift1 f =
+  (fun logger _ s -> f logger s)
 
-let print_dotnet logger s =
-  do_dotnet logger (fun logger -> Loggers.fprintf logger "%s" s)
+let print_sbml logger logger_err s =
+  do_sbml logger logger_err
+    (lift0 (fun logger ->
+         Loggers.fprintf logger "%s" s))
+
+let print_dotnet logger logger_err s =
+  do_dotnet logger logger_err
+    (lift0 (fun logger -> Loggers.fprintf logger "%s" s))
 
 (*break sbml or dotnet*)
-let break_dotnet_or_sbml logger =
-  do_dotnet_or_sbml logger Loggers.print_breakable_hint
+let break_dotnet_or_sbml logger logger_err =
+  do_dotnet_or_sbml logger logger_err
+    (lift0 Loggers.print_breakable_hint)
 
-let line_dotnet_or_sbml logger =
-  do_dotnet_or_sbml logger Loggers.print_newline
+let line_dotnet_or_sbml logger logger_err =
+  do_dotnet_or_sbml logger logger_err
+    (lift0 Loggers.print_newline)
 
-let line_dotnet logger =
-  do_dotnet logger Loggers.print_newline
+let line_dotnet logger logger_err =
+  do_dotnet logger logger_err
+    (lift0 Loggers.print_newline)
+
+let line_sbml logger logger_err =
+  do_sbml logger logger_err
+    (lift0 Loggers.print_newline)
 
 let extend s =
   if s="" || String.sub s 0 1 = " "  then s else " "^s
 
-let open_box ?options:(options=fun () -> "") logger label =
-  print_sbml logger ("<"^label^(extend (options ()))^">");
-  break_dotnet_or_sbml logger
+let open_box ?options:(options=fun () -> "") logger logger_err label =
+  print_sbml logger logger_err ("<"^label^(extend (options ()))^">");
+  break_dotnet_or_sbml logger logger_err
 
-let open_box_dotnet ?options_dotnet:(options_dotnet=fun () -> "") logger label =
-  print_dotnet logger (label^(extend (options_dotnet ())));
-  break_dotnet_or_sbml logger
+let open_box_dotnet
+    ?options_dotnet:(options_dotnet=fun () -> "") logger logger_err label
+  =
+  print_dotnet
+    logger logger_err (label^(extend (options_dotnet ())));
+  break_dotnet_or_sbml logger logger_err
 
-let close_box logger label =
-  print_sbml logger ("</"^label^">");
-  line_dotnet_or_sbml logger
+let close_box logger logger_err label =
+  print_sbml logger logger_err ("</"^label^">");
+  line_sbml logger logger_err
 
-let close_box_dotnet logger label =
-  print_dotnet logger label ;
-  line_dotnet logger
+let close_box_dotnet logger logger_err label =
+  print_dotnet logger logger_err label ;
+  line_dotnet logger logger_err
 
-let single_box ?options:(options=fun () -> "") logger label =
+let single_box ?options:(options=fun () -> "") logger logger_err label =
   let () =
-    do_sbml logger (fun logger ->
+    do_sbml logger logger_err (fun logger logger_err ->
         let () =
-          print_sbml logger ("<"^label^(extend (options ()))^"/>")
+          print_sbml logger logger_err ("<"^label^(extend (options ()))^"/>")
         in
-        line_dotnet_or_sbml logger)
+        line_dotnet_or_sbml logger logger_err)
   in
   let () =
-    do_dotnet logger (fun logger ->
+    do_dotnet logger logger_err (fun logger logger_err ->
         let () =
-          print_dotnet logger (label^(extend (options ())))
+          print_dotnet logger logger_err (label^(extend (options ())))
         in
-        line_dotnet_or_sbml logger)
+        line_dotnet_or_sbml logger logger_err )
   in
   ()
 
-let potential_break break logger =
+let potential_break break logger logger_err =
   if break
   then
-    line_dotnet_or_sbml logger
+    line_dotnet_or_sbml logger logger_err
   else
-    break_dotnet_or_sbml logger
+    break_dotnet_or_sbml logger logger_err
 
 let add_box ?break:(break=false)
     ?options:(options=fun () -> "")
     ?options_dotnet:(options_dotnet=fun () -> "")
     logger
+    logger_err
     label_sbml label_dotnet
     cont =
   let () =
-    do_sbml logger (fun logger ->
-        let () = open_box ~options logger label_sbml in
-        let () = potential_break break logger in
-        let () = do_sbml logger cont in
-        let () = close_box logger label_sbml in
+    do_sbml logger logger_err
+      (fun logger logger_err ->
+        let () = open_box ~options logger logger_err label_sbml in
+        let () = potential_break break logger logger_err in
+        let () = do_sbml logger logger_err cont in
+        let () = close_box logger logger_err label_sbml in
         ())
   in
-  do_dotnet logger (fun logger ->
-      let () = open_box_dotnet ~options_dotnet logger label_dotnet in
-      let () = do_dotnet logger cont in
-      let () = close_box_dotnet logger label_dotnet in
+  do_dotnet logger logger_err
+    (fun logger logger_err ->
+      let () = open_box_dotnet ~options_dotnet logger logger_err label_dotnet in
+      let () = do_dotnet logger logger_err cont in
+      let () = close_box_dotnet logger logger_err label_dotnet in
       ())
 
-let add_box_in_sbml_only ?break:(break=false) ?options:(options=fun () -> "")
-    logger label cont =
+let add_box_in_sbml_only
+    ?break:(break=false) ?options:(options=fun () -> "")
+    logger logger_err label cont =
   let () =
-    do_sbml logger (fun logger -> add_box ~break ~options logger label "" cont)
+    do_sbml logger logger_err
+      (fun logger logger_err ->
+         add_box ~break ~options logger logger_err label "" cont)
   in
-  let () = do_dotnet logger cont in ()
+  let () = do_dotnet logger logger_err cont in ()
 
 let clean_variable_id =
     String.map
@@ -286,7 +343,8 @@ let meta_id_of_logger logger =
 let dotnet_id_of_logger logger =
   (string_of_int (Loggers.get_fresh_meta_id logger))
 
-let print_parameters string_of_var_id logger logger_buffer variable expr =
+let print_parameters
+    string_of_var_id logger logger_buffer logger_err variable expr =
   let unit_string =
     match
       unit_of_variable variable
@@ -297,9 +355,11 @@ let print_parameters string_of_var_id logger logger_buffer variable expr =
   let id = string_of_variable logger string_of_var_id variable in
   let () = Loggers.set_id_of_global_parameter logger variable id  in
   let () =
-    do_sbml logger (fun logger ->
+    do_sbml logger logger_err
+      (fun logger logger_err ->
         single_box
           logger_buffer
+          logger_err
           "parameter"
           ~options:(fun () ->
               Format.sprintf
@@ -311,9 +371,11 @@ let print_parameters string_of_var_id logger logger_buffer variable expr =
       )
   in
   let () =
-    do_dotnet logger (fun logger ->
+    do_dotnet logger logger_err
+      (fun logger logger_err ->
         single_box
           logger_buffer
+          logger_err
           ""
           ~options:(fun () ->
               Format.sprintf
@@ -539,7 +601,52 @@ and eval_const_bool_expr logger network_handler expr =
         end
     end
 
-let rec print_alg_expr_in_sbml string_of_var_id logger
+let print_int logger logger_err n =
+  let () =
+    do_sbml logger logger_err
+      (lift0 (fun logger ->
+           Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
+         ))
+  in
+  do_dotnet logger logger_err
+    (lift0 (fun logger -> Loggers.fprintf logger "%i" n))
+
+let print_nbr logger logger_err nbr =
+  match nbr with
+  | Nbr.I n  -> print_int logger logger_err n
+  | Nbr.I64 n -> print_int logger logger_err (Int64.to_int n)
+  | Nbr.F f ->
+    let () =
+      do_sbml logger logger_err
+        (lift0 (fun logger ->
+             Loggers.fprintf logger "<cn type=\"real\"> %g </cn>" f))
+    in
+    do_dotnet logger logger_err
+      (lift0 (fun logger -> Loggers.fprintf logger "%g" f))
+
+let print_ci logger logger_err ci=
+  let () =
+    do_sbml logger logger_err
+      (fun logger _ ->
+         Loggers.fprintf logger "<ci>%s</ci>"
+           ci)
+  in
+  do_dotnet logger logger_err
+    (fun logger _ ->
+       Loggers.fprintf logger "%s" ci)
+
+let print_ci_with_id logger logger_err ci id =
+  let () =
+    do_sbml logger logger_err
+      (fun logger _ ->
+         Loggers.fprintf logger "<ci>%s%i</ci>"
+           ci id)
+  in
+  do_dotnet logger logger_err
+    (fun logger _ ->
+       Loggers.fprintf logger "%i" id)
+
+let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
     (alg_expr:
        (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id)
          Alg_expr.e Locality.annot
@@ -552,23 +659,21 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
     Ode_loggers_sig.is_expr_const alg_expr
   with
   | Some x, true ->
-    Loggers.fprintf logger " %s </ci>"
-      (Loggers.get_id_of_global_parameter
-         logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+    let () =
+      print_ci logger logger_err
+               (Loggers.get_id_of_global_parameter
+                  logger (Ode_loggers_sig.Expr (network.Network_handler.int_of_obs x)))
+    in
+    do_dotnet logger logger_err
+      (fun _ logger_err ->
+         let pos = Some __POS__ in
+         warn_expr ?pos alg_expr "not handled yet, todo" logger logger_err
+      )
   | None, _ | Some _, false ->
     begin
       match fst alg_expr with
-      | Alg_expr.CONST (Nbr.I n)  ->
-        let () =
-          do_sbml logger (fun logger ->
-              Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" n
-            )
-        in
-        do_dotnet logger (fun logger -> Loggers.fprintf logger "%i" n)
-      | Alg_expr.CONST (Nbr.I64 n) ->
-        Loggers.fprintf logger "<cn type=\"integer\"> %i </cn>" (Int64.to_int n)
-      | Alg_expr.CONST (Nbr.F f) ->
-        Loggers.fprintf logger "<cn type=\"real\"> %g </cn>" f
+      | Alg_expr.CONST nbr  ->
+        print_nbr logger logger_err nbr
       | Alg_expr.ALG_VAR x ->
         begin
           let id =
@@ -579,34 +684,43 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
           with
           | Some expr ->
             if Ode_loggers_sig.is_expr_const expr
-            then (*todo*)
+            then
               let () =
-                do_sbml logger (fun logger ->
+                do_sbml logger logger_err
+                  (lift0 (fun logger ->
                     Loggers.fprintf logger "<ci> %s </ci>"
-                      (string_of_var_id id))
+                      (string_of_var_id id)))
               in
-              do_dotnet logger (fun logger ->
+              do_dotnet logger logger_err
+                (lift0 (fun logger ->
                   Loggers.fprintf logger "%s"
-                    (string_of_var_id id))
+                    (string_of_var_id id)))
             else
               (*if expr is not a constant in case of
               DOTNET gives warning*)
               let () =
-                do_sbml logger (fun logger ->
+                do_sbml logger logger_err
+                  (fun logger logger_err ->
                     print_alg_expr_in_sbml
                       string_of_var_id
                       logger
+                      logger_err
                       expr
                       network)
               in
               let () =
-                do_dotnet logger (fun logger ->
-                    raise
-                      (ExceptionDefn.Malformed_Decl
-                         ("DOTNET backend does not support rate that is not a constant",
-                          Locality.dummy)))
+                do_dotnet logger logger_err
+                  (fun _logger logger_err ->
+                    warn_expr
+                      alg_expr
+                      "DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1"
+                      logger
+                      logger_err)
               in
-              ()
+              do_dotnet logger logger_err
+                (fun logger logger_err ->
+                   print_nbr logger logger_err Nbr.one
+                )
           | None ->
             Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
         end
@@ -614,60 +728,65 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
         Loggers.fprintf logger "<ci>s%i</ci>"
           (network.Network_handler.int_of_kappa_instance x)
       | Alg_expr.TOKEN_ID x ->
-        let () =
-          do_sbml logger (fun logger ->
-              Loggers.fprintf logger "<ci>t%i</ci>"
-                (network.Network_handler.int_of_token_id x))
-        in
-        ()
+        print_ci_with_id logger logger_err "t"
+          (network.Network_handler.int_of_token_id x)
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
-        Loggers.fprintf logger "<ci>tend</ci>"
+        print_ci logger logger_err "tend"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
-        Loggers.fprintf logger "<ci>0</ci>"
+        print_nbr logger logger_err (Nbr.zero)
       | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
         let () =
-          do_sbml logger (fun logger ->
+          do_sbml logger logger_err (fun logger _ ->
               Loggers.fprintf logger
                 "<apply>%s<ci>time</ci><ci>t_scale_factor</ci></apply>"
                 (Loggers_string_of_op.string_of_bin_op logger
                    Operator.MULT)
             )
         in
-        (*TODO: what should I return here? a warning?*)
         let () =
-          do_dotnet logger (fun logger ->
-              ()
+          do_dotnet logger logger_err
+            (fun _logger logger_err ->
+              let pos = Some __POS__ in
+              warn_expr ?pos alg_expr "Internal error" logger logger_err
             )
         in
         ()
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) ->
-        Loggers.fprintf logger "<ci>0</ci>"
+        print_nbr logger logger_err Nbr.zero
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) ->
-        Loggers.fprintf logger "<ci>event_max</ci>"
+        print_ci logger logger_err "event_max"
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) ->
-        Loggers.fprintf logger "<ci>0</ci>"
+        print_nbr logger logger_err Nbr.zero
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         let string_op = Loggers_string_of_op.string_of_bin_op logger op in
         let () =
-          do_sbml logger (fun logger ->
+          do_sbml logger logger_err
+            (fun logger logger_err ->
               let () = Loggers.fprintf logger "<apply>" in
               let () = Loggers.fprintf logger "%s" string_op in
-              let () = print_alg_expr_in_sbml string_of_var_id logger a network
+              let () =
+                print_alg_expr_in_sbml string_of_var_id logger logger_err a network
               in
-              let () = print_alg_expr_in_sbml string_of_var_id logger b network
+              let () =
+                print_alg_expr_in_sbml
+                  string_of_var_id logger logger_err b network
               in
               let () = Loggers.fprintf logger "</apply>" in
               ()
             )
         in
         let () =
-          do_dotnet logger (fun logger ->
+          do_dotnet
+            logger logger_err
+            (fun logger logger_err ->
               let () =
-                print_alg_expr_in_sbml string_of_var_id logger a network
+                print_alg_expr_in_sbml
+                  string_of_var_id logger logger_err a network
               in
               let () = Loggers.fprintf logger "%s" string_op in
               let () =
-                print_alg_expr_in_sbml string_of_var_id logger b network
+                print_alg_expr_in_sbml
+                  string_of_var_id logger logger_err b network
               in
             ()
             )
@@ -675,19 +794,55 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
         ()
       | Alg_expr.UN_ALG_OP (op, a) ->
         let string_op = Loggers_string_of_op.string_of_un_op logger op in
-        let () = Loggers.fprintf logger "<apply>" in
-        let () = Loggers.fprintf logger "%s" string_op in
-        let () = print_alg_expr_in_sbml string_of_var_id logger a network in
-        let () = Loggers.fprintf logger "</apply>" in
-        ()
+        let () =
+          do_sbml logger logger_err
+            (fun logger logger_err ->
+               let () = Loggers.fprintf logger "<apply>" in
+               let () = Loggers.fprintf logger "%s" string_op in
+               let () =
+                 print_alg_expr_in_sbml
+                   string_of_var_id logger logger_err a network
+               in
+               let () = Loggers.fprintf logger "</apply>" in
+               ())
+        in
+        let () =
+          do_dotnet logger logger_err
+            (fun logger logger_err ->
+              let () = Loggers.fprintf logger "%s" string_op in
+              let () =
+                print_alg_expr_in_sbml
+                  string_of_var_id logger logger_err a network
+              in
+              ()
+            )
+        in ()
       | Alg_expr.IF (cond, yes, no) ->
-        let () = Loggers.fprintf logger "<apply>" in
-        let () = Loggers.fprintf logger "<if-then-else>"  in
-        let () = print_bool_expr_in_sbml string_of_var_id logger cond network in
-        let () = print_alg_expr_in_sbml string_of_var_id logger yes network in
-        let () = print_alg_expr_in_sbml string_of_var_id logger no network in
-        let () = Loggers.fprintf logger "</apply>" in
-        ()
+        let () =
+          do_sbml logger logger_err
+            (fun logger logger_err ->
+               let () = Loggers.fprintf logger "<apply>" in
+               let () = Loggers.fprintf logger "<if-then-else>"  in
+               let () =
+                 print_bool_expr_in_sbml
+                   string_of_var_id logger logger_err cond network
+               in
+               let () =
+                 print_alg_expr_in_sbml
+                   string_of_var_id logger logger_err yes network
+               in
+               let () =
+                 print_alg_expr_in_sbml
+                   string_of_var_id logger logger_err no network
+               in
+               let () = Loggers.fprintf logger "</apply>" in
+               ())
+        in
+          do_dotnet logger logger_err
+            (fun _logger logger_err ->
+               let pos = Some __POS__ in
+               warn_expr ?pos alg_expr "Conditionals are not allowed in DOTNET backend" logger logger_err
+            )
       | (Alg_expr.DIFF_KAPPA_INSTANCE _
         | Alg_expr.DIFF_TOKEN _) ->
         raise
@@ -695,27 +850,48 @@ let rec print_alg_expr_in_sbml string_of_var_id logger
              ("SBML does not support differentiation",snd alg_expr))
     end
 and
-  print_bool_expr_in_sbml string_of_var_id logger cond network =
-  match fst cond with
-  | Alg_expr.TRUE -> Loggers.fprintf logger "<true/>"
-  | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
-  | Alg_expr.COMPARE_OP (op,a,b) ->
-    let () = Loggers.fprintf logger "<apply>" in
-    let () =
-      Loggers.fprintf logger "%s"
-        (Loggers_string_of_op.string_of_compare_op logger op) in
-    let () = print_alg_expr_in_sbml string_of_var_id logger a network in
-    let () = print_alg_expr_in_sbml string_of_var_id logger b network in
-    let () = Loggers.fprintf logger "</apply>" in
-    ()
-  | Alg_expr.BOOL_OP (op,a,b) ->
-    let () = Loggers.fprintf logger "<apply>" in
-    let () = Loggers.fprintf logger "%s"
-        (Loggers_string_of_op.string_of_bool_op logger op) in
-    let () = print_bool_expr_in_sbml string_of_var_id logger a network in
-    let () = print_bool_expr_in_sbml string_of_var_id logger b network in
-    let () = Loggers.fprintf logger "</apply>" in
-    ()
+  print_bool_expr_in_sbml string_of_var_id logger logger_err cond network =
+  let () =
+    do_sbml logger logger_err
+      (fun logger logger_err ->
+         match fst cond with
+         | Alg_expr.TRUE -> Loggers.fprintf logger "<true/>"
+         | Alg_expr.FALSE -> Loggers.fprintf logger "<false/>"
+         | Alg_expr.COMPARE_OP (op,a,b) ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () =
+             Loggers.fprintf logger "%s"
+               (Loggers_string_of_op.string_of_compare_op logger op) in
+           let () =
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err a network
+           in
+           let () =
+             print_alg_expr_in_sbml string_of_var_id logger logger_err b
+              network in
+           let () = Loggers.fprintf logger "</apply>" in
+           ()
+         | Alg_expr.BOOL_OP (op,a,b) ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () = Loggers.fprintf logger "%s"
+               (Loggers_string_of_op.string_of_bool_op logger op) in
+           let () =
+             print_bool_expr_in_sbml
+               string_of_var_id logger logger_err a network
+           in
+           let () =
+             print_bool_expr_in_sbml
+               string_of_var_id logger logger_err b network
+           in
+           let () = Loggers.fprintf logger "</apply>" in
+           ())
+  in
+  do_dotnet logger logger_err
+    (fun _logger logger_err ->
+       let pos = Some __POS__ in
+       warn_expr ?pos cond "Boolean expressions are not allowed in DOTNET backend" logger logger_err
+    )
+
 
 let rec substance_expr_in_sbml logger
     (alg_expr:
@@ -872,7 +1048,7 @@ let break = true
 let replace_space_with_underscore =
   String.map (fun c -> if c=' ' then '_' else c)
 
-let dump_initial_species ?units loggers network_handler k name species =
+let dump_initial_species ?units loggers logger_err network_handler k name species =
   let expr =
     match Loggers.get_expr loggers (Ode_loggers_sig.Init k) with
     | Some a -> a
@@ -901,18 +1077,18 @@ let dump_initial_species ?units loggers network_handler k name species =
       (Nbr.to_string concentration)
   in
   let () =
-    do_sbml loggers (fun loggers ->
-        single_box ~options:(fun () -> s) loggers "species"
+    do_sbml loggers logger_err (fun loggers logger_err ->
+        single_box ~options:(fun () -> s) loggers logger_err "species"
       )
   in
   let () =
-    do_dotnet loggers (fun loggers ->
-        single_box ~options:(fun () -> s_dotnet) loggers ""
+    do_dotnet loggers logger_err (fun loggers logger_err ->
+        single_box ~options:(fun () -> s_dotnet) loggers logger_err ""
       )
   in
   ()
 
-let dump_species_reference loggers species i =
+let dump_species_reference loggers logger_err species i =
   let s =
     Format.sprintf
       "metaid=\"%s\" species=\"s%i\"%s"
@@ -921,12 +1097,12 @@ let dump_species_reference loggers species i =
       (if i=1 then "" else " stoichiometry=\""^(string_of_int i)^"\"")
   in
   let () =
-    do_sbml loggers (fun loggers ->
-        single_box ~options:(fun () -> s) loggers "speciesReference"
+    do_sbml loggers logger_err (fun loggers logger_err ->
+        single_box ~options:(fun () -> s) loggers logger_err "speciesReference"
       )
   in
   let () =
-    do_dotnet loggers (fun loggers ->
+    do_dotnet loggers logger_err (fun loggers _ ->
         Loggers.fprintf loggers "%i" species
       )
   in
@@ -944,6 +1120,7 @@ let add map (id,sym) =
 
 let dump_list_of_species_reference
     loggers
+    logger_err
     ?dotnet_sep:(dotnet_sep="")
     list
   =
@@ -958,10 +1135,10 @@ let dump_list_of_species_reference
       (fun bool (s,(i,j)) ->
          let () =
            if bool then
-             do_dotnet loggers
-               (fun logger -> Loggers.fprintf logger "%s" dotnet_sep)
+             do_dotnet loggers logger_err
+               (fun logger _ -> Loggers.fprintf logger "%s" dotnet_sep)
          in
-         let () = dump_species_reference loggers s (i*j) in
+         let () = dump_species_reference loggers logger_err s (i*j) in
          (* check what to do when stochiometric coefficients are bigger than 1*)
          true
       )
@@ -969,7 +1146,7 @@ let dump_list_of_species_reference
       (Mods.IntMap.bindings map)
   in ()
 
-let dump_pair logger (t,i) =
+let dump_pair logger logger_err (t,i) =
   if i = 1 then
     let () =
       Loggers.fprintf logger "<ci> s%i </ci>" t
@@ -977,8 +1154,8 @@ let dump_pair logger (t,i) =
     ()
   else
     let () =
-      add_box ~break logger "apply" ""
-        (fun logger ->
+      add_box ~break logger logger_err "apply" ""
+        (fun logger _  ->
            let () = Loggers.fprintf logger "<divide/>" in
            Loggers.fprintf logger "<ci> s%i </ci><cn type=\"integer\"> %i </cn>" t i)
     in
@@ -1000,110 +1177,102 @@ let maybe_time_dependent logger network var_rule =
 
 
 let dump_kinetic_law
-    string_of_var_id logger network reactants var_rule correct nocc =
+    string_of_var_id logger logger_err network reactants var_rule correct nocc =
   let () =
-    do_dotnet logger
-      (fun logger  ->
+    do_dotnet logger logger_err
+      (fun logger logger_err ->
          begin
          let expr_opt =
            Loggers.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let f logger =
-           if Ode_loggers_sig.is_expr_const expr
+           let () =
+             if not (Ode_loggers_sig.is_expr_const expr)
+             then
+               warn_expr
+                 expr
+                 ("DOTNET backend does not support non-constant rates for rules: cowardly replacing it with "^(
+                     string_of_variable
+                       logger
+                       (fun _logger var ->
+                          string_of_int
+                            (* this line is error prone, check*)
+                            (network.Network_handler.int_of_kappa_instance                                            var))
+                       var_rule))
+                 logger
+                 logger_err
+           in
+           if correct = nocc
            then
-             if correct = nocc
-             then
-               Loggers.fprintf logger "%s"
-                 (string_of_variable
-                    logger
-                    (fun _logger var -> string_of_int
-                        (* this line is error prone, check*)
-                        (network.Network_handler.int_of_kappa_instance
-                           var))
-                    var_rule)
-             else
-             if correct = 1
-             then
-               add_box ~break logger "apply" ""
-                 (fun logger ->
-                    let () =
-                      Loggers.fprintf logger
-                        "%s*%i"
-                        (string_of_variable
-                           logger
-                           (fun _logger var ->
-                              string_of_int
-                               (* this line is error prone, check*)
-                               (network.Network_handler.int_of_kappa_instance
-                                  var))
-                           var_rule)
-                        nocc
-
-                    in
-                    let () = Loggers.print_newline logger in
-                    ()
-                 )
-             else
-             if nocc=1 then
-             add_box ~break logger "apply" ""
-               (fun logger ->
+             Loggers.fprintf logger "%s"
+               (string_of_variable
+                  logger
+                  (fun _logger var -> string_of_int
+(* this line is error prone, check*)
+                      (network.Network_handler.int_of_kappa_instance
+                         var))
+                  var_rule)
+           else
+           if correct = 1
+           then
+             add_box ~break logger logger_err "apply" ""
+               (fun logger _ ->
                   let () =
                     Loggers.fprintf logger
-                      "%s/%i"
+                      "%s*%i"
                       (string_of_variable
                          logger
                          (fun _logger var ->
                             string_of_int
-                             (* this line is error prone, check*)
-                             (network.Network_handler.int_of_kappa_instance
-                                var))
+(* this line is error prone, check*)
+                              (network.Network_handler.int_of_kappa_instance
+                                 var))
                          var_rule)
-                      correct
-
+                      nocc
                   in
                   let () = Loggers.print_newline logger in
                   ()
                )
-             else
-               add_box ~break logger "apply" ""
-                 (fun logger ->
-                    let () =
-                      Loggers.fprintf logger
-                        "%i*%s/%i"
-                        nocc
-                        (string_of_variable
-                           logger
-                           (fun _logger var ->
-                              string_of_int
-                                (* this line is error prone, check*)
-                                (network.Network_handler.int_of_kappa_instance
-                                   var))
-                           var_rule)
-                        correct
-                    in
-                    let () = Loggers.print_newline logger in
-                    ()
-                 )
-
            else
-             let expr =
-               if correct = nocc
-               then expr
-               else
-               if nocc = 1
-               then
-                 Alg_expr.div expr (Alg_expr.int correct)
-               else if correct = 1
-               then
-                 Alg_expr.mult (Alg_expr.int nocc) expr
-               else
-                 Alg_expr.div
-                   (Alg_expr.mult (Alg_expr.int nocc) expr)
-                   (Alg_expr.int correct)
-             in
-             (*print the kinetic rate information*)
-             print_alg_expr_in_sbml string_of_var_id logger expr network
-         in f logger
+           if nocc=1 then
+             add_box ~break logger logger_err "apply" ""
+               (fun logger _ ->
+                  let () =
+                    Loggers.fprintf logger
+                      "%s/%i"
+                      (string_of_variable logger
+                         (fun _logger var ->
+                            string_of_int
+(* this line is error prone, check*)
+                              (network.Network_handler.int_of_kappa_instance
+                                 var))
+                         var_rule)
+                      correct
+                  in
+                  let () = Loggers.print_newline logger in
+                  ()
+               )
+           else
+             add_box ~break logger logger_err "apply" ""
+               (fun logger _ ->
+                  let () =
+                    Loggers.fprintf logger
+                          "%i*%s/%i"
+                          nocc
+                          (string_of_variable
+                             logger
+                             (fun _logger var ->
+                                string_of_int
+(* this line is error prone, check*)
+                                  (network.Network_handler.int_of_kappa_instance
+                                     var))
+                             var_rule)
+                          correct
+                      in
+                      let () = Loggers.print_newline logger in
+                      ()
+                   )
+          in f logger
          (*match reactants with
          | [] ->
            f logger
@@ -1128,8 +1297,8 @@ let dump_kinetic_law
          end
       )
   in
-  do_sbml logger
-    (fun logger  ->
+  do_sbml logger logger_err
+    (fun logger _ ->
        begin
          let expr_opt =
            Loggers.get_expr logger var_rule in
@@ -1148,8 +1317,8 @@ let dump_kinetic_law
                     var_rule)
              else
              if nocc = 1 then
-               add_box ~break logger "apply" ""
-                 (fun logger ->
+               add_box ~break logger logger_err "apply" ""
+                 (fun logger _ ->
                     let () = Loggers.fprintf logger "<divide/>" in
                     let () =
                       Loggers.fprintf logger
@@ -1168,8 +1337,8 @@ let dump_kinetic_law
                  )
              else if correct=1
              then
-               add_box ~break logger "apply" ""
-                 (fun logger ->
+               add_box ~break logger logger_err "apply" ""
+                 (fun logger _ ->
                     let () = Loggers.fprintf logger "<times/>" in
                     let () =
                       Loggers.fprintf logger
@@ -1187,8 +1356,8 @@ let dump_kinetic_law
                     ()
                  )
              else
-               add_box ~break logger "apply" ""
-                 (fun logger ->
+               add_box ~break logger logger_err "apply" ""
+                 (fun logger _ ->
                     let () = Loggers.fprintf logger "<times/>" in
                     let () =
                       Loggers.fprintf logger
@@ -1222,26 +1391,27 @@ let dump_kinetic_law
                    (Alg_expr.mult (Alg_expr.int nocc) expr)
                    (Alg_expr.int correct)
              in
-             print_alg_expr_in_sbml string_of_var_id logger expr network
+             print_alg_expr_in_sbml
+               string_of_var_id logger logger_err expr network
          in
          match reactants with
          | [] ->
            f logger
          | _::_ ->
-           add_box ~break logger "apply" ""
-             (fun logger ->
+           add_box ~break logger logger_err "apply" ""
+             (fun logger _ ->
                 let () = Loggers.fprintf logger "<times/>" in
                 let () = f logger in
                 let rec aux list =
                   match list with
                     [] -> ()
                   | [t] ->
-                    dump_pair logger t
+                    dump_pair logger logger_err t
                   | t::q ->
-                    add_box ~break logger "apply" ""
-                      (fun logger ->
+                    add_box ~break logger logger_err "apply" ""
+                      (fun logger logger_err ->
                          let () = Loggers.fprintf logger "<times/>" in
-                         let () = dump_pair logger t in
+                         let () = dump_pair logger logger_err t in
                          aux q)
                 in aux reactants
              )
@@ -1263,28 +1433,34 @@ let positive_part expr =
                          Locality.dummy_annot(
                            Alg_expr.CONST (Nbr.zero)),expr))
 
-let dump_token_vector convert logger network_handler rule_id token_vector =
-  let _ =
-    List.fold_left
-      (fun n (id,_) ->
-         let expr_opt =
-           Loggers.get_expr logger
-             (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
-         in
-         let expr = unsome expr_opt in
-         let stochiometry_opt =
-           eval_const_alg_expr logger network_handler (convert expr)
-         in
-         let () =
-           match stochiometry_opt with
-           | None ->
-               Printf.printf
-               "%s: Expressions for token consumption/production  should be constants \n Cowardly replace it with 0"
-               (Locality.to_string (snd expr))
-           | Some x when Nbr.is_zero x -> ()
-           | Some x ->
-             let () =
-               do_sbml logger (fun logger ->
+let dump_token_vector convert logger logger_err network_handler rule_id token_vector =
+  let () =
+    do_sbml logger logger_err
+      (fun logger _ ->
+        let _ =
+          List.fold_left
+            (fun n (id,_) ->
+               let expr_opt =
+                 Loggers.get_expr logger
+                   (Ode_loggers_sig.Stochiometric_coef (rule_id,n))
+               in
+               let expr = unsome expr_opt in
+               let stochiometry_opt =
+                 eval_const_alg_expr logger network_handler (convert expr)
+               in
+               let () =
+                 match stochiometry_opt with
+                 | None ->
+                   let () =
+                     warn_expr
+                       expr
+                       "Expressions for token consumption/production should be constants: cowardly replace it with 0\n"
+                       logger
+                       logger_err
+                   in
+                   ()
+                 | Some x when Nbr.is_zero x -> ()
+                 | Some x ->
                    let s =
                      Format.sprintf
                        "metaid=\"%s\" species=\"t%i\"%s"
@@ -1294,23 +1470,33 @@ let dump_token_vector convert logger network_handler rule_id token_vector =
                           " stoichiometry=\""^(Nbr.to_string
                                                  x)^"\"")
                    in
-                   single_box ~options:(fun () -> s) logger
+                   single_box ~options:(fun () -> s) logger logger_err
                      "speciesReference"
-                 )
-             in
-             let () =
-               do_dotnet logger (fun logger ->
-                   ()
-                 )
-             in
-             ()
-
-         in
-         n+1)
-      1
-      token_vector
+               in
+               n+1)
+            1
+            token_vector
+        in
+        ())
   in
-  ()
+  let () =
+    do_dotnet logger logger_err
+      (fun logger logger_err ->
+         match token_vector with
+         | [] -> ()
+         | _::_ ->
+           let expr_opt =
+             Loggers.get_expr logger
+               (Ode_loggers_sig.Stochiometric_coef (rule_id,1))
+           in
+           let expr = unsome expr_opt in
+           warn_expr
+             expr
+             "Rules with tokens are not allowed in DOTNET output: cowardly ignoring them"
+             logger
+             logger_err
+      )
+  in ()
 
 let has_good_token_token_vector
     convert logger network_handler rule_id token_vector =
@@ -1342,49 +1528,20 @@ let has_products_in_token_vector logger network_handler rule_id token_vector =
     positive_part logger network_handler rule_id token_vector
 
 let dump_products_of_token_vector
-    logger network_handler rule_id token_vector =
-  let () =
-    do_sbml logger (fun logger ->
-        dump_token_vector
-          positive_part logger network_handler rule_id token_vector
-      )
-  in
-  let () =
-    do_dotnet logger (fun logger ->
-        match token_vector with
-        | [] -> ()
-        | _ :: _ ->
-          let () =
-            dump_token_vector positive_part logger network_handler
-              rule_id token_vector
-          in
-          raise
-            (ExceptionDefn.Malformed_Decl
-               ("DOTNET backend does not support tokens", Locality.dummy)))
-  in
-  ()
+    logger logger_err network_handler rule_id token_vector =
+  do_dotnet_or_sbml logger logger_err
+    (fun logger logger_err ->
+      dump_token_vector
+        positive_part logger logger_err network_handler rule_id token_vector
+    )
 
-let dump_reactants_of_token_vector logger network_handler rule_id token_vector =
-  let () =
-    do_sbml logger (fun logger ->
+let dump_reactants_of_token_vector
+    logger logger_err network_handler rule_id token_vector =
+  do_dotnet_or_sbml logger logger_err
+    (fun logger logger_err ->
         dump_token_vector
-          negative_part logger network_handler rule_id token_vector
-      )
-  in
-  let () =
-    do_dotnet logger (fun logger ->
-        match token_vector with
-        | [] -> ()
-        | _ :: _ ->
-          let () =
-            dump_token_vector positive_part logger network_handler
-              rule_id token_vector
-          in
-          raise
-            (ExceptionDefn.Malformed_Decl
-               ("DOTNET backend does not support tokens", Locality.dummy)))
-  in
-  ()
+          negative_part logger logger_err network_handler rule_id token_vector
+    )
 
 let dump_sbml_reaction
     string_of_var_id
@@ -1393,6 +1550,7 @@ let dump_sbml_reaction
     print_rule_name
     compil
     logger
+    logger_err
     network
     reactants
     products
@@ -1410,6 +1568,30 @@ let dump_sbml_reaction
   let label_list_of_products = "listOfProducts" in
   let label_list_of_mods = "listOfModifiers" in
   let rule_id = get_rule_id enriched_rule in
+  let token_vector =
+    if is_dotnet logger
+    then
+      begin
+        match token_vector with
+        | [] -> token_vector
+        | _::_ ->
+          let expr_opt =
+            Loggers.get_expr logger
+              (Ode_loggers_sig.Stochiometric_coef (rule_id,1))
+          in
+          let expr = unsome expr_opt in
+          let () =
+            warn_expr
+              expr
+              "Rules with tokens are not allowed in DOTNET output: cowardl ignoring them"
+              logger
+              logger_err
+          in
+          []
+      end
+    else
+      token_vector
+  in
   let options =
     (fun () ->
        Format.asprintf
@@ -1418,11 +1600,11 @@ let dump_sbml_reaction
     )
   in
   let () =
-    add_box_in_sbml_only ~options ~break logger label_reaction
-      (fun logger ->
+    add_box_in_sbml_only ~options ~break logger logger_err label_reaction
+      (fun logger logger_err ->
          let () =
-           do_dotnet logger
-             (fun logger ->
+           do_dotnet logger logger_err
+             (fun logger _ ->
                 Loggers.fprintf logger "%i " reaction_id)
          in
          let () =
@@ -1432,22 +1614,23 @@ let dump_sbml_reaction
            then ()
            else
              let () =
-               add_box_in_sbml_only ~break logger
+               add_box_in_sbml_only ~break logger logger_err
                  label_list_of_reactants
-                 (fun logger ->
+                 (fun logger logger_err ->
                     let () =
                       dump_list_of_species_reference ~dotnet_sep
-                        logger reactants
+                        logger logger_err reactants
                     in
                     let () =
                       dump_reactants_of_token_vector
-                        logger network rule_id token_vector
+                        logger logger_err network rule_id token_vector
                     in
                     ()
                  )
              in
              let () =
-               do_dotnet logger (fun logger -> Loggers.fprintf logger " ")
+               do_dotnet logger logger_err
+                 (fun logger _ -> Loggers.fprintf logger " ")
              in
              ()
          in
@@ -1458,19 +1641,24 @@ let dump_sbml_reaction
            then ()
            else
              let () =
-               add_box_in_sbml_only ~break logger label_list_of_products
-                 (fun logger ->
+               add_box_in_sbml_only
+                 ~break logger logger_err
+                 label_list_of_products
+                 (fun logger logger_err ->
                     let () =
                       dump_list_of_species_reference ~dotnet_sep
-                        logger products in
+                        logger logger_err products in
                     let () =
                       dump_products_of_token_vector
-                        logger network rule_id token_vector
+                        logger logger_err
+                        network rule_id token_vector
                     in
                     ())
              in
              let () =
-               do_dotnet logger (fun logger -> Loggers.fprintf logger " ")
+               do_dotnet
+                 logger logger_err
+                 (fun logger _ -> Loggers.fprintf logger " ")
              in
              ()
          in
@@ -1505,43 +1693,45 @@ let dump_sbml_reaction
            then
              ()
            else
-           add_box_in_sbml_only ~break logger label_list_of_mods
-             (fun logger ->
-               Mods.StringSet.iter
-                 (fun string ->
-                    let () =
-                      do_sbml logger (fun logger ->
-                          let s =
-                            Format.sprintf
-                              "metaid=\"%s\" species=\"%s\""
-                              (meta_id_of_logger logger) string
-                          in
-                          let () =
-                            single_box ~options:(fun () -> s) logger
-                              "modifierSpeciesReference"
+             add_box_in_sbml_only
+               ~break logger logger_err
+               label_list_of_mods
+               (fun logger logger_err ->
+                  Mods.StringSet.iter
+                    (fun string ->
+                       let () =
+                         do_sbml logger logger_err
+                           (fun logger logger_err ->
+                              let s =
+                                Format.sprintf
+                                  "metaid=\"%s\" species=\"%s\""
+                                  (meta_id_of_logger logger) string
+                              in
+                              let () =
+                                single_box ~options:(fun () -> s)
+                                  logger logger_err
+                                  "modifierSpeciesReference"
                           in
                           ())
                     in
-                    let () =
-                      do_dotnet logger (fun _ -> ())
-                  in
                   ()
                  )
                  modifiers
              )
          in
          let () =
-           add_box_in_sbml_only ~break logger "kineticLaw"
-             (fun logger ->
+           add_box_in_sbml_only ~break logger logger_err "kineticLaw"
+             (fun logger logger_err ->
                 add_box
                   ~break
                   ~options:(fun () ->
                       " xmlns=\"http://www.w3.org/1998/Math/MathML\"")
-                  logger "math" label
-                  (fun logger ->
+                  logger logger_err "math" label
+                  (fun logger logger_err ->
                      dump_kinetic_law
                        string_of_var_id
                        logger
+                       logger_err
                        network
                        reactants
                        var_rule
@@ -1555,7 +1745,7 @@ let dump_sbml_reaction
   in
   ()
 
-let time_advance logger  =
+let time_advance logger logger_err =
   let reaction_id = Loggers.get_fresh_reaction_id logger in
   let label_reaction  = "reaction" in
   let label_dotnet = "" in
@@ -1565,41 +1755,38 @@ let time_advance logger  =
         "id=\"re%i\" name=\"time advance\" reversible=\"false\" fast=\"false\"" reaction_id)
   in
   let () =
-    add_box ~options ~break logger label_reaction label_dotnet
-      (fun logger ->
+    add_box ~options ~break logger logger_err label_reaction label_dotnet
+      (fun logger logger_err ->
          let () =
-           add_box ~break logger label_list_of_products label_dotnet
-             (fun logger ->
+           add_box ~break logger logger_err label_list_of_products label_dotnet
+             (fun logger logger_err ->
                 let () =
-                  do_sbml logger (fun logger ->
+                  do_sbml logger logger_err (fun logger logger_err ->
                       let s =
                         Format.sprintf
                           "metaid=\"%s\" species=\"time\""
                           (meta_id_of_logger logger)
                       in
                       let () =
-                        single_box ~options:(fun () -> s) logger
+                        single_box ~options:(fun () -> s) logger logger_err
                           "speciesReference"
                       in
                       ()
                     )
                 in
-                let () =
-                  do_dotnet logger (fun _logger -> ())
-                in
                 ()
              )
          in
          let () =
-           add_box ~break logger "kineticLaw" label_dotnet
-             (fun logger ->
+           add_box ~break logger logger_err "kineticLaw" label_dotnet
+             (fun logger logger_err ->
                 add_box
                   ~break
                   ~options:(fun () ->
                       " xmlns=\"http://www.w3.org/1998/Math/MathML\"")
-                  logger "math" label_dotnet
-                  (fun logger ->
-                     print_sbml logger ("<cn type=\"integer\"> 1 </cn>"                    ))
+                  logger logger_err "math" label_dotnet
+                  (fun logger logger_err ->
+                     print_sbml logger logger_err ("<cn type=\"integer\"> 1 </cn>"                    ))
 
              )
          in

@@ -1,6 +1,7 @@
 type 'a t =
   {
     size: int;
+    default: 'a;
     mutable start: int;
     mutable final: int;
     content: 'a array
@@ -10,6 +11,7 @@ let create i default =
   let size = max i 2 in
   {
     size = size;
+    default = default;
     start = 0;
     final = 0;
     content = Array.make size default
@@ -36,3 +38,12 @@ let iter f t =
       aux (succ i t)
   in
   aux t.start
+
+let clean t =
+  let rec aux k =
+    if k = t.size then t
+    else
+      let () = t.content.(k)<- t.default in
+      aux (k+1)
+  in
+  aux 0

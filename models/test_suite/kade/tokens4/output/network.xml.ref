@@ -35,8 +35,8 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 </listOfCompartments>
 <listOfSpecies>
 <species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD9" id="t2" name="" compartment="default" initialAmount="1" substanceUnits="substance"/>
-<species metaid="CMD10" id="t3" name="" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD9" id="t2" name="t" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD10" id="t3" name="u" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -79,6 +79,8 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <ci>t2</ci></math>
 </kineticLaw>
 </reaction>
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 <!-- rule    : expo2 -->
 <!-- reaction:  ->  | 2:t + -(|t|):t  -->
 <reaction id="re3" name="expo2" reversible="false" fast="false">
@@ -94,6 +96,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <apply><plus/><ci>t2</ci><ci>t3</ci></apply></math>
 </kineticLaw>
 </reaction>
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 </listOfReactions>
 </model>
 </sbml>

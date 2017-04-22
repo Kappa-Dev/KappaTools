@@ -48,8 +48,11 @@ done
 	 -main function 
 	 -initial state 
 	 -ode system 
-line 0, characters -1--1:: Expressions for token consumption/production  should be constants 
- Cowardly replace it with 0line 0, characters -1--1:: Expressions for token consumption/production  should be constants 
- Cowardly replace it with 0line 0, characters -1--1:: Expressions for token consumption/production  should be constants 
- Cowardly replace it with 0	 -jacobian 
+line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0
+
+line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0
+
+line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0
+
+	 -jacobian 
 	 -observables 
