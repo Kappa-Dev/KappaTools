@@ -503,12 +503,13 @@ let get_expr t v =
   try
     Some (VarMap.find v (!(t.env)))
   with
-  | Not_found -> None
+  | Not_found ->
+    None
 
 let set_expr t v expr =
   let const = Ode_loggers_sig.is_expr_const expr in
   let () =
-    if const then
+    if not const then
         t.const := VarSet.remove v (!(t.const))
     else
       t.const := VarSet.add v (!(t.const))

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 22 2017>
+  * Last modification: Time-stamp: <Apr 23 2017>
 *)
 
 let local_trace = false
@@ -2055,18 +2055,32 @@ struct
                       (fun coef ->
                          match coef with
                          | R rate ->
-                           let () =
-                             Sbml_backend.warn_expr
-                               rate
-                               "DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1"
-                               logger logger_err
-                           in
-                           Ode_loggers.associate
-                             (I.string_of_var_id ~compil logger)
-                             ~comment:rule.comment logger logger_buffer
-                            logger_err
-                            (var_of_rate rule.rule_id_with_mode)
-                            (Alg_expr.CONST Nbr.one,snd rate) handler_expr
+                           begin
+                             match
+                               Sbml_backend.eval_const_alg_expr logger
+                                handler_expr rate
+                             with
+                             | Some _ -> ()
+(*                               Ode_loggers.associate
+                                 (I.string_of_var_id ~compil logger)
+                                 ~comment:rule.comment logger logger_buffer
+                                 logger_err
+                                 (var_of_rate rule.rule_id_with_mode)
+                                 (Alg_expr.CONST Nbr.one,snd rate) handler_expr*)
+                             | None ->
+                               let () =
+                                 Sbml_backend.warn_expr
+                                   rate
+                                   "DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1"
+                                   logger logger_err
+                               in
+                               Ode_loggers.associate
+                                 (I.string_of_var_id ~compil logger)
+                                 ~comment:rule.comment logger logger_buffer
+                                 logger_err
+                                 (var_of_rate rule.rule_id_with_mode)
+                                 (Alg_expr.CONST Nbr.one,snd rate) handler_expr
+                           end
                          | S _ -> ())
                    coefs
                  )
@@ -2353,6 +2367,7 @@ struct
            (*one reaction*)
            let () =
              Sbml_backend.dump_sbml_reaction
+               Ode_loggers.print_alg_expr_few_parenthesis
                (I.string_of_var_id ~compil logger)
                get_rule
                (fun a ->
@@ -2430,7 +2445,7 @@ struct
             Sbml_backend.print_comment
               logger
               logger_err
-              s 
+              s
         else
           let () =
             Ode_loggers.associate
