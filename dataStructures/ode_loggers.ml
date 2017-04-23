@@ -908,6 +908,17 @@ let octave_matlab format =
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
 
+let dotnet_format format =
+  match format with
+  | Loggers.DOTNET -> true
+  | Loggers.Matlab  | Loggers.Octave
+  | Loggers.Mathematica | Loggers.Maple
+  | Loggers.SBML | Loggers.Json
+  | Loggers.DOT
+  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
+
 let mathematica_maple format =
   match format with
   | Loggers.Mathematica | Loggers.Maple -> true
@@ -961,7 +972,8 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
     format
   with
   | Loggers.Matlab
-  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple ->
+  | Loggers.Octave | Loggers.Mathematica | Loggers.Maple
+  | Loggers.DOTNET ->
     begin
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
@@ -984,6 +996,11 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
               logger "var%i%s"
               (network_handler.Network_handler.int_of_obs x)
               ext
+        else if dotnet_format format
+        then
+          Loggers.fprintf
+            logger "%s"
+            (string_of_var_id (network_handler.Network_handler.int_of_obs x))
         else ()
       | Alg_expr.DIFF_TOKEN((Alg_expr.ALG_VAR x,_),id) ->
         if octave_matlab format then
@@ -991,13 +1008,23 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
             logger "jacvar(%i,%i)"
             (network_handler.Network_handler.int_of_obs x)
             id
-        else ()
+        else
+        if dotnet_format format then
+          raise
+            (ExceptionDefn.Internal_Error
+               ("Differentiated expressions are not allowed in DOTNET backend!!!",
+                snd alg_expr))
       | Alg_expr.DIFF_KAPPA_INSTANCE((Alg_expr.ALG_VAR x,_),id) ->
         if octave_matlab format then
           Loggers.fprintf
             logger "jacvar(%i,%i)"
             (network_handler.Network_handler.int_of_obs x)
             (network_handler.Network_handler.int_of_kappa_instance id)
+        else
+        if dotnet_format format then
+          raise
+            (ExceptionDefn.Internal_Error
+               ("Differentiated expressions are not allowed in DOTNET backend!!!",snd alg_expr))
       | Alg_expr.DIFF_TOKEN _
       | Alg_expr.DIFF_KAPPA_INSTANCE _ ->
         raise
@@ -1017,7 +1044,15 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
             Loggers.fprintf
             logger "%s%i%s" var
             (network_handler.Network_handler.int_of_kappa_instance x) ext
-        else ()
+        else if dotnet_format format then
+          let () =
+            Sbml_backend.warn_expr
+              alg_expr
+              ("DOTNET backend does not support kappa expression in rates for rules: cowardly replacing it with 0")
+              logger
+              logger_err
+          in
+          Loggers.fprintf logger "0"
       | Alg_expr.TOKEN_ID x ->
         if octave_matlab format then
           Loggers.fprintf
@@ -1031,10 +1066,29 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
           Loggers.fprintf
             logger "%s%i%s" var
             (network_handler.Network_handler.int_of_kappa_instance x) ext
-        else ()
+        else if dotnet_format format then
+          let () =
+            Sbml_backend.warn_expr
+              alg_expr
+              ("DOTNET backend does not support token values in rates for rules: cowardly replacing it with 0")
+              logger
+              logger_err
+          in
+          Loggers.fprintf logger "0"
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) -> Loggers.fprintf logger "tend"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) -> Loggers.fprintf logger "0"
-      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) -> Loggers.fprintf logger "t"
+      | Alg_expr.STATE_ALG_OP (Operator.TIME_VAR) ->
+        if dotnet_format format then
+          let () =
+            Sbml_backend.warn_expr
+              alg_expr
+              ("DOTNET backend does not support time-dependent expressions in rates for rules: cowardly replacing it with 0")
+              logger
+              logger_err
+          in
+          Loggers.fprintf logger "0"
+        else
+          Loggers.fprintf logger "t"
       | Alg_expr.STATE_ALG_OP (Operator.EVENT_VAR) -> Loggers.fprintf logger "0"
       | Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR) -> Loggers.fprintf logger "event_max"
       | Alg_expr.STATE_ALG_OP (Operator.NULL_EVENT_VAR) -> Loggers.fprintf logger "0"
@@ -1148,7 +1202,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
         let () = Loggers.fprintf logger ")" in
             ()
     end
-  | Loggers.SBML | Loggers.DOTNET -> (*TODO*)
+  | Loggers.SBML  ->
     let () = Loggers.fprintf logger "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" in
     let () =
       Sbml_backend.print_alg_expr_in_sbml
@@ -1519,7 +1573,72 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       let () = Loggers.print_newline logger in
       ()
     end
-  | Loggers.SBML | Loggers.DOTNET ->
+  | Loggers.DOTNET ->
+    let doit () =
+      let id = string_of_variable_sbml string_of_var_id variable in
+      let () =
+        Loggers.fprintf logger_buffer
+          "%s %s "
+          (Sbml_backend.dotnet_id_of_logger logger)
+          id
+      in
+      let () =
+        print_alg_expr_few_parenthesis
+          ~init_mode string_of_var_id logger_buffer logger_err
+          alg_expr network_handler in
+      let () = Loggers.print_newline logger_buffer in
+      ()
+    in
+    begin
+      match variable, init_mode with
+      | (Ode_loggers_sig.Tinit |
+         Ode_loggers_sig.Tend |
+         Ode_loggers_sig.Period_t_points
+        ) ,_ -> doit ()
+      | Ode_loggers_sig.Expr _ , true ->
+        begin
+          match Sbml_backend.eval_const_alg_expr logger network_handler alg_expr
+          with
+          | Some _ -> doit ()
+          | None -> ()
+        end
+      | Ode_loggers_sig.Rate _,_
+      | Ode_loggers_sig.Rated _,_
+      | Ode_loggers_sig.Rateun _,_
+      | Ode_loggers_sig.Rateund _,_ ->
+        if Ode_loggers_sig.is_expr_const alg_expr then
+          doit ()
+      | Ode_loggers_sig.Stochiometric_coef _,_
+      | Ode_loggers_sig.Jacobian_rate (_,_),_
+      | Ode_loggers_sig.Jacobian_rateun (_,_),_
+      | Ode_loggers_sig.Jacobian_rated _,_
+      | Ode_loggers_sig.Jacobian_rateund (_,_),_
+      | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
+      | Ode_loggers_sig.Expr _ , _
+      | Ode_loggers_sig.Init _, _
+      | Ode_loggers_sig.Initbis _, _
+      | Ode_loggers_sig.Concentration _,_
+      | Ode_loggers_sig.Deriv _,_
+      | Ode_loggers_sig.Obs _,_
+      | Ode_loggers_sig.Jacobian _,_
+      | Ode_loggers_sig.Jacobian_var _,_
+      | Ode_loggers_sig.MaxStep, _
+      | Ode_loggers_sig.InitialStep,_
+      | Ode_loggers_sig.AbsTol,_
+      | Ode_loggers_sig.RelTol,_
+      | Ode_loggers_sig.N_rules,_
+      | Ode_loggers_sig.N_ode_var,_
+      | Ode_loggers_sig.N_max_stoc_coef,_
+      | Ode_loggers_sig.N_var,_
+      | Ode_loggers_sig.N_obs,_
+      | Ode_loggers_sig.N_rows,_
+      | Ode_loggers_sig.Tmp,_
+      | Ode_loggers_sig.Time_scale_factor,_
+      | Ode_loggers_sig.NonNegative,_
+      | Ode_loggers_sig.Current_time,_ -> ()
+    end
+
+  | Loggers.SBML ->
     begin
       match variable, init_mode with
       | Ode_loggers_sig.Expr _ , true ->

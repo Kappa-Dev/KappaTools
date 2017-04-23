@@ -25,7 +25,7 @@ period=0.1;
 
 nodevar=6;
 max_stoc_coef=1;
-nvar=3;
+nvar=4;
 nobs=1;
 nrules=6;
 
@@ -36,6 +36,7 @@ init4=0;
 init5=0;
 
 
+var3[t_]=2;
 init1=10; (* A(x~u?, y~u?) *)
 var1[t_]=init1+init3+init2+init5;
 var2[t_]=var1[0]*var1[0]*var1[0]*t;
@@ -57,7 +58,7 @@ var1[t_]=y1[t]+y3[t]+y2[t]+y5[t];
 var2[t_]=var1[t]*var1[t]*var1[t]*t;
 
 k2[t_]=var1[t];
-k4[t_]=var2[t];
+k4[t_]=var3[t];
 stoc5_1[t_]=var1[t]*var1[t]*t;
 k5[t_]=var2[t];
 stoc6_1[t_]=var1[t]*var1[t]*t;

@@ -48,37 +48,37 @@ done
 	 -main function 
 	 -initial state 
 	 -ode system 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 10, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
-File "expr.ka", line 9, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
+File "expr.ka", line 11, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0
 
 	 -jacobian 
 	 -observables 

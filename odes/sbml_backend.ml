@@ -698,38 +698,66 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
             else
               (*if expr is not a constant in case of
               DOTNET gives warning*)
-              let () =
+              (*  let () =
                 do_sbml logger logger_err
-                  (fun logger logger_err ->
+                  (fun logger logger_err ->*)
                     print_alg_expr_in_sbml
                       string_of_var_id
                       logger
                       logger_err
                       expr
-                      network)
+                      network (*
               in
               let () =
                 do_dotnet logger logger_err
                   (fun _logger logger_err ->
                     warn_expr
                       alg_expr
-                      "DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1"
+                      ("DOTNET backend does not support non-constant rates for rules: cowardly replacing it with 1 "^(string_of_var_id id))
                       logger
                       logger_err)
               in
               do_dotnet logger logger_err
                 (fun logger logger_err ->
                    print_nbr logger logger_err Nbr.one
-                )
+                               )*)
           | None ->
             Loggers.fprintf logger "<ci>TODO:v%i</ci>" id
         end
       | Alg_expr.KAPPA_INSTANCE x ->
-        Loggers.fprintf logger "<ci>s%i</ci>"
-          (network.Network_handler.int_of_kappa_instance x)
+        let () =
+          do_sbml logger logger_err
+          (fun logger logger_err ->
+             Loggers.fprintf logger "<ci>s%i</ci>"
+               (network.Network_handler.int_of_kappa_instance x))
+        in
+        do_dotnet logger logger_err
+          (fun _logger logger_err ->
+             let () =
+               warn_expr
+                 alg_expr
+                 ("DOTNET backend does not support kappa expression in rates for rules: cowardly replacing it with 0")
+                 logger
+                 logger_err
+             in
+             print_nbr logger logger_err Nbr.zero)
       | Alg_expr.TOKEN_ID x ->
-        print_ci_with_id logger logger_err "t"
-          (network.Network_handler.int_of_token_id x)
+        let () =
+          do_sbml logger logger_err
+            (fun logger logger_err ->
+               print_ci_with_id logger logger_err "t"
+                 (network.Network_handler.int_of_token_id x))
+        in
+        do_dotnet logger logger_err
+          (fun _logger logger_err ->
+             let () =
+               warn_expr
+                 alg_expr
+                 ("DOTNET backend does not support token values in rates for rules: cowardly replacing it with 0")
+                 logger
+                 logger_err
+             in
+             print_nbr logger logger_err Nbr.zero)
       | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR) ->
         print_ci logger logger_err "tend"
       | Alg_expr.STATE_ALG_OP (Operator.CPUTIME) ->
@@ -1177,7 +1205,7 @@ let maybe_time_dependent logger network var_rule =
 
 
 let dump_kinetic_law
-    string_of_var_id logger logger_err network reactants var_rule correct nocc =
+    print_alg_expr string_of_var_id logger logger_err network reactants var_rule correct nocc =
   let () =
     do_dotnet logger logger_err
       (fun logger logger_err ->
@@ -1186,93 +1214,63 @@ let dump_kinetic_law
            Loggers.get_expr logger var_rule in
          let expr = unsome expr_opt in
          let f logger =
-           let () =
-             if not (Ode_loggers_sig.is_expr_const expr)
-             then
-               warn_expr
-                 expr
-                 ("DOTNET backend does not support non-constant rates for rules: cowardly replacing it with "^(
-                     string_of_variable
-                       logger
-                       (fun _logger var ->
-                          string_of_int
-                            (* this line is error prone, check*)
-                            (network.Network_handler.int_of_kappa_instance                                            var))
-                       var_rule))
-                 logger
-                 logger_err
-           in
-           if correct = nocc
-           then
-             Loggers.fprintf logger "%s"
-               (string_of_variable
-                  logger
-                  (fun _logger var -> string_of_int
-(* this line is error prone, check*)
-                      (network.Network_handler.int_of_kappa_instance
-                         var))
-                  var_rule)
-           else
-           if correct = 1
-           then
-             add_box ~break logger logger_err "apply" ""
-               (fun logger _ ->
-                  let () =
-                    Loggers.fprintf logger
-                      "%s*%i"
-                      (string_of_variable
+           let dump_constant =
+             match eval_const_alg_expr logger network expr with
+             | None ->
+               let () =
+                 warn_expr
+                   expr
+                   ("DOTNET backend does not support non-constant rates for rules: cowardly replacing it with "^(
+                       string_of_variable
                          logger
                          (fun _logger var ->
                             string_of_int
 (* this line is error prone, check*)
                               (network.Network_handler.int_of_kappa_instance
                                  var))
-                         var_rule)
-                      nocc
-                  in
-                  let () = Loggers.print_newline logger in
-                  ()
-               )
+                         var_rule))
+                   logger
+                   logger_err
+               in
+               (fun logger ->
+               Loggers.fprintf logger "%s"
+                 (string_of_variable
+                  logger
+                  (fun _logger var -> string_of_int
+                      (* this line is error prone, check*)
+                      (network.Network_handler.int_of_kappa_instance
+                         var))
+                  var_rule))
+             | Some _ ->
+               (fun logger ->
+                  print_alg_expr string_of_var_id logger logger_err expr network
+(*
+                    print_alg_expr_in_sbml
+                   string_of_var_id logger logger_err expr network *) )
+           in
+           if correct = nocc
+           then
+             dump_constant logger
+           else
+           if correct = 1
+           then
+             let () = dump_constant logger in
+             let () = Loggers.fprintf logger "*%i" nocc in
+             let () = Loggers.print_newline logger in
+             ()
            else
            if nocc=1 then
-             add_box ~break logger logger_err "apply" ""
-               (fun logger _ ->
-                  let () =
-                    Loggers.fprintf logger
-                      "%s/%i"
-                      (string_of_variable logger
-                         (fun _logger var ->
-                            string_of_int
-(* this line is error prone, check*)
-                              (network.Network_handler.int_of_kappa_instance
-                                 var))
-                         var_rule)
-                      correct
-                  in
-                  let () = Loggers.print_newline logger in
-                  ()
-               )
+             let () = dump_constant logger in
+             let () = Loggers.fprintf logger "/%i" correct in
+             let () = Loggers.print_newline logger in
+             ()
            else
-             add_box ~break logger logger_err "apply" ""
-               (fun logger _ ->
-                  let () =
-                    Loggers.fprintf logger
-                          "%i*%s/%i"
-                          nocc
-                          (string_of_variable
-                             logger
-                             (fun _logger var ->
-                                string_of_int
-(* this line is error prone, check*)
-                                  (network.Network_handler.int_of_kappa_instance
-                                     var))
-                             var_rule)
-                          correct
-                      in
-                      let () = Loggers.print_newline logger in
-                      ()
-                   )
-          in f logger
+             let () = Loggers.fprintf logger "%i*" nocc in
+             let () = dump_constant logger in
+             let () = Loggers.fprintf logger "/%i" correct in
+             let () = Loggers.print_newline logger in
+             ()
+         in f logger
          (*match reactants with
          | [] ->
            f logger
@@ -1544,6 +1542,7 @@ let dump_reactants_of_token_vector
     )
 
 let dump_sbml_reaction
+    print_expr
     string_of_var_id
     get_rule
     get_rule_id
@@ -1729,6 +1728,7 @@ let dump_sbml_reaction
                   logger logger_err "math" label
                   (fun logger logger_err ->
                      dump_kinetic_law
+                       print_expr
                        string_of_var_id
                        logger
                        logger_err

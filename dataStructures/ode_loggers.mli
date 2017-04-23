@@ -101,3 +101,11 @@ val return: Loggers.t -> string -> unit
 val close_procedure: Loggers.t -> unit
 
 val smash_reactions: Loggers.encoding -> Remanent_parameters_sig.parameters -> bool
+val print_alg_expr_few_parenthesis:
+  ?init_mode:bool ->
+  (int -> string) ->
+  Loggers.t ->
+  Loggers.t ->
+  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot ->
+  (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t
+  -> unit
