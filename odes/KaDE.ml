@@ -60,6 +60,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         exit 0
       end
     in
+    let propagate_constants = !(ode_args.Ode_args.propagate_constants) in
     let () =
       match
         !(ode_args.Ode_args.matlab_output)
@@ -301,6 +302,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         ?data_file:cli_args.Run_cli_args.outputDataFile
         ?init_t:cli_args.Run_cli_args.minValue
         ~max_t:(Option_util.unsome 1. cli_args.Run_cli_args.maxValue)
+        ~propagate_constants
         ~compute_jacobian
         ~show_time_advance
         ~nonnegative

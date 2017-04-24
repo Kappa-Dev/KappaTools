@@ -34,7 +34,9 @@ sig
   val export_network:
     command_line:string -> command_line_quotes:string ->
     ?data_file:string -> ?init_t:float -> max_t:float -> ?plot_period:float ->
-    ?compute_jacobian:bool -> ?show_time_advance:bool ->
+    ?compute_jacobian:bool ->
+    ?propagate_constants:bool ->
+    ?show_time_advance:bool ->
     ?nonnegative:bool -> ?initial_step:float -> ?max_step:float ->
     ?abstol:float -> ?reltol:float ->
     Remanent_parameters_sig.parameters ->

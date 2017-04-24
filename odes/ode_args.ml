@@ -26,6 +26,7 @@ type t = {
   relative_tolerance : float ref ;
   absolute_tolerance : float ref ;
   smash_reactions : bool ref ;
+  propagate_constants : bool ref ;
 }
 
 let default : t =
@@ -53,6 +54,7 @@ let default : t =
     absolute_tolerance = ref 0.001 ;
     relative_tolerance = ref 0.001 ;
     smash_reactions = ref false ;
+    propagate_constants = ref false ;
   }
 
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
@@ -88,6 +90,10 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   "--sbml-output",
   Superarg.String_opt t.sbml_output,
   "ODEs file for sbml backend",
+  ["1_output"],Normal;
+  "--propagate-constants",
+  Superarg.Bool t.propagate_constants,
+  "propagate constants",
   ["1_output"],Normal;
   "--rate-convention",
   Superarg.Choice (

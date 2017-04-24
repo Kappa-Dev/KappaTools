@@ -1,0 +1,106 @@
+begin parameters
+
+   Etot 300
+   Ftot 300
+   Stot 3000
+
+   kOnE   0.7
+   kOffE  3
+   kCatE  5.0
+
+   kOnF   0.7
+   kOffF  3
+   kCatF  5.1
+
+end parameters
+
+
+begin molecule types
+   E(s)
+   F(s)
+   S(p1~U~P,p2~U~P,p3~U~P,p4~U~P,p5~U~P,p6~U~P,p7~U~P)
+end molecule types
+
+
+begin seed species
+   E(s)     Etot
+   F(s)     Ftot
+   S(p1~U,p2~U,p3~U,p4~U,p5~U,p6~U,p7~U)  Stot
+end seed species
+
+begin reaction rules
+  
+   ###  SITE 1 ###
+   E(s) + S(p1~U) <-> E(s!1).S(p1~U!1) kOnE, kOffE
+   E(s!1).S(p1~U!1) -> E(s) + S(p1~P) kCatE
+
+   F(s) + S(p1~P) <-> F(s!1).S(p1~P!1) kOnF, kOffF
+   F(s!1).S(p1~P!1) -> F(s) + S(p1~U) kCatF
+
+
+
+   ###  SITE 2 ###
+   E(s) + S(p2~U) <-> E(s!1).S(p2~U!1) kOnE, kOffE
+   E(s!1).S(p2~U!1) -> E(s) + S(p2~P) kCatE
+
+   F(s) + S(p2~P) <-> F(s!1).S(p2~P!1) kOnF, kOffF
+   F(s!1).S(p2~P!1) -> F(s) + S(p2~U) kCatF
+
+
+
+   ###  SITE 3 ###
+   E(s) + S(p3~U) <-> E(s!1).S(p3~U!1) kOnE, kOffE
+   E(s!1).S(p3~U!1) -> E(s) + S(p3~P) kCatE
+
+   F(s) + S(p3~P) <-> F(s!1).S(p3~P!1) kOnF, kOffF
+   F(s!1).S(p3~P!1) -> F(s) + S(p3~U) kCatF
+
+
+
+   ###  SITE 4 ###
+   E(s) + S(p4~U) <-> E(s!1).S(p4~U!1) kOnE, kOffE
+   E(s!1).S(p4~U!1) -> E(s) + S(p4~P) kCatE
+
+   F(s) + S(p4~P) <-> F(s!1).S(p4~P!1) kOnF, kOffF
+   F(s!1).S(p4~P!1) -> F(s) + S(p4~U) kCatF
+
+
+   ###  SITE 5 ###
+   E(s) + S(p5~U) <-> E(s!1).S(p5~U!1) kOnE, kOffE
+   E(s!1).S(p5~U!1) -> E(s) + S(p5~P) kCatE
+
+   F(s) + S(p5~P) <-> F(s!1).S(p5~P!1) kOnF, kOffF
+   F(s!1).S(p5~P!1) -> F(s) + S(p5~U) kCatF
+
+   ###  SITE 6 ###
+   E(s) + S(p6~U) <-> E(s!1).S(p6~U!1) kOnE, kOffE
+   E(s!1).S(p6~U!1) -> E(s) + S(p6~P) kCatE
+
+   F(s) + S(p6~P) <-> F(s!1).S(p6~P!1) kOnF, kOffF
+   F(s!1).S(p6~P!1) -> F(s) + S(p6~U) kCatF
+
+
+   ###  SITE 7 ###
+   E(s) + S(p7~U) <-> E(s!1).S(p7~U!1) kOnE, kOffE
+   E(s!1).S(p7~U!1) -> E(s) + S(p7~P) kCatE
+
+   F(s) + S(p7~P) <-> F(s!1).S(p7~P!1) kOnF, kOffF
+   F(s!1).S(p7~P!1) -> F(s) + S(p7~U) kCatF
+
+end reaction rules
+
+begin observables
+
+   Molecules Efree E(s)
+   Molecules Ffree F(s)
+   Molecules S1P   S(p1~P!?)
+
+end observables
+
+writeXML();
+#simulate_nf({suffix=>nf,t_end=>200,n_steps=>100});
+#generate_network({overwrite=>1});
+#saveConcentrations();
+#simulate_ode({suffix=>ode,t_end=>300,n_steps=>100});
+#resetConcentrations();
+#simulate_ssa({suffix=>ssa,t_end=>300,n_steps=>100});
