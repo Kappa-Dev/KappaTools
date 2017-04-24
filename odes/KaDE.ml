@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 22 2017>
+  * Last modification: Time-stamp: <Apr 24 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -152,16 +152,16 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
                 f "'%s'" (if i = 0 then "KaDE" else s)))
         Sys.argv
     in
-    let ignore_obs =
+    let ignore_obs,dotnet =
       match backend with
-      | Loggers.DOTNET -> true
-      | Loggers.SBML -> true
+      | Loggers.DOTNET -> true,true
+      | Loggers.SBML
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML |
         Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-      | Loggers.XLS -> true
+      | Loggers.XLS -> true,false
       | Loggers.Octave | Loggers.Matlab
-      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> false
+      | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> false,false
     in
     let compil =
       A.get_compil
@@ -263,7 +263,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       !(ode_args.Ode_args.smash_reactions)
     in
     let network =
-      A.network_from_compil ~smash_reactions ~ignore_obs parameters compil network
+      A.network_from_compil ~dotnet ~smash_reactions ~ignore_obs parameters compil network
     in
     (*************************************************************)
     let out_channel =

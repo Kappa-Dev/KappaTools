@@ -385,7 +385,13 @@ let intersection renaming cc1 cc2 =
   { nodes_by_type; nodes;
     recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
-let print_cc ?agent_sep:(agent_sep=Pp.comma) ~new_syntax ?sigs ?cc_id ~with_id f cc =
+let dotcomma dotnet =
+  if dotnet
+  then (fun fmt -> Format.fprintf fmt ",")
+  else  Pp.comma
+let print_cc
+    ?dotnet:(dotnet=false)
+    ?full_species:(full_species=false) ~new_syntax ?sigs ?cc_id ~with_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -394,18 +400,20 @@ let print_cc ?agent_sep:(agent_sep=Pp.comma) ~new_syntax ?sigs ?cc_id ~with_id f
               if st >= 0
               then Format.fprintf
                   f "%t%a"
-                  (if not_empty then Pp.comma else Pp.empty)
+                  (if not_empty then dotcomma dotnet
+                   else Pp.empty)
                   (Agent.print_internal ?sigs ag p) st
               else
               if  el <> UnSpec then
                 Format.fprintf
                   f "%t%a"
-                  (if not_empty then Pp.comma else Pp.empty)
+                  (if not_empty then dotcomma dotnet
+                   else Pp.empty)
                   (Agent.print_site ?sigs ag) p in
             match el with
             | UnSpec ->
               if st >= 0 then
-                let () = if not new_syntax then Format.fprintf f "?" in
+                let () = if not new_syntax && not full_species then Format.fprintf f "?" in
                 (true,out)
               else (not_empty,out)
             | Free ->
@@ -435,7 +443,14 @@ let print_cc ?agent_sep:(agent_sep=Pp.comma) ~new_syntax ?sigs ?cc_id ~with_id f
          let () =
            Format.fprintf
              f "%t@[<h>%a("
-             (if not_empty then agent_sep else Pp.empty)
+             (if not_empty
+              then
+                begin
+                  if dotnet then
+                  (fun fmt -> Format.fprintf fmt ".")
+                  else Pp.comma
+                end
+              else Pp.empty)
              (Agent.print ?sigs ~with_id) ag_x in
          let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in

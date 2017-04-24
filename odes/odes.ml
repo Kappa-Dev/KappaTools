@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 23 2017>
+  * Last modification: Time-stamp: <Apr 24 2017>
 *)
 
 let local_trace = false
@@ -168,6 +168,8 @@ struct
       sym_reduction: Symmetries.reduction ;
       bwd_map: Symmetries.bwd_map ;
       max_stoch_coef: int;
+      fictitious_species: id option;
+      has_empty_lhs: bool option;
     }
 
   let may_be_time_homogeneous_gen a =
@@ -245,6 +247,8 @@ struct
       sym_reduction = Symmetries.Ground ;
       bwd_map = Symmetries.empty_bwd_map () ;
       max_stoch_coef = 0 ;
+      fictitious_species = None;
+      has_empty_lhs = None;
     }
 
   let from_nembed_correct compil nauto =
@@ -301,6 +305,11 @@ struct
     in
     inc_fresh_ode_var_id network,
     get_fresh_ode_var_id network
+
+  let add_ficitious_species network =
+    let network = {network with fictitious_species = Some (get_fresh_ode_var_id network)} in
+    let network = inc_fresh_ode_var_id network in
+    network
 
   let add_new_canonic_species canonic species network =
     let () =
@@ -695,24 +704,42 @@ struct
     in
     to_be_visited, network
 
-  let initial_network parameters compil network initial_states rules =
-    List.fold_left
-      (fun remanent enriched_rule ->
-         match enriched_rule.lhs_cc with
-         | [] ->
-           begin
-             let _, embed, mixture = I.disjoint_union compil [] in
-             let () = debug "add new reaction" in
-             add_prereaction parameters compil enriched_rule embed mixture remanent
-           end
-         | _::_ -> remanent
-      )
-      (List.fold_left
-         (fun remanent species ->
-            fst (translate_species parameters compil species
-                   remanent))
-         ([], network)
-         initial_states) rules
+  let initial_network ~dotnet parameters compil network initial_states rules =
+    let network =
+      {network with has_empty_lhs = Some false}
+    in
+    let l,network =
+      List.fold_left
+        (fun remanent enriched_rule ->
+           match enriched_rule.lhs_cc with
+           | [] ->
+             begin
+               let _, embed, mixture = I.disjoint_union compil [] in
+               let () = debug "add new reaction" in
+               let l,network = remanent in
+               let remanent = l,{network with has_empty_lhs = Some true} in
+               add_prereaction parameters compil enriched_rule embed mixture remanent
+             end
+           | _::_ -> remanent
+        )
+        (List.fold_left
+           (fun remanent species ->
+              fst (translate_species parameters compil species
+                     remanent))
+           ([], network)
+           initial_states) rules
+    in
+    if dotnet
+    then
+      match network.has_empty_lhs with
+      | None ->
+        failwith  "Internal error"
+      | Some true ->
+        l,add_ficitious_species network
+      | Some false ->
+        l,network
+    else
+      l,network
 
   let compare_reaction
       (react,prod,token,enriched_rule)
@@ -738,7 +765,7 @@ struct
   let compare_extended_reaction a b =
     compare_reaction (fst a) (fst b)
 
-  let compute_prereactions ~smash_reactions parameters compil network rules
+  let compute_prereactions ~smash_reactions ~dotnet parameters compil network rules
       initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
@@ -766,7 +793,7 @@ struct
     in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
-      initial_network
+      initial_network ~dotnet
         parameters compil network initial_states rules
     in
     let network =
@@ -1445,7 +1472,7 @@ struct
      bwd_map = bwd_map ;
      cache = cache }
 
-  let network_from_compil ~smash_reactions ~ignore_obs parameters compil network =
+  let network_from_compil ~dotnet ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
@@ -1456,7 +1483,7 @@ struct
       Format.printf "\t -saturating the set of molecular species @."
     in
     let network =
-      compute_prereactions ~smash_reactions parameters compil network rules
+      compute_prereactions ~dotnet ~smash_reactions parameters compil network rules
         initial_state
     in
     let () =
@@ -2384,6 +2411,7 @@ struct
                (var_of_rule enriched_rule)
                enriched_rule.divide_rate_by
                nocc
+               network.fictitious_species
            in
            let () =
              match
@@ -2814,64 +2842,70 @@ struct
              k = get_fresh_ode_var_id network - 1
           then "time", "t", Some "substance"
           else
-            let variable =
-              Mods.DynArray.get network.ode_vars_tab k in
-            begin
-              match variable with
-              | Dummy -> "dummy", "", None
-              | Token id ->
-                begin
+            match network.fictitious_species with
+            | Some id when id=k ->
+              (string_of_int k),
+              "I()",
+              Some ""
+            | Some _ | None ->
+              let variable = Mods.DynArray.get network.ode_vars_tab k in
+              begin
+                match variable with
+                | Dummy -> "dummy", "", None
+                | Token id ->
+                  begin
+                    match Loggers.get_encoding_format logger with
+                    | Loggers.SBML ->
+                      "t"^(string_of_int k),
+                      Format.asprintf "%a"
+                        (fun log id ->
+                           I.print_token ~compil log id) id,
+                      (Some "substance")
+                    | Loggers.DOTNET ->
+                      (string_of_int k),
+                      Format.asprintf "%a"
+                        (fun log id ->
+                           I.print_token ~compil log id) id,
+                      (Some "substance")
+                    | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                    | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
+                    | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
+                    | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
+                    | Loggers.XLS
+                      -> "", Format.asprintf "%a"
+                           (fun log k -> I.print_chemical_species ~compil log
+                               (fst
+                                  (Mods.DynArray.get network.species_tab k))
+                           ) k, None
+                  end
+                | Noccurrences _ | Nembed _ ->
                   match Loggers.get_encoding_format logger with
                   | Loggers.SBML ->
-                    "t"^(string_of_int k),
-                    Format.asprintf "%a"
-                      (fun log id ->
-                         I.print_token ~compil log id) id,
-                    (Some "substance")
-                  | Loggers.DOTNET ->
-                    (string_of_int k),
-                    Format.asprintf "%a"
-                      (fun log id ->
-                         I.print_token ~compil log id) id,
-                    (Some "substance")
-                  | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
-                  | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
-                  | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
-                  | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
-                  | Loggers.XLS
-                      -> "", Format.asprintf "%a"
-                      (fun log k -> I.print_chemical_species ~compil log
-                          (fst
-                             (Mods.DynArray.get network.species_tab k))
-                      ) k, None
-                end
-              | Noccurrences _ | Nembed _ ->
-                match Loggers.get_encoding_format logger with
-                | Loggers.SBML ->
                     "s"^(string_of_int k),
                     Format.asprintf "%a"
                       (fun log k -> I.print_chemical_species ~compil log
                           (fst
                              (Mods.DynArray.get network.species_tab k))
                       ) k, Some "substance"
-                | Loggers.DOTNET ->
+                  | Loggers.DOTNET ->
+                    let dotnet = true in
                     (string_of_int k),
                     Format.asprintf "%a"
-                      (fun log k -> I.print_chemical_species ?agent_sep:(Some Pp.dot) ~compil log
-                          (fst
-                             (Mods.DynArray.get network.species_tab k))
+                      (fun log k -> I.print_chemical_species ~dotnet ~compil
+                        log
+                        (fst (Mods.DynArray.get network.species_tab k))
                       ) k, Some ""
-                | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
-                | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
-                | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
-                | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
-                | Loggers.XLS
-                  -> "", Format.asprintf "%a"
-                  (fun log k -> I.print_chemical_species ~compil log
-                      (fst
-                         (Mods.DynArray.get network.species_tab k))
-                  ) k, None
-            end
+                  | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                  | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
+                  | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
+                  | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
+                  | Loggers.XLS
+                    -> "", Format.asprintf "%a"
+                         (fun log k -> I.print_chemical_species ~compil log
+                             (fst
+                                (Mods.DynArray.get network.species_tab k))
+                         ) k, None
+              end
         in
         let () = Ode_loggers.declare_init ~comment logger k in
         let () =
