@@ -601,6 +601,25 @@ and eval_const_bool_expr logger network_handler expr =
         end
     end
 
+let rec get_last_alias logger network_handler x =
+  let id = network_handler.Network_handler.int_of_obs x in
+  let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
+  match fst (unsome expr_opt)
+  with
+  | Alg_expr.ALG_VAR x' when x<>x' ->
+    get_last_alias logger network_handler x'
+  | Alg_expr.ALG_VAR _
+  | Alg_expr.CONST _
+  | Alg_expr.TOKEN_ID _
+  | Alg_expr.KAPPA_INSTANCE _
+  | Alg_expr.STATE_ALG_OP _
+  | Alg_expr.BIN_ALG_OP _
+  | Alg_expr.UN_ALG_OP _
+  | Alg_expr.IF _
+  | (Alg_expr.DIFF_KAPPA_INSTANCE _
+    | Alg_expr.DIFF_TOKEN _) -> x
+
+
 let print_int logger logger_err n =
   let () =
     do_sbml logger logger_err
@@ -1203,8 +1222,16 @@ let maybe_time_dependent logger network var_rule =
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET -> false
 
+let can_be_cast f =
+  let s = Nbr.to_string (Nbr.F f) in
+  s.[(String.length s)-1] = '.'
+
+let promote nbr =
+  match nbr with Nbr.F f when can_be_cast f  -> Nbr.I (int_of_float f)
+               | Nbr.I _ | Nbr.F _ | Nbr.I64 _ -> nbr
 
 let dump_kinetic_law
+    ~propagate_constants
     print_alg_expr string_of_var_id logger logger_err network reactants var_rule correct nocc =
   let () =
     do_dotnet logger logger_err
@@ -1241,12 +1268,32 @@ let dump_kinetic_law
                       (network.Network_handler.int_of_kappa_instance
                          var))
                   var_rule))
-             | Some _ ->
+(*| Some _ ->
                (fun logger ->
-                  print_alg_expr string_of_var_id logger logger_err expr network
+                  print_alg_expr string_of_var_id logger logger_err expr network*)
+             | Some cst ->
+               begin
+                 let cst = promote cst in
+                 if propagate_constants
+                 then
+                   (fun logger -> Loggers.fprintf logger "%s" (Nbr.to_string cst))
+                 else
+                 match
+                   Ode_loggers_sig.is_expr_alias expr
+                 with
+                 | Some var_id ->
+                   let var_id = get_last_alias logger network var_id in
+                   (fun logger ->
+                      Loggers.fprintf logger "%s"
+                        (string_of_var_id
+                           (network.Network_handler.int_of_obs var_id)))
+                 | None ->
+                   (fun logger -> Loggers.fprintf logger "%s" (Nbr.to_string cst))
+                 (* Put a mask to make BNGL happy *)
 (*
                     print_alg_expr_in_sbml
-                   string_of_var_id logger logger_err expr network *) )
+                   string_of_var_id logger logger_err expr network *)
+               end
            in
            if correct = nocc
            then
@@ -1541,6 +1588,7 @@ let dump_reactants_of_token_vector
     )
 
 let dump_sbml_reaction
+    ~propagate_constants
     print_expr
     string_of_var_id
     get_rule
@@ -1740,6 +1788,7 @@ let dump_sbml_reaction
                   logger logger_err "math" label
                   (fun logger logger_err ->
                      dump_kinetic_law
+                       ~propagate_constants
                        print_expr
                        string_of_var_id
                        logger

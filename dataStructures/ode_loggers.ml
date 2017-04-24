@@ -1589,6 +1589,18 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       let () = Loggers.print_newline logger_buffer in
       ()
     in
+    let doit_const cst =
+      let id = string_of_variable_sbml string_of_var_id variable in
+      let () =
+        Loggers.fprintf logger_buffer
+          "%s %s %s"
+          (Sbml_backend.dotnet_id_of_logger logger)
+          id
+          (Nbr.to_string cst)
+      in
+      let () = Loggers.print_newline logger_buffer in
+      ()
+    in
     begin
       match variable, init_mode with
       | (Ode_loggers_sig.Tinit |
@@ -1599,7 +1611,7 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
         begin
           match Sbml_backend.eval_const_alg_expr logger network_handler alg_expr
           with
-          | Some _ -> doit ()
+          | Some cst -> doit_const cst
           | None -> ()
         end
       | Ode_loggers_sig.Rate _,_

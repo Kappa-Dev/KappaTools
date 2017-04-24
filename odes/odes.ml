@@ -2176,7 +2176,9 @@ struct
   let export_main = export_main_gen ~step:1
   let export_main_follow_up = export_main_gen ~step:2
 
-  let export_dydt ~show_time_advance logger logger_err compil network split =
+  let export_dydt
+      ~propagate_constants  ~show_time_advance
+      logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
     let is_zero = fresh_is_zero network in
     let label = "listOfReactions" in
@@ -2394,6 +2396,7 @@ struct
            (*one reaction*)
            let () =
              Sbml_backend.dump_sbml_reaction
+               ~propagate_constants
                Ode_loggers.print_alg_expr_few_parenthesis
                (I.string_of_var_id ~compil logger)
                get_rule
@@ -2834,6 +2837,7 @@ struct
         k >= get_fresh_ode_var_id network
         || k = get_fresh_ode_var_id network - 1
            && Sbml_backend.is_dotnet logger
+           && may_be_not_time_homogeneous network
       then
         ()
       else
@@ -2989,6 +2993,7 @@ struct
       ~command_line ~command_line_quotes ?data_file ?init_t ~max_t
       ?plot_period
       ?compute_jacobian:(compute_jacobian=true)
+      ?propagate_constants:(propagate_constants=false)
       ?show_time_advance:(show_time_advance=false)
       ?nonnegative:(nonnegative=false)
       ?initial_step:(initial_step=0.000001)
@@ -3027,7 +3032,7 @@ struct
     in
     let () = Format.printf "\t -ode system @." in
     let () =
-      export_dydt ~show_time_advance logger logger_err compil network sorted_rules_and_decl
+      export_dydt ~propagate_constants ~show_time_advance logger logger_err compil network sorted_rules_and_decl
     in
     let () =
       if compute_jacobian then
