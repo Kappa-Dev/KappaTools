@@ -114,7 +114,8 @@ val compare_canonicals : id -> id -> int
 val is_equal_canonicals : id -> id -> bool
 
 val print_cc :
-  ?agent_sep:(Format.formatter -> unit) -> new_syntax:bool -> ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
+  ?dotnet:bool -> ?full_species:bool ->
+  new_syntax:bool -> ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
   Format.formatter -> t -> unit
 
 val print :

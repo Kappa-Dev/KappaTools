@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 11 2017>
+  * Last modification: Time-stamp: <Apr 24 2017>
 *)
 
 module type Interface =
@@ -39,11 +39,11 @@ sig
     ?compil:compil -> Format.formatter -> int -> unit
 
   val print_chemical_species:
-    ?agent_sep:(Format.formatter -> unit)
+    ?dotnet:bool
     -> ?compil:compil -> Format.formatter -> chemical_species -> unit
 
   val print_canonic_species:
-    ?agent_sep:(Format.formatter -> unit)
+    ?dotnet:bool
     -> ?compil:compil -> Format.formatter -> canonic_species -> unit
 
   val rate_convention: compil ->

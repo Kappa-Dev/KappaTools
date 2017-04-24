@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 11 2017>
+  * Last modification: Time-stamp: <Apr 24 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -127,10 +127,11 @@ let do_we_count_in_embeddings compil =
 let do_we_prompt_reactions compil =
   compil.show_reactions
 
-let print_chemical_species ?agent_sep ?compil f =
+let print_chemical_species ?dotnet ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Pattern.print_cc
-       ?agent_sep
+       ?dotnet
+       ?full_species:(Some true)   
        ~new_syntax:false
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None ~with_id:false)

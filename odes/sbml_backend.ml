@@ -1254,20 +1254,19 @@ let dump_kinetic_law
            else
            if correct = 1
            then
+             let () = Loggers.fprintf logger "%i*" nocc in
              let () = dump_constant logger in
-             let () = Loggers.fprintf logger "*%i" nocc in
              let () = Loggers.print_newline logger in
              ()
            else
            if nocc=1 then
+             let () = Loggers.fprintf logger "%g*" (1./.(float_of_int correct)) in
              let () = dump_constant logger in
-             let () = Loggers.fprintf logger "/%i" correct in
              let () = Loggers.print_newline logger in
              ()
            else
-             let () = Loggers.fprintf logger "%i*" nocc in
+             let () = Loggers.fprintf logger "%g*" ((float_of_int nocc)/.(float_of_int correct)) in
              let () = dump_constant logger in
-             let () = Loggers.fprintf logger "/%i" correct in
              let () = Loggers.print_newline logger in
              ()
          in f logger
@@ -1558,6 +1557,7 @@ let dump_sbml_reaction
     var_rule
     correct
     nocc
+    fictitious
   =
   let dotnet_sep = "," in
   let reaction_id = Loggers.get_fresh_reaction_id logger in
@@ -1567,6 +1567,18 @@ let dump_sbml_reaction
   let label_list_of_products = "listOfProducts" in
   let label_list_of_mods = "listOfModifiers" in
   let rule_id = get_rule_id enriched_rule in
+  let reactants, products =
+    if reactants=[] && is_dotnet logger
+    then
+      begin
+        match fictitious with
+        | None -> failwith "Internal error"
+        | Some id -> (id,1)::reactants, List.rev ((id,1)::(List.rev products))
+      end
+    else
+      reactants, products
+  in
+
   let token_vector =
     if is_dotnet logger
     then
