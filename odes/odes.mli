@@ -43,7 +43,7 @@ sig
     Loggers.t -> Loggers.t -> Loggers.t ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
-    unit
+    (ode_var_id, Ode_loggers_sig.ode_var_id)  network 
 
   val get_comment: enriched_rule -> string
 
@@ -83,5 +83,5 @@ sig
 
   val get_data:
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
-    int * int * int 
+    int * int * int
 end

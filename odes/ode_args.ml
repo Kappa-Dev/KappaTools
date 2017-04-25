@@ -32,7 +32,7 @@ type t = {
 
 let default : t =
   {
-    backend = ref "Octave" ;
+    backend = ref "octave" ;
     rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
     count = ref "Embeddings" ;
     show_reactions = ref true ;
@@ -73,11 +73,20 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
   "Select the backend format",
   ["1_output"],Normal;
+  "--output",
+  Superarg.MultiExt
+    ["--dotnet-output",".net";
+     "--maple-output",".mws";
+     "--mathematica-output",".nb";
+     "--matlab-output",".m";
+     "--octave-output",".m";
+     "--sbml-output",".xml"],
+  "Prefix for file name output",
+  ["1_output"],Normal;
   "--dotnet-output",
   Superarg.String_opt t.dotnet_output,
   "ODEs file for dotnet backend",
   ["1_output"],Normal;
-
   "--maple-output",
   Superarg.String_opt t.maple_output,
   "ODEs file for maple backend",

@@ -18,9 +18,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let common_args_gui = Common_args.default_gui in
   let ode_args = Ode_args.default in
   let options =
-    Run_cli_args.options_gui cli_args_gui
+    List.rev (Run_cli_args.options_gui cli_args_gui
       @ Ode_args.options ode_args
-      @ Common_args.options_gui common_args_gui
+      @ Common_args.options_gui common_args_gui)
     in
   try
     let files = Ode_args.get_option options in
@@ -296,7 +296,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> logger
     in
-    let () =
+    let network =
       A.export_network
         ~command_line
         ~command_line_quotes
