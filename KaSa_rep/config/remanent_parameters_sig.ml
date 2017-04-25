@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Apr 08 2017>
+  * Last modification:  Time-stamp: <Apr 25 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -164,6 +164,7 @@ type parameters =
     logger: Loggers.t;
     profiler: Loggers.t;
     compression_status: Loggers.t;
+    print_efficiency: bool; 
     save_error_list: Exception_without_parameter.method_handler -> unit;
     save_progress_bar: (bool*int*int*int) -> unit;
     reset_progress_bar: unit -> unit;

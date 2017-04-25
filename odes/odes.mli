@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 24 2017>
+  * Last modification: Time-stamp: <Apr 25 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -81,4 +81,7 @@ sig
     I.compil -> (ode_var_id, Ode_loggers_sig.ode_var_id) network
     -> unit
 
+  val get_data:
+    (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
+    int * int * int 
 end

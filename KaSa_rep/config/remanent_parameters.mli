@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 08 2017>
+  * Last modification: Time-stamp: <Apr 25 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -141,6 +141,8 @@ val update_call_stack:
   string option ->
   Remanent_parameters_sig.parameters
 
+val get_print_efficiency: Remanent_parameters_sig.parameters -> bool
+val set_print_efficiency: Remanent_parameters_sig.parameters -> bool -> Remanent_parameters_sig.parameters
 val open_influence_map_file: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.parameters
 val open_contact_map_file: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.parameters
 

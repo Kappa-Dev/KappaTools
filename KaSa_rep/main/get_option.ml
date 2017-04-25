@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Apr 19 2017>
+  * Last modification: Time-stamp: <Apr 25 2017>
   * *
   * primitive to parse command-line options
   *
@@ -327,7 +327,12 @@ let options =
       Hidden;
       "--unsafe-mode",
       Bool Config.unsafe,
-      "Exceptions are gathered at the end of the computation, instead of halting it ",
+      "exceptions are gathered at the end of the computation, instead of halting it ",
+      ["7_Debugging_info"],
+      Expert;
+      "--print-efficiency",
+      Bool Config.print_efficiency,
+      "prompt CPU time and various datas",
       ["7_Debugging_info"],
       Expert;
     ]

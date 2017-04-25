@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Apr 10 2017>
+  * Last modification: Time-stamp: <Apr 25 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1535,4 +1535,6 @@ let output_symmetries
   | Some sym, Some env ->
     let () = Symmetries.print_symmetries parameters env sym in
     state
+
+let get_data = Remanent_state.get_data
   end

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 08 2017>
+  * Last modification: Time-stamp: <Apr 25 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -408,6 +408,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
        | None -> Loggers.dummy_txt_logger
        | Some _ -> Loggers.open_logger_from_formatter !Config.formatter);
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
+    Remanent_parameters_sig.print_efficiency = !Config.print_efficiency;
     Remanent_parameters_sig.profiler =
       match
         channel
@@ -809,6 +810,10 @@ let get_called_from parameter = parameter.Remanent_parameters_sig.marshalisable_
 let get_compression_status_logger parameter =
   parameter.Remanent_parameters_sig.compression_status
 
+let set_print_efficiency parameter bool =
+  {parameter with Remanent_parameters_sig.print_efficiency = bool}
+let get_print_efficiency parameter =
+  parameter.Remanent_parameters_sig.print_efficiency
  let set_logger parameter logger =
    { parameter with Remanent_parameters_sig.logger = logger}
 let save_error_list parameter error =
