@@ -73,48 +73,46 @@ let is_dotnet logger =
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
 
-let do_dotnet_or_sbml logger logger_err f =
+let is_sbml logger =
+    match
+      Loggers.get_encoding_format logger
+    with
+    | Loggers.SBML -> true
+    | Loggers.DOTNET
+    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+    | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
+    | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
+    | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+
+let is_dotnet_or_sbml  logger =
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.DOTNET | Loggers.SBML ->
-      f logger logger_err
+  | Loggers.DOTNET
+  | Loggers.SBML -> true
   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
+  | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
+
+let do_dotnet_or_sbml logger logger_err f =
+  if is_dotnet_or_sbml  logger
+  then
+    f logger logger_err
 
 let do_not_sbml logger logger_err f =
-  match
-    Loggers.get_encoding_format logger
-  with
-  | Loggers.SBML -> ()
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET ->
+  if not (is_sbml logger)
+  then
     f logger logger_err
 
 let do_not_dotnet logger logger_err f =
-  match
-    Loggers.get_encoding_format logger
-  with
-  | Loggers.DOTNET -> ()
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.SBML ->
-      f logger logger_err
+  if not (is_dotnet logger)
+  then
+    f logger logger_err
 
 let do_neither_dotnet_nor_sbml logger logger_err f =
-  match
-    Loggers.get_encoding_format logger
-  with
-  | Loggers.DOTNET | Loggers.SBML -> ()
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
-  | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
-  | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
-  | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
+  if not (is_dotnet_or_sbml logger)
+  then
     f logger logger_err
 
 let lift0 f =
@@ -453,7 +451,7 @@ and eval_init_bool_expr logger network_handler expr =
       (eval_init_bool_expr logger network_handler a)
       (eval_init_bool_expr logger network_handler b)
 
-let rec propagate_def_in_alg_expr logger network_handler alg_expr =
+let rec propagate_def_in_alg_expr_p p logger network_handler alg_expr =
   match alg_expr with
   | Alg_expr.CONST _,_
   | Alg_expr.TOKEN_ID _,_
@@ -461,10 +459,14 @@ let rec propagate_def_in_alg_expr logger network_handler alg_expr =
   | Alg_expr.ALG_VAR x,loc ->
     let id = network_handler.Network_handler.int_of_obs x in
     let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
-    fst (propagate_def_in_alg_expr logger network_handler (unsome expr_opt)),loc
+    let expr = unsome expr_opt in
+    if p logger id x expr
+    then
+      fst (propagate_def_in_alg_expr_p p logger network_handler expr),loc
+    else alg_expr
   | Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR),loc ->
     let expr_opt = Loggers.get_expr logger Ode_loggers_sig.Tend in
-    fst (propagate_def_in_alg_expr logger network_handler (unsome expr_opt)),loc
+    fst (propagate_def_in_alg_expr_p p logger network_handler (unsome expr_opt)),loc
   | Alg_expr.STATE_ALG_OP
       ( Operator.CPUTIME
       | Operator.TIME_VAR
@@ -475,38 +477,50 @@ let rec propagate_def_in_alg_expr logger network_handler alg_expr =
   | Alg_expr.BIN_ALG_OP (op, a, b),loc ->
     Alg_expr.BIN_ALG_OP (
       op,
-      (propagate_def_in_alg_expr logger network_handler a),
-      (propagate_def_in_alg_expr logger network_handler b)),loc
+      (propagate_def_in_alg_expr_p p logger network_handler a),
+      (propagate_def_in_alg_expr_p p logger network_handler b)),loc
   | Alg_expr.UN_ALG_OP (op, a),loc ->
     Alg_expr.UN_ALG_OP (
       op,
-      (propagate_def_in_alg_expr logger network_handler a)),loc
+      (propagate_def_in_alg_expr_p p logger network_handler a)),loc
   | Alg_expr.IF (cond, yes, no),loc ->
     Alg_expr.IF
-      (propagate_def_in_bool_expr logger network_handler cond,
-       propagate_def_in_alg_expr logger network_handler yes,
-       propagate_def_in_alg_expr logger network_handler no), loc
+      (propagate_def_in_bool_expr_p p logger network_handler cond,
+       propagate_def_in_alg_expr_p p logger network_handler yes,
+       propagate_def_in_alg_expr_p p logger network_handler no), loc
   | (Alg_expr.DIFF_KAPPA_INSTANCE _
     | Alg_expr.DIFF_TOKEN _),pos ->
     raise
       (ExceptionDefn.Internal_Error
          ("SBML does not support differentiation",pos))
-and propagate_def_in_bool_expr logger network_handler expr =
+and propagate_def_in_bool_expr_p p logger network_handler expr =
   match expr with
   | Alg_expr.TRUE,_
   | Alg_expr.FALSE,_ -> expr
   | Alg_expr.COMPARE_OP (op,a,b),loc ->
     Alg_expr.COMPARE_OP
       (op,
-       (propagate_def_in_alg_expr logger network_handler a),
-       (propagate_def_in_alg_expr  logger network_handler b)),
+       (propagate_def_in_alg_expr_p p logger network_handler a),
+       (propagate_def_in_alg_expr_p p logger network_handler b)),
     loc
   | Alg_expr.BOOL_OP (op,a,b),loc ->
     Alg_expr.BOOL_OP
       (op,
-       (propagate_def_in_bool_expr logger network_handler a),
-       (propagate_def_in_bool_expr logger network_handler b)),
+       (propagate_def_in_bool_expr_p p logger network_handler a),
+       (propagate_def_in_bool_expr_p p logger network_handler b)),
     loc
+
+let propagate_dep_in_alg_expr a b c =
+  propagate_def_in_alg_expr_p (fun _ _ _ _ -> true ) a b c
+
+let propagate_dangerous_var_names_in_alg_expr a b c =
+  if is_dotnet a then
+    propagate_def_in_alg_expr_p
+      (fun logger id _ _  ->
+         Loggers.is_dangerous_ode_variable logger
+           ((Ode_loggers_sig.Expr id)))
+      a b c
+  else c
 
 let rec eval_const_alg_expr logger network_handler alg_expr =
   match fst alg_expr with
@@ -606,7 +620,8 @@ let rec get_last_alias logger network_handler x =
   let expr_opt = Loggers.get_expr logger (Ode_loggers_sig.Expr id) in
   match fst (unsome expr_opt)
   with
-  | Alg_expr.ALG_VAR x' when x<>x' ->
+  | Alg_expr.ALG_VAR x' when x<>x'
+                          && not (Loggers.is_dangerous_ode_variable logger (Ode_loggers_sig.Expr (network_handler.Network_handler.int_of_obs x'))) ->
     get_last_alias logger network_handler x'
   | Alg_expr.ALG_VAR _
   | Alg_expr.CONST _
@@ -1252,7 +1267,6 @@ let dump_kinetic_law
                          logger
                          (fun _logger var ->
                             string_of_int
-(* this line is error prone, check*)
                               (network.Network_handler.int_of_kappa_instance
                                  var))
                          var_rule))
@@ -1264,7 +1278,6 @@ let dump_kinetic_law
                  (string_of_variable
                   logger
                   (fun _logger var -> string_of_int
-                      (* this line is error prone, check*)
                       (network.Network_handler.int_of_kappa_instance
                          var))
                   var_rule))
@@ -1283,16 +1296,34 @@ let dump_kinetic_law
                  with
                  | Some var_id ->
                    let var_id = get_last_alias logger network var_id in
+                   let s = string_of_var_id
+                       (network.Network_handler.int_of_obs var_id)
+                   in
+                   if Loggers.has_forbidden_char logger s then
+                     (* MAKE A CLEANER TEST *)
+
+                     (fun logger ->
+                        Loggers.fprintf logger "%s"
+                          (string_of_variable
+                             logger
+                             (fun _logger var -> string_of_int
+                                 (network.Network_handler.int_of_kappa_instance
+                                    var))
+                             var_rule))
+                   else
                    (fun logger ->
                       Loggers.fprintf logger "%s"
                         (string_of_var_id
                            (network.Network_handler.int_of_obs var_id)))
                  | None ->
-                   (fun logger -> Loggers.fprintf logger "%s" (Nbr.to_string cst))
-                 (* Put a mask to make BNGL happy *)
-(*
-                    print_alg_expr_in_sbml
-                   string_of_var_id logger logger_err expr network *)
+                   (fun logger ->
+                      Loggers.fprintf logger "%s"
+                        (string_of_variable
+                           logger
+                           (fun _logger var -> string_of_int
+                               (network.Network_handler.int_of_kappa_instance
+                                  var))
+                           var_rule))
                end
            in
            if correct = nocc
@@ -1356,8 +1387,7 @@ let dump_kinetic_law
                  (string_of_variable
                     logger
                     (fun _logger var -> string_of_int
-                    (* this line is error prone, check*)
-                        (network.Network_handler.int_of_kappa_instance var))
+                    (network.Network_handler.int_of_kappa_instance var))
                     var_rule)
              else
              if nocc = 1 then
@@ -1370,7 +1400,6 @@ let dump_kinetic_law
                         (string_of_variable
                            logger
                            (fun _logger var -> string_of_int
-                           (* this line is error prone, check*)
                                (network.Network_handler.int_of_kappa_instance
                                   var))
                            var_rule)
@@ -1391,7 +1420,6 @@ let dump_kinetic_law
                         (string_of_variable
                            logger
                            (fun _logger var -> string_of_int
-                               (* this line is error prone, check*)
                                (network.Network_handler.int_of_kappa_instance
                                   var))
                            var_rule)
@@ -1410,7 +1438,6 @@ let dump_kinetic_law
                         (string_of_variable
                            logger
                            (fun _logger var -> string_of_int
-                               (* this line is error prone, check*)
                                (network.Network_handler.int_of_kappa_instance
                                   var))
                            var_rule)

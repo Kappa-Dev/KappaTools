@@ -46,6 +46,7 @@ val initialize:
   nodevar:int ->
   Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
+  propagate_constants:bool -> 
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->
   Loggers.t -> Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
