@@ -1,0 +1,116 @@
+---------------------actin_branch.ka---------------
+wf173:actin_branch quyen$ time KaSa actin_branch.ka --compute-symmetries
+Kappa Static Analyzer (DomainBased-3009-gd10ca0e-dirty) (without Tk interface)
+Analysis launched at 2017/04/25 15:54:55 (GMT+2) on wf173.di.ens.fr
+Parsing actin_branch.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 71 (sub)observables 313 navigation steps
+	 -initial conditions
+Parsing actin_branch.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+Actin() => [ Actin(c~OPEN) v Actin(c~CAPPED) ]
+Actin() => [ Actin(pointed) v Actin(pointed!Actin.barbed) ]
+Actin() => [ Actin(barbed) v Actin(barbed!Actin.pointed) ]
+Actin() => [ Actin(state~ALIVE) v Actin(state~DEAD) ]
+Actin() => [ Actin(vca) v Actin(vca!VCA.a) ]
+Actin() => [ Actin(d) v Actin(d!ADF.a) ]
+Actin() => [ Actin(p~ATP) v Actin(p~ADPp) v Actin(p~ADP) ]
+Actin() => [ Actin(arp) v Actin(arp!ARP.f) ]
+ADF() => [ ADF(a) v ADF(a!Actin.d) ]
+VCA() => [ VCA(arp) v VCA(arp!ARP.vca) ]
+VCA() => [ VCA(a) v VCA(a!Actin.vca) ]
+ARP() => [ ARP(vca) v ARP(vca!VCA.arp) ]
+ARP() => [ ARP(f) v ARP(f!Actin.arp) ]
+ARP() => [ ARP(activated~NO) v ARP(activated~YES) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+Actin(pointed!Actin.barbed) => Actin(pointed!Actin.barbed,vca)
+Actin() =>
+   [
+	  Actin(barbed,c~CAPPED,pointed!Actin.barbed,state~ALIVE,vca)
+	v Actin(barbed,c~CAPPED,pointed,state~ALIVE,vca!VCA.a)
+	v Actin(barbed,c~CAPPED,pointed,state~ALIVE,vca)
+	v Actin(barbed!Actin.pointed,c~CAPPED,pointed,state~ALIVE,vca)
+	v Actin(barbed,c~CAPPED,pointed!Actin.barbed,state~DEAD,vca)
+	v Actin(barbed,c~CAPPED,pointed,state~DEAD,vca!VCA.a)
+	v Actin(barbed,c~CAPPED,pointed,state~DEAD,vca)
+	v Actin(barbed!Actin.pointed,c~CAPPED,pointed,state~DEAD,vca)
+	v Actin(barbed,c~OPEN,pointed!Actin.barbed,state~ALIVE,vca)
+	v Actin(barbed!Actin.pointed,c~OPEN,pointed!Actin.barbed,state~ALIVE,vca)
+	v Actin(barbed,c~OPEN,pointed,state~ALIVE,vca!VCA.a)
+	v Actin(barbed,c~OPEN,pointed,state~ALIVE,vca)
+	v Actin(barbed!Actin.pointed,c~OPEN,pointed,state~ALIVE,vca!VCA.a)
+	v Actin(barbed!Actin.pointed,c~OPEN,pointed,state~ALIVE,vca)
+	v Actin(barbed,c~OPEN,pointed!Actin.barbed,state~DEAD,vca)
+	v Actin(barbed,c~OPEN,pointed,state~DEAD,vca!VCA.a)
+	v Actin(barbed,c~OPEN,pointed,state~DEAD,vca)
+	v Actin(barbed!Actin.pointed,c~OPEN,pointed,state~DEAD,vca!VCA.a)
+	v Actin(barbed!Actin.pointed,c~OPEN,pointed,state~DEAD,vca)
+   ]
+Actin(p~ADPp) => Actin(d,p~ADPp)
+Actin(p~ATP) => Actin(d,p~ATP)
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+Actin(barbed!1),Actin(pointed!1) => 
+	[
+		  Actin(barbed!1,pointed!Actin.barbed),Actin(barbed,pointed!1)
+		v Actin(barbed!1,pointed),Actin(barbed,pointed!1)
+		v Actin(barbed!1,pointed),Actin(barbed!Actin.pointed,pointed!1)
+	]
+Actin(barbed!1),Actin(pointed!1) => 
+	[
+		  Actin(barbed!1,vca!VCA.a),Actin(barbed,pointed!1)
+		v Actin(barbed!1,vca),Actin(barbed,pointed!1)
+		v Actin(barbed!1,vca),Actin(barbed!Actin.pointed,pointed!1)
+	]
+Actin(vca!1),VCA(a!1) => 
+	[
+		  Actin(c~CAPPED,vca!1),VCA(a!1,arp)
+		v Actin(c~OPEN,vca!1),VCA(a!1,arp)
+		v Actin(c~OPEN,vca!1),VCA(a!1,arp!ARP.vca)
+	]
+Actin(vca!1),VCA(a!1) => 
+	[
+		  Actin(barbed!Actin.pointed,vca!1),VCA(a!1,arp!ARP.vca)
+		v Actin(barbed,vca!1),VCA(a!1,arp)
+		v Actin(barbed,vca!1),VCA(a!1,arp!ARP.vca)
+	]
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Actin(barbed!Actin.pointed,pointed!Actin.barbed) => Actin(barbed!2,pointed!1),Actin(barbed!1),Actin(pointed!2)
+Compute the contact map...
+Symmetries:
+In rules:
+In rules and initial states:
+In rules and algebraic expression:
+execution finished without any exception
+
+real	0m0.174s
+user	0m0.148s
+sys	0m0.017s

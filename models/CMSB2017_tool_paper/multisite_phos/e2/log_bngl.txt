@@ -1,0 +1,69 @@
+---------------------e2.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file e2.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 8 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e2 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     8 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     16 rxns  0.00e+00 CPU s
+Iteration   4:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     38 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     44 rxns  1.00e-02 CPU s
+Iteration   7:    18 species     48 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   2:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   6:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   8:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Total   :    48 reactions 4.00e-02 CPU s 8.33e-04 CPU s/rxn
+Wrote network in net format to ./e2.net.
+CPU TIME: generate_network 0.04 s.
+Finished processing file e2.bngl.
+CPU TIME: total 0.05 s.
+
+real	0m0.293s
+user	0m0.259s
+sys	0m0.028s
+---------------------e2_sym.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file e2_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e2_sym )
+WARNING: Removing old network file ./e2_sym.net.
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     8 species      8 rxns  0.00e+00 CPU s
+Iteration   4:    10 species     14 rxns  1.00e-02 CPU s
+Iteration   5:    11 species     19 rxns  1.00e-02 CPU s
+Iteration   6:    12 species     22 rxns  0.00e+00 CPU s
+Iteration   7:    12 species     24 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   2:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    24 reactions 3.00e-02 CPU s 1.25e-03 CPU s/rxn
+Wrote network in net format to ./e2_sym.net.
+CPU TIME: generate_network 0.04 s.
+Finished processing file e2_sym.bngl.
+CPU TIME: total 0.05 s.
+
+real	0m0.232s
+user	0m0.205s
+sys	0m0.025s

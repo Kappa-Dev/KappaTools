@@ -1,0 +1,14 @@
+---------------------actin_branch.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file actin_branch.bngl (level 0)
+Read 31 parameters.
+Read 6 molecule types.
+Read 7 species.
+Read 25 observable(s).
+Read 4 functions.
+ABORT: [at line 218] Reaction rule label 'Barbed end elongation' contains white space. This is deprecated (BioNetGen >= 2.2.3).
+
+real	0m0.327s
+user	0m0.234s
+sys	0m0.056s

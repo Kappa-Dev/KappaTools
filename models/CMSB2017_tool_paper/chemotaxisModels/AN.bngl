@@ -1,0 +1,207 @@
+# AN.bngl
+# An extended version of the Assistance Neighborhood (AN) model 
+# of chemoreceptor adaptation in E. coli originally presented here:
+#    Hansen, Endres, & Wingreen, PLOS Comp.Bio,4,(1) 2008.
+#
+# In the original formulation of the model, the complexity of the 
+# system required the authors to create a problem specific simulator of
+# a single receptor signaling team, where the adaptational enzymes
+# CheR/CheB were treated simply as states of receptor dimers (meaning
+# that receptors could either be bound or unbound to CheR/CheB, but
+# the total number of CheR/CheB was not tracked).  The original model 
+# also assumes saturated enzyme kinetics of CheR/CheB.
+#
+# Here we extend the original model and simulations to include ALL
+# chemoreceptor signaling teams in a typical E.coli cell, which allows
+# us to explicitly track the number of CheR/CheB in the system.
+# Additionally, we have added an "active site" on each receptor dimers
+# that CheR/CheB can bind, so that saturated CheR/CheB kinetics do
+# not have to be assumed.  However, to match the results of the
+# original model, we simply choose extremely fast binding rates to
+# the active site, once CheR/CheB are tethered, which recovers the
+# effect of saturated enzymatic kinetics.  See model below for
+# details.
+
+
+begin parameters
+
+    Vol   1.41e-15  #Liters (of the reaction volume)
+ 	Na    6.02e23   #Avogadro's Number
+
+	# CheR/CheB rates for binding and unbinding the tether.  In the original
+    # study, binding rates are in units of 'per second' because CheR/CheB are
+    # treated as binding states of receptor dimers.  These rates are not valid
+    # when CheR/CheB are explicitly represented, so instead we choose the binding 
+    # of both CheR and CheB to the tether to be 2.8 uM^-1 s^-1.  The original
+    # AN model assumed equal binding rates to the tether for CheR/CheB, which
+    # is not technically accurate (Barnakov, Barnakova, & Hazelbauer, J. Biol.
+    # Chem. 277,(44) 2002), but for consistancy with the original AN model, we 
+    # do the same here by assuming the CheR/CheB binding rates are the same.  
+    # Unbinding rates, which are always in units 'per second', are unchanged 
+    # from the original model.
+    #         Original AN model binding rates: konR=konB=0.01/s
+ 	konR 2.8e6/(Na*Vol) #2.8 uM^-1 s^-1
+ 	konB 2.8e6/(Na*Vol) #
+	koffR 0.1 #s^-1
+	koffB 0.1 #s^-1
+	
+	# Methylation and demethylation catalytic rates, taken directly from
+    # the original AN model
+	kr 0.1
+	kb 0.2
+	
+
+	# Free energy of dimers for each methylation level as defined in the 
+    # original AN model.
+	e0 1.0
+	e1 0.5
+	e2 0.0
+	e3 -0.3
+	e4 -0.6
+	e5 -0.85
+	e6 -1.1
+	e7 -2.0
+	e8 -3.0
+	
+	
+	# Binding constants of TAR and TSR, the two variants of chemoreceptors that
+    # were considered in the AN model, to the chemo-attractant Aspartate
+	Asp_Koff_TAR  0.02 #mM
+	Asp_Kon_TAR   0.5  #mM
+	Asp_Koff_TSR  100  #mM
+	Asp_Kon_TSR   10^6 #mM
+	
+	#The number of Tar and Tsr receptor homodimers per signaling team
+	TAR_COUNT 6
+	TSR_COUNT 13
+	
+	#Initial Aspartate concentration
+	AspConc 0 #mM
+
+	# Here we define the number of molecules we want to simulate.  Assuming 
+    # a typical cell has ~14,000 chemoreceptors (according to Li & Hazelbauer, 
+    # J. of Bact., 186,(12) 2004), we get ~7000 receptors dimers, and 370 
+    # signaling teams of 19 receptor dimers each.  We arbitrarily choose a
+    # reasonable number of CheR and CheB molecules in order to match the 
+    # timescale of adaptation in the original model given the catyltic rates.
+	ClusterCount 370
+    CheRCount 500
+	CheBCount 500
+
+end parameters
+
+
+begin species
+
+	# Clusters of 19 Receptor Dimers (RD), connected in a hexagonal lattice as in
+	# the original AN model.  Receptor dimers have a methylation state (m), a
+    # tether binding site for CheR/CheB (r/b), an additional active catalytic
+    # site (active), and binding sites t1 to t6 to connect individual dimers
+    # in the hexagonal lattice.
+	RD(m~3,r,b,active,t1,t2,t3!1,t4!4,t5!3,t6).RD(m~3,r,b,active,t1,t2,t3!2,t4!6,t5!5,t6!1).RD(m~3,r,b,active,t1,t2,t3,t4!8,t5!7,t6!2).RD(m~3,r,b,active,t1,t2!3,t3!9,t4!13,t5!12,t6).RD(m~3,r,b,active,t1!4,t2!5,t3!10,t4!15,t5!14,t6!9).RD(m~3,r,b,active,t1!6,t2!7,t3!11,t4!17,t5!16,t6!10).RD(m~3,r,b,active,t1!8,t2,t3,t4!19,t5!18,t6!11).RD(m~3,r,b,active,t1,t2!12,t3!20,t4!24,t5,t6).RD(m~3,r,b,active,t1!13,t2!14,t3!21,t4!26,t5!25,t6!20).RD(m~3,r,b,active,t1!15,t2!16,t3!22,t4!28,t5!27,t6!21).RD(m~3,r,b,active,t1!17,t2!18,t3!23,t4!30,t5!29,t6!22).RD(m~3,r,b,active,t1!19,t2,t3,t4,t5!31,t6!23).RD(m~3,r,b,active,t1!24,t2!25,t3!32,t4!35,t5,t6).RD(m~3,r,b,active,t1!26,t2!27,t3!33,t4!37,t5!36,t6!32).RD(m~3,r,b,active,t1!28,t2!29,t3!34,t4!39,t5!38,t6!33).RD(m~3,r,b,active,t1!30,t2!31,t3,t4,t5!40,t6!34).RD(m~3,r,b,active,t1!35,t2!36,t3!41,t4,t5,t6).RD(m~3,r,b,active,t1!37,t2!38,t3!42,t4,t5,t6!41).RD(m~3,r,b,active,t1!39,t2!40,t3,t4,t5,t6!42) ClusterCount
+ 
+    # CheR and CheB have two binding sites: a binding site for receptor tethers
+    # (tether), and a binding site for the active catalytic site (active).
+	CheR(tether,active) CheRCount
+	CheB(tether,active) CheBCount
+
+end species
+
+
+begin observables
+
+	# Observables to keep track of the methylation level of receptor dimers
+	Molecules R0 RD(m~0)
+	Molecules R1 RD(m~1)
+	Molecules R2 RD(m~2)
+	Molecules R3 RD(m~3)
+	Molecules R4 RD(m~4)
+	Molecules R5 RD(m~5)
+	Molecules R6 RD(m~6)
+	Molecules R7 RD(m~7)
+	Molecules R8 RD(m~8)
+
+	# Other observables can be defined here, for instance, to keep track of the
+    # the number of CheR or CheB bound to a receptor tether
+	Molecules RD_R RD(r!1).CheR(tether!1)
+	Molecules RD_B RD(b!1).CheB(tether!1)
+
+end observables
+
+
+begin functions
+
+	# We define functions to keep track of important calculated properties of
+    # dimers and signaling teams.  First, we need a function that keeps track 
+    # of the methylation level for each dimer, so that the rates of methylation
+    # and demethylation can vary according to the number of available methylation
+    # sites available.
+	MethLevel(x) = 1*R1(x)+2*R2(x)+3*R3(x)+4*R4(x)+5*R5(x)+6*R6(x)+7*R7(x)+8*R8(x)
+
+	# We also need an activity energy function, which gives the probability for 
+    # entire signaling teams to be in the active (ON) or inactive (off)
+    # conformations.  The energy function depends on the methylation level of
+    # each dimer in a signaling team as well as the external ligand concentration
+    # that the cell sees.  This function is the primary output of each signaling
+    # team, and could be used in further extensions to control the downstream
+    # chemotaxis signalling reactions.  The pOn activity function here comes
+    # directly from the original AN model.
+	pOn(x) = 1/(1+(exp(e0*R0(x)+e1*R1(x)+e2*R2(x)+e3*R3(x)+e4*R4(x)+e5*R5(x)+e6*R6(x)+e7*R7(x)+e8*R8(x))*((1.0+(AspConc/Asp_Koff_TAR))/(1.0+(AspConc/Asp_Kon_TAR)))^TAR_COUNT*((1.0+(AspConc/Asp_Koff_TSR)) / (1.0+(AspConc/Asp_Kon_TSR)))^TSR_COUNT))
+
+end functions
+
+
+begin reaction rules
+	
+	#  R/B binding and unbinding to a receptor tether, only one R or B is
+	#  allowed to bind per dimer so both r and b sites must be open. The
+    #  active site of the dimer must also be free
+	RD(r,b) + CheR(tether,active) -> CheR(tether!1,active).RD(r!1,b) konR
+	RD(r,b) + CheB(tether,active) -> CheB(tether!1,active).RD(r,b!1) konB
+	
+	# Unbinding from the tether, does not depend on the active site
+	CheR(tether!1).RD(r!1) -> CheR(tether) + RD(r) koffR
+	CheB(tether!1).RD(b!1) -> CheB(tether) + RD(b) koffB
+	
+	# If R or B unbinds a tether, it rapidly falls off the receptor without
+	# methylating or demethylating, which is consistant with the original model
+	CheR(tether,active!1).RD(active!1) -> CheR(tether,active) + RD(active)  1000
+	CheB(tether,active!1).RD(active!1) -> CheB(tether,active) + RD(active)  1000 
+	
+	
+	# R/B binding to active site.  Assuming saturated kinetics means 
+    # that this happens very fast, but it will still depend on the number 
+    # of sites available so that the methylation distribution is correct.
+	# Binding does not depend on activity (according to the original AN model), 
+    # only the rate limiting catalytic step does.
+	RD%y(r!1,active).CheR(tether!1,active) -> RD%y(r!1,active!2).CheR(tether!1,active!2) 1000*(8-MethLevel(y))
+	RD%y(b!1,active).CheB(tether!1,active) -> RD%y(b!1,active!2).CheB(tether!1,active!2) 1000*(MethLevel(y))
+	
+	
+	# Methylation and demethylation is dependent on the signaling teams activity
+    # function and requires an R/B bound to the catalytic active site of the dimer.
+	%x::RD(m~?,active!1).CheR(active!1) -> %x::RD(m~PLUS,active) + CheR(active) kr*(1-pOn(x))
+	%x::RD(m~?,active!1).CheB(active!1) -> %x::RD(m~MINUS,active) + CheB(active) kb*(pOn(x))
+	
+	
+	# Assistance neighborhood binding rules that allow an R or B to bind the
+    # active site of a neighboring receptor that it is not directly tethered to.
+    # Again, the binding rates are fast so that we recover the original results
+    # that assumed saturated kinetics.
+	RD%y(active,t1!1).RD(r!2,t4!1).CheR(tether!2,active) -> RD%y(active!3,t1!1).RD(r!2,t4!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	RD%y(active,t2!1).RD(r!2,t5!1).CheR(tether!2,active) -> RD%y(active!3,t2!1).RD(r!2,t5!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	RD%y(active,t3!1).RD(r!2,t6!1).CheR(tether!2,active) -> RD%y(active!3,t3!1).RD(r!2,t6!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	RD%y(active,t4!1).RD(r!2,t1!1).CheR(tether!2,active) -> RD%y(active!3,t4!1).RD(r!2,t1!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	RD%y(active,t5!1).RD(r!2,t2!1).CheR(tether!2,active) -> RD%y(active!3,t5!1).RD(r!2,t2!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	RD%y(active,t6!1).RD(r!2,t3!1).CheR(tether!2,active) -> RD%y(active!3,t6!1).RD(r!2,t3!1).CheR(tether!2,active!3) 1000*(8-MethLevel(y))
+	
+	RD%y(active,t1!1).RD(b!2,t4!1).CheB(tether!2,active) -> RD%y(active!3,t1!1).RD(b!2,t4!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	RD%y(active,t2!1).RD(b!2,t5!1).CheB(tether!2,active) -> RD%y(active!3,t2!1).RD(b!2,t5!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	RD%y(active,t3!1).RD(b!2,t6!1).CheB(tether!2,active) -> RD%y(active!3,t3!1).RD(b!2,t6!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	RD%y(active,t4!1).RD(b!2,t1!1).CheB(tether!2,active) -> RD%y(active!3,t4!1).RD(b!2,t1!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	RD%y(active,t5!1).RD(b!2,t2!1).CheB(tether!2,active) -> RD%y(active!3,t5!1).RD(b!2,t2!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	RD%y(active,t6!1).RD(b!2,t3!1).CheB(tether!2,active) -> RD%y(active!3,t6!1).RD(b!2,t3!1).CheB(tether!2,active!3) 1000*(MethLevel(y))
+	
+end reaction rules
+
+writeXML();

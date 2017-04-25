@@ -1,0 +1,33 @@
+#  Run NF script file for running the tlbr system
+#
+#  Run from NFsim as : >NFsim_vXXX -rnf tlbr.rnf where XXX is the
+#  version number.
+#
+
+#First, we can provide NFsim with any command line arguments that
+#tell us how to run the simulation.  Any commandline arguments that
+#NFsim normally accepts can be placed here
+
+-utl 2   # set the universal traversal limit to 2, so that when complexes
+         # form, we don't traverse the entire complex to extract out the products
+#-bscb    # block same complex binding (prevents all ring closure reactions, but
+         # reduces performance)
+-xml tlbr.xml  # the XML file that contains the model
+#-v   # verbose output, if we leave this in
+
+# completely output the state of the system at the given time points into the
+# dump directory (which you must create!).  You can use this output in conjunction
+# with matlab scripts from the tools directory in your instalation.
+#-dump [0.01:0.01:1;2:1:10;11:5:100;100:100:1000;1100:1000:10000]->dump/
+
+
+#The 'begin' tag tells us to begin simulation and that
+#all command line arguments have been declared
+begin
+
+  echo running tlbr
+  #eq 50
+  sim 1000 3
+  print rxns
+
+end

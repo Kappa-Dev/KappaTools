@@ -1,0 +1,70 @@
+# Trivalent ligand - bivalent receptor model used to verify and test
+# the performance of NFsim.  When running this model, you can turn on
+# aggregate or complex bookkeeping to block ring formation as in the
+# original problem specification by using the parameter "-bscb" for
+# block same complex binding.  See the manual or the associated RNF file.
+
+# whenever you run this model, you should use the "-utl 3" flag in NFsim
+# so that extra molecules are not traversed during NFsim updates.  Otherwise
+# runs will be slower, especially when large aggregates form.
+
+begin parameters
+	
+
+
+	## Ramping Trajectory
+	#Lig_tot  2000
+	#Rec_tot  3000
+	#cTot     0.11
+	#beta     16.8
+	#koff     0.01
+	
+	## Sol-gel Phase
+	#Lig_tot  4200
+	#Rec_tot  300
+	#cTot     0.84
+	#beta     50
+	#koff     0.01
+	
+	
+	## Peaking Trajectory
+	Lig_tot  50000
+	Rec_tot  3000
+	cTot  2.7
+	beta  16.8
+	koff  0.01
+	
+	kp1 (cTot*koff)/(3.0*Lig_tot) #FREE BINDING RATE
+	kp2 (beta*koff)/Rec_tot #CROSSLINKING RATE
+
+end parameters
+
+begin molecule types
+	L(r,r,r)
+	R(l,l)
+end molecule types
+
+begin species
+	L(r,r,r)	Lig_tot
+	R(l,l)		Rec_tot
+end species
+
+begin reaction rules
+	R(l!1).L(r!1) -> R(l) + L(r) koff
+	L(r,r,r) + R(l) -> L(r!1,r,r).R(l!1) kp1
+	L(r,r,r!+) + R(l) -> L(r!1,r,r!+).R(l!1) kp2
+	L(r,r!+,r!+) + R(l) -> L(r!1,r!+,r!+).R(l!1) kp2
+end reaction rules
+
+begin observables
+	Molecules Rfree R(l,l)
+	Molecules Lfree L(r,r,r)
+end observables
+
+
+# Run this to test bng performance
+#generate_network({max_iter=>1,overwrite=>1});
+#simulate_ssa({suffix=>ssa,t_end=>3000,n_steps=>30});
+
+writeXML();
+

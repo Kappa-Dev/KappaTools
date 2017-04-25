@@ -71,6 +71,11 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
   "Select the backend format",
   ["1_output"],Normal;
+  "--dotnet-output",
+  Superarg.String_opt t.dotnet_output,
+  "ODEs file for dotnet backend",
+  ["1_output"],Normal;
+
   "--maple-output",
   Superarg.String_opt t.maple_output,
   "ODEs file for maple backend",

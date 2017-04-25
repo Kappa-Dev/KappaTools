@@ -1,0 +1,1341 @@
+# command line:  
+#       KaDE   e5.ka    -ode-backend   DOTNET    -with-symmetries   Forward   -propagate-constants  
+# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+# 
+# init - the initial abundances of each species and token
+# tinit - the initial simulation time (likely 0)
+# tend - the final simulation time 
+# initialstep - initial time step at the beginning of numerical integration
+# maxstep - maximal time step for numerical integration
+# reltol - relative error tolerance;
+# abstol - absolute error tolerance;
+# period - the time period between points to return
+#
+# variables (init(i),y(i)) denote numbers of embeddings 
+# rule rates are corrected by the number of automorphisms in the lhs of rules
+
+begin species
+ 1 S(p1~U,p2~U,p3~U,p4~U,p5~U) 0
+ 2 F(s) 0
+ 3 E(s) 0
+ 4 E(s!1).S(p1~U,p2~U,p3~U,p4~U,p5~U!1) 0
+ 5 E(s!1).S(p1~U,p2~U,p3~U,p4~U!2,p5~U!1).E(s!2) 0
+ 6 S(p1~P,p2~U,p3~U,p4~U,p5~U) 0
+ 7 S(p1~P!1,p2~U,p3~U,p4~U,p5~U).F(s!1) 0
+ 8 E(s!1).S(p1~P,p2~U,p3~U,p4~U,p5~U!1) 0
+ 9 E(s!1).S(p1~P!2,p2~U,p3~U,p4~U,p5~U!1).F(s!2) 0
+ 10 E(s!1).S(p1~P,p2~U,p3~U,p4~U!2,p5~U!1).E(s!2) 0
+ 11 S(p1~P,p2~P,p3~U,p4~U,p5~U) 0
+ 12 S(p1~P,p2~P!1,p3~U,p4~U,p5~U).F(s!1) 0
+ 13 E(s!1).S(p1~P,p2~P,p3~U,p4~U,p5~U!1) 0
+ 14 E(s!1).S(p1~P,p2~P!2,p3~U,p4~U,p5~U!1).F(s!2) 0
+ 15 E(s!1).S(p1~P,p2~P,p3~U,p4~U!2,p5~U!1).E(s!2) 0
+ 16 S(p1~P,p2~P,p3~P,p4~U,p5~U) 0
+ 17 S(p1~P,p2~P,p3~P!1,p4~U,p5~U).F(s!1) 0
+ 18 E(s!1).S(p1~P,p2~P,p3~P,p4~U,p5~U!1) 0
+ 19 E(s!1).S(p1~P,p2~P,p3~P!2,p4~U,p5~U!1).F(s!2) 0
+ 20 E(s!1).S(p1~P,p2~P,p3~P,p4~U!1,p5~U!2).E(s!2) 0
+ 21 S(p1~P,p2~P,p3~P,p4~P,p5~U) 0
+ 22 S(p1~P,p2~P,p3~P,p4~P!1,p5~U).F(s!1) 0
+ 23 E(s!1).S(p1~P,p2~P,p3~P,p4~P,p5~U!1) 0
+ 24 E(s!1).S(p1~P,p2~P,p3~P,p4~P!2,p5~U!1).F(s!2) 0
+ 25 S(p1~P,p2~P,p3~P,p4~P,p5~P) 0
+ 26 S(p1~P,p2~P,p3~P,p4~P,p5~P!1).F(s!1) 0
+ 27 S(p1~P,p2~P,p3~P,p4~P!1,p5~P!2).F(s!2).F(s!1) 0
+ 28 S(p1~P,p2~P,p3~P!1,p4~P!2,p5~P!3).F(s!3).F(s!2).F(s!1) 0
+ 29 S(p1~P,p2~P!1,p3~P!2,p4~P!3,p5~P!4).F(s!4).F(s!3).F(s!2).F(s!1) 0
+ 30 S(p1~P,p2~P,p3~P!1,p4~P!2,p5~U).F(s!2).F(s!1) 0
+ 31 S(p1~P,p2~P!1,p3~P!2,p4~P!3,p5~U).F(s!3).F(s!2).F(s!1) 0
+ 32 E(s!1).S(p1~P,p2~P,p3~P!2,p4~P!3,p5~U!1).F(s!3).F(s!2) 0
+ 33 E(s!1).S(p1~P,p2~P!2,p3~P!3,p4~P!4,p5~U!1).F(s!4).F(s!3).F(s!2) 0
+ 34 E(s!1).S(p1~P!2,p2~P!3,p3~P!4,p4~P!5,p5~U!1).F(s!2).F(s!5).F(s!4).F(s!3) 0
+ 35 E(s!1).S(p1~P,p2~P!2,p3~P!3,p4~U,p5~U!1).F(s!3).F(s!2) 0
+ 36 E(s!1).S(p1~P!2,p2~P!3,p3~P!4,p4~U,p5~U!1).F(s!2).F(s!4).F(s!3) 0
+ 37 E(s!1).S(p1~P,p2~P!2,p3~P!3,p4~U!4,p5~U!1).F(s!2).E(s!4).F(s!3) 0
+ 38 S(p1~P,p2~P!1,p3~P!2,p4~U,p5~U).F(s!2).F(s!1) 0
+ 39 S(p1~P!1,p2~P!2,p3~P!3,p4~U,p5~U).F(s!1).F(s!3).F(s!2) 0
+ 40 S(p1~P!1,p2~P!2,p3~U,p4~U,p5~U).F(s!2).F(s!1) 0
+ 41 E(s!1).S(p1~P!2,p2~P!3,p3~U,p4~U,p5~U!1).F(s!3).F(s!2) 0
+ 42 E(s!1).S(p1~P!2,p2~P!3,p3~U,p4~U!1,p5~U!4).F(s!3).E(s!4).F(s!2) 0
+ 43 E(s!1).S(p1~P,p2~P!2,p3~U,p4~U!3,p5~U!1).F(s!2).E(s!3) 0
+ 44 E(s!1).S(p1~P!2,p2~U,p3~U,p4~U!1,p5~U!3).F(s!2).E(s!3) 0
+ 45 E(s!1).S(p1~P!2,p2~P!3,p3~U!4,p4~U!5,p5~U!1).F(s!2).E(s!5).F(s!3).E(s!4) 0
+ 46 E(s!1).S(p1~P,p2~P!2,p3~U!3,p4~U!4,p5~U!1).F(s!2).E(s!4).E(s!3) 0
+ 47 E(s!1).S(p1~P!2,p2~U,p3~U!1,p4~U!3,p5~U!4).F(s!2).E(s!4).E(s!3) 0
+ 48 E(s!1).S(p1~P,p2~U,p3~U!1,p4~U!2,p5~U!3).E(s!3).E(s!2) 0
+ 49 E(s!1).S(p1~U,p2~U,p3~U!1,p4~U!2,p5~U!3).E(s!3).E(s!2) 0
+ 50 E(s!1).S(p1~P!2,p2~U!3,p3~U!4,p4~U!5,p5~U!1).F(s!2).E(s!5).E(s!4).E(s!3) 0
+ 51 E(s!1).S(p1~P,p2~U!2,p3~U!1,p4~U!3,p5~U!4).E(s!4).E(s!3).E(s!2) 0
+ 52 E(s!1).S(p1~U,p2~U!2,p3~U!1,p4~U!3,p5~U!4).E(s!4).E(s!3).E(s!2) 0
+ 53 E(s!1).S(p1~U!1,p2~U!2,p3~U!3,p4~U!4,p5~U!5).E(s!5).E(s!4).E(s!3).E(s!2) 0
+ 54 E(s!1).S(p1~P,p2~P,p3~U!1,p4~U!2,p5~U!3).E(s!3).E(s!2) 0
+ 55 E(s!1).S(p1~P,p2~P,p3~P!2,p4~U!1,p5~U!3).F(s!2).E(s!3) 0
+ 56 E(s!1).S(p1~P!2,p2~P!3,p3~P!4,p4~U!5,p5~U!1).F(s!2).E(s!5).F(s!4).F(s!3) 0
+ 57 S(p1~P!1,p2~P!2,p3~P!3,p4~P!4,p5~U).F(s!1).F(s!4).F(s!3).F(s!2) 0
+ 58 S(p1~P!1,p2~P!2,p3~P!3,p4~P!4,p5~P!5).F(s!1).F(s!5).F(s!4).F(s!3).F(s!2) 0
+end species
+
+
+
+begin reactions
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+1 5 3,8 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+2 5 3,4 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+3 5 3,8 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+4 5 3,4 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+5 3,5 49 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+6 3,5 49 0
+# rule    : E(s), S(p1~U) -> E(s!1), S(p1~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+7 3,5 49 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2)  
+8 3,7 9 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2)  
+9 3,7 9 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2)  
+10 3,7 9 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2)  
+11 3,7 9 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) -> S(p1~U, p2~U, p3~U, p4~U, p5~U) + F(s)  
+12 7 1,2 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) -> S(p1~P, p2~U, p3~U, p4~U, p5~U) + F(s)  
+13 7 2,6 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + E(s)  
+14 9 3,12 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) -> S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + E(s)  
+15 9 3,7 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+16 3,9 44 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+17 3,9 44 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+18 3,9 44 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + F(s)  
+19 9 2,4 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + F(s)  
+20 9 2,8 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s)  
+21 10 3,13 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+22 10 3,8 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s)  
+23 10 3,13 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s)  
+24 10 3,8 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+25 3,10 48 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+26 3,10 48 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+27 2,10 44 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2)  
+28 3,12 14 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2)  
+29 3,12 14 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2)  
+30 3,12 14 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) -> S(p1~P, p2~U, p3~U, p4~U, p5~U) + F(s)  
+31 12 2,6 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) -> S(p1~P, p2~P, p3~U, p4~U, p5~U) + F(s)  
+32 12 2,11 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + F(s) -> S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1)  
+33 2,12 40 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + E(s)  
+34 14 3,17 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + E(s)  
+35 14 3,12 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3)  
+36 3,14 43 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3)  
+37 3,14 43 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + F(s)  
+38 14 2,8 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + F(s)  
+39 14 2,13 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2)  
+40 2,14 41 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + E(s)  
+41 15 3,18 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s)  
+42 15 3,13 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + E(s)  
+43 15 3,18 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s)  
+44 15 3,13 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2)  
+45 3,15 54 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3)  
+46 2,15 43 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3)  
+47 2,15 43 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2)  
+48 3,17 19 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2)  
+49 3,17 19 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) -> S(p1~P, p2~P, p3~U, p4~U, p5~U) + F(s)  
+50 17 2,11 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) -> S(p1~P, p2~P, p3~P, p4~U, p5~U) + F(s)  
+51 17 2,16 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1)  
+52 2,17 38 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1)  
+53 2,17 38 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + E(s)  
+54 19 3,22 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + E(s)  
+55 19 3,17 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+56 3,19 55 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + F(s)  
+57 19 2,13 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + F(s)  
+58 19 2,18 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2)  
+59 2,19 35 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2)  
+60 2,19 35 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + E(s)  
+61 20 3,23 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + E(s)  
+62 20 3,18 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + E(s)  
+63 20 3,23 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + E(s)  
+64 20 3,18 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+65 2,20 55 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+66 2,20 55 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3)  
+67 2,20 55 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2)  
+68 3,22 24 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) -> S(p1~P, p2~P, p3~P, p4~U, p5~U) + F(s)  
+69 22 2,16 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s)  
+70 22 2,21 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1)  
+71 2,22 30 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1)  
+72 2,22 30 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1)  
+73 2,22 30 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + E(s)  
+74 24 3,26 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + E(s)  
+75 24 3,22 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + F(s)  
+76 24 2,18 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + F(s)  
+77 24 2,23 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2)  
+78 2,24 32 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2)  
+79 2,24 32 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2)  
+80 2,24 32 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + F(s)  
+81 58 2,57 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s)  
+82 58 2,29 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + F(s)  
+83 58 2,57 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s)  
+84 58 2,29 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + F(s)  
+85 58 2,57 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s)  
+86 58 2,29 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + F(s)  
+87 58 2,57 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s)  
+88 58 2,29 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + F(s)  
+89 58 2,57 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s)  
+90 58 2,29 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+91 29 2,31 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s)  
+92 29 2,28 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+93 29 2,31 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s)  
+94 29 2,28 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+95 29 2,31 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s)  
+96 29 2,28 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+97 29 2,31 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s)  
+98 29 2,28 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + F(s) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~P!5), F(s!1), F(s!5), F(s!4), F(s!3), F(s!2)  
+99 2,29 58 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2)  
+100 3,31 33 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+101 31 2,38 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+102 31 2,30 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+103 31 2,38 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+104 31 2,30 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+105 31 2,38 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+106 31 2,30 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2)  
+107 2,31 57 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3)  
+108 3,57 34 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + F(s)  
+109 57 2,39 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+110 57 2,31 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + F(s)  
+111 57 2,39 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+112 57 2,31 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + F(s)  
+113 57 2,39 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+114 57 2,31 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + F(s)  
+115 57 2,39 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + F(s)  
+116 57 2,31 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1) + E(s)  
+117 34 3,29 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> S(p1~P!1, p2~P!2, p3~P!3, p4~P!4, p5~U), F(s!1), F(s!4), F(s!3), F(s!2) + E(s)  
+118 34 3,57 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + F(s)  
+119 34 2,36 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + F(s)  
+120 34 2,33 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + F(s)  
+121 34 2,36 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + F(s)  
+122 34 2,33 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + F(s)  
+123 34 2,36 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + F(s)  
+124 34 2,33 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + F(s)  
+125 34 2,36 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + F(s)  
+126 34 2,33 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + E(s)  
+127 36 3,31 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + E(s)  
+128 36 3,39 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3)  
+129 3,36 56 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+130 36 2,41 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+131 36 2,35 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+132 36 2,41 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+133 36 2,35 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+134 36 2,41 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+135 36 2,35 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + E(s)  
+136 56 3,33 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + E(s)  
+137 56 3,36 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + E(s)  
+138 56 3,33 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3) + E(s)  
+139 56 3,36 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + F(s)  
+140 56 2,42 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + F(s)  
+141 56 2,37 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + F(s)  
+142 56 2,42 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + F(s)  
+143 56 2,37 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + F(s)  
+144 56 2,42 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + F(s)  
+145 56 2,37 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + E(s)  
+146 37 3,32 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+147 37 3,35 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + E(s)  
+148 37 3,32 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+149 37 3,35 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + F(s)  
+150 37 2,43 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s)  
+151 37 2,55 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + F(s)  
+152 37 2,43 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s)  
+153 37 2,55 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!4), F(s!3)  
+154 2,37 56 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + E(s)  
+155 43 3,19 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+156 43 3,14 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + E(s)  
+157 43 3,19 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+158 43 3,14 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3)  
+159 3,43 46 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s)  
+160 43 2,10 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s)  
+161 43 2,15 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2)  
+162 2,43 42 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+163 44 3,14 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+164 44 3,9 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+165 44 3,14 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + E(s)  
+166 44 3,9 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3)  
+167 3,44 47 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3)  
+168 3,44 47 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s)  
+169 44 2,5 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s)  
+170 44 2,10 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + E(s)  
+171 55 3,24 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + E(s)  
+172 55 3,19 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + E(s)  
+173 55 3,24 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + E(s)  
+174 55 3,19 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + F(s)  
+175 55 2,15 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + F(s)  
+176 55 2,20 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3)  
+177 2,55 37 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3)  
+178 2,55 37 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+179 46 3,55 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+180 46 3,43 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+181 46 3,55 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+182 46 3,43 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+183 46 3,55 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+184 46 3,43 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s)  
+185 46 2,48 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s)  
+186 46 2,54 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4)  
+187 2,46 45 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+188 48 3,15 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+189 48 3,10 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+190 48 3,15 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+191 48 3,10 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+192 48 3,15 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+193 48 3,10 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2)  
+194 3,48 51 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3)  
+195 2,48 47 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+196 49 3,10 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+197 49 3,5 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+198 49 3,10 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+199 49 3,5 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+200 49 3,10 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+201 49 3,5 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2)  
+202 3,49 52 0
+# rule    : E(s), S(p1~U) -> E(s!1), S(p1~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2)  
+203 3,49 52 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + E(s)  
+204 54 3,20 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+205 54 3,15 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + E(s)  
+206 54 3,20 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+207 54 3,15 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2) + E(s)  
+208 54 3,20 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2) + E(s)  
+209 54 3,15 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3)  
+210 2,54 46 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3)  
+211 2,54 46 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+212 51 3,54 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+213 51 3,48 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+214 51 3,54 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+215 51 3,48 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+216 51 3,54 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+217 51 3,48 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~P, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+218 51 3,54 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+219 51 3,48 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3)  
+220 2,51 50 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+221 53 3,51 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+222 53 3,52 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+223 53 3,51 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+224 53 3,52 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+225 53 3,51 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+226 53 3,52 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~P) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+227 53 3,51 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~U) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+228 53 3,52 0
+# rule    : E(s!1), S(p1~U!1) -> E(s), S(p1~P) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+229 53 3,51 0
+# rule    : E(s!1), S(p1~U!1) -> E(s), S(p1~U) 
+# E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s)  
+230 53 3,52 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+231 52 3,48 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+232 52 3,49 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+233 52 3,48 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+234 52 3,49 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+235 52 3,48 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+236 52 3,49 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~P) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+237 52 3,48 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~U) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + E(s)  
+238 52 3,49 0
+# rule    : E(s), S(p1~U) -> E(s!1), S(p1~U!1) 
+# E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + E(s) -> E(s!1), S(p1~U!1, p2~U!2, p3~U!3, p4~U!4, p5~U!5), E(s!5), E(s!4), E(s!3), E(s!2)  
+239 3,52 53 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + E(s)  
+240 50 3,46 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + E(s)  
+241 50 3,47 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + E(s)  
+242 50 3,46 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + E(s)  
+243 50 3,47 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + E(s)  
+244 50 3,46 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + E(s)  
+245 50 3,47 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + E(s)  
+246 50 3,46 0
+# rule    : E(s!1), S(p2~U!1) -> E(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + E(s)  
+247 50 3,47 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~U, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + F(s)  
+248 50 2,52 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~U!2, p3~U!1, p4~U!3, p5~U!4), E(s!4), E(s!3), E(s!2) + F(s)  
+249 50 2,51 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+250 47 3,43 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+251 47 3,44 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+252 47 3,43 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+253 47 3,44 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + E(s)  
+254 47 3,43 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + E(s)  
+255 47 3,44 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + E(s) -> E(s!1), S(p1~P!2, p2~U!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), E(s!4), E(s!3)  
+256 3,47 50 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~U, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s)  
+257 47 2,49 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) -> E(s!1), S(p1~P, p2~U, p3~U!1, p4~U!2, p5~U!3), E(s!3), E(s!2) + F(s)  
+258 47 2,48 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + E(s)  
+259 45 3,37 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + E(s)  
+260 45 3,42 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + E(s)  
+261 45 3,37 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + E(s)  
+262 45 3,42 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3) + E(s)  
+263 45 3,37 0
+# rule    : E(s!1), S(p3~U!1) -> E(s), S(p3~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + E(s)  
+264 45 3,42 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + F(s)  
+265 45 2,47 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + F(s)  
+266 45 2,46 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P!2, p2~U, p3~U!1, p4~U!3, p5~U!4), F(s!2), E(s!4), E(s!3) + F(s)  
+267 45 2,47 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4) -> E(s!1), S(p1~P, p2~P!2, p3~U!3, p4~U!4, p5~U!1), F(s!2), E(s!4), E(s!3) + F(s)  
+268 45 2,46 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+269 42 3,35 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+270 42 3,41 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+271 42 3,35 0
+# rule    : E(s!1), S(p4~U!1) -> E(s), S(p4~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + E(s)  
+272 42 3,41 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U!4, p4~U!5, p5~U!1), F(s!2), E(s!5), F(s!3), E(s!4)  
+273 3,42 45 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s)  
+274 42 2,44 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + F(s)  
+275 42 2,43 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U!1, p5~U!3), F(s!2), E(s!3) + F(s)  
+276 42 2,44 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U!3, p5~U!1), F(s!2), E(s!3) + F(s)  
+277 42 2,43 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + E(s)  
+278 41 3,38 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + E(s)  
+279 41 3,40 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2)  
+280 3,41 42 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U!1, p5~U!4), F(s!3), E(s!4), F(s!2)  
+281 3,41 42 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+282 41 2,9 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+283 41 2,14 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+284 41 2,9 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+285 41 2,14 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2)  
+286 3,40 41 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2)  
+287 3,40 41 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~U, p4~U, p5~U!1), F(s!3), F(s!2)  
+288 3,40 41 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+289 40 2,7 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+290 40 2,12 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+291 40 2,7 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+292 40 2,12 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3)  
+293 3,39 36 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3)  
+294 3,39 36 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+295 39 2,40 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+296 39 2,38 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+297 39 2,40 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+298 39 2,38 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~U) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P!1, p2~P!2, p3~U, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+299 39 2,40 0
+# rule    : F(s!1), S(p1~P!1) -> F(s), S(p1~P) 
+# S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s)  
+300 39 2,38 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2)  
+301 3,38 35 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2)  
+302 3,38 35 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+303 38 2,12 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s)  
+304 38 2,17 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1) + F(s)  
+305 38 2,12 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s)  
+306 38 2,17 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + F(s) -> S(p1~P!1, p2~P!2, p3~P!3, p4~U, p5~U), F(s!1), F(s!3), F(s!2)  
+307 2,38 39 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + E(s)  
+308 35 3,30 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~U, p5~U), F(s!2), F(s!1) + E(s)  
+309 35 3,38 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + E(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U!4, p5~U!1), F(s!2), E(s!4), F(s!3)  
+310 3,35 37 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+311 35 2,14 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s)  
+312 35 2,19 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2) + F(s)  
+313 35 2,14 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s)  
+314 35 2,19 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~U, p5~U!1), F(s!2), F(s!4), F(s!3)  
+315 2,35 36 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + E(s)  
+316 33 3,28 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1) + E(s)  
+317 33 3,31 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+318 33 2,35 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + F(s)  
+319 33 2,32 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+320 33 2,35 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + F(s)  
+321 33 2,32 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~U) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~U, p5~U!1), F(s!3), F(s!2) + F(s)  
+322 33 2,35 0
+# rule    : F(s!1), S(p2~P!1) -> F(s), S(p2~P) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + F(s)  
+323 33 2,32 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2) + F(s) -> E(s!1), S(p1~P!2, p2~P!3, p3~P!4, p4~P!5, p5~U!1), F(s!2), F(s!5), F(s!4), F(s!3)  
+324 2,33 34 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + E(s)  
+325 32 3,27 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + E(s)  
+326 32 3,30 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s)  
+327 32 2,19 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + F(s)  
+328 32 2,24 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2) + F(s)  
+329 32 2,19 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2) + F(s)  
+330 32 2,24 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2)  
+331 2,32 33 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~P!3, p4~P!4, p5~U!1), F(s!4), F(s!3), F(s!2)  
+332 2,32 33 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~P!3, p5~U!1), F(s!3), F(s!2)  
+333 3,30 32 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s)  
+334 30 2,17 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s)  
+335 30 2,22 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1) + F(s)  
+336 30 2,17 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s)  
+337 30 2,22 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1)  
+338 2,30 31 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~U), F(s!3), F(s!2), F(s!1)  
+339 2,30 31 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~U) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+340 28 2,30 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~P) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s)  
+341 28 2,27 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+342 28 2,30 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s)  
+343 28 2,27 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~U) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~U), F(s!2), F(s!1) + F(s)  
+344 28 2,30 0
+# rule    : F(s!1), S(p3~P!1) -> F(s), S(p3~P) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s)  
+345 28 2,27 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1)  
+346 2,28 29 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P!1, p3~P!2, p4~P!3, p5~P!4), F(s!4), F(s!3), F(s!2), F(s!1)  
+347 2,28 29 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~U) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s)  
+348 27 2,22 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~P) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s)  
+349 27 2,26 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~U) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1) + F(s)  
+350 27 2,22 0
+# rule    : F(s!1), S(p4~P!1) -> F(s), S(p4~P) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s)  
+351 27 2,26 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1)  
+352 2,27 28 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1)  
+353 2,27 28 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~P!2, p5~P!3), F(s!3), F(s!2), F(s!1)  
+354 2,27 28 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~U) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s)  
+355 26 2,21 0
+# rule    : F(s!1), S(p5~P!1) -> F(s), S(p5~P) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s)  
+356 26 2,25 0
+# rule    : F(s), S(p4~P) -> F(s!1), S(p4~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1)  
+357 2,26 27 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1)  
+358 2,26 27 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1)  
+359 2,26 27 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~P!2), F(s!2), F(s!1)  
+360 2,26 27 0
+# rule    : F(s), S(p5~P) -> F(s!1), S(p5~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1)  
+361 2,25 26 0
+# rule    : F(s), S(p4~P) -> F(s!1), S(p4~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1)  
+362 2,25 26 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1)  
+363 2,25 26 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1)  
+364 2,25 26 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~P) + F(s) -> S(p1~P, p2~P, p3~P, p4~P, p5~P!1), F(s!1)  
+365 2,25 26 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~P) + E(s)  
+366 23 3,25 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~U) + E(s)  
+367 23 3,21 0
+# rule    : F(s), S(p4~P) -> F(s!1), S(p4~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2)  
+368 2,23 24 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2)  
+369 2,23 24 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2)  
+370 2,23 24 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P!2, p5~U!1), F(s!2)  
+371 2,23 24 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~P, p5~U!1)  
+372 3,21 23 0
+# rule    : F(s), S(p4~P) -> F(s!1), S(p4~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1)  
+373 2,21 22 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1)  
+374 2,21 22 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1)  
+375 2,21 22 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~P, p5~U) + F(s) -> S(p1~P, p2~P, p3~P, p4~P!1, p5~U), F(s!1)  
+376 2,21 22 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) -> S(p1~P, p2~P, p3~P, p4~P, p5~U) + E(s)  
+377 18 3,21 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) -> S(p1~P, p2~P, p3~P, p4~U, p5~U) + E(s)  
+378 18 3,16 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U!1, p5~U!2), E(s!2)  
+379 3,18 20 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2)  
+380 2,18 19 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2)  
+381 2,18 19 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P, p3~P!2, p4~U, p5~U!1), F(s!2)  
+382 2,18 19 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~P, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1)  
+383 3,16 18 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~P, p3~P, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~P, p4~U, p5~U!1)  
+384 3,16 18 0
+# rule    : F(s), S(p3~P) -> F(s!1), S(p3~P!1) 
+# S(p1~P, p2~P, p3~P, p4~U, p5~U) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1)  
+385 2,16 17 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~P, p4~U, p5~U) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1)  
+386 2,16 17 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~P, p4~U, p5~U) + F(s) -> S(p1~P, p2~P, p3~P!1, p4~U, p5~U), F(s!1)  
+387 2,16 17 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) -> S(p1~P, p2~P, p3~P, p4~U, p5~U) + E(s)  
+388 13 3,16 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) -> S(p1~P, p2~P, p3~U, p4~U, p5~U) + E(s)  
+389 13 3,11 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2)  
+390 3,13 15 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U!2, p5~U!1), E(s!2)  
+391 3,13 15 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2)  
+392 2,13 14 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P, p2~P!2, p3~U, p4~U, p5~U!1), F(s!2)  
+393 2,13 14 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~P, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1)  
+394 3,11 13 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~P, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1)  
+395 3,11 13 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~P, p2~P, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~P, p3~U, p4~U, p5~U!1)  
+396 3,11 13 0
+# rule    : F(s), S(p2~P) -> F(s!1), S(p2~P!1) 
+# S(p1~P, p2~P, p3~U, p4~U, p5~U) + F(s) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1)  
+397 2,11 12 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~P, p3~U, p4~U, p5~U) + F(s) -> S(p1~P, p2~P!1, p3~U, p4~U, p5~U), F(s!1)  
+398 2,11 12 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) -> S(p1~P, p2~P, p3~U, p4~U, p5~U) + E(s)  
+399 8 3,11 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) -> S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s)  
+400 8 3,6 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+401 3,8 10 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+402 3,8 10 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+403 3,8 10 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1) + F(s) -> E(s!1), S(p1~P!2, p2~U, p3~U, p4~U, p5~U!1), F(s!2)  
+404 2,8 9 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1)  
+405 3,6 8 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1)  
+406 3,6 8 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1)  
+407 3,6 8 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~P, p2~U, p3~U, p4~U, p5~U!1)  
+408 3,6 8 0
+# rule    : F(s), S(p1~P) -> F(s!1), S(p1~P!1) 
+# S(p1~P, p2~U, p3~U, p4~U, p5~U) + F(s) -> S(p1~P!1, p2~U, p3~U, p4~U, p5~U), F(s!1)  
+409 2,6 7 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~P) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) -> S(p1~P, p2~U, p3~U, p4~U, p5~U) + E(s)  
+410 4 3,6 0
+# rule    : E(s!1), S(p5~U!1) -> E(s), S(p5~U) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) -> S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s)  
+411 4 1,3 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+412 3,4 5 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+413 3,4 5 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+414 3,4 5 0
+# rule    : E(s), S(p1~U) -> E(s!1), S(p1~U!1) 
+# E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U!2, p5~U!1), E(s!2)  
+415 3,4 5 0
+# rule    : E(s), S(p5~U) -> E(s!1), S(p5~U!1) 
+# S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1)  
+416 1,3 4 0
+# rule    : E(s), S(p4~U) -> E(s!1), S(p4~U!1) 
+# S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1)  
+417 1,3 4 0
+# rule    : E(s), S(p3~U) -> E(s!1), S(p3~U!1) 
+# S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1)  
+418 1,3 4 0
+# rule    : E(s), S(p2~U) -> E(s!1), S(p2~U!1) 
+# S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1)  
+419 1,3 4 0
+# rule    : E(s), S(p1~U) -> E(s!1), S(p1~U!1) 
+# S(p1~U, p2~U, p3~U, p4~U, p5~U) + E(s) -> E(s!1), S(p1~U, p2~U, p3~U, p4~U, p5~U!1)  
+420 1,3 4 0
+end reactions

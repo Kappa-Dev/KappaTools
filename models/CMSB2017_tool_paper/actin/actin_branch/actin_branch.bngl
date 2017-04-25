@@ -1,0 +1,329 @@
+#############################################
+##  Model of actin assembly and branching at steady state, based on
+##  Roland, et al 2008 Biophys J. 94:2082-94 and Beltzner and Polard,
+##  2008 J. of Bio. Chem. 283,11:7135-44, with additions to model
+##  the capping protein
+##
+##  written by Michael Sneddon, October 2009
+
+
+
+begin parameters
+
+  vol    1e-14    #reaction volume in Liters
+  Na     6.02e23  #avogadro's number
+
+  #############################################
+  # Starting concentrations
+  ActinConc   8e-6*(vol*Na)  #8uM, the total actin monomer concentration
+  ADFconc     2e-6*(vol*Na)  #2uM
+
+  ARPconc     5e-6*(vol*Na) #5uM
+
+  VCA_Actin_Conc 0.5e-6*(vol*Na) #0.5uM
+  ActinConcEffective ActinConc   # we can adjust the amount that is available, but
+                                 # we don't for now
+
+
+
+  #############################################
+  # Actin assembly reactions, rates from Pollard 1986 J. Cell Biol 103:2747-54
+  kOn_barbed_ATP      11.6e6/(Na*vol)     #11.6/uM/s
+  kOff_barbed_ATP     1.4                 #1.4/s
+  kOff_barbed_ADP     7.2                 #7.2/s
+
+  kOn_pointed_ATP     1.3e6/(Na*vol)      #1.3/uM/s
+  kOff_pointed_ATP    0.8                 #0.8/s
+  kOff_pointed_ADP    0.27                #0.27/s
+
+
+
+  #############################################
+  # ADF/cofilin binding reactions to actin filaments
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kOnADF     0.0085e6/(Na*vol)
+  kOffADF  0.005
+  kOnADF_coop  0.075e6/(Na*vol)
+
+
+
+  ##############################################
+  # ATP hydrolysis and phosphate release
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kHydrolysis 0.3 #per second (r1)
+  kPiRelease  0.0019 #per second (r2 initial)
+  kPiReleaseADF 0.035 #per second (r2)
+
+
+
+  ##############################################
+  # Rate of severing
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kSevering 0.012
+
+
+
+
+
+  ##############################################
+  # VCA-monomer binding to Arp2/3, taken from Beltzner and Polard,
+  # 2008 J. of Bio. Chem. 283,11:7135-44
+  kOnVCA_Actin_ARP 0.4e6/(Na*vol)
+  kOffVCA_Actin_ARP 0.74
+
+  # Arp binding to the filament, taken from Beltzner and Polard,
+  # 2008 J. of Bio. Chem. 283,11:7135-44
+  kOnArp_Filament 0.00015e6/(Na*vol)
+  kOffArp_Filament  0.001
+  kOffArpVCA_Filament  0.0002
+
+
+  #####
+  # Rate of free VCA binding free actin Monomers, taken from Beltzner and Polard,
+  # 2008 J. of Bio. Chem. 283,11:7135-44
+  kOnVCA_Actin 42.9e6/(Na*vol)   #/uM/s
+  kOffVCA_Actin 25.7             #/s
+
+
+
+  ##############################################
+  # Rate of activating the ARP2/3 full complex, taken from Beltzner and Polard,
+  # 2008 J. of Bio. Chem. 283,11:7135-44
+  kArpActivation 0.4
+
+
+
+  ###############################################
+  # Capping Reactions
+  #
+  # Parameters from Yeast Capping Protein, from Kim, et al. 2004 JCB, 164(4):567
+  #CapConc 0.1e-6*(vol*Na) #µM, free in the cell, 1.3µM total
+  #########
+  # Parameters from Schafer, et al. 1996 JCB, 135(1):169
+  kOnCap 3.5e6/(Na*vol) #/µM/s
+  kOffCap 0.0005 #/s
+  CapConc 0.1e-6*(vol*Na) #µM, free in the cell, 1.3µM total
+
+end parameters
+
+
+begin molecule types
+    ## Actin molecules contain barbed and pointed ends that can bind other
+    ## Actin molecules, a site that can be loaded with ATP, ADP-Pi or ADP,
+    ## a site that can bind ADF/cofilin named D, and a capping site that
+    ## can be open or capped, and finally a tracking state that tells if the
+    ## end is Dead or Alive so that we only track one filament at a time
+    Actin(barbed,pointed,p~ATP~ADPp~ADP,d,c~CAPPED~OPEN,vca,arp,state~DEAD~ALIVE)
+
+    ##  ADF/cofilin simply has a binding site for Actin
+    ADF(a)
+
+    ##  VCA can activate Arp2/3 which can initiate branching
+    VCA(a,arp)
+    ARP(f,vca,activated~YES~NO)
+
+
+    ## A generator and trash molecules are a simple construct for creating
+    ## and destroying molecules
+    Generator()
+    Trash()
+
+end molecule types
+
+
+
+begin species
+
+    # The pool of free Actin monomer agents
+    Actin(barbed,pointed,p~ATP,d,c~OPEN,vca,arp,state~ALIVE) ActinConcEffective
+
+    # The pool of free ADF/cofilin agents
+    ADF(a) ADFconc
+
+    # Seed nucleation site for the polymer to start growth.  This
+    # ensures that only one polymer starts forming per simulation.  You could add more, or
+    # you could just run multiple simulations
+    Actin(barbed,pointed!1,p~ATP,d,c~OPEN,vca,arp,state~ALIVE).Actin(barbed!1,pointed,p~ATP,d,c~OPEN,vca,arp,state~ALIVE) 1
+
+    # the pool of Arp2/3 and activating factor VCA
+    VCA(a,arp)  VCA_Actin_Conc
+    ARP(f,vca,activated~NO) ARPconc
+
+
+    # Generator and trash agents to remove fragments and replenish
+    # the pool of Actin and ADF/cofilin in the simulation
+    Generator() 1
+    Trash() 0
+
+end species
+
+
+
+begin observables
+    Molecules Subunit Actin(barbed!+,pointed!+)
+    Molecules B_End Actin(barbed,pointed!+)
+    Molecules P_End Actin(barbed!+,pointed)
+    Molecules P_Last Actin(barbed!+,pointed,vca)
+    Molecules Capped Actin(barbed,pointed!+,c~CAPPED)
+
+    Molecules ArpBound ARP(f!+)
+    Molecules ArpAct ARP(activated~YES)
+
+
+    Molecules ActinMonomer Actin(barbed,pointed)
+    Molecules ActinMonomerAvailable Actin(barbed,pointed,vca,p~ATP,d,c~OPEN)
+
+    Molecules ActinSubunit_ATP Actin(barbed!+,pointed!+,p~ATP)
+    Molecules ActinSubunit_ADPp Actin(barbed!+,pointed!+,p~ADPp)
+    Molecules ActinSubunit_ADP Actin(barbed!+,pointed!+,p~ADP)
+    Molecules ActinBarbedEnd Actin(barbed,pointed!+)
+    Molecules ActinPointedEnd Actin(barbed!+,pointed,vca)
+    Molecules Actin_ADF Actin(barbed!+,pointed!+,d!1)
+    Molecules ActinCapped Actin(c~CAPPED)
+    Molecules ActinTotal Actin()
+    Molecules ADFfree ADF(a)
+    Molecules ADFtotal ADF()
+    Molecules FreeVCA VCA(arp)
+    Molecules FreeVCA_Actin VCA(a!+,arp)
+    Molecules TotalVCA VCA()
+    Molecules ARP_VCA ARP(vca!+)
+    Molecules FreeARP ARP(f)
+    Molecules TotalARP ARP()
+end observables
+
+
+
+begin functions
+
+   #############################################
+   # These functions are used to create Actin and ADF/cofilin as needed.  See the
+   # actin_simple model for more details.
+   ActinGeneratorRate()=if(ActinConcEffective>ActinMonomerAvailable,1000,0)
+   ADFGeneratorRate()=if(ADFconc>ADFfree,1000,0)
+   VCA_ActinGeneratorRate()=if(VCA_Actin_Conc>FreeVCA,1000,0)
+   ARPGeneratorRate()=if(ARPconc>FreeARP,1000,0)
+
+end functions
+
+
+
+
+begin reaction rules
+
+
+   #############################################
+   # ELONGATION REACTIONS (barbed end)
+   ###### MONOMER ###### + #### FILAMENT ################
+   Barbed_end_elongation :\
+   Actin(barbed,pointed,vca) + Actin(barbed,pointed!+,c~OPEN,state~ALIVE) -> Actin(barbed,pointed!1,vca).Actin(barbed!1,pointed!+,c~OPEN,state~ALIVE) kOn_barbed_ATP
+   Actin(barbed,pointed!1,p~ATP,c~OPEN,state~ALIVE).Actin(barbed!1,pointed!+,vca) -> Actin(barbed,pointed,p~ATP,c~OPEN,state~ALIVE) + Actin(barbed,pointed!+,vca) kOff_barbed_ATP
+   Actin(barbed,pointed!1,p~ADPp,c~OPEN,state~ALIVE).Actin(barbed!1,pointed!+,vca) -> Actin(barbed,pointed,p~ADPp,c~OPEN,state~ALIVE) + Actin(barbed,pointed!+,vca) kOff_barbed_ATP
+   Actin(barbed,pointed!1,p~ADP,c~OPEN,state~ALIVE).Actin(barbed!1,pointed!+,vca) -> Actin(barbed,pointed,p~ADP,c~OPEN,state~ALIVE) + Actin(barbed,pointed!+,vca) kOff_barbed_ADP
+
+
+   #############################################
+   # ELONGATION REACTIONS (pointed end)
+   ###### FILAMENT ############## + #### MONOMER ########
+   Pointed_end_elongation :\
+   Actin(barbed!+,pointed,c~OPEN,vca,state~ALIVE) + Actin(barbed,pointed,vca) -> Actin(barbed!+,pointed!1,c~OPEN,vca,state~ALIVE).Actin(barbed!1,pointed,vca) kOn_pointed_ATP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ATP,c~OPEN,vca,state~ALIVE)  ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ATP,c~OPEN,vca,state~ALIVE) kOff_pointed_ATP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ADPp,c~OPEN,vca,state~ALIVE) ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ADPp,c~OPEN,vca,state~ALIVE) kOff_pointed_ATP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ADP,c~OPEN,vca,state~ALIVE)  ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ADP,c~OPEN,vca,state~ALIVE) kOff_pointed_ADP
+
+
+   #############################################
+   # ATP HYDROLYSIS REACTIONS
+   # first order ATP hydrolysis reactions, with the phosphate dissassociation
+   # rate dependent on the presence of a bound ADF on the filament
+   Actin(p~ATP,d).Actin() -> Actin(p~ADPp,d).Actin()   kHydrolysis
+   Actin(p~ADPp,d).Actin() -> Actin(p~ADP,d).Actin()   kPiRelease
+   Actin(p~ADPp,d).ADF() -> Actin(p~ADP,d).ADF() kPiReleaseADF-kPiRelease
+
+
+   #############################################
+   ### ADF/COFILIN BINDING REACTIONS
+   # initial binding of ADF/cofilin, requires neighboring Actin subunits to be free of ADF
+   Actin(p~ADP,d,barbed!1,pointed!2).Actin(pointed!1,d).Actin(barbed!2,d) + ADF(a) -> Actin(p~ADP,d!3,barbed!1,pointed!2).Actin(pointed!1,d).Actin(barbed!2,d).ADF(a!3) kOnADF
+
+   # cooperative binding of ADF/cofilin to neighboring subunits, either through the
+   # barbed end or through the pointed end - we need one rule for each
+   Actin(d!+,pointed!1).Actin(p~ADP,d,barbed!1,pointed!+) + ADF(a) -> Actin(d!+,pointed!1).Actin(p~ADP,d!2,barbed!1,pointed!+).ADF(a!2) kOnADF_coop
+   Actin(p~ADP,d,barbed!+,pointed!1).Actin(d!+,barbed!1) + ADF(a) -> Actin(p~ADP,d!2,barbed!+,pointed!1).Actin(d!+,barbed!1).ADF(a!2) kOnADF_coop
+
+   #Unbinding of ADF
+   Actin(d!1).ADF(a!1) -> Actin(d) + ADF(a) kOffADF
+
+
+
+   #############################################
+   ### SEVERING REACTIONS
+   # severing reaction that also immediately kills the barbed end of the fragment
+   # so that it can be discarded
+   Severing :\
+   Actin(d!+,pointed!1).Actin(d!+,barbed!1,state~ALIVE) -> Actin(d!+,pointed) + Actin(d!+,barbed,state~DEAD) kSevering
+
+
+
+
+
+   #############################################
+   ### BRANCHING REACTIONS
+
+   # binding of VCA to ACTIN monomer is treated as instant (so that we don't have to model
+   # binding and unbinding of VCA to ACTIN.  We simply create as much VCA as there are VCA-Actin)
+   VCA(a,arp) + Actin(barbed,pointed,vca) -> VCA(a!1,arp).Actin(barbed,pointed,vca!1)  10000
+
+   # VCA-Actin binding to ARP2/3
+   VCA(a!+,arp) + ARP(vca) -> VCA(a!+,arp!2).ARP(vca!2) kOnVCA_Actin_ARP
+   VCA(a!+,arp!2).ARP(f,vca!2) -> VCA(a,arp) + ARP(f,vca) kOffVCA_Actin_ARP
+
+
+   # ARP2/3 binding to a filament
+   ARP(f) + Actin(barbed!+,pointed!+,arp) -> ARP(f!1).Actin(barbed!+,pointed!+,arp!1) kOnArp_Filament
+   ARP(f!1,vca).Actin(barbed!+,pointed!+,arp!1) -> ARP(f,vca) + Actin(barbed!+,pointed!+,arp) kOffArp_Filament
+   ARP(f!1,vca!+,activated~NO).Actin(barbed!+,pointed!+,arp!1) -> ARP(f,vca!+,activated~NO) + Actin(barbed!+,pointed!+,arp) kOffArpVCA_Filament
+
+
+   ## activated ARP 2/3 complex with an actin monomer can start polymerizing
+   ## with the usual rate off of the barbed end
+   #start poly branch :\
+   ARP(vca!1,activated~YES).VCA(arp!1,a!2).Actin(vca!2,barbed,pointed,c~OPEN) + Actin(barbed,pointed,vca) -> ARP(vca!1,activated~YES).VCA(arp!1,a!2).Actin(vca!2,barbed!4,pointed,c~OPEN).Actin(barbed,pointed!4,vca) kOn_barbed_ATP
+
+
+   #############################################
+   ### ACTIVATING THE COMPLEX
+   ARP(f!+,vca!+,activated~NO) -> ARP(f!+,vca!+,activated~YES) kArpActivation
+
+
+
+
+   #############################################
+   ### CAPPING REACTIONS, at the barbed end
+   Capping:\
+   Actin(barbed,pointed!+,c~OPEN) -> Actin(barbed,pointed!+,c~CAPPED)  kOnCap*CapConc
+   Uncapping:\
+   Actin(barbed,pointed!+,c~CAPPED) -> Actin(barbed,pointed!+,c~OPEN)  kOffCap
+
+
+   #############################################
+   ### RECYCLING REACTIONS
+   # recycling reactions that discard CAPPED fragments, and add to the pool of free
+   # Actin monomers to maintain Actin concentration in the volume and free ADF to
+   # maintain the correct free ADF conncentration
+
+   # Here we add new Actin and ADF molecules to replace those that are depleted
+   Generator() -> Generator() + Actin(barbed,pointed,p~ATP,d,c~OPEN,vca,arp,state~ALIVE) ActinGeneratorRate()
+   Generator() -> Generator() + ADF(a) ADFGeneratorRate()
+   Generator() -> Generator() + VCA(a,arp) VCA_ActinGeneratorRate()
+   Generator() -> Generator() + ARP(f,vca,activated~NO) ARPGeneratorRate()
+
+   # Delete fragments that are capped and any ADP-actin monomers we can't use anymore
+   Actin(state~DEAD) -> Trash()  10000
+   Actin(barbed,pointed,p~ADP,arp,vca) -> Trash()  10000
+   Actin(barbed,pointed,p~ADPp,arp,vca) -> Trash()  10000
+
+
+end reaction rules
+
+
+generate_network({overwrite=>1})

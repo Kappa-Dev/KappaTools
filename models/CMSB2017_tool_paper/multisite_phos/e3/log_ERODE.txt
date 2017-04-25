@@ -1,0 +1,71 @@
+##########################################
+# without symmetries
+##########################################
+
+Reading network_e3_without_symmetries...
+	Parameters: 0
+	Species: 66
+	Reactions: 288 in 0.000 (s).
+
+partitioning network_e3_without_symmetries... ( 1 iterations)  completed in 0.076 (s).
+	SMT init time: 0.065 (s)
+	SMT check time: 0.006 (s)
+	From 66 species to 1 block (1.52% of original size).
+Creating reduced model... completed in 0.003 (s).
+Original model: network_e3_without_symmetries.
+	288 reactions, 66 species. 
+BDE reduced model: e3_bde.
+	2 reactions, 1 species. 
+WARNING: The partition might not be consistent with the initial conditions.
+          Each species in the reduced model has the initial concentration of the representative of its partition block.
+Writing to file /Users/quyen/ERODE/CMSB/e3_bde.ode ... completed
+
+FDE partitioning network_e3_without_symmetries... ( 65 iterations )  completed in 0.578 (s).
+	SMT init time: 0.055 (s)
+	SMT check time: 0.268 (s)
+	From 66 species to 1 block (1.52% of original size).
+Creating reduced model... completed in 0.000 (s).
+Original model: network_e3_without_symmetries.
+	288 reactions, 66 species. 
+FDE reduced model: e3_fde.
+	0 reactions, 1 species. 
+Writing to file /Users/quyen/ERODE/CMSB/e3_fde.ode ... completed
+
+##########################################
+# with symmetries forward
+##########################################
+
+Reading network_e3_forward...
+	Parameters: 0
+	Species: 22
+	Reactions: 90 in 0.000 (s). 
+
+FDE partitioning network_e3_forward... ( 21 iterations )  completed in 0.224 (s).
+	SMT init time: 0.024 (s)
+	SMT check time: 0.105 (s)
+	From 22 species to 1 block (4.55% of original size).
+Creating reduced model... completed in 0.000 (s).
+Original model: network_e3_forward.
+	90 reactions, 22 species. 
+FDE reduced model: e3_fde.
+	0 reactions, 1 species. 
+Writing to file /Users/quyen/ERODE/CMSB/e3_fde.ode ... completed
+
+##########################################
+# with symmetries backward
+##########################################
+Reading network_e3_backward...
+	Parameters: 0
+	Species: 22
+	Reactions: 90 in 0.000 (s). 
+
+FDE partitioning network_e3_backward... ( 21 iterations )  completed in 0.203 (s).
+	SMT init time: 0.025 (s)
+	SMT check time: 0.087 (s)
+	From 22 species to 1 block (4.55% of original size).
+Creating reduced model... completed in 0.000 (s).
+Original model: network_e3_backward.
+	90 reactions, 22 species. 
+FDE reduced model: e3_forward.
+	0 reactions, 1 species. 
+Writing to file /Users/quyen/ERODE/CMSB/e3_forward.ode ... completed

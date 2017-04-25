@@ -1,0 +1,92 @@
+---------------------e2.ka---------------
+----------without_symmetries-----------
+
+real	0m12.678s
+user	0m0.013s
+sys	0m0.008s
+----------with_symmetries_forward-----------
+
+real	0m1.976s
+user	0m0.017s
+sys	0m0.009s
+----------with_symmetries_backward-----------
+
+real	0m0.809s
+user	0m0.016s
+sys	0m0.009s
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3009-gd10ca0e-dirty) (without Tk interface)
+Analysis launched at 2017/04/25 16:31:38 (GMT+2) on wf173.di.ens.fr
+Parsing e2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing e2.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+execution finished without any exception
+
+real	0m0.018s
+user	0m0.011s
+sys	0m0.007s

@@ -1,0 +1,30 @@
+# RNF script to run the simple actin dynamic assembly model
+#
+# Based on Roland, Berro, et al, (2008) Biophys. J. 94:2082-94
+#
+
+
+#set all NFsim parameters here first, making sure to set the
+#traversal limit to two!  Particularly in actin assembly, we
+#only need to look at a couple molecules for updates, not the
+#entire filament!
+-xml actin_simple.xml
+-v
+-utl 2
+
+
+#begin the set of execution commands
+begin
+
+  # print out some stuff
+  echo Running Actin dynamic assembly model
+  print reactions obs
+  
+  # Run the simulation for 500 seconds, outputting 500 times
+  sim 500 500
+
+  # let us know that we are done
+  print reactions obs
+  echo done.
+  
+end

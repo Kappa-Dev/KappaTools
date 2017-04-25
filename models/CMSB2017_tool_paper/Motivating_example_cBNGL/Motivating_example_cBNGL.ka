@@ -1,0 +1,132 @@
+%init: 100 L(r,d)               # Ligand w/ receptor binding and dimerization sites.
+#%init: 100 R(loc,l,tf~Y~pY)         # Receptor with ligand and TF binding sites.
+%init: 100 R(loc~EM~PM,l,tf~Y)
+%init: 100 TF(r,d~Y,dna,im)  # Transcription factor (monomer) with receptor, DNA, and importin binding sites; and dimerization domain.
+%init: 100 DNA(p1,p2)           # DNA molecule with two promoter sites.
+%init: 100 mRNA1()              # mRNA transcript for Protein 1.
+%init: 100 mRNA2()              # mRNA transcript for Protein 2.
+%init: 100 P1(im,dna)           # Protein 1 with importin and DNA binding domains.
+%init: 100 P2()                 # Protein 2.
+%init: 100 Im(fg,cargo)         # nuclear importin molecule with hydrophobic domain (fg) that interacts with nuclear pore.
+%init: 100 NP(fg)               # nuclear pore complex w/ hydrophobic FG repeat domain.
+%init: 100 Sink()               # a place for deleted molecules.
+
+
+# receptor-ligand binding.
+'Rule1'  L(r), R(l)  <->  L(r!1), R(l!1)            @1(0),1
+
+# ligand dimerization.
+'Rule2'  L(d), L(d)  <->  L(d!1), L(d!1)            @1,1
+
+# Rule3: receptor-dimer internalization.
+'Rule3'  R(loc~PM), R(loc~PM)       ->  R(loc~EM), R(loc~EM)  @0(1)
+
+# receptor, ligand recycling.
+'Rule4'  R(loc~EM,l)  ->  R(loc~PM,l)  @1
+'Rule5'  L()  ->  L()                         @1
+
+# receptor transphosphorylation.
+'Rule6'  R(), R(tf~Y)  ->  R(), R(tf~pY)   @1
+
+# receptor dephosphorylation.
+'Rule7'  R(tf~pY)   ->  R(tf~Y)  @1
+
+# receptor-TF binding.  favor binding if TF(dim~Y), unbinding if TF(dim~pY).
+'Rule8'  R(tf~pY), TF(d~Y,r)   <->  R(tf~pY!1), TF(d~Y,r!1)	  @1,1
+'Rule9'  R(tf~pY), TF(d~pY,r)  <->  R(tf~pY!1), TF(d~pY,r!1) @1,1
+
+# transcription factor trans-phosphorylation.
+'Rule10'  TF(), R(), R(), TF(d~Y)   ->  TF(), R(), R(), TF(d~pY) @1
+
+# transcription factor dephosphorylation (CP only).
+'Rule11'  TF(d~pY)      ->  TF(d~Y)           @1
+
+# transcription factor dimerization.
+'Rule12'  TF(r,d~pY,dna), TF(r,d~pY,dna) <-> TF(r,d~pY!1,dna), TF(r,d~pY!1,dna)  	 @1,1
+
+# TF dimer binds promoter 1.
+'Rule13'  TF(dna,im), TF(dna,im),  DNA(p1) <-> TF(dna!1,im), TF(dna!2,im), DNA(p1!1), DNA(p1!2) @1,1
+
+# transcription.
+'Rule14'  DNA(p1!_) ->  DNA(p1!_), mRNA1() @1
+'Rule15'  DNA(p2!_) ->  DNA(p2!_), mRNA2() @1
+
+# mRNA transport to cytoplams.
+'Rule16'  mRNA1()  ->  mRNA1() @1
+'Rule17'  mRNA2()  ->  mRNA2()  @1
+
+# mRNA translation to protein.
+'Rule18'  mRNA1()  ->  mRNA1(), P1(im,dna)  @1
+'Rule19'  mRNA2()  ->  mRNA2(),  P2()   @1
+
+# mRNA degradation.
+'Rule20'  mRNA1()     ->  Sink() @1
+'Rule21'  mRNA()     ->  Sink() @1
+
+# protein degradation.
+'Rule22'  P1()        ->  Sink() @1
+'Rule23'  P2()        ->  Sink()   @1
+
+# importin binds TF dimer (tends to pick up in CP, drop off in NU).
+'Rule24'  TF(im,dna,r), TF(im,dna,r), Im(cargo) <-> TF(im!1,dna,r), TF(im!2,dna,r), Im(cargo!1), Im(cargo!2) @1,1
+
+'Rule25'  TF(im,dna,r), TF(im,dna,r), Im(cargo) <-> TF(im!1,dna,r), TF(im!2,dna,r), Im(cargo!1), Im(cargo!2) @1,1
+
+# importin binds P1 (tends to pick up in CP, drop off in NU).
+'Rule26'  P1(im,dna),  Im(cargo)    <->  P1(im!1,dna), Im(cargo!1) @1,1
+'Rule27'  P1(im,dna), Im(cargo)    <->  P1(im!1,dna), Im(cargo!1) @1,1
+
+# importin enters nuclear pore.
+'Rule28'  Im(fg), NP(fg)  <->  Im(fg!1), NP(fg!1) @1,1
+
+# importin traverses nuclear pore (with any cargo).
+'Rule29'  Im(fg!1), NP(fg!1)  <->  Im(fg!1), NP(fg!1) @1,1
+
+# P1 binds promoter 2.
+'Rule30'  P1(im,dna), DNA(p2)  <->  P1(im,dna!1), DNA(p2!1)@1,1
+
+
+#%obs:  'Tot_L'         L()
+#%obs: 'Tot_R'         R()
+#%obs: 'Tot_TF'        TF()
+#%obs: 'Tot_DNA'       DNA()
+#%obs: 'Tot_mRNA1'     mRNA1()
+#%obs: 'Tot_mRNA2'     mRNA2()
+#%obs: 'Tot_P1'        P1()
+#%obs: 'Tot_P2'        P2()
+#%obs: 'Tot_NP'        NP()
+#%obs: 'Tot_Im'        Im()
+
+#%obs: 'L_Dimers_EC'   L(), L()
+#%obs: 'L_Dimers_PM'   L(), L()
+#%obs: 'L_Dimers_EN'   L(), L()
+#%obs: 'L_Dimers_EM'   L(), L()
+
+#%obs: 'L_Bound_PM'    L()
+#%obs: 'L_Bound_EM'    L()
+
+#%obs: 'R_Dimers_PM'   R(), R()
+#%obs: 'R_Dimers_EM'   R(), R()
+
+#%obs: 'Catalytic_R'   R(tf~pY!_)
+#%obs: 'Catalytic_TF'  R(tf~pY!1), TF(r!1)
+#%obs:  'Phos_TF'       TF(d~pY!_)
+
+#%obs: 'TF_Dimer_CP'   TF(d~pY!1),TF(d~pY!1)
+#%obs: 'TF_Dimer_NU'   TF(d~pY!1), TF(d~pY!1)
+
+#%obs: 'Bound_prom1'   DNA(p1!_)
+#%obs: 'Bound_prom2'   DNA(p2!_)
+
+#%obs: 'P1_NU'         P1()
+#%obs: 'P1_CP'         P1()
+
+#%obs: 'Im_NU'         Im()
+#%obs: 'Im_CP'         Im()
+
+#%obs: 'Im_Cargo_NP'   Im(fg!_,cargo!_)
+
+#%obs: 'P1_NU_free'    P1(im,dna)
+#%obs: 'P1_NU_dna'     P1(im,dna!_)
+
+#%obs: 'CountSink'     Sink()

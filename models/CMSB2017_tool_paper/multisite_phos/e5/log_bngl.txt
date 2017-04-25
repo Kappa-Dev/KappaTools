@@ -1,0 +1,17 @@
+---------------------e5.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file e5.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 20 reaction rule(s).
+Read 3 observable(s).
+Wrote model in xml format to ./e5.xml.
+CPU TIME: writeXML 0.01 s.
+Finished processing file e5.bngl.
+CPU TIME: total 0.05 s.
+
+real	0m0.236s
+user	0m0.206s
+sys	0m0.023s

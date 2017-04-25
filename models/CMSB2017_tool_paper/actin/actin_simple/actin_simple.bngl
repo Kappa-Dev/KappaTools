@@ -1,0 +1,204 @@
+#############################################
+##  Simple model of steady state Actin assembly and disassembly by
+##  ADF/cofilin based on Roland, et al 2008 Biophys J. 94:2082-94
+##
+
+
+
+begin parameters
+
+  vol    1e-14    #Reaction volume, in Liters              
+  Na     6.02e23  #Avogadros number
+
+  #############################################
+  # Starting concentrations of Actin and ADF/cofilin
+  ActinConc   1e-6*(vol*Na)  #1uM
+  ADFconc     1e-6*(vol*Na)  #1uM
+
+  #############################################
+  # Actin assembly reactions, rates from Pollard 1986 J. Cell Biol 103:2747-54
+  kOn_barbed_ATP      11.6e6/(Na*vol)     #11.6/uM/s
+  kOff_barbed_ATP     1.4                 #1.4/s
+  kOff_barbed_ADP     7.2                 #7.2/s
+  
+  kOn_pointed_ATP     1.3e6/(Na*vol)      #1.3/uM/s
+  kOff_pointed_ATP    0.8                 #0.8/s
+  kOff_pointed_ADP    0.27                #0.27/s
+  
+  #############################################
+  # ADF/cofilin binding reactions to actin filaments
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kOnADF     0.0085e6/(Na*vol)  #0.0085/uM/s, first binding event
+  kOffADF  0.005                #0.005/s
+  kOnADF_coop  0.075e6/(Na*vol) #0.0085/uM/s, cooperative binding event
+  
+  ##############################################
+  # ATP hydrolysis and phosphate release
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kHydrolysis 0.3 #per second (r1)
+  kPiRelease  0.0019 #per second (r2 initial)
+  kPiReleaseADF 0.035 #per second (r2)
+  
+  ##############################################
+  # Rate of severing by two adjacent ADF/cofilin decorated subunits
+  # taken from Roland, et al 2008 Biophys J. 94:2082-94
+  kSevering 0.012
+
+end parameters
+
+
+
+begin molecule types
+    ## Actin molecules contain barbed and pointed ends that can bind other
+    ## Actin molecules, a site that can be loaded with ATP, ADP-Pi or ADP,
+    ## a site that can bind ADF/cofilin named D, and a capping site that
+    ## can be open or capped
+    Actin(barbed,pointed,p~ATP~ADPp~ADP,d,c~CAPPED~OPEN) 
+    
+    ##  ADF/cofilin simply has a binding site for Actin
+    ADF(a)
+    
+    ## A generator and trash molecules are a simple BNGL construct for creating
+    ## and destroying molecules in the middle of a simulation
+    Generator()
+    Trash()
+    
+end molecule types
+
+
+
+begin species
+
+    # The pool of free Actin monomer agents
+    Actin(barbed,pointed,p~ATP,d,c~OPEN) ActinConc
+
+    # The pool of free ADF/cofilin agents
+    ADF(a) ADFconc
+    
+    # Seed nucleation site for the polymer to start growth.  This
+    # ensures that only one polymer starts forming per simulation. You
+    # could increase the seeds and simulate multiple filaments at the
+    # same time if you want
+    Actin(barbed,pointed!1,p~ATP,d,c~OPEN).Actin(barbed!1,pointed,p~ATP,d,c~OPEN) 1
+    
+    # Generator and trash agents to remove fragments and replenish
+    # the pool of Actin and ADF/cofilin in the simulation
+    Generator() 1
+    Trash() 0
+    
+end species
+
+
+
+begin observables
+
+    Molecules ActinMonomer Actin(barbed,pointed)
+    Molecules ActinMonomerAvailable Actin(barbed,pointed,p~ATP,d,c~OPEN)
+    Molecules ActinSubunit Actin(barbed!+,pointed!+)
+    Molecules ActinSubunit_ATP Actin(barbed!+,pointed!+,p~ATP)
+    Molecules ActinSubunit_ADPp Actin(barbed!+,pointed!+,p~ADPp)
+    Molecules ActinSubunit_ADP Actin(barbed!+,pointed!+,p~ADP)
+    Molecules ActinBarbedEnd Actin(barbed,pointed!+)
+    Molecules ActinPointedEnd Actin(barbed!+,pointed)
+    Molecules Actin_ADF Actin(barbed!+,pointed!+,d!1)
+    Molecules ActinCapped Actin(c~CAPPED)
+    Molecules ActinTotal Actin()
+    Molecules ADFfree ADF(a)
+    Molecules ADFtotal ADF()
+    
+end observables
+ 
+ 
+ 
+begin functions
+
+   #############################################
+   # These functions are used to create Actin and ADF/cofilin as needed, if
+   # the levels fall below the predefined threshold.  The way to read these
+   # statements is IF([condition], Then set rate to 1000, otherwise set rate to 0)
+   # Setting the rate to 1000 ensures extra monomers are generated near instantly.
+   ActinGeneratorRate()=if(ActinMonomerAvailable<ActinConc,1000,0)
+   ADFGeneratorRate()=if(ADFfree<ADFconc,1000,0)
+   
+end functions
+ 
+ 
+ 
+ 
+begin reaction rules
+
+   #############################################
+   # ELONGATION REACTIONS (barbed end)
+   ###### MONOMER ###### + #### FILAMENT ################
+   Actin(barbed,pointed) + Actin(barbed,pointed!+,c~OPEN) -> Actin(barbed,pointed!1).Actin(barbed!1,pointed!+,c~OPEN) kOn_barbed_ATP
+   Actin(barbed,pointed!1,p~ATP,c~OPEN).Actin(barbed!1,pointed!+) -> Actin(barbed,pointed,p~ATP,c~OPEN) + Actin(barbed,pointed!+) kOff_barbed_ATP
+   Actin(barbed,pointed!1,p~ADPp,c~OPEN).Actin(barbed!1,pointed!+) -> Actin(barbed,pointed,p~ADPp,c~OPEN) + Actin(barbed,pointed!+) kOff_barbed_ADP
+   Actin(barbed,pointed!1,p~ADP,c~OPEN).Actin(barbed!1,pointed!+) -> Actin(barbed,pointed,p~ADP,c~OPEN) + Actin(barbed,pointed!+) kOff_barbed_ADP
+
+   #############################################
+   # ELONGATION REACTIONS (pointed end)
+   ###### FILAMENT ############## + #### MONOMER ########
+   Actin(barbed!+,pointed,c~OPEN) + Actin(barbed,pointed) -> Actin(barbed!+,pointed!1,c~OPEN).Actin(barbed!1,pointed) kOn_pointed_ATP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ATP,c~OPEN)  ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ATP,c~OPEN) kOff_pointed_ATP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ADPp,c~OPEN) ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ADPp,c~OPEN) kOff_pointed_ADP
+   Actin(barbed!+,pointed!1).Actin(barbed!1,pointed,p~ADP,c~OPEN)  ->  Actin(barbed!+,pointed) + Actin(barbed,pointed,p~ADP,c~OPEN) kOff_pointed_ADP
+    
+   
+   #############################################
+   # ATP HYDROLYSIS REACTIONS
+   # first order ATP hydrolysis reactions, with the phosphate dissassociation
+   # rate dependent on the presence of a bound ADF on the filament.
+   # Notice how we can declare molecules are connected to each other without
+   # explicitly giving the site that connects them. This is valid syntax in BNGL
+   # (although it cannot be currently handled in other platforms like kappa).  It
+   # can make NFsim run slower, but here it is ok. See the user manual for details
+   # regarding the "Connected-to" syntax.
+   Actin(p~ATP,d).Actin() -> Actin(p~ADPp,d).Actin()   kHydrolysis
+   Actin(p~ADPp,d).Actin() -> Actin(p~ADP,d).Actin()   kPiRelease
+   Actin(p~ADPp,d).ADF() -> Actin(p~ADP,d).ADF() kPiReleaseADF-kPiRelease
+   
+   
+   #############################################  
+   ### ADF/COFILIN BINDING REACTIONS
+   # initial binding of ADF/cofilin, requires neighboring Actin subunits to be free of ADF
+   Actin(p~ADP,d,barbed!1,pointed!2).Actin(pointed!1,d).Actin(barbed!2,d) + ADF(a) -> Actin(p~ADP,d!3,barbed!1,pointed!2).Actin(pointed!1,d).Actin(barbed!2,d).ADF(a!3) kOnADF
+  
+   # cooperative binding of ADF/cofilin to neighboring subunits, either through the
+   # barbed end or through the pointed end - we need one rule for each
+   Actin(d!+,pointed!1).Actin(p~ADP,d,barbed!1,pointed!+) + ADF(a) -> Actin(d!+,pointed!1).Actin(p~ADP,d!2,barbed!1,pointed!+).ADF(a!2) kOnADF_coop
+   Actin(p~ADP,d,barbed!+,pointed!1).Actin(d!+,barbed!1) + ADF(a) -> Actin(p~ADP,d!2,barbed!+,pointed!1).Actin(d!+,barbed!1).ADF(a!2) kOnADF_coop
+   
+   #Unbinding of ADF
+   Actin(d!1).ADF(a!1) -> Actin(d) + ADF(a) kOffADF
+
+
+
+   #############################################  
+   ### SEVERING REACTIONS
+   # severing reaction that also immediately caps the barbed end of the fragment 
+   # so that it can be discarded, an assumption of the original Roland model
+   Actin(d!+,pointed!1).Actin(d!+,barbed!1,c~OPEN) -> Actin(d!+,pointed) + Actin(d!+,barbed,c~CAPPED) kSevering
+
+
+
+   #############################################  
+   ### RECYCLING REACTIONS
+   # recycling reactions that discard CAPPED fragments, and add to the pool of free
+   # Actin monomers to maintain Actin concentration in the volume and free ADF to
+   # maintain the correct free ADF conncentration
+   
+   # Here we add new Actin and ADF molecules to replace those that are depleted
+   Generator() -> Generator() + Actin(barbed,pointed,p~ATP,d,c~OPEN) ActinGeneratorRate()
+   Generator() -> Generator() + ADF(a) ADFGeneratorRate()
+   
+   # Delete fragments that are capped and anything we can't use anymore
+   Actin(c~CAPPED) -> Trash()  10000
+   Actin(barbed,pointed,p~ADP) -> Trash()  10000
+   Actin(barbed,pointed,p~ADPp) -> Trash()  10000
+   
+
+end reaction rules
+
+
+
+writeXML();

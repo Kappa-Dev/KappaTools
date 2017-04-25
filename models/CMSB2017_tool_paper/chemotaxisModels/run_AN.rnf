@@ -1,0 +1,74 @@
+#  Run NF script for the Assistance Neighborhood model of chemoreceptors
+#  Using this run script, you can present the system with external stimuli
+#  if the stimuli is encoded in a defined parameter.  This lets you measure
+#  response, as in Fig 2 of Hansen, Endres, & Wingreen, PLOS Comp. Bio, 4,(1) 2008.
+#
+
+#set all NFsim parameters here
+-xml AN.xml
+-utl 3
+
+# uncomment this below and create the dumpAN directory to have output directed
+# to that directory.  this output can then be used to construct such things as
+# the average activity over time of all the receptor clusters.
+#-dump [0:5:3300;]->dumpAN/  #used for calculating avg activity after the simulation
+
+#begin the script
+begin
+
+  echo running the AN model
+
+  ## wildtype default
+  #set Asp_Koff_TAR  0.02 #mM
+  #set Asp_Kon_TAR   0.5  #mM
+  #set Asp_Koff_TSR  100  #mM
+  #set Asp_Kon_TSR   10^6 #mM
+  #set TAR_COUNT 6
+  #set TSR_COUNT 13
+  
+  ## mutant 1: 
+  #set Asp_Koff_TAR  0.06 #mM
+  #set TAR_COUNT 19
+  #set TSR_COUNT 0
+  
+  ## mutant 2: 
+  #set Asp_Koff_TAR  0.02 #mM
+  #set TAR_COUNT 19
+  #set TSR_COUNT 0
+
+  #set AspConc 0.0
+  #update
+  eq 600
+  sim 300 300
+  
+  set AspConc 0.01
+  update
+  echo adding 0.01mM Aspartate
+  sim 600 600
+  
+  #uncomment below to add more steps
+  #set AspConc 0.1
+  #update
+  #echo adding 0.1mM Aspartate
+  #sim 600 600
+  
+  #set AspConc 1.0
+  #update
+  #echo adding 1.0mM Aspartate
+  #sim 600 600
+  
+  #set AspConc 10.0
+  #update
+  #echo adding 10mM Aspartate
+  #sim 600 600
+  
+  #set AspConc 100
+  #update
+  #echo adding 100mM Aspartate
+  #sim 600 600
+  
+  #output the rxns when we are finished
+  #print rxns
+  
+end
+  

@@ -1,0 +1,58 @@
+---------------------e1.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file e1.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e1 )
+WARNING: Removing old network file ./e1.net.
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./e1.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file e1.bngl.
+CPU TIME: total 0.02 s.
+
+real	0m0.249s
+user	0m0.206s
+sys	0m0.031s
+---------------------e1_sym.bngl---------------
+----------BNGL-----------
+BioNetGen version 2.2.6
+Reading from file e1_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e1_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      6 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Wrote network in net format to ./e1_sym.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file e1_sym.bngl.
+CPU TIME: total 0.02 s.
+
+real	0m0.215s
+user	0m0.190s
+sys	0m0.024s
