@@ -1837,10 +1837,11 @@ struct
         in
         let () = Sbml_backend.line_dotnet_or_sbml logger_buffer logger_err in
         let () =
-          if not (Sbml_backend.is_dotnet logger && propagate_constants)
-          then
             let () =
-              Sbml_backend.open_box_dotnet logger_buffer logger_err "begin parameters"
+              if propagate_constants
+              then ()
+              else
+                Sbml_backend.open_box_dotnet logger_buffer logger_err "begin parameters"
             in
             let () = Sbml_backend.line_dotnet logger_buffer logger_err in
             (*---------------------------------------------------------------*)
@@ -2110,7 +2111,7 @@ struct
                                      handler_expr rate
                                  with
                                  | Some _ ->
-                                   if not propagate_constants then
+                                   (* if not propagate_constants then*)
                                      Ode_loggers.associate ~propagate_constants
                                        (I.string_of_var_id ~compil logger)
                                        ~comment:rule.comment logger
@@ -2144,8 +2145,11 @@ struct
             Sbml_backend.close_box logger_buffer logger_err "listOfParameters"
           in
           let () =
-            Sbml_backend.close_box_dotnet logger_buffer logger_err
-              "end parameters"
+            if propagate_constants
+            then ()
+            else
+              Sbml_backend.close_box_dotnet logger_buffer logger_err
+                "end parameters"
           in
           ()
         in
