@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Mar 03 2017>
+ * Last modification: Time-stamp: <Apr 25 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -12,6 +12,7 @@
  * under the terms of the GNU Library General Public License *)
 
 let main () =
+  let start_time = Sys.time () in
   let errors = Exception.empty_error_handler in
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
@@ -144,6 +145,63 @@ let main () =
       state, None
   in
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
+  let () =
+    if Remanent_parameters.get_print_efficiency parameters
+    then
+      let end_time = Sys.time () in
+      let cpu_time = end_time -. start_time in
+      let handler, dead_rules, separating_transitions =
+        Export_to_KaSa.get_data state
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "CPU time: %g s." cpu_time
+      in
+      let () =
+        match
+          handler
+        with
+        | None -> ()
+        | Some l ->
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; rules: %i"
+            l.Cckappa_sig.nrules
+          in
+      let () =
+        match
+          dead_rules
+        with
+        | None -> ()
+        | Some l ->
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; dead rules: %i"
+            (List.length l)
+      in
+      let () =
+        match
+          separating_transitions
+        with
+        | None -> ()
+        | Some l ->
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "; separating transitions: %i"
+            (List.length l)
+      in
+      let () =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "."
+      in
+      let () =
+        Loggers.print_newline
+          (Remanent_parameters.get_logger parameters)
+      in
+      ()
+  in
   ()
 
 let () = main ()

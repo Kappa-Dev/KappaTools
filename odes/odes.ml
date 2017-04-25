@@ -170,7 +170,27 @@ struct
       max_stoch_coef: int;
       fictitious_species: id option;
       has_empty_lhs: bool option;
+      has_time_reaction: bool option;
     }
+
+  let get_data network =
+      network.n_rules,
+      begin
+        List.length (network.reactions)
+      - (match network.has_time_reaction
+         with Some true -> 1 | None | Some false -> 0)
+      end,
+      begin
+        (VarSet.fold
+           (fun a n ->
+              match a with Noccurrences _ | Nembed _ -> n+1
+                         | Token _ | Dummy -> n)
+           network.ode_variables
+           0)
+        - (match network.has_empty_lhs with
+            None | Some false -> 0
+          | Some true -> 1)
+      end
 
   let may_be_time_homogeneous_gen a =
     match
@@ -249,6 +269,7 @@ struct
       max_stoch_coef = 0 ;
       fictitious_species = None;
       has_empty_lhs = None;
+      has_time_reaction = None;
     }
 
   let from_nembed_correct compil nauto =
@@ -2525,6 +2546,7 @@ struct
                  (get_last_ode_var_id network))
               (Alg_expr.const Nbr.one) (handler_expr network)
           in
+          let network = {network with has_time_reaction = Some true } in
           let () = Ode_loggers.print_newline logger in
           let () = Sbml_backend.time_advance logger logger_err in
           ()

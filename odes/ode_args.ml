@@ -27,6 +27,7 @@ type t = {
   absolute_tolerance : float ref ;
   smash_reactions : bool ref ;
   propagate_constants : bool ref ;
+  print_efficiency : bool ref
 }
 
 let default : t =
@@ -55,6 +56,7 @@ let default : t =
     relative_tolerance = ref 0.001 ;
     smash_reactions = ref false ;
     propagate_constants = ref false ;
+    print_efficiency = ref false ;
   }
 
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
@@ -171,6 +173,10 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   Superarg.Float t.absolute_tolerance,
   "tolerance to absolute rounding errors",
   ["3_integration_settings"],Normal;
+  "--print-efficiency",
+  Superarg.Bool t.print_efficiency,
+  "prompt CPU time and various datas",
+  ["6_debug_mode"],Expert;
 ]
 
 let get_option options =

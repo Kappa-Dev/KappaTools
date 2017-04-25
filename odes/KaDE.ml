@@ -6,6 +6,7 @@
 module A = Odes.Make (Ode_interface)
 
 let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
+  let start_time = Sys.time () in
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
     "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--dotnet-output foo.net] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float]
@@ -319,6 +320,22 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let () = Loggers.flush_logger logger in
     let () = close_out out_channel in
+    let () =
+      if !(ode_args.Ode_args.print_efficiency)
+      then
+        let end_time = Sys.time () in
+        let cpu_time = end_time -. start_time in
+        let nrules, nreactions, nspecies = A.get_data network in
+        let () =
+          Format.printf
+            "CPU time: %g s.; %i rules; %i species; %i reactions."
+            cpu_time nrules nspecies nreactions
+        in
+        let () =
+          Format.print_newline ()
+        in
+        ()
+    in
     ()
   with
   | ExceptionDefn.Malformed_Decl er ->
