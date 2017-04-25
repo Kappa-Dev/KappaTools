@@ -193,11 +193,14 @@ let () =
       else None in
     let dumpIfDeadlocked = conf.Configuration.dumpIfDeadlocked in
     let maxConsecutiveClash = conf.Configuration.maxConsecutiveClash in
+    let deltaActivitiesFileName =
+      conf.Configuration.deltaActivitiesFileName in
     let () =
       if not kasim_args.Kasim_args.compileMode then
         Outputs.initial_inputs
           {Configuration.seed = Some theSeed;
            Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
+           Configuration.deltaActivitiesFileName;
            Configuration.traceFileName = user_trace_file;
            Configuration.newSyntax = true;
            Configuration.initial =
@@ -211,7 +214,7 @@ let () =
       ~batchmode:cli_args.Run_cli_args.batchmode
       plot_file;
     if not kasim_args.Kasim_args.compileMode then
-      Outputs.initialize trace_file plotPack env;
+      Outputs.initialize deltaActivitiesFileName trace_file plotPack env;
 
     let outputs = Outputs.go (Model.signatures env) in
     let () =
@@ -222,7 +225,9 @@ let () =
     let (stop,graph,state) =
       Eval.build_initial_state
         ~bind:(fun x f -> f x) ~return:(fun x -> x) ~outputs counter env
-        ~with_trace:(trace_file<>None) random_state init_l in
+        ~with_trace:(trace_file<>None)
+        ~with_delta_activities:(deltaActivitiesFileName<>None)
+        random_state init_l in
     let () = Format.printf " (%a)" Rule_interpreter.print_stats graph in
     let () = if kasim_args.Kasim_args.showEfficiency then
         Format.printf " took %fs" (Sys.time () -. cpu_time) in

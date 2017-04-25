@@ -10,8 +10,8 @@
 
 type t (** Abstract state *)
 
-val empty : Model.t -> (Nbr.t * int) list -> t
-(** [empty env stopping_times] *)
+val empty : with_delta_activities:bool -> Model.t -> (Nbr.t * int) list -> t
+(** [empty ~with_delta_activities env stopping_times] *)
 
 val initialize :
   bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->

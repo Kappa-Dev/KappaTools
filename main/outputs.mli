@@ -9,7 +9,7 @@
 (** Deal with simulation output *)
 
 val initialize :
-  string option -> (string * string * string array) option ->
+  string option -> string option -> (string * string * string array) option ->
   Model.t -> unit
 
 val initial_inputs :

@@ -15,6 +15,7 @@ type t = {
   plotPeriod : Counter.period option;
   seed : int option;
   traceFileName : string option;
+  deltaActivitiesFileName : string option;
 }
 
 val parse :

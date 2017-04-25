@@ -1,4 +1,5 @@
 %def: "displayCompression" "none" "weak" "strong"
+%def: "deltaActivitiesFileName" "activities.json"
 
 A(y),K(x) -> A(y!1),K(x!1) @10
 K(x!_) -> K(x) @1

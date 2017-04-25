@@ -127,7 +127,7 @@ let reinitialize random_state t =
   t.graph <- Rule_interpreter.empty
       ~with_trace:false
       random_state t.env t.counter;
-  t.state <- State_interpreter.empty t.env []
+  t.state <- State_interpreter.empty ~with_delta_activities:false t.env []
 
 let clone_t t =
   create_t
@@ -235,6 +235,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                    Format.fprintf log_form "%s@." s
                  | Data.Snapshot _
                  | Data.Flux _
+                 | Data.DeltaActivities _
                  | Data.Plot _
                  | Data.TraceStep _
                  | Data.Print _ -> assert false)
@@ -259,7 +260,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                   ~graph:(Rule_interpreter.empty
                             ~with_trace(*TODO conf.Eval.traceFileName*)
                             random_state env counter)
-                  ~state:(State_interpreter.empty env [])
+                  ~state:(State_interpreter.empty ~with_delta_activities:false env [])
                   ~init_l ~lastyield
                   ~kasa_state:(KaSa.init ~compil
                                  ~called_from:Remanent_parameters_sig.Server ())
@@ -289,6 +290,7 @@ let outputs (simulation : t) =
   function
   | Data.Flux flux_map ->
     simulation.flux_maps <- flux_map::simulation.flux_maps
+  | Data.DeltaActivities _ -> assert false
   | Data.Plot new_observables ->
     let new_values = prepare_plot_value new_observables in
     simulation.plot <-
@@ -435,6 +437,7 @@ let start
                      (fun () -> x >>= f))
                  ~return:Lwt.return ~outputs:(outputs t)
                  ~with_trace:parameter.Api_types_t.simulation_store_trace
+                 ~with_delta_activities:false
                  t.counter
                  t.env
                  random_state

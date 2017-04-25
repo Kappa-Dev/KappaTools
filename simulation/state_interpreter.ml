@@ -16,6 +16,7 @@ type t = {
   activities : Random_tree.tree;
   (* pair numbers are regular rule, odd unary instances *)
   mutable flux: (Data.flux_data) list;
+  with_delta_activities : bool;
 }
 
 let initial_activity env counter graph activities =
@@ -30,7 +31,7 @@ let initial_activity env counter graph activities =
          | Some rate -> Random_tree.add (2*i) rate activities)
     () env
 
-let empty env stopping_times =
+let empty ~with_delta_activities env stopping_times =
   let activity_tree =
     Random_tree.create (2*Model.nb_rules env) in
   let stops =
@@ -45,6 +46,7 @@ let empty env stopping_times =
       Array.make (Model.nb_perturbations env) true;
     activities = activity_tree;
     flux = [];
+    with_delta_activities;
   }
 
 let observables_values env graph counter =
@@ -244,10 +246,11 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
   let act_stack = ref [] in
   let register_new_activity rd_id syntax_rd_id new_act =
     let () =
-      match state.flux with
-      | [] -> ()
-      | l ->
+      match state.flux, state.with_delta_activities with
+      | [], false -> ()
+      | l,_ ->
         let old_act = Random_tree.find rd_id state.activities in
+        let () = act_stack := (syntax_rd_id,(old_act,new_act))::!act_stack in
         List.iter
           (fun fl ->
              Fluxmap.incr_flux_flux
@@ -257,7 +260,6 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
                    match fl.Data.flux_kind with
                    | Primitives.ABSOLUTE -> new_act -. old_act
                    | Primitives.PROBABILITY ->
-                     let () = act_stack := (syntax_rd_id,new_act)::!act_stack in
                     -. (old_act /. prev_activity)
                    | Primitives.RELATIVE ->
                      if (match classify_float old_act with
@@ -277,9 +279,13 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
           l
     in Random_tree.add rd_id new_act state.activities in
   let finalize_registration () =
-    match state.flux with
-    | [] -> ()
-    | l ->
+    match state.flux, state.with_delta_activities with
+    | [], false -> ()
+    | l, _ ->
+      let () =
+        if state.with_delta_activities then
+          outputs (Data.DeltaActivities
+                     (rule.Primitives.syntactic_rule,!act_stack)) in
       let n_activity = Random_tree.total state.activities in
       let () =
         List.iter
@@ -289,10 +295,10 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
              | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
              | Primitives.PROBABILITY ->
                List.iter
-                 (fun (syntax_rd_id,new_act) ->
+                 (fun (syntax_rd_id,(_,new_act)) ->
                     Fluxmap.incr_flux_flux
                       rule.Primitives.syntactic_rule syntax_rd_id
-                      (let cand = new_act /.n_activity in
+                      (let cand = new_act /. n_activity in
                        match classify_float cand with
                        | (FP_nan | FP_infinite) ->
                          let () =

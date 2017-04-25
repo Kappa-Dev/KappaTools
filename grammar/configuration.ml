@@ -15,6 +15,7 @@ type t = {
   plotPeriod : Counter.period option;
   seed : int option;
   traceFileName : string option;
+  deltaActivitiesFileName : string option;
 }
 
 let empty = {
@@ -26,6 +27,7 @@ let empty = {
   traceFileName = None;
   plotPeriod = None;
   outputFileName = None;
+  deltaActivitiesFileName = None;
 }
 
 let parse result =
@@ -128,6 +130,11 @@ let parse result =
           (fun s _ ->
                ({ conf with traceFileName = Some s },
                 progress,story_compression,formatCflow,cflowFile))
+      | "deltaActivitiesFileName" ->
+        get_value pos_p param value_list
+          (fun s _ ->
+               ({ conf with deltaActivitiesFileName = Some s },
+                progress,story_compression,formatCflow,cflowFile))
 
       | "progressBarSize" ->
          (conf,{ progress with
@@ -199,4 +206,7 @@ let print f conf =
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"traceFileName\" \"%s\"@,")
       f conf.traceFileName in
+  let () = Pp.option ~with_space:false
+      (fun f -> Format.fprintf f "%%def: \"deltaActivitiesFileName\" \"%s\"@,")
+      f conf.deltaActivitiesFileName in
   Format.pp_close_box f ()

@@ -44,5 +44,5 @@ val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
   outputs:(Data.t -> unit) -> Counter.t -> Model.t -> with_trace:bool ->
-  Random.State.t ->
+  with_delta_activities:bool -> Random.State.t ->
   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'a

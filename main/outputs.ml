@@ -145,6 +145,39 @@ let output_flux out =
   then json_of_flux out
   else dot_of_flux out
 
+let actsDescr = ref None
+let emptyActs = ref true
+
+let init_activities env = function
+  | None -> ()
+  | Some s ->
+    let desc = Kappa_files.open_out s in
+    let form = Format.formatter_of_out_channel desc in
+    let nb_r = Model.nb_syntactic_rules env in
+    let () = actsDescr := Some (desc,form,nb_r) in
+    Format.fprintf form "@[<v>[@,"
+
+let close_activities () =
+  match !actsDescr with
+  | None -> ()
+  | Some (c,f,_) ->
+    let () = Format.fprintf f "@,]@." in
+    close_out c
+
+let output_activities r flux =
+  match !actsDescr with
+  | None -> ()
+  | Some (_,f,last) ->
+    let () =
+      if !emptyActs then emptyActs := false else Format.fprintf f ",@," in
+    let () = Format.fprintf f "@[[%i" r in
+    let () =
+      for i = 0 to last do
+        let k,k' = try List.assoc i flux with Not_found -> 0.,0. in
+        Format.fprintf f ",%f" (k'-.k)
+      done in
+    Format.fprintf f "]@]"
+
 type fd = {
   desc:out_channel;
   form:Format.formatter;
@@ -187,7 +220,7 @@ let close_trace () =
     let () = close_out desc in
     traceDescr := None
 
-let initialize trace_file plotPack env =
+let initialize activities_file trace_file plotPack env =
   let () =
     match trace_file with
     | None -> ()
@@ -198,6 +231,7 @@ let initialize trace_file plotPack env =
       let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
       let () = output_string desc ",\n\"trace\":[" in
       traceDescr := Some desc in
+  let () = init_activities env activities_file in
   match plotPack with
   | None -> ()
   | Some pack -> plotDescr := Some (StandBy pack)
@@ -276,6 +310,7 @@ let snapshot env s =
 let go env = function
   | Data.Snapshot s -> snapshot env s
   | Data.Flux f -> output_flux f
+  | Data.DeltaActivities (r,flux) -> output_activities r flux
   | Data.Plot x -> plot_now x
   | Data.Print p ->
     let desc =
@@ -311,6 +346,7 @@ let close_input ?event () =
 let close ?event () =
   let () = close_plot () in
   let () = close_trace () in
+  let () = close_activities () in
   let () = close_input ?event () in
   close_desc ()
 
