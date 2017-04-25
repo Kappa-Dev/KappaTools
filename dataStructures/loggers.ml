@@ -76,7 +76,8 @@ type t =
     edges_map: Graph_loggers_sig.options list list Mods.String2Map.t ref ;
     env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot VarMap.t ref ;
     const: VarSet.t ref;
-    id_of_parameters: string VarMap.t ref
+    id_of_parameters: string VarMap.t ref;
+    dangerous_parameters: VarSet.t ref
   }
 
 let refresh_id t =
@@ -104,6 +105,7 @@ let dummy_html_logger =
     env = ref VarMap.empty;
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
+    dangerous_parameters = ref VarSet.empty;
   }
 
 let dummy_txt_logger =
@@ -122,6 +124,7 @@ let dummy_txt_logger =
     env = ref VarMap.empty;
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
+    dangerous_parameters = ref VarSet.empty;
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -337,7 +340,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       env = ref VarMap.empty;
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
-
+      dangerous_parameters = ref VarSet.empty;
     }
   in
   let () = print_preamble logger in
@@ -360,6 +363,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       env = ref VarMap.empty;
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
+      dangerous_parameters = ref VarSet.empty;
     }
   in
   let () = print_preamble logger in
@@ -381,6 +385,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     env = ref VarMap.empty;
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
+    dangerous_parameters = ref VarSet.empty;
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
@@ -400,6 +405,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       env = ref VarMap.empty;
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
+      dangerous_parameters = ref VarSet.empty;
     }
   in
   let () = print_preamble logger in
@@ -506,6 +512,32 @@ let get_expr t v =
   | Not_found ->
     None
 
+let set_dangerous_global_parameter_name t var =
+  t.dangerous_parameters := VarSet.add var (!(t.dangerous_parameters))
+
+let forbidden_char c =
+  match c with
+    '*' | '+' | '-' | '(' | ')' -> true
+  | _ -> false
+
+let has_forbidden_char t string =
+  (match get_encoding_format t
+   with
+     DOTNET -> true
+   | Matrix | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+   | Octave | Matlab | Maple | Mathematica | Json | SBML -> false)
+  &&
+  let rec aux k n =
+    if k=n then false
+    else forbidden_char (string.[k]) || aux (k+1) n
+  in
+  aux 0 (String.length string)
+
+let flag_dangerous t id string =
+  if has_forbidden_char t string
+  then
+    set_dangerous_global_parameter_name t id
+
 let set_expr t v expr =
   let const = Ode_loggers_sig.is_expr_const expr in
   let () =
@@ -531,7 +563,11 @@ let get_id_of_global_parameter t var =
     Not_found -> ""
 
 let set_id_of_global_parameter t var id =
-  t.id_of_parameters := VarMap.add var id (!(t.id_of_parameters))
+  let () = t.id_of_parameters := VarMap.add var id (!(t.id_of_parameters)) in
+  flag_dangerous t var id
+
+let is_dangerous_ode_variable t var =
+     VarSet.mem var (!(t.dangerous_parameters))
 
 let dump_json logger json =
   let channel_opt = channel_of_logger logger in

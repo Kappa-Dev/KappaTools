@@ -1435,7 +1435,7 @@ let print_comment
       | Loggers.TXT_Tabular
       | Loggers.XLS -> ()
 
-let associate ?init_mode:(init_mode=false) ?comment:(comment="")
+let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(comment="")
     string_of_var_id logger logger_buffer logger_err variable alg_expr network_handler =
   let () = Loggers.set_expr logger variable alg_expr in
   match
@@ -1576,30 +1576,40 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
   | Loggers.DOTNET ->
     let doit () =
       let id = string_of_variable_sbml string_of_var_id variable in
-      let () =
-        Loggers.fprintf logger_buffer
-          "%s %s "
-          (Sbml_backend.dotnet_id_of_logger logger)
-          id
-      in
-      let () =
-        print_alg_expr_few_parenthesis
-          ~init_mode string_of_var_id logger_buffer logger_err
-          alg_expr network_handler in
-      let () = Loggers.print_newline logger_buffer in
-      ()
+      let () = Loggers.flag_dangerous logger variable id in
+      if not (Loggers.is_dangerous_ode_variable logger variable)
+      then
+        let () =
+          Loggers.fprintf logger_buffer
+            "%s %s "
+            (Sbml_backend.dotnet_id_of_logger logger)
+            id
+        in
+        let alg_expr =
+          Sbml_backend.propagate_dangerous_var_names_in_alg_expr
+            logger network_handler alg_expr
+        in
+        let () =
+          print_alg_expr_few_parenthesis
+            ~init_mode string_of_var_id logger_buffer logger_err
+            alg_expr network_handler in
+        let () = Loggers.print_newline logger_buffer in
+        ()
     in
     let doit_const cst =
       let id = string_of_variable_sbml string_of_var_id variable in
-      let () =
-        Loggers.fprintf logger_buffer
-          "%s %s %s"
-          (Sbml_backend.dotnet_id_of_logger logger)
-          id
-          (Nbr.to_string cst)
-      in
-      let () = Loggers.print_newline logger_buffer in
-      ()
+      let () = Loggers.flag_dangerous logger variable id in
+      if not (Loggers.is_dangerous_ode_variable logger variable)
+      then
+        let () =
+          Loggers.fprintf logger_buffer
+            "%s %s %s"
+            (Sbml_backend.dotnet_id_of_logger logger)
+            id
+            (Nbr.to_string cst)
+        in
+        let () = Loggers.print_newline logger_buffer in
+        ()
     in
     begin
       match variable, init_mode with
@@ -1620,6 +1630,8 @@ let associate ?init_mode:(init_mode=false) ?comment:(comment="")
       | Ode_loggers_sig.Rateund _,_ ->
         if Ode_loggers_sig.is_expr_const alg_expr then
           doit ()
+        else if not propagate_constants
+        then doit ()
       | Ode_loggers_sig.Stochiometric_coef _,_
       | Ode_loggers_sig.Jacobian_rate (_,_),_
       | Ode_loggers_sig.Jacobian_rateun (_,_),_
