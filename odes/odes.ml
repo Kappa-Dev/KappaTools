@@ -2527,17 +2527,20 @@ struct
     in
     (*------------------------------------------------------------*)
     (* Derivative of time is equal to 1 *)
-    let () =
+    let network =
       if may_be_not_time_homogeneous network
       then
         if Sbml_backend.is_dotnet logger
         then
           let s = "DOTNET backend does not support time dependent expressions\n" in
           let () = Printf.printf "%s" s in
+          let () =
             Sbml_backend.print_comment
               logger
               logger_err
               s
+          in
+          network
         else
           let () =
             Ode_loggers.associate ~propagate_constants
@@ -2549,9 +2552,9 @@ struct
           let network = {network with has_time_reaction = Some true } in
           let () = Ode_loggers.print_newline logger in
           let () = Sbml_backend.time_advance logger logger_err in
-          ()
+          network
       else
-        ()
+        network
     in
     let () = Ode_loggers.close_procedure logger in
     let () = Sbml_backend.close_box logger logger_err label in
@@ -2567,7 +2570,7 @@ struct
     in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
-    ()
+    network
 
   let export_jac ~propagate_constants logger logger_err compil network split =
     let nodevar = get_last_ode_var_id network in
@@ -3094,7 +3097,7 @@ struct
               Loggers.flush_and_clean logger_err fmt
     in
     let () = Format.printf "\t -ode system @." in
-    let () =
+    let network =
       export_dydt ~propagate_constants ~show_time_advance logger logger_err compil network sorted_rules_and_decl
     in
     let () =
@@ -3116,7 +3119,7 @@ struct
         ~max_t ?plot_period
         logger logger_buffer logger_err compil network sorted_rules_and_decl
     in
-    ()
+    network
 
   let get_reactions network =
     let list = get_reactions network in
