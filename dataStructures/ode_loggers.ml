@@ -1574,93 +1574,97 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
       ()
     end
   | Loggers.DOTNET ->
-    let doit () =
-      let id = string_of_variable_sbml string_of_var_id variable in
-      let () = Loggers.flag_dangerous logger variable id in
-      if not (Loggers.is_dangerous_ode_variable logger variable)
-      then
-        let () =
-          Loggers.fprintf logger_buffer
-            "%s %s "
-            (Sbml_backend.dotnet_id_of_logger logger)
-            id
-        in
-        let alg_expr =
-          Sbml_backend.propagate_dangerous_var_names_in_alg_expr
-            logger network_handler alg_expr
-        in
-        let () =
-          print_alg_expr_few_parenthesis
-            ~init_mode string_of_var_id logger_buffer logger_err
-            alg_expr network_handler in
-        let () = Loggers.print_newline logger_buffer in
-        ()
-    in
-    let doit_const cst =
-      let id = string_of_variable_sbml string_of_var_id variable in
-      let () = Loggers.flag_dangerous logger variable id in
-      if not (Loggers.is_dangerous_ode_variable logger variable)
-      then
-        let () =
-          Loggers.fprintf logger_buffer
-            "%s %s %s"
-            (Sbml_backend.dotnet_id_of_logger logger)
-            id
-            (Nbr.to_string cst)
-        in
-        let () = Loggers.print_newline logger_buffer in
-        ()
-    in
-    begin
-      match variable, init_mode with
-      | (Ode_loggers_sig.Tinit |
-         Ode_loggers_sig.Tend |
-         Ode_loggers_sig.Period_t_points
-        ) ,_ -> doit ()
-      | Ode_loggers_sig.Expr _ , true ->
-        begin
-          match Sbml_backend.eval_const_alg_expr logger network_handler alg_expr
-          with
-          | Some cst -> doit_const cst
-          | None -> ()
-        end
-      | Ode_loggers_sig.Rate _,_
-      | Ode_loggers_sig.Rated _,_
-      | Ode_loggers_sig.Rateun _,_
-      | Ode_loggers_sig.Rateund _,_ ->
-        if Ode_loggers_sig.is_expr_const alg_expr then
-          doit ()
-        else if not propagate_constants
-        then doit ()
-      | Ode_loggers_sig.Stochiometric_coef _,_
-      | Ode_loggers_sig.Jacobian_rate (_,_),_
-      | Ode_loggers_sig.Jacobian_rateun (_,_),_
-      | Ode_loggers_sig.Jacobian_rated _,_
-      | Ode_loggers_sig.Jacobian_rateund (_,_),_
-      | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
-      | Ode_loggers_sig.Expr _ , _
-      | Ode_loggers_sig.Init _, _
-      | Ode_loggers_sig.Initbis _, _
-      | Ode_loggers_sig.Concentration _,_
-      | Ode_loggers_sig.Deriv _,_
-      | Ode_loggers_sig.Obs _,_
-      | Ode_loggers_sig.Jacobian _,_
-      | Ode_loggers_sig.Jacobian_var _,_
-      | Ode_loggers_sig.MaxStep, _
-      | Ode_loggers_sig.InitialStep,_
-      | Ode_loggers_sig.AbsTol,_
-      | Ode_loggers_sig.RelTol,_
-      | Ode_loggers_sig.N_rules,_
-      | Ode_loggers_sig.N_ode_var,_
-      | Ode_loggers_sig.N_max_stoc_coef,_
-      | Ode_loggers_sig.N_var,_
-      | Ode_loggers_sig.N_obs,_
-      | Ode_loggers_sig.N_rows,_
-      | Ode_loggers_sig.Tmp,_
-      | Ode_loggers_sig.Time_scale_factor,_
-      | Ode_loggers_sig.NonNegative,_
-      | Ode_loggers_sig.Current_time,_ -> ()
-    end
+    if propagate_constants
+    then ()
+    else
+      let doit () =
+        let id = string_of_variable_sbml string_of_var_id variable in
+        let () = Loggers.flag_dangerous logger variable id in
+        if not (Loggers.is_dangerous_ode_variable logger variable)
+        then
+          let () =
+            Loggers.fprintf logger_buffer
+              "%s %s "
+              (Sbml_backend.dotnet_id_of_logger logger)
+              id
+          in
+          let alg_expr =
+            Sbml_backend.propagate_dangerous_var_names_in_alg_expr
+              logger network_handler alg_expr
+          in
+          let () =
+            print_alg_expr_few_parenthesis
+              ~init_mode string_of_var_id logger_buffer logger_err
+              alg_expr network_handler in
+          let () = Loggers.print_newline logger_buffer in
+          ()
+      in
+      let doit_const cst =
+        let id = string_of_variable_sbml string_of_var_id variable in
+        let () = Loggers.flag_dangerous logger variable id in
+        if not (Loggers.is_dangerous_ode_variable logger variable)
+        then
+          let () =
+            Loggers.fprintf logger_buffer
+              "%s %s %s"
+              (Sbml_backend.dotnet_id_of_logger logger)
+              id
+              (Nbr.to_string cst)
+          in
+          let () = Loggers.print_newline logger_buffer in
+          ()
+      in
+      begin
+        match variable, init_mode with
+        | (Ode_loggers_sig.Tinit |
+           Ode_loggers_sig.Tend |
+           Ode_loggers_sig.Period_t_points
+          ) ,_ -> doit ()
+        | Ode_loggers_sig.Expr _ , true ->
+          begin
+            match Sbml_backend.eval_const_alg_expr
+                    logger network_handler alg_expr
+            with
+            | Some cst -> doit_const cst
+            | None -> ()
+          end
+        | Ode_loggers_sig.Rate _,_
+        | Ode_loggers_sig.Rated _,_
+        | Ode_loggers_sig.Rateun _,_
+        | Ode_loggers_sig.Rateund _,_ ->
+          if Ode_loggers_sig.is_expr_const alg_expr then
+            doit ()
+          else if not propagate_constants
+          then doit ()
+        | Ode_loggers_sig.Stochiometric_coef _,_
+        | Ode_loggers_sig.Jacobian_rate (_,_),_
+        | Ode_loggers_sig.Jacobian_rateun (_,_),_
+        | Ode_loggers_sig.Jacobian_rated _,_
+        | Ode_loggers_sig.Jacobian_rateund (_,_),_
+        | Ode_loggers_sig.Jacobian_stochiometric_coef _,_
+        | Ode_loggers_sig.Expr _ , _
+        | Ode_loggers_sig.Init _, _
+        | Ode_loggers_sig.Initbis _, _
+        | Ode_loggers_sig.Concentration _,_
+        | Ode_loggers_sig.Deriv _,_
+        | Ode_loggers_sig.Obs _,_
+        | Ode_loggers_sig.Jacobian _,_
+        | Ode_loggers_sig.Jacobian_var _,_
+        | Ode_loggers_sig.MaxStep, _
+        | Ode_loggers_sig.InitialStep,_
+        | Ode_loggers_sig.AbsTol,_
+        | Ode_loggers_sig.RelTol,_
+        | Ode_loggers_sig.N_rules,_
+        | Ode_loggers_sig.N_ode_var,_
+        | Ode_loggers_sig.N_max_stoc_coef,_
+        | Ode_loggers_sig.N_var,_
+        | Ode_loggers_sig.N_obs,_
+        | Ode_loggers_sig.N_rows,_
+        | Ode_loggers_sig.Tmp,_
+        | Ode_loggers_sig.Time_scale_factor,_
+        | Ode_loggers_sig.NonNegative,_
+        | Ode_loggers_sig.Current_time,_ -> ()
+      end
 
   | Loggers.SBML ->
     begin
