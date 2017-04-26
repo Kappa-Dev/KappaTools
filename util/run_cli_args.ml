@@ -55,14 +55,14 @@ let default : t = {
 let default_gui =
   {
     alg_var_overwrite_gui = ref[];
-    minValue_gui = ref None;
-    maxValue_gui = ref None;
-    plotPeriod_gui = ref None;
-    rescale_gui = ref None;
+    minValue_gui = ref (Some 0.);
+    maxValue_gui = ref  (Some 1.);
+    plotPeriod_gui = ref (Some 0.01);
+    rescale_gui = ref (Some 1.);
     marshalizedInFile_gui = ref "";
     inputKappaFileNames_gui = ref [];
     (*  initialMix_gui = ref None;*)
-    outputDataFile_gui = ref None;
+    outputDataFile_gui = ref (Some "data.csv");
     outputDirectory_gui = ref ".";
     batchmode_gui  = ref "";
     newSyntax_gui = ref false;
@@ -165,12 +165,12 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
      (fun outputDataFile -> t.outputDataFile <- Some outputDataFile),
    Superarg.String_opt t_gui.outputDataFile_gui,
    "file name for data output",
-   ["0_model"; "3_integration_settings"], Superarg.Normal) ;
+   ["0_model"; "3_integration_settings"], Superarg.Hidden) ;
   ("-d",
    Arg.String (fun outputDirectory -> t.outputDirectory <- outputDirectory),
    Superarg.String t_gui.outputDirectory_gui,
    "Specifies directory name where output file(s) should be stored",
-   ["0_model"; "3_integration_settings"], Superarg.Normal) ;
+   ["0_model"; "2_semantics" ; "3_integration_settings"], Superarg.Normal) ;
   ("-load-sim",
    Arg.String (fun file -> t.marshalizedInFile <- file),
    Superarg.String t_gui.marshalizedInFile_gui,
@@ -202,6 +202,15 @@ let options t =
     (List.rev (options_gen t default_gui))
 
 let options_gui t_gui =
-  List.rev_map
+  (List.rev_map
     (fun (a,_,b,c,d,e) -> a,b,c,d,e)
-    (List.rev (options_gen default t_gui))
+    (List.rev (options_gen default t_gui)))
+  @[
+    "--output-plot",
+  Superarg.String_opt t_gui.outputDataFile_gui,
+  "file name for data output",
+  ["1_output";"2_semantics";"3_integration_settings"],Normal;
+  "--data-file",
+  Superarg.String_opt t_gui.outputDataFile_gui,
+  "file name for data output",
+  ["1_output";"2_semantics";"3_integration_settings"],Hidden;]
