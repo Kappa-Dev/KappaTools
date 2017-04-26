@@ -14,6 +14,7 @@ type t = {
   mathematica_output : string option ref ;
   sbml_output : string option ref ;
   dotnet_output : string option ref ;
+  data_file : string option ref ;
   with_symmetries : string ref ;
   show_symmetries : bool ref ;
   views : bool ref ;
@@ -37,12 +38,13 @@ let default : t =
     count = ref "Embeddings" ;
     show_reactions = ref true ;
     compute_jacobian = ref true ;
-    dotnet_output = ref None ;
-    octave_output = ref None  ;
-    matlab_output = ref None ;
-    maple_output = ref None ;
-    mathematica_output = ref None ;
-    sbml_output = ref None ;
+    dotnet_output = ref (Some "network.net") ;
+    octave_output = ref (Some "ode.m")  ;
+    matlab_output = ref (Some "ode.m") ;
+    maple_output = ref (Some "ode.mws") ;
+    mathematica_output = ref (Some "ode.nb") ;
+    sbml_output = ref (Some "network.xml") ;
+    data_file = ref (Some "data.csv") ;
     with_symmetries = ref "None" ;
     show_symmetries = ref false ;
     views = ref true ;
