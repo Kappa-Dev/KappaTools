@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <Apr 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -85,16 +85,12 @@ sig
   val output_symmetries:
     ?logger:Loggers.t ->
     ?accuracy_level:Remanent_state.accuracy_level ->
-<<<<<<< HEAD
-      state -> state
-=======
     state -> state
 
   val get_data:
     state ->
     Cckappa_sig.kappa_handler option * Remanent_state.dead_rules
     option * Remanent_state.separating_transitions option
->>>>>>> 1f2c023d8... --print-efficiency in KaSa and KaDe
 end
 
 module Export =
