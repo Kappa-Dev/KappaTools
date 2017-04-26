@@ -22,7 +22,7 @@ initialstep=1e-05;
 maxstep=0.02;
 reltol=0.001;
 abstol=0.001;
-period=1;
+period=0.01;
 
 nonnegative=false;
 global nodevar
