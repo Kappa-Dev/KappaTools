@@ -168,7 +168,7 @@ Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Wrote network in net format to ./e1_sym.net.
 CPU TIME: generate_network 0.01 s.
 Finished processing file e1_sym.bngl.
-CPU TIME: total 0.02 s.
+CPU TIME: total 	 s.
 ----------BNGL_without_symmetries-----------
 BioNetGen version 2.2.6
 Reading from file e1.bngl (level 0)

@@ -1,0 +1,21 @@
+Correspondence between the short and original species names from:
+	/Users/quyen/KaSim/models/CMSB2017_tool_paper/multisite_phos/network_e2_wo_sym.net
+
+s0	: S(p1~U,p2~U)
+s1	: F(s)
+s2	: E(s)
+s3	: E(s!1).S(p1~U!1,p2~U)
+s4	: E(s!1).S(p1~U,p2~U!1)
+s5	: E(s!1).S(p1~U!1,p2~U!2).E(s!2)
+s6	: S(p1~U,p2~P)
+s7	: E(s!1).S(p1~U!1,p2~P)
+s8	: S(p1~U,p2~P!1).F(s!1)
+s9	: E(s!1).S(p1~U!1,p2~P!2).F(s!2)
+s10	: S(p1~P,p2~P!1).F(s!1)
+s11	: S(p1~P!1,p2~P!2).F(s!1).F(s!2)
+s12	: S(p1~P,p2~P)
+s13	: S(p1~P,p2~U)
+s14	: S(p1~P!1,p2~U).F(s!1)
+s15	: E(s!1).S(p1~P,p2~U!1)
+s16	: E(s!1).S(p1~P!2,p2~U!1).F(s!2)
+s17	: S(p1~P!1,p2~P).F(s!1)
