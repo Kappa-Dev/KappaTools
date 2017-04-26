@@ -1,0 +1,58 @@
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-3014-g7f694d7))
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Analysis launched at 2017/04/26 14:53:46 (GMT+2) on wf173.di.ens.fr
+#Command line is: KaSa e9.ka --print-efficiency --compute-symmetries
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "s" shape =circle color = yellow size = "5"]
+label =  "E";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "s" shape =circle color = yellow size = "5"]
+label =  "F";  shape = rectangle; color = red
+} ; 
+subgraph cluster2 {
+   2.0 [style = filled label = "p1" shape =ellipse color = green size = "5"]
+   2.1 [style = filled label = "p2" shape =ellipse color = green size = "5"]
+   2.2 [style = filled label = "p3" shape =ellipse color = green size = "5"]
+   2.3 [style = filled label = "p4" shape =ellipse color = green size = "5"]
+   2.4 [style = filled label = "p5" shape =ellipse color = green size = "5"]
+   2.5 [style = filled label = "p6" shape =ellipse color = green size = "5"]
+   2.6 [style = filled label = "p7" shape =ellipse color = green size = "5"]
+   2.7 [style = filled label = "p8" shape =ellipse color = green size = "5"]
+   2.8 [style = filled label = "p9" shape =ellipse color = green size = "5"]
+   2.9 [style = filled label = "p1" shape =circle color = yellow size = "5"]
+   2.10 [style = filled label = "p2" shape =circle color = yellow size = "5"]
+   2.11 [style = filled label = "p3" shape =circle color = yellow size = "5"]
+   2.12 [style = filled label = "p4" shape =circle color = yellow size = "5"]
+   2.13 [style = filled label = "p5" shape =circle color = yellow size = "5"]
+   2.14 [style = filled label = "p6" shape =circle color = yellow size = "5"]
+   2.15 [style = filled label = "p7" shape =circle color = yellow size = "5"]
+   2.16 [style = filled label = "p8" shape =circle color = yellow size = "5"]
+   2.17 [style = filled label = "p9" shape =circle color = yellow size = "5"]
+label =  "S";  shape = rectangle; color = red
+} ; 
+0.0 -- 2.9
+0.0 -- 2.10
+0.0 -- 2.11
+0.0 -- 2.12
+0.0 -- 2.13
+0.0 -- 2.14
+0.0 -- 2.15
+0.0 -- 2.16
+0.0 -- 2.17
+1.0 -- 2.9
+1.0 -- 2.10
+1.0 -- 2.11
+1.0 -- 2.12
+1.0 -- 2.13
+1.0 -- 2.14
+1.0 -- 2.15
+1.0 -- 2.16
+1.0 -- 2.17
+}

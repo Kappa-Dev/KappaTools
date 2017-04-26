@@ -1,9 +1,0 @@
-Correspondence between the short and original species names from:
-	/Users/quyen/KaSim/models/CMSB2017_tool_paper/multisite_phos/e1/e1_sym.net
-
-s0	: E(s)
-s1	: F(s)
-s2	: S(p~U)
-s3	: E(s!1).S(p~U!1)
-s4	: F(s!1).S(p~P!1)
-s5	: S(p~P)

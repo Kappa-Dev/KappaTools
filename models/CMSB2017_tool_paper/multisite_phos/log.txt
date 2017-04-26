@@ -1,0 +1,2169 @@
+--------------------------------------
+- e1.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.006645 s.; 6 rules; 6 species; 6 reactions.
+----------with_symmetries_forward-----------
+Parsing e1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
+Parsing e1.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.007164 s.; 6 rules; 6 species; 6 reactions.
+----------with_symmetries_backward-----------
+Parsing e1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
+Parsing e1.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.010555 s.; 6 rules; 6 species; 6 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:36:25 (GMT+2) on wf173.di.ens.fr
+Parsing e1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
+Parsing e1.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) ]
+F() => [ F(s) v F(s!S.p1) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+In rules and initial states:
+In rules and algebraic expression:
+execution finished without any exception
+CPU time: 0.009136 s.; rules: 6; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e1_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e1_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      6 rxns  1.00e-02 CPU s
+Iteration   3:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./e1_sym.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file e1_sym.bngl.
+CPU TIME: total 0.02 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e1.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e1 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     5 species      3 rxns  1.00e-02 CPU s
+Iteration   3:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./e1.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file e1.bngl.
+CPU TIME: total 0.02 s.
+--------------------------------------
+- e2.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.010567 s.; 12 rules; 18 species; 48 reactions.
+----------with_symmetries_forward-----------
+Parsing e2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing e2.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.013465 s.; 12 rules; 12 species; 30 reactions.
+----------with_symmetries_backward-----------
+Parsing e2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing e2.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.012858 s.; 12 rules; 12 species; 30 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:36:26 (GMT+2) on wf173.di.ens.fr
+Parsing e2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing e2.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2}
+************
+execution finished without any exception
+CPU time: 0.008969 s.; rules: 12; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e2_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e2_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     8 species      8 rxns  1.00e-02 CPU s
+Iteration   4:    10 species     14 rxns  0.00e+00 CPU s
+Iteration   5:    11 species     19 rxns  1.00e-02 CPU s
+Iteration   6:    12 species     22 rxns  0.00e+00 CPU s
+Iteration   7:    12 species     24 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 2.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   2:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    24 reactions 3.00e-02 CPU s 1.25e-03 CPU s/rxn
+Wrote network in net format to ./e2_sym.net.
+CPU TIME: generate_network 0.03 s.
+Finished processing file e2_sym.bngl.
+CPU TIME: total 0.04 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e2.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 8 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e2 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     8 species      8 rxns  0.00e+00 CPU s
+Iteration   3:    12 species     16 rxns  1.00e-02 CPU s
+Iteration   4:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     38 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     44 rxns  1.00e-02 CPU s
+Iteration   7:    18 species     48 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     8 reactions 2.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   6:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   7:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   8:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    48 reactions 5.00e-02 CPU s 1.04e-03 CPU s/rxn
+Wrote network in net format to ./e2.net.
+CPU TIME: generate_network 0.05 s.
+Finished processing file e2.bngl.
+CPU TIME: total 0.07 s.
+--------------------------------------
+- e3.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.038558 s.; 18 rules; 66 species; 288 reactions.
+----------with_symmetries_forward-----------
+Parsing e3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
+Parsing e3.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.025061 s.; 18 rules; 22 species; 90 reactions.
+----------with_symmetries_backward-----------
+Parsing e3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
+Parsing e3.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.03074 s.; 18 rules; 22 species; 90 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:36:27 (GMT+2) on wf173.di.ens.fr
+Parsing e3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
+Parsing e3.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3}
+************
+execution finished without any exception
+CPU time: 0.014341 s.; rules: 18; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e3_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e3_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    12 species     18 rxns  1.00e-02 CPU s
+Iteration   5:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     39 rxns  1.00e-02 CPU s
+Iteration   7:    20 species     48 rxns  1.00e-02 CPU s
+Iteration   8:    21 species     55 rxns  1.00e-02 CPU s
+Iteration   9:    22 species     58 rxns  0.00e+00 CPU s
+Iteration  10:    22 species     60 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    20 reactions 1.00e-02 CPU s 5.00e-04 CPU s/rxn
+Rule   2:    10 reactions 3.00e-02 CPU s 3.00e-03 CPU s/rxn
+Rule   3:    20 reactions 3.00e-02 CPU s 1.50e-03 CPU s/rxn
+Rule   4:    10 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    60 reactions 7.00e-02 CPU s 1.17e-03 CPU s/rxn
+Wrote network in net format to ./e3_sym.net.
+CPU TIME: generate_network 0.07 s.
+Finished processing file e3_sym.bngl.
+CPU TIME: total 0.08 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e3.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 12 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e3 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      3 rxns  0.00e+00 CPU s
+Iteration   2:    12 species     15 rxns  2.00e-02 CPU s
+Iteration   3:    22 species     39 rxns  2.00e-02 CPU s
+Iteration   4:    34 species     81 rxns  4.00e-02 CPU s
+Iteration   5:    46 species    135 rxns  5.00e-02 CPU s
+Iteration   6:    56 species    189 rxns  6.00e-02 CPU s
+Iteration   7:    62 species    237 rxns  5.00e-02 CPU s
+Iteration   8:    65 species    267 rxns  4.00e-02 CPU s
+Iteration   9:    66 species    282 rxns  2.00e-02 CPU s
+Iteration  10:    66 species    288 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    32 reactions 6.00e-02 CPU s 1.88e-03 CPU s/rxn
+Rule   2:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   3:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   5:    32 reactions 2.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   6:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   7:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   8:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   9:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  10:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule  11:    32 reactions 5.00e-02 CPU s 1.56e-03 CPU s/rxn
+Rule  12:    16 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :   288 reactions 3.10e-01 CPU s 1.08e-03 CPU s/rxn
+Wrote network in net format to ./e3.net.
+CPU TIME: generate_network 0.32 s.
+Finished processing file e3.bngl.
+CPU TIME: total 0.34 s.
+--------------------------------------
+- e4.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.244628 s.; 24 rules; 258 species; 1536 reactions.
+----------with_symmetries_forward-----------
+Parsing e4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
+Parsing e4.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.095642 s.; 24 rules; 82 species; 480 reactions.
+----------with_symmetries_backward-----------
+Parsing e4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
+Parsing e4.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.110283 s.; 24 rules; 82 species; 480 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:36:28 (GMT+2) on wf173.di.ens.fr
+Parsing e4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
+Parsing e4.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p2,p3,p4}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p2,p3,p4}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p2,p3,p4}
+************
+execution finished without any exception
+CPU time: 0.021517 s.; rules: 24; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e4_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e4_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     32 rxns  2.00e-02 CPU s
+Iteration   6:    22 species     48 rxns  2.00e-02 CPU s
+Iteration   7:    26 species     66 rxns  3.00e-02 CPU s
+Iteration   8:    30 species     83 rxns  3.00e-02 CPU s
+Iteration   9:    33 species     97 rxns  4.00e-02 CPU s
+Iteration  10:    35 species    108 rxns  3.00e-02 CPU s
+Iteration  11:    36 species    115 rxns  2.00e-02 CPU s
+Iteration  12:    37 species    118 rxns  1.00e-02 CPU s
+Iteration  13:    37 species    120 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    40 reactions 8.00e-02 CPU s 2.00e-03 CPU s/rxn
+Rule   2:    20 reactions 7.00e-02 CPU s 3.50e-03 CPU s/rxn
+Rule   3:    40 reactions 7.00e-02 CPU s 1.75e-03 CPU s/rxn
+Rule   4:    20 reactions 3.00e-02 CPU s 1.50e-03 CPU s/rxn
+Total   :   120 reactions 2.50e-01 CPU s 2.08e-03 CPU s/rxn
+Wrote network in net format to ./e4_sym.net.
+CPU TIME: generate_network 0.25 s.
+Finished processing file e4_sym.bngl.
+CPU TIME: total 0.27 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e4.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 16 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e4 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      4 rxns  0.00e+00 CPU s
+Iteration   2:    17 species     24 rxns  2.00e-02 CPU s
+Iteration   3:    37 species     76 rxns  6.00e-02 CPU s
+Iteration   4:    68 species    184 rxns  1.20e-01 CPU s
+Iteration   5:   108 species    360 rxns  2.00e-01 CPU s
+Iteration   6:   152 species    592 rxns  2.80e-01 CPU s
+Iteration   7:   192 species    856 rxns  3.20e-01 CPU s
+Iteration   8:   223 species   1104 rxns  3.00e-01 CPU s
+Iteration   9:   243 species   1300 rxns  2.40e-01 CPU s
+Iteration  10:   253 species   1432 rxns  1.60e-01 CPU s
+Iteration  11:   257 species   1500 rxns  8.00e-02 CPU s
+Iteration  12:   258 species   1528 rxns  3.00e-02 CPU s
+Iteration  13:   258 species   1536 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   128 reactions 1.40e-01 CPU s 1.09e-03 CPU s/rxn
+Rule   2:    64 reactions 9.00e-02 CPU s 1.41e-03 CPU s/rxn
+Rule   3:   128 reactions 1.50e-01 CPU s 1.17e-03 CPU s/rxn
+Rule   4:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule   5:   128 reactions 1.20e-01 CPU s 9.38e-04 CPU s/rxn
+Rule   6:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule   7:   128 reactions 1.70e-01 CPU s 1.33e-03 CPU s/rxn
+Rule   8:    64 reactions 6.00e-02 CPU s 9.38e-04 CPU s/rxn
+Rule   9:   128 reactions 1.50e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  10:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule  11:   128 reactions 1.60e-01 CPU s 1.25e-03 CPU s/rxn
+Rule  12:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  13:   128 reactions 1.70e-01 CPU s 1.33e-03 CPU s/rxn
+Rule  14:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  15:   128 reactions 1.60e-01 CPU s 1.25e-03 CPU s/rxn
+Rule  16:    64 reactions 9.00e-02 CPU s 1.41e-03 CPU s/rxn
+Total   :  1536 reactions 1.83e+00 CPU s 1.19e-03 CPU s/rxn
+Wrote network in net format to ./e4.net.
+CPU TIME: generate_network 1.89 s.
+Finished processing file e4.bngl.
+CPU TIME: total 1.92 s.
+--------------------------------------
+- e5.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 2.00663 s.; 30 rules; 1026 species; 7680 reactions.
+----------with_symmetries_forward-----------
+Parsing e5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
+Parsing e5.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.107428 s.; 30 rules; 58 species; 420 reactions.
+----------with_symmetries_backward-----------
+Parsing e5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
+Parsing e5.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.198528 s.; 30 rules; 58 species; 420 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:36:33 (GMT+2) on wf173.di.ens.fr
+Parsing e5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
+Parsing e5.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) v E(s!S.p5) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) v F(s!S.p5) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p5~U?) v S(p5~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p5) v S(p5!E.s) v S(p5!F.s) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p5~P?) => [ S(p5~P) v S(p5~P!F.s) ]
+S(p5~U?) => [ S(p5~U) v S(p5~U!E.s) ]
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5}
+************
+execution finished without any exception
+CPU time: 0.025843 s.; rules: 30; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e5_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e5_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  3.00e-02 CPU s
+Iteration   6:    24 species     52 rxns  6.00e-02 CPU s
+Iteration   7:    30 species     75 rxns  4.00e-02 CPU s
+Iteration   8:    36 species    101 rxns  5.00e-02 CPU s
+Iteration   9:    42 species    126 rxns  5.00e-02 CPU s
+Iteration  10:    47 species    151 rxns  4.00e-02 CPU s
+Iteration  11:    51 species    171 rxns  5.00e-02 CPU s
+Iteration  12:    54 species    187 rxns  3.00e-02 CPU s
+Iteration  13:    56 species    198 rxns  3.00e-02 CPU s
+Iteration  14:    57 species    205 rxns  2.00e-02 CPU s
+Iteration  15:    58 species    208 rxns  1.00e-02 CPU s
+Iteration  16:    58 species    210 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    70 reactions 1.00e-01 CPU s 1.43e-03 CPU s/rxn
+Rule   2:    35 reactions 1.10e-01 CPU s 3.14e-03 CPU s/rxn
+Rule   3:    70 reactions 1.50e-01 CPU s 2.14e-03 CPU s/rxn
+Rule   4:    35 reactions 1.00e-01 CPU s 2.86e-03 CPU s/rxn
+Total   :   210 reactions 4.60e-01 CPU s 2.19e-03 CPU s/rxn
+Wrote network in net format to ./e5_sym.net.
+CPU TIME: generate_network 0.48 s.
+Finished processing file e5_sym.bngl.
+CPU TIME: total 0.49 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e5.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 20 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e5 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     8 species      5 rxns  0.00e+00 CPU s
+Iteration   2:    23 species     35 rxns  4.00e-02 CPU s
+Iteration   3:    58 species    130 rxns  1.30e-01 CPU s
+Iteration   4:   123 species    360 rxns  2.80e-01 CPU s
+Iteration   5:   224 species    805 rxns  5.60e-01 CPU s
+Iteration   6:   359 species   1515 rxns  8.80e-01 CPU s
+Iteration   7:   514 species   2490 rxns  1.17e+00 CPU s
+Iteration   8:   669 species   3640 rxns  1.38e+00 CPU s
+Iteration   9:   804 species   4815 rxns  1.47e+00 CPU s
+Iteration  10:   905 species   5865 rxns  1.31e+00 CPU s
+Iteration  11:   970 species   6670 rxns  1.07e+00 CPU s
+Iteration  12:  1005 species   7200 rxns  7.20e-01 CPU s
+Iteration  13:  1020 species   7495 rxns  4.10e-01 CPU s
+Iteration  14:  1025 species   7625 rxns  2.10e-01 CPU s
+Iteration  15:  1026 species   7670 rxns  9.00e-02 CPU s
+Iteration  16:  1026 species   7680 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   512 reactions 6.90e-01 CPU s 1.35e-03 CPU s/rxn
+Rule   2:   256 reactions 3.40e-01 CPU s 1.33e-03 CPU s/rxn
+Rule   3:   512 reactions 6.60e-01 CPU s 1.29e-03 CPU s/rxn
+Rule   4:   256 reactions 2.90e-01 CPU s 1.13e-03 CPU s/rxn
+Rule   5:   512 reactions 6.20e-01 CPU s 1.21e-03 CPU s/rxn
+Rule   6:   256 reactions 3.30e-01 CPU s 1.29e-03 CPU s/rxn
+Rule   7:   512 reactions 6.50e-01 CPU s 1.27e-03 CPU s/rxn
+Rule   8:   256 reactions 3.20e-01 CPU s 1.25e-03 CPU s/rxn
+Rule   9:   512 reactions 6.60e-01 CPU s 1.29e-03 CPU s/rxn
+Rule  10:   256 reactions 3.10e-01 CPU s 1.21e-03 CPU s/rxn
+Rule  11:   512 reactions 6.60e-01 CPU s 1.29e-03 CPU s/rxn
+Rule  12:   256 reactions 2.90e-01 CPU s 1.13e-03 CPU s/rxn
+Rule  13:   512 reactions 6.70e-01 CPU s 1.31e-03 CPU s/rxn
+Rule  14:   256 reactions 3.00e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  15:   512 reactions 6.70e-01 CPU s 1.31e-03 CPU s/rxn
+Rule  16:   256 reactions 3.10e-01 CPU s 1.21e-03 CPU s/rxn
+Rule  17:   512 reactions 7.00e-01 CPU s 1.37e-03 CPU s/rxn
+Rule  18:   256 reactions 3.30e-01 CPU s 1.29e-03 CPU s/rxn
+Rule  19:   512 reactions 6.80e-01 CPU s 1.33e-03 CPU s/rxn
+Rule  20:   256 reactions 2.70e-01 CPU s 1.05e-03 CPU s/rxn
+Total   :  7680 reactions 9.75e+00 CPU s 1.27e-03 CPU s/rxn
+Wrote network in net format to ./e5.net.
+CPU TIME: generate_network 10.08 s.
+Finished processing file e5.bngl.
+CPU TIME: total 10.12 s.
+--------------------------------------
+- e6.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 32.1281 s.; 36 rules; 4098 species; 36864 reactions.
+----------with_symmetries_forward-----------
+Parsing e6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
+Parsing e6.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.263143 s.; 36 rules; 86 species; 756 reactions.
+----------with_symmetries_backward-----------
+Parsing e6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
+Parsing e6.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.17705 s.; 36 rules; 86 species; 756 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:37:18 (GMT+2) on wf173.di.ens.fr
+Parsing e6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
+Parsing e6.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) v E(s!S.p5) v E(s!S.p6) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) v F(s!S.p5) v F(s!S.p6) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p6~U?) v S(p6~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p6) v S(p6!E.s) v S(p6!F.s) ]
+S() => [ S(p5~U?) v S(p5~P?) ]
+S() => [ S(p5) v S(p5!E.s) v S(p5!F.s) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p6~P?) => [ S(p6~P) v S(p6~P!F.s) ]
+S(p6~U?) => [ S(p6~U) v S(p6~U!E.s) ]
+S(p5~P?) => [ S(p5~P) v S(p5~P!F.s) ]
+S(p5~U?) => [ S(p5~U) v S(p5~U!E.s) ]
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6}
+************
+execution finished without any exception
+CPU time: 0.047149 s.; rules: 36; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e6_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e6_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  4.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  6.00e-02 CPU s
+Iteration   7:    32 species     79 rxns  8.00e-02 CPU s
+Iteration   8:    40 species    110 rxns  1.00e-01 CPU s
+Iteration   9:    48 species    144 rxns  1.10e-01 CPU s
+Iteration  10:    56 species    180 rxns  1.00e-01 CPU s
+Iteration  11:    63 species    215 rxns  1.20e-01 CPU s
+Iteration  12:    70 species    247 rxns  9.00e-02 CPU s
+Iteration  13:    75 species    275 rxns  8.00e-02 CPU s
+Iteration  14:    79 species    297 rxns  5.00e-02 CPU s
+Iteration  15:    82 species    313 rxns  4.00e-02 CPU s
+Iteration  16:    84 species    324 rxns  4.00e-02 CPU s
+Iteration  17:    85 species    331 rxns  4.00e-02 CPU s
+Iteration  18:    86 species    334 rxns  2.00e-02 CPU s
+Iteration  19:    86 species    336 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   112 reactions 4.00e-01 CPU s 3.57e-03 CPU s/rxn
+Rule   2:    56 reactions 1.50e-01 CPU s 2.68e-03 CPU s/rxn
+Rule   3:   112 reactions 3.20e-01 CPU s 2.86e-03 CPU s/rxn
+Rule   4:    56 reactions 1.70e-01 CPU s 3.04e-03 CPU s/rxn
+Total   :   336 reactions 1.04e+00 CPU s 3.10e-03 CPU s/rxn
+Wrote network in net format to ./e6_sym.net.
+CPU TIME: generate_network 1.07 s.
+Finished processing file e6_sym.bngl.
+CPU TIME: total 1.08 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e6.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 24 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e6 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     9 species      6 rxns  1.00e-02 CPU s
+Iteration   2:    30 species     48 rxns  5.00e-02 CPU s
+Iteration   3:    86 species    204 rxns  1.90e-01 CPU s
+Iteration   4:   206 species    636 rxns  5.40e-01 CPU s
+Iteration   5:   422 species   1596 rxns  1.36e+00 CPU s
+Iteration   6:   758 species   3372 rxns  2.52e+00 CPU s
+Iteration   7:  1214 species   6204 rxns  3.84e+00 CPU s
+Iteration   8:  1760 species  10140 rxns  5.33e+00 CPU s
+Iteration   9:  2340 species  14952 rxns  6.47e+00 CPU s
+Iteration  10:  2886 species  20172 rxns  7.83e+00 CPU s
+Iteration  11:  3342 species  25188 rxns  7.40e+00 CPU s
+Iteration  12:  3678 species  29460 rxns  6.65e+00 CPU s
+Iteration  13:  3894 species  32676 rxns  5.69e+00 CPU s
+Iteration  14:  4014 species  34788 rxns  4.51e+00 CPU s
+Iteration  15:  4070 species  35988 rxns  2.90e+00 CPU s
+Iteration  16:  4091 species  36564 rxns  1.44e+00 CPU s
+Iteration  17:  4097 species  36786 rxns  6.80e-01 CPU s
+Iteration  18:  4098 species  36852 rxns  4.00e-01 CPU s
+Iteration  19:  4098 species  36864 rxns  1.30e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  2048 reactions 2.96e+00 CPU s 1.45e-03 CPU s/rxn
+Rule   2:  1024 reactions 1.56e+00 CPU s 1.52e-03 CPU s/rxn
+Rule   3:  2048 reactions 3.10e+00 CPU s 1.51e-03 CPU s/rxn
+Rule   4:  1024 reactions 1.54e+00 CPU s 1.50e-03 CPU s/rxn
+Rule   5:  2048 reactions 2.91e+00 CPU s 1.42e-03 CPU s/rxn
+Rule   6:  1024 reactions 1.41e+00 CPU s 1.38e-03 CPU s/rxn
+Rule   7:  2048 reactions 3.10e+00 CPU s 1.51e-03 CPU s/rxn
+Rule   8:  1024 reactions 1.48e+00 CPU s 1.45e-03 CPU s/rxn
+Rule   9:  2048 reactions 3.20e+00 CPU s 1.56e-03 CPU s/rxn
+Rule  10:  1024 reactions 1.55e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  11:  2048 reactions 3.39e+00 CPU s 1.66e-03 CPU s/rxn
+Rule  12:  1024 reactions 1.55e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  13:  2048 reactions 3.43e+00 CPU s 1.67e-03 CPU s/rxn
+Rule  14:  1024 reactions 1.52e+00 CPU s 1.48e-03 CPU s/rxn
+Rule  15:  2048 reactions 3.34e+00 CPU s 1.63e-03 CPU s/rxn
+Rule  16:  1024 reactions 1.56e+00 CPU s 1.52e-03 CPU s/rxn
+Rule  17:  2048 reactions 3.38e+00 CPU s 1.65e-03 CPU s/rxn
+Rule  18:  1024 reactions 1.52e+00 CPU s 1.48e-03 CPU s/rxn
+Rule  19:  2048 reactions 3.51e+00 CPU s 1.71e-03 CPU s/rxn
+Rule  20:  1024 reactions 1.50e+00 CPU s 1.46e-03 CPU s/rxn
+Rule  21:  2048 reactions 3.71e+00 CPU s 1.81e-03 CPU s/rxn
+Rule  22:  1024 reactions 1.42e+00 CPU s 1.39e-03 CPU s/rxn
+Rule  23:  2048 reactions 3.67e+00 CPU s 1.79e-03 CPU s/rxn
+Rule  24:  1024 reactions 1.59e+00 CPU s 1.55e-03 CPU s/rxn
+Total   : 36864 reactions 5.79e+01 CPU s 1.57e-03 CPU s/rxn
+Wrote network in net format to ./e6.net.
+CPU TIME: generate_network 59.41 s.
+Finished processing file e6.bngl.
+CPU TIME: total 59.45 s.
+--------------------------------------
+- e7.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+----------with_symmetries_forward-----------
+Parsing e7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
+Parsing e7.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.984743 s.; 42 rules; 122 species; 1260 reactions.
+----------with_symmetries_backward-----------
+Parsing e7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
+Parsing e7.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 12.8846 s.; 42 rules; 122 species; 1260 reactions.
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:40:35 (GMT+2) on wf173.di.ens.fr
+Parsing e7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
+Parsing e7.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) v E(s!S.p5) v E(s!S.p6) v E(s!S.p7) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) v F(s!S.p5) v F(s!S.p6) v F(s!S.p7) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p7~U?) v S(p7~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p7) v S(p7!E.s) v S(p7!F.s) ]
+S() => [ S(p6~U?) v S(p6~P?) ]
+S() => [ S(p6) v S(p6!E.s) v S(p6!F.s) ]
+S() => [ S(p5~U?) v S(p5~P?) ]
+S() => [ S(p5) v S(p5!E.s) v S(p5!F.s) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p7~P?) => [ S(p7~P) v S(p7~P!F.s) ]
+S(p7~U?) => [ S(p7~U) v S(p7~U!E.s) ]
+S(p6~P?) => [ S(p6~P) v S(p6~P!F.s) ]
+S(p6~U?) => [ S(p6~U) v S(p6~U!E.s) ]
+S(p5~P?) => [ S(p5~P) v S(p5~P!F.s) ]
+S(p5~U?) => [ S(p5~U) v S(p5~U!E.s) ]
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7}
+************
+execution finished without any exception
+CPU time: 0.044216 s.; rules: 42; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e7_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e7_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  4.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  4.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  7.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  8.00e-02 CPU s
+Iteration   8:    42 species    114 rxns  1.10e-01 CPU s
+Iteration   9:    52 species    153 rxns  1.20e-01 CPU s
+Iteration  10:    62 species    198 rxns  1.30e-01 CPU s
+Iteration  11:    72 species    244 rxns  1.40e-01 CPU s
+Iteration  12:    82 species    291 rxns  1.40e-01 CPU s
+Iteration  13:    91 species    336 rxns  1.50e-01 CPU s
+Iteration  14:    99 species    378 rxns  1.20e-01 CPU s
+Iteration  15:   106 species    413 rxns  1.10e-01 CPU s
+Iteration  16:   111 species    443 rxns  1.10e-01 CPU s
+Iteration  17:   115 species    465 rxns  8.00e-02 CPU s
+Iteration  18:   118 species    481 rxns  7.00e-02 CPU s
+Iteration  19:   120 species    492 rxns  6.00e-02 CPU s
+Iteration  20:   121 species    499 rxns  4.00e-02 CPU s
+Iteration  21:   122 species    502 rxns  1.00e-02 CPU s
+Iteration  22:   122 species    504 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   168 reactions 5.40e-01 CPU s 3.21e-03 CPU s/rxn
+Rule   2:    84 reactions 3.10e-01 CPU s 3.69e-03 CPU s/rxn
+Rule   3:   168 reactions 5.10e-01 CPU s 3.04e-03 CPU s/rxn
+Rule   4:    84 reactions 2.90e-01 CPU s 3.45e-03 CPU s/rxn
+Total   :   504 reactions 1.65e+00 CPU s 3.27e-03 CPU s/rxn
+Wrote network in net format to ./e7_sym.net.
+CPU TIME: generate_network 1.71 s.
+Finished processing file e7_sym.bngl.
+CPU TIME: total 1.72 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e7.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 28 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e7 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    10 species      7 rxns  1.00e-02 CPU s
+Iteration   2:    38 species     63 rxns  6.00e-02 CPU s
+Iteration   3:   122 species    301 rxns  3.20e-01 CPU s
+Iteration   4:   325 species   1043 rxns  1.08e+00 CPU s
+Iteration   5:   738 species   2898 rxns  3.13e+00 CPU s
+Iteration   6:  1466 species   6776 rxns  7.25e+00 CPU s
+Iteration   7:  2594 species  13776 rxns  1.30e+01 CPU s
+Iteration   8:  4148 species  24864 rxns  1.91e+01 CPU s
+Iteration   9:  6066 species  40446 rxns  2.62e+01 CPU s
+Iteration  10:  8194 species  60046 rxns  3.18e+01 CPU s
+ABORT: BioNetGen received TERM signal (15)
+--------------------------------------
+- e8.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+----------with_symmetries_forward-----------
+Parsing e8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
+Parsing e8.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 6.30818 s.; 48 rules; 167 species; 1980 reactions.
+----------with_symmetries_backward-----------
+Parsing e8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
+Parsing e8.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:46:45 (GMT+2) on wf173.di.ens.fr
+Parsing e8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
+Parsing e8.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) v E(s!S.p5) v E(s!S.p6) v E(s!S.p7) v E(s!S.p8) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) v F(s!S.p5) v F(s!S.p6) v F(s!S.p7) v F(s!S.p8) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p8~U?) v S(p8~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p8) v S(p8!E.s) v S(p8!F.s) ]
+S() => [ S(p7~U?) v S(p7~P?) ]
+S() => [ S(p7) v S(p7!E.s) v S(p7!F.s) ]
+S() => [ S(p6~U?) v S(p6~P?) ]
+S() => [ S(p6) v S(p6!E.s) v S(p6!F.s) ]
+S() => [ S(p5~U?) v S(p5~P?) ]
+S() => [ S(p5) v S(p5!E.s) v S(p5!F.s) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p8~P?) => [ S(p8~P) v S(p8~P!F.s) ]
+S(p8~U?) => [ S(p8~U) v S(p8~U!E.s) ]
+S(p7~P?) => [ S(p7~P) v S(p7~P!F.s) ]
+S(p7~U?) => [ S(p7~U) v S(p7~U!E.s) ]
+S(p6~P?) => [ S(p6~P) v S(p6~P!F.s) ]
+S(p6~U?) => [ S(p6~U) v S(p6~U!E.s) ]
+S(p5~P?) => [ S(p5~P) v S(p5~P!F.s) ]
+S(p5~U?) => [ S(p5~U) v S(p5~U!E.s) ]
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8}
+************
+execution finished without any exception
+CPU time: 0.076063 s.; rules: 48; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e8_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e8_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  4.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  5.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  7.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  9.00e-02 CPU s
+Iteration   8:    43 species    115 rxns  1.20e-01 CPU s
+Iteration   9:    54 species    157 rxns  1.80e-01 CPU s
+Iteration  10:    66 species    207 rxns  1.80e-01 CPU s
+Iteration  11:    78 species    262 rxns  2.10e-01 CPU s
+Iteration  12:    91 species    320 rxns  2.10e-01 CPU s
+Iteration  13:   103 species    380 rxns  2.10e-01 CPU s
+Iteration  14:   115 species    439 rxns  2.00e-01 CPU s
+Iteration  15:   126 species    495 rxns  2.00e-01 CPU s
+Iteration  16:   136 species    547 rxns  2.10e-01 CPU s
+Iteration  17:   144 species    592 rxns  1.60e-01 CPU s
+Iteration  18:   151 species    629 rxns  1.40e-01 CPU s
+Iteration  19:   156 species    659 rxns  1.30e-01 CPU s
+Iteration  20:   160 species    681 rxns  1.10e-01 CPU s
+Iteration  21:   163 species    697 rxns  1.00e-01 CPU s
+Iteration  22:   165 species    708 rxns  7.00e-02 CPU s
+Iteration  23:   166 species    715 rxns  5.00e-02 CPU s
+Iteration  24:   167 species    718 rxns  4.00e-02 CPU s
+Iteration  25:   167 species    720 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   240 reactions 1.01e+00 CPU s 4.21e-03 CPU s/rxn
+Rule   2:   120 reactions 4.90e-01 CPU s 4.08e-03 CPU s/rxn
+Rule   3:   240 reactions 8.60e-01 CPU s 3.58e-03 CPU s/rxn
+Rule   4:   120 reactions 4.60e-01 CPU s 3.83e-03 CPU s/rxn
+Total   :   720 reactions 2.82e+00 CPU s 3.92e-03 CPU s/rxn
+Wrote network in net format to ./e8_sym.net.
+CPU TIME: generate_network 2.87 s.
+Finished processing file e8_sym.bngl.
+CPU TIME: total 2.89 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e8.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 32 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e8 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    11 species      8 rxns  1.00e-02 CPU s
+Iteration   2:    47 species     80 rxns  9.00e-02 CPU s
+Iteration   3:   167 species    424 rxns  4.60e-01 CPU s
+Iteration   4:   489 species   1616 rxns  1.99e+00 CPU s
+Iteration   5:  1217 species   4920 rxns  6.35e+00 CPU s
+Iteration   6:  2645 species  12592 rxns  1.80e+01 CPU s
+Iteration   7:  5117 species  27992 rxns  3.99e+01 CPU s
+ABORT: BioNetGen received TERM signal (15)
+--------------------------------------
+- e9.ka
+--------------------------------------
+----------without_symmetries-----------
+Parsing e9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+----------with_symmetries_forward-----------
+Parsing e9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
+Parsing e9.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 56.3898 s.; 54 rules; 222 species; 2970 reactions.
+----------with_symmetries_backward-----------
+Parsing e9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
+Parsing e9.ka...
+done
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -compute equivalence classes 
+----------compute_symmetries-----------
+Kappa Static Analyzer (DomainBased-3014-g7f694d7) (without Tk interface)
+Analysis launched at 2017/04/26 14:53:46 (GMT+2) on wf173.di.ens.fr
+Parsing e9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
+Parsing e9.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+E() => [ E(s) v E(s!S.p1) v E(s!S.p2) v E(s!S.p3) v E(s!S.p4) v E(s!S.p5) v E(s!S.p6) v E(s!S.p7) v E(s!S.p8) v E(s!S.p9) ]
+F() => [ F(s) v F(s!S.p1) v F(s!S.p2) v F(s!S.p3) v F(s!S.p4) v F(s!S.p5) v F(s!S.p6) v F(s!S.p7) v F(s!S.p8) v F(s!S.p9) ]
+S() => [ S(p2~U?) v S(p2~P?) ]
+S() => [ S(p1~U?) v S(p1~P?) ]
+S() => [ S(p9~U?) v S(p9~P?) ]
+S() => [ S(p3~U?) v S(p3~P?) ]
+S() => [ S(p9) v S(p9!E.s) v S(p9!F.s) ]
+S() => [ S(p8~U?) v S(p8~P?) ]
+S() => [ S(p8) v S(p8!E.s) v S(p8!F.s) ]
+S() => [ S(p7~U?) v S(p7~P?) ]
+S() => [ S(p7) v S(p7!E.s) v S(p7!F.s) ]
+S() => [ S(p6~U?) v S(p6~P?) ]
+S() => [ S(p6) v S(p6!E.s) v S(p6!F.s) ]
+S() => [ S(p5~U?) v S(p5~P?) ]
+S() => [ S(p5) v S(p5!E.s) v S(p5!F.s) ]
+S() => [ S(p4~U?) v S(p4~P?) ]
+S() => [ S(p4) v S(p4!E.s) v S(p4!F.s) ]
+S() => [ S(p3) v S(p3!E.s) v S(p3!F.s) ]
+S() => [ S(p2) v S(p2!E.s) v S(p2!F.s) ]
+S() => [ S(p1) v S(p1!E.s) v S(p1!F.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(p9~P?) => [ S(p9~P) v S(p9~P!F.s) ]
+S(p9~U?) => [ S(p9~U) v S(p9~U!E.s) ]
+S(p8~P?) => [ S(p8~P) v S(p8~P!F.s) ]
+S(p8~U?) => [ S(p8~U) v S(p8~U!E.s) ]
+S(p7~P?) => [ S(p7~P) v S(p7~P!F.s) ]
+S(p7~U?) => [ S(p7~U) v S(p7~U!E.s) ]
+S(p6~P?) => [ S(p6~P) v S(p6~P!F.s) ]
+S(p6~U?) => [ S(p6~U) v S(p6~U!E.s) ]
+S(p5~P?) => [ S(p5~P) v S(p5~P!F.s) ]
+S(p5~U?) => [ S(p5~U) v S(p5~U!E.s) ]
+S(p4~P?) => [ S(p4~P) v S(p4~P!F.s) ]
+S(p4~U?) => [ S(p4~U) v S(p4~U!E.s) ]
+S(p3~P?) => [ S(p3~P) v S(p3~P!F.s) ]
+S(p3~U?) => [ S(p3~U) v S(p3~U!E.s) ]
+S(p2~P?) => [ S(p2~P) v S(p2~P!F.s) ]
+S(p2~U?) => [ S(p2~U) v S(p2~U!E.s) ]
+S(p1~P?) => [ S(p1~P) v S(p1~P!F.s) ]
+S(p1~U?) => [ S(p1~U) v S(p1~U!E.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8,p9}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8,p9}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {p1,p2,p3,p4,p5,p6,p7,p8,p9}
+************
+execution finished without any exception
+CPU time: 0.085033 s.; rules: 54; dead rules: 0.
+----------BNGL_symmetries----------
+BioNetGen version 2.2.6
+Reading from file e9_sym.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e9_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  3.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  5.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  6.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  7.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  1.10e-01 CPU s
+Iteration   8:    43 species    115 rxns  1.30e-01 CPU s
+Iteration   9:    55 species    158 rxns  1.70e-01 CPU s
+Iteration  10:    68 species    211 rxns  2.40e-01 CPU s
+Iteration  11:    82 species    271 rxns  2.70e-01 CPU s
+Iteration  12:    97 species    338 rxns  2.80e-01 CPU s
+Iteration  13:   112 species    409 rxns  3.00e-01 CPU s
+Iteration  14:   127 species    483 rxns  2.80e-01 CPU s
+Iteration  15:   142 species    556 rxns  2.80e-01 CPU s
+Iteration  16:   156 species    629 rxns  3.00e-01 CPU s
+Iteration  17:   169 species    697 rxns  2.60e-01 CPU s
+Iteration  18:   181 species    760 rxns  2.50e-01 CPU s
+Iteration  19:   191 species    815 rxns  2.30e-01 CPU s
+Iteration  20:   199 species    862 rxns  2.20e-01 CPU s
+Iteration  21:   206 species    899 rxns  1.80e-01 CPU s
+Iteration  22:   211 species    929 rxns  1.70e-01 CPU s
+Iteration  23:   215 species    951 rxns  1.30e-01 CPU s
+Iteration  24:   218 species    967 rxns  1.10e-01 CPU s
+Iteration  25:   220 species    978 rxns  7.00e-02 CPU s
+Iteration  26:   221 species    985 rxns  7.00e-02 CPU s
+Iteration  27:   222 species    988 rxns  3.00e-02 CPU s
+Iteration  28:   222 species    990 rxns  4.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   330 reactions 1.46e+00 CPU s 4.42e-03 CPU s/rxn
+Rule   2:   165 reactions 7.70e-01 CPU s 4.67e-03 CPU s/rxn
+Rule   3:   330 reactions 1.38e+00 CPU s 4.18e-03 CPU s/rxn
+Rule   4:   165 reactions 7.40e-01 CPU s 4.48e-03 CPU s/rxn
+Total   :   990 reactions 4.35e+00 CPU s 4.39e-03 CPU s/rxn
+Wrote network in net format to ./e9_sym.net.
+CPU TIME: generate_network 4.41 s.
+Finished processing file e9_sym.bngl.
+CPU TIME: total 4.42 s.
+----------BNGL_without_symmetries-----------
+BioNetGen version 2.2.6
+Reading from file e9.bngl (level 0)
+Read 9 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 36 reaction rule(s).
+Read 3 observable(s).
+ACTION: generate_network( e9 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    12 species      9 rxns  2.00e-02 CPU s
+Iteration   2:    57 species     99 rxns  1.10e-01 CPU s
+Iteration   3:   222 species    576 rxns  7.00e-01 CPU s
+Iteration   4:   708 species   2394 rxns  2.99e+00 CPU s
+Iteration   5:  1914 species   7920 rxns  1.13e+01 CPU s
+Iteration   6:  4512 species  21996 rxns  4.08e+01 CPU s
+ABORT: BioNetGen received TERM signal (15)

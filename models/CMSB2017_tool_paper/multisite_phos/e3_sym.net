@@ -1,0 +1,103 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Etot   300  # Constant
+    2 Ftot   300  # Constant
+    3 Stot   3000  # Constant
+    4 kOnE   0.7  # Constant
+    5 kOffE  3  # Constant
+    6 kCatE  5.0  # Constant
+    7 kOnF   0.7  # Constant
+    8 kOffF  3  # Constant
+    9 kCatF  5.1  # Constant
+end parameters
+begin species
+    1 E(s) Etot
+    2 F(s) Ftot
+    3 S(p~U,p~U,p~U) Stot
+    4 E(s!1).S(p~U!1,p~U,p~U) 0
+    5 E(s!1).E(s!2).S(p~U!2,p~U!1,p~U) 0
+    6 S(p~P,p~U,p~U) 0
+    7 E(s!1).E(s!2).E(s!3).S(p~U!3,p~U!2,p~U!1) 0
+    8 E(s!1).S(p~P,p~U!1,p~U) 0
+    9 F(s!1).S(p~P!1,p~U,p~U) 0
+   10 E(s!1).E(s!2).S(p~P,p~U!2,p~U!1) 0
+   11 E(s!1).F(s!2).S(p~P!2,p~U!1,p~U) 0
+   12 S(p~P,p~P,p~U) 0
+   13 E(s!1).E(s!2).F(s!3).S(p~P!3,p~U!2,p~U!1) 0
+   14 E(s!1).S(p~P,p~P,p~U!1) 0
+   15 F(s!1).S(p~P!1,p~P,p~U) 0
+   16 E(s!1).F(s!2).S(p~P!2,p~P,p~U!1) 0
+   17 S(p~P,p~P,p~P) 0
+   18 F(s!1).F(s!2).S(p~P!2,p~P!1,p~U) 0
+   19 E(s!1).F(s!2).F(s!3).S(p~P!3,p~P!2,p~U!1) 0
+   20 F(s!1).S(p~P!1,p~P,p~P) 0
+   21 F(s!1).F(s!2).S(p~P!2,p~P!1,p~P) 0
+   22 F(s!1).F(s!2).F(s!3).S(p~P!3,p~P!2,p~P!1) 0
+end species
+begin reactions
+    1 1,3 4 3*kOnE #_R1
+    2 1,4 5 2*kOnE #_R1
+    3 4 1,3 kOffE #_reverse__R1
+    4 4 1,6 kCatE #_R2
+    5 1,5 7 kOnE #_R1
+    6 1,6 8 2*kOnE #_R1
+    7 5 1,4 2*kOffE #_reverse__R1
+    8 5 1,8 2*kCatE #_R2
+    9 2,6 9 kOnF #_R3
+   10 1,8 10 kOnE #_R1
+   11 1,9 11 2*kOnE #_R1
+   12 7 1,5 3*kOffE #_reverse__R1
+   13 8 1,6 kOffE #_reverse__R1
+   14 7 1,10 3*kCatE #_R2
+   15 8 1,12 kCatE #_R2
+   16 2,8 11 kOnF #_R3
+   17 9 2,6 kOffF #_reverse__R3
+   18 9 2,3 kCatF #_R4
+   19 1,11 13 kOnE #_R1
+   20 1,12 14 kOnE #_R1
+   21 10 1,8 2*kOffE #_reverse__R1
+   22 11 1,9 kOffE #_reverse__R1
+   23 10 1,14 2*kCatE #_R2
+   24 11 1,15 kCatE #_R2
+   25 2,10 13 kOnF #_R3
+   26 2,12 15 2*kOnF #_R3
+   27 11 2,8 kOffF #_reverse__R3
+   28 11 2,4 kCatF #_R4
+   29 1,15 16 kOnE #_R1
+   30 13 1,11 2*kOffE #_reverse__R1
+   31 14 1,12 kOffE #_reverse__R1
+   32 13 1,16 2*kCatE #_R2
+   33 14 1,17 kCatE #_R2
+   34 2,14 16 2*kOnF #_R3
+   35 2,15 18 kOnF #_R3
+   36 13 2,10 kOffF #_reverse__R3
+   37 15 2,12 kOffF #_reverse__R3
+   38 13 2,5 kCatF #_R4
+   39 15 2,6 kCatF #_R4
+   40 1,18 19 kOnE #_R1
+   41 16 1,15 kOffE #_reverse__R1
+   42 16 1,20 kCatE #_R2
+   43 2,16 19 kOnF #_R3
+   44 2,17 20 3*kOnF #_R3
+   45 16 2,14 kOffF #_reverse__R3
+   46 18 2,15 2*kOffF #_reverse__R3
+   47 16 2,8 kCatF #_R4
+   48 18 2,9 2*kCatF #_R4
+   49 19 1,18 kOffE #_reverse__R1
+   50 19 1,21 kCatE #_R2
+   51 2,20 21 2*kOnF #_R3
+   52 19 2,16 2*kOffF #_reverse__R3
+   53 20 2,17 kOffF #_reverse__R3
+   54 19 2,11 2*kCatF #_R4
+   55 20 2,12 kCatF #_R4
+   56 2,21 22 kOnF #_R3
+   57 21 2,20 2*kOffF #_reverse__R3
+   58 21 2,15 2*kCatF #_R4
+   59 22 2,21 3*kOffF #_reverse__R3
+   60 22 2,18 3*kCatF #_R4
+end reactions
+begin groups
+    1 Efree                1
+    2 Ffree                2
+    3 S1P                  6,8,9,10,11,2*12,13,2*14,2*15,2*16,3*17,2*18,2*19,3*20,3*21,3*22
+end groups
