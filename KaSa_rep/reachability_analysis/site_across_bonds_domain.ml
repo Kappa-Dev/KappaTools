@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Apr 08 2017>
+   * Last modification: Time-stamp: <Apr 27 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -972,7 +972,30 @@ struct
   (*APPLY RULE*)
   (***************************************************************************)
 
+  let check_association_list
+      parameters error bdu_false
+      pair
+      check
+      dynamic
+    =
+    let store_result = get_value dynamic in
+    let handler = get_mvbdu_handler dynamic in
+    let error, handler, mvbdu =
+      Ckappa_sig.Views_bdu.mvbdu_of_association_list
+        parameters handler error check
+    in
+    let error, handler, bool =
+      Site_across_bonds_domain_type.check
+        parameters error bdu_false handler
+        pair
+        mvbdu
+        store_result
+    in
+    let dynamic = set_mvbdu_handler handler dynamic in
+    error, dynamic, bool
 (*there is an action binding in the domain of a rule*)
+
+
 
   let build_mvbdu_association_list parameters error bdu_false
       kappa_handler dump_title bool modified_sites pair pair_list dynamic =
@@ -1205,19 +1228,53 @@ struct
     let dynamic = set_global_dynamic_information global_dynamic dynamic in
     error, dynamic, precondition, state_list
 
+
+
   let get_state_of_site_in_precondition_2
-      error static dynamic rule agent_id
-      (site_type_x, agent_type_y, site_type_y)
-      site_type'_y
+      error static dynamic rule
+      agent_id agent_type site
       precondition =
-    let defined_in = Communication.LHS rule in
-    get_state_of_site_in_pre_post_condition_2
-      error static dynamic
-      agent_id
-      (site_type_x, agent_type_y, site_type_y)
-      site_type'_y
-      defined_in
-      precondition
+
+    let path =
+      {
+        Communication.defined_in = Communication.LHS rule;
+        path =
+          {
+            Communication.agent_id = agent_id;
+            Communication.relative_address = [];
+            Communication.site = site}
+      }
+    in
+    let error, global_dynamic, precondition, state_list_lattice =
+      Communication.get_state_of_site
+        error
+        precondition
+        (get_global_static_information static)
+        (get_global_dynamic_information dynamic)
+        path
+    in
+    let error, state_list =
+      match state_list_lattice with
+      | Usual_domains.Val l -> error, l
+      | Usual_domains.Undefined -> error, []
+      | Usual_domains.Any ->
+        let parameter = get_parameter static in
+        let error, () =
+          if Remanent_parameters.get_view_analysis parameter
+          then
+            Exception.warn
+              (get_parameter static) error __POS__ Exit ()
+          else
+            error, ()
+        in
+        let kappa_handler = get_kappa_handler static in
+        Handler.state_list
+          parameter kappa_handler error agent_type site
+    in
+    let dynamic = set_global_dynamic_information global_dynamic dynamic in
+    error, dynamic, precondition, state_list
+
+
 
   let get_state_of_site_in_postcondition_2
       error static dynamic rule agent_id
@@ -1231,6 +1288,7 @@ struct
       site_type'_y
       defined_in
       precondition
+
 
   type pos = Fst | Snd
 
@@ -1259,6 +1317,8 @@ struct
         rule agent_id_mod
         (site_type_y, agent_type_x, site_type_x) site_type'_x
         precondition
+
+
 
   let get_potential_tuple_pair parameters error (agent, site) empty_map map =
     let error, result =
@@ -1341,13 +1401,47 @@ struct
                                | Snd -> site_type'_x))
                   __POS__ Exit
               in
+              let error', dynamic, precondition, state_list_other =
+                let error, agent =
+                    match
+                      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                        parameters
+                        error
+                        agent_id_mod
+                        rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+                    with
+                    | error, None ->
+                      Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
+                    | error, Some a -> error, a
+                in
+                match agent with
+                | Cckappa_sig.Ghost
+                | Cckappa_sig.Unknown_agent _
+                | Cckappa_sig.Dead_agent _ ->
+                  error, dynamic, precondition, []
+                | Cckappa_sig.Agent agent ->
+                  get_state_of_site_in_precondition_2
+                    error static dynamic
+                    (rule_id, rule)
+                    agent_id_mod agent_type_mod site_type_mod
+                    precondition
+              in
+              let error =
+                Exception.check_point
+                  Exception.warn
+                  parameters error error'
+                  ~message:(context rule_id agent_id_mod site_type_mod)
+                  __POS__ Exit
+              in
               (*-----------------------------------------------------------*)
               let error, bool, dynamic, precondition, modified_sites =
-                match state'_list_other with
-                | [] | _::_::_ ->
-                  (* we know for sure that the site has not been modified *)
-                  error, bool, dynamic, precondition, modified_sites
-                | [_]  ->
+                let not_modified =
+                  match state'_list_other with
+                  | [] | _::_::_ -> true
+(* we know for sure that the site has not been modified *)
+
+                  | [_] -> false
+                in
                 List.fold_left
                   (fun (error, bool, dynamic, precondition, modified_sites)
                     state'_other ->
@@ -1364,17 +1458,58 @@ struct
                       (agent_type_x, site_type_x, site_type'_x,state_x),
                       (agent_type_y, site_type_y, site_type'_y,state_y)
                     in
-                    let error, bool, dynamic, modified_sites =
-                      build_mvbdu_association_list
+                    let check =
+                      match state_list_other,pos
+                      with
+                        ([] | _::_::_),_ -> []
+                      | [a],Fst ->
+                        [Ckappa_sig.fst_site, a]
+                      | [a],Snd ->
+                        [Ckappa_sig.snd_site, a]
+                    in
+                    let check =
+                      if not_modified
+                      then
+                        match pos with
+                        | Fst  ->
+                          (* to do: add info about the other site *)
+                          (* if the bond between site_type_x and site_type_y
+                             has not been created by the rule *)
+                          (* this is the state before the modification *)
+                          (* otherwise, nothing to check *)
+                          (Ckappa_sig.snd_site, state'_other)::check
+                        | Snd ->
+                          (* to do: add info about the other site *)
+                          (* if the bond between site_type_x and site_type_y
+                             has not been created by the rule *)
+                          (* this is the state before the modification *)
+                          (* this is the state before the modification *)
+                          (Ckappa_sig.fst_site, state'_other)::check
+                      else
+                        check
+                    in
+                    let error, dynamic, unmodified_sites_ok =
+                      check_association_list
                         parameters error bdu_false
-                        kappa_handler dump_title
-                        bool
-                        modified_sites
                         pair
-                        pair_list
+                        check
                         dynamic
                     in
-                    error, bool, dynamic, precondition, modified_sites
+                    if unmodified_sites_ok
+                    then
+                      let error, bool, dynamic, modified_sites =
+                        build_mvbdu_association_list
+                          parameters error bdu_false
+                          kappa_handler dump_title
+                          bool
+                          modified_sites
+                          pair
+                          pair_list
+                          dynamic
+                      in
+                      error, bool, dynamic, precondition, modified_sites
+                    else
+                      error, bool, dynamic, precondition, modified_sites
                   )
                   (error, bool, dynamic, precondition, modified_sites)
                   state'_list_other
