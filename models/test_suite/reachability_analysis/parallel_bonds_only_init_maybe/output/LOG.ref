@@ -542,7 +542,7 @@ Id=24
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -557,12 +557,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -572,7 +572,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -587,12 +587,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -610,7 +610,7 @@ B() => [ B(z) v B(z!A.z) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -625,12 +625,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -640,7 +640,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -655,12 +655,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -686,7 +686,7 @@ A(t!1),B(t!1) =>
 * Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -701,12 +701,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -716,7 +716,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -731,12 +731,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -746,7 +746,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -761,12 +761,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -776,7 +776,7 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=25
+Id=27
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -791,12 +791,12 @@ Id=25
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=27
+Id=29
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=26
+  Id=28
    Node(site_type:0<2)
     Id=1
      Leaf True 

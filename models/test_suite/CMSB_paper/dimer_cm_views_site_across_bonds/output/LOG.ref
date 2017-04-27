@@ -44,11 +44,6 @@ R(c!1),R(c!1) =>
 	]
 R(c!1),R(c!1) => 
 	[
-		  R(c!1,cr!R.n),R(c!1,n!R.cr)
-		v R(c!1,cr),R(c!1,n)
-	]
-R(c!1),R(c!1) => 
-	[
 		  R(c!1,n!R.cr),R(c!1,n)
 		v R(c!1,n),R(c!1,n)
 		v R(c!1,n),R(c!1,n!R.cr)

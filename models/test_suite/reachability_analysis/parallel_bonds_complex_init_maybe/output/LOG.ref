@@ -595,12 +595,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=26
+Id=28
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:1<2)
     Id=17
      Node(site_type:2<0)
@@ -636,12 +636,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=35
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=32
+  Id=34
    Node(site_type:1<1)
     Id=17
      Node(site_type:2<0)
@@ -791,7 +791,7 @@ Id=70
 
       Id=44
        Node(site_type:2<1)
-        Id=27
+        Id=29
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -851,12 +851,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=72
+Id=78
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=71
+  Id=77
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -891,12 +891,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~,z!,t!)
 
 INTENSIONAL DESCRIPTION:
-Id=72
+Id=78
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=71
+  Id=77
    Node(site_type:1<2)
     Id=21
      Node(site_type:2<1)
@@ -1061,15 +1061,15 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,z!,t!)
 
+	Applying rule r1 (File "parallel_bonds.ka", line 8, characters 4-24:):
+		the precondition is satisfied
+
+		Updating the views for B(x~,z!,t!)
+
 	Applying rule r4 (File "parallel_bonds.ka", line 11, characters 4-50:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,z!,t!)
-
-		Updating the views for B(x~,z!,t!)
-
-	Applying rule r1 (File "parallel_bonds.ka", line 8, characters 4-24:):
-		the precondition is satisfied
 
 		Updating the views for B(x~,z!,t!)
 
@@ -1110,16 +1110,16 @@ Id=102
   Id=0
    Leaf False 
 
-  Id=75
+  Id=81
    Node(site_type:1<2)
-    Id=74
+    Id=80
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=73
+      Id=79
        Node(site_type:2<2)
-        Id=27
+        Id=29
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -1144,16 +1144,16 @@ Id=102
   Id=0
    Leaf False 
 
-  Id=75
+  Id=81
    Node(site_type:1<2)
-    Id=74
+    Id=80
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=73
+      Id=79
        Node(site_type:2<2)
-        Id=27
+        Id=29
          Node(site_type:3<0)
           Id=0
            Leaf False 
@@ -1369,23 +1369,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
-A(z!1),B(z!1) => 
-	[
-		  A(x~p,z!1),B(t,z!1)
-		v A(x~p,z!1),B(t!A.t,z!1)
-		v A(x~u,z!1),B(t!A.t,z!1)
-	]
-A(z!1),B(z!1) => 
-	[
-		  A(t!B.t,z!1),B(x~u,z!1)
-		v A(t!B.t,z!1),B(x~p,z!1)
-		v A(t,z!1),B(x~p,z!1)
-	]
-A(z!1),B(z!1) => 
-	[
-		  A(t!B.t,z!1),B(t!A.t,z!1)
-		v A(t,z!1),B(t,z!1)
-	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
@@ -1600,17 +1583,6 @@ A()=> [
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z!1),B(z!1)=> [
-		  A(x~p,z!1),B(t,z!1)
-		v A(x~p,z!1),B(t!A.t,z!1)
-		v A(x~u,z!1),B(t!A.t,z!1)]
-A(z!1),B(z!1)=> [
-		  A(t!B.t,z!1),B(x~u,z!1)
-		v A(t!B.t,z!1),B(x~p,z!1)
-		v A(t,z!1),B(x~p,z!1)]
-A(z!1),B(z!1)=> [
-		  A(t!B.t,z!1),B(t!A.t,z!1)
-		v A(t,z!1),B(t,z!1)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):

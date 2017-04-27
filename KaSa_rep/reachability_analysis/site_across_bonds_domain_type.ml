@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Apr 08 2017>
+   * Last modification: Time-stamp: <Apr 27 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -503,6 +503,25 @@ let add_sites_from_tuples parameters error tuple modified_sites =
       )
       (error, modified_sites)
       [agent,site1;agent,site2;agent',site1';agent',site2']
+
+let check
+    parameters error bdu_false handler
+    pair
+    mvbdu
+    store_result
+  =
+  let error, bdu_old =
+    get_mvbdu_from_tuple_pair parameters error pair bdu_false store_result
+  in
+  let error, handler, new_bdu =
+    Ckappa_sig.Views_bdu.mvbdu_and
+      parameters handler error bdu_old mvbdu
+  in
+  if Ckappa_sig.Views_bdu.equal new_bdu bdu_false
+  then
+    error, handler, false
+  else
+    error, handler, true
 
 let add_link_and_check parameter error bdu_false handler
     kappa_handler bool dump_title x mvbdu modified_sites store_result =

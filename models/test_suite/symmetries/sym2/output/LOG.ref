@@ -844,14 +844,14 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=32
+Id=38
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=37
    Node(site_type:1<1)
-    Id=30
+    Id=36
      Node(site_type:2<0)
       Id=0
        Leaf False 
@@ -887,7 +887,7 @@ Id=32
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=39
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -902,7 +902,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=40
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -923,14 +923,14 @@ A() => [ A(x) v A(x!A.x) v A(x!A.y) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=45
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=44
    Node(site_type:0<1)
-    Id=33
+    Id=39
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -943,7 +943,7 @@ Id=40
         Id=0
          Leaf False 
 
-    Id=38
+    Id=43
      Node(site_type:0<3)
       Id=3
        Node(site_type:1<0)
@@ -971,7 +971,7 @@ A(x!A.x) => A(x!A.x,y)
 * Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=33
+Id=39
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -986,7 +986,7 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=40
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1001,14 +1001,14 @@ Id=35
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=40
+Id=45
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=39
+  Id=44
    Node(site_type:0<1)
-    Id=33
+    Id=39
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -1021,7 +1021,7 @@ Id=40
         Id=0
          Leaf False 
 
-    Id=38
+    Id=43
      Node(site_type:0<3)
       Id=3
        Node(site_type:1<0)

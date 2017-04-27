@@ -729,12 +729,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(z~,z!,t~)
 
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=72
  Node(site_type:1<1)
   Id=0
    Leaf False 
 
-  Id=69
+  Id=71
    Node(site_type:1<2)
     Id=63
      Node(site_type:2<0)
@@ -844,12 +844,12 @@ Id=55
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=74
+Id=76
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=73
+  Id=75
    Node(site_type:1<1)
     Id=63
      Node(site_type:2<0)
@@ -874,9 +874,9 @@ Id=74
         Id=0
          Leaf False 
 
-    Id=72
+    Id=74
      Node(site_type:1<2)
-      Id=71
+      Id=73
        Node(site_type:2<0)
         Id=0
          Leaf False 
@@ -922,28 +922,13 @@ Id=66
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=81
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
   Id=56
    Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=66
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -967,7 +952,22 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=66
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=81
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -983,8 +983,8 @@ Id=75
 EXTENSIONAL DESCRIPTION:
 A() => [ A(t~u) v A(t~p) ]
 A() => [ A(z) v A(z!B.z) ]
-B() => [ B(z) v B(z!A.z) ]
 B() => [ B(t~u) v B(t~p) ]
+B() => [ B(z) v B(z!A.z) ]
 B() => [ B(z~u?) v B(z~p?) ]
 
 ------------------------------------------------------------
@@ -1006,7 +1006,7 @@ Id=66
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
+Id=81
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1036,12 +1036,12 @@ Id=39
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=81
+Id=87
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=80
+  Id=86
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1056,7 +1056,7 @@ Id=81
         Id=0
          Leaf False 
 
-    Id=79
+    Id=85
      Node(site_type:0<2)
       Id=66
        Node(site_type:1<0)
@@ -1083,6 +1083,7 @@ A(z!1),B(z!1) =>
 	[
 		  A(t~p,z!1),B(t~p,z!1)
 		v A(t~u,z!1),B(t~u,z!1)
+		v A(t~u,z!1),B(t~p,z!1)
 	]
 ------------------------------------------------------------
 * Properties of pairs of bonds
@@ -1103,82 +1104,7 @@ Id=66
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=75
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=56
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=66
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=39
- Node(site_type:2<0)
-  Id=0
-   Leaf False 
-
-  Id=20
-   Node(site_type:2<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=75
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=56
-   Node(site_type:0<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=66
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=12
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=75
+Id=81
  Node(site_type:0<0)
   Id=0
    Leaf False 
@@ -1200,6 +1126,21 @@ Id=39
 
   Id=20
    Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=66
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -1213,7 +1154,67 @@ Id=81
   Id=0
    Leaf False 
 
-  Id=80
+  Id=56
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=66
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=81
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=56
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=39
+ Node(site_type:2<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:2<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=87
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=86
    Node(site_type:0<1)
     Id=3
      Node(site_type:1<0)
@@ -1228,7 +1229,7 @@ Id=81
         Id=0
          Leaf False 
 
-    Id=79
+    Id=85
      Node(site_type:0<2)
       Id=66
        Node(site_type:1<0)
@@ -1254,11 +1255,11 @@ B()=> [
 		  B(z~u?)
 		v B(z~p?)]
 B()=> [
-		  B(t~u)
-		v B(t~p)]
-B()=> [
 		  B(z)
 		v B(z!A.z)]
+B()=> [
+		  B(t~u)
+		v B(t~p)]
 A()=> [
 		  A(z)
 		v A(z!B.z)]
@@ -1276,7 +1277,8 @@ B(z!A.z)=> [B(z~p!A.z)]
 ------------------------------------------------------------
 A(z!1),B(z!1)=> [
 		  A(t~p,z!1),B(t~p,z!1)
-		v A(t~u,z!1),B(t~u,z!1)]
+		v A(t~u,z!1),B(t~u,z!1)
+		v A(t~u,z!1),B(t~p,z!1)]
 
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
