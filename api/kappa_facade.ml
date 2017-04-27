@@ -153,17 +153,17 @@ let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
       |  ExceptionDefn.Syntax_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Locality.to_range location))
+             ~region:(Some location)
              message)
       | ExceptionDefn.Malformed_Decl ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Locality.to_range location))
+             ~region:(Some location)
              message)
       | ExceptionDefn.Internal_Error ((message,location) : string Locality.annot) ->
         handler
           (Api_data.api_message_errors
-             ~region:(Some (Locality.to_range location))
+             ~region:(Some location)
              message)
       | Invalid_argument error ->
         handler (Api_data.api_message_errors ("Runtime error "^ error))

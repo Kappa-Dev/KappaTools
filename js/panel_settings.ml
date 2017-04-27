@@ -251,7 +251,7 @@ module DivErrorMessage : Ui_common.Div = struct
          in
          match range with
          | None -> ""
-         | Some range -> Format.sprintf  "[%s]" range.Api_types_j.file)
+         | Some range -> Format.sprintf  "[%s]" range.Locality.file)
       error_index
       State_error.errors
 

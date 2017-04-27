@@ -54,7 +54,7 @@ let start_simulation () =
          __LOC__
          (State_simulation.with_simulation
             ~label:__LOC__
-            (fun _ p_id t ->
+            (fun _ p_id _t ->
                let simulation_parameter =
                  State_project.create_simulation_parameter p_id in
                State_simulation.start_simulation simulation_parameter))
@@ -74,9 +74,9 @@ let perturb_simulation () =
        >>= (fun _ -> Lwt.return_unit)
     )
 
-let focus_range (range : Api_types_j.range) : unit =
-  let file_id = range.Api_types_j.file in
-  let line = range.Api_types_j.from_position.Locality.line in
+let focus_range (range : Locality.t) : unit =
+  let file_id = range.Locality.file in
+  let line = range.Locality.from_position.Locality.line in
   Common.async
     (fun () ->
        State_error.wrap

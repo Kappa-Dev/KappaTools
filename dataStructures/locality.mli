@@ -6,7 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type t
+type position = { chr: int; line: int }
+type range = {
+  file : string ;
+  from_position: position;
+  to_position: position
+}
+
+type t = range
 type 'a annot = 'a * t
 type 'a maybe = ?pos:t -> 'a
 
@@ -21,14 +28,21 @@ val print : Format.formatter -> t -> unit
 val print_annot :
   (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a annot -> unit
 
-type position = { chr: int; line: int }
-type range = { file : string ;
-               from_position: position;
-               to_position: position }
-
-val to_range : t -> range
-
-val of_json : Yojson.Basic.json -> t
-val to_json : t -> Yojson.Basic.json
 val annot_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a annot
 val annot_to_json : ('a -> Yojson.Basic.json) -> 'a annot -> Yojson.Basic.json
+
+val write_range : Bi_outbuf.t -> t -> unit
+  (** Output a JSON value of type {!t}. *)
+
+val string_of_range : ?len:int -> t -> string
+  (** Serialize a value of type {!t} into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_range :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
+  (** Input JSON data of type {!t}. *)
+
+val range_of_string : string -> t
+  (** Deserialize JSON data of type {!t}. *)

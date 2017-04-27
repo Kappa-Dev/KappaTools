@@ -97,7 +97,7 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
       match model.State_file.model_current with
       | None -> None
       | Some file_id ->
-        if range.Api_types_j.file = file_id then
+        if range.Locality.file = file_id then
           Some (Codemirror.create_lint
                   ~message:error.Api_types_j.message_text
               (* This is a bit of a hack ... i am trying to keep
