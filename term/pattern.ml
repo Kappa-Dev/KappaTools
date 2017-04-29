@@ -122,44 +122,46 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
     | None -> ()
     | Some s -> s := Mods.Int2Set.remove x !s in
   let rec aux at_least_one_edge rename = function
-    | [] -> if at_least_one_edge then Some rename else None
+    | [] -> if at_least_one_edge then (Some rename,[]) else (None,[])
     | (o,p as pair)::todos ->
       let () = tick pair in
       match Tools.array_fold_left2i
-              (fun _ c (lx,ix) (ly,iy) ->
+              (fun i c (lx,ix) (ly,iy) ->
                  match c with
-                 | None -> c
-                 | Some (one_edge,todo,ren) ->
+                 | (None,_) -> c
+                 | (Some (one_edge,todo,ren),_) ->
                    if ((not strict && (ix = -1||iy = -1)) || ix = iy) then
                      match lx, ly with
-                     | (Link _, Free| Free, Link _) -> None
+                     | (Link _, Free| Free, Link _) ->
+                        (None,[(o,i,lx,-1);(o,i,ly,-1)])
                      | (UnSpec, Free| Free, UnSpec
                        | Link _, UnSpec |UnSpec, Link _) ->
-                       if strict then None
-                       else Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
+                        if strict then (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                        else
+                          (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),[])
                      | UnSpec, UnSpec ->
-                       Some (one_edge || (ix <> -1 && ix = iy),todo,ren)
-                     | Free, Free -> Some (true,todo,ren)
+                       (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),[])
+                     | Free, Free -> (Some (true,todo,ren),[])
                      | Link (n1,s1), Link (n2,s2) ->
                        if s1 = s2 then
                          if Renaming.mem n1 ren then
                            if Renaming.apply ren n1 = n2
-                           then Some (true,todo,ren)
-                           else None
+                           then (Some (true,todo,ren),[])
+                           else (None,[(o,i,lx,-1);(o,i,ly,-1)])
                          else match Renaming.add n1 n2 ren with
-                           | None -> None
+                           | None -> (None,[(o,i,lx,-1);(o,i,ly,-1)])
                            | Some r' ->
                              if find_ty cc1 n1 = find_ty cc2 n2
-                             then Some (true,(n1,n2)::todo,r')
-                             else None
-                       else None
-                   else None
+                             then (Some (true,(n1,n2)::todo,r'),[])
+                             else (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                       else (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                   else (None,[(o,i,UnSpec,ix);(o,i,UnSpec,iy)])
               )
-              (Some (at_least_one_edge,todos,rename))
+              (Some (at_least_one_edge,todos,rename),[])
               (Mods.IntMap.find_default [||] o cc1.nodes)
               (Mods.IntMap.find_default [||] p cc2.nodes) with
-      | None -> None
-      | Some (one_edges',todos',ren') -> aux one_edges' ren' todos' in
+      | (None,conflict) -> (None,conflict)
+      | (Some (one_edges',todos',ren'),_) -> aux one_edges' ren' todos' in
   match Renaming.add root1 root2 Renaming.empty with
   | None -> assert false
   | Some r ->
@@ -182,7 +184,8 @@ let equal a b =
       (fun bool ag ->
          match bool with
          | Some _ -> bool
-         | None -> are_compatible ~strict:true h1 a ag b)
+         | None ->
+            let (rename,_) = are_compatible ~strict:true h1 a ag b in rename)
       None ags
 
 let automorphisms a =
@@ -195,8 +198,8 @@ let automorphisms a =
   | _, (h :: _ as l) ->
     List.fold_left (fun acc ag ->
         match are_compatible ~strict:true h a ag a with
-        | None -> acc
-        | Some r -> r::acc) [] l
+        | (None,_) -> acc
+        | (Some r,_) -> r::acc) [] l
 
 let potential_pairing =
   Tools.array_fold_left2i
@@ -212,8 +215,8 @@ let matchings a b =
     | None -> acc
     | Some (x,y) ->
       match are_compatible ~possibilities ~strict:false x a y b with
-      | None -> for_one_root acc
-      | Some r -> for_one_root (r::acc) in
+      | (None,_) -> for_one_root acc
+      | (Some r,_) -> for_one_root (r::acc) in
   for_one_root []
 
 (*turns a cc into a path(:list) in the domain*)
@@ -973,8 +976,8 @@ let embeddings_to_fully_specified domain a_id b =
   | Some (h,ty) ->
     List.fold_left (fun acc ag ->
       match are_compatible ~strict:false h a ag b with
-      | None -> acc
-      | Some r -> r::acc) [] b.nodes_by_type.(ty)
+      | (None,_) -> acc
+      | (Some r,_) -> r::acc) [] b.nodes_by_type.(ty)
 
 type prepoint = {
   p_id: id;
@@ -1429,8 +1432,10 @@ let merge_on_inf env m g1 g2 =
       Mods.Int2Set.empty m_list in
   let possibilities = ref pairing in
   match (are_compatible ~possibilities ~strict:true root1 g1 root2 g2) with
-  | Some m' ->
+  | (Some m',_) ->
      let (_,pushout) =
        merge_compatible env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
-     Some pushout
-  | None -> None
+     (Some pushout,[])
+  | (None,conflict) -> (None,conflict)
+
+let length cc = Mods.IntMap.size (cc.nodes)

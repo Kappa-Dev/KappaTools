@@ -163,6 +163,8 @@ type elementary_rule = {
 
 let extract_cc_ids r = r.connected_components
 
+let extract_abstract_event r = r.instantiations
+
 let rule_to_yojson r =
   let alg_expr_to_json =
     Alg_expr.e_to_yojson

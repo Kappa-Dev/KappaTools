@@ -661,8 +661,8 @@ let log_event id quarks event_kind steps =
                 | Instantiation.Create ((aid,_),sites) ->
                    check_create_quarks aid sites quarks
                 | Instantiation.Free _ | Instantiation.Bind_to _
-                  | Instantiation.Bind _-> true
-                | Instantiation.Mod_internal _ | Instantiation.Remove _ ->
+                  | Instantiation.Bind _ | Instantiation.Mod_internal _ -> true
+                | Instantiation.Remove _ ->
                    raise (ExceptionDefn.Internal_Error
                             (Locality.dummy_annot
                                "init event has actions not allowed"))) actions
@@ -846,9 +846,10 @@ let pretty_print
                   (dot_of_grid profiling env enriched_config)
              | Json ->
                 let (_,grid_story,_) = List.nth grid_list cpt in
-                let filename = Kappa_files.get_cflow
-                                 [compression_type;(string_of_int cpt)] "json"
-                in
+                let filename =
+                  Kappa_files.path
+                    (Kappa_files.get_cflow
+                       [compression_type;(string_of_int cpt)] "json") in
                 Yojson.Basic.to_file
                   filename
                   (json_of_grid enriched_config grid_story steps)
@@ -874,9 +875,11 @@ let pretty_print
         ) 0 story_list
     in
     let () = match dotFormat with
-        Json -> let env_filename =
-                  Kappa_files.get_cflow [compression_type;"env"] "json" in
-                Yojson.Basic.to_file env_filename (Model.to_yojson env)
+      | Json ->
+         let env_filename =
+           Kappa_files.path
+             (Kappa_files.get_cflow [compression_type;"env"] "json") in
+         Yojson.Basic.to_file env_filename (Model.to_yojson env)
       | Dot | Html -> () in
     let _ =
       Kappa_files.with_cflow_file

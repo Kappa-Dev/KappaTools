@@ -144,60 +144,70 @@ let match_actions = function
   | (Create _,_) | (Mod_internal _,_)| (Bind _,_)| (Bind_to _,_)| (Free _,_)
     | (Remove _,_) -> false
 
-let get_ids f =
+let get_ids f aux =
   List.fold_left
     (fun acc a ->
       let id = f a in
-      if (List.mem id acc) then acc else id::acc) []
+      if (List.mem id acc) then acc else id::acc) aux
 
-let find_match tests actions ctests cactions =
-  let possible_matches abstract_quarks concrete_quarks fmap fmatch id_list =
-    List.fold_left
-      (fun acc aq ->
-        let ids =
-          get_ids (fmap (Agent.id))
-                  (List.find_all
-                     (fun cq -> fmatch (aq,cq)) concrete_quarks) in
-        match acc with
-        | [] -> ids
-        | _ ->
-           List.fold_left
-             (fun acc' i ->
-               if (List.mem i acc) then i::acc' else acc') [] ids)
-      id_list abstract_quarks in
-  let possible_tests = possible_matches tests ctests map_test match_tests [] in
-  let possible_actions =
-    possible_matches actions cactions map_action match_actions possible_tests in
-  let pick = List.hd possible_actions in
-  let remove_quarks fmap =
-    List.filter (fun q -> not((fmap (Agent.id) q) = pick)) in
-  (pick,(remove_quarks map_test ctests),(remove_quarks map_action cactions))
+let rec match_quarks a_quarks c_quarks fmatch =
+  match a_quarks with
+  | aq::aqs ->
+     let (cqs,rest) =
+       List.partition (fun cq -> fmatch (aq,cq)) c_quarks in
+     if (cqs = []) then false
+     else match_quarks aqs rest fmatch
+  | [] -> (c_quarks = [])
+
+let rec find_match tests actions ctests cactions = function
+  | [] ->
+     raise
+       (ExceptionDefn.Internal_Error
+          (Locality.dummy_annot "abstract and concret quarks don't match"))
+  | cid::tl ->
+     let ctests' =
+       List.filter
+         (fun test -> map_test (fun a -> (Agent.id a) = cid) test) ctests in
+     let cactions' =
+       List.filter
+         (fun act -> map_action (fun a -> (Agent.id a) = cid) act) cactions in
+     if ((match_quarks tests ctests' match_tests)&&
+           (match_quarks actions cactions' match_actions)) then cid
+     else find_match tests actions ctests cactions tl
 
 let matching_abstract_concrete ae ce =
   let ae_tests = List.flatten ae.tests in
   let ce_tests = List.flatten ce.tests in
   let abstract_ids =
-    (get_ids (map_action (Matching.Agent.get_id)) ae.actions)@
-      (get_ids (map_test (Matching.Agent.get_id)) ae_tests) in
+    (get_ids
+       (map_action (Matching.Agent.get_id))
+       (get_ids (map_test (Matching.Agent.get_id)) [] ae_tests)
+       ae.actions) in
+  let concrete_ids =
+    (get_ids
+       (map_action (Agent.id))
+       (get_ids (map_test (Agent.id)) [] ce_tests)
+       ce.actions) in
+  let available_ids used =
+    match used with
+    | None -> concrete_ids
+    | Some r ->
+       List.filter
+         (fun i -> not(Mods.IntSet.mem i (Renaming.image r))) concrete_ids in
   let acc_option f acc = match acc with
     | Some a -> f a
     | None -> None in
-  let (matching,_,_,_,_) =
+  let partition fmap i =
+    List.partition (fun q -> fmap (fun a -> (Matching.Agent.get_id a) = i) q) in
+  let matching =
     List.fold_left
-      (fun (acc,ae_tests,ce_tests,ae_actions,ce_actions) i ->
-        let (curr_tests,tests) =
-          List.partition
-            (fun test -> map_test (fun a -> (Matching.Agent.get_id a) = i) test)
-            ae_tests in
-        let (curr_actions,actions) =
-          List.partition
-            (fun act -> map_action (fun a -> (Matching.Agent.get_id a) = i) act)
-            ae_actions in
-        let (j,tests',actions') =
-          find_match curr_tests curr_actions ce_tests ce_actions in
-        ((acc_option (Renaming.add i j) acc),tests,tests',actions,actions'))
-      (Some (Renaming.empty),ae_tests,ce_tests,ae.actions,ce.actions)
-      abstract_ids in
+      (fun acc i ->
+        let (tests,_) = partition map_test i ae_tests in
+        let (actions,_) = partition map_action i ae.actions in
+        let j =
+          find_match tests actions ce_tests ce.actions (available_ids acc) in
+        (acc_option (Renaming.add i j) acc))
+      (Some Renaming.empty) abstract_ids in
   matching
 
 let subst_map_concrete_agent f (id,na as agent) =
