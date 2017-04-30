@@ -13,9 +13,12 @@ done
 	 -initial conditions
 + Building initial state (2048 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output'
++ Command line to rerun is: 'KaSim' 'json.ka' '-seed' '840540685' '-l' '5' '-d' 'output' '-trace' '/tmp/cflow-json-trace.json'
 ____________________________________________________________
 ############################################################
+Simulation ended
+92.45% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%
 + Loading trace
 	- removing events occurring after the last observable: nothing has changed 
 + Producing causal compressions
@@ -48,6 +51,3 @@ ____________________________________________________________
 ############################################################
 
 + Pretty printing 2 weakly compressed flows
-Simulation ended
-92.45% of event loops were productive. Null event cause:
-	Clashing instance: 100.00%

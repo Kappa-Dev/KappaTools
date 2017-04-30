@@ -846,13 +846,11 @@ let pretty_print
                   (dot_of_grid profiling env enriched_config)
              | Json ->
                 let (_,grid_story,_) = List.nth grid_list cpt in
-                let filename =
-                  Kappa_files.path
-                    (Kappa_files.get_cflow
-                       [compression_type;(string_of_int cpt)] "json") in
-                Yojson.Basic.to_file
-                  filename
-                  (json_of_grid enriched_config grid_story steps)
+                Kappa_files.with_cflow_file
+                  [compression_type;(string_of_int cpt)] "json"
+                  (fun f -> Format.fprintf f "%s@."
+                      (Yojson.Basic.to_string
+                         (json_of_grid enriched_config grid_story steps)))
              | Html ->
                 let profiling desc =
                   Format.fprintf
@@ -876,10 +874,9 @@ let pretty_print
     in
     let () = match dotFormat with
       | Json ->
-         let env_filename =
-           Kappa_files.path
-             (Kappa_files.get_cflow [compression_type;"env"] "json") in
-         Yojson.Basic.to_file env_filename (Model.to_yojson env)
+        Kappa_files.with_cflow_file [compression_type;"env"] "json"
+          (fun f -> Format.fprintf f "%s@."
+              (Yojson.Basic.to_string (Model.to_yojson env)))
       | Dot | Html -> () in
     let _ =
       Kappa_files.with_cflow_file
