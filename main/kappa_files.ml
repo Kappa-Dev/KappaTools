@@ -177,6 +177,11 @@ let set_cflow s = cflowFileName := s
 let get_cflow l e = get_fresh_filename !cflowFileName l "" e
 let with_cflow_file l e f =
   with_formatter (get_fresh_filename !cflowFileName l "" e) f
+let with_json_cflow l e json =
+  let oc = open_out (get_cflow l e) in
+  let () = Yojson.Basic.to_channel oc json in
+  let () = output_string oc "\n" in
+  close_out oc
 
 let open_tasks_profiling () = open_out !tasks_profilingName
 let open_branch_and_cut_engine_profiling () = open_out !branch_and_cut_engine_profilingName

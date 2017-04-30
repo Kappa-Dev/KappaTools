@@ -228,7 +228,7 @@ module Agent = struct
     | Fresh (i,_) -> i
 
   let get_id = function
-    | Existing (_,i) -> i
+    | Existing (n,_) -> Agent.id n
     | Fresh (_,i) -> i
 
   let same_connected_component p p' =

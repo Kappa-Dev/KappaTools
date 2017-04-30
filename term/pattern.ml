@@ -136,10 +136,10 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
                    if ((not strict && (ix = -1||iy = -1)) || ix = iy) then
                      match lx, ly with
                      | (Link _, Free| Free, Link _) ->
-                        (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                        (None,[(o,i,lx,-1);(p,i,ly,-1)])
                      | (UnSpec, Free| Free, UnSpec
                        | Link _, UnSpec |UnSpec, Link _) ->
-                        if strict then (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                        if strict then (None,[(o,i,lx,-1);(p,i,ly,-1)])
                         else
                           (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),[])
                      | UnSpec, UnSpec ->
@@ -150,15 +150,15 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
                          if Renaming.mem n1 ren then
                            if Renaming.apply ren n1 = n2
                            then (Some (true,todo,ren),[])
-                           else (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                           else (None,[(o,i,lx,-1);(p,i,ly,-1)])
                          else match Renaming.add n1 n2 ren with
-                           | None -> (None,[(o,i,lx,-1);(o,i,ly,-1)])
+                           | None -> (None,[(o,i,lx,-1);(p,i,ly,-1)])
                            | Some r' ->
                              if find_ty cc1 n1 = find_ty cc2 n2
                              then (Some (true,(n1,n2)::todo,r'),[])
-                             else (None,[(o,i,lx,-1);(o,i,ly,-1)])
-                       else (None,[(o,i,lx,-1);(o,i,ly,-1)])
-                   else (None,[(o,i,UnSpec,ix);(o,i,UnSpec,iy)])
+                             else (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                       else (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                   else (None,[(o,i,UnSpec,ix);(p,i,UnSpec,iy)])
               )
               (Some (at_least_one_edge,todos,rename),[])
               (Mods.IntMap.find_default [||] o cc1.nodes)
