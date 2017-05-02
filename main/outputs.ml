@@ -155,13 +155,18 @@ let init_activities env = function
     let form = Format.formatter_of_out_channel desc in
     let nb_r = Model.nb_syntactic_rules env in
     let () = actsDescr := Some (desc,form,nb_r) in
-    Format.fprintf form "@[<v>[@,"
+    let () = Format.fprintf form "@[<v>{@,rules:@[[" in
+    let () =
+      Tools.iteri
+        (fun x -> Format.fprintf form "\"%a\",@," (Model.print_ast_rule ~env) x)
+        nb_r in
+    Format.fprintf form "\"%a\"]@],@,data:[@," (Model.print_ast_rule ~env) nb_r
 
 let close_activities () =
   match !actsDescr with
   | None -> ()
   | Some (c,f,_) ->
-    let () = Format.fprintf f "@,]@." in
+    let () = Format.fprintf f "@,]}@]@." in
     close_out c
 
 let output_activities r flux =
