@@ -146,14 +146,15 @@ let from_edge domain graph (out,cache as acc) edge =
              match survive_nav inj_point2graph graph son.Pattern.Env.next with
              | None -> pair
              | Some inj' ->
-               let p' = Pattern.Env.get domain son.Pattern.Env.dst in
                let rename = Renaming.compose false son.Pattern.Env.inj inj' in
-               let next = (son.Pattern.Env.dst,p',rename) in
                let ca' = CacheSetMap.Set.add
                    (son.Pattern.Env.dst,Renaming.min_elt rename) ca in
                if ca == ca'
                then pair
-               else (next::re,ca'))
+               else
+                 let p' = Pattern.Env.get domain son.Pattern.Env.dst in
+                 let next = (son.Pattern.Env.dst,p',rename) in
+                 (next::re,ca'))
           (remains,cache) (Pattern.Env.sons point) in
       aux_from_edges cache' acc' remains' in
   match Pattern.Env.get_elementary domain edge with
