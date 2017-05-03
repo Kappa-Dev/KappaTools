@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <May 03 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -18,6 +18,7 @@ sig
   val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
 
   val network_from_compil:
+    ?max_size:int -> 
     dotnet:bool ->
     smash_reactions:bool ->
     ignore_obs:bool ->
@@ -43,7 +44,7 @@ sig
     Loggers.t -> Loggers.t -> Loggers.t ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id)  network ->
-    (ode_var_id, Ode_loggers_sig.ode_var_id)  network 
+    (ode_var_id, Ode_loggers_sig.ode_var_id)  network
 
   val get_comment: enriched_rule -> string
 

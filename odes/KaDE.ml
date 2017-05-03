@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 26 2017>
+  * Last modification: Time-stamp: <May 03 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -9,8 +9,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let start_time = Sys.time () in
   let usage_msg =
     "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--dotnet-output foo.net] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float]
-    [--relative-tolerance float] [--absolute-tolerance float]\n"
+    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--dotnet-output foo.net] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float] [--relative-tolerance float] [--absolute-tolerance float] [--truncate int]\n"
   in
   let cli_args = Run_cli_args.default in
   let cli_args_gui = Run_cli_args.default_gui in
@@ -62,6 +61,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       end
     in
     let propagate_constants = !(ode_args.Ode_args.propagate_constants) in
+    let max_size = !(ode_args.Ode_args.max_size_for_species) in
     let () =
       match
         !(ode_args.Ode_args.matlab_output)
@@ -265,7 +265,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       !(ode_args.Ode_args.smash_reactions)
     in
     let network =
-      A.network_from_compil ~dotnet ~smash_reactions ~ignore_obs parameters compil network
+      A.network_from_compil ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network
     in
     (*************************************************************)
     let out_channel =
