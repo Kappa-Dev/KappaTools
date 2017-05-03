@@ -69,7 +69,7 @@ let print_agent fmt s interface =
     in
     print_elements interface
 
-let print_rule fmt interface interface1 f_a =
+let print_rule fmt interface interface1 f_a rate rate1=
   let () =
     let (a,b) = f_a in
     Format.fprintf fmt "%s, " b;
@@ -77,10 +77,11 @@ let print_rule fmt interface interface1 f_a =
     Format.fprintf fmt " <-> ";
     Format.fprintf fmt "%s, " a;
     print_agent fmt "S" interface1;
+    Format.fprintf fmt " @%s{%s},%s\n" rate1 rate rate1
   in
   ()
 
-let print_rule_binding fmt interface interface1 f_a  =
+let print_rule_binding fmt interface interface1 f_a rate  =
   let () =
     let (a, b) = f_a in
     Format.fprintf fmt "%s, " a;
@@ -88,6 +89,7 @@ let print_rule_binding fmt interface interface1 f_a  =
     Format.fprintf fmt " -> ";
     Format.fprintf fmt "%s, " b;
     print_agent_binding fmt "S" interface1;
+    Format.fprintf fmt " @%s\n" rate
   in
   ()
 
@@ -118,6 +120,14 @@ let declare_rate fmt n =
   in
   aux 0
 
+let count_p interface =
+  List.fold_left
+    (fun n (_,state,_) -> if state="p" then n+1 else n) 0 interface
+
+let rate_of kind interface =
+  let n = count_p interface in
+  "k"^kind^(string_of_int n)
+
 (******************************************************)
 (*deal with loop *)
 
@@ -140,11 +150,11 @@ let potential_valuations fmt list =
   aux list [[]]
 
 let flip_binding (s,state, state') =
-  if state = "u" then (s, "u!1", "p")
-  else if state = "p" then  (s, "p!1", "u")
-  else if state' = "p!1" then (s, "p", "p")
-  else if state' = "u!1" then (s, "u", "u")
-  else (s, state, state')
+  if state = "u" then "p", (s, "u!1", "p")
+  else if state = "p" then "u" , (s, "p!1", "u")
+  else if state' = "p!1" then "u!1", (s, "p", "p")
+  else if state' = "u!1" then "p!1", (s, "u", "u")
+  else "", (s, state, state')
 
 let first_agent  (state, state') =
   if state = "p" then ("F(s!1)", "F(s)")
@@ -158,12 +168,15 @@ let deal_with_one_valuation fmt interface =
     match suffix with
     | [] -> ()
     | (h,s,s')::tl ->
-      let flip = flip_binding (h,s,s') in
+      let kind,flip = flip_binding (h,s,s') in
       let f_a = first_agent  (s, s') in
       let interface1 = flip :: tl in
-      let () = print_rule fmt interface interface1 f_a in
+      let rate1 = rate_of kind interface1 in
+      let rate = rate_of kind interface in
+      let () = print_rule fmt interface interface1 f_a rate rate1 in
       let () = Format.fprintf fmt "\n" in
-      let () = print_rule_binding fmt interface1 interface1 f_a in
+      let () = print_rule_binding fmt interface1 interface1 f_a
+          rate in
       aux tl (h::prefix)
   in
   aux (List.rev interface) []
