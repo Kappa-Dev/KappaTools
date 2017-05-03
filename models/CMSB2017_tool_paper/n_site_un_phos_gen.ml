@@ -43,8 +43,6 @@ let site_list n =
     else aux (k-1) (("x"^(string_of_int k))::l)
   in aux n []
 
-
-
 let potential_valuations list =
   let list = List.rev list in
   let rec aux remaining_site partial_valuations =
