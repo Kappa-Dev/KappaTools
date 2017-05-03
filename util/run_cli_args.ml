@@ -211,8 +211,8 @@ let options_gui t_gui =
     "--output-plot",
   Superarg.String_opt t_gui.outputDataFile_gui,
   "file name for data output",
-  ["1_output";"2_semantics";"3_integration_settings"],Normal;
+  ["1_output";"2_semantics";"3_integration_settings"],Superarg.Normal;
   "--data-file",
   Superarg.String_opt t_gui.outputDataFile_gui,
   "file name for data output",
-  ["1_output";"2_semantics";"3_integration_settings"],Hidden;]
+  ["1_output";"2_semantics";"3_integration_settings"],Superarg.Hidden;]

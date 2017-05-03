@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 24 2017>
+  * Last modification: Time-stamp: <May 03 2017>
 *)
 
 module type Interface =
@@ -210,5 +210,11 @@ sig
     cache *
     Symmetries.bwd_map
 
+  val valid_mixture:
+    compil ->
+    cache ->
+    ?max_size:int ->
+    mixture -> 
+    cache * bool
 
 end

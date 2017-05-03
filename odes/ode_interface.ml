@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Apr 24 2017>
+  * Last modification: Time-stamp: <May 03 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -131,7 +131,7 @@ let print_chemical_species ?dotnet ?compil f =
   Format.fprintf f "@[<h>%a@]"
     (Pattern.print_cc
        ?dotnet
-       ?full_species:(Some true)   
+       ?full_species:(Some true)
        ~new_syntax:false
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None ~with_id:false)
@@ -520,3 +520,16 @@ let add_equiv_class parameters compil cache red bwd_map species =
               seen = seen
   },
   bwd_map
+
+let valid_mixture compil cc_cache  ?max_size mixture =
+  match max_size
+  with
+  | None -> cc_cache,true
+  | Some n ->
+    let cc_cache, cc_list =
+      connected_components_of_mixture compil cc_cache mixture
+    in
+    cc_cache,
+      List.for_all
+        (fun cc -> Pattern.size_of_cc cc <= n)
+        cc_list

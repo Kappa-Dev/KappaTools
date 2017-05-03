@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <May 03 2017>
 *)
 
 let local_trace = false
@@ -695,7 +695,7 @@ struct
       Alg_expr.BOOL_OP (op,
                         convert_bool_expr parameter compil network a,
                         convert_bool_expr parameter compil network b),pos
-  let add_prereaction
+  let add_reaction ?max_size
       parameters compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
     let _  = debug "REACTANTS\n" in
@@ -703,29 +703,38 @@ struct
       petrify_mixture parameters compil mixture remanent in
     let _  = debug "PRODUCT\n" in
     let products = I.apply compil rule embedding_forest mixture in
-    let tokens = I.token_vector rule in
-    let remanent, products =
-      petrify_mixture parameters compil products remanent in
-    let remanent, tokens =
-      List.fold_left
-        (fun (remanent, tokens) (_,b) ->
-           let remanent, id = translate_token b remanent in
-           remanent,(Locality.dummy_annot id)::tokens)
-        (remanent,[])
-        tokens
+    let list, network = remanent in
+    let cache, bool  =
+      I.valid_mixture compil network.cache ?max_size products
     in
-    let to_be_visited, network = remanent in
-    let network =
-      {
-        network with
-        reactions =
-          ((List.rev reactants, List.rev products, List.rev tokens,
-            enriched_rule),1)::network.reactions
-      }
-    in
-    to_be_visited, network
+    let network = {network with cache = cache} in
+    let remanent = list, network in
+    if bool then
+      let tokens = I.token_vector rule in
+      let remanent, products =
+        petrify_mixture parameters compil products remanent in
+      let remanent, tokens =
+        List.fold_left
+          (fun (remanent, tokens) (_,b) ->
+             let remanent, id = translate_token b remanent in
+             remanent,(Locality.dummy_annot id)::tokens)
+          (remanent,[])
+          tokens
+      in
+      let to_be_visited, network = remanent in
+      let network =
+        {
+          network with
+          reactions =
+            ((List.rev reactants, List.rev products, List.rev tokens,
+              enriched_rule),1)::network.reactions
+        }
+      in
+      to_be_visited, network
+    else
+      remanent
 
-  let initial_network ~dotnet parameters compil network initial_states rules =
+  let initial_network ?max_size ~dotnet parameters compil network initial_states rules =
     let network =
       {network with has_empty_lhs = Some false}
     in
@@ -739,7 +748,7 @@ struct
                let () = debug "add new reaction" in
                let l,network = remanent in
                let remanent = l,{network with has_empty_lhs = Some true} in
-               add_prereaction parameters compil enriched_rule embed mixture remanent
+               add_reaction ?max_size parameters compil enriched_rule embed mixture remanent
              end
            | _::_ -> remanent
         )
@@ -786,7 +795,7 @@ struct
   let compare_extended_reaction a b =
     compare_reaction (fst a) (fst b)
 
-  let compute_prereactions ~smash_reactions ~dotnet parameters compil network rules
+  let compute_reactions ?max_size ~smash_reactions ~dotnet parameters compil network rules
       initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
@@ -814,7 +823,7 @@ struct
     in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
-      initial_network ~dotnet
+      initial_network ?max_size ~dotnet
         parameters compil network initial_states rules
     in
     let network =
@@ -970,7 +979,7 @@ struct
                          let () =
                            debug "add new reaction"
                          in
-                         add_prereaction
+                         add_reaction ?max_size
                            parameters compil enriched_rule embed
                            mixture remanent)
                       (to_be_visited,network)
@@ -990,7 +999,7 @@ struct
                     in
                     fold_left_swap
                       (fun embed ->
-                         add_prereaction
+                         add_reaction ?max_size
                            parameters compil enriched_rule embed
                            (I.lift_species compil new_species))
                       lembed
@@ -1059,7 +1068,7 @@ struct
           in
           (reactants,products, tokens, rule)::reactions)
         []
-        (List.rev network.prereactions)
+        (List.rev network.reactions)
     in
           reactions*)
 
@@ -1493,7 +1502,7 @@ struct
      bwd_map = bwd_map ;
      cache = cache }
 
-  let network_from_compil ~dotnet ~smash_reactions ~ignore_obs parameters compil network =
+  let network_from_compil ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
     let rules = I.get_rules compil in
     let () = Format.printf "\t -initial states @." in
@@ -1504,8 +1513,7 @@ struct
       Format.printf "\t -saturating the set of molecular species @."
     in
     let network =
-      compute_prereactions ~dotnet ~smash_reactions parameters compil network rules
-        initial_state
+      compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
     let () =
       match network.sym_reduction with

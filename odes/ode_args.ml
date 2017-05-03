@@ -28,7 +28,8 @@ type t = {
   absolute_tolerance : float ref ;
   smash_reactions : bool ref ;
   propagate_constants : bool ref ;
-  print_efficiency : bool ref
+  print_efficiency : bool ref ;
+  max_size_for_species : int option ref ;
 }
 
 let default : t =
@@ -59,6 +60,7 @@ let default : t =
     smash_reactions = ref false ;
     propagate_constants = ref false ;
     print_efficiency = ref false ;
+    max_size_for_species = ref None ;
   }
 
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
@@ -127,7 +129,15 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
       "Occurrences","count the number of occurrences of species"],
     ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
     "tune whether we cound in embeddings or in occurrences",
-    ["2_semantics"],Normal;
+  ["2_semantics"],Normal;
+  "--truncate",
+  Superarg.Int_opt t.max_size_for_species,
+  "truncate the network by discarding species with size greater than the argument",
+  ["2_semantics"],Normal;
+  "--max-size-for-species",
+  Superarg.Int_opt t.max_size_for_species,
+  "truncate the network by discarding species with size greater than the argument",
+  ["2_semantics"],Normal;
   "--show-reactions",
   Superarg.Bool t.smash_reactions,
   "Gather identical reactions in the ODEs",

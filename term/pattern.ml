@@ -25,6 +25,9 @@ type t = cc
 
 type id = int
 
+let size_of_cc cc =
+  Mods.IntMap.fold (fun _ _ -> succ) cc.nodes 0 
+
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
 
 let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0

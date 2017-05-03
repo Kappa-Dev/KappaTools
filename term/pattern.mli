@@ -136,6 +136,8 @@ val automorphisms : t -> Renaming.t list
 
 val embeddings_to_fully_specified : Env.t -> id -> cc -> Renaming.t list
 
+val size_of_cc : cc -> int
+
 val add_fully_specified_to_graph :
   Signature.s -> Edges.t -> cc -> Edges.t * Renaming.t
 
