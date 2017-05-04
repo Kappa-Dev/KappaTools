@@ -282,10 +282,30 @@ let string_of_variable logger string_of_var_id variable =
   | Ode_loggers_sig.Tmp -> Ode_loggers_sig.string_of_array_name variable
   | Ode_loggers_sig.Current_time -> "t"
   | Ode_loggers_sig.Time_scale_factor -> "t_scale_factor"
-  | Ode_loggers_sig.Rate int -> Printf.sprintf "k%i" int
-  | Ode_loggers_sig.Rated int -> Printf.sprintf "kd%i" int
-  | Ode_loggers_sig.Rateun int -> Printf.sprintf "kun%i" int
-  | Ode_loggers_sig.Rateund int -> Printf.sprintf "kdun%i" int
+  | Ode_loggers_sig.Rate int ->
+    let s = Printf.sprintf "k%i" int in
+    if is_dotnet logger then
+      Loggers.allocate_fresh_name logger s "_"
+    else
+      s
+  | Ode_loggers_sig.Rated int ->
+    let s = Printf.sprintf "kd%i" int in
+    if is_dotnet logger then
+      Loggers.allocate_fresh_name logger s "_"
+    else
+      s
+  | Ode_loggers_sig.Rateun int ->
+    let s = Printf.sprintf "kun%i" int in
+    if is_dotnet logger then
+      Loggers.allocate_fresh_name logger s "_"
+    else
+      s
+  | Ode_loggers_sig.Rateund int ->
+    let s = Printf.sprintf "kdun%i" int in
+    if is_dotnet logger then
+      Loggers.allocate_fresh_name logger s "_"
+    else
+      s
   | Ode_loggers_sig.Stochiometric_coef (int1,int2) ->
     Printf.sprintf "stoc%i.%i" int1 int2
   | Ode_loggers_sig.Jacobian_stochiometric_coef _
@@ -1281,9 +1301,6 @@ let dump_kinetic_law
                       (network.Network_handler.int_of_kappa_instance
                          var))
                   var_rule))
-(*| Some _ ->
-               (fun logger ->
-                  print_alg_expr string_of_var_id logger logger_err expr network*)
              | Some cst ->
                begin
                  let cst = promote cst in

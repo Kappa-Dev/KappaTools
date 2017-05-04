@@ -1053,25 +1053,6 @@ struct
       network
       (I.nb_tokens compil)
 
-      (*  let convert_stochiometric_coef parameters compil network =
-    let reactions =
-      List.fold_left
-        (fun
-          reactions
-          (reactants, products, tokens, rule) ->
-          let tokens =
-            List.fold_left
-              (fun tokens (a,b) ->
-                 let a' = convert_alg_expr parameters compil network a in
-                 (a', b)::tokens)
-              [] (List.rev tokens)
-          in
-          (reactants,products, tokens, rule)::reactions)
-        []
-        (List.rev network.reactions)
-    in
-          reactions*)
-
   let species_of_species_id network =
     (fun i -> Mods.DynArray.get network.species_tab i)
 

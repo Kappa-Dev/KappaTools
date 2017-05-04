@@ -1577,8 +1577,15 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
     if propagate_constants
     then ()
     else
-      let doit () =
-        let id = string_of_variable_sbml string_of_var_id variable in
+      let doit ~must_be_fresh suffix  =
+        let id_init = string_of_variable_sbml string_of_var_id variable in
+        let id =
+          if must_be_fresh then
+            Loggers.allocate_fresh_name logger id_init suffix
+          else
+            id_init
+        in
+        let () = Loggers.allocate logger id_init in
         let () = Loggers.flag_dangerous logger variable id in
         if not (Loggers.is_dangerous_ode_variable logger variable)
         then
@@ -1599,8 +1606,15 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
           let () = Loggers.print_newline logger_buffer in
           ()
       in
-      let doit_const cst =
-        let id = string_of_variable_sbml string_of_var_id variable in
+      let doit_const ~must_be_fresh suffix cst =
+        let id_init = string_of_variable_sbml string_of_var_id variable in
+        let id =
+          if must_be_fresh then
+            Loggers.allocate_fresh_name logger id_init suffix
+          else
+            id_init
+        in
+        let () = Loggers.allocate logger id_init in 
         let () = Loggers.flag_dangerous logger variable id in
         if not (Loggers.is_dangerous_ode_variable logger variable)
         then
@@ -1619,13 +1633,13 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | (Ode_loggers_sig.Tinit |
            Ode_loggers_sig.Tend |
            Ode_loggers_sig.Period_t_points
-          ) ,_ -> doit ()
+          ) ,_ -> doit ~must_be_fresh:false ""
         | Ode_loggers_sig.Expr _ , true ->
           begin
             match Sbml_backend.eval_const_alg_expr
                     logger network_handler alg_expr
             with
-            | Some cst -> doit_const cst
+            | Some cst -> doit_const ~must_be_fresh:false "" cst
             | None -> ()
           end
         | Ode_loggers_sig.Rate _,_
@@ -1633,15 +1647,15 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | Ode_loggers_sig.Rateun _,_
         | Ode_loggers_sig.Rateund _,_ ->
           if Ode_loggers_sig.is_expr_const alg_expr then
-            doit ()
+            doit ~must_be_fresh:true "_"
           else if
             not propagate_constants
             && not
               (match Ode_loggers_sig.is_expr_alias alg_expr
-               with 
+               with
                | None -> false
                | Some _ -> true)
-          then doit ()
+          then doit ~must_be_fresh:true "_"
         | Ode_loggers_sig.Stochiometric_coef _,_
         | Ode_loggers_sig.Jacobian_rate (_,_),_
         | Ode_loggers_sig.Jacobian_rateun (_,_),_

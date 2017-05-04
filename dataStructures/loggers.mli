@@ -86,4 +86,6 @@ val set_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string -> unit
 val get_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string
 val is_dangerous_ode_variable: t -> Ode_loggers_sig.variable -> bool
 val flag_dangerous: t -> Ode_loggers_sig.variable -> string -> unit
-val has_forbidden_char: t -> string -> bool 
+val has_forbidden_char: t -> string -> bool
+val allocate_fresh_name: t -> string -> string -> string
+val allocate: t -> string -> unit 
