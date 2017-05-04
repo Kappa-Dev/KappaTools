@@ -382,6 +382,7 @@ rate:
       {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
     | alg_expr OP_CUR CL_CUR
       {($1,Some (Locality.dummy_annot (Alg_expr.CONST Nbr.zero),None))}
+    | {raise (ExceptionDefn.Syntax_Error (add_pos "missing rule rate"))}
     ;
 
 alg_with_radius:
@@ -419,11 +420,7 @@ agent_expression:
 
 interface_expression:
   /*empty*/ {[]}
-    | ne_interface_expression {$1}
-    ;
-
-ne_interface_expression:
-    | port_expression COMMA ne_interface_expression {$1::$3}
+    | port_expression COMMA interface_expression {$1::$3}
     | port_expression {[$1]}
     ;
 
