@@ -64,10 +64,10 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(6)=t;
-var(3)=2;
+var(3)=2; % c
 init(1)=10; % A(x~u, y~u)
-var(1)=init(1)+init(3)+init(2)+init(5);
-var(2)=var(1)*var(1)*var(1)*t;
+var(1)=init(1)+init(3)+init(2)+init(5); % a
+var(2)=var(1)*var(1)*var(1)*t; % b
 
 k(1)=1; % A(x~u) -> A(x~p)
 k(3)=1; % A(y~u) -> A(y~p)
@@ -198,8 +198,8 @@ global kun
 global kdun
 global stoc
 
-var(1)=y(1)+y(3)+y(2)+y(5);
-var(2)=var(1)*var(1)*var(1)*t;
+var(1)=y(1)+y(3)+y(2)+y(5); % a
+var(2)=var(1)*var(1)*var(1)*t; % b
 
 k(2)=var(1);
 k(4)=var(3);
@@ -336,8 +336,8 @@ global jackun
 global jackund
 global jacstoc
 
-var(1)=y(1)+y(3)+y(2)+y(5);
-var(2)=var(1)*var(1)*var(1)*t;
+var(1)=y(1)+y(3)+y(2)+y(5); % a
+var(2)=var(1)*var(1)*var(1)*t; % b
 
 k(2)=var(1);
 k(4)=var(3);
@@ -671,10 +671,10 @@ global var
 obs=zeros(nobs,1);
 
 t = y(6);
-var(1)=y(1)+y(3)+y(2)+y(5);
-var(2)=var(1)*var(1)*var(1)*t;
+var(1)=y(1)+y(3)+y(2)+y(5); % a
+var(2)=var(1)*var(1)*var(1)*t; % b
 
-obs(1)=t;
+obs(1)=t; % [T]
 
 end
 

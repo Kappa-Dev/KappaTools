@@ -66,8 +66,8 @@ t = 0.000000;
 init(8)=t;
 init(2)=10; % E(r, s)
 init(1)=100; % R(e, r)
-var(2)=init(1)+init(3)+init(4);
-var(1)=(2*init(6)+2*init(7)+2*init(5))/2;
+var(2)=init(1)+init(3)+init(4); % monomers
+var(1)=(2*init(6)+2*init(7)+2*init(5))/2; % dimmers
 
 k(1)=1; % E(r,s), R(e) -> E(r!1,s), R(e!1)
 k(2)=1; % E(r,s), R(e) -> E(r,s!1), R(e!1)
@@ -212,8 +212,8 @@ global kun
 global kdun
 global stoc
 
-var(2)=y(1)+y(3)+y(4);
-var(1)=(2*y(6)+2*y(7)+2*y(5))/2;
+var(2)=y(1)+y(3)+y(4); % monomers
+var(1)=(2*y(6)+2*y(7)+2*y(5))/2; % dimmers
 
 
 dydt=zeros(nodevar,1);
@@ -380,8 +380,8 @@ global jackun
 global jackund
 global jacstoc
 
-var(2)=y(1)+y(3)+y(4);
-var(1)=(2*y(6)+2*y(7)+2*y(5))/2;
+var(2)=y(1)+y(3)+y(4); % monomers
+var(1)=(2*y(6)+2*y(7)+2*y(5))/2; % dimmers
 
 jacvar(2,1)=1;
 jacvar(2,3)=1;
@@ -560,12 +560,12 @@ global var
 obs=zeros(nobs,1);
 
 t = y(8);
-var(2)=y(1)+y(3)+y(4);
-var(1)=(2*y(6)+2*y(7)+2*y(5))/2;
+var(2)=y(1)+y(3)+y(4); % monomers
+var(1)=(2*y(6)+2*y(7)+2*y(5))/2; % dimmers
 
-obs(1)=t;
-obs(2)=var(1);
-obs(3)=var(2);
+obs(1)=t; % [T]
+obs(2)=var(1); % dimmers
+obs(3)=var(2); % monomers
 
 end
 

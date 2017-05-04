@@ -1561,8 +1561,8 @@ struct
     else
       Ode_loggers.increment ~init_mode ~comment string_of_var logger logger_err (Ode_loggers_sig.Init x)
 
-  let affect_var ~propagate_constants is_zero ?init_mode:(init_mode=false) logger
-      logger_buffer logger_err compil network decl =
+  let affect_var ~propagate_constants is_zero ?init_mode:(init_mode=false)
+      logger logger_buffer logger_err compil network decl =
     let handler_expr = handler_expr network in
     match decl with
     | Dummy_decl -> ()
@@ -1608,14 +1608,14 @@ struct
                  handler_init)
             list
       end
-    | Var (id,_comment,expr) ->
+    | Var (id,comment,expr) ->
       let expr =
         if Sbml_backend.is_dotnet logger then
           Sbml_backend.propagate_dangerous_var_names_in_alg_expr
             logger handler_expr expr
         else expr
       in
-      Ode_loggers.associate ~propagate_constants
+      Ode_loggers.associate ?comment ~propagate_constants
         ~init_mode (I.string_of_var_id ~compil ~init_mode logger)
         logger logger_buffer logger_err
         (Ode_loggers_sig.Expr id) expr handler_expr
@@ -1656,7 +1656,7 @@ struct
     match decl with
     | Dummy_decl
     | Init_expr _ -> dep
-    | Var (id,_comment,expr) ->
+    | Var (id,comment,expr) ->
       let dep_var = get_dep ?time_var dep expr network in
       let dep = Mods.IntMap.add id dep_var dep in
       let () =
