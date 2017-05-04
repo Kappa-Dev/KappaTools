@@ -7,8 +7,15 @@
 %init:100 F(s)
 %init: 100 S(p1~U)
 
+%var: 'kES' 0.01
+%var: 'kdES' 1
+%var: 'kpS' 0.1
+%var: 'kFS' 0.001/0.01
+%var: 'kdFS' 0.1/1
+%var: 'kuS' 0.01/0.1
+
 ###  SITE 1 ###
-E(s), S(p1~U) <-> E(s!1), S(p1~U!1) @ 1{0},1
-E(s!1), S(p1~U!1) -> E(s), S(p1~P) @ 1
-F(s), S(p1~P) <-> F(s!1), S(p1~P!1) @ 1{0},1
-F(s!1), S(p1~P!1) -> F(s), S(p1~U) @ 1
+E(s), S(p1~U) <-> E(s!1), S(p1~U!1) @ 'kES','kdES'
+E(s!1), S(p1~U!1) -> E(s), S(p1~P) @ 'kpS'
+F(s), S(p1~P) <-> F(s!1), S(p1~P!1) @ 'kFS','kdFS'
+F(s!1), S(p1~P!1) -> F(s), S(p1~U) @ 'kuS'

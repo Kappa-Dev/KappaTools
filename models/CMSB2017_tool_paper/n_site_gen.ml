@@ -69,7 +69,7 @@ let print_agent fmt s interface =
     in
     print_elements interface
 
-let print_rule fmt interface interface1 f_a rate rate1=
+let print_rule fmt interface interface1 f_a =
   let () =
     let (a,b) = f_a in
     Format.fprintf fmt "%s, " b;
@@ -77,11 +77,16 @@ let print_rule fmt interface interface1 f_a rate rate1=
     Format.fprintf fmt " <-> ";
     Format.fprintf fmt "%s, " a;
     print_agent fmt "S" interface1;
-    Format.fprintf fmt " @%s{%s},%s\n" rate1 rate rate1
+    let () =
+      if b = "E(s)" then
+        Format.fprintf fmt " @'kES','kdES'\n"
+      else Format.fprintf fmt " @'kFS','kdFS' \n"
+    in
+    ()
   in
   ()
 
-let print_rule_binding fmt interface interface1 f_a rate  =
+let print_rule_binding fmt interface interface1 f_a =
   let () =
     let (a, b) = f_a in
     Format.fprintf fmt "%s, " a;
@@ -89,44 +94,35 @@ let print_rule_binding fmt interface interface1 f_a rate  =
     Format.fprintf fmt " -> ";
     Format.fprintf fmt "%s, " b;
     print_agent_binding fmt "S" interface1;
-    Format.fprintf fmt " @%s\n" rate
+    let () =
+      if b = "E(s)" then
+        Format.fprintf fmt " @'KpS'\n"
+      else Format.fprintf fmt " @'KuS'"
+    in
+    ()
   in
   ()
 
 (******************************************************)
 (*rate*)
 
-let rec exp i j =
-  if j=0 then 1
-  else if j=1 then i
-  else let q,r = j/2, j mod 2 in
-    let root = exp i q in
-    let square = root*root in
-    if r=0 then square
-    else i*square
+let declare_rate fmt =
+  let () = Format.fprintf fmt "%%var: 'kES' 0.01\n" in
+  let () = Format.fprintf fmt "%%var: 'kdES' 1\n" in
+  let () = Format.fprintf fmt "%%var: 'kpS' 0.1\n" in
+  let () = Format.fprintf fmt "%%var: 'kFS' 0.001\n" in
+  let () = Format.fprintf fmt "%%var: 'kdFS' 0.1\n" in
+  let () = Format.fprintf fmt "%%var: 'kuS' 0.01\n" in
+  ()
 
-let rate state k =
-  if state = "u" then 3*(exp 5 k)
-  else if state = "p" then 2*(exp 7 k)
-  else 0
-
-let declare_rate fmt n =
-  let rec aux k =
-    if k=n then ()
-    else
-      let () = Format.fprintf fmt "%%var: 'kp%i' %i\n" k (rate "u" k) in
-      let () = Format.fprintf fmt "%%var: 'ku%i' %i\n" (k+1) (rate "p" (k+1)) in
-      aux (k+1)
-  in
-  aux 0
-
-let count_p interface =
-  List.fold_left
-    (fun n (_,state,_) -> if state="p" then n+1 else n) 0 interface
-
-let rate_of kind interface =
-  let n = count_p interface in
-  "k"^kind^(string_of_int n)
+let declare_rate_equal fmt =
+  let () = Format.fprintf fmt "%%var: 'kES' 0.01\n" in
+  let () = Format.fprintf fmt "%%var: 'kdES' 1\n" in
+  let () = Format.fprintf fmt "%%var: 'kpS' 0.1\n" in
+  let () = Format.fprintf fmt "%%var: 'kFS' 0.01\n" in
+  let () = Format.fprintf fmt "%%var: 'kdFS' 1\n" in
+  let () = Format.fprintf fmt "%%var: 'kuS' 0.1\n"in
+  ()
 
 (******************************************************)
 (*deal with loop *)
@@ -150,11 +146,11 @@ let potential_valuations fmt list =
   aux list [[]]
 
 let flip_binding (s,state, state') =
-  if state = "u" then "p", (s, "u!1", "p")
-  else if state = "p" then "u" , (s, "p!1", "u")
-  else if state' = "p!1" then "u!1", (s, "p", "p")
-  else if state' = "u!1" then "p!1", (s, "u", "u")
-  else "", (s, state, state')
+  if state = "u" then (s, "u!1", "p")
+  else if state = "p" then (s, "p!1", "u")
+  else if state' = "p!1" then (s, "p", "p")
+  else if state' = "u!1" then (s, "u", "u")
+  else (s, state, state')
 
 let first_agent  (state, state') =
   if state = "p" then ("F(s!1)", "F(s)")
@@ -168,15 +164,12 @@ let deal_with_one_valuation fmt interface =
     match suffix with
     | [] -> ()
     | (h,s,s')::tl ->
-      let kind,flip = flip_binding (h,s,s') in
+      let flip = flip_binding (h,s,s') in
       let f_a = first_agent  (s, s') in
       let interface1 = flip :: tl in
-      let rate1 = rate_of kind interface1 in
-      let rate = rate_of kind interface in
-      let () = print_rule fmt interface interface1 f_a rate rate1 in
+      let () = print_rule fmt interface interface1 f_a  in
       let () = Format.fprintf fmt "\n" in
-      let () = print_rule_binding fmt interface1 interface1 f_a
-          rate in
+      let () = print_rule_binding fmt interface1 interface1 f_a in
       aux tl (h::prefix)
   in
   aux (List.rev interface) []
@@ -199,7 +192,7 @@ let main n =
   let fmt = Format.formatter_of_out_channel channel in
   let () = print_signatures fmt n in
   let () = print_init fmt n in
-  let () = declare_rate fmt n in
+  let () = declare_rate fmt in
   let () = Format.fprintf fmt "\n" in
   let sites = site_list n in
   let potential_valuations = potential_valuations fmt sites in
@@ -214,6 +207,28 @@ let main n =
   let () = close_out channel in
   ()
 
+let main2 n =
+  let file = "ex_mul_equal_rate_"^(string_of_int n)^".ka" in
+  let channel = open_out file in
+  let fmt = Format.formatter_of_out_channel channel in
+  let () = print_signatures fmt n in
+  let () = print_init fmt n in
+  let () = declare_rate_equal fmt in
+  let () = Format.fprintf fmt "\n" in
+  let sites = site_list n in
+  let potential_valuations = potential_valuations fmt sites in
+  let () =
+    List.iter
+      (fun valuation ->
+         deal_with_one_valuation fmt valuation;
+         Format.fprintf fmt "\n\n"
+      )
+      potential_valuations
+  in
+  let () = close_out channel in
+  ()
+
+
 (*******************************************************)
 (*input the number of sites*)
 
@@ -226,5 +241,17 @@ let () =
       if k>n then ()
       else
         let () = main k in aux (k+1)
+    in aux (int_of_string Sys.argv.(1))
+  | _ -> Printf.printf "Please call with one or two int arguments\n\n"
+
+let () =
+  match Array.length Sys.argv with
+  | 2 -> main2 (int_of_string Sys.argv.(1))
+  | 3 ->
+    let n = int_of_string Sys.argv.(2) in
+    let rec aux k =
+      if k>n then ()
+      else
+        let () = main2 k in aux (k+1)
     in aux (int_of_string Sys.argv.(1))
   | _ -> Printf.printf "Please call with one or two int arguments\n\n"
