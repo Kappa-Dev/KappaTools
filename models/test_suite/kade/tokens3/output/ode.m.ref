@@ -65,12 +65,12 @@ t = 0.000000;
 
 init(3)=t;
 init(2)=1;
-var(5)=init(2);
-var(4)=init(2);
-var(1)=10;
+var(5)=init(2); % expo3_rate
+var(4)=init(2); % expo2_rate
+var(1)=10; % nT
 init(1)=var(1); % T()
-var(3)=init(1);
-var(2)=init(2);
+var(3)=init(1); % T
+var(2)=init(2); % t
 
 k(1)=1; % expo
 stoc(2,2)=2;
@@ -202,10 +202,10 @@ global kun
 global kdun
 global stoc
 
-var(5)=y(2);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(2);
+var(5)=y(2); % expo3_rate
+var(4)=y(2); % expo2_rate
+var(3)=y(1); % T
+var(2)=y(2); % t
 
 stoc(2,1)=(-y(2));
 k(2)=var(4);
@@ -254,10 +254,10 @@ global jackun
 global jackund
 global jacstoc
 
-var(5)=y(2);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(2);
+var(5)=y(2); % expo3_rate
+var(4)=y(2); % expo2_rate
+var(3)=y(1); % T
+var(2)=y(2); % t
 
 stoc(2,1)=(-y(2));
 k(2)=var(4);
@@ -302,14 +302,14 @@ global var
 obs=zeros(nobs,1);
 
 t = y(3);
-var(5)=y(2);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(2);
+var(5)=y(2); % expo3_rate
+var(4)=y(2); % expo2_rate
+var(3)=y(1); % T
+var(2)=y(2); % t
 
-obs(1)=t;
-obs(2)=var(2);
-obs(3)=var(3);
+obs(1)=t; % [T]
+obs(2)=var(2); % t
+obs(3)=var(3); % T
 
 end
 

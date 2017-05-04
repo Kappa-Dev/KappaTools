@@ -36,10 +36,10 @@ init4:=0:
 init5:=0:
 
 
-var3:=(t -> 2):
+var3:=(t -> 2): # c
 init1:=10: # A(x~u, y~u)
-var1:=(t -> init1+init3+init2+init5):
-var2:=(t -> var1(0)*var1(0)*var1(0)*t):
+var1:=(t -> init1+init3+init2+init5): # a
+var2:=(t -> var1(0)*var1(0)*var1(0)*t): # b
 
 k1:=(t -> 1): # A(x~u) -> A(x~p)
 k3:=(t -> 1): # A(y~u) -> A(y~p)
@@ -54,8 +54,8 @@ k3:=(t -> 1): # A(y~u) -> A(y~p)
 
 
 
-var1:=(t -> y1(t)+y3(t)+y2(t)+y5(t)):
-var2:=(t -> var1(t)*var1(t)*var1(t)*t):
+var1:=(t -> y1(t)+y3(t)+y2(t)+y5(t)): # a
+var2:=(t -> var1(t)*var1(t)*var1(t)*t): # b
 
 k2:=(t -> var1(t)):
 k4:=(t -> var3(t)):
@@ -172,7 +172,7 @@ dydt6:=(t -> 1):
 
 
 
-obs1:=(t -> t):
+obs1:=(t -> t): # [T]
 
 
 

@@ -66,7 +66,7 @@ t = 0.000000;
 init(6)=t;
 init(1)=6; % B(x, y)
 init(2)=4.5; % A(x)
-var(1)=(init(2)+init(3)+init(4)+2*init(5))*t;
+var(1)=(init(2)+init(3)+init(4)+2*init(5))*t; % r0: A(x!_) ->  @ (|A()| * [T])_rate
 
 k(1)=1; % A(x), B(x) -> A(x!1), B(x!1)
 
@@ -196,7 +196,7 @@ global kun
 global kdun
 global stoc
 
-var(1)=(y(2)+y(3)+y(4)+2*y(5))*t;
+var(1)=(y(2)+y(3)+y(4)+2*y(5))*t; % r0: A(x!_) ->  @ (|A()| * [T])_rate
 
 k(2)=t;
 k(3)=var(1);
@@ -278,7 +278,7 @@ global jackun
 global jackund
 global jacstoc
 
-var(1)=(y(2)+y(3)+y(4)+2*y(5))*t;
+var(1)=(y(2)+y(3)+y(4)+2*y(5))*t; % r0: A(x!_) ->  @ (|A()| * [T])_rate
 
 k(2)=t;
 k(3)=var(1);
@@ -422,9 +422,9 @@ global var
 obs=zeros(nobs,1);
 
 t = y(6);
-var(1)=(y(2)+y(3)+y(4)+2*y(5))*t;
+var(1)=(y(2)+y(3)+y(4)+2*y(5))*t; % r0: A(x!_) ->  @ (|A()| * [T])_rate
 
-obs(1)=t;
+obs(1)=t; % [T]
 
 end
 

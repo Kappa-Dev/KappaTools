@@ -64,19 +64,19 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(11)=t;
-var(8)=1000;
+var(8)=1000; % n_ab
 var(10)=var(8);
 init(3)=var(10);
 init(2)=var(10);
-var(7)=init(10);
-var(6)=init(7)+init(8)+init(9);
-var(9)=10000;
+var(7)=init(10); % Cpp
+var(6)=init(7)+init(8)+init(9); % Cpu
+var(9)=10000; % n_c
 init(1)=var(9); % C(x1~u, x2~u)
-var(5)=init(1)+init(6)+init(5);
-var(4)=init(4)+init(5)+init(9);
-var(3)=1;
-var(2)=0.1;
-var(1)=0.001;
+var(5)=init(1)+init(6)+init(5); % Cuu
+var(4)=init(4)+init(5)+init(9); % AB
+var(3)=1; % mod_rate
+var(2)=0.1; % off_rate
+var(1)=0.001; % on_rate
 
 
 uiIsOctave = false;
@@ -214,10 +214,10 @@ global kun
 global kdun
 global stoc
 
-var(7)=y(10);
-var(6)=y(7)+y(8)+y(9);
-var(5)=y(1)+y(6)+y(5);
-var(4)=y(4)+y(5)+y(9);
+var(7)=y(10); % Cpp
+var(6)=y(7)+y(8)+y(9); % Cpu
+var(5)=y(1)+y(6)+y(5); % Cuu
+var(4)=y(4)+y(5)+y(9); % AB
 
 k(1)=var(1);
 k(2)=var(2);
@@ -327,10 +327,10 @@ global jackun
 global jackund
 global jacstoc
 
-var(7)=y(10);
-var(6)=y(7)+y(8)+y(9);
-var(5)=y(1)+y(6)+y(5);
-var(4)=y(4)+y(5)+y(9);
+var(7)=y(10); % Cpp
+var(6)=y(7)+y(8)+y(9); % Cpu
+var(5)=y(1)+y(6)+y(5); % Cuu
+var(4)=y(4)+y(5)+y(9); % AB
 
 k(1)=var(1);
 k(2)=var(2);
@@ -453,16 +453,16 @@ global var
 obs=zeros(nobs,1);
 
 t = y(11);
-var(7)=y(10);
-var(6)=y(7)+y(8)+y(9);
-var(5)=y(1)+y(6)+y(5);
-var(4)=y(4)+y(5)+y(9);
+var(7)=y(10); % Cpp
+var(6)=y(7)+y(8)+y(9); % Cpu
+var(5)=y(1)+y(6)+y(5); % Cuu
+var(4)=y(4)+y(5)+y(9); % AB
 
-obs(1)=t;
-obs(2)=var(4);
-obs(3)=var(5);
-obs(4)=var(6);
-obs(5)=var(7);
+obs(1)=t; % [T]
+obs(2)=var(4); % AB
+obs(3)=var(5); % Cuu
+obs(4)=var(6); % Cpu
+obs(5)=var(7); % Cpp
 
 end
 

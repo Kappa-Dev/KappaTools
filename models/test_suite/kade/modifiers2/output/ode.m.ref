@@ -64,13 +64,13 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(4)=t;
-var(1)=10;
+var(1)=10; % nT
 init(2)=var(1); % T(x)
-var(5)=init(2)+init(3);
-var(4)=init(2);
+var(5)=init(2)+init(3); % unbind_rate
+var(4)=init(2); % T
 init(1)=var(1); % U(x)
-var(3)=init(1);
-var(2)=init(1)+init(3);
+var(3)=init(1); % t
+var(2)=init(1)+init(3); % qU
 
 
 uiIsOctave = false;
@@ -199,10 +199,10 @@ global kun
 global kdun
 global stoc
 
-var(5)=y(2)+y(3);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(1)+y(3);
+var(5)=y(2)+y(3); % unbind_rate
+var(4)=y(2); % T
+var(3)=y(1); % t
+var(2)=y(1)+y(3); % qU
 
 k(1)=var(2);
 k(2)=var(5);
@@ -245,10 +245,10 @@ global jackun
 global jackund
 global jacstoc
 
-var(5)=y(2)+y(3);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(1)+y(3);
+var(5)=y(2)+y(3); % unbind_rate
+var(4)=y(2); % T
+var(3)=y(1); % t
+var(2)=y(1)+y(3); % qU
 
 k(1)=var(2);
 k(2)=var(5);
@@ -304,14 +304,14 @@ global var
 obs=zeros(nobs,1);
 
 t = y(4);
-var(5)=y(2)+y(3);
-var(4)=y(2);
-var(3)=y(1);
-var(2)=y(1)+y(3);
+var(5)=y(2)+y(3); % unbind_rate
+var(4)=y(2); % T
+var(3)=y(1); % t
+var(2)=y(1)+y(3); % qU
 
-obs(1)=t;
-obs(2)=var(3);
-obs(3)=var(4);
+obs(1)=t; % [T]
+obs(2)=var(3); % t
+obs(3)=var(4); % T
 
 end
 

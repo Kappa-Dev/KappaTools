@@ -245,7 +245,7 @@ obs=zeros(nobs,1);
 
 t = y(2);
 
-obs(1)=t;
+obs(1)=t; % [T]
 
 end
 
