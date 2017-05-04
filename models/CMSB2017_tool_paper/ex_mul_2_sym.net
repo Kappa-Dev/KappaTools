@@ -1,0 +1,52 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Etot   300  # Constant
+    2 Ftot   300  # Constant
+    3 Stot   300  # Constant
+    4 kOnE   0.7  # Constant
+    5 kOffE  3  # Constant
+    6 kCatE  5.0  # Constant
+    7 kOnF   0.7  # Constant
+    8 kOffF  3  # Constant
+    9 kCatF  5.1  # Constant
+end parameters
+begin species
+    1 E(s) Etot
+    2 F(s) Ftot
+    3 S(x~u,x~u) Stot
+    4 E(s!1).S(x~u!1,x~u) 0
+    5 E(s!1).E(s!2).S(x~u!2,x~u!1) 0
+    6 S(x~p,x~u) 0
+    7 E(s!1).S(x~p,x~u!1) 0
+    8 F(s!1).S(x~p!1,x~u) 0
+    9 E(s!1).F(s!2).S(x~p!2,x~u!1) 0
+   10 S(x~p,x~p) 0
+   11 F(s!1).S(x~p!1,x~p) 0
+   12 F(s!1).F(s!2).S(x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 2*kOnE #_R1
+    2 1,4 5 kOnE #_R1
+    3 4 1,3 kOffE #_reverse__R1
+    4 4 1,6 kCatE #_R2
+    5 1,6 7 kOnE #_R1
+    6 5 1,4 2*kOffE #_reverse__R1
+    7 5 1,7 2*kCatE #_R2
+    8 2,6 8 kOnF #_R3
+    9 1,8 9 kOnE #_R1
+   10 7 1,6 kOffE #_reverse__R1
+   11 7 1,10 kCatE #_R2
+   12 2,7 9 kOnF #_R3
+   13 8 2,6 kOffF #_reverse__R3
+   14 8 2,3 kCatF #_R4
+   15 9 1,8 kOffE #_reverse__R1
+   16 9 1,11 kCatE #_R2
+   17 2,10 11 2*kOnF #_R3
+   18 9 2,7 kOffF #_reverse__R3
+   19 9 2,4 kCatF #_R4
+   20 2,11 12 kOnF #_R3
+   21 11 2,10 kOffF #_reverse__R3
+   22 11 2,6 kCatF #_R4
+   23 12 2,11 2*kOffF #_reverse__R3
+   24 12 2,8 2*kCatF #_R4
+end reactions

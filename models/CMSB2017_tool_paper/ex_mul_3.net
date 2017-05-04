@@ -1,0 +1,370 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Etot   300  # Constant
+    2 Ftot   300  # Constant
+    3 Stot   300  # Constant
+    4 kOnE   0.7  # Constant
+    5 kOffE  3  # Constant
+    6 kCatE  5.0  # Constant
+    7 kOnF   0.7  # Constant
+    8 kOffF  3  # Constant
+    9 kCatF  5.1  # Constant
+end parameters
+begin species
+    1 E(s) Etot
+    2 F(s) Ftot
+    3 S(x1~u,x2~u,x3~u) Stot
+    4 E(s!1).S(x1~u!1,x2~u,x3~u) 0
+    5 E(s!1).S(x1~u,x2~u!1,x3~u) 0
+    6 E(s!1).S(x1~u,x2~u,x3~u!1) 0
+    7 E(s!1).E(s!2).S(x1~u!1,x2~u!2,x3~u) 0
+    8 E(s!1).E(s!2).S(x1~u!1,x2~u,x3~u!2) 0
+    9 S(x1~p,x2~u,x3~u) 0
+   10 E(s!1).E(s!2).S(x1~u,x2~u!1,x3~u!2) 0
+   11 S(x1~u,x2~p,x3~u) 0
+   12 S(x1~u,x2~u,x3~p) 0
+   13 F(s!1).S(x1~p!1,x2~u,x3~u) 0
+   14 E(s!1).E(s!2).E(s!3).S(x1~u!1,x2~u!2,x3~u!3) 0
+   15 E(s!1).S(x1~u!1,x2~p,x3~u) 0
+   16 E(s!1).S(x1~u!1,x2~u,x3~p) 0
+   17 E(s!1).S(x1~p,x2~u!1,x3~u) 0
+   18 E(s!1).S(x1~p,x2~u,x3~u!1) 0
+   19 F(s!1).S(x1~u,x2~p!1,x3~u) 0
+   20 E(s!1).S(x1~u,x2~u!1,x3~p) 0
+   21 E(s!1).S(x1~u,x2~p,x3~u!1) 0
+   22 F(s!1).S(x1~u,x2~u,x3~p!1) 0
+   23 E(s!1).F(s!2).S(x1~p!2,x2~u!1,x3~u) 0
+   24 E(s!1).F(s!2).S(x1~p!2,x2~u,x3~u!1) 0
+   25 E(s!1).F(s!2).S(x1~u!1,x2~p!2,x3~u) 0
+   26 E(s!1).E(s!2).S(x1~u!1,x2~u!2,x3~p) 0
+   27 E(s!1).E(s!2).S(x1~u!1,x2~p,x3~u!2) 0
+   28 E(s!1).F(s!2).S(x1~u!1,x2~u,x3~p!2) 0
+   29 E(s!1).E(s!2).S(x1~p,x2~u!1,x3~u!2) 0
+   30 S(x1~p,x2~p,x3~u) 0
+   31 S(x1~p,x2~u,x3~p) 0
+   32 E(s!1).F(s!2).S(x1~u,x2~p!2,x3~u!1) 0
+   33 E(s!1).F(s!2).S(x1~u,x2~u!1,x3~p!2) 0
+   34 S(x1~u,x2~p,x3~p) 0
+   35 E(s!1).E(s!2).F(s!3).S(x1~p!3,x2~u!1,x3~u!2) 0
+   36 F(s!1).S(x1~p!1,x2~p,x3~u) 0
+   37 F(s!1).S(x1~p!1,x2~u,x3~p) 0
+   38 E(s!1).E(s!2).F(s!3).S(x1~u!1,x2~p!3,x3~u!2) 0
+   39 E(s!1).E(s!2).F(s!3).S(x1~u!1,x2~u!2,x3~p!3) 0
+   40 E(s!1).S(x1~u!1,x2~p,x3~p) 0
+   41 F(s!1).S(x1~p,x2~p!1,x3~u) 0
+   42 E(s!1).S(x1~p,x2~u!1,x3~p) 0
+   43 E(s!1).S(x1~p,x2~p,x3~u!1) 0
+   44 F(s!1).S(x1~p,x2~u,x3~p!1) 0
+   45 F(s!1).S(x1~u,x2~p!1,x3~p) 0
+   46 F(s!1).S(x1~u,x2~p,x3~p!1) 0
+   47 F(s!1).F(s!2).S(x1~p!1,x2~p!2,x3~u) 0
+   48 E(s!1).F(s!2).S(x1~p!2,x2~u!1,x3~p) 0
+   49 E(s!1).F(s!2).S(x1~p!2,x2~p,x3~u!1) 0
+   50 F(s!1).F(s!2).S(x1~p!1,x2~u,x3~p!2) 0
+   51 E(s!1).F(s!2).S(x1~u!1,x2~p!2,x3~p) 0
+   52 E(s!1).F(s!2).S(x1~u!1,x2~p,x3~p!2) 0
+   53 E(s!1).F(s!2).S(x1~p,x2~p!2,x3~u!1) 0
+   54 E(s!1).F(s!2).S(x1~p,x2~u!1,x3~p!2) 0
+   55 S(x1~p,x2~p,x3~p) 0
+   56 F(s!1).F(s!2).S(x1~u,x2~p!1,x3~p!2) 0
+   57 E(s!1).F(s!2).F(s!3).S(x1~p!2,x2~p!3,x3~u!1) 0
+   58 E(s!1).F(s!2).F(s!3).S(x1~p!2,x2~u!1,x3~p!3) 0
+   59 F(s!1).S(x1~p!1,x2~p,x3~p) 0
+   60 E(s!1).F(s!2).F(s!3).S(x1~u!1,x2~p!2,x3~p!3) 0
+   61 F(s!1).S(x1~p,x2~p!1,x3~p) 0
+   62 F(s!1).S(x1~p,x2~p,x3~p!1) 0
+   63 F(s!1).F(s!2).S(x1~p!1,x2~p!2,x3~p) 0
+   64 F(s!1).F(s!2).S(x1~p!1,x2~p,x3~p!2) 0
+   65 F(s!1).F(s!2).S(x1~p,x2~p!1,x3~p!2) 0
+   66 F(s!1).F(s!2).F(s!3).S(x1~p!1,x2~p!2,x3~p!3) 0
+end species
+begin reactions
+    1 1,3 4 kOnE #_R3
+    2 1,3 5 kOnE #_R7
+    3 1,3 6 kOnE #_R11
+    4 1,5 7 kOnE #_R3
+    5 1,6 8 kOnE #_R3
+    6 4 1,3 kOffE #_reverse__R3
+    7 4 1,9 kCatE #_R4
+    8 1,4 7 kOnE #_R7
+    9 1,6 10 kOnE #_R7
+   10 5 1,3 kOffE #_reverse__R7
+   11 5 1,11 kCatE #_R8
+   12 1,4 8 kOnE #_R11
+   13 1,5 10 kOnE #_R11
+   14 6 1,3 kOffE #_reverse__R11
+   15 6 1,12 kCatE #_R12
+   16 2,9 13 kOnF #_R1
+   17 1,10 14 kOnE #_R3
+   18 1,11 15 kOnE #_R3
+   19 1,12 16 kOnE #_R3
+   20 7 1,5 kOffE #_reverse__R3
+   21 8 1,6 kOffE #_reverse__R3
+   22 7 1,17 kCatE #_R4
+   23 8 1,18 kCatE #_R4
+   24 2,11 19 kOnF #_R5
+   25 1,8 14 kOnE #_R7
+   26 1,9 17 kOnE #_R7
+   27 1,12 20 kOnE #_R7
+   28 7 1,4 kOffE #_reverse__R7
+   29 10 1,6 kOffE #_reverse__R7
+   30 7 1,15 kCatE #_R8
+   31 10 1,21 kCatE #_R8
+   32 2,12 22 kOnF #_R9
+   33 1,7 14 kOnE #_R11
+   34 1,9 18 kOnE #_R11
+   35 1,11 21 kOnE #_R11
+   36 8 1,4 kOffE #_reverse__R11
+   37 10 1,5 kOffE #_reverse__R11
+   38 8 1,16 kCatE #_R12
+   39 10 1,20 kCatE #_R12
+   40 2,17 23 kOnF #_R1
+   41 2,18 24 kOnF #_R1
+   42 13 2,9 kOffF #_reverse__R1
+   43 13 2,3 kCatF #_R2
+   44 1,19 25 kOnE #_R3
+   45 1,20 26 kOnE #_R3
+   46 1,21 27 kOnE #_R3
+   47 1,22 28 kOnE #_R3
+   48 14 1,10 kOffE #_reverse__R3
+   49 15 1,11 kOffE #_reverse__R3
+   50 16 1,12 kOffE #_reverse__R3
+   51 14 1,29 kCatE #_R4
+   52 15 1,30 kCatE #_R4
+   53 16 1,31 kCatE #_R4
+   54 2,15 25 kOnF #_R5
+   55 2,21 32 kOnF #_R5
+   56 19 2,11 kOffF #_reverse__R5
+   57 19 2,3 kCatF #_R6
+   58 1,13 23 kOnE #_R7
+   59 1,16 26 kOnE #_R7
+   60 1,18 29 kOnE #_R7
+   61 1,22 33 kOnE #_R7
+   62 14 1,8 kOffE #_reverse__R7
+   63 17 1,9 kOffE #_reverse__R7
+   64 20 1,12 kOffE #_reverse__R7
+   65 14 1,27 kCatE #_R8
+   66 17 1,30 kCatE #_R8
+   67 20 1,34 kCatE #_R8
+   68 2,16 28 kOnF #_R9
+   69 2,20 33 kOnF #_R9
+   70 22 2,12 kOffF #_reverse__R9
+   71 22 2,3 kCatF #_R10
+   72 1,13 24 kOnE #_R11
+   73 1,15 27 kOnE #_R11
+   74 1,17 29 kOnE #_R11
+   75 1,19 32 kOnE #_R11
+   76 14 1,7 kOffE #_reverse__R11
+   77 18 1,9 kOffE #_reverse__R11
+   78 21 1,11 kOffE #_reverse__R11
+   79 14 1,26 kCatE #_R12
+   80 18 1,31 kCatE #_R12
+   81 21 1,34 kCatE #_R12
+   82 2,29 35 kOnF #_R1
+   83 2,30 36 kOnF #_R1
+   84 2,31 37 kOnF #_R1
+   85 23 2,17 kOffF #_reverse__R1
+   86 24 2,18 kOffF #_reverse__R1
+   87 23 2,5 kCatF #_R2
+   88 24 2,6 kCatF #_R2
+   89 1,32 38 kOnE #_R3
+   90 1,33 39 kOnE #_R3
+   91 1,34 40 kOnE #_R3
+   92 25 1,19 kOffE #_reverse__R3
+   93 26 1,20 kOffE #_reverse__R3
+   94 27 1,21 kOffE #_reverse__R3
+   95 28 1,22 kOffE #_reverse__R3
+   96 25 1,41 kCatE #_R4
+   97 26 1,42 kCatE #_R4
+   98 27 1,43 kCatE #_R4
+   99 28 1,44 kCatE #_R4
+  100 2,27 38 kOnF #_R5
+  101 2,30 41 kOnF #_R5
+  102 2,34 45 kOnF #_R5
+  103 25 2,15 kOffF #_reverse__R5
+  104 32 2,21 kOffF #_reverse__R5
+  105 25 2,4 kCatF #_R6
+  106 32 2,6 kCatF #_R6
+  107 1,24 35 kOnE #_R7
+  108 1,28 39 kOnE #_R7
+  109 1,31 42 kOnE #_R7
+  110 23 1,13 kOffE #_reverse__R7
+  111 26 1,16 kOffE #_reverse__R7
+  112 29 1,18 kOffE #_reverse__R7
+  113 33 1,22 kOffE #_reverse__R7
+  114 23 1,36 kCatE #_R8
+  115 26 1,40 kCatE #_R8
+  116 29 1,43 kCatE #_R8
+  117 33 1,46 kCatE #_R8
+  118 2,26 39 kOnF #_R9
+  119 2,31 44 kOnF #_R9
+  120 2,34 46 kOnF #_R9
+  121 28 2,16 kOffF #_reverse__R9
+  122 33 2,20 kOffF #_reverse__R9
+  123 28 2,4 kCatF #_R10
+  124 33 2,5 kCatF #_R10
+  125 1,23 35 kOnE #_R11
+  126 1,25 38 kOnE #_R11
+  127 1,30 43 kOnE #_R11
+  128 24 1,13 kOffE #_reverse__R11
+  129 27 1,15 kOffE #_reverse__R11
+  130 29 1,17 kOffE #_reverse__R11
+  131 32 1,19 kOffE #_reverse__R11
+  132 24 1,37 kCatE #_R12
+  133 27 1,40 kCatE #_R12
+  134 29 1,42 kCatE #_R12
+  135 32 1,45 kCatE #_R12
+  136 2,41 47 kOnF #_R1
+  137 2,42 48 kOnF #_R1
+  138 2,43 49 kOnF #_R1
+  139 2,44 50 kOnF #_R1
+  140 35 2,29 kOffF #_reverse__R1
+  141 36 2,30 kOffF #_reverse__R1
+  142 37 2,31 kOffF #_reverse__R1
+  143 35 2,10 kCatF #_R2
+  144 36 2,11 kCatF #_R2
+  145 37 2,12 kCatF #_R2
+  146 1,45 51 kOnE #_R3
+  147 1,46 52 kOnE #_R3
+  148 38 1,32 kOffE #_reverse__R3
+  149 39 1,33 kOffE #_reverse__R3
+  150 40 1,34 kOffE #_reverse__R3
+  151 38 1,53 kCatE #_R4
+  152 39 1,54 kCatE #_R4
+  153 40 1,55 kCatE #_R4
+  154 2,36 47 kOnF #_R5
+  155 2,40 51 kOnF #_R5
+  156 2,43 53 kOnF #_R5
+  157 2,46 56 kOnF #_R5
+  158 38 2,27 kOffF #_reverse__R5
+  159 41 2,30 kOffF #_reverse__R5
+  160 45 2,34 kOffF #_reverse__R5
+  161 38 2,8 kCatF #_R6
+  162 41 2,9 kCatF #_R6
+  163 45 2,12 kCatF #_R6
+  164 1,37 48 kOnE #_R7
+  165 1,44 54 kOnE #_R7
+  166 35 1,24 kOffE #_reverse__R7
+  167 39 1,28 kOffE #_reverse__R7
+  168 42 1,31 kOffE #_reverse__R7
+  169 35 1,49 kCatE #_R8
+  170 39 1,52 kCatE #_R8
+  171 42 1,55 kCatE #_R8
+  172 2,37 50 kOnF #_R9
+  173 2,40 52 kOnF #_R9
+  174 2,42 54 kOnF #_R9
+  175 2,45 56 kOnF #_R9
+  176 39 2,26 kOffF #_reverse__R9
+  177 44 2,31 kOffF #_reverse__R9
+  178 46 2,34 kOffF #_reverse__R9
+  179 39 2,7 kCatF #_R10
+  180 44 2,9 kCatF #_R10
+  181 46 2,11 kCatF #_R10
+  182 1,36 49 kOnE #_R11
+  183 1,41 53 kOnE #_R11
+  184 35 1,23 kOffE #_reverse__R11
+  185 38 1,25 kOffE #_reverse__R11
+  186 43 1,30 kOffE #_reverse__R11
+  187 35 1,48 kCatE #_R12
+  188 38 1,51 kCatE #_R12
+  189 43 1,55 kCatE #_R12
+  190 2,53 57 kOnF #_R1
+  191 2,54 58 kOnF #_R1
+  192 2,55 59 kOnF #_R1
+  193 47 2,41 kOffF #_reverse__R1
+  194 48 2,42 kOffF #_reverse__R1
+  195 49 2,43 kOffF #_reverse__R1
+  196 50 2,44 kOffF #_reverse__R1
+  197 47 2,19 kCatF #_R2
+  198 48 2,20 kCatF #_R2
+  199 49 2,21 kCatF #_R2
+  200 50 2,22 kCatF #_R2
+  201 1,56 60 kOnE #_R3
+  202 51 1,45 kOffE #_reverse__R3
+  203 52 1,46 kOffE #_reverse__R3
+  204 51 1,61 kCatE #_R4
+  205 52 1,62 kCatE #_R4
+  206 2,49 57 kOnF #_R5
+  207 2,52 60 kOnF #_R5
+  208 2,55 61 kOnF #_R5
+  209 47 2,36 kOffF #_reverse__R5
+  210 51 2,40 kOffF #_reverse__R5
+  211 53 2,43 kOffF #_reverse__R5
+  212 56 2,46 kOffF #_reverse__R5
+  213 47 2,13 kCatF #_R6
+  214 51 2,16 kCatF #_R6
+  215 53 2,18 kCatF #_R6
+  216 56 2,22 kCatF #_R6
+  217 1,50 58 kOnE #_R7
+  218 48 1,37 kOffE #_reverse__R7
+  219 54 1,44 kOffE #_reverse__R7
+  220 48 1,59 kCatE #_R8
+  221 54 1,62 kCatE #_R8
+  222 2,48 58 kOnF #_R9
+  223 2,51 60 kOnF #_R9
+  224 2,55 62 kOnF #_R9
+  225 50 2,37 kOffF #_reverse__R9
+  226 52 2,40 kOffF #_reverse__R9
+  227 54 2,42 kOffF #_reverse__R9
+  228 56 2,45 kOffF #_reverse__R9
+  229 50 2,13 kCatF #_R10
+  230 52 2,15 kCatF #_R10
+  231 54 2,17 kCatF #_R10
+  232 56 2,19 kCatF #_R10
+  233 1,47 57 kOnE #_R11
+  234 49 1,36 kOffE #_reverse__R11
+  235 53 1,41 kOffE #_reverse__R11
+  236 49 1,59 kCatE #_R12
+  237 53 1,61 kCatE #_R12
+  238 2,61 63 kOnF #_R1
+  239 2,62 64 kOnF #_R1
+  240 57 2,53 kOffF #_reverse__R1
+  241 58 2,54 kOffF #_reverse__R1
+  242 59 2,55 kOffF #_reverse__R1
+  243 57 2,32 kCatF #_R2
+  244 58 2,33 kCatF #_R2
+  245 59 2,34 kCatF #_R2
+  246 60 1,56 kOffE #_reverse__R3
+  247 60 1,65 kCatE #_R4
+  248 2,59 63 kOnF #_R5
+  249 2,62 65 kOnF #_R5
+  250 57 2,49 kOffF #_reverse__R5
+  251 60 2,52 kOffF #_reverse__R5
+  252 61 2,55 kOffF #_reverse__R5
+  253 57 2,24 kCatF #_R6
+  254 60 2,28 kCatF #_R6
+  255 61 2,31 kCatF #_R6
+  256 58 1,50 kOffE #_reverse__R7
+  257 58 1,64 kCatE #_R8
+  258 2,59 64 kOnF #_R9
+  259 2,61 65 kOnF #_R9
+  260 58 2,48 kOffF #_reverse__R9
+  261 60 2,51 kOffF #_reverse__R9
+  262 62 2,55 kOffF #_reverse__R9
+  263 58 2,23 kCatF #_R10
+  264 60 2,25 kCatF #_R10
+  265 62 2,30 kCatF #_R10
+  266 57 1,47 kOffE #_reverse__R11
+  267 57 1,63 kCatE #_R12
+  268 2,65 66 kOnF #_R1
+  269 63 2,61 kOffF #_reverse__R1
+  270 64 2,62 kOffF #_reverse__R1
+  271 63 2,45 kCatF #_R2
+  272 64 2,46 kCatF #_R2
+  273 2,64 66 kOnF #_R5
+  274 63 2,59 kOffF #_reverse__R5
+  275 65 2,62 kOffF #_reverse__R5
+  276 63 2,37 kCatF #_R6
+  277 65 2,44 kCatF #_R6
+  278 2,63 66 kOnF #_R9
+  279 64 2,59 kOffF #_reverse__R9
+  280 65 2,61 kOffF #_reverse__R9
+  281 64 2,36 kCatF #_R10
+  282 65 2,41 kCatF #_R10
+  283 66 2,65 kOffF #_reverse__R1
+  284 66 2,56 kCatF #_R2
+  285 66 2,64 kOffF #_reverse__R5
+  286 66 2,50 kCatF #_R6
+  287 66 2,63 kOffF #_reverse__R9
+  288 66 2,47 kCatF #_R10
+end reactions

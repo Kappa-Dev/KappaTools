@@ -1,0 +1,80 @@
+%agent: E(s) 
+%agent: F(s) 
+%agent: S(x1~u~p,x2~u~p,x3~u~p,x4~u~p,x5~u~p,x6~u~p,x7~u~p)
+
+%init: 100 E(s)
+%init: 100 F(s)
+%init: 100 S(x1~u,x2~u,x3~u,x4~u,x5~u,x6~u,x7~u)
+
+%var: 'kES' 0.01
+%var: 'kdES' 1
+%var: 'kpS' 0.1
+%var: 'kFS' 0.01
+%var: 'kdFS' 1
+%var: 'kuS' 0.1
+
+F(s), S(x1~p) <-> F(s!1), S(x1~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x1~p!1) -> F(s), S(x1~u) @'kuS'
+
+E(s), S(x1~u) <-> E(s!1), S(x1~u!1) @'kES','kdES'
+
+E(s!1), S(x1~u!1) -> E(s), S(x1~p) @'kpS'
+
+
+F(s), S(x2~p) <-> F(s!1), S(x2~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x2~p!1) -> F(s), S(x2~u) @'kuS'
+
+E(s), S(x2~u) <-> E(s!1), S(x2~u!1) @'kES','kdES'
+
+E(s!1), S(x2~u!1) -> E(s), S(x2~p) @'kpS'
+
+
+F(s), S(x3~p) <-> F(s!1), S(x3~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x3~p!1) -> F(s), S(x3~u) @'kuS'
+
+E(s), S(x3~u) <-> E(s!1), S(x3~u!1) @'kES','kdES'
+
+E(s!1), S(x3~u!1) -> E(s), S(x3~p) @'kpS'
+
+
+F(s), S(x4~p) <-> F(s!1), S(x4~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x4~p!1) -> F(s), S(x4~u) @'kuS'
+
+E(s), S(x4~u) <-> E(s!1), S(x4~u!1) @'kES','kdES'
+
+E(s!1), S(x4~u!1) -> E(s), S(x4~p) @'kpS'
+
+
+F(s), S(x5~p) <-> F(s!1), S(x5~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x5~p!1) -> F(s), S(x5~u) @'kuS'
+
+E(s), S(x5~u) <-> E(s!1), S(x5~u!1) @'kES','kdES'
+
+E(s!1), S(x5~u!1) -> E(s), S(x5~p) @'kpS'
+
+
+F(s), S(x6~p) <-> F(s!1), S(x6~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x6~p!1) -> F(s), S(x6~u) @'kuS'
+
+E(s), S(x6~u) <-> E(s!1), S(x6~u!1) @'kES','kdES'
+
+E(s!1), S(x6~u!1) -> E(s), S(x6~p) @'kpS'
+
+
+F(s), S(x7~p) <-> F(s!1), S(x7~p!1) @'kFS','kdFS' 
+
+F(s!1), S(x7~p!1) -> F(s), S(x7~u) @'kuS'
+
+E(s), S(x7~u) <-> E(s!1), S(x7~u!1) @'kES','kdES'
+
+E(s!1), S(x7~u!1) -> E(s), S(x7~p) @'kpS'
+
+
+
+
