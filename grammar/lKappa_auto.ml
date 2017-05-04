@@ -166,8 +166,8 @@ let translate rate_convention cache rule  =
              (fun (map, site_id) ((state,_),switch) ->
                 match state, switch with
                 | Ast.LNK_VALUE (i,_), LKappa.Maintained  ->
-                  add_map rate_convention (Rhs i) (agent_id,site_id+n_site)
-                    (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
+                  add_map rate_convention (Lhs i) (agent_id, site_id) map,
+                  site_id + 1
                 | Ast.LNK_VALUE (i,_), LKappa.Linked (j,_) ->
                   add_map rate_convention (Rhs j) (agent_id,site_id+n_site)
                     (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
