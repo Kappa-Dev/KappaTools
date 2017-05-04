@@ -36,6 +36,15 @@ let site_list k format =
       (fun i -> "s"^(string_of_int i))
       (List.rev (int_list 1 k))
   | BNGL_compact -> ["s"]
+let site_list_init k format =
+  match format with
+  | Kappa | BNGL ->
+    List.rev_map
+      (fun i -> "s"^(string_of_int i))
+      (List.rev (int_list 1 k))
+  | BNGL_compact -> List.rev_map
+                      (fun i -> "s")
+                      (List.rev (int_list 1 k))
 
 let next (l : label) = (succ l : label)
 let string_of_label (l : label) = (string_of_int l : string)
@@ -125,7 +134,7 @@ let print_init fmt n format =
     Format.fprintf fmt "\n"
   | BNGL | BNGL_compact ->
     Format.fprintf fmt "begin seed species\n";
-    print_pattern_n fmt (List.rev_map (fun s -> (s,"u")) (List.rev (site_list  n format))) 1 format;
+    print_pattern_n fmt (List.rev_map (fun s -> (s,"u")) (List.rev (site_list_init  n format))) 1 format;
     Format.fprintf fmt " Stot\nend seed species\n"
 
 
@@ -207,7 +216,7 @@ let main n format =
     match format with
     | Kappa -> ()
     | BNGL | BNGL_compact ->
-      Format.fprintf fmt "begin reaction rules"
+      Format.fprintf fmt "begin reaction rules\n"
   in
   let () =
     List.iter
