@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 03 2017>
+  * Last modification: Time-stamp: <May 04 2017>
 *)
 
 let local_trace = false
@@ -1800,10 +1800,6 @@ struct
 
   let breakline = true
 
-  (* TODO : if unspecified, data_file, init_t and plot_period should
-     get their value from field [conf] of [compil] before falling
-     back to their default *)
-
   let good_step ~step logger =
     match Loggers.get_encoding_format logger
     with
@@ -2216,8 +2212,7 @@ struct
         let () = Ode_loggers.print_interpolate logger in
         let () = Ode_loggers.print_newline logger in
         let () =
-            Ode_loggers.print_dump_plots ~nobs ~data_file ~command_line ~titles
-              logger
+            Ode_loggers.print_dump_plots ~nobs ~data_file ~command_line ~titles logger
         in
         let () = Ode_loggers.print_newline logger in
         ()
@@ -3031,6 +3026,7 @@ struct
           (get_last_ode_var_id network)
       else ()
     in
+    let titles = I.get_obs_titles compil in
     let () =
       match
         Loggers.get_encoding_format logger
@@ -3048,13 +3044,28 @@ struct
         -> ()
     in
     let () = Ode_loggers.print_newline logger in
+    let titles =
+      List.fold_left
+        (fun titles (id,expr) ->
+           match titles with
+           | comment::tail ->
+             let () =
+               Ode_loggers.associate
+                 ~comment ~propagate_constants
+                 (I.string_of_var_id ~compil logger)
+                 logger logger logger_err
+             (Ode_loggers_sig.Obs id) expr (handler_expr network)
+             in tail
+           | [] ->
+             let () =
+               Loggers.fprintf logger "Internal error, more obs than obs labels"
+             in titles )
+        titles network.obs
+    in
     let () =
-      List.iter
-        (fun (id,expr) ->
-           Ode_loggers.associate ~propagate_constants
-             (I.string_of_var_id ~compil logger) logger logger logger_err
-             (Ode_loggers_sig.Obs id) expr (handler_expr network))
-        network.obs
+      if not (titles = [])
+      then
+      Loggers.fprintf logger "Internal error, less obs than obs labels"
     in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.close_procedure logger in
