@@ -8,6 +8,37 @@ let states = (["u";"p"], ["u!1"; "p!1"])
 (********************************************************)
 
 (*full sites information*)
+let print_sites_init fmt n =
+  let rec aux k =
+    if k>n then ()
+    else
+      let () =
+        if k>1 then Format.fprintf fmt ","
+      in
+      let () = Format.fprintf fmt "x%i" k in
+      let (unbinding, _binding) = states in
+      let () =
+        match unbinding with
+        | [] -> ()
+        | x :: _ ->  Format.fprintf fmt "~%s" x
+      in
+      aux (k+1)
+  in
+  let () = aux 1 in
+  let () = Format.fprintf fmt  ")\n\n" in
+  ()
+
+(*initial states *)
+
+let print_init fmt n =
+  Format.fprintf fmt "%%init: 100 E(s)\n";
+  Format.fprintf fmt "%%init: 100 F(s)\n";
+  Format.fprintf fmt "%%init: 100 S(";
+  print_sites_init fmt n
+
+(********************************************************)
+(*Print Signatures*)
+
 let print_sites fmt n =
   let rec aux k =
     if k>n then ()
@@ -25,17 +56,6 @@ let print_sites fmt n =
   let () = aux 1 in
   let () = Format.fprintf fmt  ")\n\n" in
   ()
-
-(*initial states *)
-
-let print_init fmt n =
-  Format.fprintf fmt "%%init: 100 E(s)\n";
-  Format.fprintf fmt "%%init: 100 F(s)\n";
-  Format.fprintf fmt "%%init: 100 S(";
-  print_sites fmt n
-
-(********************************************************)
-(*Print Signatures*)
 
 (*print agent and init*)
 let print_signatures fmt n =
@@ -96,8 +116,8 @@ let print_rule_binding fmt interface interface1 f_a =
     print_agent_binding fmt "S" interface1;
     let () =
       if b = "E(s)" then
-        Format.fprintf fmt " @'KpS'\n"
-      else Format.fprintf fmt " @'KuS'"
+        Format.fprintf fmt " @'kpS'\n"
+      else Format.fprintf fmt " @'kuS'"
     in
     ()
   in
