@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaDE polymers.ka  -d output  --truncate 4 || exit 0

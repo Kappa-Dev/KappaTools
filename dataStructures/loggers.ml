@@ -77,7 +77,8 @@ type t =
     env: (Ode_loggers_sig.ode_var_id,Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot VarMap.t ref ;
     const: VarSet.t ref;
     id_of_parameters: string VarMap.t ref;
-    dangerous_parameters: VarSet.t ref
+    dangerous_parameters: VarSet.t ref ;
+    idset: Mods.StringSet.t ref ;
   }
 
 let refresh_id t =
@@ -106,6 +107,7 @@ let dummy_html_logger =
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
     dangerous_parameters = ref VarSet.empty;
+    idset = ref Mods.StringSet.empty ;
   }
 
 let dummy_txt_logger =
@@ -125,6 +127,7 @@ let dummy_txt_logger =
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
     dangerous_parameters = ref VarSet.empty;
+    idset = ref Mods.StringSet.empty ;
   }
 
 (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
@@ -341,6 +344,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
       dangerous_parameters = ref VarSet.empty;
+      idset = ref Mods.StringSet.empty ;
     }
   in
   let () = print_preamble logger in
@@ -364,6 +368,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
       dangerous_parameters = ref VarSet.empty;
+      idset = ref Mods.StringSet.empty ;
     }
   in
   let () = print_preamble logger in
@@ -386,6 +391,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
     dangerous_parameters = ref VarSet.empty;
+    idset = ref Mods.StringSet.empty ;
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
@@ -406,6 +412,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
       const = ref VarSet.empty;
       id_of_parameters = ref VarMap.empty;
       dangerous_parameters = ref VarSet.empty;
+      idset = ref Mods.StringSet.empty ;
     }
   in
   let () = print_preamble logger in
@@ -566,6 +573,16 @@ let set_id_of_global_parameter t var id =
   let () = t.id_of_parameters := VarMap.add var id (!(t.id_of_parameters)) in
   flag_dangerous t var id
 
+let rec allocate_fresh_name t name potential_suffix =
+  if Mods.StringSet.mem name (!(t.idset))
+  then
+    allocate_fresh_name t (name^potential_suffix) potential_suffix
+  else
+    name
+
+let allocate t name =
+  let () = t.idset := Mods.StringSet.add name (!(t.idset)) in
+  ()
 let is_dangerous_ode_variable t var =
      VarSet.mem var (!(t.dangerous_parameters))
 
