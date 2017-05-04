@@ -1634,7 +1634,13 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | Ode_loggers_sig.Rateund _,_ ->
           if Ode_loggers_sig.is_expr_const alg_expr then
             doit ()
-          else if not propagate_constants
+          else if
+            not propagate_constants
+            && not
+              (match Ode_loggers_sig.is_expr_alias alg_expr
+               with 
+               | None -> false
+               | Some _ -> true)
           then doit ()
         | Ode_loggers_sig.Stochiometric_coef _,_
         | Ode_loggers_sig.Jacobian_rate (_,_),_
