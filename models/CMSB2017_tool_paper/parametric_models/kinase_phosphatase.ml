@@ -225,6 +225,7 @@ let declare_rate fmt format = declare_rate_list fmt format parameters
 let declare_rate_equal fmt format =
   declare_rate_list fmt format parameters_equal
 
+
 (******************************************************)
 (*print a list of site *)
 
@@ -276,17 +277,18 @@ let declare_rules fmt format n =
 (******************************************************)
 (*main function*)
 
-let main rep format n =
-    let ext =
+let main rep eq format n =
+  let equal_rate = if eq then "equal_rate_" else "" in
+  let ext =
       match format with
       | Kappa -> ".ka"
       | BNGL -> ".bngl"
       | BNGL_compact -> "_sym.bngl"
     in
-    let file = rep^"/"^ex_file_name^(string_of_int n)^ext in
+    let file = rep^"/"^ex_file_name^equal_rate^(string_of_int n)^ext in
     let channel = open_out file in
     let fmt = Format.formatter_of_out_channel channel in
-    let () = declare_rate fmt format in
+    let () = (if eq then declare_rate_equal else declare_rate) fmt format in
     let () = print_signatures fmt format n in
     let () = print_init fmt format n in
     let () = Format.fprintf fmt "\n" in
@@ -295,9 +297,12 @@ let main rep format n =
     ()
 
 let do_it rep k =
-  main rep Kappa k;
-  main rep BNGL k;
-  main rep BNGL_compact k
+  main rep true Kappa k;
+  main rep true BNGL k;
+  main rep true BNGL_compact k;
+  main rep false Kappa k;
+  main rep false BNGL k;
+  main rep false BNGL_compact k
 (*******************************************************)
 (*input the number of sites*)
 
