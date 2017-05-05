@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 04 2017>
+  * Last modification: Time-stamp: <May 05 2017>
 *)
 
 let local_trace = false
@@ -172,6 +172,46 @@ struct
       has_empty_lhs: bool option;
       has_time_reaction: bool option;
     }
+
+
+  let has_pattern_in_expr expr = Alg_expr.has_mix (fst expr)
+
+  let has_pattern_in_rules compil network =
+    let list = network.rules in
+    List.exists
+      (fun enriched_rule ->
+         let rule_id = enriched_rule.rule_id_with_mode in
+         let rule = enriched_rule.rule in
+         let token_vector = I.token_vector rule in
+         let rate = I.rate compil rule rule_id in
+         begin
+           match rate with
+         | None -> false
+         | Some rate ->
+           has_pattern_in_expr rate
+         end
+         || List.exists (fun (a,_) -> has_pattern_in_expr a) token_vector)
+      list
+
+  let has_pattern_in_var_declaration network =
+    let list = network.var_declaration in
+    List.exists
+      (function
+        | Var (_,_,expr) | Init_expr (_,expr,_) -> has_pattern_in_expr expr
+        | Dummy_decl -> false
+      )
+      list
+
+   let has_pattern_in_obs network =
+      let list = network.obs in
+      List.exists
+        (function
+          | (_,a) -> has_pattern_in_expr a)
+        list
+
+  let has_pattern_in_alg_expr compil network =
+    has_pattern_in_rules compil network
+    || has_pattern_in_var_declaration network
 
   let get_data network =
       network.n_rules,
@@ -1496,6 +1536,10 @@ struct
     let network =
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
+<<<<<<< HEAD
+=======
+    let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil network in
+>>>>>>> 66fcec0... optimiziing reduction by backward bisimulations
     let () =
       match network.sym_reduction with
       | Symmetries.Ground | Symmetries.Forward _
