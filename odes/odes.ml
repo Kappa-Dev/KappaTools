@@ -1537,16 +1537,19 @@ struct
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
     let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil network in
-    let () =
-      match network.sym_reduction with
-      | Symmetries.Ground | Symmetries.Forward _
-        -> ()
-      | Symmetries.Backward _ ->
-      Format.printf "\t -compute equivalence classes @."
-    in
-    let network =
-      compute_equivalence_classes
-        parameters compil network
+    let network  =
+      if has_pattern_in_alg_expr then
+        match network.sym_reduction with
+        | Symmetries.Ground | Symmetries.Forward _
+          -> network
+        | Symmetries.Backward _ ->
+          let () = Format.printf "\t -compute equivalence classes @." in
+          let network =
+            compute_equivalence_classes
+              parameters compil network
+          in
+          network
+      else network
     in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
