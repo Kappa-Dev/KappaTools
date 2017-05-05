@@ -1,3 +1,5 @@
+let ex_file_name = "n_phos_sites_with_counter_"
+
 type format = Kappa | BNGL | BNGL_compact
 type label = int
 type state = U | P
@@ -196,13 +198,14 @@ let declare_rate fmt n format =
     let () = Format.fprintf fmt "Stot 100\n" in
     Format.fprintf fmt "end parameters\n\n"
 
-let main n format =
-  let file =
-    match format with
-    | Kappa -> "ex_"^(string_of_int n)^".ka"
-    | BNGL -> "ex_"^(string_of_int n)^".bngl"
-    | BNGL_compact -> "ex_"^(string_of_int n)^"_sym.bngl"
+let main rep n format =
+  let ext =
+      match format with
+      | Kappa -> ".ka"
+      | BNGL -> ".bngl"
+      | BNGL_compact -> "_sym.bngl"
   in
+  let file = rep^"/"^ex_file_name^(string_of_int n)^ext in
   let channel = open_out file in
   let fmt = Format.formatter_of_out_channel channel in
   let () = declare_rate fmt n format in
@@ -246,21 +249,25 @@ let main n format =
   let () = close_out channel in
   ()
 
-let do_it k =
-  let () = main k Kappa in
-  let () = main k BNGL in
-  let () = main k BNGL_compact in
+let do_it rep k =
+  let () = main rep k Kappa in
+  let () = main rep k BNGL in
+  let () = main rep k BNGL_compact in
   ()
 
 let () =
   match Array.length Sys.argv with
-  | 2 -> do_it (int_of_string Sys.argv.(1))
   | 3 ->
-    let n = int_of_string Sys.argv.(2) in
+    do_it
+      Sys.argv.(1) (int_of_string Sys.argv.(2))
+  | 4 ->
+    let n = int_of_string Sys.argv.(3) in
     let rec aux k =
       if k>n then ()
       else
-        let () = do_it k in
+        let () = do_it  Sys.argv.(1) k in
         aux (k+1)
-    in aux (int_of_string Sys.argv.(1))
-  | _ -> Printf.printf "Please call with one or two int arguments\n\n"
+    in
+    let () = aux (int_of_string Sys.argv.(2)) in
+    ()
+  | _ -> Printf.printf "Please call with two or three int arguments\n\n"
