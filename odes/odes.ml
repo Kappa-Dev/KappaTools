@@ -1536,10 +1536,7 @@ struct
     let network =
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
-<<<<<<< HEAD
-=======
     let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil network in
->>>>>>> 66fcec0... optimiziing reduction by backward bisimulations
     let () =
       match network.sym_reduction with
       | Symmetries.Ground | Symmetries.Forward _
