@@ -1,8 +1,10 @@
-File "rafinements.ka", line 62, characters 6-100:
+File "rafinements.ka", line 118, characters 6-49:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "rafinements.ka", lines 63-64, characters 6-52:
+File "rafinements.ka", line 120, characters 6-85:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "rafinements.ka", lines 65-66, characters 6-104:
+File "rafinements.ka", line 122, characters 6-121:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "rafinements.ka", line 75, characters 12-18:
+File "rafinements.ka", line 124, characters 6-163:
+Warning: Deprecated variable syntax: use |kappa instance| instead.
+File "rafinements.ka", line 129, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
