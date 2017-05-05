@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 04 2017>
+  * Last modification: Time-stamp: <May 05 2017>
 *)
 
 let local_trace = false
@@ -172,6 +172,31 @@ struct
       has_empty_lhs: bool option;
       has_time_reaction: bool option;
     }
+
+  let has_pattern_in_expr expr = true
+
+  let has_pattern_in_rules network =
+    let list = network.rules in
+    List.exists
+      (fun enriched_rule ->
+         let rule = enriched_rule.rule in
+         let token_vector = I.token_vector rule in
+         let rate_list = [] in
+         true)
+    true
+
+  let has_pattern_in_var_declaration network =
+    let list = network.var_declaration in
+    true
+
+   let has_pattern_in_obs network =
+      let list = network.obs in
+      true
+
+  let has_pattern_in_alg_expr network =
+    has_pattern_in_rules network
+    || has_pattern_in_var_declaration network
+
 
   let get_data network =
       network.n_rules,
@@ -679,7 +704,6 @@ struct
         (convert_alg_expr parameter compil network expr,
               dt),pos
     | Alg_expr.DIFF_KAPPA_INSTANCE(expr,dt),pos ->
-      (* TO DO ??? *)
       raise
         (ExceptionDefn.Internal_Error
            ("Cannot translate partial derivative",pos))
@@ -1496,16 +1520,20 @@ struct
     let network =
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
+    let has_pattern_in_alg_expr = has_pattern_in_alg_expr network in
     let () =
       match network.sym_reduction with
       | Symmetries.Ground | Symmetries.Forward _
         -> ()
       | Symmetries.Backward _ ->
-      Format.printf "\t -compute equivalence classes @."
+        if has_pattern_in_alg_expr then
+          Format.printf "\t -compute equivalence classes @."
     in
     let network =
+      if has_pattern_in_alg_expr then
       compute_equivalence_classes
         parameters compil network
+      else network
     in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in

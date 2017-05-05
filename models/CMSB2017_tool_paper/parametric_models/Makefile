@@ -21,7 +21,7 @@ $(MODELREP):
 
 $(MODELREP)/%: $(MODELREP)
 	mkdir $@
-	cp $(SCRIPTREP)* $@/
+	cp $(SCRIPTREP)*.sh $@/
 
 clean:
 	rm -rf  *.cm* *.o
