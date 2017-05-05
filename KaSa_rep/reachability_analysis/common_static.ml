@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 19 2017>
+  * Last modification: Time-stamp: <May 05 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -890,7 +890,7 @@ let scan_rule_binding_views parameter error rule_id rule store_result =
 (*VIEWS*)
 (***************************************************************************)
 
-let collect_views_pattern_aux parameter error views store_result =
+let collect_views_pattern_aux ?init:(init=false) parameter handler error views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter
       error
@@ -909,8 +909,8 @@ let collect_views_pattern_aux parameter error views store_result =
          | Cckappa_sig.Dead_agent (agent,_,_,_)
          | Cckappa_sig.Agent agent ->
            let error, site_map =
-             Common_map.collect_site_map_for_views
-               parameter error agent
+             Common_map.collect_site_map_for_views ~init
+               parameter handler error agent
            in
            let error, store_result =
              Ckappa_sig.Agent_id_map_and_set.Map.add
@@ -923,6 +923,7 @@ let collect_views_pattern_aux parameter error views store_result =
       ) views store_result
   in
   error, store_result
+
 
 let collect_test_sites parameters error rule_id viewslhs store_result =
   let error, store_result =
@@ -953,7 +954,7 @@ let collect_test_sites parameters error rule_id viewslhs store_result =
   in
   error, store_result
 
-let collect_views_aux parameter error rule_id views store_result =
+let collect_views_aux parameter handler error rule_id views store_result =
   let error, old_map =
     Common_map.get_rule_id_map_and_set parameter error
       rule_id
@@ -961,7 +962,7 @@ let collect_views_aux parameter error rule_id views store_result =
       store_result
   in
   let error, map =
-    collect_views_pattern_aux parameter error
+    collect_views_pattern_aux parameter handler error
       views
       old_map
   in
@@ -971,31 +972,31 @@ let collect_views_aux parameter error rule_id views store_result =
   in
   error, store_result
 
-let collect_views_lhs parameter error rule_id rule store_result =
+let collect_views_lhs parameter handler error rule_id rule store_result =
   collect_views_aux
-    parameter error
+    parameter handler error
     rule_id
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     store_result
 
-let collect_views_rhs parameter error rule_id rule store_result =
+let collect_views_rhs parameter handler error rule_id rule store_result =
   collect_views_aux
-    parameter error
+    parameter handler error
     rule_id
     rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
     store_result
 
-let scan_rule_test parameters error rule_id rule store_result =
+let scan_rule_test parameters handler error rule_id rule store_result =
   let error, store_views_rhs =
     collect_views_rhs
-      parameters error
+      parameters handler error
       rule_id
       rule
       store_result.store_views_rhs
   in
   let error, store_views_lhs =
     collect_views_lhs
-      parameters error
+      parameters handler error
       rule_id
       rule
       store_result.store_views_lhs
@@ -1452,7 +1453,7 @@ let scan_rule parameter error handler_kappa rule_id rule compil store_result =
   in
   (*------------------------------------------------------------------------*)
   let error, store_test =
-    scan_rule_test parameter error
+    scan_rule_test parameter handler_kappa error
       rule_id
       rule
       store_result.store_test

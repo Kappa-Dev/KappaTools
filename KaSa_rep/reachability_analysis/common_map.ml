@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 18th of Feburary
-  * Last modification: Time-stamp: <Jan 23 2017>
+  * Last modification: Time-stamp: <May 05 2017>
   *
   *
   *
@@ -293,22 +293,45 @@ let collect_sites_map_in_agent_interface parameters error agent
        error, store_result
     ) agent.Cckappa_sig.agent_interface (error, store_result)
 
-let collect_site_map_for_views parameters error agent =
+let collect_site_map_for_views ?init:(init=false) parameters handler error agent =
+  let error, last_site =
+    Handler.last_site_of_agent
+      parameters error handler agent.Cckappa_sig.agent_name
+  in
+  let rec aux k (error,output) =
+    if
+      Ckappa_sig.compare_site_name k Ckappa_sig.dummy_site_name < 0
+    then
+      error,output
+    else
+      let output =
+        Ckappa_sig.Site_map_and_set.Map.add
+          parameters error
+          k
+          (Ckappa_sig.dummy_state_index ,Ckappa_sig.dummy_state_index)
+          output
+      in
+      aux (Ckappa_sig.pred_site_name k) output
+  in
+  let error, site_map =
+    if init then aux last_site (error,Ckappa_sig.Site_map_and_set.Map.empty)
+    else error, Ckappa_sig.Site_map_and_set.Map.empty
+  in
   let error, site_map =
     Ckappa_sig.Site_map_and_set.Map.fold
       (fun site_type port (error, store_map) ->
          let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
          let state_min = port.Cckappa_sig.site_state.Cckappa_sig.min in
          let error, store_map =
-           Ckappa_sig.Site_map_and_set.Map.add
+           Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
              parameters error
              site_type
              (state_min, state_max)
              store_map
          in
-         error, store_map
+       error, store_map
       )
       agent.Cckappa_sig.agent_interface
-      (error, Ckappa_sig.Site_map_and_set.Map.empty)
+      (error, site_map)
   in
   error, site_map
