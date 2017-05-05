@@ -1,6 +1,6 @@
 (* data structures *)
 (* Manager state *)
-type parse_state = (Kappa_facade.t,Api_types_j.errors) Result_data.t
+type parse_state = (Kappa_facade.t,Api_types_j.errors) Result.result
 
 class type simulation = object
   method get_simulation_id : unit -> Api_types_j.simulation_id

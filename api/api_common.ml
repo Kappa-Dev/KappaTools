@@ -3,7 +3,7 @@ open Lwt.Infix
 (* Helper functions for result *)
 let result_ok ?(result_code:Api.manager_code = `OK)
     (ok:'ok) : 'ok Api.result =
-  { Api_types_j.result_data = `Ok ok ;
+  { Api_types_j.result_data = Ok ok ;
     Api_types_j.result_code = result_code }
 let error_msg
     ?(severity:Api_types_j.severity = `Error)
@@ -16,7 +16,7 @@ let result_error_msg
     ?(result_code:Api.manager_code = `ERROR)
     (message:string) : 'ok Api.result =
   { Api_types_j.result_data =
-      `Error [{ Api_types_j.message_severity = severity;
+      Error [{ Api_types_j.message_severity = severity;
                 Api_types_j.message_text = message;
                 Api_types_j.message_range = None }];
     Api_types_j.result_code = result_code }
@@ -24,7 +24,7 @@ let result_error_msg
 let result_messages
     ?(result_code:Api.manager_code = `ERROR)
     (messages : Api_types_j.errors) : 'ok Api.result =
-  { Api_types_j.result_data = `Error messages ;
+  { Api_types_j.result_data = Error messages ;
     Api_types_j.result_code = result_code }
 
 let result_error_exception
@@ -46,8 +46,8 @@ let result_map :
     ~(error:'code -> Api_types_j.errors -> 'a)
     (result:('ok,'code) Api_types_j.result)
   ->  ((match result.Api_types_j.result_data with
-      | `Ok data -> ok result.Api_types_j.result_code data
-      | `Error data -> error result.Api_types_j.result_code data) : 'a)
+      | Ok data -> ok result.Api_types_j.result_code data
+      | Error data -> error result.Api_types_j.result_code data) : 'a)
 
 let result_bind :
   ok:('ok -> ('a_ok, 'a_code) Api_types_j.result) ->
@@ -57,9 +57,9 @@ let result_bind :
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result)
     (result:('ok,'code) Api_types_j.result) ->
     ((match result.Api_types_j.result_data with
-        | `Ok data -> ok data
-        | `Error data ->
-          { Api_types_j.result_data = `Error data ;
+        | Ok data -> ok data
+        | Error data ->
+          { Api_types_j.result_data = Error data ;
             Api_types_j.result_code = result.Api_types_j.result_code }) :
        ('a_ok,'a_code) Api_types_j.result)
 
@@ -71,10 +71,10 @@ let result_bind_lwt :
     ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result Lwt.t)
     (result:('ok,'code) Api_types_j.result) ->
   (match result.Api_types_j.result_data with
-  | `Ok data -> ok data
-  | `Error data ->
+  | Ok data -> ok data
+  | Error data ->
     Lwt.return
-      { Api_types_j.result_data = `Error data ;
+      { Api_types_j.result_data = Error data ;
         Api_types_j.result_code = result.Api_types_j.result_code }
     : ('a_ok,'a_code) Api_types_j.result Lwt.t)
 
@@ -108,7 +108,7 @@ let rec result_combine : unit Api.result list -> unit Api.result =
           result_map
             ~ok:(fun _ _-> l)
             ~error:(fun result_code (data_r : Api_types_j.errors) ->
-                { Api_types_j.result_data = `Error (data_1@data_r);
+                { Api_types_j.result_data = Error (data_1@data_r);
                   Api_types_j.result_code = result_code }
               )
             r

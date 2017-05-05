@@ -4,9 +4,7 @@
 *)
 type unit_t = unit
 
-type ('ok,'error) result_data <ocaml_biniou t="result"> =
-     [ Ok of 'ok
-     | Error of 'error ] <json repr="object">
+type ('ok,'error) result_data <ocaml from module="Result_util" t="t"> = abstract
 
 type range <ocaml from module="Locality"> = abstract
 

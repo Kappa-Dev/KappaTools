@@ -7,7 +7,7 @@ let stop_simulation (system_process:Kappa_facade.system_process) :
   | Some current ->
     let t : Kappa_facade.t = current#get_runtime_state () in
     (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
-    (Result_data.map
+    (Result_util.map
        ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))
        ~error:(fun errors ->
            Lwt.return (Api_common.result_messages errors)))
@@ -46,7 +46,7 @@ object
          project#get_state () >>= function
          | Some x ->
            Lwt.return
-             (Result_data.map
+             (Result_util.map
                 ~ok:(fun kappa_facade ->
                     Api_common.result_ok
                       (Kappa_facade.get_dead_rules kappa_facade))
@@ -74,7 +74,7 @@ object
                    ~system_process
                    ~kappa_files:(project#get_files ());
                  harakiri >>= fun () ->
-                 Lwt.return (Result_data.error
+                 Lwt.return (Result_util.error
                                [Api_common.error_msg
                                   "Parse cancelled by modified files"])
                ] in
@@ -83,7 +83,7 @@ object
          >>=
          (fun state ->
             Lwt.return
-              (Result_data.map
+              (Result_util.map
                  ~ok:(fun kappa_facade ->
                      Api_common.result_ok
                        { Api_types_j.project_parse_contact_map =
