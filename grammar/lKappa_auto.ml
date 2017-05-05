@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type binding_id = Lhs of int | Rhs of int
+type binding_id = Lhs of int | Rhs of int | Copy_lhs of int
 
 module Binding_id =
 struct
@@ -16,6 +16,7 @@ struct
     function
     | Lhs i -> Format.fprintf log "LHS(%i)" i
     | Rhs i -> Format.fprintf log "RHS(%i)" i
+    | Copy_lhs  i -> Format.fprintf log "RHS(%i')" i
 end
 
 module Binding_idSetMap = SetMap.Make (Binding_id)
@@ -131,7 +132,8 @@ let translate rate_convention cache rule  =
     | Remanent_parameters_sig.Biochemist, _  ->
       Binding_idMap.add
         i (j::(Binding_idMap.find_default [] i map)) map
-    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs, Rhs _ -> map
+    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs,
+      (Rhs _ | Copy_lhs _)  -> map
   in
   let ag_created =
     match rate_convention with
@@ -166,7 +168,9 @@ let translate rate_convention cache rule  =
              (fun (map, site_id) ((state,_),switch) ->
                 match state, switch with
                 | Ast.LNK_VALUE (i,_), LKappa.Maintained  ->
-                  add_map rate_convention (Lhs i) (agent_id, site_id) map,
+                  add_map rate_convention
+                    (Copy_lhs i) (agent_id, site_id+n_site)
+                    (add_map rate_convention (Lhs i) (agent_id, site_id) map),
                   site_id + 1
                 | Ast.LNK_VALUE (i,_), LKappa.Linked (j,_) ->
                   add_map rate_convention (Rhs j) (agent_id,site_id+n_site)
