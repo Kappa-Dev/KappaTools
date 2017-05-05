@@ -148,11 +148,15 @@ let pop_entry parameters error id (map,set) =
     | None ->
       Exception.warn parameters error __POS__ Exit (None,map)
 
-let rec scan_interface parameters k agent interface remanent =
+let rec scan_interface parameters k agent interface ((error,a),set as remanent)=
   match interface with
   | [] -> remanent
-  | port::interface ->
-    let (error,a),set = remanent in
+  | Ast.Counter _::_ ->
+    (Exception.warn
+        parameters error __POS__
+        ~message:"Do not deal with counters yet"
+        Exit a,set)
+  | Ast.Port port::interface ->
     let error,set =
       check_freshness parameters error "Site" (fst port.Ast.port_nme) set
     in
@@ -300,7 +304,9 @@ let translate_port is_signature parameters int_set port remanent =
 let rec translate_interface parameters is_signature int_set interface remanent =
   match interface with
   | [] -> Ckappa_sig.EMPTY_INTF,remanent
-  | port::interface ->
+  | Ast.Counter _::interface ->
+    translate_interface parameters is_signature int_set interface remanent
+  | Ast.Port port::interface ->
     let port,remanent =
       translate_port is_signature parameters int_set port remanent in
     let interface,remanent =
@@ -409,8 +415,9 @@ let support_agent ((name,_),intfs,_) =
     let rec scan intf list =
       match intf with
       | [] -> List.sort compare list
-      | port::intf ->
+      | Ast.Port port::intf ->
         scan intf ((fst port.Ast.port_nme)::list)
+      | Ast.Counter _::intf -> scan intf list
     in
     scan intfs []
   in

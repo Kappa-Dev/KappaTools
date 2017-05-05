@@ -29,9 +29,21 @@ type port = {
   port_lnk_mod: int Locality.annot option option;
 }
 
+type counter_test = CEQ of int | CGTE of int | CVAR of string
+
+type counter = {
+  count_nme: string Locality.annot;
+  count_test: counter_test Locality.annot option;
+  count_delta: int Locality.annot;
+}
+
+type site =
+  | Port of port
+  | Counter of counter
+
 type agent_mod = Erase | Create
 
-type agent = (string Locality.annot * port list * agent_mod option)
+type agent = (string Locality.annot * site list * agent_mod option)
 
 type mixture = agent list
 
@@ -162,7 +174,7 @@ type parsing_compil = (agent,mixture,string,rule,edit_rule) compil
 
 val empty_compil : parsing_compil
 
-val no_more_site_on_right : bool -> port list -> port list -> bool
+val no_more_site_on_right : bool -> site list -> site list -> bool
 
 val split_mixture : mixture -> (mixture * mixture * mixture * mixture)
 (** @return [lhs,rhs,add,del] *)

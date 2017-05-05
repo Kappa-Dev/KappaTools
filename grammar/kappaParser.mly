@@ -457,20 +457,43 @@ interface_expression:
     | port_expression {[$1]}
     ;
 
+counter_test:
+   | TYPE INT { Some (Ast.CEQ $2,rhs_pos 2)}
+   | TYPE GREATER INT { Some (Ast.CGTE $3,rhs_pos 3)}
+   | TYPE ID { Some (Ast.CVAR $2,rhs_pos 2)}
 
 port_expression:
     | ID internal_state link_state_mod
-	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
+	 { Ast.Port
+	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
 	    Ast.port_int_mod = None; Ast.port_lnk_mod = $3; } }
     | ID internal_state link_state link_state_mod
-	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
+	 { Ast.Port
+	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3;
 	    Ast.port_int_mod = None; Ast.port_lnk_mod = $4; } }
     | ID internal_state DIV KAPPA_MRK link_state_mod
-	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
+	 { Ast.Port
+	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=[];
 	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $5; } }
     | ID internal_state DIV KAPPA_MRK link_state link_state_mod
-	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
+	 { Ast.Port
+	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
 	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $6; } }
+    | ID counter_test PLUS EQUAL INT
+         { Ast.Counter
+	   { Ast.count_nme = ($1,rhs_pos 1);
+	   Ast.count_test = $2;
+	   Ast.count_delta = ($5,rhs_pos 5)} }
+    | ID PLUS EQUAL INT
+         { Ast.Counter
+	   { Ast.count_nme = ($1,rhs_pos 1);
+	   Ast.count_test = None;
+	   Ast.count_delta = ($4,rhs_pos 4)} }
+    | ID counter_test
+         { Ast.Counter
+	   { Ast.count_nme = ($1,rhs_pos 1);
+	   Ast.count_test = $2;
+	   Ast.count_delta = Locality.dummy_annot 0} }
     ;
 
 internal_state:

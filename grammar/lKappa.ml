@@ -984,6 +984,11 @@ let refer_links_annot links_annot mix =
                | Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.ANY_FREE),_),_ -> ())
          ra.ra_ports) mix
 
+let separate_sites =
+  List.fold_left (fun (ps,cs) -> function
+      | Ast.Port p -> (p::ps,cs)
+      | Ast.Counter c -> (ps,c::cs)) ([],[])
+
 (*
 Is responsible for the check that:
 - agent exists
@@ -993,15 +998,16 @@ Is responsible for the check that:
 - unique internal_state / site
 - links appear exactly twice
 *)
-
 let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
-    | ((lag_na,lpos as ag_ty),lag_p,lmod)::lt, ((rag_na,rpos),rag_p,rmod)::rt
+    | ((lag_na,lpos as ag_ty),lag_s,lmod)::lt, ((rag_na,rpos),rag_s,rmod)::rt
       when String.compare lag_na rag_na = 0 &&
-           Ast.no_more_site_on_right true lag_p rag_p ->
+           Ast.no_more_site_on_right true lag_s rag_s ->
       let () = forbid_modification lpos lmod in
       let () = forbid_modification rpos rmod in
+      let (lag_p,_) = separate_sites lag_s in
+      let (rag_p,_) = separate_sites rag_s in
       let ra,links_annot' =
         annotate_agent_with_diff
           sigs ?contact_map ag_ty links_annot lag_p rag_p in
@@ -1022,8 +1028,9 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let syntax_version=Ast.V3 in
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
-          (fun (acc,lannot) ((_,pos as na),intf,modif) ->
+          (fun (acc,lannot) ((_,pos as na),sites,modif) ->
              let () = forbid_modification pos modif in
+             let intf,_ = separate_sites sites in
              let ra,lannot' =
                annotate_dropped_agent ~syntax_version sigs lannot na intf in
              (ra::acc,lannot'))
@@ -1035,8 +1042,9 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let () = refer_links_annot lhs_links_two mix in
       let cmix,(rhs_links_one,_) =
         List.fold_left
-          (fun (acc,rannot) ((_,pos as na),intf,modif) ->
+          (fun (acc,rannot) ((_,pos as na),sites,modif) ->
              let () = forbid_modification pos modif in
+             let intf,_ = separate_sites sites in
              let rannot',x' = annotate_created_agent
                  ~syntax_version sigs ?contact_map rannot na intf in
              x'::acc,rannot')
@@ -1053,7 +1061,8 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
 let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
   let ((lhs_links_one,lhs_links_two),(rhs_links_one,_)),mix,cmix =
     List.fold_left
-      (fun (lannot,acc,news) (ty,intf,modif) ->
+      (fun (lannot,acc,news) (ty,sites,modif) ->
+         let (intf,counts) = separate_sites sites in
          match modif with
          | None ->
            let a,lannot' = annotate_edit_agent
@@ -1352,7 +1361,8 @@ let assemble_rule ~syntax_version ~r_editStyle
         un_rate;
   }
 
-let create_t ast_intf =
+let create_t ast_sites =
+  let ast_intf,_ = separate_sites ast_sites in
   NamedDecls.create (
     Tools.array_map_of_list
       (fun p ->
