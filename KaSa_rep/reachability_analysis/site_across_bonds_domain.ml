@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Apr 27 2017>
+   * Last modification: Time-stamp: <May 05 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -781,10 +781,13 @@ struct
     let parameters = get_parameter static in
     (*views in the initial state that has two agents and their sites are
       different*)
+    let kappa_handler = get_kappa_handler static in
     let views = species.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
+    let init = true in
     let error, store_views_init =
       Common_static.collect_views_pattern_aux
-        parameters error
+        ~init
+        parameters kappa_handler error
         views
         Ckappa_sig.Agent_id_map_and_set.Map.empty
     in
@@ -928,6 +931,7 @@ struct
   let maybe_reachable static dynamic error _flag (pattern:Cckappa_sig.mixture)
       precondition =
     let parameters = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     let error, dynamic, bdu_false =
       get_mvbdu_false static dynamic error in
     let error, bonds_lhs =
@@ -940,7 +944,7 @@ struct
     in
     let error, views_lhs =
       Common_static.collect_views_pattern_aux
-        parameters error
+        parameters kappa_handler error
         pattern.Cckappa_sig.views
         Ckappa_sig.Agent_id_map_and_set.Map.empty
     in
