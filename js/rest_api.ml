@@ -254,6 +254,15 @@ class manager
         `GET
         Mpi_message_j.simulation_info_of_string
         (fun result -> `SimulationInfo result)
+    | `SimulationEfficiency project_id ->
+      send
+        (Format.sprintf
+           "%s/v2/projects/%s/simulation/efficiency"
+           url
+           project_id)
+        `GET
+        Mpi_message_j.simulation_efficiency_of_string
+        (fun result -> `SimulationEfficiency result)
     | `SimulationCatalogFileLine project_id ->
       send
         (Format.sprintf
