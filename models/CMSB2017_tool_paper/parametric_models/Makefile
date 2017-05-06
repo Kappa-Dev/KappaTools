@@ -1,4 +1,5 @@
 SUMMARY?=summary.txt
+TIMEOUT?=10m
 FROM?=1
 TO?=10
 
@@ -17,7 +18,8 @@ all: $(ANALYZEMODEL)
 	touch $@
 
 %.analyze_model: %.generate_model
-	cd $(MODELREP)/$* ; make clean ; make SUMMARY=$(SUMMARY)
+	cd $(MODELREP)/$* ; make clean ; make SUMMARY=$(SUMMARY) TIMEOUT=$(TIMEOUT)
+  echo time_out $(TIMEOUT) >> $(SUMMARY)
 	cat $(MODELREP)/$*/$(SUMMARY) >> $(SUMMARY)
 
 %: %.ml
