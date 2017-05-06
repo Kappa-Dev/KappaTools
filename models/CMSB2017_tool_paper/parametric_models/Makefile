@@ -11,22 +11,27 @@ SCRIPTREP= ../script/
 GENMODEL=$(ML:%.ml=%.generate_model)
 ANALYZEMODEL=$(ML:%.ml=%.analyze_model)
 
-all: $(ANALYZEMODEL)
+all: $(REPS) $(GENMODEL) $(ANALYZEMODEL)
+	echo $(BIN)
+	echo $(MODELREP)
+	echo $(REPS)
 
-%.generate_model: % $(BIN) $(MODELREP) $(REPS)
-	./$* $(MODELREP)/$*/ $(FROM) $(TO)
+%.generate_model: %.bin $(MODELREP) $(MODELREP)/%
+	./$* $(MODELREP)/$* $(FROM) $(TO)
 	touch $@
 
-%.analyze_model: %.generate_model
+%.analyze_model:  %.generate_model
 	cd $(MODELREP)/$* ; make clean ; make SUMMARY=$(SUMMARY) TIMEOUT=$(TIMEOUT)
-  echo time_out $(TIMEOUT) >> $(SUMMARY)
+	echo time_out $(TIMEOUT) >> $(SUMMARY)
 	cat $(MODELREP)/$*/$(SUMMARY) >> $(SUMMARY)
+	touch $@
 
-%: %.ml
-	ocamlopt.opt	$< -o $@
+%.bin: %.ml
+	ocamlopt.opt	$< -o $*
+	touch $@
 
 $(MODELREP):
-	mkdir $(MODELREP)
+	mkdir $@
 
 $(MODELREP)/%: $(MODELREP)
 	mkdir $@
@@ -37,4 +42,4 @@ clean:
 	rm -rf  *.cm* *.o
 
 clean_all: clean
-	rm -rf $(MODELREP) $(BIN) $(SUMMARY)
+	rm -rf $(MODELREP) $(BIN) $(SUMMARY) *.generate_model *.analyze_model *.bin
