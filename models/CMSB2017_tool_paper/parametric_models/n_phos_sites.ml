@@ -139,7 +139,7 @@ let potential_valuations format list =
         in
         aux (k+1) (valuation::l)
     in
-    aux 1 []
+    aux 0 []
 
 
 
