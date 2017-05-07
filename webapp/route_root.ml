@@ -47,12 +47,12 @@ let route
                        fun () -> exit 0)
                  in
                  Lwt.return
-                   { Api_types_j.result_data = `Ok "shutting down" ;
+                   { Api_types_j.result_data = Result.Ok "shutting down" ;
                      Api_types_j.result_code = `OK }
                | _ ->
                  Lwt.return
                    { Api_types_j.result_data =
-                       `Error [{ Api_types_j.message_severity = `Error ;
+                       Result.Error [{ Api_types_j.message_severity = `Error ;
                                  Api_types_j.message_text = "invalid key";
                                  Api_types_j.message_range = None ; }] ;
                      Api_types_j.result_code = `ERROR })
