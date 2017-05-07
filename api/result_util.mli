@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a,'b) t = ('a,'b) result
+type ('a,'b) t = ('a,'b) Result.result
 
 val write_t :
   (Bi_outbuf.t -> 'ok -> unit) ->

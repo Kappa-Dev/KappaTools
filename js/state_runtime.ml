@@ -200,8 +200,8 @@ let init () =
     | [] -> ()
     | url::urls ->
       match create_spec ~load url with
-      | { Api_types_j.result_data = Ok (); _ } -> add_urls urls false
-      | { Api_types_j.result_data = Error _; _ } -> add_urls urls load
+      | { Api_types_j.result_data = Result.Ok (); _ } -> add_urls urls false
+      | { Api_types_j.result_data = Result.Error _; _ } -> add_urls urls load
   in
   let () = add_urls hosts true in
   create_manager "" >>=

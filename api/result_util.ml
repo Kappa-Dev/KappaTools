@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('a,'b) t = ('a,'b) result
+type ('a,'b) t = ('a,'b) Result.result
 
 (*let to_yojson f g = function
   | Ok a -> `List [`String "Ok"; f a]
@@ -19,11 +19,11 @@ let of_yojson f g = function
 *)
 
 let write_t write__ok write__error = fun ob -> function
-  | Ok x ->
+  | Result.Ok x ->
     Bi_outbuf.add_string ob "[\"Ok\",";
         write__ok ob x;
     Bi_outbuf.add_char ob ']'
-  | Error x ->
+  | Result.Error x ->
     Bi_outbuf.add_string ob "[\"Error\",";
     write__error ob x;
     Bi_outbuf.add_char ob ']'
@@ -41,8 +41,8 @@ let read_t read__ok read__error = fun p lb ->
            Yojson.Basic.read_comma p lb;
            Yojson.Basic.read_space p lb;
            match String.sub s pos len with
-           | "Ok" -> Ok (read__ok p lb)
-           | "Error" -> Error (read__error p lb)
+           | "Ok" -> Result.Ok (read__ok p lb)
+           | "Error" -> Result.Error (read__error p lb)
            | x -> raise (Yojson.Json_error ("Field \""^x^
                                             "\" does not belong to the result type"))
         ) lb in
@@ -63,16 +63,13 @@ let map
     ~(error:'error -> 'a) : ('ok,'error) t -> 'a
   =
   function
-  | Ok o -> ok o
-  | Error e -> error e
+  | Result.Ok o -> ok o
+  | Result.Error e -> error e
 
-let bind
-    ~(ok:'ok -> 'a) : ('ok,'error) t -> 'a
-  =
-  function
-  | Ok o -> ok o
-  | Error e -> `Error e
+let bind ~(ok:'ok -> 'a) : ('ok,'error) t -> 'a = function
+  | Result.Ok o -> ok o
+  | Result.Error e -> `Error e
 
-let error (error:'error ) : ('ok,'error) t = Error error
+let error (error:'error ) : ('ok,'error) t = Result.Error error
 
-let ok (ok : 'ok) : ('ok,'error) t = Ok ok
+let ok (ok : 'ok) : ('ok,'error) t = Result.Ok ok

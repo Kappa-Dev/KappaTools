@@ -3,32 +3,32 @@ open Lwt.Infix
 (* Helper functions for result *)
 let result_ok ?(result_code:Api.manager_code = `OK)
     (ok:'ok) : 'ok Api.result =
-  { Api_types_j.result_data = Ok ok ;
-    Api_types_j.result_code = result_code }
+  { Api_types_t.result_data = Result.Ok ok ;
+    Api_types_t.result_code = result_code }
 let error_msg
-    ?(severity:Api_types_j.severity = `Error)
-    (message:string) : Api_types_j.message =
-  { Api_types_j.message_severity = severity;
-    Api_types_j.message_text = message;
-    Api_types_j.message_range = None }
+    ?(severity:Api_types_t.severity = `Error)
+    (message:string) : Api_types_t.message =
+  { Api_types_t.message_severity = severity;
+    Api_types_t.message_text = message;
+    Api_types_t.message_range = None }
 let result_error_msg
-    ?(severity:Api_types_j.severity = `Error)
+    ?(severity:Api_types_t.severity = `Error)
     ?(result_code:Api.manager_code = `ERROR)
     (message:string) : 'ok Api.result =
-  { Api_types_j.result_data =
-      Error [{ Api_types_j.message_severity = severity;
-                Api_types_j.message_text = message;
-                Api_types_j.message_range = None }];
-    Api_types_j.result_code = result_code }
+  { Api_types_t.result_data =
+      Result.Error [{ Api_types_t.message_severity = severity;
+                Api_types_t.message_text = message;
+                Api_types_t.message_range = None }];
+    Api_types_t.result_code = result_code }
 
 let result_messages
     ?(result_code:Api.manager_code = `ERROR)
-    (messages : Api_types_j.errors) : 'ok Api.result =
-  { Api_types_j.result_data = Error messages ;
-    Api_types_j.result_code = result_code }
+    (messages : Api_types_t.errors) : 'ok Api.result =
+  { Api_types_t.result_data = Result.Error messages ;
+    Api_types_t.result_code = result_code }
 
 let result_error_exception
-    ?(severity:Api_types_j.severity = `Error)
+    ?(severity:Api_types_t.severity = `Error)
     ?(result_code:Api.manager_code = `ERROR)
     (e : exn) : 'ok Api.result =
   let message = (try  (Printexc.to_string e)
@@ -39,57 +39,57 @@ let result_error_exception
     message
 let result_map :
   ok:('code -> 'ok -> 'a) ->
-  error:('code -> Api_types_j.errors -> 'a) ->
-  ('ok, 'code) Api_types_j.result -> 'a =
+  error:('code -> Api_types_t.errors -> 'a) ->
+  ('ok, 'code) Api_types_t.result -> 'a =
   fun
     ~(ok:'code -> 'ok -> 'a)
-    ~(error:'code -> Api_types_j.errors -> 'a)
-    (result:('ok,'code) Api_types_j.result)
-  ->  ((match result.Api_types_j.result_data with
-      | Ok data -> ok result.Api_types_j.result_code data
-      | Error data -> error result.Api_types_j.result_code data) : 'a)
+    ~(error:'code -> Api_types_t.errors -> 'a)
+    (result:('ok,'code) Api_types_t.result)
+  ->  ((match result.Api_types_t.result_data with
+      | Result.Ok data -> ok result.Api_types_t.result_code data
+      | Result.Error data -> error result.Api_types_t.result_code data) : 'a)
 
 let result_bind :
-  ok:('ok -> ('a_ok, 'a_code) Api_types_j.result) ->
-  ('ok, 'a_code) Api_types_j.result ->
-  ('a_ok, 'a_code) Api_types_j.result =
+  ok:('ok -> ('a_ok, 'a_code) Api_types_t.result) ->
+  ('ok, 'a_code) Api_types_t.result ->
+  ('a_ok, 'a_code) Api_types_t.result =
   fun
-    ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result)
-    (result:('ok,'code) Api_types_j.result) ->
-    ((match result.Api_types_j.result_data with
-        | Ok data -> ok data
-        | Error data ->
-          { Api_types_j.result_data = Error data ;
-            Api_types_j.result_code = result.Api_types_j.result_code }) :
-       ('a_ok,'a_code) Api_types_j.result)
+    ~(ok:'ok -> ('a_ok,'a_code) Api_types_t.result)
+    (result:('ok,'code) Api_types_t.result) ->
+    ((match result.Api_types_t.result_data with
+        | Result.Ok data -> ok data
+        | Result.Error data ->
+          { Api_types_t.result_data = Result.Error data ;
+            Api_types_t.result_code = result.Api_types_t.result_code }) :
+       ('a_ok,'a_code) Api_types_t.result)
 
 let result_bind_lwt :
-  ok:('ok -> ('a_ok, 'a_code) Api_types_j.result Lwt.t) ->
-  ('ok, 'a_code) Api_types_j.result ->
-  ('a_ok, 'a_code) Api_types_j.result Lwt.t =
+  ok:('ok -> ('a_ok, 'a_code) Api_types_t.result Lwt.t) ->
+  ('ok, 'a_code) Api_types_t.result ->
+  ('a_ok, 'a_code) Api_types_t.result Lwt.t =
   fun
-    ~(ok:'ok -> ('a_ok,'a_code) Api_types_j.result Lwt.t)
-    (result:('ok,'code) Api_types_j.result) ->
-  (match result.Api_types_j.result_data with
-  | Ok data -> ok data
-  | Error data ->
+    ~(ok:'ok -> ('a_ok,'a_code) Api_types_t.result Lwt.t)
+    (result:('ok,'code) Api_types_t.result) ->
+  (match result.Api_types_t.result_data with
+  | Result.Ok data -> ok data
+  | Result.Error data ->
     Lwt.return
-      { Api_types_j.result_data = Error data ;
-        Api_types_j.result_code = result.Api_types_j.result_code }
-    : ('a_ok,'a_code) Api_types_j.result Lwt.t)
+      { Api_types_t.result_data = Result.Error data ;
+        Api_types_t.result_code = result.Api_types_t.result_code }
+    : ('a_ok,'a_code) Api_types_t.result Lwt.t)
 
 let rec result_fold_lwt :
-  f:(('ok, 'a_code) Api_types_j.result ->
+  f:(('ok, 'a_code) Api_types_t.result ->
      'value ->
-     ('ok, 'a_code) Api_types_j.result Lwt.t) ->
-  id:('ok, 'a_code) Api_types_j.result ->
+     ('ok, 'a_code) Api_types_t.result Lwt.t) ->
+  id:('ok, 'a_code) Api_types_t.result ->
   ('value list) ->
-  ('a_ok, 'a_code) Api_types_j.result Lwt.t =
+  ('a_ok, 'a_code) Api_types_t.result Lwt.t =
   fun
-    ~(f : (('ok, 'a_code) Api_types_j.result ->
+    ~(f : (('ok, 'a_code) Api_types_t.result ->
            'value ->
-           ('ok, 'a_code) Api_types_j.result Lwt.t))
-    ~(id : ('ok, 'a_code) Api_types_j.result)
+           ('ok, 'a_code) Api_types_t.result Lwt.t))
+    ~(id : ('ok, 'a_code) Api_types_t.result)
     (l : ('value list)) ->
     match l with
     | [] -> Lwt.return id
@@ -104,12 +104,12 @@ let rec result_combine : unit Api.result list -> unit Api.result =
     let r = result_combine t in
     result_map
       ~ok:(fun _ _-> r)
-      ~error:(fun _ (data_1 : Api_types_j.errors) ->
+      ~error:(fun _ (data_1 : Api_types_t.errors) ->
           result_map
             ~ok:(fun _ _-> l)
-            ~error:(fun result_code (data_r : Api_types_j.errors) ->
-                { Api_types_j.result_data = Error (data_1@data_r);
-                  Api_types_j.result_code = result_code }
+            ~error:(fun result_code (data_r : Api_types_t.errors) ->
+                { Api_types_t.result_data = Result.Error (data_1@data_r);
+                  Api_types_t.result_code = result_code }
               )
             r
         )
@@ -176,7 +176,7 @@ end;;
 
 module ProjectCollection =
 struct
-  type id = Api_types_j.project_id
+  type id = Api_types_t.project_id
   type collection = Api_environment.environment
   type item = Api_environment.project
   let label : string = "project"
@@ -189,28 +189,28 @@ struct
     workspace#set_projects projects
   let identifier (project : Api_environment.project) =
     project#get_project_id ()
-  let id_to_string (project_id : Api_types_j.project_id) : string =
+  let id_to_string (project_id : Api_types_t.project_id) : string =
     Format.sprintf "%s" project_id
 end;;
 
 module ProjectOperations = CollectionOperations(ProjectCollection)
 
 module FileCollection : COLLECTION_TYPE
-  with type id = Api_types_j.file_id
+  with type id = Api_types_t.file_id
   and type collection = Api_environment.project
-  and type item = Api_types_j.file
+  and type item = Api_types_t.file
 =
 struct
-  type id = Api_types_j.file_id
+  type id = Api_types_t.file_id
   type collection = Api_environment.project
-  type item = Api_types_j.file
+  type item = Api_types_t.file
   let label : string = "file"
   let list
       (project : Api_environment.project) =
     project#get_files ()
-  let identifier (file : Api_types_j.file) =
-    file.Api_types_j.file_metadata.Api_types_j.file_metadata_id
-  let id_to_string (file_id : Api_types_j.file_id) : string =
+  let identifier (file : Api_types_t.file) =
+    file.Api_types_t.file_metadata.Api_types_t.file_metadata_id
+  let id_to_string (file_id : Api_types_t.file_id) : string =
     Format.sprintf "%s" file_id
 end;;
 
@@ -218,11 +218,11 @@ module FileOperations = CollectionOperations(FileCollection)
 
 let bind_simulation
     environment
-    (project_id : Api_types_j.project_id)
+    (project_id : Api_types_t.project_id)
     handler
     =
     ProjectOperations.bind
-      (project_id : Api_types_j.project_id)
+      (project_id : Api_types_t.project_id)
       environment
       (fun project ->
          match project#get_simulation () with
@@ -232,12 +232,12 @@ let bind_simulation
            Lwt.return (result_error_msg ~result_code:`NOT_FOUND m))
 let bind_file
     environment
-    (project_id : Api_types_j.project_id)
-    (file_id : Api_types_j.file_id)
+    (project_id : Api_types_t.project_id)
+    (file_id : Api_types_t.file_id)
     handler
     =
     ProjectOperations.bind
-      (project_id : Api_types_j.project_id)
+      (project_id : Api_types_t.project_id)
       environment
       (fun project -> FileOperations.bind file_id
           project
