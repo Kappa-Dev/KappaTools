@@ -413,10 +413,14 @@ let build_spec (a:Superarg.t) bparent fparent =
 exception Exit of string list
 
 (* main *)
-let gui (a:Superarg.t) (args:string list) : string list =
+let gui ?title (a:Superarg.t) (args:string list) : string list =
 
   let top = openTk () in
-  appname_set Version.version_kasa_full_name;
+  let () =
+    appname_set
+      (match title with
+      | None -> Version.version_kasa_full_name
+      | Some x -> x) in
   Balloon.init ();
   (* option list *)
   let up = Frame.create top in
@@ -572,13 +576,13 @@ let gui (a:Superarg.t) (args:string list) : string list =
 (* MAIN *)
 (* **** *)
 
-let parse (a:Superarg.t) (def:string list ref) =
+let parse ?title (a:Superarg.t) (def:string list ref) =
   Superarg.check a;
   (* drop the first command-line argument: it is the executable name *)
   let args = List.tl (Array.to_list Sys.argv) in
   (* if no argument or "--gui" given, launch the gui, otherwise, parse args *)
   let rem =
     if args=[] || List.exists ((=) "--gui") args
-    then gui a args else Superarg.parse_list a args
+    then gui ?title a args else Superarg.parse_list ?title a args
   in
   if rem<>[] then def := rem
