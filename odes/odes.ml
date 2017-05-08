@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 05 2017>
+  * Last modification: Time-stamp: <May 08 2017>
 *)
 
 let local_trace = false
@@ -174,44 +174,47 @@ struct
     }
 
 
-  let has_pattern_in_expr expr = Alg_expr.has_mix (fst expr)
+  let has_pattern_in_expr expr =
+    Alg_expr.has_mix (fst expr)
 
-  let has_pattern_in_rules compil network =
-    let list = network.rules in
+  let has_pattern_in_rules compil =
+    let list = I.get_rules compil in
     List.exists
-      (fun enriched_rule ->
-         let rule_id = enriched_rule.rule_id_with_mode in
-         let rule = enriched_rule.rule in
-         let token_vector = I.token_vector rule in
-         let rate = I.rate compil rule rule_id in
-         begin
-           match rate with
-         | None -> false
-         | Some rate ->
-           has_pattern_in_expr rate
-         end
-         || List.exists (fun (a,_) -> has_pattern_in_expr a) token_vector)
-      list
-
-  let has_pattern_in_var_declaration network =
-    let list = network.var_declaration in
-    List.exists
-      (function
-        | Var (_,_,expr) | Init_expr (_,expr,_) -> has_pattern_in_expr expr
-        | Dummy_decl -> false
+      (fun rule ->
+         let mode = I.valid_modes compil rule 0 in
+         let tokens = I.token_vector rule in
+         List.exists
+           (fun mode ->
+              let rate = I.rate compil rule mode in
+              match rate with
+              | None -> false
+              | Some expr ->
+                (has_pattern_in_expr expr))
+           mode
+         ||
+         List.exists (fun (a,_) -> has_pattern_in_expr a) tokens
       )
       list
 
-   let has_pattern_in_obs network =
-      let list = network.obs in
-      List.exists
-        (function
-          | (_,a) -> has_pattern_in_expr a)
-        list
+  let has_pattern_in_var_declaration compil =
+    let decl = I.get_variables compil in
+    let n = Array.length decl in
+    let rec aux k =
+      if k=n then false
+      else
+        has_pattern_in_expr (snd (decl.(k)))
+        ||  aux (k+1)
+    in aux 0
 
-  let has_pattern_in_alg_expr compil network =
-    has_pattern_in_rules compil network
-    || has_pattern_in_var_declaration network
+
+  let has_pattern_in_obs compil =
+    let obs = I.get_obs compil in
+    List.exists (fun a -> has_pattern_in_expr (Locality.dummy_annot a)) obs
+
+  let has_pattern_in_alg_expr compil  =
+    has_pattern_in_rules compil
+    || has_pattern_in_var_declaration compil
+    || has_pattern_in_obs compil
 
   let get_data network =
       network.n_rules,
@@ -523,7 +526,7 @@ struct
       acc prefix_list
 
 
-  let nembed_of_connected_component_fwd compil network
+  let count_in_connected_component_fwd target compil network
       connected_component =
     VarMap.fold
       (fun vars id alg ->
@@ -544,9 +547,7 @@ struct
            else
              let species = Locality.dummy_annot (Alg_expr.KAPPA_INSTANCE id) in
              let term =
-               if n_embs = 1 then species
-               else
-                 to_nembed compil
+               target compil
                    (from
                       (Alg_expr.mult (Alg_expr.int n_embs) species)
                       nauto)
@@ -558,7 +559,7 @@ struct
       network.id_of_ode_var
       (Alg_expr.const Nbr.zero)
 
-  let nembed_of_connected_component_bwd parameters compil network
+  let count_in_connected_component_bwd target parameters compil network
       connected_component =
     I.fold_bwd_map
       (fun species _ alg ->
@@ -571,7 +572,7 @@ struct
              (I.find_embeddings compil connected_component species) in
          if n_embs = 0 then alg
          else
-           let species_rep, species_rep_id, nauto_rep, num,den =
+           let _species_rep, species_rep_id, nauto_rep, num,den =
              let class_desc =
                I.bwd_interpretation
                  parameters
@@ -637,9 +638,7 @@ struct
            in
            let species = Locality.dummy_annot (Alg_expr.KAPPA_INSTANCE species_rep_id) in
            let term =
-             if n_embs = 1 then species
-             else
-               to_nembed compil
+               target  compil
                  (from
                     (Alg_expr.mult (Alg_expr.int n_embs) species)
                     nauto_rep)
@@ -665,10 +664,21 @@ struct
       connected_component =
     match network.sym_reduction with
     | Symmetries.Ground | Symmetries.Forward _ ->
-      nembed_of_connected_component_fwd
+      count_in_connected_component_fwd to_nembed
         compil network connected_component
     | Symmetries.Backward _ ->
-      nembed_of_connected_component_bwd
+      count_in_connected_component_bwd to_nembed
+        parameters compil network connected_component
+
+  let nocc_of_connected_component
+      parameters compil network
+      connected_component =
+    match network.sym_reduction with
+    | Symmetries.Ground | Symmetries.Forward _ ->
+      count_in_connected_component_fwd to_nocc
+        compil network connected_component
+    | Symmetries.Backward _ ->
+      count_in_connected_component_bwd to_nocc
         parameters compil network connected_component
 
   let rec convert_alg_expr parameter compil network alg =
@@ -689,7 +699,7 @@ struct
             (fun expr h ->
                Alg_expr.mult
                  expr
-                 (nembed_of_connected_component parameter compil network  h))
+                 (nocc_of_connected_component parameter compil network  h))
             (Alg_expr.const Nbr.one)
             x
         in
@@ -718,7 +728,7 @@ struct
       Alg_expr.DIFF_TOKEN
         (convert_alg_expr parameter compil network expr,
               dt),pos
-    | Alg_expr.DIFF_KAPPA_INSTANCE(expr,dt),pos ->
+    | Alg_expr.DIFF_KAPPA_INSTANCE(_expr,_dt),pos ->
       (* TO DO ??? *)
       raise
         (ExceptionDefn.Internal_Error
@@ -1536,7 +1546,7 @@ struct
     let network =
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
     in
-    let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil network in
+    let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil in
     let network  =
       if has_pattern_in_alg_expr then
         match network.sym_reduction with
@@ -1645,7 +1655,7 @@ struct
         logger logger_buffer logger_err
         (Ode_loggers_sig.Expr id) expr handler_expr
 
-  let get_dep ?time_var dep_map expr network =
+  let get_dep ?time_var dep_map expr _network =
     Alg_expr_extra.dep
       ?time_var
       (Mods.IntSet.empty, Mods.IntSet.empty)
@@ -1681,7 +1691,7 @@ struct
     match decl with
     | Dummy_decl
     | Init_expr _ -> dep
-    | Var (id,comment,expr) ->
+    | Var (id,_comment,expr) ->
       let dep_var = get_dep ?time_var dep expr network in
       let dep = Mods.IntMap.add id dep_var dep in
       let () =
