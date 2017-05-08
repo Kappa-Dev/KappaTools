@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 13 (sub)observables 8 navigation steps
 	 -initial conditions
-+ Building initial state (4 agents)
++ Building initial state
 Done
 + Command line to rerun is: 'KaSim' '-l' '1' '-d' 'output' '-seed' '148153191' 'remove_nodes_and_link.ka'
 Simulation ended

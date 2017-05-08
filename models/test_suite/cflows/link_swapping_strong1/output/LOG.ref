@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 11 (sub)observables 6 navigation steps
 	 -initial conditions
-+ Building initial state (2 agents)
++ Building initial state
 Done
 + Command line to rerun is: 'KaSim' 'link_swapping_strong1.ka' '-seed' '924556145' '-u' 'event' '-l' '300' '-d' 'output' '--time-independent'
 ____________________________________________________________

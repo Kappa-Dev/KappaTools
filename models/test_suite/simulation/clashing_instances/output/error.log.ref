@@ -5,7 +5,7 @@ Environment:
   Signatures:
     %agent: A(x)
   Rules:
-    0: (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
+    0: 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
       -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
 Polymers:
   

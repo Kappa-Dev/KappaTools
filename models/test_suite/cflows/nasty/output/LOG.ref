@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 13 (sub)observables 10 navigation steps
 	 -initial conditions
-+ Building initial state (2 agents)
++ Building initial state
 Done
 + Command line to rerun is: 'KaSim' 'nasty.ka' '-seed' '924556145' '-u' 'event' '-l' '100' '-d' 'output' '--time-independent'
 ____________________________________________________________

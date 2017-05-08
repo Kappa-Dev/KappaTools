@@ -11,7 +11,7 @@ done
 	 -update_domain construction
 	 3 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state (2 agents)
++ Building initial state
 Done
 + Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output'
 ____________________________________________________________
