@@ -104,7 +104,7 @@ let altkey (k:key) =
   if String.length k > 2 && k.[0]='-' && k.[1]='-'
   then "--(no-)"^(String.sub k 2 (String.length k-2))
   else if String.length k > 1 && k.[0]='-'
-  then "-no-"^(String.sub k 1 (String.length k-1))
+  then "-(no-)"^(String.sub k 1 (String.length k-1))
   else failwith (k^" option (alt) does not begin with -- not - ")
 
 
@@ -286,7 +286,7 @@ let print_help (header:bool) (verbose:bool) f (a:t) =
 (* parse the command-line arguments, given as a list of strings,
    returns the list of non-options (filenames) in reverse order)
  *)
-let parse_list (a:t) (l:string list) : string list =
+let parse_list ?title (a:t) (l:string list) : string list =
   let long_help = ref false
   and short_help = ref false
   and show_version = ref false
@@ -387,7 +387,13 @@ let parse_list (a:t) (l:string list) : string list =
 
   in
   let filenames = doit [] l in
-  if !show_version then (Format.printf "%s @.(with%s Tk interface) @." Version.version_kasa_full_name (if Tk_version.tk then "" else "out"); exit 0)
+  if !show_version then
+    (Format.printf "%s @.(with%s Tk interface) @."
+       (match title
+        with
+        | None -> Version.version_kasa_full_name
+        | Some x -> x)
+      (if Tk_version.tk then "" else "out"); exit 0)
   else if !long_help then (Format.printf "%a" (print_help true true) a; exit 0)
   else if !short_help then (Format.printf "%a" (print_help true false) a; exit 0);
   (* List.concat*) filenames (*(List.map Wordexp.wordexp filenames)*)
@@ -397,10 +403,10 @@ let parse_list (a:t) (l:string list) : string list =
 (* **** *)
 
 
-let parse (a:t) (def:string list ref) =
+let parse ?title (a:t) (def:string list ref) =
   check a;
   (* drop the first command-line argument: it is the executable name *)
   let args = List.tl (Array.to_list Sys.argv) in
   (* parse options & get remaining fienames *)
-  let rem = parse_list a args in
+  let rem = parse_list ?title a args in
   if rem<>[] then def := rem
