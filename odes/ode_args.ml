@@ -90,27 +90,27 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   "--dotnet-output",
   Superarg.String_opt t.dotnet_output,
   "ODEs file for dotnet backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--maple-output",
   Superarg.String_opt t.maple_output,
   "ODEs file for maple backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--mathematica-output",
   Superarg.String_opt t.mathematica_output,
   "ODEs file for mathematica backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--matlab-output",
   Superarg.String_opt t.matlab_output,
   "ODEs file for matlab backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--octave-output",
   Superarg.String_opt t.octave_output,
   "ODEs file for octave backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--sbml-output",
   Superarg.String_opt t.sbml_output,
   "ODEs file for sbml backend",
-  ["1_output"],Normal;
+  ["1_output"],Hidden;
   "--propagate-constants",
   Superarg.Bool t.propagate_constants,
   "propagate constants",
@@ -206,7 +206,8 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
 ]
 
 let get_option options =
-  let () = SuperargTk.parse options FileNames.input in
+  let title = Version.version_kade_full_name in
+  let () = SuperargTk.parse ~title options FileNames.input in
   !FileNames.input
 
 let build_kasa_parameters ~called_from t t_common =
