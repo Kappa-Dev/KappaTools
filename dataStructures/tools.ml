@@ -208,3 +208,15 @@ let smash_duplicate_in_ordered_list p l =
   match (List.rev l) with
   | [] -> []
   | (h,n)::t -> aux t n h []
+
+let power i j =
+  let () = assert (i<11 && j<11) in
+  let rec aux i k accu =
+    if k=0 then accu
+    else if k=0 mod 2
+    then
+      aux i (k/2) accu*accu
+    else
+      aux i (k/2) (i*accu*accu)
+  in
+  aux i j 1

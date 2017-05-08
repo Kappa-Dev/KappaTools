@@ -61,7 +61,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><ci> s3 </ci></apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply></apply><ci> s3 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
@@ -78,7 +78,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><ci>s1</ci></apply><apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s1</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply>
 <times/><ci> s2 </ci><ci> s1 </ci></apply>
 </apply>
 </math>
