@@ -3,6 +3,9 @@ TIMEOUT?=10m
 FROM?=1
 TO?=10
 
+KAPPABIN?=$(HOME)/KaSim/bin/
+BNGBIN?=$(HOME)/BioNetGen/
+
 MODELREP=generated_models
 ML=$(wildcard *.ml)
 BIN=$(basename $(ML))
@@ -21,7 +24,7 @@ all: $(REPS) $(GENMODEL) $(ANALYZEMODEL)
 	touch $@
 
 %.analyze_model:  %.generate_model
-	cd $(MODELREP)/$* ; make clean ; make SUMMARY=$(SUMMARY) TIMEOUT=$(TIMEOUT)
+	cd $(MODELREP)/$* ; make clean ; make KAPPABIN=$(KAPPABIN) BNGBIN=$(BNGBIN) SUMMARY=$(SUMMARY) TIMEOUT=$(TIMEOUT)
 	echo time_out $(TIMEOUT) >> $(SUMMARY)
 	cat $(MODELREP)/$*/$(SUMMARY) >> $(SUMMARY)
 	touch $@
