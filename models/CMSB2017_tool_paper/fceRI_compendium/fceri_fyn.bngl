@@ -11,7 +11,7 @@ Syk_tot         4.0e2
  km2  0
  kpL  5e-2
  kmL  20
-kpLs  5e-2 
+kpLs  5e-2
 kmLs  0.12
  kpF  5e-2
  kmF  20
@@ -26,7 +26,7 @@ pLgs    3
  pLS   30
 pLSs  100
  pSS  100
-pSSs  200 
+pSSs  200
  pLF   30
 pLFs  100
   dm   20
@@ -41,8 +41,8 @@ Syk(tSH2,l~Y,a~Y) Syk_tot
 Rec(a,b~Y,g~Y) Rec_tot
 end species
 
-begin reaction_rules
-# Ligand-receptor binding      
+begin reaction rules
+# Ligand-receptor binding
 Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp1, km1
 
 # Receptor-aggregation
@@ -118,8 +118,8 @@ Syk(tSH2!1,a~pY)-> Syk(tSH2!1,a~Y) dm
 Syk(tSH2,l~pY)-> Syk(tSH2,l~Y) dc
 Syk(tSH2,a~pY)-> Syk(tSH2,a~Y) dc
 
-end reaction_rules
+end reaction rules
 
 #generate_network({max_iter=>100});
-#generate_network({overwrite=>1});
+generate_network({overwrite=>1});
 writeXML();
