@@ -359,6 +359,10 @@ EXTENSIONAL DESCRIPTION:
 		B(z!free,t!A@t)
 
 
+		A(t!B.t,z!1),B(t,z!1)
+		A(t!1,z!B.z),B(t!1,z)
+		B(t,z!1),A(t!B.t,z!1)
+		B(t!1,z),A(t!1,z!B.z)
 	Applying rule r0 (File "parallel_bonds.ka", line 8, characters 4-42:):
 		the precondition is satisfied
 
@@ -467,7 +471,7 @@ every agent may occur in the model
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=29
+Id=31
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -534,7 +538,7 @@ Id=23
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -549,12 +553,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -564,7 +568,7 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -579,12 +583,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -602,7 +606,7 @@ B() => [ B(z) v B(z!A.z) ]
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -617,12 +621,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -632,14 +636,14 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=37
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=34
+  Id=36
    Node(site_type:0<1)
-    Id=30
+    Id=32
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -652,7 +656,7 @@ Id=35
         Id=0
          Leaf False 
 
-    Id=33
+    Id=35
      Node(site_type:0<2)
       Id=3
        Node(site_type:1<0)
@@ -679,7 +683,7 @@ B(z!A.z) => B(t,z!A.z)
 * Properties of pairs of bonds
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -694,12 +698,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -709,7 +713,7 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -724,12 +728,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -739,7 +743,7 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=32
  Node(site_type:1<0)
   Id=0
    Leaf False 
@@ -754,12 +758,12 @@ Id=30
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=32
+Id=34
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=31
+  Id=33
    Node(site_type:0<2)
     Id=1
      Leaf True 
@@ -769,14 +773,14 @@ Id=32
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=37
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=34
+  Id=36
    Node(site_type:0<1)
-    Id=30
+    Id=32
      Node(site_type:1<0)
       Id=0
        Leaf False 
@@ -789,7 +793,7 @@ Id=35
         Id=0
          Leaf False 
 
-    Id=33
+    Id=35
      Node(site_type:0<2)
       Id=3
        Node(site_type:1<0)
