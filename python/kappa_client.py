@@ -1,125 +1,15 @@
 """ Web api client for the kappa programming language
 """
 
-import urllib.error
-import urllib.request
-import urllib.parse
 import sys
 import getopt
 import time
 import subprocess
 import json
 import uuid
-import threading
 import kappa_common
-
-class FileMetadata(object):
-
-    def __init__(self,
-                 file_metadata_id,
-                 file_metadata_position,
-                 file_metadata_compile = True ,
-                 file_metadata_hash = None ,
-                 file_version = []):
-        self.file_metadata_id = file_metadata_id
-        self.file_metadata_position = file_metadata_position
-        self.file_metadata_compile = file_metadata_compile
-        self.file_metadata_hash = file_metadata_hash
-        self.file_version = file_version
-    def toJSON(self):
-        return({ "file_metadata_compile" : self.file_metadata_compile ,
-                 "file_metadata_hash" : self.file_metadata_hash ,
-                 "file_metadata_id" : self.file_metadata_id ,
-                 "file_metadata_position" : self.file_metadata_position ,
-                 "file_metadata_version" : self.file_version })
-
-    def get_file_id(self):
-        return(self.file_metadata_id)
-
-class File(object):
-
-    def __init__(self,
-                 file_metadata,
-                 file_content):
-        self.file_metadata = file_metadata
-        self.file_content = file_content
-
-    def toJSON(self):
-        return({ "file_metadata" : self.file_metadata.toJSON() ,
-                 "file_content" : self.file_content })
-
-    def get_file_id(self):
-        return(self.file_metadata.get_file_id())
-    def get_content(self):
-        return(self.file_content)
-
-class SimulationParameter(object):
-
-    def __init__(self,
-                 simulation_plot_period,
-                 simulation_id,
-                 simulation_pause_condition,
-                 simulation_seed = None,
-                 simulation_store_trace = False) :
-        self.simulation_plot_period = simulation_plot_period
-        self.simulation_id = simulation_id
-        self.simulation_pause_condition = simulation_pause_condition
-        self.simulation_seed = simulation_seed
-        self.simulation_store_trace = simulation_store_trace
-
-    def toJSON(self):
-        return({ "simulation_plot_period" : self.simulation_plot_period,
-                 "simulation_id" : self.simulation_id,
-                 "simulation_pause_condition": self.simulation_pause_condition ,
-                 "simulation_store_trace": self.simulation_store_trace ,
-                 "simulation_seed" : self.simulation_seed })
-
-class PlotLimit(object):
-
-    def __init__(self,
-                 plot_limit_offset,
-                 plot_limit_points = None) :
-        self.plot_limit_offset = plot_limit_offset
-        self.plot_limit_points = plot_limit_points
-
-    def toURL(self):
-
-        if self.plot_limit_offset :
-            url_plot_limit_offset = "&plot_limit_offset={0}".format(self.plot_limit_offset)
-        else :
-            url_plot_limit_offset = ""
-
-        if self.plot_limit_points :
-            url_plot_limit_points = "&plot_limit_points={0}".format(self.plot_limit_points)
-        else :
-            url_plot_limit_points = ""
-
-        url_plot_limit = "{0}{1}".format(url_plot_limit_offset,
-                                         url_plot_limit_points)
-        return url_plot_limit
-
-    def toJSON(self):
-        return({ "plot_limit_offset" : self.plot_limit_offset ,
-                 "plot_limit_points" : self.plot_limit_points })
-
-class PlotParameter(object):
-    def __init__(self,
-                 plot_parameter_plot_limit = None) :
-        self.plot_parameter_plot_limit = plot_parameter_plot_limit
-
-    def toJSON(self):
-        if self.plot_parameter_plot_limit :
-            limit = self.plot_parameter_plot_limit.toJSON()
-        else:
-            limit =  None
-        return({ "plot_parameter_plot_limit" : limit })
-
-    def toURL(self):
-        if self.plot_parameter_plot_limit :
-            url = self.plot_parameter_plot_limit.toURL()
-        else:
-            url = ""
-        return url
+import kappa_std
+import kappa_rest
 
 def project_catalog_project_id (project_catalog):
     print(project_catalog)
@@ -128,248 +18,12 @@ def project_catalog_project_id (project_catalog):
 def file_catalog_file_id (file_catalog):
     return(map((lambda entry: entry["file_metadata_id"]),file_catalog["file_metadata_list"]))
 
-def hydrate_file (info):
-    return(File(info["file_metadata"],
-                info["file_content"]))
-
-class KappaStd(kappa_common.StdBase):
-    def __init__(self, path , delimiter = '\x1e', ):
-        kappa_common.StdBase.__init__(self ,
-                                      path ,
-                                      delimiter ,
-                                      args = [],)
-
-    def projection(self,response):
-        result_data = response["data"][1]["result_data"]
-        data = result_data[1]
-        if result_data[0] == "Ok":
-            return data
-        else:
-            raise kappa_common.KappaError(data)
-
-    def info(self):
-        return(self.dispatch("EnvironmentInfo",None))
-
-    def project_create(self,project_id):
-        project_parameter = { "project_parameter_project_id" : project_id }
-        return(self.dispatch("ProjectCreate",project_parameter))
-    def project_info(self):
-        return(self.dispatch("ProjectCatalog",None))
-
-    def project_delete(self,project_id):
-        return(self.dispatch("ProjectDelete",project_id))
-
-    def project_parse(self,project_id):
-        return(self.dispatch("ProjectParse",project_id))
-
-    def file_create(self,project_id,file_object):
-        file_data = file_object.toJSON()
-        return(self.dispatch("FileCreate",[project_id,file_data]))
-
-    def file_delete(self,project_id,file_id):
-        return(self.dispatch("FileDelete",[project_id,file_id]))
-
-    def file_get(self,project_id,file_id):
-        f = self.dispatch("FileGet",[project_id,file_id])
-        return(hydrate_file(f))
-
-    def file_info(self,project_id):
-        info = self.dispatch("FileCatalog",project_id)
-        #return(list(map(hydrate_filemetadata,info)))
-        return(info)
-
-    def simulation_delete(self,project_id):
-        return(self.dispatch("SimulationDelete",[project_id]))
-
-    def simulation_detail_file_line(self,project_id,file_line_id):
-        return(self.dispatch("SimulationDetailFileLine",
-                             [project_id,file_line_id]))
-
-    def simulation_detail_flux_map(self,project_id,flux_map_id):
-        return(self.dispatch("SimulationDetailFluxMap",
-                             [project_id,flux_map_id]))
-
-    def simulation_detail_log_message(self,project_id):
-        return(self.dispatch("SimulationDetailLogMessage",
-                             [project_id]))
-
-    def simulation_detail_plot(self,project_id,plot_parameter = None):
-        if plot_parameter :
-            parameter = plot_parameter.toJSON()
-        else:
-            parameter = PlotParameter().toJSON()
-
-        return(self.dispatch("SimulationDetailPlot",
-                             [project_id,parameter]))
-
-    def simulation_detail_snapshot(self,project_id,snapshot_id):
-        return(self.dispatch("SimulationDetailSnapshot",
-                             [project_id,snapshot_id]))
-
-    def simulation_info(self,project_id):
-        return(self.dispatch("SimulationInfo",project_id))
-
-    def simulation_info_file_line(self,project_id):
-        return(self.dispatch("SimulationCatalogFileLine",project_id))
-
-    def simulation_info_flux_map(self,project_id):
-        return(self.dispatch("SimulationCatalogFluxMap",project_id))
-
-    def simulation_info_snapshot(self,project_id):
-        return(self.dispatch("SimulationCatalogSnapshot",
-                             project_id))
-
-    def simulation_pause(self,project_id):
-        return(self.dispatch("SimulationPause",
-                             project_id))
-
-    def simulation_perturbation(self,project_id,perturbation_code):
-        return(self.dispatch("SimulationPause",
-                             [project_id ,
-                              { "perturbation_code" : perturbation_code }]))
-
-    def simulation_start(self,project_id,simulation_parameter):
-        return(self.dispatch("SimulationStart",
-                             [project_id,simulation_parameter.toJSON()]))
-
-
-class KappaRest(kappa_common.RestBase):
-    def __init__(self, endpoint):
-        kappa_common.RestBase.__init__(self ,"{0}/v2".format(endpoint))
-
-    def info(self):
-        method = "GET"
-        url = "{0}".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def project_create(self,project_id):
-        method = "POST"
-        url = "{0}/projects".format(self.url)
-        body = { "project_parameter_project_id" : project_id }
-        return(self.dispatch(method,url,body))
-
-    def project_info(self):
-        method = "GET"
-        url = "{0}/projects".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def project_delete(self,project_id):
-        method = "DELETE"
-        url = "{0}/projects/{1}".format(self.url,project_id)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def project_parse(self,project_id):
-        method = "GET"
-        url = "{0}/projects/{1}/parse".format(self.url,project_id)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def file_create(self,project_id,file_object):
-        method = "POST"
-        url = "{0}/projects/{1}/files".format(self.url,project_id)
-        body = file_object.toJSON()
-        return(self.dispatch(method,url,body))
-
-    def file_delete(self,project_id,file_id):
-        method = "DELETE"
-        url = "{0}/projects/{1}/files/{2}".format(self.url,project_id,file_id)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def file_get(self,project_id,file_id):
-        method = "GET"
-        url = "{0}/projects/{1}/files/{2}".format(self.url,project_id,file_id)
-        body = None
-        file = self.dispatch(method,url,body)
-        return(hydrate_file(file))
-
-    def file_info(self,project_id):
-        method = "GET"
-        url = "{0}/projects/{1}/files".format(self.url,project_id)
-        body = None
-        info = self.dispatch(method,url,body)
-        #return(list(map(hydrate_filemetada,info)))
-        return(info)
-
-    def simulation_delete(self,project_id):
-        method = "DELETE"
-        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def simulation_detail_file_line(self,project_id,file_line_id):
-        url = "{0}/projects/{1}/simulation/file_lines/{2}".format(self.url,project_id,file_line_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_detail_flux_map(self,project_id,flux_map_id):
-        url = "{0}/projects/{1}/simulation/fluxmaps/{2}".format(self.url,project_id,flux_map_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_detail_log_message(self,project_id):
-        url = "{0}/projects/{1}/simulation/logmessages".format(self.url,project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_detail_plot(self,project_id,plot_parameter = None):
-        if plot_parameter :
-            parameter = "?{0}".format(plot_parameter.toURL())
-        else:
-            parameter =  ""
-        url = "{0}/projects/{1}/simulation/plot{2}".format(self.url,project_id,parameter)
-        print(url)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_detail_snapshot(self,project_id,snapshot_id):
-        url = "{0}/projects/{1}/simulation/snapshots/{2}".format(self.url,project_id,snapshot_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_info(self,project_id):
-        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_info_file_line(self,project_id):
-        url = "{0}/projects/{1}/simulation/file_lines".format(self.url,project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_info_flux_map(self,project_id):
-        url = "{0}/projects/{1}/simulation/fluxmaps".format(self.url,project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_info_snapshot(self,project_id):
-        url = "{0}/projects/{1}/simulation/snapshots".format(self.url,
-                                                                  project_id)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_delete(self,project_id):
-        url = "{0}/projects/{1}/simulation".format(self.url,
-                                                        project_id)
-        return(self.dispatch("DELETE",url,None))
-
-    def simulation_pause(self,project_id):
-        message = { "action" : "pause" }
-        url = "{0}/projects/{1}/simulation".format(self.url,
-                                                        project_id)
-        return(self.dispatch("PUT",url,message ))
-
-    def simulation_perturbation(self,project_id,perturbation_code):
-        url = "{0}/projects/{1}/simulation".format(self.url,
-                                                        project_id)
-        message = { "perturbation_code" : perturbation_code }
-        return(self.dispatch("PUT",url,message ))
-
-    def simulation_start(self,project_id,simulation_parameter):
-        url = "{0}/projects/{1}/simulation".format(self.url,project_id)
-        message = simulation_parameter.toJSON()
-        return(self.dispatch("POST",url,message ))
-
 def scratch():
     file_id = str(uuid.uuid1())
     project_id_1 = "1"
     project_id_2 = "2"
     project_id_3 = "3"
-    kappaStd = KappaStd("/home/mwm1/Work/KaSim/StdSim.native")
+    kappaStd = kappa_std.KappaStd("/home/mwm1/Work/KaSim/StdSim.native")
     print(kappaStd.info())
     print(kappaStd.project_create(project_id_1))
     # print(kappaStd.project_create(project_id_2))
@@ -455,24 +109,24 @@ def main():
 
     try:
         if url.startswith('http'):
-            runtime = KappaRest(url)
+            runtime = kappa_rest.KappaRest(url)
         else:
-            runtime = KappaStd(url)
+            runtime = kappa_std.KappaStd(url)
         project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
         print("project_id : {0}".format(runtime.project_create(project_id)))
         if inputfile:
             with open(inputfile) as f:
                 code = f.read()
                 file_content = str(code)
-                file_metadata = FileMetadata(inputfile,0)
-                file_object = File(file_metadata,file_content)
+                file_metadata = kappa_common.FileMetadata(inputfile,0)
+                file_object = kappa_common.File(file_metadata,file_content)
                 runtime.file_create(project_id,file_object)
                 simulation_id = str(uuid.uuid1())
                 print("simulation_id : {0}".format(simulation_id))
 
 
                 end_time = 10.0
-                simulation_parameter = SimulationParameter(plot_period,
+                simulation_parameter = kaapa_common.SimulationParameter(plot_period,
                                                            pause_condition,
                                                            seed)
                 runtime.simulation_start(project_id,simulation_parameter)

@@ -1,3 +1,4 @@
 kappa_common
+kappa_std
+kappa_rest
 kappa_client
-kappa_client_v1
