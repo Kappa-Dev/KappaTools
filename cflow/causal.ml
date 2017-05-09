@@ -829,7 +829,8 @@ let pretty_print
            in
            let () =   (*dump grid fic state env ; *)
              match dotFormat with
-             | Dot ->
+             | Dot | Json ->
+                let () =
                 let profiling desc =
                   Format.fprintf
                     desc "/* @[Compression of %d causal flows" n;
@@ -844,13 +845,14 @@ let pretty_print
                 Kappa_files.with_cflow_file
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
-             | Json ->
-                let (_,grid_story,_) = List.nth grid_list cpt in
-                Kappa_files.with_cflow_file
-                  [compression_type;(string_of_int cpt)] "json"
-                  (fun f -> Format.fprintf f "%s@."
+                in
+                if (dotFormat = Json) then
+                  (let (_,grid_story,_) = List.nth grid_list cpt in
+                   Kappa_files.with_cflow_file
+                     [compression_type;(string_of_int cpt)] "json"
+                     (fun f -> Format.fprintf f "%s@."
                       (Yojson.Basic.to_string
-                         (json_of_grid enriched_config grid_story steps)))
+                         (json_of_grid enriched_config grid_story steps))))
              | Html ->
                 let profiling desc =
                   Format.fprintf

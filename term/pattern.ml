@@ -903,10 +903,13 @@ end = struct
       "dag", `List
         (Array.fold_right (fun x acc ->
              (point_to_yojson x)::acc) env.domain []);
+      "id_by_type", `List
+         (Array.fold_right (fun x acc ->
+             `List (List.map (fun i -> `Int i) x)::acc) env.id_by_type [])
     ]
 
   let of_yojson = function
-    | `Assoc l as x when List.length l = 4 ->
+    | `Assoc l as x when List.length l = 5 ->
       begin
         let sig_decl = Signature.of_json (List.assoc "signatures" l) in
         try
@@ -937,7 +940,14 @@ end = struct
                 | `List l  ->
                   Tools.array_map_of_list (point_of_yojson sig_decl) l
                 | _ -> raise Not_found);
-            id_by_type = [||];
+            id_by_type = (match List.assoc "id_by_type" l with
+                | `List l ->
+                   Tools.array_map_of_list (function
+                       | `List l -> List.map (function
+                           | `Int i -> i
+                           | _ -> raise Not_found) l
+                       | _ -> raise Not_found) l
+                | _ -> raise Not_found);
             max_obs = -1;
           }
         with Not_found ->
@@ -1434,7 +1444,7 @@ let merge_on_inf env m g1 g2 =
       (fun acc (a,b) -> Mods.Int2Set.add (a,b) acc)
       Mods.Int2Set.empty m_list in
   let possibilities = ref pairing in
-  match (are_compatible ~possibilities ~strict:true root1 g1 root2 g2) with
+  match (are_compatible ~possibilities ~strict:false root1 g1 root2 g2) with
   | (Some m',_) ->
      let (_,pushout) =
        merge_compatible env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
