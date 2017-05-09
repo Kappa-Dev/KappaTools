@@ -4,7 +4,6 @@
 import sys
 import getopt
 import time
-import subprocess
 import json
 import uuid
 import kappa_common
@@ -126,7 +125,7 @@ def main():
 
 
                 end_time = 10.0
-                simulation_parameter = kaapa_common.SimulationParameter(plot_period,
+                simulation_parameter = kappa_common.SimulationParameter(plot_period,
                                                            pause_condition,
                                                            seed)
                 runtime.simulation_start(project_id,simulation_parameter)

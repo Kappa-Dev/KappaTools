@@ -60,10 +60,10 @@ class KappaStd(object):
         self.popen.kill()
 
     def projection(self,response):
-        result_data = response["data"][1]["result_data"]
+        result_data = response["data"]["result_data"]
         data = result_data[1]
         if result_data[0] == "Ok":
-            return data
+            return data[1]
         else:
             raise kappa_common.KappaError(data)
 
