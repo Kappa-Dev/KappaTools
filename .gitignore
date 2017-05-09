@@ -1,5 +1,4 @@
 js/external
-main/version.ml
 todo.org
 *.cm*
 *.o
@@ -59,7 +58,7 @@ models/test_suite/*/*/output/profiling.html
 models/test_suite/*/*/output/compression_status.txt
 
 # generated code
-generated
+generated/
 site
 *.byte
 *.native
