@@ -364,7 +364,7 @@ let fold_trace_file f init fname =
   let out = Yojson.Basic.read_sequence
       (fun acc x y ->
          f env acc (step_of_yojson (Yojson.Basic.read_json x y)))
-      init lex_st lex_buf in
+      (init env) lex_st lex_buf in
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let () = try Yojson.Basic.read_object_end lex_buf
     with Yojson.End_of_object -> () in

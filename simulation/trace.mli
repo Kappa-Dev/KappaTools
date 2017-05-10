@@ -96,4 +96,4 @@ val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 
 val fold_trace_file :
-  (Model.t -> 'a -> step -> 'a) -> 'a -> string -> (Model.t * 'a)
+  (Model.t -> 'a -> step -> 'a) -> (Model.t -> 'a) -> string -> (Model.t * 'a)

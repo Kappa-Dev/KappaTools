@@ -70,8 +70,8 @@ let server_mode () =
 
 
 let get_simulation fname =
-  let env, steps =
-    Trace.fold_trace_file (fun _env steps step -> step::steps) [] fname in
+  let env, steps = Trace.fold_trace_file
+      (fun _env steps step -> step::steps) (fun _ -> []) fname in
   env, List.rev steps
 
 let main () =
