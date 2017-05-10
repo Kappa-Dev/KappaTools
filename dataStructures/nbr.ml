@@ -83,6 +83,10 @@ let sub n1 n2 = cast_bin_op ~op_f:(-.) ~op_i:(-) ~op_i64:Int64.sub n1 n2
 let mult n1 n2 = cast_bin_op ~op_f:( *.) ~op_i:( * ) ~op_i64:Int64.mul n1 n2
 let min n1 n2 = cast_bin_op ~op_f:min ~op_i:min ~op_i64:min n1 n2
 let max n1 n2 = cast_bin_op ~op_f:max ~op_i:max ~op_i64:max n1 n2
+let rem n1 n2 =
+  cast_bin_op ~op_i:(mod) ~op_i64:Int64.rem ~op_f:mod_float n1 n2
+let internal_div n1 n2 =
+  cast_bin_op ~op_i:(/) ~op_i64:Int64.div ~op_f:(/.) n1 n2
 
 let succ n = cast_un_op ~op_f:((+.) 1.) ~op_i:succ ~op_i64:Int64.succ n
 let pred n = cast_un_op ~op_f:(fun x -> x -. 1.) ~op_i:pred ~op_i64:Int64.pred n
@@ -96,7 +100,6 @@ let to_float n =
     | FP_zero | FP_normal | FP_subnormal -> Some x
     | FP_infinite | FP_nan -> None
 
-
 let to_int n =
   match n with
   | F x -> (int_of_float x)
@@ -107,9 +110,7 @@ let zero = I 0
 let is_zero = function
   | I64 x -> x = Int64.zero
   | I x -> x = 0
-  | F x -> match classify_float x with
-    | FP_zero -> true
-    | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
+  | F x -> Tools.float_is_zero x
 
 let one = I 1
 
@@ -117,6 +118,15 @@ let is_strictly_positive = function
   | F x -> x > 0.
   | I x -> x > 0
   | I64 x -> x > Int64.zero
+
+let pos_pow n1 n2 =
+  cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 n1 n2
+let pow x n =
+  if is_zero n || is_strictly_positive n
+  then pos_pow x n
+  else match to_float x with
+    | Some x -> pos_pow (F (1. /. x)) (neg n)
+    | None -> F nan
 
 let print f = function
   | F x -> Format.fprintf f "%s" (string_of_float x)
@@ -179,24 +189,13 @@ let of_json = function
 let of_bin_alg_op = function
   | Operator.MULT -> mult
   | Operator.SUM -> add
-  | Operator.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
+  | Operator.DIV -> fun x y ->
+    if is_zero (rem x y) then internal_div x y else cast_bin_op ~op_f:(/.) x y
   | Operator.MINUS -> sub
-  | Operator.MODULO ->
-    cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
-      ~op_f:(fun a b ->
-          float_of_int
-            (int_of_float a mod int_of_float b))
+  | Operator.MODULO -> rem
   | Operator.MIN -> min
   | Operator.MAX -> max
-  | Operator.POW ->
-    fun x n ->
-      let f =
-        cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
-      if is_zero n || is_strictly_positive n
-      then f x n
-      else match to_float x with
-        | Some x -> f (F (1. /. x)) (neg n)
-        | None -> F nan
+  | Operator.POW -> pow
 
 let of_un_alg_op = function
   | Operator.LOG -> fun x -> cast_un_op ~op_f:log x
