@@ -6,7 +6,7 @@ B ../_build/js
 PKG js_of_ocaml.tyxml
 PKG js_of_ocaml.ppx
 PKG tyxml.ppx
-PKG lwt.react
+PKG lwt_react
 PKG atdgen
 
 REC

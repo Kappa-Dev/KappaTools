@@ -16,8 +16,8 @@ let send
     (meth : Common.meth)
     ?(data : string option)
     (hydrate : string -> 'a)
-    (wrap : 'a Api.result -> Mpi_message_j.response)
-  : Mpi_message_j.response Api.result Lwt.t =
+    (wrap : 'a -> Mpi_message_j.response_content)
+  : Mpi_message_j.response Lwt.t =
   let reply,feeder = Lwt.task () in
   let handler status response_text =
     let result_code : Api.manager_code option =
@@ -29,7 +29,7 @@ let send
       | 404 -> Some `NOT_FOUND
       | 409 -> Some `CONFLICT
       | _ -> None in
-    let result : Mpi_message_j.response Api.result =
+    let result : Mpi_message_j.response =
       match result_code with
       | None ->
         Api_common.result_error_exception (BadResponseCode status)
@@ -37,18 +37,18 @@ let send
         let result : 'a Api.result =
           if (400 <= status) && (status < 500) then
             Api_common.result_messages
-              ~result_code:result_code
+              ~result_code
               (Api_types_j.errors_of_string response_text)
           else
             let response = hydrate response_text in
             let () = Common.debug response in
-            Api_common.result_ok
-              ~result_code:result_code
-              response
+            Api_common.result_ok ~result_code response
         in
-        let response : Mpi_message_j.response = wrap result in
+        let response : Mpi_message_j.response =
+          Api_common.result_bind
+            ~ok:(fun x -> Api_common.result_ok ~result_code (wrap x)) result in
         let () = Common.debug response in
-        Api_common.result_ok response
+        response
     in
     let () = Lwt.wakeup feeder result in ()
   in
@@ -66,8 +66,7 @@ class manager
     (url:string) =
   object
   method message :
-      Mpi_message_j.request ->
-      Mpi_message_j.response Api.result Lwt.t =
+      Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
     | `EnvironmentInfo  () ->
       send

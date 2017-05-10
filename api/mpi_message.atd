@@ -85,32 +85,35 @@ type request = [ EnvironmentInfo of unit
                | SimulationStart of (project_id * simulation_parameter)
                ]
 
-type response = [ EnvironmentInfo of environment_info result
-                | FileCreate of file_metadata result
-                | FileDelete of unit result
-                | FileGet of file result
-                | FileCatalog of file_catalog result
-                | FileUpdate of file_metadata result
-                | ProjectCatalog of project_catalog result
-                | ProjectCreate of unit result
-                | ProjectDelete of unit result
-                | ProjectParse of project_parse result
-                | ProjectDeadRules of string list result
-		| ProjectGet of project result
-                | SimulationContinue of unit result
-                | SimulationDelete of unit result
-                | SimulationDetailFileLine of file_line_detail result
-                | SimulationDetailFluxMap of flux_map result
-                | SimulationDetailLogMessage of log_message result
-                | SimulationDetailPlot of plot_detail result
-                | SimulationDetailSnapshot of snapshot_detail result
-                | SimulationInfo of simulation_info result
-		| SimulationEfficiency of simulation_efficiency result
-                | SimulationCatalogFileLine of file_line_catalog result
-                | SimulationCatalogFluxMap of flux_map_catalog result
-                | SimulationCatalogSnapshot of snapshot_catalog result
-                | SimulationParameter of simulation_parameter result
-                | SimulationPause of unit result
-                | SimulationPerturbation of unit result
-                | SimulationStart of simulation_artifact result
-                ]
+type response_content = [
+     EnvironmentInfo of environment_info
+   | FileCreate of file_metadata
+   | FileDelete of unit
+   | FileGet of file
+   | FileCatalog of file_catalog
+   | FileUpdate of file_metadata
+   | ProjectCatalog of project_catalog
+   | ProjectCreate of unit
+   | ProjectDelete of unit
+   | ProjectParse of project_parse
+   | ProjectDeadRules of string list
+   | ProjectGet of project
+   | SimulationContinue of unit
+   | SimulationDelete of unit
+   | SimulationDetailFileLine of file_line_detail
+   | SimulationDetailFluxMap of flux_map
+   | SimulationDetailLogMessage of log_message
+   | SimulationDetailPlot of plot_detail
+   | SimulationDetailSnapshot of snapshot_detail
+   | SimulationInfo of simulation_info
+   | SimulationEfficiency of simulation_efficiency
+   | SimulationCatalogFileLine of file_line_catalog
+   | SimulationCatalogFluxMap of flux_map_catalog
+   | SimulationCatalogSnapshot of snapshot_catalog
+   | SimulationParameter of simulation_parameter
+   | SimulationPause of unit
+   | SimulationPerturbation of unit
+   | SimulationStart of simulation_artifact
+]
+
+type response = response_content result

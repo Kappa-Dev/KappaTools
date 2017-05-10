@@ -1,6 +1,6 @@
 open Lwt.Infix
 
-exception BadResponse of Mpi_message_j.response
+exception BadResponse of Mpi_message_j.response_content
 
 let on_message
     (manager: Api.manager)
@@ -11,13 +11,13 @@ let on_message
       Mpi_message_j.read_request text_message
   in
   let handler :
-    'a. ('a -> Mpi_message_j.response)->
-    'a ->
-    unit Lwt.t =
+    'a. ('a -> Mpi_message_j.response_content)-> 'a Api.result -> unit Lwt.t =
     (fun pack result ->
        let message :  Mpi_message_j.response Mpi_message_j.message =
          { Mpi_message_j.id = message.Mpi_message_j.id ;
-         Mpi_message_j.data = pack result } in
+           Mpi_message_j.data =
+             Api_common.result_bind
+               ~ok:(fun x -> Api_common.result_ok (pack x)) result } in
        let text : string =
          Mpi_message_j.string_of_message
            Mpi_message_j.write_response message
@@ -114,8 +114,7 @@ let on_message
 class type virtual manager_base_type =
   object
     method virtual message :
-      Mpi_message_j.request ->
-      Mpi_message_j.response Api.result Lwt.t
+      Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
     inherit Api.manager
 end
@@ -124,8 +123,7 @@ class virtual  manager_base () : manager_base_type =
   object(self)
 
     method virtual message :
-      Mpi_message_j.request ->
-      Mpi_message_j.response Api.result Lwt.t
+      Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
     method environment_info () :
       Api_types_j.environment_info Api.result Lwt.t =
@@ -134,8 +132,8 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `EnvironmentInfo
-                (result : Mpi_message_t.environment_info Mpi_message_t.result) ->
-              Lwt.return result
+                (result : Mpi_message_t.environment_info) ->
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -149,7 +147,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileCreate result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -163,7 +161,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileDelete result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -178,7 +176,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileGet result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -192,7 +190,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileCatalog result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -208,7 +206,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileUpdate result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -220,7 +218,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectCreate result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -231,7 +229,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectGet result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -242,7 +240,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectParse result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -253,7 +251,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectDeadRules result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -267,7 +265,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectDelete result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -281,7 +279,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectCatalog result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -297,7 +295,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationContinue result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -311,7 +309,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDelete result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -326,7 +324,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailFileLine file_line_list ->
-              Lwt.return file_line_list
+              Lwt.return (Api_common.result_ok file_line_list)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -342,7 +340,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailFluxMap flux_map ->
-              Lwt.return flux_map
+              Lwt.return (Api_common.result_ok flux_map)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -355,7 +353,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailLogMessage log_message ->
-              Lwt.return log_message
+              Lwt.return (Api_common.result_ok log_message)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -370,7 +368,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailPlot plot ->
-              Lwt.return plot
+              Lwt.return (Api_common.result_ok plot)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -385,7 +383,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationDetailSnapshot snapshot ->
-              Lwt.return snapshot
+              Lwt.return (Api_common.result_ok snapshot)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -398,7 +396,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationInfo simulation_status ->
-              Lwt.return simulation_status
+              Lwt.return (Api_common.result_ok simulation_status)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -411,7 +409,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationEfficiency efficiency ->
-              Lwt.return efficiency
+              Lwt.return (Api_common.result_ok efficiency)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -424,7 +422,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogFileLine info ->
-              Lwt.return info
+              Lwt.return (Api_common.result_ok info)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -437,7 +435,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogFluxMap info ->
-              Lwt.return info
+              Lwt.return (Api_common.result_ok info)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -450,7 +448,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationCatalogSnapshot info ->
-              Lwt.return info
+              Lwt.return (Api_common.result_ok info)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -463,7 +461,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationPause result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -475,7 +473,7 @@ class virtual  manager_base () : manager_base_type =
       self#message (`SimulationParameter project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationParameter result -> Lwt.return result
+            | `SimulationParameter result -> Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -490,7 +488,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationPerturbation result ->
-              Lwt.return result
+              Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -506,7 +504,7 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationStart simulation_id ->
-              Lwt.return simulation_id
+              Lwt.return (Api_common.result_ok simulation_id)
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -522,7 +520,7 @@ class type virtual manager_mpi_type =
     method virtual post_message : string -> unit
     method virtual sleep : float -> unit Lwt.t
     method virtual post_message : string -> unit
-    method message : Mpi_message_j.request -> Mpi_message_j.response Api.result Lwt.t
+    method message : Mpi_message_j.request -> Mpi_message_j.response Lwt.t
     method receive : string -> unit
 
     inherit Api.manager
@@ -545,7 +543,7 @@ class virtual manager () : manager_mpi_type =
       | None -> ()
 
     method message (request : Mpi_message_j.request) :
-      Mpi_message_j.response Api.result Lwt.t =
+      Mpi_message_j.response Lwt.t =
       let result,feeder = Lwt.task () in
       let () = context <- { context with id = context.id + 1 } in
       let message : Mpi_message_j.request Mpi_message_j.message =
@@ -559,9 +557,7 @@ class virtual manager () : manager_mpi_type =
       let () = context <-
           { context with
             mailboxes = IntMap.add context.id feeder context.mailboxes } in
-      (result >>=
-       (fun (response : Mpi_message_j.response) ->
-          Lwt.return (Api_common.result_ok response)))
+      result
 
     inherit manager_base ()
   end
