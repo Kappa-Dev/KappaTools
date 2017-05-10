@@ -88,8 +88,9 @@ let rec simplify expr =
         begin
           match a,b with
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
-          | (Alg_expr.CONST (Nbr.I a),_),(Alg_expr.CONST (Nbr.I b),_) when
-              b<>0 && (a/b)*b=a -> Alg_expr.CONST (Nbr.I (a/b)),loc
+          | (Alg_expr.CONST a,_),(Alg_expr.CONST b,_) when
+              not (Nbr.is_zero b) && Nbr.is_zero (Nbr.rem a b) ->
+            Alg_expr.CONST (Nbr.internal_div a b),loc
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
              | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
@@ -103,9 +104,10 @@ let rec simplify expr =
         begin
           match a,b with
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
-          | (Alg_expr.CONST (Nbr.I a),_),(Alg_expr.CONST (Nbr.I b),_)
-            when a<11 && b < 11 ->
-            (Alg_expr.CONST (Nbr.I (Tools.power a b)),loc)
+          | (Alg_expr.CONST a,_),(Alg_expr.CONST b,_)
+            when Nbr.is_smaller a (Nbr.I 11) &&
+                 Nbr.is_greater b Nbr.zero && Nbr.is_smaller b (Nbr.I 11) ->
+            (Alg_expr.CONST (Nbr.pow a b),loc)
           | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
              | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _

@@ -13,11 +13,19 @@ val compare : t -> t -> int
 val is_greater : t -> t -> bool
 val is_smaller : t -> t -> bool
 val is_equal : t -> t -> bool
+
 val add : t -> t -> t
 val sub : t -> t -> t
 val mult : t -> t -> t
+val internal_div : t -> t -> t
+(** euler division when only int are involved, float div else *)
+
+val rem : t -> t -> t
+val pow : t -> t -> t
+
 val min : t -> t -> t
 val max : t -> t -> t
+
 val succ : t -> t
 val pred : t -> t
 val neg : t -> t

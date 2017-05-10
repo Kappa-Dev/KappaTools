@@ -11,19 +11,30 @@ let float_is_zero x =
   | FP_zero -> true
   | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
 
-let pow x n =
-  assert (n >= 0);
-  let rec aux x n acc =
-    if n = 0 then acc
-    else aux x (pred n) (x*acc) in
-  aux x n 1
+let pow i j =
+  let () = assert (0 <= j) in
+  let rec aux i k accu =
+    if k=0 then accu
+    else if k land 1 = 0
+    then
+      aux i (k/2) accu*accu
+    else
+      aux i (k/2) (i*accu*accu)
+  in
+  aux i j 1
 
+let div2 x = Int64.div x (Int64.add Int64.one Int64.one)
 let pow64 x n =
   assert (n >= Int64.zero);
-  let rec aux x n acc =
-    if n = Int64.zero then acc
-    else aux x (Int64.pred n) (Int64.mul x acc) in
-  aux x n Int64.one
+  let rec aux k accu =
+    if k=Int64.zero then accu
+    else if Int64.logand k Int64.one = Int64.zero
+    then
+      aux (div2 k) (Int64.mul accu accu)
+    else
+      aux (div2 k) (Int64.mul x (Int64.mul accu accu))
+  in
+  aux n Int64.one
 
 let read_input () =
   let rec parse acc input =
@@ -208,15 +219,3 @@ let smash_duplicate_in_ordered_list p l =
   match (List.rev l) with
   | [] -> []
   | (h,n)::t -> aux t n h []
-
-let power i j =
-  let () = assert (i<11 && j<11) in
-  let rec aux i k accu =
-    if k=0 then accu
-    else if k=0 mod 2
-    then
-      aux i (k/2) accu*accu
-    else
-      aux i (k/2) (i*accu*accu)
-  in
-  aux i j 1
