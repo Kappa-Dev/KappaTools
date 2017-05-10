@@ -7,48 +7,6 @@ import time
 import uuid
 import kappa_common
 import kappa_std
-import kappa_rest
-
-def project_catalog_project_id (project_catalog):
-    print(project_catalog)
-    return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
-
-def file_catalog_file_id (file_catalog):
-    return(map((lambda entry: entry["file_metadata_id"]),file_catalog["file_metadata_list"]))
-
-def scratch():
-    file_id = str(uuid.uuid1())
-    project_id_1 = "1"
-    project_id_2 = "2"
-    project_id_3 = "3"
-    kappaStd = kappa_std.KappaStd("/home/mwm1/Work/KaSim/StdSim.native")
-    print(kappaStd.info())
-    print(kappaStd.project_create(project_id_1))
-    # print(kappaStd.project_create(project_id_2))
-    # print(kappaStd.info())
-    print(kappaStd.project_info())
-    # file = File(FileMetadata(file_id,0),
-    #             "%agent: A(x,c) # Declaration of agent A ")
-    # print(kappaStd.file_create(project_id_1,file))
-    # print(kappaStd.file_info(project_id_1))
-    # print(kappaStd.file_get(project_id_1,file_id))
-    # print(kappaStd.file_delete(project_id_1,file_id))
-    # print(kappaStd.file_info(project_id_1))
-
-    # file_id = str(uuid.uuid1())
-    # project_id_1 = str(uuid.uuid1())
-    # print(kappaStd.project_create(project_id_1))
-    # inputfile = "/home/mwm1/Work/KaSim/models/abc.ka"
-    # with open(inputfile) as f:
-    #     code = f.read()
-    #     file = File(FileMetadata(file_id,0),code)
-    #     print(kappaStd.file_create(project_id_1,file))
-    #     simulation_parameter =
-    #       SimulationParameter(1,project_id_1,simulation_pause_condition = "[E] = 10")
-    #     print(kappaStd.simulation_start(project_id_1,simulation_parameter))
-    #     print(kappaStd.simulation_info(project_id_1,project_id_1))
-    # kappaStd.shutdown()
-
 
 def main():
     # command line
@@ -57,18 +15,19 @@ def main():
 
     # default arguments
     inputfile = None  # if missing input file just get version
-    url = "http://localhost:8080"
+    url = "../bin/StdSim"
     pause_condition = "[false]"
     plot_period = 0.1
     seed = None
 
-    help_line = (cmd +
-                 ' -k <kappafile> ' +
-                 ' -u <url or path to stdsim> ' +
-                 ' -t <max_time> ' +
-                 ' -e <max_events> ' +
-                 ' -pp <plot_period> ' +
-                 ' -s <random_seed> ')
+    help_line= (cmd
+                + ' -k <kappafile> '
+                + ' -u <url or path to stdsim> '
+                + ' -t <max_time> '
+                + ' -e <max_events> '
+                + ' -pp <plot_period> '
+                + ' -s <random_seed> ')
+
     try:
         opts, args = getopt.getopt(argv,
                                    "h:k:u:t:e:pp:s",
@@ -77,14 +36,13 @@ def main():
                                     "max_time=",
                                     "max_event=",
                                     "plot_period=",
-                                    "seed="])
+                                    "seed=", ])
     except:
         print(help_line)
-
         sys.exit(2)
 
     for opt, arg in opts:
-        if opt == '-h':
+        if opt in ('-h',"--help"):
             print(help_line)
             sys.exit()
         elif opt in ("-k", "--kappafile"):
@@ -107,11 +65,8 @@ def main():
     print('Random seed : {0} '.format(seed))
 
     try:
-        if url.startswith('http'):
-            runtime = kappa_rest.KappaRest(url)
-        else:
-            runtime = kappa_std.KappaStd(url)
-        project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
+        runtime = kappa_std.KappaStd(url)
+        project_id = str(uuid.uuid1())
         runtime.project_create(project_id)
         print("project_id : {0}".format(project_id))
         if inputfile:
@@ -124,6 +79,7 @@ def main():
                 runtime.project_parse(project_id)
                 simulation_id = str(uuid.uuid1())
                 print("simulation_id : {0}".format(simulation_id))
+
 
                 end_time = 10.0
                 simulation_parameter = kappa_common.SimulationParameter(plot_period,
