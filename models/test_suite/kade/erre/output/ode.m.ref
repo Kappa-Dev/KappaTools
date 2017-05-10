@@ -313,7 +313,7 @@ var(1)=2*y(5)/2/2; % dimmers
 k(4)=t;
 jacvar(2,3)=1;
 jacvar(2,6)=1;
-jacvar(1,5)=4/8*2/8;
+jacvar(1,5)=2;
 
 jack(4,8)=1;
 
