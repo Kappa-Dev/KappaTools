@@ -15,9 +15,6 @@ GENMODEL=$(ML:%.ml=%.generate_model)
 ANALYZEMODEL=$(ML:%.ml=%.analyze_model)
 
 all: $(REPS) $(GENMODEL) $(ANALYZEMODEL)
-	echo $(BIN)
-	echo $(MODELREP)
-	echo $(REPS)
 
 %.generate_model: %.bin $(MODELREP) $(MODELREP)/%
 	./$* $(MODELREP)/$* $(FROM) $(TO)
@@ -38,7 +35,6 @@ $(MODELREP):
 
 $(MODELREP)/%: $(MODELREP)
 	mkdir $@
-	cp -f $(SCRIPTREP)*.sh $@/
 	cp -f $(SCRIPTREP)Makefile $@/
 
 clean:
