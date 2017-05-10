@@ -538,9 +538,11 @@ class virtual manager () : manager_mpi_type =
       let message : Mpi_message_j.response Mpi_message_j.message =
         Mpi_message_j.message_of_string
           Mpi_message_j.read_response response_text in
-      match IntMap.find_option message.Mpi_message_j.id context.mailboxes with
-      | Some value -> Lwt.wakeup value message.Mpi_message_j.data
-      | None -> ()
+      match IntMap.pop message.Mpi_message_j.id context.mailboxes with
+      | Some value, mailboxes ->
+        let () = context <- { context with mailboxes } in
+        Lwt.wakeup value message.Mpi_message_j.data
+      | None, mailboxes -> context <- { context with mailboxes }
 
     method message (request : Mpi_message_j.request) :
       Mpi_message_j.response Lwt.t =
