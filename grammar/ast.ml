@@ -971,3 +971,110 @@ let compil_of_json = function
         raise (Yojson.Basic.Util.Type_error ("Incorrect AST",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect AST",x))
+
+let combinations ls1 ls2 =
+  if (ls1 = []) then List.fold_left (fun acc (b,ds) -> ([b],ds)::acc) [] ls2
+  else
+    List.fold_left
+      (fun acc (a,cs) ->
+        List.fold_left (fun acc' (b,ds) -> ((b::a),ds@cs)::acc') acc ls2)
+      [] ls1
+
+let name_match (s,_) (s',_) = String.equal s s'
+
+let update_rate counters (k,a) =
+  let update_id s k =
+    try
+      let (_,x) = List.find (fun (s',_) -> String.equal s s') counters in
+      Alg_expr.CONST (Nbr.I x)
+    with Not_found -> k in
+  let rec update_bool k = match k with
+    | Alg_expr.TRUE | Alg_expr.FALSE -> k
+    | Alg_expr.BIN_BOOL_OP (op,(k1,a1),(k2,a2)) ->
+       Alg_expr.BIN_BOOL_OP (op,((update_bool k1),a1),((update_bool k2),a2))
+    | Alg_expr.UN_BOOL_OP (op,(k,a)) ->
+      Alg_expr.UN_BOOL_OP (op,(update_bool k,a))
+    | Alg_expr.COMPARE_OP (op,(k1,a1),(k2,a2)) ->
+      Alg_expr.COMPARE_OP (op,((update_expr k1),a1),((update_expr k2),a2))
+  and update_expr k = match k with
+    | Alg_expr.BIN_ALG_OP (op,(k1,a1),(k2,a2)) ->
+       Alg_expr.BIN_ALG_OP (op,((update_expr k1),a1),((update_expr k2),a2))
+    | Alg_expr.UN_ALG_OP (op,(k1,a1)) ->
+       Alg_expr.UN_ALG_OP (op,((update_expr k1),a1))
+    | Alg_expr.IF ((k1,a1),(k2,a2),(k3,a3)) ->
+       Alg_expr.IF
+         (((update_bool k1),a1),((update_expr k2),a2),((update_expr k3),a3))
+    | Alg_expr.DIFF_TOKEN ((k1,a1),k2) ->
+       Alg_expr.DIFF_TOKEN (((update_expr k1),a1),k2)
+    | Alg_expr.DIFF_KAPPA_INSTANCE ((k,a),m) ->
+       Alg_expr.DIFF_KAPPA_INSTANCE (((update_expr k),a),m)
+    | Alg_expr.ALG_VAR id| Alg_expr.TOKEN_ID id -> update_id id k
+    | Alg_expr.STATE_ALG_OP _| Alg_expr.CONST _| Alg_expr.KAPPA_INSTANCE _ -> k
+  in
+  ((update_expr k),a)
+
+
+let counters_signature s (agents:agent list) =
+  let (_,sites',_) = List.find (fun (s',_,_) -> name_match s s') agents in
+  List.fold_left
+    (fun acc s -> match s with
+                    Counter c -> c::acc
+                  | Port _ -> acc) [] sites'
+
+let enumerate_counter_tests x a count_delta c' =
+  let (max,_) = c'.count_delta in
+  let min =
+    match c'.count_test with
+      None| Some (CGTE _,_)| Some (CVAR _,_) ->
+             let (_,pos) = c'.count_nme in
+             raise
+               (ExceptionDefn.Malformed_Decl
+                  ("Invalid counter signature - have to specify min bound",pos))
+      | Some (CEQ min,_) -> min in
+  let rec enum v =
+    if (v=max) then []
+    else
+      (Counter {count_nme=c'.count_nme;count_test = Some(CEQ v,a);count_delta},
+       [x,v])::(enum (v+1)) in
+  enum min
+
+let remove_variable_in_counters rules signatures =
+  let remove_var_rule r =
+    let remove_var_site counters =
+      function
+        Port p -> [(Port p,[])]
+      | Counter c ->
+         match c.count_test with
+           None | Some (CEQ _,_) | Some (CGTE _,_) -> [(Counter c,[])]
+           | Some (CVAR x,a) ->
+              enumerate_counter_tests x a c.count_delta
+                (List.find
+                   (fun c' -> name_match c.count_nme c'.count_nme) counters) in
+    let rec remove_var_sites counters = function
+      | [] -> []
+      | s::t ->
+         combinations
+           (remove_var_sites counters t) (remove_var_site counters s) in
+    let remove_var_agent (s,sites,m) =
+      let counters = counters_signature s signatures in
+      let enumerate_sites = remove_var_sites counters sites in
+      List.map (fun (sites',c) -> ((s,sites',m),c)) enumerate_sites in
+    let rec remove_var_mixture = function
+      | [] -> []
+      | ag::t -> combinations (remove_var_mixture t) (remove_var_agent ag) in
+    List.map
+      (fun (lhs,counters) ->
+        let k_def = update_rate counters r.k_def in
+        {r with lhs; k_def}) (remove_var_mixture r.lhs) in
+    List.fold_left
+      (fun acc (s,(r,a)) ->
+        let enumerate_r =
+          List.map (fun r' -> (s,(r',a))) (remove_var_rule r) in
+        enumerate_r@acc) [] rules
+
+let compile_counters c =
+  let rules = remove_variable_in_counters c.rules c.signatures in
+  let () =
+    List.iter (fun (_,(r,_)) -> Format.printf "@.r = %a" print_ast_rule r)
+              rules in
+  {c with rules}
