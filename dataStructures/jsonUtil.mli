@@ -6,6 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(** Parsing utils *)
+
+val read_between_spaces :
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a)
+
 (** Jsonify simple types *)
 
 val build_msg: string -> string

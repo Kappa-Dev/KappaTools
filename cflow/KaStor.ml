@@ -70,45 +70,9 @@ let server_mode () =
 
 
 let get_simulation fname =
-  let desc = open_in fname in
-  let lex_buf = Lexing.from_channel desc in
-  let lex_st = Yojson.init_lexer ~fname () in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_lcurl lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let ident = Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "uuid") in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_colon lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let _ = Yojson.Basic.read_string lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_comma lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let ident = Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "env") in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_colon lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let env = Model.of_yojson
-      (Yojson.Basic.read_json lex_st lex_buf) in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_comma lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let ident = Yojson.Basic.read_ident lex_st lex_buf in
-  let () = assert (ident = "trace") in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = Yojson.Basic.read_colon lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let steps = Yojson.Basic.read_list
-      (fun x y -> Trace.step_of_yojson (Yojson.Basic.read_json x y))
-      lex_st lex_buf in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = try Yojson.Basic.read_object_end lex_buf
-    with Yojson.End_of_object -> () in
-  let () = Yojson.Basic.read_space lex_st lex_buf in
-  let () = close_in desc in
-  (env,steps)
+  let env, steps =
+    Trace.fold_trace_file (fun _env steps step -> step::steps) [] fname in
+  env, List.rev steps
 
 let main () =
   let () =
@@ -134,5 +98,5 @@ let main () =
     Compression_main.compress_and_print
       parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
 
-let () = Sys.catch_break true  
+let () = Sys.catch_break true
 let () = main ()

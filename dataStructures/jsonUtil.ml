@@ -6,6 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let read_between_spaces f lex_st lex_buf =
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let x = f lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  x
+
 let build_msg s = "Not a correct "^s
 let of_string (s:string) = `String s
 

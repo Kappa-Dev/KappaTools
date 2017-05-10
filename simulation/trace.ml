@@ -333,3 +333,41 @@ let actions_of_step = function
 let side_effects_of_step = function
   | Rule ((_,e,_)) | Pert ((_,e,_)) -> e.Instantiation.side_effects_dst
   | Subs _ | Obs _ | Dummy _ | Init _ -> []
+
+let fold_trace_file f init fname =
+  let desc = open_in fname in
+  let lex_buf = Lexing.from_channel desc in
+  let lex_st = Yojson.init_lexer ~fname () in
+  let () =
+    JsonUtil.read_between_spaces Yojson.Basic.read_lcurl lex_st lex_buf in
+  let ident = Yojson.Basic.read_ident lex_st lex_buf in
+  let ident' =
+    if ident = "uuid" then
+      let () =
+        JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
+      let _ = Yojson.Basic.read_string lex_st lex_buf in
+      let () =
+        JsonUtil.read_between_spaces Yojson.Basic.read_comma lex_st lex_buf in
+      Yojson.Basic.read_ident lex_st lex_buf
+    else ident in
+  let () = assert (ident' = "env") in
+  let () =
+    JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
+  let env = Model.of_yojson
+      (Yojson.Basic.read_json lex_st lex_buf) in
+  let () =
+    JsonUtil.read_between_spaces Yojson.Basic.read_comma lex_st lex_buf in
+  let ident = Yojson.Basic.read_ident lex_st lex_buf in
+  let () = assert (ident = "trace") in
+  let () =
+    JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
+  let out = Yojson.Basic.read_sequence
+      (fun acc x y ->
+         f env acc (step_of_yojson (Yojson.Basic.read_json x y)))
+      init lex_st lex_buf in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = try Yojson.Basic.read_object_end lex_buf
+    with Yojson.End_of_object -> () in
+  let () = Yojson.Basic.read_space lex_st lex_buf in
+  let () = close_in desc in
+  (env,out)
