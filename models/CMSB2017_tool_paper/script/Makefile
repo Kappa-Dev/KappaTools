@@ -13,7 +13,7 @@ WITNESS=$(KA:%.ka=%.done)
 
 KADE=$(KAPPABIN)KaDE
 KASA=$(KAPPABIN)KaSa
-BNGL=$(BNGBIN)BNGL2.pl
+BNGL=$(BNGBIN)BNG2.pl
 
 all: clean $(WITNESS) $(SUMMARY)
 
