@@ -64,11 +64,11 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(5)=t;
-var(5)=2*init(2)/2; % x_dimer
+var(5)=init(2); % x_dimer
 init(1)=10; % A(x, y)
-var(4)=init(1)+2*init(4)/2+init(3); % x_free
-var(3)=init(1)+2*init(4)/2+2*init(2)/2+2*init(3); % cst
-var(2)=init(1)+2*init(4)/2+2*init(2)/2+2*init(3); % cstt
+var(4)=init(1)+init(4)+init(3); % x_free
+var(3)=init(1)+init(4)+init(2)+2*init(3); % cst
+var(2)=init(1)+init(4)+init(2)+2*init(3); % cstt
 var(1)=1; % k
 
 
@@ -200,10 +200,10 @@ global kun
 global kdun
 global stoc
 
-var(5)=2*y(2)/2; % x_dimer
-var(4)=y(1)+2*y(4)/2+y(3); % x_free
-var(3)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cst
-var(2)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cstt
+var(5)=y(2); % x_dimer
+var(4)=y(1)+y(4)+y(3); % x_free
+var(3)=y(1)+y(4)+y(2)+2*y(3); % cst
+var(2)=y(1)+y(4)+y(2)+2*y(3); % cstt
 
 k(1)=var(2);
 k(2)=var(1);
@@ -254,10 +254,10 @@ global jackun
 global jackund
 global jacstoc
 
-var(5)=2*y(2)/2; % x_dimer
-var(4)=y(1)+2*y(4)/2+y(3); % x_free
-var(3)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cst
-var(2)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cstt
+var(5)=y(2); % x_dimer
+var(4)=y(1)+y(4)+y(3); % x_free
+var(3)=y(1)+y(4)+y(2)+2*y(3); % cst
+var(2)=y(1)+y(4)+y(2)+2*y(3); % cstt
 
 k(1)=var(2);
 k(2)=var(1);
@@ -333,10 +333,10 @@ global var
 obs=zeros(nobs,1);
 
 t = y(5);
-var(5)=2*y(2)/2; % x_dimer
-var(4)=y(1)+2*y(4)/2+y(3); % x_free
-var(3)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cst
-var(2)=y(1)+2*y(4)/2+2*y(2)/2+2*y(3); % cstt
+var(5)=y(2); % x_dimer
+var(4)=y(1)+y(4)+y(3); % x_free
+var(3)=y(1)+y(4)+y(2)+2*y(3); % cst
+var(2)=y(1)+y(4)+y(2)+2*y(3); % cstt
 
 obs(1)=t; % [T]
 obs(2)=var(3); % cst

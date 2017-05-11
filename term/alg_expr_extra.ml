@@ -18,12 +18,19 @@ type ('a,'b) corrected_rate_const =
     var: ('a,'b) Alg_expr.e Locality.annot option
   }
 
-let rec simplify expr =
+let rec simplify ?root_only:(root_only=false) expr =
   match expr
   with
   | Alg_expr.BIN_ALG_OP (op,a,b),loc ->
     begin
-      let a,b = simplify a, simplify b in
+      let a,b =
+        if
+          root_only
+        then a,b
+        else
+          simplify a, simplify b
+      in
+      let root_only = true in
       match op with
       | Operator.SUM ->
         begin
@@ -72,7 +79,43 @@ let rec simplify expr =
           | _,(Alg_expr.CONST b',_) when Nbr.is_equal b' Nbr.zero -> b
           | (Alg_expr.CONST a,_),_ when Nbr.is_equal a Nbr.one -> b
           | _,(Alg_expr.CONST b,_) when Nbr.is_equal b Nbr.one -> a
-          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+          | (Alg_expr.CONST a,loc_cst),
+            ( Alg_expr.BIN_ALG_OP (Operator.MULT,(Alg_expr.CONST b,_),c),_
+            | Alg_expr.BIN_ALG_OP (Operator.MULT,c,(Alg_expr.CONST b,_)),_)
+          |
+            ( Alg_expr.BIN_ALG_OP (Operator.MULT,(Alg_expr.CONST b,_),c),_
+            | Alg_expr.BIN_ALG_OP (Operator.MULT,c, (Alg_expr.CONST b,_)),_), (Alg_expr.CONST a,loc_cst)
+              -> (* a*(b*c) -> (a*b)*c if a & b are constant *)
+            simplify ~root_only
+              (Alg_expr.BIN_ALG_OP(
+                  Operator.MULT,
+                  (Alg_expr.CONST (Nbr.mult a b),loc_cst),
+                  c),loc)
+          | (Alg_expr.CONST a,loc_cst),
+            (Alg_expr.BIN_ALG_OP (Operator.DIV,(Alg_expr.CONST b,_),c),_)
+          |
+            (Alg_expr.BIN_ALG_OP (Operator.DIV,(Alg_expr.CONST b,_),c),_),
+            (Alg_expr.CONST a,loc_cst)
+            ->
+            (* a*(b/c) -> (a*b)/c if a & b are constant *)
+            simplify ~root_only
+              (Alg_expr.BIN_ALG_OP
+                 (Operator.DIV,(Alg_expr.CONST (Nbr.mult a b),loc_cst)
+                 ,c),loc)
+          |
+            (Alg_expr.BIN_ALG_OP (Operator.DIV,b,(Alg_expr.CONST c,_)),_),
+            (Alg_expr.CONST a,loc_cst)
+          |(Alg_expr.CONST a,loc_cst),
+            (Alg_expr.BIN_ALG_OP (Operator.DIV,b,(Alg_expr.CONST c,_)),_)
+            when not (Nbr.is_zero c) && Nbr.is_zero (Nbr.rem a c)
+            ->
+            (* a*(b/c) -> ((a/c)*b) if a & c are constant  and c|a *)
+            simplify ~root_only
+              (Alg_expr.BIN_ALG_OP
+                 (Operator.MULT,(Alg_expr.CONST (Nbr.internal_div a c),loc_cst)
+                 ,b),loc)
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP
+                ((Operator.DIV | Operator.MULT | Operator.SUM | Operator.MINUS | Operator.POW | Operator.MODULO | Operator.MIN | Operator.MAX),_,_)
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
              | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF_KAPPA_INSTANCE _
@@ -83,6 +126,7 @@ let rec simplify expr =
              | Alg_expr.IF _ | Alg_expr.DIFF_KAPPA_INSTANCE _
              | Alg_expr.DIFF_TOKEN _),_)
             -> Alg_expr.BIN_ALG_OP(op,a,b),loc
+
         end
       | Operator.DIV ->
         begin
@@ -91,7 +135,44 @@ let rec simplify expr =
           | (Alg_expr.CONST a,_),(Alg_expr.CONST b,_) when
               not (Nbr.is_zero b) && Nbr.is_zero (Nbr.rem a b) ->
             Alg_expr.CONST (Nbr.internal_div a b),loc
-          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _ | Alg_expr.BIN_ALG_OP _
+          | (Alg_expr.BIN_ALG_OP
+               (Operator.MULT,
+                (Alg_expr.CONST a,_),
+                b),loc_bin),
+              (Alg_expr.CONST c,_)
+            when Nbr.is_zero (Nbr.rem a c)->
+            (* (a*b/c) & c|a -> ((c/a)*b)*)
+            simplify ~root_only
+                (Alg_expr.BIN_ALG_OP
+                  (Operator.MULT,
+                   (Alg_expr.CONST (Nbr.internal_div c a),loc_bin),
+                   b),loc)
+          | (Alg_expr.BIN_ALG_OP
+                 (Operator.MULT,b,
+                  (Alg_expr.CONST a,_)
+                 ),loc_bin),
+            (Alg_expr.CONST c,_)
+            when Nbr.is_zero (Nbr.rem a c)
+            -> (* (b*a/c) & c|a -> ((c/a)*b)*)
+            simplify ~root_only
+              (Alg_expr.BIN_ALG_OP
+              (Operator.MULT,
+               (Alg_expr.CONST (Nbr.internal_div c a),loc_bin),
+               b),loc)
+
+          | a,
+            (Alg_expr.BIN_ALG_OP
+               (Operator.DIV,
+                (Alg_expr.CONST b,_),
+                (Alg_expr.CONST c,_)),locdiv) ->
+            (* (a/b/c) -> a/(b*c) *)
+            simplify ~root_only
+              (Alg_expr.BIN_ALG_OP
+                 (Operator.DIV,a,Alg_expr.(CONST (Nbr.mult b c),locdiv)),
+               loc)
+          | ((Alg_expr.CONST _ | Alg_expr.ALG_VAR _
+             | Alg_expr.BIN_ALG_OP
+                ((Operator.DIV | Operator.MULT | Operator.SUM | Operator.MINUS | Operator.POW | Operator.MODULO | Operator.MIN | Operator.MAX),_,_)
              | Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _
              | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _
              | Alg_expr.IF _ | Alg_expr.DIFF_KAPPA_INSTANCE _
@@ -310,6 +391,10 @@ and simplify_bool expr_bool =
        | Alg_expr.TOKEN_ID _
        | Alg_expr.IF _
        | Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _),_) -> Alg_expr.COMPARE_OP(op,a,b),loc
+
+let simplify expr =
+  let root_only = false in
+  simplify ~root_only expr
 
 
 let rec clean expr =
