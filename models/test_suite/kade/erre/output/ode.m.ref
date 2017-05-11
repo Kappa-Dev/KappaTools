@@ -70,7 +70,7 @@ init(4)=10; % E(r)
 init(3)=100; % R(e, r)
 var(2)=init(3)+init(6); % monomers
 init(5)=20; % R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3)
-var(1)=2*init(5)/2/2; % dimmers
+var(1)=init(5)/2; % dimmers
 
 k(1)=1; % E(r), R(e) -> E(r!1), R(e!1)
 k(2)=2; % E(r!1), R(e!1,r) -> E(r), R(e,r)
@@ -211,7 +211,7 @@ global kdun
 global stoc
 
 var(2)=y(3)+y(6); % monomers
-var(1)=2*y(5)/2/2; % dimmers
+var(1)=y(5)/2; % dimmers
 
 k(4)=t;
 
@@ -308,7 +308,7 @@ global jackund
 global jacstoc
 
 var(2)=y(3)+y(6); % monomers
-var(1)=2*y(5)/2/2; % dimmers
+var(1)=y(5)/2; % dimmers
 
 k(4)=t;
 jacvar(2,3)=1;
@@ -411,7 +411,7 @@ obs=zeros(nobs,1);
 
 t = y(8);
 var(2)=y(3)+y(6); % monomers
-var(1)=2*y(5)/2/2; % dimmers
+var(1)=y(5)/2; % dimmers
 
 obs(1)=t; % [T]
 obs(2)=var(1); % dimmers
