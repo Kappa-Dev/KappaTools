@@ -984,10 +984,13 @@ let refer_links_annot links_annot mix =
                | Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.ANY_FREE),_),_ -> ())
          ra.ra_ports) mix
 
-let separate_sites =
-  List.fold_left (fun (ps,cs) -> function
-      | Ast.Port p -> (p::ps,cs)
-      | Ast.Counter c -> (ps,c::cs)) ([],[])
+let separate_sites ls =
+  let (a,b) =
+    List.fold_left
+      (fun (ps,cs) -> function
+        | Ast.Port p -> (p::ps,cs)
+        | Ast.Counter c -> (ps,c::cs)) ([],[]) ls in
+  (List.rev a,b)
 
 (*
 Is responsible for the check that:
