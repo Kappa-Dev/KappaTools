@@ -12,7 +12,7 @@ type t = {
   algs : (Alg_expr.t Locality.annot) NamedDecls.t;
   observables : Alg_expr.t Locality.annot array;
   ast_rules :
-    (string Locality.annot option * LKappa.rule Locality.annot)
+    (string Locality.annot option * (LKappa.rule_agent) LKappa.rule Locality.annot)
       array;
   rules : Primitives.elementary_rule array;
   perturbations : Primitives.perturbation array;

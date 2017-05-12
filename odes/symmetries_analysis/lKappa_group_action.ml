@@ -221,9 +221,9 @@ let backtrack ~fmt_err ~sigs sigma_inv sigma_raw_inv counter positions rule =
 let for_all_elt_permutation
     ~fmt_err ~sigs
     (positions:int list)
-    (f:LKappa.rule_agent -> LKappa.rule -> 'a -> 'a * bool )
-    (f_raw:Raw_mixture.agent -> LKappa.rule -> 'a -> 'a * bool)
-    (rule:LKappa.rule)
+    (f:LKappa.rule_agent -> LKappa.rule_agent LKappa.rule -> 'a -> 'a * bool )
+    (f_raw:Raw_mixture.agent -> LKappa.rule_agent LKappa.rule -> 'a -> 'a * bool)
+    (rule:LKappa.rule_agent LKappa.rule)
     (init:'a)  =
   let rec next ~fmt_err ~sigs agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
@@ -269,8 +269,10 @@ let for_all_over_orbit
     (sigma_inv:LKappa.rule_agent -> unit)
     (sigma_raw:Raw_mixture.agent -> unit)
     (sigma_raw_inv:Raw_mixture.agent -> unit)
-    (f: trace: bool option -> fmt:Format.formatter option -> fmt_err:Format.formatter option -> sigs:Signature.s option -> LKappa.rule -> 'a -> 'a * bool)
-    (rule:LKappa.rule)
+    (f: trace: bool option -> fmt:Format.formatter option ->
+     fmt_err:Format.formatter option -> sigs:Signature.s option ->
+     LKappa.rule_agent LKappa.rule -> 'a -> 'a * bool)
+    (rule:LKappa.rule_agent LKappa.rule)
     (init:'a) : 'a * bool =
     let n = List.length positions in
     let counter = Array.make n false in
@@ -407,8 +409,8 @@ let fold_over_elt_transformation
     get_sym_internal_states
     get_sym_binding_states
     get_sym_full_states
-    (rule: LKappa.rule)
-    (f:LKappa.rule -> 'a -> 'a)
+    (rule: LKappa.rule_agent LKappa.rule)
+    (f:LKappa.rule_agent LKappa.rule -> 'a -> 'a)
     (*acc*)
     (accu: 'a) : 'a =
   (*position is a list of agent*)
@@ -509,6 +511,8 @@ let copy_lkappa_rule rule =
   }
 
 let equiv_class
+    ?parameters
+    ?sigs
     cache
     seen
     rule
@@ -517,17 +521,18 @@ let equiv_class
     ~partitions_full_states
     ~convention
   =
+  let _ = sigs, parameters in
   let to_visit = [rule] in
-  let rec aux cache to_visit seen visited =
-    match
-      to_visit
-    with
-    | [] -> cache, seen, visited
-    | h::q ->
-      let cache, hashed_list = LKappa_auto.cannonic_form cache h in
-      let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-      if Mods.DynArray.get seen hash
-      then aux cache q seen visited
+   let rec aux cache to_visit seen visited =
+     match
+       to_visit
+     with
+     | [] -> cache, seen, visited
+     | h::q ->
+       let cache, hashed_list = LKappa_auto.cannonic_form cache h in
+       let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
+       if Mods.DynArray.get seen hash
+       then aux cache q seen visited
       else
         let visited = h::visited in
         let () = Mods.DynArray.set seen hash true in
@@ -541,21 +546,21 @@ let equiv_class
             q
         in
         aux cache to_visit seen visited
-  in
-  let cache,seen,equ_class = aux cache to_visit seen [] in
-  let cache, equ_class =
-    List.fold_left
-      (fun (cache, list) elt ->
-         let cache, nauto =
-           LKappa_auto.nauto
-             convention
-             cache
-             elt
-         in
-         (cache, (elt,nauto)::list))
-      (cache,[]) equ_class
-  in
-  cache, seen, equ_class
+   in
+   let cache,seen,equ_class = aux cache to_visit seen [] in
+   let cache, equ_class =
+     List.fold_left
+       (fun (cache, list) elt ->
+          let cache, nauto =
+            LKappa_auto.nauto
+              convention
+              cache
+              elt
+          in
+          (cache, (elt,nauto)::list))
+       (cache,[]) equ_class
+   in
+   cache, seen, equ_class
 
 type bwd_bisim_info =
   int Symmetries_sig.site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)

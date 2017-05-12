@@ -30,17 +30,21 @@ type rule_agent =
 
 type rule_mixture = rule_agent list
 
-type rule =
+type rule_agent_counters =
   {
-    r_mix: rule_mixture;
+    ra : rule_agent;
+    ra_counters : (Ast.counter * switching) list;
+  }
+
+type 'agent rule =
+  {
+    r_mix: 'agent list;
     r_created: Raw_mixture.t;
     r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
-    r_un_rate :
-      ((rule_mixture,int) Alg_expr.e Locality.annot
-       * (rule_mixture,int) Alg_expr.e Locality.annot
-         option) option;
+    r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
+                 * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
     r_editStyle: bool;
   }
 
@@ -116,7 +120,7 @@ let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints) =
       if (match ports.(i) with
          | (Ast.LNK_ANY, _), Maintained ->  ints.(i) <> I_ANY
          | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _) |
-            ((Ast.LNK_SOME | Ast.ANY_FREE |  Ast.LNK_FREE |
+            ((Ast.LNK_SOME | Ast.ANY_FREE | Ast.LNK_FREE |
               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true) then
         let () = Format.fprintf
             f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
@@ -574,7 +578,7 @@ let of_raw_mixture x =
     x
 
 let annotate_dropped_agent
-    ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf =
+    ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -645,8 +649,11 @@ let annotate_dropped_agent
            raise (ExceptionDefn.Malformed_Decl
                     ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
-    ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
+  let ra_counters = List.map (fun c -> (c,Erased)) counts in
+  let ra =
+    { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
+      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
+  {ra; ra_counters},lannot
 
 let annotate_created_agent
     ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
@@ -713,7 +720,8 @@ let translate_modification sigs ?contact_map ag_id p_id
       Linked (j,pos_j),(lhs_links,rhs_links')
 
 let annotate_edit_agent
-    ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty) links_annot intf =
+    ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty) links_annot
+    intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -796,11 +804,15 @@ let annotate_edit_agent
     (links_annot',pset') in
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
-    ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
+  let ra_counters = List.map (fun c -> (c,Maintained)) counts in
+  let ra =
+    { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
+      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
+  {ra; ra_counters},annot'
+
 
 let annotate_agent_with_diff
-    sigs ?contact_map (agent_name, _ as ag_ty) links_annot lp rp =
+    sigs ?contact_map (agent_name, _ as ag_ty) links_annot lp rp lc rc =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -932,9 +944,9 @@ although it is left unpecified in the left hand side"
                 "' is underspecified on the right hand side", pos))
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
       several_internal_states pos in
-  let find_in_rp (na,pos) rp =
+  let find_in_r (na,pos) rp f =
     let (p',r) =
-      List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
+      List.partition (fun p -> String.compare (f p) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
     | [] -> not_enough_specified agent_name (na,pos)
@@ -950,7 +962,7 @@ although it is left unpecified in the left hand side"
          let () = forbid_modification p_pos p.Ast.port_lnk_mod in
          let () = forbid_modification p_pos p.Ast.port_int_mod in
 
-         let p',rp' = find_in_rp p_na rp in
+         let p',rp' = find_in_r p_na rp (fun p -> fst p.Ast.port_nme) in
          let annot' = register_port_modif
              p_id p.Ast.port_lnk p' annot in
          let () = register_internal_modif p_id p.Ast.port_int p' in
@@ -963,8 +975,29 @@ although it is left unpecified in the left hand side"
          let () = register_internal_modif p_id [] p in
          register_port_modif p_id [Locality.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
-    ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
+  let register_counter_modif count_nme count_test count_delta =
+    ({Ast.count_nme; Ast.count_delta; Ast.count_test}, Maintained) in
+  let (rc_r,_,ra_counters) =
+    List.fold_left
+      (fun (rc,cset,acc) c ->
+        let c_na = c.Ast.count_nme in
+        let c_id = Signature.num_of_site ~agent_name c_na sign in
+        let cset' = Mods.IntSet.add c_id cset in
+        let () = if cset == cset' then
+                   several_occurence_of_site agent_name c_na in
+        let c',rc' = find_in_r c_na rc (fun p -> fst p.Ast.count_nme) in
+        let c'' =
+          register_counter_modif c.Ast.count_nme c.Ast.count_test
+                                 c'.Ast.count_delta in
+        (rc',cset',c''::acc)) (rc,Mods.IntSet.empty,[]) lc in
+  let ra_counters =
+    (List.map
+      (fun c -> register_counter_modif c.Ast.count_nme None c.Ast.count_delta)
+      rc_r)@ra_counters in
+  let ra =
+    { ra_type = ag_id; ra_ports = ports; ra_ints = internals;ra_erased = false;
+      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
+  {ra; ra_counters},annot'
 
 let refer_links_annot links_annot mix =
   List.iter
@@ -1009,11 +1042,11 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
            Ast.no_more_site_on_right true lag_s rag_s ->
       let () = forbid_modification lpos lmod in
       let () = forbid_modification rpos rmod in
-      let (lag_p,_) = separate_sites lag_s in
-      let (rag_p,_) = separate_sites rag_s in
+      let (lag_p,lag_c) = separate_sites lag_s in
+      let (rag_p,rag_c) = separate_sites rag_s in
       let ra,links_annot' =
         annotate_agent_with_diff
-          sigs ?contact_map ag_ty links_annot lag_p rag_p in
+          sigs ?contact_map ag_ty links_annot lag_p rag_p lag_c rag_c in
       aux links_annot' (ra::acc) lt rt
     | erased, added ->
       let () =
@@ -1033,16 +1066,16 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
         List.fold_left
           (fun (acc,lannot) ((_,pos as na),sites,modif) ->
              let () = forbid_modification pos modif in
-             let intf,_ = separate_sites sites in
+             let intf,counts = separate_sites sites in
              let ra,lannot' =
-               annotate_dropped_agent ~syntax_version sigs lannot na intf in
+               annotate_dropped_agent ~syntax_version sigs lannot na intf counts in
              (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let () =
         match Mods.IntMap.root lhs_links_one with
         | None -> ()
         | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
-      let () = refer_links_annot lhs_links_two mix in
+      let () = refer_links_annot lhs_links_two (List.map (fun r -> r.ra) mix) in
       let cmix,(rhs_links_one,_) =
         List.fold_left
           (fun (acc,rannot) ((_,pos as na),sites,modif) ->
@@ -1069,7 +1102,7 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
          match modif with
          | None ->
            let a,lannot' = annotate_edit_agent
-               ~syntax_version ~is_rule sigs ?contact_map ty lannot intf in
+               ~syntax_version ~is_rule sigs ?contact_map ty lannot intf counts in
            (lannot',a::acc,news)
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
@@ -1077,7 +1110,7 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
            ((fst lannot,rannot'),acc,x'::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
-               ~syntax_version sigs (fst lannot) ty intf in
+               ~syntax_version sigs (fst lannot) ty intf counts in
            ((lannot',snd lannot),ra::acc,news))
       (((Mods.IntMap.empty,Mods.IntMap.empty),
         (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
@@ -1086,7 +1119,7 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
     | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
-  let () = refer_links_annot lhs_links_two mix in
+  let () = refer_links_annot lhs_links_two (List.map (fun r -> r.ra) mix) in
   let () =
     match Mods.IntMap.root rhs_links_one with
     | None -> ()
@@ -1177,7 +1210,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
 
 let mixture_of_ast ~syntax_version sigs ?contact_map pos mix =
   match annotate_edit_mixture ~syntax_version ~is_rule:false sigs ?contact_map mix with
-  | r, [] -> r
+  | r, [] -> List.map (fun r -> r.ra) r
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
@@ -1385,6 +1418,14 @@ let create_sig l =
   Tools.array_map_of_list
     (fun (name,intf,_) -> (name,create_t intf)) l
 
+let remove_counters rules =
+  let list_rem_counts = List.map (fun ag -> ag.ra) in
+  List.map
+    (fun (s,(r,a)) ->
+      let r_mix = list_rem_counts r.r_mix in
+      let r' = {r with r_mix} in
+      (s,(r',a))) rules
+
 let compil_of_ast ~syntax_version overwrite c =
   let c' = Ast.compile_counters c in
   let c =
@@ -1445,6 +1486,7 @@ let compil_of_ast ~syntax_version overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
+  let rules = remove_counters rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =

@@ -534,7 +534,7 @@ let cannonic_form_from_syntactic_rules
 let check_invariance_gen
     p ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
-                          LKappa.rule) list)
+                          LKappa.rule_agent LKappa.rule) list)
     cache agent_type site1 site2 =
   let rec aux hash_and_rule_list (cache, to_be_checked, counter) =
     match hash_and_rule_list with
@@ -560,7 +560,7 @@ let check_invariance_gen
 let check_invariance_internal_states
     ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
-                          LKappa.rule) list)
+                          LKappa.rule_agent LKappa.rule) list)
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen

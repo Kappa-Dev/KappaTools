@@ -47,26 +47,29 @@ val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
 
-type rule =
-  { r_mix: rule_mixture;
+type 'agent rule =
+  {
+    r_mix: 'agent list;
     r_created: Raw_mixture.t;
     r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
     r_rate : (rule_mixture,int) Alg_expr.e Locality.annot;
-    r_un_rate : ((rule_mixture,int) Alg_expr.e Locality.annot
-                 * (rule_mixture,int) Alg_expr.e Locality.annot option) option;
-    r_editStyle : bool;
+    r_un_rate :
+      ((rule_mixture,int) Alg_expr.e Locality.annot
+       * (rule_mixture,int) Alg_expr.e Locality.annot
+         option) option;
+    r_editStyle: bool;
   }
 
 val print_rates : Signature.s -> (Format.formatter -> int -> unit)
-  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
+  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule_agent rule -> unit
 
 val print_rule :
   full:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
-  (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
+  (Format.formatter -> int -> unit) -> Format.formatter -> rule_agent rule -> unit
 
-val rule_to_json : rule -> Yojson.Basic.json
-val rule_of_json : Yojson.Basic.json -> rule
+val rule_to_json : rule_agent rule -> Yojson.Basic.json
+val rule_of_json : Yojson.Basic.json -> rule_agent rule
 
 val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
@@ -89,7 +92,7 @@ val compil_of_ast :
   syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
   Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
-  int list * (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
+  int list * (Ast.agent, rule_agent list, int, rule_agent rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
     @return the signature of agent, the contact map, the signature of
