@@ -56,7 +56,6 @@ val fold_perturbations :
 
 val get_alg_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
-val get_always_outdated : t -> Operator.DepSet.t
 val all_dependencies :
   t -> (Operator.DepSet.t * Operator.DepSet.t *
         Operator.DepSet.t array * Operator.DepSet.t array)

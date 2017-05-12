@@ -6,12 +6,17 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type precomputed =
+  {
+    unary_patterns: Pattern.Set.t;
+    always_outdated: Operator.DepSet.t;
+  }
+
 type t =
   {
     mutable outdated : bool;
 
-    (* Constant cacha *)
-    unary_patterns: Pattern.Set.t;
+    precomputed: precomputed;
 
     (* With rectangular approximation *)
     roots_of_patterns: IntCollection.t Pattern.ObsMap.t;
@@ -86,13 +91,16 @@ let empty ~with_trace random_state env counter =
              r.Primitives.connected_components.(0)
              (Pattern.Set.add r.Primitives.connected_components.(1) acc)
       ) Pattern.Set.empty env in
+  let always_outdated =
+    let (deps_in_t,deps_in_e,_,_) = Model.all_dependencies env in
+        Operator.DepSet.union deps_in_t deps_in_e in
   let with_connected_components = not (Pattern.Set.is_empty unary_patterns) in
   let variables_overwrite = Array.make (Model.nb_algs env) None in
   let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
   let cand =
     {
       outdated = false;
-      unary_patterns;
+      precomputed = { unary_patterns; always_outdated};
       roots_of_patterns = Pattern.Env.new_obs_map
           (Model.domain env) (fun _ -> IntCollection.create 64);
       roots_of_unary_patterns = Pattern.Env.new_obs_map
@@ -102,7 +110,7 @@ let empty ~with_trace random_state env counter =
       variables_overwrite; variables_cache;
       edges = Edges.empty ~with_connected_components;
       tokens = Array.make (Model.nb_tokens env) Nbr.zero;
-      outdated_elements = Operator.DepSet.empty,Hashtbl.create 32;
+      outdated_elements = always_outdated,Hashtbl.create 32;
       nb_rectangular_instances_by_cc = Mods.IntMap.empty;
       random_state;
       story_machinery =
@@ -457,7 +465,7 @@ let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
   let () =
     List.iter
       (fun (pat,(root,_)) ->
-         update_roots false state.unary_patterns edges_after_neg
+         update_roots false state.precomputed.unary_patterns edges_after_neg
            state.roots_of_patterns roots_by_cc mod_connectivity pat root)
       del_obs in
   (*Positive update*)
@@ -485,7 +493,7 @@ let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
   let () =
     List.iter
       (fun (pat,(root,_)) ->
-         update_roots true state.unary_patterns edges''
+         update_roots true state.precomputed.unary_patterns edges''
            state.roots_of_patterns roots_by_cc' mod_connectivity pat root)
       new_obs in
   (*Store event*)
@@ -500,7 +508,7 @@ let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
   { outdated = false;
-    unary_patterns = state.unary_patterns;
+    precomputed = state.precomputed;
     roots_of_patterns = state.roots_of_patterns;
     roots_of_unary_patterns = roots_by_cc';
     unary_candidates = state.unary_candidates;
@@ -600,13 +608,13 @@ let update_outdated_activities store env counter state =
                | Some _, match' ->
                  { state with matchings_of_rule = match' }),perts))
       dep acc in
-  let pack = aux (Model.get_always_outdated env) (state,[]) in
-  let state',perts = aux deps pack in
+  let state',perts = aux deps (state,[]) in
   let state'' =
     if Hashtbl.length changed_connectivity = 0 then state'
     else Model.fold_rules (unary_rule_update changed_connectivity) state' env in
   ({state'' with
-    outdated_elements = Operator.DepSet.empty,Hashtbl.create 32},perts)
+    outdated_elements =
+      state.precomputed.always_outdated,Hashtbl.create 32},perts)
 
 let overwrite_var i counter state expr =
   let rdeps,changed_connectivity = state.outdated_elements in

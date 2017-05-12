@@ -18,7 +18,6 @@ type t = {
   perturbations : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
   dependencies_in_event : Operator.DepSet.t;
-  need_update_each_loop : Operator.DepSet.t; (*union of 2 above for perf*)
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
   contact_map : Contact_map.t;
@@ -28,7 +27,6 @@ let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     (ast_rules,rules) observables perturbations contact_map =
   { domain; tokens; ast_rules; rules; algs; observables; perturbations;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
-    need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
     contact_map;
   }
@@ -94,7 +92,6 @@ let nb_perturbations env = Array.length env.perturbations
 
 let get_alg_reverse_dependencies env i = env.algs_reverse_dependencies.(i)
 let get_token_reverse_dependencies env i = env.tokens_reverse_dependencies.(i)
-let get_always_outdated env = env.need_update_each_loop
 let all_dependencies env =
   (env.dependencies_in_time,env.dependencies_in_event,
    env.tokens_reverse_dependencies,env.algs_reverse_dependencies)
@@ -237,7 +234,6 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
            (Alg_expr.propagate_constant_bool
               ?max_time ?max_events updated_vars algs'))
         x.perturbations;
-    need_update_each_loop = x.need_update_each_loop;
     dependencies_in_time = x.dependencies_in_time;
     dependencies_in_event = x.dependencies_in_event;
     algs_reverse_dependencies = x.algs_reverse_dependencies;
@@ -276,7 +272,6 @@ let to_yojson env =
        perturbations : Primitives.perturbation array;
        dependencies_in_time : Operator.DepSet.t;
        dependencies_in_event : Operator.DepSet.t;
-       need_update_each_loop : Operator.DepSet.t; (*union of 2 above for perf*)
        algs_reverse_dependencies : Operator.DepSet.t array;
        tokens_reverse_dependencies : Operator.DepSet.t array;*)
   ]
@@ -320,7 +315,6 @@ let of_yojson = function
           perturbations = [||];
           dependencies_in_time = Operator.DepSet.empty;
           dependencies_in_event = Operator.DepSet.empty;
-          need_update_each_loop = Operator.DepSet.empty;
           algs_reverse_dependencies = [||];
           tokens_reverse_dependencies = [||];
           contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
