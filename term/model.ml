@@ -15,7 +15,6 @@ type t = {
     (string Locality.annot option * LKappa.rule Locality.annot)
       array;
   rules : Primitives.elementary_rule array;
-  cc_of_unaries : Pattern.Set.t;
   perturbations : Primitives.perturbation array;
   dependencies_in_time : Operator.DepSet.t;
   dependencies_in_event : Operator.DepSet.t;
@@ -26,9 +25,8 @@ type t = {
 }
 
 let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
-    (ast_rules,rules,cc_of_unaries) obs perts contact_map =
-  { domain; tokens; ast_rules; rules; cc_of_unaries; algs;
-    observables = obs; perturbations = perts;
+    (ast_rules,rules) observables perturbations contact_map =
+  { domain; tokens; ast_rules; rules; algs; observables; perturbations;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
@@ -82,8 +80,6 @@ let nums_of_rule name env =
     [] env
 
 let nb_syntactic_rules env = Array.length env.ast_rules
-
-let connected_components_of_unary_rules env = env.cc_of_unaries
 
 let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.algs s
 let get_alg env i = fst @@ snd env.algs.NamedDecls.decls.(i)
@@ -233,7 +229,6 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
         (Primitives.map_expr_rule
            (Alg_expr.propagate_constant
               ?max_time ?max_events updated_vars algs')) x.rules;
-    cc_of_unaries = x.cc_of_unaries;
     perturbations =
       Array.map
         (Primitives.map_expr_perturbation
@@ -278,7 +273,6 @@ let to_yojson env =
     "elementary_rules", JsonUtil.of_array Primitives.rule_to_yojson env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
     (*
-       cc_of_unaries : Pattern.Set.t;
        perturbations : Primitives.perturbation array;
        dependencies_in_time : Operator.DepSet.t;
        dependencies_in_event : Operator.DepSet.t;
@@ -323,7 +317,6 @@ let of_yojson = function
                    | `List o ->
                       Tools.array_map_of_list Primitives.rule_of_yojson o
                    | _ -> raise Not_found);
-          cc_of_unaries = Pattern.Set.empty;
           perturbations = [||];
           dependencies_in_time = Operator.DepSet.empty;
           dependencies_in_event = Operator.DepSet.empty;

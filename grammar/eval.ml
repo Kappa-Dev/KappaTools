@@ -95,7 +95,7 @@ let rules_of_ast
   let unary_infos =
     let crp = compile_pure_alg ~compileModeOn rule.LKappa.r_rate in
     match rule.LKappa.r_un_rate with
-    | None -> fun _ uncc -> crp,None,uncc
+    | None -> fun _ -> crp,None
     | Some ((_,pos as rate),dist) ->
       let dist' = match dist with
         | None -> None
@@ -103,7 +103,7 @@ let rules_of_ast
            let (d', _) = compile_pure_alg ~compileModeOn d in
            Some d' in
       let unrate = compile_pure_alg ~compileModeOn rate in
-      fun ccs uncc ->
+      fun ccs ->
         match Array.length ccs with
         | (0 | 1) ->
           let () =
@@ -113,17 +113,16 @@ let rules_of_ast
                  Format.pp_print_text
                    f "Useless molecular ambiguity, the rules is \
 always considered as unary.") in
-          unrate,None,uncc
+          unrate,None
         | 2 ->
-          crp,Some (unrate, dist'),
-          Pattern.Set.add ccs.(0) (Pattern.Set.add ccs.(1) uncc)
+          crp,Some (unrate, dist')
         | n ->
           raise (ExceptionDefn.Malformed_Decl
                    ("Unary rule does not deal with "^
                     string_of_int n^" connected components.",pos)) in
-  let build deps un_ccs (origin,ccs,syntax,(neg,pos)) =
+  let build deps (origin,ccs,syntax,(neg,pos)) =
     let ccs' = Array.map fst ccs in
-    let rate,unrate,un_ccs' = unary_infos ccs' un_ccs in
+    let rate,unrate = unary_infos ccs' in
     Option_util.map
       (fun x ->
          let origin =
@@ -133,7 +132,7 @@ always considered as unary.") in
            | None -> x
            | Some (ur,_) -> Alg_expr.add_dep x origin ur in
          Alg_expr.add_dep x' origin rate)
-      deps,un_ccs',{
+      deps,{
       Primitives.unary_rate = unrate;
       Primitives.rate = rate;
       Primitives.connected_components = ccs';
@@ -147,19 +146,19 @@ always considered as unary.") in
     Snip.connected_components_sum_of_ambiguous_rule
       ~compileModeOn contact_map
       domain' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
-  let deps_algs',unary_ccs',rules_l =
+  let deps_algs',rules_l =
     List.fold_right
-      (fun r (deps_algs,un_ccs,out) ->
-         let deps_algs',un_ccs',r'' = build deps_algs un_ccs r in
-         deps_algs',un_ccs',r''::out)
-      rule_mixtures (deps,Pattern.Set.empty,[]) in
+      (fun r (deps_algs,out) ->
+         let deps_algs',r'' = build deps_algs r in
+         deps_algs',r''::out)
+      rule_mixtures (deps,[]) in
   domain',(match origin' with
       | None -> None
       | Some o -> Some (o,
                         match deps_algs' with
                         | Some d -> d
                         | None -> failwith "ugly Eval.rule_of_ast")),
-  unary_ccs',rules_l
+  rules_l
 
 let obs_of_result ~compileModeOn contact_map domain res =
   let time =
@@ -224,7 +223,7 @@ let rule_effect ~compileModeOn contact_map domain alg_expr
     } in
   let (domain',alg_pos) =
     compile_alg ~compileModeOn contact_map domain alg_expr in
-  let domain'',_,_,elem_rules =
+  let domain'',_,elem_rules =
     rules_of_ast
       ~compileModeOn contact_map domain' ~syntax_ref:0 (ast_rule,mix_pos) in
   let elem_rule = match elem_rules with
@@ -382,9 +381,9 @@ let compile_inits ?rescale ~compileModeOn contact_map env inits =
                rules_of_ast ~compileModeOn contact_map
                  preenv' ~syntax_ref:0 (fake_rule,mix_pos)
              with
-             | domain'',_,_,[ compiled_rule ] ->
+             | domain'',_,[ compiled_rule ] ->
                (fst alg',compiled_rule,mix_pos),domain''
-             | _,_,_,_ ->
+             | _,_,_ ->
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
                            "initial mixture %a is partially defined"
@@ -403,9 +402,9 @@ let compile_inits ?rescale ~compileModeOn contact_map env inits =
                ~compileModeOn contact_map preenv ~syntax_ref:0
                (Locality.dummy_annot fake_rule)
            with
-           | domain'',_,_,[ compiled_rule ] ->
+           | domain'',_,[ compiled_rule ] ->
              (Alg_expr.CONST Nbr.one,compiled_rule,pos_tk),domain''
-           | _,_,_,_ -> assert false
+           | _,_,_ -> assert false
       ) inits (Pattern.PreEnv.empty (Model.signatures env)) in
   init_l
 
@@ -421,19 +420,17 @@ let compile_alg_vars ~compileModeOn contact_map domain vars =
 let compile_rules alg_deps ~compileModeOn contact_map domain rules =
   match
     List.fold_left
-      (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (_,rule) ->
-         let (domain',origin',extra_unary_cc,cr) =
+      (fun (domain,syntax_ref,deps_machinery,acc) (_,rule) ->
+         let (domain',origin',cr) =
            rules_of_ast ?deps_machinery ~compileModeOn contact_map domain
              ~syntax_ref rule in
          (domain',succ syntax_ref,origin',
-          Pattern.Set.union unary_cc extra_unary_cc,
           List.append cr acc))
-      (domain,1,Some (Operator.RULE 0,alg_deps),
-       Pattern.Set.empty,[])
+      (domain,1,Some (Operator.RULE 0,alg_deps),[])
       rules with
-  | fdomain,_,Some (_,falg_deps),unary_cc,frules ->
-    fdomain,falg_deps,List.rev frules,unary_cc
-  | _, _, None, _, _ ->
+  | fdomain,_,Some (_,falg_deps),frules ->
+    fdomain,falg_deps,List.rev frules
+  | _, _, None, _ ->
     failwith "The origin of Eval.compile_rules has been lost"
 
 (*let translate_contact_map sigs kasa_contact_map =
@@ -485,7 +482,7 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn ?overwrite_init
 
   pause @@ fun () ->
   outputs (Data.Log "\t -rules");
-  let (preenv',alg_deps',compiled_rules,cc_unaries) =
+  let (preenv',alg_deps',compiled_rules) =
     compile_rules
       alg_deps ~compileModeOn contact_map preenv' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
@@ -512,7 +509,7 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn ?overwrite_init
 
   let env =
     Model.init domain tk_nd alg_nd alg_deps''
-      (Array.of_list result.rules,rule_nd,cc_unaries)
+      (Array.of_list result.rules,rule_nd)
       (Array.of_list (List.rev obs)) (Array.of_list pert) contact_map in
 
   outputs (Data.Log "\t -initial conditions");

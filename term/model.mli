@@ -16,8 +16,7 @@ val init :
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
   ((string Locality.annot option * LKappa.rule Locality.annot) array *
-     Primitives.elementary_rule array *
-       Pattern.Set.t) ->
+     Primitives.elementary_rule array) ->
   Alg_expr.t Locality.annot array -> Primitives.perturbation array ->
   Contact_map.t -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
@@ -28,7 +27,6 @@ val nb_algs : t -> int
 val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
-val connected_components_of_unary_rules : t -> Pattern.Set.t
 
 val domain : t -> Pattern.Env.t
 val get_obs : t -> Alg_expr.t Locality.annot array

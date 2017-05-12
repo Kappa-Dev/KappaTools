@@ -76,7 +76,16 @@ let recompute env counter state i =
     value_alg counter state (raw_get_alg env state.variables_overwrite i)
 
 let empty ~with_trace random_state env counter =
-  let unary_patterns = Model.connected_components_of_unary_rules env in
+  let unary_patterns =
+    Model.fold_rules
+      (fun _ acc r ->
+         match r.Primitives.unary_rate with
+         | None -> acc
+         | Some _ ->
+           Pattern.Set.add
+             r.Primitives.connected_components.(0)
+             (Pattern.Set.add r.Primitives.connected_components.(1) acc)
+      ) Pattern.Set.empty env in
   let with_connected_components = not (Pattern.Set.is_empty unary_patterns) in
   let variables_overwrite = Array.make (Model.nb_algs env) None in
   let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
