@@ -10,6 +10,9 @@ type t =
   {
     mutable outdated : bool;
 
+    (* Constant cacha *)
+    unary_patterns: Pattern.Set.t;
+
     (* With rectangular approximation *)
     roots_of_patterns: IntCollection.t Pattern.ObsMap.t;
     roots_of_unary_patterns:
@@ -73,14 +76,14 @@ let recompute env counter state i =
     value_alg counter state (raw_get_alg env state.variables_overwrite i)
 
 let empty ~with_trace random_state env counter =
-  let with_connected_components =
-    not (Pattern.Set.is_empty
-           (Model.connected_components_of_unary_rules env)) in
+  let unary_patterns = Model.connected_components_of_unary_rules env in
+  let with_connected_components = not (Pattern.Set.is_empty unary_patterns) in
   let variables_overwrite = Array.make (Model.nb_algs env) None in
   let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
   let cand =
     {
       outdated = false;
+      unary_patterns;
       roots_of_patterns = Pattern.Env.new_obs_map
           (Model.domain env) (fun _ -> IntCollection.create 64);
       roots_of_unary_patterns = Pattern.Env.new_obs_map
@@ -424,8 +427,7 @@ let store_obs domain edges roots obs acc = function
          with Not_found -> acc)
       acc obs
 
-let update_edges outputs counter domain unary_patterns inj_nodes
-    state event_kind ?path rule =
+let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
   let former_deps,mod_connectivity  = state.outdated_elements in
@@ -446,7 +448,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
   let () =
     List.iter
       (fun (pat,(root,_)) ->
-         update_roots false unary_patterns edges_after_neg
+         update_roots false state.unary_patterns edges_after_neg
            state.roots_of_patterns roots_by_cc mod_connectivity pat root)
       del_obs in
   (*Positive update*)
@@ -474,7 +476,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
   let () =
     List.iter
       (fun (pat,(root,_)) ->
-         update_roots true unary_patterns edges''
+         update_roots true state.unary_patterns edges''
            state.roots_of_patterns roots_by_cc' mod_connectivity pat root)
       new_obs in
   (*Store event*)
@@ -489,6 +491,7 @@ let update_edges outputs counter domain unary_patterns inj_nodes
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
   { outdated = false;
+    unary_patterns = state.unary_patterns;
     roots_of_patterns = state.roots_of_patterns;
     roots_of_unary_patterns = roots_by_cc';
     unary_candidates = state.unary_candidates;
@@ -619,16 +622,14 @@ let update_tokens env counter state injected =
                      Operator.DepSet.union rdeps deps',changed_connectivity }
     ) state injected'
 
-let transform_by_a_rule outputs env unary_patterns counter
-    state event_kind ?path rule inj =
+let transform_by_a_rule outputs env counter state event_kind ?path rule inj =
   let state' =
     update_tokens
       env counter state rule.Primitives.delta_tokens in
-  update_edges outputs counter (Model.domain env) unary_patterns inj
+  update_edges outputs counter (Model.domain env) inj
     state' event_kind ?path rule
 
-let apply_unary_rule
-    ~outputs ~rule_id env unary_ccs counter state event_kind rule =
+let apply_unary_rule ~outputs ~rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let inj,path =
@@ -679,9 +680,8 @@ let apply_unary_rule
         domain rule.Primitives.connected_components inj in
     match path with
     | Some _ ->
-      Success
-        (transform_by_a_rule outputs env unary_ccs counter state'
-           event_kind ?path rule inj)
+      Success (transform_by_a_rule
+                 outputs env counter state' event_kind ?path rule inj)
     | None ->
       let max_distance = match rule.Primitives.unary_rate with
         | None -> None
@@ -692,12 +692,10 @@ let apply_unary_rule
       match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
       | None -> Corrected
       | Some _ as path ->
-        Success
-          (transform_by_a_rule outputs env unary_ccs counter state'
-             event_kind ?path rule inj)
+        Success (transform_by_a_rule
+                   outputs env counter state' event_kind ?path rule inj)
 
-let apply_rule
-    ~outputs ?rule_id env unary_patterns counter state event_kind rule =
+let apply_rule ~outputs ?rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let from_patterns () =
@@ -736,8 +734,7 @@ let apply_rule
     match rule.Primitives.unary_rate with
     | None ->
       let out =
-        transform_by_a_rule outputs env unary_patterns counter
-          state event_kind rule inj in
+        transform_by_a_rule outputs env counter state event_kind rule inj in
       Success out
     | Some (_,max_distance) ->
       match max_distance with
@@ -745,8 +742,8 @@ let apply_rule
         if Edges.in_same_connected_component roots.(0) roots.(1) state.edges then
           Corrected
         else
-          Success (transform_by_a_rule outputs env unary_patterns
-                                       counter state event_kind rule inj)
+          Success
+            (transform_by_a_rule outputs env counter state event_kind rule inj)
       | Some dist ->
          let dist' = Some (max_dist_to_int counter state dist) in
          let nodes = Matching.elements_with_types
@@ -755,14 +752,12 @@ let apply_rule
            Edges.are_connected ?max_distance:dist' state.edges nodes.(0)
                                nodes.(1) with
          | None ->
-            Success (transform_by_a_rule outputs env unary_patterns
-                                         counter state event_kind rule inj)
+           Success (transform_by_a_rule
+                      outputs env counter state event_kind rule inj)
          | Some _ -> Corrected
 
-let force_rule
-    ~outputs env unary_patterns counter state event_kind rule =
-  match apply_rule
-          ~outputs env unary_patterns counter state event_kind rule with
+let force_rule ~outputs env counter state event_kind rule =
+  match apply_rule ~outputs env counter state event_kind rule with
   | Success out -> Some out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
@@ -786,7 +781,7 @@ let force_rule
     | l ->
        let (h,_) = List_util.random state.random_state l in
        Some (transform_by_a_rule
-               outputs env unary_patterns counter state event_kind rule h)
+               outputs env counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id store env counter state rule =
   let () = assert (not state.outdated) in

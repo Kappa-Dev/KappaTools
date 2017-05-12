@@ -67,9 +67,7 @@ let do_modification ~outputs env counter graph state extra modification =
       Nbr.maybe_iteri
         (fun _ g ->
            Rule_interpreter.force_rule
-             ~outputs env
-             (Model.connected_components_of_unary_rules env)
-             counter g (Trace.PERT text) r)
+             ~outputs env counter g (Trace.PERT text) r)
         graph (Rule_interpreter.value_alg counter graph v) in
     let graph'',extra' =
       Rule_interpreter.update_outdated_activities
@@ -210,9 +208,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                 Nbr.iteri
                   (fun _ s ->
                      match Rule_interpreter.apply_rule
-                             ~outputs env
-                             (Model.connected_components_of_unary_rules env)
-                             counter s (Trace.INIT creations_sort)
+                             ~outputs env counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success s -> s
                      | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
@@ -324,9 +320,7 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
     if choice mod 2 = 1
     then Rule_interpreter.apply_unary_rule ~outputs ~rule_id
     else Rule_interpreter.apply_rule ~outputs ~rule_id in
-  match apply_rule
-          env (Model.connected_components_of_unary_rules env)
-          counter graph cause rule with
+  match apply_rule env counter graph cause rule with
   | Rule_interpreter.Success (graph') ->
     let final_step = not (Counter.one_constructive_event counter dt) in
     let graph'',extra_pert =

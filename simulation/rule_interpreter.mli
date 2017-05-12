@@ -29,19 +29,19 @@ val value_bool :
 (** {6 Core} *)
 
 val apply_rule :
-  outputs:(Data.t -> unit) -> ?rule_id:int -> Model.t -> Pattern.Set.t ->
+  outputs:(Data.t -> unit) -> ?rule_id:int -> Model.t ->
   Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
 val apply_unary_rule :
-  outputs:(Data.t -> unit) -> rule_id:int -> Model.t -> Pattern.Set.t ->
+  outputs:(Data.t -> unit) -> rule_id:int -> Model.t ->
   Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
     [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
-  outputs:(Data.t -> unit) -> Model.t -> Pattern.Set.t -> Counter.t ->
+  outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
   t -> Trace.event_kind -> Primitives.elementary_rule -> t option
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand

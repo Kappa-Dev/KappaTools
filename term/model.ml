@@ -277,7 +277,7 @@ let to_yojson env =
               LKappa.rule_to_json r]::l) env.ast_rules []);
     "elementary_rules", JsonUtil.of_array Primitives.rule_to_yojson env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
-    (* rules : Primitives.elementary_rule array;
+    (*
        cc_of_unaries : Pattern.Set.t;
        perturbations : Primitives.perturbation array;
        dependencies_in_time : Operator.DepSet.t;
