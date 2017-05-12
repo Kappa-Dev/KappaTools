@@ -190,7 +190,9 @@ let of_bin_alg_op = function
   | Operator.MULT -> mult
   | Operator.SUM -> add
   | Operator.DIV -> fun x y ->
-    if is_zero (rem x y) then internal_div x y else cast_bin_op ~op_f:(/.) x y
+    if not (is_zero y) && is_zero (rem x y)
+    then internal_div x y
+    else cast_bin_op ~op_f:(/.) x y
   | Operator.MINUS -> sub
   | Operator.MODULO -> rem
   | Operator.MIN -> min

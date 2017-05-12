@@ -7,7 +7,8 @@ let print_bool f a =
     (fun f (x,_) -> Format.pp_print_string f x)
     (fun f (x,_) -> Format.pp_print_string f x) f a
 let print_cc =
-  Pattern.print_cc ~new_syntax:true ~with_id:true ?sigs:None ?cc_id:None ?agent_sep:None
+  Pattern.print_cc ~new_syntax:true ~with_id:true ?sigs:None
+    ?cc_id:None ?dotnet:None ?full_species:None
 let print_cc_id = Pattern.print ~new_syntax:true ?domain:None ~with_id:true
 let print_place = Matching.Agent.print ?sigs:None
 let print_transformation = Primitives.Transformation.print ?sigs:None
