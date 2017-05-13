@@ -14,13 +14,17 @@
     Ast.compil ->
   Primitives.contact_map * Export_to_KaSim.state
 *)
+
+
 val compile_bool:
+  ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
   compileModeOn:bool -> ?origin:Operator.rev_dep -> Contact_map.t ->
   Pattern.PreEnv.t -> (LKappa.rule_mixture, int) Alg_expr.bool Locality.annot ->
   Pattern.PreEnv.t *
   (Pattern.id array list,int) Alg_expr.bool Locality.annot
 
 val compile_modifications_no_track:
+  ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
   (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
@@ -29,7 +33,9 @@ val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
-  max_sharing:bool -> compileModeOn:bool ->
+  max_sharing:bool ->
+  ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
+  compileModeOn:bool ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Contact_map.t ->
   ('c, LKappa.rule_mixture, int, LKappa.rule, unit) Ast.compil -> 'b

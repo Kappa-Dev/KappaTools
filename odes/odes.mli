@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 03 2017>
+  * Last modification: Time-stamp: <May 13 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -11,14 +11,16 @@ sig
   type connected_component_id
 
   val get_compil :
+    ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
     rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.compil
 
   val init: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
+  val reset: I.compil -> (ode_var_id,Ode_loggers_sig.ode_var_id) network -> (ode_var_id,Ode_loggers_sig.ode_var_id) network
 
   val network_from_compil:
-    ?max_size:int -> 
+    ?max_size:int ->
     dotnet:bool ->
     smash_reactions:bool ->
     ignore_obs:bool ->
@@ -85,4 +87,6 @@ sig
   val get_data:
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
     int * int * int
+
+  val init_bwd_bisim_info: I.compil -> (ode_var_id, Ode_loggers_sig.ode_var_id) network -> Symmetries_sig.bwd_bisim_info option
 end
