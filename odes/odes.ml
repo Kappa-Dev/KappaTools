@@ -166,7 +166,6 @@ struct
       time_homogeneous_rates: bool option ;
       symmetries: Symmetries.symmetries option;
       sym_reduction: Symmetries.reduction ;
-      bwd_map: Symmetries.bwd_map ;
       max_stoch_coef: int;
       fictitious_species: id option;
       has_empty_lhs: bool option;
@@ -265,7 +264,6 @@ struct
       time_homogeneous_rates = None ;
       symmetries = None ;
       sym_reduction = Symmetries.Ground ;
-      bwd_map = Symmetries.empty_bwd_map () ;
       max_stoch_coef = 0 ;
       fictitious_species = None;
       has_empty_lhs = None;
@@ -629,7 +627,6 @@ struct
       network,
       (Alg_expr.DIFF_TOKEN (output,dt),pos)
   | Alg_expr.DIFF_KAPPA_INSTANCE(_expr,_dt),pos ->
-      (* TO DO ??? *)
       raise
         (ExceptionDefn.Internal_Error
            ("Cannot translate partial derivative",pos))
@@ -878,11 +875,6 @@ struct
                   in
                   let () = debug "new embeddings" in
                   let () = dump_store store_new_embeddings in
-                  (*  let () = debug "old embeddings" in
-                      let () = dump_store   store_old_embeddings in
-
-                      let () = debug "all embeddings" in
-                      let () = dump_store   store_all_embeddings in*)
                   let _,new_embedding_list =
                     List.fold_left
                       (fun (partial_emb_list,
@@ -1419,28 +1411,6 @@ struct
     match b_opt with
     | None -> "none"
     | Some b -> string_of_bool b
-
-  let compute_equivalence_classes parameters compil network =
-    let red = network.sym_reduction in
-    let bwd_map = Symmetries.empty_bwd_map () in
-    let cache, bwd_map =
-      VarMap.fold
-        (fun _ id (cache,bwd_map) ->
-           let (species,_) = Mods.DynArray.get network.species_tab id in
-           I.add_equiv_class
-             parameters
-             compil
-             cache
-             red
-             bwd_map
-             species
-        )
-        network.id_of_ode_var
-        (network.cache, bwd_map)
-    in
-    {network with
-     bwd_map = bwd_map ;
-     cache = cache }
 
   let network_from_compil ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network =
     let () = Format.printf "+ generate the network... @." in
@@ -2194,8 +2164,7 @@ struct
     let () = declare_rates_global logger network in
     let () =
       if not
-          (Sbml_backend.is_dotnet logger
-          (* || Sbml_backend.is_sbml logger*))
+          (Sbml_backend.is_dotnet logger)
       then
         let () =
           List.iter

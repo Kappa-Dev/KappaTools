@@ -3,8 +3,6 @@
   * Last modification: Time-stamp: <May 13 2017>
 *)
 
-(*type contact_map = (int list * (int * int) list) array array*)
-
 type rule = Primitives.elementary_rule
 
 type compil =
@@ -24,8 +22,6 @@ type nauto_in_rules_cache = LKappa_auto.cache
 
 type sym_cache = Symmetries.cache
 
-type equib_class_map = Symmetries.bwd_map
-
 type seen_cache = bool Mods.DynArray.t
 
 type cache =
@@ -39,35 +35,22 @@ type cache =
 
   }
 
-  let get_representative parameters compil cache symmetries species =
-    let sigs = Model.signatures compil.environment in
-    let rep_cache, rule_cache, cc_cache, species =
-      Symmetries.representative
-        ~parameters
-        ~sigs
-        cache.representative_cache
-        cache.rule_cache
-        cache.cc_cache
-        symmetries species
-    in
-    {cache with
-      representative_cache = rep_cache;
-      cc_cache = cc_cache ;
-      rule_cache = rule_cache ;
-    }, species
-
-(*let clean l =
-   let l = List.sort (fun a b -> compare b a)  l in
-   let rec aux l current output =
-       match l with
-          | [] -> current::output
-          | h::t when h=current -> aux t current output
-          | h::t -> aux t h (current::output)
-   in
-   match l
-   with
-    | [] -> []
-    | h::t -> aux t h []*)
+let get_representative parameters compil cache symmetries species =
+  let sigs = Model.signatures compil.environment in
+  let rep_cache, rule_cache, cc_cache, species =
+    Symmetries.representative
+      ~parameters
+      ~sigs
+      cache.representative_cache
+      cache.rule_cache
+      cache.cc_cache
+      symmetries species
+  in
+  {cache with
+   representative_cache = rep_cache;
+   cc_cache = cc_cache ;
+   rule_cache = rule_cache ;
+  }, species
 
 let equiv_class_of_pattern parameters compil cache symmetries pattern =
   let env = compil.environment in
@@ -89,15 +72,6 @@ let equiv_class_of_pattern parameters compil cache symmetries pattern =
   },
   equiv_class
 
-
-let bwd_interpretation parameters bwd_map reduction species =
-  Symmetries.bwd_interpretation ~parameters bwd_map reduction species
-
-let fold_bwd_map f map acc =
-  Symmetries.fold_bwd_map f map acc
-
-let class_representative equiv_class = equiv_class.Symmetries.class_representative
-
 let get_cc_cache cache = cache.cc_cache
 
 let set_cc_cache cc_cache cache = {cache with cc_cache = cc_cache}
@@ -111,8 +85,6 @@ let get_sym_cache cache = cache.representative_cache
 
 let set_sym_cache sym_cache cache =
   {cache with representative_cache = sym_cache}
-
-(*type hidden_init = Primitives.elementary_rule*)
 
 type init = (Alg_expr.t * rule * Locality.t) list
 
@@ -222,20 +194,6 @@ let lift_embedding x =
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
-(*let find_embeddings compil pattern species =
-  let () =
-    print_connected_component ~compil Format.std_formatter pattern
-  in
-  let () = Format.fprintf Format.std_formatter " into " in
-  let () =
-    print_chemical_species ~compil Format.std_formatter species
-  in
-  let l =
-    find_embeddings compil pattern species
-  in
-  let () = Format.fprintf Format.std_formatter "? embeddings: %i \n" (List.length l) in
-  l*)
-
 let find_embeddings_unary_binary compil p x =
   Tools.array_fold_lefti
     (fun i acc cc ->
@@ -287,19 +245,8 @@ let add x y list  =
   | None -> list
   | Some _ -> x::list
 
-let mode_of_rule compil rule =
-  let _env = environment compil in
-  let _id = rule.Primitives.syntactic_rule in
-  if (* Pierre, could you help me here please ? *)
-    (* I would like to know if the rule comes from the interpretation of a rule in a direct way, or from the interpretation of a rule in a reverse way *)
-    (* ex: 'A.B' A(x),B(x) <-> A(x!1),B(x!1) @ 1(2),3(4) *)
-    (* I am expecting Direct for the rule A(x),B(x) -> A(x!1),B(x!1) @ 1(2) *)
-    (* and Op for the rule A(x!1),B(x!1) -> A(x),B(x) @ 3(4) *)
-    true
-  then
+let mode_of_rule _compil _rule =
     Rule_modes.Direct
-  else
-    Rule_modes.Op
 
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
@@ -354,7 +301,7 @@ let string_of_var_id ?compil ?init_mode logger r =
       _ -> f logger r
 
 let string_of_var_id_jac ?compil r dt =
-  let _ = compil in 
+  let _ = compil in
   "jacvar("^(string_of_int r)^","^(string_of_int dt)^")"
 
 let rate_name compil rule rule_id =
@@ -544,23 +491,6 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
   Symmetries.print_symmetries parameters env symmetries
-
-let add_equiv_class parameters compil cache red bwd_map species =
-  let rule_cache = cache.rule_cache in
-  let preenv = cache.cc_cache in
-  let seen_species = cache.seen_species in
-  let env = compil.environment in
-  let seen_species, rule_cache, preenv, bwd_map =
-      Symmetries.add_equiv_class parameters env
-        nbr_automorphisms_in_chemical_species
-        seen_species rule_cache preenv
-      red bwd_map species
-  in
-  {cache with rule_cache = rule_cache ;
-              cc_cache = preenv ;
-              seen_species = seen_species
-  },
-  bwd_map
 
 let valid_mixture compil cc_cache  ?max_size mixture =
   match max_size
