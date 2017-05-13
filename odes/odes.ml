@@ -241,6 +241,28 @@ struct
 
   let get_compil = I.get_compil
 
+  let reset compil network =
+    {network with
+      ode_variables = VarSet.empty ;
+      ode_vars_tab = Mods.DynArray.create 0 Dummy ;
+      id_of_ode_var = VarMap.empty ;
+      species_tab = Mods.DynArray.create 0
+          (I.dummy_chemical_species compil,1) ;
+      cache = I.empty_cache compil ;
+      fresh_ode_var_id = fst_id ;
+      fresh_var_id = fst_id ;
+      varmap = Mods.IntMap.empty ;
+      tokenmap = Mods.IntMap.empty ;
+      var_declaration = [];
+      obs = [] ;
+      n_obs = 1 ;
+      time_homogeneous_vars = None ;
+      time_homogeneous_obs = None ;
+      time_homogeneous_rates = None ;
+      (*  symmetries = None ;*)
+      (*sym_reduction = Symmetries.Ground ;*)
+    }
+
   let init compil =
     {
       rules = [] ;
@@ -3111,4 +3133,8 @@ let print_symmetries parameters compil network =
       compil
       sym
 
+let init_bwd_bisim_info compil network =
+  match network.sym_reduction with
+  | Symmetries.Backward red -> Some (I.init_bwd_bisim_info compil red)
+  | Symmetries.Forward _ | Symmetries.Ground -> None
 end

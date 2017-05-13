@@ -15,7 +15,7 @@ sig
   type connected_component  (* connected, maybe partially specified *)
 
   type rule
-  
+
   type init =
     ((connected_component array list,int) Alg_expr.e * rule
      * Locality.t) list
@@ -126,6 +126,7 @@ sig
   val lift_species: compil -> chemical_species -> mixture
 
   val get_compil:
+    ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
     rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> compil
@@ -194,5 +195,10 @@ sig
     ?max_size:int ->
     mixture ->
     cache * bool
+
+  val init_bwd_bisim_info:
+    compil ->
+    Symmetries.equivalence_classes ->
+    Symmetries_sig.bwd_bisim_info
 
 end

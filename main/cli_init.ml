@@ -9,7 +9,7 @@
 type directive_unit = Time | Event
 
 let get_compilation
-    ?(unit=Time) ?(max_sharing=false) ?(compileModeOn=false)
+    ?(unit=Time) ?(max_sharing=false) ?bwd_bisim ?(compileModeOn=false)
     cli_args =
   let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
@@ -48,7 +48,7 @@ let get_compilation
           ~outputs:(Outputs.go (Signature.create [||]))
           ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
           ?rescale_init:cli_args.Run_cli_args.rescale
-          ?overwrite_init ~compileModeOn
+          ?overwrite_init ?bwd_bisim ~compileModeOn
           sigs_nd tk_nd contact_map result' in
       let story_compression =
         if has_tracking && (n||w||s) then Some story_compression else None in

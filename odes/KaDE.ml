@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 03 2017>
+  * Last modification: Time-stamp: <May 13 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -187,7 +187,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | "backward" -> backward
       | _ -> ground
     in
-    let network =
+    let network,compil =
       if
         (not (reduction = ground))
         || !(ode_args.Ode_args.show_symmetries)
@@ -238,17 +238,33 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             network
             contact_map
         in
-        let network =
+        let network,compil =
           if reduction = backward
           then
-            A.set_to_backward_symmetries_from_model
-              network
+            let network =
+              A.set_to_backward_symmetries_from_model
+                network
+            in
+            let bwd_bisim =
+              A.init_bwd_bisim_info compil network
+            in
+            let compil =
+              A.get_compil ?bwd_bisim
+                ~rate_convention ~show_reactions ~count ~compute_jacobian
+                cli_args
+            in
+            let network = A.reset compil network in
+            let network =
+              A.set_to_backward_symmetries_from_model
+                network
+            in
+            network, compil
           else if reduction = forward
           then
             A.set_to_forward_symmetries_from_model
-              network
+              network, compil
           else
-            network
+            network, compil
         in
         let () =
           if !(ode_args.Ode_args.show_symmetries)
@@ -257,9 +273,9 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
               parameters compil
               network
         in
-        network
+        network,compil
       else
-        network
+        network,compil
     in
     let smash_reactions =
       !(ode_args.Ode_args.smash_reactions)
