@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 12 2017>
+  * Last modification: Time-stamp: <May 13 2017>
 *)
 
 module type Interface =
@@ -15,8 +15,7 @@ sig
   type connected_component  (* connected, maybe partially specified *)
 
   type rule
-  (*type hidden_init*)
-
+  
   type init =
     ((connected_component array list,int) Alg_expr.e * rule
      * Locality.t) list
@@ -188,29 +187,6 @@ sig
   Remanent_parameters_sig.parameters ->
   compil -> cache -> Symmetries.reduction ->
   connected_component -> cache * (int * (connected_component * int) list)
-
-  val bwd_interpretation:
-    Remanent_parameters_sig.parameters ->
-    Symmetries.bwd_map -> Symmetries.reduction -> chemical_species ->
-    Symmetries.class_description option
-
-  val fold_bwd_map:
-  (chemical_species -> Symmetries.class_description -> 'a -> 'a) ->
-  Symmetries.bwd_map ->
-  'a -> 'a
-
-  val class_representative:
-    Symmetries.class_description -> chemical_species
-
-  val add_equiv_class:
-    Remanent_parameters_sig.parameters ->
-    compil ->
-    cache ->
-    Symmetries.reduction ->
-    Symmetries.bwd_map ->
-    chemical_species ->
-    cache *
-    Symmetries.bwd_map
 
   val valid_mixture:
     compil ->
