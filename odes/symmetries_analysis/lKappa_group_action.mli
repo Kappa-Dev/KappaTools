@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Apr 04 2017>
+   * Last modification: Time-stamp: <May 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -24,7 +24,7 @@
 
 val check_orbit_internal_state_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -46,7 +46,7 @@ val check_orbit_internal_state_permutation:
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 val check_orbit_binding_state_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -69,7 +69,7 @@ val check_orbit_binding_state_permutation:
 
 val check_orbit_full_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -82,7 +82,7 @@ val check_orbit_full_permutation:
 
 val is_invariant_internal_states_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -92,7 +92,7 @@ val is_invariant_internal_states_permutation:
 
 val is_invariant_binding_states_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -102,7 +102,7 @@ val is_invariant_binding_states_permutation:
 
 val is_invariant_full_states_permutation:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -112,11 +112,13 @@ val is_invariant_full_states_permutation:
 
 val equiv_class:
   ?parameters:Remanent_parameters_sig.parameters ->
-  ?env:Model.t ->
+  ?sigs:Signature.s ->
   LKappa_auto.cache ->
   bool Mods.DynArray.t ->
   LKappa.rule ->
   partitions_internal_states:(int -> int list list) ->
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->
-  LKappa_auto.cache * bool Mods.DynArray.t * LKappa.rule list
+  convention:Remanent_parameters_sig.rate_convention ->
+  LKappa_auto.cache * bool Mods.DynArray.t *
+  (LKappa.rule * int) list

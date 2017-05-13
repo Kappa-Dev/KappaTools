@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Apr 04 2017>
+   * Last modification: Time-stamp: <May 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -72,7 +72,7 @@ let may_swap_full_regular ag_type site1 site2 ag =
   may_swap_binding_state_regular ag_type site1 site2 ag
   || may_swap_internal_state_regular ag_type site1 site2 ag
 
-let swap_binding_state_regular ag_type site1 site2 ag =
+let swap_binding_state_regular _ag_type site1 site2 ag =
   let tmp = ag.LKappa.ra_ports.(site1) in
   let () =
     ag.LKappa.ra_ports.(site1) <- ag.LKappa.ra_ports.(site2) in
@@ -105,7 +105,7 @@ let may_swap_full_created ag_type site1 site2 ag =
   may_swap_internal_state_created ag_type site1 site2 ag
   || may_swap_binding_state_created ag_type site1 site2 ag
 
-let swap_binding_state_created ag_type site1 site2 ag =
+let swap_binding_state_created _ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ports.(site1) in
   let () =
     ag.Raw_mixture.a_ports.(site1) <- ag.Raw_mixture.a_ports.(site2)
@@ -113,7 +113,7 @@ let swap_binding_state_created ag_type site1 site2 ag =
   let () = ag.Raw_mixture.a_ports.(site2) <- tmp in
   ()
 
-let swap_internal_state_created ag_type site1 site2 ag =
+let swap_internal_state_created _ag_type site1 site2 ag =
   let tmp = ag.Raw_mixture.a_ints.(site1) in
   let () =
     ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
@@ -155,9 +155,9 @@ let apply_head sigma sigma_raw (rule_tail,created_tail) =
 
 let apply_head_predicate f f_raw cache (rule_tail,created_tail) rule =
   match rule_tail, created_tail with
-  | h::t, _ ->
+  | h::_, _ ->
     f h rule cache
-  | _, h::t ->
+  | _, h::_ ->
     f_raw h rule cache
   | [], [] ->
     let s1,i1,i2,i3 = __POS__ in
@@ -333,28 +333,27 @@ let for_all_over_orbit
 
 exception False
 
-let do_print parameters env f =
-  match parameters, env  with
-| Some parameters, Some env ->
+let do_print ?parameters ?sigs f =
+  match parameters,sigs with
+| Some parameters, Some sigs ->
   begin
     if Remanent_parameters.get_trace parameters
     then
-      let sigs = Model.signatures env in
       let logger = Remanent_parameters.get_logger parameters in
       let fmt_opt = Loggers.formatter_of_logger logger in
       match fmt_opt with
       | None -> ()
       | Some fmt -> f sigs logger fmt
   end
-| None, _ | _, None -> ()
+| None, _ | _, None  -> ()
 
 let check_orbit
-    ?parameters ?env
+    ?parameters ?sigs
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
     to_be_checked =
   let () =
-    do_print parameters env
+    do_print ?parameters ?sigs
       (fun sigs logger fmt ->
           let () = Loggers.fprintf logger "Check an orbit" in
           let () = Loggers.print_newline logger in
@@ -381,7 +380,7 @@ let check_orbit
   let accu = cache, [], counter, to_be_checked in
   let f rule (cache, l, counter, to_be_checked) =
     let () =
-      do_print parameters env
+      do_print ?parameters ?sigs
         (fun sigs logger fmt ->
             let () = Loggers.fprintf logger " rule:   " in
             let () =
@@ -400,7 +399,7 @@ let check_orbit
     then
       begin
         let () =
-          do_print parameters env
+          do_print ?parameters ?sigs
             (fun _ logger _ ->
                let () = Loggers.fprintf logger "Existing rule" in
                Loggers.print_newline logger)
@@ -415,7 +414,7 @@ let check_orbit
       end
     else
     let () =
-      do_print parameters env
+      do_print ?parameters ?sigs
         (fun _ logger _ ->
            let () = Loggers.fprintf logger "Unknown rule" in
            Loggers.print_newline logger)
@@ -495,10 +494,10 @@ let weight ~correct ~card_stabilizer ~rate =
        (correct * card_stabilizer))
 
 let check_orbit_internal_state_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?parameters ?env
+    ?parameters ?sigs
     (potential_positions_for_swapping_internal_states,
      swap_internal_state_regular,
      swap_internal_state_regular,
@@ -507,10 +506,10 @@ let check_orbit_internal_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?parameters ?env
+    ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,
      swap_binding_state_regular,
@@ -519,10 +518,10 @@ let check_orbit_binding_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?parameters ?env
+    ?parameters ?sigs
     (potential_positions_for_swapping_full,
      swap_full_regular,
      swap_full_regular,
@@ -531,10 +530,11 @@ let check_orbit_full_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_invariance
-    ?parameters ?env
+    ?parameters ?sigs
     (get_positions, is_equal, is_equal_raw)
     agent_type site1 site2 rule cache
   =
+  let _ = sigs in
   for_all_elt_permutation
     (get_positions agent_type site1 site2 rule)
     is_equal
@@ -544,8 +544,9 @@ let check_invariance
 
 let is_invariant_internal_states_permutation
     ?parameters
-    ?env
+    ?sigs
     ~agent_type ~site1 ~site2 rule cache =
+  let _ = sigs,parameters in
   let positions =
     potential_positions_for_swapping_internal_states
       agent_type site1 site2 rule
@@ -573,11 +574,11 @@ let check_gen swap agent_type site1 site2 agent rule cache =
   cache, i=i'
 
 let is_invariant_binding_states_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache
   =
   check_invariance
-    ?parameters ?env
+    ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
      (check_gen
         swap_binding_state_regular
@@ -588,17 +589,17 @@ let is_invariant_binding_states_permutation
     agent_type site1 site2 rule cache
 
 let is_invariant_full_states_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache
   =
   let cache, b1 =
     is_invariant_internal_states_permutation
-      ?parameters ?env ~agent_type ~site1 ~site2
+      ?parameters ?sigs ~agent_type ~site1 ~site2
       rule cache
   in
   if b1 then
     is_invariant_binding_states_permutation
-    ?parameters ?env ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache
   else
     cache, false
@@ -737,25 +738,27 @@ let copy_lkappa_rule rule =
 
 let equiv_class
     ?parameters
-    ?env
+    ?sigs
     cache
     seen
     rule
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
+    ~convention
   =
+  let _ = sigs, parameters in
   let to_visit = [rule] in
-  let rec aux cache to_visit seen visited =
-    match
-      to_visit
-    with
-    | [] -> cache, seen, visited
-    | h::q ->
-      let cache, hashed_list = LKappa_auto.cannonic_form cache h in
-      let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-      if Mods.DynArray.get seen hash
-      then aux cache q seen visited
+   let rec aux cache to_visit seen visited =
+     match
+       to_visit
+     with
+     | [] -> cache, seen, visited
+     | h::q ->
+       let cache, hashed_list = LKappa_auto.cannonic_form cache h in
+       let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
+       if Mods.DynArray.get seen hash
+       then aux cache q seen visited
       else
         let visited = h::visited in
         let () = Mods.DynArray.set seen hash true in
@@ -765,9 +768,22 @@ let equiv_class
             partitions_binding_states
             partitions_full_states
             h
-            (fun rule list -> (copy_lkappa_rule rule)::list)
+            (fun rule list -> (copy_lkappa_rule rule::list))
             q
         in
         aux cache to_visit seen visited
-  in
-  aux cache to_visit seen []
+   in
+   let cache,seen,equ_class = aux cache to_visit seen [] in
+   let cache, equ_class =
+     List.fold_left
+       (fun (cache, list) elt ->
+          let cache, nauto =
+            LKappa_auto.nauto
+              convention
+              cache
+              elt
+          in
+          (cache, (elt,nauto)::list))
+       (cache,[]) equ_class
+   in
+   cache, seen, equ_class

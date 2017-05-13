@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 03 2017>
+  * Last modification: Time-stamp: <May 13 2017>
 *)
 
 (*type contact_map = (int list * (int * int) list) array array*)
@@ -33,24 +33,62 @@ type cache =
     cc_cache: cc_cache ;
     rule_cache: nauto_in_rules_cache;
     representative_cache: sym_cache ;
-    seen: seen_cache ;
+    seen_rule: seen_cache ;
+    seen_pattern: seen_cache;
+    seen_species: seen_cache;
+
   }
 
-let get_representative parameters compil cache symmetries species =
-  let rep_cache, rule_cache, cc_cache, species =
-    Symmetries.representative
+  let get_representative parameters compil cache symmetries species =
+    let sigs = Model.signatures compil.environment in
+    let rep_cache, rule_cache, cc_cache, species =
+      Symmetries.representative
+        ~parameters
+        ~sigs
+        cache.representative_cache
+        cache.rule_cache
+        cache.cc_cache
+        symmetries species
+    in
+    {cache with
+      representative_cache = rep_cache;
+      cc_cache = cc_cache ;
+      rule_cache = rule_cache ;
+    }, species
+
+(*let clean l =
+   let l = List.sort (fun a b -> compare b a)  l in
+   let rec aux l current output =
+       match l with
+          | [] -> current::output
+          | h::t when h=current -> aux t current output
+          | h::t -> aux t h (current::output)
+   in
+   match l
+   with
+    | [] -> []
+    | h::t -> aux t h []*)
+
+let equiv_class_of_pattern parameters compil cache symmetries pattern =
+  let env = compil.environment in
+  let rep_cache, rule_cache, cc_cache, seen_pattern,  equiv_class =
+    Symmetries.equiv_class
       ~parameters
-      (Model.signatures compil.environment)
+      env
+      cache.seen_pattern
       cache.representative_cache
       cache.rule_cache
       cache.cc_cache
-      symmetries species
+      symmetries pattern
   in
   {cache with
     representative_cache = rep_cache;
     cc_cache = cc_cache ;
     rule_cache = rule_cache ;
-  }, species
+    seen_pattern = seen_pattern ;
+  },
+  equiv_class
+
 
 let bwd_interpretation parameters bwd_map reduction species =
   Symmetries.bwd_interpretation ~parameters bwd_map reduction species
@@ -316,6 +354,7 @@ let string_of_var_id ?compil ?init_mode logger r =
       _ -> f logger r
 
 let string_of_var_id_jac ?compil r dt =
+  let _ = compil in 
   "jacvar("^(string_of_int r)^","^(string_of_int dt)^")"
 
 let rate_name compil rule rule_id =
@@ -430,7 +469,9 @@ let empty_cache compil =
     cc_cache  = empty_cc_cache compil ;
     rule_cache = empty_lkappa_cache () ;
     representative_cache = empty_sym_cache () ;
-    seen = empty_seen_cache () ;
+    seen_pattern = empty_seen_cache () ;
+    seen_rule = empty_seen_cache () ;
+    seen_species = empty_seen_cache () ;
   }
 
 let mixture_of_init compil c =
@@ -507,17 +548,17 @@ let print_symmetries parameters compil symmetries =
 let add_equiv_class parameters compil cache red bwd_map species =
   let rule_cache = cache.rule_cache in
   let preenv = cache.cc_cache in
-  let seen = cache.seen in
+  let seen_species = cache.seen_species in
   let env = compil.environment in
-  let seen, rule_cache, preenv, bwd_map =
+  let seen_species, rule_cache, preenv, bwd_map =
       Symmetries.add_equiv_class parameters env
         nbr_automorphisms_in_chemical_species
-        seen rule_cache preenv
+        seen_species rule_cache preenv
       red bwd_map species
   in
   {cache with rule_cache = rule_cache ;
               cc_cache = preenv ;
-              seen = seen
+              seen_species = seen_species
   },
   bwd_map
 

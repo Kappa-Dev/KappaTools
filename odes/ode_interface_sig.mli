@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 03 2017>
+  * Last modification: Time-stamp: <May 12 2017>
 *)
 
 module type Interface =
@@ -168,9 +168,6 @@ sig
   compil ->
   cache ->
   chemical_species list ->
-  (*(string *
-   (connected_component array list,int) Alg_expr.e Locality.annot)
-    array ->*)
   (string list * (string * string) list) Mods.StringMap.t
     Mods.StringMap.t -> cache * Symmetries.symmetries
 
@@ -186,6 +183,11 @@ sig
     Remanent_parameters_sig.parameters ->
     compil -> cache -> Symmetries.reduction ->
     chemical_species -> cache * chemical_species
+
+  val equiv_class_of_pattern:
+  Remanent_parameters_sig.parameters ->
+  compil -> cache -> Symmetries.reduction ->
+  connected_component -> cache * (int * (connected_component * int) list)
 
   val bwd_interpretation:
     Remanent_parameters_sig.parameters ->
@@ -214,7 +216,7 @@ sig
     compil ->
     cache ->
     ?max_size:int ->
-    mixture -> 
+    mixture ->
     cache * bool
 
 end

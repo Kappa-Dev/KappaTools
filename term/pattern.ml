@@ -26,7 +26,7 @@ type t = cc
 type id = int
 
 let size_of_cc cc =
-  Mods.IntMap.fold (fun _ _ -> succ) cc.nodes 0 
+  Mods.IntMap.fold (fun _ _ -> succ) cc.nodes 0
 
 let compare_canonicals cc cc' = Mods.int_compare cc cc'
 

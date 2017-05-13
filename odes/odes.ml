@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 08 2017>
+  * Last modification: Time-stamp: <May 12 2017>
 *)
 
 let local_trace = false
@@ -172,49 +172,6 @@ struct
       has_empty_lhs: bool option;
       has_time_reaction: bool option;
     }
-
-
-  let has_pattern_in_expr expr =
-    Alg_expr.has_mix (fst expr)
-
-  let has_pattern_in_rules compil =
-    let list = I.get_rules compil in
-    List.exists
-      (fun rule ->
-         let mode = I.valid_modes compil rule 0 in
-         let tokens = I.token_vector rule in
-         List.exists
-           (fun mode ->
-              let rate = I.rate compil rule mode in
-              match rate with
-              | None -> false
-              | Some expr ->
-                (has_pattern_in_expr expr))
-           mode
-         ||
-         List.exists (fun (a,_) -> has_pattern_in_expr a) tokens
-      )
-      list
-
-  let has_pattern_in_var_declaration compil =
-    let decl = I.get_variables compil in
-    let n = Array.length decl in
-    let rec aux k =
-      if k=n then false
-      else
-        has_pattern_in_expr (snd (decl.(k)))
-        ||  aux (k+1)
-    in aux 0
-
-
-  let has_pattern_in_obs compil =
-    let obs = I.get_obs compil in
-    List.exists (fun a -> has_pattern_in_expr (Locality.dummy_annot a)) obs
-
-  let has_pattern_in_alg_expr compil  =
-    has_pattern_in_rules compil
-    || has_pattern_in_var_declaration compil
-    || has_pattern_in_obs compil
 
   let get_data network =
       network.n_rules,
@@ -528,7 +485,7 @@ struct
 
   let count_in_connected_component_fwd target compil network
       connected_component =
-    VarMap.fold
+    network, VarMap.fold
       (fun vars id alg ->
          match vars with
          | Token _ | Dummy -> alg
@@ -561,103 +518,32 @@ struct
 
   let count_in_connected_component_bwd target parameters compil network
       connected_component =
-    I.fold_bwd_map
-      (fun species _ alg ->
-         let from, cast =
-           from_nembed compil,
-           (fun id -> Nembed (I.canonic_form id))
-         in
-         let n_embs =
-           List.length
-             (I.find_embeddings compil connected_component species) in
-         if n_embs = 0 then alg
-         else
-           let _species_rep, species_rep_id, nauto_rep, num,den =
-             let class_desc =
-               I.bwd_interpretation
-                 parameters
-                 network.bwd_map
-                 network.sym_reduction
-                 species
-             in
-             match class_desc with
-             | None ->
-               begin
-                 match
-                   VarMap.find_option
-                     (cast species)
-                     network.id_of_ode_var
-                 with
-                 | None -> assert false
-                 | Some id ->
-                   let (_,nauto) = Mods.DynArray.get network.species_tab id in
-                   species, id, nauto,
-                   1, 1
-               end
-             | Some class_desc ->
-               let species_rep = I.class_representative class_desc in
-               let class_desc' =
-                 I.bwd_interpretation
-                   parameters
-                   network.bwd_map
-                   network.sym_reduction
-                   species_rep
-               in
-               match class_desc' with
-               | None ->
-                 begin
-                   match
-                     VarMap.find_option (cast species_rep) network.id_of_ode_var
-                   with
-                   | None -> assert false
-                   | Some id ->
-                     let (_,nauto) = Mods.DynArray.get network.species_tab id in
-                     species, id, nauto, 1, 1
-                 end
-               | Some class_desc' ->
-                 let num =
-                   class_desc.Symmetries.species_weight *
-                  class_desc.Symmetries.species_weight
-                 in
-                 let den =
-                   class_desc.Symmetries.class_weight *
-                   class_desc'.Symmetries.species_weight
-                 in
-                 let id' =
-                   VarMap.find_option
-                     (cast species_rep)
-                     network.id_of_ode_var
-                 in
-                 match id' with
-                 | None -> assert false
-                 | Some id' ->
-                   let (_,nauto) =
-                     Mods.DynArray.get network.species_tab id'
-                   in
-                   species_rep,id',nauto,num,den
-           in
-           let species = Locality.dummy_annot (Alg_expr.KAPPA_INSTANCE species_rep_id) in
-           let term =
-               target  compil
-                 (from
-                    (Alg_expr.mult (Alg_expr.int n_embs) species)
-                    nauto_rep)
-                 nauto_rep
-           in
-           let term =
-             if num = den then term
-             else
-               Alg_expr.mult
-                 (Alg_expr.div
-                    (Alg_expr.int num)
-                    (Alg_expr.int den))
-                 species
-             in
-             if fst alg = Alg_expr.CONST Nbr.zero then term
-             else Alg_expr.add alg term
-      )
-      network.bwd_map
-      (Alg_expr.const Nbr.zero)
+    let cache = network.cache in
+    let cache,(w,l) =
+      I.equiv_class_of_pattern parameters
+        compil
+        cache
+        network.sym_reduction
+        connected_component
+    in
+    let network = {network with cache = cache} in
+    let term network h wh =
+      let network, expr =
+        count_in_connected_component_fwd target compil network h
+      in
+      network,
+      Alg_expr.div (Alg_expr.mult (Alg_expr.int wh) expr) (Alg_expr.int w)
+    in
+    let rec aux list (network,expr) =
+      match list with
+      | [] -> network,expr
+      | (h,w)::tail ->
+        let network, term = term network h w in
+        aux tail (network,(Alg_expr.add term expr))
+    in
+    match l with
+    | [] -> network, Alg_expr.int 0
+    | (h,w)::tail ->  aux tail (term network h w)
 
   let nembed_of_connected_component
       parameters compil network
@@ -686,49 +572,63 @@ struct
       alg
     with
     | Alg_expr.BIN_ALG_OP (op, arg1, arg2 ),loc ->
-      Alg_expr.BIN_ALG_OP
-        (op, convert_alg_expr parameter compil network arg1,
-         convert_alg_expr parameter compil network arg2),loc
+      let network, output1 =
+        convert_alg_expr parameter compil network arg1
+      in
+      let network, output2 =
+        convert_alg_expr parameter compil network arg2
+      in
+      network, (Alg_expr.BIN_ALG_OP (op, output1, output2),loc)
     | Alg_expr.UN_ALG_OP (op, arg),loc ->
-      Alg_expr.UN_ALG_OP
-        (op, convert_alg_expr parameter compil network arg),loc
+      let network, output = convert_alg_expr parameter compil network arg in
+      network, (Alg_expr.UN_ALG_OP (op, output),loc)
     | Alg_expr.KAPPA_INSTANCE cc, _loc ->
       begin
-        let f x =
+        let f x network =
           Array.fold_left
-            (fun expr h ->
+            (fun (network,expr) h ->
+               let network,expr' =
+                 nocc_of_connected_component parameter compil network  h
+               in
+               network,
                Alg_expr.mult
                  expr
-                 (nocc_of_connected_component parameter compil network  h))
-            (Alg_expr.const Nbr.one)
+                 expr')
+            (network,Alg_expr.const Nbr.one)
             x
         in
         match cc with
-        | [] -> Alg_expr.const Nbr.zero
+        | [] -> network, Alg_expr.const Nbr.zero
         | head::tail ->
           List.fold_left
-            (fun acc l ->
-               Alg_expr.add
-                 acc
-                 (f l))
-            (f head)
+            (fun (network,acc) l ->
+               let network, expr = f l network in
+                   network,
+                   Alg_expr.add acc expr)
+            (f head network)
             tail
       end
     | Alg_expr.TOKEN_ID id, loc ->
       let id = snd (translate_token id ([],network)) in
-      Alg_expr.TOKEN_ID id, loc
+      network, (Alg_expr.TOKEN_ID id, loc)
     |  (  Alg_expr.ALG_VAR _
       | Alg_expr.CONST _
-      | Alg_expr.STATE_ALG_OP _),_ as a -> a
+       | Alg_expr.STATE_ALG_OP _),_ as a -> network, a
     | Alg_expr.IF (cond,yes,no),pos ->
-      Alg_expr.IF (convert_bool_expr parameter compil network cond,
-                   convert_alg_expr parameter compil network yes,
-                   convert_alg_expr parameter compil network no),pos
+      let network, outputb = convert_bool_expr parameter compil network cond in
+      let network, outputyes = convert_alg_expr parameter compil network yes in
+      let network, outputno = convert_alg_expr parameter compil network no in
+      network,
+      (Alg_expr.IF (outputb,
+                    outputyes,
+                    outputno),pos)
     | Alg_expr.DIFF_TOKEN(expr,dt),pos ->
-      Alg_expr.DIFF_TOKEN
-        (convert_alg_expr parameter compil network expr,
-              dt),pos
-    | Alg_expr.DIFF_KAPPA_INSTANCE(_expr,_dt),pos ->
+      let network, output =
+        convert_alg_expr parameter compil network expr
+      in
+      network,
+      (Alg_expr.DIFF_TOKEN (output,dt),pos)
+  | Alg_expr.DIFF_KAPPA_INSTANCE(_expr,_dt),pos ->
       (* TO DO ??? *)
       raise
         (ExceptionDefn.Internal_Error
@@ -736,15 +636,16 @@ struct
 
 
   and convert_bool_expr parameter compil network = function
-    | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> a
+    | (Alg_expr.TRUE | Alg_expr.FALSE),_ as a -> network, a
     | Alg_expr.COMPARE_OP (op,a,b),pos ->
-      Alg_expr.COMPARE_OP (op,
-                           convert_alg_expr parameter compil network a,
-                           convert_alg_expr parameter compil network b),pos
+      let network, outputa = convert_alg_expr parameter compil network a in
+      let network, outputb = convert_alg_expr parameter compil network b in
+      network, (Alg_expr.COMPARE_OP (op, outputa, outputb),pos)
     | Alg_expr.BOOL_OP (op,a,b),pos ->
-      Alg_expr.BOOL_OP (op,
-                        convert_bool_expr parameter compil network a,
-                        convert_bool_expr parameter compil network b),pos
+      let network, outputa = convert_bool_expr parameter compil network a in
+      let network, outputb = convert_bool_expr parameter compil network b in
+      network, (Alg_expr.BOOL_OP (op,outputa,outputb),pos)
+
   let add_reaction ?max_size
       parameters compil enriched_rule embedding_forest mixture remanent =
     let rule = enriched_rule.rule in
@@ -1110,7 +1011,10 @@ struct
 
   let convert_initial_state parameters compil intro network =
     let b,c,a = intro in
-    convert_alg_expr parameters compil network (b,a) ,
+    let network, expr_init =
+      convert_alg_expr parameters compil network (b,a)
+    in
+    expr_init,
     match I.token_vector_of_init c with
     | [] ->
       let m = I.mixture_of_init compil c in
@@ -1145,7 +1049,7 @@ struct
     let list, network =
       Tools.array_fold_lefti
         (fun i (list,network) def ->
-           let a,b = convert_var_def parameters compil network def in
+           let a,(network,b) = convert_var_def parameters compil network def in
            (Var (get_fresh_var_id network,Some a,b))::list,
            inc_fresh_var_id
              {network with
@@ -1295,10 +1199,14 @@ struct
     let network =
       List.fold_left
         (fun network obs ->
+           let network,expr_obs =
+             convert_alg_expr parameters compil network
+               (Locality.dummy_annot obs)
+           in
            inc_fresh_obs_id
              {network with
               obs = (get_fresh_obs_id network,
-                     convert_alg_expr parameters compil network (Locality.dummy_annot obs))
+                     expr_obs)
                     ::network.obs})
         network
         list_obs
@@ -1393,38 +1301,38 @@ struct
       init = List.rev decl.init}
 
   let split_rules parameters compil network sort_rules_and_decls =
-    let sort =
+    let network, sort =
       List.fold_left
-        (fun sort_rules enriched_rule ->
+        (fun (network,sort_rules) enriched_rule ->
            let rate =
              I.rate
                compil enriched_rule.rule enriched_rule.rule_id_with_mode
            in
            match rate with
-           | None -> sort_rules
+           | None -> network, sort_rules
            | Some rate ->
              let const_list = [] in
              let var_list = [] in
-             let rate = convert_alg_expr parameters compil network rate in
-             let const_list, var_list =
+             let network,rate = convert_alg_expr parameters compil network rate in
+             let network, const_list, var_list =
                if Ode_loggers_sig.is_expr_const rate
                then
-                 (R rate)::const_list, var_list
+                 network, (R rate)::const_list, var_list
                else
-                 const_list, (R rate)::var_list
+                 network, const_list, (R rate)::var_list
              in
              let vector =
                I.token_vector enriched_rule.rule
              in
-             let const_list, var_list, _ =
+             let network, const_list, var_list, _ =
                List.fold_left
-                 (fun (const_list, var_list, n) (expr,_) ->
-                    let rate = convert_alg_expr parameters compil network expr in
+                 (fun (network, const_list, var_list, n) (expr,_) ->
+                    let network, rate = convert_alg_expr parameters compil network expr in
                     if Ode_loggers_sig.is_expr_const rate
-                    then (S (n,rate))::const_list, var_list, n+1
-                    else const_list, (S (n,rate))::var_list, n+1
+                    then network, (S (n,rate))::const_list, var_list, n+1
+                    else network, const_list, (S (n,rate))::var_list, n+1
                  )
-                 (const_list, var_list, 1)
+                 (network, const_list, var_list, 1)
                  vector
              in
              let sort_rules =
@@ -1449,10 +1357,11 @@ struct
                            var_list)::sort_rules.var_rate
                  }
              in
-             sort_rules)
-        sort_rules_and_decls
+             network, sort_rules)
+        (network, sort_rules_and_decls)
         network.rules
     in
+    network,
     {sort
      with const_rate = List.rev sort.const_rate ;
           var_rate = List.rev sort.var_rate}
@@ -1545,21 +1454,6 @@ struct
     in
     let network =
       compute_reactions ?max_size ~dotnet ~smash_reactions parameters compil network rules initial_state
-    in
-    let has_pattern_in_alg_expr = has_pattern_in_alg_expr compil in
-    let network  =
-      if has_pattern_in_alg_expr then
-        match network.sym_reduction with
-        | Symmetries.Ground | Symmetries.Forward _
-          -> network
-        | Symmetries.Backward _ ->
-          let () = Format.printf "\t -compute equivalence classes @." in
-          let network =
-            compute_equivalence_classes
-              parameters compil network
-          in
-          network
-      else network
     in
     let () = Format.printf "\t -tokens @." in
     let network = convert_tokens compil network in
@@ -2110,7 +2004,7 @@ struct
                       handler_init
                   in
                   Sbml_backend.print_parameters
-                    I.string_of_var_id
+                    (fun x -> I.string_of_var_id x)
                     logger logger_buffer logger_err
                     Ode_loggers_sig.Time_scale_factor Nbr.one;
                   Sbml_backend.line_dotnet logger logger_err
@@ -3127,7 +3021,7 @@ struct
         inc_fresh_ode_var_id network
       else network
     in
-    let sorted_rules_and_decl =
+    let network, sorted_rules_and_decl =
       split_rules_and_decl parameters compil network
     in
     let () = Format.printf "+ exporting the network... @." in

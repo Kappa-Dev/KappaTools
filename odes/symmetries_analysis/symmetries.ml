@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Apr 04 2017>
+   * Last modification: Time-stamp: <May 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -16,6 +16,9 @@
 (******************************************************************)
 (*TYPE*)
 (******************************************************************)
+
+let local_trace = false
+
 
 type contact_map =
   ((string list) * (string*string) list)
@@ -177,9 +180,9 @@ let collect_partitioned_contact_map contact_map =
       (fun agent partition ->
          Symmetries_sig.print
            log
-           (fun agent fmt site ->
+           (fun _agent _fmt site ->
               Loggers.fprintf log "%s" site)
-           (fun fmt agent ->
+           (fun _fmt agent ->
               Loggers.fprintf log "%s" agent)
            agent
            partition
@@ -261,6 +264,8 @@ let translate_to_lkappa_representation env partitioned_contact_map =
       partitioned_contact_map
   in
   array
+
+
 
 let partition_pair cache p l =
   let rec part cache yes no = function
@@ -516,7 +521,7 @@ let cannonic_form_from_syntactic_rules
 (*detect_symmetries*)
 
 let check_invariance_gen
-    p ?parameters ?env ~to_be_checked ~counter ~correct ~rates
+    p ?parameters ?sigs ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     cache agent_type site1 site2 =
@@ -529,7 +534,7 @@ let check_invariance_gen
         to_be_checked.(id)
       then
         let (cache, counter, to_be_checked), b =
-          p ?parameters ?env ~agent_type ~site1 ~site2 rule ~correct
+          p ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
         if b then
@@ -542,36 +547,36 @@ let check_invariance_gen
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
 let check_invariance_internal_states
-    ~correct ~rates ?parameters ?env
+    ~correct ~rates ?parameters ?sigs
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_internal_state_permutation
-    ?parameters ?env
+    ?parameters ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_binding_states
-    ~correct ~rates ?parameters ?env
+    ~correct ~rates ?parameters ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_binding_state_permutation
-    ?parameters ?env
+    ?parameters ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_both
-    ~correct ~rates ?parameters ?env
+    ~correct ~rates ?parameters ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_full_permutation
-    ?parameters ?env
+    ?parameters ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
@@ -644,18 +649,21 @@ let print_symmetries_gen parameters env contact_map
          ()
       ) cannonic_list
 
-let detect_symmetries parameters env cache
+let detect_symmetries
+    (parameters:Remanent_parameters_sig.parameters)
+    env cache
     rate_convention
     chemical_species
     get_rules
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
   (*-------------------------------------------------------------*)
+  let sigs = Model.signatures env in
   let lkappa_rule_list =
     List.fold_left (fun current_list species ->
         let lkappa =
-          Patterns_extra.species_to_lkappa_rule parameters
-            env species
+          Patterns_extra.species_to_lkappa_rule ~parameters ~sigs
+            species
         in
         lkappa :: current_list
       ) [] chemical_species
@@ -707,18 +715,18 @@ let detect_symmetries parameters env cache
   (*-------------------------------------------------------------*)
   (*rules*)
   let (cache, _, _), refined_partitioned_contact_map =
-    let parameters, env = Some parameters, Some env in
+    let parameters = Some parameters in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
       (check_invariance_internal_states
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list)
+         ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_binding_states
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list)
+         ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_both
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list)
+         ~sigs ~correct ~rates hash_and_rule_list)
       p'
   in
   let refined_partitioned_contact_map =
@@ -731,20 +739,20 @@ let detect_symmetries parameters env cache
     Array.copy refined_partitioned_contact_map
   in
   let (cache, _, _), refined_partitioned_contact_map_init =
-    let parameters, env = Some parameters, Some env in
+    let parameters = Some parameters in
     let correct = correct_init in
     let rates = rates_init in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked_init, counter_init)
       (check_invariance_internal_states
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list_init)
+         ~sigs ~correct ~rates hash_and_rule_list_init)
       (check_invariance_binding_states
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list_init)
+         ~sigs  ~correct ~rates hash_and_rule_list_init)
       (check_invariance_both
          ?parameters
-         ?env ~correct ~rates hash_and_rule_list_init)
+         ~sigs ~correct ~rates hash_and_rule_list_init)
       refined_partitioned_contact_map_copy
   in
   let refined_partitioned_contact_map_init =
@@ -767,31 +775,31 @@ let detect_symmetries parameters env cache
              cache
              (fun cache agent_type site1 site2 ->
                 Pattern_group_action.is_pattern_invariant_internal_states_permutation
-                  parameters
-                  env
-                  agent_type
-                  site1
-                  site2
+                  ~parameters
+                  ~env
+                  ~agent_type
+                  ~site1
+                  ~site2
                   pid
                   cache
              )
              (fun cache agent_type site1 site2 ->
                 Pattern_group_action.is_pattern_invariant_binding_states_permutation
-                  parameters
-                  env
-                  agent_type
-                  site1
-                  site2
+                  ~parameters
+                  ~env
+                  ~agent_type
+                  ~site1
+                  ~site2
                   pid
                   cache
              )
              (fun cache agent_type site1 site2 ->
                 Pattern_group_action.is_pattern_invariant_full_states_permutation
-                  parameters
-                  env
-                  agent_type
-                  site1
-                  site2
+                  ~parameters
+                  ~env
+                  ~agent_type
+                  ~site1
+                  ~site2
                   pid
                   cache
              )
@@ -838,9 +846,28 @@ module CcSetMap = SetMap.Make(Cc)
 
 module CcMap = CcSetMap.Map
 
-type cache = Pattern.cc CcMap.t
+module CcId =
+struct
+  type t = Pattern.id
+  let compare = compare
+  let print _ _ = ()
+end
 
-let empty_cache () = CcMap.empty
+module CcIdSetMap = SetMap.Make(CcId)
+
+module CcIdMap = CcIdSetMap.Map
+
+type cache =
+  {
+    rep: Pattern.cc CcMap.t ;
+    equiv_class: (int * (Pattern.id * int) list) CcIdMap.t ;
+}
+
+let empty_cache () =
+  {
+    rep = CcMap.empty ;
+    equiv_class = CcIdMap.empty
+  }
 
 type class_description =
   {
@@ -860,26 +887,92 @@ type bwd_map = class_description CcMap.t
 
 let empty_bwd_map () = CcMap.empty
 
-let representative ?parameters signature cache rule_cache preenv_cache
+let representative ?parameters ~sigs cache rule_cache preenv_cache
     symmetries species =
   match symmetries with
   | Ground -> cache, rule_cache, preenv_cache, species
   | Forward sym | Backward sym ->
     begin
-      match CcMap.find_option species cache with
+      match CcMap.find_option species cache.rep with
       | Some species -> cache, rule_cache, preenv_cache, species
       | None ->
         let rule_cache, preenv_cache, species' =
           Pattern_group_action.normalize_species
             ?parameters
-            signature
+            ~sigs
             rule_cache
             preenv_cache
             sym
             species
         in
-        let cache  = CcMap.add species species' cache in
+        let cache  =
+          {cache with rep = CcMap.add species species' cache.rep}
+        in
         cache, rule_cache, preenv_cache, species'
+    end
+
+let equiv_class ?parameters env array cache rule_cache preenv_cache
+    symmetries pattern =
+  match symmetries with
+  | Ground -> cache, rule_cache, preenv_cache, array, (1, [pattern,1])
+  | Forward partitions | Backward partitions ->
+    begin
+      match CcIdMap.find_option pattern cache.equiv_class  with
+      | Some equiv_class -> cache, rule_cache, preenv_cache, array, equiv_class
+      | None ->
+      let partitions_internal_states a =
+        partitions.(a).Symmetries_sig.over_internal_states
+      in
+      let partitions_binding_states a =
+        partitions.(a).Symmetries_sig.over_binding_states
+      in
+      let partitions_full_states a =
+        partitions.(a).Symmetries_sig.over_full_states
+      in
+      let rule_cache, preenv_cache, array, equiv_class =
+        Pattern_group_action.equiv_class_of_a_pattern
+          ?parameters
+          ~env
+          ~partitions_internal_states
+          ~partitions_binding_states
+          ~partitions_full_states
+          rule_cache
+          preenv_cache
+          array
+          pattern
+      in
+      let w_list =
+        List.rev_map snd equiv_class
+      in
+      let lcm = Tools.lcm w_list in
+      let equiv_class =
+        List.rev_map
+          (fun (a,b) -> a,lcm/b)
+          equiv_class
+      in
+      let w =
+        List.fold_left
+          (fun w' (_,w) -> w' + w)
+          0
+          equiv_class
+      in
+      let equiv_class_w  = w,equiv_class in
+      let equiv_class_map =
+        List.fold_left
+          (fun equiv_class_map (id,_) ->
+             let () =
+               if local_trace || !Parameter.debugModeOn
+               then
+                 let _ = Pattern.id_to_yojson id in ()
+             in
+             CcIdMap.add id equiv_class_w equiv_class_map )
+          cache.equiv_class
+          equiv_class
+      in
+      {cache
+       with
+        equiv_class = equiv_class_map},
+      rule_cache, preenv_cache, array,  (w,equiv_class)
     end
 
 let print_symmetries parameters env symmetries =
@@ -930,6 +1023,7 @@ let add_equiv_class
     match reduction with
     | Ground | Forward _ -> seen, rule_cache, preenv_cache, [cc,1]
     | Backward partitions ->
+      let sigs = Model.signatures env in
       let partitions_internal_states a =
         partitions.(a).Symmetries_sig.over_internal_states
       in
@@ -945,7 +1039,7 @@ let add_equiv_class
         seen,
         equiv_class =
         Pattern_group_action.equiv_class_of_a_species
-          ~parameters ~env
+          ~parameters ~sigs
           ~partitions_internal_states
           ~partitions_binding_states
           ~partitions_full_states
@@ -1000,7 +1094,7 @@ let fold_bwd_map f bwd_map accu =
     bwd_map accu
 
 let bwd_interpretation ?parameters bwd_map reduction cc =
-  match reduction
-  with
+  let _ = parameters in
+  match reduction with
   | Ground | Forward _ -> Some (dummy_class cc)
   | Backward _ ->  CcMap.find_option cc bwd_map
