@@ -3072,7 +3072,6 @@ struct
 
 let compute_symmetries_from_model parameters compil network
     contact_map =
-  let () = Format.printf "+ compute symmetric sites... @." in
   (********************************************************)
   (*initial_states*)
   let network, chemical_species =

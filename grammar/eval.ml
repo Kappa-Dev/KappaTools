@@ -483,8 +483,13 @@ let init_kasa called_from sigs result =
   translate_contact_map sigs contact_map,
   Export_to_KaSim.flush_errors kasa_state
 *)
-let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?overwrite_init
+let compile ~outputs ?outputs' ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?overwrite_init
     ?rescale_init sigs_nd tk_nd contact_map result =
+  let outputs' =
+    match outputs' with
+    | None -> outputs
+    | Some outputs' -> outputs'
+  in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
@@ -512,10 +517,10 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
   let preenv,obs =
     obs_of_result ?bwd_bisim ~compileModeOn contact_map preenv result in
 
-  outputs (Data.Log "\t -update_domain construction");
+  outputs' (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain,dom_stats = Pattern.finalize ~max_sharing preenv contact_map in
-  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
+  outputs' (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.nav_steps^
                      " navigation steps"));

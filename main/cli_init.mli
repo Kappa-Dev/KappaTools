@@ -11,6 +11,7 @@ type directive_unit = Time | Event
 val get_compilation :
   ?unit:directive_unit -> ?max_sharing:bool ->
   ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
+  ?quiet:bool -> 
   ?compileModeOn:bool -> Run_cli_args.t ->
   (Configuration.t * Counter.progressBar * Model.t * Contact_map.t * int list *
    (bool*bool*bool) option * string * string option *
