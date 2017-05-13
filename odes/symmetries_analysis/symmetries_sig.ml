@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Mar 13 2017>
+   * Last modification: Time-stamp: <May 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -20,6 +20,9 @@ type 'a site_partition =
       over_internal_states: 'a list list ;
       over_full_states: 'a list list ;
     }
+
+type bwd_bisim_info =
+  int site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)
 
 let empty =
   {
