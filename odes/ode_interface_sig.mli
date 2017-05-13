@@ -127,6 +127,7 @@ sig
 
   val get_compil:
     ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
+    ?quiet:bool -> 
     rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> compil

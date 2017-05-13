@@ -9,21 +9,28 @@
 type directive_unit = Time | Event
 
 let get_compilation
-    ?(unit=Time) ?(max_sharing=false) ?bwd_bisim ?(compileModeOn=false)
+    ?(unit=Time) ?(max_sharing=false) ?bwd_bisim ?(quiet=false) ?(compileModeOn=false)
     cli_args =
   let (conf, progressConf, env0, contact_map, updated_vars, story_compression,
        formatCflows, cflowFile, init_l),
       alg_overwrite,overwrite_t0 =
     match cli_args.Run_cli_args.marshalizedInFile with
     | "" ->
+      let fmt =
+        if quiet
+        then (Format.make_formatter
+                (fun _ _ _ -> ())
+                (fun _ -> ()))
+        else Format.std_formatter
+      in
       let result =
-        List.fold_left (KappaLexer.compile Format.std_formatter)
+        List.fold_left (KappaLexer.compile fmt)
           Ast.empty_compil cli_args.Run_cli_args.inputKappaFileNames in
-      let () = Format.printf "+ simulation parameters@." in
+      let () = if quiet then () else Format.printf "+ simulation parameters@." in
       let conf, progressConf,
           (n,w,s as story_compression), formatCflow, cflowFile =
         Configuration.parse result.Ast.configurations in
-      let () = Format.printf "+ Sanity checks@." in
+      let () = if quiet then () else Format.printf "+ Sanity checks@." in
       let new_syntax =
         (cli_args.Run_cli_args.newSyntax || conf.Configuration.newSyntax) in
       let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
@@ -42,10 +49,18 @@ let get_compilation
                ~new_syntax sigs_nd contact_map tk_nd.NamedDecls.finder
                alg_finder compil.Ast.init),
           conf.Configuration.initial in
-      let () = Format.printf "+ Compiling...@." in
+      let () = if quiet then () else Format.printf "+ Compiling...@." in
+      let outputs,outputs' =
+        if quiet then
+          let sigs = Signature.create [||] in
+          (fun _ -> ()),
+          Some (Outputs.go sigs)
+        else
+          Outputs.go (Signature.create [||]), None
+      in
       let (env, has_tracking,init_l) =
         Eval.compile
-          ~outputs:(Outputs.go (Signature.create [||]))
+          ~outputs ?outputs'
           ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
           ?rescale_init:cli_args.Run_cli_args.rescale
           ?overwrite_init ?bwd_bisim ~compileModeOn

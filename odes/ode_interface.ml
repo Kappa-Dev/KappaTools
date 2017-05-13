@@ -388,10 +388,10 @@ let get_obs_titles compil =
     env
 
 let get_compil
-    ?bwd_bisim
+    ?bwd_bisim ?quiet:(quiet=false)
     ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
-    Cli_init.get_compilation ?bwd_bisim cli_args in
+    Cli_init.get_compilation ?bwd_bisim ~quiet cli_args in
   {
     environment = env ;
     contact_map = contact_map ;
