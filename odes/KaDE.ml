@@ -202,9 +202,13 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         let module Export_to_kade =
           (val export_to_kade : Export_to_KaDE.Type)
         in
+        let () = Format.printf "+ compute symmetric sites... @." in
         let kasa_compil =
           List.fold_left
-            (KappaLexer.compile Format.std_formatter)
+            (KappaLexer.compile
+               (Format.make_formatter
+               (fun _ _ _ -> ())
+               (fun _ -> ())))
             Ast.empty_compil
             cli_args.Run_cli_args.inputKappaFileNames
         in
@@ -248,8 +252,10 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             let bwd_bisim =
               A.init_bwd_bisim_info compil network
             in
+            let quiet = true in
+            let () = Format.printf "+ completing the domain with ~-equivalent patterns... @." in
             let compil =
-              A.get_compil ?bwd_bisim
+              A.get_compil ?bwd_bisim ~quiet
                 ~rate_convention ~show_reactions ~count ~compute_jacobian
                 cli_args
             in

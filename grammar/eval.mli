@@ -30,7 +30,7 @@ val compile_modifications_no_track:
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile :
-  outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
+  outputs:(Data.t -> 'a) -> ?outputs':(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
           (Alg_expr.t * Primitives.elementary_rule * Locality.t) list -> 'b) ->
   max_sharing:bool ->

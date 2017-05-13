@@ -447,7 +447,7 @@ let compile_rules alg_deps ?bwd_bisim ~compileModeOn contact_map domain rules =
     List.fold_left
       (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (_,rule) ->
          let (domain',origin',extra_unary_cc,cr) =
-           rules_of_ast ?deps_machinery ~compileModeOn contact_map domain
+           rules_of_ast ?deps_machinery ?bwd_bisim ~compileModeOn contact_map domain
              ~syntax_ref short_branch_agents rule in
          (domain',succ syntax_ref,origin',
           Pattern.Set.union unary_cc extra_unary_cc,
@@ -498,8 +498,14 @@ let init_kasa called_from sigs result =
   Export_to_KaSim.flush_errors kasa_state
 *)
 
-let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn
+let compile
+    ~outputs ?outputs' ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn
     ?rescale_init sigs_nd tk_nd contact_map result =
+  let outputs' =
+    match outputs' with
+    | None -> outputs
+    | Some outputs' -> outputs'
+  in
   outputs (Data.Log "+ Building initial simulation conditions...");
   let preenv = Pattern.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
@@ -527,10 +533,10 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn
   let preenv,obs =
     obs_of_result ?bwd_bisim ~compileModeOn contact_map preenv result in
 
-  outputs (Data.Log "\t -update_domain construction");
+  outputs' (Data.Log "\t -update_domain construction");
   pause @@ fun () ->
   let domain,dom_stats = Pattern.finalize ~max_sharing preenv contact_map in
-  outputs (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
+  outputs' (Data.Log ("\t "^string_of_int dom_stats.Pattern.PreEnv.nodes^
                      " (sub)observables "^
                      string_of_int dom_stats.Pattern.PreEnv.nav_steps^
                      " navigation steps"));
