@@ -66,7 +66,11 @@ val num_of_token : string Locality.annot -> t -> int
 val nums_of_rule : string -> t -> int list
 
 val print_ast_rule : ?env:t -> Format.formatter -> int -> unit
+(** The int is the ast_rule_id *)
+
 val print_rule : ?env:t -> Format.formatter -> int -> unit
+(** Same as above but the int is this time the rule_id *)
+
 val print_agent : ?env:t -> Format.formatter -> int -> unit
 val print_alg : ?env:t -> Format.formatter -> int -> unit
 val print_token : ?env:t -> Format.formatter -> int -> unit

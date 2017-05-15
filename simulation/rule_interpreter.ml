@@ -544,7 +544,7 @@ let store_activity store env counter state id syntax_id rate cc_va =
                "At t=%.2f %sctivity of rule %a has become negative (%f)"
                (Counter.current_time counter)
                (if unary then "Unary " else "")
-               (Model.print_ast_rule ~env) syntax_id act),
+               (Model.print_rule ~env) id act),
             Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
   store id syntax_id act
 

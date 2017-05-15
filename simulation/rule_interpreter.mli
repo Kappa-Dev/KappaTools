@@ -50,10 +50,16 @@ side to do apply the rule and returns the remaining exact injections. *)
 val adjust_rule_instances :
   rule_id:int -> (int -> int -> float -> unit) ->
   Model.t -> Counter.t -> t -> Primitives.elementary_rule -> t
+(** Compute the exact number of instances of rule [rule_id]
+
+    Said differently: unplug rectangular approximation for [rule_id]
+    (up to the next application of a rule impacting the number of
+    instances of [rule_id] *)
 
 val adjust_unary_rule_instances :
   rule_id:int -> (int -> int -> float -> unit) ->
   Model.t -> Counter.t -> t -> Primitives.elementary_rule -> t
+(** Compute the exact number of unary instances of rule [rule_id] *)
 
 val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
 

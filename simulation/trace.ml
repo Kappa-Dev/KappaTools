@@ -76,8 +76,7 @@ let print_event_kind ?env f x =
     match x with
     | PERT s -> Format.pp_print_string f s
     | RULE r_id ->
-      Model.print_ast_rule ~env f
-        (Model.get_rule env r_id).Primitives.syntactic_rule
+      Model.print_rule ~env f r_id
     | INIT s ->
       Format.fprintf
         f "Intro @[<h>%a@]"
@@ -87,7 +86,7 @@ let print_event_kind_dot_annot env f = function
   | RULE r_id  ->
     Format.fprintf
       f "[label=\"%a\", shape=%s, style=%s, fillcolor = %s]"
-      (Model.print_ast_rule ~env) (Model.get_rule env r_id).Primitives.syntactic_rule
+      (Model.print_rule ~env) r_id
       "invhouse" "filled" "lightblue"
   | INIT s ->
     Format.fprintf
@@ -214,8 +213,7 @@ let print_label_of_step ?env f x =  match env with
   | Some env -> match x with
       | Subs _ -> ()
       | Rule (x,_,_) ->
-         let ast_x = Model.get_rule env x in
-         Model.print_ast_rule ~env f ((ast_x).Primitives.syntactic_rule)
+         Model.print_rule ~env f x
       | Pert (x,_,_) -> Format.pp_print_string f x
       | Init a ->
          let l = get_types_from_init a in
