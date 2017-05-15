@@ -355,8 +355,8 @@ let close ?event () =
   let () = close_input ?event () in
   close_desc ()
 
-let initial_inputs conf env contact_map init =
-  let inputs = Kappa_files.open_out_fresh "inputs" "" "ka" in
+let initial_inputs conf env contact_map init ~filename =
+  let inputs = Kappa_files.open_out_fresh filename "" "ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () = Format.fprintf inputs_form "# \"uuid\" : \"%i\"@." uuid in
   let () = Format.fprintf inputs_form

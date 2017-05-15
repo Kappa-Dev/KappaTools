@@ -197,18 +197,21 @@ let () =
       conf.Configuration.deltaActivitiesFileName in
     let () =
       if not kasim_args.Kasim_args.compileMode then
-        Outputs.initial_inputs
-          {Configuration.seed = Some theSeed;
-           Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
-           Configuration.deltaActivitiesFileName;
-           Configuration.traceFileName = user_trace_file;
-           Configuration.newSyntax = true;
-           Configuration.initial =
-             if Tools.float_is_zero (Counter.init_time counter) then None
-             else Some (Counter.init_time counter);
-           Configuration.plotPeriod = Some (Counter.plot_period counter);
-           Configuration.outputFileName = Some plot_file;}
-          env contact_map init_l in
+        match kasim_args.Kasim_args.logFile with
+        | None -> ()
+        | Some filename ->
+          Outputs.initial_inputs
+            {Configuration.seed = Some theSeed;
+             Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
+             Configuration.deltaActivitiesFileName;
+             Configuration.traceFileName = user_trace_file;
+             Configuration.newSyntax = true;
+             Configuration.initial =
+               if Tools.float_is_zero (Counter.init_time counter) then None
+               else Some (Counter.init_time counter);
+             Configuration.plotPeriod = Some (Counter.plot_period counter);
+             Configuration.outputFileName = Some plot_file;}
+            env contact_map init_l ~filename in
 
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
