@@ -1,7 +1,7 @@
 #!/bin/sh
 
 HISTORYFILE=/tmp/ocamldebug-KaSim_history
-BUILDROOT=${KAPPABIN}../_build/
+BUILDROOT=${KAPPABIN}/
 
 EXEC=$1
 shift;

@@ -479,16 +479,16 @@ port_expression:
 	 { Ast.Port
 	   {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$5;
 	    Ast.port_int_mod = Some($4,rhs_pos 4); Ast.port_lnk_mod = $6; } }
-    | ID counter_test PLUS EQUAL INT
-         { Ast.Counter
-	   { Ast.count_nme = ($1,rhs_pos 1);
-	   Ast.count_test = $2;
-	   Ast.count_delta = ($5,rhs_pos 5)} }
     | ID PLUS EQUAL INT
          { Ast.Counter
 	   { Ast.count_nme = ($1,rhs_pos 1);
 	   Ast.count_test = None;
 	   Ast.count_delta = ($4,rhs_pos 4)} }
+    | ID counter_test PLUS EQUAL INT
+         { Ast.Counter
+	   { Ast.count_nme = ($1,rhs_pos 1);
+	   Ast.count_test = $2;
+	   Ast.count_delta = ($5,rhs_pos 5)} }
     | ID counter_test
          { Ast.Counter
 	   { Ast.count_nme = ($1,rhs_pos 1);

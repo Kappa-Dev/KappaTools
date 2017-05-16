@@ -33,7 +33,7 @@ type rule_mixture = rule_agent list
 type rule_agent_counters =
   {
     ra : rule_agent;
-    ra_counters : (Ast.counter * switching) list;
+    ra_counters : (Ast.counter * switching) array;
   }
 
 type 'agent rule =
@@ -577,6 +577,14 @@ let of_raw_mixture x =
          ra_syntax = Some (Array.copy ports, Array.copy internals); })
     x
 
+let incr_agent sigs =
+  let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in
+  let incr = Signature.get sigs id in
+  let arity = Signature.arity sigs id in
+  let after = Signature.num_of_site ("a",Locality.dummy) incr in
+  let before = Signature.num_of_site ("b",Locality.dummy) incr in
+  (id,arity,before,after)
+
 let annotate_dropped_agent
     ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -649,7 +657,17 @@ let annotate_dropped_agent
            raise (ExceptionDefn.Malformed_Decl
                     ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
-  let ra_counters = List.map (fun c -> (c,Erased)) counts in
+  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let _ =
+    List.fold_left
+      (fun pset c ->
+        let p_na = c.Ast.count_nme in
+        let p_id = Signature.num_of_site ~agent_name p_na sign in
+        let pset' = Mods.IntSet.add p_id pset in
+        let () = if pset == pset' then
+             several_occurence_of_site agent_name c.Ast.count_nme in
+        let () = ra_counters.(p_id) <-(c,Erased) in pset')
+      Mods.IntSet.empty counts in
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
@@ -804,7 +822,17 @@ let annotate_edit_agent
     (links_annot',pset') in
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
-  let ra_counters = List.map (fun c -> (c,Maintained)) counts in
+  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let _ =
+    List.fold_left
+      (fun pset c ->
+        let p_na = c.Ast.count_nme in
+        let p_id = Signature.num_of_site ~agent_name p_na sign in
+        let pset' = Mods.IntSet.add p_id pset in
+        let () = if pset == pset' then
+             several_occurence_of_site agent_name c.Ast.count_nme in
+        let () = ra_counters.(p_id) <-(c,Erased) in pset')
+      Mods.IntSet.empty counts in
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
@@ -812,7 +840,7 @@ let annotate_edit_agent
 
 
 let annotate_agent_with_diff
-    sigs ?contact_map (agent_name, _ as ag_ty) links_annot lp rp lc rc =
+    sigs ?contact_map (agent_name, pos as ag_ty) links_annot lp rp lc rc =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -944,9 +972,9 @@ although it is left unpecified in the left hand side"
                 "' is underspecified on the right hand side", pos))
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
       several_internal_states pos in
-  let find_in_r (na,pos) rp f =
+  let find_in_r (na,pos) rp =
     let (p',r) =
-      List.partition (fun p -> String.compare (f p) na = 0) rp in
+      List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
     | [] -> not_enough_specified agent_name (na,pos)
@@ -962,7 +990,7 @@ although it is left unpecified in the left hand side"
          let () = forbid_modification p_pos p.Ast.port_lnk_mod in
          let () = forbid_modification p_pos p.Ast.port_int_mod in
 
-         let p',rp' = find_in_r p_na rp (fun p -> fst p.Ast.port_nme) in
+         let p',rp' = find_in_r p_na rp in
          let annot' = register_port_modif
              p_id p.Ast.port_lnk p' annot in
          let () = register_internal_modif p_id p.Ast.port_int p' in
@@ -975,25 +1003,38 @@ although it is left unpecified in the left hand side"
          let () = register_internal_modif p_id [] p in
          register_port_modif p_id [Locality.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
-  let register_counter_modif count_nme count_test count_delta =
+
+  let register_counter_modif count_nme count_test count_delta c_id =
+    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    let () = add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
     ({Ast.count_nme; Ast.count_delta; Ast.count_test}, Maintained) in
-  let (rc_r,_,ra_counters) =
+  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let rc_r,_ =
     List.fold_left
-      (fun (rc,cset,acc) c ->
-        let c_na = c.Ast.count_nme in
+      (fun (rc,cset) c ->
+        let (na,_) as c_na = c.Ast.count_nme in
         let c_id = Signature.num_of_site ~agent_name c_na sign in
         let cset' = Mods.IntSet.add c_id cset in
         let () = if cset == cset' then
                    several_occurence_of_site agent_name c_na in
-        let c',rc' = find_in_r c_na rc (fun p -> fst p.Ast.count_nme) in
+        let c',rc' =
+          List.partition
+            (fun p -> String.compare (fst p.Ast.count_nme) na = 0) rc in
         let c'' =
-          register_counter_modif c.Ast.count_nme c.Ast.count_test
-                                 c'.Ast.count_delta in
-        (rc',cset',c''::acc)) (rc,Mods.IntSet.empty,[]) lc in
-  let ra_counters =
-    (List.map
-      (fun c -> register_counter_modif c.Ast.count_nme None c.Ast.count_delta)
-      rc_r)@ra_counters in
+          match c' with
+          | [c'] ->
+             register_counter_modif
+               c.Ast.count_nme c.Ast.count_test c'.Ast.count_delta c_id
+          | [] ->
+             register_counter_modif
+               c.Ast.count_nme c.Ast.count_test (0,Locality.dummy) c_id
+          | _ :: _ -> several_occurence_of_site agent_name c_na in
+        let () = ra_counters.(c_id) <- c'' in
+        (rc',cset')) (rc,Mods.IntSet.empty) lc in
+  let _ =
+    if not(rc_r =[]) then
+      raise (ExceptionDefn.Internal_Error
+               ("Counters in "^agent_name^" should have tests by now",pos)) in
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals;ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
@@ -1397,8 +1438,8 @@ let assemble_rule ~syntax_version ~r_editStyle
         un_rate;
   }
 
-let create_t ast_sites =
-  let ast_intf,_ = separate_sites ast_sites in
+let create_t ast_intf =
+  (*let ast_intf,_ = separate_sites ast_sites in*)
   NamedDecls.create (
     Tools.array_map_of_list
       (fun p ->
@@ -1412,27 +1453,218 @@ let create_t ast_sites =
                           ("Forbidden link status inside a definition of signature",
                            pos))
                | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc) [] p.Ast.port_lnk))
-      ) ast_intf)
+      ) (ast_intf))
 
-let create_sig l =
+(*
+let counters_to_ports ag_na counters before_links =
+  let annot = Locality.dummy in
+  List.fold_left
+    (fun (intf,count) c ->
+      let links_to_counter = Ast.LNK_TYPE (c.Ast.count_nme,ag_na),annot in
+      {Ast.port_nme = c.Ast.count_nme; port_int = [];port_int_mod =None;
+       port_lnk=[];
+       port_lnk_mod = None}::intf,
+      links_to_counter::count)
+    ([],before_links) counters
+  let (l',before_links') =
+    List.fold_left
+      (fun (acc,before_links) (name,intf,r) ->
+        let ports,counters = separate_sites intf in
+        let ports',before_links' =
+          counters_to_ports name counters before_links in
+        (name,ports@ports',r)::acc,before_links') ([],[]) l in
+  let after =
+    {Ast.port_nme=("a",annot);Ast.port_int=[];Ast.port_int_mod =None;
+     Ast.port_lnk=[(Ast.LNK_TYPE (("b",annot),("__incr",annot))),annot];
+     Ast.port_lnk_mod=None} in
+  let before =
+    {Ast.port_nme=("b",Locality.dummy);Ast.port_int=[];Ast.port_int_mod =None;
+     Ast.port_lnk=
+       (Ast.LNK_TYPE (("a",annot),("__incr",annot)),annot)::before_links';
+     Ast.port_lnk_mod=None} in*)
+
+let counters_to_ports counters =
+  List.map
+    (fun c ->
+      {Ast.port_nme = c.Ast.count_nme; port_int = [];port_int_mod =None;
+       port_lnk=[];port_lnk_mod = None}) counters
+
+let create_sig_for_counters l with_counters =
+  let l'=
+    List.map
+      (fun (name,intf,r) ->
+        let ports,counters = separate_sites intf in
+        let ports' = counters_to_ports counters in
+        name,ports@ports',r)  l in
+  if (with_counters) then
+    let annot = Locality.dummy in
+    let after =
+      {Ast.port_nme=("a",annot);Ast.port_int=[];Ast.port_int_mod =None;
+       Ast.port_lnk=[];Ast.port_lnk_mod=None} in
+    let before =
+      {Ast.port_nme=("b",Locality.dummy);Ast.port_int=[];Ast.port_int_mod =None;
+       Ast.port_lnk=[];Ast.port_lnk_mod=None} in
+    let counter_agent =
+      (("__incr",Locality.dummy),[after;before],None) in
+    counter_agent::l'
+  else l'
+
+let create_sig l with_counters =
   Tools.array_map_of_list
-    (fun (name,intf,_) -> (name,create_t intf)) l
+    (fun (name,intf,_) -> (name,create_t intf))
+    (create_sig_for_counters l with_counters)
 
-let remove_counters rules =
-  let list_rem_counts = List.map (fun ag -> ag.ra) in
+let make_counter_agent
+      (first,dst) (last,equal) (ra_type,arity,incr_b,incr_a) i j =
+  let ra_ports =
+    Array.make arity ((Ast.LNK_FREE, Locality.dummy), Maintained) in
+  let before =
+    if first then Ast.LNK_VALUE (i,dst), Locality.dummy
+    else Ast.LNK_VALUE (i,(ra_type,incr_a)), Locality.dummy in
+  let () = ra_ports.(incr_b) <- (before,Maintained) in
+  let after =
+    if (last&&equal) then Ast.LNK_FREE, Locality.dummy
+    else
+      if last then Ast.LNK_ANY, Locality.dummy
+      else Ast.LNK_VALUE (j,(ra_type,incr_b)), Locality.dummy in
+  let () = ra_ports.(incr_a) <- (after,Maintained) in
+  let ra_ints = Array.make arity I_ANY in
+  {ra_type; ra_erased = false; ra_ports; ra_ints;
+   ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
+
+let counter_becomes_port
+      i j (delta,pos') pos equal lnk_nb ra
+      ((incr_type,_,incr_b,_) as incr_info) =
+  let increment_agents nb delta ag_info equal lnk_nb =
+    let rec link_incr i =
+      if (i=nb) then []
+      else
+        let first = (i=0) in
+        let last = (i = (nb-1)) in
+        let ra_agent =
+          make_counter_agent
+            (first,ag_info) (last,equal) incr_info (lnk_nb+i) (lnk_nb+i+1) in
+        ra_agent::(link_incr (i+1)) in
+
+    let rec erase_incr i lnk_nb = function
+      | hd::tl ->
+         if (i = abs(delta)) then
+           let () =
+             let (before,_) = hd.ra_ports.(incr_b) in
+             hd.ra_ports.(incr_b) <-
+               before, Linked (lnk_nb+abs(delta), Locality.dummy) in
+           hd::tl
+         else
+           let ag = {hd with ra_erased = true} in
+           ag::(erase_incr (i+1) lnk_nb tl)
+      | [] -> [] in
+
+    let add_incr = link_incr 0 in
+    let adjust_delta =
+      if (delta<0) then erase_incr 0 lnk_nb add_incr else add_incr in
+    (adjust_delta,[]) in
+
+  let incrs = increment_agents j delta (i,ra.ra_type) equal lnk_nb in
+  let switch =
+    if (delta = 0) then Maintained
+    else
+      let diff = j+delta in
+      if (diff = 0) then Freed
+      else
+        if (diff >0) then Linked (lnk_nb+abs(delta), pos')
+        else
+          raise (ExceptionDefn.Internal_Error
+                   ("Counter test should be strictly greater
+                     then abs(delta) when delta is negative",pos')) in
+  let p = (Ast.LNK_VALUE (lnk_nb,(incr_b,incr_type)),pos),switch in
+  let () = ra.ra_ports.(i) <- p in
+  incrs
+
+(* ag - agents with counters in a rule
+   lnk_nb - the max link number used in the rule;
+   incr_info - info on the incr agent from the signature
+   returns: agents with explicit counters; created agents;
+            the next link number to use *)
+let remove_counter_agent ag lnk_nb incr_info =
+  let ports = ag.ra.ra_ports in
+  let (incrs,lnk_nb') =
+    Tools.array_fold_lefti
+    (fun i (acc_incrs,lnk_nb) (counter,switch) ->
+      let (s,pos) = counter.Ast.count_nme in
+      if (s = "") then (acc_incrs,lnk_nb)
+      else
+        match (counter.Ast.count_test,counter.Ast.count_delta) with
+        | (None,_) ->
+           raise (ExceptionDefn.Internal_Error
+                    ("Counter "^s^" should have a test by now",pos))
+        | (Some (test,pos)), (delta,_) ->
+           match test with
+           | Ast.CEQ j ->
+              if (j=0) then
+                let p = (Ast.LNK_FREE,pos),switch in
+                let () = ports.(i) <- p in
+                (acc_incrs,lnk_nb)
+              else
+                (counter_becomes_port
+                   i j (counter.Ast.count_delta) pos true lnk_nb ag.ra
+                   incr_info)::acc_incrs,
+                (lnk_nb+j+delta)
+           | Ast.CGTE j ->
+              (counter_becomes_port
+                 i j (counter.Ast.count_delta) pos false lnk_nb ag.ra
+                 incr_info)::acc_incrs,
+              (lnk_nb+j+delta)
+           | Ast.CVAR _ ->
+              raise (ExceptionDefn.Internal_Error
+                       ("Counter "^s^" should not have a var by now",pos)))
+    ([],lnk_nb) ag.ra_counters in
+  let (als,bls) =
+    List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
+  (als,bls,lnk_nb')
+
+let remove_counter_rule mix created sigs with_counters contact_map =
+  if (with_counters) then
+    let lnk_nb =
+      List.fold_left
+        (fun max ag ->
+          Array.fold_left
+            (fun max ((lnk,_),switch) ->
+              let max' =
+                match lnk with
+                  Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
+                | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
+                  | Ast.LNK_TYPE _ -> max in
+              match switch with
+              | Linked (i,_) ->  if (max'<i) then i else max'
+              | Freed | Maintained | Erased -> max)
+            max ag.ra.ra_ports) 0 mix in
+    let ((incr_id,_,incr_b,incr_a) as incr_info) = incr_agent sigs in
+    let () = add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
+    let (incrs,incrs_created,ra_mix,_) =
+      List.fold_left
+        (fun (a,b,c,d) ag ->
+          let (a',b',d') = remove_counter_agent ag d incr_info in
+          a'@a,b'@b,ag.ra::c,d')
+        ([],[],[],lnk_nb+1) mix in
+    (ra_mix@incrs,created@incrs_created)
+  else (List.map (fun ag -> ag.ra) mix,[])
+
+let remove_counters rules sigs with_counters contact_map =
   List.map
     (fun (s,(r,a)) ->
-      let r_mix = list_rem_counts r.r_mix in
+      let (r_mix,_) =
+        remove_counter_rule
+          r.r_mix r.r_created sigs with_counters contact_map in
       let r' = {r with r_mix} in
       (s,(r',a))) rules
 
 let compil_of_ast ~syntax_version overwrite c =
-  let c' = Ast.compile_counters c in
+  let (c,with_counters) = Ast.compile_counters c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then Ast.implicit_signature c
     else c in
-  let sigs = Signature.create (create_sig c.Ast.signatures) in
+  let sigs = Signature.create (create_sig c.Ast.signatures with_counters) in
   let contact_map =
     Array.init
       (Signature.size sigs)
@@ -1440,6 +1672,8 @@ let compil_of_ast ~syntax_version overwrite c =
           (fun s -> (Tools.recti
                        (fun a k -> k::a) []
                        (Signature.internal_states_number i s sigs),[]))) in
+(*  let () =  Format.printf "sigs@.@.%a"
+            Signature.print sigs in*)
   let (name_pack,var_pack,cleaned_rules) =
     List.fold_right
       name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
@@ -1486,7 +1720,27 @@ let compil_of_ast ~syntax_version overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
-  let rules = remove_counters rules in
+  let rules = remove_counters rules sigs with_counters contact_map in
+  (*
+  let () =
+    Format.printf "lkappa rules@.@.";
+    List.iter (fun (s,(r,_)) ->
+                let label = match s with None -> "" | Some (l,_) -> l in
+                Format.printf
+                  "@.%s = %a" label
+                  (print_rule ~full:true sigs (fun _ _ -> ()) (fun _ _ -> ())) r)
+              rules in
+  let () =  Format.printf "contact map@.@.";
+            Array.iteri
+              (fun i ar ->
+                Array.iteri
+                  (fun j (ints,links) ->
+                    Format.printf "[%d][%d] = (" i j;
+                    List.iter (Format.printf "%d, ") ints;
+                    Format.printf "); links= ";
+                    List.iter (fun (a,b) -> Format.printf "(%d,%d)" a b) links)
+                  ar) contact_map in*)
+
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =

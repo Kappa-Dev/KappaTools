@@ -271,7 +271,7 @@ let print_ast_port f p =
     f_mod_l p.port_lnk_mod
 
 let print_counter_test f = function
-  | CEQ x, _ -> Format.fprintf f ":%i" x
+  | CEQ x, _ -> Format.fprintf f "=%i" x
   | CGTE x, _ -> Format.fprintf f ">=%i" x
   | CVAR x, _ ->  Format.fprintf f ":%s" x
 
@@ -1022,6 +1022,7 @@ let counters_signature s (agents:agent list) =
                     Counter c -> c::acc
                   | Port _ -> acc) [] sites'
 
+(* c': counter declaration, returns counter in rule*)
 let enumerate_counter_tests x a count_delta c' =
   let (max,_) = c'.count_delta in
   let min =
@@ -1039,15 +1040,32 @@ let enumerate_counter_tests x a count_delta c' =
        [x,v])::(enum (v+1)) in
   enum min
 
+let enumerate rules f =
+  List.rev
+    (List.fold_left
+       (fun acc (s,r) ->
+         let enumerate_r =
+           List.map
+             (fun (s',r') ->
+               match s,s' with
+                 None, _ -> None,r'
+               | Some _, None -> s,r'
+               | Some (s1,a1), Some s2 -> Some (s1^"__"^s2,a1),r') (f r) in
+         enumerate_r@acc) [] rules)
+
 let remove_variable_in_counters rules edit_rules signatures =
   let remove_var_site counters =
     function
       Port p -> [(Port p,[])]
     | Counter c ->
        match c.count_test with
-         None | Some (CEQ _,_) | Some (CGTE _,_) -> [(Counter c,[])]
-         | Some (CVAR x,a) ->
-            enumerate_counter_tests x a c.count_delta
+         None ->
+         let count_zero = {c with count_test=Some (CEQ 0,Locality.dummy)} in
+         let count_gte_one = {c with count_test=Some (CGTE 1,Locality.dummy)} in
+         [(Counter count_zero,[]);(Counter count_gte_one,[])]
+       | Some (CEQ _,_) | Some (CGTE _,_) -> [(Counter c,[])]
+       | Some (CVAR x,a) ->
+          enumerate_counter_tests x a c.count_delta
                (List.find
                   (fun c' -> name_match c.count_nme c'.count_nme) counters) in
   let rec remove_var_sites counters = function
@@ -1082,30 +1100,22 @@ let remove_variable_in_counters rules edit_rules signatures =
             let k_un = update_pair_rate counters r.k_un in
             let k_op = update_opt_rate counters r.k_op in
             let k_op_un = update_pair_rate counters r.k_op_un in
-            ({r with lhs; k_def; k_un; k_op; k_op_un},a)) r in
-  let remove_var_edit_rule =
+            let append =
+              if (counters = []) then None
+              else
+                Some (List.fold_left
+                        (fun acc (_,i) -> (string_of_int i)^acc) "" counters) in
+            (append,({r with lhs; k_def; k_un; k_op; k_op_un},a))) r in
+  let remove_var_edit_rule r =
     merge (fun r -> r.mix)
           (fun mix counters r ->
             let act = update_rate counters r.act in
             let un_act = update_pair_rate counters r.un_act in
-            {r with mix; act; un_act}) in
+            let append = None in
+            (append,{r with mix; act; un_act})) r in
 
-  let enumerate rules f =
-    List.rev
-      (List.fold_left
-         (fun acc (s,r) ->
-           let enumerate_r = List.map (fun r' -> (s,r')) (f r) in
-           enumerate_r@acc) [] rules) in
-  ((enumerate edit_rules remove_var_edit_rule),(enumerate rules remove_var_rule))
-
-let counter_agent =
-  let after =
-    Port {port_nme=("a",Locality.dummy);port_int=[];port_int_mod =None;
-          port_lnk=[(ANY_FREE,Locality.dummy)];port_lnk_mod=None} in
-  let before =
-    Port {port_nme=("b",Locality.dummy);port_int=[];port_int_mod =None;
-          port_lnk=[(ANY_FREE,Locality.dummy)];port_lnk_mod=None} in
-  (("__incr",Locality.dummy),[after;before],None)
+  ((enumerate edit_rules remove_var_edit_rule),
+   (enumerate rules remove_var_rule))
 
 let with_counters c =
   let with_counters_mix mix =
@@ -1124,9 +1134,15 @@ let compile_counters c =
   if (with_counters c) then
     let (edit_rules,rules) =
       remove_variable_in_counters c.rules c.edit_rules c.signatures in
-    let signatures = counter_agent::c.signatures in
-    let () =
-      List.iter (fun (_,(r,_)) -> Format.printf "@.r = %a" print_ast_rule r)
-                rules in
-    {c with rules;edit_rules;signatures}
-  else c
+    (*let () =
+      Format.printf "unfold rules@.@.";
+      List.iter (fun (s,(r,_)) ->
+                  let label = match s with None -> "" | Some (l,_) -> l in
+                  Format.printf "@.%s = %a" label print_ast_rule r)
+                rules in*)
+    ({c with rules;edit_rules},true)
+  else (c,false)
+
+let empty_counter =
+  {count_nme = ("",Locality.dummy);
+   count_test = None; count_delta =(0,Locality.dummy)}

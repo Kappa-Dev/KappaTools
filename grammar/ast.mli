@@ -207,3 +207,6 @@ val link_of_json :
 
 val compil_of_json : Yojson.Basic.json -> parsing_compil
 val compil_to_json : parsing_compil -> Yojson.Basic.json
+
+val compile_counters : parsing_compil -> parsing_compil * bool
+val empty_counter : counter
