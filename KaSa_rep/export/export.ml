@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <May 16 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -372,8 +372,7 @@ let compute_compilation show_title state =
     | Remanent_state.Compil compil -> compil
     | Remanent_state.Files files ->
       let () = show_title state in
-      List.fold_left (KappaLexer.compile Format.std_formatter)
-        Ast.empty_compil files
+      Cli_init.get_ast_from_list_of_files files
   in
   let state = Remanent_state.set_compilation compil state in
   state, compil
