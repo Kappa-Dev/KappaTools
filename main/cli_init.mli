@@ -16,6 +16,9 @@ val get_compilation :
    (Alg_expr.t * Primitives.elementary_rule * Locality.t) list) *
   Counter.t
 
+val get_ast_from_list_of_files:
+  string list -> Ast.parsing_compil
+
 val get_ast_from_cli_args:
   Run_cli_args.t -> Ast.parsing_compil
 
@@ -23,7 +26,7 @@ val get_preprocessed_ast_from_cli_args:
   ?kasim_args:Kasim_args.t -> Run_cli_args.t -> preprocessed_ast
 
 val preprocess:
-    ?kasim_args:Kasim_args.t -> Run_cli_args.t -> 
+    ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
     Ast.parsing_compil -> preprocessed_ast
 
 val get_compilation_from_preprocessed_ast :
