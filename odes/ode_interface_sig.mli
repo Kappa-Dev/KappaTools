@@ -1,10 +1,12 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 13 2017>
+  * Last modification: Time-stamp: <May 16 2017>
 *)
 
 module type Interface =
 sig
+  type ast
+  type preprocessed_ast
   type compil
   type cache
 
@@ -125,12 +127,16 @@ sig
 
   val lift_species: compil -> chemical_species -> mixture
 
+  val get_preprocessed_ast: Run_cli_args.t -> preprocessed_ast    
+  val get_ast: Run_cli_args.t -> ast
+  val to_ast: ast -> Ast.parsing_compil
+  val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
+
   val get_compil:
     ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
-    ?quiet:bool -> 
     rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
-    compute_jacobian:bool -> Run_cli_args.t -> compil
+    compute_jacobian:bool -> Run_cli_args.t -> preprocessed_ast -> compil
 
   val get_rules: compil -> rule list
 
