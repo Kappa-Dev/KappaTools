@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 13 2017>
+  * Last modification: Time-stamp: <May 16 2017>
 *)
 
 let local_trace = false
@@ -240,6 +240,11 @@ struct
       b a
 
   let get_compil = I.get_compil
+
+  let get_preprocessed_ast = I.get_preprocessed_ast
+  let get_ast = I.get_ast
+  let to_ast = I.to_ast
+  let preprocess = I.preprocess
 
   let reset compil network =
     {network with

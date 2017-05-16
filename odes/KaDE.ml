@@ -7,10 +7,6 @@ module A = Odes.Make (Ode_interface)
 
 let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
   let start_time = Sys.time () in
-  let usage_msg =
-    "KaDE "^Version.version_string^":\n"^
-    "Usage is KaDE input_file [--ode-backend Matlab | Octave | Maple | Mathematica | SBML | DOTNET ] [--rate-convention KaSim | Divide_by_nbr_of_autos_in_lhs | Biochemist] [-t-init time] [-t time] [-p delta_t] [-o output_file] [--matlab-output foo.m] [--octave-output foo.m] [--maple-output foo.mws] [--mathematica foo.nb] [--sbml-output foo.xml] [--dotnet-output foo.net] [--compute-jacobian true | false] [--with-symmetries Ground | Forward | Backward] [--show-symmetres false | true] [--views-domain true | false] [--double-bonds-domain true | false] [--site-across-bonds-domain true | false] [--nonnegative false | true ] [--export-time-advance false | true ] [--initial-step float] [--max-step float] [--relative-tolerance float] [--absolute-tolerance float] [--truncate int]\n"
-  in
   let cli_args = Run_cli_args.default in
   let cli_args_gui = Run_cli_args.default_gui in
   let common_args = Common_args.default in
@@ -126,13 +122,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     let max_step = !(ode_args.Ode_args.max_step) in
     let reltol = !(ode_args.Ode_args.relative_tolerance) in
     let abstol= !(ode_args.Ode_args.absolute_tolerance) in
-    let abort =
-      match cli_args.Run_cli_args.inputKappaFileNames with
-      | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
-      | _ -> false
-    in
-    if abort then (prerr_string usage_msg ; exit 1) ;
-    let () = Sys.catch_break true in
     let () =
       Kappa_files.setCheckFileExistsODE
         ~batchmode:cli_args.Run_cli_args.batchmode
@@ -165,14 +154,14 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       | Loggers.Octave | Loggers.Matlab
       | Loggers.Mathematica | Loggers.Maple | Loggers.Json -> false,false
     in
-    let compil =
-      A.get_compil
-        ~rate_convention ~show_reactions ~count ~compute_jacobian
-        cli_args
+    let ast =
+      A.get_ast cli_args
+    in
+    let preprocessed_ast =
+      A.preprocess cli_args ast
     in
     (*************************************************************)
     (*TEST-symmetries*)
-    let network = A.init compil in
     let parameters =
       Ode_args.build_kasa_parameters ~called_from ode_args
         common_args
@@ -203,17 +192,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           (val export_to_kade : Export_to_KaDE.Type)
         in
         let () = Format.printf "+ compute symmetric sites... @." in
-        let kasa_compil =
-          List.fold_left
-            (KappaLexer.compile
-               (Format.make_formatter
-               (fun _ _ _ -> ())
-               (fun _ -> ())))
-            Ast.empty_compil
-            cli_args.Run_cli_args.inputKappaFileNames
-        in
         let state =
-          Export_to_kade.init ~compil:kasa_compil ()
+          Export_to_kade.init ~compil:(A.to_ast ast) ()
         in
         let parameters =
           Export_to_kade.get_parameters state
@@ -248,6 +228,12 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             parameters
             (Remanent_parameters.get_trace parameters')
         in
+        let compil =
+          A.get_compil
+            ~rate_convention ~show_reactions ~count ~compute_jacobian
+            cli_args preprocessed_ast
+        in
+        let network = A.init compil in
         let network =
           A.compute_symmetries_from_model
             parameters
@@ -265,12 +251,11 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             let bwd_bisim =
               A.init_bwd_bisim_info compil network
             in
-            let quiet = true in
-            let () = Format.printf "+ completing the domain with ~-equivalent patterns... @." in
+            let () = Format.printf "+ restart compilation to account for ~-equivalent patterns in algebraic expressions... @." in
             let compil =
-              A.get_compil ?bwd_bisim ~quiet
+              A.get_compil ?bwd_bisim
                 ~rate_convention ~show_reactions ~count ~compute_jacobian
-                cli_args
+                cli_args preprocessed_ast
             in
             let network = A.reset compil network in
             let network =
@@ -294,6 +279,12 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         network,compil
       else
+        let compil =
+          A.get_compil
+            ~rate_convention ~show_reactions ~count ~compute_jacobian
+            cli_args preprocessed_ast
+        in
+        let network = A.init compil in
         network,compil
     in
     let smash_reactions =
