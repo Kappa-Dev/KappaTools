@@ -122,7 +122,7 @@ let () =
 
     let abort =
       match cli_args.Run_cli_args.inputKappaFileNames with
-      | [] -> cli_args.Run_cli_args.marshalizedInFile = ""
+      | [] -> kasim_args.Kasim_args.marshalizedInFile = ""
       | _ -> false in
     if abort then (prerr_string usage_msg ; exit 1) ;
     let () = Sys.catch_break true in
@@ -135,8 +135,7 @@ let () =
         counter = Cli_init.get_compilation
         ~unit:kasim_args.Kasim_args.unit
         ~max_sharing:kasim_args.Kasim_args.maxSharing
-        ~compileModeOn:kasim_args.Kasim_args.compileMode cli_args in
-
+        ~compileModeOn:kasim_args.Kasim_args.compileMode ~kasim_args cli_args in
     let theSeed,seed_arg =
       match kasim_args.Kasim_args.seedValue,conf.Configuration.seed with
       | Some seed,_ | None, Some seed -> seed,[||]

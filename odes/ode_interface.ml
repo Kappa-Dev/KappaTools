@@ -1,9 +1,12 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 13 2017>
+  * Last modification: Time-stamp: <May 16 2017>
 *)
 
 type rule = Primitives.elementary_rule
+
+type preprocessed_ast = Cli_init.preprocessed_ast
+type ast = Ast.parsing_compil
 
 type compil =
   {
@@ -387,11 +390,20 @@ let get_obs_titles compil =
            (Kappa_printer.alg_expr ~env) x))
     env
 
+let get_preprocessed_ast cli_args =
+  Cli_init.get_preprocessed_ast_from_cli_args cli_args
+let to_preprocessed_ast x = x
+
+let get_ast cli_args = Cli_init.get_ast_from_cli_args cli_args
+let to_ast x = x
+
+let preprocess cli_args ast = Cli_init.preprocess cli_args ast 
 let get_compil
-    ?bwd_bisim ?quiet:(quiet=false)
-    ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args =
+    ?bwd_bisim
+    ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
-    Cli_init.get_compilation ?bwd_bisim ~quiet cli_args in
+    Cli_init.get_compilation_from_preprocessed_ast ?bwd_bisim cli_args preprocessed_ast
+  in
   {
     environment = env ;
     contact_map = contact_map ;

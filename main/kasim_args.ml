@@ -6,10 +6,15 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type t = {
-  mutable seedValue : int option;
-  mutable unit : Cli_init.directive_unit;
+type directive_unit = Time | Event
 
+type t = {
+  mutable alg_var_overwrite   : (string * Nbr.t) list;
+  mutable marshalizedInFile   : string;
+  mutable initialMix          : string option;
+  mutable rescale             : float option;
+  mutable seedValue : int option;
+  mutable unit : directive_unit;
   mutable marshalizeOutFile : string option;
   mutable domainOutputFile : string option;
   mutable traceFile : string option;
@@ -19,9 +24,12 @@ type t = {
 }
 
 let default : t = {
+  alg_var_overwrite = [];
+  rescale = None;
+  marshalizedInFile = "";
+  initialMix = None;
   seedValue  = None;
-  unit = Cli_init.Time;
-
+  unit = Time;
   marshalizeOutFile = None;
   domainOutputFile = None;
   traceFile = None;
@@ -31,12 +39,33 @@ let default : t = {
 }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
+(*    ("-mixture",
+       Arg.String (fun fic -> t.initialMix <- Some fic),
+       "Take the initial state from this file (ignore %init from other files)") ;*)
+  ("-var",
+   Arg.Tuple
+     (let tmp_var_name = ref "" in
+      [Arg.String (fun name -> tmp_var_name := name);
+       Arg.String (fun var_val ->
+           t.alg_var_overwrite <-
+             (!tmp_var_name,
+              try Nbr.of_string var_val with
+                Failure _ ->
+                raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
+             ::t.alg_var_overwrite)]),
+   "Set a variable to a given value") ;
+  ("-load-sim",
+   Arg.String (fun file -> t.marshalizedInFile <- file),
+   "load simulation package instead of kappa files");
+  ("-rescale",
+   Arg.Float (fun i -> t.rescale <- Some i),
+   "Apply rescaling factor to initial condition");
   ("-u",
    Arg.String
      (function
-       | "time" | "Time" | "t" -> t.unit <- Cli_init.Time
+       | "time" | "Time" | "t" -> t.unit <- Time
        | "event" | "events" | "e" | "Event" | "Events" -> t.unit <-
-           Cli_init.Event
+           Event
        | s -> raise (Arg.Bad ("Unrecognized unit: "^s))),
    "unit (time/event) in which limit and plot period are specified");
   ("-e",
