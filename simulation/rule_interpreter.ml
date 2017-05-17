@@ -947,10 +947,10 @@ let add_tracked patterns name tests state =
     { state with outdated = false }
 let remove_tracked patterns state =
   let () = assert (not state.outdated) in
-  let () = state.outdated <- true in
   match state.story_machinery with
   | None -> state
   | Some tpattern ->
+    let () = state.outdated <- true in
     let tester (_,el,_) =
       not @@
       Tools.array_fold_lefti
