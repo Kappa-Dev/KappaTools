@@ -6,4 +6,3 @@ File "link_passing_strong4.ka", line 7, characters 13-14:
 Warning: rule induces a link permutation on site 'x' of agent 'K'
 File "link_passing_strong4.ka", line 8, characters 13-14:
 Warning: rule induces a link permutation on site 'x' of agent 'K'
-Warning: Model.to_yojson is partial

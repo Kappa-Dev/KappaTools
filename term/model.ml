@@ -244,10 +244,11 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
 let kappa_instance_to_yojson =
   JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson)
 
+let depset_to_yojson x =
+  `List (Operator.DepSet.fold
+           (fun x a -> Operator.rev_dep_to_yojson x :: a) x [])
+
 let to_yojson env =
-  let () =
-    ExceptionDefn.warning
-      (fun f -> Format.pp_print_string f "Model.to_yojson is partial") in
   `Assoc [
     "update", Pattern.Env.to_yojson (domain env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
@@ -270,17 +271,27 @@ let to_yojson env =
     "contact_map", Contact_map.to_yojson (env.contact_map);
     "perturbations",
     JsonUtil.of_array Primitives.perturbation_to_yojson env.perturbations;
-       (* dependencies_in_time : Operator.DepSet.t;
-       dependencies_in_event : Operator.DepSet.t;
-       algs_reverse_dependencies : Operator.DepSet.t array;
-       tokens_reverse_dependencies : Operator.DepSet.t array;*)
+    "dependencies_in_time", depset_to_yojson env.dependencies_in_time;
+    "dependencies_in_event", depset_to_yojson env.dependencies_in_event;
+    "algs_reverse_dependencies",
+    JsonUtil.of_array depset_to_yojson env.algs_reverse_dependencies;
+    "tokens_reverse_dependencies",
+    JsonUtil.of_array depset_to_yojson env.tokens_reverse_dependencies;
   ]
 
 let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
+let depset_of_yojson = function
+  | `Null -> Operator.DepSet.empty
+  | `List l ->
+    List.fold_left
+      (fun acc x -> Operator.DepSet.add (Operator.rev_dep_of_yojson x) acc)
+      Operator.DepSet.empty l
+  | x -> raise (Yojson.Basic.Util.Type_error("Invalid depset",x))
+
 let of_yojson = function
-  | `Assoc l as x when List.length l = 8 ->
+  | `Assoc l as x when List.length l = 12 ->
     begin
       try {
         domain = Pattern.Env.of_yojson (List.assoc "update" l);
@@ -317,10 +328,18 @@ let of_yojson = function
         perturbations =
           JsonUtil.to_array Primitives.perturbation_of_yojson
             (Yojson.Basic.Util.member "perturbations" x);
-        dependencies_in_time = Operator.DepSet.empty;
-        dependencies_in_event = Operator.DepSet.empty;
-        algs_reverse_dependencies = [||];
-        tokens_reverse_dependencies = [||];
+        dependencies_in_time =
+          depset_of_yojson
+            (Yojson.Basic.Util.member "dependencies_in_time" x);
+        dependencies_in_event =
+          depset_of_yojson
+            (Yojson.Basic.Util.member "dependencies_in_event" x);
+        algs_reverse_dependencies =
+          JsonUtil.to_array depset_of_yojson
+            (Yojson.Basic.Util.member "algs_reverse_dependencies" x);
+        tokens_reverse_dependencies =
+          JsonUtil.to_array depset_of_yojson
+            (Yojson.Basic.Util.member "tokens_reverse_dependencies" x);
         contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
       }
       with Not_found ->

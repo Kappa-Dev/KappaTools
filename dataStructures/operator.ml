@@ -124,6 +124,18 @@ let print_rev_dep f = function
     Format.fprintf f "algebraic variable [%i]" id
   (*"variable '%a'" (Model.print_alg env) id*)
   | PERT id -> Format.fprintf f "perturbation [%i]" id
+
+let rev_dep_to_yojson = function
+  | RULE id -> `List [ `String "RULE"; `Int id ]
+  | ALG id -> `List [ `String "ALG"; `Int id ]
+  | PERT id -> `List [ `String "PERT"; `Int id ]
+
+let rev_dep_of_yojson = function
+  | `List [ `String "RULE"; `Int id ] -> RULE id
+  | `List [ `String "ALG"; `Int id ] -> ALG id
+  | `List [ `String "PERT"; `Int id ] -> PERT id
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rev_dep",x))
+
 module DepSetMap = SetMap.Make (struct type t = rev_dep
     let compare = compare
     let print = print_rev_dep end)

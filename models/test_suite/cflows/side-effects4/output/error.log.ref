@@ -2,4 +2,3 @@ File "side-effects.ka", line 5, characters 4-5:
 Warning: breaking a semi-link on site 'x' will induce a side effect
 File "side-effects.ka", line 6, characters 4-5:
 Warning: breaking a semi-link on site 'x' will induce a side effect
-Warning: Model.to_yojson is partial
