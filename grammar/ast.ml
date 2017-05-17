@@ -985,10 +985,13 @@ let name_match (s,_) (s',_) = (String.compare s s') = 0
 
 let update_rate counters (k,a) =
   let update_id s k =
-    try
-      let (_,x) = List.find (fun (s',_) -> (String.compare s s') = 0) counters in
-      Alg_expr.CONST (Nbr.I x)
-    with Not_found -> k in
+    let (a,_) = List.partition (fun (s',_) -> (String.compare s s') = 0) counters in
+    match a with
+    | [(_,x)] -> Alg_expr.CONST (Nbr.I x)
+    | [] -> k
+    | _::_ -> raise (ExceptionDefn.Malformed_Decl
+                       ("Counter variable "^s^" appears twice in rule",
+                        Locality.dummy)) in
   let rec update_bool k = match k with
     | Alg_expr.TRUE | Alg_expr.FALSE -> k
     | Alg_expr.BIN_BOOL_OP (op,(k1,a1),(k2,a2)) ->
@@ -1020,7 +1023,7 @@ let prepare_agent rsites lsites =
     | hd::tl ->
        match hd with
          Counter c' when (name_match c.count_nme c'.count_nme) ->
-         (Counter {c with count_delta = c'.count_delta})::tl
+         (Counter {c' with count_delta = c.count_delta})::tl
        | Counter _ | Port _ -> hd::(prepare_site c tl) in
   let counters =
     List.fold_left
@@ -1029,12 +1032,25 @@ let prepare_agent rsites lsites =
       [] rsites in
   List.fold_left (fun acc' c -> prepare_site c acc') lsites counters
 
-(* - add in the lhs : (i) counters only mentioned in the rhs and (ii) the deltas *)
+(* - add in the lhs : (i) counters only mentioned in the rhs and (ii) the deltas
+   - syntactic checks of no test in rhs; no modif in lhs *)
 let prepare_counters rules =
+  let syntax sites f error =
+    List.iter
+      (function Port _ -> ()
+              | Counter c ->
+                 if (f c) then
+                   raise (ExceptionDefn.Malformed_Decl
+                            ("Counter "^(fst c.count_nme)^error,
+                             (snd c.count_nme)))) sites in
   let aux r =
     let lhs =
       List.fold_right2
         (fun (rna,rsites,_) ((lna,lsites,b) as lagent) acc ->
+          let () = syntax lsites (fun c -> not((fst c.count_delta)=0))
+                          " has a modif in the lhs";
+                   syntax rsites (fun c -> not(c.count_test=None))
+                          " has a test in the rhs" in
           if ((String.compare (fst rna) (fst lna)) = 0) then
             let lsites' = prepare_agent rsites lsites in (lna,lsites',b)::acc
           else lagent::acc) r.rhs r.lhs [] in
@@ -1105,15 +1121,22 @@ let remove_variable_in_counters rules edit_rules signatures =
               (ExceptionDefn.Malformed_Decl
                  ("Counter "^(fst c.count_nme)^" becomes negative",
                   (snd c.count_nme)))
-       | Some (CGTE v,_) ->
-          if (delta >0 || abs(delta) < v) then [(Counter c,[])]
+       | Some (CGTE v,pos) ->
+          if (v=0)&&(delta>0) then
+            let () =
+              let error = "Counter "^(fst c.count_nme)^":>0 always holds" in
+              ExceptionDefn.warning
+                ~pos (fun f -> Format.pp_print_string f error) in
+            unfold_delta_in_tests c 0
           else
-            if (delta <0 && abs(delta) = v) then unfold_delta_in_tests c delta
+            if (delta >0 || abs(delta) < v) then [(Counter c,[])]
             else
-              raise
-                (ExceptionDefn.Malformed_Decl
-                   ("Counter "^(fst c.count_nme)^" becomes negative",
-                    (snd c.count_nme)))
+              if (delta <0 && abs(delta) = v) then unfold_delta_in_tests c delta
+              else
+                raise
+                  (ExceptionDefn.Malformed_Decl
+                     ("Counter "^(fst c.count_nme)^" becomes negative",
+                      (snd c.count_nme)))
        | Some (CVAR x,a) ->
           enumerate_counter_tests x a c.count_delta
                (List.find
@@ -1185,13 +1208,13 @@ let compile_counters c =
   if (with_counters c) then
     let (edit_rules,rules) =
       remove_variable_in_counters c.rules c.edit_rules c.signatures in
-    (*let () =
+    let () =
       if (!Parameter.debugModeOn) then
       (Format.printf "ast rules@.";
       List.iter (fun (s,(r,_)) ->
                   let label = match s with None -> "" | Some (l,_) -> l in
                   Format.printf "@.%s = %a" label print_ast_rule r)
-                rules) in*)
+                rules) in
     ({c with rules;edit_rules},true)
   else (c,false)
 

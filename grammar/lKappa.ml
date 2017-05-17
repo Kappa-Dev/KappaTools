@@ -1734,7 +1734,7 @@ let compil_of_ast ~syntax_version overwrite c =
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
   let rules = remove_counters rules sigs with_counters contact_map in
-  (*let () =
+  let () =
     if (!Parameter.debugModeOn && with_counters) then
       (Format.printf "@.lkappa rules@.";
        List.iter (fun (s,(r,_)) ->
@@ -1742,7 +1742,7 @@ let compil_of_ast ~syntax_version overwrite c =
                 Format.printf
                   "@.%s = %a" label
                   (print_rule ~full:true sigs (fun _ _ -> ()) (fun _ _ -> ())) r)
-                 rules) in*)
+                 rules) in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =
