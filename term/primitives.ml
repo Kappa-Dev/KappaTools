@@ -176,7 +176,7 @@ let alg_expr_of_yojson =
     (JsonUtil.to_int ?error_msg:None)
 
 let rule_to_yojson r =
-  `Assoc [
+  JsonUtil.smart_assoc [
      "rate", Locality.annot_to_json alg_expr_to_yojson r.rate;
      "unary_rate",
      JsonUtil.of_option
@@ -185,7 +185,7 @@ let rule_to_yojson r =
           (JsonUtil.of_option alg_expr_to_yojson))
        r.unary_rate;
       "connected_components",
-      (JsonUtil.of_array Pattern.id_to_yojson) r.connected_components;
+      JsonUtil.of_array Pattern.id_to_yojson r.connected_components;
       "removed", JsonUtil.of_list Transformation.to_yojson r.removed;
       "inserted", JsonUtil.of_list Transformation.to_yojson r.inserted;
       "delta_tokens",
@@ -204,41 +204,37 @@ let rule_of_yojson r =
   | ((`Assoc l):Yojson.Basic.json) as x ->
      begin
        try {
-           rate = Locality.annot_of_json alg_expr_of_yojson (List.assoc "rate" l);
-           unary_rate =
-             (try
-                JsonUtil.to_option
-                  (JsonUtil.to_pair
-                     (Locality.annot_of_json alg_expr_of_yojson)
-                     (JsonUtil.to_option alg_expr_of_yojson))
-                  (List.assoc "unary_rate" l)
-              with Not_found -> None);
-           connected_components =
-             (match (List.assoc "connected_components" l) with
-             |`List o ->
-               Tools.array_map_of_list Pattern.id_of_yojson o
-             | _ -> raise Not_found);
-           removed =
-             JsonUtil.to_list Transformation.of_yojson (List.assoc "removed" l);
-           inserted =
-             JsonUtil.to_list Transformation.of_yojson
-                              (List.assoc "inserted" l);
-           delta_tokens =
-             JsonUtil.to_list
-               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                                 (Locality.annot_of_json alg_expr_of_yojson)
-                                 (JsonUtil.to_int ?error_msg:None))
-               (List.assoc "delta_tokens" l);
+         rate = Locality.annot_of_json alg_expr_of_yojson (List.assoc "rate" l);
+         unary_rate =
+           JsonUtil.to_option
+             (JsonUtil.to_pair
+                (Locality.annot_of_json alg_expr_of_yojson)
+                (JsonUtil.to_option alg_expr_of_yojson))
+             (Yojson.Basic.Util.member "unary_rate" x);
+         connected_components =
+           JsonUtil.to_array Pattern.id_of_yojson
+             (Yojson.Basic.Util.member "connected_components" x);
+         removed =
+           JsonUtil.to_list Transformation.of_yojson
+             (Yojson.Basic.Util.member "removed" x);
+         inserted =
+           JsonUtil.to_list Transformation.of_yojson
+             (Yojson.Basic.Util.member "inserted" x);
+         delta_tokens =
+           JsonUtil.to_list
+             (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
+                (Locality.annot_of_json alg_expr_of_yojson)
+                (JsonUtil.to_int ?error_msg:None))
+             (Yojson.Basic.Util.member "delta_tokens" x);
            syntactic_rule = JsonUtil.to_int (List.assoc "syntactic_rule" l);
            instantiations =
              Instantiation.event_of_json Matching.Agent.of_yojson
-                                         (List.assoc "instantiations" l);
-         }
+               (List.assoc "instantiations" l);
+       }
        with Not_found ->
          raise (Yojson.Basic.Util.Type_error ("Not a correct elementary rule",x))
      end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct elementary rule",x))
-
 
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot
