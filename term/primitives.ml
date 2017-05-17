@@ -165,18 +165,24 @@ let extract_cc_ids r = r.connected_components
 
 let extract_abstract_event r = r.instantiations
 
+let alg_expr_to_yojson =
+  Alg_expr.e_to_yojson
+    (JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson))
+    JsonUtil.of_int
+
+let alg_expr_of_yojson =
+  Alg_expr.e_of_yojson
+    (JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson))
+    (JsonUtil.to_int ?error_msg:None)
+
 let rule_to_yojson r =
-  let alg_expr_to_json =
-    Alg_expr.e_to_yojson
-      (JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson))
-      JsonUtil.of_int in
   `Assoc [
-     "rate", Locality.annot_to_json alg_expr_to_json r.rate;
+     "rate", Locality.annot_to_json alg_expr_to_yojson r.rate;
      "unary_rate",
      JsonUtil.of_option
        (JsonUtil.of_pair
-          (Locality.annot_to_json alg_expr_to_json)
-          (JsonUtil.of_option alg_expr_to_json))
+          (Locality.annot_to_json alg_expr_to_yojson)
+          (JsonUtil.of_option alg_expr_to_yojson))
        r.unary_rate;
       "connected_components",
       (JsonUtil.of_array Pattern.id_to_yojson) r.connected_components;
@@ -185,7 +191,7 @@ let rule_to_yojson r =
       "delta_tokens",
       JsonUtil.of_list
         (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-                          (Locality.annot_to_json alg_expr_to_json)
+                          (Locality.annot_to_json alg_expr_to_yojson)
                           JsonUtil.of_int)
         r.delta_tokens;
       "syntactic_rule", `Int r.syntactic_rule;
@@ -194,21 +200,17 @@ let rule_to_yojson r =
    ]
 
 let rule_of_yojson r =
-  let alg_expr_of_json =
-    Alg_expr.e_of_yojson
-      (JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson))
-      (JsonUtil.to_int ?error_msg:None) in
   match r with
   | ((`Assoc l):Yojson.Basic.json) as x ->
      begin
        try {
-           rate = Locality.annot_of_json alg_expr_of_json (List.assoc "rate" l);
+           rate = Locality.annot_of_json alg_expr_of_yojson (List.assoc "rate" l);
            unary_rate =
              (try
                 JsonUtil.to_option
                   (JsonUtil.to_pair
-                     (Locality.annot_of_json alg_expr_of_json)
-                     (JsonUtil.to_option alg_expr_of_json))
+                     (Locality.annot_of_json alg_expr_of_yojson)
+                     (JsonUtil.to_option alg_expr_of_yojson))
                   (List.assoc "unary_rate" l)
               with Not_found -> None);
            connected_components =
@@ -224,7 +226,7 @@ let rule_of_yojson r =
            delta_tokens =
              JsonUtil.to_list
                (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                                 (Locality.annot_of_json alg_expr_of_json)
+                                 (Locality.annot_of_json alg_expr_of_yojson)
                                  (JsonUtil.to_int ?error_msg:None))
                (List.assoc "delta_tokens" l);
            syntactic_rule = JsonUtil.to_int (List.assoc "syntactic_rule" l);
@@ -299,6 +301,132 @@ type modification =
   | PLOTENTRY
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
 
+let print_t_expr_to_yojson =
+  print_expr_to_yojson
+    (JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson))
+    JsonUtil.of_int
+
+let print_t_expr_of_yojson =
+  print_expr_of_yojson
+    (JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson))
+    (JsonUtil.to_int ?error_msg:None)
+
+let modification_to_yojson = function
+  | ITER_RULE(n,r) ->
+    `Assoc [ "action", `String "ITER";
+             "repeats", Locality.annot_to_json alg_expr_to_yojson n;
+             "rule", rule_to_yojson r ]
+  | UPDATE(v,e) ->
+    `Assoc [ "action", `String "UPDATE";
+             "var", `Int v;
+             "value", Locality.annot_to_json alg_expr_to_yojson e ]
+  | SNAPSHOT f ->
+    JsonUtil.smart_assoc [
+      "action", `String "SNAPSHOT";
+      "file", JsonUtil.of_list print_t_expr_to_yojson f ]
+  | STOP f ->
+    JsonUtil.smart_assoc [
+      "action", `String "STOP";
+      "file", JsonUtil.of_list print_t_expr_to_yojson f ]
+  | CFLOW (name,ids,tests) ->
+    JsonUtil.smart_assoc [
+      "action", `String "CFLOW";
+      "name", JsonUtil.of_option JsonUtil.of_string name;
+      "pattern", JsonUtil.of_array Pattern.id_to_yojson ids;
+      "tests",
+      JsonUtil.of_list
+        (JsonUtil.of_list
+           (Instantiation.test_to_json Matching.Agent.to_yojson))
+        tests ]
+  | CFLOWOFF ids ->
+    `Assoc [ "action", `String "CFLOWOFF";
+             "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
+  | FLUX(kind,f) ->
+    `Assoc [ "action", `String "FLUX";
+             "kind", flux_kind_to_yojson kind;
+             "file", `List (List.map print_t_expr_to_yojson f) ]
+  | FLUXOFF f ->
+    JsonUtil.smart_assoc [
+      "action", `String "FLUXOFF";
+      "file", JsonUtil.of_list print_t_expr_to_yojson f ]
+  | PLOTENTRY -> `Assoc [ "action", `String "PLOTNOW" ]
+  | PRINT(f,t) ->
+    `Assoc [ "action", `String "PRINT";
+             "text", `List (List.map print_t_expr_to_yojson t);
+             "file", `List (List.map print_t_expr_to_yojson f) ]
+
+let modification_of_yojson = function
+  | `Assoc [ "action", `String "PRINT"; "file", `List f; "text", `List t ]
+  | `Assoc [ "text", `List t; "file", `List f; "action", `String "PRINT" ]
+  | `Assoc [ "action", `String "PRINT"; "text", `List t; "file", `List f ]
+  | `Assoc [ "text", `List t; "action", `String "PRINT"; "file", `List f ]
+  | `Assoc [ "file", `List f; "action", `String "PRINT"; "text", `List t ]
+  | `Assoc [ "file", `List f; "text", `List t; "action", `String "PRINT" ] ->
+    PRINT(List.map print_t_expr_of_yojson f, List.map print_t_expr_of_yojson t)
+  | `Assoc [ "action", `String "PRINT"; "file", `Null; "text", `List t ]
+  | `Assoc [ "text", `List t; "file", `Null; "action", `String "PRINT" ]
+  | `Assoc [ "action", `String "PRINT"; "text", `List t; "file", `Null ]
+  | `Assoc [ "text", `List t; "action", `String "PRINT"; "file", `Null ]
+  | `Assoc [ "file", `Null; "action", `String "PRINT"; "text", `List t ]
+  | `Assoc [ "file", `Null; "text", `List t; "action", `String "PRINT" ]
+  | `Assoc [ "action", `String "PRINT"; "text", `List t ]
+  | `Assoc [ "text", `List t; "action", `String "PRINT" ] ->
+    PRINT([], List.map print_t_expr_of_yojson t)
+  | `Assoc [ "action", `String "FLUX"; "file", `List f; "kind", kind ]
+  | `Assoc [ "kind", kind; "file", `List f; "action", `String "FLUX" ]
+  | `Assoc [ "action", `String "FLUX"; "kind", kind; "file", `List f ]
+  | `Assoc [ "kind", kind; "action", `String "FLUX"; "file", `List f ]
+  | `Assoc [ "file", `List f; "action", `String "FLUX"; "kind", kind ]
+  | `Assoc [ "file", `List f; "kind", kind; "action", `String "FLUX" ] ->
+    FLUX(flux_kind_of_yojson kind, List.map print_t_expr_of_yojson f)
+  | `Assoc [ "action", `String "CFLOWOFF"; "pattern", p ]
+  | `Assoc [ "pattern", p; "action", `String "CFLOWOFF" ] ->
+    CFLOWOFF(JsonUtil.to_array Pattern.id_of_yojson p)
+  | `Assoc [ "action", `String "UPDATE"; "var", `Int v; "value", e ]
+  | `Assoc [ "var", `Int v; "action", `String "UPDATE"; "value", e ]
+  | `Assoc [ "action", `String "UPDATE"; "value", e; "var", `Int v ]
+  | `Assoc [ "var", `Int v; "value", e; "action", `String "UPDATE" ]
+  | `Assoc [ "value", e; "action", `String "UPDATE"; "var", `Int v ]
+  | `Assoc [ "value", e; "var", `Int v; "action", `String "UPDATE" ] ->
+    UPDATE(v,Locality.annot_of_json alg_expr_of_yojson e)
+  | `Assoc [ "action", `String "ITER"; "repeats", n; "rule", r ]
+  | `Assoc [ "action", `String "ITER"; "rule", r; "repeats", n ]
+  | `Assoc [ "repeats", n; "action", `String "ITER"; "rule", r ]
+  | `Assoc [ "rule", r; "action", `String "ITER"; "repeats", n ]
+  | `Assoc [ "repeats", n; "rule", r; "action", `String "ITER" ]
+  | `Assoc [ "rule", r; "repeats", n; "action", `String "ITER" ] ->
+    ITER_RULE (Locality.annot_of_json alg_expr_of_yojson n, rule_of_yojson r)
+  | `Assoc [ "action", `String "PLOTNOW" ] -> PLOTENTRY
+  | `Assoc [ "action", `String "FLUXOFF"; "file", `List l ]
+  | `Assoc [ "file", `List l; "action", `String "FLUXOFF" ] ->
+    FLUXOFF (List.map print_t_expr_of_yojson l)
+  | `Assoc [ "action", `String "FLUXOFF"; "file", `Null ]
+  | `Assoc [ "file", `Null; "action", `String "FLUXOFF" ]
+  | `Assoc [ "action", `String "FLUXOFF" ] -> FLUXOFF []
+  | `Assoc [ "action", `String "SNAPSHOT"; "file", `List l ]
+  | `Assoc [ "file", `List l; "action", `String "SNAPSHOT" ] ->
+    SNAPSHOT (List.map print_t_expr_of_yojson l)
+  | `Assoc [ "action", `String "SNAPSHOT"; "file", `Null ]
+  | `Assoc [ "file", `Null; "action", `String "SNAPSHOT" ]
+  | `Assoc [ "action", `String "SNAPSHOT" ] -> SNAPSHOT []
+  | `Assoc [ "action", `String "STOP"; "file", `List l ]
+  | `Assoc [ "file", `List l; "action", `String "STOP" ] ->
+    STOP (List.map print_t_expr_of_yojson l)
+  | `Assoc [ "action", `String "STOP"; "file", `Null ]
+  | `Assoc [ "file", `Null; "action", `String "STOP" ]
+  | `Assoc [ "action", `String "STOP" ] -> STOP []
+  | `Assoc _ as l when Yojson.Basic.Util.member "action" l = `String "CFLOW" ->
+    CFLOW (
+      JsonUtil.to_option (JsonUtil.to_string ?error_msg:None)
+        (Yojson.Basic.Util.member "name" l),
+      JsonUtil.to_array Pattern.id_of_yojson
+        (Yojson.Basic.Util.member "pattern" l),
+      JsonUtil.to_list (JsonUtil.to_list
+                          (Instantiation.test_of_json Matching.Agent.of_yojson))
+        (Yojson.Basic.Util.member "tests" l))
+  | x -> raise
+           (Yojson.Basic.Util.Type_error ("Invalid modification",x))
+
 type perturbation =
   { precondition:
       (Pattern.id array list,int) Alg_expr.bool Locality.annot;
@@ -306,6 +434,56 @@ type perturbation =
     abort : (Pattern.id array list,int)
       Alg_expr.bool Locality.annot option;
   }
+
+let bool_expr_to_yojson =
+  Alg_expr.bool_to_yojson
+    (JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson))
+    JsonUtil.of_int
+
+let bool_expr_of_yojson =
+  Alg_expr.bool_of_yojson
+    (JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson))
+    (JsonUtil.to_int ?error_msg:None)
+
+let perturbation_to_yojson p =
+  JsonUtil.smart_assoc [
+    "condition", Locality.annot_to_json bool_expr_to_yojson p.precondition;
+    "effect", JsonUtil.of_list modification_to_yojson p.effect;
+    "abort",
+    JsonUtil.of_option (Locality.annot_to_json bool_expr_to_yojson) p.abort ]
+
+let perturbation_of_yojson = function
+  | `Assoc [ "condition", c; "effect", e; "abort", p ]
+  | `Assoc [ "condition", c; "abort", p; "effect", e ]
+  | `Assoc [ "effect", e; "condition", c; "abort", p ]
+  | `Assoc [ "abort", p; "condition", c; "effect", e ]
+  | `Assoc [ "effect", e; "abort", p; "condition", c ]
+  | `Assoc [ "abort", p; "effect", e; "condition", c ] -> {
+      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      effect = JsonUtil.to_list modification_of_yojson e;
+      abort =
+        JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
+    }
+  | `Assoc [ "condition", c; "effect", e ]
+  | `Assoc [ "effect", e; "condition", c ] -> {
+      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      effect = JsonUtil.to_list modification_of_yojson e;
+      abort = None
+    }
+  | `Assoc [ "condition", c; "abort", p ]
+  | `Assoc [ "abort", p; "condition", c ] -> {
+      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      effect = [];
+      abort =
+        JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
+    }
+  | `Assoc [ "condition", c ] -> {
+      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      effect = [];
+      abort = None
+    }
+  | x -> raise
+           (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
 
 let exists_modification check l =
   Array.fold_left (fun acc p -> acc || List.exists check p.effect) false l

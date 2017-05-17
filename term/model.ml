@@ -268,9 +268,9 @@ let to_yojson env =
               LKappa.rule_to_json r]::l) env.ast_rules []);
     "elementary_rules", JsonUtil.of_array Primitives.rule_to_yojson env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
-    (*
-       perturbations : Primitives.perturbation array;
-       dependencies_in_time : Operator.DepSet.t;
+    "perturbations",
+    JsonUtil.of_array Primitives.perturbation_to_yojson env.perturbations;
+       (* dependencies_in_time : Operator.DepSet.t;
        dependencies_in_event : Operator.DepSet.t;
        algs_reverse_dependencies : Operator.DepSet.t array;
        tokens_reverse_dependencies : Operator.DepSet.t array;*)
@@ -280,45 +280,49 @@ let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
-  | `Assoc l as x when List.length l = 7 ->
+  | `Assoc l as x when List.length l = 8 ->
     begin
-      try
-        { domain = Pattern.Env.of_yojson (List.assoc "update" l);
-          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
-          algs = NamedDecls.of_json
-              (fun x -> Locality.dummy_annot
-                  (Alg_expr.e_of_yojson kappa_instance_of_yojson
-                     (JsonUtil.to_int ?error_msg:None) x))
-              (List.assoc "algs" l);
-          observables = (match List.assoc "observables" l with
-              | `List o ->
-                Tools.array_map_of_list
-                  (fun x -> Locality.dummy_annot
-                      (Alg_expr.e_of_yojson kappa_instance_of_yojson
-                         (JsonUtil.to_int ?error_msg:None) x)) o
-              | _ -> raise Not_found);
-          ast_rules = (match List.assoc "ast_rules" l with
-              | `List o ->
-                Tools.array_map_of_list
-                  (function
-                    | `List [`Null;r]->
-                      (None, Locality.dummy_annot (LKappa.rule_of_json r))
-                    | `List [`String n;r]->
-                      (Some (Locality.dummy_annot n),
-                       Locality.dummy_annot (LKappa.rule_of_json r))
-                    | _ -> raise Not_found) o
-              | _ -> raise Not_found);
-          rules = (match (List.assoc "elementary_rules" l) with
-                   | `List o ->
-                      Tools.array_map_of_list Primitives.rule_of_yojson o
-                   | _ -> raise Not_found);
-          perturbations = [||];
-          dependencies_in_time = Operator.DepSet.empty;
-          dependencies_in_event = Operator.DepSet.empty;
-          algs_reverse_dependencies = [||];
-          tokens_reverse_dependencies = [||];
-          contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
-        }
+      try {
+        domain = Pattern.Env.of_yojson (List.assoc "update" l);
+        tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
+        algs = NamedDecls.of_json
+            (fun x -> Locality.dummy_annot
+                (Alg_expr.e_of_yojson kappa_instance_of_yojson
+                   (JsonUtil.to_int ?error_msg:None) x))
+            (List.assoc "algs" l);
+        observables = (match List.assoc "observables" l with
+            | `List o ->
+              Tools.array_map_of_list
+                (fun x -> Locality.dummy_annot
+                    (Alg_expr.e_of_yojson kappa_instance_of_yojson
+                       (JsonUtil.to_int ?error_msg:None) x)) o
+            | `Null -> [||]
+            | _ -> raise Not_found);
+        ast_rules = (match List.assoc "ast_rules" l with
+            | `List o ->
+              Tools.array_map_of_list
+                (function
+                  | `List [`Null;r]->
+                    (None, Locality.dummy_annot (LKappa.rule_of_json r))
+                  | `List [`String n;r]->
+                    (Some (Locality.dummy_annot n),
+                     Locality.dummy_annot (LKappa.rule_of_json r))
+                  | _ -> raise Not_found) o
+            | `Null -> [||]
+            | _ -> raise Not_found);
+        rules = (match (List.assoc "elementary_rules" l) with
+            | `List o ->
+              Tools.array_map_of_list Primitives.rule_of_yojson o
+            | _ -> raise Not_found);
+        perturbations =
+          JsonUtil.to_array Primitives.perturbation_of_yojson
+            (Yojson.Basic.Util.member "perturbations" x);
+        dependencies_in_time = Operator.DepSet.empty;
+        dependencies_in_event = Operator.DepSet.empty;
+        algs_reverse_dependencies = [||];
+        tokens_reverse_dependencies = [||];
+        contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
+      }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
     end

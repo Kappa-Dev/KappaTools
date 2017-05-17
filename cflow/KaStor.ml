@@ -94,9 +94,13 @@ let main () =
       Loggers.fprintf (Compression_main.get_logger parameter)
         "+ Loading trace@." in
     let dotFormat = !dotCflows in
-    let env,steps = get_simulation !file in
-    Compression_main.compress_and_print
-      parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
+    try
+      let env,steps = get_simulation !file in
+      Compression_main.compress_and_print
+        parameter ~dotFormat env (Compression_main.init_secret_log_info ()) steps
+    with Yojson.Basic.Util.Type_error(s,x) ->
+      Loggers.fprintf (Compression_main.get_logger parameter)
+        "Json error: \"%s\" in %s@." s (Yojson.Basic.to_string x)
 
 let () = Sys.catch_break true
 let () = main ()

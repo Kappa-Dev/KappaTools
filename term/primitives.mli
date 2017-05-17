@@ -114,6 +114,9 @@ type perturbation =
         Alg_expr.bool Locality.annot option;
   }
 
+val perturbation_to_yojson : perturbation -> Yojson.Basic.json
+val perturbation_of_yojson : Yojson.Basic.json -> perturbation
+
 val exists_modification : (modification -> bool) -> perturbation array -> bool
 
 val extract_connected_components_modifications :
