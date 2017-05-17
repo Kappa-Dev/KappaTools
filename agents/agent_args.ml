@@ -6,8 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type t = { mutable delimiter : char option; }
-let default : t = { delimiter = None; }
+type t = { mutable delimiter : char; }
+let default : t = { delimiter = Mpi_api.default_message_delimter; }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
   ("--delimiter",
@@ -20,7 +20,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
             else
               raise (Arg.Bad (Format.sprintf "delimeter has multiple characters '%s'" d))
           in
-          let () = t.delimiter <- Some d in
+          let () = t.delimiter <- d in
           ()
         with Scanf.Scan_failure _ ->
           raise (Arg.Bad (Format.sprintf "failed to parse delimeter '%s'" d))

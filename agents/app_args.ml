@@ -19,13 +19,6 @@ let options (t :t)  : (string * Arg.spec * string) list = [
    Arg.Unit
      (fun () -> t.api <- V2),
    "enable experimental api - not intended for public use or comment");
-  ("--version",
-   Arg.Unit
-     (fun () ->
-        Format.print_string Version.version_msg ;
-        Format.print_newline () ;
-        exit 0),
-   "display KaSim version");
   ("--log",
    Arg.String
      (fun file_name ->

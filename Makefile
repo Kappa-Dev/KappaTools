@@ -181,18 +181,18 @@ WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 
 WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-I webapp -I api \
+	-I webapp -I api -I agents \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
+	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
 	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
 StdSim.native StdSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-I webapp -I api \
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I api -I agents \
 	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<webapp/*> : thread, package(lwt),package(lwt.unix),package(atdgen)" \
+	-tag-line "<api/*> : package(lwt.unix),package(atdgen)" \
+	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
 	$@
 
 bin/%: %.$(OCAMLBEST) Makefile
@@ -289,7 +289,7 @@ KappaBin.zip:
 	mv _build/KaSa_rep/main/KaSa.native KappaBin/bin/KaSa.exe
 	mv _build/cflow/KaStor.native KappaBin/bin/KaStor.exe
 	mv _build/odes/KaDE.native KappaBin/bin/KaDE.exe
-	mv _build/webapp/StdSim.native KappaBin/bin/StdSim.exe
+	mv _build/agents/StdSim.native KappaBin/bin/StdSim.exe
 	zip -r $@ KappaBin
 	rm -r KappaBin
 

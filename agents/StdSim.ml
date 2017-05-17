@@ -28,46 +28,15 @@ let process_comand_v2
        Lwt_io.write Lwt_io.stdout (message^(String.make 1 message_delimter)))
 
 (*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
-let serve () : unit Lwt.t =
-  let app_args = App_args.default in
-  let common_args = Common_args.default in
-  let stdsim_args = Stdsim_args.default in
-  let options =
-    App_args.options app_args @
-    Common_args.options common_args @
-    Stdsim_args.options stdsim_args in
-  let usage_msg =
-    "kappa stdio simulator" in
-  let () =
-    Arg.parse options
-      (fun _ -> ()) usage_msg in
-  (* set message delimiter *)
-  let message_delimter : char =
-    match stdsim_args.Stdsim_args.delimiter with
-    | None -> Mpi_api.default_message_delimter
-    | Some d ->
-      d in
-  (* debugging TODO : remove me
-  let () =
-    Lwt.async
-      (fun _ ->
-         Lwt_io.print
-           (Format.sprintf "delimiter:'%c'" message_delimter))
-  in
-  *)
-  (* set protocol version *)
-  let process_comand : string -> unit Lwt.t =
-    (match app_args.App_args.api with
-     | App_args.V2 -> process_comand_v2
-    ) message_delimter in
+let serve process_command delimiter : unit Lwt.t =
   (* read and handle messages *)
   let buffer = Buffer.create 512 in
   let rec aux_serve () =
     Lwt_io.read_char Lwt_io.stdin >>=
     (fun (char : char) ->
-       if char = message_delimter then
+       if char = delimiter then
          let m = Buffer.contents buffer in
-         process_comand m <&>
+         process_command m <&>
          let () = Buffer.reset buffer in aux_serve ()
        else
          let () = Buffer.add_char buffer char in
@@ -75,4 +44,22 @@ let serve () : unit Lwt.t =
   aux_serve ()
 
 (* start server *)
-let () = Lwt_main.run (serve ())
+let () =
+  let app_args = App_args.default in
+  let common_args = Common_args.default in
+  let stdsim_args = Agent_args.default in
+  let options =
+    App_args.options app_args @
+    Common_args.options common_args @
+    Agent_args.options stdsim_args in
+  let usage_msg =
+    "kappa stdio simulator" in
+  let () =
+    Arg.parse options
+      (fun _ -> ()) usage_msg in
+  (* set protocol version *)
+  let process_comand : string -> unit Lwt.t =
+    (match app_args.App_args.api with
+     | App_args.V2 -> process_comand_v2
+    ) stdsim_args.Agent_args.delimiter in
+  Lwt_main.run (serve process_comand stdsim_args.Agent_args.delimiter)
