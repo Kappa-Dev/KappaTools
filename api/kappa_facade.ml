@@ -352,31 +352,32 @@ let run_simulation
        let rstop = ref stopped in
        let () = t.is_running <- true in
        let rec iter () =
-         try
-           let () =
-             while (not !rstop) &&
-                   Sys.time () -. t.lastyield <
-                   system_process#min_run_duration ()
-             do
-               let (stop,graph',state') =
-                 State_interpreter.a_loop
-                   ~outputs:(outputs t) ~dumpIfDeadlocked:t.dumpIfDeadlocked
-                   ~maxConsecutiveClash:t.maxConsecutiveClash
-                   t.env t.counter t.graph t.state in
-               rstop := stop || Rule_interpreter.value_bool
-                          t.counter graph' t.pause_condition;
-               t.graph <- graph';
-               t.state <- state'
-             done in
-           if !rstop then
-             let () = t.is_running <- false in
-             Lwt.return_unit
-           else if t.is_running then
-             (system_process#yield ()) >>= (fun () ->
-                 let () = t.lastyield <- Sys.time () in iter ())
-           else
-             Lwt.return_unit
-         with e -> Lwt.fail e in
+         (try
+            let () =
+              while (not !rstop) &&
+                    Sys.time () -. t.lastyield <
+                    system_process#min_run_duration ()
+              do
+                let (stop,graph',state') =
+                  State_interpreter.a_loop
+                    ~outputs:(outputs t) ~dumpIfDeadlocked:t.dumpIfDeadlocked
+                    ~maxConsecutiveClash:t.maxConsecutiveClash
+                    t.env t.counter t.graph t.state in
+                rstop := stop || Rule_interpreter.value_bool
+                           t.counter graph' t.pause_condition;
+                t.graph <- graph';
+                t.state <- state'
+              done in
+            Lwt.return_unit
+          with e -> Lwt.fail e) >>= fun () ->
+         if !rstop then
+           let () = t.is_running <- false in
+           Lwt.return_unit
+         else if t.is_running then
+           (system_process#yield ()) >>= (fun () ->
+               let () = t.lastyield <- Sys.time () in iter ())
+         else
+           Lwt.return_unit in
        (iter ()) >>=
        (fun () ->
           let () =
@@ -388,9 +389,9 @@ let run_simulation
           Lwt.return_unit))
     (catch_error
        (fun e ->
-           let () = t.is_running <- false in
-           let () = t.error_messages <- e in
-         Lwt.return_unit))
+          let () = t.is_running <- false in
+          let () = t.error_messages <- e in
+          Lwt.return_unit))
 
 let start
     ~(system_process : system_process)
