@@ -981,12 +981,12 @@ let combinations ls1 ls2 =
         List.fold_left (fun acc' (b,ds) -> ((b::a),ds@cs)::acc') acc ls2)
       [] ls1
 
-let name_match (s,_) (s',_) = String.equal s s'
+let name_match (s,_) (s',_) = (String.compare s s') = 0
 
 let update_rate counters (k,a) =
   let update_id s k =
     try
-      let (_,x) = List.find (fun (s',_) -> String.equal s s') counters in
+      let (_,x) = List.find (fun (s',_) -> (String.compare s s') = 0) counters in
       Alg_expr.CONST (Nbr.I x)
     with Not_found -> k in
   let rec update_bool k = match k with
@@ -1024,7 +1024,7 @@ let add_counter_to_lhs rules =
     let lhs =
       List.fold_right2
         (fun ((rna,_),rsites,_) (((lna,a),lsites,b) as lagent) acc ->
-          if (String.equal rna lna) then
+          if ((String.compare rna lna) = 0) then
             let counters =
               List.fold_left
                 (fun acc' rsite ->
