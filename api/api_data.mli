@@ -1,6 +1,6 @@
 val api_message_errors :
   ?severity:Api_types_t.severity ->
-  ?region:Api_types_t.range option -> string -> Api_types_t.errors
+  ?region:Api_types_t.range -> string -> Api_types_t.errors
 val api_exception_errors : exn -> Api_types_t.errors
 val links_of_mix :
   Raw_mixture.agent list -> Mods.Int2Map.elt Mods.Int2Map.t

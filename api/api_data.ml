@@ -1,6 +1,6 @@
 let api_message_errors
     ?(severity:Api_types_t.severity = `Error)
-    ?(region:Api_types_t.range option = None)
+    ?(region:Api_types_t.range option)
     (message : string) : Api_types_t.errors =
   [{ Api_types_t.message_severity = severity;
      Api_types_t.message_text = message ;

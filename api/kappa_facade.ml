@@ -152,21 +152,12 @@ let clone_t t =
 let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
   fun handler ->
     (function
-      |  ExceptionDefn.Syntax_Error ((message,location) : string Locality.annot) ->
-        handler
-          (Api_data.api_message_errors
-             ~region:(Some location)
-             message)
-      | ExceptionDefn.Malformed_Decl ((message,location) : string Locality.annot) ->
-        handler
-          (Api_data.api_message_errors
-             ~region:(Some location)
-             message)
-      | ExceptionDefn.Internal_Error ((message,location) : string Locality.annot) ->
-        handler
-          (Api_data.api_message_errors
-             ~region:(Some location)
-             message)
+      |  ExceptionDefn.Syntax_Error ((message,region) : string Locality.annot) ->
+        handler (Api_data.api_message_errors ~region message)
+      | ExceptionDefn.Malformed_Decl ((message,region) : string Locality.annot) ->
+        handler (Api_data.api_message_errors ~region message)
+      | ExceptionDefn.Internal_Error ((message,region) : string Locality.annot) ->
+        handler (Api_data.api_message_errors ~region message)
       | Invalid_argument error ->
         handler (Api_data.api_message_errors ("Runtime error "^ error))
       | exn -> handler (Api_data.api_exception_errors exn))
