@@ -116,6 +116,7 @@ rule token = parse
 	 (n^" is a incorrect integer",
 	     Locality.of_pos (Lexing.lexeme_start_p lexbuf)
 		      (Lexing.lexeme_end_p lexbuf)))}
+
 	 | real as f {FLOAT (float_of_string f)}
 	 | '\'' ([^'\n''\'']+ as x) '\''{LABEL(x)}
 	 | id as str {keyword_or_id str}
