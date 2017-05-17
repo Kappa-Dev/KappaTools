@@ -1,8 +1,8 @@
 #This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-3083-g1567d7b-dirty))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2017/05/17 14:48:44 (GMT+2) on wf102.di.ens.fr
-#Command line is: KaSa egfr_path.ka
+#Analysis launched at 2017/05/17 16:39:26 (GMT+2) on wf102.di.ens.fr
+#Command line is: KaSa Repressilator_td.ka
 #
 #This file contains the description of the contact map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
@@ -10,74 +10,51 @@
 graph G{ 
 subgraph cluster0 {
    0.0 [shape = plaintext label = ""]
-label =  "EGF";  shape = rectangle; color = red
+label =  "Null";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
-   1.0 [shape = plaintext label = ""]
-label =  "Grb2";  shape = rectangle; color = red
+   1.0 [style = filled label = "lac1" shape =circle color = yellow size = "5"]
+   1.1 [style = filled label = "lac2" shape =circle color = yellow size = "5"]
+label =  "gTetR";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {
-   2.0 [shape = plaintext label = ""]
-label =  "Grb2_Sos";  shape = rectangle; color = red
+   2.0 [style = filled label = "tet" shape =circle color = yellow size = "5"]
+label =  "pLacI";  shape = rectangle; color = red
 } ; 
 subgraph cluster3 {
-   3.0 [shape = plaintext label = ""]
-label =  "Shc";  shape = rectangle; color = red
+   3.0 [style = filled label = "tet1" shape =circle color = yellow size = "5"]
+   3.1 [style = filled label = "tet2" shape =circle color = yellow size = "5"]
+label =  "gCI";  shape = rectangle; color = red
 } ; 
 subgraph cluster4 {
-   4.0 [shape = plaintext label = ""]
-label =  "ShcP";  shape = rectangle; color = red
+   4.0 [style = filled label = "cI" shape =circle color = yellow size = "5"]
+label =  "pTetR";  shape = rectangle; color = red
 } ; 
 subgraph cluster5 {
-   5.0 [shape = plaintext label = ""]
-label =  "ShcP_Grb2";  shape = rectangle; color = red
+   5.0 [style = filled label = "cI1" shape =circle color = yellow size = "5"]
+   5.1 [style = filled label = "cI2" shape =circle color = yellow size = "5"]
+label =  "gLacI";  shape = rectangle; color = red
 } ; 
 subgraph cluster6 {
-   6.0 [shape = plaintext label = ""]
-label =  "ShcP_Grb2_Sos";  shape = rectangle; color = red
+   6.0 [style = filled label = "lac" shape =circle color = yellow size = "5"]
+label =  "pCI";  shape = rectangle; color = red
 } ; 
 subgraph cluster7 {
    7.0 [shape = plaintext label = ""]
-label =  "Sos";  shape = rectangle; color = red
+label =  "mTetR";  shape = rectangle; color = red
 } ; 
 subgraph cluster8 {
    8.0 [shape = plaintext label = ""]
-label =  "R";  shape = rectangle; color = red
+label =  "mCI";  shape = rectangle; color = red
 } ; 
 subgraph cluster9 {
    9.0 [shape = plaintext label = ""]
-label =  "RA";  shape = rectangle; color = red
+label =  "mLacI";  shape = rectangle; color = red
 } ; 
-subgraph cluster10 {
-   10.0 [shape = plaintext label = ""]
-label =  "R2";  shape = rectangle; color = red
-} ; 
-subgraph cluster11 {
-   11.0 [shape = plaintext label = ""]
-label =  "RP";  shape = rectangle; color = red
-} ; 
-subgraph cluster12 {
-   12.0 [shape = plaintext label = ""]
-label =  "R_Sh";  shape = rectangle; color = red
-} ; 
-subgraph cluster13 {
-   13.0 [shape = plaintext label = ""]
-label =  "R_ShP";  shape = rectangle; color = red
-} ; 
-subgraph cluster14 {
-   14.0 [shape = plaintext label = ""]
-label =  "R_Sh_G";  shape = rectangle; color = red
-} ; 
-subgraph cluster15 {
-   15.0 [shape = plaintext label = ""]
-label =  "R_Sh_G_S";  shape = rectangle; color = red
-} ; 
-subgraph cluster16 {
-   16.0 [shape = plaintext label = ""]
-label =  "R_G";  shape = rectangle; color = red
-} ; 
-subgraph cluster17 {
-   17.0 [shape = plaintext label = ""]
-label =  "R_G_S";  shape = rectangle; color = red
-} ; 
+1.0 -- 2.0
+1.1 -- 2.0
+3.0 -- 4.0
+3.1 -- 4.0
+5.0 -- 6.0
+5.1 -- 6.0
 }
