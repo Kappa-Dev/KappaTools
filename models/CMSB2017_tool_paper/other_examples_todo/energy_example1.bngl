@@ -1,0 +1,168 @@
+# Illustration of energy modeling approach w/ a simple protein scaffold model
+# AUTHOR: justin.s.hogg@gmail.com
+# UPDATE: 31 March 2013
+#
+# A free-energy approach to rule-based modeling was introduced by
+# J. Ollivier, et al. (PLoS Comp. Bio. 2011); with key generalizations by
+# Vincent Danos. Keep an eye out for a paper describing our implementation
+# of energy modeling in the BioNetGen platform. We think there are lots of
+# exciting applications on the horizon.
+
+# Requires BioNetGen >= 2.2.4
+version("2.2.4")
+
+# BNG uses the following value, along with compartment volumes, to convert
+# intensive units (concentration) to extensive units (numbers). If you are
+# measuring quantity in moles, set this to Avogadro's number. If quantity is
+# measured by pure numbers, then set to 1, etc.
+setOption("NumberPerQuantityUnit",6.0221e23)
+
+begin model
+begin parameters
+    # Fundamental constants
+    RT  2.5774863        # product of Universal gas constant and Temperature, kJ/mol
+    NA  6.0221418e23     # Avogadro's Number, /mol
+    PI  3.1415927        # Pi, no units
+    # Geometry parameters
+    rad_cell  1e-4                 # radius of cell, dm
+    vol_CP    4/3*PI*rad_cell^3    # volume of cytoplasm, L
+    # Initial species concentrations, M
+    conc_S_0  1e-9
+    conc_A_0  10e-9
+    conc_B_0  10e-9
+    conc_C_0  10e-9
+    # Free energy parameters. See "energy patterns" block for more info.
+    # Bond energy terms, kJ/mol. (NOTE: -47.5 kJ/mol ~= Kd=10nM)
+    Gf_SA    -47.5  
+    Gf_SB    -47.5
+    Gf_SC    -47.5
+    # Bond-bond cooperativity, kJ/mol. (NOTE: 0 kJ/mol = no cooperativity)
+    Gf_SAB    1.8
+    Gf_SBC   -5.9
+    Gf_SABC  -1.8
+    # Rate distribution parameter, no units. Phi=1/2 is a good choice.
+    phi       0.5
+    # Baseline activation energy terms, kJ/mol. See reaction rules block for
+    # an explanation of how kinetic rates are computed from phi and Ea0.
+    Ea0_SA   -17.8
+    Ea0_SB   -17.8
+    Ea0_SC   -17.8
+    # NOTE: negative Ea0 values are ok! For our calculations, we assume the
+    # transition state energy absorbs the pre-exponential factor "C" of the
+    # Arrhenius ratelaw. Consequently, the energy may be negative. (Future
+    # releases may allow the user to specify a value for "C" directly.
+    # For unimolecular reactions, a typical Ea0 is positive,
+    # e.g. (5.9 -> 17.8 kJ/mol). For bimolecular reactions, a typical Ea0 is
+    # negative (-23.7 -> -11.9 kJ/mol). Typical values do depend on "phi", so
+    # be sure to reconsider your estimates if "phi" is changed from 1/2.
+end parameters
+begin compartments
+    # Compartments are not required for use of energy modeling,
+    # but BNG will convert intensive units to extensive units
+    # automatically if you specify compartments. Recall that BNG requires
+    # extensive units (e.g. counts/s) for discrete stochastic simulations.
+    # If compartments are disabled, you must do the conversions directly
+    # (which some users may prefer).
+    CP  3  vol_CP    # "CP" = cytoplasm, 3-dim space, volume = "vol_CP"
+end compartments
+begin molecule types
+    S(a,b,c)   # Scaffold protein with three binding domains
+    A(s)       # Protein A interacts with scaffold at site S(a)
+    B(s)       # Protein B interacts with scaffold at site S(b)
+    C(s)       # Protein C interacts with scaffold at site S(c)
+end molecule types
+begin seed species
+    # seed species units should counts, not concentration
+    S(a,b,c)@CP  conc_S_0*NA*vol_CP
+    A(s)@CP      conc_A_0*NA*vol_CP
+    B(s)@CP      conc_B_0*NA*vol_CP
+    C(s)@CP      conc_B_0*NA*vol_CP
+end seed species
+begin energy patterns
+    # this new block is required for energy BNGL models!
+    #
+    # Energy patterns describe motifs within complexes where free-energy is
+    # "stored", e.g. bonds, high-energy states, etc. The standard free-energy
+    # of formation for a complex is computed by finding all energy pattern
+    # motifs and summing over the free-energy parameters weighted by the number
+    # of matches.
+    #
+    # Let "x" be a complex, "p" be an index over energy patterns, and "n(p,x)"
+    # be the number of times pattern p is found in complex x, then the    
+    # standard free energy of formation for x is:
+    #
+    #    DeltaG_f(x) = Sum_p Gf_p * n(p,x)
+    #
+    # free-energy parameters should be unitless, e.g., if energy has units
+    # kJ/mol, then divide by RT (product of univ. gas constant and temperature).
+
+    # bond energy motifs
+    S(a!0).A(s!0)    Gf_SA/RT
+    S(b!0).B(s!0)    Gf_SB/RT
+    S(c!0).C(s!0)    Gf_SC/RT
+    # bond-bond cooperativity motifs
+    S(a!0,b!1).A(s!0).B(s!1)               Gf_SAB/RT
+    S(b!0,c!1).B(s!0).C(s!1)               Gf_SBC/RT
+    S(a!0,b!1,c!2).A(s!0).B(s!1).C(s!2)    Gf_SABC/RT
+end energy patterns
+begin observables
+    # S observables
+    Molecules SAB_only  S(a!0,b!1,c).A(s!0).B(s!1)           # least favorable trimer configuration
+    Molecules SAC_only  S(a!0,c!1).A(s!0).C(s!1)             # intermediate favorability
+    Molecules SBC_only  S(b!0,c!1).B(s!0).C(s!1)             # most favorable trimer configuration
+    Molecules SABC      S(a!0,b!1,c!2).A(s!0).B(s!1).C(s!2)
+    Molecules S_total   S()
+    # A observables
+    Molecules A_bound   S(a!0).A(s!0)
+    Molecules A_total   A()
+    # B observables
+    Molecules B_bound   S(b!0).B(s!0)
+    Molecules B_total   B()
+    # C observables
+    Molecules C_bound   S(c!0).C(s!0)
+    Molecules C_total   C()
+end observables
+begin reaction rules
+    # Rules in an energy model are written with minimal context. For example,
+    # a binding rule would not usually include components or molecules that
+    # are not directly participating in the new bond. (Note that context may
+    # be useful for limiting the size of reaction networks). Kinetics
+    # are derived for each reaction generated by a rule from the free-energy
+    # change and activation energy. Energy rules have an Arrhenius rate law,
+    # which has the following syntax:
+    #
+    #     Arrhenius(phi, Ea0/RT)
+    #
+    # where "phi" is the rate distribution parameter (no units), "Ea0" the
+    # baseline activation energy (kJ/mol) for a reaction with DeltaG=0, and
+    # "RT" is the product of univ. gas constant and temperature (kJ/mol).
+    #
+    # Kinetic rates are computed as follows:
+    #
+    #   k+ = C*exp(-(Ea0 + phi*DeltaG)/RT)
+    #   k- = C*exp(-(Ea0 + (phi-1)*DeltaG)/RT)
+    #
+    # This deviates slightly from Ollivier et al., but has the same spirit. 
+    # Note that we assume C=1 (no loss of generality if temperature is fixed).
+    #
+    # In most cases, phi=1/2 is a good choice. Bidirectional energy rules
+    # only have ONE Arrhenius type ratelaw, not two (in contrast to other
+    # ratelaw types). Note that a model may include both elementary ratelaw
+    # rules and Arrhenius ratelaw rules. However, there is no guarantee that
+    # detailed balance will be satisfied.
+
+    # ..And here are the reaction rules. Relish the simplicity.
+    R0:  S(a) + A(s)  <->  S(a!0).A(s!0)  Arrhenius(phi,Ea0_SA/RT)
+    R1:  S(b) + B(s)  <->  S(b!0).B(s!0)  Arrhenius(phi,Ea0_SB/RT)
+    R2:  S(c) + C(s)  <->  S(c!0).C(s!0)  Arrhenius(phi,Ea0_SC/RT)
+end reaction rules
+end model
+
+# Generate the network. Kinetics are computed as the reactions are constructed. 
+generate_network({overwrite=>1})
+# Simulate with ODE or SSA only. NFsim does not yet support energy models =(.
+writeSBML()
+#simulate({method=>"ode",t_start=>0,t_end=>200,n_steps=>1000,atol=>1e-4,rtol=>1e-6})
+
+# ..and we're done!
+

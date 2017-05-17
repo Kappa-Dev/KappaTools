@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March the 10th of 2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <May 16 2017>
  *
  * Compute the influence relations between rules and sites.
  *

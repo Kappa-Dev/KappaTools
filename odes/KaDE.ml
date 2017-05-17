@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 13 2017>
+  * Last modification: Time-stamp: <May 16 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -225,6 +225,19 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           Export_to_kade.get_contact_map
             ~accuracy_level:Remanent_state.High state
         in
+        (*--------------------------------------------*)
+        (*test: contact map*)
+        let errors = Exception.empty_error_handler in
+        let _state, internal_contact_map =
+          Export_to_kade.get_internal_contact_map
+            ~accuracy_level:Remanent_state.High state
+        in
+        let () = Format.printf "+ compute contact map ... @." in
+        let _ =
+          Contact_map_scc.contact_map_graph parameters errors
+            internal_contact_map
+        in
+        (*--------------------------------------------*)
         let parameters =
           Remanent_parameters.set_logger
             parameters

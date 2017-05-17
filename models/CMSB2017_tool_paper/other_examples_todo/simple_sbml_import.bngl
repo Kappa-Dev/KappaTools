@@ -1,0 +1,3 @@
+readFile({file=>"BIOMD0000000010.xml",atomize=>1})
+generate_network({overwrite=>1})
+simulate({method=>"ode",t_start=>0,t_end=>7200,n_steps=>1000})

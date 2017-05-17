@@ -1,0 +1,141 @@
+# simple_nfsim.bngl
+#
+# An example model for running NFsim to get you started.
+#
+# Comments in BNGL are always preceded with a pound (#) character, so that any text that
+# follows a pound character is ignored.  The model file below is commented to help you
+# understand the main parts of a BNGL file.  Note that some commands at the end of the
+# model file that allow you to run the model with different simulators are commented out.
+# To use these other options, simply remove the pound character before the command.
+
+begin model
+
+# The first part of a BNGL file is the parameters block, where you can define the rates
+# of equations or the starting numbers of any of the molecular species.
+
+begin parameters
+    kon 10
+    koff 5
+    kcat 0.7
+    dephos 0.5
+end parameters
+
+
+# Next, we define the set of molecule types in the system.  This is a declaration only, so
+# we don't specify how many of each molecules there are, and we have to provide a list
+# of all possible state values for each component of each molecule with a tilda (~)
+# character.
+
+begin molecule types
+    X(y,p~0~1)
+    Y(x)
+end molecule types
+
+
+# Here is where we declare the starting molecules in our simulation.  Each component
+# must be assigned a single state value, and we have to provide how many of each
+# molecule exists in the system.  The number of starting molecules can also be
+# specified with one of the parameters defined earlier.
+
+begin species
+    X(y,p~0)   5000
+    X(y,p~1)   0
+    Y(x)       500
+end species
+
+
+# Observables allow us to define simulation output.  Here we have declared a number
+# of Molecules observables with the given name and pattern.  If you look at the output
+# gdat files that are generated from simulations of this model, you will see that they
+# each have a count for every simulation time.
+
+begin observables
+    Molecules    X_free          X(p~0,y)
+    Molecules    X_p_total       X(p~1)
+    Molecules    Xp_free         X(p~1,y)
+    Molecules    XY              X(y!1).Y(x!1)
+    Molecules    Ytotal          Y()
+    Molecules    Xtotal          X()
+end observables
+
+
+# This model does not require any user-defined functions, but you would
+# declare them here if you needed to.  See the user manual for help with
+# declaring your own functions.
+
+begin functions
+
+end functions
+
+
+# This is a very simple system indeed.  The only rules that are defined
+# tell us that X can bind Y if X is dephosphorylated.  Then the XY complex
+# can either disassociate, or a phosphorylation reaction can occur.  Finally, X
+# will dephosphorylate regardless of whether or not it is bound to Y, although
+# for these rules, it will always be unbound to Y if it is phosphorylated.
+# Here are the rule definitions:
+
+begin reaction rules
+    X(y,p~0) + Y(x) -> X(y!1,p~0).Y(x!1)   kon
+    X(y!1,p~0).Y(x!1) -> X(y,p~0) + Y(x)   koff
+    X(y!1,p~0).Y(x!1) -> X(y,p~1) + Y(x)   kcat
+
+    X(p~1) -> X(p~0)                       dephos
+end reaction rules
+
+end model
+
+# COMMAND FOR RUNNING OR PROCESSING THIS BNGL FILE
+
+# Now we can run NFsim directly from BioNetGen using the 'simulate' command with
+# the 'method' argument set to "nf". Here, "t_end" is the simulation time, "n_steps" 
+# is the number of output steps, and "suffix" is the filename ending of this run.  
+# The suffix allows us to run the same model multiple times here, and distinguish 
+# between all the runs with different "suffix"s. Note that this step will also 
+# automatically create an NFsim readable XML model specification file.
+ 
+simulate({method=>"nf",suffix=>"goNFsim",t_end=>100,n_steps=>50})
+
+# We can also pass various additional arguments to NFsim. As an example, we can 
+# rerun the model with the 'verbose' and universal traversal limit ('utl') 
+# options. See the manual for a description of Universal Traversal Limits. See
+# the 'BioNetGen Actions & Arguments Guide', available at bionetgen.org, for all
+# supported arguments.
+
+# simulate_nf({suffix=>"nfVerbose",t_end=>100,n_steps=>50,verbose=>1,utl=>3})
+
+# If we want to run NFsim directly from the console and ignore BioNetGen altogether
+# after the BNGL file has been processed, we need to include the "writeXML" command.
+# This will write out your model to "simple_nfsim.xml".  In general, the XML file
+# name will match the BNGL file name, with a .xml extension instead of .bngl.
+
+# writeXML()
+
+# If you uncomment and use this command here, then you can run NFsim directly by
+# calling the NFsim_[version] executable from the command line, where [version] is
+# the NFsim version that matches your operating system.  See the user manual for more
+# help.
+
+# Finally, if we want to simulate this model with ordinary differential equations (ODEs)
+# or with Gillespie's stochastic simulation algorithm (SSA) in BioNetGen, we have
+# to first generate the reaction network with the following command.  The overwrite
+# option (which you can remove) is set to 1 here so that every time this is run the
+# reaction network output file will be regenerated.
+
+# generate_network({overwrite=>1})
+
+# Then we can call the 'simulate' command with the desired 'method' argument to run the model file.  
+# Again, the suffix parameter is used to name the output of the simulations.  Note also that
+# between BioNetGen ODE and SSA simulation commands, we have to reset the molecule concentrations.
+# this is needed because BioNetGen allows you to restart a simulation from the end of a
+# previous simulation.
+
+# simulate({method=>"ode",t_end=>100,n_steps=>50})
+
+# resetConcentrations()
+
+# simulate({method=>"ssa",suffix=>ssa,t_end=>100,n_steps=>50})
+
+
+
+

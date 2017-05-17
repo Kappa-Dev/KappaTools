@@ -1,0 +1,152 @@
+# The primary focus of the model developed by Kholodenko
+# is the cascade of signaling events that lead to 
+# recruitment of cytosolic Sos to the inner cell membrane.  
+# EGF binds to EGFR, which leads to the formation of signaling-competent 
+# receptor dimers.  A dimer then can be transphoshorylated. 
+# The cytosolic adapter proteins Grb2 and Shc are recruited to 
+# phosphorylated dimer.  
+# When Shc is bound to a dimer, it can be phosphorylated by EGFR. 
+# The phosphorylated form of Shc interacts with Grb2, which 
+# interacts constitutively with Sos.
+
+begin model
+begin parameters
+    EGF_tot          1.2e6    # molecule counts
+    Rec_tot          1.8e5
+    Grb2_tot         1.0e5      
+    Shc_tot          2.7e5
+    SOS_tot          1.3e4   
+    Grb2_SOS_tot     4.9e4
+
+    kp1      1.667e-06 # ligand-monomer binding (scaled), units: /molecule/s
+    km1           0.06 # ligand-monomer dissociation, units: /s
+
+    kp2      5.556e-06 # aggregation of bound monomers (scaled)
+    km2            0.1 # dissociation of bound monomers
+
+    kp3              1 # dimer transphosphorylation   
+    km3              9 # dimer dephosphorylation        
+
+    kp14             6 # Shc transphosphorylation  
+    km14          0.06 # Shc dephosphorylation      
+
+    km16         0.005 # Shc cytosolic dephosphorylation     
+
+    kp9       1.666e-6 # binding of Grb2 to receptor (scaled)
+    km9           0.05 # dissociation of Grb2 from receptor
+
+    kp10     5.556e-06 # binding of Sos to receptor (scaled)
+    km10          0.06 # dissociation of Sos from receptor
+
+    kp11       2.5e-06 # binding of Grb2-Sos to receptor (scaled)
+    km11          0.03 # diss. of Grb2-Sos from receptor
+
+    kp13         5e-05 # binding of Shc to receptor (scaled)
+    km13           0.6 # diss. of Shc from receptor
+
+    kp15         5e-07 # binding of ShcP to receptor (scaled)
+    km15           0.3 # diss. of ShcP from receptor
+
+    kp17     1.667e-06 # binding of Grb2 to RP-ShcP (scaled)
+    km17           0.1 # diss. of Grb2 from RP-ShcP  
+
+    kp18        5e-07 # binding of ShcP-Grb2 to receptor (scaled)
+    km18           0.3 # diss. of ShcP-Grb2 from receptor
+
+    kp19     5.556e-06 # binding of Sos to RP-ShcP-Grb2 (scaled)
+    km19        0.0214 # diss. of Sos from RP-ShcP-Grb2 
+
+    kp20     1.333e-07 # binding of ShcP-Grb2-Sos to receptor (scaled)
+    km20          0.12 # diss. of ShcP-Grb2-Sos from receptor
+
+    kp24         5e-06 # binding of Grb2-Sos to RP-ShcP (scaled)
+    km24        0.0429 # diss. of Grb2-Sos from RP-ShcP
+
+    kp21     1.667e-06 # binding of ShcP to Grb2 in cytosol (scaled)
+    km21          0.01 # diss. of Grb2 and SchP in cytosol
+
+    kp23     1.167e-05 # binding of ShcP to Grb2-Sos in cytosol (scaled)
+    km23           0.1 # diss. of Grb2-Sos and SchP in cytosol
+
+    kp12     5.556e-08 # binding of Grb2 to Sos in cytosol (scaled)
+    km12        0.0015 # diss. of Grb2 and Sos in cytosol
+
+    kp22     1.667e-05 # binding of ShcP-Grb2 to Sos in cytosol (scaled)
+    km22         0.064 # diss. of ShcP-Grb2 and Sos in cytosol
+
+    # check detailed balance
+    loop1 = (kp9/km9)*(kp10/km10)/((kp11/km11)*(kp12/km12))
+    loop2 = (kp15/km15)*(kp17/km17)/((kp21/km21)*(kp18/km18))
+    loop3 = (kp18/km18)*(kp19/km19)/((kp22/km22)*(kp20/km20))
+    loop4 = (kp12/km12)*(kp23/km23)/((kp22/km22)*(kp21/km21))
+    loop5 = (kp15/km15)*(kp24/km24)/((kp20/km20)*(kp23/km23))
+end parameters
+
+begin seed species
+    EGF            0
+    Grb2           Grb2_tot 
+    Grb2_Sos       Grb2_SOS_tot 
+    Shc            Shc_tot 
+    ShcP           0        
+    ShcP_Grb2      0        
+    ShcP_Grb2_Sos  0        
+    Sos            SOS_tot  
+    R              Rec_tot  
+    RA             0        
+    R2             0        
+    RP             0        
+    R_Sh           0        
+    R_ShP          0        
+    R_Sh_G         0        
+    R_Sh_G_S       0        
+    R_G            0        
+    R_G_S          0        
+end seed species
+
+begin reaction rules
+    R         + EGF           <->   RA             kp1,  km1
+    RA        + RA            <->   R2             kp2,  km2
+    R2                        <->   RP             kp3,  km3
+    RP        + Grb2          <->   R_G            kp9,  km9
+    R_G       + Sos           <->   R_G_S          kp10, km10
+    RP        + Grb2_Sos      <->   R_G_S          kp11, km11
+    RP        + Shc           <->   R_Sh           kp13, km13
+    R_Sh                      <->   R_ShP          kp14, km14
+    RP        + ShcP          <->   R_ShP          kp15, km15
+    R_ShP     + Grb2          <->   R_Sh_G         kp17, km17
+    RP        + ShcP_Grb2     <->   R_Sh_G         kp18, km18
+    R_Sh_G    + Sos           <->   R_Sh_G_S       kp19, km19
+    RP        + ShcP_Grb2_Sos <->   R_Sh_G_S       kp20, km20
+    R_ShP     + Grb2_Sos      <->   R_Sh_G_S       kp24, km24
+    ShcP      + Grb2          <->   ShcP_Grb2      kp21, km21
+    ShcP      + Grb2_Sos      <->   ShcP_Grb2_Sos  kp23, km23
+    ShcP                       ->   Shc            km16
+    Grb2      + Sos           <->   Grb2_Sos       kp12, km12
+    ShcP_Grb2 + Sos           <->   ShcP_Grb2_Sos  kp22, km22
+end reaction rules
+
+begin observables
+    Species  Dimers       R2, RP, R_G, R_G_S, R_Sh, R_ShP, R_Sh_G, R_Sh_G_S, R2, RP, R_G, R_G_S, R_Sh, R_ShP, R_Sh_G, R_Sh_G_S 
+    Species  Sos_act      R_G_S, R_Sh_G_S
+    Species  RP           RP, R_G, R_G_S, R_Sh, R_ShP, R_Sh_G, R_Sh_G_S   
+    Species  Shc_Grb      R_Sh_G, R_Sh_G_S, ShcP_Grb2, ShcP_Grb2_Sos 
+    Species  Shc_Grb_Sos  R_Sh_G_S, ShcP_Grb2_Sos 
+    Species  R_Grb2       R_G, R_G_S, R_Sh_G, R_Sh_G_S 
+    Species  R_Shc        R_Sh
+    Species  R_ShcP       R_ShP, R_Sh_G, R_Sh_G_S
+    Species  Shc_P        R_ShP, R_Sh_G, R_Sh_G_S, ShcP, ShcP_Grb2, ShcP_Grb2_Sos 
+    Species  R_G_S        R_G_S
+    Species  R_S_G_S      R_Sh_G_S
+end observables
+end model
+
+## actions ##
+generate_network({overwrite=>1})
+
+# Equilibration
+setConcentration("EGF",0)
+simulate({method=>"ode",t_end=>100000,n_steps=>10,steady_state=>1})
+
+# Kinetics
+setConcentration("EGF","EGF_tot")
+simulate({method=>"ode",t_end=>120,n_steps=>120})

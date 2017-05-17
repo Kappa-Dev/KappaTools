@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <May 16 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -26,7 +26,8 @@ module AccuracyMap: SetMap.Map with type elt = accuracy_level
 type internal_contact_map =
   (Ckappa_sig.c_state list *
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
-    Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
+    Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_map_and_set.Map.t
 
 type contact_map =
   ((string list) * (string*string) list)

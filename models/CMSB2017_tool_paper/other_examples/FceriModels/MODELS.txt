@@ -1,0 +1,10 @@
+Model                   Species     Reactions
+fceri_ji_red.bngl       172         1433
+fceri_ji.bngl           354         3680
+fceri_lyn_745.bngl      745         ?
+fceri_fyn.bngl          1281        15256
+fceri_fyn_lig.bngl      2562        ?
+fceri_trimer.bngl       2954        49948
+fceri_gamma2.bngl       3744        ?
+fceri_gamma2_asym.bngl  10734       183532
+fceri_fyn_trimer.bngl   20881       ?

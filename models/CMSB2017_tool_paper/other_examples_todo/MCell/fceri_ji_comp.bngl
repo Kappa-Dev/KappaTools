@@ -1,0 +1,136 @@
+begin model
+begin parameters
+    Nav   6.022e8
+    Lig_tot  6.0e3  # units: molecules
+    Rec_tot  4.0e2  # units: molecules
+    Lyn_tot  2.8e2  # units: molecules
+    Syk_tot  4e2  # units: molecules
+     kp1  1e5/Nav  # units: M
+     km1  0.00             # units: /s
+     kp2  1e3/Nav        # units: M
+     km2  0.00              # units: /s
+     kpL  1e7/Nav           # units: M
+     kmL  20             # units: /s
+    kpLs  1e7/Nav           # units: M
+    kmLs  0.12           # units: /s
+     kpS  1e7/Nav           # units: M
+     kmS  0.13           # units: /s
+     pLb  30             # units: /s
+    pLbs  100            # units: /s
+     pLg    1            # units: /s
+    pLgs    3            # units: /s
+     pLS   30            # units: /s
+    pLSs  100            # units: /s
+     pSS  100            # units: /s
+    pSSs  200            # units: /s
+      dm   0.1            # units: /s
+      dc   0.1            # units: /s
+      vol_wall 0.88
+      vol_EC   39
+      vol_PM   0.01
+      vol_CP   1
+end parameters 
+
+begin compartments
+ wall 2  vol_wall
+ EC  3  vol_EC   wall
+ PM  2  vol_PM  EC
+ CP  3  vol_CP   PM
+end compartments 
+ 
+begin molecule types
+Lig(l,l)
+Lyn(U,SH2)
+Syk(tSH2,l~Y~pY,a~Y~pY)
+Rec(a,b~Y~pY,g~Y~pY)
+end molecule types
+
+begin species
+    @EC:Lig(l,l)           Lig_tot
+    @PM:Lyn(U,SH2)         Lyn_tot
+    @CP:Syk(tSH2,l~Y,a~Y)  Syk_tot
+    @PM:Rec(a,b~Y,g~Y)     Rec_tot
+end species
+
+begin reaction rules
+    # Ligand-receptor binding      
+    R1: Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l)  kp1, km1
+
+    # Receptor-aggregation
+    R2: Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+)  kp2, km2
+
+    # Constitutive Lyn-receptor binding
+    R3: Rec(b~Y) + Lyn(U,SH2) <-> Rec(b~Y!1).Lyn(U!1,SH2)  kpL, kmL
+
+    # Transphosphorylation of beta by constitutive Lyn
+    R4: Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY)  pLb
+
+    # Transphosphorylation of gamma by constitutive Lyn
+    R5: Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY)  pLg
+
+    # Lyn-receptor binding through SH2 domain
+    R6: Rec(b~pY) + Lyn(U,SH2) <-> Rec(b~pY!1).Lyn(U,SH2!1)  kpLs, kmLs
+
+    # Transphosphorylation of beta by SH2-bound Lyn
+    R7: Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY)  pLbs
+
+    # Transphosphorylation of gamma by SH2-bound Lyn
+    R8: Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY)  pLgs
+
+    # Syk-receptor binding through tSH2 domain
+    R9: Rec(g~pY) + Syk(tSH2) <-> Rec(g~pY!1).Syk(tSH2!1)  kpS, kmS
+
+    # Transphosphorylation of Syk by constitutive Lyn
+    R10: Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+         Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY)  pLS
+
+    # Transphosphorylation of Syk by SH2-bound Lyn
+    R11: Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+         Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY)  pLSs
+
+    # Transphosphorylation of Syk by Syk not phosphorylated on aloop
+    R12: Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+         Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY)  pSS
+
+    # Transphosphorylation of Syk by Syk phosphorylated on aloop
+    R13: Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+         Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY)  pSSs
+
+    # Dephosphorylation of Rec beta
+    R14: Rec(b~pY) -> Rec(b~Y)  dm
+
+    # Dephosphorylation of Rec gamma
+    R15: Rec(g~pY) -> Rec(g~Y)  dm
+
+    # Dephosphorylation of Syk at membrane
+    R16: Syk(tSH2!+,l~pY) -> Syk(tSH2!+,l~Y)  dm
+    R17: Syk(tSH2!+,a~pY) -> Syk(tSH2!+,a~Y)  dm
+
+    # Dephosphorylation of Syk in cytosol
+    R18: Syk(tSH2,l~pY) -> Syk(tSH2,l~Y)  dc
+    R19: Syk(tSH2,a~pY) -> Syk(tSH2,a~Y)  dc
+end reaction rules
+
+begin observables
+    Molecules  LynFree    Lyn(U,SH2)
+    Molecules  RecMon	  Rec(a), Rec(a!1).Lig(l!1,l)
+    Molecules  RecDim     Rec.Rec                   
+
+    Molecules  RecPbeta   Rec(b~pY!?)
+    Molecules  RecPgamma  Rec(g~pY), Rec(g~pY!+)
+    Molecules  RecSyk     Rec(g~pY!1).Syk(tSH2!1)
+    Molecules  RecSykPS   Rec(g~pY!1).Syk(tSH2!1,a~pY)
+
+    Molecules  SykTest    Syk
+    Molecules  LynTest    Lyn
+    Molecules  RecTest    Rec
+end observables
+end model
+
+## actions ##
+#generate_network({overwrite=>1})
+#writeXML()
+writeMDL() 
+#generate_network({overwrite=>1})
+#simulate({method=>"ode",t_end=>5,n_steps=>1000,atol=>1e-8,rtol=>1e-8})
+

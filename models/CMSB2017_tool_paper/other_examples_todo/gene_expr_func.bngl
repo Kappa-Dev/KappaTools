@@ -1,0 +1,97 @@
+# Three-stage Model of Gene Expression
+# from: V Shahrezaei and PS Swain (2008) PNAS
+# doi: 10.1073/pnas.0803850105
+#
+# Let n be the number of proteins in the system at equilibrium.
+# In the limit that gam -> infinity, we have:
+#   P(n) = G(alpha+n)*G(beta+n)*G(kap0+kap1)/G(n+1)/G(alpha)/G(beta)/G(kap1+kap2+n)
+#           * (b/(1+b))^n * (1 - b/(1+b))^alpha * 2F1(alpha+n, kap0+kap1-beta; kap0+kap1+n; b/(1+b))
+# where alpha = 0.5*(a+kap0+kap1+phi),
+#       beta  = 0.5*(a+kap0+kap1-phi),
+#       phi^2   = (a+kap0+kap1)^2-4*a*kap0,
+#       G is the Gamma function, and
+#       2F1 is the Gauss hypergeometric function.
+#
+# We can validate the equilibrium distribution of our simulator by collecting N=10,000 samples,
+#  placing those samples into B=20 bins, and comparing the expected and observed frequencies
+#  using the Pearson's chi-square test with D=19 degrees of freedom.
+#
+# Bins: n = 0, 1-2, 3-6, 7-9, 10-12, 13-15, 16-17, 18-20, 21-23, 24-26, 27-28, 29-31,
+#           32-35, 36-38, 39-42, 43-46, 47-52, 53-59, 60-71, 72-infinity
+#
+# p(Bins):  0.0407, 0.0435, 0.0655, 0.0470, 0.0490, 0.0515, 0.0356, 0.0546, 0.0551, 0.0546,
+#           0.0355, 0.0514, 0.0640, 0.0439, 0.0527, 0.0459, 0.0566, 0.0494, 0.0530, 0.0503
+#
+# chi-square calculation:  SUM_b=1..B[ (Observed(b) - N*pBin(b))^2 / (N*pBin(b)) ]
+#
+# p-values: 0.200 => 23.900
+#           0.100 => 27.204
+#           0.050 => 30.144
+#           0.020 => 33.687
+#           0.010 => 36.191
+#           0.005 => 38.582
+#           0.002 => 41.610
+#           0.001 => 43.820
+# (degrees of freedom = 19)
+
+begin model
+begin parameters
+    # unitless parameters
+    a     4       # a = v0/d1
+    b     10      # b = v1/d0
+    gam   10      # gam = d0/d
+    kap0  0.6     # kap0 = k0/d1
+    kap1  0.2     # kap1 = k1/d1
+    # kinetic parameters
+    d1   0.0005      # /s
+    d0   gam*d1      # /s
+    k0   kap0*d1     # /s
+    k1   kap1*d1     # /s
+    v0   a*d1        # /s
+    v1   b*d0        # /s
+end parameters
+begin molecule types
+    DNA(promoter~0~1)
+    mRNA()
+    Protein()
+    Src()
+    Null()
+end molecule types
+begin seed species
+    DNA(promoter~0)  1
+    mRNA()           0
+    Protein()        0
+    Src()            1
+    $Null()          0
+end seed species
+begin observables
+    Molecules  DNA_Active     DNA(promoter~1)
+    Molecules  DNA_Total      DNA()
+    Molecules  mRNA_Total     mRNA()
+    Molecules  Protein_Total  Protein()
+end observables
+begin functions
+    fcn_mRNA() =  v0*DNA_Active
+    fcn_Prot() =  v1*mRNA_Total
+end functions
+begin reaction rules
+    # promoter activation
+    DNA(promoter~0)  <->  DNA(promoter~1)    k0,k1
+    # mRNA synthesis
+    Src()  ->  Src() + mRNA()       fcn_mRNA()
+    # Protein synthesis
+    Src()  ->  Src() + Protein()    fcn_Prot()
+    # degradation
+    mRNA()     ->  Null()   d0
+    Protein()  ->  Null()   d1
+end reaction rules
+end model
+
+## actions ##
+generate_network({overwrite=>1})
+simulate({method=>"ssa",suffix=>"burnin",t_start=>0,t_end=>10000000,n_steps=>1})
+saveConcentrations()
+simulate({method=>"ssa",suffix=>"ssa_equil",t_start=>0,t_end=>200000000,n_steps=>10000})
+resetConcentrations()
+simulate({method=>"nf",suffix=>"nf_equil",t_start=>0,t_end=>200000000,n_steps=>10000,gml=>1000000})
+

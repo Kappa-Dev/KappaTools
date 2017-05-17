@@ -1,0 +1,46 @@
+begin model
+begin parameters
+  A0     100
+  B0     100
+  X0     100
+  kf_A   10
+  km_A   1
+  kcat   0.1
+  kf_B   10
+  km_B1  1
+  km_B2  0.1
+end parameters
+
+begin molecule types
+  X(a,b~Y~pY)
+  A1(x)
+  A2(x)
+  B(x)
+end molecule types
+
+begin seed species
+  A1(x)     A0
+  A2(x)     A0
+  B(x)      B0
+  X(a,b~Y)  X0
+end seed species
+
+begin reaction rules
+  R1a: X(a) + A1(x) <-> X(a!1).A1(x!1)               kf_A, km_A
+  R1b: X(a) + A2(x) <-> X(a!1).A2(x!1)               kf_A, km_A
+
+  R2a: X(a!1,b~Y).A1(x!1) -> X(a!1,b~pY).A1(x!1)     kcat
+  R2b: X(a!1,b~Y).A2(x!1) -> X(a!1,b~pY).A2(x!1)     kcat
+
+  R3a: X(b~Y) + B(x) <-> X(b~Y!1).B(x!1)             kf_B, km_B1
+  R3b: X(b~pY) + B(x) <-> X(b~pY!1).B(x!1)           kf_B, km_B2
+end reaction rules
+end model
+
+visualize({type=>"contactmap"})
+visualize({type=>"ruleviz_pattern"})
+visualize({type=>"ruleviz_operation"})
+visualize({type=>"regulatory","background"=>1,suffix=>"1"})
+visualize({type=>"regulatory","background"=>0,opts=>["visualize_opts1.txt"],suffix=>"2"})
+visualize({type=>"regulatory","background"=>0,opts=>["visualize_opts1.txt","visualize_opts2.txt"],groups=>1,suffix=>"3"})
+visualize({type=>"regulatory","background"=>0,opts=>["visualize_opts1.txt","visualize_opts2.txt"],groups=>1,collapse=>1,suffix=>"4"})

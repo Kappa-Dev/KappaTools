@@ -1,0 +1,22 @@
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-3083-g1567d7b-dirty))
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Analysis launched at 2017/05/17 13:53:41 (GMT+2) on wf102.di.ens.fr
+#Command line is: KaSa rec_dim.ka
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "l1" shape =circle color = yellow size = "5"]
+   0.1 [style = filled label = "l2" shape =circle color = yellow size = "5"]
+label =  "Lig";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "a" shape =circle color = yellow size = "5"]
+label =  "Rec";  shape = rectangle; color = red
+} ; 
+0.0 -- 1.0
+0.1 -- 1.0
+}

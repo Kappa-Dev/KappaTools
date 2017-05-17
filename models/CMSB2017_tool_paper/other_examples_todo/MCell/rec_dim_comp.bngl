@@ -1,0 +1,53 @@
+begin model
+begin parameters
+     NaV      6.022e23*1e-15 # molecule -> concentration conversion assuming volume in um^3 (fL)   
+     Lig_tot  6.0e3          # molecules
+     Rec_tot  4.0e2          # molecules
+     kp1  (1e5)/NaV          # (L/mol/s) -> um^3/molec/s
+     km1  0.01               # /s
+     kp2  (1e3)/NaV          # (L/mol/s) -> um^3/molec/s
+     km2  0.01               # /s
+     vol_wall   0.88         # um^3
+     vol_EC    39            # um^3
+     vol_PM    0.01          # um^3
+     vol_CP     1            # um^3
+end parameters 
+
+begin compartments
+# name dimension volume contained_by
+    wall 2  vol_wall
+    EC  3  vol_EC   wall
+    PM  2  vol_PM  EC
+    CP  3  vol_CP   PM
+end compartments 
+ 
+begin molecule types
+Lig(l,l)
+Rec(a)
+end molecule types
+
+begin species
+    @EC:Lig(l,l)   Lig_tot
+    @PM:Rec(a)     Rec_tot
+end species
+
+begin observables
+    Molecules RecFree  Rec(a) 
+    Molecules RecBound Rec(a!+)
+    Species   Dimers   Rec().Rec()                   
+end observables
+
+begin reaction rules
+    # Ligand-receptor binding      
+    R1: Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l)  kp1, km1
+
+    # Receptor-aggregation
+    R2: Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+)  kp2, km2
+end reaction rules
+
+end model
+
+writeMDL()
+#generate_network({overwrite=>1})
+#simulate({method=>"ode",t_end=>5,n_steps=>1000})
+

@@ -1,0 +1,78 @@
+begin model
+begin parameters
+    kon_S1      1
+    koff_S1     0.1
+    kon_S2      1
+    koff_S2     0.001
+    kp1_PTP     0.1
+    km1_PTP     90
+    kcat_PTP    10
+    kp1_KD      10
+    km1_KD      99
+    kcat_KD     1 
+    chi_m       100
+    R_tot       1
+end parameters
+
+begin species
+    #R(KD,Y1~U,Y2~U) 1.00
+    R(KD,Y1~P)     R_tot
+    S1(PTP,SH2)    1.00
+    S2(SH2,Y~U)    0.25
+end species
+
+begin reaction rules
+
+    # Binding of S1(SH2) from cytosol
+    R(Y1~P) + S1(SH2) <-> R(Y1~P!1).S1(SH2!1)  kon_S1, koff_S1 \
+              exclude_reactants(2,R) 
+
+    # Binding of S1(SH2) from membrane
+    R(Y1~P) + S1(SH2) <-> R(Y1~P!1).S1(SH2!1)  chi_m*kon_S1, koff_S1 \
+              include_reactants(2,R) 
+
+    # Binding of S2(SH2) from cytosol
+    R(Y1~P) + S2(SH2) <-> R(Y1~P!1).S2(SH2!1)  kon_S2, koff_S2 \
+              exclude_reactants(2,R) 
+
+    # Binding of S2(SH2) from membrane
+    R(Y1~P) + S2(SH2) <-> R(Y1~P!1).S2(SH2!1)  chi_m*kon_S2, koff_S2 \
+              include_reactants(2,R) 
+
+    # Binding of R(KD) to S2(Y~U) intracomplex and phosphorylation
+    R(KD,Y1~P!1).S2(SH2!1,Y~U) <-> R(KD!2,Y1~P!1).S2(SH2!1,Y~U!2)  kp1_KD, km1_KD
+    R(KD!2,Y1~P!1).S2(SH2!1,Y~U!2) -> R(KD,Y1~P!1).S2(SH2!1,Y~P)   kcat_KD
+
+    # Binding of S2(Y~P) in cytosol to S1(PTP) in cytosol
+    S2(Y~P) + S1(PTP) <-> S2(Y~P!1).S1(PTP!1)  kp1_PTP, km1_PTP \
+    exclude_reactants(1,R) exclude_reactants(2,R) 
+
+    # Binding of S2(Y~P) in cytosol to S1(PTP) at membrane
+    S2(Y~P) + S1(PTP) <-> S2(Y~P!1).S1(PTP!1)  kp1_PTP, km1_PTP \
+    exclude_reactants(1,R) include_reactants(2,R) 
+
+    # Binding of S2(Y~P) at membran to S1(PTP) in cytosol
+    S2(Y~P) + S1(PTP) <-> S2(Y~P!1).S1(PTP!1)  kp1_PTP, km1_PTP \
+    include_reactants(1,R) exclude_reactants(2,R)
+
+    # Binding of S2(Y~P) at membrane to S1(PTP) at membrane
+    S2(Y~P) + S1(PTP) <-> S2(Y~P!1).S1(PTP!1)  chi_m*kp1_PTP, km1_PTP \
+    include_reactants(1,R) include_reactants(2,R)
+
+    # Dephosphorylation of S2(Y~P)
+    S2(Y~P!1).S1(PTP!1) -> S2(Y~U) + S1(PTP)  kcat_PTP
+end reaction rules
+
+begin observables
+    Molecules  S2_P_tot  S2(Y~P!?)
+    Molecules  S2_P_mem  S2(SH2!1,Y~P!?).R(Y1~P!1), S2(SH2,Y~P!1).S1(PTP!1,SH2!2).R(Y1!2)
+    Molecules  R_total   R
+    Molecules  S1_total  S1
+    Molecules  S2_total  S2
+end observables
+end model
+
+## actions ##
+generate_network({overwrite=>1})
+simulate({method=>"ode",t_end=>50,n_steps=>5,rtol=>1e-12,atol=>1e-12})
+

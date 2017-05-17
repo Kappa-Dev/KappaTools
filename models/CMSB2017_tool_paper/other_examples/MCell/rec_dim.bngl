@@ -1,0 +1,40 @@
+begin model
+begin parameters
+     Lig_tot  6.0e3      
+     Rec_tot  4.0e2        
+     kp1  1.32845238e-7  # units: /molecule/s
+     km1  0              # units: /s
+     kp2  2.5e-1         # units: /molecule/s
+     km2  0              # units: /s
+end parameters 
+
+begin molecule types
+Lig(l,l)
+Rec(a)
+end molecule types
+
+begin species
+    Lig(l,l)   Lig_tot
+    Rec(a)     Rec_tot
+end species
+
+begin observables
+    Molecules RecFree  Rec(a) 
+    Molecules RecBound Rec(a!+)
+    Species   Dimers   Rec().Rec()                   
+end observables
+
+begin reaction rules
+    # Ligand-receptor binding      
+    R1: Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l)  kp1, km1
+
+    # Receptor-aggregation
+    R2: Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+)  kp2, km2
+end reaction rules
+
+end model
+
+writeMDL()
+#generate_network({overwrite=>1})
+#simulate({method=>"ode",t_end=>5,n_steps=>1000})
+

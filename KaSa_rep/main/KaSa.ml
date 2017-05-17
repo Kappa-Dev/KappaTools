@@ -4,12 +4,14 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Apr 28 2017>
+ * Last modification: Time-stamp: <May 16 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
+
+
 
 let main () =
   let start_time = Sys.time () in
@@ -92,6 +94,8 @@ let main () =
       else
       state
   in
+  (*-----------------------------------------------------------------------*)
+  (*contact map*)
   let state =
     if (Remanent_parameters.get_do_contact_map parameters)
     then
@@ -107,6 +111,8 @@ let main () =
       | Remanent_parameters_sig.Low -> state
     else state
   in
+  (*-----------------------------------------------------------------------*)
+  (*symmetries*)
   let state =
     if (Remanent_parameters.get_compute_symmetries parameters)
     then
@@ -144,6 +150,8 @@ let main () =
     else
       state, None
   in
+  (*-----------------------------------------------------------------------*)
+  (*efficiency parameters*)
   let _ = Exception.print parameters (Export_to_KaSa.get_errors state) in
   let () =
     if Remanent_parameters.get_print_efficiency parameters
