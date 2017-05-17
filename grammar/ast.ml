@@ -1014,28 +1014,29 @@ let update_rate counters (k,a) =
   in
   ((update_expr k),a)
 
-let add_counter_to_lhs rules =
+let prepare_agent rsites lsites =
+  let rec prepare_site c = function
+    | [] -> [Counter c]
+    | hd::tl ->
+       match hd with
+         Counter c' when (name_match c.count_nme c'.count_nme) ->
+         (Counter {c with count_delta = c'.count_delta})::tl
+       | Counter _ | Port _ -> hd::(prepare_site c tl) in
+  let counters =
+    List.fold_left
+      (fun acc' rsite ->
+        match rsite with Port _ -> acc' | Counter c -> c::acc')
+      [] rsites in
+  List.fold_left (fun acc' c -> prepare_site c acc') lsites counters
+
+(* - add in the lhs : (i) counters only mentioned in the rhs and (ii) the deltas *)
+let prepare_counters rules =
   let aux r =
-    let add_to_lhs c sites =
-      if (List.exists
-            (function Counter c' -> name_match c.count_nme c'.count_nme
-                    | Port _ -> false) sites) then sites
-      else (Counter {c with count_delta = (0,Locality.dummy)})::sites in
     let lhs =
       List.fold_right2
-        (fun ((rna,_),rsites,_) (((lna,a),lsites,b) as lagent) acc ->
-          if ((String.compare rna lna) = 0) then
-            let counters =
-              List.fold_left
-                (fun acc' rsite ->
-                  match rsite with
-                  | Port _ -> acc'
-                  | Counter c -> c::acc') [] rsites in
-            let lsites' =
-              List.fold_left
-                (fun acc' c ->
-                  add_to_lhs c acc') lsites counters in
-            ((lna,a),lsites',b)::acc
+        (fun (rna,rsites,_) ((lna,lsites,b) as lagent) acc ->
+          if ((String.compare (fst rna) (fst lna)) = 0) then
+            let lsites' = prepare_agent rsites lsites in (lna,lsites',b)::acc
           else lagent::acc) r.rhs r.lhs [] in
     {r with lhs} in
   List.map (fun (s,(r,a)) -> (s,(aux r,a))) rules
@@ -1084,8 +1085,8 @@ let enumerate rules f =
 
 let remove_variable_in_counters rules edit_rules signatures =
   let unfold_delta_in_tests c delta =
-    let count_delta = {c with count_test=Some (CEQ delta,Locality.dummy)} in
-    let count_gte = {c with count_test=Some (CGTE (delta+1),Locality.dummy)} in
+    let count_delta = {c with count_test=Some (CEQ (abs(delta)),Locality.dummy)} in
+    let count_gte = {c with count_test=Some (CGTE (abs(delta)+1),Locality.dummy)} in
     [(Counter count_delta,["",delta]);(Counter count_gte,["",delta+1])] in
 
   let remove_var_site counters =
@@ -1162,7 +1163,7 @@ let remove_variable_in_counters rules edit_rules signatures =
             let un_act = update_pair_rate counters r.un_act in
             let append = None in
             (append,{r with mix; act; un_act})) r in
-  let rules = add_counter_to_lhs rules in
+  let rules = prepare_counters rules in
 
   ((enumerate edit_rules remove_var_edit_rule),
    (enumerate rules remove_var_rule))

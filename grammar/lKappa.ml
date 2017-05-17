@@ -841,7 +841,7 @@ let annotate_edit_agent
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
              several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = ra_counters.(p_id) <-(c,Erased) in pset')
+        let () = ra_counters.(p_id) <-(c,Maintained) in pset')
       Mods.IntSet.empty counts in
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
@@ -1014,10 +1014,10 @@ although it is left unpecified in the left hand side"
          register_port_modif p_id [Locality.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
 
-  let register_counter_modif count_nme count_test count_delta c_id =
+  let register_counter_modif c c_id =
     let (incr_id,_,incr_b,_) = incr_agent sigs in
     let () = add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
-    ({Ast.count_nme; Ast.count_delta; Ast.count_test}, Maintained) in
+    (c, Maintained) in
   let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
   let rc_r,_ =
     List.fold_left
@@ -1032,12 +1032,7 @@ although it is left unpecified in the left hand side"
             (fun p -> String.compare (fst p.Ast.count_nme) na = 0) rc in
         let c'' =
           match c' with
-          | [c'] ->
-             register_counter_modif
-               c.Ast.count_nme c.Ast.count_test c'.Ast.count_delta c_id
-          | [] ->
-             register_counter_modif
-               c.Ast.count_nme c.Ast.count_test (0,Locality.dummy) c_id
+          | _::[] | [] -> register_counter_modif c c_id
           | _ :: _ -> several_occurence_of_site agent_name c_na in
         let () = ra_counters.(c_id) <- c'' in
         (rc',cset')) (rc,Mods.IntSet.empty) lc in
@@ -1496,12 +1491,13 @@ let create_sig l with_counters =
     (create_sig_for_counters l with_counters)
 
 let make_counter_agent
-      (first,dst) (last,equal) (ra_type,arity,incr_b,incr_a) i j pos =
+      (first,dst) (last,equal) (ra_type,arity,incr_b,incr_a) i j pos created =
   let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), Maintained) in
+  let before_switch = if first&&created then Linked (i,pos) else Maintained in
   let before =
-    if first then (Ast.LNK_VALUE (i,dst), pos),Linked (i,pos)
-    else (Ast.LNK_VALUE (i,(ra_type,incr_a)), pos),Maintained in
-  let () = ra_ports.(incr_b) <- before in
+    if first then Ast.LNK_VALUE (i,dst), pos
+    else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
+  let () = ra_ports.(incr_b) <- before,before_switch in
   let after =
     if (last&&equal) then Ast.LNK_FREE, pos
     else
@@ -1545,12 +1541,13 @@ let counter_becomes_port
         let last = (i=(nb-1)) in
         let ra_agent =
           make_counter_agent
-            (first,ag_info) (last,equal) incr_info (lnk_nb+i) (lnk_nb+i+1) pos in
+            (first,ag_info) (last,equal) incr_info
+            (lnk_nb+i) (lnk_nb+i+1) pos (delta>0)in
         ra_agent::(link_incr (i+1) nb) in
 
     let rec erase_incr i = function
       | hd::tl ->
-         if (i = (abs(delta)-1)) then
+         if (i = abs(delta)) then
            let () =
              let (before,_) = hd.ra_ports.(incr_b) in
              hd.ra_ports.(incr_b) <-
@@ -1739,13 +1736,13 @@ let compil_of_ast ~syntax_version overwrite c =
   let rules = remove_counters rules sigs with_counters contact_map in
   (*let () =
     if (!Parameter.debugModeOn && with_counters) then
-    (Format.printf "@.lkappa rules@.";
-    List.iter (fun (s,(r,_)) ->
-                let label = match s with None -> "" | Some (l,_) -> l in
+      (Format.printf "@.lkappa rules@.";
+       List.iter (fun (s,(r,_)) ->
+                   let label = match s with None -> "" | Some (l,_) -> l in
                 Format.printf
                   "@.%s = %a" label
                   (print_rule ~full:true sigs (fun _ _ -> ()) (fun _ _ -> ())) r)
-              rules) in*)
+                 rules) in*)
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =
