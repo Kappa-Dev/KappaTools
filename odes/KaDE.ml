@@ -191,7 +191,6 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         let module Export_to_kade =
           (val export_to_kade : Export_to_KaDE.Type)
         in
-        let () = Format.printf "+ compute symmetric sites... @." in
         let state =
           Export_to_kade.init ~compil:(A.to_ast ast) ()
         in
@@ -222,6 +221,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             cli_args preprocessed_ast
         in
         let network = A.init compil in
+        let () = Format.printf "+ compute symmetric sites... @." in
         let network =
           A.compute_symmetries_from_model
             parameters
