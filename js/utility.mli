@@ -7,4 +7,3 @@
 (******************************************************************************)
 
 val split : string -> char -> string * string option
-val input_float_string : float -> string
