@@ -1,0 +1,5 @@
+%agent:	A(x~u~p,c:0 +=3,d:1 +=2)
+
+%init:	10	A(x~u,c:0,d:1)
+
+'negative_delta_too_big' A(x~u,c:1) -> A(x~p,c +=-3) @ 1

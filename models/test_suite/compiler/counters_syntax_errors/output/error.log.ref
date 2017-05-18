@@ -1,0 +1,18 @@
+line 0, characters -1--1:
+Counter variable y appears twice in rule
+_____(1)
+A(x~u?), +A(x~u!., d!., c!.)
+_____(1)
+A(d!1(*b.__incr*)), __incr(a!2(*x.A*), b!1(*d.A*)), __incr(b!2(*a.__incr*))
+_____(1)
+A(c!1(*b.__incr*)), __incr(a!2(*x.A*), b!1(*
+***Runtime error index out of bounds***
+
+File "modif_lhs.ka", line 5, characters 18-19:
+Counter c has a modif in the lhs
+File "negative_delta_too_big.ka", line 5, characters 31-32:
+Counter c becomes negative
+File "test_rhs.ka", line 5, characters 27-28:
+Counter c has a test in the rhs
+File "var_not_spec.ka", line 7, characters 59-60:
+z is not a declared variable

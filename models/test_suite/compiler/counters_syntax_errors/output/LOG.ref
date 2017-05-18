@@ -1,0 +1,29 @@
+Parsing counter_name_twice.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing counter_not_enough_spec.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+Parsing modif_lhs.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing negative_delta_too_big.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing test_rhs.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing var_not_spec.ka...
+done
++ simulation parameters
++ Sanity checks

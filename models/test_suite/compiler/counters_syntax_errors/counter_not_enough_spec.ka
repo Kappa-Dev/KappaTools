@@ -1,0 +1,5 @@
+%agent:	A(x~u~p,c:0 +=3,d:1 +=2)
+
+%init:	10	A(x~u,c:0,d:1)
+
+'not_spec' A(x~u) -> A(x~u),A(x~u,c:0) @ 1
