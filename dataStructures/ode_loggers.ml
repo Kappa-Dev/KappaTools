@@ -1277,10 +1277,10 @@ let string_of_variable_sbml string_of_var_id variable =
   | Ode_loggers_sig.Expr i ->
     string_of_var_id i
   | Ode_loggers_sig.Concentration i -> "s"^(string_of_int i)
+  | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Init _
   | Ode_loggers_sig.Initbis _
   | Ode_loggers_sig.Deriv _
-  | Ode_loggers_sig.Obs _
   | Ode_loggers_sig.Jacobian _
   | Ode_loggers_sig.Jacobian_var _
   | Ode_loggers_sig.NonNegative
@@ -1434,6 +1434,9 @@ let print_comment
       | Loggers.TXT
       | Loggers.TXT_Tabular
       | Loggers.XLS -> ()
+
+let is_time expr =
+  fst expr = Alg_expr.STATE_ALG_OP (Operator.TIME_VAR)
 
 let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(comment="")
     string_of_var_id logger logger_buffer logger_err variable alg_expr network_handler =
@@ -1614,7 +1617,7 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
           else
             id_init
         in
-        let () = Loggers.allocate logger id_init in 
+        let () = Loggers.allocate logger id_init in
         let () = Loggers.flag_dangerous logger variable id in
         if not (Loggers.is_dangerous_ode_variable logger variable)
         then
@@ -1624,6 +1627,46 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
               (Sbml_backend.dotnet_id_of_logger logger)
               id
               (Nbr.to_string cst)
+          in
+          let () = Loggers.print_newline logger_buffer in
+          ()
+      in
+      let doit_obs ()  =
+        let id = comment  in
+        let expr = Alg_expr_extra.simplify alg_expr in
+        if is_time expr
+        then ()
+        else
+          let lin =
+            Lin_comb.Lin.of_expr
+              (fun i ->
+                 Loggers.get_expr logger
+                   (Ode_loggers_sig.Expr
+                      (network_handler.Network_handler.int_of_obs i))
+              )
+              expr
+          in
+          let () =
+            match lin with
+            | Some lin ->
+              let () =
+                Loggers.fprintf logger_buffer
+                  "%i %s "
+                  (Loggers.get_fresh_obs_id logger)
+                  id
+              in
+              let () =
+                Lin_comb.Lin.print
+                  ~sep:","
+                  ~product:"*"
+                  (fun logger i -> Loggers.fprintf logger "%i" i)
+                  (fun logger i -> Loggers.fprintf logger "%i" i)
+                  logger lin
+              in
+              ()
+            | None ->
+              print_comment logger
+                ("Obs "^id^" is ignored: it is not linear")
           in
           let () = Loggers.print_newline logger_buffer in
           ()
@@ -1656,6 +1699,8 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
                | None -> false
                | Some _ -> true)
           then doit ~must_be_fresh:true "_"
+        | Ode_loggers_sig.Obs _,_ ->
+          doit_obs ()
         | Ode_loggers_sig.Stochiometric_coef _,_
         | Ode_loggers_sig.Jacobian_rate (_,_),_
         | Ode_loggers_sig.Jacobian_rateun (_,_),_
@@ -1667,7 +1712,6 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
         | Ode_loggers_sig.Initbis _, _
         | Ode_loggers_sig.Concentration _,_
         | Ode_loggers_sig.Deriv _,_
-        | Ode_loggers_sig.Obs _,_
         | Ode_loggers_sig.Jacobian _,_
         | Ode_loggers_sig.Jacobian_var _,_
         | Ode_loggers_sig.MaxStep, _

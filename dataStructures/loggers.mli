@@ -80,6 +80,7 @@ val is_const:
 
 val of_json: Yojson.Basic.json -> string list
 val to_json: t -> Yojson.Basic.json
+val get_fresh_obs_id: t -> int 
 val get_fresh_reaction_id: t -> int
 val get_fresh_meta_id: t -> int
 val set_id_of_global_parameter: t -> Ode_loggers_sig.variable -> string -> unit
@@ -88,4 +89,4 @@ val is_dangerous_ode_variable: t -> Ode_loggers_sig.variable -> bool
 val flag_dangerous: t -> Ode_loggers_sig.variable -> string -> unit
 val has_forbidden_char: t -> string -> bool
 val allocate_fresh_name: t -> string -> string -> string
-val allocate: t -> string -> unit 
+val allocate: t -> string -> unit
