@@ -578,5 +578,3 @@ class virtual manager () : manager_mpi_type =
 
     inherit manager_base ()
   end
-
-let default_message_delimter : char = '\x1e' (* "\t" *)

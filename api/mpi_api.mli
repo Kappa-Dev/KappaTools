@@ -24,5 +24,3 @@ class type virtual manager_mpi_type =
   end
 
 class virtual manager : unit -> manager_mpi_type
-
-val default_message_delimter : char

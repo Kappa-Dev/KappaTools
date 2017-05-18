@@ -46,3 +46,5 @@ val lowercase: string -> string
 val capitalize: string -> string
 val smash_duplicate_in_ordered_list:
   ('a -> 'a -> int) -> ('a * int) list -> ('a * int) list
+
+val default_message_delimter : char

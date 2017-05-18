@@ -219,3 +219,5 @@ let smash_duplicate_in_ordered_list p l =
   match (List.rev l) with
   | [] -> []
   | (h,n)::t -> aux t n h []
+
+let default_message_delimter : char = '\x1e' (* "\t" *)

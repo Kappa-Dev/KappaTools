@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type t = { mutable delimiter : char; }
-let default : t = { delimiter = Mpi_api.default_message_delimter; }
+let default : t = { delimiter = Tools.default_message_delimter; }
 
 let options (t :t)  : (string * Arg.spec * string) list = [
   ("--delimiter",

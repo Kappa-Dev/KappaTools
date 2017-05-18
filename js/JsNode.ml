@@ -67,7 +67,7 @@ let kappa_process : process option ref = ref None
 
 
 class manager
-    ?(message_delimiter : char = Mpi_api.default_message_delimter)
+    ?(message_delimiter : char = Tools.default_message_delimter)
     (command : string)
     (args : string list) =
   object(self)
