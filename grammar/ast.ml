@@ -1093,6 +1093,20 @@ let enumerate rules f =
     (List.fold_left
        (fun acc (s,r) ->
          let enumerate_r =
+           if ((fst r).lhs = []) then [(None,r)] else
+             List.map
+               (fun (s',r') ->
+                 match s,s' with
+                   None, _ -> None,r'
+                 | Some _, None -> s,r'
+                 | Some (s1,a1), Some s2 -> Some (s1^"__"^s2,a1),r') (f r) in
+         enumerate_r@acc) [] rules)
+
+let enumerate_edit rules f =
+  List.rev
+    (List.fold_left
+       (fun acc (s,r) ->
+         let enumerate_r =
            List.map
              (fun (s',r') ->
                match s,s' with
@@ -1100,6 +1114,7 @@ let enumerate rules f =
                | Some _, None -> s,r'
                | Some (s1,a1), Some s2 -> Some (s1^"__"^s2,a1),r') (f r) in
          enumerate_r@acc) [] rules)
+
 
 let remove_variable_in_counters rules edit_rules signatures =
   let unfold_delta_in_tests c delta =
@@ -1190,7 +1205,7 @@ let remove_variable_in_counters rules edit_rules signatures =
             (append,{r with mix; act; un_act})) r in
   let rules = prepare_counters rules in
 
-  ((enumerate edit_rules remove_var_edit_rule),
+  ((enumerate_edit edit_rules remove_var_edit_rule),
    (enumerate rules remove_var_rule))
 
 let with_counters c =
@@ -1207,11 +1222,16 @@ let compile_counters c =
       remove_variable_in_counters c.rules c.edit_rules c.signatures in
     let () =
       if (!Parameter.debugModeOn) then
-      (Format.printf "ast rules@.";
+      (Format.printf "@.ast rules@.";
       List.iter (fun (s,(r,_)) ->
                   let label = match s with None -> "" | Some (l,_) -> l in
                   Format.printf "@.%s = %a" label print_ast_rule r)
-                rules) in
+                rules;
+      Format.printf "@.ast edit_rules@.";
+      List.iter (fun (s,r) ->
+                  let label = match s with None -> "" | Some (l,_) -> l in
+                  Format.printf "@.%s = %a" label print_ast_edit_rule r)
+                edit_rules) in
     ({c with rules;edit_rules},true)
   else (c,false)
 
