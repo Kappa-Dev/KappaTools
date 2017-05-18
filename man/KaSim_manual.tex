@@ -1419,6 +1419,44 @@ parameter & possible values & description \\
 \end{table}
 %%
 
+\section{Counters}
+
+An agent can have \emph{counters}, which are sites storing a positive integer. When declaring an agent, each counter has to be assigned a \emph{min} and a \emph{max} value.
+For instance, the agent \ttt{\%agent: A(x,c:1 += 4,d:0 +=2)} has two counters, named $c$ and $d$, which range from $1$ to $4$, and from $0$ to $2$, respectively.
+
+%%
+\begin{table}[htbp]
+  \centering
+  \caption{Agent signature with counters extends Table~\ref{tab:sig}}
+  \begin{tabular}{@{} lcl @{}}
+    \textit{signature\_expression} & ::= &
+    \tcb{Id}\tcb{(}\textit{sig}\tcb{)} \\
+
+    \textit{sig} & ::= &
+    \tcb{Id}~\textit{internal\_state\_list}\tcb{,}\ \textit{sig} $\mid$ \tcb{Id}~\textit{counter\_test}~\textit{counter\_modif}\tcb{,}\ \textit{sig}
+    $\mid\varepsilon$ \\
+ \end{tabular}
+\end{table}
+%%
+
+At initialisation, an initial value for the counter has to be specified.
+
+In rules, all counter tests have to be in the lhs, while the counter modifications in the rhs.
+A counter test can do three things: (i) check that the counter value is equal to a positive integer; (ii) check that the counter's value is greater than a positive integer or (iii) declare a variable, to which the counter's value is assigned. The variable can then be used in the rate constant.
+
+A counter modification increments or decrements the original counter value. In the following table, $n\leq 0$ and both $n$ and $i$ are integers.
+\begin{table}[ht!]
+  \centering
+  \caption{Counter expressions}
+  \begin{tabular}{@{} lcl @{}}
+    \textit{counter\_expression} & ::= & \tcb{Id}~\textit{counter\_test}~\textit{counter\_modif}$\mid\varepsilon$ \\
+    \textit{counter\_test} & ::= & \tcb{: n} $\mid$ \tcb{:> n} $\mid$ \tcb{:> variable} $\mid\varepsilon$\\
+    \textit{counter\_modif} & ::= & \tcb{: i} $\mid\varepsilon$\\
+    \end{tabular}
+\end{table}
+
+If the counter goes negative the compilation stops with an error. If the counter goes up beyond its declared maximum value, the simulation stops with an error.
+
 \chapter{The \KaSa~static analyser}
 
 \section{General usage}
