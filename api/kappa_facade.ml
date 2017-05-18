@@ -59,12 +59,6 @@ type kappa_file =
 
 type kappa_code = kappa_file list
 
-let rec count_char c s =
-  try
-    let sp = String.index s c in
-    1 + (count_char c (String.sub s (sp+1) (String.length s - sp - 1)))
-  with Not_found -> 0
-
 (** State of the running simulation. *)
 type t =
   { mutable is_running : bool ;

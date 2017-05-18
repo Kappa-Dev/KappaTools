@@ -19,6 +19,7 @@ Kappapp.app
 #server
 WebSim
 StdSim
+KaSaAgent
 ide/Kappa.icns
 ide/Kappa.iconset/
 ide/Info.plist

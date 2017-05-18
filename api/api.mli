@@ -3,21 +3,16 @@
    are run using the kappa code.
 *)
 
-type manager_code = [ `ACCEPTED |
-                      `CONFLICT |
-                      `CREATED |
-                      `ERROR |
-                      `NOT_FOUND |
-                      `OK ]
+type manager_code =
+  [ `ACCEPTED | `CONFLICT | `CREATED | `ERROR | `NOT_FOUND | `OK ]
 type result_code = manager_code
-type 'ok result = ('ok,manager_code) Api_types_j.result
+type 'ok result = ('ok,manager_code) Api_types_t.result
 
 class type manager_environment =
   object
     method environment_info:
-      unit ->
-      Api_types_j.environment_info result Lwt.t
-  end;;
+      unit -> Api_types_j.environment_info result Lwt.t
+  end
 
 class type manager_project =
   object
@@ -34,14 +29,14 @@ class type manager_project =
     method project_delete :
       Api_types_j.project_id ->
       unit result Lwt.t
-  end;;
+  end
 (* The type is parameterized here are there are
    implementations of the file manager that cannot
    generate the contact map.
 
    'file_status_summary = Api_types_j.contact_map
 *)
-class type ['file_status_summary] manager_file =
+class type manager_file =
   object
     method file_catalog :
       Api_types_j.project_id ->
@@ -67,8 +62,7 @@ class type ['file_status_summary] manager_file =
       Api_types_j.project_id ->
       Api_types_j.file_id ->
       unit result Lwt.t
-
-  end;;
+  end
 
 class type  manager_file_line =
   object
@@ -79,7 +73,7 @@ class type  manager_file_line =
       Api_types_j.project_id ->
       Api_types_j.file_line_id ->
       Api_types_j.file_line list result Lwt.t
-  end;;
+  end
 
 class type  manager_flux_map =
   object
@@ -90,14 +84,14 @@ class type  manager_flux_map =
       Api_types_j.project_id ->
       Api_types_j.flux_map_id ->
       Api_types_j.flux_map result Lwt.t
-  end;;
+  end
 
 class type  manager_log_message =
   object
     method simulation_detail_log_message :
       Api_types_j.project_id ->
       Api_types_j.log_message result Lwt.t
-  end;;
+  end
 
 class type  manager_plot =
   object
@@ -105,7 +99,7 @@ class type  manager_plot =
       Api_types_j.project_id ->
       Api_types_j.plot_parameter ->
       Api_types_j.plot_detail result Lwt.t
-  end;;
+  end
 
 class type  manager_snapshot =
   object
@@ -116,7 +110,7 @@ class type  manager_snapshot =
       Api_types_j.project_id ->
       Api_types_j.snapshot_id ->
       Api_types_j.snapshot result Lwt.t
-  end;;
+  end
 
 class type  manager_simulation =
   object
@@ -162,19 +156,35 @@ class type  manager_simulation =
     inherit  manager_log_message
     inherit  manager_plot
     inherit  manager_snapshot
+  end
 
-  end;;
+class type manager_static_analysis =
+  object
+    method init_static_analyser :
+      Ast.parsing_compil -> (unit, string) Lwt_result.t
+    method get_contact_map :
+      Remanent_state.accuracy_level option ->
+      (Yojson.Basic.json,string) Lwt_result.t
+    method get_influence_map :
+      Remanent_state.accuracy_level option ->
+      (Yojson.Basic.json,string) Lwt_result.t
+    method get_dead_rules :
+      (Yojson.Basic.json,string) Lwt_result.t
+    method get_constraints_list :
+      (Yojson.Basic.json,string) Lwt_result.t
+  end
 
 class type manager =
   object
     inherit manager_environment
-    inherit [Api_types_j.project_parse] manager_file
     inherit manager_project
+    inherit manager_file
     inherit manager_simulation
-  end;;
+  end
 
 class type concrete_manager =
   object
     inherit manager
+    inherit manager_static_analysis
     method terminate : unit -> unit
   end

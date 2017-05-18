@@ -20,10 +20,10 @@ let constructor_process_configuration : process_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 
 let create_process_configuration
-    ?(onStdout : (Js.js_string Js.t -> unit) option = None)
-    ?(onStderr : (Js.js_string Js.t -> unit) option = None)
-    ?(onClose : (unit -> unit) option = None)
-    ?(onError : (unit -> unit) option = None)
+    ?(onStdout : (Js.js_string Js.t -> unit) option)
+    ?(onStderr : (Js.js_string Js.t -> unit) option)
+    ?(onClose : (unit -> unit) option)
+    ?(onError : (unit -> unit) option)
     (command : string)
     (args : string list)
   : process_configuration Js.t  =
@@ -63,31 +63,43 @@ let spawn_process (configuration : process_configuration  Js.t) : process Js.t J
     (Js.Unsafe.js_expr "spawnProcess")
     [| Js.Unsafe.inject configuration |]
 
-let kappa_process : process option ref = ref None
-
-
 class manager
     ?(message_delimiter : char = Tools.default_message_delimter)
     (command : string)
     (args : string list) =
+  let sim_re = Re.compile (Re.str "StdSim") in
+  let sa_re = Re.compile (Re.str "KaSaAgent") in
+  let sim_command,sa_command =
+    if Re.execp sim_re command then
+      command, Re.replace_string  sim_re ~by:"KaSaAgent" command
+    else if Re.execp sa_re command then
+      Re.replace_string sa_re ~by:"StdSim" command, command
+    else
+      failwith ("Unrecognized command: "^command) in
+  let sa_configuration : process_configuration Js.t  =
+    create_process_configuration
+      ~onStdout:(fun msg -> Kasa_client.receive (Js.to_string msg))
+      sa_command args in
+  let sa_process =
+    Js.Opt.case
+      (spawn_process sa_configuration)
+      (fun () -> failwith ("Launching '"^sa_command^"' failed"))
+      (fun x -> x) in
   object(self)
-    val mutable process : process Js.t option = None
-    val mutable process_is_running : bool = false
+    val mutable sim_process : process Js.t option = None
     val buffer = Buffer.create 1024
     initializer
-      let configuration : process_configuration Js.t  =
+      let sim_configuration : process_configuration Js.t  =
         create_process_configuration
-          ~onStdout:(Some (fun msg -> self#onStdout (Js.to_string msg)))
-          ~onClose:(Some (fun () -> process_is_running <- true))
-          ~onError:(Some (fun () -> process_is_running <- true))
-          command
+          ~onStdout:(fun msg -> self#onSimStdout (Js.to_string msg))
+          sim_command
           args
       in
-      let p : process Js.t Js.opt = spawn_process configuration in
-      let () = process <- Js.Opt.to_option p in
+      let p : process Js.t Js.opt = spawn_process sim_configuration in
+      let () = sim_process <- Js.Opt.to_option p in
       ()
 
-    method private onStdout (msg : string) : unit =
+    method private onSimStdout (msg : string) : unit =
       let () = Common.debug (Js.string msg) in
       match Utility.split msg message_delimiter with
       | (prefix,None) ->
@@ -98,11 +110,11 @@ class manager
         Buffer.add_string buffer prefix;
         self#receive (Buffer.contents buffer);
         Buffer.reset buffer;
-        self#onStdout suffix
+        self#onSimStdout suffix
 
     method sleep timeout = Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
-      match process with
+      match sim_process with
       | None -> ()
       | Some process ->
         process##write
@@ -113,14 +125,23 @@ class manager
                 message_delimiter))
 
     method is_running () : bool =
-      match process with
+      match sim_process with
       | Some _ -> true
       | None -> false
 
-    method terminate () : unit =
-      match process with
+    method terminate () =
+      let () = sa_process##kill in
+      match sim_process with
       | Some process -> process##kill
       | None -> ()
 
     inherit Mpi_api.manager ()
+    inherit Kasa_client.new_client
+        ~post:(fun message_text ->
+            sa_process##write
+              (Js.string
+                 (Format.sprintf
+                    "%s%c"
+                    message_text
+                    message_delimiter)))
   end

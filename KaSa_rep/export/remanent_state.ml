@@ -33,7 +33,7 @@ type refined_compilation =
 
 type accuracy_level = Low | Medium | High | Full
 
-let json_of_accuracy accuracy =
+let accuracy_to_json accuracy =
   JsonUtil.of_string
     (
       match
@@ -45,7 +45,7 @@ let json_of_accuracy accuracy =
       | Full -> "full"
     )
 
-let json_to_accuracy json =
+let accuracy_of_json json =
   match
     JsonUtil.to_string json
   with
@@ -241,7 +241,7 @@ let influence_map_to_json influence_map =
   [influencemap,
    JsonUtil.of_pair
      ~lab1:accuracy_string ~lab2:map
-     json_of_accuracy
+     accuracy_to_json
      (fun influence_map ->
         `Assoc
           [
@@ -258,7 +258,7 @@ let influence_map_of_json =
         JsonUtil.to_pair
         ~lab1:accuracy_string ~lab2:map
         ~error_msg:(JsonUtil.build_msg "influence map1")
-        json_to_accuracy
+        accuracy_of_json
       (function
         | `Assoc l as x when List.length l = 2 ->
           begin
@@ -301,7 +301,7 @@ let contact_map_to_json contact_map=
     [contactmap,
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
-       json_of_accuracy
+       accuracy_to_json
        (Mods.StringSetMap.Map.to_json
        ~lab_key:agent ~lab_value:interface
        JsonUtil.of_string
@@ -327,7 +327,7 @@ let contact_map_of_json =
         JsonUtil.to_pair
           ~lab1:accuracy_string ~lab2:map
           ~error_msg:(JsonUtil.build_msg "contact map")
-          json_to_accuracy
+          accuracy_of_json
           (Mods.StringSetMap.Map.of_json
              ~lab_key:agent ~lab_value:interface
              (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
@@ -700,7 +700,7 @@ let add_map get title label to_json state l =
          (JsonUtil.of_pair
             ~lab1:accuracy_string
             ~lab2:label
-            json_of_accuracy
+            accuracy_to_json
             (fun x ->
                match to_json x with
                | `Assoc [s,m] when s = label -> m
@@ -715,7 +715,7 @@ let get_map empty add of_json label json =
       (JsonUtil.to_pair
          ~lab1:accuracy_string
          ~lab2:label ~error_msg:"pair11"
-         json_to_accuracy
+         accuracy_of_json
          (fun json ->
             of_json
               (`Assoc [label,json])))

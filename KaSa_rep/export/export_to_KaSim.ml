@@ -15,10 +15,8 @@ module type Type =
 sig
   type state
 
-
   type contact_map =
     (string list * (string * string) list) Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
-
 
   val init:
     ?compil:Ast.parsing_compil ->

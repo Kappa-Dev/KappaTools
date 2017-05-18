@@ -95,7 +95,17 @@ let read_spec : string -> spec option =
                      protocol = protocol ; })
 
 class embedded () : Api.concrete_manager =
+  let kasa_worker = Worker.create "KaSaWorker.js" in
   object
+    initializer
+      let () = kasa_worker##.onmessage :=
+          (Dom.handler
+             (fun (response_message : string Worker.messageEvent Js.t) ->
+                let response_text : string = response_message##.data in
+                let () = Kasa_client.receive response_text  in
+                Js._true
+             )) in
+      ()
     inherit Api_runtime.manager
         (object
           method min_run_duration () = 0.1
@@ -106,7 +116,11 @@ class embedded () : Api.concrete_manager =
             in
             Lwt.return_unit
         end : Kappa_facade.system_process)
-    method terminate () = () (*TODO*)
+    inherit Kasa_client.new_client
+        ~post:(fun message_text -> kasa_worker##postMessage(message_text))
+    method terminate () =
+      let () = kasa_worker##terminate in
+      ()(*TODO*)
   end
 
 let state , set_state =
@@ -149,18 +163,21 @@ let create_manager _project_id =
     )
 
   | Remote { label ; protocol = CLI cli } ->
-    let () = Common.debug (Format.sprintf "set_runtime_url: %s" cli.url) in
-    let js_node_runtime = new JsNode.manager cli.command cli.args in
-    if js_node_runtime#is_running () then
-      let () = Common.debug (Js.string "set_runtime_url:sucess") in
-      let () = State_settings.set_synch false in
-      Lwt.return (Api_common.result_ok (js_node_runtime :> Api.concrete_manager))
-    else
-      let () = Common.debug (Js.string "set_runtime_url:failure") in
-      let error_msg : string =
-        Format.sprintf "Could not start cli runtime %s " label
-      in
-      Lwt.return (Api_common.result_error_msg error_msg)
+    let () = Common.debug (Js.string ("set_runtime_url: "^cli.url)) in
+    try
+      let js_node_runtime = new JsNode.manager cli.command cli.args in
+      if js_node_runtime#is_running () then
+        let () = Common.debug (Js.string "set_runtime_url:sucess") in
+        let () = State_settings.set_synch false in
+        Lwt.return (Api_common.result_ok (js_node_runtime :> Api.concrete_manager))
+      else
+        let () = Common.debug (Js.string "set_runtime_url:failure") in
+        let error_msg : string =
+          Format.sprintf "Could not start cli runtime %s " label
+        in
+        Lwt.return (Api_common.result_error_msg error_msg)
+    with Failure x ->
+      Lwt.return (Api_common.result_error_msg x)
 
 let set_spec runtime =
   let current_state = React.S.value state in

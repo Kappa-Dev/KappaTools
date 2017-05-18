@@ -126,8 +126,7 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 (* modified from : https://searchcode.com/file/1109908/commons/common.ml *)
 
 class manager_file
-    (environment : Api_environment.environment)
-  : [Api_types_j.project_parse] Api.manager_file =
+    (environment : Api_environment.environment) : Api.manager_file =
   object
     method file_catalog
         (project_id : Api_types_j.project_id) :

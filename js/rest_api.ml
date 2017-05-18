@@ -9,6 +9,7 @@
 exception BadResponseCode of int
 exception TimeOut
 
+open Lwt.Infix
 
 let send
     ?(timeout : float option)
@@ -16,8 +17,7 @@ let send
     (meth : Common.meth)
     ?(data : string option)
     (hydrate : string -> 'a)
-    (wrap : 'a -> Mpi_message_j.response_content)
-  : Mpi_message_j.response Lwt.t =
+  : 'a Api.result Lwt.t =
   let reply,feeder = Lwt.task () in
   let handler status response_text =
     let result_code : Api.manager_code option =
@@ -29,27 +29,19 @@ let send
       | 404 -> Some `NOT_FOUND
       | 409 -> Some `CONFLICT
       | _ -> None in
-    let result : Mpi_message_j.response =
+    let result =
       match result_code with
       | None ->
         Api_common.result_error_exception (BadResponseCode status)
       | Some result_code ->
-        let result : 'a Api.result =
-          if (400 <= status) && (status < 500) then
-            Api_common.result_messages
-              ~result_code
-              (Api_types_j.errors_of_string response_text)
-          else
-            let response = hydrate response_text in
-            let () = Common.debug response in
-            Api_common.result_ok ~result_code response
-        in
-        let response : Mpi_message_j.response =
-          Api_common.result_bind
-            ~ok:(fun x -> Api_common.result_ok ~result_code (wrap x)) result in
-        let () = Common.debug response in
-        response
-    in
+        if (400 <= status) && (status < 500) then
+          Api_common.result_messages
+            ~result_code
+            (Api_types_j.errors_of_string response_text)
+        else
+          let response = hydrate response_text in
+          let () = Common.debug response in
+          Api_common.result_ok response in
     let () = Lwt.wakeup feeder result in ()
   in
   let () =
@@ -73,8 +65,8 @@ class manager
         ~timeout
         (Format.sprintf "%s/v2" url)
         `GET
-        Mpi_message_j.environment_info_of_string
-        (fun result -> `EnvironmentInfo result)
+        (fun result ->
+             (`EnvironmentInfo (Mpi_message_j.environment_info_of_string result)))
     | `FileCreate (project_id,file) ->
       send
         ~timeout
@@ -82,81 +74,72 @@ class manager
         `POST
         ~data:(Api_types_j.string_of_file file)
         (fun result ->
-           Mpi_message_j.file_metadata_of_string
-             result)
-        (fun result -> `FileCreate result)
+           (`FileCreate (Mpi_message_j.file_metadata_of_string result)))
     | `FileDelete (project_id,file_id) ->
       send
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
         (fun result ->
-           Api_types_j.unit_t_of_string
-             result)
-        (fun result -> `FileDelete result)
+           (`FileDelete (Api_types_j.unit_t_of_string result)))
     | `FileGet (project_id,file_id) ->
       send
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `GET
-        Mpi_message_j.file_of_string
-        (fun result -> `FileGet result)
+        (fun result ->
+           (`FileGet (Mpi_message_j.file_of_string result)))
     | `FileCatalog project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
-        Mpi_message_j.file_catalog_of_string
-        (fun result -> `FileCatalog result)
+        (fun result ->
+           (`FileCatalog (Mpi_message_j.file_catalog_of_string result)))
     | `FileUpdate (project_id,file_id,file_modification) ->
       send
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
         ~data:(Api_types_j.string_of_file_modification file_modification)
         (fun result ->
-           Mpi_message_j.file_metadata_of_string
-             result)
-        (fun result -> `FileUpdate result)
+             (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
     | `ProjectCatalog () ->
       send
         (Format.sprintf "%s/v2/projects" url)
         `GET
-        Mpi_message_j.project_catalog_of_string
-        (fun result -> `ProjectCatalog result)
+        (fun result ->
+             (`ProjectCatalog (Mpi_message_j.project_catalog_of_string result)))
     | `ProjectCreate project_parameter ->
       send
         (Format.sprintf "%s/v2/projects" url)
         `POST
         ~data:(Api_types_j.string_of_project_parameter project_parameter)
-        Api_types_j.unit_t_of_string
-        (fun result -> `ProjectCreate result)
+        (fun result ->
+             (`ProjectCreate (Api_types_j.unit_t_of_string result)))
     | `ProjectDelete project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
-        (fun _ -> ())
-        (fun result -> `ProjectDelete result)
-
+        (fun result ->
+             (`ProjectDelete (Api_types_j.unit_t_of_string result)))
     | `ProjectParse project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `GET
-        Mpi_message_j.project_parse_of_string
-        (fun result -> `ProjectParse result)
-
+        (fun result ->
+             (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
     | `ProjectDeadRules project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s/dead_rules" url project_id)
         `GET
-        (fun s -> Yojson.Safe.read_list
-           Yojson.Safe.read_string
-           (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
-        (fun result -> `ProjectDeadRules result)
-
+        (fun s ->
+             (`ProjectDeadRules
+                (Yojson.Safe.read_list
+                   Yojson.Safe.read_string
+                   (Yojson.Safe.init_lexer ()) (Lexing.from_string s))))
     | `ProjectGet project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `GET
-        Mpi_message_j.project_of_string
-        (fun result -> `ProjectGet result)
-
+        (fun result ->
+             (`ProjectGet (Mpi_message_j.project_of_string result)))
     | `SimulationContinue (project_id,simulation_parameter) ->
       send
         (Format.sprintf
@@ -165,8 +148,7 @@ class manager
         `PUT
         ~data:(Api_types_j.string_of_simulation_parameter
                  simulation_parameter)
-        (fun _ -> ())
-        (fun result -> `SimulationContinue result)
+        (fun _ -> (`SimulationContinue ()))
     | `SimulationDelete project_id ->
       send
         (Format.sprintf
@@ -174,8 +156,7 @@ class manager
            url
            project_id)
         `DELETE
-        (fun _ -> ())
-        (fun result -> `SimulationDelete result)
+        (fun _ -> (`SimulationDelete ()))
     | `SimulationDetailFileLine (project_id,file_line_id) ->
       send
         (Format.sprintf
@@ -187,8 +168,9 @@ class manager
             |Some file_line_id -> file_line_id
            ))
         `GET
-        Mpi_message_j.file_line_detail_of_string
-        (fun result -> `SimulationDetailFileLine result)
+        (fun result ->
+           (`SimulationDetailFileLine
+                        (Mpi_message_j.file_line_detail_of_string result)))
     | `SimulationDetailFluxMap (project_id,flux_map_id) ->
       send
         (Format.sprintf
@@ -197,8 +179,8 @@ class manager
            project_id
            flux_map_id)
         `GET
-        Mpi_message_j.flux_map_of_string
-        (fun result -> `SimulationDetailFluxMap result)
+        (fun result ->
+             (`SimulationDetailFluxMap (Mpi_message_j.flux_map_of_string result)))
     | `SimulationDetailLogMessage project_id ->
       send
         (Format.sprintf
@@ -206,8 +188,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.log_message_of_string
-        (fun result -> `SimulationDetailLogMessage result)
+        (fun result ->
+           (`SimulationDetailLogMessage
+                        (Mpi_message_j.log_message_of_string result)))
     | `SimulationDetailPlot (project_id,plot_parameters) ->
       let args =
         String.concat
@@ -232,8 +215,8 @@ class manager
            project_id)
         `GET
         ~data:args
-        Mpi_message_j.plot_detail_of_string
-        (fun result -> `SimulationDetailPlot result)
+        (fun result ->
+             (`SimulationDetailPlot (Mpi_message_j.plot_detail_of_string result)))
     | `SimulationDetailSnapshot (project_id,snapshot_id) ->
       send
         (Format.sprintf
@@ -242,8 +225,9 @@ class manager
            project_id
            snapshot_id)
         `GET
-        Mpi_message_j.snapshot_detail_of_string
-        (fun result -> `SimulationDetailSnapshot result)
+        (fun result ->
+           (`SimulationDetailSnapshot
+              (Mpi_message_j.snapshot_detail_of_string result)))
     | `SimulationInfo project_id ->
       send
         (Format.sprintf
@@ -251,8 +235,8 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.simulation_info_of_string
-        (fun result -> `SimulationInfo result)
+        (fun result ->
+             (`SimulationInfo (Mpi_message_j.simulation_info_of_string result)))
     | `SimulationEfficiency project_id ->
       send
         (Format.sprintf
@@ -260,8 +244,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.simulation_efficiency_of_string
-        (fun result -> `SimulationEfficiency result)
+        (fun result ->
+           (`SimulationEfficiency
+                        (Mpi_message_j.simulation_efficiency_of_string result)))
     | `SimulationTrace project_id ->
       send
         (Format.sprintf
@@ -269,8 +254,7 @@ class manager
            url
            project_id)
         `GET
-        (fun s -> s)
-        (fun result -> `SimulationTrace result)
+        (fun s -> (`SimulationTrace s))
     | `SimulationCatalogFileLine project_id ->
       send
         (Format.sprintf
@@ -278,8 +262,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.file_line_catalog_of_string
-        (fun result -> `SimulationCatalogFileLine result)
+        (fun result ->
+           (`SimulationCatalogFileLine
+                        (Mpi_message_j.file_line_catalog_of_string result)))
     | `SimulationCatalogFluxMap project_id ->
       send
         (Format.sprintf
@@ -287,8 +272,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.flux_map_catalog_of_string
-        (fun result -> `SimulationCatalogFluxMap result)
+        (fun result ->
+           (`SimulationCatalogFluxMap
+                        (Mpi_message_j.flux_map_catalog_of_string result)))
     | `SimulationCatalogSnapshot project_id ->
       send
         (Format.sprintf
@@ -296,8 +282,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.snapshot_catalog_of_string
-        (fun result -> `SimulationCatalogSnapshot result)
+        (fun result ->
+           (`SimulationCatalogSnapshot
+                        (Mpi_message_j.snapshot_catalog_of_string result)))
     | `SimulationPause project_id ->
       send
         (Format.sprintf
@@ -305,8 +292,7 @@ class manager
            url
            project_id)
         `PUT
-        (fun _ -> ())
-        (fun result -> `SimulationPause result)
+        (fun _ -> (`SimulationPause ()))
     | `SimulationParameter project_id ->
       send
         (Format.sprintf
@@ -314,8 +300,9 @@ class manager
            url
            project_id)
         `GET
-        Mpi_message_j.simulation_parameter_of_string
-        (fun result -> `SimulationParameter result)
+        (fun result ->
+           (`SimulationParameter
+                        (Mpi_message_j.simulation_parameter_of_string result)))
     | `SimulationPerturbation
         (project_id,simulation_perturbation) ->
       send
@@ -326,8 +313,7 @@ class manager
         `PUT
         ~data:(Api_types_j.string_of_simulation_perturbation
                  simulation_perturbation)
-        (fun _ -> ())
-        (fun result -> `SimulationPerturbation result)
+        (fun _ -> (`SimulationPerturbation ()))
     | `SimulationStart
         (project_id,simulation_parameter) ->
       send
@@ -337,9 +323,79 @@ class manager
            project_id)
         `POST
         ~data:(Api_types_j.string_of_simulation_parameter simulation_parameter)
-        Mpi_message_j.simulation_artifact_of_string
-        (fun result -> `SimulationStart result)
+        (fun result ->
+           (`SimulationStart
+                        (Mpi_message_j.simulation_artifact_of_string result)))
 
   inherit Mpi_api.manager_base ()
   method terminate () = () (*TODO*)
-  end
+
+  method init_static_analyser compil =
+    send
+      (Format.sprintf "%s/v2/analyses" url)
+      `PUT
+      ~data:(Yojson.Basic.to_string (Ast.compil_to_json compil))
+      (fun x ->
+         match Yojson.Basic.from_string x with
+         | `Null -> ()
+         | x ->
+           raise
+             (Yojson.Basic.Util.Type_error ("Not a KaSa INIT response: ", x)))
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_contact_map accuracy =
+    send
+      (match accuracy with
+       | Some accuracy ->
+         Format.sprintf "%s/v2/analyses/contact_map/%s" url
+           (Yojson.Basic.to_string (Remanent_state.accuracy_to_json accuracy))
+       | None -> Format.sprintf "%s/v2/analyses/contact_map" url)
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_influence_map accuracy =
+    send
+      (match accuracy with
+       | Some accuracy ->
+         Format.sprintf "%s/v2/analyses/influence_map/%s" url
+           (Yojson.Basic.to_string (Remanent_state.accuracy_to_json accuracy))
+       | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_dead_rules =
+    send
+      (Format.sprintf "%s/v2/analyses/dead_rules" url)
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method  get_constraints_list =
+    send
+      (Format.sprintf "%s/v2/analyses/constraints" url)
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+end

@@ -137,7 +137,7 @@ TestJsSim: TestJsSim.byte
 TestWebSim: TestWebSim.byte
 	./TestWebSim.byte -runner sequential
 
-site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js
+site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js
 	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
@@ -170,7 +170,7 @@ TestWebSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*)))
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(lwt)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.ppx), package(lwt)" \
 	$@
 
 WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
@@ -182,7 +182,7 @@ WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
-StdSim.native StdSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+StdSim.native StdSim.byte %Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I api -I agents \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt.unix),package(atdgen)" \
@@ -241,6 +241,7 @@ install-lib:
 
 clean_ide:
 	rm -f StdSim bin/StdSim
+	rm -f KaSaAgent bin/KaSaAgent
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
 	rm -rf Kappapp.app

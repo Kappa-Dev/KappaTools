@@ -21,6 +21,9 @@ type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
 
 type accuracy_level = Low | Medium | High | Full
 
+val accuracy_to_json : accuracy_level -> Yojson.Basic.json
+val accuracy_of_json : Yojson.Basic.json -> accuracy_level
+
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
 
 type internal_contact_map =
