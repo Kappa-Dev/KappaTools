@@ -34,6 +34,7 @@ type rule_agent_counters =
   {
     ra : rule_agent;
     ra_counters : (Ast.counter * switching) array;
+    ra_created : bool;
   }
 
 type 'agent rule =
@@ -671,10 +672,10 @@ let annotate_dropped_agent
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {ra; ra_counters},lannot
+  {ra; ra_counters; ra_created = false},lannot
 
 let annotate_created_agent
-    ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf counts =
+    ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -712,6 +713,18 @@ let annotate_created_agent
            pset',rannot'
          | [(Ast.ANY_FREE | Ast.LNK_FREE), _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
+  rannot,
+  { Raw_mixture.a_type = ag_id;
+    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+
+let annotate_created_counters sigs ?contact_map (agent_name,_ as ag_ty) counts =
+  let ag_id = Signature.num_of_agent ag_ty sigs in
+  let sign = Signature.get sigs ag_id in
+  let arity = Signature.arity sigs ag_id in
+  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let register_counter_modif c_id =
+    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
   let _ =
     List.fold_left
       (fun pset c ->
@@ -720,11 +733,13 @@ let annotate_created_agent
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
                    several_occurence_of_site agent_name c.Ast.count_nme in
-        pset')
-        Mods.IntSet.empty counts in
-  rannot,
-  { Raw_mixture.a_type = ag_id;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+        let () = register_counter_modif p_id in
+        let () = ra_counters.(p_id) <- c,Maintained in
+        pset') Mods.IntSet.empty counts in
+  let ra =
+    {ra_type = ag_id;ra_ports =[||];ra_ints =[||];ra_erased = false;
+     ra_syntax = Some ([||],[||]);} in
+  {ra; ra_counters;ra_created = true}
 
 let translate_modification sigs ?contact_map ag_id p_id
     ?warn (lhs_links,rhs_links as links_annot) = function
@@ -832,7 +847,11 @@ let annotate_edit_agent
     (links_annot',pset') in
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
+
   let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let register_counter_modif c_id =
+    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
   let _ =
     List.fold_left
       (fun pset c ->
@@ -841,13 +860,13 @@ let annotate_edit_agent
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
              several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = ra_counters.(p_id) <-(c,Maintained) in pset')
+        let () = register_counter_modif p_id in
+        let () = ra_counters.(p_id) <- c,Maintained in pset')
       Mods.IntSet.empty counts in
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {ra; ra_counters},annot'
-
+  {ra; ra_counters; ra_created=false},annot'
 
 let annotate_agent_with_diff
     sigs ?contact_map (agent_name, pos as ag_ty) links_annot lp rp lc rc =
@@ -1043,7 +1062,7 @@ although it is left unpecified in the left hand side"
   let ra =
     { ra_type = ag_id; ra_ports = ports; ra_ints = internals;ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {ra; ra_counters},annot'
+  {ra; ra_counters; ra_created = false},annot'
 
 let refer_links_annot links_annot mix =
   List.iter
@@ -1122,15 +1141,18 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
         | None -> ()
         | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
       let () = refer_links_annot lhs_links_two (List.map (fun r -> r.ra) mix) in
-      let cmix,(rhs_links_one,_) =
+      let mix,cmix,(rhs_links_one,_) =
         List.fold_left
-          (fun (acc,rannot) ((_,pos as na),sites,modif) ->
+          (fun (acc',acc,rannot) ((_,pos as na),sites,modif) ->
              let () = forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
-                 ~syntax_version sigs ?contact_map rannot na intf counts in
-             x'::acc,rannot')
-          ([],snd links_annot) added in
+                 ~syntax_version sigs ?contact_map rannot na intf in
+             let acc'' =
+               if (counts = []) then acc' else
+                 (annotate_created_counters sigs ?contact_map na counts)::acc' in
+             acc'',x'::acc,rannot')
+          (mix,[],snd links_annot) added in
       let () =
         match Mods.IntMap.root rhs_links_one with
         | None -> ()
@@ -1152,7 +1174,7 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
            (lannot',a::acc,news)
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
-               ~syntax_version sigs ?contact_map (snd lannot) ty intf counts in
+               ~syntax_version sigs ?contact_map (snd lannot) ty intf in
            ((fst lannot,rannot'),acc,x'::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
@@ -1490,8 +1512,9 @@ let create_sig l with_counters =
     (fun (name,intf,_) -> (name,create_t intf))
     (create_sig_for_counters l with_counters)
 
-let make_counter_agent
-      (first,dst) (last,equal) (ra_type,arity,incr_b,incr_a) i j pos created =
+let make_counter_agent sigs
+      (first,dst) (last,equal) i j pos created =
+  let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
   let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), Maintained) in
   let before_switch = if first&&created then Linked (i,pos) else Maintained in
   let before =
@@ -1509,8 +1532,8 @@ let make_counter_agent
    ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
 
 let raw_counter_agent
-      (first,first_lnk) (last,last_lnk) (incr_type,arity,incr_b,incr_a)
-      i j sigs equal =
+      (first,first_lnk) (last,last_lnk) i j sigs equal =
+  let (incr_type,arity,incr_b,incr_a) = incr_agent sigs in
   let ports = Array.make arity (Raw_mixture.FREE) in
   let internals =
     Array.init arity
@@ -1528,59 +1551,59 @@ let raw_counter_agent
   { Raw_mixture.a_type = incr_type;
     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
 
-let counter_becomes_port
-      p_id (delta,pos') pos equal test start_lnk_nb ra
-      ((incr_type,_,incr_b,_) as incr_info) sigs =
+let rec add_incr i first_lnk last_lnk delta equal sigs =
+  if (i=delta) then []
+  else
+    let first = (i=0) in
+    let last = (i=(delta-1)) in
+    let raw_incr =
+      raw_counter_agent
+        (first,first_lnk) (last,last_lnk)
+        (first_lnk+i) (first_lnk+i+1) sigs equal in
+    raw_incr::(add_incr (i+1) first_lnk last_lnk delta equal sigs)
 
-  let incr_agents ag_info lnk_nb delta_lnk neg_delta_lnk =
+let rec link_incr sigs i nb ag_info equal lnk pos delta =
+  if (i=nb) then []
+  else
+    let first = (i=0) in
+    let last = (i=(nb-1)) in
+    let ra_agent =
+      make_counter_agent sigs (first,ag_info) (last,equal)
+                         (lnk+i) (lnk+i+1) pos (delta>0) in
+    ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
 
-    let rec link_incr i nb =
-      if (i=nb) then []
-      else
-        let first = (i=0) in
-        let last = (i=(nb-1)) in
-        let ra_agent =
-          make_counter_agent
-            (first,ag_info) (last,equal) incr_info
-            (lnk_nb+i) (lnk_nb+i+1) pos (delta>0)in
-        ra_agent::(link_incr (i+1) nb) in
+let rec erase_incr sigs i incrs delta lnk =
+  let (_,_,incr_b,_) = incr_agent sigs in
+  match incrs with
+  | hd::tl ->
+     if (i = abs(delta)) then
+       let (before,_) = hd.ra_ports.(incr_b) in
+       let () = hd.ra_ports.(incr_b) <- before, Linked lnk in
+       hd::tl
+     else
+       let ag = {hd with ra_erased = true} in
+       ag::(erase_incr sigs (i+1) tl delta lnk)
+  | [] -> []
 
-    let rec erase_incr i = function
-      | hd::tl ->
-         if (i = abs(delta)) then
-           let () =
-             let (before,_) = hd.ra_ports.(incr_b) in
-             hd.ra_ports.(incr_b) <-
-               before, Linked (neg_delta_lnk,pos) in
-           hd::tl
-         else
-           let ag = {hd with ra_erased = true} in
-           ag::(erase_incr (i+1) tl)
-      | [] -> [] in
-
-    let rec add_incr i first_lnk last_lnk =
-      if (i=delta) then []
-      else
-        let first = (i=0) in
-        let last = (i=(delta-1)) in
-        let raw_incr =
-          raw_counter_agent
-            (first,first_lnk) (last,last_lnk) incr_info
-            (first_lnk+i) (first_lnk+i+1) sigs equal in
-        raw_incr::(add_incr (i+1) first_lnk last_lnk) in
-
-    let test_incr = link_incr 0 test in
-    let adjust_delta =
-      if (delta<0) then erase_incr 0 test_incr else test_incr in
-    let created =
-      if (delta>0) then add_incr 0 delta_lnk start_lnk_nb else [] in
-    (adjust_delta,created) in
-
+let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
+  let (incr_type,_,incr_b,_) = incr_agent sigs in
   let start_lnk_for_created = start_lnk_nb + test in
   let lnk_for_erased = start_lnk_nb + abs(delta) in
-  let incrs =
-    incr_agents (p_id,ra.ra_type)
-                start_lnk_nb start_lnk_for_created lnk_for_erased in
+  let ag_info = p_id,ra.ra_type in
+
+  let test_incr = link_incr sigs 0 test ag_info equal start_lnk_nb pos delta in
+  let adjust_delta =
+    if (delta<0)
+    then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
+    else test_incr in
+  let created =
+    if (test = 0)
+    then add_incr 0 start_lnk_for_created start_lnk_nb delta true sigs
+    else
+      if (delta>0)
+      then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
+      else [] in
+
   let switch =
     if (delta = 0) then Maintained
     else
@@ -1596,14 +1619,14 @@ let counter_becomes_port
     if (test = 0) then (Ast.LNK_FREE,pos),switch
     else (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
   let () = ra.ra_ports.(p_id) <- p in
-  incrs
+  (adjust_delta,created)
 
-(* ag - agents with counters in a rule
+(* ag - agent with counters in a rule
    lnk_nb - the max link number used in the rule;
    incr_info - info on the incr agent from the signature
-   returns: agents with explicit counters; created agents;
+   returns: agent with explicit counters; created incr agents;
             the next link number to use *)
-let remove_counter_agent ag lnk_nb incr_info sigs =
+let remove_counter_agent sigs ag lnk_nb =
   let (incrs,lnk_nb') =
     Tools.array_fold_lefti
     (fun id (acc_incrs,lnk_nb) (counter,_) ->
@@ -1618,11 +1641,11 @@ let remove_counter_agent ag lnk_nb incr_info sigs =
            match test with
            | Ast.CEQ j ->
               (counter_becomes_port
-                 id delta pos true j lnk_nb ag.ra incr_info sigs)::acc_incrs,
+                 sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
               lnk_nb+j+(fst delta)
            | Ast.CGTE j ->
               (counter_becomes_port
-                 id delta pos false j lnk_nb ag.ra incr_info sigs)::acc_incrs,
+                 sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
               lnk_nb+j+(fst delta)
            | Ast.CVAR _ ->
               raise (ExceptionDefn.Internal_Error
@@ -1632,8 +1655,38 @@ let remove_counter_agent ag lnk_nb incr_info sigs =
     List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
   (als,bls,lnk_nb')
 
-let remove_counter_rule mix created sigs with_counters contact_map =
+let remove_counter_created_agent sigs raw ag lnk_nb =
+  let raw_agent =
+    List.find (fun rag -> rag.Raw_mixture.a_type = ag.ra.ra_type) raw in
+  let ports = raw_agent.Raw_mixture.a_ports in
+  let () = Signature.print_agent sigs (Format.str_formatter) ag.ra.ra_type in
+  let agent_name = Format.flush_str_formatter () in
+  Tools.array_fold_lefti
+    (fun p_id (acc,lnk) (c,_) ->
+      let (s,_) = c.Ast.count_nme in
+      if (s = "") then (acc,lnk)
+      else
+      match c.Ast.count_test with
+      | None -> not_enough_specified agent_name c.Ast.count_nme
+      | Some (test,_) ->
+         match test with
+         | Ast.CEQ j ->
+            let p = if (j = 0) then Raw_mixture.FREE else Raw_mixture.VAL lnk in
+            let () = ports.(p_id) <- p in
+            let incrs = add_incr 0 lnk (lnk+j-1) j true sigs in
+            (acc@incrs,(lnk+j))
+         | Ast.CGTE _ | Ast.CVAR _ ->
+            not_enough_specified agent_name c.Ast.count_nme)
+    ([],lnk_nb) ag.ra_counters
+
+(* - adds increment agents to the contact map
+   - adds increment agents to the raw mixture
+   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
+     to the increments *)
+let remove_counter_rule sigs contact_map with_counters mix created =
   if (with_counters) then
+    let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
+    let () = add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
     let lnk_nb =
       List.fold_left
         (fun max ag ->
@@ -1646,25 +1699,31 @@ let remove_counter_rule mix created sigs with_counters contact_map =
                   | Ast.LNK_TYPE _ -> max in
               match switch with
               | Linked (i,_) ->  if (max'<i) then i else max'
-              | Freed | Maintained | Erased -> max)
+              | Freed | Maintained | Erased -> max')
             max ag.ra.ra_ports) 0 mix in
-    let ((incr_id,_,incr_b,incr_a) as incr_info) = incr_agent sigs in
-    let () = add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
-    let (incrs,incrs_created,ra_mix,_) =
+    let mix_created,mix' = List.partition (fun ag -> ag.ra_created) mix in
+    let (incrs,incrs_created,ra_mix,lnk_nb') =
       List.fold_left
-        (fun (a,b,c,d) ag ->
-          let (a',b',d') = remove_counter_agent ag d incr_info sigs in
-          a'@a,b'@b,ag.ra::c,d')
-        ([],[],[],lnk_nb+1) mix in
-    (ra_mix@incrs,created@incrs_created)
-  else (List.map (fun ag -> ag.ra) mix,created)
+        (fun (a,b,c,lnk) ag ->
+            let (a',b',lnk') = remove_counter_agent sigs ag lnk in
+            a'@a,b'@b,ag.ra::c,lnk')
+        ([],[],[],lnk_nb+1) mix' in
+    let incrs_created',_ =
+      List.fold_left
+        (fun (acc,lnk) ag ->
+          let (a,lnk') =
+            remove_counter_created_agent sigs created ag lnk in
+          (a::acc,lnk'))
+        ([],lnk_nb') mix_created in
+    (ra_mix@incrs,created@incrs_created@(List.flatten incrs_created'))
+  else List.map (fun ag -> ag.ra) mix,created
 
-let remove_counters rules sigs with_counters contact_map =
+let remove_counters sigs contact_map with_counters rules  =
   List.map
     (fun (s,(r,a)) ->
       let (r_mix,r_created) =
-        remove_counter_rule
-          r.r_mix r.r_created sigs with_counters contact_map in
+        remove_counter_rule sigs contact_map with_counters
+                            r.r_mix r.r_created in
       let r' = {r with r_mix;r_created} in
       (s,(r',a))) rules
 
@@ -1673,11 +1732,11 @@ let compil_of_ast ~syntax_version overwrite c =
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then
-(*      if (with_counters) then
+      if (with_counters) then
         raise (ExceptionDefn.Malformed_Decl
                  ("implicit signature is incompatible with counters",
-                  Locality.dummy)) else *)
-      Ast.implicit_signature c
+                  Locality.dummy))
+      else Ast.implicit_signature c
     else c in
   let sigs = Signature.create (create_sig c.Ast.signatures with_counters) in
   let contact_map =
@@ -1733,8 +1792,8 @@ let compil_of_ast ~syntax_version overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
-  let rules = remove_counters rules sigs with_counters contact_map in
-  let () =
+  let rules = remove_counters sigs contact_map with_counters rules in
+(*  let () =
     if (!Parameter.debugModeOn && with_counters) then
       (Format.printf "@.lkappa rules@.";
        List.iter (fun (s,(r,_)) ->
@@ -1742,7 +1801,7 @@ let compil_of_ast ~syntax_version overwrite c =
                 Format.printf
                   "@.%s = %a" label
                   (print_rule ~full:true sigs (fun _ _ -> ()) (fun _ _ -> ())) r)
-                 rules) in
+                 rules) in*)
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =

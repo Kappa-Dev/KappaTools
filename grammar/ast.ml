@@ -1043,18 +1043,20 @@ let prepare_counters rules =
                    raise (ExceptionDefn.Malformed_Decl
                             ("Counter "^(fst c.count_nme)^error,
                              (snd c.count_nme)))) sites in
-  let aux r =
-    let lhs =
-      List.fold_right2
-        (fun (rna,rsites,_) ((lna,lsites,b) as lagent) acc ->
-          let () = syntax lsites (fun c -> not((fst c.count_delta)=0))
-                          " has a modif in the lhs";
-                   syntax rsites (fun c -> not(c.count_test=None))
-                          " has a test in the rhs" in
-          if ((String.compare (fst rna) (fst lna)) = 0) then
-            let lsites' = prepare_agent rsites lsites in (lna,lsites',b)::acc
-          else lagent::acc) r.rhs r.lhs [] in
-    {r with lhs} in
+
+  let rec fold rhs lhs = match (rhs,lhs) with
+    | ((rna,rsites,_)::r, ((lna,lsites,b) as lagent)::l) ->
+       let () = syntax lsites (fun c -> not((fst c.count_delta)=0))
+                       " has a modif in the lhs";
+                syntax rsites (fun c -> not(c.count_test=None))
+                       " has a test in the rhs" in
+       if ((String.compare (fst rna) (fst lna)) = 0) then
+         let lsites' = prepare_agent rsites lsites in
+         (lna,lsites',b)::(fold r l)
+       else lagent::(fold r l)
+    | [], _ | _, [] -> [] in
+
+  let aux r = {r with lhs = (fold r.rhs r.lhs)} in
   List.map (fun (s,(r,a)) -> (s,(aux r,a))) rules
 
 let counters_signature s (agents:agent list) =
@@ -1197,12 +1199,7 @@ let with_counters c =
       (fun (_,ls,_) ->
         List.exists (function Counter _ -> true | Port _ -> false) ls)
       mix in
-  (List.exists
-     (fun (_,(r,_)) -> (with_counters_mix r.lhs)||(with_counters_mix r.rhs))
-     c.rules) ||
-    (List.exists
-       (fun (_,r) -> (with_counters_mix r.mix))
-       c.edit_rules)
+  with_counters_mix c.signatures
 
 let compile_counters c =
   if (with_counters c) then
