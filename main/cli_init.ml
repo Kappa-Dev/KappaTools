@@ -11,18 +11,17 @@ type preprocessed_ast =
   float option
 
 let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
-  let () = if quiet then () else Format.printf "+ simulation parameters@." in
-  let conf, progressConf,
-    (n,w,s as story_compression), formatCflow, cflowFile =
-    Configuration.parse result.Ast.configurations in
-  let () = if quiet then () else Format.printf "+ Sanity checks@." in
+  let () = Format.printf "+ simulation parameters@." in
+  let conf, progressConf, story_compression, formatCflow, cflowFile =
+    Configuration.parse ast.Ast.configurations in
+  let () = Format.printf "+ Sanity checks@." in
   let new_syntax =
     (cli_args.Run_cli_args.newSyntax || conf.Configuration.newSyntax) in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa.compil_of_ast
       ~new_syntax
-      cli_args.Run_cli_args.alg_var_overwrite result in
-  let overwrite_init,overwrite_t0 = match cli_args.Run_cli_args.initialMix with
+      kasim_args.Kasim_args.alg_var_overwrite ast in
+  let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
     | None -> None,None
     | Some file ->
       let compil =
@@ -70,7 +69,7 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     Eval.compile
       ~outputs
       ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
-      ?rescale_init:cli_args.Run_cli_args.rescale
+      ?rescale_init:kasim_args.Kasim_args.rescale
       ?overwrite_init ?bwd_bisim ~compileModeOn
       sigs_nd tk_nd contact_map result' in
   let story_compression =
@@ -104,8 +103,8 @@ let get_pack_from_marshalizedfile
         (fun (s,v) ->
            Model.num_of_alg (Locality.dummy_annot s) env,
            Alg_expr.CONST v)
-        cli_args.Run_cli_args.alg_var_overwrite in
-    match cli_args.Run_cli_args.initialMix with
+        kasim_args.Kasim_args.alg_var_overwrite in
+    match kasim_args.Kasim_args.initialMix with
     | None -> pack,alg_overwrite,None
     | Some file ->
       let compil =
