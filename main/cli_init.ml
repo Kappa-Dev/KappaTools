@@ -46,11 +46,6 @@ let get_ast_from_list_of_files list =
 let get_ast_from_cli_args cli_args =
   get_ast_from_list_of_files cli_args.Run_cli_args.inputKappaFileNames
 
-let get_preprocessed_ast_from_list_of_files
-    ?(kasim_args=Kasim_args.default) cli_args list =
-  let ast = get_ast_from_list_of_files list in
-  preprocess cli_args ~kasim_args ast
-
 let get_preprocessed_ast_from_cli_args
     ?(kasim_args=Kasim_args.default) cli_args =
   let ast =
@@ -58,7 +53,7 @@ let get_preprocessed_ast_from_cli_args
   in
   preprocess  cli_args ~kasim_args ast
 
-let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default) cli_args
+let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     ~max_sharing ?bwd_bisim ~compileModeOn preprocessed_ast
   =
   let conf, progressConf,
@@ -185,7 +180,7 @@ let get_compilation_from_preprocessed_ast
     let pack =
       get_pack_from_preprocessed_ast
       ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
-      cli_args preprocessed
+      preprocessed
     in
     get_compilation_from_pack ~unit cli_args pack
 
@@ -198,7 +193,7 @@ let get_compilation
          let preprocess = get_preprocessed_ast_from_cli_args cli_args in
          get_pack_from_preprocessed_ast
            ~kasim_args ~max_sharing ?bwd_bisim ~compileModeOn
-           cli_args preprocess
+           preprocess
        | marshalized_file ->
          get_pack_from_marshalizedfile
            kasim_args cli_args marshalized_file in

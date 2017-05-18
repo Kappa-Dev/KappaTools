@@ -70,6 +70,7 @@ type t =
     fresh_id: int ref ;
     fresh_meta_id: int ref ;
     fresh_reaction_id: int ref;
+    fresh_obs_id: int ref;
     mutable current_line: token list;
     nodes: (string * Graph_loggers_sig.options list) list ref ;
     edges: (string * string * Graph_loggers_sig.options list) list ref ;
@@ -103,6 +104,7 @@ let dummy_html_logger =
     edges = ref [];
     edges_map = ref Mods.String2Map.empty;
     fresh_reaction_id = ref 1;
+    fresh_obs_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
@@ -123,6 +125,7 @@ let dummy_txt_logger =
     edges = ref [];
     edges_map = ref Mods.String2Map.empty;
     fresh_reaction_id = ref 1;
+    fresh_obs_id = ref 1;
     env = ref VarMap.empty;
     const = ref VarSet.empty;
     id_of_parameters = ref VarMap.empty;
@@ -332,6 +335,7 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
       id_map = ref StringMap.empty;
       fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
+      fresh_obs_id = ref 1;
       logger = Formatter formatter;
       channel_opt = Some channel;
       encoding = mode;
@@ -356,6 +360,7 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       id_map = ref StringMap.empty;
       fresh_meta_id = ref 1 ;
       fresh_id = ref 1;
+      fresh_obs_id = ref 1;
       logger = Formatter formatter;
       channel_opt = None;
       encoding = mode;
@@ -379,6 +384,7 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
     id_map = ref StringMap.empty;
     fresh_meta_id = ref 1 ;
     fresh_id = ref 1;
+    fresh_obs_id = ref 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     channel_opt = None;
     encoding = mode;
@@ -399,6 +405,7 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
     {
       id_map = ref StringMap.empty;
       fresh_meta_id = ref 1 ;
+      fresh_obs_id = ref 1;
       fresh_id = ref 1;
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
       channel_opt = None;
@@ -474,15 +481,15 @@ let flush_and_clean logger fmt =
 
 let fprintf logger = fprintf ~fprintnewline:false logger
 
-let fresh_id logger =
-  let i = !(logger.fresh_id) in
-  let () = logger.fresh_id := i+1 in
+let get_ref ref =
+  let i = !ref in
+  let () = ref := i+1 in
   i
 
-let get_fresh_meta_id logger =
-  let i = !(logger.fresh_meta_id) in
-  let () = logger.fresh_meta_id := i+1 in
-  i
+let fresh_id logger = get_ref logger.fresh_id
+let get_fresh_meta_id logger = get_ref logger.fresh_meta_id
+let get_fresh_obs_id logger = get_ref logger.fresh_obs_id
+
 let int_of_string_id logger string =
   try
     StringMap.find string !(logger.id_map)
@@ -579,6 +586,7 @@ let rec allocate_fresh_name t name potential_suffix =
     allocate_fresh_name t (name^potential_suffix) potential_suffix
   else
     name
+
 
 let allocate t name =
   let () = t.idset := Mods.StringSet.add name (!(t.idset)) in

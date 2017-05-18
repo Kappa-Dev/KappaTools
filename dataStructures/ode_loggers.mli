@@ -46,7 +46,7 @@ val initialize:
   nodevar:int ->
   Loggers.t -> Ode_loggers_sig.variable -> unit
 val associate:
-  propagate_constants:bool -> 
+  propagate_constants:bool ->
   ?init_mode:bool -> ?comment:string ->
   (int -> string) ->
   Loggers.t -> Loggers.t -> Loggers.t -> Ode_loggers_sig.variable ->
@@ -110,3 +110,5 @@ val print_alg_expr_few_parenthesis:
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot ->
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t
   -> unit
+
+val is_time: (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> bool 

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 16 2017>
+  * Last modification: Time-stamp: <May 18 2017>
 *)
 
 let local_trace = false
@@ -2956,6 +2956,7 @@ struct
       match
         Loggers.get_encoding_format logger
       with
+      | Loggers.DOTNET
       | Loggers.Matlab | Loggers.Octave ->
         List.iter
           (affect_var ~propagate_constants is_zero logger logger logger_err ~init_mode:false compil
@@ -2964,35 +2965,61 @@ struct
       |  Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
       | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
-      | Loggers.SBML | Loggers.DOTNET
+      | Loggers.SBML
       | Loggers.Json
         -> ()
     in
-    let () = Ode_loggers.print_newline logger in
-    let titles =
-      List.fold_left
-        (fun titles (id,expr) ->
-           match titles with
-           | comment::tail ->
-             let () =
-               Ode_loggers.associate
-                 ~comment ~propagate_constants
-                 (I.string_of_var_id ~compil logger)
-                 logger logger logger_err
-             (Ode_loggers_sig.Obs id) expr (handler_expr network)
-             in tail
-           | [] ->
-             let () =
-               Loggers.fprintf logger "Internal error, more obs than obs labels"
-             in titles )
-        titles network.obs
-    in
     let () =
-      if not (titles = [])
-      then
-      Loggers.fprintf logger "Internal error, less obs than obs labels"
+      if Sbml_backend.is_dotnet logger && 
+        List.for_all
+          (fun (id,expr) -> Ode_loggers.is_time expr)
+          network.obs
+      then (* No observable in the model *)
+        ()
+      else
+        let () =
+          Sbml_backend.do_dotnet logger logger_err
+            (fun log _ -> Loggers.print_newline log)
+        in
+        let () =
+          Sbml_backend.open_box_dotnet logger logger_err
+            "begin groups"
+        in
+        let () =
+          Sbml_backend.do_dotnet logger logger_err
+            (fun log _ -> Loggers.print_newline log)
+        in
+        let () = Ode_loggers.print_newline logger_err in
+        let titles =
+          List.fold_left
+            (fun titles (id,expr) ->
+               match titles with
+               | comment::tail ->
+                 let () =
+                   Ode_loggers.associate
+                     ~comment ~propagate_constants
+                     (I.string_of_var_id ~compil logger)
+                     logger logger logger_err
+                     (Ode_loggers_sig.Obs id) expr (handler_expr network)
+                 in tail
+               | [] ->
+                 let () =
+                   Loggers.fprintf logger_err "Internal error, more obs than obs labels"
+                 in titles )
+            titles network.obs
+        in
+        let () =
+          if not (titles = [])
+          then
+            Loggers.fprintf logger_err "Internal error, less obs than obs labels"
+        in
+        let () = if Sbml_backend.is_dotnet logger then
+            Sbml_backend.close_box_dotnet logger logger_err
+              "end groups"
+        in
+        let () = Ode_loggers.print_newline logger in
+        ()
     in
-    let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.close_procedure logger in
     let () = Ode_loggers.print_newline logger in
     let () = Ode_loggers.print_newline logger in
@@ -3054,7 +3081,9 @@ struct
     in
     let () = Format.printf "\t -observables @." in
     let () =
-      export_obs ~propagate_constants logger logger_err compil network sorted_rules_and_decl in
+      export_obs
+        ~propagate_constants logger logger_err compil network sorted_rules_and_decl
+    in
     let () = Ode_loggers.launch_main logger in
     let () =
       export_main_follow_up
