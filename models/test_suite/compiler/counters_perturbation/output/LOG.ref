@@ -1,0 +1,22 @@
+Parsing counter_max.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 10 (sub)observables 6 navigation steps
+	 -initial conditions
++ Building initial state (64 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '10' '-seed' '92067277' '-d' 'output' 'counter_max.ka'
+____________________________________________________________
+
+Counter c of agent A reached maximum
+
+############################################################
+Simulation ended

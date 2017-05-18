@@ -1,0 +1,6 @@
+# Snapshot [Event: 3]
+%def: "T0" "0.0842794"
+
+%init: 1 __incr(a, b!3), __incr(a!3, b!2), __incr(a!2, b!1), A(x~u, c!1)
+%init: 39 A(x~u, c)
+

@@ -1727,6 +1727,54 @@ let remove_counters sigs contact_map with_counters rules  =
       let r' = {r with r_mix;r_created} in
       (s,(r',a))) rules
 
+let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
+  let (incr_type,_,incr_b,_) = incr_agent sigs in
+  let ag_id = Signature.num_of_agent ag_ty sigs in
+  let sign = Signature.get sigs ag_id in
+  let arity = Signature.arity sigs ag_id in
+  let ports =
+    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, Maintained) in
+  let internals = Array.make arity I_ANY in
+  let c_na = c.Ast.count_nme in
+  let c_id = Signature.num_of_site ~agent_name c_na sign in
+  let (max_val,pos) = c.Ast.count_delta in
+  let incrs = link_incr sigs 0 max_val (ag_id,c_id) false 1 pos (-1) in
+  let p =
+    if (max_val = 0) then (Ast.LNK_FREE,pos) else
+      (Ast.LNK_VALUE (1,(incr_b,incr_type)),pos) in
+  let () = ports.(c_id) <- p,Maintained in
+  let ra =
+    { ra_type = ag_id;ra_ports = ports;ra_ints = internals;ra_erased = false;
+      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
+  ra::incrs
+
+let counter_perturbation sigs c ag_ty =
+  let filename =
+    [Primitives.Str_pexpr ("counter_perturbation", snd c.Ast.count_nme) ] in
+  let stop_message =
+    "\nCounter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum\n" in
+  let stop_message' =
+    [Primitives.Str_pexpr (stop_message, snd c.Ast.count_nme) ] in
+  let mods = [Ast.PRINT ([],stop_message'); Ast.STOP filename] in
+  let val_of_counter =
+    Alg_expr.KAPPA_INSTANCE (agent_with_max_counter sigs c ag_ty) in
+  let pre:(rule_agent list, int) Alg_expr.bool =
+    Alg_expr.COMPARE_OP
+      (Operator.EQUAL,(val_of_counter,snd c.Ast.count_nme),
+       (Alg_expr.CONST (Nbr.I 1),snd c.Ast.count_nme)) in
+  (pre,snd ag_ty),mods,None
+
+let counters_perturbations sigs ast_sigs =
+  List.fold_left
+    (fun acc (ag_ty,sites,_)->
+      List.fold_left
+        (fun acc' site ->
+          match site with
+            Ast.Port _ -> acc'
+          | Ast.Counter c ->
+             ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc') acc sites)
+    [] ast_sigs
+
 let compil_of_ast ~syntax_version overwrite c =
   let (c,with_counters) = Ast.compile_counters c in
   let c =
@@ -1770,6 +1818,9 @@ let compil_of_ast ~syntax_version overwrite c =
     List_util.fold_right_map
       (perturbation_of_ast ~syntax_version sigs tok algs contact_map)
       c.Ast.perturbations [] in
+  let perts'' =
+    if (with_counters) then (counters_perturbations sigs c.Ast.signatures)@perts'
+    else perts' in
   let old_style_rules =
     List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
         let mix,created =
@@ -1793,15 +1844,6 @@ let compil_of_ast ~syntax_version overwrite c =
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
   let rules = remove_counters sigs contact_map with_counters rules in
-  let () =
-    if (!Parameter.debugModeOn && with_counters) then
-      (Format.printf "@.lkappa rules@.";
-       List.iter (fun (s,(r,_)) ->
-                   let label = match s with None -> "" | Some (l,_) -> l in
-                Format.printf
-                  "@.%s = %a" label
-                  (print_rule ~full:true sigs (fun _ _ -> ()) (fun _ _ -> ())) r)
-                 rules) in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =
@@ -1821,7 +1863,7 @@ let compil_of_ast ~syntax_version overwrite c =
           lab,alg_expr_of_ast ~syntax_version sigs tok algs expr,
           init_of_ast ~syntax_version sigs tok contact_map ini)
         c.Ast.init;
-    Ast.perturbations = perts';
+    Ast.perturbations = perts'';
     Ast.volumes = c.Ast.volumes;
     Ast.tokens = c.Ast.tokens;
     Ast.signatures = c.Ast.signatures;

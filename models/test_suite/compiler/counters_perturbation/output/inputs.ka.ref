@@ -1,0 +1,22 @@
+%def: "seed" "92067277"
+%def: "newSyntax" "true"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: __incr(a!b.__incr, b!a.__incr!c.A)
+%agent: A(x~u~p, c!b.__incr)
+
+%plot: [T]
+'r1__0' A(x!., c!./!1), +__incr(a!., b!1) @ 1
+'r1__1' A(x!., c!1/!2), __incr(b!1/!1), +__incr(a!1, b!2) @ 1
+'r2' A(x!., c!1/!2), __incr(b!1/!1), +__incr(a!1, b!2) @ 10
+
+/*0*/%mod: (|A(c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(b!3)| = 1) do $PRINTF  <"
+Counter c of agent A reached maximum
+">; $STOP "counter_perturbation"
+
+%init: 40 A(x~u!., c!.)
+
+%mod: [E] = 3 do $STOP
