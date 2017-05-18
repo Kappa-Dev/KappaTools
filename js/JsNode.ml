@@ -8,12 +8,12 @@
 
 class type process_configuration =
   object
-    val command : string Js.t Js.prop
-    val args : Js.string_array Js.t Js.prop
-    val onStdout : (string Js.t -> unit) Js.t Js.prop
-    val onStderr : (string Js.t -> unit) Js.t Js.prop
-    val onClose : (unit -> unit) Js.t Js.prop
-    val onError : (unit -> unit) Js.t Js.prop
+    method command : Js.js_string Js.t Js.prop
+    method args : Js.js_string Js.t Js.js_array Js.t Js.prop
+    method onStdout : (Js.js_string Js.t -> unit) Js.prop
+    method onStderr : (Js.js_string Js.t -> unit) Js.prop
+    method onClose : (unit -> unit) Js.prop
+    method onError : (unit -> unit) Js.prop
   end
 
 let constructor_process_configuration : process_configuration Js.t Js.constr =
@@ -30,23 +30,23 @@ let create_process_configuration
   let configuration : process_configuration Js.t =
     new%js constructor_process_configuration in
   let () =
-    (Js.Unsafe.coerce configuration)##.command := Js.string command;
-    (Js.Unsafe.coerce configuration)##.args :=
+    configuration##.command := Js.string command;
+    configuration##.args :=
       Js.array (Array.of_list (List.map Js.string args));
     (match onStdout with
-     | Some onStdout -> (Js.Unsafe.coerce configuration)##.onStdout := onStdout
+     | Some onStdout -> configuration##.onStdout := onStdout
      | None -> ()
     );
     (match onStderr with
-     | Some onStderr -> (Js.Unsafe.coerce configuration)##.onStderr := onStderr
+     | Some onStderr -> configuration##.onStderr := onStderr
      | None -> ()
     );
     (match onClose with
-     | Some onClose -> (Js.Unsafe.coerce configuration)##.onClose := onClose
+     | Some onClose -> configuration##.onClose := onClose
      | None -> ()
     );
     (match onError with
-     | Some onError -> (Js.Unsafe.coerce configuration)##.onError := onError
+     | Some onError -> configuration##.onError := onError
      | None -> ()
     );
     ()
