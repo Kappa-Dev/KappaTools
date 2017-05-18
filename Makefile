@@ -98,9 +98,6 @@ ide/Info.plist: ide/Info.plist.skel $(wildcard .git/refs/heads/*)
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.cmxa %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KADEREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
-
 site: $(RESOURCES_HTML)
 	mkdir -p $@
 	cp $^ $@
@@ -129,12 +126,9 @@ site/external/jquery: externals.mk
 	curl -LsS -o site/external/jquery/jquery.js https://code.jquery.com/jquery-$(JQUERY_VERSION).min.js
 	curl -LsS -o site/external/jquery/jquery-ui.min.js http://code.jquery.com/ui/$(JQUERY_UI_VERSION)/jquery-ui.min.js
 
-site/JsSim.js: JsSim.byte site
+site/%.js: %.byte site
 	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
-	sed -i.bak 's/.process.argv.length>0/.process.argv.length>1/' site/JsSim.js
-
-site/WebWorker.js: WebWorker.byte site
-	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
+	sed -i.bak 's/.process.argv.length>0/.process.argv.length>1/' $@
 
 ounit: TestJsSim TestWebSim
 
@@ -171,7 +165,7 @@ TestWebSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*)))
 	-tag-line "<webapp/*> : thread, package(atdgen), package(qcheck.ounit), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
-WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+%Worker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
@@ -194,6 +188,9 @@ StdSim.native StdSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	-tag-line "<api/*> : package(lwt.unix),package(atdgen)" \
 	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
 	$@
+
+%.cma %.cmxa %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KADEREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 bin/%: %.$(OCAMLBEST) Makefile
 	[ -d bin ] || mkdir bin && strip -o $@ $<
