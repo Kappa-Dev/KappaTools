@@ -174,7 +174,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
           (Ast.agent,
            LKappa.rule_agent list,
            int,
-           LKappa.rule, unit) Ast.compil)) ->
+           LKappa.rule_agent LKappa.rule, unit) Ast.compil)) ->
       (yield ()) >>=
       (fun () ->
          (* The last yield is updated after the last yield.
