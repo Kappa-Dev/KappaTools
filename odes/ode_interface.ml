@@ -198,15 +198,23 @@ let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
 let find_embeddings_unary_binary compil p x =
-  Tools.array_fold_lefti
-    (fun i acc cc ->
-       let em = find_embeddings compil cc x in
-       List_util.map_flatten
-         (fun m ->
-            List_util.map_option (fun r -> Matching.add_cc m i r) em)
-         acc)
-    [Matching.empty]
-    p
+  let mix,ren =
+    Pattern.add_fully_specified_to_graph
+      (Model.signatures compil.environment)
+      (Edges.empty ~with_connected_components:false) x in
+  let matc =
+    Tools.array_fold_lefti
+      (fun i acc cc ->
+         let em = find_embeddings compil cc x in
+         List_util.map_flatten
+           (fun m ->
+              List_util.map_option
+                (fun r ->
+                   Matching.add_cc m i (Renaming.compose false r ren)) em)
+           acc)
+      [Matching.empty]
+      p in
+  (matc,mix)
 
 let disjoint_union_sigs  sigs l =
   let pat = Tools.array_map_of_list (fun (x,_,_) -> x) l in
@@ -370,12 +378,6 @@ let apply_sigs sigs rule inj_nodes mix =
 let apply compil rule inj_nodes mix =
   let sigs = Model.signatures compil.environment in
   apply_sigs sigs rule inj_nodes mix
-
-let lift_species compil x =
-  fst @@
-  Pattern.add_fully_specified_to_graph
-    (Model.signatures compil.environment)
-    (Edges.empty ~with_connected_components:false) x
 
 let get_rules compil =
   Model.fold_rules

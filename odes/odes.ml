@@ -963,15 +963,13 @@ struct
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
                   let to_be_visited, network =
-                    let lembed =
+                    let lembed,mix =
                       I.find_embeddings_unary_binary compil
-                        enriched_rule.lhs new_species
-                    in
+                        enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
                          add_reaction ?max_size
-                           parameters compil enriched_rule embed
-                           (I.lift_species compil new_species))
+                           parameters compil enriched_rule embed mix)
                       lembed
                       (to_be_visited, network)
                   in
