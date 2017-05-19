@@ -5,7 +5,7 @@ sudo: required
 
 env:
   global:
-    secure: bZcUIoyDu8tL8xyO6FL8JjfpRQe2QzzdKav7/V68NVjRxVNuc6FPc+VTchaVtKAfo7iVxjk0krUpyOeQujY3j8uL+ePs7dswGDHY/9trTyGws7NvcCzH+UrR5Yn2TM6I6ill5eHiBiW9W1/eX+K8UiSd/Usk9gZeBjJyz76tZh4=
+    secure: "XBCnCpNZ9WfkvDLkwMeW/D/TphPpqDJQdSsC9UOK9HFR3rgBmCof36DlirrZeefF6YKTr3Exkbl/7jDUK7hAGoa1c5NbXqYFp4ne3pSo77G3jHbC0zEP5k2F15NKSo8P9x0QsKzi7Mg1liratz7u65jRqURaZG4kFMw4f0NfVGU="
 
 matrix:
   include:
