@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaDE unary3.ka  -d output   || exit 0
+
+#the rule should apply creating some C()s.
+#there is no difficulty in this example 
