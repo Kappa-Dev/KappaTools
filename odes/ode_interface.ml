@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 16 2017>
+  * Last modification: Time-stamp: <May 19 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -243,21 +243,32 @@ type rule_id_with_mode = rule_id * arity * direction
 
 let lhs _compil _rule_id r = r.Primitives.connected_components
 
+let is_zero expr =
+  match expr with
+  | Alg_expr.CONST a,_ ->
+    Nbr.is_zero a
+  | _ -> false
+
 let add x y list  =
   match y with
   | None -> list
+  | Some x when is_zero (fst x) -> list
   | Some _ -> x::list
+
+let add_not_zero x y list =
+  if is_zero y then list
+  else x::list
 
 let mode_of_rule _compil _rule =
     Rule_modes.Direct
 
 let valid_modes compil rule id =
   let mode = mode_of_rule compil rule in
-  List.rev_map
-    (fun x -> id,x,mode)
-    (List.rev
-       (Rule_modes.Usual::
-        (add Rule_modes.Unary rule.Primitives.unary_rate [])))
+    List.rev_map
+      (fun x -> id,x,mode)
+      (List.rev
+         (add_not_zero Rule_modes.Usual rule.Primitives.rate
+            (add Rule_modes.Unary rule.Primitives.unary_rate [])))
 
 let rate _compil rule (_,arity,_) =
   match
@@ -397,7 +408,7 @@ let to_preprocessed_ast x = x
 let get_ast cli_args = Cli_init.get_ast_from_cli_args cli_args
 let to_ast x = x
 
-let preprocess cli_args ast = Cli_init.preprocess cli_args ast 
+let preprocess cli_args ast = Cli_init.preprocess cli_args ast
 let get_compil
     ?bwd_bisim
     ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
