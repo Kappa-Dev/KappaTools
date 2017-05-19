@@ -10,6 +10,7 @@ type t = {
   init_stopping_times : (Nbr.t * int) list;
   mutable stopping_times : (Nbr.t * int) list;
   perturbations_alive : bool array;
+  time_dependent_perts : int list;
   mutable active_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
@@ -36,12 +37,25 @@ let empty ~with_delta_activities env stopping_times =
     Random_tree.create (2*Model.nb_rules env) in
   let stops =
     List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times in
+  let time_dependent_perts =
+    let rec aux dep acc =
+      Operator.DepSet.fold
+        (fun dep perts ->
+           match dep with
+           | Operator.ALG j ->
+             aux (Model.get_alg_reverse_dependencies env j) perts
+           | Operator.PERT p ->
+             List_util.merge_uniq Mods.int_compare [p] perts
+           | Operator.RULE _ -> perts)
+    dep acc in
+    aux (let x,_,_,_ = Model.all_dependencies env in x) [] in
   {
     init_stopping_times = stops;
     stopping_times = stops;
     perturbations_alive =
       Array.make (Model.nb_perturbations env) true;
     active_perturbations = [];
+    time_dependent_perts;
     perturbations_not_done_yet =
       Array.make (Model.nb_perturbations env) true;
     activities = activity_tree;
@@ -233,7 +247,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
            state0.perturbations_not_done_yet in
        return out)
 
-let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
+let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
   let choice,_ = Random_tree.random
       (Rule_interpreter.get_random_state graph) state.activities in
   let rule_id = choice/2 in
@@ -322,7 +336,7 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
     else Rule_interpreter.apply_rule ~outputs ~rule_id in
   match apply_rule env counter graph cause rule with
   | Rule_interpreter.Success (graph') ->
-    let final_step = not (Counter.one_constructive_event counter dt) in
+    let final_step = not (Counter.one_constructive_event counter) in
     let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
@@ -343,10 +357,10 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
   | (Rule_interpreter.Clash | Rule_interpreter.Corrected) as out ->
     let continue =
       if out = Rule_interpreter.Clash then
-        Counter.one_clashing_instance_event counter dt
+        Counter.one_clashing_instance_event counter
       else if choice mod 2 = 1
-      then Counter.one_no_more_unary_event counter dt
-      else Counter.one_no_more_binary_event counter dt in
+      then Counter.one_no_more_unary_event counter
+      else Counter.one_no_more_binary_event counter in
     if Counter.consecutive_null_event counter < maxConsecutiveClash
     then (not continue,graph,state)
     else
@@ -409,8 +423,11 @@ let a_loop
       | _ ->
         let () =
           Counter.fill ~outputs counter ~dt (observables_values env graph) in
-
-        one_rule ~outputs ~maxConsecutiveClash dt env counter graph state in
+        let () = Counter.one_time_advance counter dt in
+        let (stop,graph',state' as pack) = perturbate
+            ~outputs env counter graph state state.time_dependent_perts in
+        if stop then pack else
+          one_rule ~outputs ~maxConsecutiveClash env counter graph' state' in
   out
 
 let end_of_simulation ~outputs form env counter graph state =

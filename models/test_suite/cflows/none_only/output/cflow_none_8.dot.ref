@@ -1,4 +1,4 @@
-/* Compression of 1 causal flows obtained in average at 6.365727E+01 t.u */
+/* Compression of 1 causal flows obtained in average at 6.415460E+01 t.u */
 /* Compressed causal flows were: [2] */
 digraph G{
  ranksep=.5 ;
@@ -9,6 +9,7 @@ node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_6 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_9 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 node_10 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 node_11 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 node_12 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
@@ -27,11 +28,10 @@ node_24 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcol
 node_25 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 node_26 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 node_27 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
-node_28 [label="$ADD 10000 C(x1~u, x2~u)", shape=invhouse, style=filled, fillcolor = green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_7 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_9 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_28 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
 node_8 [label="a..b", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -190,53 +190,53 @@ node_75 [label="Cpp", style=filled, fillcolor=red] ;
 node_2 -> node_7
 node_4 -> node_7
 node_7 -> node_8
-node_5 -> node_9
-node_6 -> node_9
-node_9 -> node_29
-node_12 -> node_29
+node_5 -> node_28
+node_6 -> node_28
+node_11 -> node_29
+node_28 -> node_29
 node_29 -> node_30
-node_13 -> node_31
+node_12 -> node_31
 node_30 -> node_31
 node_31 -> node_32
-node_21 -> node_33
+node_20 -> node_33
 node_32 -> node_33
 node_33 -> node_34
-node_14 -> node_35
+node_13 -> node_35
 node_34 -> node_35
 node_1 -> node_36
 node_8 -> node_36
 node_35 -> node_37
-node_20 -> node_38
+node_19 -> node_38
 node_37 -> node_38
-node_15 -> node_39
+node_14 -> node_39
 node_36 -> node_39
 node_39 -> node_40
 node_38 -> node_41
-node_16 -> node_42
+node_15 -> node_42
 node_40 -> node_42
 node_42 -> node_43
-node_28 -> node_44
+node_27 -> node_44
 node_43 -> node_44
 node_44 -> node_45
-node_18 -> node_46
+node_17 -> node_46
 node_45 -> node_46
 node_46 -> node_47
-node_27 -> node_48
+node_26 -> node_48
 node_47 -> node_48
 node_48 -> node_49
-node_19 -> node_50
+node_18 -> node_50
 node_49 -> node_50
 node_50 -> node_51
-node_22 -> node_52
+node_21 -> node_52
 node_51 -> node_52
 node_52 -> node_53
-node_17 -> node_54
+node_16 -> node_54
 node_53 -> node_54
 node_54 -> node_55
-node_23 -> node_56
+node_22 -> node_56
 node_55 -> node_56
 node_56 -> node_57
-node_24 -> node_58
+node_23 -> node_58
 node_57 -> node_58
 node_36 -> node_59
 node_58 -> node_60
@@ -246,17 +246,17 @@ node_60 -> node_61
 node_61 -> node_62
 node_3 -> node_63
 node_59 -> node_63
-node_11 -> node_64
+node_10 -> node_64
 node_62 -> node_64
 node_63 -> node_64
 node_64 -> node_65
-node_10 -> node_66
+node_9 -> node_66
 node_65 -> node_66
 node_66 -> node_67
-node_26 -> node_68
+node_25 -> node_68
 node_67 -> node_68
 node_68 -> node_69
-node_25 -> node_70
+node_24 -> node_70
 node_69 -> node_70
 node_63 -> node_71
 node_70 -> node_72

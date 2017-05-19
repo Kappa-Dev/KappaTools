@@ -55,10 +55,11 @@ val next_story : t -> unit Trace.Simulation_info.t
 val fill :
   outputs:(Data.t -> unit) -> t -> dt:float -> (t -> Nbr.t array) -> unit
 
-val one_constructive_event : t -> float -> bool
-val one_clashing_instance_event : t -> float -> bool
-val one_no_more_unary_event : t -> float -> bool
-val one_no_more_binary_event : t -> float -> bool
+val one_time_advance : t -> float -> unit
+val one_constructive_event : t -> bool
+val one_clashing_instance_event : t -> bool
+val one_no_more_unary_event : t -> bool
+val one_no_more_binary_event : t -> bool
 val one_time_correction_event : t -> Nbr.t -> bool
 
 val inc_stories : t -> unit

@@ -167,7 +167,7 @@ let current_time c = c.time
 let current_event c = c.events
 let nb_null_event c = Efficiency.nb c.stat_null
 let consecutive_null_event c = Efficiency.nb_consecutive c.stat_null
-let inc_time c dt = c.time <- (c.time +. dt)
+let one_time_advance c dt = c.time <- (c.time +. dt)
 let inc_stories c = c.stories <- (c.stories + 1)
 let inc_events c =c.events <- (c.events + 1)
 let check_time c =
@@ -176,22 +176,18 @@ let check_output_time c ot =
   match c.max_time with None -> true | Some max -> ot <= max
 let check_events c =
   match c.max_event with None -> true | Some max -> c.events < max
-let one_constructive_event c dt =
+let one_constructive_event c =
   let () = c.stat_null <- Efficiency.reset_consecutive c.stat_null in
   let () = inc_events c in
-  let () = inc_time c dt in
   check_time c && check_events c
-let one_no_more_binary_event c dt =
+let one_no_more_binary_event c =
   let () = c.stat_null <- Efficiency.incr_no_more_binary c.stat_null in
-  let () = inc_time c dt in
   check_time c && check_events c
-let one_no_more_unary_event c dt =
+let one_no_more_unary_event c =
   let () = c.stat_null <- Efficiency.incr_no_more_unary c.stat_null in
-  let () = inc_time c dt in
   check_time c && check_events c
-let one_clashing_instance_event c dt =
+let one_clashing_instance_event c =
   let () = c.stat_null <- Efficiency.incr_clashing_instance c.stat_null in
-  let () = inc_time c dt in
   check_time c && check_events c
 let one_time_correction_event c ti =
   match Nbr.to_float ti with
@@ -282,7 +278,7 @@ let tick ~efficiency conf c =
   let current_simulation_info c =
   { Trace.Simulation_info.story_id = current_story c;
     Trace.Simulation_info.story_time = current_time c;
-    Trace.Simulation_info.story_event = current_event c;
+    Trace.Simulation_info.story_event = current_event c+1;
     Trace.Simulation_info.profiling_info = (); }
   let next_story c =
     let () = inc_stories c in

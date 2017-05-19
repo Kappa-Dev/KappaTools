@@ -1,4 +1,4 @@
-/* Compression of 2 causal flows obtained in average at 6.015801E+00 t.u */
+/* Compression of 2 causal flows obtained in average at 6.016344E+00 t.u */
 /* Compressed causal flows were: [483;570] */
 digraph G{
  ranksep=.5 ;
