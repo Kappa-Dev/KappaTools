@@ -75,7 +75,7 @@ sig
     embedding list
 
   val find_embeddings_unary_binary:
-    compil -> pattern -> chemical_species -> embedding_forest list
+    compil -> pattern -> chemical_species -> embedding_forest list * mixture
 
   val disjoint_union:
     compil  ->
@@ -125,9 +125,7 @@ sig
 
   val apply: compil -> rule -> embedding_forest -> mixture -> mixture
 
-  val lift_species: compil -> chemical_species -> mixture
-
-  val get_preprocessed_ast: Run_cli_args.t -> preprocessed_ast    
+  val get_preprocessed_ast: Run_cli_args.t -> preprocessed_ast
   val get_ast: Run_cli_args.t -> ast
   val to_ast: ast -> Ast.parsing_compil
   val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
