@@ -1,8 +1,8 @@
 %init: 10 A(x!1),B(x!1)
 
-A(x!_,y),B(y)-> A(x!_,y!1),B(y!1),C() @ 5{100}
+A(x!_),B(y)-> A(x!_),B(y!1),C(x!1) @ 5{100}
 
 %obs: 'goal' C()
 %agent: A(x,y)
 %agent: B(x,y)
-%agent: C()
+%agent: C(x)
