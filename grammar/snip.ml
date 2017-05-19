@@ -130,11 +130,11 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
                 LKappa.ra_syntax = ag.LKappa.ra_syntax;}, todo)
              :: acc
            else acc
-         | (Ast.LNK_VALUE (k,x),_),s when k > id ->
+         | (Ast.LNK_VALUE (k,x),_),s ->
            begin
              match
                List.partition
-                 (fun (j,(a',p'),_,sw') -> j=k && i=p' && a'= ag.LKappa.ra_type
+                 (fun (j,_,(p',a'),sw') -> j=k && i=p' && a'= ag.LKappa.ra_type
                                            && sw' = p_switch) todo with
              | [ _ ], todo' ->
                let ports' = Array.copy ag.LKappa.ra_ports in
@@ -149,8 +149,7 @@ let complete_with_candidate ag id todo p_id dst_info p_switch =
              |[], _ -> acc
              | _ :: _ :: _, _ -> assert false
            end
-         | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ |
-             Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
+         | ((Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.LNK_SOME),_), _ -> acc)
     [] ag.LKappa.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link dst_info switch =
