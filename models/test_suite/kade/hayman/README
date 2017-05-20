@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaDE hayman.ka  -d output   || exit 0
+
+#this rule always clashes.
+#the ODEs is empty
