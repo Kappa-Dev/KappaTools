@@ -1,0 +1,1222 @@
+--------------------------------------
+Process with: fceri_fyn
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 20:44:33 (GMT+2) on quyen
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with forward symmetries-------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with backward symmetries------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn.bngl (level 0)
+Read 31 parameters.
+Read 5 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 24 reaction rule(s).
+ACTION: generate_network( fceri_fyn )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      2 rxns  0.00e+00 CPU s
+Iteration   2:    10 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    13 species     20 rxns  2.00e-02 CPU s
+Iteration   4:    24 species     37 rxns  2.00e-02 CPU s
+Iteration   5:    51 species    112 rxns  9.00e-02 CPU s
+Iteration   6:   108 species    318 rxns  2.60e-01 CPU s
+Iteration   7:   295 species    969 rxns  8.20e-01 CPU s
+Iteration   8:   583 species   3208 rxns  3.72e+00 CPU s
+Iteration   9:   975 species   6404 rxns  5.64e+00 CPU s
+Iteration  10:  1266 species  11577 rxns  8.98e+00 CPU s
+Iteration  11:  1281 species  15104 rxns  6.32e+00 CPU s
+Iteration  12:  1281 species  15256 rxns  3.60e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:    96 reactions 4.10e-01 CPU s 4.27e-03 CPU s/rxn
+Rule   2:  4608 reactions 6.63e+00 CPU s 1.44e-03 CPU s/rxn
+Rule   3:  1200 reactions 1.97e+00 CPU s 1.64e-03 CPU s/rxn
+Rule   4:    72 reactions 3.10e-01 CPU s 4.31e-03 CPU s/rxn
+Rule   5:    96 reactions 3.60e-01 CPU s 3.75e-03 CPU s/rxn
+Rule   6:  1200 reactions 2.01e+00 CPU s 1.67e-03 CPU s/rxn
+Rule   7:  1200 reactions 1.97e+00 CPU s 1.64e-03 CPU s/rxn
+Rule   8:    72 reactions 3.10e-01 CPU s 4.31e-03 CPU s/rxn
+Rule   9:    96 reactions 3.30e-01 CPU s 3.44e-03 CPU s/rxn
+Rule  10:  3200 reactions 4.86e+00 CPU s 1.52e-03 CPU s/rxn
+Rule  11:    72 reactions 3.20e-01 CPU s 4.44e-03 CPU s/rxn
+Rule  12:    72 reactions 3.00e-01 CPU s 4.17e-03 CPU s/rxn
+Rule  13:    72 reactions 3.00e-01 CPU s 4.17e-03 CPU s/rxn
+Rule  14:     0 reactions 1.90e-01 CPU s 0.00e+00 CPU s/rxn
+Rule  15:   192 reactions 5.40e-01 CPU s 2.81e-03 CPU s/rxn
+Rule  16:   192 reactions 5.30e-01 CPU s 2.76e-03 CPU s/rxn
+Rule  17:   256 reactions 7.20e-01 CPU s 2.81e-03 CPU s/rxn
+Rule  18:   256 reactions 6.80e-01 CPU s 2.66e-03 CPU s/rxn
+Rule  19:   300 reactions 4.00e-01 CPU s 1.33e-03 CPU s/rxn
+Rule  20:   400 reactions 5.00e-01 CPU s 1.25e-03 CPU s/rxn
+Rule  21:   800 reactions 1.22e+00 CPU s 1.52e-03 CPU s/rxn
+Rule  22:   800 reactions 1.28e+00 CPU s 1.60e-03 CPU s/rxn
+Rule  23:     2 reactions 5.00e-02 CPU s 2.50e-02 CPU s/rxn
+Rule  24:     2 reactions 5.00e-02 CPU s 2.50e-02 CPU s/rxn
+Total   : 15256 reactions 2.62e+01 CPU s 1.72e-03 CPU s/rxn
+Wrote network in net format to ./fceri_fyn.net.
+CPU TIME: generate_network 26.79 s.
+Finished processing file fceri_fyn.bngl.
+CPU TIME: total 26.85 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn_sym.bngl (level 0)
+Read 31 parameters.
+Read 5 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 24 reaction rule(s).
+ACTION: generate_network( fceri_fyn_sym )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      2 rxns  1.00e-02 CPU s
+Iteration   2:    10 species      8 rxns  0.00e+00 CPU s
+Iteration   3:    13 species     20 rxns  2.00e-02 CPU s
+Iteration   4:    24 species     37 rxns  3.00e-02 CPU s
+Iteration   5:    51 species    112 rxns  8.00e-02 CPU s
+Iteration   6:   108 species    318 rxns  2.80e-01 CPU s
+Iteration   7:   295 species    969 rxns  8.90e-01 CPU s
+Iteration   8:   583 species   3208 rxns  3.28e+00 CPU s
+Iteration   9:   975 species   6404 rxns  5.50e+00 CPU s
+Iteration  10:  1266 species  11577 rxns  8.88e+00 CPU s
+Iteration  11:  1281 species  15104 rxns  6.31e+00 CPU s
+Iteration  12:  1281 species  15256 rxns  3.40e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:    96 reactions 3.60e-01 CPU s 3.75e-03 CPU s/rxn
+Rule   2:  4608 reactions 6.35e+00 CPU s 1.38e-03 CPU s/rxn
+Rule   3:  1200 reactions 1.90e+00 CPU s 1.58e-03 CPU s/rxn
+Rule   4:    72 reactions 2.80e-01 CPU s 3.89e-03 CPU s/rxn
+Rule   5:    96 reactions 3.20e-01 CPU s 3.33e-03 CPU s/rxn
+Rule   6:  1200 reactions 2.02e+00 CPU s 1.68e-03 CPU s/rxn
+Rule   7:  1200 reactions 1.91e+00 CPU s 1.59e-03 CPU s/rxn
+Rule   8:    72 reactions 3.00e-01 CPU s 4.17e-03 CPU s/rxn
+Rule   9:    96 reactions 3.20e-01 CPU s 3.33e-03 CPU s/rxn
+Rule  10:  3200 reactions 4.87e+00 CPU s 1.52e-03 CPU s/rxn
+Rule  11:    72 reactions 2.90e-01 CPU s 4.03e-03 CPU s/rxn
+Rule  12:    72 reactions 3.40e-01 CPU s 4.72e-03 CPU s/rxn
+Rule  13:    72 reactions 2.80e-01 CPU s 3.89e-03 CPU s/rxn
+Rule  14:     0 reactions 1.60e-01 CPU s 0.00e+00 CPU s/rxn
+Rule  15:   192 reactions 5.40e-01 CPU s 2.81e-03 CPU s/rxn
+Rule  16:   192 reactions 5.10e-01 CPU s 2.66e-03 CPU s/rxn
+Rule  17:   256 reactions 6.90e-01 CPU s 2.70e-03 CPU s/rxn
+Rule  18:   256 reactions 7.30e-01 CPU s 2.85e-03 CPU s/rxn
+Rule  19:   300 reactions 4.00e-01 CPU s 1.33e-03 CPU s/rxn
+Rule  20:   400 reactions 5.10e-01 CPU s 1.27e-03 CPU s/rxn
+Rule  21:   800 reactions 1.21e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  22:   800 reactions 1.22e+00 CPU s 1.53e-03 CPU s/rxn
+Rule  23:     2 reactions 7.00e-02 CPU s 3.50e-02 CPU s/rxn
+Rule  24:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
+Total   : 15256 reactions 2.56e+01 CPU s 1.68e-03 CPU s/rxn
+Wrote network in net format to ./fceri_fyn_sym.net.
+CPU TIME: generate_network 26.16 s.
+Finished processing file fceri_fyn_sym.bngl.
+CPU TIME: total 26.21 s.
+--------------------------------------
+Process with: fceri_fyn_lig
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 20:45:27 (GMT+2) on quyen
+Parsing fceri_fyn_lig.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with forward symmetries-------
+Parsing fceri_fyn_lig.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with backward symmetries------
+Parsing fceri_fyn_lig.ka...
+done
++ simulation parameters
++ Sanity checks
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn_lig.bngl (level 0)
+Read 32 parameters.
+Read 5 species.
+Adding 2 as allowed state of component a of molecule Lig
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 25 reaction rule(s).
+ACTION: generate_network( fceri_fyn_lig )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     8 species      3 rxns  1.00e-02 CPU s
+Iteration   2:    13 species     13 rxns  1.00e-02 CPU s
+Iteration   3:    19 species     38 rxns  2.00e-02 CPU s
+Iteration   4:    33 species     72 rxns  5.00e-02 CPU s
+Iteration   5:    72 species    186 rxns  1.50e-01 CPU s
+Iteration   6:   164 species    539 rxns  4.40e-01 CPU s
+Iteration   7:   490 species   1716 rxns  1.60e+00 CPU s
+Iteration   8:  1079 species   6044 rxns  6.34e+00 CPU s
+Iteration   9:  1866 species  13252 rxns  1.25e+01 CPU s
+Iteration  10:  2470 species  24398 rxns  1.97e+01 CPU s
+Iteration  11:  2506 species  32388 rxns  1.45e+01 CPU s
+Iteration  12:  2506 species  32776 rxns  9.30e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  2450 reactions 3.57e+00 CPU s 1.46e-03 CPU s/rxn
+Rule   2:   192 reactions 7.70e-01 CPU s 4.01e-03 CPU s/rxn
+Rule   3:  9216 reactions 1.32e+01 CPU s 1.43e-03 CPU s/rxn
+Rule   4:  2376 reactions 3.83e+00 CPU s 1.61e-03 CPU s/rxn
+Rule   5:   144 reactions 6.30e-01 CPU s 4.38e-03 CPU s/rxn
+Rule   6:   192 reactions 6.60e-01 CPU s 3.44e-03 CPU s/rxn
+Rule   7:  2376 reactions 4.00e+00 CPU s 1.68e-03 CPU s/rxn
+Rule   8:  2376 reactions 3.89e+00 CPU s 1.64e-03 CPU s/rxn
+Rule   9:   144 reactions 6.10e-01 CPU s 4.24e-03 CPU s/rxn
+Rule  10:   192 reactions 6.90e-01 CPU s 3.59e-03 CPU s/rxn
+Rule  11:  6336 reactions 9.94e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  12:   144 reactions 6.10e-01 CPU s 4.24e-03 CPU s/rxn
+Rule  13:   144 reactions 6.90e-01 CPU s 4.79e-03 CPU s/rxn
+Rule  14:   144 reactions 6.10e-01 CPU s 4.24e-03 CPU s/rxn
+Rule  15:     0 reactions 3.40e-01 CPU s 0.00e+00 CPU s/rxn
+Rule  16:   384 reactions 1.07e+00 CPU s 2.79e-03 CPU s/rxn
+Rule  17:   384 reactions 1.05e+00 CPU s 2.73e-03 CPU s/rxn
+Rule  18:   512 reactions 1.45e+00 CPU s 2.83e-03 CPU s/rxn
+Rule  19:   512 reactions 1.40e+00 CPU s 2.73e-03 CPU s/rxn
+Rule  20:   594 reactions 8.50e-01 CPU s 1.43e-03 CPU s/rxn
+Rule  21:   792 reactions 1.10e+00 CPU s 1.39e-03 CPU s/rxn
+Rule  22:  1584 reactions 2.49e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  23:  1584 reactions 2.48e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  24:     2 reactions 1.10e-01 CPU s 5.50e-02 CPU s/rxn
+Rule  25:     2 reactions 1.10e-01 CPU s 5.50e-02 CPU s/rxn
+Total   : 32776 reactions 5.61e+01 CPU s 1.71e-03 CPU s/rxn
+Wrote network in net format to ./fceri_fyn_lig.net.
+CPU TIME: generate_network 57.32 s.
+Finished processing file fceri_fyn_lig.bngl.
+CPU TIME: total 57.37 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn_lig_sym.bngl (level 0)
+Read 32 parameters.
+Read 5 species.
+Adding 2 as allowed state of component a of molecule Lig
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 25 reaction rule(s).
+ACTION: generate_network( fceri_fyn_lig_sym )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     8 species      3 rxns  1.00e-02 CPU s
+Iteration   2:    13 species     13 rxns  1.00e-02 CPU s
+Iteration   3:    19 species     38 rxns  3.00e-02 CPU s
+Iteration   4:    33 species     72 rxns  7.00e-02 CPU s
+Iteration   5:    72 species    186 rxns  1.30e-01 CPU s
+Iteration   6:   164 species    539 rxns  4.80e-01 CPU s
+Iteration   7:   490 species   1716 rxns  1.55e+00 CPU s
+Iteration   8:  1079 species   6044 rxns  6.26e+00 CPU s
+Iteration   9:  1866 species  13252 rxns  1.27e+01 CPU s
+Iteration  10:  2470 species  24398 rxns  1.99e+01 CPU s
+Iteration  11:  2506 species  32388 rxns  1.45e+01 CPU s
+Iteration  12:  2506 species  32776 rxns  9.10e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  2450 reactions 3.66e+00 CPU s 1.49e-03 CPU s/rxn
+Rule   2:   192 reactions 7.60e-01 CPU s 3.96e-03 CPU s/rxn
+Rule   3:  9216 reactions 1.31e+01 CPU s 1.42e-03 CPU s/rxn
+Rule   4:  2376 reactions 3.93e+00 CPU s 1.65e-03 CPU s/rxn
+Rule   5:   144 reactions 6.20e-01 CPU s 4.31e-03 CPU s/rxn
+Rule   6:   192 reactions 7.10e-01 CPU s 3.70e-03 CPU s/rxn
+Rule   7:  2376 reactions 4.00e+00 CPU s 1.68e-03 CPU s/rxn
+Rule   8:  2376 reactions 3.95e+00 CPU s 1.66e-03 CPU s/rxn
+Rule   9:   144 reactions 6.20e-01 CPU s 4.31e-03 CPU s/rxn
+Rule  10:   192 reactions 6.70e-01 CPU s 3.49e-03 CPU s/rxn
+Rule  11:  6336 reactions 9.95e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  12:   144 reactions 6.30e-01 CPU s 4.38e-03 CPU s/rxn
+Rule  13:   144 reactions 6.70e-01 CPU s 4.65e-03 CPU s/rxn
+Rule  14:   144 reactions 6.20e-01 CPU s 4.31e-03 CPU s/rxn
+Rule  15:     0 reactions 3.70e-01 CPU s 0.00e+00 CPU s/rxn
+Rule  16:   384 reactions 1.08e+00 CPU s 2.81e-03 CPU s/rxn
+Rule  17:   384 reactions 1.10e+00 CPU s 2.86e-03 CPU s/rxn
+Rule  18:   512 reactions 1.47e+00 CPU s 2.87e-03 CPU s/rxn
+Rule  19:   512 reactions 1.39e+00 CPU s 2.71e-03 CPU s/rxn
+Rule  20:   594 reactions 8.60e-01 CPU s 1.45e-03 CPU s/rxn
+Rule  21:   792 reactions 1.11e+00 CPU s 1.40e-03 CPU s/rxn
+Rule  22:  1584 reactions 2.58e+00 CPU s 1.63e-03 CPU s/rxn
+Rule  23:  1584 reactions 2.56e+00 CPU s 1.62e-03 CPU s/rxn
+Rule  24:     2 reactions 1.00e-01 CPU s 5.00e-02 CPU s/rxn
+Rule  25:     2 reactions 1.10e-01 CPU s 5.50e-02 CPU s/rxn
+Total   : 32776 reactions 5.66e+01 CPU s 1.73e-03 CPU s/rxn
+Wrote network in net format to ./fceri_fyn_lig_sym.net.
+CPU TIME: generate_network 57.78 s.
+Finished processing file fceri_fyn_lig_sym.bngl.
+CPU TIME: total 57.83 s.
+--------------------------------------
+Process with: fceri_fyn_trimer
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 20:47:24 (GMT+2) on quyen
+Parsing fceri_fyn_trimer.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with forward symmetries-------
+Parsing fceri_fyn_trimer.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with backward symmetries------
+Parsing fceri_fyn_trimer.ka...
+done
++ simulation parameters
++ Sanity checks
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn_trimer.bngl (level 0)
+Read 31 parameters.
+Read 5 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 24 reaction rule(s).
+ACTION: generate_network( fceri_fyn_trimer )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      2 rxns  0.00e+00 CPU s
+Iteration   2:    10 species     10 rxns  1.00e-02 CPU s
+Iteration   3:    16 species     31 rxns  4.00e-02 CPU s
+Iteration   4:    33 species     74 rxns  9.00e-02 CPU s
+Iteration   5:    90 species    265 rxns  3.60e-01 CPU s
+Iteration   6:   287 species   1074 rxns  1.68e+00 CPU s
+Iteration   7:  1192 species   4718 rxns  7.98e+00 CPU s
+Iteration   8:  4480 species  23609 rxns  4.52e+01 CPU s
+Iteration   9: 13292 species  90579 rxns  1.97e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_fyn_trimer_sym.bngl (level 0)
+Read 31 parameters.
+Read 5 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Lyn
+Adding pY as allowed state of component a of molecule Fyn
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 24 reaction rule(s).
+ACTION: generate_network( fceri_fyn_trimer_sym )
+Iteration   0:     5 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      2 rxns  1.00e-02 CPU s
+Iteration   2:    10 species     10 rxns  2.00e-02 CPU s
+Iteration   3:    16 species     31 rxns  5.00e-02 CPU s
+Iteration   4:    33 species     74 rxns  1.60e-01 CPU s
+Iteration   5:    90 species    265 rxns  5.60e-01 CPU s
+Iteration   6:   287 species   1074 rxns  2.07e+00 CPU s
+Iteration   7:  1192 species   4718 rxns  7.83e+00 CPU s
+Iteration   8:  4480 species  23609 rxns  4.49e+01 CPU s
+Iteration   9: 13292 species  90579 rxns  2.19e+02 CPU s
+--------------------------------------
+Process with: fceri_gamma2
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 21:07:28 (GMT+2) on quyen
+Parsing fceri_gamma2.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with forward symmetries-------
+Parsing fceri_gamma2.ka...
+done
++ simulation parameters
++ Sanity checks
+Process with backward symmetries------
+Parsing fceri_gamma2.ka...
+done
++ simulation parameters
++ Sanity checks
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_gamma2.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 19 reaction rule(s).
+ACTION: generate_network( fceri_gamma2 )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     9 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     20 rxns  3.00e-02 CPU s
+Iteration   4:    23 species     37 rxns  4.00e-02 CPU s
+Iteration   5:    50 species    111 rxns  1.00e-01 CPU s
+Iteration   6:   108 species    326 rxns  2.70e-01 CPU s
+Iteration   7:   259 species    957 rxns  8.20e-01 CPU s
+Iteration   8:   558 species   2864 rxns  3.00e+00 CPU s
+Iteration   9:  1421 species   7261 rxns  7.93e+00 CPU s
+Iteration  10:  2941 species  21693 rxns  2.93e+01 CPU s
+Iteration  11:  3674 species  46733 rxns  6.08e+01 CPU s
+Iteration  12:  3744 species  57432 rxns  3.23e+01 CPU s
+Iteration  13:  3744 species  58276 rxns  3.33e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:   168 reactions 1.06e+00 CPU s 6.31e-03 CPU s/rxn
+Rule   2: 14112 reactions 2.49e+01 CPU s 1.77e-03 CPU s/rxn
+Rule   3:  3612 reactions 7.93e+00 CPU s 2.20e-03 CPU s/rxn
+Rule   4:   441 reactions 1.49e+00 CPU s 3.38e-03 CPU s/rxn
+Rule   5:   504 reactions 1.65e+00 CPU s 3.27e-03 CPU s/rxn
+Rule   6:  3612 reactions 7.90e+00 CPU s 2.19e-03 CPU s/rxn
+Rule   7:   441 reactions 1.47e+00 CPU s 3.33e-03 CPU s/rxn
+Rule   8:   504 reactions 1.54e+00 CPU s 3.06e-03 CPU s/rxn
+Rule   9: 16512 reactions 3.83e+01 CPU s 2.32e-03 CPU s/rxn
+Rule  10:  1008 reactions 3.54e+00 CPU s 3.51e-03 CPU s/rxn
+Rule  11:  1008 reactions 3.46e+00 CPU s 3.43e-03 CPU s/rxn
+Rule  12:  2112 reactions 8.26e+00 CPU s 3.91e-03 CPU s/rxn
+Rule  13:  2112 reactions 7.75e+00 CPU s 3.67e-03 CPU s/rxn
+Rule  14:  1806 reactions 3.29e+00 CPU s 1.82e-03 CPU s/rxn
+Rule  15:  2064 reactions 3.65e+00 CPU s 1.77e-03 CPU s/rxn
+Rule  16:  4128 reactions 1.03e+01 CPU s 2.50e-03 CPU s/rxn
+Rule  17:  4128 reactions 1.10e+01 CPU s 2.66e-03 CPU s/rxn
+Rule  18:     2 reactions 2.30e-01 CPU s 1.15e-01 CPU s/rxn
+Rule  19:     2 reactions 2.10e-01 CPU s 1.05e-01 CPU s/rxn
+Total   : 58276 reactions 1.38e+02 CPU s 2.37e-03 CPU s/rxn
+Wrote network in net format to ./fceri_gamma2.net.
+CPU TIME: generate_network 139.96 s.
+Finished processing file fceri_gamma2.bngl.
+CPU TIME: total 140.00 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_gamma2_sym.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 19 reaction rule(s).
+ACTION: generate_network( fceri_gamma2_sym )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     9 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     20 rxns  1.00e-02 CPU s
+Iteration   4:    23 species     37 rxns  3.00e-02 CPU s
+Iteration   5:    50 species    111 rxns  9.00e-02 CPU s
+Iteration   6:   108 species    326 rxns  2.70e-01 CPU s
+Iteration   7:   259 species    957 rxns  8.70e-01 CPU s
+Iteration   8:   558 species   2864 rxns  2.88e+00 CPU s
+Iteration   9:  1421 species   7261 rxns  7.88e+00 CPU s
+Iteration  10:  2941 species  21693 rxns  2.87e+01 CPU s
+Iteration  11:  3674 species  46733 rxns  6.18e+01 CPU s
+Iteration  12:  3744 species  57432 rxns  3.24e+01 CPU s
+Iteration  13:  3744 species  58276 rxns  3.34e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:   168 reactions 1.04e+00 CPU s 6.19e-03 CPU s/rxn
+Rule   2: 14112 reactions 2.45e+01 CPU s 1.74e-03 CPU s/rxn
+Rule   3:  3612 reactions 7.72e+00 CPU s 2.14e-03 CPU s/rxn
+Rule   4:   441 reactions 1.52e+00 CPU s 3.45e-03 CPU s/rxn
+Rule   5:   504 reactions 1.60e+00 CPU s 3.17e-03 CPU s/rxn
+Rule   6:  3612 reactions 7.75e+00 CPU s 2.15e-03 CPU s/rxn
+Rule   7:   441 reactions 1.46e+00 CPU s 3.31e-03 CPU s/rxn
+Rule   8:   504 reactions 1.55e+00 CPU s 3.08e-03 CPU s/rxn
+Rule   9: 16512 reactions 3.82e+01 CPU s 2.31e-03 CPU s/rxn
+Rule  10:  1008 reactions 3.50e+00 CPU s 3.47e-03 CPU s/rxn
+Rule  11:  1008 reactions 3.45e+00 CPU s 3.42e-03 CPU s/rxn
+Rule  12:  2112 reactions 9.22e+00 CPU s 4.37e-03 CPU s/rxn
+Rule  13:  2112 reactions 8.08e+00 CPU s 3.83e-03 CPU s/rxn
+Rule  14:  1806 reactions 3.32e+00 CPU s 1.84e-03 CPU s/rxn
+Rule  15:  2064 reactions 3.66e+00 CPU s 1.77e-03 CPU s/rxn
+Rule  16:  4128 reactions 1.04e+01 CPU s 2.51e-03 CPU s/rxn
+Rule  17:  4128 reactions 1.09e+01 CPU s 2.65e-03 CPU s/rxn
+Rule  18:     2 reactions 2.00e-01 CPU s 1.00e-01 CPU s/rxn
+Rule  19:     2 reactions 2.40e-01 CPU s 1.20e-01 CPU s/rxn
+Total   : 58276 reactions 1.38e+02 CPU s 2.37e-03 CPU s/rxn
+Wrote network in net format to ./fceri_gamma2_sym.net.
+CPU TIME: generate_network 140.40 s.
+Finished processing file fceri_gamma2_sym.bngl.
+CPU TIME: total 140.44 s.
+--------------------------------------
+Process with: fceri_gamma2_asym
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 21:12:10 (GMT+2) on quyen
+Parsing fceri_gamma2_asym.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 94 (sub)observables 442 navigation steps
+	 -initial conditions
+Parsing fceri_gamma2_asym.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+Lig() => [ Lig(l2) v Lig(l2!Rec.a) ]
+Lig() => [ Lig(l1) v Lig(l1!Rec.a) ]
+Lyn() => [ Lyn(SH2) v Lyn(SH2!Rec.b) ]
+Lyn() => [ Lyn(U) v Lyn(U!Rec.b) ]
+Syk() => [ Syk(a~Y) v Syk(a~pY) ]
+Syk() => [ Syk(tSH2) v Syk(tSH2!Rec.g1) v Syk(tSH2!Rec.g2) ]
+Syk() => [ Syk(l~Y) v Syk(l~pY) ]
+Rec() => [ Rec(g1~Y?) v Rec(g1~pY?) ]
+Rec() => [ Rec(a) v Rec(a!Lig.l1) v Rec(a!Lig.l2) ]
+Rec() => [ Rec(g2~Y?) v Rec(g2~pY?) ]
+Rec() => [ Rec(b~Y?) v Rec(b~pY?) ]
+Rec() => [ Rec(g2) v Rec(g2!Syk.tSH2) ]
+Rec() => [ Rec(g1) v Rec(g1!Syk.tSH2) ]
+Rec() => [ Rec(b) v Rec(b!Lyn.U) v Rec(b!Lyn.SH2) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+Lyn(U!Rec.b) => Lyn(SH2,U!Rec.b)
+Rec(g2!Syk.tSH2) => Rec(g2~pY!Syk.tSH2)
+Rec(g1!Syk.tSH2) => Rec(g1~pY!Syk.tSH2)
+Rec(b~pY?) => [ Rec(b~pY) v Rec(b~pY!Lyn.SH2) ]
+Rec(b~Y?) => [ Rec(b~Y) v Rec(b~Y!Lyn.U) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+************
+Agent: Rec
+  -Equivalence classes of sites (both):
+      {g1,g2}
+************
+In rules and initial states:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+************
+Agent: Rec
+  -Equivalence classes of sites (both):
+      {g1,g2}
+************
+In rules and algebraic expression:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+************
+Agent: Rec
+  -Equivalence classes of sites (both):
+      {g1,g2}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.256866 s.; rules: 59; dead rules: 0.
+Process with forward symmetries-------
+Parsing fceri_gamma2_asym.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 94 (sub)observables 442 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 286.571 s.; 61 rules; 3744 species; 66075 reactions.
+Process with backward symmetries------
+Parsing fceri_gamma2_asym.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 94 (sub)observables 442 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 94 (sub)observables 442 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 287.992 s.; 61 rules; 3744 species; 66075 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_gamma2_asym.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g1 of molecule Rec
+Adding pY as allowed state of component g2 of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 31 reaction rule(s).
+Finished processing file fceri_gamma2_asym.bngl.
+CPU TIME: total 0.06 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_gamma2_asym_sym.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g1 of molecule Rec
+Adding pY as allowed state of component g2 of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 31 reaction rule(s).
+Finished processing file fceri_gamma2_asym_sym.bngl.
+CPU TIME: total 0.07 s.
+--------------------------------------
+Process with: fceri_ji
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 21:21:46 (GMT+2) on quyen
+Parsing fceri_ji.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 59 (sub)observables 270 navigation steps
+	 -initial conditions
+Parsing fceri_ji.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule R4 (File "fceri_ji.ka", line 49, characters 8-131:) will never be applied.
+rule R5 (File "fceri_ji.ka", line 55, characters 8-131:) will never be applied.
+rule R7 (File "fceri_ji.ka", line 63, characters 8-134:) will never be applied.
+rule R7_2 (File "fceri_ji.ka", line 65, characters 10-136:) will never be applied.
+rule R8 (File "fceri_ji.ka", line 68, characters 8-134:) will never be applied.
+rule R8_2 (File "fceri_ji.ka", line 70, characters 10-136:) will never be applied.
+rule R10 (File "fceri_ji.ka", lines 76-77, characters 9-86:) will never be applied.
+rule R10_1 (File "fceri_ji.ka", lines 79-80, characters 11-86:) will never be applied.
+rule R11 (File "fceri_ji.ka", lines 83-84, characters 9-88:) will never be applied.
+rule R11_2 (File "fceri_ji.ka", lines 86-87, characters 11-88:) will never be applied.
+rule R12 (File "fceri_ji.ka", lines 90-91, characters 9-90:) will never be applied.
+rule R12_2 (File "fceri_ji.ka", lines 93-94, characters 11-90:) will never be applied.
+rule R13 (File "fceri_ji.ka", lines 97-98, characters 9-92:) will never be applied.
+rule R13_2 (File "fceri_ji.ka", lines 100-101, characters 11-92:) will never be applied.
+rule R16 (File "fceri_ji.ka", line 110, characters 9-50:) will never be applied.
+rule R17 (File "fceri_ji.ka", line 111, characters 9-50:) will never be applied.
+rule R18 (File "fceri_ji.ka", line 114, characters 9-46:) will never be applied.
+rule R19 (File "fceri_ji.ka", line 115, characters 9-46:) will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+Lig() => [ Lig(l2) v Lig(l2!Rec.a) ]
+Lig() => [ Lig(l1) v Lig(l1!Rec.a) ]
+Lyn() => [ Lyn(SH2) v Lyn(SH2!Rec.b) ]
+Lyn() => [ Lyn(U) v Lyn(U!Rec.b) ]
+Syk() => Syk(a~Y)
+Syk() => [ Syk(tSH2) v Syk(tSH2!Rec.g) ]
+Syk() => Syk(l~Y)
+Rec() => [ Rec(g~Y?) v Rec(g~pY?) ]
+Rec() => [ Rec(b) v Rec(b!Lyn.U) v Rec(b!Lyn.SH2) ]
+Rec() => [ Rec(a) v Rec(a!Lig.l1) v Rec(a!Lig.l2) ]
+Rec() => [ Rec(b~Y?) v Rec(b~pY?) ]
+Rec() => [ Rec(g) v Rec(g!Syk.tSH2) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+Lyn(U!Rec.b) => Lyn(SH2,U!Rec.b)
+Rec(g!Syk.tSH2) => Rec(g~pY!Syk.tSH2)
+Rec(b~pY?) => [ Rec(b~pY) v Rec(b~pY!Lyn.SH2) ]
+Rec(b~Y?) => [ Rec(b~Y) v Rec(b~Y!Lyn.U) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+In rules and initial states:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+In rules and algebraic expression:
+************
+Agent: Lig
+  -Equivalence classes of sites for bindings states:
+      {l1,l2}
+  -Equivalence classes of sites (both):
+      {l1,l2}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.065589 s.; rules: 36; dead rules: 18.
+Process with forward symmetries-------
+Parsing fceri_ji.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 59 (sub)observables 270 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.08286 s.; 36 rules; 354 species; 3824 reactions.
+Process with backward symmetries------
+Parsing fceri_ji.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 59 (sub)observables 270 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 59 (sub)observables 270 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.17967 s.; 36 rules; 354 species; 3824 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_ji.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 19 reaction rule(s).
+Read 10 observable(s).
+ACTION: generate_network( fceri_ji )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     9 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     20 rxns  3.00e-02 CPU s
+Iteration   4:    22 species     36 rxns  4.00e-02 CPU s
+Iteration   5:    43 species    100 rxns  1.20e-01 CPU s
+Iteration   6:    78 species    255 rxns  2.50e-01 CPU s
+Iteration   7:   139 species    586 rxns  5.50e-01 CPU s
+Iteration   8:   199 species   1190 rxns  1.02e+00 CPU s
+Iteration   9:   303 species   1841 rxns  1.22e+00 CPU s
+Iteration  10:   354 species   3143 rxns  1.99e+00 CPU s
+Iteration  11:   354 species   3680 rxns  8.50e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:    48 reactions 1.10e-01 CPU s 2.29e-03 CPU s/rxn
+Rule   2:  1152 reactions 1.71e+00 CPU s 1.48e-03 CPU s/rxn
+Rule   3:   312 reactions 5.30e-01 CPU s 1.70e-03 CPU s/rxn
+Rule   4:    36 reactions 1.10e-01 CPU s 3.06e-03 CPU s/rxn
+Rule   5:    24 reactions 1.00e-01 CPU s 4.17e-03 CPU s/rxn
+Rule   6:   312 reactions 5.10e-01 CPU s 1.63e-03 CPU s/rxn
+Rule   7:    36 reactions 1.20e-01 CPU s 3.33e-03 CPU s/rxn
+Rule   8:    24 reactions 6.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   9:   832 reactions 1.28e+00 CPU s 1.54e-03 CPU s/rxn
+Rule  10:    48 reactions 1.20e-01 CPU s 2.50e-03 CPU s/rxn
+Rule  11:    48 reactions 1.00e-01 CPU s 2.08e-03 CPU s/rxn
+Rule  12:    64 reactions 2.30e-01 CPU s 3.59e-03 CPU s/rxn
+Rule  13:    64 reactions 1.50e-01 CPU s 2.34e-03 CPU s/rxn
+Rule  14:   156 reactions 2.10e-01 CPU s 1.35e-03 CPU s/rxn
+Rule  15:   104 reactions 1.60e-01 CPU s 1.54e-03 CPU s/rxn
+Rule  16:   208 reactions 2.90e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  17:   208 reactions 2.70e-01 CPU s 1.30e-03 CPU s/rxn
+Rule  18:     2 reactions 2.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule  19:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :  3680 reactions 6.08e+00 CPU s 1.65e-03 CPU s/rxn
+Wrote network in net format to ./fceri_ji.net.
+CPU TIME: generate_network 6.21 s.
+Finished processing file fceri_ji.bngl.
+CPU TIME: total 6.28 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_ji_sym.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component l of molecule Syk
+Adding pY as allowed state of component a of molecule Syk
+Read 19 reaction rule(s).
+Read 10 observable(s).
+ACTION: generate_network( fceri_ji_sym )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     9 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     20 rxns  2.00e-02 CPU s
+Iteration   4:    22 species     36 rxns  3.00e-02 CPU s
+Iteration   5:    43 species    100 rxns  7.00e-02 CPU s
+Iteration   6:    78 species    255 rxns  2.10e-01 CPU s
+Iteration   7:   139 species    586 rxns  4.40e-01 CPU s
+Iteration   8:   199 species   1190 rxns  9.60e-01 CPU s
+Iteration   9:   303 species   1841 rxns  1.14e+00 CPU s
+Iteration  10:   354 species   3143 rxns  2.06e+00 CPU s
+Iteration  11:   354 species   3680 rxns  8.40e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:    48 reactions 1.10e-01 CPU s 2.29e-03 CPU s/rxn
+Rule   2:  1152 reactions 1.60e+00 CPU s 1.39e-03 CPU s/rxn
+Rule   3:   312 reactions 4.70e-01 CPU s 1.51e-03 CPU s/rxn
+Rule   4:    36 reactions 1.30e-01 CPU s 3.61e-03 CPU s/rxn
+Rule   5:    24 reactions 6.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   6:   312 reactions 4.70e-01 CPU s 1.51e-03 CPU s/rxn
+Rule   7:    36 reactions 8.00e-02 CPU s 2.22e-03 CPU s/rxn
+Rule   8:    24 reactions 9.00e-02 CPU s 3.75e-03 CPU s/rxn
+Rule   9:   832 reactions 1.25e+00 CPU s 1.50e-03 CPU s/rxn
+Rule  10:    48 reactions 1.40e-01 CPU s 2.92e-03 CPU s/rxn
+Rule  11:    48 reactions 1.20e-01 CPU s 2.50e-03 CPU s/rxn
+Rule  12:    64 reactions 1.90e-01 CPU s 2.97e-03 CPU s/rxn
+Rule  13:    64 reactions 1.60e-01 CPU s 2.50e-03 CPU s/rxn
+Rule  14:   156 reactions 2.00e-01 CPU s 1.28e-03 CPU s/rxn
+Rule  15:   104 reactions 1.10e-01 CPU s 1.06e-03 CPU s/rxn
+Rule  16:   208 reactions 2.90e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  17:   208 reactions 2.90e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  18:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  19:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Total   :  3680 reactions 5.78e+00 CPU s 1.57e-03 CPU s/rxn
+Wrote network in net format to ./fceri_ji_sym.net.
+CPU TIME: generate_network 5.93 s.
+Finished processing file fceri_ji_sym.bngl.
+CPU TIME: total 5.97 s.
+--------------------------------------
+Process with: fceri_ji_red
+--------------------------------------
+Process without symmetries------------
+Parsing fceri_fyn.ka...
+done
++ simulation parameters
++ Sanity checks
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3081-g54528e7) (without Tk interface)
+Analysis launched at 2017/05/20 21:22:01 (GMT+2) on quyen
+Parsing fceri_ji_red.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 244 navigation steps
+	 -initial conditions
+Parsing fceri_ji_red.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule R4 (File "fceri_ji_red.ka", line 49, characters 8-131:) will never be applied.
+rule R5 (File "fceri_ji_red.ka", line 54, characters 8-131:) will never be applied.
+rule R7 (File "fceri_ji_red.ka", line 62, characters 8-134:) will never be applied.
+rule R7_2 (File "fceri_ji_red.ka", line 64, characters 10-136:) will never be applied.
+rule R8 (File "fceri_ji_red.ka", line 67, characters 8-134:) will never be applied.
+rule R8_2 (File "fceri_ji_red.ka", line 69, characters 10-136:) will never be applied.
+rule File "fceri_ji_red.ka", line 77, characters 0-165: will never be applied.
+rule File "fceri_ji_red.ka", line 82, characters 0-169: will never be applied.
+rule R12 (File "fceri_ji_red.ka", line 85, characters 9-178:) will never be applied.
+rule R12_2 (File "fceri_ji_red.ka", lines 87-88, characters 11-90:) will never be applied.
+rule R13 (File "fceri_ji_red.ka", line 91, characters 9-181:) will never be applied.
+rule R13_2 (File "fceri_ji_red.ka", line 93, characters 11-184:) will never be applied.
+rule R16 (File "fceri_ji_red.ka", line 102, characters 9-52:) will never be applied.
+rule R17 (File "fceri_ji_red.ka", line 103, characters 9-52:) will never be applied.
+rule R18 (File "fceri_ji_red.ka", line 106, characters 9-48:) will never be applied.
+rule R19 (File "fceri_ji_red.ka", line 107, characters 9-48:) will never be applied.
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+Lig() => [ Lig(l2) v Lig(l2!Rec.a) ]
+Lig() => [ Lig(l1) v Lig(l1!Rec.a) ]
+Lyn() => [ Lyn(SH2) v Lyn(SH2!Rec.b) ]
+Lyn() => [ Lyn(U) v Lyn(U!Rec.b) ]
+Syk() => Syk(a~Y)
+Syk() => [ Syk(tSH2) v Syk(tSH2!Rec.g) ]
+Syk() => Syk(l~Y)
+Rec() => [ Rec(g~Y?) v Rec(g~pY?) ]
+Rec() => [ Rec(b) v Rec(b!Lyn.U) v Rec(b!Lyn.SH2) ]
+Rec() => [ Rec(a) v Rec(a!Lig.l1) v Rec(a!Lig.l2) ]
+Rec() => [ Rec(b~Y?) v Rec(b~pY?) ]
+Rec() => [ Rec(g) v Rec(g!Syk.tSH2) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+Lyn(U!Rec.b) => Lyn(SH2,U!Rec.b)
+Rec(g!Syk.tSH2) => Rec(g~pY!Syk.tSH2)
+Rec(b~pY?) => [ Rec(b~pY) v Rec(b~pY!Lyn.SH2) ]
+Rec(b~Y?) => [ Rec(b~Y) v Rec(b~Y!Lyn.U) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+In rules and initial states:
+In rules and algebraic expression:
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.053993 s.; rules: 34; dead rules: 16.
+Process with forward symmetries-------
+Parsing fceri_ji_red.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 244 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.98165 s.; 34 rules; 654 species; 7178 reactions.
+Process with backward symmetries------
+Parsing fceri_ji_red.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 244 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 244 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.94416 s.; 34 rules; 654 species; 7178 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file fceri_ji_red.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Syk
+Adding pY as allowed state of component l of molecule Syk
+Read 17 reaction rule(s).
+Read 10 observable(s).
+ACTION: generate_network( fceri_ji_red )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
+Iteration   2:     9 species      8 rxns  1.00e-02 CPU s
+Iteration   3:    12 species     20 rxns  2.00e-02 CPU s
+Iteration   4:    22 species     36 rxns  3.00e-02 CPU s
+Iteration   5:    42 species     99 rxns  8.00e-02 CPU s
+Iteration   6:    71 species    245 rxns  1.90e-01 CPU s
+Iteration   7:    97 species    482 rxns  3.30e-01 CPU s
+Iteration   8:   119 species    690 rxns  3.20e-01 CPU s
+Iteration   9:   168 species    931 rxns  4.20e-01 CPU s
+Iteration  10:   172 species   1403 rxns  6.80e-01 CPU s
+Iteration  11:   172 species   1433 rxns  7.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    32 reactions 8.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   2:   512 reactions 7.10e-01 CPU s 1.39e-03 CPU s/rxn
+Rule   3:   144 reactions 1.90e-01 CPU s 1.32e-03 CPU s/rxn
+Rule   4:    16 reactions 7.00e-02 CPU s 4.38e-03 CPU s/rxn
+Rule   5:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   6:   144 reactions 2.20e-01 CPU s 1.53e-03 CPU s/rxn
+Rule   7:    16 reactions 6.00e-02 CPU s 3.75e-03 CPU s/rxn
+Rule   8:    16 reactions 4.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   9:   288 reactions 4.00e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  10:    16 reactions 5.00e-02 CPU s 3.13e-03 CPU s/rxn
+Rule  11:    16 reactions 5.00e-02 CPU s 3.12e-03 CPU s/rxn
+Rule  12:    72 reactions 7.00e-02 CPU s 9.72e-04 CPU s/rxn
+Rule  13:    72 reactions 8.00e-02 CPU s 1.11e-03 CPU s/rxn
+Rule  14:     0 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  15:    72 reactions 1.10e-01 CPU s 1.53e-03 CPU s/rxn
+Rule  16:     0 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  17:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :  1433 reactions 2.15e+00 CPU s 1.50e-03 CPU s/rxn
+Wrote network in net format to ./fceri_ji_red.net.
+CPU TIME: generate_network 2.20 s.
+Finished processing file fceri_ji_red.bngl.
+CPU TIME: total 2.24 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file fceri_ji_red_sym.bngl (level 0)
+Read 26 parameters.
+Read 4 species.
+Adding pY as allowed state of component b of molecule Rec
+Adding pY as allowed state of component g of molecule Rec
+Adding pY as allowed state of component a of molecule Syk
+Adding pY as allowed state of component l of molecule Syk
+Read 17 reaction rule(s).
+Read 10 observable(s).
+ACTION: generate_network( fceri_ji_red_sym )
+Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     9 species      8 rxns  0.00e+00 CPU s
+Iteration   3:    12 species     20 rxns  2.00e-02 CPU s
+Iteration   4:    22 species     36 rxns  3.00e-02 CPU s
+Iteration   5:    42 species     99 rxns  7.00e-02 CPU s
+Iteration   6:    71 species    245 rxns  1.90e-01 CPU s
+Iteration   7:    97 species    482 rxns  3.10e-01 CPU s
+Iteration   8:   119 species    690 rxns  3.30e-01 CPU s
+Iteration   9:   168 species    931 rxns  4.30e-01 CPU s
+Iteration  10:   172 species   1403 rxns  6.90e-01 CPU s
+Iteration  11:   172 species   1433 rxns  6.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    32 reactions 7.00e-02 CPU s 2.19e-03 CPU s/rxn
+Rule   2:   512 reactions 6.60e-01 CPU s 1.29e-03 CPU s/rxn
+Rule   3:   144 reactions 2.30e-01 CPU s 1.60e-03 CPU s/rxn
+Rule   4:    16 reactions 5.00e-02 CPU s 3.13e-03 CPU s/rxn
+Rule   5:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   6:   144 reactions 2.20e-01 CPU s 1.53e-03 CPU s/rxn
+Rule   7:    16 reactions 4.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   8:    16 reactions 4.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   9:   288 reactions 4.10e-01 CPU s 1.42e-03 CPU s/rxn
+Rule  10:    16 reactions 7.00e-02 CPU s 4.37e-03 CPU s/rxn
+Rule  11:    16 reactions 5.00e-02 CPU s 3.13e-03 CPU s/rxn
+Rule  12:    72 reactions 7.00e-02 CPU s 9.72e-04 CPU s/rxn
+Rule  13:    72 reactions 8.00e-02 CPU s 1.11e-03 CPU s/rxn
+Rule  14:     0 reactions 2.00e-02 CPU s 0.00e+00 CPU s/rxn
+Rule  15:    72 reactions 1.10e-01 CPU s 1.53e-03 CPU s/rxn
+Rule  16:     0 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  17:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :  1433 reactions 2.14e+00 CPU s 1.49e-03 CPU s/rxn
+Wrote network in net format to ./fceri_ji_red_sym.net.
+CPU TIME: generate_network 2.20 s.
+Finished processing file fceri_ji_red_sym.bngl.
+CPU TIME: total 2.24 s.

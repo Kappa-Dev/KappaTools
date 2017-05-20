@@ -1,8 +1,8 @@
-#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-3083-g1567d7b-dirty))
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-3081-g54528e7))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2017/05/17 13:48:01 (GMT+2) on wf102.di.ens.fr
-#Command line is: KaSa fceri_ji.ka
+#Analysis launched at 2017/05/20 21:22:01 (GMT+2) on quyen
+#Command line is: KaSa fceri_ji_red.ka --print-efficiency --no-do-all --compute-symmetries
 #
 #This file contains the description of the contact map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
