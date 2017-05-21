@@ -67,8 +67,7 @@ init(4)=t;
 init(1)=10; % A(x!1, y), B(x!1, y)
 var(1)=init(3); % goal
 
-kun(1)=100; % A(x!_,y), B(x!_,y) -> A(x!_,y!1), B(x!_,y!1), C()(unary context)
-k(2)=100; % A(x!_,y), B(x!_,y) -> A(x!_,y!1), B(x!_,y!1), C()
+kun(1)=100; % A(x!_,y), B(x!_,y) -> A(x!_,y!1), B(x!_,y!1), C() (unary context)
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -203,9 +202,9 @@ dydt=zeros(nodevar,1);
 % rule    : A(x!_,y), B(x!_,y) -> A(x!_,y!1), B(x!_,y!1), C()
 % reaction: A(x!1, y), B(x!1, y) -> C() + A(x!1, y!2), B(x!1, y!2) 
 
-dydt(1)=dydt(1)-k(2)*y(1);
-dydt(2)=dydt(2)+k(2)*y(1);
-dydt(3)=dydt(3)+k(2)*y(1);
+dydt(1)=dydt(1)-kun(1)*y(1);
+dydt(2)=dydt(2)+kun(1)*y(1);
+dydt(3)=dydt(3)+kun(1)*y(1);
 dydt(4)=1;
 
 end
@@ -239,9 +238,9 @@ jac=sparse(nodevar,nodevar);
 % rule    : A(x!_,y), B(x!_,y) -> A(x!_,y!1), B(x!_,y!1), C()
 % reaction: A(x!1, y), B(x!1, y) -> C() + A(x!1, y!2), B(x!1, y!2) 
 
-jac(1,1)=jac(1,1)-k(2);
-jac(2,1)=jac(2,1)+k(2);
-jac(3,1)=jac(3,1)+k(2);
+jac(1,1)=jac(1,1)-kun(1);
+jac(2,1)=jac(2,1)+kun(1);
+jac(3,1)=jac(3,1)+kun(1);
 end
 
 

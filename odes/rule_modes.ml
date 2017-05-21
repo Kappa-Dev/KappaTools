@@ -1,5 +1,17 @@
-type arity = Usual | Unary
+type arity = Usual | Unary | Unary_refinement
 type direction = Direct | Op
+
+module RuleModeIdS:
+  SetMap.S with type elt = int * arity * direction
+  =
+  SetMap.Make
+    (struct
+      type t = int * arity * direction
+      let compare = compare
+      let print _ _ = ()
+    end)
+
+module RuleModeIdSet = RuleModeIdS.Set
 
 module RuleModeS:
   SetMap.S with type elt = arity * direction

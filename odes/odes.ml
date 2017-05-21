@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 18 2017>
+  * Last modification: Time-stamp: <May 21 2017>
 *)
 
 let local_trace = false
@@ -41,7 +41,9 @@ struct
             Format.fprintf a
               "Component_wise:(%a,%s,%s,%i,%a)"
               I.print_rule_id r
-              (match ar with Rule_modes.Usual -> "@" | Rule_modes.Unary -> "(1)")
+              (match ar with Rule_modes.Usual -> "@"
+                           | Rule_modes.Unary | Rule_modes.Unary_refinement
+                             -> "(1)")
               (match dir with Rule_modes.Direct -> "->" | Rule_modes.Op -> "<-")
               cc_id
               (I.print_connected_component ?compil:None) cc
@@ -103,7 +105,7 @@ struct
       lhs: I.pattern ;
       lhs_cc:
         (connected_component_id * I.connected_component) list ;
-      divide_rate_by: int
+      divide_rate_by: int;
     }
 
   let get_comment e = e.comment
@@ -125,9 +127,9 @@ struct
   let var_of_rate (rule_id,arity,direction) =
     match arity,direction with
     | Rule_modes.Usual,Rule_modes.Direct -> Ode_loggers_sig.Rate rule_id
-    | Rule_modes.Unary,Rule_modes.Direct -> Ode_loggers_sig.Rateun rule_id
+    | (Rule_modes.Unary | Rule_modes.Unary_refinement), Rule_modes.Direct -> Ode_loggers_sig.Rateun rule_id
     | Rule_modes.Usual,Rule_modes.Op -> Ode_loggers_sig.Rated rule_id
-    | Rule_modes.Unary,Rule_modes.Op -> Ode_loggers_sig.Rateund rule_id
+    | (Rule_modes.Unary | Rule_modes.Unary_refinement), Rule_modes.Op -> Ode_loggers_sig.Rateund rule_id
 
   let var_of_rule rule =
     var_of_rate rule.rule_id_with_mode
@@ -373,7 +375,7 @@ struct
 
   let enrich_rule cache compil rule rule_id_with_mode =
     let lhs = I.lhs compil rule_id_with_mode rule in
-    let _,lhs_cc =
+    let succ_last_cc_id,lhs_cc =
       List.fold_left
         (fun (counter,list) cc ->
            (next_cc_id counter,
@@ -382,7 +384,8 @@ struct
         (List.rev (I.connected_components_of_patterns lhs))
     in
     let cache, divide_rate_by =
-        I.divide_rule_rate_by cache compil rule
+      I.divide_rule_rate_by cache compil rule
+      (* to do, check if we do not compute it many times *)
     in
     cache,
     {
@@ -770,30 +773,34 @@ struct
   let compare_extended_reaction a b =
     compare_reaction (fst a) (fst b)
 
-  let compute_reactions ?max_size ~smash_reactions ~dotnet parameters compil network rules
-      initial_states =
+
+  let compute_reactions ?max_size ~smash_reactions ~dotnet parameters compil network rules initial_states =
     (* Let us annotate the rules with cc decomposition *)
     let n_rules = List.length rules in
     let cache = network.cache in
     let cache, max_coef, rules_rev =
       List.fold_left
-        (fun ((id, cache), max_coef, list) rule ->
-           let modes = I.valid_modes compil rule id in
+        (fun (cache, max_coef, list) rule ->
+           let cache, modes =
+             I.valid_modes cache compil rule
+           in
            let max_coef = max max_coef (List.length (I.token_vector rule)) in
            let a,b =
              List.fold_left
-             (fun ((id, cache), list) mode ->
+             (fun (cache, list) mode ->
                 let cache, elt =
                   enrich_rule cache compil rule mode in
-                (id, cache), elt::list)
-             ((next_id id, cache),  list) modes
+                cache,
+                elt::list)
+             (cache,  list) modes
            in
            a, max_coef, b)
-        ((fst_id, cache), network.max_stoch_coef, []) (List.rev rules)
+        ((cache:I.cache), network.max_stoch_coef, [])
+        (List.rev rules)
     in
     let network =
       {network
-       with cache = snd cache ;
+       with cache = cache ;
             max_stoch_coef = max_coef}
     in
     let rules = List.rev rules_rev in
@@ -837,7 +844,7 @@ struct
                   (I.print_rule ~compil) enriched_rule.rule
               in
               match arity_of enriched_rule with
-              | Rule_modes.Usual ->
+              | Rule_modes.Usual | Rule_modes.Unary_refinement ->
                 begin
                   let () = debug "regular case" in
                   let store_new_embeddings =
@@ -881,6 +888,7 @@ struct
                                "@[<v 2>* rule:%i %s %s  cc:%i:@[%a@]:" a
                                (match ar with
                                   Rule_modes.Usual -> "@"
+                                | Rule_modes.Unary_refinement
                                 | Rule_modes.Unary -> "(1)")
                                (match dir with
                                   Rule_modes.Direct -> "->"
@@ -1317,65 +1325,101 @@ struct
       var_decl = List.rev decl.var_decl ;
       init = List.rev decl.init}
 
+  let flatten_rate (id,mode,direct) =
+    match mode with
+    | Rule_modes.Unary | Rule_modes.Usual -> (id,mode,direct)
+    | Rule_modes.Unary_refinement -> (id,Rule_modes.Unary,direct)
+
+  let flatten_coef (id,mode,direct) = id,Rule_modes.Usual, direct
+
   let split_rules parameters compil network sort_rules_and_decls =
-    let network, sort =
+    let rate_set = Rule_modes.RuleModeIdSet.empty in
+    let coef_set = Rule_modes.RuleModeIdSet.empty in
+    let network, sort, _ =
       List.fold_left
-        (fun (network,sort_rules) enriched_rule ->
-           let rate =
-             I.rate
-               compil enriched_rule.rule enriched_rule.rule_id_with_mode
-           in
-           match rate with
-           | None -> network, sort_rules
-           | Some rate ->
-             let const_list = [] in
-             let var_list = [] in
-             let network,rate = convert_alg_expr parameters compil network rate in
-             let network, const_list, var_list =
-               if Ode_loggers_sig.is_expr_const rate
-               then
-                 network, (R rate)::const_list, var_list
-               else
-                 network, const_list, (R rate)::var_list
+        (fun (network,sort_rules, (rate_set,coef_set)) enriched_rule ->
+           if Rule_modes.RuleModeIdSet.mem
+               (flatten_rate enriched_rule.rule_id_with_mode)
+               rate_set
+           then (network,sort_rules, (rate_set,coef_set))
+           else
+             let rate =
+               I.rate
+                 compil enriched_rule.rule enriched_rule.rule_id_with_mode
              in
-             let vector =
-               I.token_vector enriched_rule.rule
-             in
-             let network, const_list, var_list, _ =
-               List.fold_left
-                 (fun (network, const_list, var_list, n) (expr,_) ->
-                    let network, rate = convert_alg_expr parameters compil network expr in
-                    if Ode_loggers_sig.is_expr_const rate
-                    then network, (S (n,rate))::const_list, var_list, n+1
-                    else network, const_list, (S (n,rate))::var_list, n+1
-                 )
-                 (network, const_list, var_list, 1)
-                 vector
-             in
-             let sort_rules =
-               match const_list with
-               | [] -> sort_rules
-               | _::_ ->
-                 {
-                   sort_rules
-                   with const_rate =
-                          (enriched_rule,
-                           const_list)::sort_rules.const_rate
-                 }
-             in
-             let sort_rules =
-               match var_list with
-               | [] -> sort_rules
-               | _::_ ->
-                  {
-                   sort_rules
-                   with var_rate =
-                          (enriched_rule,
-                           var_list)::sort_rules.var_rate
-                 }
-             in
-             network, sort_rules)
-        (network, sort_rules_and_decls)
+             match rate with
+             | None -> network, sort_rules, (rate_set, coef_set)
+             | Some rate ->
+               let rate_set =
+                 Rule_modes.RuleModeIdSet.add
+                   (flatten_rate enriched_rule.rule_id_with_mode)
+                   rate_set
+               in            
+               let const_list = [] in
+               let var_list = [] in
+               let network,rate =
+                 convert_alg_expr parameters compil network rate
+               in
+               let network, const_list, var_list =
+                 if Ode_loggers_sig.is_expr_const rate
+                 then
+                   network, (R rate)::const_list, var_list
+                 else
+                   network, const_list, (R rate)::var_list
+               in
+               let network, const_list, var_list, coef_set =
+                 if Rule_modes.RuleModeIdSet.mem
+                     (flatten_coef enriched_rule.rule_id_with_mode)
+                     coef_set
+                 then
+                   network, const_list, var_list, coef_set
+                 else
+                   let coef_set =
+                     Rule_modes.RuleModeIdSet.add
+                       (flatten_coef enriched_rule.rule_id_with_mode)
+                       coef_set
+                   in
+                   let vector =
+                     I.token_vector enriched_rule.rule
+                   in
+                   let network, const_list, var_list, _ =
+                     List.fold_left
+                       (fun (network, const_list, var_list, n) (expr,_) ->
+                          let network, rate =
+                            convert_alg_expr parameters compil network expr in
+                          if Ode_loggers_sig.is_expr_const rate
+                          then network, (S (n,rate))::const_list, var_list, n+1
+                          else network, const_list, (S (n,rate))::var_list, n+1
+                       )
+                       (network, const_list, var_list, 1)
+                       vector
+                   in
+                   network, const_list, var_list, coef_set
+               in
+               let sort_rules =
+                 match const_list with
+                 | [] -> sort_rules
+                 | _::_ ->
+                   {
+                     sort_rules
+                     with const_rate =
+                            (enriched_rule,
+                             const_list)::sort_rules.const_rate
+                   }
+               in
+               let sort_rules =
+                 match var_list with
+                 | [] -> sort_rules
+                 | _::_ ->
+                   {
+                     sort_rules
+                     with var_rate =
+                            (enriched_rule,
+                             var_list)::sort_rules.var_rate
+                   }
+               in
+               network, sort_rules, (rate_set,coef_set))
+        (network, sort_rules_and_decls, (rate_set, coef_set))
         network.rules
     in
     network,
@@ -2968,7 +3012,7 @@ struct
         -> ()
     in
     let () =
-      if Sbml_backend.is_dotnet logger && 
+      if Sbml_backend.is_dotnet logger &&
         List.for_all
           (fun (id,expr) -> Ode_loggers.is_time expr)
           network.obs
