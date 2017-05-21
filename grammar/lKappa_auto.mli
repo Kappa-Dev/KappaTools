@@ -24,5 +24,7 @@ val mixture_to_species_map : Remanent_parameters_sig.rate_convention -> cache ->
 val nauto: Remanent_parameters_sig.rate_convention -> cache ->
   LKappa.rule -> cache * int
 
+val n_cc: cache -> LKappa.rule -> cache * int
+
 val cannonic_form: cache -> LKappa.rule ->
   cache * RuleCache.hashed_list

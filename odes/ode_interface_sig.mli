@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 16 2017>
+  * Last modification: Time-stamp: <May 21 2017>
 *)
 
 module type Interface =
@@ -91,7 +91,7 @@ sig
   type rule_id_with_mode =
     rule_id * Rule_modes.arity * Rule_modes.direction
 
-  val valid_modes: compil -> rule -> rule_id -> rule_id_with_mode list
+  val valid_modes: cache -> compil -> rule -> cache * rule_id_with_mode list
 
   val lhs: compil -> rule_id_with_mode -> rule -> pattern
 
@@ -115,6 +115,8 @@ sig
 
   val string_of_var_id:
     ?compil:compil -> ?init_mode:bool -> Loggers.t -> int -> string
+
+  (*  module SyntacticRuleSetMap:SetMap.SetMap*)
 
   val rate:
     compil -> rule -> rule_id_with_mode ->
