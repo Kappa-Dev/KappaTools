@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 function main=main()
 % command line: 
 %      'KaDE' 'unary4.ka' '-d' 'output' '--max-size-for-species''10'
@@ -452,4 +450,3 @@ end
 
 main();
 
->>>>>>> 2b13038a9... fix to the second part of #399: the function valid_mode detect if the disambuiguation of a rule has changed its arity. From binary to unary, the unary rate is taken. From n<>2 to stritly less than n, the rule is ignored; also all the refinements of a same rule, now share the same (pairs) of rate constant(s)
