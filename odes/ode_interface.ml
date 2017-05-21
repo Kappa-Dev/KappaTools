@@ -1,9 +1,11 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 19 2017>
+  * Last modification: Time-stamp: <May 21 2017>
 *)
 
 type rule = Primitives.elementary_rule
+
+module SyntacticRuleSetMap = Mods.IntSetMap
 
 type preprocessed_ast = Cli_init.preprocessed_ast
 type ast = Ast.parsing_compil
@@ -19,6 +21,8 @@ type compil =
     compute_jacobian: bool
   }
 
+
+
 type cc_cache = Pattern.PreEnv.t
 
 type nauto_in_rules_cache = LKappa_auto.cache
@@ -27,6 +31,7 @@ type sym_cache = Symmetries.cache
 
 type seen_cache = bool Mods.DynArray.t
 
+type rule_weight = int option Mods.DynArray.t
 type cache =
   {
     cc_cache: cc_cache ;
@@ -35,8 +40,18 @@ type cache =
     seen_rule: seen_cache ;
     seen_pattern: seen_cache;
     seen_species: seen_cache;
+    correcting_coef: rule_weight;
+    n_cc: rule_weight;
 
   }
+
+let hash_rule_weight get set f cache compil rule =
+  match get cache rule with
+  | Some n -> cache, n
+  | None ->
+    let cache,n = f cache compil rule in
+    let cache = set cache rule n in
+    cache, n
 
 let get_representative parameters compil cache symmetries species =
   let sigs = Model.signatures compil.environment in
@@ -257,7 +272,7 @@ let is_zero expr =
     Nbr.is_zero a
   | _ -> false
 
-let add x y list  =
+let add_not_none_not_zero x y list  =
   match y with
   | None -> list
   | Some x when is_zero (fst x) -> list
@@ -270,20 +285,83 @@ let add_not_zero x y list =
 let mode_of_rule _compil _rule =
     Rule_modes.Direct
 
-let valid_modes compil rule id =
+let n_cc cache compil rule =
+  let id = rule.Primitives.syntactic_rule in
+  let rule_cache = get_rule_cache cache in
+  let lkappa_rule = Model.get_ast_rule compil.environment id in
+  let rule_cache, arity = LKappa_auto.n_cc rule_cache lkappa_rule in
+  let cache = set_rule_cache rule_cache cache in
+  cache, arity
+
+let n_cc cache compil rule  =
+  hash_rule_weight
+    (fun cache rule ->
+       let id = rule.Primitives.syntactic_rule in
+       Mods.DynArray.get cache.n_cc id
+    )
+    (fun cache rule n ->
+       let id = rule.Primitives.syntactic_rule in
+       let () = Mods.DynArray.set cache.n_cc id (Some n) in
+       cache)
+    n_cc
+    cache compil rule
+
+
+let valid_modes cache compil rule =
+  let id = rule.Primitives.syntactic_rule in
+  let cache, arity =n_cc cache compil rule in
+  let arity' = Array.length rule.Primitives.connected_components in
   let mode = mode_of_rule compil rule in
+  let () = assert (arity' <= arity) in
+  cache,
+  if arity = arity' then
     List.rev_map
       (fun x -> id,x,mode)
       (List.rev
          (add_not_zero Rule_modes.Usual rule.Primitives.rate
-            (add Rule_modes.Unary rule.Primitives.unary_rate [])))
+            (add_not_none_not_zero Rule_modes.Unary rule.Primitives.unary_rate [])))
+  else if arity'=1 && arity=2
+  then
+    let lkappa_rule = Model.get_ast_rule compil.environment id in
+    match lkappa_rule.LKappa.r_un_rate
+    with None -> []
+       | Some (e,_) ->
+         if is_zero e then []
+         else [id,Rule_modes.Unary_refinement,mode]
+  else
+    []
+
+let valid_modes cache compil rule =
+  let id = rule.Primitives.syntactic_rule in
+  let cache, arity =n_cc cache compil rule in
+  let arity' = Array.length rule.Primitives.connected_components in
+  let mode = mode_of_rule compil rule in
+  let () = assert (arity' <= arity) in
+  let mode_list =
+    if arity = arity' then
+      add_not_zero Rule_modes.Usual rule.Primitives.rate
+        (add_not_none_not_zero Rule_modes.Unary rule.Primitives.unary_rate [])
+    else if arity'=1 && arity=2
+    then
+      let lkappa_rule = Model.get_ast_rule compil.environment id in
+      add_not_none_not_zero
+        Rule_modes.Unary_refinement
+        lkappa_rule.LKappa.r_un_rate
+        []
+    else
+      []
+  in
+  cache,
+  List.rev_map
+    (fun x -> id,x,mode)
+    (List.rev mode_list)
 
 let rate _compil rule (_,arity,_) =
   match
     arity
   with
   | Rule_modes.Usual -> Some rule.Primitives.rate
-  | Rule_modes.Unary -> Option_util.map fst rule.Primitives.unary_rate
+  | (Rule_modes.Unary | Rule_modes.Unary_refinement) -> Option_util.map fst rule.Primitives.unary_rate
 
 let token_vector a = a.Primitives.delta_tokens
 
@@ -331,12 +409,12 @@ let rate_name compil rule rule_id =
   let arity_tag =
     match arity with
     | Rule_modes.Usual -> ""
-    | Rule_modes.Unary -> "(unary context)"
+    | (Rule_modes.Unary | Rule_modes.Unary_refinement) -> " (unary context)"
   in
   let direction_tag =
     match direction with
     | Rule_modes.Direct -> ""
-    | Rule_modes.Op -> "(op)"
+    | Rule_modes.Op -> " (op)"
   in
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
@@ -424,7 +502,7 @@ let get_compil
     rate_convention = rate_convention ;
     show_reactions = show_reactions ;
     count = count ;
-    compute_jacobian = compute_jacobian
+    compute_jacobian = compute_jacobian ;
   }
 
 let empty_cc_cache compil =
@@ -437,6 +515,8 @@ let empty_sym_cache () = Symmetries.empty_cache ()
 let empty_seen_cache () =
   Mods.DynArray.create 1 false
 
+let empty_rule_weight () =
+  Mods.DynArray.create 1 None
 let empty_cache compil =
   {
     cc_cache  = empty_cc_cache compil ;
@@ -445,6 +525,8 @@ let empty_cache compil =
     seen_pattern = empty_seen_cache () ;
     seen_rule = empty_seen_cache () ;
     seen_species = empty_seen_cache () ;
+    n_cc = empty_rule_weight () ;
+    correcting_coef = empty_rule_weight () ;
   }
 
 let mixture_of_init compil c =
@@ -481,6 +563,7 @@ let species_of_initial_state compil cache list =
 
 let nb_tokens compil = Model.nb_tokens (environment compil)
 
+
 let divide_rule_rate_by cache compil rule =
   match compil.rate_convention with
   | Remanent_parameters_sig.Common -> assert false
@@ -498,6 +581,18 @@ let divide_rule_rate_by cache compil rule =
         lkappa_rule
     in
     {cache with rule_cache = rule_cache}, output
+
+let divide_rule_rate_by cache compil rule =
+  hash_rule_weight
+    (fun cache rule ->
+       let rule_id = rule.Primitives.syntactic_rule in
+       Mods.DynArray.get cache.correcting_coef rule_id)
+    (fun cache rule n ->
+       let rule_id = rule.Primitives.syntactic_rule in
+       let () = Mods.DynArray.set cache.correcting_coef rule_id (Some n) in
+       cache)
+    divide_rule_rate_by
+    cache compil rule
 
 let detect_symmetries parameters compil cache chemical_species contact_map =
   let rule_cache = cache.rule_cache in

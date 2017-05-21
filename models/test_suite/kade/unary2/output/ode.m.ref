@@ -68,8 +68,7 @@ init(1)=10; % A(x!1), B(x!1, y)
 var(1)=init(2); % goal
 
 k(1)=5; % A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
-kun(1)=100; % A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)(unary context)
-k(2)=100; % A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
+kun(1)=100; % A(x!_), B(y) -> A(x!_), B(y!1), C(x!1) (unary context)
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -211,8 +210,8 @@ dydt(2)=dydt(2)+k(1)*y(1)*y(2);
 % rule    : A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
 % reaction: A(x!1), B(x!1, y) -> C(x!1), A(x!2), B(x!2, y!1) 
 
-dydt(1)=dydt(1)-k(2)*y(1);
-dydt(2)=dydt(2)+k(2)*y(1);
+dydt(1)=dydt(1)-kun(1)*y(1);
+dydt(2)=dydt(2)+kun(1)*y(1);
 
 % rule    : A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
 % reaction: A(x!1), B(x!1, y) + A(x!1), B(x!1, y) -> C(x!1), A(x!2), B(x!2, y!1) + A(x!1), B(x!1, y) 
@@ -266,8 +265,8 @@ jac(2,2)=jac(2,2)+k(1)*y(1);
 % rule    : A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
 % reaction: A(x!1), B(x!1, y) -> C(x!1), A(x!2), B(x!2, y!1) 
 
-jac(1,1)=jac(1,1)-k(2);
-jac(2,1)=jac(2,1)+k(2);
+jac(1,1)=jac(1,1)-kun(1);
+jac(2,1)=jac(2,1)+kun(1);
 
 % rule    : A(x!_), B(y) -> A(x!_), B(y!1), C(x!1)
 % reaction: A(x!1), B(x!1, y) + A(x!1), B(x!1, y) -> C(x!1), A(x!2), B(x!2, y!1) + A(x!1), B(x!1, y) 

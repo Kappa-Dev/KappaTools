@@ -1,5 +1,8 @@
-type arity = Usual | Unary
+type arity = Usual | Unary | Unary_refinement
 type direction = Direct | Op
+
+module RuleModeIdSet:
+  SetMap.Set with type elt = int * arity * direction 
 
 module RuleModeMap:
   SetMap.Map with type elt = arity * direction

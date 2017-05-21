@@ -126,13 +126,14 @@ let translate rate_convention cache rule  =
   let ag_created = rule.LKappa.r_created in
   let add_map rate_convention i j map =
     match rate_convention, i  with
-    | Remanent_parameters_sig.No_correction, _  -> assert false
     | Remanent_parameters_sig.Common,_
-    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs , Lhs _
+    | (Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs |
+       Remanent_parameters_sig.No_correction) , Lhs _
     | Remanent_parameters_sig.Biochemist, _  ->
       Binding_idMap.add
         i (j::(Binding_idMap.find_default [] i map)) map
-    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs,
+    | (Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs |
+       Remanent_parameters_sig.No_correction),
       (Rhs _ | Copy_lhs _)  -> map
   in
   let ag_created =
@@ -143,12 +144,7 @@ let translate rate_convention cache rule  =
     | Remanent_parameters_sig.Biochemist -> ag_created
   in
   let n_agents_wo_creation = List.length lkappa_mixture in
-  let n_agents =
-    match rate_convention with
-    | Remanent_parameters_sig.No_correction -> assert false
-    | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> n_agents_wo_creation
-    | Remanent_parameters_sig.Common | Remanent_parameters_sig.Biochemist -> n_agents_wo_creation + (List.length ag_created)
-  in
+  let n_agents = n_agents_wo_creation + (List.length ag_created) in
   let array_name = Array.make n_agents 0 in
   let state_of_internal x =
     match x with
@@ -247,7 +243,7 @@ let translate rate_convention cache rule  =
     in
     let rule_internal = (* Here we add the fictitious site for the agents that are degraded  *)
       match rate_convention with
-      | Remanent_parameters_sig.No_correction -> assert false
+      | Remanent_parameters_sig.No_correction
       | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> rule_internal
       | Remanent_parameters_sig.Common
       | Remanent_parameters_sig.Biochemist ->
@@ -560,11 +556,9 @@ let cannonical_of_root bonds_map array ag_id =
 (* The cc that contains created agents only shall be ignored *)
 let keep_this_cc rate_convention n_agents cc =
   match rate_convention with
-  | Remanent_parameters_sig.No_correction -> assert false
   | Remanent_parameters_sig.Biochemist ->
-    begin
       List.exists (fun i -> i<n_agents) cc
-    end
+  | Remanent_parameters_sig.No_correction
   | Remanent_parameters_sig.Common
   | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs -> true
 
@@ -650,6 +644,12 @@ let nauto rate_convention cache rule =
   in
   cache, nauto_of_map map
 
+let ncc_of_map map =
+  CannonicMap.fold
+    (fun _ (nocc,_) acc -> acc+nocc)
+    map
+    0
+
 (****************************************************************)
 (*cannonic form for symmetries*)
 (****************************************************************)
@@ -674,3 +674,9 @@ let cannonic_form cache rule =
   {
     cache with rule_cache = rule_cache
   }, hash
+
+let n_cc cache rule =
+  let cache, map =
+    mixture_to_species_map Remanent_parameters_sig.No_correction cache rule
+  in
+  cache, ncc_of_map map

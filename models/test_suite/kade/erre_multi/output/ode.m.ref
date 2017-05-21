@@ -72,15 +72,9 @@ var(1)=(init(6)+2*init(7)+init(5))/2; % dimmers
 k(1)=1; % E(r,s), R(e) -> E(r!1,s), R(e!1)
 k(2)=1; % E(r,s), R(e) -> E(r,s!1), R(e!1)
 k(3)=2; % R(e!_,r) -> R(e,r)
-k(4)=2; % R(e!_,r) -> R(e,r)
-k(5)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(6)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(7)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(8)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(9)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(10)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
-k(11)=4; % R(r!_) -> 
-k(12)=5; % R(r!_) -> R(r)
+k(4)=3; % R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+k(5)=4; % R(r!_) -> 
+k(6)=5; % R(r!_) -> R(r)
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -221,79 +215,93 @@ dydt=zeros(nodevar,1);
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) 
 
-dydt(6)=dydt(6)-2*k(12)*y(6)/2;
-dydt(3)=dydt(3)+k(12)*y(6)/2;
-dydt(3)=dydt(3)+k(12)*y(6)/2;
+dydt(6)=dydt(6)-2*k(6)*y(6)/2;
+dydt(3)=dydt(3)+k(6)*y(6)/2;
+dydt(3)=dydt(3)+k(6)*y(6)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) 
 
-dydt(6)=dydt(6)-2*k(12)*y(6)/2;
-dydt(3)=dydt(3)+k(12)*y(6)/2;
-dydt(3)=dydt(3)+k(12)*y(6)/2;
+dydt(6)=dydt(6)-2*k(6)*y(6)/2;
+dydt(3)=dydt(3)+k(6)*y(6)/2;
+dydt(3)=dydt(3)+k(6)*y(6)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-dydt(6)=dydt(6)-2*k(11)*y(6)/2;
-dydt(2)=dydt(2)+k(11)*y(6)/2;
-dydt(3)=dydt(3)+k(11)*y(6)/2;
+dydt(6)=dydt(6)-2*k(5)*y(6)/2;
+dydt(2)=dydt(2)+k(5)*y(6)/2;
+dydt(3)=dydt(3)+k(5)*y(6)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-dydt(6)=dydt(6)-2*k(11)*y(6)/2;
-dydt(2)=dydt(2)+k(11)*y(6)/2;
-dydt(3)=dydt(3)+k(11)*y(6)/2;
+dydt(6)=dydt(6)-2*k(5)*y(6)/2;
+dydt(2)=dydt(2)+k(5)*y(6)/2;
+dydt(3)=dydt(3)+k(5)*y(6)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) 
 
-dydt(7)=dydt(7)-k(12)*y(7);
-dydt(3)=dydt(3)+k(12)*y(7);
-dydt(4)=dydt(4)+k(12)*y(7);
+dydt(7)=dydt(7)-k(6)*y(7);
+dydt(3)=dydt(3)+k(6)*y(7);
+dydt(4)=dydt(4)+k(6)*y(7);
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) 
 
-dydt(7)=dydt(7)-k(12)*y(7);
-dydt(3)=dydt(3)+k(12)*y(7);
-dydt(4)=dydt(4)+k(12)*y(7);
+dydt(7)=dydt(7)-k(6)*y(7);
+dydt(3)=dydt(3)+k(6)*y(7);
+dydt(4)=dydt(4)+k(6)*y(7);
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-dydt(7)=dydt(7)-k(11)*y(7);
-dydt(2)=dydt(2)+k(11)*y(7);
-dydt(4)=dydt(4)+k(11)*y(7);
+dydt(7)=dydt(7)-k(5)*y(7);
+dydt(2)=dydt(2)+k(5)*y(7);
+dydt(4)=dydt(4)+k(5)*y(7);
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-dydt(7)=dydt(7)-k(11)*y(7);
-dydt(2)=dydt(2)+k(11)*y(7);
-dydt(3)=dydt(3)+k(11)*y(7);
+dydt(7)=dydt(7)-k(5)*y(7);
+dydt(2)=dydt(2)+k(5)*y(7);
+dydt(3)=dydt(3)+k(5)*y(7);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
 
-dydt(4)=dydt(4)-1/2*k(9)*y(4)*y(3);
-dydt(3)=dydt(3)-1/2*k(9)*y(4)*y(3);
-dydt(7)=dydt(7)+1/2*k(9)*y(4)*y(3);
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(3);
+dydt(3)=dydt(3)-1/2*k(4)*y(4)*y(3);
+dydt(7)=dydt(7)+1/2*k(4)*y(4)*y(3);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
+
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(3);
+dydt(3)=dydt(3)-1/2*k(4)*y(4)*y(3);
+dydt(7)=dydt(7)+1/2*k(4)*y(4)*y(3);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
 
-dydt(3)=dydt(3)-1/2*k(7)*y(3)*y(4);
-dydt(4)=dydt(4)-1/2*k(7)*y(3)*y(4);
-dydt(7)=dydt(7)+1/2*k(7)*y(3)*y(4);
+dydt(3)=dydt(3)-1/2*k(4)*y(3)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(3)*y(4);
+dydt(7)=dydt(7)+1/2*k(4)*y(3)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
+
+dydt(3)=dydt(3)-1/2*k(4)*y(3)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(3)*y(4);
+dydt(7)=dydt(7)+1/2*k(4)*y(3)*y(4);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) 
 
-dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
-dydt(3)=dydt(3)-1/2*k(5)*y(3)*y(3);
-dydt(6)=dydt(6)+2/2*k(5)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(4)*y(3)*y(3);
+dydt(3)=dydt(3)-1/2*k(4)*y(3)*y(3);
+dydt(6)=dydt(6)+2/2*k(4)*y(3)*y(3);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: R(e!1, r), E(r!1, s) -> R(e, r) + E(r, s) 
@@ -305,44 +313,58 @@ dydt(1)=dydt(1)+k(3)*y(3);
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) 
 
-dydt(5)=dydt(5)-2*k(12)*y(5)/2;
-dydt(4)=dydt(4)+k(12)*y(5)/2;
-dydt(4)=dydt(4)+k(12)*y(5)/2;
+dydt(5)=dydt(5)-2*k(6)*y(5)/2;
+dydt(4)=dydt(4)+k(6)*y(5)/2;
+dydt(4)=dydt(4)+k(6)*y(5)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) 
 
-dydt(5)=dydt(5)-2*k(12)*y(5)/2;
-dydt(4)=dydt(4)+k(12)*y(5)/2;
-dydt(4)=dydt(4)+k(12)*y(5)/2;
+dydt(5)=dydt(5)-2*k(6)*y(5)/2;
+dydt(4)=dydt(4)+k(6)*y(5)/2;
+dydt(4)=dydt(4)+k(6)*y(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-dydt(5)=dydt(5)-2*k(11)*y(5)/2;
-dydt(2)=dydt(2)+k(11)*y(5)/2;
-dydt(4)=dydt(4)+k(11)*y(5)/2;
+dydt(5)=dydt(5)-2*k(5)*y(5)/2;
+dydt(2)=dydt(2)+k(5)*y(5)/2;
+dydt(4)=dydt(4)+k(5)*y(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-dydt(5)=dydt(5)-2*k(11)*y(5)/2;
-dydt(2)=dydt(2)+k(11)*y(5)/2;
-dydt(4)=dydt(4)+k(11)*y(5)/2;
+dydt(5)=dydt(5)-2*k(5)*y(5)/2;
+dydt(2)=dydt(2)+k(5)*y(5)/2;
+dydt(4)=dydt(4)+k(5)*y(5)/2;
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
 
-dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
-dydt(4)=dydt(4)-1/2*k(10)*y(4)*y(4);
-dydt(5)=dydt(5)+2/2*k(10)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(5)=dydt(5)+2/2*k(4)*y(4)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
+
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(5)=dydt(5)+2/2*k(4)*y(4)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
+
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(4)=dydt(4)-1/2*k(4)*y(4)*y(4);
+dydt(5)=dydt(5)+2/2*k(4)*y(4)*y(4);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: R(e!1, r), E(r, s!1) -> R(e, r) + E(r, s) 
 
-dydt(4)=dydt(4)-k(4)*y(4);
-dydt(2)=dydt(2)+k(4)*y(4);
-dydt(1)=dydt(1)+k(4)*y(4);
+dydt(4)=dydt(4)-k(3)*y(4);
+dydt(2)=dydt(2)+k(3)*y(4);
+dydt(1)=dydt(1)+k(3)*y(4);
 
 % rule    : E(r,s), R(e) -> E(r,s!1), R(e!1)
 % reaction: R(e, r) + E(r, s) -> R(e!1, r), E(r, s!1) 
@@ -396,88 +418,108 @@ jac=sparse(nodevar,nodevar);
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) 
 
-jac(6,6)=jac(6,6)-2*k(12)/2;
-jac(3,6)=jac(3,6)+k(12)/2;
-jac(3,6)=jac(3,6)+k(12)/2;
+jac(6,6)=jac(6,6)-2*k(6)/2;
+jac(3,6)=jac(3,6)+k(6)/2;
+jac(3,6)=jac(3,6)+k(6)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) 
 
-jac(6,6)=jac(6,6)-2*k(12)/2;
-jac(3,6)=jac(3,6)+k(12)/2;
-jac(3,6)=jac(3,6)+k(12)/2;
+jac(6,6)=jac(6,6)-2*k(6)/2;
+jac(3,6)=jac(3,6)+k(6)/2;
+jac(3,6)=jac(3,6)+k(6)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-jac(6,6)=jac(6,6)-2*k(11)/2;
-jac(2,6)=jac(2,6)+k(11)/2;
-jac(3,6)=jac(3,6)+k(11)/2;
+jac(6,6)=jac(6,6)-2*k(5)/2;
+jac(2,6)=jac(2,6)+k(5)/2;
+jac(3,6)=jac(3,6)+k(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-jac(6,6)=jac(6,6)-2*k(11)/2;
-jac(2,6)=jac(2,6)+k(11)/2;
-jac(3,6)=jac(3,6)+k(11)/2;
+jac(6,6)=jac(6,6)-2*k(5)/2;
+jac(2,6)=jac(2,6)+k(5)/2;
+jac(3,6)=jac(3,6)+k(5)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) 
 
-jac(7,7)=jac(7,7)-k(12);
-jac(3,7)=jac(3,7)+k(12);
-jac(4,7)=jac(4,7)+k(12);
+jac(7,7)=jac(7,7)-k(6);
+jac(3,7)=jac(3,7)+k(6);
+jac(4,7)=jac(4,7)+k(6);
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) 
 
-jac(7,7)=jac(7,7)-k(12);
-jac(3,7)=jac(3,7)+k(12);
-jac(4,7)=jac(4,7)+k(12);
+jac(7,7)=jac(7,7)-k(6);
+jac(3,7)=jac(3,7)+k(6);
+jac(4,7)=jac(4,7)+k(6);
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-jac(7,7)=jac(7,7)-k(11);
-jac(2,7)=jac(2,7)+k(11);
-jac(4,7)=jac(4,7)+k(11);
+jac(7,7)=jac(7,7)-k(5);
+jac(2,7)=jac(2,7)+k(5);
+jac(4,7)=jac(4,7)+k(5);
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) -> R(e!1, r), E(r!1, s) + E(r, s) 
 
-jac(7,7)=jac(7,7)-k(11);
-jac(2,7)=jac(2,7)+k(11);
-jac(3,7)=jac(3,7)+k(11);
+jac(7,7)=jac(7,7)-k(5);
+jac(2,7)=jac(2,7)+k(5);
+jac(3,7)=jac(3,7)+k(5);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
 
-jac(4,4)=jac(4,4)-1/2*k(9)*y(3);
-jac(4,3)=jac(4,3)-1/2*k(9)*y(4);
-jac(3,4)=jac(3,4)-1/2*k(9)*y(3);
-jac(3,3)=jac(3,3)-1/2*k(9)*y(4);
-jac(7,4)=jac(7,4)+1/2*k(9)*y(3);
-jac(7,3)=jac(7,3)+1/2*k(9)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(3);
+jac(4,3)=jac(4,3)-1/2*k(4)*y(4);
+jac(3,4)=jac(3,4)-1/2*k(4)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(4);
+jac(7,4)=jac(7,4)+1/2*k(4)*y(3);
+jac(7,3)=jac(7,3)+1/2*k(4)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
+
+jac(4,4)=jac(4,4)-1/2*k(4)*y(3);
+jac(4,3)=jac(4,3)-1/2*k(4)*y(4);
+jac(3,4)=jac(3,4)-1/2*k(4)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(4);
+jac(7,4)=jac(7,4)+1/2*k(4)*y(3);
+jac(7,3)=jac(7,3)+1/2*k(4)*y(4);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
 
-jac(3,3)=jac(3,3)-1/2*k(7)*y(4);
-jac(3,4)=jac(3,4)-1/2*k(7)*y(3);
-jac(4,3)=jac(4,3)-1/2*k(7)*y(4);
-jac(4,4)=jac(4,4)-1/2*k(7)*y(3);
-jac(7,3)=jac(7,3)+1/2*k(7)*y(4);
-jac(7,4)=jac(7,4)+1/2*k(7)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(4);
+jac(3,4)=jac(3,4)-1/2*k(4)*y(3);
+jac(4,3)=jac(4,3)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(3);
+jac(7,3)=jac(7,3)+1/2*k(4)*y(4);
+jac(7,4)=jac(7,4)+1/2*k(4)*y(3);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r!3, s) 
+
+jac(3,3)=jac(3,3)-1/2*k(4)*y(4);
+jac(3,4)=jac(3,4)-1/2*k(4)*y(3);
+jac(4,3)=jac(4,3)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(3);
+jac(7,3)=jac(7,3)+1/2*k(4)*y(4);
+jac(7,4)=jac(7,4)+1/2*k(4)*y(3);
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r!1, s) + R(e!1, r), E(r!1, s) -> R(e!1, r!2), R(e!3, r!2), E(r!1, s), E(r!3, s) 
 
-jac(3,3)=jac(3,3)-1/2*k(5)*y(3);
-jac(3,3)=jac(3,3)-1/2*k(5)*y(3);
-jac(3,3)=jac(3,3)-1/2*k(5)*y(3);
-jac(3,3)=jac(3,3)-1/2*k(5)*y(3);
-jac(6,3)=jac(6,3)+2/2*k(5)*y(3);
-jac(6,3)=jac(6,3)+2/2*k(5)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(3);
+jac(3,3)=jac(3,3)-1/2*k(4)*y(3);
+jac(6,3)=jac(6,3)+2/2*k(4)*y(3);
+jac(6,3)=jac(6,3)+2/2*k(4)*y(3);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: R(e!1, r), E(r!1, s) -> R(e, r) + E(r, s) 
@@ -489,47 +531,67 @@ jac(1,3)=jac(1,3)+k(3);
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) 
 
-jac(5,5)=jac(5,5)-2*k(12)/2;
-jac(4,5)=jac(4,5)+k(12)/2;
-jac(4,5)=jac(4,5)+k(12)/2;
+jac(5,5)=jac(5,5)-2*k(6)/2;
+jac(4,5)=jac(4,5)+k(6)/2;
+jac(4,5)=jac(4,5)+k(6)/2;
 
 % rule    : R(r!_) -> R(r)
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) 
 
-jac(5,5)=jac(5,5)-2*k(12)/2;
-jac(4,5)=jac(4,5)+k(12)/2;
-jac(4,5)=jac(4,5)+k(12)/2;
+jac(5,5)=jac(5,5)-2*k(6)/2;
+jac(4,5)=jac(4,5)+k(6)/2;
+jac(4,5)=jac(4,5)+k(6)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-jac(5,5)=jac(5,5)-2*k(11)/2;
-jac(2,5)=jac(2,5)+k(11)/2;
-jac(4,5)=jac(4,5)+k(11)/2;
+jac(5,5)=jac(5,5)-2*k(5)/2;
+jac(2,5)=jac(2,5)+k(5)/2;
+jac(4,5)=jac(4,5)+k(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) -> R(e!1, r), E(r, s!1) + E(r, s) 
 
-jac(5,5)=jac(5,5)-2*k(11)/2;
-jac(2,5)=jac(2,5)+k(11)/2;
-jac(4,5)=jac(4,5)+k(11)/2;
+jac(5,5)=jac(5,5)-2*k(5)/2;
+jac(2,5)=jac(2,5)+k(5)/2;
+jac(4,5)=jac(4,5)+k(5)/2;
 
 % rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
 % reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
 
-jac(4,4)=jac(4,4)-1/2*k(10)*y(4);
-jac(4,4)=jac(4,4)-1/2*k(10)*y(4);
-jac(4,4)=jac(4,4)-1/2*k(10)*y(4);
-jac(4,4)=jac(4,4)-1/2*k(10)*y(4);
-jac(5,4)=jac(5,4)+2/2*k(10)*y(4);
-jac(5,4)=jac(5,4)+2/2*k(10)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
+
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
+
+% rule    : R(e!_,r), R(e!_,r) -> R(e!_,r!1), R(e!_,r!1)
+% reaction: R(e!1, r), E(r, s!1) + R(e!1, r), E(r, s!1) -> R(e!1, r!2), R(e!3, r!2), E(r, s!1), E(r, s!3) 
+
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(4,4)=jac(4,4)-1/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
+jac(5,4)=jac(5,4)+2/2*k(4)*y(4);
 
 % rule    : R(e!_,r) -> R(e,r)
 % reaction: R(e!1, r), E(r, s!1) -> R(e, r) + E(r, s) 
 
-jac(4,4)=jac(4,4)-k(4);
-jac(2,4)=jac(2,4)+k(4);
-jac(1,4)=jac(1,4)+k(4);
+jac(4,4)=jac(4,4)-k(3);
+jac(2,4)=jac(2,4)+k(3);
+jac(1,4)=jac(1,4)+k(3);
 
 % rule    : E(r,s), R(e) -> E(r,s!1), R(e!1)
 % reaction: R(e, r) + E(r, s) -> R(e!1, r), E(r, s!1) 

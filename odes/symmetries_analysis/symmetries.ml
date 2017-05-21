@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <May 13 2017>
+   * Last modification: Time-stamp: <May 21 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -402,6 +402,7 @@ let divide_rule_rate_by rule_cache env rate_convention rule
 let rate rule (_, arity, _) =
   match arity with
   | Rule_modes.Usual -> Some rule.Primitives.rate
+  | Rule_modes.Unary_refinement
   | Rule_modes.Unary ->
     Option_util.map fst rule.Primitives.unary_rate
 
