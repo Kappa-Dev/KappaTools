@@ -39,6 +39,7 @@
 
 \def\KaSim{\textsf{KaSim}}
 \def\KaSa{\textsf{KaSa}}
+\def\KaDE{\textsf{KaDE}}
 \def\sep{\hbox{-}}
 \def\int{\textasciitilde}
 \def\intstate{\textasciitilde}
@@ -76,7 +77,7 @@
 
 \input{generated_img/version}
 
-\title{KaSim~\& KaSa~reference manual\\ \small (release \version)}
+\title{KaSim,~KaSa,~\& KaDE~reference manual\\ \small (release \version)}
 \author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@irif.fr} and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
 
 \date{}
@@ -130,6 +131,16 @@ Note that \KaSim~can only render curves in the svg format. However, data outputs
 \KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute the contact map and the influence map. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.  Other analyses including  model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon.
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaSa. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
+
+\section{The \KaDE~ODEs generator}
+
+\KaDE~is an open source tool to compile rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa into systems of ordinary differential equations, or equivalently into reaction networks.
+It also supports some model reduction techniques, that may reduce the
+dimension of the ODEs (or the number of different bio-molecular species in reaction networks).
+
+\KaDE~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to select a backend format, some semantics options, and some model reduction methods.
+
+A graphical interface is proposed to navigate through the various options and utilities  of \KaDE. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
 
 \section{Support}
@@ -188,14 +199,14 @@ If the tool \ttt{ocamlbuild} is not in your path, you may
 set the variable \ttt{OCAMLBINPATH} to point to the location of the
 compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
 
-\section{Compilation of KaSa~graphical interface}
+\section{Compilation of the graphical interface of KaSa~and KaDE}
 
-The graphical interface of \KaSa~requires
+The graphical interface of \KaSa~and \KaDE~requires
 \href{http://www.tcl.tk/}{tk-dev} and
 \href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By
 default, the graphical interface is not compiled. The compilation of
 this interface can be toggled on by using the following command:
-\ttt{make USE\_TK=1 bin/KaSa}
+\ttt{make USE\_TK=1 bin/KaSa} (or \ttt{make USE\_TK=1 bin/KaDE}).
 
 Common compilation errors are the following:
 \begin{enumerate}
@@ -1901,6 +1912,159 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 \caption{Log of the reachability analysis.}
 \label{fig:reachability_influence}
 \end{figure}
+
+\chapter{The \KaDE~ODEs generator}
+
+\section{General usage}
+
+From a terminal window, \KaDE~can be invoked by typing
+\ITE{
+\item[\$] \ttt{KaDE file\_1 ... file\_n  [option]}
+}
+where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}).
+
+All the options are summarised as follows:
+\input{generated_img/KaDE_options.txt}
+
+Orders in option matter, since they can be used to toggle on/off some functionalities or to assign a value to some environment variables.
+The options are interpreted from left to right.
+
+\section{Graphical interface}
+
+\subsection{Launching the interface}
+
+The graphical interface can be launched by typing
+\ITE{\item[\$] \ttt{KaDE}}
+
+without any option.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 2080 1368]{img/kade_0.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{0\_model}}
+\label{fig:kade:0}
+\end{figure}
+
+\subsection{The areas of interests}
+
+There are five different areas of importance in the graphical interface:
+\begin{enumerate}
+\item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
+In expert modes, more options are available in the graphical interface.
+\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{0\_model}, \texttt{1\_output}, \texttt{2\_semantics}, \texttt{3\_integration\_settings}, \texttt{4\_model\_reduction}, \texttt{5\_static\_analysis}, \texttt{6\_debug\_mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
+
+\item Center: The options of the selected sub-tab are displayed and can be tuned.
+
+Contextual help is provided when the mouse is hovered over an element.
+
+The interface will store the options that are checked or filled and the order in which they have been selected.
+When launched, the analysis interprets these options in the order they have been entered.
+
+Some options appear in several sub-tabs. They denote the same option and share the same value.
+
+\item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options.
+
+Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
+before the last reset, before the last quit, or before the last analysis.
+\end{enumerate}
+
+\subsection{The sub-tab \texttt{0\_models}}
+
+%The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
+
+%\begin{itemize}
+%\item The button \texttt{--do-all} activates all the functionalities.
+%\item The button \texttt{--reset-all} inactivates all the functionalities.
+%\item The option \texttt{--compute-contact-map} can be used to (des)activate the computation of the contact map.
+%\item The option \texttt{--compute-influence-map} can be used to (des)activate the computation of the influence map.
+%\item The option \texttt{--compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
+%\item The option \texttt{--compute-local-traces} can be used to (des)activate the computation of the trace analysis.
+%\end{itemize}
+
+\subsection{The sub-tab \texttt{1\_output}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_1.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{1\_output}}
+\label{fig:kade:1}
+\end{figure}
+
+
+%The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
+
+%\begin{itemize}
+%\item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
+%\item The field \texttt{--output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
+%\item The field \texttt{--output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
+%\item The field \texttt{--output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
+%\item The field \texttt{--output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
+%\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--influence-map-format}.
+%\item The field \texttt{--output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
+%\item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--local-traces-format}.
+
+
+%\end{itemize}
+
+%When a file already exists, it is overwritten without any warning.
+
+\subsection{The sub-tab \texttt{2\_output}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_2.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{2\_semantics}}
+\label{fig:kade:2}
+\end{figure}
+
+\subsection{The sub-tab \texttt{3\_integration\_settings}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{3\_integration\_settings}}
+\label{fig:kade:3}
+\end{figure}
+
+\subsection{The sub-tab \texttt{4\_model\_reduction}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_4.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{4\_model\_reduction}}
+\label{fig:kade:4}
+\end{figure}
+
+\subsection{The sub-tab \texttt{5\_static\_analysis}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{5\_static\_analysis}}
+\label{fig:kade:5}
+\end{figure}
+
+\subsection{The sub-tab \texttt{6\_debug\_mode}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}}
+\label{fig:kade:6}
+\end{figure}
+
+\section{Differential semantics}
+
+\subsection{From rules to reactions}
+\subsection{Semantics convention}
+
+\subsubsection{Rate constant conventions}
+\subsubsection{Ambiguous molecularity}
+\subsubsection{Embeddings VS occurrences}
+
+\section{Tutorial}
+
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
