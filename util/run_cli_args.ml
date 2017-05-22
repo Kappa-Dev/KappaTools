@@ -128,7 +128,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Arg.String (fun outputDirectory -> t.outputDirectory <- outputDirectory),
    Superarg.String t_gui.outputDirectory_gui,
    "Specifies directory name where output file(s) should be stored",
-   ["0_model"; "2_semantics" ; "3_integration_settings"], Superarg.Normal) ;
+   ["1_output"], Superarg.Normal) ;
    ("-mode",
     Arg.String
       (fun m -> if m = "batch" then t.batchmode <- true
