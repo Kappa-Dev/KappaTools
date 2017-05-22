@@ -235,7 +235,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
   | Superarg.Int _ | Superarg.Int_opt _ | Superarg.String _ | Superarg.String_opt _ | Superarg.String_list _ | Superarg.StringNbr_list _
   | Superarg.Float _ | Superarg.Float_opt _ ->
       let ext = match spec with
-      | Superarg.Int _ | Superarg.Int_opt _ -> "<Superarg.Int>"
+      | Superarg.Int _ | Superarg.Int_opt _ -> "<int>"
       | Superarg.String _ | Superarg.String_opt _ -> "<name>"
       | Superarg.String_list _ | Superarg.StringNbr_list _ -> "<names> ..."
       | Superarg.Float _ | Superarg.Float_opt _ -> "<float>"
