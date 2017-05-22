@@ -66,17 +66,6 @@ let default : t =
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
                        Superarg.category list * Superarg.level) list =
    [
-  "--ode-backend",
-  Superarg.Choice (
-    [ "dotnet", "dotnet (BNGL) backend";
-      "octave", "octave backend";
-      "matlab", "matlab backend";
-      "mathematica", "mathematica backend (in progress)";
-      "maple", "maple backend (in progress)";
-      "sbml", "sbml backend"],
-    ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
-  "Select the backend format",
-  ["1_output"],Normal;
   "--output",
   Superarg.MultiExt
     ["--dotnet-output",".net";
@@ -86,6 +75,17 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
      "--octave-output",".m";
      "--sbml-output",".xml"],
   "Prefix for file name output",
+  ["0_data_set";"1_output";"2_semantics";"3_integration_settings";"4_model_reduction";"5_static_analysis";"6_debug_mode"],Normal;
+  "--ode-backend",
+  Superarg.Choice (
+    [ "dotnet", "dotnet (BNGL) backend";
+      "maple", "maple backend (in progress)";
+      "mathematica", "mathematica backend (in progress)";
+      "matlab", "matlab backend";
+      "octave", "octave backend";
+      "sbml", "sbml backend"],
+    ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
+  "Select the backend format",
   ["1_output"],Normal;
   "--dotnet-output",
   Superarg.String_opt t.dotnet_output,
@@ -114,6 +114,10 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   "--propagate-constants",
   Superarg.Bool t.propagate_constants,
   "propagate constants",
+  ["1_output"],Hidden;
+  "--constant-propagation",
+  Superarg.Bool t.propagate_constants,
+  "propagate constants",
   ["1_output"],Normal;
   "--rate-convention",
   Superarg.Choice (
@@ -137,15 +141,15 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
   "--max-size-for-species",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
-  ["2_semantics"],Normal;
+  ["2_semantics"],Hidden;
   "--show-reactions",
-  Superarg.Bool t.smash_reactions,
-  "Gather identical reactions in the ODEs",
-  ["1_output";"3_integration_settings"],Normal ;
-  "--smash-reactions",
   Superarg.Bool t.show_reactions,
     "Annotate ODEs by the corresponding chemical reactions",
     ["1_output"],Normal ;
+  "--smash-reactions",
+  Superarg.Bool t.smash_reactions,
+  "Gather identical reactions in the ODEs",
+  ["1_output";"3_integration_settings"],Normal ;
   "--compute-jacobian",
   Superarg.Bool t.compute_jacobian,
   "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)",

@@ -1941,7 +1941,7 @@ without any option.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_0.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{0\_model}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{0\_data\_set}}
 \label{fig:kade:0}
 \end{figure}
 
@@ -1951,7 +1951,7 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
 In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{0\_model}, \texttt{1\_output}, \texttt{2\_semantics}, \texttt{3\_integration\_settings}, \texttt{4\_model\_reduction}, \texttt{5\_static\_analysis}, \texttt{6\_debug\_mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
+\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{0\_data\_set}, \texttt{1\_output}, \texttt{2\_semantics}, \texttt{3\_integration\_settings}, \texttt{4\_model\_reduction}, \texttt{5\_static\_analysis}, \texttt{6\_debug\_mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
 
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
 
@@ -1963,24 +1963,28 @@ When launched, the analysis interprets these options in the order they have been
 Some options appear in several sub-tabs. They denote the same option and share the same value.
 
 \item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
-\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaDE\ with the current options.
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
 before the last reset, before the last quit, or before the last analysis.
 \end{enumerate}
 
-\subsection{The sub-tab \texttt{0\_models}}
+Two fields defines the repository and the name of the output:
+\begin{itemize}
+  \item \item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
+\item The field \texttt{--output} sets the name of the output file.
+The following extension will be added automatically according to the choice of the backend format: ".net" in DOTNET format, ".mws" in Maple, ".nb" in Mathematica, ".m" in Matlab and Octave, and ".xml" in SBML.
+\end{itemize}
+Both fields may be modified from every sub-tab.
 
-%The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
+\subsection{The sub-tab \texttt{0\_data\_set}}
 
-%\begin{itemize}
-%\item The button \texttt{--do-all} activates all the functionalities.
-%\item The button \texttt{--reset-all} inactivates all the functionalities.
-%\item The option \texttt{--compute-contact-map} can be used to (des)activate the computation of the contact map.
-%\item The option \texttt{--compute-influence-map} can be used to (des)activate the computation of the influence map.
-%\item The option \texttt{--compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
-%\item The option \texttt{--compute-local-traces} can be used to (des)activate the computation of the trace analysis.
-%\end{itemize}
+The sub-tab \texttt{0\_data\_set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
+\begin{itemize}
+\item The field \texttt{--initial} defines the starting date of the simulation.
+\item The field \texttt{-l} defines the final date of the simulation.
+\item The field \texttt{-p} defines the time interval between two plots.
+\end{itemize}
 
 \subsection{The sub-tab \texttt{1\_output}}
 
@@ -1992,24 +1996,19 @@ before the last reset, before the last quit, or before the last analysis.
 \end{figure}
 
 
-%The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
+The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kade:1}) contains the names of the output files and their format.
 
-%\begin{itemize}
-%\item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
-%\item The field \texttt{--output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
-%\item The field \texttt{--output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
-%\item The field \texttt{--output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
-%\item The field \texttt{--output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
-%\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--influence-map-format}.
-%\item The field \texttt{--output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
-%\item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--local-traces-format}.
+\begin{itemize}
+\item The field \texttt{--ode-backend} allows for the choice among the different backend formats: DOTNET, Maple, Mathematica, Matlab, Octave and SBML.
+\item The field \texttt{--output-plot} sets the name of the file where the plots will be dumped when it applies. Only the Maple, Mathematica, Matlab and Octave dump plots. The option is ignored in the other backend formats.
+\item The option \texttt{--(no)-constant-propagation} switches on/off constant propagation.
+\item The option \texttt{--(no)-show-reactions} annotates each expression in the output file, with the Kappa rule and the reactions that has generated this contribution.
+\item The option \texttt{--(no)-smash-reactions} identify multiple occurrences of a same reaction in the reaction network, and sum up  their contribution into a single reaction.
+\end{itemize}
 
+When a file already exists,
 
-%\end{itemize}
-
-%When a file already exists, it is overwritten without any warning.
-
-\subsection{The sub-tab \texttt{2\_output}}
+\subsection{The sub-tab \texttt{2\_semantics}}
 
 \begin{figure}[htbp]
 \centering
@@ -2017,6 +2016,21 @@ before the last reset, before the last quit, or before the last analysis.
 \caption{\KaDE~ graphical interface - sub-tab \texttt{2\_semantics}}
 \label{fig:kade:2}
 \end{figure}
+
+The differential semantics of a Kappa model is described in Sect.~\ref{sec:differential semantics}. The option in the sub-tab \textttt{2\_semantics} allows for the choice among several choice for the meaning of the ODEs variables and for the meaning of the rate constants.
+
+
+\begin{itemize}
+  \item \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule.
+  \KaDE offers three conventions. With the convention \texttt{KaSim}, there is no correction, as it is done in the simulator; with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
+  with the convention \texttt{Biochemist}, each rate constant is divided
+  by the number of automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule.
+  \item 
+  \item
+  \item
+
+\end{itemize}
+
 
 \subsection{The sub-tab \texttt{3\_integration\_settings}}
 
@@ -2055,6 +2069,7 @@ before the last reset, before the last quit, or before the last analysis.
 \end{figure}
 
 \section{Differential semantics}
+\label{sec:differential semantics}
 
 \subsection{From rules to reactions}
 \subsection{Semantics convention}
