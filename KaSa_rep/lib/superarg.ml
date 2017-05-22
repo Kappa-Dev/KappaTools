@@ -224,7 +224,7 @@ let print_option verbose f (key,spec,msg,_cat,_lvl) =
       | None   -> Format.fprintf f "  %s <float>   (default: disabled)@." key2
       | Some v -> Format.fprintf f "  %s <float>   (default: %f)@." key2 v)
    | Choice (l,_,r) ->
-     Format.fprintf f "  %s @[%a@]    (default: %s)@."
+     Format.fprintf f "  %s @[%a@] @  (default: %s)@."
        key
        (Pp.list
           (fun f -> Format.fprintf f " |@ ")
