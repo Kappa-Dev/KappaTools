@@ -88,16 +88,16 @@ end model
 # COMMAND FOR RUNNING OR PROCESSING THIS BNGL FILE
 
 # Now we can run NFsim directly from BioNetGen using the 'simulate' command with
-# the 'method' argument set to "nf". Here, "t_end" is the simulation time, "n_steps" 
-# is the number of output steps, and "suffix" is the filename ending of this run.  
-# The suffix allows us to run the same model multiple times here, and distinguish 
-# between all the runs with different "suffix"s. Note that this step will also 
+# the 'method' argument set to "nf". Here, "t_end" is the simulation time, "n_steps"
+# is the number of output steps, and "suffix" is the filename ending of this run.
+# The suffix allows us to run the same model multiple times here, and distinguish
+# between all the runs with different "suffix"s. Note that this step will also
 # automatically create an NFsim readable XML model specification file.
- 
-simulate({method=>"nf",suffix=>"goNFsim",t_end=>100,n_steps=>50})
 
-# We can also pass various additional arguments to NFsim. As an example, we can 
-# rerun the model with the 'verbose' and universal traversal limit ('utl') 
+# simulate({method=>"nf",suffix=>"goNFsim",t_end=>100,n_steps=>50})
+
+# We can also pass various additional arguments to NFsim. As an example, we can
+# rerun the model with the 'verbose' and universal traversal limit ('utl')
 # options. See the manual for a description of Universal Traversal Limits. See
 # the 'BioNetGen Actions & Arguments Guide', available at bionetgen.org, for all
 # supported arguments.
@@ -122,20 +122,16 @@ simulate({method=>"nf",suffix=>"goNFsim",t_end=>100,n_steps=>50})
 # option (which you can remove) is set to 1 here so that every time this is run the
 # reaction network output file will be regenerated.
 
-# generate_network({overwrite=>1})
+ generate_network({overwrite=>1})
 
-# Then we can call the 'simulate' command with the desired 'method' argument to run the model file.  
+# Then we can call the 'simulate' command with the desired 'method' argument to run the model file.
 # Again, the suffix parameter is used to name the output of the simulations.  Note also that
 # between BioNetGen ODE and SSA simulation commands, we have to reset the molecule concentrations.
 # this is needed because BioNetGen allows you to restart a simulation from the end of a
 # previous simulation.
 
-# simulate({method=>"ode",t_end=>100,n_steps=>50})
+ simulate({method=>"ode",t_end=>100,n_steps=>50})
 
 # resetConcentrations()
 
 # simulate({method=>"ssa",suffix=>ssa,t_end=>100,n_steps=>50})
-
-
-
-

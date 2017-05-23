@@ -4,7 +4,7 @@
 # References:
 # 1) B Goldstein, AS Perelson. "Equilibrium theory for the clustering
 #      of bivalent cell surface receptors by trivalent ligands".
-#      Biophysical Journal. 1985, vol45, p1109-1123. 
+#      Biophysical Journal. 1985, vol45, p1109-1123.
 # 2) MW Sneddon, JR Faeder, T Emonet. "Efficient modeling, simulation and
 #      course-graining of biological complexity with NFsim".
 #      Nature methods. 2011, vol8, p177-183.
@@ -16,7 +16,7 @@ begin parameters
     cTot     0.84
     beta     50
     koff     0.01
-    
+
     kp1 (cTot*koff)/(3.0*Lig_tot)  #FREE BINDING RATE
     kp2 (beta*koff)/Rec_tot        #CROSSLINKING RATE
 end parameters
@@ -35,8 +35,8 @@ begin observables
     Molecules  Rfreesite R(l)
     Species    Lmonomer  L(r,r,r)
     Species    Rmonomer  R(l,l)
-    Molecules  Ltot      L()    
-    Molecules  Rtot      R() 
+    Molecules  Ltot      L()
+    Molecules  Rtot      R()
 end observables
 begin reaction rules
     R(l) + L(r,r,r)     <-> R(l!1).L(r!1,r,r)      kp1, koff
@@ -46,4 +46,5 @@ end reaction rules
 end model
 
 ## actions ##
-simulate({method=>"nf",t_start=>0,t_end=>200,n_steps=>200})
+generate_network({overwrite=>1})
+#simulate({method=>"nf",t_start=>0,t_end=>200,n_steps=>200})
