@@ -18,21 +18,21 @@ let set_visibility (a:Superarg.t) =
     (fun (key,_,_,_,lvl) ->
       try
 	let f = snd (Misc_sa.unsome (error,StringMap.find_option key !fmap)
-			       (fun _ -> raise Not_found)) in
-	if Superarg.show_level lvl
-	then
-	  List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
-	else
-	  List.iter (fun f -> Pack.forget [coe f]) f
+                (fun _ -> raise Not_found)) in
+ List.iter (fun f -> Pack.forget [coe f]) f;
+ if Superarg.show_level lvl
+ then
+   List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
       with Not_found -> ()
     ) a
 
 let set_visibility_bis a  =
+  List.iter (fun (f,_) -> Pack.forget [coe f]) a;
   List.iter
     (fun (f,lvl) -> if Superarg.show_level lvl
 		    then
 		      	pack ~side:`Left ~padx:1 ~pady:1 [coe f]
-		    else Pack.forget [coe f])
+    )
     a
 
 let set_visibility (a,b) =
@@ -198,7 +198,7 @@ let cmd_of_widget (a:Superarg.t) short =
 
       | Not_found -> accum
       | Failure f -> failwith ("Invalid argument type for option "^key^" in "^(
-			       List.fold_left (fun sol x -> sol^" "^x) "" cat)^": "^f)
+          List.fold_left (fun sol ((x,_),_) -> sol^" "^x) "" cat)^": "^f)
     ) [] (List.rev a)
 
 
@@ -398,13 +398,21 @@ class pager bparent fparent =
 
 let build_spec (a:Superarg.t) bparent fparent =
   let opts = new pager bparent fparent in
-  Superarg.StringMap.iter(*_map*)
+  Superarg.StringIntMap.iter(*_map*)
     (fun  _ (l,cat_lvl) ->
       List.iter
-	(fun (key,spec,msg,cat,lvl) ->
-	  List.iter (fun cat ->
-	    widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl)
-             ) cat) l ) (Superarg.order a);
+        (fun ((key:Superarg.key),
+              (spec:Superarg.spec),
+              (msg:Superarg.msg),
+              (cat:(Superarg.category*Superarg.position) list),
+              (lvl:Superarg.level))
+          ->
+          List.iter
+            (fun (((cat:string),_),_) ->
+               widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl))
+            cat)
+        l )
+    (Superarg.order a);
   let _ = widget_update_from_spec a in
   opts#get_pages_lvl ()
 
@@ -577,6 +585,14 @@ let gui ?title (a:Superarg.t) (args:string list) : string list =
 
 let parse ?title (a:Superarg.t) (def:string list ref) =
   Superarg.check a;
+  let a = Superarg.order a in
+  let a =
+    Superarg.StringIntMap.fold
+      (fun _ (list,_) list' ->
+         List.fold_left
+           (fun list' a -> a::list') list' (List.rev list))
+      a []
+  in
   (* drop the first command-line argument: it is the executable name *)
   let args = List.tl (Array.to_list Sys.argv) in
   (* if no argument or "--gui" given, launch the gui, otherwise, parse args *)

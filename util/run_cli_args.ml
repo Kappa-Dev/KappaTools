@@ -89,7 +89,7 @@ let copy_from_gui t_gui t =
   t.batchmode <- t_tmp.batchmode ;
   t.interactive <- t_tmp.interactive
 
-let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * string * string list * Superarg.level) list = [
+let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * string * (Superarg.category * Superarg.position) list * Superarg.level) list = [
   ("-i",
    Arg.String (fun fic ->
        t.inputKappaFileNames <- fic::t.inputKappaFileNames),
@@ -100,12 +100,16 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Arg.Float (fun time -> t.minValue <- Some time),
    (Superarg.Float_opt t_gui.minValue_gui),
    "Min time of simulation (arbitrary time unit)",
-   ["0_data_set";"3_integration_settings"],Superarg.Normal);
+   [Common_args.data_set,0;
+    Common_args.integration_settings,0],
+   Superarg.Normal);
   ("-l",
    Arg.Float(fun time -> t.maxValue <- Some time),
    (Superarg.Float_opt t_gui.maxValue_gui),
    "Limit of the simulation",
-   ["0_data_set";"3_integration_settings"],Superarg.Normal);
+   [
+     Common_args.data_set,1;
+     Common_args.integration_settings,1],Superarg.Normal);
   ("-t",
    Arg.Float (fun f ->
        raise (Arg.Bad ("Option '-t' has been replace by '[-u time] -l "^
@@ -117,18 +121,30 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
    Arg.Float (fun pointNumberValue -> t.plotPeriod <- Some pointNumberValue),
    Superarg.Float_opt t_gui.plotPeriod_gui,
    "plot period: time interval between points in plot (default: 1.0)",
-  ["0_data_set";"3_integration_settings"],Superarg.Normal);
+  [Common_args.data_set,2;Common_args.integration_settings,2],Superarg.Normal);
   ("-o",
    Arg.String
      (fun outputDataFile -> t.outputDataFile <- Some outputDataFile),
    Superarg.String_opt t_gui.outputDataFile_gui,
    "file name for data output",
-   ["0_data_set"; "3_integration_settings"], Superarg.Hidden) ;
+   [
+     Common_args.data_set,3;
+     Common_args.output,3;
+     Common_args.integration_settings,3], Superarg.Hidden) ;
   ("-d",
    Arg.String (fun outputDirectory -> t.outputDirectory <- outputDirectory),
    Superarg.String t_gui.outputDirectory_gui,
    "Specifies directory name where output file(s) should be stored",
-   ["0_data_set";"1_output";"2_semantics";"3_integration_settings";"4_model_reduction";"5_static_analysis";"6_debug_mode"], Superarg.Normal) ;
+   [
+     Common_args.data_set,100;
+     Common_args.output,100;
+     Common_args.semantics,100;
+     Common_args.integration_settings,100;
+     Common_args.model_reduction,100;
+     Common_args.static_analysis,100;
+     Common_args.debug_mode,100
+   ],
+   Superarg.Normal) ;
    ("-mode",
     Arg.String
       (fun m -> if m = "batch" then t.batchmode <- true
@@ -136,7 +152,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
     Superarg.Choice
       (["batch","batch mode";"interactive","interactive mode"],[],t_gui.batchmode_gui),
     "either \"batch\" to never ask anything to the user or \"interactive\" to ask something before doing anything",
-    ["1_output"], Superarg.Expert) ;
+    [Common_args.output,7;Common_args.debug_mode,7], Superarg.Expert) ;
    ("--new-syntax",
     Arg.Unit (fun () -> t.newSyntax <- true),
     Superarg.Bool t_gui.newSyntax_gui,
@@ -157,8 +173,15 @@ let options_gui t_gui =
     "--output-plot",
   Superarg.String_opt t_gui.outputDataFile_gui,
   "file name for data output",
-  ["1_output";"2_semantics";"3_integration_settings"],Superarg.Normal;
+    [
+      Common_args.output,1;
+      Common_args.semantics,1;
+      Common_args.integration_settings,1
+    ],Superarg.Normal;
   "--data-file",
   Superarg.String_opt t_gui.outputDataFile_gui,
   "file name for data output",
-  ["1_output";"2_semantics";"3_integration_settings"],Superarg.Hidden;]
+  [
+    Common_args.output,1; Common_args.semantics,2;
+    Common_args.integration_settings,3
+  ],Superarg.Hidden;]

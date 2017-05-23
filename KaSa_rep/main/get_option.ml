@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <May 22 2017>
+  * Last modification: Time-stamp: <May 23 2017>
   * *
   * primitive to parse command-line options
   *
@@ -13,6 +13,15 @@
   * under the terms of the GNU Library General Public License *)
 
 open Superarg
+
+let actions = "Actions",0
+let output = "Output",1
+let reachability = "Reachability analysis",2
+let traces = "Trace analysis",3
+let contact_map = "Contact map",4
+let influence_map = "Influence map",5
+let flow = "Flow of information",6
+let debug = "Debugging information",7
 
 let options =
   List.rev
@@ -25,7 +34,7 @@ let options =
           "--compute-ODE-flow-of-information";
           "--compute-stochastic-flow-of-information";
           "--compute-reachability-analysis";
-        ],[]),"launch everything",["0_Actions"],Normal;
+        ],[]),"launch everything",[actions,0],Normal;
       "--reset-all",
       Multi(
         [
@@ -34,17 +43,18 @@ let options =
           "--no-compute-ODE-flow-of-information";
           "--no-compute-stochastic-flow-of-information";
           "--no-compute-reachability-analysis";
-        ],[]),"launch nothing",["0_Actions"],Normal;
+        ],[]),"launch nothing",[actions,1],Normal;
+      "--void",Void,"",[actions,2],Normal;
       "--compute-contact-map",
       Bool Config.do_contact_map,
       "compute the contact map",
-      ["0_Actions";"4_Contact_map"],
+      [actions,2;contact_map,0],
       Normal;
 
       "--compute-influence-map",
       Bool Config.do_influence_map,
       "compute the influence map",
-      ["0_Actions";"5_Influence_map"],
+      [actions,3;influence_map,0],
       Normal;
 
       "--influence-map-accuracy-level",
@@ -55,25 +65,25 @@ let options =
           ["Low";"High";"Full";"Medium"],
           Config.influence_map_accuracy_level)),
       "Tune the accuracy level of the influence map",
-      ["5_Influence_map"],
+      [influence_map,1],
       Normal;
 
       "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
       "Compute an approximation of the flow of information in the ODE semantics",
-      ["0_Actions";"6_FLow_of_information"],
+      [actions,4;flow,6],
       Expert;
 
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
-      ["0_Actions";"6_FLow_of_information"],
+      [actions,5;flow,6],
       Expert;
 
       "--compute-reachability-analysis",
       Bool Config.do_reachability_analysis,
       "Compute an approximation of the states of agent sites",
-      ["0_Actions";"2_Reachability_analysis"],
+      [actions,6;reachability,0],
       Normal;
       "--enable-every-domain",
       Multi(
@@ -82,7 +92,7 @@ let options =
           "--views-domain";
           "--double-bonds-domain";
           "--sites-across-bonds-domain";
-        ],[]),"enable every abstract domain",["2_Reachability_analysis"],Normal;
+        ],[]),"enable every abstract domain",[reachability,1],Normal;
       "--disable-every-domain",
       Multi(
         [
@@ -90,35 +100,35 @@ let options =
           "--no-views-domain";
           "--no-double-bonds-domain";
           "--no-sites-across-bonds-domain";
-        ],[]),"disable every abstract domain",["2_Reachability_analysis"],Normal;
+        ],[]),"disable every abstract domain",[reachability,2],Normal;
       "--contact-map-domain",
       Choice
          (["static","Very coarse static abstraction: every bond that occurs in initial states and rhs of rules is considered";
            "dynamic","More accurate abstraction: only the bonds that occur in the initial state or a rule that has already been applied successfully, are considered"],
           [],
           Config.with_dynamic_contact_map),"contact map domain is used to over-approximate side-effects",
-       ["2_Reachability_analysis"],Normal;
+       [reachability,3],Normal;
        "--views-domain",
       Bool Config.with_views_analysis,
           "enable local views analysis",
-          ["2_Reachability_analysis"],Normal;
+          [reachability,4],Normal;
       "--double-bonds-domain",
       Bool Config.with_parallel_bonds_analysis,
       "enable double bonds analysis",
-      ["2_Reachability_analysis"],Normal;
+      [reachability,5],Normal;
       "--sites-across-bonds-domain",
       Bool Config.with_site_across_bonds_analysis,
       "enable the analysis of the relation among the states of sites in connected agents",
-      ["2_Reachability_analysis"],Normal;
+      [reachability,6],Normal;
       "--sites-accross-bonds-domain",
       Bool Config.with_site_across_bonds_analysis,
       "enable the analysis of the relation among the states of sites in connected agents",
-      ["2_Reachability_analysis"],Hidden;
+      [reachability,6],Hidden;
 
       "--compute-symmetries",
       Bool Config.do_symmetries,
       "Look up for pairs of symmetric sites",
-      ["0_Actions"],Normal;
+      [actions,7],Normal;
       "--verbosity-level-for-view-analysis",
       (Choice
          ([
@@ -130,7 +140,7 @@ let options =
            [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the view analysis",
-      ["2_Reachability_analysis"],
+      [reachability,7],
       Hidden;
 
       "--verbosity-level-for-reachability-analysis",
@@ -144,18 +154,18 @@ let options =
            [],
            Config.verbosity_level_for_reachability_analysis)),
       "Tune the verbosity level for the reachability analysis",
-      ["2_Reachability_analysis"],
+      [reachability,8],
       Normal;
       "--hide-one-d-relations-from-cartesian-decomposition",
       Bool Config.hide_one_d_relations_from_cartesian_decomposition,
       "Filter out 1-d relations from the Cartesian decomposition",
-      ["2_Reachability_analysis"],
+      [reachability,9],
       Developper;
 
       "--smash-relations",
       Bool Config.smash_relations,
       "Recombine relations to get a more precise & compact output",
-      ["2_Reachability_analysis"],
+      [reachability,10],
       Developper;
 
       "--output-mode-for-reachability-analysis",
@@ -165,49 +175,49 @@ let options =
                ],[],
                Config.use_natural_language)),
       "post-process relation and output the result in the chosen format",
-      ["2_Reachability_analysis"],
+      [reachability,11],
       Normal;
 
       "--compute-local-traces",
       Bool Config.compute_local_traces,
       "Compute the local traces of interesting parts of agent interfaces",
-      ["0_Actions";"3_Trace_analysis"],
+      [actions,8;traces,0],
       Normal;
 
       "--show-rule-names-in-local-traces",
       Bool Config.show_rule_names_in_local_traces,
       "Annotate each transition with the name of the rules in trace abstraction",
-      ["3_Trace_analysis"],
+      [traces,1],
       Normal;
 
       "--use-macrotransitions-in-local-traces",
       Bool Config.use_macrotransitions_in_local_traces,
       "Use macrotransitions to get a compact trace up to change of the interleaving order of commuting microtransitions",
-      ["3_Trace_analysis"],
+      [traces,2],
       Normal;
 
       "--ignore-trivial-losanges",
       Bool Config.do_not_compress_trivial_losanges,
       "Do not use macrotransitions for simplifying trivial losanges",
-      ["3_Trace_analysis"],
+      [traces,3],
       Expert;
 
       "--add-singular-macrostates",
       Bool Config.add_singular_macrostates,
       "Complete the simplicial complexes with singular intersection of higher-dimension faces",
-      ["3_Trace_analysis"],
+      [traces,4],
       Hidden;
 
       "--add-singular-microstates",
       Bool Config.add_singular_microstates,
       "Complete the simplicial complexes with singular intersection of higher-dimension faces",
-      ["3_Trace_analysis"],
+      [traces,5],
       Hidden;
 
       "--compute-separating-transitions",
       Bool Config.compute_separating_transitions,
       "Compute the transitions that separates strongly connected set of configurations",
-      ["0_Actions";"3_Trace_analysis"],
+      [actions,9;traces,6],
       Normal;
 
       "--output-directory",
@@ -218,20 +228,20 @@ let options =
           "--output-local-traces-directory","";
           "--output-log-directory",""],
       "Default repository for outputs",
-      ["1_Output"],
+      [output,0],
       Normal;
 
       (* CONTACT MAP *)
       "--output-contact-map-directory",
       String Config.output_cm_directory,
       "put the contact map file in this directory",
-      ["1_Output";"4_Contact_map"],
+      [output,0;contact_map,2],
       Normal;
 
       "--output-contact-map",
       String Config.contact_map_file,
       "file name for the contact map output",
-      ["1_Output";"4_Contact_map"],
+      [output,1;contact_map,2],
       Normal;
 
       "--contact-map-format",
@@ -239,7 +249,7 @@ let options =
                 (*"HTML","HTML format"*)],[],
                Config.contact_map_format)),
       "Tune the output format for the contact map",
-      ["1_Output";"4_Contact_map"],
+      [output,2;contact_map,3],
       Hidden;
 
       "--contact-map-accuracy-level",
@@ -249,13 +259,13 @@ let options =
           ],[],
           Config.contact_map_accuracy_level)),
       "Tune the accuracy level of the contact map",
-      ["4_Contact_map"],
+      [contact_map,4],
       Expert;
 
       "--pure-contact",
       Bool Config.pure_contact,
       "show in the contact map  only the sites with a binding state",
-      ["4_Contact_map"],
+      [contact_map,5],
       Expert;
 
 
@@ -264,13 +274,13 @@ let options =
       "--output-influence-map-directory",
       String Config.output_im_directory,
       "put the influence map file in this directory",
-      ["1_Output";"5_Influence_map"],
+      [output,3;influence_map,2],
       Normal;
 
       "--output-influence-map",
       String Config.influence_map_file,
       "file name for the influence map",
-      ["1_Output";"5_Influence_map"],
+      [output,3;influence_map,3],
       Normal;
 
       "--influence-map-format",
@@ -281,7 +291,7 @@ let options =
          ],[],
            Config.influence_map_format)),
       "Tune the output format for the influence map",
-      ["1_Output";"5_Influence_map"],
+      [output,4;influence_map,4],
       Normal;
 
 
@@ -290,7 +300,7 @@ let options =
       "--output-local-traces-directory",
       String Config.output_local_trace_directory,
       "put the files about local traces in this directory",
-      ["1_Output";"3_Trace_analysis"],
+      [output,5;traces,7],
       Normal;
 
       "--local-traces-format",
@@ -301,39 +311,39 @@ let options =
           ],[],
           Config.local_trace_format)),
       "Tune the output format for the local transition systems",
-      ["1_Output";"3_Trace_analysis"],
+      [output,6;traces,8],
       Normal;
 
       (* LOG *)
       "--output-log-directory",
       String Config.output_directory,
       "put the log files in this directory",
-      ["1_Output";"7_Debugging_info"],
+      [output,7;debug,0],
       Expert;
       "--debug",
       Bool Config.trace,
       "dump debugging information",
-      ["7_Debugging_info"],
+      [debug,1],
       Expert;
       "--debug-mode",
       Bool Config.trace,
       "dump debugging information",
-      ["7_Debugging_info"],
+      [debug,2],
       Hidden;
       "--debugging-mode",
       Bool Config.trace,
       "dump debugging information",
-      ["7_Debugging_info"],
+      [debug,3],
       Hidden;
       "--unsafe-mode",
       Bool Config.unsafe,
       "exceptions are gathered at the end of the computation, instead of halting it ",
-      ["7_Debugging_info"],
+      [debug,4],
       Expert;
       "--print-efficiency",
       Bool Config.print_efficiency,
       "prompt CPU time and various datas",
-      ["7_Debugging_info"],
+      [debug,5],
       Expert;
     ]
 

@@ -8,11 +8,27 @@
    Copyright (C) Antoine Mine' 2006
  *)
 
-module StringSetMap  = Mods.StringSetMap
-module StringMap = StringSetMap.Map
+module StringInt =
+struct
+  type t = string * int
+  let compare (a,b) (c,d) =
+    let cmp = compare b d in
+    if cmp=0
+    then compare a c
+    else cmp
+  let print fmt (a,b) = Format.fprintf fmt "%s:%i" a b
+end
+
+module StringIntSetMap  = SetMap.Make(StringInt)
+module StringIntMap = StringIntSetMap.Map
+module StringIntSet = StringIntSetMap.Set
+
+module StringSetMap = Mods.StringSetMap
 module StringSet = StringSetMap.Set
+module StringMap = StringSetMap.Map
 
 let tk = "(with Tk interface)"
+
 
 let expert_mode = ref false  (* shows expert options *)
 let dev_mode = ref false    (* accept _ALL_ options *)
@@ -39,7 +55,8 @@ let min_level a b =
   | Developper,_ | _,Developper -> Developper
   | Hidden,Hidden -> Hidden
 
-type category = string
+type position = int
+type category = string * position
 
 type spec =
   | Void                                  (* To skip a line *)
@@ -68,7 +85,7 @@ type spec =
   | MultiExt of (key*string) list
 
 
-type t = (key * spec * msg * category list * level) list
+type t = (key * spec * msg * (category * position) list * level) list
 
 
 (* Utilities *)
@@ -124,21 +141,32 @@ let cut_list (s:string) : string list =
 
 (* order by category *)
 let error = Exception.empty_error_handler
+let p (_,_,_,l,_) (_,_,_,l',_) =
+  match l,l' with
+    [_,i],[_,i'] -> compare i i'
+  | ([] | _::_::_),_
+  | _,([] | _::_::_) -> assert false
 let order (a:t) =
-  let ordered = ref StringMap.empty in
+  let ordered = ref StringIntMap.empty in
   List.iter
     (fun (a,b,c,cat,lvl) ->
        if accept_level_display lvl then
          List.iter
-           (fun cat ->
+           (fun (cat,i) ->
               let asso,old_lvl =
-                StringMap.find_default ([],Hidden) cat !ordered in
+                 StringIntMap.find_default ([],Hidden) cat !ordered in
               ordered :=
-                StringMap.add
-                  cat (((a,b,c,[cat],lvl)::asso), (min_level lvl old_lvl)) (!ordered)
+                StringIntMap.add
+                  cat (((a,b,c,[cat,i],lvl)::asso), (min_level lvl old_lvl)) (!ordered)
            )
            cat)
     a;
+  ordered :=
+  (StringIntMap.map
+     (fun (a,b) ->
+        List.sort p a,
+        b)
+     !ordered);
   !ordered
 
 (* sanity checking *)
@@ -262,8 +290,8 @@ let print_help (header:bool) (verbose:bool) f (a:t) =
   if verbose && header then Format.fprintf f "@.";
 
   (* dump *)
-  StringMap.iter
-    (fun cat (l,lvl) ->
+  StringIntMap.iter
+    (fun (cat,_) (l,lvl) ->
        if
          show_level lvl
        then
