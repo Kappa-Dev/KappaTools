@@ -27,9 +27,9 @@
 
     Null() -> Ga() , Null()     @'k1'
     Ga() -> Ga() , Ga()         @'k2'
-    Ga() , PLC() -> PLC()       @'k3'/('K4'+'G')      #Sat(k3,K4)
-    Ga() , Ca() -> Ca()         @'k5'/('K6'+'G')      #Sat(k5,K6)
+    Ga() , PLC() -> PLC()       @'k3'/('K4'+|Ga()|)      #Sat(k3,K4)
+    Ga() , Ca() -> Ca()         @'k5'/('K6'+|Ga()|)      #Sat(k5,K6)
     Ga() -> PLC() , Ga()        @'k7'
-    PLC() , Null() -> Null()    @'k8'/('K9'+'P')      #Sat(k8,K9)
+    PLC() , Null() -> Null()    @'k8'/('K9'+|PLC()|)      #Sat(k8,K9)
     Ga() -> Ca() , Ga()         @'k10'
-    Ca() , Null() -> Null()     @'k11'/('K12'+'C')    #Sat(k11,K12)
+    Ca() , Null() -> Null()     @'k11'/('K12'+|Ca()|)    #Sat(k11,K12)

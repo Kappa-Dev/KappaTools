@@ -2,7 +2,7 @@ begin model
 begin parameters
     Na    6.022e23      # Avogadro's # [mol^-1]
     V     1e-21         # Volume [L]
-    #    
+    #
     k1    0.212*Na*V    # [M s^-1]
     k2     2.85         # [s^-1]
     k3     1.52         # [s^-1]
@@ -23,9 +23,9 @@ end parameters
 
 begin molecule types
     Null()
-    Ga() 
+    Ga()
     PLC()
-    Ca() 
+    Ca()
 end molecule types
 
 begin species
@@ -35,7 +35,7 @@ begin species
     Ca()      Ca_0
 end species
 
-begin observables 
+begin observables
     Molecules    G       Ga()
     Molecules    P       PLC()
     Molecules    C       Ca()
