@@ -6,6 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let data_set = "Data set",0
+let output = "Output",1
+let semantics = "Semantics",2
+let integration_settings = "Integration settings",3
+let model_reduction = "Model reduction",4
+let static_analysis = "Static analysis" , 5
+let debug_mode = "Debug mode",6
+
 type t = { mutable backtrace           : bool ;
 	   mutable debug               : bool ;
 	   mutable timeIndependent     : bool }
@@ -59,7 +67,8 @@ let copy_from_gui t_gui t =
   t.debug <- t_tmp.debug;
   t.timeIndependent <- t_tmp.timeIndependent
 
-let options_gen t t_gui : (string * Arg.spec * Superarg.spec * string * string list * Superarg.level) list = [
+let options_gen t t_gui : (string * Arg.spec * Superarg.spec * string *
+                           (Superarg.category * Superarg.position) list * Superarg.level) list = [
     ("--version",
      Arg.Unit do_version,
      Superarg.Bool t_gui.version_gui,
@@ -68,21 +77,21 @@ let options_gen t t_gui : (string * Arg.spec * Superarg.spec * string * string l
     ("--debug", Arg.Unit (fun () -> t.debug <- true),
      Superarg.Bool t_gui.debug_gui,
      "Enable debug mode",
-     ["6_debug_mode"],Superarg.Expert) ;
+     [debug_mode,1],Superarg.Expert) ;
     ("--backtrace", Arg.Unit (fun () -> t.backtrace <- true),
      Superarg.Bool t_gui.backtrace_gui,
      "Backtracing exceptions",
-    ["6_debug_mode"],Superarg.Expert) ;
+     [debug_mode,2],Superarg.Expert) ;
     ("--gluttony",
      Arg.Unit do_gluttony,
      Superarg.Bool t_gui.gluttony_gui,
      "Lower gc activity for a faster but memory intensive simulation",
-     ["6_debug_mode"],Superarg.Expert) ;
+     [debug_mode,3],Superarg.Expert) ;
     ("--time-independent",
      Arg.Unit (fun () -> t.timeIndependent <- true),
      Superarg.Bool t_gui.timeIndependent_gui,
      "Disable the use of time is story heuritics (for test suite)",
-    ["6_debug_mode"],Superarg.Hidden;)
+     [debug_mode,4],Superarg.Hidden;)
 ]
 
 let options t =

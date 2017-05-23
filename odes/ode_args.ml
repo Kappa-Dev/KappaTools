@@ -63,9 +63,31 @@ let default : t =
     max_size_for_species = ref None ;
   }
 
+let combine l1 l2 =
+  List.fold_left
+    (fun list a1 ->
+       List.fold_left
+         (fun list (a2:int) ->
+            (a1,a2)::list)
+         list l2)
+    [] l1
+
+
 let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
-                       Superarg.category list * Superarg.level) list =
-   [
+                       (Superarg.category * Superarg.position) list * Superarg.level) list =
+  [
+    "--void",Superarg.Void,"",
+    combine
+      [Common_args.data_set;
+       Common_args.output;
+       Common_args.semantics;
+       Common_args.integration_settings;
+       Common_args.model_reduction;
+       Common_args.static_analysis;
+       Common_args.debug_mode]
+      [50;51;52],
+    Normal;
+
   "--output",
   Superarg.MultiExt
     ["--dotnet-output",".net";
@@ -75,7 +97,13 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
      "--octave-output",".m";
      "--sbml-output",".xml"],
   "Prefix for file name output",
-  ["0_data_set";"1_output";"2_semantics";"3_integration_settings";"4_model_reduction";"5_static_analysis";"6_debug_mode"],Normal;
+  [Common_args.data_set,101;
+   Common_args.output,101;
+   Common_args.semantics,101;
+   Common_args.integration_settings,101;
+   Common_args.model_reduction,101;
+   Common_args.static_analysis,101;
+   Common_args.debug_mode,101],Normal;
   "--ode-backend",
   Superarg.Choice (
     [ "dotnet", "dotnet (BNGL) backend";
@@ -86,39 +114,39 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
       "sbml", "sbml backend"],
     ["Dotnet";"DOTNET";"Octave";"OCTAVE";"Matlab";"MATLAB";"Mathematica";"MATHEMATICA";"Maple";"MAPLE";"Sbml";"SBML"],t.backend),
   "Select the backend format",
-  ["1_output"],Normal;
+  [Common_args.output,1],Normal;
   "--dotnet-output",
   Superarg.String_opt t.dotnet_output,
   "ODEs file for dotnet backend",
-  ["1_output"],Hidden;
+  [Common_args.output,2],Hidden;
   "--maple-output",
   Superarg.String_opt t.maple_output,
   "ODEs file for maple backend",
-  ["1_output"],Hidden;
+  [Common_args.output,3],Hidden;
   "--mathematica-output",
   Superarg.String_opt t.mathematica_output,
   "ODEs file for mathematica backend",
-  ["1_output"],Hidden;
+  [Common_args.output,4],Hidden;
   "--matlab-output",
   Superarg.String_opt t.matlab_output,
   "ODEs file for matlab backend",
-  ["1_output"],Hidden;
+  [Common_args.output,5],Hidden;
   "--octave-output",
   Superarg.String_opt t.octave_output,
   "ODEs file for octave backend",
-  ["1_output"],Hidden;
+  [Common_args.output,6],Hidden;
   "--sbml-output",
   Superarg.String_opt t.sbml_output,
   "ODEs file for sbml backend",
-  ["1_output"],Hidden;
+  [Common_args.output,7],Hidden;
   "--propagate-constants",
   Superarg.Bool t.propagate_constants,
   "propagate constants",
-  ["1_output"],Hidden;
+  [Common_args.output,8],Hidden;
   "--constant-propagation",
   Superarg.Bool t.propagate_constants,
   "propagate constants",
-  ["1_output"],Normal;
+  [Common_args.output,9],Normal;
   "--rate-convention",
   Superarg.Choice (
     [ "KaSim","do not divide by anything";
@@ -126,34 +154,34 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
       "Biochemist","divide by the number of autos in the lhs of rules that induce an auto also in the rhs"],
     ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rate_convention),
     "convention for dividing constant rates",
-    ["2_semantics"],Normal;
+    [Common_args.semantics,1],Normal;
   "--count",
   Superarg.Choice (
     [ "Embeddings","count the number of embeddings of patterns into species";
       "Occurrences","count the number of occurrences of species"],
     ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
     "tune whether we cound in embeddings or in occurrences",
-  ["2_semantics"],Normal;
+  [Common_args.semantics,2],Normal;
   "--truncate",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
-  ["2_semantics"],Normal;
+  [Common_args.semantics,3],Normal;
   "--max-size-for-species",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
-  ["2_semantics"],Hidden;
+  [Common_args.semantics,4],Hidden;
   "--show-reactions",
   Superarg.Bool t.show_reactions,
     "Annotate ODEs by the corresponding chemical reactions",
-    ["1_output"],Normal ;
+    [Common_args.output,10],Normal ;
   "--smash-reactions",
   Superarg.Bool t.smash_reactions,
   "Gather identical reactions in the ODEs",
-  ["1_output";"3_integration_settings"],Normal ;
+  [Common_args.output,11;Common_args.integration_settings,1],Normal ;
   "--compute-jacobian",
   Superarg.Bool t.compute_jacobian,
   "Enable/disable the computation of the Jacobian of the ODEs \n\t (not available yet)",
-  ["3_integration_settings"],Normal  ;
+  [Common_args.integration_settings,2],Normal  ;
   "--with-symmetries",
   Superarg.Choice (
     ["None", "no symmetries reduction";
@@ -162,51 +190,52 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     ["none";"NONE";"BACKWARD";"backward";"forward";"FORWARD";"true";"TRUE";"True";"false";"FALSE";"False"],
     t.with_symmetries),
     "Tune which kind of bisimulation is used to reduce the set of species",
-    ["2_semantics";"4_model_reduction"],Normal;
+    [Common_args.semantics,5;Common_args.model_reduction,1],Normal;
   "--show-symmetries",
   Superarg.Bool t.show_symmetries,
   "Display the equivalence relations over the sites",
-    ["4_model_reduction"],Normal;
+    [Common_args.model_reduction,2],Normal;
     "--views-domain",
   Superarg.Bool t.views,
     "Enable/disable views analysis when detecting symmetric sites",
-    ["5_static_analysis"],Expert    ;
+    [Common_args.static_analysis,1],Expert    ;
   "--double-bonds-domain",
   Superarg.Bool t.dbonds,
   "Enable/disable double bonds analysis when detecting symmetric sites",
-  ["5_static_analysis"],Expert   ;
+  [Common_args.static_analysis,2],Expert   ;
   "--site-across-bonds-domain",
   Superarg.Bool t.site_across ,
   "Enable/disable the analysis of the relation amond the states of sites in
-      connected agents",  ["5_static_analysis"],Expert    ;
+      connected agents",
+  [Common_args.static_analysis,3],Expert    ;
   "--nonnegative",
   Superarg.Bool t.nonnegative,
   "Enable/disable the correction of negative concentrations in stiff ODE systems",
-  ["3_integration_settings"],Normal;
+  [Common_args.integration_settings,3],Normal;
   "--show-time-advance",
   Superarg.Bool t.show_time_advance,
   "Display time advance during numerical integration",
-  ["6_debug_mode"],Expert;
+  [Common_args.debug_mode,1],Expert;
   "--initial-step",
   Superarg.Float t.initial_step,
   "Initial integration step",
-  ["3_integration_settings"],Normal ;
+  [Common_args.integration_settings,4],Normal ;
   "--max-step",
   Superarg.Float t.max_step,
   "Maximum integration step",
-  ["3_integration_settings"],Normal;
+  [Common_args.integration_settings,5],Normal;
   "--relative-tolerance",
   Superarg.Float t.relative_tolerance,
   "tolerance to relative rounding errors",
-  ["3_integration_settings"],Normal;
+  [Common_args.integration_settings,6],Normal;
   "--absolute-tolerance",
   Superarg.Float t.absolute_tolerance,
   "tolerance to absolute rounding errors",
-  ["3_integration_settings"],Normal;
+  [Common_args.integration_settings,7],Normal;
   "--print-efficiency",
   Superarg.Bool t.print_efficiency,
   "prompt CPU time and various datas",
-  ["6_debug_mode"],Expert;
+  [Common_args.debug_mode,2],Expert;
 ]
 
 let get_option options =
