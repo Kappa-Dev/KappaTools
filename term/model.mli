@@ -15,8 +15,9 @@ val init :
   Alg_expr.t Locality.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ((string Locality.annot option * (LKappa.rule_agent) LKappa.rule Locality.annot) array *
-     Primitives.elementary_rule array * Pattern.Set.t) ->
+  ((string Locality.annot option *
+    (LKappa.rule_agent) LKappa.rule Locality.annot) array *
+   Primitives.elementary_rule array) ->
   Alg_expr.t Locality.annot array -> Primitives.perturbation array ->
   Contact_map.t -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]

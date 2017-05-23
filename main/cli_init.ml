@@ -7,8 +7,11 @@
 (******************************************************************************)
 
 type preprocessed_ast =
-  Configuration.t * Counter.progressBar * (bool * bool * bool) * string * string option * Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t * int list *  (Ast.agent, LKappa.rule_agent list, int, LKappa.rule, unit) Ast.compil * (LKappa.rule_mixture, int) Ast.init_statment list option *
-  float option
+  Configuration.t * Counter.progressBar * (bool * bool * bool) * string *
+  string option * Signature.s * Contact_map.t * unit NamedDecls.t *
+  int Mods.StringMap.t * int list *
+  (Ast.agent, LKappa.rule_agent list, int, LKappa.rule_agent LKappa.rule, unit) Ast.compil *
+  (LKappa.rule_mixture, int) Ast.init_statment list option * float option
 
 let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
   let () = Format.printf "+ simulation parameters@." in
