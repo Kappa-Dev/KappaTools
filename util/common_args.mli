@@ -6,6 +6,14 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+val data_set: string * int
+val output: string * int
+val semantics: string * int
+val integration_settings: string * int
+val model_reduction: string * int
+val static_analysis: string * int
+val debug_mode: string * int 
+
 type t = { mutable backtrace           : bool ;
 	   mutable debug               : bool;
 	   mutable timeIndependent     : bool }
@@ -18,6 +26,6 @@ val default_gui : t_gui
 val options : t -> (string * Arg.spec * string) list
 val options_gui :
   t_gui ->
-  (string * Superarg.spec * string * string list * Superarg.level) list
+  (string * Superarg.spec * string * (Superarg.category * Superarg.position)  list * Superarg.level) list
 
 val copy_from_gui: t_gui -> t -> unit
