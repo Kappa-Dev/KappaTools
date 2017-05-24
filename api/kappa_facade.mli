@@ -60,6 +60,8 @@ val efficiency : t -> Counter.Efficiency.t
 
 val get_raw_trace : t -> string
 
+val get_raw_ast : t -> string
+
 val get_contact_map : t -> Api_types_j.site_node array
 
 val get_dead_rules : t -> string list

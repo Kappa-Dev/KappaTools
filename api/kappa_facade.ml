@@ -76,36 +76,32 @@ type t =
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
     mutable trace : Trace.t ;
+    ast : Ast.parsing_compil;
     contact_map : Contact_map.t ;
     mutable env : Model.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     mutable lastyield : float ;
-    mutable kasa_state : KaSa.state
+    mutable kasa_state : KaSa.state;
   }
 
 let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
-    ~state
-    ~init_l
-    ~lastyield
-    ~kasa_state
-  : t =
-  {
-    is_running = false; run_finalize = false; counter; log_buffer; log_form;
-    pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
-    new_syntax;
-    plot = { Api_types_j.plot_legend = [] ;
-             Api_types_j.plot_time_series = [] ; } ;
-    snapshots = [];
-    flux_maps = [];
-    files = [];
-    error_messages = [];
-    trace = [];
-    contact_map; env; graph; state; init_l;
-    lastyield; kasa_state;
-  }
+    ~state ~init_l ~lastyield ~ast ~kasa_state : t = {
+  is_running = false; run_finalize = false; counter; log_buffer; log_form;
+  pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
+  new_syntax;
+  plot = { Api_types_j.plot_legend = [] ;
+           Api_types_j.plot_time_series = [] ; } ;
+  snapshots = [];
+  flux_maps = [];
+  files = [];
+  error_messages = [];
+  trace = [];
+  ast; contact_map; env; graph; state; init_l;
+  lastyield; kasa_state;
+}
 
 let reinitialize random_state t =
   let () = Counter.reinitialize t.counter in
@@ -133,7 +129,7 @@ let clone_t t =
     ~new_syntax:t.new_syntax
     ~maxConsecutiveClash:t.maxConsecutiveClash
     ~dumpIfDeadlocked:t.dumpIfDeadlocked
-    ~env:t.env
+    ~ast:t.ast ~env:t.env
     ~counter:t.counter (* FALSE imperatively modified *)
     ~graph:t.graph (* FALSE imperatively modified *)
     ~state:t.state (* FALSE imperatively modified *)
@@ -192,11 +188,11 @@ let rec compile_file
 let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
-  let post_parse compil =
+  let post_parse ast =
     let (conf,_,_,_,_) =
-      Configuration.parse compil.Ast.configurations in
+      Configuration.parse ast.Ast.configurations in
     let new_syntax = conf.Configuration.newSyntax in
-    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] compil) >>=
+    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -240,7 +236,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                 | Some theSeed -> Random.State.make [|theSeed|] in
               let simulation =
                 create_t
-                  ~contact_map ~log_form ~log_buffer  ~env ~counter
+                  ~contact_map ~log_form ~log_buffer ~ast ~env ~counter
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
                   ~new_syntax
@@ -249,7 +245,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                             random_state env counter)
                   ~state:(State_interpreter.empty ~with_delta_activities:false env [])
                   ~init_l ~lastyield
-                  ~kasa_state:(KaSa.init ~compil
+                  ~kasa_state:(KaSa.init ~compil:ast
                                  ~called_from:Remanent_parameters_sig.Server ())
               in
               Lwt.return (Result_util.ok simulation))
@@ -612,6 +608,9 @@ let get_raw_trace t =
         "env", Model.to_yojson t.env;
         "trace", `List (List.rev_map Trace.step_to_yojson t.trace);
       ])
+
+let get_raw_ast t =
+  Yojson.Basic.to_string (Ast.compil_to_json t.ast)
 
 let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map

@@ -63,9 +63,11 @@ type site_node = {
 
 type site_graph = site_node list <ocaml repr="array">
 type contact_map = site_graph
-type project_parse = { project_parse_contact_map  : contact_map <json name="contact_map"> ;
-                       project_parse_project_version : project_version <json name="project_version"> ;
-                     }
+type project_parse = {
+  project_parse_contact_map  : contact_map <json name="contact_map">;
+  project_parse_project_version : project_version <json name="project_version">;
+  project_parse_raw_ast : string <json name="boxed_ast">;
+}
 type kappa_code = string
 type simulation_seed = int
 

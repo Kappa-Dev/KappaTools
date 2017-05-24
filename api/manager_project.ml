@@ -86,10 +86,12 @@ object
               (Result_util.map
                  ~ok:(fun kappa_facade ->
                      Api_common.result_ok
-                       { Api_types_j.project_parse_contact_map =
+                       { Api_types_t.project_parse_contact_map =
                            Kappa_facade.get_contact_map kappa_facade;
-                         Api_types_j.project_parse_project_version =
+                         Api_types_t.project_parse_project_version =
                            project#get_version ();
+                         Api_types_t.project_parse_raw_ast =
+                           Kappa_facade.get_raw_ast kappa_facade;
                        })
                  ~error:(fun error -> Api_common.result_messages error)
                  state
