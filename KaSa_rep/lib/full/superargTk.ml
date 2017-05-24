@@ -198,7 +198,7 @@ let cmd_of_widget (a:Superarg.t) short =
 
       | Not_found -> accum
       | Failure f -> failwith ("Invalid argument type for option "^key^" in "^(
-          List.fold_left (fun sol ((x,_),_) -> sol^" "^x) "" cat)^": "^f)
+          List.fold_left (fun sol ((x,_,_),_) -> sol^" "^x) "" cat)^": "^f)
     ) [] (List.rev a)
 
 
@@ -373,7 +373,7 @@ class pager bparent fparent =
 
 
     (* gets a page (create if non existing) *)
-    method get_page name (lvl:Superarg.level) : Widget.frame Widget.widget =
+    method get_page name (lvl:Superarg.level): Widget.frame Widget.widget =
       try let _,p,_ = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) name !pages) (fun _ -> raise Not_found)) in p
       with Not_found ->
 	if !barsize/maxbarwidth <> (!barsize+String.length name)/maxbarwidth
@@ -408,7 +408,8 @@ let build_spec (a:Superarg.t) bparent fparent =
               (lvl:Superarg.level))
           ->
           List.iter
-            (fun (((cat:string),_),_) ->
+            (fun (((cat:string),_,lvl_opt),_) ->
+               let cat_lvl = Superarg.max_level_opt cat_lvl lvl_opt in 
                widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl))
             cat)
         l )
