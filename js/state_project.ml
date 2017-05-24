@@ -97,6 +97,8 @@ let update_state
     me.project_manager#project_parse project_id >>=
     (Api_common.result_map
        ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
+           me.project_manager#init_static_analyser_raw
+             project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
              set_state {
                project_current = Some me;
@@ -106,7 +108,7 @@ let update_state
                project_version =
                  project_parse.Api_types_j.project_parse_project_version ;
              } in
-           Lwt.return (Api_common.result_ok ()))
+           Lwt.return (Api_common.result_lift out))
        ~error:(fun _ errors ->
            let () = set_state {
                project_current = Some me ;
@@ -182,13 +184,16 @@ let sync () : unit Api.result Lwt.t =
     current.project_manager#project_parse current.project_id >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (project_parse : Api_types_j.project_parse) ->
+           current.project_manager#init_static_analyser_raw
+             project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
-             set_state { (React.S.value state) with
-                         project_version =
-                           project_parse.Api_types_j.project_parse_project_version;
-                         project_contact_map =
-                           Some project_parse.Api_types_j.project_parse_contact_map; } in
-           Lwt.return (Api_common.result_ok ())))
+             set_state {
+               (React.S.value state) with
+               project_version =
+                 project_parse.Api_types_j.project_parse_project_version;
+               project_contact_map =
+                 Some project_parse.Api_types_j.project_parse_contact_map; } in
+           Lwt.return (Api_common.result_lift out)))
 
 let remove_simulations manager project_id =
   manager#simulation_delete project_id
@@ -310,7 +315,7 @@ let init existing_projects : unit Lwt.t =
 
 let with_project :
   'a . label:string ->
-  (Api.manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) ->
+  (Api.concrete_manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t  =
   fun ~label handler ->
     match (React.S.value state).project_current with
@@ -321,4 +326,4 @@ let with_project :
           label in
       Lwt.return (Api_common.result_error_msg error_msg)
     | Some current ->
-      handler (current.project_manager :> Api.manager) current.project_id
+      handler current.project_manager current.project_id

@@ -38,26 +38,6 @@ object
          Lwt.return (Api_common.result_ok (to_project project))
       )
 
-  method project_dead_rules project_id =
-    Api_common.ProjectOperations.bind
-      project_id
-      environment
-      (fun (project : Api_environment.project) ->
-         project#get_state () >>= function
-         | Some x ->
-           Lwt.return
-             (Result_util.map
-                ~ok:(fun kappa_facade ->
-                    Api_common.result_ok
-                      (Kappa_facade.get_dead_rules kappa_facade))
-                ~error:(fun error -> Api_common.result_messages error)
-                x)
-         | None ->
-           Lwt.return
-             (Api_common.result_error_msg
-                "No dead rules available before parse")
-      )
-
   method project_parse (project_id : Api_types_j.project_id) :
     Api_types_j.project_parse Api.result Lwt.t =
     Api_common.ProjectOperations.bind

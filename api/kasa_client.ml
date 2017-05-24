@@ -24,26 +24,32 @@ let receive x =
     let out = reply_of_string x in
     let () = Lwt.wakeup t out in mailbox := None
 
-let message post request =
+let raw_message post request =
   match !mailbox with
   | None ->
     let result,feeder = Lwt.task () in
-    let () = post (Yojson.Basic.to_string request) in
+    let () = post request in
     let () = mailbox := Some feeder in
     result
   | Some _ ->
     Lwt.return_error "KaSa agent already busy"
 
+let message post request =
+  raw_message post (Yojson.Basic.to_string request)
+
 class new_client ~post =
-  object
-    method init_static_analyser compil =
-      let request = `List [ `String "INIT"; Ast.compil_to_json compil ] in
+  object(self)
+    method init_static_analyser_raw compil =
       Lwt_result.bind_result
-        (message post request)
+        (raw_message post ("[ \"INIT\", "^compil^"]"))
         (function `Null -> Result.Ok ()
                 | x -> Result.Error
                          ("Not a KaSa INIT response: "^
                           Yojson.Basic.to_string x))
+    method init_static_analyser compil =
+      self#init_static_analyser_raw
+        (Yojson.Basic.to_string (Ast.compil_to_json compil))
+
     method get_contact_map accuracy =
       let request =
         `List ( `String "CONTACT_MAP" :: match accuracy with

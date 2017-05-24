@@ -21,6 +21,14 @@ let gState =
   let compil = Ast.empty_compil in
   ref (init ~compil ~called_from:Remanent_parameters_sig.Server ())
 
+let send_exception post e =
+  let reply =
+    `Assoc [
+      "code", `String "ERROR";
+      "data", `String (Printexc.to_string e);
+    ] in
+  post (Yojson.Basic.to_string reply)
+
 let send_response post x =
   let reply =
     if false (*TODO: there_are_errors_in !gState*)
@@ -34,10 +42,12 @@ let send_response post x =
 let on_message post text =
   match Yojson.Basic.from_string text with
   | `List [ `String "INIT"; compil ] ->
-    let compil = Ast.compil_of_json compil in
-    let () = gState :=
-        init ~compil ~called_from:Remanent_parameters_sig.Server () in
-    send_response post `Null
+    (try
+       let compil = Ast.compil_of_json compil in
+       let () = gState :=
+           init ~compil ~called_from:Remanent_parameters_sig.Server () in
+       send_response post `Null
+     with e -> send_exception post e)
   | `List [ `String "CONTACT_MAP"; acc ] ->
     let accuracy_level = Remanent_state.accuracy_of_json acc in
     let state, cm = get_contact_map ~accuracy_level !gState in

@@ -58,9 +58,6 @@ let on_message
   |  `ProjectParse project_id ->
     (manager#project_parse project_id) >>=
     (handler (fun result -> `ProjectParse result))
-  |  `ProjectDeadRules project_id ->
-    (manager#project_dead_rules project_id) >>=
-    (handler (fun result -> `ProjectDeadRules result))
   | `SimulationContinue (project_id,simulation_parameter) ->
     (manager#simulation_continue project_id simulation_parameter) >>=
     (handler (fun result -> `SimulationContinue result))
@@ -248,18 +245,6 @@ class virtual  manager_base () : manager_base_type =
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
-
-    method project_dead_rules (project_id : Api_types_j.project_id) =
-      self#message (`ProjectDeadRules project_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectDeadRules result ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
 
     method project_delete
         (project_id : Api_types_j.project_id) :

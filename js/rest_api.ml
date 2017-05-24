@@ -56,7 +56,7 @@ let send
 class manager
     ?(timeout:float = 30.0)
     (url:string) =
-  object
+  object(self)
   method message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
@@ -125,15 +125,6 @@ class manager
         `GET
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
-    | `ProjectDeadRules project_id ->
-      send
-        (Format.sprintf "%s/v2/projects/%s/dead_rules" url project_id)
-        `GET
-        (fun s ->
-             (`ProjectDeadRules
-                (Yojson.Safe.read_list
-                   Yojson.Safe.read_string
-                   (Yojson.Safe.init_lexer ()) (Lexing.from_string s))))
     | `ProjectGet project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s" url project_id)
@@ -330,11 +321,10 @@ class manager
   inherit Mpi_api.manager_base ()
   method terminate () = () (*TODO*)
 
-  method init_static_analyser compil =
+  method init_static_analyser_raw data =
     send
       (Format.sprintf "%s/v2/analyses" url)
-      `PUT
-      ~data:(Yojson.Basic.to_string (Ast.compil_to_json compil))
+      `PUT ~data
       (fun x ->
          match Yojson.Basic.from_string x with
          | `Null -> ()
@@ -346,6 +336,10 @@ class manager
       ~error:(fun _ -> function
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
+
+  method init_static_analyser compil =
+    self#init_static_analyser_raw
+      (Yojson.Basic.to_string (Ast.compil_to_json compil))
 
   method get_contact_map accuracy =
     send

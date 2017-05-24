@@ -60,7 +60,8 @@ let model : model React.signal = state
 
 let with_simulation :
   'a . label:string ->
-  (Api.manager -> Api_types_j.project_id -> t -> 'a  Api.result Lwt.t) ->
+  (Api.concrete_manager -> Api_types_j.project_id ->
+   t -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t  =
   fun ~label handler ->
     let project_handler manager project_id =
@@ -72,15 +73,15 @@ let fail_lwt error_msg = Lwt.return (Api_common.result_error_msg error_msg)
 
 let with_simulation_info
   ~(label : string)
-  ?(stopped : Api.manager ->
+  ?(stopped : Api.concrete_manager ->
     Api_types_j.project_id ->
     unit Api.result Lwt.t =
     fun _ _ -> fail_lwt "Simulation stopped")
-  ?(initializing : Api.manager ->
+  ?(initializing : Api.concrete_manager ->
     Api_types_j.project_id ->
     unit Api.result Lwt.t =
     fun _ _ -> fail_lwt "Simulation initalizing")
-  ?(ready : Api.manager ->
+  ?(ready : Api.concrete_manager ->
     Api_types_j.project_id ->
     Api_types_j.simulation_info ->
     unit Api.result Lwt.t =
@@ -88,7 +89,7 @@ let with_simulation_info
   () =
   with_simulation
   ~label
-  (fun (manager : Api.manager) (project_id : Api_types_j.project_id) s ->
+  (fun manager (project_id : Api_types_j.project_id) s ->
      match s.simulation_state with
      | SIMULATION_STATE_STOPPED -> stopped manager project_id
      | SIMULATION_STATE_INITALIZING -> initializing manager project_id
@@ -98,7 +99,8 @@ let with_simulation_info
 let when_ready
     ~(label : string)
     ?(handler : unit Api.result -> unit Lwt.t = fun _ -> Lwt.return_unit)
-    (operation : Api.manager -> Api_types_j.project_id -> unit Api.result Lwt.t) : unit =
+    (operation : Api.concrete_manager -> Api_types_j.project_id ->
+     unit Api.result Lwt.t) : unit =
     Common.async
       (fun () ->
          with_simulation_info
@@ -172,11 +174,7 @@ let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun
-        (manager : Api.manager)
-        (project_id : Api_types_j.project_id)
-        _
-        ->
+      (fun manager (project_id : Api_types_j.project_id) _ ->
           manager#simulation_continue
           project_id
           simulation_parameter
@@ -200,11 +198,9 @@ let pause_simulation () : unit Api.result Lwt.t =
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun
-        (manager : Api.manager)
-        (project_id : Api_types_j.project_id)
+      (fun manager (project_id : Api_types_j.project_id)
         (_ : Api_types_j.simulation_info) ->
-          manager#simulation_pause project_id)
+        manager#simulation_pause project_id)
     ()
 
 let stop_simulation () : unit Api.result Lwt.t =
@@ -223,9 +219,7 @@ let stop_simulation () : unit Api.result Lwt.t =
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun
-        (manager : Api.manager)
-        (project_id : Api_types_j.project_id)
+      (fun manager (project_id : Api_types_j.project_id)
         (_ : Api_types_j.simulation_info)
         ->
           manager#simulation_delete project_id >>=
@@ -238,8 +232,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
   with_simulation_info
     ~label:"start_simulation"
     ~stopped:
-      (fun
-        (manager : Api.manager)
+      (fun manager
         (project_id : Api_types_j.project_id) ->
         let on_error (error_msgs : Api_types_j.errors) : unit Api.result Lwt.t =
           let () =
@@ -314,9 +307,7 @@ let perturb_simulation (code : string) : unit Api.result Lwt.t =
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun
-        (manager : Api.manager)
-        (project_id : Api_types_j.project_id)
+      (fun manager (project_id : Api_types_j.project_id)
         _ ->
         manager#simulation_perturbation
           project_id

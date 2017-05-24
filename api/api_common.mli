@@ -26,6 +26,8 @@ val result_fold_lwt :
   id:('a_ok, 'a_code) Api_types_j.result ->
   'value list -> ('a_ok, 'a_code) Api_types_j.result Lwt.t
 val result_combine : unit Api.result list -> unit Api.result
+val result_lift : ('a,string) Result.result -> 'a Api.result
+
 val md5sum : string -> string
 module type COLLECTION_TYPE =
 sig

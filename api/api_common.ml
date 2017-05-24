@@ -115,6 +115,9 @@ let rec result_combine : unit Api.result list -> unit Api.result =
         )
       l
 
+let result_lift = function
+  | Result.Ok o -> result_ok o
+  | Result.Error e -> result_error_msg e
 
 let md5sum text = Digest.to_hex (Digest.string text)
 

@@ -20,26 +20,23 @@ let content () =
       (fun _ ->
          State_project.with_project
            ~label:__LOC__
-           (fun manager project_id ->
-                (manager#project_dead_rules project_id)
-                >>=
-                (Api_common.result_bind_lwt
-                   ~ok:(fun rule_ids ->
-                       let () = ReactiveData.RList.set set_dead_rules
-                           (List.rev_map
-                              (fun x ->
-                                 Html.p [Html.pcdata x])
-                              rule_ids) in
-                       Lwt.return (Api_common.result_ok ()))
-                )
-             )
+           (fun (manager : Api.concrete_manager) _project_id ->
+              (Lwt_result.map
+                 (fun dead_json ->
+                    let () = ReactiveData.RList.set set_dead_rules
+                        [ Html.p [Html.pcdata
+                                    (Yojson.Basic.to_string dead_json) ] ] in
+                    ())
+                 manager#get_dead_rules) >>=
+              fun out -> Lwt.return (Api_common.result_lift out)
+           )
       )
       (React.S.on tab_is_active
          State_project.dummy_model State_project.model) in
-    [ Tyxml_js.R.Html5.div
+  [ Tyxml_js.R.Html5.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
       dead_rules
-    ]
+  ]
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active

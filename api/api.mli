@@ -22,8 +22,6 @@ class type manager_project =
       Api_types_j.project_id -> Api_types_j.project result Lwt.t
     method project_parse :
       Api_types_j.project_id -> Api_types_j.project_parse result Lwt.t
-    method project_dead_rules :
-      Api_types_j.project_id -> string list result Lwt.t
     method project_create :
       Api_types_j.project_parameter -> unit result Lwt.t
     method project_delete :
@@ -162,6 +160,8 @@ class type manager_static_analysis =
   object
     method init_static_analyser :
       Ast.parsing_compil -> (unit, string) Lwt_result.t
+    method init_static_analyser_raw :
+      string -> (unit, string) Lwt_result.t
     method get_contact_map :
       Remanent_state.accuracy_level option ->
       (Yojson.Basic.json,string) Lwt_result.t

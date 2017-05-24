@@ -450,7 +450,7 @@ let rule_to_json f_mix f_var r =
   ]
 
 let rule_of_json f_mix f_var = function
-  | `Assoc l as x when List.length l < 9 ->
+  | `Assoc l as x when List.length l <= 9 ->
     begin
       try
         {

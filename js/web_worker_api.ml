@@ -13,9 +13,10 @@ class manager ()  =
     initializer
       let () = kasa_worker##.onmessage :=
           (Dom.handler
-             (fun (response_message : string Worker.messageEvent Js.t) ->
-                let response_text : string = response_message##.data in
-                let () = Kasa_client.receive response_text  in
+             (fun response_message ->
+                let response_text = response_message##.data in
+                let () = Common.debug response_text in
+                let () = Kasa_client.receive response_text in
                 Js._true
              )) in
       let () = sim_worker##.onmessage :=
@@ -31,7 +32,9 @@ class manager ()  =
       sim_worker##postMessage(message_text)
     inherit Mpi_api.manager ()
     inherit Kasa_client.new_client
-        ~post:(fun message_text -> kasa_worker##postMessage(message_text))
+        ~post:(fun message_text ->
+            let () = Common.debug (Js.string message_text) in
+            kasa_worker##postMessage(message_text))
     method terminate () =
       let () = sim_worker##terminate in
       kasa_worker##terminate

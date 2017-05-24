@@ -83,12 +83,11 @@ type t =
     mutable state : State_interpreter.t ;
     init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
     mutable lastyield : float ;
-    mutable kasa_state : KaSa.state;
   }
 
 let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
-    ~state ~init_l ~lastyield ~ast ~kasa_state : t = {
+    ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
   new_syntax;
@@ -100,7 +99,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
   error_messages = [];
   trace = [];
   ast; contact_map; env; graph; state; init_l;
-  lastyield; kasa_state;
+  lastyield;
 }
 
 let reinitialize random_state t =
@@ -135,7 +134,6 @@ let clone_t t =
     ~state:t.state (* FALSE imperatively modified *)
     ~init_l:t.init_l
     ~lastyield:t.lastyield
-    ~kasa_state:t.kasa_state
 
 
 
@@ -245,8 +243,6 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                             random_state env counter)
                   ~state:(State_interpreter.empty ~with_delta_activities:false env [])
                   ~init_l ~lastyield
-                  ~kasa_state:(KaSa.init ~compil:ast
-                                 ~called_from:Remanent_parameters_sig.Server ())
               in
               Lwt.return (Result_util.ok simulation))
          with e ->
@@ -616,11 +612,3 @@ let get_contact_map (t : t) : Api_types_j.site_node array =
   Api_data.api_contact_map
     (Model.signatures t.env)
     t.contact_map
-
-let get_dead_rules t =
-  let new_state,dr = KaSa.get_dead_rules t.kasa_state in
-  let () = t.kasa_state <- new_state in
-  List.rev_map (fun id ->
-      Format.asprintf "%a"
-        (Model.print_ast_rule ~env:t.env) (Ckappa_sig.int_of_rule_id id + 1))
-    dr

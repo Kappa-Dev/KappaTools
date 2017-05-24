@@ -106,7 +106,7 @@ let model : model React.signal =
        }
     )
 let update_directory
-    (manager : Api.manager)
+    (manager : Api.concrete_manager)
     (project_id : Api_types_j.project_id)
   : unit Api.result Lwt.t =
   (manager#file_catalog project_id) >>=
