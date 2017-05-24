@@ -51,6 +51,7 @@ matrix:
           - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
+          - texlive-xypic
           - tex4ht
   - os: osx
 
