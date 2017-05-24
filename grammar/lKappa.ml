@@ -1351,37 +1351,30 @@ let rec erase_incr sigs i incrs delta lnk =
 
 let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
   let (incr_type,_,incr_b,_) = incr_agent sigs in
-  let start_lnk_for_created = start_lnk_nb + test in
+  let start_lnk_for_created = start_lnk_nb + test +1 in
   let lnk_for_erased = start_lnk_nb + abs(delta) in
   let ag_info = p_id,ra.ra_type in
 
-  let test_incr = link_incr sigs 0 test ag_info equal start_lnk_nb pos delta in
+  let test_incr = link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
   let adjust_delta =
     if (delta<0)
     then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
     else test_incr in
   let created =
-    if (test = 0)
-    then add_incr 0 start_lnk_for_created start_lnk_nb delta true sigs
-    else
-      if (delta>0)
-      then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
-      else [] in
+    if (delta>0)
+    then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
+    else [] in
 
+  let () = if (test + delta < 0) then
+             raise (ExceptionDefn.Internal_Error
+                      ("Counter test should be greater then abs(delta)",pos')) in
   let switch =
     if (delta = 0) then Maintained
     else
       if (delta > 0) then Linked (start_lnk_for_created,pos')
-      else
-        let diff = test + delta in
-        if (diff = 0) then Freed
-        else if (diff >0) then Linked (lnk_for_erased,pos')
-        else
-          raise (ExceptionDefn.Internal_Error
-                   ("Counter test should be greater then abs(delta)",pos')) in
-  let p =
-    if (test = 0) then (Ast.LNK_FREE,pos),switch
-    else (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
+      else Linked (lnk_for_erased,pos') in
+
+  let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
   let () = ra.ra_ports.(p_id) <- p in
   (adjust_delta,created)
 
@@ -1406,11 +1399,11 @@ let remove_counter_agent sigs ag lnk_nb =
            | Ast.CEQ j ->
               (counter_becomes_port
                  sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
-              lnk_nb+j+(fst delta)
+              lnk_nb+1+j+(fst delta)
            | Ast.CGTE j ->
               (counter_becomes_port
                  sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
-              lnk_nb+j+(fst delta)
+              lnk_nb+1+j+(fst delta)
            | Ast.CVAR _ ->
               raise (ExceptionDefn.Internal_Error
                        ("Counter "^s^" should not have a var by now",pos')))
@@ -1435,9 +1428,9 @@ let remove_counter_created_agent sigs raw ag lnk_nb =
       | Some (test,_) ->
          match test with
          | Ast.CEQ j ->
-            let p = if (j = 0) then Raw_mixture.FREE else Raw_mixture.VAL lnk in
+            let p = Raw_mixture.VAL lnk in
             let () = ports.(p_id) <- p in
-            let incrs = add_incr 0 lnk (lnk+j-1) j true sigs in
+            let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
             (acc@incrs,(lnk+j))
          | Ast.CGTE _ | Ast.CVAR _ ->
             not_enough_specified agent_name c.Ast.count_nme)
@@ -1647,10 +1640,8 @@ let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let c_na = c.Ast.count_nme in
   let c_id = Signature.num_of_site ~agent_name c_na sign in
   let (max_val,pos) = c.Ast.count_delta in
-  let incrs = link_incr sigs 0 max_val (ag_id,c_id) false 1 pos (-1) in
-  let p =
-    if (max_val = 0) then (Ast.LNK_FREE,pos) else
-      (Ast.LNK_VALUE (1,(incr_b,incr_type)),pos) in
+  let incrs = link_incr sigs 0 (max_val+1) (ag_id,c_id) false 1 pos (-1) in
+  let p = Ast.LNK_VALUE (1,(incr_b,incr_type)),pos in
   let () = ports.(c_id) <- p,Maintained in
   let ra =
     { ra_type = ag_id;ra_ports = ports;ra_ints = internals;ra_erased = false;
@@ -1667,7 +1658,7 @@ let counter_perturbation sigs c ag_ty =
   let mods = [Ast.PRINT ([],stop_message'); Ast.STOP filename] in
   let val_of_counter =
     Alg_expr.KAPPA_INSTANCE (agent_with_max_counter sigs c ag_ty) in
-  let pre:(rule_agent list, int) Alg_expr.bool =
+  let pre =
     Alg_expr.COMPARE_OP
       (Operator.EQUAL,(val_of_counter,snd c.Ast.count_nme),
        (Alg_expr.CONST (Nbr.I 1),snd c.Ast.count_nme)) in

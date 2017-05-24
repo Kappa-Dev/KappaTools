@@ -1072,16 +1072,16 @@ let enumerate_counter_tests x a ((delta,_) as count_delta) c' =
   let min =
     match c'.count_test with
       None| Some (CGTE _,_)| Some (CVAR _,_) ->
-             let (_,pos) = c'.count_nme in
              raise
                (ExceptionDefn.Malformed_Decl
-                  ("Invalid counter signature - have to specify min bound",pos))
+                  ("Invalid counter signature - have to specify min bound",
+                   (snd c'.count_nme)))
       | Some (CEQ min,_) -> min in
 
   let rec enum v =
     if (v=max) then []
     else
-      if (delta >0 || abs(delta) < v)
+      if (v+delta < max)&&(v+delta >= 0)
       then (Counter
               {count_nme=c'.count_nme;count_test = Some(CEQ v,a);count_delta},
             [x,v])::(enum (v+1))
@@ -1117,10 +1117,11 @@ let enumerate_edit rules f =
 
 
 let remove_variable_in_counters rules edit_rules signatures =
-  let unfold_delta_in_tests c delta =
-    let count_delta = {c with count_test=Some (CEQ (abs(delta)),Locality.dummy)} in
-    let count_gte = {c with count_test=Some (CGTE (abs(delta)+1),Locality.dummy)} in
-    [(Counter count_delta,["",delta]);(Counter count_gte,["",delta+1])] in
+  let counter_gte_delta c delta =
+    let count_delta = {c with count_test=Some (CGTE (abs(delta)),Locality.dummy)} in
+    [(Counter count_delta,[])] in
+  let counter_gte_zero c =
+    [(Counter {c with count_test=Some (CGTE 0,Locality.dummy)}), []] in
 
   let remove_var_site counters =
     function
@@ -1129,8 +1130,7 @@ let remove_variable_in_counters rules edit_rules signatures =
        let (delta,_) = c.count_delta in
        match c.count_test with
          None ->
-         if (delta >0) then unfold_delta_in_tests c 0
-         else unfold_delta_in_tests c delta
+         if (delta <0) then counter_gte_delta c delta else counter_gte_zero c
        | Some (CEQ v,_) ->
           if (delta >0 || abs(delta) <= v) then [(Counter c,[])]
           else
@@ -1139,21 +1139,16 @@ let remove_variable_in_counters rules edit_rules signatures =
                  ("Counter "^(fst c.count_nme)^" becomes negative",
                   (snd c.count_nme)))
        | Some (CGTE v,pos) ->
-          if (v=0)&&(delta>0) then
-            let () =
-              let error = "Counter "^(fst c.count_nme)^":>0 always holds" in
-              ExceptionDefn.warning
-                ~pos (fun f -> Format.pp_print_string f error) in
-            unfold_delta_in_tests c 0
-          else
-            if (delta >0 || abs(delta) < v) then [(Counter c,[])]
-            else
-              if (delta <0 && abs(delta) = v) then unfold_delta_in_tests c delta
-              else
-                raise
-                  (ExceptionDefn.Malformed_Decl
-                     ("Counter "^(fst c.count_nme)^" becomes negative",
-                      (snd c.count_nme)))
+          let () = if (v+delta <0) then
+                     raise
+                       (ExceptionDefn.Malformed_Decl
+                          ("Counter "^(fst c.count_nme)^" becomes negative",
+                           (snd c.count_nme))) in
+          let () = if (v=0) then
+                     let error = "Counter "^(fst c.count_nme)^":>0 always holds" in
+                     ExceptionDefn.warning
+                       ~pos (fun f -> Format.pp_print_string f error) in
+          [(Counter c,[])]
        | Some (CVAR x,a) ->
           enumerate_counter_tests x a c.count_delta
                (List.find
