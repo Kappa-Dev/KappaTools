@@ -8,24 +8,7 @@
    Copyright (C) Antoine Mine' 2006
  *)
 
-module StringInt =
-struct
-  type t = string * int
-  let compare (a,b) (c,d) =
-    let cmp = compare b d in
-    if cmp=0
-    then compare a c
-    else cmp
-  let print fmt (a,b) = Format.fprintf fmt "%s:%i" a b
-end
 
-module StringIntSetMap  = SetMap.Make(StringInt)
-module StringIntMap = StringIntSetMap.Map
-module StringIntSet = StringIntSetMap.Set
-
-module StringSetMap = Mods.StringSetMap
-module StringSet = StringSetMap.Set
-module StringMap = StringSetMap.Map
 
 let tk = "(with Tk interface)"
 
@@ -48,6 +31,25 @@ type level =
   | Developper  (* only shown & accepted in developper mode *)
   | Hidden      (* never shown *)
 
+  module StringInt =
+  struct
+    type t = string * int * (level option)
+    let compare (a,b,_) (c,d,_) =
+      let cmp = compare b d in
+      if cmp=0
+      then compare a c
+      else cmp
+    let print fmt (a,b,_) = Format.fprintf fmt "%s:%i" a b
+  end
+
+  module StringIntSetMap  = SetMap.Make(StringInt)
+  module StringIntMap = StringIntSetMap.Map
+  module StringIntSet = StringIntSetMap.Set
+
+  module StringSetMap = Mods.StringSetMap
+  module StringSet = StringSetMap.Set
+  module StringMap = StringSetMap.Map
+
 let min_level a b =
   match a,b with
   | Normal,_ | _,Normal -> Normal
@@ -55,8 +57,20 @@ let min_level a b =
   | Developper,_ | _,Developper -> Developper
   | Hidden,Hidden -> Hidden
 
+let max_level a b =
+    match a,b with
+    | Hidden,_ | _,Hidden -> Hidden
+    | Developper,_ | _,Developper -> Developper
+    | Expert,_ | _,Expert -> Expert
+    | Normal,Normal -> Normal
+
+let max_level_opt a b =
+  match b with
+  | None -> a
+  | Some b -> max_level a b
+
 type position = int
-type category = string * position
+type category = string * position * (level option)
 
 type spec =
   | Void                                  (* To skip a line *)
@@ -96,6 +110,10 @@ let show_level (lvl:level) : bool = match lvl with
   | Expert -> !expert_mode
   | Developper -> !dev_mode && !expert_mode
   | Hidden -> false
+
+let show_level_opt (lvl_opt:level option) : bool = match lvl_opt with
+  | None -> true
+  | Some lvl -> show_level lvl
 
 let accept_level_display (lvl:level) : bool = match lvl with
   | Normal | Expert -> true
@@ -291,9 +309,9 @@ let print_help (header:bool) (verbose:bool) f (a:t) =
 
   (* dump *)
   StringIntMap.iter
-    (fun (cat,_) (l,lvl) ->
+    (fun (cat,_,lvl_opt) (l,lvl) ->
        if
-         show_level lvl
+         show_level_opt lvl_opt && show_level lvl
        then
          begin
            if header
@@ -370,7 +388,7 @@ let parse_list ?title (a:t) (l:string list) : string list =
             | String_list r, (v::rem) when opt=key -> r := v::(!r); rem
             | String_list r, rem -> r := []; rem
             | StringNbr_list _, (""::rem) when opt=key -> rem
-            | StringNbr_list _, ([a]) when opt=key -> failwith "invalid pair"
+            | StringNbr_list _, ([_]) when opt=key -> failwith "invalid pair"
             | StringNbr_list r, (v'::v::rem) when opt=key -> r := (v,v')::(!r); rem
             | StringNbr_list r, rem -> r := []; rem
 

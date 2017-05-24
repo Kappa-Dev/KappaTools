@@ -6,13 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val data_set: string * int
-val output: string * int
-val semantics: string * int
-val integration_settings: string * int
-val model_reduction: string * int
-val static_analysis: string * int
-val debug_mode: string * int 
+val data_set: Superarg.category
+val output: Superarg.category
+val semantics: Superarg.category
+val integration_settings: Superarg.category
+val model_reduction: Superarg.category
+val static_analysis: Superarg.category
+val debug_mode: Superarg.category
 
 type t = { mutable backtrace           : bool ;
 	   mutable debug               : bool;

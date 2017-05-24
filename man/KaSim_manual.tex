@@ -1415,7 +1415,7 @@ without any option.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_0.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{0\_Actions}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Actions}}
 \label{fig:kasa:0}
 \end{figure}
 
@@ -1425,7 +1425,7 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
 In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{0\_Actions}, \texttt{1\_Output}, \texttt{2\_Reachability\_analysis}, \texttt{3\_Trace\_analysis}, \texttt{4\_Contact\_map}, \texttt{5\_Influence\_map}.
+\item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{Actions}, \texttt{Output}, \texttt{Reachability analysis}, \texttt{Trace analysis}, \texttt{Contact map}, \texttt{Influence map}.
 
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
 
@@ -1443,9 +1443,9 @@ Importantly, options are saved automatically under various occasions. Thus, it i
 before the last reset, before the last quit, or before the last analysis.
 \end{enumerate}
 
-\subsection{The sub-tab \texttt{0\_Actions}}
+\subsection{The sub-tab \texttt{Actions}}
 
-The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
+The sub-tab \texttt{Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
 
 \begin{itemize}
 \item The button \texttt{--do-all} activates all the functionalities.
@@ -1456,17 +1456,17 @@ The sub-tab \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main ac
 \item The option \texttt{--compute-local-traces} can be used to (des)activate the computation of the trace analysis.
 \end{itemize}
 
-\subsection{The sub-tab \texttt{1\_Output}}
+\subsection{The sub-tab \texttt{Output}}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_1.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{1\_output}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{output}}
 \label{fig:kasa:1}
 \end{figure}
 
 
-The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
+The sub-tab \texttt{Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
 
 \begin{itemize}
 \item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
@@ -1488,7 +1488,7 @@ When a file already exists, it is overwritten without any warning.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_2.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{2\_Reachability\_analysis}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Reachability\_analysis}}
 \label{fig:kasa:2}
 \end{figure}
 
@@ -1670,7 +1670,7 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_3.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{3\_Trace\_analysis}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Trace analysis}}
 \label{fig:kasa:3}
 \end{figure}
 
@@ -1755,7 +1755,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_4.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{4\_Contact\_map}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}}
 \label{fig:kasa:4}
 \end{figure}
 
@@ -1769,7 +1769,7 @@ Typing the following instruction:
 will produce a dot format file named \texttt{contact.dot}.
 The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}.
 The directory is assumed to exist. The file will be overwritten if it exists. All the options related to the computation of the contact map can be accessed on the
-sub-tab \texttt{4\_Contact\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
+sub-tab \texttt{Contact map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
 
 
 
@@ -1799,12 +1799,12 @@ Typing the following instruction:
 
 will produce a dot format file named \texttt{influence.dot}.
 The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-influence-map} and \texttt{--output-directory}.
-The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{5\_Influence\_map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{--influence-map-format}.
+The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{Influence map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{--influence-map-format}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_5.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{5\_Influence\_map}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}}
 \label{fig:kasa:4}
 \end{figure}
 
@@ -1941,7 +1941,7 @@ without any option.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_0.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{0\_data\_set}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Data set}}
 \label{fig:kade:0}
 \end{figure}
 
@@ -1951,7 +1951,7 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
 In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{0\_data\_set}, \texttt{1\_output}, \texttt{2\_semantics}, \texttt{3\_integration\_settings}, \texttt{4\_model\_reduction}, \texttt{5\_static\_analysis}, \texttt{6\_debug\_mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
+\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{Data set}, \texttt{Output}, \texttt{Semantics}, \texttt{Integration settings}, \texttt{Model reduction}, \texttt{Static analysis}, \texttt{Debug mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
 
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
 
@@ -1977,26 +1977,30 @@ The following extension will be added automatically according to the choice of t
 \end{itemize}
 Both fields may be modified from every sub-tab.
 
-\subsection{The sub-tab \texttt{0\_data\_set}}
+When the repository does not exist, {\KaDE} will create it.
 
-The sub-tab \texttt{0\_data\_set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
+When the output file already exists, {\KaDE} will ask for confirmation before overwritting it, unless the tool is set in batch mode (e.g.~see Sect.~\ref{kade:debug}).
+
+\subsection{The sub-tab \texttt{Data set}}
+
+The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
 \begin{itemize}
 \item The field \texttt{--initial} defines the starting date of the simulation.
 \item The field \texttt{-l} defines the final date of the simulation.
 \item The field \texttt{-p} defines the time interval between two plots.
 \end{itemize}
 
-\subsection{The sub-tab \texttt{1\_output}}
+\subsection{The sub-tab \texttt{Output}}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_1.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{1\_output}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Output}}
 \label{fig:kade:1}
 \end{figure}
 
 
-The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kade:1}) contains the names of the output files and their format.
+The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of the output files and their format.
 
 \begin{itemize}
 \item The field \texttt{--ode-backend} allows for the choice among the different backend formats: DOTNET, Maple, Mathematica, Matlab, Octave and SBML.
@@ -2006,7 +2010,11 @@ The sub-tab \texttt{1\_Ouput} (see Fig.~\ref{fig:kade:1}) contains the names of 
 \item The option \texttt{--(no)-smash-reactions} identify multiple occurrences of a same reaction in the reaction network, and sum up  their contribution into a single reaction.
 \end{itemize}
 
-When a file already exists,
+
+
+\subsection{The sub-tab \texttt{Debug}}
+
+The last sub-tab provides options to tune the amount of daplaied debugging information.
 
 \subsection{The sub-tab \texttt{2\_semantics}}
 
