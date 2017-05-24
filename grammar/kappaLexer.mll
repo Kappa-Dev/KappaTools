@@ -42,7 +42,6 @@ let real =
      ((((['0'-'9']+ ('.' ['0'-'9']*)?) | ('.' ['0'-'9']+))
 	['e' 'E'] ['+' '-']? ['0'-'9']+)
   | ((['0'-'9']+ '.' ['0'-'9']* ) | (['0'-'9']* '.' ['0'-'9']+)))
-let neg_integer = ('-' integer)
 let id = ('_'* ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']* )
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z' '_' '-' '+']+)
 let pert = '$' id
@@ -119,12 +118,6 @@ rule token = parse
 		      (Lexing.lexeme_end_p lexbuf)))}
 
 	 | real as f {FLOAT (float_of_string f)}
-	 | neg_integer as n {try INT (int_of_string n)
-	 with Failure _ -> raise (ExceptionDefn.Syntax_Error
-	 (n^" is a incorrect integer",
-	     Locality.of_pos (Lexing.lexeme_start_p lexbuf)
-		      (Lexing.lexeme_end_p lexbuf)))}
-
 	 | '\'' ([^'\n''\'']+ as x) '\''{LABEL(x)}
 	 | id as str {keyword_or_id str}
 	 | '@' {AT}

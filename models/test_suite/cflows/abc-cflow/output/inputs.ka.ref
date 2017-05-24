@@ -10,7 +10,7 @@
 %agent: C(x1~u~p!c.A, x2~u~p!c.A)
 
 %var:/*0*/ 'on_rate' 0.001
-%var:/*1*/ 'off_rate' (10 ^ -1)
+%var:/*1*/ 'off_rate' (10 ^ -(1))
 %var:/*2*/ 'mod_rate' 1
 %var:/*3*/ 'AB' |A(x!1), B(x!1)|
 %var:/*4*/ 'Cuu' |C(x1~u, x2~u)|
