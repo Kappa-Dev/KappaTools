@@ -47,6 +47,7 @@ matrix:
           - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
+          - texlive-pictures
           - tex4ht
   - os: osx
 
