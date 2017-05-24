@@ -1641,7 +1641,7 @@ let modif_expr_of_ast ~new_syntax sigs tok algs contact_map ?c modif acc =
       (List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
        List.map (print_expr_of_ast ~new_syntax sigs tok algs) p'),acc
   | Ast.CFLOWMIX (b,(m,pos)) ->
-    Ast.CFLOWMIX (b,(mixture_of_ast ~new_syntax sigs pos m,pos)),acc
+    Ast.CFLOWMIX (b,(mixture_of_ast ~new_syntax sigs pos m ?c,pos)),acc
   | Ast.SPECIES_OF (b,p,(m,pos)) ->
     Ast.SPECIES_OF
       (b,List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
