@@ -215,15 +215,15 @@ bin/%: %.$(OCAMLBEST) Makefile
 	" -cunihtf -utf8" "" "-halt-on-error"> $${LOG} 2>&1 && \
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
-%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor $(MODELS) %.gplot
+%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor bin/KaDE $(MODELS) %.gplot
 	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
-%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor $(MODELS)
+%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa bin/KaStor bin/KaDE $(MODELS)
 	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
-doc: man/KaSim_manual.pdf
+doc: $(MANGENREP) man/KaSim_manual.pdf
 doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 debug:
