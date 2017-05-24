@@ -62,6 +62,13 @@
 %var: 'kp22'     1.667e-05 # binding of ShcP-Grb2 to Sos in cytosol (scaled), units: /molecule/s
 %var: 'km22'         0.064 # diss. of ShcP-Grb2 and Sos in cytosol, units: /s
 
+%init: 100 egf(r)
+%init: 100 Grb2(SH2,SH3)
+%init: 100 Shc(PTB,Y317~Y)
+%init: 100 Sos(dom)
+%init: 100 egfr(l,r,Y1068~Y,Y1148~Y)
+%init: 100 Grb2(SH2,SH3!1),Sos(dom!1)    
+
 
 # Ligand-receptor binding (ligand-monomer)
 egfr(l,r)   , egf(r) <-> egfr(l!1,r),egf(r!1)   @'kp1'{0}, 'km1'

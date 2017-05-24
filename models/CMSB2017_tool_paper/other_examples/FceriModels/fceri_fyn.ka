@@ -1,5 +1,5 @@
 
-%var:   'Lig_tot'  6.0e3
+    %var: 'Lig_tot'  6.0e3
     %var: 'Rec_tot'  4.0e2
     %var: 'Lyn_tot'  2.8e1
     %var: 'Fyn_tot'  4.0e2
@@ -38,7 +38,6 @@
     %init: 100 Fyn(SH2,a~Y,t~Y)
     %init: 100 Syk(tSH2,l~Y,a~Y)
     %init: 100 Rec(a,b~Y,g~Y)
-
 
 
     # Ligand-receptor binding
