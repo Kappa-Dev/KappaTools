@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <May 23 2017>
+  * Last modification: Time-stamp: <May 24 2017>
   * *
   * primitive to parse command-line options
   *
@@ -14,14 +14,14 @@
 
 open Superarg
 
-let actions = "Actions",0
-let output = "Output",1
-let reachability = "Reachability analysis",2
-let traces = "Trace analysis",3
-let contact_map = "Contact map",4
-let influence_map = "Influence map",5
-let flow = "Flow of information",6
-let debug = "Debugging information",7
+let actions = "Actions",0,None
+let output = "Output",1,None
+let reachability = "Reachability analysis",2,None
+let traces = "Trace analysis",3,None
+let contact_map = "Contact map",4,None
+let influence_map = "Influence map",5,None
+let flow = "Flow of information",6,None
+let debug = "Debugging information",7,None
 
 let options =
   List.rev

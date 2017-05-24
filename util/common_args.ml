@@ -6,13 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let data_set = "Data set",0
-let output = "Output",1
-let semantics = "Semantics",2
-let integration_settings = "Integration settings",3
-let model_reduction = "Model reduction",4
-let static_analysis = "Static analysis" , 5
-let debug_mode = "Debug mode",6
+let data_set = "Data set",0,None
+let output = "Output",1,None
+let semantics = "Semantics",2,None
+let integration_settings = "Integration settings",3,None
+let model_reduction = "Model reduction",4,None
+let static_analysis = "Static analysis" , 5,Some Superarg.Expert
+let debug_mode = "Debug mode",6,Some Superarg.Expert
 
 type t = { mutable backtrace           : bool ;
 	   mutable debug               : bool ;
