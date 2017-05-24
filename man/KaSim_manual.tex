@@ -21,6 +21,7 @@
 
 \usepackage[svgnames]{xcolor}
 \usepackage{listings}
+\usepackage{xypic}
 \input{Kappa_LaTeX_Lang}
 
 \usepackage[linktoc=page,colorlinks=true]{hyperref}
@@ -2018,9 +2019,95 @@ The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of th
 
 \subsection{The sub-tab \texttt{Debug}}
 
-The last sub-tab provides options to tune the amount of daplaied debugging information.
+In expert mode, the last sub-tab provides options to tune the amount of debugging information that is displaied.
 
-\subsection{The sub-tab \texttt{2\_semantics}}
+\begin{itemize}
+\item The option \texttt{--(no)-show-time-advance} includes some
+instruction in the output file, so as to track the progress during numerical integration of the ODEs, in the Maple, Mathematica, Matlab, and Octave backend.
+This option is ignored in the other backend format.
+
+\item The field \texttt{--(no)-print-efficiency} provides some information about the CPU time that has been used to generate the set of reactions and about the size of the initial and reduced models.
+
+\item The option \texttt{--(no)-backtrace} provides more/less information about internal exceptions.
+\item The option \texttt{--(no)-glutonny} tunes the parameters of the garbage collector.
+\item The field \texttt{-mode} allows for the choice among batch and interactive mode. In interactive mode, {\KaDE} has to ask the permission before overwriting a file. In batch mode, {\KaDE} may overwrite output files, without asking the permission.
+\end{itemize}
+
+\begin{figure}[t]
+\begin{minipage}{\linewidth}
+    \centering\scalebox{0.7}{\includegraphics{img/sect1-bind.pdf}}
+  \end{minipage}
+  \caption{Proteins \texttt{K} and \texttt{S} may bind. }
+  \label{fig:sec1:bind}
+\end{figure}
+\begin{figure}[t]
+\begin{minipage}{\linewidth}
+\centering\scalebox{0.7}{\includegraphics{img/sect1-phos.pdf}}
+\end{minipage}
+\caption{The protein \texttt{K} may activate the protein \texttt{S}.}
+\label{fig:sec1:phos}
+\end{figure}
+
+\section{Differential semantics}
+\label{sec:differential semantics}
+
+\subsection{From rules to reactions}
+
+In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcsb/DanosFFHK09}, according to their preconditions.
+
+Consider the following two rules:
+\begin{lstlisting}[language=kappa]
+'bind'  K(r),S(l) -> K(r!1),S(l!1) @k
+'phos'  K(r!1),S(l!1,r~u) -> K(r!1),S(l!1,r~p) @kp
+\end{lstlisting}
+
+
+
+\newcommand{\gbind}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind.pdf}}\end{minipage}}
+\newcommand{\gbindu}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-u.pdf}}\end{minipage}}
+\newcommand{\gbindp}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-p.pdf}}\end{minipage}}
+\begin{figure}[t]
+  \begin{equation*}
+    \xymatrix@C=10mm@R=2mm{%
+& \gbindu  \cr
+\gbind\ar@{->}[rd]\ar@{->}[ru] & \cr
+& \gbindp \cr
+}
+  \end{equation*}
+  \caption{From rules to reactions. The rule in Fig.~\ref{fig:sec1:bind} is refined into two reactions according to whether the site \texttt{r} of the protein \texttt{S} is phosphorylated or not.}
+  \label{fig:refinement}
+\end{figure}
+
+ The first rule (e.g.~see Fig.~\ref{fig:sec1:bind}) stipulates that proteins of type \texttt{K} and proteins of type \texttt{S} may bind via their respective right and left sites. The second rule (e.g.~see Fig.~\ref{fig:sec1:phos})  stipulates that a protein \texttt{S} bound to a protein \texttt{K} may be activated (on its site \texttt{r}).
+
+It is worth noticing that the first rule may be applied in two different contexts, according to whether or not the right site  of the protein on the right  is already phosphorylated, or not. It follows the refinement that is depicted in Fig.~\ref{fig:refinement}.
+
+In general, each rule may be refined into a (potentially infinite) multi-set of reactions over fully specified site-graphs.
+%In the differential semantics, rule applications preserve disconnectedness, unless it is specified explicitly in the model. Thus each connected component in the left hand side is refined separately.
+Each connected component in a reaction denotes an instance of a bio-molecular species. For every bio-molecular species $S$, a reaction $R_1 + \ldots + R_m {\rightarrow} P_1 + \ldots + P_n$ gives the following contribution to the derivative of the concentration of $S$,
+
+\newcommand{\myfrac}[2]{\frac{\strut \displaystyle #1}{\strut \displaystyle #2}}
+\newcommand{\diff}[1]{\myfrac{\mathrm{d}#1}{\mathrm{d}t}}
+
+\begin{equation*}
+  \diff{[S]} \stackrel{+}= \sum_r \gamma(r)\cdot[r,R]\cdot\Delta(R,S)\cdot [R_1] \cdot \ldots \cdot [R_m]
+\end{equation*}
+where:
+\begin{enumerate}
+  \item $[r,R]$ is the number of different ways to induce the reaction $R$ from the rule $r$;
+  \item $\gamma(r)$ is the corrected rate of the rule $r$ (a fraction of the rate of the rule $r$ is taken according to a choice among three  conventions defining how automorphisms are taken into account.);
+  \item and $\Delta(R,S)$ is the difference between the number of occurrences of the species $S$ in the sequence $P_1,\ldots,P_n$ and
+the one in the sequence $R_1,\ldots,R_m$.
+ \end{enumerate}
+
+ This defines the ODE semantics of Kappa models.
+
+\subsection{Semantics convention}
+\subsubsection{Rate constant conventions}
+\subsubsection{Ambiguous molecularity}
+\subsubsection{Embeddings VS occurrences}
+
+
 
 \begin{figure}[htbp]
 \centering
@@ -2080,15 +2167,7 @@ The differential semantics of a Kappa model is described in Sect.~\ref{sec:diffe
 \label{fig:kade:6}
 \end{figure}
 
-\section{Differential semantics}
-\label{sec:differential semantics}
 
-\subsection{From rules to reactions}
-\subsection{Semantics convention}
-
-\subsubsection{Rate constant conventions}
-\subsubsection{Ambiguous molecularity}
-\subsubsection{Embeddings VS occurrences}
 
 \section{Tutorial}
 
