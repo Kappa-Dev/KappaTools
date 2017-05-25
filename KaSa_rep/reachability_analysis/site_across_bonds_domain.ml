@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <May 05 2017>
+   * Last modification: Time-stamp: <May 25 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -858,7 +858,7 @@ struct
     error, dynamic, new_mvbdu
 
   let common_scan parameters error bdu_false dynamic store_value list =
-    let rec scan list error =
+    let rec scan list dynamic error =
       match list with
       | [] -> error, true, dynamic
       | tuple :: tail ->
@@ -880,9 +880,9 @@ struct
         then
           error, false, dynamic
         else
-          scan tail error
+          scan tail dynamic error
     in
-    scan list error
+    scan list dynamic error
 
   let whether_or_not_it_has_precondition parameters error bdu_false tuple_set
       dynamic precondition =
