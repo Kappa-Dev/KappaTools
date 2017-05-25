@@ -1,3 +1,8 @@
+%agent: Lig(l1,l2,a~1~2)
+%agent: Lyn(U,SH2,a~Y~pY)
+%agent: Fyn(SH2,a~Y~pY,t~Y)
+%agent: Syk(tSH2,l~Y~pY,a~Y~pY)
+%agent: Rec(a,b~Y~pY,g~Y~pY)
 
     %var: 'Lig_tot'  6.0e3
     %var: 'Rec_tot'  4.0e2

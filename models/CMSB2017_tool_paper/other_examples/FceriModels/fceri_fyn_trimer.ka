@@ -1,3 +1,9 @@
+%agent: Lig(l1,l2,l3,a~1~2)
+%agent: Lyn(U,SH2,a~Y~pY)
+%agent: Fyn(SH2,a~Y~pY,t~Y)
+%agent: Syk(tSH2,l~Y~pY,a~Y~pY)
+%agent: Rec(a,b~Y~pY,g~Y~pY)
+
 
     %var: 'Lig_tot'  6.0e3
     %var: 'Rec_tot'  4.0e2
@@ -129,7 +135,7 @@
     Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
 
     Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
-    Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
+    Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
 
     Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~Y) -> \
     Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY!4),Lyn(SH2!4,a~pY) @'pLS'
