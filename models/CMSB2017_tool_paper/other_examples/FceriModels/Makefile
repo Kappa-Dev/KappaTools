@@ -34,7 +34,7 @@ clean:
 	echo -------------------------------------- >> $(LOG)
 	touch $@
 
-%.kade: *.ka
+%.kade: %.ka
 	echo Process without symmetries------------ >> $(LOG)
 	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --dotnet-output network_$*_wo_sym.net --propagate-constants >> $(LOG) |exit 0
 	touch $@
