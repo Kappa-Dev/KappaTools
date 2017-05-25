@@ -1371,6 +1371,9 @@ let rec erase_incr sigs i incrs delta lnk =
        let () = hd.ra_ports.(incr_b) <- before, Linked lnk in
        hd::tl
      else
+       let () =
+         Array.iteri
+           (fun i (a,_) -> hd.ra_ports.(i) <- a,Erased) hd.ra_ports in
        let ag = {hd with ra_erased = true} in
        ag::(erase_incr sigs (i+1) tl delta lnk)
   | [] -> []
