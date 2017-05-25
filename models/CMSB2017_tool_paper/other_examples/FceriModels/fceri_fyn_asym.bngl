@@ -1,8 +1,11 @@
+#TODO: in Lig: replace site l with site l1, l2
+
 begin model
 begin parameters
     Lig_tot  6.0e3
     Rec_tot  4.0e2
     Lyn_tot  2.8e1
+    Fyn_tot  4.0e2
     Syk_tot  4.0e2
 
      kp1  1.32845238e-7
@@ -11,8 +14,10 @@ begin parameters
      km2  0
      kpL  5e-2
      kmL  20
-    kpLs  5e-2 
+    kpLs  5e-2
     kmLs  0.12
+     kpF  5e-2
+     kmF  20
      kpS  6e-2
      kmS  0.13
     kpSs  6e-2
@@ -24,7 +29,9 @@ begin parameters
      pLS   30
     pLSs  100
      pSS  100
-    pSSs  200 
+    pSSs  200
+     pLF   30
+    pLFs  100
       dm   20
       dc   20
 end parameters
@@ -32,16 +39,17 @@ end parameters
 begin seed species
     Lig(l,l)           Lig_tot
     Lyn(U,SH2,a~Y)     Lyn_tot
+    Fyn(SH2,a~Y,t~Y)   Fyn_tot
     Syk(tSH2,l~Y,a~Y)  Syk_tot
     Rec(a,b~Y,g~Y)     Rec_tot
 end seed species
 
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l)  kp1, km1
 
     # Receptor-aggregation
-    Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+)  kp2, km2
+    Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+)  kp2,km2
 
     # Constitutive Lyn-receptor binding
     Rec(b~Y) + Lyn(U,SH2) <-> Rec(b~Y!1).Lyn(U!1,SH2)  kpL, kmL
@@ -55,6 +63,9 @@ begin reaction rules
     # Lyn-receptor binding through SH2 domain
     Rec(b~pY) + Lyn(U,SH2) <-> Rec(b~pY!1).Lyn(U,SH2!1) kpLs, kmLs
 
+    # Fyn-receptor binding through SH2 domain
+    Rec(b~pY) + Fyn(SH2) <-> Rec(b~pY!1).Fyn(SH2!1) kpF, kmF
+
     # Transphosphorylation of beta by SH2-bound Lyn
     Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
 
@@ -65,12 +76,27 @@ begin reaction rules
     Rec(g~pY) + Syk(tSH2) <-> Rec(g~pY!1).Syk(tSH2!1) kpS, kmS
 
     # Transphosphorylation of Lyn by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLS
+    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
+    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLS
 
     # Transphosphorylation of Lyn by SH2-bound Lyn
     Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
     Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLSs
+
+    # Transphosphorylation of Fyn by constitutive Lyn
+    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLF
+
+    # Transphosphorylation of Fyn by SH2-bound Lyn
+    # KaSa has discovered that the following rule is wrong
+    # Lyn has to be bound via SH2, not via U (since it is bound to a site with state pY)
+
+    #Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) #-> \
+    #Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
+
+    #correct rule:
+    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
 
     # Transphosphorylation of Syk by constitutive Lyn
     Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
@@ -89,18 +115,18 @@ begin reaction rules
     Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
 
     # Dephosphorylation of Rec beta
-    Rec(b~pY) -> Rec(b~Y)  dm
+    Rec(b~pY)-> Rec(b~Y) dm
 
     # Dephosphorylation of Rec gamma
-    Rec(g~pY) -> Rec(g~Y)  dm
+    Rec(g~pY)-> Rec(g~Y) dm
 
     # Dephosphorylation of Syk at membrane
-    Syk(tSH2!+,l~pY) -> Syk(tSH2!+,l~Y)  dm
-    Syk(tSH2!+,a~pY) -> Syk(tSH2!+,a~Y)  dm
+    Syk(tSH2!+,l~pY)-> Syk(tSH2!+,l~Y) dm
+    Syk(tSH2!+,a~pY)-> Syk(tSH2!+,a~Y) dm
 
     # Dephosphorylation of Syk in cytosol
-    Syk(tSH2,l~pY) -> Syk(tSH2,l~Y)  dc
-    Syk(tSH2,a~pY) -> Syk(tSH2,a~Y)  dc
+    Syk(tSH2,l~pY)-> Syk(tSH2,l~Y) dc
+    Syk(tSH2,a~pY)-> Syk(tSH2,a~Y) dc
 end reaction rules
 end model
 
