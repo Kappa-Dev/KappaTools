@@ -11,7 +11,7 @@ begin parameters
      km2  0
      kpL  5e-2
      kmL  20
-    kpLs  5e-2 
+    kpLs  5e-2
     kmLs  0.12
      kpS  6e-2
      kmS  0.13
@@ -24,7 +24,7 @@ begin parameters
      pLS   30
     pLSs  100
      pSS  100
-    pSSs  200 
+    pSSs  200
       dm   20
       dc   20
 end parameters
@@ -38,7 +38,7 @@ end seed species
 
 
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     Rec(a) + Lig(l,l,l) <-> Rec(a!1).Lig(l!1,l,l)  0.5*kp1, 0.5*km1
 
     # Receptor-aggregation

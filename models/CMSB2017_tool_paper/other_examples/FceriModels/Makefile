@@ -5,13 +5,15 @@ TIMEOUT?=10m
 FROM?=1
 TO?=10
 
+KADEOPTIONS?=--truncate 10
+
 KAPPABIN?=$(HOME)/KaSim/bin/
 BNGBIN?=$(HOME)/BioNetGen/
 
 KA=$(wildcard *.ka)
 WITNESS=$(KA:%.ka=%.done)
 
-KADE=$(KAPPABIN)KaDE
+KADE=$(KAPPABIN)KaDE $(KADEOPTIONS)
 KASA=$(KAPPABIN)KaSa
 BNGL=$(BNGBIN)BNG2.pl
 
@@ -52,12 +54,12 @@ clean:
 	$(TIMEOUTBIN) $(KASA) $<  --print-efficiency --no-do-all --compute-symmetries >> $(LOG) |exit 0
 	touch $@
 
-%.bngl_with_sym: %_sym.bngl
+%.bngl_with_sym: %.bngl
 	echo Process BNGL with symmetries---------- >> $(LOG)
 	$(TIMEOUTBIN) $(BNGL) $*_sym.bngl >> log.txt |exit 0
 	touch $@
 
-%.bngl_wo_sym: %.bngl
+%.bngl_wo_sym: %_asym.bngl
 	echo Process BNGL withoutsymmetries-------- >> $(LOG)
 	$(TIMEOUTBIN) $(BNGL) $*.bngl >> log.txt |exit 0
 	touch $@

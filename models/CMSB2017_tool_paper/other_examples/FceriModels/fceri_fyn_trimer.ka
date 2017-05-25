@@ -183,23 +183,45 @@
 
 
     # Transphosphorylation of Fyn by SH2-bound Lyn
-    Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    # KaSa has discovered that both following six rules are wrong
+    # Lyn has to be bound via SH2, not via U (since it is bound to a site with state pY)
+    #Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
-    Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    #Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
-    Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    #Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l1!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
-    Lig(l3!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l3!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    #Lig(l3!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l3!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
-    Lig(l2!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l2!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    #Lig(l2!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l2!1,l3!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
-    Lig(l3!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
-    Lig(l3!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+    #Lig(l3!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    #Lig(l3!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    #correct rules:
+
+    Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    Lig(l1!1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    Lig(l3!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l3!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    Lig(l2!1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l3!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
+
+    Lig(l3!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~Y) -> \
+    Lig(l3!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY!4),Fyn(SH2!4,a~pY) @'pLFs'
 
     # Transphosphorylation of Syk by constitutive Lyn
     Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> \
