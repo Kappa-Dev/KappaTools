@@ -717,29 +717,56 @@ let annotate_created_agent
   { Raw_mixture.a_type = ag_id;
     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
 
-let annotate_created_counters sigs ?contact_map (agent_name,_ as ag_ty) counts =
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
-  let register_counter_modif c_id =
-    let (incr_id,_,incr_b,_) = incr_agent sigs in
-    add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
-  let _ =
-    List.fold_left
-      (fun pset c ->
-        let p_na = c.Ast.count_nme in
-        let p_id = Signature.num_of_site ~agent_name p_na sign in
-        let pset' = Mods.IntSet.add p_id pset in
-        let () = if pset == pset' then
-                   several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = register_counter_modif p_id in
-        let () = ra_counters.(p_id) <- c,Maintained in
-        pset') Mods.IntSet.empty counts in
-  let ra =
-    {ra_type = ag_id;ra_ports =[||];ra_ints =[||];ra_erased = false;
-     ra_syntax = Some ([||],[||]);} in
-  {ra; ra_counters;ra_created = true}
+let agent_with_counters agent_name ast_sigs =
+  let (_,sites,_) =
+    List.find
+      (fun ((ag_na,_),_,_) -> (String.compare ag_na agent_name) =0) ast_sigs in
+  sites,
+  List.exists
+    (fun site -> match site with Ast.Port _ -> false | Ast.Counter _ -> true)
+    sites
+
+let annotate_created_counters
+      sigs ast_sigs ?contact_map (agent_name,_ as ag_ty) counts acc =
+
+  let (sites,with_counters) = agent_with_counters agent_name ast_sigs in
+  if not(with_counters) then acc
+  else
+    let ag_id = Signature.num_of_agent ag_ty sigs in
+    let sign = Signature.get sigs ag_id in
+    let arity = Signature.arity sigs ag_id in
+    let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+
+    (* register all counters with min value *)
+    let () =
+      List.iter
+        (fun site ->
+          match site with
+            Ast.Port _ -> ()
+          | Ast.Counter c ->
+             let p_na = c.Ast.count_nme in
+             let p_id = Signature.num_of_site ~agent_name p_na sign in
+             ra_counters.(p_id) <-
+               {c with Ast.count_delta = (0,Locality.dummy)},Maintained) sites in
+
+    let register_counter_modif c_id =
+      let (incr_id,_,incr_b,_) = incr_agent sigs in
+      add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
+    let _ =
+      List.fold_left
+        (fun pset c ->
+          let p_na = c.Ast.count_nme in
+          let p_id = Signature.num_of_site ~agent_name p_na sign in
+          let pset' = Mods.IntSet.add p_id pset in
+          let () = if pset == pset' then
+                     several_occurence_of_site agent_name c.Ast.count_nme in
+          let () = register_counter_modif p_id in
+          let () = ra_counters.(p_id) <- c,Maintained in
+          pset') Mods.IntSet.empty counts in
+    let ra =
+      {ra_type = ag_id;ra_ports =[||];ra_ints =[||];ra_erased = false;
+       ra_syntax = Some ([||],[||]);} in
+    {ra; ra_counters;ra_created = true}::acc
 
 let translate_modification sigs ?contact_map ag_id p_id
     ?warn (lhs_links,rhs_links as links_annot) = function
@@ -1099,7 +1126,7 @@ Is responsible for the check that:
 - unique internal_state / site
 - links appear exactly twice
 *)
-let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
+let annotate_lhs_with_diff sigs ast_sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
     | ((lag_na,lpos as ag_ty),lag_s,lmod)::lt, ((rag_na,rpos),rag_s,rmod)::rt
@@ -1149,8 +1176,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
              let rannot',x' = annotate_created_agent
                  ~syntax_version sigs ?contact_map rannot na intf in
              let acc'' =
-               if (counts = []) then acc' else
-                 (annotate_created_counters sigs ?contact_map na counts)::acc' in
+               annotate_created_counters sigs ast_sigs ?contact_map na counts acc' in
              acc'',x'::acc,rannot')
           (mix,[],snd links_annot) added in
       let () =
@@ -1812,7 +1838,7 @@ let compil_of_ast ~syntax_version overwrite c =
   let old_style_rules =
     List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
         let mix,created =
-          annotate_lhs_with_diff sigs ~contact_map lhs rhs in
+          annotate_lhs_with_diff sigs c.Ast.signatures ~contact_map lhs rhs in
         label,
         (assemble_rule
            ~syntax_version ~r_editStyle:false
