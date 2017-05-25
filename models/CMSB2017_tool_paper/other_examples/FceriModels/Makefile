@@ -56,7 +56,7 @@ clean:
 
 %.bngl_with_sym: %.bngl
 	echo Process BNGL with symmetries---------- >> $(LOG)
-	$(TIMEOUTBIN) $(BNGL) $*_sym.bngl >> log.txt |exit 0
+	$(TIMEOUTBIN) $(BNGL) $*_asym.bngl >> log.txt |exit 0
 	touch $@
 
 %.bngl_wo_sym: %_asym.bngl
