@@ -65,7 +65,7 @@
     # Transphosphorylation of beta by SH2-bound Lyn
     Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
 
-    Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
+    Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
 
     # Transphosphorylation of gamma by SH2-bound Lyn
     Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~Y) -> Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY) @'pLgs'
