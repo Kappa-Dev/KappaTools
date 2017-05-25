@@ -1,0 +1,52 @@
+%def: "seed" "442310228"
+%def: "syntaxVersion" "4"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: __incr(a!b.__incr, b!a.__incr!d.A!c.A!c.B)
+%agent: A(x~u~p!x.B, d!b.__incr, c!b.__incr)
+%agent: B(x!x.A, c!b.__incr)
+
+%var:/*0*/ 'A1' |A(x~u!., c!1), __incr(a!2, b!1), __incr(b!2)|
+%plot: [T]
+%plot: A1
+
+'r1' B(x!./!1), A(x!./!1) @ 1
+'r2__210' B(x!./!1, c!5), A(x!./!1, d!2, c!4), __incr(a!6, b!5), __incr(a!7, b!6), __incr(a!., b!7), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!., b!4) @ (((2 + 1) + 0) * 0.1)
+'r2__211' B(x!./!1, c!6), A(x!./!1, d!2, c!4), __incr(a!7, b!6), __incr(a!8, b!7), __incr(a!., b!8), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!., b!5) @ (((2 + 1) + 1) * 0.1)
+'r2__212' B(x!./!1, c!7), A(x!./!1, d!2, c!4), __incr(a!8, b!7), __incr(a!9, b!8), __incr(a!., b!9), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!6, b!5), __incr(a!., b!6) @ (((2 + 1) + 2) * 0.1)
+'r2__110' B(x!./!1, c!5), A(x!./!1, d!2, c!4), __incr(a!6, b!5), __incr(a!., b!6), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!., b!4) @ (((1 + 1) + 0) * 0.1)
+'r2__111' B(x!./!1, c!6), A(x!./!1, d!2, c!4), __incr(a!7, b!6), __incr(a!., b!7), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!., b!5) @ (((1 + 1) + 1) * 0.1)
+'r2__112' B(x!./!1, c!7), A(x!./!1, d!2, c!4), __incr(a!8, b!7), __incr(a!., b!8), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!6, b!5), __incr(a!., b!6) @ (((1 + 1) + 2) * 0.1)
+'r2__010' B(x!./!1, c!5), A(x!./!1, d!2, c!4), __incr(a!., b!5), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!., b!4) @ (((0 + 1) + 0) * 0.1)
+'r2__011' B(x!./!1, c!6), A(x!./!1, d!2, c!4), __incr(a!., b!6), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!., b!5) @ (((0 + 1) + 1) * 0.1)
+'r2__012' B(x!./!1, c!7), A(x!./!1, d!2, c!4), __incr(a!., b!7), __incr(a!3, b!2), __incr(a!., b!3), __incr(a!5, b!4), __incr(a!6, b!5), __incr(a!., b!6) @ (((0 + 1) + 2) * 0.1)
+'r3' A(x~u/~p!., c!1/!2), __incr(b!1/!1), +__incr(a!3, b!2), +__incr(a!1, b!3) @ 1
+'r4' A(x~u/~p!., c!1/!3), -__incr(a!2, b!1), -__incr(a!3, b!2), __incr(b!3/!3) @ 0.1
+'r5' A(x~u/~p!., c!1/!2), -__incr(a!2, b!1), __incr(a!3, b!2/!2), __incr(a!4, b!3), __incr(a!., b!4) @ 1
+'r6' B(x!1/!.), A(x!1/!., c!2/!4), __incr(a!3, b!2/!2), __incr(a!., b!3), +__incr(a!5, b!4), +__incr(a!6, b!5), +__incr(a!2, b!6) @ 1
+'r7' B(x!1/!., c!7/!10), A(x!1/!., c!2/!4), __incr(a!8, b!7/!7), __incr(a!9, b!8), __incr(a!., b!9), __incr(a!3, b!2/!2), __incr(a!., b!3), +__incr(a!11, b!10), +__incr(a!7, b!11), +__incr(a!5, b!4), +__incr(a!6, b!5), +__incr(a!2, b!6) @ 1
+'r8' B(x!1/!.), A(x!1/!., d!2/!5, c!7/!9), __incr(a!3, b!2/!2), __incr(a!4, b!3), __incr(a!., b!4), __incr(a!8, b!7/!7), __incr(a!., b!8), +__incr(a!6, b!5), +__incr(a!2, b!6), +__incr(a!10, b!9), +__incr(a!11, b!10), +__incr(a!7, b!11) @ 1
+'r9' A(x~u/~p!., c!1/!3), __incr(a!2, b!1/!1), __incr(b!2), +__incr(a!4, b!3), +__incr(a!1, b!4) @ 1
+'r10' A(x~u!.), +A(x~u!., d!1, c!3), +__incr(a!2, b!1), +__incr(a!3, b!2), +__incr(a!., b!3), +__incr(a!., b!3) @ 1
++A(x~u!., d!1, c!3), +__incr(a!2, b!1), +__incr(a!3, b!2), +__incr(a!., b!3), +__incr(a!4, b!3), +__incr(a!., b!4) @ 1
+'r12' B(x!1/!.), A(x!1/!., c!2/!4), -__incr(a!3, b!2), -__incr(a!4, b!3), __incr(a!5, b!4/!4), __incr(a!., b!5), +A(x~u!., d!4, c!5), +__incr(a!5, b!4), +__incr(a!., b!5), +__incr(a!6, b!5), +__incr(a!7, b!6), +__incr(a!., b!7) @ 1
+'r13' A(x~u!.), +A(x~u!., d!1, c!2), +__incr(a!2, b!1), +__incr(a!., b!2), +__incr(a!., b!2) @ 1
+'get_zero' A(x~u/~p!., c!1/!2), __incr(b!1/!1), +__incr(a!1, b!2) @ 1
+
+/*0*/%mod: (|__incr(a!1, b!2), __incr(a!3, b!1), B(c!2), __incr(a!4, b!3), __incr(b!4)| = 1) do $PRINTF  <"
+Counter c of agent B reached maximum
+">; $STOP "counter_perturbation" repeat ([false])
+/*1*/%mod: (|A(d!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(b!3)| = 1) do $PRINTF  <"
+Counter d of agent A reached maximum
+">; $STOP "counter_perturbation" repeat ([false])
+/*2*/%mod: (|A(c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(b!4)| = 1) do $PRINTF  <"
+Counter c of agent A reached maximum
+">; $STOP "counter_perturbation" repeat ([false])
+
+%init: 10 A(x~u!., d!1, c!3), __incr(a!2, b!1), __incr(a!., b!2), __incr(a!., b!3)
+%init: 10 B(x!., c!1), __incr(a!., b!1)
+
+%mod: [E] = 8 do $STOP
