@@ -5,7 +5,7 @@ TIMEOUT?=10m
 FROM?=1
 TO?=10
 
-KADEOPTIONS?=--truncate 10
+KADEOPTIONS?=
 
 KAPPABIN?=$(HOME)/KaSim/bin/
 BNGBIN?=$(HOME)/BioNetGen/
