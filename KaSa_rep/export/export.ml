@@ -27,7 +27,7 @@ type state =
    Reachability.dynamic_information)
     Remanent_state.state
 
-type contact_map = Remanent_state.contact_map
+type contact_map = Public_data.contact_map
 
 type ctmc_flow = Remanent_state.flow
 
@@ -500,7 +500,7 @@ let compute_raw_internal_contact_map show_title state =
     Preprocess.export_contact_map parameters error handler
   in
   let state = Remanent_state.set_errors error state in
-  Remanent_state.set_internal_contact_map Remanent_state.Low contact_map state,
+  Remanent_state.set_internal_contact_map Public_data.Low contact_map state,
   contact_map
 
 let dump_raw_internal_contact_map state handler =
@@ -514,7 +514,7 @@ let get_raw_internal_contact_map  =
     ~do_we_show_title:title_only_in_kasa
     ~log_title:"Generating the raw contact map"
     (*  ~dump:dump_raw_internal_contact_map *)
-    (Remanent_state.get_internal_contact_map Remanent_state.Low)
+    (Remanent_state.get_internal_contact_map Public_data.Low)
     compute_raw_internal_contact_map
 
 let compute_raw_contact_map show_title state =
@@ -608,14 +608,14 @@ let compute_raw_contact_map show_title state =
       (Mods.StringSetMap.Map.map (fun (l,x) -> List.rev l,x)) sol
   in
   Remanent_state.set_errors error
-    (Remanent_state.set_contact_map Remanent_state.Low sol state),
+    (Remanent_state.set_contact_map Public_data.Low sol state),
   sol
 
 let get_raw_contact_map =
   get_gen
     ~do_we_show_title:title_only_in_kasa
     ~log_title:"Compute the contact map"
-    (Remanent_state.get_contact_map Remanent_state.Low)
+    (Remanent_state.get_contact_map Public_data.Low)
     compute_raw_contact_map
 
 let convert_label a =
@@ -736,7 +736,7 @@ let compute_raw_internal_influence_map show_title state =
     else error
   in
   let state =
-    Remanent_state.set_internal_influence_map Remanent_state.Low
+    Remanent_state.set_internal_influence_map Public_data.Low
       (wake_up_map,inhibition_map)
       state
   in
@@ -749,7 +749,7 @@ let get_raw_internal_influence_map =
     ~log_prefix:"Influence_map:"
     ~log_main_title:"Generating the raw influence map..."
     ~phase:(StoryProfiling.Internal_influence_map "raw")
-    (Remanent_state.get_internal_influence_map Remanent_state.Low)
+    (Remanent_state.get_internal_influence_map Public_data.Low)
     compute_raw_internal_influence_map
 
 module AgentProj =
@@ -860,7 +860,7 @@ let compute_intermediary_internal_influence_map show_title state =
       parameters error handler compil inhibition_map false
   in
   let state =
-    Remanent_state.set_internal_influence_map Remanent_state.Medium
+    Remanent_state.set_internal_influence_map Public_data.Medium
       (wake_up_map,inhibition_map)
       state
   in
@@ -869,7 +869,7 @@ let compute_intermediary_internal_influence_map show_title state =
   let error = Remanent_state.get_errors state in
   let nrules = Handler.nrules parameters error handler in
   let state =
-    Remanent_state.set_influence_map Remanent_state.Medium
+    Remanent_state.set_influence_map Public_data.Medium
       {
         Remanent_state.positive =
           convert_half_influence_map wake_up_map nrules;
@@ -914,14 +914,14 @@ let compute_intermediary_internal_influence_map show_title state =
   Remanent_state.set_errors error state, (wake_up_map, inhibition_map)
 
 let compute_map_gen
-    (get: ?accuracy_level:Remanent_state.accuracy_level ->
+    (get: ?accuracy_level:Public_data.accuracy_level ->
      (Reachability.static_information,
       Reachability.dynamic_information)
        Remanent_state.state ->
      (Reachability.static_information,
       Reachability.dynamic_information)
        Remanent_state.state * 'a )
-    store convert ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    store convert ?(accuracy_level=Public_data.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
     ?log_title
     state =
@@ -944,7 +944,7 @@ let get_intermediary_internal_influence_map =
     ~log_prefix:"Influence_map:"
     ~log_title:"Refining the influence map"
     ~phase:(StoryProfiling.Internal_influence_map "medium")
-    (Remanent_state.get_internal_influence_map Remanent_state.Medium)
+    (Remanent_state.get_internal_influence_map Public_data.Medium)
     compute_intermediary_internal_influence_map
 
 let compute_reachability_result show_title state =
@@ -1002,7 +1002,7 @@ let compute_high_res_internal_influence_map show_title state =
   in
   let state = Remanent_state.set_reachability_result (static, dynamic) state in
   let state =
-    Remanent_state.set_internal_influence_map Remanent_state.High
+    Remanent_state.set_internal_influence_map Public_data.High
       (wake_up_map,inhibition_map)
       state
   in
@@ -1011,7 +1011,7 @@ let compute_high_res_internal_influence_map show_title state =
   let error = Remanent_state.get_errors state in
   let nrules = Handler.nrules parameters error handler in
   let state =
-    Remanent_state.set_influence_map Remanent_state.High
+    Remanent_state.set_influence_map Public_data.High
       {
         Remanent_state.positive =
           convert_half_influence_map wake_up_map nrules;
@@ -1060,22 +1060,22 @@ let compute_high_res_internal_influence_map show_title state =
       ~log_prefix:"Influence_map:"
       ~log_title:"Refining further the influence map"
       ~phase:(StoryProfiling.Internal_influence_map "high")
-      (Remanent_state.get_internal_influence_map Remanent_state.High)
+      (Remanent_state.get_internal_influence_map Public_data.High)
       compute_high_res_internal_influence_map
 
 
 let get_internal_influence_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?accuracy_level:(accuracy_level=Public_data.Low)
     state =
   match accuracy_level with
-  | Remanent_state.Low ->
+  | Public_data.Low ->
     get_raw_internal_influence_map state
-  | Remanent_state.Medium -> get_intermediary_internal_influence_map state
-  | Remanent_state.High | Remanent_state.Full ->
+  | Public_data.Medium -> get_intermediary_internal_influence_map state
+  | Public_data.High | Public_data.Full ->
     get_high_res_internal_influence_map state
 
 let compute_influence_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
+    ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
   compute_map_gen
     get_internal_influence_map
     Remanent_state.set_influence_map
@@ -1083,15 +1083,15 @@ let compute_influence_map
     ~accuracy_level
 
 let get_influence_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?accuracy_level:(accuracy_level=Public_data.Low)
     ?do_we_show_title:(do_we_show_title=(fun _ -> true))
     ?log_title:(log_title=
                 (fun x ->
                     match x with
-                    | Remanent_state.Low ->
+                    | Public_data.Low ->
                       Some "Compute the influence map"
-                    | Remanent_state.Medium
-                    | Remanent_state.High | Remanent_state.Full ->
+                    | Public_data.Medium
+                    | Public_data.High | Public_data.Full ->
                       Some "Refine the influence map"))
      =
      get_gen
@@ -1126,7 +1126,7 @@ let get_dead_agents  =
 let compute_intermediary_internal_contact_map _show_title state =
   let state,_ = get_reachability_analysis state in
   match
-    Remanent_state.get_internal_contact_map Remanent_state.Medium state
+    Remanent_state.get_internal_contact_map Public_data.Medium state
   with
   | Some map -> state, map
   | None -> assert false
@@ -1136,21 +1136,21 @@ let get_intermediary_internal_contact_map =
     ~do_we_show_title:title_only_in_kasa
     ~log_title:"Generating the intermediary contact map"
     (*  ~dump:dump_raw_internal_contact_map *)
-    (Remanent_state.get_internal_contact_map Remanent_state.Medium)
+    (Remanent_state.get_internal_contact_map Public_data.Medium)
     compute_intermediary_internal_contact_map
 
 let get_internal_contact_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+    ?accuracy_level:(accuracy_level=Public_data.Low) state =
   match
     accuracy_level
   with
-  | Remanent_state.Low -> get_raw_internal_contact_map state
-  | Remanent_state.Medium
-  | Remanent_state.High
-  | Remanent_state.Full -> get_intermediary_internal_contact_map state
+  | Public_data.Low -> get_raw_internal_contact_map state
+  | Public_data.Medium
+  | Public_data.High
+  | Public_data.Full -> get_intermediary_internal_contact_map state
 
 let compute_contact_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) _show_title =
+    ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
   compute_map_gen
     get_internal_contact_map
     Remanent_state.set_contact_map
@@ -1158,7 +1158,7 @@ let compute_contact_map
     ~accuracy_level
 
 let get_contact_map
-    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?accuracy_level:(accuracy_level=Public_data.Low)
   =
   get_gen
     (Remanent_state.get_contact_map accuracy_level)
@@ -1167,19 +1167,19 @@ let get_contact_map
        ~do_we_show_title:(fun _ -> true)
        ~log_title:(fun x ->
          match x with
-         | Remanent_state.Low ->
+         | Public_data.Low ->
            Some "Compute the contact map"
-         | Remanent_state.Medium
-         | Remanent_state.High | Remanent_state.Full ->
+         | Public_data.Medium
+         | Public_data.High | Public_data.Full ->
            Some "Refine the contact map"))
 
 let get_internal_contact_map
-      ?accuracy_level:(accuracy_level=Remanent_state.Low)
+      ?accuracy_level:(accuracy_level=Public_data.Low)
       state =
   match accuracy_level with
-  | Remanent_state.Low ->
+  | Public_data.Low ->
     get_raw_internal_contact_map state
-  | Remanent_state.Medium | Remanent_state.High | Remanent_state.Full ->
+  | Public_data.Medium | Public_data.High | Public_data.Full ->
     get_intermediary_internal_contact_map state
 
 (******************************************************************)
@@ -1264,11 +1264,11 @@ let get_ode_flow =
 
 let find_most_precise map =
   match
-    Remanent_state.AccuracyMap.max_key map
+    Public_data.AccuracyMap.max_key map
   with
   | None -> None
   | Some key ->
-    Remanent_state.AccuracyMap.find_option key map
+    Public_data.AccuracyMap.find_option key map
 
 let get_most_accurate_contact_map state =
   let map = Remanent_state.get_contact_map_map state in
@@ -1278,7 +1278,7 @@ let get_most_accurate_influence_map state =
   let map = Remanent_state.get_influence_map_map state in
   find_most_precise map
 
-let dump_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+let dump_influence_map ?accuracy_level:(accuracy_level=Public_data.Low) state =
   match
     Remanent_state.get_influence_map accuracy_level state
   with
@@ -1287,7 +1287,7 @@ let dump_influence_map ?accuracy_level:(accuracy_level=Remanent_state.Low) state
     print_influence_map (Remanent_state.get_parameters state) influence_map
 
 let output_internal_influence_map ?logger
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+    ?accuracy_level:(accuracy_level=Public_data.Low) state =
   let parameters = get_parameters state in
   let state, influence_map = get_internal_influence_map ~accuracy_level state in
   let state, c_compil = get_c_compilation state in
@@ -1302,7 +1302,7 @@ let output_internal_influence_map ?logger
 let output_best_internal_influence_map state =
   let map = Remanent_state.get_internal_influence_map_map state in
   match
-    Remanent_state.AccuracyMap.max_key map
+    Public_data.AccuracyMap.max_key map
   with
   | None -> state
   | Some accuracy_level ->
@@ -1317,7 +1317,7 @@ let dump_contact_map accuracy state =
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
 let output_internal_contact_map ?logger
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+    ?accuracy_level:(accuracy_level=Public_data.Low) state =
   let parameters = Remanent_state.get_parameters state in
   let state, contact_map = get_internal_contact_map ~accuracy_level state in
   let state, handler = get_handler state in
@@ -1462,7 +1462,7 @@ let get_constraints_list_to_json state =
 (*symmetries*)
 
 let compute_symmetries
-    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?accuracy_level:(accuracy_level=Public_data.Low)
     _show_title state =
   let state, env = get_env state in
   let state, init = get_init state in
@@ -1512,14 +1512,14 @@ let compute_symmetries
     end
 
 let get_symmetric_sites
-    ?accuracy_level:(accuracy_level=Remanent_state.Low) =
+    ?accuracy_level:(accuracy_level=Public_data.Low) =
   get_gen
     (Remanent_state.get_symmetries accuracy_level)
     (compute_symmetries ~accuracy_level )
 
 let output_symmetries
     ?logger
-    ?accuracy_level:(accuracy_level=Remanent_state.Low)
+    ?accuracy_level:(accuracy_level=Public_data.Low)
     state =
   let parameters = Remanent_state.get_parameters state in
   let parameters =

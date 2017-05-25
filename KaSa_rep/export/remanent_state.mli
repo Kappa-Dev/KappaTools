@@ -19,32 +19,27 @@ type init =
 
 type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
 
-type accuracy_level = Low | Medium | High | Full
-
-val accuracy_to_json : accuracy_level -> Yojson.Basic.json
-val accuracy_of_json : Yojson.Basic.json -> accuracy_level
-
-module AccuracyMap: SetMap.Map with type elt = accuracy_level
-
 type internal_contact_map =
   (Ckappa_sig.c_state list *
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
-type contact_map =
-  ((string list) * (string*string) list)
-    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
-
-val contact_map_to_json:
-  accuracy_level * contact_map -> Yojson.Basic.json
-
-val contact_map_of_json:
-  Yojson.Basic.json -> accuracy_level * contact_map
-
 type quark_map = Quark_type.quarks
 
 type rule_id = int
 type var_id =  int
+
+type dead_rules = Ckappa_sig.c_rule_id list
+type dead_agents = Ckappa_sig.c_agent_name list
+
+val dead_rules_to_json : dead_rules -> Yojson.Basic.json
+
+type separating_transitions =
+  (string * Ckappa_sig.c_rule_id * string) list
+
+val separating_transitions_to_json:
+  separating_transitions -> Yojson.Basic.json
+
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
@@ -68,10 +63,10 @@ type influence_map =
   }
 
 val influence_map_to_json:
-  accuracy_level * influence_map -> Yojson.Basic.json
+  Public_data.accuracy_level * influence_map -> Yojson.Basic.json
 
 val influence_map_of_json:
-  Yojson.Basic.json -> accuracy_level * influence_map
+  Yojson.Basic.json -> Public_data.accuracy_level * influence_map
 
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
@@ -80,19 +75,6 @@ type internal_influence_map =
 type ('static,'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
-
-type dead_rules = Ckappa_sig.c_rule_id list
-
-val dead_rules_to_json : dead_rules -> Yojson.Basic.json
-val dead_rules_of_json : Yojson.Basic.json -> dead_rules
-
-type dead_agents = Ckappa_sig.c_agent_name list
-
-type separating_transitions =
-  (string * Ckappa_sig.c_rule_id * string) list
-
-val separating_transitions_to_json: separating_transitions -> Yojson.Basic.json
-val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
 
 type flow =
     Ckappa_sig.Site_union_find.t
@@ -137,11 +119,11 @@ val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
 
 val of_json: Yojson.Basic.json ->
   Exception_without_parameter.method_handler *
-  contact_map AccuracyMap.t *
-  influence_map AccuracyMap.t *
-  Ckappa_sig.c_rule_id list option *
+  Public_data.contact_map Public_data.AccuracyMap.t *
+  influence_map Public_data.AccuracyMap.t *
+  int list option *
   constraints_list option *
-  separating_transitions option
+  Public_data.separating_transitions option
 
 val create_state:
   ?errors:Exception.method_handler -> ?env:Model.t option ->
@@ -201,16 +183,21 @@ val get_errors: ('static, 'compile) state -> Exception.method_handler
 
 val set_errors: Exception.method_handler -> ('static, 'compile) state -> ('static, 'compile) state
 
-val set_internal_contact_map: accuracy_level -> internal_contact_map -> ('static, 'compile) state -> ('static, 'compile) state
+val set_internal_contact_map:
+  Public_data.accuracy_level -> internal_contact_map ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
-val get_internal_contact_map: accuracy_level -> ('static, 'compile) state ->
+val get_internal_contact_map:
+  Public_data.accuracy_level -> ('static, 'compile) state ->
   internal_contact_map option
 
-val set_contact_map: accuracy_level -> contact_map -> ('static, 'compile) state
-  -> ('static, 'compile) state
+val set_contact_map:
+  Public_data.accuracy_level -> Public_data.contact_map ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
-val get_contact_map: accuracy_level -> ('static, 'compile) state -> contact_map
-    option
+val get_contact_map:
+  Public_data.accuracy_level -> ('static, 'compile) state ->
+  Public_data.contact_map option
 
 val set_signature: Signature.s -> ('static, 'compile) state -> ('static, 'compile) state
 
@@ -220,13 +207,21 @@ val set_quark_map: quark_map -> ('static, 'compile) state -> ('static, 'compile)
 
 val get_quark_map: ('static, 'compile) state -> quark_map option
 
-val set_internal_influence_map: accuracy_level -> internal_influence_map -> ('static, 'compile) state -> ('static, 'compile) state
+val set_internal_influence_map:
+  Public_data.accuracy_level -> internal_influence_map ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
-val get_internal_influence_map: accuracy_level -> ('static, 'compile) state -> internal_influence_map option
+val get_internal_influence_map:
+  Public_data.accuracy_level -> ('static, 'compile) state ->
+  internal_influence_map option
 
-val set_influence_map: accuracy_level -> influence_map -> ('static, 'compile) state -> ('static, 'compile) state
+val set_influence_map:
+  Public_data.accuracy_level -> influence_map ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
-val get_influence_map: accuracy_level -> ('static, 'compile) state -> influence_map option
+val get_influence_map:
+  Public_data.accuracy_level -> ('static, 'compile) state ->
+  influence_map option
 
 val set_ode_flow: Ode_fragmentation_type.ode_frag -> ('static, 'compile) state -> ('static, 'compile) state
 
@@ -250,22 +245,31 @@ val set_subviews_info: subviews_info -> ('static, 'compile) state -> ('static, '
 
 val get_dead_rules: ('static, 'compile) state -> dead_rules option
 
-val set_dead_rules: dead_rules -> ('static, 'compile) state -> ('static, 'compile) state
+val set_dead_rules:
+  dead_rules -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_dead_agents: ('static, 'compile) state -> dead_agents option
 
-val set_dead_agents: dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
+val set_dead_agents:
+  dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
 
-val get_influence_map_map: ('static, 'compile) state -> influence_map AccuracyMap.t
+val get_influence_map_map:
+  ('static, 'compile) state -> influence_map Public_data.AccuracyMap.t
 
-val set_separating_transitions: separating_transitions -> ('static, 'compile) state -> ('static, 'compile) state
-val get_separating_transitions: ('static, 'compile) state -> separating_transitions option
+val set_separating_transitions:
+  separating_transitions -> ('static, 'compile) state ->
+  ('static, 'compile) state
+val get_separating_transitions:
+  ('static, 'compile) state -> separating_transitions option
 
-val get_contact_map_map: ('static, 'compile) state -> contact_map AccuracyMap.t
+val get_contact_map_map:
+  ('static, 'compile) state -> Public_data.contact_map Public_data.AccuracyMap.t
 
-val get_internal_influence_map_map: ('static, 'compile) state -> internal_influence_map AccuracyMap.t
+val get_internal_influence_map_map:
+  ('static, 'compile) state -> internal_influence_map Public_data.AccuracyMap.t
 
-val get_internal_contact_map_map: ('static, 'compile) state -> internal_contact_map AccuracyMap.t
+val get_internal_contact_map_map:
+  ('static, 'compile) state -> internal_contact_map Public_data.AccuracyMap.t
 
 val set_log_info: StoryProfiling.StoryStats.log_info -> ('static, 'compile) state -> ('static, 'compile) state
 
@@ -283,11 +287,14 @@ val get_constraints_list : ('static, 'compile) state ->
 val set_constraints_list : constraints_list -> ('static, 'compile) state ->
   ('static, 'compile) state
 
-val get_symmetries : accuracy_level -> ('static, 'compile) state -> symmetric_sites option
+val get_symmetries :
+  Public_data.accuracy_level -> ('static, 'compile) state -> symmetric_sites option
 
-val set_symmetries : accuracy_level -> symmetric_sites
+val set_symmetries :
+  Public_data.accuracy_level -> symmetric_sites
   -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_data:
   ('static, 'compile) state ->
-  Cckappa_sig.kappa_handler option * dead_rules option * separating_transitions option
+  Cckappa_sig.kappa_handler option * dead_rules option *
+  separating_transitions option

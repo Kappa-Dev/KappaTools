@@ -203,7 +203,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         let _state, contact_map =
           Export_to_kade.get_contact_map
-            ~accuracy_level:Remanent_state.High state
+            ~accuracy_level:Public_data.High state
         in
         let parameters =
           Remanent_parameters.set_logger

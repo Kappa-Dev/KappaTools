@@ -26,8 +26,7 @@ module type Type =
       unit -> state
 
     val get_contact_map:
-      ?accuracy_level: Remanent_state.accuracy_level
-      -> state -> state * contact_map
+      ?accuracy_level: Public_data.accuracy_level -> state -> state * contact_map
 
     val get_dead_rules:
       state -> state * Ckappa_sig.c_rule_id list

@@ -4324,7 +4324,7 @@ struct
       let dynamic = set_mvbdu_handler handler dynamic in
       let kasa_state =
         Remanent_state.set_internal_contact_map
-          Remanent_state.Medium contact_map kasa_state
+          Public_data.Medium contact_map kasa_state
       in
       error, dynamic, kasa_state
 

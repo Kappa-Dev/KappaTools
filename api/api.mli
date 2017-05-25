@@ -163,10 +163,10 @@ class type manager_static_analysis =
     method init_static_analyser_raw :
       string -> (unit, string) Lwt_result.t
     method get_contact_map :
-      Remanent_state.accuracy_level option ->
+      Public_data.accuracy_level option ->
       (Yojson.Basic.json,string) Lwt_result.t
     method get_influence_map :
-      Remanent_state.accuracy_level option ->
+      Public_data.accuracy_level option ->
       (Yojson.Basic.json,string) Lwt_result.t
     method get_dead_rules :
       (Yojson.Basic.json,string) Lwt_result.t

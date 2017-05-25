@@ -27,66 +27,6 @@ type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string,
    Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
-(*******************)
-(* Accuracy levels *)
-(*******************)
-
-type accuracy_level = Low | Medium | High | Full
-
-let accuracy_to_json accuracy =
-  JsonUtil.of_string
-    (
-      match
-        accuracy
-      with
-      | Low -> "low"
-      | Medium -> "medium"
-      | High -> "high"
-      | Full -> "full"
-    )
-
-let accuracy_of_json json =
-  match
-    JsonUtil.to_string json
-  with
-  | "low" -> Low
-  | "medium" -> Medium
-  | "high" -> High
-  | "full" -> Full
-  | _ ->
-    raise
-      (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level",json))
-
-(******************************************************************)
-
-module AccuracySetMap =
-  SetMap.Make
-    (struct
-      type t = accuracy_level
-      let compare a b =
-        match a,b with
-        | Low,Low -> 0
-        | Low,_ -> -1
-        | _,Low -> 1
-        | Medium,Medium -> 0
-        | Medium,_ -> -1
-        | _,Medium -> 1
-        | High, High -> 0
-        | High,_ -> -1
-        | _,High -> 1
-        | Full,Full -> 0
-
-      let print f = function
-        | Full -> Format.fprintf f "Full"
-        | High -> Format.fprintf f "High"
-        | Medium -> Format.fprintf f "Medium"
-        | Low -> Format.fprintf f "Low"
-    end)
-
-module AccuracyMap = AccuracySetMap.Map
-
-(******************************************************************)
-
 type quark_map = Quark_type.quarks
 
 type rule_id = int
@@ -96,6 +36,14 @@ type var_id =  int
 (* JSon labels*)
 (**************)
 
+let accuracy_string = "accuracy"
+let map = "map"
+let site="site name"
+let stateslist="states list"
+let interface="interface"
+let agent="agent name"
+let contactmap="contact map"
+let dead_rules = "dead rules"
 let wakeup = "wake-up map"
 let inhibition = "inhibition map"
 let source = "source"
@@ -104,20 +52,11 @@ let target = "target"
 let location_pair_list = "location pair list"
 let rhs = "RHS"
 let lhs = "LHS"
-let agent="agent name"
-let interface="interface"
-let site="site name"
-let stateslist="states list"
-let props="property states"
-let binds="binding states"
-let contactmap="contact map"
 let contactmaps="contact maps"
 let influencemap="influence map"
 let influencemaps="influence maps"
 let refinement_lemmas="refinement lemmas"
 let separating_transitions = "separating transitions"
-let map = "map"
-let accuracy_string = "accuracy"
 let variable = "variable"
 let rule = "rule"
 let direct = "direct"
@@ -128,8 +67,27 @@ let hyp = "site graph"
 let refinement = "site graph list"
 let domain_name = "domain name"
 let refinements_list = "refinements list"
-let dead_rules = "dead rules"
 let errors = "errors"
+
+type dead_rules = Ckappa_sig.c_rule_id list
+
+let dead_rules_to_json json =
+  `Assoc
+    [dead_rules, JsonUtil.of_list Ckappa_sig.rule_id_to_json json]
+
+type dead_agents = Ckappa_sig.c_agent_name list
+
+type separating_transitions =
+  (string * Ckappa_sig.c_rule_id * string) list
+
+let separating_transitions_to_json =
+  JsonUtil.of_list
+    (JsonUtil.of_triple
+       ~lab1:"s1" ~lab2:"label" ~lab3:"s3"
+       JsonUtil.of_string
+       Ckappa_sig.rule_id_to_json
+       JsonUtil.of_string)
+
 
 (*****************)
 (* Influence map *)
@@ -241,7 +199,7 @@ let influence_map_to_json influence_map =
   [influencemap,
    JsonUtil.of_pair
      ~lab1:accuracy_string ~lab2:map
-     accuracy_to_json
+     Public_data.accuracy_to_json
      (fun influence_map ->
         `Assoc
           [
@@ -258,7 +216,7 @@ let influence_map_of_json =
         JsonUtil.to_pair
         ~lab1:accuracy_string ~lab2:map
         ~error_msg:(JsonUtil.build_msg "influence map1")
-        accuracy_of_json
+        Public_data.accuracy_of_json
       (function
         | `Assoc l as x when List.length l = 2 ->
           begin
@@ -288,109 +246,7 @@ let influence_map_of_json =
 (******************************************************************************)
 (******************************************************************************)
 
-(***************)
-(* Contact map *)
-(***************)
-
-type contact_map =
-  ((string list) * (string*string) list)
-    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
-
-let contact_map_to_json contact_map=
-  `Assoc
-    [contactmap,
-     JsonUtil.of_pair
-       ~lab1:accuracy_string ~lab2:map
-       accuracy_to_json
-       (Mods.StringSetMap.Map.to_json
-       ~lab_key:agent ~lab_value:interface
-       JsonUtil.of_string
-       (Mods.StringSetMap.Map.to_json
-          ~lab_key:site ~lab_value:stateslist
-          JsonUtil.of_string
-          (JsonUtil.of_pair
-             ~lab1:props ~lab2:binds
-             (JsonUtil.of_list JsonUtil.of_string)
-             (JsonUtil.of_list
-                (JsonUtil.of_pair
-                   ~lab1:agent ~lab2:site
-                   JsonUtil.of_string
-                   JsonUtil.of_string)
-             )))) contact_map]
-
-let contact_map_of_json =
-  function
-  | `Assoc l as x ->
-    begin
-      try
-        let json = List.assoc contactmap l in
-        JsonUtil.to_pair
-          ~lab1:accuracy_string ~lab2:map
-          ~error_msg:(JsonUtil.build_msg "contact map")
-          accuracy_of_json
-          (Mods.StringSetMap.Map.of_json
-             ~lab_key:agent ~lab_value:interface
-             (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
-             (Mods.StringSetMap.Map.of_json
-                ~error_msg:(JsonUtil.build_msg "interface")
-                ~lab_key:site ~lab_value:stateslist
-                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
-                  (JsonUtil.to_pair
-                     ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
-                     ~lab1:props ~lab2:binds
-                     (JsonUtil.to_list
-                        ~error_msg:(JsonUtil.build_msg "list of internal states")
-                        (JsonUtil.to_string
-                           ~error_msg:(JsonUtil.build_msg "internal state")))
-                     (JsonUtil.to_list
-                        ~error_msg:(JsonUtil.build_msg "list of binding states")
-                        (JsonUtil.to_pair
-                           ~error_msg:(JsonUtil.build_msg "binding type")
-                           ~lab1:agent ~lab2:site
-                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
-                                                             "agent name"))
-                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
-                                                             "site")))))))
-          json
-      with
-      | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
-    end
-  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
-
 (******************************************************************************)
-(******************************************************************************)
-
-(**************)
-(* dead rules *)
-(**************)
-
-type dead_rules = Ckappa_sig.c_rule_id list
-
-let dead_rules_to_json json =
-  `Assoc
-    [dead_rules, JsonUtil.of_list Ckappa_sig.rule_id_to_json json]
-
-let dead_rules_of_json =
-  function
-  | `Assoc l as x ->
-    begin
-      try
-        let json = List.assoc dead_rules l in
-        JsonUtil.to_list
-          ~error_msg:"list of dead rules" Ckappa_sig.rule_id_of_json json
-      with
-      | _ ->
-        raise
-          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead  rules",x))
-    end
-  | x ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
-
-(***************)
-(* dead agents *)
-(***************)
-
-type dead_agents = Ckappa_sig.c_agent_name list
 
 (*********************)
 (* refinement lemmas *)
@@ -568,28 +424,6 @@ type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
 
-type separating_transitions =
-  (string * Ckappa_sig.c_rule_id * string) list
-
-let separating_transitions_of_json =
-  JsonUtil.to_list
-    ~error_msg:"separating transitions"
-    (
-      JsonUtil.to_triple
-        ~error_msg:"transition"
-        ~lab1:"s1" ~lab2:"label" ~lab3:"s2"
-        JsonUtil.to_string
-        Ckappa_sig.rule_id_of_json
-        JsonUtil.to_string)
-
-let separating_transitions_to_json =
-  JsonUtil.of_list
-    (JsonUtil.of_triple
-       ~lab1:"s1" ~lab2:"label" ~lab3:"s3"
-       JsonUtil.of_string
-       Ckappa_sig.rule_id_to_json
-       JsonUtil.of_string)
-
 type flow =
   Ckappa_sig.Site_union_find.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t
@@ -615,10 +449,10 @@ type ('static,'dynamic) state =
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;
     quark_map: quark_map option ;
-    internal_influence_map: internal_influence_map AccuracyMap.t ;
-    influence_map : influence_map AccuracyMap.t ;
-    internal_contact_map: internal_contact_map AccuracyMap.t;
-    contact_map   : contact_map AccuracyMap.t ;
+    internal_influence_map: internal_influence_map Public_data.AccuracyMap.t ;
+    influence_map : influence_map Public_data.AccuracyMap.t ;
+    internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
+    contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
     reachability_state: ('static, 'dynamic) reachability_result option ;
@@ -630,7 +464,7 @@ type ('static,'dynamic) state =
     errors        : Exception.method_handler ;
     internal_constraints_list : internal_constraints_list option;
     constraints_list : constraints_list option;
-    symmetric_sites : symmetric_sites AccuracyMap.t;
+    symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
   }
 
@@ -659,10 +493,10 @@ let create_state ?errors ?env ?init_state parameters init =
     refined_compilation = None ;
     c_compil = None ;
     quark_map = None ;
-    internal_influence_map = AccuracyMap.empty ;
-    influence_map = AccuracyMap.empty ;
-    internal_contact_map = AccuracyMap.empty ;
-    contact_map = AccuracyMap.empty ;
+    internal_influence_map = Public_data.AccuracyMap.empty ;
+    influence_map = Public_data.AccuracyMap.empty ;
+    internal_contact_map = Public_data.AccuracyMap.empty ;
+    contact_map = Public_data.AccuracyMap.empty ;
     signature = None ;
     bdu_handler = handler_bdu ;
     ode_flow = None ;
@@ -674,7 +508,7 @@ let create_state ?errors ?env ?init_state parameters init =
     errors = error ;
     internal_constraints_list = None;
     constraints_list = None;
-    symmetric_sites = AccuracyMap.empty;
+    symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
   }
 
@@ -686,21 +520,21 @@ let add_to_json f state l =
   (f state) :: l
 
 let annotate map =
-  AccuracyMap.fold
+  Public_data.AccuracyMap.fold
     (fun x y l -> (x,(x,y))::l)
     map
     []
 
 let add_map get title label to_json state l =
   let map = get state in
-  if AccuracyMap.is_empty map then l
+  if Public_data.AccuracyMap.is_empty map then l
   else
     let y = annotate (get state) in
       (title, JsonUtil.of_list
          (JsonUtil.of_pair
             ~lab1:accuracy_string
             ~lab2:label
-            accuracy_to_json
+            Public_data.accuracy_to_json
             (fun x ->
                match to_json x with
                | `Assoc [s,m] when s = label -> m
@@ -715,7 +549,7 @@ let get_map empty add of_json label json =
       (JsonUtil.to_pair
          ~lab1:accuracy_string
          ~lab2:label ~error_msg:"pair11"
-         accuracy_of_json
+         Public_data.accuracy_of_json
          (fun json ->
             of_json
               (`Assoc [label,json])))
@@ -728,14 +562,14 @@ let get_map empty add of_json label json =
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
-let get_separating_transitions state = state.separating_transitions
+(*let get_separating_transitions state = state.separating_transitions*)
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 
 let add_contact_map_to_json state l
      =
   add_map get_contact_map_map
-    contactmaps contactmap contact_map_to_json
+    contactmaps contactmap Public_data.contact_map_to_json
     state l
 
 
@@ -799,25 +633,25 @@ let of_json =
     in
     let contact_maps =
       try
-        get_map AccuracyMap.empty AccuracyMap.add
-          contact_map_of_json
+        get_map Public_data.AccuracyMap.empty Public_data.AccuracyMap.add
+          Public_data.contact_map_of_json
           contactmap
           (List.assoc contactmaps l)
       with
-      | Not_found -> AccuracyMap.empty
+      | Not_found -> Public_data.AccuracyMap.empty
     in
     let influence_maps =
       try
-        get_map AccuracyMap.empty AccuracyMap.add
+        get_map Public_data.AccuracyMap.empty Public_data.AccuracyMap.add
           influence_map_of_json
           influencemap
           (List.assoc influencemaps l)
       with
-      | Not_found -> AccuracyMap.empty
+      | Not_found -> Public_data.AccuracyMap.empty
     in
     let dead_rules =
       try
-        Some (dead_rules_of_json (List.assoc dead_rules l))
+        Some (Public_data.dead_rules_of_json (List.assoc dead_rules l))
       with
       | Not_found -> None
     in
@@ -829,7 +663,8 @@ let of_json =
     in
     let separating_transitions =
       try
-        Some (separating_transitions_of_json (List.assoc separating_transitions l))
+        Some (Public_data.separating_transitions_of_json
+                (List.assoc separating_transitions l))
       with
       | Not_found -> None
     in
@@ -908,35 +743,39 @@ let set_quark_map quark_map state =
 let get_quark_map state = state.quark_map
 
 let set_contact_map accuracy map state =
-  {state with contact_map = AccuracyMap.add accuracy map state.contact_map}
+  {state with contact_map =
+                Public_data.AccuracyMap.add accuracy map state.contact_map}
 
 let get_contact_map accuracy state =
-  AccuracyMap.find_option accuracy state.contact_map
+  Public_data.AccuracyMap.find_option accuracy state.contact_map
 
 let set_signature signature state = {state with signature = Some signature}
 
 let get_signature state = state.signature
 
 let set_influence_map accuracy map state =
-  {state with influence_map = AccuracyMap.add accuracy map state.influence_map}
+  {state with influence_map =
+                Public_data.AccuracyMap.add accuracy map state.influence_map}
 
 let get_influence_map accuracy state =
-  AccuracyMap.find_option accuracy state.influence_map
+  Public_data.AccuracyMap.find_option accuracy state.influence_map
 
 let set_internal_influence_map accuracy map state =
   {state
    with internal_influence_map =
-          AccuracyMap.add accuracy map state.internal_influence_map}
+          Public_data.AccuracyMap.add accuracy map state.internal_influence_map}
 
 let get_internal_influence_map accuracy state =
-  AccuracyMap.find_option accuracy state.internal_influence_map
+  Public_data.AccuracyMap.find_option accuracy state.internal_influence_map
 
 let set_internal_contact_map accuracy int_contact_map state =
   {state
-   with internal_contact_map = AccuracyMap.add accuracy int_contact_map state.internal_contact_map}
+   with internal_contact_map =
+          Public_data.AccuracyMap.add
+            accuracy int_contact_map state.internal_contact_map}
 
 let get_internal_contact_map accuracy state =
-  AccuracyMap.find_option accuracy state.internal_contact_map
+  Public_data.AccuracyMap.find_option accuracy state.internal_contact_map
 
 let get_reachability_result state = state.reachability_state
 
@@ -994,11 +833,12 @@ let set_constraints_list list state =
 
 
 let get_symmetries accuracy state =
-  AccuracyMap.find_option accuracy state.symmetric_sites
+  Public_data.AccuracyMap.find_option accuracy state.symmetric_sites
 
 let set_symmetries accuracy partition state =
   {
     state
     with symmetric_sites =
-           AccuracyMap.add accuracy partition state.symmetric_sites
+           Public_data.AccuracyMap.add
+             accuracy partition state.symmetric_sites
   }

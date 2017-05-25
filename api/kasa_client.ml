@@ -54,7 +54,7 @@ class new_client ~post =
       let request =
         `List ( `String "CONTACT_MAP" :: match accuracy with
           | None -> []
-          | Some a -> [Remanent_state.accuracy_to_json a]) in
+          | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
         (message post request)
         (fun x -> Result.Ok x)
@@ -62,7 +62,7 @@ class new_client ~post =
       let request =
         `List ( `String "INFLUENCE_MAP" :: match accuracy with
           | None -> []
-          | Some a -> [Remanent_state.accuracy_to_json a]) in
+          | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
         (message post request)
         (fun x -> Result.Ok x)

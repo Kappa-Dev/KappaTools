@@ -49,25 +49,25 @@ let on_message post text =
        send_response post `Null
      with e -> send_exception post e)
   | `List [ `String "CONTACT_MAP"; acc ] ->
-    let accuracy_level = Remanent_state.accuracy_of_json acc in
+    let accuracy_level = Public_data.accuracy_of_json acc in
     let state, cm = get_contact_map ~accuracy_level !gState in
     let () = gState := state in
     send_response
-      post (Remanent_state.contact_map_to_json (accuracy_level,cm))
+      post (Public_data.contact_map_to_json (accuracy_level,cm))
   | `List [ `String "CONTACT_MAP" ] | `String "CONTACT_MAP" ->
-    let accuracy_level = Remanent_state.Low in
+    let accuracy_level = Public_data.Low in
     let state, cm = get_contact_map ~accuracy_level !gState in
     let () = gState := state in
     send_response
-      post (Remanent_state.contact_map_to_json (accuracy_level,cm))
+      post (Public_data.contact_map_to_json (accuracy_level,cm))
   | `List [ `String "INFLUENCE_MAP"; acc ] ->
-    let accuracy_level = Remanent_state.accuracy_of_json acc in
+    let accuracy_level = Public_data.accuracy_of_json acc in
     let state, im = get_influence_map ~accuracy_level !gState in
     let () = gState := state in
     send_response
       post (Remanent_state.influence_map_to_json (accuracy_level,im))
   | `List [ `String "INFLUENCE_MAP" ] | `String "INFLUENCE_MAP" ->
-    let accuracy_level = Remanent_state.Low in
+    let accuracy_level = Public_data.Low in
     let state, im = get_influence_map ~accuracy_level !gState in
     let () = gState := state in
     send_response

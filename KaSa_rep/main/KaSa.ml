@@ -43,7 +43,7 @@ let main () =
         | Remanent_parameters_sig.Low ->
           true,
           Export_to_KaSa.output_contact_map
-            ~accuracy_level:Remanent_state.Low state
+            ~accuracy_level:Public_data.Low state
         | Remanent_parameters_sig.Medium
         | Remanent_parameters_sig.High
         | Remanent_parameters_sig.Full -> false, state
@@ -71,12 +71,10 @@ let main () =
                            Remanent_parameters.get_influence_map_accuracy_level parameters
                          with
                          | Remanent_parameters_sig.None
-                         | Remanent_parameters_sig.Low ->
-                           Remanent_state.Low
-                         | Remanent_parameters_sig.Medium ->
-                           Remanent_state.Medium
+                         | Remanent_parameters_sig.Low -> Public_data.Low
+                         | Remanent_parameters_sig.Medium -> Public_data.Medium
                          | Remanent_parameters_sig.High
-                         | Remanent_parameters_sig.Full -> Remanent_state.High)
+                         | Remanent_parameters_sig.Full -> Public_data.High)
         state
     else
       state
@@ -101,7 +99,7 @@ let main () =
       | Remanent_parameters_sig.High
       | Remanent_parameters_sig.Full ->
         Export_to_KaSa.output_contact_map
-          ~accuracy_level:Remanent_state.Medium
+          ~accuracy_level:Public_data.Medium
           state
       | Remanent_parameters_sig.None
       | Remanent_parameters_sig.Low -> state
@@ -116,12 +114,12 @@ let main () =
     | Remanent_parameters_sig.High
     | Remanent_parameters_sig.Full ->
       Export_to_KaSa.output_symmetries
-        ~accuracy_level:Remanent_state.Medium
+        ~accuracy_level:Public_data.Medium
         state
     | Remanent_parameters_sig.None
     | Remanent_parameters_sig.Low ->
       Export_to_KaSa.output_symmetries
-        ~accuracy_level:Remanent_state.Low
+        ~accuracy_level:Public_data.Low
         state
     else
       state

@@ -28,8 +28,8 @@ module type Type =
     val get_errors: state -> errors
 
     val get_contact_map:
-      ?accuracy_level:Remanent_state.accuracy_level ->
-      state -> state * Remanent_state.contact_map
+      ?accuracy_level:Public_data.accuracy_level -> state ->
+      state * Public_data.contact_map
 
   end
 

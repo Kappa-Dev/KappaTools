@@ -54,11 +54,11 @@ sig
   val get_c_compilation: state -> state * c_compilation
 
   val get_contact_map:
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_contact_map
 
   val get_influence_map:
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_influence_map
 
   val get_reachability_analysis: state -> state * reachability_analysis
@@ -70,21 +70,21 @@ sig
   val get_ode_flow: state -> state * ode_flow
 
   val get_symmetric_sites:
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Remanent_state.symmetric_sites
 
   val dump_c_compil: state -> c_compilation -> state
 
-  val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+  val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
-  val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Remanent_state.accuracy_level -> state -> state
+  val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
   val output_constraints_list: ?logger:Loggers.t ->
     state -> state
 
   val output_symmetries:
     ?logger:Loggers.t ->
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state
 
   val get_data:

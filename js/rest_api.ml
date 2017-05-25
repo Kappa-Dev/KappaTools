@@ -346,7 +346,7 @@ class manager
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/analyses/contact_map/%s" url
-           (Yojson.Basic.to_string (Remanent_state.accuracy_to_json accuracy))
+           (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
        | None -> Format.sprintf "%s/v2/analyses/contact_map" url)
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -361,7 +361,7 @@ class manager
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/analyses/influence_map/%s" url
-           (Yojson.Basic.to_string (Remanent_state.accuracy_to_json accuracy))
+           (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
       (fun x -> Yojson.Basic.from_string x)

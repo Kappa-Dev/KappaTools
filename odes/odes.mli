@@ -74,7 +74,7 @@ sig
     Remanent_parameters_sig.parameters ->
     I.compil ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
-    Remanent_state.contact_map ->
+    Public_data.contact_map ->
     (ode_var_id, Ode_loggers_sig.ode_var_id) network
   val set_to_backward_symmetries_from_model:
     (ode_var_id, Ode_loggers_sig.ode_var_id) network ->
