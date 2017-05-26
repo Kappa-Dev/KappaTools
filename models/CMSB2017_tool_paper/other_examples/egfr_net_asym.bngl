@@ -1,0 +1,174 @@
+begin model
+begin parameters
+    egf_tot       1.2e6    # molecule counts
+    egfr_tot      1.8e5    # molecule counts
+    Grb2_tot      1.0e5    # molecule counts
+    Shc_tot       2.7e5    # molecule counts
+    Sos_tot       1.3e4    # molecule counts
+    Grb2_Sos_tot  4.9e4    # molecule counts
+
+    kp1      1.667e-06 # ligand-monomer binding (scaled), units: /molecule/s
+    km1           0.06 # ligand-monomer dissociation, units: /s
+
+    kp2      5.556e-06 # aggregation of bound monomers (scaled), units: /molecule/s
+    km2            0.1 # dissociation of bound monomers, units: /s
+
+    kp3            0.5 # dimer transphosphorylation, units: /s
+    km3          4.505 # dimer dephosphorylation, units: /s
+
+    kp14             3 # Shc transphosphorylation, units: /s
+    km14          0.03 # Shc dephosphorylation, units: /s
+    
+    km16         0.005 # Shc cytosolic dephosphorylation, units: /s
+
+    kp9      8.333e-07 # binding of Grb2 to receptor (scaled), units: /molecule/s
+    km9           0.05 # dissociation of Grb2 from receptor, units: /s
+
+    kp10     5.556e-06 # binding of Sos to receptor (scaled), units: /molecule/s
+    km10          0.06 # dissociation of Sos from receptor, units: /s
+
+    kp11      1.25e-06 # binding of Grb2-Sos to receptor (scaled), units: /molecule/s
+    km11          0.03 # diss. of Grb2-Sos from receptor, units: /s
+    
+    kp13       2.5e-05 # binding of Shc to receptor (scaled), units: /molecule/s
+    km13           0.6 # diss. of Shc from receptor, units: /s
+
+    kp15       2.5e-07 # binding of ShcP to receptor (scaled), units: /molecule/s
+    km15           0.3 # diss. of ShcP from receptor, units: /s
+
+    kp17     1.667e-06 # binding of Grb2 to RP-ShcP (scaled), units: /molecule/s
+    km17           0.1 # diss. of Grb2 from RP-ShcP, units: /s
+
+    kp18       2.5e-07 # binding of ShcP-Grb2 to receptor (scaled), units: /molecule/s
+    km18           0.3 # diss. of ShcP-Grb2 from receptor, units: /s
+
+    kp19     5.556e-06 # binding of Sos to RP-ShcP-Grb2 (scaled), units: /molecule/s
+    km19        0.0214 # diss. of Sos from RP-ShcP-Grb2, units: /s
+
+    kp20     6.667e-08 # binding of ShcP-Grb2-Sos to receptor (scaled), units: /molecule/s
+    km20          0.12 # diss. of ShcP-Grb2-Sos from receptor, units: /s
+
+    kp24         5e-06 # binding of Grb2-Sos to RP-ShcP (scaled), units: /molecule/s
+    km24        0.0429 # diss. of Grb2-Sos from RP-ShcP, units: /s
+
+    kp21     1.667e-06 # binding of ShcP to Grb2 in cytosol (scaled), units: /molecule/s
+    km21          0.01 # diss. of Grb2 and SchP in cytosol, units: /s
+
+    kp23     1.167e-05 # binding of ShcP to Grb2-Sos in cytosol (scaled), units: /molecule/s
+    km23           0.1 # diss. of Grb2-Sos and SchP in cytosol, units: /s
+
+    kp12     5.556e-08 # binding of Grb2 to Sos in cytosol (scaled), units: /molecule/s
+    km12        0.0015 # diss. of Grb2 and Sos in cytosol, units: /s
+
+    kp22     1.667e-05 # binding of ShcP-Grb2 to Sos in cytosol (scaled), units: /molecule/s
+    km22         0.064 # diss. of ShcP-Grb2 and Sos in cytosol, units: /s
+
+    # check detailed balanced
+    loop1 = (kp9/km9)*(kp10/km10)/((kp11/km11)*(kp12/km12))
+    loop2 = (kp15/km15)*(kp17/km17)/((kp21/km21)*(kp18/km18))
+    loop3 = (kp18/km18)*(kp19/km19)/((kp22/km22)*(kp20/km20))
+    loop4 = (kp12/km12)*(kp23/km23)/((kp22/km22)*(kp21/km21))
+    loop5 = (kp15/km15)*(kp24/km24)/((kp20/km20)*(kp23/km23))
+end parameters
+
+begin molecule types
+    egf(r)
+    egfr(l,r,Y1068~Y~pY,Y1148~Y~pY)
+    Shc(PTB,Y317~Y~pY)
+    Grb2(SH2,SH3)
+    Sos(dom)
+end molecule types
+
+begin seed species
+    egf(r)                        egf_tot
+    Grb2(SH2,SH3)                 Grb2_tot
+    Shc(PTB,Y317~Y)               Shc_tot
+    Sos(dom)                      Sos_tot
+    egfr(l,r,Y1068~Y,Y1148~Y)     egfr_tot
+    Grb2(SH2,SH3!1).Sos(dom!1)    Grb2_Sos_tot
+end seed species
+
+begin reaction rules
+    # Ligand-receptor binding (ligand-monomer)
+    egfr(l,r)   + egf(r) <-> egfr(l!1,r).egf(r!1)   kp1, km1 
+
+    # Note changed multiplicity
+    # Receptor-aggregation 
+    egfr(l!+,r) + egfr(l!+,r) <-> egfr(l!+,r!3).egfr(l!+,r!3)  kp2, km2
+
+    # Transphosphorylation of egfr by RTK
+    egfr(r!+,Y1068~Y) -> egfr(r!+,Y1068~pY)  kp3
+    egfr(r!+,Y1148~Y) -> egfr(r!+,Y1148~pY)  kp3
+
+    #Dephosphorylayion
+    egfr(Y1068~pY) -> egfr(Y1068~Y)  km3
+    egfr(Y1148~pY) -> egfr(Y1148~Y)  km3
+
+    # Shc transphosph
+    egfr(r!+,Y1148~pY!1).Shc(PTB!1,Y317~Y) ->  egfr(r!+,Y1148~pY!1).Shc(PTB!1,Y317~pY)  kp14
+    Shc(PTB!+,Y317~pY)  ->  Shc(PTB!+,Y317~Y)  km14
+
+    # Y1068 activity
+    egfr(Y1068~pY) + Grb2(SH2,SH3)   <-> egfr(Y1068~pY!1).Grb2(SH2!1,SH3)    kp9, km9
+    egfr(Y1068~pY) + Grb2(SH2,SH3!+) <-> egfr(Y1068~pY!1).Grb2(SH2!1,SH3!+)  kp11, km11
+    egfr(Y1068~pY!1).Grb2(SH2!1,SH3) + Sos(dom) <-> egfr(Y1068~pY!1).Grb2(SH2!1,SH3!2).Sos(dom!2)  kp10, km10
+
+    # Y1148 activity
+    egfr(Y1148~pY) + Shc(PTB,Y317~Y)    <-> egfr(Y1148~pY!1).Shc(PTB!1,Y317~Y)   kp13, km13
+    egfr(Y1148~pY) + Shc(PTB,Y317~pY)   <-> egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY)  kp15, km15
+    egfr(Y1148~pY) + Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3)   <-> \
+        egfr(Y1148~pY!2).Shc(PTB!2,Y317~pY!1).Grb2(SH2!1,SH3)  kp18, km18
+    egfr(Y1148~pY) + Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3!3).Sos(dom!3)   <-> \
+        egfr(Y1148~pY!2).Shc(PTB!2,Y317~pY!1).Grb2(SH2!1,SH3!3).Sos(dom!3)  kp20, km20
+
+    egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY) + Grb2(SH2,SH3)   <-> \
+        egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY!2).Grb2(SH2!2,SH3)  kp17, km17
+
+    egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY) + Grb2(SH2,SH3!3).Sos(dom!3)   <-> \
+        egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3)  kp24, km24
+
+    Shc(PTB!+,Y317~pY!2).Grb2(SH2!2,SH3) + Sos(dom)   <-> \
+        Shc(PTB!+,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3)  kp19, km19
+
+    # Cytosolic 
+    Shc(PTB,Y317~pY) + Grb2(SH2,SH3)   <-> Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3)    kp21, km21
+    Shc(PTB,Y317~pY) + Grb2(SH2,SH3!+) <-> Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3!+)  kp23, km23
+    Shc(PTB,Y317~pY) -> Shc(PTB,Y317~Y)  km16
+    Grb2(SH2,SH3) + Sos(dom) <-> Grb2(SH2,SH3!1).Sos(dom!1)  kp12, km12
+    Shc(PTB,Y317~pY!2).Grb2(SH2!2,SH3) + Sos(dom)   <-> \
+    Shc(PTB,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3)  kp22, km22
+end reaction rules
+
+begin observables
+    Molecules     Dimers       egfr(r!1).egfr(r!1)
+    Molecules     Sos_act      Shc(PTB!+,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3), egfr(Y1068~pY!1).Grb2(SH2!1,SH3!2).Sos(dom!2)
+    Molecules     RP           egfr(Y1068~pY!?), egfr(Y1148~pY!?)
+    Molecules     Shc_Grb      Shc(Y317~pY!1).Grb2(SH2!1)
+    Molecules     Shc_Grb_Sos  Shc(Y317~pY!1).Grb2(SH2!1,SH3!2).Sos(dom!2)
+    Molecules     R_Grb2       egfr(Y1068~pY!1).Grb2(SH2!1)
+    Molecules     R_Shc        egfr(Y1148~pY!1).Shc(PTB!1,Y317~Y)
+    Molecules     R_ShcP       egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY!?)
+    Molecules     ShcP         Shc(Y317~pY!?)
+    Molecules     R_G_S        egfr(Y1068~pY!1).Grb2(SH2!1,SH3!2).Sos(dom!2)
+    # Strong differences are seen for R_G_S in comparison with path model
+    Molecules     R_S_G_S      egfr(Y1148~pY!1).Shc(PTB!1,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3)
+
+    Molecules     Efgr_total  egfr
+    Molecules     Shc_total   Shc
+    Molecules     Sos_total   Sos
+    Molecules     Grb2_total  Grb2
+end observables
+end model
+
+## actions ##
+# construct reaction network
+generate_network({overwrite=>1})
+
+# Equilibration..
+#setConcentration("egf(r)",0)
+#simulate({method=>"ode",t_end=>100000,n_steps=>10,sparse=>1,steady_state=>1})
+
+# Kinetics..
+#setConcentration("egf(r)","egf_tot")
+simulate({method=>"ode",t_end=>40,n_steps=>50,atol=>1e-8,rtol=>1e-8,sparse=>1})
+
