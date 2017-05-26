@@ -11,4 +11,4 @@ ledit -x -h ${HISTORYFILE} ocamldebug $(ocamlfind query -r -i-format yojson) \
       -I ${BUILDROOT}pattern -I ${BUILDROOT}simulation -I ${BUILDROOT}term \
       -I ${BUILDROOT}siteGraphs -I ${BUILDROOT}dataStructures -I ${BUILDROOT}main \
       -I ${BUILDROOT}cflow -I ${BUILDROOT}webapp -I ${BUILDROOT}api \
-      ${BUILDROOT}${EXEC}.byte $@
+      ${BUILDROOT}../${EXEC}.byte $@
