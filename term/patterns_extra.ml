@@ -233,21 +233,27 @@ Mods.IntMap.add i (j::old) map
 
 let top_sort_gen get_val get_ports list =
   let array = Array.of_list list in
-  let (map1,map2,set)  =
+  let (map1,map2,set,empty)  =
     Tools.array_fold_lefti
-      (fun pos (map1,map2,set) agent ->
-       Tools.array_fold_lefti
-         (fun _ (map1, map2, set) value ->
-            match get_val value with
-            | Some i ->
-             add_map i pos map1,
-             add_map pos i map2,
-             pos :: set
-            | None
-              -> map1, map2, pos::set)
-         (map1, map2, set)
-         (get_ports agent))
-      (Mods.IntMap.empty,Mods.IntMap.empty,[])
+      (fun pos (map1,map2,set,empty) agent ->
+         let intf = get_ports agent in
+         if Array.length intf = 0
+         then
+           map1,map2,set,agent::empty
+         else
+           Tools.array_fold_lefti
+             (fun _ (map1, map2, set,empty) value ->
+                match get_val value with
+                | Some i ->
+                  add_map i pos map1,
+                  add_map pos i map2,
+                  pos :: set,
+                  empty
+                | None
+                  -> map1, map2, pos::set,empty)
+             (map1, map2, set, empty)
+             (get_ports agent))
+      (Mods.IntMap.empty,Mods.IntMap.empty,[],[])
       array
   in
   let rec aux to_do black_listed list =
@@ -270,8 +276,8 @@ let top_sort_gen get_val get_ports list =
       aux t black_listed (array.(h)::list)
   in
   match set with
-  | [] -> []
-  | head :: _ -> aux [head] Mods.IntSet.empty []
+  | [] -> empty
+  | head :: _ -> aux [head] Mods.IntSet.empty empty
 
 let top_sort_raw_mixture list =
   top_sort_gen
