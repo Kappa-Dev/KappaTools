@@ -85,6 +85,9 @@ type ('mixture,'id) modif_expr =
   | FLUX of
       Primitives.flux_kind * ('mixture,'id) Alg_expr.e Primitives.print_expr list
   | FLUXOFF of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | SPECIES_OF of
+      (bool * ('mixture,'id) Alg_expr.e Primitives.print_expr list
+       * 'mixture Locality.annot)
 
 type ('mixture,'id) perturbation =
   (('mixture,'id) Alg_expr.bool Locality.annot *
@@ -592,6 +595,11 @@ let modif_to_json f_mix f_var = function
   | FLUXOFF file ->
     `List (`String "FLUXOFF" ::
            List.map (Primitives.print_expr_to_yojson f_mix f_var) file)
+  | SPECIES_OF (b,l,m) ->
+     `List [ `String "SPECIES_OF";
+             `Bool b;
+             JsonUtil.of_list (Primitives.print_expr_to_yojson f_mix f_var) l;
+             Locality.annot_to_json f_mix m ]
 
 let modif_of_json f_mix f_var = function
   | `List [ `String "INTRO"; alg; mix ] ->
@@ -628,6 +636,11 @@ let modif_of_json f_mix f_var = function
           JsonUtil.to_list (Primitives.print_expr_of_yojson f_mix f_var) file)
   | `List (`String "FLUXOFF" :: file) ->
      FLUXOFF (List.map (Primitives.print_expr_of_yojson f_mix f_var) file)
+  | `List [ `String "SPECIES_OF"; `Bool b; file; m ] ->
+     SPECIES_OF
+       (b,
+        JsonUtil.to_list (Primitives.print_expr_of_yojson f_mix f_var) file,
+        Locality.annot_of_json f_mix m)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid modification",x))
 
 let merge_internals =
@@ -699,7 +712,8 @@ let sig_from_perts =
             | UPDATE_TOK (t,na) ->
               (ags,merge_tokens toks [na,t])
             | (DELETE _ | UPDATE _ | STOP _ | SNAPSHOT _ | PRINT _ | PLOTENTRY |
-               CFLOWLABEL _ | CFLOWMIX _ | FLUX _ | FLUXOFF _) -> (ags,toks))
+               CFLOWLABEL _ | CFLOWMIX _ | FLUX _ | FLUXOFF _ | SPECIES_OF _) ->
+               (ags,toks))
          acc p)
 
 let implicit_signature r =

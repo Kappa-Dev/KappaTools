@@ -65,6 +65,7 @@ rule token = parse
 		      | "$PRINTF" -> PRINTF
 		      | "$PLOTENTRY" -> PLOTENTRY
 		      | "$RUN" -> RUN
+		      | "$SPECIES_OF" -> SPECIES_OF
 		      | s ->
 			 raise
 			   (ExceptionDefn.Syntax_Error

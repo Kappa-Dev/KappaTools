@@ -186,7 +186,8 @@ let check_if_counter_is_filled_enough x =
                   Primitives.SNAPSHOT _ | Primitives.CFLOW _ |
                   Primitives.FLUX _ | Primitives.FLUXOFF _ |
                   Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
-                  Primitives.PRINT _) -> false) x.perturbations then
+                  Primitives.PRINT _ | Primitives.SPECIES _ |
+                  Primitives.SPECIES_OFF _ ) -> false) x.perturbations then
     raise (ExceptionDefn.Malformed_Decl
              (Locality.dummy_annot
                 "There is no way for the simulation to stop."))

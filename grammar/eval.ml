@@ -309,6 +309,17 @@ let effects_of_modif
     (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
   | PLOTENTRY ->
     (domain, (Primitives.PLOTENTRY)::rev_effects)
+  | SPECIES_OF (on,pexpr,(ast,_)) ->
+    let (domain',pexpr') =
+      compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
+    let adds tests l x =
+      if on then Primitives.SPECIES (pexpr',x,tests) :: l
+      else Primitives.SPECIES_OFF x :: l in
+    let domain'',ccs =
+      Snip.connected_components_sum_of_ambiguous_mixture
+        ~compileModeOn contact_map domain' ~origin ast in
+    (domain'',
+     List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
 let effects_of_modifs
     ast_algs ast_rules origin ?bwd_bisim ~compileModeOn contact_map domain l =
@@ -346,12 +357,13 @@ let pert_of_result
         let has_tracking =
           tracking_enabled || List.exists
             (function
-              | Primitives.CFLOW _ -> true
+              | Primitives.CFLOW _ | Primitives.SPECIES _ -> true
               | (Primitives.CFLOWOFF _ | Primitives.PRINT _ |
                  Primitives.UPDATE _ | Primitives.SNAPSHOT _
                 | Primitives.FLUX _ | Primitives.FLUXOFF _ |
                 Primitives.PLOTENTRY | Primitives.STOP _ |
-                Primitives.ITER_RULE _) -> false) effects in
+                Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
+            effects in
         let pert =
           { Primitives.precondition = pre;
             Primitives.effect = effects;

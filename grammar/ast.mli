@@ -87,6 +87,9 @@ type ('mixture,'id) modif_expr =
   | FLUX of
       Primitives.flux_kind * ('mixture,'id) Alg_expr.e Primitives.print_expr list
   | FLUXOFF of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | SPECIES_OF of
+      (bool * ('mixture,'id) Alg_expr.e Primitives.print_expr list
+       * 'mixture Locality.annot)
 
 type ('mixture,'id) perturbation =
   (('mixture,'id) Alg_expr.bool Locality.annot *

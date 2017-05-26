@@ -296,6 +296,9 @@ type modification =
   | CFLOWOFF of Pattern.id array
   | PLOTENTRY
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
+  | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
+             Instantiation.abstract Instantiation.test list list
+  | SPECIES_OFF of Pattern.id array
 
 let print_t_expr_to_yojson =
   print_expr_to_yojson
@@ -350,6 +353,20 @@ let modification_to_yojson = function
     `Assoc [ "action", `String "PRINT";
              "text", `List (List.map print_t_expr_to_yojson t);
              "file", `List (List.map print_t_expr_to_yojson f) ]
+  | SPECIES (f,ids,tests) ->
+     JsonUtil.smart_assoc [
+      "action", `String "SPECIES";
+      "file", `List (List.map print_t_expr_to_yojson f);
+      "pattern", JsonUtil.of_array Pattern.id_to_yojson ids;
+      "tests",
+      JsonUtil.of_list
+        (JsonUtil.of_list
+           (Instantiation.test_to_json Matching.Agent.to_yojson))
+        tests ]
+  | SPECIES_OFF ids ->
+    `Assoc [ "action", `String "SPECIES_OFF";
+             "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
+
 
 let modification_of_yojson = function
   | `Assoc [ "action", `String "PRINT"; "file", `List f; "text", `List t ]
@@ -415,6 +432,18 @@ let modification_of_yojson = function
     CFLOW (
       JsonUtil.to_option (JsonUtil.to_string ?error_msg:None)
         (Yojson.Basic.Util.member "name" l),
+      JsonUtil.to_array Pattern.id_of_yojson
+        (Yojson.Basic.Util.member "pattern" l),
+      JsonUtil.to_list (JsonUtil.to_list
+                          (Instantiation.test_of_json Matching.Agent.of_yojson))
+        (Yojson.Basic.Util.member "tests" l))
+  | `Assoc [ "action", `String "SPECIES_OFF"; "pattern", p ]
+  | `Assoc [ "pattern", p; "action", `String "SPECIES_OFF" ] ->
+    SPECIES_OFF(JsonUtil.to_array Pattern.id_of_yojson p)
+  | `Assoc _ as l when Yojson.Basic.Util.member "action" l = `String "SPECIES" ->
+    SPECIES (
+       JsonUtil.to_list print_t_expr_of_yojson
+        (Yojson.Basic.Util.member "file" l),
       JsonUtil.to_array Pattern.id_of_yojson
         (Yojson.Basic.Util.member "pattern" l),
       JsonUtil.to_list (JsonUtil.to_list
@@ -521,7 +550,8 @@ let extract_connected_components_modification acc = function
   | PRINT (fn,p) ->
     extract_connected_components_print
       (extract_connected_components_print acc p) fn
-  | CFLOW (_,x,_) | CFLOWOFF x -> List.rev_append (Array.to_list x) acc
+  | CFLOW (_,x,_) | CFLOWOFF x | SPECIES (_,x,_) | SPECIES_OFF x ->
+     List.rev_append (Array.to_list x) acc
   | PLOTENTRY -> acc
 
 let extract_connected_components_modifications l =
@@ -546,7 +576,8 @@ let map_expr_modification f = function
   | PRINT (fn,p) -> PRINT (map_expr_print f fn, map_expr_print f p)
   | FLUX (b,p) -> FLUX (b,map_expr_print f p)
   | FLUXOFF p -> FLUXOFF (map_expr_print f p)
-  | (CFLOW _ | CFLOWOFF _ | PLOTENTRY) as x -> x
+  | (CFLOW _ | CFLOWOFF _ | SPECIES_OFF _ | PLOTENTRY) as x -> x
+  | SPECIES (p,x,t) -> SPECIES ((map_expr_print f p),x,t)
 
 let map_expr_perturbation f_alg f_bool x =
   { precondition = f_bool x.precondition;

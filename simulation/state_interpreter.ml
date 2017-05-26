@@ -134,7 +134,7 @@ let do_modification ~outputs env counter graph state extra modification =
       Rule_interpreter.add_tracked cc name tests graph,
       state),
      extra)
-  | Primitives.CFLOWOFF cc ->
+  | Primitives.CFLOWOFF cc | Primitives.SPECIES_OFF cc ->
     ((false, Rule_interpreter.remove_tracked cc graph, state),extra)
   | Primitives.FLUX (rel,s) ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
@@ -161,6 +161,18 @@ let do_modification ~outputs env counter graph state extra modification =
         these in
     let () = state.flux <- others in
     ((false, graph, state),extra)
+  | Primitives.SPECIES (_,cc,tests) ->
+    let name =
+      let domain = Model.domain env in
+      Format.asprintf
+        "@[<h>%a@]"
+        (Pp.array Pp.comma
+            (fun _ -> Pattern.print ~new_syntax:true ~domain ~with_id:false))
+        cc in
+    ((false,
+      Rule_interpreter.add_tracked cc name tests graph,
+      state),
+     extra)
 
 let rec perturbate ~outputs env counter graph state = function
   | [] -> (false,graph,state)

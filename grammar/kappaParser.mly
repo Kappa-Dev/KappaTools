@@ -14,7 +14,7 @@
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
-%token CPUTIME EMAX TMAX PLOTENTRY DELETE INTRO TRACK DO SET REPEAT
+%token CPUTIME EMAX TMAX PLOTENTRY DELETE INTRO TRACK DO SET REPEAT SPECIES_OF
 %token UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN POW ABS MODULO
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
@@ -121,7 +121,8 @@ instruction:
 			  (fun effect ->
 			   match effect with
 			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
-			      | Ast.FLUX _ | Ast.FLUXOFF _) -> true
+			      | Ast.FLUX _ | Ast.FLUXOFF _
+			      | Ast.SPECIES_OF _) -> true
 			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
 			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
 			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
@@ -216,6 +217,7 @@ effect:
     | STOP print_expr {Ast.STOP $2}
     | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4) }
     | PLOTENTRY { Ast.PLOTENTRY }
+    | SPECIES_OF print_expr non_empty_mixture boolean { Ast.SPECIES_OF ($4,$2,($3, rhs_pos 3))}
     ;
 
 nonempty_print_expr:

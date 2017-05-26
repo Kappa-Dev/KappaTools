@@ -1287,6 +1287,10 @@ let modif_expr_of_ast ~new_syntax sigs tok algs contact_map modif acc =
        List.map (print_expr_of_ast ~new_syntax sigs tok algs) p'),acc
   | Ast.CFLOWMIX (b,(m,pos)) ->
     Ast.CFLOWMIX (b,(mixture_of_ast ~new_syntax sigs pos m,pos)),acc
+  | Ast.SPECIES_OF (b,p,(m,pos)) ->
+    Ast.SPECIES_OF
+      (b,List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
+       (mixture_of_ast ~new_syntax sigs pos m,pos)),acc
 
 let perturbation_of_ast
     ~new_syntax sigs tok algs contact_map ((pre,mods,post),pos) up_vars =

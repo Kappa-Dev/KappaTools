@@ -105,6 +105,9 @@ type modification =
   | CFLOWOFF of Pattern.id array
   | PLOTENTRY
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
+  | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
+             Instantiation.abstract Instantiation.test list list
+  | SPECIES_OFF of Pattern.id array
 
 type perturbation =
   { precondition:
