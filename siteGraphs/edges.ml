@@ -17,6 +17,7 @@ module Edge = struct
   (* let dummy_link = ((-1,-1),-1) *)
 end
 
+(* functions using the cache are responsible of reseting the cache at exit *)
 module Cache = struct
   type t = {
     tests : int Mods.DynArray.t;
@@ -462,6 +463,17 @@ let one_connected_component sigs ty node graph =
               Raw_mixture.a_ints = Mods.DynArray.get graph.state node; } in
           build (skel::acc) free_id' dangling' todos'
   in build [] 1 Mods.Int2Map.empty [ty,node]
+
+let species sigs root graph =
+  let specie = match Mods.DynArray.get graph.sort root with
+    | None ->
+       raise
+         (ExceptionDefn.Internal_Error
+            (Locality.dummy_annot
+               ("Sort of node unavailable "^string_of_int root)))
+    | Some ty -> fst (one_connected_component sigs ty root graph) in
+  let () = Cache.reset graph.cache in
+  specie
 
 let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in

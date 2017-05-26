@@ -91,6 +91,13 @@ val add_tracked :
   Instantiation.abstract Instantiation.test list list -> t -> t
 val remove_tracked : Pattern.id array -> t -> t
 
+(** {6 Species} *)
+
+val add_tracked_species :
+  Pattern.id array -> string ->
+  Instantiation.abstract Instantiation.test list list -> t -> t
+val remove_tracked_species : Pattern.id array -> t -> t
+
 (** {6 Debugging} *)
 
 type stats = { mixture_stats : Edges.stats }

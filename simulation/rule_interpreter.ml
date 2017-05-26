@@ -42,6 +42,11 @@ type t =
       (string (*obs name*) * Pattern.id array *
         Instantiation.abstract Instantiation.test list list)
          list Pattern.ObsMap.t (*currently tracked ccs *) option;
+
+    species :
+      (string (*filename*) * Pattern.id array (*with only one pattern*) *
+        Instantiation.abstract Instantiation.test list list) list
+        Pattern.ObsMap.t;
   }
 
 type result = Clash | Corrected | Success of t
@@ -118,6 +123,8 @@ let empty ~with_trace random_state env counter =
           Some (Pattern.Env.new_obs_map
                   (Model.domain env) (fun _ -> []))
         else None;
+      species = Pattern.Env.new_obs_map
+                  (Model.domain env) (fun _ -> []);
     } in
   let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
   cand
@@ -423,6 +430,23 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
                       (Trace.Obs(i,x,Counter.next_story counter))))
         new_tracked_obs_instances
 
+let get_species_obs sigs edges obs acc tracked =
+  List.fold_left
+    (fun acc (pattern,(root,_)) ->
+      try
+        List.fold_left
+          (fun acc (fn,patterns,_) ->
+            if Array.fold_left
+                 (fun ok pid ->
+                   ((Pattern.compare_canonicals pid pattern) = 0)||ok)
+                 false patterns
+            then
+              let spec = Edges.species sigs root edges in
+              (fn,patterns,spec)::acc else acc)
+          acc (Pattern.ObsMap.get tracked pattern)
+      with Not_found -> acc)
+    acc obs
+
 let store_obs domain edges roots obs acc = function
   | None -> acc
   | Some tracked ->
@@ -444,7 +468,8 @@ let store_obs domain edges roots obs acc = function
          with Not_found -> acc)
       acc obs
 
-let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
+let update_edges
+      outputs counter domain inj_nodes state event_kind ?path rule sigs =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
   let former_deps,mod_connectivity  = state.outdated_elements in
@@ -504,7 +529,14 @@ let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind
       ?path remaining_side_effects rule outputs state.story_machinery in
-
+  (*Print species*)
+  let species =
+    get_species_obs sigs edges'' new_obs [] state.species in
+  let () =
+    List.iter
+      (fun (file,_,mixture) ->
+        outputs (Data.Species
+                   (file,(Counter.current_time counter),mixture))) species in
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
   { outdated = false;
@@ -520,6 +552,7 @@ let update_edges outputs counter domain inj_nodes state event_kind ?path rule =
     nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
     random_state = state.random_state;
     story_machinery = state.story_machinery;
+    species = state.species;
   }
 
 let max_dist_to_int counter state d =
@@ -644,7 +677,7 @@ let transform_by_a_rule outputs env counter state event_kind ?path rule inj =
     update_tokens
       env counter state rule.Primitives.delta_tokens in
   update_edges outputs counter (Model.domain env) inj
-    state' event_kind ?path rule
+    state' event_kind ?path rule (Model.signatures env)
 
 let apply_unary_rule ~outputs ~rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
@@ -925,6 +958,31 @@ let debug_print f state =
     (print_unary_injections ?domain:None)
     state.roots_of_unary_patterns
 
+let aux_add_tracked patterns name tests state tpattern =
+  let () = state.outdated <- true in
+  let () =
+    Array.iter
+      (fun pattern ->
+        let acc = Pattern.ObsMap.get tpattern pattern in
+        Pattern.ObsMap.set tpattern
+                           pattern ((name,patterns,tests)::acc))
+      patterns in
+  { state with outdated = false }
+let aux_remove_tracked patterns state tpattern =
+  let () = state.outdated <- true in
+  let tester (_,el,_) =
+    not @@
+      Tools.array_fold_lefti
+        (fun i b x -> b && Pattern.is_equal_canonicals x el.(i))
+        true patterns in
+  let () =
+    Array.iter
+      (fun pattern ->
+        let acc = Pattern.ObsMap.get tpattern pattern in
+        Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
+      patterns in
+  { state with outdated = false }
+
 let add_tracked patterns name tests state =
   let () = assert (not state.outdated) in
   match state.story_machinery with
@@ -935,33 +993,16 @@ let add_tracked patterns name tests state =
             "Observable %s should be tracked but the trace is not stored"
             name) in
     state
-  | Some tpattern ->
-    let () = state.outdated <- true in
-    let () =
-      Array.iter
-        (fun pattern ->
-           let acc = Pattern.ObsMap.get tpattern pattern in
-           Pattern.ObsMap.set tpattern
-             pattern ((name,patterns,tests)::acc))
-        patterns in
-    { state with outdated = false }
+  | Some tpattern -> aux_add_tracked patterns name tests state tpattern
 let remove_tracked patterns state =
   let () = assert (not state.outdated) in
   match state.story_machinery with
   | None -> state
-  | Some tpattern ->
-    let () = state.outdated <- true in
-    let tester (_,el,_) =
-      not @@
-      Tools.array_fold_lefti
-        (fun i b x -> b && Pattern.is_equal_canonicals x el.(i))
-        true patterns in
-    let () =
-      Array.iter
-        (fun pattern ->
-           let acc = Pattern.ObsMap.get tpattern pattern in
-           Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
-        patterns in
-    { state with outdated = false }
+  | Some tpattern -> aux_remove_tracked patterns state tpattern
+
+let add_tracked_species patterns name tests state =
+  aux_add_tracked patterns name tests state state.species
+let remove_tracked_species patterns state =
+  aux_remove_tracked patterns state state.species
 
 let get_random_state state = state.random_state

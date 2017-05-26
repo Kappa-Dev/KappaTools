@@ -647,6 +647,17 @@ let modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
         (error,[]) (List.rev list)
     in
     error,Ast.FLUXOFF list'
+  | Ast.SPECIES_OF (a,list,(mix,pos)) ->
+    let error,list' =
+      List.fold_left
+        (fun (error,list) elt ->
+           let error,elt' = print_expr_map f_allowing_question_marks error elt in
+           error,elt'::list)
+        (error,[]) (List.rev list)
+    in
+    let error,mix' = f_allowing_question_marks error mix in
+    error,Ast.SPECIES_OF(a,list',(mix',pos))
+
 
 
 let bool_with_pos_map = map_with_pos bool_map
@@ -807,7 +818,7 @@ let translate_compil parameters error compil =
          let error,direct =
            error,
            {
-             Ckappa_sig.position = Locality.dummy ; 
+             Ckappa_sig.position = Locality.dummy ;
              Ckappa_sig.prefix = prefix ;
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;
@@ -876,7 +887,7 @@ let translate_compil parameters error compil =
                   error,(Ast.SNAPSHOT l')::list
                 | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.FLUX _
                 | Ast.FLUXOFF _ | Ast.CFLOWMIX _ | Ast.PLOTENTRY
-                | Ast.CFLOWLABEL _ ->
+                | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
                   error,list (*to do*))
              (error,[])
              m

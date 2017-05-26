@@ -9,17 +9,21 @@
 let print_desc : (string,out_channel * Format.formatter) Hashtbl.t =
   Hashtbl.create 2
 
+let species_desc : (string,out_channel * Format.formatter) Hashtbl.t =
+  Hashtbl.create 2
+
 let uuid = Random.State.bits (Random.State.make_self_init ())
 
-let get_desc file =
-  try snd (Hashtbl.find print_desc file)
+let get_desc file tbl =
+  try snd (Hashtbl.find tbl file)
   with Not_found ->
     let d_chan = Kappa_files.open_out file in
     let d = Format.formatter_of_out_channel d_chan in
-    (Hashtbl.add print_desc file (d_chan,d) ; d)
+    (Hashtbl.add tbl file (d_chan,d) ; d)
 
 let close_desc () =
-  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc
+  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc;
+  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) species_desc
 
 let dot_of_flux flux =
   let printer desc =
@@ -312,6 +316,12 @@ let snapshot env s =
       s.Data.snapshot_file s.Data.snapshot_event "ka"
       (fun f -> Format.fprintf f "%a@." (print_snapshot env) s)
 
+let print_species sigs f time mixture =
+  Format.fprintf
+    f "%g: @[<h>%a@]@." time
+    (Raw_mixture.print
+       ~new_syntax:false ~compact:false ~created:false ~sigs) mixture
+
 let go env = function
   | Data.Snapshot s -> snapshot env s
   | Data.Flux f -> output_flux f
@@ -321,7 +331,7 @@ let go env = function
     let desc =
       match p.Data.file_line_name with
         None -> Format.formatter_of_out_channel stdout
-      | Some file -> get_desc file
+      | Some file -> get_desc file print_desc
     in
     Format.fprintf desc "%s@." p.Data.file_line_text
   | Data.Log s -> Format.printf "%s@." s
@@ -333,6 +343,9 @@ let go env = function
           if !traceNotEmpty then output_char d ',' else traceNotEmpty := true in
         Yojson.Basic.to_channel d (Trace.step_to_yojson step)
     end
+  | Data.Species (file,time,mixture) ->
+     let desc = get_desc file species_desc in
+     print_species env desc time mixture
 
 let inputsDesc = ref None
 

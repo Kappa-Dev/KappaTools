@@ -721,7 +721,7 @@ let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX
 
 type 'mixture rule =
   {
-    position: Locality.t ; 
+    position: Locality.t ;
     prefix: int;
     delta: int;
     lhs   : 'mixture;
@@ -986,6 +986,7 @@ let mixture_of_modif =
   | Ast.PLOTENTRY
   | Ast.CFLOWLABEL _
   | Ast.CFLOWMIX _
+  | Ast.SPECIES_OF _
   | Ast.FLUX _
   | Ast.FLUXOFF _ -> None
 

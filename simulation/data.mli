@@ -41,3 +41,4 @@ type t =
   | TraceStep of Trace.step
   | Snapshot of snapshot
   | Log of string
+  | Species of string * float * Raw_mixture.t
