@@ -2104,8 +2104,6 @@ the one in the sequence $R_1,\ldots,R_m$.
 
 \subsection{Semantics convention}
 \subsubsection{Rate constant conventions}
-\subsubsection{Ambiguous molecularity}
-\subsubsection{Embeddings VS occurrences}
 
 
 
@@ -2116,22 +2114,94 @@ the one in the sequence $R_1,\ldots,R_m$.
 \label{fig:kade:2}
 \end{figure}
 
-The differential semantics of a Kappa model is described in Sect.~\ref{sec:differential semantics}. The option in the sub-tab \texttt{2\_semantics} allows for the choice among several choice for the meaning of the ODEs variables and for the meaning of the rate constants.
+The options in the sub-tab \texttt{Semantics} allow for the choice among several possibilities for the meaning of the ODEs variables and for the meaning of the rate constants.
 
 
-\begin{itemize}
-  \item \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule.
+ \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule.
   \KaDE offers three conventions. With the convention \texttt{KaSim}, there is no correction, as it is done in the simulator; with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
   with the convention \texttt{Biochemist}, each rate constant is divided
-  by the number of automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule.
-  \item
-  \item
-  \item
+  by the number of automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule (more formally, an automorphism in the lhs of a rule is taken into account, but its restriction to the part that is common to the lhs and the rhs of the rule, may be extened to an automorphism of the rhs of the rule).
 
-\end{itemize}
+  Consider the following rule:
+    \begin{lstlisting}[language=kappa]
+      A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p)
+    \end{lstlisting}
+which is depicted as follows:
+\begin{center}
+  \scalebox{0.8}{\includegraphics{img/auto.pdf}}
+\end{center}
+
+  with the first convention (that is the one of the simulator), rates of rules are not corrected, hence the effective rate of this rule is $k$;
+  with the second one, rates are divided by the number of automorphisms in the left hand side of rules (here $24$); the third convention accounts only for the permutations among the agents that are undistinguishable from the rules point of view: rates are divided by the number of automorphisms in the left hand side of rules that may be extended in automorphisms of the right hand side (in particular, they map degraded proteins, if any, to degraded proteins) (here $2$).
+
+  \subsubsection{Ambiguous molecularity}
+
+The differential semantics is defined as the limit of the stochastic semantics when the temperature diverges toward the infinity. Thus a rate constant stands indeed for a function mapping the temperature to an effective rate constant the expression of which depends on the arity of the reaction. Even it the unary rate and the binary rate of a rule may be equal for a given temperature, it is never the case at all temperature. Another insight, is that a rate constant for a unary reaction and a rate constant for a binary reaction are not expressed in the same physical units.
+
+To account for this, {\KaDE} never applies a binary rule in a
+  unary context, unless two rate constants have been provided explicitly.
+
+  Let us give an example. We consider the agent type \texttt{A} with two binding sites \texttt{x} and \texttt{y}. We assume that two sites \texttt{x} (in different \texttt{A}s) may be bound pair-wise and that two sites \texttt{y} (in different \texttt{A}s) may be bound pair-wise. Both following rules:
+  \begin{lstlisting}[language=kappa]
+    A(x),A(x) -> A(x!1),A(x!1) @ 1
+    A(x),A(x) -> A(x!1),A(x!1) @ 1{0}
+  \end{lstlisting}
+  will behave the same: they both apply to the following mixture
+  \begin{lstlisting}[language=kappa]
+    A(x,y),A(x,y)
+  \end{lstlisting}
+  but not to the following one:
+  \begin{lstlisting}[language=kappa]
+    A(x,y!2),A(x,y!2)
+  \end{lstlisting}
+
+  So as to allow the rule to form a bond within the two agents of the dimer, the following rule:
+  \begin{lstlisting}[language=kappa]
+    A(x),A(x) -> A(x!1),A(x!1) @ 1{1}
+  \end{lstlisting}
+   shall be used instead:
+
+  This way, when a rule is given with one rate constant only, the connected components in its left hand side have to be refined into pair-wisely disjoint bio-molecular species. When a rule is binary and it is given with two rate constants, then it may be apply in a unary context (which consists in embedding its left hand side into a single bio-molecular species) with the second rate constant, or in a binary context (which consists in embedding each connected components in its left hand side into two disjoint bio-molecular species (which may be two isomorphic copies of the same species).
+
+  \subsubsection{Embeddings VS occurrences}
+
+In a Kappa file, a pattern may denotes two different quantities.
+At initialisation, a pattern denotes an occurence of a bio-molecular species. In an algebraic expressions (which includes functional rates,
+stoichiometric coefficients for tokens, observables), a pattern denotes a number of embeddings from this pattern and a mixture.
+
+Formally, we define the number (resp.~the concentration) of embeddings of a pattern from a mixture (resp.~ a concentration function) as
+the sum, for each bio-molecular species,
+ of the number of occurrences (resp.~concentration) of that bio-molecular species and the number of occurrence of the pattern in that bio-molecular species. Then we define the number (resp.~the concentration) of occurrences of a pattern as the quotient of
+ the number (resp.~the concentration) of embedding of this pattern by the number of automorphisms in this pattern.
+
+To illustrate this, we may have a look at the following Kappa model:
+\begin{lstlisting}[language=kappa]
+%agent: A(x)
+%agent: D()
+
+%init: 10 A(x!1),A(x!1)
+
+-> D() @1
+
+%obs: 'dimer' |A(x!1),A(x!1)|
+\end{lstlisting}
+
+TO DO plot the curve.
+
+KaSim will indicates $20$ for the quantities of dimer.
+This accounts for the fact that each dimer satisfies two automorphisms.
 
 
-\subsection{The sub-tab \texttt{3\_integration\_settings}}
+The command-line option \texttt{--count [Embeddings | Occurrences]}
+change the meaning of the variables that occur in the differential equations. The choice has no impact on the quantities that are ploted. Introduced quantities always denote
+concentration of occurrences, and patterns in algrebraic expressions always denote concentration of embeddings. It just change the meaning of the variables that are used internaly in the differential equations.
+
+\subsubsection{Polymers}
+
+\subsubsection{Equivalent sites}
+
+
+\subsection{The sub-tab \texttt{Integration\_settings}}
 
 \begin{figure}[htbp]
 \centering
@@ -2140,7 +2210,7 @@ The differential semantics of a Kappa model is described in Sect.~\ref{sec:diffe
 \label{fig:kade:3}
 \end{figure}
 
-\subsection{The sub-tab \texttt{4\_model\_reduction}}
+\subsection{The sub-tab \texttt{Model reduction}}
 
 \begin{figure}[htbp]
 \centering
@@ -2149,7 +2219,7 @@ The differential semantics of a Kappa model is described in Sect.~\ref{sec:diffe
 \label{fig:kade:4}
 \end{figure}
 
-\subsection{The sub-tab \texttt{5\_static\_analysis}}
+\subsection{The sub-tab \texttt{Static analysis}}
 
 \begin{figure}[htbp]
 \centering
@@ -2158,7 +2228,7 @@ The differential semantics of a Kappa model is described in Sect.~\ref{sec:diffe
 \label{fig:kade:5}
 \end{figure}
 
-\subsection{The sub-tab \texttt{6\_debug\_mode}}
+\subsection{The sub-tab \texttt{Debug mode}}
 
 \begin{figure}[htbp]
 \centering
