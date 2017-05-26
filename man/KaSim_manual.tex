@@ -1974,9 +1974,9 @@ Importantly, options are saved automatically under various occasions. Thus, it i
 before the last reset, before the last quit, or before the last analysis.
 \end{enumerate}
 
-Two fields defines the repository and the name of the output:
+Two fields define the repository and the name of the output:
 \begin{itemize}
-  \item \item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
+\item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
 \item The field \texttt{--output} sets the name of the output file.
 The following extension will be added automatically according to the choice of the backend format: ".net" in DOTNET format, ".mws" in Maple, ".nb" in Mathematica, ".m" in Matlab and Octave, and ".xml" in SBML.
 \end{itemize}
@@ -1988,7 +1988,8 @@ When the output file already exists, {\KaDE} will ask for confirmation before ov
 
 \subsection{The sub-tab \texttt{Data set}}
 
-The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
+The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots. These fields are used only in Maple, Mathematica, Matlab, and Octave backend formats.
+They are ignored in SBML and DOTNET backend formats.
 \begin{itemize}
 \item The field \texttt{--initial} defines the starting date of the simulation.
 \item The field \texttt{-l} defines the final date of the simulation.
@@ -2015,11 +2016,52 @@ The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of th
 \item The option \texttt{--(no)-smash-reactions} identify multiple occurrences of a same reaction in the reaction network, and sum up  their contribution into a single reaction.
 \end{itemize}
 
+\subsection{The sub-tab \texttt{Integration settings}}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Integration settings}}
+\label{fig:kade:3}
+\end{figure}
+
+The sub-tab \texttt{Integration settings} (see Fig.~\ref{fig:kade:3}) contains the parameters to guide the engine of numerical integration. Except the option \texttt{--smashs-reaction}, these options are ignored in the SBML and in the
+DOTNET backend format.
+
+\begin{itemize}
+  \item The option \texttt{--compute-jacobian} switches on the computation of the Jacobian of the system of ordinary differential equations.
+  The Jacobian is computed symbolically. It speeds up the numerical integration. The computation of the Jacobian is implemented only in two backend formats:  Matlab and Octave. Other formats will ignore this option.
+  \item The option \texttt{--non-negative} can be used to force concentration to have a non negative value during numerical integration.
+  The computation of the Jacobian is implemented only in two backend formats:  Matlab and Octave. Other formats will ignore this option.
+  \item The field \texttt{--initial-step} tunes the initial integration step.
+  This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{--max-step} tunes the maximal size of integration steps. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{--relative-tolerance} defines the relative numerical error tolerance in integration engines. This means that numerical errors cannot go beyond a bound that is proportional to the concentration of the bio-molecular species. This field sets the value of the proportionality coefficient.   This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{--absolute-tolerance} defines the absolute numerical error tolerance in integration engines. This means that numerical errors cannot go beyond the value of that field.  This field is used only in Maple, Mathematica, Matlab, and Octave backend formats. It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{--output-plot} defined the csv file where the values of the sample plots will be printed. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The option \texttt{--smash-reaction} gathers isomorphic reactions before generating the network or the system of ordinary differential equations (while summing their rates). This option is used in every backend format.
+  \item The field \texttt{--initial} defines the starting date of the simulation. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-l} defines the final date of the simulation. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-p} defines the time interval between two plots. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+\end{itemize}
 
 \subsection{The sub-tab \texttt{Debug}}
+\label{kade:debug}
+In expert mode, the last sub-tab provides options to tune the amount of debugging information that is displayed.
 
-In expert mode, the last sub-tab provides options to tune the amount of debugging information that is displaied.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}}
+\label{fig:kade:6}
+\end{figure}
 
 \begin{itemize}
 \item The option \texttt{--(no)-show-time-advance} includes some
@@ -2117,10 +2159,14 @@ the one in the sequence $R_1,\ldots,R_m$.
 The options in the sub-tab \texttt{Semantics} allow for the choice among several possibilities for the meaning of the ODEs variables and for the meaning of the rate constants.
 
 
- \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule.
-  \KaDE offers three conventions. With the convention \texttt{KaSim}, there is no correction, as it is done in the simulator; with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
+ \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule. \KaDE offers three conventions:
+\begin{enumerate}
+  \item with the convention \texttt{KaSim}, there is no correction, as it is done in the simulator;
+  \item with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
+
   with the convention \texttt{Biochemist}, each rate constant is divided
-  by the number of automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule (more formally, an automorphism in the lhs of a rule is taken into account, but its restriction to the part that is common to the lhs and the rhs of the rule, may be extened to an automorphism of the rhs of the rule).
+  by the number of the automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule (more formally, an automorphism in the lhs of a rule is taken into account, but its restriction to the part that is common to the lhs and the rhs of the rule, may be extened to an automorphism of the rhs of the rule).
+\end{enumerate}
 
   Consider the following rule:
     \begin{lstlisting}[language=kappa]
@@ -2193,49 +2239,52 @@ This accounts for the fact that each dimer satisfies two automorphisms.
 
 
 The command-line option \texttt{--count [Embeddings | Occurrences]}
-change the meaning of the variables that occur in the differential equations. The choice has no impact on the quantities that are ploted. Introduced quantities always denote
-concentration of occurrences, and patterns in algrebraic expressions always denote concentration of embeddings. It just change the meaning of the variables that are used internaly in the differential equations.
+change the meaning of the variables that occur in the differential equations. The choice has no impact on the quantities that are plot. Introduced quantities always denote
+concentration of occurrences, and patterns in algebraic expressions always denote concentration of embeddings. It just change the meaning of the variables that are used internally in the differential equations.
 
 \subsubsection{Polymers}
+
+In case of polymerisation, the size of the bio-molecular species is unbounded and there is an infinite amount of differential equations (this is the case even if there is no agent synthesis, since the initial state is given in concentration, and not in occurrence number). {\KaDE} will not terminate. Yet it is possible to truncate the system of ordinary differential equations: the command-line option \texttt{--truncate} specifies an upper bound to the number of agents in the bio-molecular species to be considered. Each reaction that would involve a large bio-molecular species is discarded.
+
+For instance, we can consider the model \texttt{poly.ka} that is defined as follows:
+\begin{lstlisting}[language=kappa]
+  %agent: A(l,r)
+  %init: 10 A()
+  A(r), A(l) -> A(r!1),A(l!1) @ 1
+\end{lstlisting}
+
+The instruction:
+\ITE{\item[\$] \ttt{KaDE} poly.ka}
+will not terminate, wheareas the following one:
+\ITE{\item[\$] \ttt{KaDe} poly.ka --truncate 10}
+will.
+
 
 \subsubsection{Equivalent sites}
 
 
-\subsection{The sub-tab \texttt{Integration\_settings}}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{3\_integration\_settings}}
-\label{fig:kade:3}
-\end{figure}
 
-\subsection{The sub-tab \texttt{Model reduction}}
+\subsection{Model reduction}
 
+\subsubsection{Equivalent sites}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_4.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{4\_model\_reduction}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Model reduction}}
 \label{fig:kade:4}
 \end{figure}
 
-\subsection{The sub-tab \texttt{Static analysis}}
+\subsubsection{Static analysis}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{5\_static\_analysis}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Static analysis}}
 \label{fig:kade:5}
 \end{figure}
 
-\subsection{The sub-tab \texttt{Debug mode}}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}}
-\label{fig:kade:6}
-\end{figure}
 
 
 
