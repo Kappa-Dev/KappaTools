@@ -2265,12 +2265,50 @@ will.
 
 \subsubsection{Equivalent sites}
 
+In BNGL, the interface of a given agent may include several occurrence of a given site name. These sites have exactly the same capabilities of interactions. This features provides a convenient syntactic construction to describe models even more compactly, at the cost of having to deal with more complex structures (detecting embeddings between such site-graphs may be very difficult).
 
+In Kappa, the interface of every agent is made of pair-wisely distinct site names. Yet it may happen that some sites have exactly the same capabilities of information. {\KaDE} can infer this property and use it to derive a more compact system of differential equations \cite{Feret-MFPSXXVII,CAMPORESI201073,Feret201545}.
 
+\begin{figure}[t]
+  \begin{minipage}{0.3\linewidth}
+    \centering\scalebox{0.7}{\includegraphics{img/symtt.pdf}}
+  \end{minipage}\hspace*{5mm}
+  \begin{minipage}{0.3\linewidth}
+    \scalebox{0.7}{\includegraphics{img/symff.pdf}}
+  \end{minipage}\hspace*{5mm}
+\begin{minipage}{0.3\linewidth}
+    \centering\scalebox{0.7}{\includegraphics{img/symtf.pdf}}
+  \end{minipage}
+  \caption{Sites are equivalent, if the corrected rates of the third rule is twice the corrected rate of each other rule.}
+  \label{fig:symetric:rules}
+\end{figure}
 
-\subsection{Model reduction}
+Consider the following model:
+\begin{lstlisting}[language=kappa]
+%agent: A(x,y)
+%init: 10 A()
 
-\subsubsection{Equivalent sites}
+A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @1
+A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @1
+A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
+\end{lstlisting}
+The rules are depicted in Fig.~\ref{fig:symetric:rules}. Rules may be obtained from one another by swapping the sites in agents.  So we say that sites are equivalent in this set of rules. Equivalent sites may be used to induce forward and backward bisimulations \cite{buchholz_bisimulation,Feret_IJSI2013,Feret-MFPSXXVII,CAMPORESI201073,Feret201545} over the stochastic and the differential semantics of Kappa.
+
+Let us consider two site names \ttt{x} and \ttt{y} in the signature of an agent type \ttt{A}.
+A \emph{set of rules} is symmetric with respect to \ttt{x} and \ttt{y}, if for every two rules that may be obtained one from the other by permuting the sites \ttt{x} and \ttt{y} in some agents of type \ttt{A}, their corrected rates is inversely proportional to their number of automorphisms.
+For instance the set of rules is symmetric with respect to \ttt{x} and \ttt{y} only on the convention in which constant rates kept as they are given, without any corrective factor. A \emph{valuation} from bio-molecular species to real numbers is symmetric with respect to \ttt{x} and \ttt{y}, if for every two bio-molecular species that can be obtained one from the other by permuting the sites \ttt{x} and \ttt{y} in some agents of type \ttt{A}, the image of the two bio-molecular species by the valuation is inversely proportional to their number of automorphisms. Lastly an \emph{expression} over bio-molecular species is symmetric with respect to \ttt{x} and \ttt{y}, if and only if it takes the same values for every two symmetric valuations.
+
+If the set of rules and the initial state of the model are symmetric with respect to two sites, ignoring the difference among these two sites in bio-molecular species induces a backward bisimulation (that is to say, the state of the system remains symmetric at every time \cite{buchholz_lump}). If the set of rules and every algebraic expression that occurs in rates or stoichiometric coefficients are symmetric, then ignoring the difference between these two sites in bio-molecular species induces a forward bisimulation (we can define the ODEs directly over the equivalence-classes of bio-molecular species \cite{buchholz_lump}).
+
+\begin{itemize}
+  \item
+The command line option \texttt{--with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
+\end{itemize}
+
+\subsection{The sub-tab \texttt{Model reduction}}
+
+The sub-tab \texttt{Model reduction} gives access to more information about
+potential model reduction.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_4.png}
@@ -2278,7 +2316,12 @@ will.
 \label{fig:kade:4}
 \end{figure}
 
-\subsubsection{Static analysis}
+\begin{itemize}
+  \item The option \texttt{--show-symmetries} itemize the sites that are equivalent with respect to the rules of the models, with respect to the rules of the model and the initial state (backward bisimulation), and with respect to the rules of the models and the algebraic expressions (forward bisimulation).
+  \item The command line option \texttt{--with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
+\end{itemize}
+
+\subsubsection{The sub-tab \texttt{Static analysis (Expert)}}
 
 \begin{figure}[htbp]
 \centering
@@ -2287,9 +2330,15 @@ will.
 \label{fig:kade:5}
 \end{figure}
 
+The inference of equivalent sites is more precise when dead rules are discarded. Dead rules can be computed thanks to {\KaSa}. The sub-tab \texttt{Static analysis} allows the end-user to switch on/switch off abstract domains in order to tune the trade-off between accuracy and efficiency in this static analysis.
 
+\begin{itemize}
+\item The option \verb?--(no-)views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
 
+\item The option \verb?--(no-)double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between between proteins.
 
+\item The option \verb?--(no-)site-across-bonds-domain? can be used to switch on/off the analysis of the relations among the states of the sites in connected proteins.
+\end{itemize}
 
 \section{Tutorial}
 
