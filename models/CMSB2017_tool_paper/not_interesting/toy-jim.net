@@ -1,0 +1,160 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 L_tot      1  # Constant
+    2 R_tot      1  # Constant
+    3 A_tot      1  # Constant
+    4 K_tot      1  # Constant
+    5 kpL        0.1  # Constant
+    6 kmL        0.1  # Constant
+    7 kpD        1.0  # Constant
+    8 kmD        0.1  # Constant
+    9 kpA        0.1  # Constant
+   10 kmA        0.1  # Constant
+   11 kpK        0.1  # Constant
+   12 kmK        0.1  # Constant
+   13 pK         1  # Constant
+   14 pKs        10  # Constant
+   15 dM         1  # Constant
+   16 dC         10  # Constant
+end parameters
+begin species
+    1 L(r) L_tot
+    2 R(a,l,r) 6.180339896383e-01
+    3 A(k,r) 3.819660123478e-01
+    4 K(Y~U,a) 6.180339896383e-01
+    5 Null() 0.000000000000e+00
+    6 L(r!1).R(a,l!1,r) 0.000000000000e+00
+    7 A(k,r!1).R(a!1,l,r) 2.360679772905e-01
+    8 A(k!1,r).K(Y~U,a!1) 2.360679772905e-01
+    9 A(k,r!1).L(r!2).R(a!1,l!2,r) 0.000000000000e+00
+   10 L(r!1).L(r!2).R(a,l!1,r!3).R(a,l!2,r!3) 0.000000000000e+00
+   11 A(k!1,r!2).K(Y~U,a!1).R(a!2,l,r) 1.458980330712e-01
+   12 A(k!1,r!2).K(Y~U,a!1).L(r!3).R(a!2,l!3,r) 0.000000000000e+00
+   13 A(k,r!1).L(r!2).L(r!3).R(a!1,l!3,r!4).R(a,l!2,r!4) 0.000000000000e+00
+   14 A(k!1,r!2).K(Y~U,a!1).L(r!3).L(r!4).R(a!2,l!4,r!5).R(a,l!3,r!5) 0.000000000000e+00
+   15 A(k,r!1).A(k,r!2).L(r!3).L(r!4).R(a!1,l!3,r!5).R(a!2,l!4,r!5) 0.000000000000e+00
+   16 A(k!1,r!2).A(k,r!3).K(Y~U,a!1).L(r!4).L(r!5).R(a!3,l!4,r!6).R(a!2,l!5,r!6) 0.000000000000e+00
+   17 A(k!1,r!2).A(k!3,r!4).K(Y~U,a!1).K(Y~U,a!3).L(r!5).L(r!6).R(a!2,l!5,r!7).R(a!4,l!6,r!7) 0.000000000000e+00
+   18 A(k!1,r!2).A(k!3,r!4).K(Y~P,a!3).K(Y~U,a!1).L(r!5).L(r!6).R(a!2,l!5,r!7).R(a!4,l!6,r!7) 0.000000000000e+00
+   19 A(k!1,r!2).K(Y~P,a!1).L(r!3).R(a!2,l!3,r) 0.000000000000e+00
+   20 A(k!1,r!2).K(Y~P,a!1).L(r!3).L(r!4).R(a!2,l!4,r!5).R(a,l!3,r!5) 0.000000000000e+00
+   21 A(k!1,r).K(Y~P,a!1) 0.000000000000e+00
+   22 A(k!1,r!2).A(k,r!3).K(Y~P,a!1).L(r!4).L(r!5).R(a!3,l!4,r!6).R(a!2,l!5,r!6) 0.000000000000e+00
+   23 K(Y~P,a) 0.000000000000e+00
+   24 A(k!1,r!2).A(k!3,r!4).K(Y~P,a!3).K(Y~P,a!1).L(r!5).L(r!6).R(a!2,l!5,r!7).R(a!4,l!6,r!7) 0.000000000000e+00
+   25 A(k!1,r!2).K(Y~P,a!1).R(a!2,l,r) 0.000000000000e+00
+end species
+begin reactions
+    1 1,2 6 kpL #_R1
+    2 2,3 7 kpA #_R3
+    3 3,4 8 kpK #_R4
+    4 1,7 9 kpL #_R1
+    5 6 1,2 kmL #_reverse__R1
+    6 6,6 10 0.5*kpD #_R2
+    7 3,6 9 kpA #_R3
+    8 2,8 11 kpA #_R3
+    9 6,8 12 kpA #_R3
+   10 7 2,3 kmA #_reverse__R3
+   11 4,7 11 kpK #_R4
+   12 8 3,4 kmK #_reverse__R4
+   13 1,11 12 kpL #_R1
+   14 9 1,7 kmL #_reverse__R1
+   15 12 1,11 kmL #_reverse__R1
+   16 6,9 13 kpD #_R2
+   17 6,12 14 kpD #_R2
+   18 9,9 15 0.5*kpD #_R2
+   19 9,12 16 kpD #_R2
+   20 12,12 17 0.5*kpD #_R2
+   21 10 6,6 kmD #_reverse__R2
+   22 3,10 13 2*kpA #_R3
+   23 8,10 14 2*kpA #_R3
+   24 9 3,6 kmA #_reverse__R3
+   25 11 2,8 kmA #_reverse__R3
+   26 12 6,8 kmA #_reverse__R3
+   27 4,9 12 kpK #_R4
+   28 11 4,7 kmK #_reverse__R4
+   29 12 4,9 kmK #_reverse__R4
+   30 13 6,9 kmD #_reverse__R2
+   31 14 6,12 kmD #_reverse__R2
+   32 15 9,9 kmD #_reverse__R2
+   33 16 9,12 kmD #_reverse__R2
+   34 17 12,12 kmD #_reverse__R2
+   35 3,13 15 kpA #_R3
+   36 3,14 16 kpA #_R3
+   37 8,13 16 kpA #_R3
+   38 8,14 17 kpA #_R3
+   39 13 3,10 kmA #_reverse__R3
+   40 14 8,10 kmA #_reverse__R3
+   41 15 3,13 2*kmA #_reverse__R3
+   42 16 8,13 kmA #_reverse__R3
+   43 16 3,14 kmA #_reverse__R3
+   44 17 8,14 2*kmA #_reverse__R3
+   45 4,13 14 kpK #_R4
+   46 4,15 16 2*kpK #_R4
+   47 4,16 17 kpK #_R4
+   48 14 4,13 kmK #_reverse__R4
+   49 16 4,15 kmK #_reverse__R4
+   50 17 4,16 2*kmK #_reverse__R4
+   51 17 18 2*pK #_R5
+   52 18 12,19 kmD #_reverse__R2
+   53 18 8,20 kmA #_reverse__R3
+   54 18 14,21 kmA #_reverse__R3
+   55 18 4,22 kmK #_reverse__R4
+   56 18 16,23 kmK #_reverse__R4
+   57 18 24 pKs #_R6
+   58 18 17 dM #_R7
+   59 19 1,25 kmL #_reverse__R1
+   60 6,19 20 kpD #_R2
+   61 9,19 22 kpD #_R2
+   62 12,19 18 kpD #_R2
+   63 19,19 24 0.5*kpD #_R2
+   64 20 6,19 kmD #_reverse__R2
+   65 22 9,19 kmD #_reverse__R2
+   66 24 19,19 kmD #_reverse__R2
+   67 3,20 22 kpA #_R3
+   68 8,20 18 kpA #_R3
+   69 2,21 25 kpA #_R3
+   70 6,21 19 kpA #_R3
+   71 10,21 20 2*kpA #_R3
+   72 13,21 22 kpA #_R3
+   73 14,21 18 kpA #_R3
+   74 20,21 24 kpA #_R3
+   75 19 6,21 kmA #_reverse__R3
+   76 20 10,21 kmA #_reverse__R3
+   77 22 13,21 kmA #_reverse__R3
+   78 22 3,20 kmA #_reverse__R3
+   79 24 20,21 2*kmA #_reverse__R3
+   80 3,23 21 kpK #_R4
+   81 7,23 25 kpK #_R4
+   82 9,23 19 kpK #_R4
+   83 13,23 20 kpK #_R4
+   84 15,23 22 2*kpK #_R4
+   85 16,23 18 kpK #_R4
+   86 4,22 18 kpK #_R4
+   87 22,23 24 kpK #_R4
+   88 19 9,23 kmK #_reverse__R4
+   89 20 13,23 kmK #_reverse__R4
+   90 21 3,23 kmK #_reverse__R4
+   91 22 15,23 kmK #_reverse__R4
+   92 24 22,23 2*kmK #_reverse__R4
+   93 19 12 dM #_R7
+   94 20 14 dM #_R7
+   95 22 16 dM #_R7
+   96 24 18 2*dM #_R7
+   97 23 4 dC #_R8
+   98 1,25 19 kpL #_R1
+   99 25 2,21 kmA #_reverse__R3
+  100 25 7,23 kmK #_reverse__R4
+  101 25 11 dM #_R7
+end reactions
+begin groups
+    1 RecDim               2*10,2*13,2*14,2*15,2*16,2*17,2*18,2*20,2*22,2*24
+    2 Rec_A                7,9,11,12,13,14,2*15,2*16,2*17,2*18,19,20,2*22,2*24,25
+    3 Rec_K                11,12,14,16,2*17,2*18,19,20,22,2*24,25
+    4 Rec_Kp               18,19,20,22,2*24,25
+    5 RecDim_Kp            18,20,22,2*24
+    6 L_total              1,6,9,2*10,12,2*13,2*14,2*15,2*16,2*17,2*18,19,2*20,2*22,2*24
+    7 A_total              3,7,8,9,11,12,13,14,2*15,2*16,2*17,2*18,19,20,21,2*22,2*24,25
+    8 K_total              4,8,11,12,14,16,2*17,2*18,19,20,21,22,23,2*24,25
+    9 R_total              2,6,7,9,2*10,11,12,2*13,2*14,2*15,2*16,2*17,2*18,19,2*20,2*22,2*24,25
+end groups

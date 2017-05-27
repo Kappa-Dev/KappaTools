@@ -1,0 +1,48 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Na         6.022e23  # Constant
+    2 V          1e-21  # Constant
+    3 k1         (0.212*Na)*V  # ConstantExpression
+    4 k2         2.85  # Constant
+    5 k3         1.52  # Constant
+    6 K4         (0.19*Na)*V  # ConstantExpression
+    7 k5         4.88  # Constant
+    8 K6         (1.18*Na)*V  # ConstantExpression
+    9 k7         1.24  # Constant
+   10 k8         (32.24*Na)*V  # ConstantExpression
+   11 K9         (29.09*Na)*V  # ConstantExpression
+   12 k10        13.58  # Constant
+   13 k11        (153.0*Na)*V  # ConstantExpression
+   14 K12        (0.16*Na)*V  # ConstantExpression
+   15 Ga_0       (0.01*Na)*V  # ConstantExpression
+   16 PLC_0      (0.01*Na)*V  # ConstantExpression
+   17 Ca_0       (0.01*Na)*V  # ConstantExpression
+end parameters
+begin functions
+    1 _rateLaw1() k3/(K4+G)
+    2 _rateLaw2() k5/(K6+G)
+    3 _rateLaw3() k8/(K9+P)
+    4 _rateLaw4() k11/(K12+C)
+end functions
+begin species
+    1 Null() 1
+    2 Ga() Ga_0
+    3 PLC() PLC_0
+    4 Ca() Ca_0
+end species
+begin reactions
+    1 1 1,2 k1 #_R1
+    2 2 2,2 k2 #_R2
+    3 2,3 3 _rateLaw1 #_R3
+    4 2,4 4 _rateLaw2 #_R4
+    5 2 2,3 k7 #_R5
+    6 3,1 1 _rateLaw3 #_R6
+    7 2 2,4 k10 #_R7
+    8 4,1 1 _rateLaw4 #_R8
+end reactions
+begin groups
+    1 G                    2
+    2 P                    3
+    3 C                    4
+    4 NULL                 1
+end groups

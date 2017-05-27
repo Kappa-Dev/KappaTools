@@ -1,0 +1,27 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 kon        10  # Constant
+    2 koff       5  # Constant
+    3 kcat       0.7  # Constant
+    4 dephos     0.5  # Constant
+end parameters
+begin species
+    1 X(p~0,y) 5000
+    2 X(p~1,y) 0
+    3 Y(x) 500
+    4 X(p~0,y!1).Y(x!1) 0
+end species
+begin reactions
+    1 1,3 4 kon #_R1
+    2 2 1 dephos #_R4
+    3 4 1,3 koff #_R2
+    4 4 2,3 kcat #_R3
+end reactions
+begin groups
+    1 X_free               1
+    2 X_p_total            2
+    3 Xp_free              2
+    4 XY                   4
+    5 Ytotal               3,4
+    6 Xtotal               1,2,4
+end groups

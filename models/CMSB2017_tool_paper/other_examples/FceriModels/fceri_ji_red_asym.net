@@ -1,0 +1,3174 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Lig_tot    6.0e3  # Constant
+    2 Rec_tot    4.0e2  # Constant
+    3 Lyn_tot    2.8e1  # Constant
+    4 Syk_tot    4.0e2  # Constant
+    5 kp1        1.32845238e-7  # Constant
+    6 km1        0  # Constant
+    7 kp2        2.5e-1  # Constant
+    8 km2        0  # Constant
+    9 kpL        5e-2  # Constant
+   10 kmL        20  # Constant
+   11 kpLs       5e-2  # Constant
+   12 kmLs       0.12  # Constant
+   13 kpS        6e-2  # Constant
+   14 kmS        0.13  # Constant
+   15 kpSs       6e-2  # Constant
+   16 kmSs       0.13  # Constant
+   17 pLb        30  # Constant
+   18 pLbs       100  # Constant
+   19 pLg        1  # Constant
+   20 pLgs       3  # Constant
+   21 pLS        30  # Constant
+   22 pLSs       100  # Constant
+   23 pSS        100  # Constant
+   24 pSSs       200  # Constant
+   25 dm         20  # Constant
+   26 dc         20  # Constant
+end parameters
+begin species
+    1 Lig(l1,l2) Lig_tot
+    2 Lyn(SH2,U) Lyn_tot
+    3 Syk(a~Y,l~Y,tSH2) Syk_tot
+    4 Rec(a,b~Y,g~Y) Rec_tot
+    5 Lig(l1!1,l2).Rec(a!1,b~Y,g~Y) 0
+    6 Lig(l1,l2!1).Rec(a!1,b~Y,g~Y) 0
+    7 Lyn(SH2,U!1).Rec(a,b~Y!1,g~Y) 0
+    8 Lig(l1!1,l2).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~Y) 0
+    9 Lig(l1,l2!1).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~Y) 0
+   10 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~Y,g~Y) 0
+   11 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y,g~Y) 0
+   12 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y,g~Y) 0
+   13 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y!4,g~Y) 0
+   14 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~pY,g~Y) 0
+   15 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~pY,g~Y) 0
+   16 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y,g~pY) 0
+   17 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y,g~pY) 0
+   18 Rec(a,b~pY,g~Y) 0
+   19 Lig(l1,l2!1).Rec(a!1,b~pY,g~Y) 0
+   20 Rec(a,b~Y,g~pY) 0
+   21 Lig(l1,l2!1).Rec(a!1,b~Y,g~pY) 0
+   22 Lig(l1!1,l2).Rec(a!1,b~pY,g~Y) 0
+   23 Lig(l1!1,l2).Rec(a!1,b~Y,g~pY) 0
+   24 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y!4,g~pY) 0
+   25 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y!4,g~pY) 0
+   26 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY,g~Y) 0
+   27 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY,g~Y) 0
+   28 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~Y,g~pY) 0
+   29 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~Y,g~pY) 0
+   30 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~pY,g~pY) 0
+   31 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~pY,g~pY) 0
+   32 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~Y).Rec(a!1,b~pY!3,g~Y) 0
+   33 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~Y).Rec(a!2,b~pY!3,g~Y) 0
+   34 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   35 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   36 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~Y).Rec(a!2,b~pY,g~Y) 0
+   37 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY,g~Y) 0
+   38 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY,g~Y) 0
+   39 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY).Rec(a!2,b~Y,g~pY) 0
+   40 Lyn(SH2,U!1).Rec(a,b~Y!1,g~pY) 0
+   41 Lig(l1,l2!1).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY) 0
+   42 Rec(a,b~pY,g~pY) 0
+   43 Lig(l1,l2!1).Rec(a!1,b~pY,g~pY) 0
+   44 Lyn(SH2!1,U).Rec(a,b~pY!1,g~Y) 0
+   45 Lig(l1,l2!1).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~Y) 0
+   46 Rec(a,b~Y,g~pY!1).Syk(a~Y,l~Y,tSH2!1) 0
+   47 Lig(l1,l2!1).Rec(a!1,b~Y,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+   48 Lig(l1!1,l2).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY) 0
+   49 Lig(l1!1,l2).Rec(a!1,b~pY,g~pY) 0
+   50 Lig(l1!1,l2).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~Y) 0
+   51 Lig(l1!1,l2).Rec(a!1,b~Y,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+   52 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~Y,g~Y) 0
+   53 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~Y,g~Y) 0
+   54 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y!4,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+   55 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y!4,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+   56 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY,g~pY) 0
+   57 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY,g~pY) 0
+   58 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY!3,g~Y) 0
+   59 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY!3,g~Y) 0
+   60 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~Y,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+   61 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~Y,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+   62 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   63 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   64 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~Y!4,g~pY) 0
+   65 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~Y).Rec(a!1,b~pY!3,g~pY) 0
+   66 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~Y).Rec(a!2,b~pY!3,g~pY) 0
+   67 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY).Rec(a!2,b~pY!3,g~Y) 0
+   68 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY).Rec(a!1,b~pY!3,g~Y) 0
+   69 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~pY,g~Y) 0
+   70 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~Y).Rec(a!2,b~pY,g~pY) 0
+   71 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~Y).Rec(a!1,b~pY,g~Y) 0
+   72 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!3) 0
+   73 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~Y,g~pY) 0
+   74 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY,g~pY) 0
+   75 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY!3,g~Y) 0
+   76 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~Y,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+   77 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~pY,g~Y) 0
+   78 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~Y,g~pY) 0
+   79 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~pY,g~pY) 0
+   80 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   81 Lig(l1!1,l2!2).Rec(a!2,b~pY,g~Y).Rec(a!1,b~pY,g~pY) 0
+   82 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY,g~pY) 0
+   83 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~pY,g~pY) 0
+   84 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY).Rec(a!2,b~pY,g~pY) 0
+   85 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~Y).Rec(a!1,b~pY,g~pY) 0
+   86 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+   87 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY,g~Y) 0
+   88 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY!3,g~Y) 0
+   89 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY,g~pY) 0
+   90 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY!4,g~Y) 0
+   91 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+   92 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!3) 0
+   93 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+   94 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+   95 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+   96 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+   97 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~Y,l~Y,tSH2!4) 0
+   98 Lyn(SH2,U!1).Rec(a,b~Y!1,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+   99 Lig(l1,l2!1).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  100 Rec(a,b~pY,g~pY!1).Syk(a~Y,l~Y,tSH2!1) 0
+  101 Lig(l1,l2!1).Rec(a!1,b~pY,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+  102 Lyn(SH2!1,U).Rec(a,b~pY!1,g~pY) 0
+  103 Lig(l1,l2!1).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY) 0
+  104 Lig(l1!1,l2).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  105 Lig(l1!1,l2).Rec(a!1,b~pY,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+  106 Lig(l1!1,l2).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY) 0
+  107 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  108 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  109 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  110 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  111 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY!3,g~pY) 0
+  112 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY!3,g~pY) 0
+  113 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~Y!3,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  114 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY).Rec(a!1,b~pY!3,g~pY) 0
+  115 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~Y!3,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  116 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY).Rec(a!2,b~pY!3,g~pY) 0
+  117 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~Y).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  118 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~Y).Rec(a!2,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  119 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~Y).Syk(a~Y,l~Y,tSH2!5) 0
+  120 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~Y).Syk(a~Y,l~Y,tSH2!5) 0
+  121 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  122 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~Y).Rec(a!2,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  123 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY).Rec(a!1,b~pY,g~Y) 0
+  124 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  125 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  126 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY!3,g~pY) 0
+  127 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  128 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  129 Lig(l1!1,l2!2).Rec(a!2,b~pY,g~pY!3).Rec(a!1,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+  130 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY).Rec(a!1,b~pY,g~pY) 0
+  131 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  132 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY!4,g~pY) 0
+  133 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!4) 0
+  134 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~Y,l~Y,tSH2!4) 0
+  135 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  136 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  137 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  138 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  139 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~Y,l~Y,tSH2!5) 0
+  140 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY!5).Rec(a!2,b~Y!4,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!6) 0
+  141 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~Y,l~Y,tSH2!5) 0
+  142 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  143 Lig(l1!1,l2!2).Rec(a!2,b~pY,g~Y).Rec(a!1,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  144 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  145 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  146 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!3) 0
+  147 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~Y).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  148 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4).Syk(a~Y,l~Y,tSH2!3) 0
+  149 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!4) 0
+  150 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~Y,l~Y,tSH2!4) 0
+  151 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  152 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY).Rec(a!2,b~pY,g~Y) 0
+  153 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY!3,g~pY) 0
+  154 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY).Rec(a!2,b~pY,g~pY) 0
+  155 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~Y).Rec(a!1,b~pY!3,g~pY) 0
+  156 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  157 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  158 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  159 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY).Rec(a!2,b~pY!4,g~pY) 0
+  160 Lyn(SH2!1,U).Rec(a,b~pY!1,g~pY!2).Syk(a~Y,l~Y,tSH2!2) 0
+  161 Lig(l1,l2!1).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  162 Lig(l1!1,l2).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY!3).Syk(a~Y,l~Y,tSH2!3) 0
+  163 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY!3,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  164 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY!3,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  165 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY).Rec(a!2,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  166 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  167 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!3) 0
+  168 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  169 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  170 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY!3,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  171 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  172 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY!4,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  173 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~Y,l~Y,tSH2!5) 0
+  174 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!6) 0
+  175 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!4) 0
+  176 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~pY!5).Rec(a!1,b~pY!3,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  177 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~Y).Syk(a~Y,l~Y,tSH2!4) 0
+  178 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY!3,g~pY!4).Syk(a~Y,l~Y,tSH2!4) 0
+  179 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY).Syk(a~Y,l~Y,tSH2!4) 0
+  180 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~Y).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5) 0
+  181 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!4) 0
+  182 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!6).Syk(a~Y,l~Y,tSH2!5) 0
+  183 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~Y,l~Y,tSH2!5) 0
+  184 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY!5).Rec(a!2,b~pY!4,g~pY).Syk(a~Y,l~Y,tSH2!5) 0
+  185 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY!5).Rec(a!2,b~pY!4,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~Y,l~Y,tSH2!6) 0
+  186 Rec(a,b~Y,g~pY!1).Syk(a~pY,l~Y,tSH2!1) 0
+  187 Lig(l1,l2!1).Rec(a!1,b~Y,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  188 Lig(l1!1,l2).Rec(a!1,b~Y,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  189 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  190 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  191 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  192 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  193 Syk(a~pY,l~Y,tSH2) 0
+  194 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  195 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~Y,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  196 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!3) 0
+  197 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY!5).Rec(a!2,b~Y!4,g~pY!6).Syk(a~Y,l~Y,tSH2!6).Syk(a~pY,l~Y,tSH2!5) 0
+  198 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  199 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  200 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  201 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!3) 0
+  202 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  203 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY!5).Rec(a!2,b~Y!4,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  204 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  205 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!3) 0
+  206 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  207 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~Y,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  208 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~Y,g~pY!4).Syk(a~pY,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  209 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~Y,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  210 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  211 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!3) 0
+  212 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~Y,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  213 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  214 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  215 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  216 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  217 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~Y,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  218 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  219 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!3) 0
+  220 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~Y,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  221 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  222 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  223 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  224 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  225 Lyn(SH2,U!1).Rec(a,b~Y!1,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  226 Lig(l1,l2!1).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  227 Rec(a,b~pY,g~pY!1).Syk(a~pY,l~Y,tSH2!1) 0
+  228 Lig(l1,l2!1).Rec(a!1,b~pY,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  229 Lig(l1!1,l2).Lyn(SH2,U!2).Rec(a!1,b~Y!2,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  230 Lig(l1!1,l2).Rec(a!1,b~pY,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  231 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  232 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  233 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~pY!5).Syk(a~pY,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  234 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~pY!5).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  235 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!6).Syk(a~pY,l~Y,tSH2!5) 0
+  236 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  237 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  238 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  239 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  240 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  241 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  242 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!6).Syk(a~pY,l~Y,tSH2!5) 0
+  243 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  244 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  245 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~Y!4,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  246 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~Y!4,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  247 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~Y).Rec(a!1,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  248 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~Y).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  249 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~Y,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  250 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~Y,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  251 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  252 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  253 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY!5).Rec(a!2,b~Y!4,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  254 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~Y!3,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  255 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~Y).Rec(a!1,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  256 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~Y).Rec(a!2,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  257 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~Y).Syk(a~pY,l~Y,tSH2!5) 0
+  258 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~Y).Syk(a~pY,l~Y,tSH2!5) 0
+  259 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  260 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~Y).Rec(a!2,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  261 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  262 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  263 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  264 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  265 Lig(l1!1,l2!2).Rec(a!2,b~pY,g~Y).Rec(a!1,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  266 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  267 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  268 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY).Rec(a!1,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  269 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  270 Lig(l1!1,l2!2).Rec(a!2,b~pY,g~pY!3).Rec(a!1,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!3) 0
+  271 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~Y).Rec(a!1,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  272 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  273 Lyn(SH2!1,U).Rec(a,b~pY!1,g~pY!2).Syk(a~pY,l~Y,tSH2!2) 0
+  274 Lig(l1,l2!1).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  275 Lig(l1!1,l2).Lyn(SH2!2,U).Rec(a!1,b~pY!2,g~pY!3).Syk(a~pY,l~Y,tSH2!3) 0
+  276 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~Y).Rec(a!1,b~pY!3,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  277 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~Y).Rec(a!2,b~pY!3,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  278 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  279 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY).Rec(a!1,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  280 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  281 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY).Rec(a!2,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  282 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  283 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY).Rec(a!2,b~pY!3,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  284 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  285 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY).Rec(a!1,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  286 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~Y).Rec(a!2,b~pY!4,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  287 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~Y).Syk(a~pY,l~Y,tSH2!4) 0
+  288 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY).Rec(a!1,b~pY!3,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  289 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY).Syk(a~pY,l~Y,tSH2!4) 0
+  290 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4) 0
+  291 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~Y).Rec(a!1,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5) 0
+  292 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY!5).Rec(a!2,b~pY!4,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  293 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~pY!5).Rec(a!1,b~pY!3,g~pY).Syk(a~pY,l~Y,tSH2!5) 0
+  294 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!2,b~pY!4,g~pY!5).Rec(a!1,b~pY!3,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  295 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY!5).Rec(a!2,b~pY!4,g~pY!6).Syk(a~Y,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  296 Lig(l1!1,l2!2).Rec(a!1,b~Y,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  297 Lig(l1!1,l2!2).Lyn(SH2,U!3).Lyn(SH2,U!4).Rec(a!1,b~Y!3,g~pY!5).Rec(a!2,b~Y!4,g~pY!6).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  298 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!1,b~Y!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~pY,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  299 Lig(l1!1,l2!2).Rec(a!2,b~Y,g~pY!3).Rec(a!1,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!3) 0
+  300 Lig(l1!1,l2!2).Lyn(SH2,U!3).Rec(a!2,b~Y!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  301 Lig(l1!1,l2!2).Rec(a!1,b~pY,g~pY!3).Rec(a!2,b~pY,g~pY!4).Syk(a~pY,l~Y,tSH2!3).Syk(a~pY,l~Y,tSH2!4) 0
+  302 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~Y,g~pY!4).Rec(a!2,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  303 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!1,b~Y!4,g~pY!5).Rec(a!2,b~pY!3,g~pY!6).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+  304 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~pY!3,g~pY!4).Rec(a!1,b~pY,g~pY!5).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  305 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!2,b~Y,g~pY!4).Rec(a!1,b~pY!3,g~pY!5).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!4) 0
+  306 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2,U!4).Rec(a!2,b~Y!4,g~pY!5).Rec(a!1,b~pY!3,g~pY!6).Syk(a~pY,l~Y,tSH2!6).Syk(a~pY,l~Y,tSH2!5) 0
+  307 Lig(l1!1,l2!2).Lyn(SH2!3,U).Rec(a!1,b~pY!3,g~pY!4).Rec(a!2,b~pY,g~pY!5).Syk(a~pY,l~Y,tSH2!4).Syk(a~pY,l~Y,tSH2!5) 0
+  308 Lig(l1!1,l2!2).Lyn(SH2!3,U).Lyn(SH2!4,U).Rec(a!1,b~pY!3,g~pY!5).Rec(a!2,b~pY!4,g~pY!6).Syk(a~pY,l~Y,tSH2!5).Syk(a~pY,l~Y,tSH2!6) 0
+end species
+begin reactions
+    1 1,4 5 kp1 #R1
+    2 1,4 6 kp1 #R1a
+    3 2,4 7 kpL #R3
+    4 1,7 8 kp1 #R1
+    5 5 1,4 km1 #_reverse_R1
+    6 1,7 9 kp1 #R1a
+    7 6 1,4 km1 #_reverse_R1a
+    8 4,6 10 kp2 #R2
+    9 6,7 11 kp2 #R2
+   10 4,5 10 kp2 #R2a
+   11 5,7 12 kp2 #R2a
+   12 2,5 8 kpL #R3
+   13 2,6 9 kpL #R3
+   14 7 2,4 kmL #_reverse_R3
+   15 8 1,7 km1 #_reverse_R1
+   16 9 1,7 km1 #_reverse_R1a
+   17 4,9 12 kp2 #R2
+   18 7,9 13 kp2 #R2
+   19 10 4,6 km2 #_reverse_R2
+   20 11 6,7 km2 #_reverse_R2
+   21 12 4,9 km2 #_reverse_R2
+   22 4,8 11 kp2 #R2a
+   23 7,8 13 kp2 #R2a
+   24 10 4,5 km2 #_reverse_R2a
+   25 11 4,8 km2 #_reverse_R2a
+   26 12 5,7 km2 #_reverse_R2a
+   27 2,10 11 kpL #R3
+   28 2,10 12 kpL #R3
+   29 2,11 13 kpL #R3
+   30 2,12 13 kpL #R3
+   31 8 2,5 kmL #_reverse_R3
+   32 9 2,6 kmL #_reverse_R3
+   33 11 2,10 kmL #_reverse_R3
+   34 12 2,10 kmL #_reverse_R3
+   35 12 14 pLb #R4
+   36 11 15 pLb #R4a
+   37 12 16 pLg #R5
+   38 11 17 pLg #R5a
+   39 13 7,9 km2 #_reverse_R2
+   40 14 9,18 km2 #_reverse_R2
+   41 15 7,19 km2 #_reverse_R2
+   42 16 9,20 km2 #_reverse_R2
+   43 17 7,21 km2 #_reverse_R2
+   44 13 7,8 km2 #_reverse_R2a
+   45 14 7,22 km2 #_reverse_R2a
+   46 15 8,18 km2 #_reverse_R2a
+   47 16 7,23 km2 #_reverse_R2a
+   48 17 8,20 km2 #_reverse_R2a
+   49 2,16 24 kpL #R3
+   50 2,17 25 kpL #R3
+   51 13 2,12 kmL #_reverse_R3
+   52 13 2,11 kmL #_reverse_R3
+   53 14 2,26 kmL #_reverse_R3
+   54 15 2,27 kmL #_reverse_R3
+   55 16 2,28 kmL #_reverse_R3
+   56 17 2,29 kmL #_reverse_R3
+   57 16 30 pLb #R4
+   58 17 31 pLb #R4a
+   59 13 24 pLg #R5
+   60 14 30 pLg #R5
+   61 13 25 pLg #R5a
+   62 15 31 pLg #R5a
+   63 2,14 32 kpLs #R6
+   64 2,15 33 kpLs #R6
+   65 3,16 34 kpS #R9
+   66 3,17 35 kpS #R9
+   67 14 12 dm #R14
+   68 15 11 dm #R14
+   69 16 12 dm #R15
+   70 17 11 dm #R15
+   71 1,18 22 kp1 #R1
+   72 1,20 23 kp1 #R1
+   73 22 1,18 km1 #_reverse_R1
+   74 23 1,20 km1 #_reverse_R1
+   75 1,18 19 kp1 #R1a
+   76 1,20 21 kp1 #R1a
+   77 19 1,18 km1 #_reverse_R1a
+   78 21 1,20 km1 #_reverse_R1a
+   79 4,19 27 kp2 #R2
+   80 4,21 29 kp2 #R2
+   81 7,19 15 kp2 #R2
+   82 7,21 17 kp2 #R2
+   83 6,18 26 kp2 #R2
+   84 9,18 14 kp2 #R2
+   85 18,19 36 kp2 #R2
+   86 18,21 37 kp2 #R2
+   87 6,20 28 kp2 #R2
+   88 9,20 16 kp2 #R2
+   89 19,20 38 kp2 #R2
+   90 20,21 39 kp2 #R2
+   91 24 9,40 km2 #_reverse_R2
+   92 25 7,41 km2 #_reverse_R2
+   93 26 6,18 km2 #_reverse_R2
+   94 27 4,19 km2 #_reverse_R2
+   95 28 6,20 km2 #_reverse_R2
+   96 29 4,21 km2 #_reverse_R2
+   97 30 9,42 km2 #_reverse_R2
+   98 31 7,43 km2 #_reverse_R2
+   99 32 9,44 km2 #_reverse_R2
+  100 33 7,45 km2 #_reverse_R2
+  101 34 9,46 km2 #_reverse_R2
+  102 35 7,47 km2 #_reverse_R2
+  103 4,22 26 kp2 #R2a
+  104 4,23 28 kp2 #R2a
+  105 7,22 14 kp2 #R2a
+  106 7,23 16 kp2 #R2a
+  107 5,18 27 kp2 #R2a
+  108 8,18 15 kp2 #R2a
+  109 18,22 36 kp2 #R2a
+  110 18,23 38 kp2 #R2a
+  111 5,20 29 kp2 #R2a
+  112 8,20 17 kp2 #R2a
+  113 20,22 37 kp2 #R2a
+  114 20,23 39 kp2 #R2a
+  115 24 7,48 km2 #_reverse_R2a
+  116 25 8,40 km2 #_reverse_R2a
+  117 26 4,22 km2 #_reverse_R2a
+  118 27 5,18 km2 #_reverse_R2a
+  119 28 4,23 km2 #_reverse_R2a
+  120 29 5,20 km2 #_reverse_R2a
+  121 30 7,49 km2 #_reverse_R2a
+  122 31 8,42 km2 #_reverse_R2a
+  123 32 7,50 km2 #_reverse_R2a
+  124 33 8,44 km2 #_reverse_R2a
+  125 34 7,51 km2 #_reverse_R2a
+  126 35 8,46 km2 #_reverse_R2a
+  127 2,20 40 kpL #R3
+  128 2,21 41 kpL #R3
+  129 2,23 48 kpL #R3
+  130 2,26 14 kpL #R3
+  131 2,27 15 kpL #R3
+  132 2,28 16 kpL #R3
+  133 2,28 52 kpL #R3
+  134 2,29 17 kpL #R3
+  135 2,29 53 kpL #R3
+  136 2,34 54 kpL #R3
+  137 2,35 55 kpL #R3
+  138 24 2,52 kmL #_reverse_R3
+  139 24 2,16 kmL #_reverse_R3
+  140 25 2,53 kmL #_reverse_R3
+  141 25 2,17 kmL #_reverse_R3
+  142 30 2,56 kmL #_reverse_R3
+  143 31 2,57 kmL #_reverse_R3
+  144 32 2,58 kmL #_reverse_R3
+  145 33 2,59 kmL #_reverse_R3
+  146 34 2,60 kmL #_reverse_R3
+  147 35 2,61 kmL #_reverse_R3
+  148 34 62 pLb #R4
+  149 35 63 pLb #R4a
+  150 25 64 pLg #R5
+  151 32 65 pLg #R5
+  152 24 64 pLg #R5a
+  153 33 66 pLg #R5a
+  154 2,18 44 kpLs #R6
+  155 2,19 45 kpLs #R6
+  156 2,22 50 kpLs #R6
+  157 2,26 58 kpLs #R6
+  158 2,27 59 kpLs #R6
+  159 2,30 65 kpLs #R6
+  160 2,31 66 kpLs #R6
+  161 32 2,14 kmLs #_reverse_R6
+  162 33 2,15 kmLs #_reverse_R6
+  163 33 67 pLgs #R8
+  164 32 68 pLgs #R8a
+  165 3,20 46 kpS #R9
+  166 3,21 47 kpS #R9
+  167 3,23 51 kpS #R9
+  168 3,24 54 kpS #R9
+  169 3,25 55 kpS #R9
+  170 3,28 60 kpS #R9
+  171 3,29 61 kpS #R9
+  172 3,30 62 kpS #R9
+  173 3,31 63 kpS #R9
+  174 34 3,16 kmS #_reverse_R9
+  175 35 3,17 kmS #_reverse_R9
+  176 18 4 dm #R14
+  177 19 6 dm #R14
+  178 22 5 dm #R14
+  179 26 10 dm #R14
+  180 27 10 dm #R14
+  181 30 16 dm #R14
+  182 31 17 dm #R14
+  183 20 4 dm #R15
+  184 21 6 dm #R15
+  185 23 5 dm #R15
+  186 24 13 dm #R15
+  187 25 13 dm #R15
+  188 28 10 dm #R15
+  189 29 10 dm #R15
+  190 30 14 dm #R15
+  191 31 15 dm #R15
+  192 1,40 48 kp1 #R1
+  193 1,42 49 kp1 #R1
+  194 1,44 50 kp1 #R1
+  195 1,46 51 kp1 #R1
+  196 48 1,40 km1 #_reverse_R1
+  197 49 1,42 km1 #_reverse_R1
+  198 50 1,44 km1 #_reverse_R1
+  199 51 1,46 km1 #_reverse_R1
+  200 1,40 41 kp1 #R1a
+  201 1,42 43 kp1 #R1a
+  202 1,44 45 kp1 #R1a
+  203 1,46 47 kp1 #R1a
+  204 41 1,40 km1 #_reverse_R1a
+  205 43 1,42 km1 #_reverse_R1a
+  206 45 1,44 km1 #_reverse_R1a
+  207 47 1,46 km1 #_reverse_R1a
+  208 4,41 53 kp2 #R2
+  209 4,43 57 kp2 #R2
+  210 4,45 59 kp2 #R2
+  211 4,47 61 kp2 #R2
+  212 7,41 25 kp2 #R2
+  213 7,43 31 kp2 #R2
+  214 7,45 33 kp2 #R2
+  215 7,47 35 kp2 #R2
+  216 18,41 69 kp2 #R2
+  217 18,43 70 kp2 #R2
+  218 18,45 71 kp2 #R2
+  219 18,47 72 kp2 #R2
+  220 20,41 73 kp2 #R2
+  221 20,43 74 kp2 #R2
+  222 20,45 75 kp2 #R2
+  223 20,47 76 kp2 #R2
+  224 6,40 52 kp2 #R2
+  225 9,40 24 kp2 #R2
+  226 19,40 77 kp2 #R2
+  227 21,40 78 kp2 #R2
+  228 40,41 64 kp2 #R2
+  229 40,43 79 kp2 #R2
+  230 40,45 67 kp2 #R2
+  231 40,47 80 kp2 #R2
+  232 6,42 56 kp2 #R2
+  233 9,42 30 kp2 #R2
+  234 19,42 81 kp2 #R2
+  235 21,42 82 kp2 #R2
+  236 41,42 83 kp2 #R2
+  237 42,43 84 kp2 #R2
+  238 42,45 85 kp2 #R2
+  239 42,47 86 kp2 #R2
+  240 6,44 58 kp2 #R2
+  241 9,44 32 kp2 #R2
+  242 19,44 87 kp2 #R2
+  243 21,44 88 kp2 #R2
+  244 41,44 68 kp2 #R2
+  245 43,44 89 kp2 #R2
+  246 44,45 90 kp2 #R2
+  247 44,47 91 kp2 #R2
+  248 6,46 60 kp2 #R2
+  249 9,46 34 kp2 #R2
+  250 19,46 92 kp2 #R2
+  251 21,46 93 kp2 #R2
+  252 41,46 94 kp2 #R2
+  253 43,46 95 kp2 #R2
+  254 45,46 96 kp2 #R2
+  255 46,47 97 kp2 #R2
+  256 36 18,19 km2 #_reverse_R2
+  257 37 18,21 km2 #_reverse_R2
+  258 38 19,20 km2 #_reverse_R2
+  259 39 20,21 km2 #_reverse_R2
+  260 52 6,40 km2 #_reverse_R2
+  261 53 4,41 km2 #_reverse_R2
+  262 54 9,98 km2 #_reverse_R2
+  263 55 7,99 km2 #_reverse_R2
+  264 56 6,42 km2 #_reverse_R2
+  265 57 4,43 km2 #_reverse_R2
+  266 58 6,44 km2 #_reverse_R2
+  267 59 4,45 km2 #_reverse_R2
+  268 60 6,46 km2 #_reverse_R2
+  269 61 4,47 km2 #_reverse_R2
+  270 62 9,100 km2 #_reverse_R2
+  271 63 7,101 km2 #_reverse_R2
+  272 64 40,41 km2 #_reverse_R2
+  273 65 9,102 km2 #_reverse_R2
+  274 66 7,103 km2 #_reverse_R2
+  275 67 40,45 km2 #_reverse_R2
+  276 68 41,44 km2 #_reverse_R2
+  277 4,48 52 kp2 #R2a
+  278 4,49 56 kp2 #R2a
+  279 4,50 58 kp2 #R2a
+  280 4,51 60 kp2 #R2a
+  281 7,48 24 kp2 #R2a
+  282 7,49 30 kp2 #R2a
+  283 7,50 32 kp2 #R2a
+  284 7,51 34 kp2 #R2a
+  285 18,48 77 kp2 #R2a
+  286 18,49 81 kp2 #R2a
+  287 18,50 87 kp2 #R2a
+  288 18,51 92 kp2 #R2a
+  289 20,48 78 kp2 #R2a
+  290 20,49 82 kp2 #R2a
+  291 20,50 88 kp2 #R2a
+  292 20,51 93 kp2 #R2a
+  293 5,40 53 kp2 #R2a
+  294 8,40 25 kp2 #R2a
+  295 22,40 69 kp2 #R2a
+  296 23,40 73 kp2 #R2a
+  297 40,48 64 kp2 #R2a
+  298 40,49 83 kp2 #R2a
+  299 40,50 68 kp2 #R2a
+  300 40,51 94 kp2 #R2a
+  301 5,42 57 kp2 #R2a
+  302 8,42 31 kp2 #R2a
+  303 22,42 70 kp2 #R2a
+  304 23,42 74 kp2 #R2a
+  305 42,48 79 kp2 #R2a
+  306 42,49 84 kp2 #R2a
+  307 42,50 89 kp2 #R2a
+  308 42,51 95 kp2 #R2a
+  309 5,44 59 kp2 #R2a
+  310 8,44 33 kp2 #R2a
+  311 22,44 71 kp2 #R2a
+  312 23,44 75 kp2 #R2a
+  313 44,48 67 kp2 #R2a
+  314 44,49 85 kp2 #R2a
+  315 44,50 90 kp2 #R2a
+  316 44,51 96 kp2 #R2a
+  317 5,46 61 kp2 #R2a
+  318 8,46 35 kp2 #R2a
+  319 22,46 72 kp2 #R2a
+  320 23,46 76 kp2 #R2a
+  321 46,48 80 kp2 #R2a
+  322 46,49 86 kp2 #R2a
+  323 46,50 91 kp2 #R2a
+  324 46,51 97 kp2 #R2a
+  325 36 18,22 km2 #_reverse_R2a
+  326 37 20,22 km2 #_reverse_R2a
+  327 38 18,23 km2 #_reverse_R2a
+  328 39 20,23 km2 #_reverse_R2a
+  329 52 4,48 km2 #_reverse_R2a
+  330 53 5,40 km2 #_reverse_R2a
+  331 54 7,104 km2 #_reverse_R2a
+  332 55 8,98 km2 #_reverse_R2a
+  333 56 4,49 km2 #_reverse_R2a
+  334 57 5,42 km2 #_reverse_R2a
+  335 58 4,50 km2 #_reverse_R2a
+  336 59 5,44 km2 #_reverse_R2a
+  337 60 4,51 km2 #_reverse_R2a
+  338 61 5,46 km2 #_reverse_R2a
+  339 62 7,105 km2 #_reverse_R2a
+  340 63 8,100 km2 #_reverse_R2a
+  341 64 40,48 km2 #_reverse_R2a
+  342 65 7,106 km2 #_reverse_R2a
+  343 66 8,102 km2 #_reverse_R2a
+  344 67 44,48 km2 #_reverse_R2a
+  345 68 40,50 km2 #_reverse_R2a
+  346 2,37 69 kpL #R3
+  347 2,38 77 kpL #R3
+  348 2,39 78 kpL #R3
+  349 2,39 73 kpL #R3
+  350 2,46 98 kpL #R3
+  351 2,47 99 kpL #R3
+  352 2,51 104 kpL #R3
+  353 2,52 24 kpL #R3
+  354 2,53 25 kpL #R3
+  355 2,56 30 kpL #R3
+  356 2,57 31 kpL #R3
+  357 2,58 32 kpL #R3
+  358 2,59 33 kpL #R3
+  359 2,60 34 kpL #R3
+  360 2,60 107 kpL #R3
+  361 2,61 35 kpL #R3
+  362 2,61 108 kpL #R3
+  363 40 2,20 kmL #_reverse_R3
+  364 41 2,21 kmL #_reverse_R3
+  365 48 2,23 kmL #_reverse_R3
+  366 52 2,28 kmL #_reverse_R3
+  367 53 2,29 kmL #_reverse_R3
+  368 54 2,107 kmL #_reverse_R3
+  369 54 2,34 kmL #_reverse_R3
+  370 55 2,108 kmL #_reverse_R3
+  371 55 2,35 kmL #_reverse_R3
+  372 62 2,109 kmL #_reverse_R3
+  373 63 2,110 kmL #_reverse_R3
+  374 64 2,73 kmL #_reverse_R3
+  375 64 2,78 kmL #_reverse_R3
+  376 65 2,111 kmL #_reverse_R3
+  377 66 2,112 kmL #_reverse_R3
+  378 67 2,75 kmL #_reverse_R3
+  379 68 2,88 kmL #_reverse_R3
+  380 53 69 pLb #R4
+  381 52 77 pLb #R4a
+  382 53 73 pLg #R5
+  383 55 113 pLg #R5
+  384 68 114 pLg #R5
+  385 52 78 pLg #R5a
+  386 54 115 pLg #R5a
+  387 67 116 pLg #R5a
+  388 2,36 87 kpLs #R6
+  389 2,36 71 kpLs #R6
+  390 2,37 88 kpLs #R6
+  391 2,38 75 kpLs #R6
+  392 2,42 102 kpLs #R6
+  393 2,43 103 kpLs #R6
+  394 2,49 106 kpLs #R6
+  395 2,56 111 kpLs #R6
+  396 2,57 112 kpLs #R6
+  397 2,62 117 kpLs #R6
+  398 2,63 118 kpLs #R6
+  399 44 2,18 kmLs #_reverse_R6
+  400 45 2,19 kmLs #_reverse_R6
+  401 50 2,22 kmLs #_reverse_R6
+  402 58 2,26 kmLs #_reverse_R6
+  403 59 2,27 kmLs #_reverse_R6
+  404 65 2,30 kmLs #_reverse_R6
+  405 66 2,31 kmLs #_reverse_R6
+  406 67 2,77 kmLs #_reverse_R6
+  407 68 2,69 kmLs #_reverse_R6
+  408 59 71 pLbs #R7
+  409 58 87 pLbs #R7a
+  410 59 75 pLgs #R8
+  411 66 116 pLgs #R8
+  412 58 88 pLgs #R8a
+  413 65 114 pLgs #R8a
+  414 3,37 72 kpS #R9
+  415 3,38 92 kpS #R9
+  416 3,39 93 kpS #R9
+  417 3,39 76 kpS #R9
+  418 3,40 98 kpS #R9
+  419 3,41 99 kpS #R9
+  420 3,42 100 kpS #R9
+  421 3,43 101 kpS #R9
+  422 3,48 104 kpS #R9
+  423 3,49 105 kpS #R9
+  424 3,52 107 kpS #R9
+  425 3,53 108 kpS #R9
+  426 3,56 109 kpS #R9
+  427 3,57 110 kpS #R9
+  428 3,64 115 kpS #R9
+  429 3,64 113 kpS #R9
+  430 3,65 117 kpS #R9
+  431 3,66 118 kpS #R9
+  432 3,67 119 kpS #R9
+  433 3,68 120 kpS #R9
+  434 46 3,20 kmS #_reverse_R9
+  435 47 3,21 kmS #_reverse_R9
+  436 51 3,23 kmS #_reverse_R9
+  437 54 3,24 kmS #_reverse_R9
+  438 55 3,25 kmS #_reverse_R9
+  439 60 3,28 kmS #_reverse_R9
+  440 61 3,29 kmS #_reverse_R9
+  441 62 3,30 kmS #_reverse_R9
+  442 63 3,31 kmS #_reverse_R9
+  443 36 27 dm #R14
+  444 36 26 dm #R14
+  445 37 29 dm #R14
+  446 38 28 dm #R14
+  447 42 20 dm #R14
+  448 43 21 dm #R14
+  449 49 23 dm #R14
+  450 56 28 dm #R14
+  451 57 29 dm #R14
+  452 62 34 dm #R14
+  453 63 35 dm #R14
+  454 37 26 dm #R15
+  455 38 27 dm #R15
+  456 39 29 dm #R15
+  457 39 28 dm #R15
+  458 40 7 dm #R15
+  459 41 9 dm #R15
+  460 42 18 dm #R15
+  461 43 19 dm #R15
+  462 48 8 dm #R15
+  463 49 22 dm #R15
+  464 52 11 dm #R15
+  465 53 12 dm #R15
+  466 56 26 dm #R15
+  467 57 27 dm #R15
+  468 64 25 dm #R15
+  469 64 24 dm #R15
+  470 65 32 dm #R15
+  471 66 33 dm #R15
+  472 67 33 dm #R15
+  473 68 32 dm #R15
+  474 1,98 104 kp1 #R1
+  475 1,100 105 kp1 #R1
+  476 1,102 106 kp1 #R1
+  477 104 1,98 km1 #_reverse_R1
+  478 105 1,100 km1 #_reverse_R1
+  479 106 1,102 km1 #_reverse_R1
+  480 1,98 99 kp1 #R1a
+  481 1,100 101 kp1 #R1a
+  482 1,102 103 kp1 #R1a
+  483 99 1,98 km1 #_reverse_R1a
+  484 101 1,100 km1 #_reverse_R1a
+  485 103 1,102 km1 #_reverse_R1a
+  486 4,99 108 kp2 #R2
+  487 4,101 110 kp2 #R2
+  488 4,103 112 kp2 #R2
+  489 7,99 55 kp2 #R2
+  490 7,101 63 kp2 #R2
+  491 7,103 66 kp2 #R2
+  492 18,99 121 kp2 #R2
+  493 18,101 122 kp2 #R2
+  494 18,103 123 kp2 #R2
+  495 20,99 124 kp2 #R2
+  496 20,101 125 kp2 #R2
+  497 20,103 126 kp2 #R2
+  498 40,99 113 kp2 #R2
+  499 40,101 127 kp2 #R2
+  500 40,103 116 kp2 #R2
+  501 42,99 128 kp2 #R2
+  502 42,101 129 kp2 #R2
+  503 42,103 130 kp2 #R2
+  504 44,99 120 kp2 #R2
+  505 44,101 131 kp2 #R2
+  506 44,103 132 kp2 #R2
+  507 46,99 133 kp2 #R2
+  508 46,101 134 kp2 #R2
+  509 46,103 135 kp2 #R2
+  510 6,98 107 kp2 #R2
+  511 9,98 54 kp2 #R2
+  512 19,98 136 kp2 #R2
+  513 21,98 137 kp2 #R2
+  514 41,98 115 kp2 #R2
+  515 43,98 138 kp2 #R2
+  516 45,98 119 kp2 #R2
+  517 47,98 139 kp2 #R2
+  518 98,99 140 kp2 #R2
+  519 98,101 141 kp2 #R2
+  520 98,103 142 kp2 #R2
+  521 6,100 109 kp2 #R2
+  522 9,100 62 kp2 #R2
+  523 19,100 143 kp2 #R2
+  524 21,100 144 kp2 #R2
+  525 41,100 145 kp2 #R2
+  526 43,100 146 kp2 #R2
+  527 45,100 147 kp2 #R2
+  528 47,100 148 kp2 #R2
+  529 99,100 149 kp2 #R2
+  530 100,101 150 kp2 #R2
+  531 100,103 151 kp2 #R2
+  532 6,102 111 kp2 #R2
+  533 9,102 65 kp2 #R2
+  534 19,102 152 kp2 #R2
+  535 21,102 153 kp2 #R2
+  536 41,102 114 kp2 #R2
+  537 43,102 154 kp2 #R2
+  538 45,102 155 kp2 #R2
+  539 47,102 156 kp2 #R2
+  540 99,102 157 kp2 #R2
+  541 101,102 158 kp2 #R2
+  542 102,103 159 kp2 #R2
+  543 69 18,41 km2 #_reverse_R2
+  544 70 18,43 km2 #_reverse_R2
+  545 71 18,45 km2 #_reverse_R2
+  546 72 18,47 km2 #_reverse_R2
+  547 73 20,41 km2 #_reverse_R2
+  548 74 20,43 km2 #_reverse_R2
+  549 75 20,45 km2 #_reverse_R2
+  550 76 20,47 km2 #_reverse_R2
+  551 77 19,40 km2 #_reverse_R2
+  552 78 21,40 km2 #_reverse_R2
+  553 79 40,43 km2 #_reverse_R2
+  554 80 40,47 km2 #_reverse_R2
+  555 81 19,42 km2 #_reverse_R2
+  556 82 21,42 km2 #_reverse_R2
+  557 83 41,42 km2 #_reverse_R2
+  558 84 42,43 km2 #_reverse_R2
+  559 85 42,45 km2 #_reverse_R2
+  560 86 42,47 km2 #_reverse_R2
+  561 87 19,44 km2 #_reverse_R2
+  562 88 21,44 km2 #_reverse_R2
+  563 89 43,44 km2 #_reverse_R2
+  564 90 44,45 km2 #_reverse_R2
+  565 91 44,47 km2 #_reverse_R2
+  566 92 19,46 km2 #_reverse_R2
+  567 93 21,46 km2 #_reverse_R2
+  568 94 41,46 km2 #_reverse_R2
+  569 95 43,46 km2 #_reverse_R2
+  570 96 45,46 km2 #_reverse_R2
+  571 97 46,47 km2 #_reverse_R2
+  572 107 6,98 km2 #_reverse_R2
+  573 108 4,99 km2 #_reverse_R2
+  574 109 6,100 km2 #_reverse_R2
+  575 110 4,101 km2 #_reverse_R2
+  576 111 6,102 km2 #_reverse_R2
+  577 112 4,103 km2 #_reverse_R2
+  578 113 40,99 km2 #_reverse_R2
+  579 114 41,102 km2 #_reverse_R2
+  580 115 41,98 km2 #_reverse_R2
+  581 116 40,103 km2 #_reverse_R2
+  582 117 9,160 km2 #_reverse_R2
+  583 118 7,161 km2 #_reverse_R2
+  584 119 45,98 km2 #_reverse_R2
+  585 120 44,99 km2 #_reverse_R2
+  586 4,104 107 kp2 #R2a
+  587 4,105 109 kp2 #R2a
+  588 4,106 111 kp2 #R2a
+  589 7,104 54 kp2 #R2a
+  590 7,105 62 kp2 #R2a
+  591 7,106 65 kp2 #R2a
+  592 18,104 136 kp2 #R2a
+  593 18,105 143 kp2 #R2a
+  594 18,106 152 kp2 #R2a
+  595 20,104 137 kp2 #R2a
+  596 20,105 144 kp2 #R2a
+  597 20,106 153 kp2 #R2a
+  598 40,104 115 kp2 #R2a
+  599 40,105 145 kp2 #R2a
+  600 40,106 114 kp2 #R2a
+  601 42,104 138 kp2 #R2a
+  602 42,105 146 kp2 #R2a
+  603 42,106 154 kp2 #R2a
+  604 44,104 119 kp2 #R2a
+  605 44,105 147 kp2 #R2a
+  606 44,106 155 kp2 #R2a
+  607 46,104 139 kp2 #R2a
+  608 46,105 148 kp2 #R2a
+  609 46,106 156 kp2 #R2a
+  610 5,98 108 kp2 #R2a
+  611 8,98 55 kp2 #R2a
+  612 22,98 121 kp2 #R2a
+  613 23,98 124 kp2 #R2a
+  614 48,98 113 kp2 #R2a
+  615 49,98 128 kp2 #R2a
+  616 50,98 120 kp2 #R2a
+  617 51,98 133 kp2 #R2a
+  618 98,104 140 kp2 #R2a
+  619 98,105 149 kp2 #R2a
+  620 98,106 157 kp2 #R2a
+  621 5,100 110 kp2 #R2a
+  622 8,100 63 kp2 #R2a
+  623 22,100 122 kp2 #R2a
+  624 23,100 125 kp2 #R2a
+  625 48,100 127 kp2 #R2a
+  626 49,100 129 kp2 #R2a
+  627 50,100 131 kp2 #R2a
+  628 51,100 134 kp2 #R2a
+  629 100,104 141 kp2 #R2a
+  630 100,105 150 kp2 #R2a
+  631 100,106 158 kp2 #R2a
+  632 5,102 112 kp2 #R2a
+  633 8,102 66 kp2 #R2a
+  634 22,102 123 kp2 #R2a
+  635 23,102 126 kp2 #R2a
+  636 48,102 116 kp2 #R2a
+  637 49,102 130 kp2 #R2a
+  638 50,102 132 kp2 #R2a
+  639 51,102 135 kp2 #R2a
+  640 102,104 142 kp2 #R2a
+  641 102,105 151 kp2 #R2a
+  642 102,106 159 kp2 #R2a
+  643 69 22,40 km2 #_reverse_R2a
+  644 70 22,42 km2 #_reverse_R2a
+  645 71 22,44 km2 #_reverse_R2a
+  646 72 22,46 km2 #_reverse_R2a
+  647 73 23,40 km2 #_reverse_R2a
+  648 74 23,42 km2 #_reverse_R2a
+  649 75 23,44 km2 #_reverse_R2a
+  650 76 23,46 km2 #_reverse_R2a
+  651 77 18,48 km2 #_reverse_R2a
+  652 78 20,48 km2 #_reverse_R2a
+  653 79 42,48 km2 #_reverse_R2a
+  654 80 46,48 km2 #_reverse_R2a
+  655 81 18,49 km2 #_reverse_R2a
+  656 82 20,49 km2 #_reverse_R2a
+  657 83 40,49 km2 #_reverse_R2a
+  658 84 42,49 km2 #_reverse_R2a
+  659 85 44,49 km2 #_reverse_R2a
+  660 86 46,49 km2 #_reverse_R2a
+  661 87 18,50 km2 #_reverse_R2a
+  662 88 20,50 km2 #_reverse_R2a
+  663 89 42,50 km2 #_reverse_R2a
+  664 90 44,50 km2 #_reverse_R2a
+  665 91 46,50 km2 #_reverse_R2a
+  666 92 18,51 km2 #_reverse_R2a
+  667 93 20,51 km2 #_reverse_R2a
+  668 94 40,51 km2 #_reverse_R2a
+  669 95 42,51 km2 #_reverse_R2a
+  670 96 44,51 km2 #_reverse_R2a
+  671 97 46,51 km2 #_reverse_R2a
+  672 107 4,104 km2 #_reverse_R2a
+  673 108 5,98 km2 #_reverse_R2a
+  674 109 4,105 km2 #_reverse_R2a
+  675 110 5,100 km2 #_reverse_R2a
+  676 111 4,106 km2 #_reverse_R2a
+  677 112 5,102 km2 #_reverse_R2a
+  678 113 48,98 km2 #_reverse_R2a
+  679 114 40,106 km2 #_reverse_R2a
+  680 115 40,104 km2 #_reverse_R2a
+  681 116 48,102 km2 #_reverse_R2a
+  682 117 7,162 km2 #_reverse_R2a
+  683 118 8,160 km2 #_reverse_R2a
+  684 119 44,104 km2 #_reverse_R2a
+  685 120 50,98 km2 #_reverse_R2a
+  686 2,72 121 kpL #R3
+  687 2,73 64 kpL #R3
+  688 2,74 79 kpL #R3
+  689 2,75 67 kpL #R3
+  690 2,76 124 kpL #R3
+  691 2,76 80 kpL #R3
+  692 2,78 64 kpL #R3
+  693 2,80 113 kpL #R3
+  694 2,82 83 kpL #R3
+  695 2,86 128 kpL #R3
+  696 2,88 68 kpL #R3
+  697 2,91 120 kpL #R3
+  698 2,92 136 kpL #R3
+  699 2,93 137 kpL #R3
+  700 2,93 94 kpL #R3
+  701 2,94 115 kpL #R3
+  702 2,95 138 kpL #R3
+  703 2,96 119 kpL #R3
+  704 2,97 139 kpL #R3
+  705 2,97 133 kpL #R3
+  706 2,107 54 kpL #R3
+  707 2,108 55 kpL #R3
+  708 2,109 62 kpL #R3
+  709 2,110 63 kpL #R3
+  710 2,111 65 kpL #R3
+  711 2,112 66 kpL #R3
+  712 69 2,37 kmL #_reverse_R3
+  713 73 2,39 kmL #_reverse_R3
+  714 77 2,38 kmL #_reverse_R3
+  715 78 2,39 kmL #_reverse_R3
+  716 79 2,74 kmL #_reverse_R3
+  717 80 2,76 kmL #_reverse_R3
+  718 83 2,82 kmL #_reverse_R3
+  719 94 2,93 kmL #_reverse_R3
+  720 98 2,46 kmL #_reverse_R3
+  721 99 2,47 kmL #_reverse_R3
+  722 104 2,51 kmL #_reverse_R3
+  723 107 2,60 kmL #_reverse_R3
+  724 108 2,61 kmL #_reverse_R3
+  725 113 2,80 kmL #_reverse_R3
+  726 113 2,124 kmL #_reverse_R3
+  727 114 2,153 kmL #_reverse_R3
+  728 115 2,94 kmL #_reverse_R3
+  729 115 2,137 kmL #_reverse_R3
+  730 116 2,126 kmL #_reverse_R3
+  731 117 2,163 kmL #_reverse_R3
+  732 118 2,164 kmL #_reverse_R3
+  733 119 2,96 kmL #_reverse_R3
+  734 120 2,91 kmL #_reverse_R3
+  735 73 83 pLb #R4
+  736 94 145 pLb #R4
+  737 108 121 pLb #R4
+  738 78 79 pLb #R4a
+  739 80 127 pLb #R4a
+  740 107 136 pLb #R4a
+  741 69 83 pLg #R5
+  742 108 124 pLg #R5
+  743 120 157 pLg #R5
+  744 77 79 pLg #R5a
+  745 107 137 pLg #R5a
+  746 119 142 pLg #R5a
+  747 2,69 68 kpLs #R6
+  748 2,70 89 kpLs #R6
+  749 2,70 123 kpLs #R6
+  750 2,71 90 kpLs #R6
+  751 2,72 91 kpLs #R6
+  752 2,74 126 kpLs #R6
+  753 2,77 67 kpLs #R6
+  754 2,79 116 kpLs #R6
+  755 2,81 85 kpLs #R6
+  756 2,81 152 kpLs #R6
+  757 2,82 153 kpLs #R6
+  758 2,83 114 kpLs #R6
+  759 2,84 154 kpLs #R6
+  760 2,84 130 kpLs #R6
+  761 2,85 155 kpLs #R6
+  762 2,86 156 kpLs #R6
+  763 2,87 90 kpLs #R6
+  764 2,89 132 kpLs #R6
+  765 2,92 96 kpLs #R6
+  766 2,95 135 kpLs #R6
+  767 2,100 160 kpLs #R6
+  768 2,101 161 kpLs #R6
+  769 2,105 162 kpLs #R6
+  770 2,109 163 kpLs #R6
+  771 2,110 164 kpLs #R6
+  772 71 2,36 kmLs #_reverse_R6
+  773 75 2,38 kmLs #_reverse_R6
+  774 85 2,81 kmLs #_reverse_R6
+  775 87 2,36 kmLs #_reverse_R6
+  776 88 2,37 kmLs #_reverse_R6
+  777 89 2,70 kmLs #_reverse_R6
+  778 90 2,71 kmLs #_reverse_R6
+  779 90 2,87 kmLs #_reverse_R6
+  780 91 2,72 kmLs #_reverse_R6
+  781 96 2,92 kmLs #_reverse_R6
+  782 102 2,42 kmLs #_reverse_R6
+  783 103 2,43 kmLs #_reverse_R6
+  784 106 2,49 kmLs #_reverse_R6
+  785 111 2,56 kmLs #_reverse_R6
+  786 112 2,57 kmLs #_reverse_R6
+  787 114 2,83 kmLs #_reverse_R6
+  788 116 2,79 kmLs #_reverse_R6
+  789 117 2,62 kmLs #_reverse_R6
+  790 118 2,63 kmLs #_reverse_R6
+  791 119 2,136 kmLs #_reverse_R6
+  792 120 2,121 kmLs #_reverse_R6
+  793 75 85 pLbs #R7
+  794 96 147 pLbs #R7
+  795 112 123 pLbs #R7
+  796 88 89 pLbs #R7a
+  797 91 131 pLbs #R7a
+  798 111 152 pLbs #R7a
+  799 71 85 pLgs #R8
+  800 90 155 pLgs #R8
+  801 112 126 pLgs #R8
+  802 118 165 pLgs #R8
+  803 87 89 pLgs #R8a
+  804 90 132 pLgs #R8a
+  805 111 153 pLgs #R8a
+  806 117 166 pLgs #R8a
+  807 3,69 121 kpS #R9
+  808 3,70 122 kpS #R9
+  809 3,73 124 kpS #R9
+  810 3,73 94 kpS #R9
+  811 3,74 95 kpS #R9
+  812 3,74 125 kpS #R9
+  813 3,75 96 kpS #R9
+  814 3,76 97 kpS #R9
+  815 3,77 136 kpS #R9
+  816 3,78 137 kpS #R9
+  817 3,78 80 kpS #R9
+  818 3,79 138 kpS #R9
+  819 3,79 127 kpS #R9
+  820 3,80 139 kpS #R9
+  821 3,81 143 kpS #R9
+  822 3,82 86 kpS #R9
+  823 3,82 144 kpS #R9
+  824 3,83 128 kpS #R9
+  825 3,83 145 kpS #R9
+  826 3,84 146 kpS #R9
+  827 3,84 129 kpS #R9
+  828 3,85 147 kpS #R9
+  829 3,86 148 kpS #R9
+  830 3,88 91 kpS #R9
+  831 3,89 131 kpS #R9
+  832 3,93 97 kpS #R9
+  833 3,94 133 kpS #R9
+  834 3,95 134 kpS #R9
+  835 3,102 160 kpS #R9
+  836 3,103 161 kpS #R9
+  837 3,106 162 kpS #R9
+  838 3,111 163 kpS #R9
+  839 3,112 164 kpS #R9
+  840 3,113 140 kpS #R9
+  841 3,114 157 kpS #R9
+  842 3,114 166 kpS #R9
+  843 3,115 140 kpS #R9
+  844 3,116 142 kpS #R9
+  845 3,116 165 kpS #R9
+  846 72 3,37 kmS #_reverse_R9
+  847 76 3,39 kmS #_reverse_R9
+  848 80 3,78 kmS #_reverse_R9
+  849 86 3,82 kmS #_reverse_R9
+  850 91 3,88 kmS #_reverse_R9
+  851 92 3,38 kmS #_reverse_R9
+  852 93 3,39 kmS #_reverse_R9
+  853 94 3,73 kmS #_reverse_R9
+  854 95 3,74 kmS #_reverse_R9
+  855 96 3,75 kmS #_reverse_R9
+  856 97 3,76 kmS #_reverse_R9
+  857 97 3,93 kmS #_reverse_R9
+  858 98 3,40 kmS #_reverse_R9
+  859 99 3,41 kmS #_reverse_R9
+  860 100 3,42 kmS #_reverse_R9
+  861 101 3,43 kmS #_reverse_R9
+  862 104 3,48 kmS #_reverse_R9
+  863 105 3,49 kmS #_reverse_R9
+  864 107 3,52 kmS #_reverse_R9
+  865 108 3,53 kmS #_reverse_R9
+  866 109 3,56 kmS #_reverse_R9
+  867 110 3,57 kmS #_reverse_R9
+  868 113 3,64 kmS #_reverse_R9
+  869 115 3,64 kmS #_reverse_R9
+  870 117 3,65 kmS #_reverse_R9
+  871 118 3,66 kmS #_reverse_R9
+  872 119 3,67 kmS #_reverse_R9
+  873 120 3,68 kmS #_reverse_R9
+  874 97 167 pSS #R12
+  875 97 168 pSS #R12a
+  876 69 53 dm #R14
+  877 70 57 dm #R14
+  878 70 37 dm #R14
+  879 71 59 dm #R14
+  880 72 61 dm #R14
+  881 74 39 dm #R14
+  882 77 52 dm #R14
+  883 79 78 dm #R14
+  884 81 56 dm #R14
+  885 81 38 dm #R14
+  886 82 39 dm #R14
+  887 83 73 dm #R14
+  888 84 74 dm #R14
+  889 84 82 dm #R14
+  890 85 75 dm #R14
+  891 86 76 dm #R14
+  892 87 58 dm #R14
+  893 89 88 dm #R14
+  894 92 60 dm #R14
+  895 95 93 dm #R14
+  896 100 46 dm #R14
+  897 101 47 dm #R14
+  898 105 51 dm #R14
+  899 109 60 dm #R14
+  900 110 61 dm #R14
+  901 69 14 dm #R15
+  902 70 36 dm #R15
+  903 73 16 dm #R15
+  904 73 53 dm #R15
+  905 74 57 dm #R15
+  906 74 38 dm #R15
+  907 75 59 dm #R15
+  908 76 61 dm #R15
+  909 77 15 dm #R15
+  910 78 17 dm #R15
+  911 78 52 dm #R15
+  912 79 31 dm #R15
+  913 79 77 dm #R15
+  914 80 35 dm #R15
+  915 81 36 dm #R15
+  916 82 56 dm #R15
+  917 82 37 dm #R15
+  918 83 30 dm #R15
+  919 83 69 dm #R15
+  920 84 70 dm #R15
+  921 84 81 dm #R15
+  922 85 71 dm #R15
+  923 86 72 dm #R15
+  924 88 58 dm #R15
+  925 89 87 dm #R15
+  926 93 60 dm #R15
+  927 94 34 dm #R15
+  928 95 92 dm #R15
+  929 102 44 dm #R15
+  930 103 45 dm #R15
+  931 106 50 dm #R15
+  932 111 58 dm #R15
+  933 112 59 dm #R15
+  934 113 55 dm #R15
+  935 114 65 dm #R15
+  936 114 68 dm #R15
+  937 115 54 dm #R15
+  938 116 66 dm #R15
+  939 116 67 dm #R15
+  940 1,160 162 kp1 #R1
+  941 162 1,160 km1 #_reverse_R1
+  942 1,160 161 kp1 #R1a
+  943 161 1,160 km1 #_reverse_R1a
+  944 4,161 164 kp2 #R2
+  945 7,161 118 kp2 #R2
+  946 18,161 169 kp2 #R2
+  947 20,161 170 kp2 #R2
+  948 40,161 165 kp2 #R2
+  949 42,161 171 kp2 #R2
+  950 44,161 172 kp2 #R2
+  951 46,161 173 kp2 #R2
+  952 98,161 174 kp2 #R2
+  953 100,161 175 kp2 #R2
+  954 102,161 176 kp2 #R2
+  955 6,160 163 kp2 #R2
+  956 9,160 117 kp2 #R2
+  957 19,160 177 kp2 #R2
+  958 21,160 178 kp2 #R2
+  959 41,160 166 kp2 #R2
+  960 43,160 179 kp2 #R2
+  961 45,160 180 kp2 #R2
+  962 47,160 181 kp2 #R2
+  963 99,160 182 kp2 #R2
+  964 101,160 183 kp2 #R2
+  965 103,160 184 kp2 #R2
+  966 160,161 185 kp2 #R2
+  967 121 18,99 km2 #_reverse_R2
+  968 122 18,101 km2 #_reverse_R2
+  969 123 18,103 km2 #_reverse_R2
+  970 124 20,99 km2 #_reverse_R2
+  971 125 20,101 km2 #_reverse_R2
+  972 126 20,103 km2 #_reverse_R2
+  973 127 40,101 km2 #_reverse_R2
+  974 128 42,99 km2 #_reverse_R2
+  975 129 42,101 km2 #_reverse_R2
+  976 130 42,103 km2 #_reverse_R2
+  977 131 44,101 km2 #_reverse_R2
+  978 132 44,103 km2 #_reverse_R2
+  979 133 46,99 km2 #_reverse_R2
+  980 134 46,101 km2 #_reverse_R2
+  981 135 46,103 km2 #_reverse_R2
+  982 136 19,98 km2 #_reverse_R2
+  983 137 21,98 km2 #_reverse_R2
+  984 138 43,98 km2 #_reverse_R2
+  985 139 47,98 km2 #_reverse_R2
+  986 140 98,99 km2 #_reverse_R2
+  987 141 98,101 km2 #_reverse_R2
+  988 142 98,103 km2 #_reverse_R2
+  989 143 19,100 km2 #_reverse_R2
+  990 144 21,100 km2 #_reverse_R2
+  991 145 41,100 km2 #_reverse_R2
+  992 146 43,100 km2 #_reverse_R2
+  993 147 45,100 km2 #_reverse_R2
+  994 148 47,100 km2 #_reverse_R2
+  995 149 99,100 km2 #_reverse_R2
+  996 150 100,101 km2 #_reverse_R2
+  997 151 100,103 km2 #_reverse_R2
+  998 152 19,102 km2 #_reverse_R2
+  999 153 21,102 km2 #_reverse_R2
+ 1000 154 43,102 km2 #_reverse_R2
+ 1001 155 45,102 km2 #_reverse_R2
+ 1002 156 47,102 km2 #_reverse_R2
+ 1003 157 99,102 km2 #_reverse_R2
+ 1004 158 101,102 km2 #_reverse_R2
+ 1005 159 102,103 km2 #_reverse_R2
+ 1006 163 6,160 km2 #_reverse_R2
+ 1007 164 4,161 km2 #_reverse_R2
+ 1008 165 40,161 km2 #_reverse_R2
+ 1009 166 41,160 km2 #_reverse_R2
+ 1010 167 47,186 km2 #_reverse_R2
+ 1011 168 46,187 km2 #_reverse_R2
+ 1012 4,162 163 kp2 #R2a
+ 1013 7,162 117 kp2 #R2a
+ 1014 18,162 177 kp2 #R2a
+ 1015 20,162 178 kp2 #R2a
+ 1016 40,162 166 kp2 #R2a
+ 1017 42,162 179 kp2 #R2a
+ 1018 44,162 180 kp2 #R2a
+ 1019 46,162 181 kp2 #R2a
+ 1020 98,162 182 kp2 #R2a
+ 1021 100,162 183 kp2 #R2a
+ 1022 102,162 184 kp2 #R2a
+ 1023 5,160 164 kp2 #R2a
+ 1024 8,160 118 kp2 #R2a
+ 1025 22,160 169 kp2 #R2a
+ 1026 23,160 170 kp2 #R2a
+ 1027 48,160 165 kp2 #R2a
+ 1028 49,160 171 kp2 #R2a
+ 1029 50,160 172 kp2 #R2a
+ 1030 51,160 173 kp2 #R2a
+ 1031 104,160 174 kp2 #R2a
+ 1032 105,160 175 kp2 #R2a
+ 1033 106,160 176 kp2 #R2a
+ 1034 160,162 185 kp2 #R2a
+ 1035 121 22,98 km2 #_reverse_R2a
+ 1036 122 22,100 km2 #_reverse_R2a
+ 1037 123 22,102 km2 #_reverse_R2a
+ 1038 124 23,98 km2 #_reverse_R2a
+ 1039 125 23,100 km2 #_reverse_R2a
+ 1040 126 23,102 km2 #_reverse_R2a
+ 1041 127 48,100 km2 #_reverse_R2a
+ 1042 128 49,98 km2 #_reverse_R2a
+ 1043 129 49,100 km2 #_reverse_R2a
+ 1044 130 49,102 km2 #_reverse_R2a
+ 1045 131 50,100 km2 #_reverse_R2a
+ 1046 132 50,102 km2 #_reverse_R2a
+ 1047 133 51,98 km2 #_reverse_R2a
+ 1048 134 51,100 km2 #_reverse_R2a
+ 1049 135 51,102 km2 #_reverse_R2a
+ 1050 136 18,104 km2 #_reverse_R2a
+ 1051 137 20,104 km2 #_reverse_R2a
+ 1052 138 42,104 km2 #_reverse_R2a
+ 1053 139 46,104 km2 #_reverse_R2a
+ 1054 140 98,104 km2 #_reverse_R2a
+ 1055 141 100,104 km2 #_reverse_R2a
+ 1056 142 102,104 km2 #_reverse_R2a
+ 1057 143 18,105 km2 #_reverse_R2a
+ 1058 144 20,105 km2 #_reverse_R2a
+ 1059 145 40,105 km2 #_reverse_R2a
+ 1060 146 42,105 km2 #_reverse_R2a
+ 1061 147 44,105 km2 #_reverse_R2a
+ 1062 148 46,105 km2 #_reverse_R2a
+ 1063 149 98,105 km2 #_reverse_R2a
+ 1064 150 100,105 km2 #_reverse_R2a
+ 1065 151 102,105 km2 #_reverse_R2a
+ 1066 152 18,106 km2 #_reverse_R2a
+ 1067 153 20,106 km2 #_reverse_R2a
+ 1068 154 42,106 km2 #_reverse_R2a
+ 1069 155 44,106 km2 #_reverse_R2a
+ 1070 156 46,106 km2 #_reverse_R2a
+ 1071 157 98,106 km2 #_reverse_R2a
+ 1072 158 100,106 km2 #_reverse_R2a
+ 1073 159 102,106 km2 #_reverse_R2a
+ 1074 163 4,162 km2 #_reverse_R2a
+ 1075 164 5,160 km2 #_reverse_R2a
+ 1076 165 48,160 km2 #_reverse_R2a
+ 1077 166 40,162 km2 #_reverse_R2a
+ 1078 167 46,188 km2 #_reverse_R2a
+ 1079 168 51,186 km2 #_reverse_R2a
+ 1080 2,124 113 kpL #R3
+ 1081 2,125 127 kpL #R3
+ 1082 2,126 116 kpL #R3
+ 1083 2,133 140 kpL #R3
+ 1084 2,134 141 kpL #R3
+ 1085 2,135 142 kpL #R3
+ 1086 2,137 115 kpL #R3
+ 1087 2,139 140 kpL #R3
+ 1088 2,144 145 kpL #R3
+ 1089 2,148 149 kpL #R3
+ 1090 2,153 114 kpL #R3
+ 1091 2,156 157 kpL #R3
+ 1092 2,163 117 kpL #R3
+ 1093 2,164 118 kpL #R3
+ 1094 2,167 189 kpL #R3
+ 1095 2,167 190 kpL #R3
+ 1096 2,168 191 kpL #R3
+ 1097 2,168 192 kpL #R3
+ 1098 121 2,72 kmL #_reverse_R3
+ 1099 124 2,76 kmL #_reverse_R3
+ 1100 127 2,125 kmL #_reverse_R3
+ 1101 128 2,86 kmL #_reverse_R3
+ 1102 133 2,97 kmL #_reverse_R3
+ 1103 136 2,92 kmL #_reverse_R3
+ 1104 137 2,93 kmL #_reverse_R3
+ 1105 138 2,95 kmL #_reverse_R3
+ 1106 139 2,97 kmL #_reverse_R3
+ 1107 140 2,133 kmL #_reverse_R3
+ 1108 140 2,139 kmL #_reverse_R3
+ 1109 141 2,134 kmL #_reverse_R3
+ 1110 142 2,135 kmL #_reverse_R3
+ 1111 145 2,144 kmL #_reverse_R3
+ 1112 149 2,148 kmL #_reverse_R3
+ 1113 157 2,156 kmL #_reverse_R3
+ 1114 165 2,170 kmL #_reverse_R3
+ 1115 166 2,178 kmL #_reverse_R3
+ 1116 124 128 pLb #R4
+ 1117 133 149 pLb #R4
+ 1118 137 138 pLb #R4a
+ 1119 139 141 pLb #R4a
+ 1120 121 128 pLg #R5
+ 1121 136 138 pLg #R5a
+ 1122 2,121 120 kpLs #R6
+ 1123 2,122 131 kpLs #R6
+ 1124 2,122 169 kpLs #R6
+ 1125 2,123 132 kpLs #R6
+ 1126 2,125 170 kpLs #R6
+ 1127 2,127 165 kpLs #R6
+ 1128 2,128 157 kpLs #R6
+ 1129 2,129 171 kpLs #R6
+ 1130 2,129 158 kpLs #R6
+ 1131 2,130 159 kpLs #R6
+ 1132 2,131 172 kpLs #R6
+ 1133 2,134 173 kpLs #R6
+ 1134 2,136 119 kpLs #R6
+ 1135 2,138 142 kpLs #R6
+ 1136 2,141 174 kpLs #R6
+ 1137 2,143 147 kpLs #R6
+ 1138 2,143 177 kpLs #R6
+ 1139 2,144 178 kpLs #R6
+ 1140 2,145 166 kpLs #R6
+ 1141 2,146 179 kpLs #R6
+ 1142 2,146 151 kpLs #R6
+ 1143 2,147 180 kpLs #R6
+ 1144 2,148 181 kpLs #R6
+ 1145 2,149 182 kpLs #R6
+ 1146 2,150 183 kpLs #R6
+ 1147 2,150 175 kpLs #R6
+ 1148 2,151 184 kpLs #R6
+ 1149 2,152 155 kpLs #R6
+ 1150 2,154 159 kpLs #R6
+ 1151 2,158 176 kpLs #R6
+ 1152 123 2,70 kmLs #_reverse_R6
+ 1153 126 2,74 kmLs #_reverse_R6
+ 1154 130 2,84 kmLs #_reverse_R6
+ 1155 131 2,122 kmLs #_reverse_R6
+ 1156 132 2,123 kmLs #_reverse_R6
+ 1157 132 2,89 kmLs #_reverse_R6
+ 1158 135 2,95 kmLs #_reverse_R6
+ 1159 142 2,138 kmLs #_reverse_R6
+ 1160 147 2,143 kmLs #_reverse_R6
+ 1161 151 2,146 kmLs #_reverse_R6
+ 1162 152 2,81 kmLs #_reverse_R6
+ 1163 153 2,82 kmLs #_reverse_R6
+ 1164 154 2,84 kmLs #_reverse_R6
+ 1165 155 2,152 kmLs #_reverse_R6
+ 1166 155 2,85 kmLs #_reverse_R6
+ 1167 156 2,86 kmLs #_reverse_R6
+ 1168 157 2,128 kmLs #_reverse_R6
+ 1169 158 2,129 kmLs #_reverse_R6
+ 1170 159 2,130 kmLs #_reverse_R6
+ 1171 159 2,154 kmLs #_reverse_R6
+ 1172 160 2,100 kmLs #_reverse_R6
+ 1173 161 2,101 kmLs #_reverse_R6
+ 1174 162 2,105 kmLs #_reverse_R6
+ 1175 163 2,109 kmLs #_reverse_R6
+ 1176 164 2,110 kmLs #_reverse_R6
+ 1177 165 2,127 kmLs #_reverse_R6
+ 1178 166 2,145 kmLs #_reverse_R6
+ 1179 126 130 pLbs #R7
+ 1180 135 151 pLbs #R7
+ 1181 164 169 pLbs #R7
+ 1182 153 154 pLbs #R7a
+ 1183 156 158 pLbs #R7a
+ 1184 163 177 pLbs #R7a
+ 1185 123 130 pLgs #R8
+ 1186 132 159 pLgs #R8
+ 1187 164 170 pLgs #R8
+ 1188 152 154 pLgs #R8a
+ 1189 155 159 pLgs #R8a
+ 1190 163 178 pLgs #R8a
+ 1191 3,123 169 kpS #R9
+ 1192 3,124 133 kpS #R9
+ 1193 3,125 134 kpS #R9
+ 1194 3,126 135 kpS #R9
+ 1195 3,126 170 kpS #R9
+ 1196 3,127 141 kpS #R9
+ 1197 3,128 149 kpS #R9
+ 1198 3,129 150 kpS #R9
+ 1199 3,130 171 kpS #R9
+ 1200 3,130 151 kpS #R9
+ 1201 3,132 172 kpS #R9
+ 1202 3,135 173 kpS #R9
+ 1203 3,137 139 kpS #R9
+ 1204 3,138 141 kpS #R9
+ 1205 3,142 174 kpS #R9
+ 1206 3,144 148 kpS #R9
+ 1207 3,145 149 kpS #R9
+ 1208 3,146 150 kpS #R9
+ 1209 3,151 175 kpS #R9
+ 1210 3,152 177 kpS #R9
+ 1211 3,153 156 kpS #R9
+ 1212 3,153 178 kpS #R9
+ 1213 3,154 179 kpS #R9
+ 1214 3,154 158 kpS #R9
+ 1215 3,155 180 kpS #R9
+ 1216 3,156 181 kpS #R9
+ 1217 3,157 182 kpS #R9
+ 1218 3,158 183 kpS #R9
+ 1219 3,159 184 kpS #R9
+ 1220 3,159 176 kpS #R9
+ 1221 3,165 174 kpS #R9
+ 1222 3,166 182 kpS #R9
+ 1223 121 3,69 kmS #_reverse_R9
+ 1224 122 3,70 kmS #_reverse_R9
+ 1225 124 3,73 kmS #_reverse_R9
+ 1226 125 3,74 kmS #_reverse_R9
+ 1227 127 3,79 kmS #_reverse_R9
+ 1228 128 3,83 kmS #_reverse_R9
+ 1229 129 3,84 kmS #_reverse_R9
+ 1230 131 3,89 kmS #_reverse_R9
+ 1231 133 3,94 kmS #_reverse_R9
+ 1232 133 3,124 kmS #_reverse_R9
+ 1233 134 3,125 kmS #_reverse_R9
+ 1234 134 3,95 kmS #_reverse_R9
+ 1235 135 3,126 kmS #_reverse_R9
+ 1236 136 3,77 kmS #_reverse_R9
+ 1237 137 3,78 kmS #_reverse_R9
+ 1238 138 3,79 kmS #_reverse_R9
+ 1239 139 3,80 kmS #_reverse_R9
+ 1240 139 3,137 kmS #_reverse_R9
+ 1241 140 3,113 kmS #_reverse_R9
+ 1242 140 3,115 kmS #_reverse_R9
+ 1243 141 3,127 kmS #_reverse_R9
+ 1244 141 3,138 kmS #_reverse_R9
+ 1245 142 3,116 kmS #_reverse_R9
+ 1246 143 3,81 kmS #_reverse_R9
+ 1247 144 3,82 kmS #_reverse_R9
+ 1248 145 3,83 kmS #_reverse_R9
+ 1249 146 3,84 kmS #_reverse_R9
+ 1250 147 3,85 kmS #_reverse_R9
+ 1251 148 3,144 kmS #_reverse_R9
+ 1252 148 3,86 kmS #_reverse_R9
+ 1253 149 3,145 kmS #_reverse_R9
+ 1254 149 3,128 kmS #_reverse_R9
+ 1255 150 3,129 kmS #_reverse_R9
+ 1256 150 3,146 kmS #_reverse_R9
+ 1257 151 3,130 kmS #_reverse_R9
+ 1258 156 3,153 kmS #_reverse_R9
+ 1259 157 3,114 kmS #_reverse_R9
+ 1260 158 3,154 kmS #_reverse_R9
+ 1261 160 3,102 kmS #_reverse_R9
+ 1262 161 3,103 kmS #_reverse_R9
+ 1263 162 3,106 kmS #_reverse_R9
+ 1264 163 3,111 kmS #_reverse_R9
+ 1265 164 3,112 kmS #_reverse_R9
+ 1266 165 3,116 kmS #_reverse_R9
+ 1267 166 3,114 kmS #_reverse_R9
+ 1268 167 76,193 kmS #_reverse_R9
+ 1269 167 3,194 kmS #_reverse_R9
+ 1270 168 3,195 kmS #_reverse_R9
+ 1271 168 93,193 kmS #_reverse_R9
+ 1272 133 190 pSS #R12
+ 1273 134 196 pSS #R12
+ 1274 139 189 pSS #R12
+ 1275 140 197 pSS #R12
+ 1276 141 198 pSS #R12
+ 1277 148 199 pSS #R12
+ 1278 149 200 pSS #R12
+ 1279 150 201 pSS #R12
+ 1280 133 192 pSS #R12a
+ 1281 134 202 pSS #R12a
+ 1282 139 191 pSS #R12a
+ 1283 140 203 pSS #R12a
+ 1284 141 204 pSS #R12a
+ 1285 148 205 pSS #R12a
+ 1286 149 206 pSS #R12a
+ 1287 150 207 pSS #R12a
+ 1288 168 208 pSSs #R13
+ 1289 167 208 pSSs #R13a
+ 1290 121 108 dm #R14
+ 1291 122 110 dm #R14
+ 1292 122 72 dm #R14
+ 1293 123 112 dm #R14
+ 1294 125 76 dm #R14
+ 1295 127 80 dm #R14
+ 1296 128 124 dm #R14
+ 1297 129 86 dm #R14
+ 1298 129 125 dm #R14
+ 1299 130 126 dm #R14
+ 1300 131 91 dm #R14
+ 1301 134 97 dm #R14
+ 1302 136 107 dm #R14
+ 1303 138 137 dm #R14
+ 1304 141 139 dm #R14
+ 1305 143 109 dm #R14
+ 1306 143 92 dm #R14
+ 1307 144 93 dm #R14
+ 1308 145 94 dm #R14
+ 1309 146 95 dm #R14
+ 1310 146 144 dm #R14
+ 1311 147 96 dm #R14
+ 1312 148 97 dm #R14
+ 1313 149 133 dm #R14
+ 1314 150 134 dm #R14
+ 1315 150 148 dm #R14
+ 1316 151 135 dm #R14
+ 1317 152 111 dm #R14
+ 1318 154 153 dm #R14
+ 1319 158 156 dm #R14
+ 1320 123 71 dm #R15
+ 1321 124 108 dm #R15
+ 1322 125 110 dm #R15
+ 1323 126 112 dm #R15
+ 1324 126 75 dm #R15
+ 1325 127 63 dm #R15
+ 1326 128 121 dm #R15
+ 1327 129 122 dm #R15
+ 1328 130 85 dm #R15
+ 1329 130 123 dm #R15
+ 1330 132 90 dm #R15
+ 1331 135 96 dm #R15
+ 1332 137 107 dm #R15
+ 1333 138 136 dm #R15
+ 1334 142 119 dm #R15
+ 1335 144 109 dm #R15
+ 1336 145 62 dm #R15
+ 1337 146 143 dm #R15
+ 1338 151 147 dm #R15
+ 1339 152 87 dm #R15
+ 1340 153 111 dm #R15
+ 1341 153 88 dm #R15
+ 1342 154 89 dm #R15
+ 1343 154 152 dm #R15
+ 1344 155 90 dm #R15
+ 1345 156 91 dm #R15
+ 1346 157 120 dm #R15
+ 1347 158 131 dm #R15
+ 1348 159 132 dm #R15
+ 1349 159 155 dm #R15
+ 1350 165 118 dm #R15
+ 1351 166 117 dm #R15
+ 1352 167 97 dm #R17
+ 1353 168 97 dm #R17
+ 1354 1,186 188 kp1 #R1
+ 1355 188 1,186 km1 #_reverse_R1
+ 1356 1,186 187 kp1 #R1a
+ 1357 187 1,186 km1 #_reverse_R1a
+ 1358 4,187 209 kp2 #R2
+ 1359 7,187 210 kp2 #R2
+ 1360 18,187 211 kp2 #R2
+ 1361 20,187 195 kp2 #R2
+ 1362 40,187 212 kp2 #R2
+ 1363 42,187 213 kp2 #R2
+ 1364 44,187 214 kp2 #R2
+ 1365 46,187 168 kp2 #R2
+ 1366 98,187 191 kp2 #R2
+ 1367 100,187 205 kp2 #R2
+ 1368 102,187 215 kp2 #R2
+ 1369 160,187 216 kp2 #R2
+ 1370 6,186 217 kp2 #R2
+ 1371 9,186 218 kp2 #R2
+ 1372 19,186 219 kp2 #R2
+ 1373 21,186 194 kp2 #R2
+ 1374 41,186 220 kp2 #R2
+ 1375 43,186 221 kp2 #R2
+ 1376 45,186 222 kp2 #R2
+ 1377 47,186 167 kp2 #R2
+ 1378 99,186 190 kp2 #R2
+ 1379 101,186 196 kp2 #R2
+ 1380 103,186 223 kp2 #R2
+ 1381 161,186 224 kp2 #R2
+ 1382 186,187 208 kp2 #R2
+ 1383 169 18,161 km2 #_reverse_R2
+ 1384 170 20,161 km2 #_reverse_R2
+ 1385 171 42,161 km2 #_reverse_R2
+ 1386 172 44,161 km2 #_reverse_R2
+ 1387 173 46,161 km2 #_reverse_R2
+ 1388 174 98,161 km2 #_reverse_R2
+ 1389 175 100,161 km2 #_reverse_R2
+ 1390 176 102,161 km2 #_reverse_R2
+ 1391 177 19,160 km2 #_reverse_R2
+ 1392 178 21,160 km2 #_reverse_R2
+ 1393 179 43,160 km2 #_reverse_R2
+ 1394 180 45,160 km2 #_reverse_R2
+ 1395 181 47,160 km2 #_reverse_R2
+ 1396 182 99,160 km2 #_reverse_R2
+ 1397 183 101,160 km2 #_reverse_R2
+ 1398 184 103,160 km2 #_reverse_R2
+ 1399 185 160,161 km2 #_reverse_R2
+ 1400 189 47,225 km2 #_reverse_R2
+ 1401 190 99,186 km2 #_reverse_R2
+ 1402 191 98,187 km2 #_reverse_R2
+ 1403 192 46,226 km2 #_reverse_R2
+ 1404 194 21,186 km2 #_reverse_R2
+ 1405 195 20,187 km2 #_reverse_R2
+ 1406 196 101,186 km2 #_reverse_R2
+ 1407 197 99,225 km2 #_reverse_R2
+ 1408 198 101,225 km2 #_reverse_R2
+ 1409 199 47,227 km2 #_reverse_R2
+ 1410 200 99,227 km2 #_reverse_R2
+ 1411 201 101,227 km2 #_reverse_R2
+ 1412 202 46,228 km2 #_reverse_R2
+ 1413 203 98,226 km2 #_reverse_R2
+ 1414 204 98,228 km2 #_reverse_R2
+ 1415 205 100,187 km2 #_reverse_R2
+ 1416 206 100,226 km2 #_reverse_R2
+ 1417 207 100,228 km2 #_reverse_R2
+ 1418 208 186,187 km2 #_reverse_R2
+ 1419 4,188 217 kp2 #R2a
+ 1420 7,188 218 kp2 #R2a
+ 1421 18,188 219 kp2 #R2a
+ 1422 20,188 194 kp2 #R2a
+ 1423 40,188 220 kp2 #R2a
+ 1424 42,188 221 kp2 #R2a
+ 1425 44,188 222 kp2 #R2a
+ 1426 46,188 167 kp2 #R2a
+ 1427 98,188 190 kp2 #R2a
+ 1428 100,188 196 kp2 #R2a
+ 1429 102,188 223 kp2 #R2a
+ 1430 160,188 224 kp2 #R2a
+ 1431 5,186 209 kp2 #R2a
+ 1432 8,186 210 kp2 #R2a
+ 1433 22,186 211 kp2 #R2a
+ 1434 23,186 195 kp2 #R2a
+ 1435 48,186 212 kp2 #R2a
+ 1436 49,186 213 kp2 #R2a
+ 1437 50,186 214 kp2 #R2a
+ 1438 51,186 168 kp2 #R2a
+ 1439 104,186 191 kp2 #R2a
+ 1440 105,186 205 kp2 #R2a
+ 1441 106,186 215 kp2 #R2a
+ 1442 162,186 216 kp2 #R2a
+ 1443 186,188 208 kp2 #R2a
+ 1444 169 22,160 km2 #_reverse_R2a
+ 1445 170 23,160 km2 #_reverse_R2a
+ 1446 171 49,160 km2 #_reverse_R2a
+ 1447 172 50,160 km2 #_reverse_R2a
+ 1448 173 51,160 km2 #_reverse_R2a
+ 1449 174 104,160 km2 #_reverse_R2a
+ 1450 175 105,160 km2 #_reverse_R2a
+ 1451 176 106,160 km2 #_reverse_R2a
+ 1452 177 18,162 km2 #_reverse_R2a
+ 1453 178 20,162 km2 #_reverse_R2a
+ 1454 179 42,162 km2 #_reverse_R2a
+ 1455 180 44,162 km2 #_reverse_R2a
+ 1456 181 46,162 km2 #_reverse_R2a
+ 1457 182 98,162 km2 #_reverse_R2a
+ 1458 183 100,162 km2 #_reverse_R2a
+ 1459 184 102,162 km2 #_reverse_R2a
+ 1460 185 160,162 km2 #_reverse_R2a
+ 1461 189 46,229 km2 #_reverse_R2a
+ 1462 190 98,188 km2 #_reverse_R2a
+ 1463 191 104,186 km2 #_reverse_R2a
+ 1464 192 51,225 km2 #_reverse_R2a
+ 1465 194 20,188 km2 #_reverse_R2a
+ 1466 195 23,186 km2 #_reverse_R2a
+ 1467 196 100,188 km2 #_reverse_R2a
+ 1468 197 98,229 km2 #_reverse_R2a
+ 1469 198 100,229 km2 #_reverse_R2a
+ 1470 199 46,230 km2 #_reverse_R2a
+ 1471 200 98,230 km2 #_reverse_R2a
+ 1472 201 100,230 km2 #_reverse_R2a
+ 1473 202 51,227 km2 #_reverse_R2a
+ 1474 203 104,225 km2 #_reverse_R2a
+ 1475 204 104,227 km2 #_reverse_R2a
+ 1476 205 105,186 km2 #_reverse_R2a
+ 1477 206 105,225 km2 #_reverse_R2a
+ 1478 207 105,227 km2 #_reverse_R2a
+ 1479 208 186,188 km2 #_reverse_R2a
+ 1480 2,170 165 kpL #R3
+ 1481 2,173 174 kpL #R3
+ 1482 2,178 166 kpL #R3
+ 1483 2,181 182 kpL #R3
+ 1484 2,186 225 kpL #R3
+ 1485 2,187 226 kpL #R3
+ 1486 2,188 229 kpL #R3
+ 1487 2,189 197 kpL #R3
+ 1488 2,190 197 kpL #R3
+ 1489 2,191 203 kpL #R3
+ 1490 2,192 203 kpL #R3
+ 1491 2,194 231 kpL #R3
+ 1492 2,194 220 kpL #R3
+ 1493 2,195 232 kpL #R3
+ 1494 2,195 212 kpL #R3
+ 1495 2,196 198 kpL #R3
+ 1496 2,199 200 kpL #R3
+ 1497 2,202 204 kpL #R3
+ 1498 2,205 206 kpL #R3
+ 1499 2,208 233 kpL #R3
+ 1500 2,208 234 kpL #R3
+ 1501 174 2,173 kmL #_reverse_R3
+ 1502 182 2,181 kmL #_reverse_R3
+ 1503 189 2,167 kmL #_reverse_R3
+ 1504 190 2,167 kmL #_reverse_R3
+ 1505 191 2,168 kmL #_reverse_R3
+ 1506 192 2,168 kmL #_reverse_R3
+ 1507 197 2,190 kmL #_reverse_R3
+ 1508 197 2,189 kmL #_reverse_R3
+ 1509 198 2,196 kmL #_reverse_R3
+ 1510 200 2,199 kmL #_reverse_R3
+ 1511 203 2,192 kmL #_reverse_R3
+ 1512 203 2,191 kmL #_reverse_R3
+ 1513 204 2,202 kmL #_reverse_R3
+ 1514 206 2,205 kmL #_reverse_R3
+ 1515 190 200 pLb #R4
+ 1516 192 206 pLb #R4
+ 1517 189 198 pLb #R4a
+ 1518 191 204 pLb #R4a
+ 1519 2,169 172 kpLs #R6
+ 1520 2,171 176 kpLs #R6
+ 1521 2,175 185 kpLs #R6
+ 1522 2,177 180 kpLs #R6
+ 1523 2,179 184 kpLs #R6
+ 1524 2,183 185 kpLs #R6
+ 1525 2,196 224 kpLs #R6
+ 1526 2,198 235 kpLs #R6
+ 1527 2,199 236 kpLs #R6
+ 1528 2,200 237 kpLs #R6
+ 1529 2,201 238 kpLs #R6
+ 1530 2,201 239 kpLs #R6
+ 1531 2,202 240 kpLs #R6
+ 1532 2,204 241 kpLs #R6
+ 1533 2,205 216 kpLs #R6
+ 1534 2,206 242 kpLs #R6
+ 1535 2,207 243 kpLs #R6
+ 1536 2,207 244 kpLs #R6
+ 1537 169 2,122 kmLs #_reverse_R6
+ 1538 170 2,125 kmLs #_reverse_R6
+ 1539 171 2,129 kmLs #_reverse_R6
+ 1540 172 2,169 kmLs #_reverse_R6
+ 1541 172 2,131 kmLs #_reverse_R6
+ 1542 173 2,134 kmLs #_reverse_R6
+ 1543 174 2,141 kmLs #_reverse_R6
+ 1544 175 2,150 kmLs #_reverse_R6
+ 1545 176 2,158 kmLs #_reverse_R6
+ 1546 176 2,171 kmLs #_reverse_R6
+ 1547 177 2,143 kmLs #_reverse_R6
+ 1548 178 2,144 kmLs #_reverse_R6
+ 1549 179 2,146 kmLs #_reverse_R6
+ 1550 180 2,177 kmLs #_reverse_R6
+ 1551 180 2,147 kmLs #_reverse_R6
+ 1552 181 2,148 kmLs #_reverse_R6
+ 1553 182 2,149 kmLs #_reverse_R6
+ 1554 183 2,150 kmLs #_reverse_R6
+ 1555 184 2,151 kmLs #_reverse_R6
+ 1556 184 2,179 kmLs #_reverse_R6
+ 1557 185 2,175 kmLs #_reverse_R6
+ 1558 185 2,183 kmLs #_reverse_R6
+ 1559 170 171 pLbs #R7
+ 1560 173 175 pLbs #R7
+ 1561 178 179 pLbs #R7a
+ 1562 181 183 pLbs #R7a
+ 1563 169 171 pLgs #R8
+ 1564 172 176 pLgs #R8
+ 1565 177 179 pLgs #R8a
+ 1566 180 184 pLgs #R8a
+ 1567 16,193 218 kpS #R9
+ 1568 17,193 210 kpS #R9
+ 1569 20,193 186 kpS #R9
+ 1570 21,193 187 kpS #R9
+ 1571 23,193 188 kpS #R9
+ 1572 24,193 245 kpS #R9
+ 1573 25,193 246 kpS #R9
+ 1574 28,193 217 kpS #R9
+ 1575 29,193 209 kpS #R9
+ 1576 30,193 247 kpS #R9
+ 1577 31,193 248 kpS #R9
+ 1578 37,193 211 kpS #R9
+ 1579 38,193 219 kpS #R9
+ 1580 39,193 194 kpS #R9
+ 1581 39,193 195 kpS #R9
+ 1582 40,193 225 kpS #R9
+ 1583 41,193 226 kpS #R9
+ 1584 42,193 227 kpS #R9
+ 1585 43,193 228 kpS #R9
+ 1586 48,193 229 kpS #R9
+ 1587 49,193 230 kpS #R9
+ 1588 52,193 249 kpS #R9
+ 1589 53,193 250 kpS #R9
+ 1590 56,193 251 kpS #R9
+ 1591 57,193 252 kpS #R9
+ 1592 64,193 253 kpS #R9
+ 1593 64,193 254 kpS #R9
+ 1594 65,193 255 kpS #R9
+ 1595 66,193 256 kpS #R9
+ 1596 67,193 257 kpS #R9
+ 1597 68,193 258 kpS #R9
+ 1598 69,193 259 kpS #R9
+ 1599 70,193 260 kpS #R9
+ 1600 73,193 232 kpS #R9
+ 1601 73,193 220 kpS #R9
+ 1602 74,193 221 kpS #R9
+ 1603 74,193 261 kpS #R9
+ 1604 75,193 222 kpS #R9
+ 1605 76,193 167 kpS #R9
+ 1606 77,193 262 kpS #R9
+ 1607 78,193 231 kpS #R9
+ 1608 78,193 212 kpS #R9
+ 1609 79,193 263 kpS #R9
+ 1610 79,193 264 kpS #R9
+ 1611 80,193 189 kpS #R9
+ 1612 81,193 265 kpS #R9
+ 1613 82,193 213 kpS #R9
+ 1614 82,193 266 kpS #R9
+ 1615 83,193 267 kpS #R9
+ 1616 83,193 268 kpS #R9
+ 1617 84,193 269 kpS #R9
+ 1618 84,193 270 kpS #R9
+ 1619 85,193 271 kpS #R9
+ 1620 86,193 199 kpS #R9
+ 1621 88,193 214 kpS #R9
+ 1622 89,193 272 kpS #R9
+ 1623 93,193 168 kpS #R9
+ 1624 94,193 192 kpS #R9
+ 1625 95,193 202 kpS #R9
+ 1626 102,193 273 kpS #R9
+ 1627 103,193 274 kpS #R9
+ 1628 106,193 275 kpS #R9
+ 1629 111,193 276 kpS #R9
+ 1630 112,193 277 kpS #R9
+ 1631 113,193 197 kpS #R9
+ 1632 114,193 278 kpS #R9
+ 1633 114,193 279 kpS #R9
+ 1634 115,193 203 kpS #R9
+ 1635 116,193 280 kpS #R9
+ 1636 116,193 281 kpS #R9
+ 1637 123,193 282 kpS #R9
+ 1638 124,193 190 kpS #R9
+ 1639 125,193 196 kpS #R9
+ 1640 126,193 223 kpS #R9
+ 1641 126,193 283 kpS #R9
+ 1642 127,193 198 kpS #R9
+ 1643 128,193 200 kpS #R9
+ 1644 129,193 201 kpS #R9
+ 1645 130,193 284 kpS #R9
+ 1646 130,193 285 kpS #R9
+ 1647 132,193 286 kpS #R9
+ 1648 135,193 240 kpS #R9
+ 1649 137,193 191 kpS #R9
+ 1650 138,193 204 kpS #R9
+ 1651 142,193 241 kpS #R9
+ 1652 144,193 205 kpS #R9
+ 1653 145,193 206 kpS #R9
+ 1654 146,193 207 kpS #R9
+ 1655 151,193 244 kpS #R9
+ 1656 152,193 287 kpS #R9
+ 1657 153,193 215 kpS #R9
+ 1658 153,193 288 kpS #R9
+ 1659 154,193 289 kpS #R9
+ 1660 154,193 290 kpS #R9
+ 1661 155,193 291 kpS #R9
+ 1662 156,193 236 kpS #R9
+ 1663 157,193 237 kpS #R9
+ 1664 158,193 238 kpS #R9
+ 1665 159,193 292 kpS #R9
+ 1666 159,193 293 kpS #R9
+ 1667 165,193 235 kpS #R9
+ 1668 166,193 242 kpS #R9
+ 1669 3,170 173 kpS #R9
+ 1670 170,193 224 kpS #R9
+ 1671 3,171 175 kpS #R9
+ 1672 171,193 239 kpS #R9
+ 1673 3,176 185 kpS #R9
+ 1674 176,193 294 kpS #R9
+ 1675 3,178 181 kpS #R9
+ 1676 178,193 216 kpS #R9
+ 1677 3,179 183 kpS #R9
+ 1678 179,193 243 kpS #R9
+ 1679 3,184 185 kpS #R9
+ 1680 184,193 295 kpS #R9
+ 1681 3,194 167 kpS #R9
+ 1682 193,194 208 kpS #R9
+ 1683 3,195 168 kpS #R9
+ 1684 193,195 208 kpS #R9
+ 1685 169 3,123 kmS #_reverse_R9
+ 1686 170 3,126 kmS #_reverse_R9
+ 1687 171 3,130 kmS #_reverse_R9
+ 1688 172 3,132 kmS #_reverse_R9
+ 1689 173 3,170 kmS #_reverse_R9
+ 1690 173 3,135 kmS #_reverse_R9
+ 1691 174 3,165 kmS #_reverse_R9
+ 1692 174 3,142 kmS #_reverse_R9
+ 1693 175 3,151 kmS #_reverse_R9
+ 1694 175 3,171 kmS #_reverse_R9
+ 1695 176 3,159 kmS #_reverse_R9
+ 1696 177 3,152 kmS #_reverse_R9
+ 1697 178 3,153 kmS #_reverse_R9
+ 1698 179 3,154 kmS #_reverse_R9
+ 1699 180 3,155 kmS #_reverse_R9
+ 1700 181 3,178 kmS #_reverse_R9
+ 1701 181 3,156 kmS #_reverse_R9
+ 1702 182 3,166 kmS #_reverse_R9
+ 1703 182 3,157 kmS #_reverse_R9
+ 1704 183 3,158 kmS #_reverse_R9
+ 1705 183 3,179 kmS #_reverse_R9
+ 1706 184 3,159 kmS #_reverse_R9
+ 1707 185 3,176 kmS #_reverse_R9
+ 1708 185 3,184 kmS #_reverse_R9
+ 1709 186 20,193 kmS #_reverse_R9
+ 1710 187 21,193 kmS #_reverse_R9
+ 1711 188 23,193 kmS #_reverse_R9
+ 1712 189 80,193 kmS #_reverse_R9
+ 1713 189 3,231 kmS #_reverse_R9
+ 1714 190 3,220 kmS #_reverse_R9
+ 1715 190 124,193 kmS #_reverse_R9
+ 1716 191 3,212 kmS #_reverse_R9
+ 1717 191 137,193 kmS #_reverse_R9
+ 1718 192 94,193 kmS #_reverse_R9
+ 1719 192 3,232 kmS #_reverse_R9
+ 1720 194 39,193 kmS #_reverse_R9
+ 1721 195 39,193 kmS #_reverse_R9
+ 1722 196 125,193 kmS #_reverse_R9
+ 1723 196 3,221 kmS #_reverse_R9
+ 1724 197 113,193 kmS #_reverse_R9
+ 1725 197 3,253 kmS #_reverse_R9
+ 1726 198 127,193 kmS #_reverse_R9
+ 1727 198 3,263 kmS #_reverse_R9
+ 1728 199 3,266 kmS #_reverse_R9
+ 1729 199 86,193 kmS #_reverse_R9
+ 1730 200 3,268 kmS #_reverse_R9
+ 1731 200 128,193 kmS #_reverse_R9
+ 1732 201 129,193 kmS #_reverse_R9
+ 1733 201 3,269 kmS #_reverse_R9
+ 1734 202 3,261 kmS #_reverse_R9
+ 1735 202 95,193 kmS #_reverse_R9
+ 1736 203 3,254 kmS #_reverse_R9
+ 1737 203 115,193 kmS #_reverse_R9
+ 1738 204 3,264 kmS #_reverse_R9
+ 1739 204 138,193 kmS #_reverse_R9
+ 1740 205 144,193 kmS #_reverse_R9
+ 1741 205 3,213 kmS #_reverse_R9
+ 1742 206 145,193 kmS #_reverse_R9
+ 1743 206 3,267 kmS #_reverse_R9
+ 1744 207 3,270 kmS #_reverse_R9
+ 1745 207 146,193 kmS #_reverse_R9
+ 1746 208 193,195 kmS #_reverse_R9
+ 1747 208 193,194 kmS #_reverse_R9
+ 1748 173 224 pSS #R12
+ 1749 174 235 pSS #R12
+ 1750 175 239 pSS #R12
+ 1751 181 236 pSS #R12
+ 1752 182 237 pSS #R12
+ 1753 183 238 pSS #R12
+ 1754 185 294 pSS #R12
+ 1755 173 240 pSS #R12a
+ 1756 174 241 pSS #R12a
+ 1757 175 244 pSS #R12a
+ 1758 181 216 pSS #R12a
+ 1759 182 242 pSS #R12a
+ 1760 183 243 pSS #R12a
+ 1761 185 295 pSS #R12a
+ 1762 191 233 pSSs #R13
+ 1763 192 234 pSSs #R13
+ 1764 202 296 pSSs #R13
+ 1765 203 297 pSSs #R13
+ 1766 204 298 pSSs #R13
+ 1767 205 299 pSSs #R13
+ 1768 206 300 pSSs #R13
+ 1769 207 301 pSSs #R13
+ 1770 189 233 pSSs #R13a
+ 1771 190 234 pSSs #R13a
+ 1772 196 296 pSSs #R13a
+ 1773 197 297 pSSs #R13a
+ 1774 198 298 pSSs #R13a
+ 1775 199 299 pSSs #R13a
+ 1776 200 300 pSSs #R13a
+ 1777 201 301 pSSs #R13a
+ 1778 169 164 dm #R14
+ 1779 171 170 dm #R14
+ 1780 175 173 dm #R14
+ 1781 177 163 dm #R14
+ 1782 179 178 dm #R14
+ 1783 183 181 dm #R14
+ 1784 196 167 dm #R14
+ 1785 198 189 dm #R14
+ 1786 199 167 dm #R14
+ 1787 200 190 dm #R14
+ 1788 201 196 dm #R14
+ 1789 201 199 dm #R14
+ 1790 202 168 dm #R14
+ 1791 204 191 dm #R14
+ 1792 205 168 dm #R14
+ 1793 206 192 dm #R14
+ 1794 207 202 dm #R14
+ 1795 207 205 dm #R14
+ 1796 170 164 dm #R15
+ 1797 171 169 dm #R15
+ 1798 176 172 dm #R15
+ 1799 178 163 dm #R15
+ 1800 179 177 dm #R15
+ 1801 184 180 dm #R15
+ 1802 194 217 dm #R15
+ 1803 195 209 dm #R15
+ 1804 186 46 dm #R17
+ 1805 187 47 dm #R17
+ 1806 188 51 dm #R17
+ 1807 189 139 dm #R17
+ 1808 190 133 dm #R17
+ 1809 191 139 dm #R17
+ 1810 192 133 dm #R17
+ 1811 194 93 dm #R17
+ 1812 195 76 dm #R17
+ 1813 196 134 dm #R17
+ 1814 197 140 dm #R17
+ 1815 198 141 dm #R17
+ 1816 199 148 dm #R17
+ 1817 200 149 dm #R17
+ 1818 201 150 dm #R17
+ 1819 202 134 dm #R17
+ 1820 203 140 dm #R17
+ 1821 204 141 dm #R17
+ 1822 205 148 dm #R17
+ 1823 206 149 dm #R17
+ 1824 207 150 dm #R17
+ 1825 208 168 dm #R17
+ 1826 208 167 dm #R17
+ 1827 193 3 dc #R19
+ 1828 1,225 229 kp1 #R1
+ 1829 1,227 230 kp1 #R1
+ 1830 1,273 275 kp1 #R1
+ 1831 229 1,225 km1 #_reverse_R1
+ 1832 230 1,227 km1 #_reverse_R1
+ 1833 275 1,273 km1 #_reverse_R1
+ 1834 1,225 226 kp1 #R1a
+ 1835 1,227 228 kp1 #R1a
+ 1836 1,273 274 kp1 #R1a
+ 1837 226 1,225 km1 #_reverse_R1a
+ 1838 228 1,227 km1 #_reverse_R1a
+ 1839 274 1,273 km1 #_reverse_R1a
+ 1840 4,226 250 kp2 #R2
+ 1841 4,228 252 kp2 #R2
+ 1842 4,274 277 kp2 #R2
+ 1843 7,226 246 kp2 #R2
+ 1844 7,228 248 kp2 #R2
+ 1845 7,274 256 kp2 #R2
+ 1846 18,226 259 kp2 #R2
+ 1847 18,228 260 kp2 #R2
+ 1848 18,274 282 kp2 #R2
+ 1849 20,226 232 kp2 #R2
+ 1850 20,228 261 kp2 #R2
+ 1851 20,274 283 kp2 #R2
+ 1852 40,226 254 kp2 #R2
+ 1853 40,228 264 kp2 #R2
+ 1854 40,274 281 kp2 #R2
+ 1855 42,226 267 kp2 #R2
+ 1856 42,228 270 kp2 #R2
+ 1857 42,274 284 kp2 #R2
+ 1858 44,226 258 kp2 #R2
+ 1859 44,228 272 kp2 #R2
+ 1860 44,274 286 kp2 #R2
+ 1861 46,226 192 kp2 #R2
+ 1862 46,228 202 kp2 #R2
+ 1863 46,274 240 kp2 #R2
+ 1864 98,226 203 kp2 #R2
+ 1865 98,228 204 kp2 #R2
+ 1866 98,274 241 kp2 #R2
+ 1867 100,226 206 kp2 #R2
+ 1868 100,228 207 kp2 #R2
+ 1869 100,274 244 kp2 #R2
+ 1870 102,226 278 kp2 #R2
+ 1871 102,228 290 kp2 #R2
+ 1872 102,274 293 kp2 #R2
+ 1873 160,226 242 kp2 #R2
+ 1874 160,228 243 kp2 #R2
+ 1875 160,274 295 kp2 #R2
+ 1876 186,226 234 kp2 #R2
+ 1877 186,228 296 kp2 #R2
+ 1878 186,274 302 kp2 #R2
+ 1879 6,225 249 kp2 #R2
+ 1880 9,225 245 kp2 #R2
+ 1881 19,225 262 kp2 #R2
+ 1882 21,225 231 kp2 #R2
+ 1883 41,225 253 kp2 #R2
+ 1884 43,225 263 kp2 #R2
+ 1885 45,225 257 kp2 #R2
+ 1886 47,225 189 kp2 #R2
+ 1887 99,225 197 kp2 #R2
+ 1888 101,225 198 kp2 #R2
+ 1889 103,225 280 kp2 #R2
+ 1890 161,225 235 kp2 #R2
+ 1891 187,225 233 kp2 #R2
+ 1892 225,226 297 kp2 #R2
+ 1893 225,228 298 kp2 #R2
+ 1894 225,274 303 kp2 #R2
+ 1895 6,227 251 kp2 #R2
+ 1896 9,227 247 kp2 #R2
+ 1897 19,227 265 kp2 #R2
+ 1898 21,227 266 kp2 #R2
+ 1899 41,227 268 kp2 #R2
+ 1900 43,227 269 kp2 #R2
+ 1901 45,227 271 kp2 #R2
+ 1902 47,227 199 kp2 #R2
+ 1903 99,227 200 kp2 #R2
+ 1904 101,227 201 kp2 #R2
+ 1905 103,227 285 kp2 #R2
+ 1906 161,227 239 kp2 #R2
+ 1907 187,227 299 kp2 #R2
+ 1908 226,227 300 kp2 #R2
+ 1909 227,228 301 kp2 #R2
+ 1910 227,274 304 kp2 #R2
+ 1911 6,273 276 kp2 #R2
+ 1912 9,273 255 kp2 #R2
+ 1913 19,273 287 kp2 #R2
+ 1914 21,273 288 kp2 #R2
+ 1915 41,273 279 kp2 #R2
+ 1916 43,273 289 kp2 #R2
+ 1917 45,273 291 kp2 #R2
+ 1918 47,273 236 kp2 #R2
+ 1919 99,273 237 kp2 #R2
+ 1920 101,273 238 kp2 #R2
+ 1921 103,273 292 kp2 #R2
+ 1922 161,273 294 kp2 #R2
+ 1923 187,273 305 kp2 #R2
+ 1924 226,273 306 kp2 #R2
+ 1925 228,273 307 kp2 #R2
+ 1926 273,274 308 kp2 #R2
+ 1927 209 4,187 km2 #_reverse_R2
+ 1928 210 7,187 km2 #_reverse_R2
+ 1929 211 18,187 km2 #_reverse_R2
+ 1930 212 40,187 km2 #_reverse_R2
+ 1931 213 42,187 km2 #_reverse_R2
+ 1932 214 44,187 km2 #_reverse_R2
+ 1933 215 102,187 km2 #_reverse_R2
+ 1934 216 160,187 km2 #_reverse_R2
+ 1935 217 6,186 km2 #_reverse_R2
+ 1936 218 9,186 km2 #_reverse_R2
+ 1937 219 19,186 km2 #_reverse_R2
+ 1938 220 41,186 km2 #_reverse_R2
+ 1939 221 43,186 km2 #_reverse_R2
+ 1940 222 45,186 km2 #_reverse_R2
+ 1941 223 103,186 km2 #_reverse_R2
+ 1942 224 161,186 km2 #_reverse_R2
+ 1943 231 21,225 km2 #_reverse_R2
+ 1944 232 20,226 km2 #_reverse_R2
+ 1945 233 187,225 km2 #_reverse_R2
+ 1946 234 186,226 km2 #_reverse_R2
+ 1947 235 161,225 km2 #_reverse_R2
+ 1948 236 47,273 km2 #_reverse_R2
+ 1949 237 99,273 km2 #_reverse_R2
+ 1950 238 101,273 km2 #_reverse_R2
+ 1951 239 161,227 km2 #_reverse_R2
+ 1952 240 46,274 km2 #_reverse_R2
+ 1953 241 98,274 km2 #_reverse_R2
+ 1954 242 160,226 km2 #_reverse_R2
+ 1955 243 160,228 km2 #_reverse_R2
+ 1956 244 100,274 km2 #_reverse_R2
+ 1957 245 9,225 km2 #_reverse_R2
+ 1958 246 7,226 km2 #_reverse_R2
+ 1959 247 9,227 km2 #_reverse_R2
+ 1960 248 7,228 km2 #_reverse_R2
+ 1961 249 6,225 km2 #_reverse_R2
+ 1962 250 4,226 km2 #_reverse_R2
+ 1963 251 6,227 km2 #_reverse_R2
+ 1964 252 4,228 km2 #_reverse_R2
+ 1965 253 41,225 km2 #_reverse_R2
+ 1966 254 40,226 km2 #_reverse_R2
+ 1967 255 9,273 km2 #_reverse_R2
+ 1968 256 7,274 km2 #_reverse_R2
+ 1969 257 45,225 km2 #_reverse_R2
+ 1970 258 44,226 km2 #_reverse_R2
+ 1971 259 18,226 km2 #_reverse_R2
+ 1972 260 18,228 km2 #_reverse_R2
+ 1973 261 20,228 km2 #_reverse_R2
+ 1974 262 19,225 km2 #_reverse_R2
+ 1975 263 43,225 km2 #_reverse_R2
+ 1976 264 40,228 km2 #_reverse_R2
+ 1977 265 19,227 km2 #_reverse_R2
+ 1978 266 21,227 km2 #_reverse_R2
+ 1979 267 42,226 km2 #_reverse_R2
+ 1980 268 41,227 km2 #_reverse_R2
+ 1981 269 43,227 km2 #_reverse_R2
+ 1982 270 42,228 km2 #_reverse_R2
+ 1983 271 45,227 km2 #_reverse_R2
+ 1984 272 44,228 km2 #_reverse_R2
+ 1985 276 6,273 km2 #_reverse_R2
+ 1986 277 4,274 km2 #_reverse_R2
+ 1987 278 102,226 km2 #_reverse_R2
+ 1988 279 41,273 km2 #_reverse_R2
+ 1989 280 103,225 km2 #_reverse_R2
+ 1990 281 40,274 km2 #_reverse_R2
+ 1991 282 18,274 km2 #_reverse_R2
+ 1992 283 20,274 km2 #_reverse_R2
+ 1993 284 42,274 km2 #_reverse_R2
+ 1994 285 103,227 km2 #_reverse_R2
+ 1995 286 44,274 km2 #_reverse_R2
+ 1996 287 19,273 km2 #_reverse_R2
+ 1997 288 21,273 km2 #_reverse_R2
+ 1998 289 43,273 km2 #_reverse_R2
+ 1999 290 102,228 km2 #_reverse_R2
+ 2000 291 45,273 km2 #_reverse_R2
+ 2001 292 103,273 km2 #_reverse_R2
+ 2002 293 102,274 km2 #_reverse_R2
+ 2003 294 161,273 km2 #_reverse_R2
+ 2004 295 160,274 km2 #_reverse_R2
+ 2005 296 186,228 km2 #_reverse_R2
+ 2006 297 225,226 km2 #_reverse_R2
+ 2007 298 225,228 km2 #_reverse_R2
+ 2008 299 187,227 km2 #_reverse_R2
+ 2009 300 226,227 km2 #_reverse_R2
+ 2010 301 227,228 km2 #_reverse_R2
+ 2011 4,229 249 kp2 #R2a
+ 2012 4,230 251 kp2 #R2a
+ 2013 4,275 276 kp2 #R2a
+ 2014 7,229 245 kp2 #R2a
+ 2015 7,230 247 kp2 #R2a
+ 2016 7,275 255 kp2 #R2a
+ 2017 18,229 262 kp2 #R2a
+ 2018 18,230 265 kp2 #R2a
+ 2019 18,275 287 kp2 #R2a
+ 2020 20,229 231 kp2 #R2a
+ 2021 20,230 266 kp2 #R2a
+ 2022 20,275 288 kp2 #R2a
+ 2023 40,229 253 kp2 #R2a
+ 2024 40,230 268 kp2 #R2a
+ 2025 40,275 279 kp2 #R2a
+ 2026 42,229 263 kp2 #R2a
+ 2027 42,230 269 kp2 #R2a
+ 2028 42,275 289 kp2 #R2a
+ 2029 44,229 257 kp2 #R2a
+ 2030 44,230 271 kp2 #R2a
+ 2031 44,275 291 kp2 #R2a
+ 2032 46,229 189 kp2 #R2a
+ 2033 46,230 199 kp2 #R2a
+ 2034 46,275 236 kp2 #R2a
+ 2035 98,229 197 kp2 #R2a
+ 2036 98,230 200 kp2 #R2a
+ 2037 98,275 237 kp2 #R2a
+ 2038 100,229 198 kp2 #R2a
+ 2039 100,230 201 kp2 #R2a
+ 2040 100,275 238 kp2 #R2a
+ 2041 102,229 280 kp2 #R2a
+ 2042 102,230 285 kp2 #R2a
+ 2043 102,275 292 kp2 #R2a
+ 2044 160,229 235 kp2 #R2a
+ 2045 160,230 239 kp2 #R2a
+ 2046 160,275 294 kp2 #R2a
+ 2047 186,229 233 kp2 #R2a
+ 2048 186,230 299 kp2 #R2a
+ 2049 186,275 305 kp2 #R2a
+ 2050 5,225 250 kp2 #R2a
+ 2051 8,225 246 kp2 #R2a
+ 2052 22,225 259 kp2 #R2a
+ 2053 23,225 232 kp2 #R2a
+ 2054 48,225 254 kp2 #R2a
+ 2055 49,225 267 kp2 #R2a
+ 2056 50,225 258 kp2 #R2a
+ 2057 51,225 192 kp2 #R2a
+ 2058 104,225 203 kp2 #R2a
+ 2059 105,225 206 kp2 #R2a
+ 2060 106,225 278 kp2 #R2a
+ 2061 162,225 242 kp2 #R2a
+ 2062 188,225 234 kp2 #R2a
+ 2063 225,229 297 kp2 #R2a
+ 2064 225,230 300 kp2 #R2a
+ 2065 225,275 306 kp2 #R2a
+ 2066 5,227 252 kp2 #R2a
+ 2067 8,227 248 kp2 #R2a
+ 2068 22,227 260 kp2 #R2a
+ 2069 23,227 261 kp2 #R2a
+ 2070 48,227 264 kp2 #R2a
+ 2071 49,227 270 kp2 #R2a
+ 2072 50,227 272 kp2 #R2a
+ 2073 51,227 202 kp2 #R2a
+ 2074 104,227 204 kp2 #R2a
+ 2075 105,227 207 kp2 #R2a
+ 2076 106,227 290 kp2 #R2a
+ 2077 162,227 243 kp2 #R2a
+ 2078 188,227 296 kp2 #R2a
+ 2079 227,229 298 kp2 #R2a
+ 2080 227,230 301 kp2 #R2a
+ 2081 227,275 307 kp2 #R2a
+ 2082 5,273 277 kp2 #R2a
+ 2083 8,273 256 kp2 #R2a
+ 2084 22,273 282 kp2 #R2a
+ 2085 23,273 283 kp2 #R2a
+ 2086 48,273 281 kp2 #R2a
+ 2087 49,273 284 kp2 #R2a
+ 2088 50,273 286 kp2 #R2a
+ 2089 51,273 240 kp2 #R2a
+ 2090 104,273 241 kp2 #R2a
+ 2091 105,273 244 kp2 #R2a
+ 2092 106,273 293 kp2 #R2a
+ 2093 162,273 295 kp2 #R2a
+ 2094 188,273 302 kp2 #R2a
+ 2095 229,273 303 kp2 #R2a
+ 2096 230,273 304 kp2 #R2a
+ 2097 273,275 308 kp2 #R2a
+ 2098 209 5,186 km2 #_reverse_R2a
+ 2099 210 8,186 km2 #_reverse_R2a
+ 2100 211 22,186 km2 #_reverse_R2a
+ 2101 212 48,186 km2 #_reverse_R2a
+ 2102 213 49,186 km2 #_reverse_R2a
+ 2103 214 50,186 km2 #_reverse_R2a
+ 2104 215 106,186 km2 #_reverse_R2a
+ 2105 216 162,186 km2 #_reverse_R2a
+ 2106 217 4,188 km2 #_reverse_R2a
+ 2107 218 7,188 km2 #_reverse_R2a
+ 2108 219 18,188 km2 #_reverse_R2a
+ 2109 220 40,188 km2 #_reverse_R2a
+ 2110 221 42,188 km2 #_reverse_R2a
+ 2111 222 44,188 km2 #_reverse_R2a
+ 2112 223 102,188 km2 #_reverse_R2a
+ 2113 224 160,188 km2 #_reverse_R2a
+ 2114 231 20,229 km2 #_reverse_R2a
+ 2115 232 23,225 km2 #_reverse_R2a
+ 2116 233 186,229 km2 #_reverse_R2a
+ 2117 234 188,225 km2 #_reverse_R2a
+ 2118 235 160,229 km2 #_reverse_R2a
+ 2119 236 46,275 km2 #_reverse_R2a
+ 2120 237 98,275 km2 #_reverse_R2a
+ 2121 238 100,275 km2 #_reverse_R2a
+ 2122 239 160,230 km2 #_reverse_R2a
+ 2123 240 51,273 km2 #_reverse_R2a
+ 2124 241 104,273 km2 #_reverse_R2a
+ 2125 242 162,225 km2 #_reverse_R2a
+ 2126 243 162,227 km2 #_reverse_R2a
+ 2127 244 105,273 km2 #_reverse_R2a
+ 2128 245 7,229 km2 #_reverse_R2a
+ 2129 246 8,225 km2 #_reverse_R2a
+ 2130 247 7,230 km2 #_reverse_R2a
+ 2131 248 8,227 km2 #_reverse_R2a
+ 2132 249 4,229 km2 #_reverse_R2a
+ 2133 250 5,225 km2 #_reverse_R2a
+ 2134 251 4,230 km2 #_reverse_R2a
+ 2135 252 5,227 km2 #_reverse_R2a
+ 2136 253 40,229 km2 #_reverse_R2a
+ 2137 254 48,225 km2 #_reverse_R2a
+ 2138 255 7,275 km2 #_reverse_R2a
+ 2139 256 8,273 km2 #_reverse_R2a
+ 2140 257 44,229 km2 #_reverse_R2a
+ 2141 258 50,225 km2 #_reverse_R2a
+ 2142 259 22,225 km2 #_reverse_R2a
+ 2143 260 22,227 km2 #_reverse_R2a
+ 2144 261 23,227 km2 #_reverse_R2a
+ 2145 262 18,229 km2 #_reverse_R2a
+ 2146 263 42,229 km2 #_reverse_R2a
+ 2147 264 48,227 km2 #_reverse_R2a
+ 2148 265 18,230 km2 #_reverse_R2a
+ 2149 266 20,230 km2 #_reverse_R2a
+ 2150 267 49,225 km2 #_reverse_R2a
+ 2151 268 40,230 km2 #_reverse_R2a
+ 2152 269 42,230 km2 #_reverse_R2a
+ 2153 270 49,227 km2 #_reverse_R2a
+ 2154 271 44,230 km2 #_reverse_R2a
+ 2155 272 50,227 km2 #_reverse_R2a
+ 2156 276 4,275 km2 #_reverse_R2a
+ 2157 277 5,273 km2 #_reverse_R2a
+ 2158 278 106,225 km2 #_reverse_R2a
+ 2159 279 40,275 km2 #_reverse_R2a
+ 2160 280 102,229 km2 #_reverse_R2a
+ 2161 281 48,273 km2 #_reverse_R2a
+ 2162 282 22,273 km2 #_reverse_R2a
+ 2163 283 23,273 km2 #_reverse_R2a
+ 2164 284 49,273 km2 #_reverse_R2a
+ 2165 285 102,230 km2 #_reverse_R2a
+ 2166 286 50,273 km2 #_reverse_R2a
+ 2167 287 18,275 km2 #_reverse_R2a
+ 2168 288 20,275 km2 #_reverse_R2a
+ 2169 289 42,275 km2 #_reverse_R2a
+ 2170 290 106,227 km2 #_reverse_R2a
+ 2171 291 44,275 km2 #_reverse_R2a
+ 2172 292 102,275 km2 #_reverse_R2a
+ 2173 293 106,273 km2 #_reverse_R2a
+ 2174 294 160,275 km2 #_reverse_R2a
+ 2175 295 162,273 km2 #_reverse_R2a
+ 2176 296 188,227 km2 #_reverse_R2a
+ 2177 297 225,229 km2 #_reverse_R2a
+ 2178 298 227,229 km2 #_reverse_R2a
+ 2179 299 186,230 km2 #_reverse_R2a
+ 2180 300 225,230 km2 #_reverse_R2a
+ 2181 301 227,230 km2 #_reverse_R2a
+ 2182 2,209 210 kpL #R3
+ 2183 2,209 250 kpL #R3
+ 2184 2,210 246 kpL #R3
+ 2185 2,211 259 kpL #R3
+ 2186 2,212 254 kpL #R3
+ 2187 2,213 267 kpL #R3
+ 2188 2,214 258 kpL #R3
+ 2189 2,215 278 kpL #R3
+ 2190 2,216 242 kpL #R3
+ 2191 2,217 218 kpL #R3
+ 2192 2,217 249 kpL #R3
+ 2193 2,218 245 kpL #R3
+ 2194 2,219 262 kpL #R3
+ 2195 2,220 253 kpL #R3
+ 2196 2,221 263 kpL #R3
+ 2197 2,222 257 kpL #R3
+ 2198 2,223 280 kpL #R3
+ 2199 2,224 235 kpL #R3
+ 2200 2,231 253 kpL #R3
+ 2201 2,232 254 kpL #R3
+ 2202 2,233 297 kpL #R3
+ 2203 2,234 297 kpL #R3
+ 2204 2,236 237 kpL #R3
+ 2205 2,240 241 kpL #R3
+ 2206 2,249 245 kpL #R3
+ 2207 2,250 246 kpL #R3
+ 2208 2,251 247 kpL #R3
+ 2209 2,252 248 kpL #R3
+ 2210 2,261 264 kpL #R3
+ 2211 2,266 268 kpL #R3
+ 2212 2,276 255 kpL #R3
+ 2213 2,277 256 kpL #R3
+ 2214 2,283 281 kpL #R3
+ 2215 2,288 279 kpL #R3
+ 2216 2,296 298 kpL #R3
+ 2217 2,299 300 kpL #R3
+ 2218 210 2,209 kmL #_reverse_R3
+ 2219 212 2,195 kmL #_reverse_R3
+ 2220 218 2,217 kmL #_reverse_R3
+ 2221 220 2,194 kmL #_reverse_R3
+ 2222 225 2,186 kmL #_reverse_R3
+ 2223 226 2,187 kmL #_reverse_R3
+ 2224 229 2,188 kmL #_reverse_R3
+ 2225 231 2,194 kmL #_reverse_R3
+ 2226 232 2,195 kmL #_reverse_R3
+ 2227 233 2,208 kmL #_reverse_R3
+ 2228 234 2,208 kmL #_reverse_R3
+ 2229 235 2,224 kmL #_reverse_R3
+ 2230 237 2,236 kmL #_reverse_R3
+ 2231 241 2,240 kmL #_reverse_R3
+ 2232 242 2,216 kmL #_reverse_R3
+ 2233 245 2,249 kmL #_reverse_R3
+ 2234 245 2,218 kmL #_reverse_R3
+ 2235 246 2,250 kmL #_reverse_R3
+ 2236 246 2,210 kmL #_reverse_R3
+ 2237 247 2,251 kmL #_reverse_R3
+ 2238 248 2,252 kmL #_reverse_R3
+ 2239 249 2,217 kmL #_reverse_R3
+ 2240 250 2,209 kmL #_reverse_R3
+ 2241 253 2,220 kmL #_reverse_R3
+ 2242 253 2,231 kmL #_reverse_R3
+ 2243 254 2,212 kmL #_reverse_R3
+ 2244 254 2,232 kmL #_reverse_R3
+ 2245 255 2,276 kmL #_reverse_R3
+ 2246 256 2,277 kmL #_reverse_R3
+ 2247 257 2,222 kmL #_reverse_R3
+ 2248 258 2,214 kmL #_reverse_R3
+ 2249 259 2,211 kmL #_reverse_R3
+ 2250 262 2,219 kmL #_reverse_R3
+ 2251 263 2,221 kmL #_reverse_R3
+ 2252 264 2,261 kmL #_reverse_R3
+ 2253 267 2,213 kmL #_reverse_R3
+ 2254 268 2,266 kmL #_reverse_R3
+ 2255 278 2,215 kmL #_reverse_R3
+ 2256 279 2,288 kmL #_reverse_R3
+ 2257 280 2,223 kmL #_reverse_R3
+ 2258 281 2,283 kmL #_reverse_R3
+ 2259 297 2,234 kmL #_reverse_R3
+ 2260 297 2,233 kmL #_reverse_R3
+ 2261 298 2,296 kmL #_reverse_R3
+ 2262 300 2,299 kmL #_reverse_R3
+ 2263 218 247 pLb #R4
+ 2264 220 268 pLb #R4
+ 2265 232 267 pLb #R4
+ 2266 234 300 pLb #R4
+ 2267 250 259 pLb #R4
+ 2268 210 248 pLb #R4a
+ 2269 212 264 pLb #R4a
+ 2270 231 263 pLb #R4a
+ 2271 233 298 pLb #R4a
+ 2272 249 262 pLb #R4a
+ 2273 246 254 pLg #R5
+ 2274 250 232 pLg #R5
+ 2275 258 278 pLg #R5
+ 2276 259 267 pLg #R5
+ 2277 245 253 pLg #R5a
+ 2278 249 231 pLg #R5a
+ 2279 257 280 pLg #R5a
+ 2280 262 263 pLg #R5a
+ 2281 2,211 214 kpLs #R6
+ 2282 2,213 215 kpLs #R6
+ 2283 2,219 222 kpLs #R6
+ 2284 2,221 223 kpLs #R6
+ 2285 2,227 273 kpLs #R6
+ 2286 2,228 274 kpLs #R6
+ 2287 2,230 275 kpLs #R6
+ 2288 2,238 294 kpLs #R6
+ 2289 2,239 294 kpLs #R6
+ 2290 2,243 295 kpLs #R6
+ 2291 2,244 295 kpLs #R6
+ 2292 2,247 255 kpLs #R6
+ 2293 2,248 256 kpLs #R6
+ 2294 2,251 276 kpLs #R6
+ 2295 2,252 277 kpLs #R6
+ 2296 2,259 258 kpLs #R6
+ 2297 2,260 272 kpLs #R6
+ 2298 2,260 282 kpLs #R6
+ 2299 2,261 283 kpLs #R6
+ 2300 2,262 257 kpLs #R6
+ 2301 2,263 280 kpLs #R6
+ 2302 2,264 281 kpLs #R6
+ 2303 2,265 271 kpLs #R6
+ 2304 2,265 287 kpLs #R6
+ 2305 2,266 288 kpLs #R6
+ 2306 2,267 278 kpLs #R6
+ 2307 2,268 279 kpLs #R6
+ 2308 2,269 289 kpLs #R6
+ 2309 2,269 285 kpLs #R6
+ 2310 2,270 284 kpLs #R6
+ 2311 2,270 290 kpLs #R6
+ 2312 2,271 291 kpLs #R6
+ 2313 2,272 286 kpLs #R6
+ 2314 2,282 286 kpLs #R6
+ 2315 2,284 293 kpLs #R6
+ 2316 2,285 292 kpLs #R6
+ 2317 2,287 291 kpLs #R6
+ 2318 2,289 292 kpLs #R6
+ 2319 2,290 293 kpLs #R6
+ 2320 2,296 302 kpLs #R6
+ 2321 2,298 303 kpLs #R6
+ 2322 2,299 305 kpLs #R6
+ 2323 2,300 306 kpLs #R6
+ 2324 2,301 307 kpLs #R6
+ 2325 2,301 304 kpLs #R6
+ 2326 214 2,211 kmLs #_reverse_R6
+ 2327 215 2,213 kmLs #_reverse_R6
+ 2328 216 2,205 kmLs #_reverse_R6
+ 2329 222 2,219 kmLs #_reverse_R6
+ 2330 223 2,221 kmLs #_reverse_R6
+ 2331 224 2,196 kmLs #_reverse_R6
+ 2332 235 2,198 kmLs #_reverse_R6
+ 2333 236 2,199 kmLs #_reverse_R6
+ 2334 237 2,200 kmLs #_reverse_R6
+ 2335 238 2,201 kmLs #_reverse_R6
+ 2336 239 2,201 kmLs #_reverse_R6
+ 2337 240 2,202 kmLs #_reverse_R6
+ 2338 241 2,204 kmLs #_reverse_R6
+ 2339 242 2,206 kmLs #_reverse_R6
+ 2340 243 2,207 kmLs #_reverse_R6
+ 2341 244 2,207 kmLs #_reverse_R6
+ 2342 255 2,247 kmLs #_reverse_R6
+ 2343 256 2,248 kmLs #_reverse_R6
+ 2344 257 2,262 kmLs #_reverse_R6
+ 2345 258 2,259 kmLs #_reverse_R6
+ 2346 271 2,265 kmLs #_reverse_R6
+ 2347 272 2,260 kmLs #_reverse_R6
+ 2348 273 2,227 kmLs #_reverse_R6
+ 2349 274 2,228 kmLs #_reverse_R6
+ 2350 275 2,230 kmLs #_reverse_R6
+ 2351 276 2,251 kmLs #_reverse_R6
+ 2352 277 2,252 kmLs #_reverse_R6
+ 2353 278 2,267 kmLs #_reverse_R6
+ 2354 279 2,268 kmLs #_reverse_R6
+ 2355 280 2,263 kmLs #_reverse_R6
+ 2356 281 2,264 kmLs #_reverse_R6
+ 2357 282 2,260 kmLs #_reverse_R6
+ 2358 283 2,261 kmLs #_reverse_R6
+ 2359 284 2,270 kmLs #_reverse_R6
+ 2360 285 2,269 kmLs #_reverse_R6
+ 2361 286 2,282 kmLs #_reverse_R6
+ 2362 286 2,272 kmLs #_reverse_R6
+ 2363 287 2,265 kmLs #_reverse_R6
+ 2364 288 2,266 kmLs #_reverse_R6
+ 2365 289 2,269 kmLs #_reverse_R6
+ 2366 290 2,270 kmLs #_reverse_R6
+ 2367 291 2,287 kmLs #_reverse_R6
+ 2368 291 2,271 kmLs #_reverse_R6
+ 2369 292 2,285 kmLs #_reverse_R6
+ 2370 292 2,289 kmLs #_reverse_R6
+ 2371 293 2,290 kmLs #_reverse_R6
+ 2372 293 2,284 kmLs #_reverse_R6
+ 2373 294 2,238 kmLs #_reverse_R6
+ 2374 294 2,239 kmLs #_reverse_R6
+ 2375 295 2,244 kmLs #_reverse_R6
+ 2376 295 2,243 kmLs #_reverse_R6
+ 2377 222 271 pLbs #R7
+ 2378 223 285 pLbs #R7
+ 2379 224 239 pLbs #R7
+ 2380 240 244 pLbs #R7
+ 2381 277 282 pLbs #R7
+ 2382 283 284 pLbs #R7
+ 2383 214 272 pLbs #R7a
+ 2384 215 290 pLbs #R7a
+ 2385 216 243 pLbs #R7a
+ 2386 236 238 pLbs #R7a
+ 2387 276 287 pLbs #R7a
+ 2388 288 289 pLbs #R7a
+ 2389 256 281 pLgs #R8
+ 2390 277 283 pLgs #R8
+ 2391 282 284 pLgs #R8
+ 2392 286 293 pLgs #R8
+ 2393 255 279 pLgs #R8a
+ 2394 276 288 pLgs #R8a
+ 2395 287 289 pLgs #R8a
+ 2396 291 292 pLgs #R8a
+ 2397 3,212 191 kpS #R9
+ 2398 193,212 233 kpS #R9
+ 2399 3,213 205 kpS #R9
+ 2400 193,213 299 kpS #R9
+ 2401 3,215 216 kpS #R9
+ 2402 193,215 305 kpS #R9
+ 2403 3,220 190 kpS #R9
+ 2404 193,220 234 kpS #R9
+ 2405 3,221 196 kpS #R9
+ 2406 193,221 296 kpS #R9
+ 2407 3,223 224 kpS #R9
+ 2408 193,223 302 kpS #R9
+ 2409 3,231 189 kpS #R9
+ 2410 193,231 233 kpS #R9
+ 2411 3,232 192 kpS #R9
+ 2412 193,232 234 kpS #R9
+ 2413 3,253 197 kpS #R9
+ 2414 193,253 297 kpS #R9
+ 2415 3,254 203 kpS #R9
+ 2416 193,254 297 kpS #R9
+ 2417 3,261 202 kpS #R9
+ 2418 193,261 296 kpS #R9
+ 2419 3,263 198 kpS #R9
+ 2420 193,263 298 kpS #R9
+ 2421 3,264 204 kpS #R9
+ 2422 193,264 298 kpS #R9
+ 2423 3,266 199 kpS #R9
+ 2424 193,266 299 kpS #R9
+ 2425 3,267 206 kpS #R9
+ 2426 193,267 300 kpS #R9
+ 2427 3,268 200 kpS #R9
+ 2428 193,268 300 kpS #R9
+ 2429 3,269 201 kpS #R9
+ 2430 193,269 301 kpS #R9
+ 2431 3,270 207 kpS #R9
+ 2432 193,270 301 kpS #R9
+ 2433 3,278 242 kpS #R9
+ 2434 193,278 306 kpS #R9
+ 2435 3,279 237 kpS #R9
+ 2436 193,279 306 kpS #R9
+ 2437 3,280 235 kpS #R9
+ 2438 193,280 303 kpS #R9
+ 2439 3,281 241 kpS #R9
+ 2440 193,281 303 kpS #R9
+ 2441 3,283 240 kpS #R9
+ 2442 193,283 302 kpS #R9
+ 2443 3,284 244 kpS #R9
+ 2444 193,284 304 kpS #R9
+ 2445 3,285 239 kpS #R9
+ 2446 193,285 304 kpS #R9
+ 2447 3,288 236 kpS #R9
+ 2448 193,288 305 kpS #R9
+ 2449 3,289 238 kpS #R9
+ 2450 193,289 307 kpS #R9
+ 2451 3,290 243 kpS #R9
+ 2452 193,290 307 kpS #R9
+ 2453 3,292 294 kpS #R9
+ 2454 193,292 308 kpS #R9
+ 2455 3,293 295 kpS #R9
+ 2456 193,293 308 kpS #R9
+ 2457 209 29,193 kmS #_reverse_R9
+ 2458 210 17,193 kmS #_reverse_R9
+ 2459 211 37,193 kmS #_reverse_R9
+ 2460 212 78,193 kmS #_reverse_R9
+ 2461 213 82,193 kmS #_reverse_R9
+ 2462 214 88,193 kmS #_reverse_R9
+ 2463 215 153,193 kmS #_reverse_R9
+ 2464 216 178,193 kmS #_reverse_R9
+ 2465 216 3,215 kmS #_reverse_R9
+ 2466 217 28,193 kmS #_reverse_R9
+ 2467 218 16,193 kmS #_reverse_R9
+ 2468 219 38,193 kmS #_reverse_R9
+ 2469 220 73,193 kmS #_reverse_R9
+ 2470 221 74,193 kmS #_reverse_R9
+ 2471 222 75,193 kmS #_reverse_R9
+ 2472 223 126,193 kmS #_reverse_R9
+ 2473 224 170,193 kmS #_reverse_R9
+ 2474 224 3,223 kmS #_reverse_R9
+ 2475 225 40,193 kmS #_reverse_R9
+ 2476 226 41,193 kmS #_reverse_R9
+ 2477 227 42,193 kmS #_reverse_R9
+ 2478 228 43,193 kmS #_reverse_R9
+ 2479 229 48,193 kmS #_reverse_R9
+ 2480 230 49,193 kmS #_reverse_R9
+ 2481 231 78,193 kmS #_reverse_R9
+ 2482 232 73,193 kmS #_reverse_R9
+ 2483 233 193,212 kmS #_reverse_R9
+ 2484 233 193,231 kmS #_reverse_R9
+ 2485 234 193,220 kmS #_reverse_R9
+ 2486 234 193,232 kmS #_reverse_R9
+ 2487 235 165,193 kmS #_reverse_R9
+ 2488 235 3,280 kmS #_reverse_R9
+ 2489 236 3,288 kmS #_reverse_R9
+ 2490 236 156,193 kmS #_reverse_R9
+ 2491 237 3,279 kmS #_reverse_R9
+ 2492 237 157,193 kmS #_reverse_R9
+ 2493 238 158,193 kmS #_reverse_R9
+ 2494 238 3,289 kmS #_reverse_R9
+ 2495 239 3,285 kmS #_reverse_R9
+ 2496 239 171,193 kmS #_reverse_R9
+ 2497 240 3,283 kmS #_reverse_R9
+ 2498 240 135,193 kmS #_reverse_R9
+ 2499 241 3,281 kmS #_reverse_R9
+ 2500 241 142,193 kmS #_reverse_R9
+ 2501 242 166,193 kmS #_reverse_R9
+ 2502 242 3,278 kmS #_reverse_R9
+ 2503 243 3,290 kmS #_reverse_R9
+ 2504 243 179,193 kmS #_reverse_R9
+ 2505 244 151,193 kmS #_reverse_R9
+ 2506 244 3,284 kmS #_reverse_R9
+ 2507 245 24,193 kmS #_reverse_R9
+ 2508 246 25,193 kmS #_reverse_R9
+ 2509 247 30,193 kmS #_reverse_R9
+ 2510 248 31,193 kmS #_reverse_R9
+ 2511 249 52,193 kmS #_reverse_R9
+ 2512 250 53,193 kmS #_reverse_R9
+ 2513 251 56,193 kmS #_reverse_R9
+ 2514 252 57,193 kmS #_reverse_R9
+ 2515 253 64,193 kmS #_reverse_R9
+ 2516 254 64,193 kmS #_reverse_R9
+ 2517 255 65,193 kmS #_reverse_R9
+ 2518 256 66,193 kmS #_reverse_R9
+ 2519 257 67,193 kmS #_reverse_R9
+ 2520 258 68,193 kmS #_reverse_R9
+ 2521 259 69,193 kmS #_reverse_R9
+ 2522 260 70,193 kmS #_reverse_R9
+ 2523 261 74,193 kmS #_reverse_R9
+ 2524 262 77,193 kmS #_reverse_R9
+ 2525 263 79,193 kmS #_reverse_R9
+ 2526 264 79,193 kmS #_reverse_R9
+ 2527 265 81,193 kmS #_reverse_R9
+ 2528 266 82,193 kmS #_reverse_R9
+ 2529 267 83,193 kmS #_reverse_R9
+ 2530 268 83,193 kmS #_reverse_R9
+ 2531 269 84,193 kmS #_reverse_R9
+ 2532 270 84,193 kmS #_reverse_R9
+ 2533 271 85,193 kmS #_reverse_R9
+ 2534 272 89,193 kmS #_reverse_R9
+ 2535 273 102,193 kmS #_reverse_R9
+ 2536 274 103,193 kmS #_reverse_R9
+ 2537 275 106,193 kmS #_reverse_R9
+ 2538 276 111,193 kmS #_reverse_R9
+ 2539 277 112,193 kmS #_reverse_R9
+ 2540 278 114,193 kmS #_reverse_R9
+ 2541 279 114,193 kmS #_reverse_R9
+ 2542 280 116,193 kmS #_reverse_R9
+ 2543 281 116,193 kmS #_reverse_R9
+ 2544 282 123,193 kmS #_reverse_R9
+ 2545 283 126,193 kmS #_reverse_R9
+ 2546 284 130,193 kmS #_reverse_R9
+ 2547 285 130,193 kmS #_reverse_R9
+ 2548 286 132,193 kmS #_reverse_R9
+ 2549 287 152,193 kmS #_reverse_R9
+ 2550 288 153,193 kmS #_reverse_R9
+ 2551 289 154,193 kmS #_reverse_R9
+ 2552 290 154,193 kmS #_reverse_R9
+ 2553 291 155,193 kmS #_reverse_R9
+ 2554 292 159,193 kmS #_reverse_R9
+ 2555 293 159,193 kmS #_reverse_R9
+ 2556 294 3,292 kmS #_reverse_R9
+ 2557 294 176,193 kmS #_reverse_R9
+ 2558 295 3,293 kmS #_reverse_R9
+ 2559 295 184,193 kmS #_reverse_R9
+ 2560 296 193,261 kmS #_reverse_R9
+ 2561 296 193,221 kmS #_reverse_R9
+ 2562 297 193,254 kmS #_reverse_R9
+ 2563 297 193,253 kmS #_reverse_R9
+ 2564 298 193,264 kmS #_reverse_R9
+ 2565 298 193,263 kmS #_reverse_R9
+ 2566 299 193,266 kmS #_reverse_R9
+ 2567 299 193,213 kmS #_reverse_R9
+ 2568 300 193,268 kmS #_reverse_R9
+ 2569 300 193,267 kmS #_reverse_R9
+ 2570 301 193,270 kmS #_reverse_R9
+ 2571 301 193,269 kmS #_reverse_R9
+ 2572 216 305 pSSs #R13
+ 2573 240 302 pSSs #R13
+ 2574 241 303 pSSs #R13
+ 2575 242 306 pSSs #R13
+ 2576 243 307 pSSs #R13
+ 2577 244 304 pSSs #R13
+ 2578 295 308 pSSs #R13
+ 2579 224 302 pSSs #R13a
+ 2580 235 303 pSSs #R13a
+ 2581 236 305 pSSs #R13a
+ 2582 237 306 pSSs #R13a
+ 2583 238 307 pSSs #R13a
+ 2584 239 304 pSSs #R13a
+ 2585 294 308 pSSs #R13a
+ 2586 211 209 dm #R14
+ 2587 213 195 dm #R14
+ 2588 219 217 dm #R14
+ 2589 221 194 dm #R14
+ 2590 227 186 dm #R14
+ 2591 228 187 dm #R14
+ 2592 230 188 dm #R14
+ 2593 238 236 dm #R14
+ 2594 239 224 dm #R14
+ 2595 243 216 dm #R14
+ 2596 244 240 dm #R14
+ 2597 247 218 dm #R14
+ 2598 248 210 dm #R14
+ 2599 251 217 dm #R14
+ 2600 252 209 dm #R14
+ 2601 259 250 dm #R14
+ 2602 260 252 dm #R14
+ 2603 260 211 dm #R14
+ 2604 261 195 dm #R14
+ 2605 262 249 dm #R14
+ 2606 263 231 dm #R14
+ 2607 264 212 dm #R14
+ 2608 265 251 dm #R14
+ 2609 265 219 dm #R14
+ 2610 266 194 dm #R14
+ 2611 267 232 dm #R14
+ 2612 268 220 dm #R14
+ 2613 269 221 dm #R14
+ 2614 269 266 dm #R14
+ 2615 270 213 dm #R14
+ 2616 270 261 dm #R14
+ 2617 271 222 dm #R14
+ 2618 272 214 dm #R14
+ 2619 282 277 dm #R14
+ 2620 284 283 dm #R14
+ 2621 285 223 dm #R14
+ 2622 287 276 dm #R14
+ 2623 289 288 dm #R14
+ 2624 290 215 dm #R14
+ 2625 296 208 dm #R14
+ 2626 298 233 dm #R14
+ 2627 299 208 dm #R14
+ 2628 300 234 dm #R14
+ 2629 301 296 dm #R14
+ 2630 301 299 dm #R14
+ 2631 212 210 dm #R15
+ 2632 213 211 dm #R15
+ 2633 215 214 dm #R15
+ 2634 220 218 dm #R15
+ 2635 221 219 dm #R15
+ 2636 223 222 dm #R15
+ 2637 231 249 dm #R15
+ 2638 232 250 dm #R15
+ 2639 253 245 dm #R15
+ 2640 254 246 dm #R15
+ 2641 261 252 dm #R15
+ 2642 263 262 dm #R15
+ 2643 264 248 dm #R15
+ 2644 266 251 dm #R15
+ 2645 267 259 dm #R15
+ 2646 268 247 dm #R15
+ 2647 269 265 dm #R15
+ 2648 270 260 dm #R15
+ 2649 278 258 dm #R15
+ 2650 279 255 dm #R15
+ 2651 280 257 dm #R15
+ 2652 281 256 dm #R15
+ 2653 283 277 dm #R15
+ 2654 284 282 dm #R15
+ 2655 285 271 dm #R15
+ 2656 288 276 dm #R15
+ 2657 289 287 dm #R15
+ 2658 290 272 dm #R15
+ 2659 292 291 dm #R15
+ 2660 293 286 dm #R15
+ 2661 209 61 dm #R17
+ 2662 210 35 dm #R17
+ 2663 211 72 dm #R17
+ 2664 212 80 dm #R17
+ 2665 213 86 dm #R17
+ 2666 214 91 dm #R17
+ 2667 215 156 dm #R17
+ 2668 216 181 dm #R17
+ 2669 217 60 dm #R17
+ 2670 218 34 dm #R17
+ 2671 219 92 dm #R17
+ 2672 220 94 dm #R17
+ 2673 221 95 dm #R17
+ 2674 222 96 dm #R17
+ 2675 223 135 dm #R17
+ 2676 224 173 dm #R17
+ 2677 225 98 dm #R17
+ 2678 226 99 dm #R17
+ 2679 227 100 dm #R17
+ 2680 228 101 dm #R17
+ 2681 229 104 dm #R17
+ 2682 230 105 dm #R17
+ 2683 231 137 dm #R17
+ 2684 232 124 dm #R17
+ 2685 233 191 dm #R17
+ 2686 233 189 dm #R17
+ 2687 234 192 dm #R17
+ 2688 234 190 dm #R17
+ 2689 235 174 dm #R17
+ 2690 236 181 dm #R17
+ 2691 237 182 dm #R17
+ 2692 238 183 dm #R17
+ 2693 239 175 dm #R17
+ 2694 240 173 dm #R17
+ 2695 241 174 dm #R17
+ 2696 242 182 dm #R17
+ 2697 243 183 dm #R17
+ 2698 244 175 dm #R17
+ 2699 245 54 dm #R17
+ 2700 246 55 dm #R17
+ 2701 247 62 dm #R17
+ 2702 248 63 dm #R17
+ 2703 249 107 dm #R17
+ 2704 250 108 dm #R17
+ 2705 251 109 dm #R17
+ 2706 252 110 dm #R17
+ 2707 253 115 dm #R17
+ 2708 254 113 dm #R17
+ 2709 255 117 dm #R17
+ 2710 256 118 dm #R17
+ 2711 257 119 dm #R17
+ 2712 258 120 dm #R17
+ 2713 259 121 dm #R17
+ 2714 260 122 dm #R17
+ 2715 261 125 dm #R17
+ 2716 262 136 dm #R17
+ 2717 263 138 dm #R17
+ 2718 264 127 dm #R17
+ 2719 265 143 dm #R17
+ 2720 266 144 dm #R17
+ 2721 267 128 dm #R17
+ 2722 268 145 dm #R17
+ 2723 269 146 dm #R17
+ 2724 270 129 dm #R17
+ 2725 271 147 dm #R17
+ 2726 272 131 dm #R17
+ 2727 273 160 dm #R17
+ 2728 274 161 dm #R17
+ 2729 275 162 dm #R17
+ 2730 276 163 dm #R17
+ 2731 277 164 dm #R17
+ 2732 278 157 dm #R17
+ 2733 279 166 dm #R17
+ 2734 280 142 dm #R17
+ 2735 281 165 dm #R17
+ 2736 282 169 dm #R17
+ 2737 283 170 dm #R17
+ 2738 284 171 dm #R17
+ 2739 285 151 dm #R17
+ 2740 286 172 dm #R17
+ 2741 287 177 dm #R17
+ 2742 288 178 dm #R17
+ 2743 289 179 dm #R17
+ 2744 290 158 dm #R17
+ 2745 291 180 dm #R17
+ 2746 292 184 dm #R17
+ 2747 293 176 dm #R17
+ 2748 294 185 dm #R17
+ 2749 295 185 dm #R17
+ 2750 296 202 dm #R17
+ 2751 296 196 dm #R17
+ 2752 297 203 dm #R17
+ 2753 297 197 dm #R17
+ 2754 298 204 dm #R17
+ 2755 298 198 dm #R17
+ 2756 299 205 dm #R17
+ 2757 299 199 dm #R17
+ 2758 300 206 dm #R17
+ 2759 300 200 dm #R17
+ 2760 301 207 dm #R17
+ 2761 301 201 dm #R17
+ 2762 302 186,274 km2 #_reverse_R2
+ 2763 303 225,274 km2 #_reverse_R2
+ 2764 304 227,274 km2 #_reverse_R2
+ 2765 305 187,273 km2 #_reverse_R2
+ 2766 306 226,273 km2 #_reverse_R2
+ 2767 307 228,273 km2 #_reverse_R2
+ 2768 308 273,274 km2 #_reverse_R2
+ 2769 302 188,273 km2 #_reverse_R2a
+ 2770 303 229,273 km2 #_reverse_R2a
+ 2771 304 230,273 km2 #_reverse_R2a
+ 2772 305 186,275 km2 #_reverse_R2a
+ 2773 306 225,275 km2 #_reverse_R2a
+ 2774 307 227,275 km2 #_reverse_R2a
+ 2775 308 273,275 km2 #_reverse_R2a
+ 2776 2,302 303 kpL #R3
+ 2777 2,305 306 kpL #R3
+ 2778 303 2,302 kmL #_reverse_R3
+ 2779 306 2,305 kmL #_reverse_R3
+ 2780 2,304 308 kpLs #R6
+ 2781 2,307 308 kpLs #R6
+ 2782 302 2,296 kmLs #_reverse_R6
+ 2783 303 2,298 kmLs #_reverse_R6
+ 2784 304 2,301 kmLs #_reverse_R6
+ 2785 305 2,299 kmLs #_reverse_R6
+ 2786 306 2,300 kmLs #_reverse_R6
+ 2787 307 2,301 kmLs #_reverse_R6
+ 2788 308 2,304 kmLs #_reverse_R6
+ 2789 308 2,307 kmLs #_reverse_R6
+ 2790 302 304 pLbs #R7
+ 2791 305 307 pLbs #R7a
+ 2792 302 193,283 kmS #_reverse_R9
+ 2793 302 193,223 kmS #_reverse_R9
+ 2794 303 193,281 kmS #_reverse_R9
+ 2795 303 193,280 kmS #_reverse_R9
+ 2796 304 193,285 kmS #_reverse_R9
+ 2797 304 193,284 kmS #_reverse_R9
+ 2798 305 193,288 kmS #_reverse_R9
+ 2799 305 193,215 kmS #_reverse_R9
+ 2800 306 193,279 kmS #_reverse_R9
+ 2801 306 193,278 kmS #_reverse_R9
+ 2802 307 193,290 kmS #_reverse_R9
+ 2803 307 193,289 kmS #_reverse_R9
+ 2804 308 193,293 kmS #_reverse_R9
+ 2805 308 193,292 kmS #_reverse_R9
+ 2806 304 302 dm #R14
+ 2807 307 305 dm #R14
+ 2808 302 240 dm #R17
+ 2809 302 224 dm #R17
+ 2810 303 241 dm #R17
+ 2811 303 235 dm #R17
+ 2812 304 244 dm #R17
+ 2813 304 239 dm #R17
+ 2814 305 216 dm #R17
+ 2815 305 236 dm #R17
+ 2816 306 242 dm #R17
+ 2817 306 237 dm #R17
+ 2818 307 243 dm #R17
+ 2819 307 238 dm #R17
+ 2820 308 295 dm #R17
+ 2821 308 294 dm #R17
+end reactions
+begin groups
+    1 LynFree              2
+    2 RecMon               4,5,7,8,18,20,22,23,40,42,44,46,48,49,50,51,98,100,102,104,105,106,160,162,186,188,225,227,229,230,273,275
+    3 RecDim               2*10,2*11,2*12,2*13,2*14,2*15,2*16,2*17,2*24,2*25,2*26,2*27,2*28,2*29,2*30,2*31,2*32,2*33,2*34,2*35,2*36,2*37,2*38,2*39,2*52,2*53,2*54,2*55,2*56,2*57,2*58,2*59,2*60,2*61,2*62,2*63,2*64,2*65,2*66,2*67,2*68,2*69,2*70,2*71,2*72,2*73,2*74,2*75,2*76,2*77,2*78,2*79,2*80,2*81,2*82,2*83,2*84,2*85,2*86,2*87,2*88,2*89,2*90,2*91,2*92,2*93,2*94,2*95,2*96,2*97,2*107,2*108,2*109,2*110,2*111,2*112,2*113,2*114,2*115,2*116,2*117,2*118,2*119,2*120,2*121,2*122,2*123,2*124,2*125,2*126,2*127,2*128,2*129,2*130,2*131,2*132,2*133,2*134,2*135,2*136,2*137,2*138,2*139,2*140,2*141,2*142,2*143,2*144,2*145,2*146,2*147,2*148,2*149,2*150,2*151,2*152,2*153,2*154,2*155,2*156,2*157,2*158,2*159,2*163,2*164,2*165,2*166,2*167,2*168,2*169,2*170,2*171,2*172,2*173,2*174,2*175,2*176,2*177,2*178,2*179,2*180,2*181,2*182,2*183,2*184,2*185,2*189,2*190,2*191,2*192,2*194,2*195,2*196,2*197,2*198,2*199,2*200,2*201,2*202,2*203,2*204,2*205,2*206,2*207,2*208,2*209,2*210,2*211,2*212,2*213,2*214,2*215,2*216,2*217,2*218,2*219,2*220,2*221,2*222,2*223,2*224,2*231,2*232,2*233,2*234,2*235,2*236,2*237,2*238,2*239,2*240,2*241,2*242,2*243,2*244,2*245,2*246,2*247,2*248,2*249,2*250,2*251,2*252,2*253,2*254,2*255,2*256,2*257,2*258,2*259,2*260,2*261,2*262,2*263,2*264,2*265,2*266,2*267,2*268,2*269,2*270,2*271,2*272,2*276,2*277,2*278,2*279,2*280,2*281,2*282,2*283,2*284,2*285,2*286,2*287,2*288,2*289,2*290,2*291,2*292,2*293,2*294,2*295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+    4 RecPbeta             14,15,18,19,22,26,27,30,31,32,33,2*36,37,38,42,43,44,45,49,50,56,57,58,59,62,63,65,66,67,68,69,2*70,2*71,72,74,75,77,79,2*81,82,83,2*84,2*85,86,2*87,88,2*89,2*90,91,92,95,96,100,101,102,103,105,106,109,110,111,112,114,116,117,118,119,120,121,2*122,2*123,125,126,127,128,2*129,2*130,2*131,2*132,134,135,136,138,141,142,2*143,144,145,2*146,2*147,148,149,2*150,2*151,2*152,153,2*154,2*155,156,157,2*158,2*159,160,161,162,163,164,165,166,2*169,170,2*171,2*172,173,174,2*175,2*176,2*177,178,2*179,2*180,181,182,2*183,2*184,2*185,196,198,199,200,2*201,202,204,205,206,2*207,211,213,214,215,216,219,221,222,223,224,227,228,230,235,236,237,2*238,2*239,240,241,242,2*243,2*244,247,248,251,252,255,256,257,258,259,2*260,261,262,263,264,2*265,266,267,268,2*269,2*270,2*271,2*272,273,274,275,276,277,278,279,280,281,2*282,283,2*284,2*285,2*286,2*287,288,2*289,2*290,2*291,2*292,2*293,2*294,2*295,296,298,299,300,2*301,302,303,2*304,305,306,2*307,2*308
+    5 RecPgamma            16,17,20,21,23,24,25,28,29,30,31,34,35,37,38,2*39,40,41,42,43,46,47,48,49,51,52,53,54,55,56,57,60,61,62,63,2*64,65,66,67,68,69,70,72,2*73,2*74,75,2*76,77,2*78,2*79,2*80,81,2*82,2*83,2*84,85,2*86,88,89,91,92,2*93,2*94,2*95,96,2*97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,2*113,2*114,2*115,2*116,117,118,119,120,121,122,123,2*124,2*125,2*126,2*127,2*128,2*129,2*130,131,132,2*133,2*134,2*135,136,2*137,2*138,2*139,2*140,2*141,2*142,143,2*144,2*145,2*146,147,2*148,2*149,2*150,2*151,152,2*153,2*154,155,2*156,2*157,2*158,2*159,160,161,162,163,164,2*165,2*166,2*167,2*168,169,2*170,2*171,172,2*173,2*174,2*175,2*176,177,2*178,2*179,180,2*181,2*182,2*183,2*184,2*185,186,187,188,2*189,2*190,2*191,2*192,2*194,2*195,2*196,2*197,2*198,2*199,2*200,2*201,2*202,2*203,2*204,2*205,2*206,2*207,2*208,209,210,211,2*212,2*213,214,2*215,2*216,217,218,219,2*220,2*221,222,2*223,2*224,225,226,227,228,229,230,2*231,2*232,2*233,2*234,2*235,2*236,2*237,2*238,2*239,2*240,2*241,2*242,2*243,2*244,245,246,247,248,249,250,251,252,2*253,2*254,255,256,257,258,259,260,2*261,262,2*263,2*264,265,2*266,2*267,2*268,2*269,2*270,271,272,273,274,275,276,277,2*278,2*279,2*280,2*281,282,2*283,2*284,2*285,286,287,2*288,2*289,2*290,291,2*292,2*293,2*294,2*295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+    6 RecSyk               34,35,46,47,51,54,55,60,61,62,63,72,76,80,86,91,92,93,94,95,96,2*97,98,99,100,101,104,105,107,108,109,110,113,115,117,118,119,120,121,122,124,125,127,128,129,131,2*133,2*134,135,136,137,138,2*139,2*140,2*141,142,143,144,145,146,147,2*148,2*149,2*150,151,156,157,158,160,161,162,163,164,165,166,2*167,2*168,169,170,171,172,2*173,2*174,2*175,176,177,178,179,180,2*181,2*182,2*183,184,2*185,186,187,188,2*189,2*190,2*191,2*192,194,195,2*196,2*197,2*198,2*199,2*200,2*201,2*202,2*203,2*204,2*205,2*206,2*207,2*208,209,210,211,212,213,214,215,2*216,217,218,219,220,221,222,223,2*224,225,226,227,228,229,230,231,232,2*233,2*234,2*235,2*236,2*237,2*238,2*239,2*240,2*241,2*242,2*243,2*244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,2*294,2*295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+    7 RecSykPS             167,168,186,187,188,189,190,191,192,194,195,196,197,198,199,200,201,202,203,204,205,206,207,2*208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,2*233,2*234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+    8 SykTest              3,34,35,46,47,51,54,55,60,61,62,63,72,76,80,86,91,92,93,94,95,96,2*97,98,99,100,101,104,105,107,108,109,110,113,115,117,118,119,120,121,122,124,125,127,128,129,131,2*133,2*134,135,136,137,138,2*139,2*140,2*141,142,143,144,145,146,147,2*148,2*149,2*150,151,156,157,158,160,161,162,163,164,165,166,2*167,2*168,169,170,171,172,2*173,2*174,2*175,176,177,178,179,180,2*181,2*182,2*183,184,2*185,186,187,188,2*189,2*190,2*191,2*192,193,194,195,2*196,2*197,2*198,2*199,2*200,2*201,2*202,2*203,2*204,2*205,2*206,2*207,2*208,209,210,211,212,213,214,215,2*216,217,218,219,220,221,222,223,2*224,225,226,227,228,229,230,231,232,2*233,2*234,2*235,2*236,2*237,2*238,2*239,2*240,2*241,2*242,2*243,2*244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,2*294,2*295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+    9 LynTest              2,7,8,9,11,12,2*13,14,15,16,17,2*24,2*25,30,31,2*32,2*33,34,35,40,41,44,45,48,50,52,53,2*54,2*55,58,59,62,63,2*64,2*65,2*66,2*67,2*68,69,71,73,75,77,78,79,80,83,85,87,88,89,2*90,91,94,96,98,99,102,103,104,106,107,108,111,112,2*113,2*114,2*115,2*116,2*117,2*118,2*119,2*120,121,123,124,126,127,128,130,131,2*132,133,135,136,137,138,139,2*140,141,2*142,145,147,149,151,152,153,154,2*155,156,2*157,158,2*159,160,161,162,163,164,2*165,2*166,169,170,171,2*172,173,2*174,175,2*176,177,178,179,2*180,181,2*182,183,2*184,2*185,189,190,191,192,2*197,198,200,2*203,204,206,210,212,214,215,216,218,220,222,223,224,225,226,229,231,232,233,234,2*235,236,2*237,238,239,240,2*241,2*242,243,244,2*245,2*246,247,248,249,250,2*253,2*254,2*255,2*256,2*257,2*258,259,262,263,264,267,268,271,272,273,274,275,276,277,2*278,2*279,2*280,2*281,282,283,284,285,2*286,287,288,289,290,2*291,2*292,2*293,2*294,2*295,2*297,298,300,302,2*303,304,305,2*306,307,2*308
+   10 RecTest              4,5,6,7,8,9,2*10,2*11,2*12,2*13,2*14,2*15,2*16,2*17,18,19,20,21,22,23,2*24,2*25,2*26,2*27,2*28,2*29,2*30,2*31,2*32,2*33,2*34,2*35,2*36,2*37,2*38,2*39,40,41,42,43,44,45,46,47,48,49,50,51,2*52,2*53,2*54,2*55,2*56,2*57,2*58,2*59,2*60,2*61,2*62,2*63,2*64,2*65,2*66,2*67,2*68,2*69,2*70,2*71,2*72,2*73,2*74,2*75,2*76,2*77,2*78,2*79,2*80,2*81,2*82,2*83,2*84,2*85,2*86,2*87,2*88,2*89,2*90,2*91,2*92,2*93,2*94,2*95,2*96,2*97,98,99,100,101,102,103,104,105,106,2*107,2*108,2*109,2*110,2*111,2*112,2*113,2*114,2*115,2*116,2*117,2*118,2*119,2*120,2*121,2*122,2*123,2*124,2*125,2*126,2*127,2*128,2*129,2*130,2*131,2*132,2*133,2*134,2*135,2*136,2*137,2*138,2*139,2*140,2*141,2*142,2*143,2*144,2*145,2*146,2*147,2*148,2*149,2*150,2*151,2*152,2*153,2*154,2*155,2*156,2*157,2*158,2*159,160,161,162,2*163,2*164,2*165,2*166,2*167,2*168,2*169,2*170,2*171,2*172,2*173,2*174,2*175,2*176,2*177,2*178,2*179,2*180,2*181,2*182,2*183,2*184,2*185,186,187,188,2*189,2*190,2*191,2*192,2*194,2*195,2*196,2*197,2*198,2*199,2*200,2*201,2*202,2*203,2*204,2*205,2*206,2*207,2*208,2*209,2*210,2*211,2*212,2*213,2*214,2*215,2*216,2*217,2*218,2*219,2*220,2*221,2*222,2*223,2*224,225,226,227,228,229,230,2*231,2*232,2*233,2*234,2*235,2*236,2*237,2*238,2*239,2*240,2*241,2*242,2*243,2*244,2*245,2*246,2*247,2*248,2*249,2*250,2*251,2*252,2*253,2*254,2*255,2*256,2*257,2*258,2*259,2*260,2*261,2*262,2*263,2*264,2*265,2*266,2*267,2*268,2*269,2*270,2*271,2*272,273,274,275,2*276,2*277,2*278,2*279,2*280,2*281,2*282,2*283,2*284,2*285,2*286,2*287,2*288,2*289,2*290,2*291,2*292,2*293,2*294,2*295,2*296,2*297,2*298,2*299,2*300,2*301,2*302,2*303,2*304,2*305,2*306,2*307,2*308
+end groups
