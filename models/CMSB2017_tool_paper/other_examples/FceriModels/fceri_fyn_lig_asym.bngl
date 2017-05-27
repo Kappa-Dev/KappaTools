@@ -1,5 +1,3 @@
-#TODO: in Lig: replace site l with site l1, l2
-
 begin model
 begin parameters
     Lig_tot  6.0e3
@@ -38,7 +36,7 @@ begin parameters
 end parameters
 
 begin seed species
-    Lig(l,l,a~1)       Lig_tot
+    Lig(l1,l2,a~1)       Lig_tot
     Lyn(U,SH2,a~Y)     Lyn_tot
     Fyn(SH2,a~Y,t~Y)   Fyn_tot
     Syk(tSH2,l~Y,a~Y)  Syk_tot
@@ -50,19 +48,24 @@ begin reaction rules
     Lig(a~1) <-> Lig(a~2) klig,klig
 
     # Ligand-receptor binding
-    Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp1, km1
+    Rec(a) + Lig(l1,l2) <-> Rec(a!1).Lig(l1!1,l2) kp1, km1
+    Rec(a) + Lig(l2,l1) <-> Rec(a!1).Lig(l2!1,l1) kp1, km1
 
     # Receptor-aggregation
-    Rec(a) + Lig(l,l!+) <-> Rec(a!2).Lig(l!2,l!+) kp2,km2
+    Rec(a) + Lig(l1,l2!+) <-> Rec(a!2).Lig(l1!2,l2!+) kp2,km2
+    Rec(a) + Lig(l2,l1!+) <-> Rec(a!2).Lig(l2!2,l1!+) kp2,km2
 
     # Constitutive Lyn-receptor binding
     Rec(b~Y) + Lyn(U,SH2) <-> Rec(b~Y!1).Lyn(U!1,SH2) kpL, kmL
 
     # Transphosphorylation of beta by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
 
     # Transphosphorylation of gamma by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
 
     # Lyn-receptor binding through SH2 domain
     Rec(b~pY) + Lyn(U,SH2) <-> Rec(b~pY!1).Lyn(U,SH2!1) kpLs, kmLs
@@ -71,25 +74,33 @@ begin reaction rules
     Rec(b~pY) + Fyn(SH2) <-> Rec(b~pY!1).Fyn(SH2!1) kpF, kmF
 
     # Transphosphorylation of beta by SH2-bound Lyn
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
 
     # Transphosphorylation of gamma by SH2-bound Lyn
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
 
     # Syk-receptor binding through tSH2 domain
     Rec(g~pY) + Syk(tSH2) <-> Rec(g~pY!1).Syk(tSH2!1) kpS, kmS
 
     # Transphosphorylation of Lyn by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLS
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLS
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLS
 
     # Transphosphorylation of Lyn by SH2-bound Lyn
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLSs
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLSs
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Lyn(SH2!4,a~pY) pLSs
 
     # Transphosphorylation of Fyn by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLF
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLF
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLF
 
     # Transphosphorylation of Fyn by SH2-bound Lyn
     # KaSa has discovered that the following rule is wrong
@@ -99,24 +110,34 @@ begin reaction rules
     #Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
 
     #corrected rule
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY!4).Fyn(SH2!4,a~pY) pLFs
 
     # Transphosphorylation of Syk by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
 
     # Transphosphorylation of Syk by SH2-bound Lyn
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
+    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
-    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
 
     # Transphosphorylation of Syk by Syk phosphorylated on aloop
-    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
 
     # Dephosphorylation of Rec beta
     Rec(b~pY) -> Rec(b~Y)  dm
