@@ -72,16 +72,15 @@
     'R9' Rec(g~pY) , Syk(tSH2) <-> Rec(g~pY!1),Syk(tSH2!1) @'kpS'{0}, 'kmS'
 
     # Transphosphorylation of Syk by constitutive Lyn
-    #R10:
-    Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+    #R10:Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
 
-    Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) ->  Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
+    #Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLS'
 
     # Transphosphorylation of Syk by SH2-bound Lyn
     #R11:
-    Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+    #Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
 
-    Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) ->   Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
+    #Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,l~pY) @'pLSs'
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
     'R12' Lig(l1!1,l2!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~Y) -> Lig(l1!1,l2!2),Syk(tSH2!3,a~Y),Rec(a!2,g~pY!3),Rec(a!1,g~pY!4),Syk(tSH2!4,a~pY) @'pSS'

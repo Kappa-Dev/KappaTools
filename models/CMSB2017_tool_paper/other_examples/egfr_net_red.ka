@@ -73,12 +73,12 @@
 
 # Ligand-receptor binding
 egfr_1(l,r) , egf(r) <-> egfr_1(l!1,r),egf(r!1)   @'kp1'{0}, 'km1'   #ligand-monomer
-egfr_2(l,r)          <-> egfr_2(l!1,r),egf(r!1)   @'kp1'*'EGF_free', 'km1'   #ligand-monomer
-egfr_3(l,r)          <-> egfr_3(l!1,r),egf(r!1)   @'kp1'*'EGF_free', 'km1'   #ligand-monomer
+egfr_2(l,r)          <-> egfr_2(l!1,r),egf(r!1)   @'kp1'*|egf(r)|, 'km1'   #ligand-monomer
+egfr_3(l,r)          <-> egfr_3(l!1,r),egf(r!1)   @'kp1'*|egf(r)|, 'km1'   #ligand-monomer
 
 # Receptor-aggregation
 egfr_2(l!_,r) , egfr_1(l!_,r) <-> egfr_2(l!_,r!3),egfr_1(l!_,r!3)  @'kp2'{0}, 'km2'
-egfr_3(l!_,r)                 <-> egfr_3(l!_,r!3),egfr_1(l!1,r!3),egf(r!1)  @'kp2'*'EGF_EGFR_1', 'km2'
+egfr_3(l!_,r)                 <-> egfr_3(l!_,r!3),egfr_1(l!1,r!3),egf(r!1)  @'kp2'*|egf(r!1),egfr_1(l!1)|, 'km2'
 
 # Transphosphorylation of egfr by RTK
 egfr_2(r!_,Y1068~Y) -> egfr_2(r!_,Y1068~pY)  @'kp3'
