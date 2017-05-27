@@ -10,18 +10,18 @@ begin parameters
     # Inital amount of ligand (nM)
     EGF_init     20*1e-10*NA*Vo  # convert to copies per cell
     # Initial amounts of cellular components (copies per cell)
-    EGFR_init    f*1.8e5   
-    Grb2_init    f*1.5e5  
+    EGFR_init    f*1.8e5
+    Grb2_init    f*1.5e5
     Sos1_init    f*6.2e4
-    # Rate constants 
+    # Rate constants
     # Divide by NA*Vcyt to convert bimolecular rate constants
     # from /M/sec to /(molecule/cell)/sec
     kp1  3.0e6/(NA*V)  # ligand-monomer binding
     km1  0.06          # ligand-monomer dissociation
     kp2  1.0e7/(NA*V)  # aggregation of bound monomers
     km2  0.1           # dissociation of bound monomers
-    kp3  0.5           # dimer transphosphorylation   
-    km3  4.505         # dimer dephosphorylation        
+    kp3  0.5           # dimer transphosphorylation
+    km3  4.505         # dimer dephosphorylation
     kp4  1.5e6/(NA*V)  # binding of Grb2 to receptor
     km4  0.05          # dissociation of Grb2 from receptor
     kp5  1.0e7/(NA*V)  # binding of Grb2 to Sos1
@@ -52,9 +52,9 @@ begin observables
     Molecules  Grb2Sos1  Grb2(SH2,SH3!1).Sos1(PxxP!1)
 end observables
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     R1: EGFR(L,CR1) + EGF(R) <-> EGFR(L!1,CR1).EGF(R!1)  kp1, km1
-    # Receptor-aggregation 
+    # Receptor-aggregation
     R2: EGFR(L!+,CR1) + EGFR(L!+,CR1) <-> EGFR(L!+,CR1!1).EGFR(L!+,CR1!1)  kp2,km2
     # Transphosphorylation of EGFR by RTK
     R3: EGFR(CR1!+,Y1068~U) -> EGFR(CR1!+,Y1068~P)  kp3
@@ -76,22 +76,21 @@ begin actions
     # Equilibration
     #simulate({method=>ode,suffix=>equil,t_end=>100000,n_steps=>10,sparse=>1,steady_state=>1})
 
-    # Kinetics 
-    setConcentration("EGF(R)","EGF_init")
-    simulate({method=>"ode",t_start=>0,t_end=>100,n_steps=>40})
-    setConcentration("EGF(R)", "10*EGF_init")
-    simulate({method=>"ode",t_end=>200,n_steps=>40,continue=>1})
-    setConcentration("EGF(R)", "0.1*EGF_init")
-    simulate({method=>"ode",t_end=>300,n_steps=>40,continue=>1})
+    # Kinetics
+    #setConcentration("EGF(R)","EGF_init")
+    #simulate({method=>"ode",t_start=>0,t_end=>100,n_steps=>40})
+    #setConcentration("EGF(R)", "10*EGF_init")
+    #simulate({method=>"ode",t_end=>200,n_steps=>40,continue=>1})
+    #setConcentration("EGF(R)", "0.1*EGF_init")
+    #simulate({method=>"ode",t_end=>300,n_steps=>40,continue=>1})
 
-    resetConcentrations() # reverts to saved Concentrations
+    #resetConcentrations() # reverts to saved Concentrations
     # Stochastic simulation
-    setConcentration("EGF(R)","EGF_init")
-    simulate({method=>"ssa",suffix=>"ssa",t_start=>0,t_end=>100,n_steps=>40})
-    setConcentration("EGF(R)", "10*EGF_init")
-    simulate({method=>"ssa",suffix=>"ssa",t_end=>200,n_steps=>40,continue=>1})
-    setConcentration("EGF(R)", "0.1*EGF_init")
-    simulate({method=>"ssa",suffix=>"ssa",t_end=>300,n_steps=>40,continue=>1})
+    #setConcentration("EGF(R)","EGF_init")
+    #simulate({method=>"ssa",suffix=>"ssa",t_start=>0,t_end=>100,n_steps=>40})
+    #setConcentration("EGF(R)", "10*EGF_init")
+    #simulate({method=>"ssa",suffix=>"ssa",t_end=>200,n_steps=>40,continue=>1})
+    #setConcentration("EGF(R)", "0.1*EGF_init")
+    #simulate({method=>"ssa",suffix=>"ssa",t_end=>300,n_steps=>40,continue=>1})
 
 end actions
-

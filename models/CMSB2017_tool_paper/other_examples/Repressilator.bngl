@@ -3,7 +3,7 @@ begin parameters
     Na    6.022e23    # Avogadro's [mol^-1]
     V      1.4e-15    # Cell volume [L]
     #
-    c0    1e9         # M^-1 s^-1 
+    c0    1e9         # M^-1 s^-1
     c1    224         # s^-1
     c2    9           # s^-1
     c3    0.5         # s^-1
@@ -43,7 +43,7 @@ begin seed species
     pLacI(tet)                     165670
 end seed species
 
-begin observables 
+begin observables
     Molecules    pTetR    pTetR(cI)
     Molecules    pCI      pCI(lac)
     Molecules    pLacI    pLacI(tet)
@@ -78,5 +78,5 @@ end reaction rules
 end model
 
 generate_network({overwrite=>1})
-simulate({method=>"ode",t_end=>4e4,n_steps=>4e2,verbose=>1,atol=>1e-12,rtol=>1e-12})
+#simulate({method=>"ode",t_end=>4e4,n_steps=>4e2,verbose=>1,atol=>1e-12,rtol=>1e-12})
 #simulate({method=>"pla",t_end=>4e4,n_steps=>4e2,verbose=>1,pla_config=>"fEuler|pre-eps:sb|eps=0.03"})

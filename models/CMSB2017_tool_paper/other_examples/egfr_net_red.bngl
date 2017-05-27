@@ -19,7 +19,7 @@ begin parameters
 
     kp14             3 # Shc transphosphorylation, units: /s
     km14          0.03 # Shc dephosphorylation, units: /s
-    
+
     km16         0.005 # Shc cytosolic dephosphorylation, units: /s
 
     kp9      8.333e-07 # binding of Grb2 to receptor (scaled), units: /molecule/s
@@ -30,7 +30,7 @@ begin parameters
 
     kp11      1.25e-06 # binding of Grb2-Sos to receptor (scaled), units: /molecule/s
     km11          0.03 # diss. of Grb2-Sos from receptor, units: /s
-    
+
     kp13       2.5e-05 # binding of Shc to receptor (scaled), units: /molecule/s
     km13           0.6 # diss. of Shc from receptor, units: /s
 
@@ -112,12 +112,12 @@ begin observables
 end observables
 
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     egfr_1(l,r) + egf(r) <-> egfr_1(l!1,r).egf(r!1)   kp1, km1   #ligand-monomer
     egfr_2(l,r)          <-> egfr_2(l!1,r).egf(r!1)   kp1*EGF_free, km1   #ligand-monomer
     egfr_3(l,r)          <-> egfr_3(l!1,r).egf(r!1)   kp1*EGF_free, km1   #ligand-monomer
 
-    # Receptor-aggregation 
+    # Receptor-aggregation
     egfr_2(l!+,r) + egfr_1(l!+,r) <-> egfr_2(l!+,r!3).egfr_1(l!+,r!3)  kp2, km2
     egfr_3(l!+,r)                 <-> egfr_3(l!+,r!3).egfr_1(l!1,r!3).egf(r!1)  kp2*EGF_EGFR_1, km2
 
@@ -155,7 +155,7 @@ begin reaction rules
     Shc(PTB!+,Y317~pY!2).Grb2(SH2!2,SH3) + Sos(dom)   <-> \
         Shc(PTB!+,Y317~pY!2).Grb2(SH2!2,SH3!3).Sos(dom!3)  kp19, km19
 
-    # Cytosolic 
+    # Cytosolic
     Shc(PTB,Y317~pY) + Grb2(SH2,SH3)   <-> Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3)    kp21, km21
     Shc(PTB,Y317~pY) + Grb2(SH2,SH3!+) <-> Shc(PTB,Y317~pY!1).Grb2(SH2!1,SH3!+)  kp23, km23
     Shc(PTB,Y317~pY) -> Shc(PTB,Y317~Y)  km16
@@ -171,10 +171,9 @@ end model
 generate_network({overwrite=>1})
 
 # Equilibration
-setConcentration("egf(r)",0);
-simulate({method=>"ode",t_end=>100000,n_steps=>10,sparse=>1,steady_state=>1})
+#setConcentration("egf(r)",0);
+#simulate({method=>"ode",t_end=>100000,n_steps=>10,sparse=>1,steady_state=>1})
 
 # Kinetics
-setConcentration("egf(r)","egf_tot")
-simulate({method=>"ode",t_end=>120,n_steps=>120,atol=>1e-8,rtol=>1e-8,sparse=>1})
-
+#setConcentration("egf(r)","egf_tot")
+#simulate({method=>"ode",t_end=>120,n_steps=>120,atol=>1e-8,rtol=>1e-8,sparse=>1})
