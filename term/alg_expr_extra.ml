@@ -521,13 +521,95 @@ let print pr_var f corrected_rate_const =
         Format.fprintf f "(%a/%a)" Nbr.print a.num Nbr.print a.den
     end
 
+let rec equal_upto_pos a b =
+  match a,b
+  with
+  | (Alg_expr.BIN_ALG_OP (opa,a1,a2),_),
+    (Alg_expr.BIN_ALG_OP (opb,b1,b2),_)
+    -> opa = opb && equal_upto_pos a1 b1 && equal_upto_pos a2 b2
+  | (Alg_expr.BIN_ALG_OP _,_),
+    ((Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_)
+  | ((Alg_expr.UN_ALG_OP _ | Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_),(Alg_expr.BIN_ALG_OP _,_)
+                            -> false
+  |  (Alg_expr.UN_ALG_OP (opa,a1),_),
+     (Alg_expr.UN_ALG_OP (opb,b1),_)
+    -> opa = opb && equal_upto_pos a1 b1
+  | (Alg_expr.UN_ALG_OP _,_),
+    ((Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_)
+  | ((Alg_expr.STATE_ALG_OP _ | Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_),
+    (Alg_expr.UN_ALG_OP _,_)
+    -> false
+  | (Alg_expr.STATE_ALG_OP opa,_),
+    (Alg_expr.STATE_ALG_OP opb,_) -> opa = opb
+  | (Alg_expr.STATE_ALG_OP _,_),
+    ((Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_)
+  | ((Alg_expr.ALG_VAR _ | Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _ | Alg_expr.IF _),_),(Alg_expr.STATE_ALG_OP _,_)
+    -> false
+  | (Alg_expr.ALG_VAR id1,_), (Alg_expr.ALG_VAR id2,_) -> id1=id2
+  | (Alg_expr.ALG_VAR _,_),
+    ((Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+     | Alg_expr.IF _),_)
+  | ((Alg_expr.KAPPA_INSTANCE _ | Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+     | Alg_expr.IF _),_),(Alg_expr.ALG_VAR _,_)
+    -> false
+  | (Alg_expr.KAPPA_INSTANCE mix1,_),(Alg_expr.KAPPA_INSTANCE mix2,_) -> mix1=mix2
+  | (Alg_expr.KAPPA_INSTANCE _,_),
+    (( Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+     | Alg_expr.IF _),_)
+  | (( Alg_expr.TOKEN_ID _ | Alg_expr.CONST _
+     | Alg_expr.IF _),_), (Alg_expr.KAPPA_INSTANCE _,_)
+    -> false
+  | (Alg_expr.TOKEN_ID id1,_), (Alg_expr.TOKEN_ID id2,_) -> id1=id2
+  | (Alg_expr.TOKEN_ID _,_),
+    (( Alg_expr.CONST _
+     | Alg_expr.IF _),_)
+  | (( Alg_expr.CONST _
+     | Alg_expr.IF _),_)   , (Alg_expr.TOKEN_ID _,_) -> false
+  | (Alg_expr.CONST c1, _), (Alg_expr.CONST c2, _) -> Nbr.is_equal c1 c2
+  | (Alg_expr.CONST _,_), (Alg_expr.IF _,_)
+  | (Alg_expr.IF _,_),(Alg_expr.CONST _,_) -> false
+
+  | (Alg_expr.IF (conda,a1,a2),_),
+    (Alg_expr.IF (condb,b1,b2),_) ->
+    equal_bool_upto_pos conda condb &&
+    equal_upto_pos a1 b1 &&
+    equal_upto_pos a2 b2
+  | ((Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _),_),_
+  | _,((Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _),_) ->
+         assert false
+and equal_bool_upto_pos a b  =
+  match a,b with
+  | (Alg_expr.TRUE,_),(Alg_expr.TRUE,_) -> true
+  | (Alg_expr.TRUE,_),((Alg_expr.FALSE | Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_)
+  | ((Alg_expr.FALSE | Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_),
+    (Alg_expr.TRUE,_)
+    -> false
+  | (Alg_expr.FALSE,_),(Alg_expr.FALSE,_) -> true
+  | (Alg_expr.FALSE,_),((Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_)
+  |  ((Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_), (Alg_expr.FALSE,_)   -> false
+  | (Alg_expr.BOOL_OP (opa,a1,a2),_),
+    (Alg_expr.BOOL_OP (opb,b1,b2),_) -> opa=opb && equal_bool_upto_pos a1 b1 && equal_bool_upto_pos a2 b2
+  | (Alg_expr.BOOL_OP _,_),(Alg_expr.COMPARE_OP _,_)
+  | (Alg_expr.COMPARE_OP _,_),(Alg_expr.BOOL_OP _,_) -> false
+  | (Alg_expr.COMPARE_OP (opa,a1,a2),_),
+    (Alg_expr.COMPARE_OP (opb,b1,b2),_) ->
+    opa=opb && equal_upto_pos a1 b1 && equal_upto_pos a2 b2
+
+
 let necessarily_equal a_opt b_opt =
   match a_opt,b_opt
   with
   | None,_ | _,None -> false
   | Some a, Some b ->
-    a.var = b.var
+    begin
+      (match a.var, b.var
+      with
+      | None,None -> true
+      | None, _ | _,None -> false
+      | Some vara,Some varb ->
+        equal_upto_pos vara varb) 
     && Nbr.is_equal (Nbr.mult a.num b.den) (Nbr.mult a.den b.num)
+    end
 
 let dep empty add_mixture add_token union dep_env ?time_var expr =
   let rec aux add_mixture add_token union dep_env expr accu =
