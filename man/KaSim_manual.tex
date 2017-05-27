@@ -2240,6 +2240,821 @@ concentration of occurrences, and patterns in algrebraic expressions always deno
 
 \section{Tutorial}
 
+We consider the following Kappa file:
+The model can be encoded in Kappa as follows:
+\begin{lstlisting}[language=kappa]
+#sym.ka
+
+%agent: A(x,y)
+
+%init: 100 A()
+
+%var: 'k' 1
+%obs: 'asym' |A(x!1),A(y!1)|
+
+A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @'k'
+A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @'k'
+A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @'k'
+
+#We use the third convention (consider only the
+#automorphisms in the lhs thatare preserved in
+#the rhs). There are two of them in the first
+#and in the third rule. Only one in the second
+#one. Hence the rate of the first and third are
+#divided by 2.
+\end{lstlisting}
+
+The rules of this models are depicted as follows:
+
+\begin{center}
+\begin{minipage}{0.49\linewidth}
+    \centering\scalebox{0.85}{\includegraphics{img/symtt.pdf}}
+  \end{minipage}
+
+
+\begin{minipage}{0.49\linewidth}
+  \centering\scalebox{0.85}{\includegraphics{img/symff.pdf}}
+\end{minipage}
+
+
+\begin{minipage}{0.49\linewidth}
+    \centering\scalebox{0.85}{\includegraphics{img/symtf.pdf}}
+  \end{minipage}
+
+\end{center}
+
+We denote as $\gamma_1$, $\gamma_2$, and $\gamma_3$ the corrected rate constants of these rules. With the third convention, which roughly speaking consists in dividing rates per the number of automorphisms in the left hand side of rules, that are preserved in the right hand side, we have:
+\begin{itemize}
+  \item $\gamma_1 = \myfrac{k_1}{2}$;
+  \item $\gamma_2 = \myfrac{k_2}{2}$;
+  \item $\gamma_3 = k_3$.
+\end{itemize}
+Indeed, in the third rule, the rule makes a difference among the two agents.
+The non trivial automorphism in the left hand side is not preserved in the right hand side.
+
+
+Rules $1$ and $2$ have two automorphisms, whereas rule $3$ has only one.
+As a consequence, the rules are symmetric with respect to both sites if and only $2\cdot\myfrac{k_1}{2}=2\cdot\myfrac{k_2}{2}=k_3$, that is to say $k_1=k_2=k_3$.
+
+
+We use the following command line to generate the ODE semantics in \textsc{Octave}:
+\begin{verbatim}
+KaDe --rate-convention Biochemist sym.ka
+\end{verbatim}
+
+By default, equivalent sites are not analysed and the \textsc{Octave} backend is used.
+
+The result dumped in the file \texttt{'ode.m'} that is given as follows:
+
+\begin{lstlisting}[language=octave]
+  function main=main()
+  % command line:
+  %      'KaDE' 'sym.ka' '--rate-convention''Biochemist'
+  %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+  %%
+  %% init - the initial abundances of each species and token
+  %% tinit - the initial simulation time (likely 0)
+  %% tend - the final simulation time
+  %% initialstep - initial time step at the beginning of numerical integration
+  %% maxstep - maximal time step for numerical integration
+  %% reltol - relative error tolerance;
+  %% abstol - absolute error tolerance;
+  %% period - the time period between points to return
+  %%
+  %% variables (init(i),y(i)) denote numbers of embeddings
+  %% rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well
+
+
+  tinit=0;
+  tend=1;
+  initialstep=1e-05;
+  maxstep=0.02;
+  reltol=0.001;
+  abstol=0.001;
+  period=0.01;
+  nonnegative=false;
+
+  global nodevar
+  nodevar=5;
+  global max_stoc_coef
+  max_stoc_coef=0;
+  nvar=3;
+  nobs=2;
+  nrules=3;
+
+  global var
+  var=zeros(nvar,1);
+  global init
+  init=sparse(nodevar,1);
+  stoc=zeros(nrules,max_stoc_coef);
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  k=zeros(nrules,1);
+  kd=zeros(nrules,1);
+  kun=zeros(nrules,1);
+  kdun=zeros(nrules,1);
+  global jacvar
+  jacvar=sparse(nvar,nodevar);
+  global jack
+  global jackd
+  global jackun
+  global jackund
+  global jacstoc
+
+  jack=zeros(nrules,nodevar);
+  jackd=zeros(nrules,nodevar);
+  jackun=zeros(nrules,nodevar);
+  jackund=zeros(nrules,nodevar);
+
+  t = 0.000000;
+
+  init(5)=t;
+  init(1)=100; % A(x, y)
+  var(2)=init(3); % asym
+  var(1)=1; % k
+
+
+  uiIsOctave = false;
+  uiIsMatlab = false;
+  LIC = license('inuse');
+  for elem = 1:numel(LIC)
+      envStr = LIC(elem).feature
+      if strcmpi(envStr,'octave')
+         LICname=envStr;
+         uiIsOctave = true;
+         break
+      end
+      if strcmpi(envStr,'matlab')
+         LICname=envStr
+         uiIsMatlab = true;
+         break
+      end
+  end
+
+
+  if nonnegative
+     options = odeset('RelTol', reltol, ...
+                      'AbsTol', abstol, ...
+                      'InitialStep', initialstep, ...
+                      'MaxStep', maxstep, ...
+                      'Jacobian', @ode_jacobian, ...
+                     'NonNegative', [1:1:4]);
+  else
+     options = odeset('RelTol', reltol, ...
+                      'AbsTol', abstol, ...
+                      'InitialStep', initialstep, ...
+                      'MaxStep', maxstep, ...
+                      'Jacobian', @ode_jacobian);
+  end
+
+
+  if nonnegative
+     if uiIsMatlab
+        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+        soln.y=soln.y';
+        vt = soln.x;
+        vy = soln.y;
+     elseif uiIsOctave
+        [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+     end
+  else
+     if uiIsMatlab
+        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+        soln.y=soln.y';
+        vt = soln.x;
+        vy = soln.y;
+     elseif uiIsOctave
+        soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+        vt = soln.x;
+        vy = soln.y;
+     end
+  end;
+
+
+  nrows = length(vt);
+
+  tmp = zeros(nodevar,1);
+
+  n_points = floor ((tend-tinit)/period)+1;
+  t = linspace(tinit, tend, n_points);
+  obs = zeros(nrows,nobs);
+
+  for j=1:nrows
+      for i=1:nodevar
+          z(i)=vy(j,i);
+      end
+      h=ode_obs(z);
+      for i=1:nobs
+          obs(j,i)=h(i);
+      end
+  end
+  if nobs==1
+     y = interp1(vt, obs, t, 'pchip')';
+  else
+     y = interp1(vt, obs, t, 'pchip');
+  end
+
+
+  filename = 'data.csv';
+  fid = fopen (filename,'w');
+  fprintf(fid,'# KaDE sym.ka --rate-convention Biochemist\n')
+  fprintf(fid,'# ')
+  fprintf(fid,'[T],')
+  fprintf(fid,'asym,')
+  fprintf(fid,'\n')
+  for j=1:n_points
+      for i=1:nobs
+          fprintf(fid,'%f,',y(j,i));
+      end
+      fprintf(fid,'\n');
+  end
+  fclose(fid);
+
+
+  end
+
+
+
+  function Init=ode_init()
+
+  global nodevar
+  global init
+  Init=zeros(nodevar,1);
+
+  Init(1) = init(1); % A(x, y)
+  Init(2) = init(2); % A(x!1, y), A(x!1, y)
+  Init(3) = init(3); % A(x!1, y), A(x, y!1)
+  Init(4) = init(4); % A(x, y!1), A(x, y!1)
+  Init(5) = init(5); % t
+  end
+
+
+  function dydt=ode_aux(t,y)
+
+  global nodevar
+  global max_stoc_coef
+  global var
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  var(2)=y(3); % asym
+
+  k(1)=var(1);
+  k(2)=var(1);
+  k(3)=var(1);
+
+  dydt=zeros(nodevar,1);
+
+  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
+  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
+  dydt(4)=dydt(4)+2/2*k(3)*y(1)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x!1, y), A(x, y!1)
+
+  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
+  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
+  dydt(3)=dydt(3)+k(2)*y(1)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
+  % reaction: A(x, y) + A(x, y) -> A(x!1, y), A(x!1, y)
+
+  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+  dydt(2)=dydt(2)+2/2*k(1)*y(1)*y(1);
+  dydt(5)=1;
+
+  end
+
+
+  function jac=ode_jacobian(t,y)
+
+  global nodevar
+  global max_stoc_coef
+  global jacvar
+  global var
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  global jack
+  global jackd
+  global jackun
+  global jackund
+  global jacstoc
+
+  var(2)=y(3); % asym
+
+  k(1)=var(1);
+  k(2)=var(1);
+  k(3)=var(1);
+  jacvar(2,3)=1;
+
+
+  jac=sparse(nodevar,nodevar);
+
+  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(4,1)=jac(4,1)+2/2*k(3)*y(1);
+  jac(4,1)=jac(4,1)+2/2*k(3)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x!1, y), A(x, y!1)
+
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(3,1)=jac(3,1)+k(2)*y(1);
+  jac(3,1)=jac(3,1)+k(2)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
+  % reaction: A(x, y) + A(x, y) -> A(x!1, y), A(x!1, y)
+
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
+  end
+
+
+  function obs=ode_obs(y)
+
+  global nobs
+  global var
+  obs=zeros(nobs,1);
+
+  t = y(5);
+  var(2)=y(3); % asym
+
+  obs(1)=t; % [T]
+  obs(2)=var(2); % asym
+
+  end
+
+
+  main();
+\end{lstlisting}
+
+Integration parameters are given lines $19$ to $26$.
+We notice line $29$ that the ODEs has $5$ variables: $4$ for each kind of biomolecular species and $1$ for time advance.
+Initial state is defined lines $173$ to $184$.
+Line $183$ we notice that a special variable is introduced for time.
+Then, each instruction is annotated with some information referring to the Kappa file. Variables are annotated by the corresponding name in the Kappa file. Initial species are annotated by Kappa expression describing the corresponding bio-molecular species.
+
+The ODEs are given lines $204$ to $228$. Each contribution is annotated with the corresponding reaction and the underlying Kappa rule. The Jacobian of the ODEs is given lines $231$ to $288$.
+The definition of the observables are defined lines $300$ to $301$.
+
+We now wonder whether the sites are equivalent or not. We use the following command line:
+\begin{verbatim}
+  KaDE --rate-convention Biochemist sym.ka --show-symmetries
+\end{verbatim}
+The status of equivalent sites is described in the log:
+\begin{verbatim}
+  + compute symmetric sites...
+  Symmetries:
+  In rules:
+  ************
+  Agent: A
+    -Equivalence classes of sites for bindings states:
+        {x,y}
+    -Equivalence classes of sites (both):
+        {x,y}
+  ************
+  In rules and initial states:
+  ************
+  Agent: A
+    -Equivalence classes of sites for bindings states:
+        {x,y}
+    -Equivalence classes of sites (both):
+        {x,y}
+  ************
+  In rules and algebraic expression:
+  ************
+\end{verbatim}
+
+The set of rules and the initial state are symmetric with respect to the pair of sites. This is not the case of the observable. Thus, only backward bisimulation may be used to reduce the system. Indeed, if we ignore the difference between sites \texttt{x} and \texttt{y}, we can no longer express the concentration of the sites  \texttt{x} that are free. This  excludes forward bisimulation. Backward bisimulations may still be used since the concentration of each species can be computed by from the overall concentration of its equivalence class,  since the concentration of two equivalent species are always inversely proportional to their number of automorphisms.
+
+The command line:
+\begin{verbatim}
+KaDe --rate-convention Biochemist sym.ka --with-symmetries Forward \
+-output ode_with_fwd_sym --output-plot data_fwd.csv
+\end{verbatim}
+give the same model, without any reduction (we omit it).
+
+The command line:
+\begin{verbatim}
+KaDe --rate-convention Biochemist sym.ka --with-symmetries Backward \
+--output ode_with_bwd_sym --output-plot data_bwd.csv
+\end{verbatim}
+reduces the system by ignoring the difference between sites \texttt{x} and \texttt{y}. This is done by replacing in each product of reaction, every species by an arbitrary representative of its equivalence class, and in each algebraic expression, each species concentration by the product of its the concentration of its representative times the relative weight of this species in its equivalence class (which is constant and inversely proportional to its number of automorphisms.)
+
+The \textsc{Octave} output is the following one:
+
+\begin{lstlisting}[language=octave]
+  function main=main()
+  % command line:
+  %      'KaDE' 'sym.ka' '--rate-convention' 'Biochemist' '--with-symmetries''Backward'
+  %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+  %%
+  %% init - the initial abundances of each species and token
+  %% tinit - the initial simulation time (likely 0)
+  %% tend - the final simulation time
+  %% initialstep - initial time step at the beginning of numerical integration
+  %% maxstep - maximal time step for numerical integration
+  %% reltol - relative error tolerance;
+  %% abstol - absolute error tolerance;
+  %% period - the time period between points to return
+  %%
+  %% variables (init(i),y(i)) denote numbers of embeddings
+  %% rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well
+
+
+  tinit=0;
+  tend=1;
+  initialstep=1e-05;
+  maxstep=0.02;
+  reltol=0.001;
+  abstol=0.001;
+  period=0.01;
+
+  nonnegative=false;
+  global nodevar
+  nodevar=3;
+  global max_stoc_coef
+  max_stoc_coef=0;
+  nvar=3;
+  nobs=2;
+  nrules=3;
+
+  global var
+  var=zeros(nvar,1);
+  global init
+  init=sparse(nodevar,1);
+  stoc=zeros(nrules,max_stoc_coef);
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  k=zeros(nrules,1);
+  kd=zeros(nrules,1);
+  kun=zeros(nrules,1);
+  kdun=zeros(nrules,1);
+  global jacvar
+  jacvar=sparse(nvar,nodevar);
+  global jack
+  global jackd
+  global jackun
+  global jackund
+  global jacstoc
+
+  jack=zeros(nrules,nodevar);
+  jackd=zeros(nrules,nodevar);
+  jackun=zeros(nrules,nodevar);
+  jackund=zeros(nrules,nodevar);
+
+  t = 0.000000;
+
+  init(3)=t;
+  init(1)=100; % A(x, y)
+  var(2)=init(2); % asym
+  var(1)=1; % k
+
+
+  uiIsOctave = false;
+  uiIsMatlab = false;
+  LIC = license('inuse');
+  for elem = 1:numel(LIC)
+      envStr = LIC(elem).feature
+      if strcmpi(envStr,'octave')
+         LICname=envStr;
+         uiIsOctave = true;
+         break
+      end
+      if strcmpi(envStr,'matlab')
+         LICname=envStr
+         uiIsMatlab = true;
+         break
+      end
+  end
+
+
+  if nonnegative
+     options = odeset('RelTol', reltol, ...
+                      'AbsTol', abstol, ...
+                      'InitialStep', initialstep, ...
+                      'MaxStep', maxstep, ...
+                      'Jacobian', @ode_jacobian, ...
+                     'NonNegative', [1:1:2]);
+  else
+     options = odeset('RelTol', reltol, ...
+                      'AbsTol', abstol, ...
+                      'InitialStep', initialstep, ...
+                      'MaxStep', maxstep, ...
+                      'Jacobian', @ode_jacobian);
+  end
+
+
+  if nonnegative
+     if uiIsMatlab
+        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+        soln.y=soln.y';
+        vt = soln.x;
+        vy = soln.y;
+     elseif uiIsOctave
+        [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
+     end
+  else
+     if uiIsMatlab
+        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
+        soln.y=soln.y';
+        vt = soln.x;
+        vy = soln.y;
+     elseif uiIsOctave
+        soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
+        vt = soln.x;
+        vy = soln.y;
+     end
+  end;
+
+
+  nrows = length(vt);
+
+  tmp = zeros(nodevar,1);
+
+  n_points = floor ((tend-tinit)/period)+1;
+  t = linspace(tinit, tend, n_points);
+  obs = zeros(nrows,nobs);
+
+  for j=1:nrows
+      for i=1:nodevar
+          z(i)=vy(j,i);
+      end
+      h=ode_obs(z);
+      for i=1:nobs
+          obs(j,i)=h(i);
+      end
+  end
+  if nobs==1
+     y = interp1(vt, obs, t, 'pchip')';
+  else
+     y = interp1(vt, obs, t, 'pchip');
+  end
+
+
+  filename = 'data.csv';
+  fid = fopen (filename,'w');
+  fprintf(fid,'# KaDE sym.ka --rate-convention Biochemist --with-symmetries Backward\n')
+  fprintf(fid,'# ')
+  fprintf(fid,'[T],')
+  fprintf(fid,'asym,')
+  fprintf(fid,'\n')
+  for j=1:n_points
+      for i=1:nobs
+          fprintf(fid,'%f,',y(j,i));
+      end
+      fprintf(fid,'\n');
+  end
+  fclose(fid);
+
+
+  end
+
+
+
+  function Init=ode_init()
+
+  global nodevar
+  global init
+  Init=zeros(nodevar,1);
+
+  Init(1) = init(1); % A(x, y)
+  Init(2) = init(2); % A(x, y!1), A(x, y!1)
+  Init(3) = init(3); % t
+  end
+
+
+  function dydt=ode_aux(t,y)
+
+  global nodevar
+  global max_stoc_coef
+  global var
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  var(2)=y(2); % asym
+
+  k(1)=var(1);
+  k(2)=var(1);
+  k(3)=var(1);
+
+  dydt=zeros(nodevar,1);
+
+  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
+  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
+  dydt(2)=dydt(2)+2/2*k(3)*y(1)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
+  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
+  dydt(2)=dydt(2)+2*k(2)*y(1)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
+  dydt(2)=dydt(2)+2/2*k(1)*y(1)*y(1);
+  dydt(3)=1;
+
+  end
+
+
+  function jac=ode_jacobian(t,y)
+
+  global nodevar
+  global max_stoc_coef
+  global jacvar
+  global var
+  global k
+  global kd
+  global kun
+  global kdun
+  global stoc
+
+  global jack
+  global jackd
+  global jackun
+  global jackund
+  global jacstoc
+
+  var(2)=y(2); % asym
+
+  k(1)=var(1);
+  k(2)=var(1);
+  k(3)=var(1);
+  jacvar(2,2)=1;
+
+
+  jac=sparse(nodevar,nodevar);
+
+  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(3)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(3)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(1,1)=jac(1,1)-k(2)*y(1);
+  jac(2,1)=jac(2,1)+2*k(2)*y(1);
+  jac(2,1)=jac(2,1)+2*k(2)*y(1);
+
+  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
+  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
+
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
+  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
+  end
+
+
+  function obs=ode_obs(y)
+
+  global nobs
+  global var
+  obs=zeros(nobs,1);
+
+  t = y(3);
+  var(2)=y(2)/4; % asym
+
+  obs(1)=t; % [T]
+  obs(2)=var(2); % asym
+
+  end
+
+
+  main();
+\end{lstlisting}
+
+We notice line $29$ that there are only $3$ variables remaining: one for time advance, one for free \texttt{A}{}s, and one for dimers (no matter which sites are bound). {\KaDE} has gathered the three kinds of dimers into a single equivalence class (no matter with sites are bound).  For instance, lines $211-212$, the production of an asymmetric dimer, is replaced with the production of a dimer in which the bond is on both sites \texttt{y}.
+
+The definition of observables is given from line $289$ to $301$. We are interested in asymetric dimers only. We notice that their concentration is obtained by dividing the overall quantity of dimers by $4$. To understand why, we shall have a closer look at the meaning of each variables. There exist two conventions. One variable may denote the number of occurrences of a bio-molecular species, or the number of embeddings between this bio-molecular species and the current state of the system. Both convention are related by the fact, that the number of embeddings is equal to the number of occurrences multiplied by the number of automorphisms in the bio-molecular species. The reduction of the model replace each occurrence of a dimer into a dimer made of two proteins bond via their site y.
+
+As indicated at line $15$, the convention is to count in number of embeddings. Thus the total number of dimers is $y(2)/2$. Then half of them only is an asymetric dimer, which gives $y(2)/4$
+
+Let us check the soundness of our tools, by integrating both ODEs systems.
+
+Firsly we define the file \texttt{plot.gplot} as follows:
+\begin{lstlisting}
+set xlabel 'Asymetric dimer concentration'
+set ylabel 'CPU time (s.)'
+set datafile separator ','
+set title 'Initial model'
+set term png
+set output 'plot.png'
+set xrange [0:1]
+set yrange [0.0:40.]
+set output 'plot.png'
+plot 'data.csv' using 1:2 w l
+\end{lstlisting}
+the file \texttt{plot\_fwd.gplot} as follows:
+\begin{lstlisting}
+set xlabel 'Asymetric dimer concentration'
+set ylabel 'CPU time (s.)'
+set datafile separator ','
+set title 'reduced model (fwd)'
+set term png
+set output 'plot_fwd.png'
+set xrange [0:1]
+set yrange [0.0:40.]
+set output 'plot_fwd.png'
+plot 'data_fwd.csv' using 1:2 w l
+\end{lstlisting}
+and the file \texttt{plot\_bwd.gplot} as follows:
+\begin{lstlisting}
+set xlabel 'Asymetric dimer concentration'
+set ylabel 'CPU time (s.)'
+set datafile separator ','
+set term png
+set title 'Reduced model (bwd)'
+set output 'plot_bwd.png'
+set xrange [0:1]
+set yrange [0.0:40.]
+set output 'plot_bwd.png'
+plot 'data.csv' using 1:2 w l
+\end{lstlisting}
+
+Then we can integrate our three differential systems and plot their respective  solutions thanks to the following instrucations:
+\begin{verbatim}
+  octave ode.m
+  octave ode_fwd.m
+  octave ode_bwd.m
+  gnuplot plot.gplot
+  gnuplot plot_fwd.gplot
+  gnuplot plot_bwd.gplot
+\end{verbatim}
+
+We obtain the following plots:
+\begin{figure}[htp]
+\centering  \begin{minipage}{0.25\linewidth}
+   \scalebox{0.25}{\includegraphics{img/plot.png}}
+\end{minipage}
+\caption{Initial model (without reduction).}
+\end{figure}
+
+\begin{figure}[htp]
+\centering\begin{minipage}{0.25\linewidth}
+  \scalebox{0.25}{\includegraphics{img/plot_fwd.png}}
+\end{minipage}
+\caption{Reduced model (fwd bisimulation).}
+\end{figure}
+
+\begin{figure}[htp]
+\centering\begin{minipage}{0.25\linewidth}
+  \scalebox{0.25}{\includegraphics{img/plot_bwd.png}}
+\end{minipage}\caption{Reduced model (bwd bisimulation).}
+\end{figure}
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
