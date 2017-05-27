@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 21 2017>
+  * Last modification: Time-stamp: <May 27 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -611,7 +611,6 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
-  let () = Pattern.Env.print Format.std_formatter (Model.domain env) in
   Symmetries.print_symmetries parameters env symmetries
 
 let valid_mixture compil cc_cache  ?max_size mixture =
