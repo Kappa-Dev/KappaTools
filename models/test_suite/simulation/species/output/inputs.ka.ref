@@ -1,0 +1,23 @@
+%def: "seed" "1054220715"
+%def: "newSyntax" "true"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(a~u~p!a.B)
+%agent: B(a!a.A, b!b.B, c!c.C)
+%agent: C(c!c.B)
+
+%plot: [T]
+'ab' A(a!./!1), B(a!./!1) @ 0.01
+'bb' B(b!./!1), B(b!./!1) @ 0.01
+'bc' B(c!./!1), C(c!./!1) @ 0.01
+
+/*0*/%mod: [true] do $SPECIES_OF "species.ka" A(a!1), B(a!1) [true]
+
+%init: 100 A(a~u!.)
+%init: 100 B(a!., b!., c!.)
+%init: 100 C(c!.)
+
+%mod: [E] = 238 do $STOP
