@@ -1399,7 +1399,7 @@ where \ttt{file\_i} are the input Kappa files containing the rules, initial cond
 All the options are summarised as follows:
 \input{generated_img/KaSa_options.txt}
 
-Orders in option matter, since they can be used to toggle on/off some functionalities or to assign a value to some environment variables.
+Order in options matters, since they can be used to toggle on/off some functionalities or to assign a value to some environment variables.
 The options are interpreted from left to right.
 
 More options are available in the OCaml file \texttt{KaSa\_rep/config/config.ml} and can be tuned before compilation.
@@ -1420,12 +1420,12 @@ without any option.
 \label{fig:kasa:0}
 \end{figure}
 
-\subsection{The areas of interests}
+\subsection{The areas of interest}
 
 There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
-In expert modes, more options are available in the graphical interface.
+In expert mode, more options are available in the graphical interface.
 \item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{Actions}, \texttt{Output}, \texttt{Reachability analysis}, \texttt{Trace analysis}, \texttt{Contact map}, \texttt{Influence map}.
 
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
@@ -1438,7 +1438,7 @@ When launched, the analysis interprets these options in the order they have been
 Some options appear in several sub-tabs. They denote the same option and share the same value.
 
 \item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
-\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tunes all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options.
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
 before the last reset, before the last quit, or before the last analysis.
@@ -1449,12 +1449,12 @@ before the last reset, before the last quit, or before the last analysis.
 The sub-tab \texttt{Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
 
 \begin{itemize}
-\item The button \texttt{--do-all} activates all the functionalities.
-\item The button \texttt{--reset-all} inactivates all the functionalities.
-\item The option \texttt{--compute-contact-map} can be used to (des)activate the computation of the contact map.
-\item The option \texttt{--compute-influence-map} can be used to (des)activate the computation of the influence map.
-\item The option \texttt{--compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
-\item The option \texttt{--compute-local-traces} can be used to (des)activate the computation of the trace analysis.
+\item The button \texttt{-{}-do-all} activates all the functionalities.
+\item The button \texttt{-{}-reset-all} inactivates all the functionalities.
+\item The option \texttt{-{}-compute-contact-map} can be used to (des)activate the computation of the contact map.
+\item The option \texttt{-{}-compute-influence-map} can be used to (des)activate the computation of the influence map.
+\item The option \texttt{-{}-compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
+\item The option \texttt{-{}-compute-local-traces} can be used to (des)activate the computation of the trace analysis.
 \end{itemize}
 
 \subsection{The sub-tab \texttt{Output}}
@@ -1470,14 +1470,14 @@ The sub-tab \texttt{Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actio
 The sub-tab \texttt{Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
 
 \begin{itemize}
-\item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
-\item The field \texttt{--output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
-\item The field \texttt{--output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
-\item The field \texttt{--output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
-\item The field \texttt{--output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
-\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--influence-map-format}.
-\item The field \texttt{--output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
-\item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{--local-traces-format}.
+\item The field \texttt{-{}-output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
+\item The field \texttt{-{}-output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
+\item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-influence-map-format}.
+\item The field \texttt{-{}-output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
+\item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-local-traces-format}.
 
 
 \end{itemize}
@@ -1702,7 +1702,7 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{--output-directory} and \texttt{--output-local-trace-directory}. Moreover, file names is made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
+two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}. Moreover, file names is made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
 
 The transition system that describes the local traces for the agents of kind $P$ is descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site $x$ is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site $x$ is denoted as $x!\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
 
@@ -1715,7 +1715,7 @@ The transition system that describes the local traces for the agents of kind $P$
 
 We notice that the transition system that is given in Fig.~\ref{fig:trace-raw}  contains too many nodes. We can coarse-grain this transition system thanks to the following option:
 \begin{center}
-\texttt{--use-macrotransitions-in-local-traces}.
+\texttt{-{}-use-macrotransitions-in-local-traces}.
 \end{center}
 Typing the following instruction:
 
@@ -1725,7 +1725,7 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{--output-directory} and \texttt{--output-local-trace-directory}.
+two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}.
 This time, the files describe a coarse-graining of the corresponding transition systems.
 
 For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$, is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $g$ can get bound.
@@ -1768,7 +1768,7 @@ Typing the following instruction:
 \texttt{KaSa abc.ka --reset-all --compute-contact-map}
 
 will produce a dot format file named \texttt{contact.dot}.
-The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}.
+The name of the output file and the directory can be changed thanks to the command line options \texttt{-{}-output-contact-map} and \texttt{-{}-output-directory}.
 The directory is assumed to exist. The file will be overwritten if it exists. All the options related to the computation of the contact map can be accessed on the
 sub-tab \texttt{Contact map} of the graphical interface (see Fig.~\ref{fig:kasa:4}).
 
@@ -1799,8 +1799,8 @@ Typing the following instruction:
 \texttt{KaSa abc.ka --reset-all --compute-influence-map}
 
 will produce a dot format file named \texttt{influence.dot}.
-The name of the output file and the directory can be changed thanks to the command line options \texttt{--output-influence-map} and \texttt{--output-directory}.
-The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{Influence map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{--influence-map-format}.
+The name of the output file and the directory can be changed thanks to the command line options \texttt{-{}-output-influence-map} and \texttt{-{}-output-directory}.
+The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the sub-tab \texttt{Influence map} of the graphical interface (see Fig.~\ref{fig:kasa:4}). Two formats are available for the output: influence map can be generated in DOT or HTML format. The format can be choosen thanks to the command line option \texttt{-{}-influence-map-format}.
 
 \begin{figure}[htbp]
 \centering
@@ -1847,7 +1847,7 @@ The current implementation has the following limitations:
 Lastly, KaSa\ computes an over-approximation of the influence map. They may show an influence despite the fact that there can be no actual one. But if it shows no influence it means that either there are NO such influence, or that we are in a case that is not covered yet as itemised previously.
 
 Three levels of precision are available: \texttt{Low}, \texttt{Medium}, and
-\texttt{High}. The level of precision can be changed thanks to the command line option \texttt{--influence-map-accuracy-level}.
+\texttt{High}. The level of precision can be changed thanks to the command line option \texttt{-{}-influence-map-accuracy-level}.
 
 At low precision, an influence is detected if one rule change at least one bit of information (the internal state of a site, the binding state of a site), in favor/defavor of the application another rule. This abstraction level ignore completely the context of application of rules, and just focuses on modifications.
 
@@ -1918,7 +1918,7 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 
 \section{General usage}
 
-From a terminal window, \KaDE~can be invoked by typing
+From a terminal window, \KaDE~can be invoked by typing:
 \ITE{
 \item[\$] \ttt{KaDE file\_1 ... file\_n  [option]}
 }
@@ -1946,25 +1946,23 @@ without any option.
 \label{fig:kade:0}
 \end{figure}
 
-\subsection{The areas of interests}
+\subsection{The areas of interest}
 
 There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation).
-In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{Data set}, \texttt{Output}, \texttt{Semantics}, \texttt{Integration settings}, \texttt{Model reduction}, \texttt{Static analysis}, \texttt{Debug mode}. The last two tabs are activated only in expert mode (which can be selected on the top-left of the window).
+In expert mode, more options are available in the graphical interface.
+\item On the top center/right, some button allows for the selection of the tab. There are currently seven sub-tabs available: \texttt{Data set}, \texttt{Output}, \texttt{Semantics}, \texttt{Integration settings}, \texttt{Model reduction}, \texttt{Static analysis}, \texttt{Debug mode}. The last two tabs are availanle only in expert mode (which can be selected on the top-left of the window).
 
 \item Center: The options of the selected sub-tab are displayed and can be tuned.
 
 Contextual help is provided when the mouse is hovered over an element.
-
 The interface will store the options that are checked or filled and the order in which they have been selected.
 When launched, the analysis interprets these options in the order they have been entered.
-
 Some options appear in several sub-tabs. They denote the same option and share the same value.
 
 \item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
-\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaDE\ with the current options.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tunes all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaDE\ with the current options.
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
 before the last reset, before the last quit, or before the last analysis.
@@ -1972,23 +1970,23 @@ before the last reset, before the last quit, or before the last analysis.
 
 Two fields defines the repository and the name of the output:
 \begin{itemize}
-  \item \item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
-\item The field \texttt{--output} sets the name of the output file.
-The following extension will be added automatically according to the choice of the backend format: ".net" in DOTNET format, ".mws" in Maple, ".nb" in Mathematica, ".m" in Matlab and Octave, and ".xml" in SBML.
+ica, ".m" in Matlab and Octave, and ".xml" in SBML.
+\item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output} sets the name of the output file.
+The following extension will be added automatically according to the choice of the backend format: ".net" in DOTNET format, ".mws" in Maple, ".nb" in Mathematica, ".m" in Matlab and Octave, and ".xml" in SBML. When the output file already exists, {\KaDE} will ask for confirmation before overwritting it, unless the tool is set in batch mode (e.g.~see Sect.~\ref{kade:debug}).
 \end{itemize}
 Both fields may be modified from every sub-tab.
 
-When the repository does not exist, {\KaDE} will create it.
 
-When the output file already exists, {\KaDE} will ask for confirmation before overwritting it, unless the tool is set in batch mode (e.g.~see Sect.~\ref{kade:debug}).
+
 
 \subsection{The sub-tab \texttt{Data set}}
 
 The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
 \begin{itemize}
-\item The field \texttt{--initial} defines the starting date of the simulation.
+\item The field \texttt{-{}-initial} defines the starting date of the simulation.
 \item The field \texttt{-l} defines the final date of the simulation.
-\item The field \texttt{-p} defines the time interval between two plots.
+\item The field \texttt{-p} defines the time interval between consecutive plots.
 \end{itemize}
 
 \subsection{The sub-tab \texttt{Output}}
@@ -2004,30 +2002,74 @@ The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options t
 The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of the output files and their format.
 
 \begin{itemize}
-\item The field \texttt{--ode-backend} allows for the choice among the different backend formats: DOTNET, Maple, Mathematica, Matlab, Octave and SBML.
-\item The field \texttt{--output-plot} sets the name of the file where the plots will be dumped when it applies. Only the Maple, Mathematica, Matlab and Octave dump plots. The option is ignored in the other backend formats.
-\item The option \texttt{--(no)-constant-propagation} switches on/off constant propagation.
-\item The option \texttt{--(no)-show-reactions} annotates each expression in the output file, with the Kappa rule and the reactions that has generated this contribution.
-\item The option \texttt{--(no)-smash-reactions} identify multiple occurrences of a same reaction in the reaction network, and sum up  their contribution into a single reaction.
+\item The field \texttt{-{}-ode-backend} allows for the choice among the different backend formats among DOTNET, Maple, Mathematica, Matlab, Octave and SBML.
+\item The field \texttt{-{}-output-plot} sets the name of the file where the plots will be dumped when it applies. Only the Maple, Mathematica, Matlab and Octave dump plots. The option is ignored in the other backend formats.
+\item The option \texttt{-{}-(no)-constant-propagation} switches on/off constant propagation.
+\item The option \texttt{-{}-(no)-show-reactions} annotates each expression in the output file, with the Kappa rule and the reaction that have generated this contribution.
+\item The option \texttt{-{}-(no)-smash-reactions} identifies multiple occurrences of a same reaction in the reaction network, and sums up  their contribution into a single reaction.
 \end{itemize}
 
 
+\subsection{The sub-tab \texttt{Integration settings}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Integration settings}}
+\label{fig:kade:3}
+\end{figure}
+
+The sub-tab \texttt{Integration settings} (see Fig.~\ref{fig:kade:3}) contains the parameters to guide the numerical integration engine. Except the option \texttt{-{}-smash-reaction}, these options are ignored in the SBML and the
+DOTNET backend format.
+
+\begin{itemize}
+  \item The option \texttt{-{}-compute-jacobian} switches on the computation of the Jacobian of the system of ordinary differential equations.
+  The Jacobian is computed symbolically. It speeds up the numerical integration. The computation of the Jacobian is implemented only in two backend formats:  Matlab and Octave. Other formats will ignore this option.
+  \item The option \texttt{-{}-non-negative} can be used to force concentration to have a non negative value during numerical integration.
+  The computation of the Jacobian is implemented only in two backend formats:  Matlab and Octave. Other formats will ignore this option.
+  \item The field \texttt{-{}-initial-step} tunes the initial integration step.
+  This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-{}-max-step} tunes the maximal size of integration steps. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-{}-relative-tolerance} defines the relative numerical error tolerance in integration engines. This means that numerical errors cannot go beyond a bound that is proportional to the concentration of the bio-molecular species. This field sets the value of the proportionality coefficient.   This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-{}-absolute-tolerance} defines the absolute numerical error tolerance in integration engines. This means that numerical errors cannot go beyond the value of that field.  This field is used only in Maple, Mathematica, Matlab, and Octave backend formats. It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-{}-output-plot} defined the csv file where the values of the sample plots will be printed. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The option \texttt{-{}-smash-reaction} gathers isomorphic reactions before generating the network or the system of ordinary differential equations (while summing their rates). This option is used in every backend format.
+  \item The field \texttt{-{}-initial} defines the starting date of the simulation. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-l} defines the final date of the simulation. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+  \item The field \texttt{-p} defines the time interval between two plots. This field is used only in Maple, Mathematica, Matlab, and Octave backend formats.
+  It is ignored in SBML and DOTNET backend formats.
+\end{itemize}
 
 \subsection{The sub-tab \texttt{Debug}}
 
 In expert mode, the last sub-tab provides options to tune the amount of debugging information that is displaied.
 
 \begin{itemize}
-\item The option \texttt{--(no)-show-time-advance} includes some
-instruction in the output file, so as to track the progress during numerical integration of the ODEs, in the Maple, Mathematica, Matlab, and Octave backend.
+\item The option \texttt{-{}-(no)-show-time-advance} includes some
+instructions in the output file, so as to track the progress during numerical integration in the Maple, Mathematica, Matlab, and Octave backend.
 This option is ignored in the other backend format.
 
-\item The field \texttt{--(no)-print-efficiency} provides some information about the CPU time that has been used to generate the set of reactions and about the size of the initial and reduced models.
+\item The field \texttt{-{}-(no)-print-efficiency} provides some information about the CPU time that has been used to generate the set of reactions and about the size of the initial and reduced models.
 
-\item The option \texttt{--(no)-backtrace} provides more/less information about internal exceptions.
-\item The option \texttt{--(no)-glutonny} tunes the parameters of the garbage collector.
-\item The field \texttt{-mode} allows for the choice among batch and interactive mode. In interactive mode, {\KaDE} has to ask the permission before overwriting a file. In batch mode, {\KaDE} may overwrite output files, without asking the permission.
+\item The option \texttt{-{}-(no)-backtrace} provides more/less information about internal exceptions.
+\item The option \texttt{-{}-(no)-glutonny} tunes the parameters of the garbage collector.
+\item The field \texttt{-mode} allows for the choice among batch and interactive mode. In interactive mode, {\KaDE} always asks  permission to  overwrite files. In batch mode, {\KaDE} may overwrite output files, without permission.
 \end{itemize}
+
+
+
+\section{Differential semantics}
+\label{sec:differential semantics}
+
+\subsection{From rules to reactions}
+
+In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcsb/DanosFFHK09}, according to their preconditions.
 
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
@@ -2043,22 +2085,6 @@ This option is ignored in the other backend format.
 \caption{The protein \texttt{K} may activate the protein \texttt{S}.}
 \label{fig:sec1:phos}
 \end{figure}
-
-\section{Differential semantics}
-\label{sec:differential semantics}
-
-\subsection{From rules to reactions}
-
-In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcsb/DanosFFHK09}, according to their preconditions.
-
-Consider the following two rules:
-\begin{lstlisting}[language=kappa]
-'bind'  K(r),S(l) -> K(r!1),S(l!1) @k
-'phos'  K(r!1),S(l!1,r~u) -> K(r!1),S(l!1,r~p) @kp
-\end{lstlisting}
-
-
-
 \newcommand{\gbind}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind.pdf}}\end{minipage}}
 \newcommand{\gbindu}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-u.pdf}}\end{minipage}}
 \newcommand{\gbindp}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-p.pdf}}\end{minipage}}
@@ -2074,7 +2100,16 @@ Consider the following two rules:
   \label{fig:refinement}
 \end{figure}
 
- The first rule (e.g.~see Fig.~\ref{fig:sec1:bind}) stipulates that proteins of type \texttt{K} and proteins of type \texttt{S} may bind via their respective right and left sites. The second rule (e.g.~see Fig.~\ref{fig:sec1:phos})  stipulates that a protein \texttt{S} bound to a protein \texttt{K} may be activated (on its site \texttt{r}).
+Consider the following two rules:
+\begin{lstlisting}[language=kappa]
+'bind'  K(r),S(l) -> K(r!1),S(l!1) @k
+'phos'  K(r!1),S(l!1,r~u) -> K(r!1),S(l!1,r~p) @kp
+\end{lstlisting}
+
+
+
+
+ The first rule (e.g.~see Fig.~\ref{fig:sec1:bind}) stipulates that proteins of type \texttt{K} and proteins of type \texttt{S} may bind via their respective right and left sites. The second rule (e.g.~see Fig.~\ref{fig:sec1:phos})  stipulates that a protein \texttt{S} bound to a protein \texttt{K} may be activated (on its right site).
 
 It is worth noticing that the first rule may be applied in two different contexts, according to whether or not the right site  of the protein on the right  is already phosphorylated, or not. It follows the refinement that is depicted in Fig.~\ref{fig:refinement}.
 
@@ -2091,7 +2126,7 @@ Each connected component in a reaction denotes an instance of a bio-molecular sp
 where:
 \begin{enumerate}
   \item $[r,R]$ is the number of different ways to induce the reaction $R$ from the rule $r$;
-  \item $\gamma(r)$ is the corrected rate of the rule $r$ (a fraction of the rate of the rule $r$ is taken according to a choice among three  conventions defining how automorphisms are taken into account.);
+  \item $\gamma(r)$ is the corrected rate of the rule $r$ (a fraction of the rate of the rule $r$ is taken according to a choice among three  conventions defining how automorphisms are taken into account);
   \item and $\Delta(R,S)$ is the difference between the number of occurrences of the species $S$ in the sequence $P_1,\ldots,P_n$ and
 the one in the sequence $R_1,\ldots,R_m$.
  \end{enumerate}
@@ -2116,14 +2151,18 @@ the one in the sequence $R_1,\ldots,R_m$.
 The options in the sub-tab \texttt{Semantics} allow for the choice among several possibilities for the meaning of the ODEs variables and for the meaning of the rate constants.
 
 
- \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule.
-  \KaDE offers three conventions. With the convention \texttt{KaSim}, there is no correction, as it is done in the simulator; with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
-  with the convention \texttt{Biochemist}, each rate constant is divided
-  by the number of automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule (more formally, an automorphism in the lhs of a rule is taken into account, but its restriction to the part that is common to the lhs and the rhs of the rule, may be extened to an automorphism of the rhs of the rule).
+
+ \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule. {\KaDE} offers the choice among three conventions:
+\begin{enumerate}
+  \item with the convention \texttt{KaSim}, there is no correction, as it is done in the simulator;
+  \item with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
+  \item  with the convention \texttt{Biochemist}, each rate constant is divided
+  by the number of the automorphisms in the lhs, that also induces an automorphism over the agents that are preserved in the rhs of the rule (more formally, an automorphism in the lhs of a rule is taken into account only if its restriction to the part that is common to the lhs and the rhs of the rule, can be extended to an automorphism of the rhs of the rule). In particular, only automorphisms that  map degraded proteins, if any, to degraded proteins, are considered. Indeed this convention account for the automorphisms of the left hand side of rules which identifies the agents that cannot be ditinguished from a mechanistic point of view.
+\end{enumerate}
 
   Consider the following rule:
     \begin{lstlisting}[language=kappa]
-      A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p)
+A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p) @ 'k'
     \end{lstlisting}
 which is depicted as follows:
 \begin{center}
@@ -2131,76 +2170,107 @@ which is depicted as follows:
 \end{center}
 
   with the first convention (that is the one of the simulator), rates of rules are not corrected, hence the effective rate of this rule is $k$;
-  with the second one, rates are divided by the number of automorphisms in the left hand side of rules (here $24$); the third convention accounts only for the permutations among the agents that are undistinguishable from the rules point of view: rates are divided by the number of automorphisms in the left hand side of rules that may be extended in automorphisms of the right hand side (in particular, they map degraded proteins, if any, to degraded proteins) (here $2$).
+  with the second one, rates are divided by the number of automorphisms in the left hand side of rules (here $4!$ that is to say $24$); the third convention accounts only for the permutations among the agents that are undistinguishable from a mechanistic point of view: rates are divided by the number of automorphisms in the left hand side of rules that also induce automorphisms of the right hand side  (here $2$).
 
   \subsubsection{Ambiguous molecularity}
 
-The differential semantics is defined as the limit of the stochastic semantics when the temperature diverges toward the infinity. Thus a rate constant stands indeed for a function mapping the temperature to an effective rate constant the expression of which depends on the arity of the reaction. Even it the unary rate and the binary rate of a rule may be equal for a given temperature, it is never the case at all temperature. Another insight, is that a rate constant for a unary reaction and a rate constant for a binary reaction are not expressed in the same physical units.
+The differential semantics is defined as the limit of the stochastic semantics when the temperature diverges toward the infinity. Thus a rate constant stands indeed for a function mapping the temperature to an effective rate constant the expression of which depends on the arity of the reaction. Even if the unary rate and the binary rate of a rule may be equal for a given temperature, it is never the case at all temperature. Another insight, is that rate constants for a unary reaction and rate constants for a binary reaction are not expressed in the same physical units.
 
 To account for this, {\KaDE} never applies a binary rule in a
   unary context, unless two rate constants have been provided explicitly.
 
+\begin{figure}[t]
+  \hfill\begin{minipage}{0.4\linewidth}
+  \scalebox{0.7}{\includegraphics{img/ambigus_crossed.pdf}}
+\end{minipage}\hfill\begin{minipage}{0.4\linewidth}
+\scalebox{0.7}{\includegraphics{img/ambigus.pdf}}
+\end{minipage}\hfill\mbox{}
+\caption{The rule \texttt{A(x),A(x) -> A(x!1),A(x!1)} may bind two agents that are already in the same connected component, only if a second rate constant is given explictly.}
+\end{figure}
   Let us give an example. We consider the agent type \texttt{A} with two binding sites \texttt{x} and \texttt{y}. We assume that two sites \texttt{x} (in different \texttt{A}s) may be bound pair-wise and that two sites \texttt{y} (in different \texttt{A}s) may be bound pair-wise. Both following rules:
-  \begin{lstlisting}[language=kappa]
-    A(x),A(x) -> A(x!1),A(x!1) @ 1
-    A(x),A(x) -> A(x!1),A(x!1) @ 1{0}
-  \end{lstlisting}
+\begin{lstlisting}[language=kappa]
+A(x),A(x) -> A(x!1),A(x!1) @ 1
+A(x),A(x) -> A(x!1),A(x!1) @ 1{0}
+\end{lstlisting}
   will behave the same: they both apply to the following mixture
-  \begin{lstlisting}[language=kappa]
-    A(x,y),A(x,y)
-  \end{lstlisting}
+\begin{lstlisting}[language=kappa]
+A(x,y),A(x,y)
+\end{lstlisting}
   but not to the following one:
-  \begin{lstlisting}[language=kappa]
-    A(x,y!2),A(x,y!2)
-  \end{lstlisting}
+\begin{lstlisting}[language=kappa]
+A(x,y!2),A(x,y!2)
+\end{lstlisting}
 
   So as to allow the rule to form a bond within the two agents of the dimer, the following rule:
   \begin{lstlisting}[language=kappa]
-    A(x),A(x) -> A(x!1),A(x!1) @ 1{1}
+A(x),A(x) -> A(x!1),A(x!1) @ 1{1}
   \end{lstlisting}
    shall be used instead:
 
-  This way, when a rule is given with one rate constant only, the connected components in its left hand side have to be refined into pair-wisely disjoint bio-molecular species. When a rule is binary and it is given with two rate constants, then it may be apply in a unary context (which consists in embedding its left hand side into a single bio-molecular species) with the second rate constant, or in a binary context (which consists in embedding each connected components in its left hand side into two disjoint bio-molecular species (which may be two isomorphic copies of the same species).
+  This way, when a rule is given with one rate constant only, the connected components in its left hand side have to be refined into pair-wisely disjoint bio-molecular species. When a rule is binary and when it is given with two rate constants,  it may be apply in a unary context (which consists in embedding its left hand side into a single bio-molecular species) with the second rate constant, or in a binary context (which consists in embedding each connected components in its left hand side into two disjoint bio-molecular species (which may be two isomorphic copies of the same species).
 
   \subsubsection{Embeddings VS occurrences}
 
-In a Kappa file, a pattern may denotes two different quantities.
+In a Kappa file, a pattern may denote two different quantities.
 At initialisation, a pattern denotes an occurence of a bio-molecular species. In an algebraic expressions (which includes functional rates,
-stoichiometric coefficients for tokens, observables), a pattern denotes a number of embeddings from this pattern and a mixture.
+stoichiometric coefficients for tokens, observables), a pattern denotes a number of embeddings from this pattern to a mixture.
 
-Formally, we define the number (resp.~the concentration) of embeddings of a pattern from a mixture (resp.~ a concentration function) as
+Formally, we define the number (resp.~the concentration) of embeddings from a pattern to a mixture (resp.~to a concentration function) as
 the sum, for each bio-molecular species,
- of the number of occurrences (resp.~concentration) of that bio-molecular species and the number of occurrence of the pattern in that bio-molecular species. Then we define the number (resp.~the concentration) of occurrences of a pattern as the quotient of
- the number (resp.~the concentration) of embedding of this pattern by the number of automorphisms in this pattern.
+ of the number of occurrences (resp.~concentration) of that bio-molecular species and the number of occurrence of the pattern in that bio-molecular species. We also define the number (resp.~the concentration) of occurrences of a pattern in a mixture (resp.~in a concentration function) as the quotient between the number (resp.~the concentration) of embeddings from this pattern to a mixture (resp.~to a concentration function) and the number of automorphisms in this pattern.
 
-To illustrate this, we may have a look at the following Kappa model:
-\begin{lstlisting}[language=kappa]
-%agent: A(x)
-%agent: D()
+To illustrate this, we assume that the file \texttt{occ.ka} contains the following code:
+\lstinputlisting[language=kappa]{kappa/occ.ka}
+We use the following instruction to get the value of the observable.
+\ITE{\item[\$] \ttt{KaSim} occ.ka -l 1 -p 0.5 -o occ.csv}
 
-%init: 10 A(x!1),A(x!1)
+The file \texttt{csv} contains the following data set:
+{\lstset{numbers=none}\lstinputlisting{generated_img/occ.csv}}
+{\lstset{numbers=left}}
 
--> D() @1
-
-%obs: 'dimer' |A(x!1),A(x!1)|
-\end{lstlisting}
-
-TO DO plot the curve.
-
-KaSim will indicates $20$ for the quantities of dimer.
+We notice that KaSim indicates $20$ for the quantities of dimers.
 This accounts for the fact that each dimer satisfies two automorphisms.
 
 
-The command-line option \texttt{--count [Embeddings | Occurrences]}
-change the meaning of the variables that occur in the differential equations. The choice has no impact on the quantities that are ploted. Introduced quantities always denote
-concentration of occurrences, and patterns in algrebraic expressions always denote concentration of embeddings. It just change the meaning of the variables that are used internaly in the differential equations.
+The command-line option \texttt{-{}-count [Embeddings | Occurrences]}
+changes the meaning of the variables that occur in the differential equations. The choice has no impact on the quantities that are plot. Introduced bio-molecular species are always introduced in
+concentration of occurrences, and patterns in algebraic expressions always denote concentration of embeddings. It just changes the meaning of the variables that are used internally in the differential equations.
 
 \subsubsection{Polymers}
 
+In case of polymerisation, the size of the bio-molecular species is potentially  unbounded and there may be an infinite amount of differential equations (this is the case even if there is no agent synthesis, since the initial state is given in concentration, and not in occurrence number). In such a case, {\KaDE} will not terminate. Yet it is possible to truncate the system of ordinary differential equations: the command-line option \texttt{-{}-truncate} specifies an upper bound to the number of agents in the bio-molecular species. Each reaction that would involve a larger bio-molecular species is discarded.
+
+For instance, we can consider the model \texttt{poly.ka} that is defined as follows:
+\begin{lstlisting}[language=kappa]
+  %agent: A(l,r)
+  %init: 10 A()
+  A(r), A(l) -> A(r!1),A(l!1) @ 1
+\end{lstlisting}
+
+The instruction:
+\ITE{\item[\$] \ttt{KaDE} poly.ka}
+will not terminate, wheareas the following one:
+\ITE{\item[\$] \ttt{KaDe} poly.ka --truncate 10}
+will.
+
+
 \subsubsection{Equivalent sites}
+\label{sec:kade:ex}
+In BNGL, the interface of a given agent may include several occurrence of a given site name. These sites have exactly the same capabilities of interaction. This feature provides a convenient syntactic construction to describe models even more compactly, at the cost of having to deal with more complex structures (detecting embeddings between such site-graphs may be very difficult).
 
 
-\subsection{The sub-tab \texttt{Integration\_settings}}
+In Kappa, the interface of every agent is made of pair-wisely distinct site names. Yet it may happen that some sites have exactly the same capabilities of interaction. {\KaDE} can infer this property and use it to derive a more compact system of differential equations \cite{Feret-MFPSXXVII,CAMPORESI201073,Feret201545}.
+
+
+Consider the following model:
+\begin{lstlisting}[language=kappa]
+%agent: A(x,y)
+%init: 10 A()
+
+A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @1
+A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @1
+A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
+\end{lstlisting}
 
 \begin{figure}[htbp]
 \centering
@@ -2208,6 +2278,20 @@ concentration of occurrences, and patterns in algrebraic expressions always deno
 \caption{\KaDE~ graphical interface - sub-tab \texttt{3\_integration\_settings}}
 \label{fig:kade:3}
 \end{figure}
+
+
+The rules are depicted in Fig.~\ref{fig:symetric:rules}. We notice that each rule may be obtained from one another by swapping the sites in agents.  So we say that sites are equivalent in this set of rules. Equivalent sites may be used to induce forward and backward bisimulations \cite{buchholz_bisimulation,Feret_IJSI2013,Feret-MFPSXXVII,CAMPORESI201073,Feret201545} over the stochastic and the differential semantics of Kappa.
+
+Let us consider two site names \ttt{x} and \ttt{y} in the signature of an agent type \ttt{A}.
+A \emph{set of rules} is symmetric with respect to \ttt{x} and \ttt{y}, if for every two rules that may be obtained one from the other one by permuting the sites \ttt{x} and \ttt{y} in some agents of type \ttt{A}, their corrected rates is inversely proportional to their number of automorphisms.
+In our example,  the set of rules is symmetric with respect to \ttt{x} and \ttt{y} only with the convention in which constant rates are kept as they are given, without any corrective factor. A \emph{valuation} from bio-molecular species to real numbers is symmetric with respect to \ttt{x} and \ttt{y}, if for every two bio-molecular species that can be obtained one from the other one by permuting the sites \ttt{x} and \ttt{y} in some agents of type \ttt{A}, the image of the two bio-molecular species by the valuation is inversely proportional to their number of automorphisms. Lastly an \emph{expression} over bio-molecular species is symmetric with respect to \ttt{x} and \ttt{y}, if and only if it takes the same values for every two symmetric valuations.
+
+If the set of rules and the initial state of the model are symmetric with respect to two sites, ignoring the difference among these two sites in bio-molecular species induces a backward bisimulation (that is to say, the state of the system remains symmetric at every time \cite{buchholz_lump}). If the set of rules and every algebraic expression that occurs in rates or stoichiometric coefficients are symmetric, then ignoring the difference between these two sites in bio-molecular species induces a forward bisimulation (we can define the ODEs directly over the equivalence-classes of bio-molecular species \cite{buchholz_lump}).
+
+\begin{itemize}
+  \item
+The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
+\end{itemize}
 
 \subsection{The sub-tab \texttt{Model reduction}}
 
@@ -2218,7 +2302,13 @@ concentration of occurrences, and patterns in algrebraic expressions always deno
 \label{fig:kade:4}
 \end{figure}
 
-\subsection{The sub-tab \texttt{Static analysis}}
+
+\begin{itemize}
+  \item The option \texttt{-{}-show-symmetries} itemizes the sites that are equivalent with respect to the rules of the models, with respect to the rules of the model and the initial state (backward bisimulation), and with respect to the rules of the models and the algebraic expressions (forward bisimulation).
+  \item The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
+\end{itemize}
+
+\subsubsection{The sub-tab \texttt{Static analysis (Expert)}}
 
 \begin{figure}[htbp]
 \centering
@@ -2227,42 +2317,20 @@ concentration of occurrences, and patterns in algrebraic expressions always deno
 \label{fig:kade:5}
 \end{figure}
 
-\subsection{The sub-tab \texttt{Debug mode}}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}}
-\label{fig:kade:6}
-\end{figure}
+The inference of equivalent sites is more precise when dead rules are discarded. Dead rules can be computed thanks to {\KaSa}. The sub-tab \texttt{Static analysis} allows the end-user to switch on/switch off abstract domains in order to tune the trade-off between accuracy and efficiency of  static analysis.
 
+\begin{itemize}
+\item The option \verb?--(no-)views-domain? can be used to switch on/off the views domains.
+
+\item The option \verb?--(no-)double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between proteins.
 
 
 \section{Tutorial}
 
-We consider the following Kappa file:
-The model can be encoded in Kappa as follows:
-\begin{lstlisting}[language=kappa]
-#sym.ka
-
-%agent: A(x,y)
-
-%init: 100 A()
-
-%var: 'k' 1
-%obs: 'asym' |A(x!1),A(y!1)|
-
-A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @'k'
-A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @'k'
-A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @'k'
-
-#We use the third convention (consider only the
-#automorphisms in the lhs thatare preserved in
-#the rhs). There are two of them in the first
-#and in the third rule. Only one in the second
-#one. Hence the rate of the first and third are
-#divided by 2.
-\end{lstlisting}
+Now we explain further how to use {\KaDE} to deal with the example of Sect.~\ref{sec:kade:ex}.
+The model is described in the following Kappa file:
+\lstinputlisting[language=Kappa]{kappa/sym.ka}
 
 The rules of this models are depicted as follows:
 
@@ -2289,8 +2357,7 @@ We denote as $\gamma_1$, $\gamma_2$, and $\gamma_3$ the corrected rate constants
   \item $\gamma_2 = \myfrac{k_2}{2}$;
   \item $\gamma_3 = k_3$.
 \end{itemize}
-Indeed, in the third rule, the rule makes a difference among the two agents.
-The non trivial automorphism in the left hand side is not preserved in the right hand side.
+Indeed, in the third rule, the mechanism makes a difference among the two agents. The non trivial automorphism in the left hand side is not preserved in the right hand side.
 
 
 Rules $1$ and $2$ have two automorphisms, whereas rule $3$ has only one.
@@ -2298,376 +2365,90 @@ As a consequence, the rules are symmetric with respect to both sites if and only
 
 
 We use the following command line to generate the ODE semantics in \textsc{Octave}:
-\begin{verbatim}
-KaDe --rate-convention Biochemist sym.ka
-\end{verbatim}
+\ITE{
+\item[\$] \ttt{KaDe --rate-convention Biochemist sym.ka}}
 
-By default, equivalent sites are not analysed and the \textsc{Octave} backend is used.
+By default, equivalent sites are not analysed and the \textsc{Octave} backend is used.
 
-The result dumped in the file \texttt{'ode.m'}.
-
-This file is editable. Moreover, each instruction is annotated with some information referring to the Kappa file. Variables are annotated by the corresponding name in the Kappa file. Initial species are annotated by Kappa expression describing the corresponding bio-molecular species.
+The result is dumped in the file \texttt{'ode.m'}, which  is editable. Moreover, each instruction is annotated with some information referring to the Kappa file. Variables are annotated by the corresponding name in the Kappa file. Initial species are annotated by Kappa expressions describing the corresponding bio-molecular species.
 
 
 \lstset{numbers=none}
 
 Integration parameters are defined as follows:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'tinit=' ode.m --after-context 8}}
 \lstinputlisting[language=Octave]{generated_img/int_parameters.txt}
 
-THe function \texttt{ode\_init} defines the list of variables and their initial concentration:
-\lstinputlisting[language=Octave]{generated_img/init.txt}
-We notice that a special variable is introduced for time.
+The variable \texttt{nodevar} gives the number of variables:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'nodevar=' ode.m}}
+\lstinputlisting[language=Octave]{generated_img/n_var.txt}
 
-The function \texttt{ode\_dydt} defines the differential equations:
+The function \texttt{ode\_init} defines the list of variables and their initial concentration:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'function Init' ode.m --after-context 11 }}
+\lstinputlisting[language=Octave]{generated_img/init.txt}
+We notice that four variables encode the concentration of bio-molecular species and a special one accounts for time advance.
+
+The function \texttt{dydt} defines the differential equations:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'function dydt' ode.m --after-context 38}}
 \lstinputlisting[language=Octave]{generated_img/dydt.txt}
 
-The function \texttt{ode\_obs} defines the observables:
+The function \texttt{obs} defines the observables:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'function obs' ode.m --after-context 12}}
 \lstinputlisting[language=Octave]{generated_img/obs.txt}
 
-The function \texttt{ode\_jacobian} provides the Jacobian (we omit it).
+The function \texttt{jac} provides the Jacobian (we omit it).
 
 We now wonder whether the sites are equivalent or not. We use the following command line:
-\begin{verbatim}
-  KaDE --rate-convention Biochemist sym.ka --show-symmetries
-\end{verbatim}
+\ITE{
+\item[\$] \ttt{KaDE --rate-convention Biochemist sym.ka --show-symmetries}}
 The status of equivalent sites is described in the log:
-\lstinputlisting{generated_img/sym.txt}
+\lstinputlisting[language=Octave]{generated_img/sym.txt}
 
-The set of rules and the initial state are symmetric with respect to the pair of sites. This is not the case of the observable. Thus, only backward bisimulation may be used to reduce the system. Indeed, if we ignore the difference between sites \texttt{x} and \texttt{y}, we can no longer express the concentration of the sites  \texttt{x} that are free. This  excludes forward bisimulation. Backward bisimulations may still be used since the concentration of each species can be computed by from the overall concentration of its equivalence class,  since the concentration of two equivalent species are always inversely proportional to their number of automorphisms.
-
-The command line:
-\begin{verbatim}
-KaDe --rate-convention Biochemist sym.ka --with-symmetries Forward \
--output ode_with_fwd_sym --output-plot data_fwd.csv
-\end{verbatim}
-give the same model, without any reduction.
+The set of rules and the initial state are symmetric with respect to the pair of sites. This is not the case of the observable. Thus, only backward bisimulation may be used to reduce the system. Indeed, if we ignore the difference between sites \texttt{x} and \texttt{y}, we can no longer express the concentration of asymetric dimers. This  excludes forward bisimulation. Backward bisimulations may still be used since the concentration of each species can be computed by from the overall concentration of its equivalence class,  since the concentration of two equivalent species are always inversely proportional to their number of automorphisms.
 
 The command line:
-\begin{verbatim}
-KaDe --rate-convention Biochemist sym.ka --with-symmetries Backward \
---output ode_with_bwd_sym --output-plot data_bwd.csv
-\end{verbatim}
-reduces the system by ignoring the difference between sites \texttt{x} and \texttt{y}. This is done by replacing in each product of reaction, every species by an arbitrary representative of its equivalence class, and in each algebraic expression, each species concentration by the product of its the concentration of its representative times the relative weight of this species in its equivalence class (which is constant and inversely proportional to its number of automorphisms.)
-
-The \textsc{Octave} output is the following one:
-
-\begin{lstlisting}[language=octave]
-  function main=main()
-  % command line:
-  %      'KaDE' 'sym.ka' '--rate-convention' 'Biochemist' '--with-symmetries''Backward'
-  %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
-  %%
-  %% init - the initial abundances of each species and token
-  %% tinit - the initial simulation time (likely 0)
-  %% tend - the final simulation time
-  %% initialstep - initial time step at the beginning of numerical integration
-  %% maxstep - maximal time step for numerical integration
-  %% reltol - relative error tolerance;
-  %% abstol - absolute error tolerance;
-  %% period - the time period between points to return
-  %%
-  %% variables (init(i),y(i)) denote numbers of embeddings
-  %% rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well
-
-
-  tinit=0;
-  tend=1;
-  initialstep=1e-05;
-  maxstep=0.02;
-  reltol=0.001;
-  abstol=0.001;
-  period=0.01;
-
-  nonnegative=false;
-  global nodevar
-  nodevar=3;
-  global max_stoc_coef
-  max_stoc_coef=0;
-  nvar=3;
-  nobs=2;
-  nrules=3;
-
-  global var
-  var=zeros(nvar,1);
-  global init
-  init=sparse(nodevar,1);
-  stoc=zeros(nrules,max_stoc_coef);
-  global k
-  global kd
-  global kun
-  global kdun
-  global stoc
-
-  k=zeros(nrules,1);
-  kd=zeros(nrules,1);
-  kun=zeros(nrules,1);
-  kdun=zeros(nrules,1);
-  global jacvar
-  jacvar=sparse(nvar,nodevar);
-  global jack
-  global jackd
-  global jackun
-  global jackund
-  global jacstoc
-
-  jack=zeros(nrules,nodevar);
-  jackd=zeros(nrules,nodevar);
-  jackun=zeros(nrules,nodevar);
-  jackund=zeros(nrules,nodevar);
-
-  t = 0.000000;
-
-  init(3)=t;
-  init(1)=100; % A(x, y)
-  var(2)=init(2); % asym
-  var(1)=1; % k
-
-
-  uiIsOctave = false;
-  uiIsMatlab = false;
-  LIC = license('inuse');
-  for elem = 1:numel(LIC)
-      envStr = LIC(elem).feature
-      if strcmpi(envStr,'octave')
-         LICname=envStr;
-         uiIsOctave = true;
-         break
-      end
-      if strcmpi(envStr,'matlab')
-         LICname=envStr
-         uiIsMatlab = true;
-         break
-      end
-  end
-
-
-  if nonnegative
-     options = odeset('RelTol', reltol, ...
-                      'AbsTol', abstol, ...
-                      'InitialStep', initialstep, ...
-                      'MaxStep', maxstep, ...
-                      'Jacobian', @ode_jacobian, ...
-                     'NonNegative', [1:1:2]);
-  else
-     options = odeset('RelTol', reltol, ...
-                      'AbsTol', abstol, ...
-                      'InitialStep', initialstep, ...
-                      'MaxStep', maxstep, ...
-                      'Jacobian', @ode_jacobian);
-  end
-
-
-  if nonnegative
-     if uiIsMatlab
-        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
-        soln.y=soln.y';
-        vt = soln.x;
-        vy = soln.y;
-     elseif uiIsOctave
-        [vt,vy] = ode23s(@ode_aux,[tinit tend],ode_init(),options);
-     end
-  else
-     if uiIsMatlab
-        soln =  ode15s(@ode_aux,[tinit tend],ode_init(),options);
-        soln.y=soln.y';
-        vt = soln.x;
-        vy = soln.y;
-     elseif uiIsOctave
-        soln = ode2r(@ode_aux,[tinit tend],ode_init(),options);
-        vt = soln.x;
-        vy = soln.y;
-     end
-  end;
-
-
-  nrows = length(vt);
-
-  tmp = zeros(nodevar,1);
-
-  n_points = floor ((tend-tinit)/period)+1;
-  t = linspace(tinit, tend, n_points);
-  obs = zeros(nrows,nobs);
-
-  for j=1:nrows
-      for i=1:nodevar
-          z(i)=vy(j,i);
-      end
-      h=ode_obs(z);
-      for i=1:nobs
-          obs(j,i)=h(i);
-      end
-  end
-  if nobs==1
-     y = interp1(vt, obs, t, 'pchip')';
-  else
-     y = interp1(vt, obs, t, 'pchip');
-  end
-
-
-  filename = 'data.csv';
-  fid = fopen (filename,'w');
-  fprintf(fid,'# KaDE sym.ka --rate-convention Biochemist --with-symmetries Backward\n')
-  fprintf(fid,'# ')
-  fprintf(fid,'[T],')
-  fprintf(fid,'asym,')
-  fprintf(fid,'\n')
-  for j=1:n_points
-      for i=1:nobs
-          fprintf(fid,'%f,',y(j,i));
-      end
-      fprintf(fid,'\n');
-  end
-  fclose(fid);
-
-
-  end
-
-
-
-  function Init=ode_init()
-
-  global nodevar
-  global init
-  Init=zeros(nodevar,1);
-
-  Init(1) = init(1); % A(x, y)
-  Init(2) = init(2); % A(x, y!1), A(x, y!1)
-  Init(3) = init(3); % t
-  end
-
-
-  function dydt=ode_aux(t,y)
-
-  global nodevar
-  global max_stoc_coef
-  global var
-  global k
-  global kd
-  global kun
-  global kdun
-  global stoc
-
-  var(2)=y(2); % asym
-
-  k(1)=var(1);
-  k(2)=var(1);
-  k(3)=var(1);
-
-  dydt=zeros(nodevar,1);
-
-  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
-  dydt(1)=dydt(1)-1/2*k(3)*y(1)*y(1);
-  dydt(2)=dydt(2)+2/2*k(3)*y(1)*y(1);
-
-  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
-  dydt(1)=dydt(1)-k(2)*y(1)*y(1);
-  dydt(2)=dydt(2)+2*k(2)*y(1)*y(1);
-
-  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
-  dydt(1)=dydt(1)-1/2*k(1)*y(1)*y(1);
-  dydt(2)=dydt(2)+2/2*k(1)*y(1)*y(1);
-  dydt(3)=1;
-
-  end
-
-
-  function jac=ode_jacobian(t,y)
-
-  global nodevar
-  global max_stoc_coef
-  global jacvar
-  global var
-  global k
-  global kd
-  global kun
-  global kdun
-  global stoc
-
-  global jack
-  global jackd
-  global jackun
-  global jackund
-  global jacstoc
-
-  var(2)=y(2); % asym
-
-  k(1)=var(1);
-  k(2)=var(1);
-  k(3)=var(1);
-  jacvar(2,2)=1;
-
-
-  jac=sparse(nodevar,nodevar);
-
-  % rule    : A(x,y), A(x,y) -> A(x,y!1), A(x,y!1)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(3)*y(1);
-  jac(2,1)=jac(2,1)+2/2*k(3)*y(1);
-  jac(2,1)=jac(2,1)+2/2*k(3)*y(1);
-
-  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  jac(1,1)=jac(1,1)-k(2)*y(1);
-  jac(1,1)=jac(1,1)-k(2)*y(1);
-  jac(1,1)=jac(1,1)-k(2)*y(1);
-  jac(1,1)=jac(1,1)-k(2)*y(1);
-  jac(2,1)=jac(2,1)+2*k(2)*y(1);
-  jac(2,1)=jac(2,1)+2*k(2)*y(1);
-
-  % rule    : A(x,y), A(x,y) -> A(x!1,y), A(x!1,y)
-  % reaction: A(x, y) + A(x, y) -> A(x, y!1), A(x, y!1)
-
-  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
-  jac(1,1)=jac(1,1)-1/2*k(1)*y(1);
-  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
-  jac(2,1)=jac(2,1)+2/2*k(1)*y(1);
-  end
-
-
-  function obs=ode_obs(y)
-
-  global nobs
-  global var
-  obs=zeros(nobs,1);
-
-  t = y(3);
-  var(2)=y(2)/4; % asym
-
-  obs(1)=t; % [T]
-  obs(2)=var(2); % asym
-
-  end
-
-
-  main();
-\end{lstlisting}
-
-We notice line $29$ that there are only $3$ variables remaining: one for time advance, one for free \texttt{A}{}s, and one for dimers (no matter which sites are bound). {\KaDE} has gathered the three kinds of dimers into a single equivalence class (no matter with sites are bound).  For instance, lines $211-212$, the production of an asymmetric dimer, is replaced with the production of a dimer in which the bond is on both sites \texttt{y}.
-
-The definition of observables is given from line $289$ to $301$. We are interested in asymetric dimers only. We notice that their concentration is obtained by dividing the overall quantity of dimers by $4$. To understand why, we shall have a closer look at the meaning of each variables. There exist two conventions. One variable may denote the number of occurrences of a bio-molecular species, or the number of embeddings between this bio-molecular species and the current state of the system. Both convention are related by the fact, that the number of embeddings is equal to the number of occurrences multiplied by the number of automorphisms in the bio-molecular species. The reduction of the model replace each occurrence of a dimer into a dimer made of two proteins bond via their site y.
-
-As indicated at line $15$, the convention is to count in number of embeddings. Thus the total number of dimers is $y(2)/2$. Then half of them only is an asymetric dimer, which gives $y(2)/4$
-
-Let us check the soundness of our tools, by integrating both ODEs systems.
+\ITE{
+\item[\$] \ttt{KaDe --rate-convention Biochemist sym.ka --with-symmetries Forward --output ode\_with\_fwd\_sym --output-plot data\_fwd.csv}}
+gives the same model, without any reduction.
+
+The command line:
+\ITE{
+\item[\$] \ttt{KaDe --rate-convention Biochemist sym.ka --with-symmetries Backward --output ode\_with\_bwd\_sym --output-plot data\_bwd.csv}}
+reduces the system by ignoring the difference between sites \texttt{x} and \texttt{y}. This is done by replacing in each reaction product, every species by an arbitrary representative of its equivalence class, and in each algebraic expression, each species concentration by the product of its the concentration of its representative times the relative weight of this species in its equivalence class (which is constant and inversely proportional to its number of automorphisms.)
+
+We notice that there are only $3$ variables remaining:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 '\%\% variables' ode\_with\_bwd\_sym.m}}
+\lstinputlisting[language=Octave]{generated_img/n_var_bwd.txt}
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'function Init' ode\_with\_bwd\_sym.m --after-context 9 }}
+\lstinputlisting[language=Octave]{generated_img/init_bwd.txt}
+one for time advance, one for free \texttt{A}{}s, and one for dimers (no matter which sites are bound). {\KaDE} has gathered the three kinds of dimers into a single equivalence class (no matter with sites are bound).  For instance, in the following:
+\ITE{
+\item[\$] \ttt{grep --after-context 6 -n -m 1 'rule    : A(x,y), A(x,y) -> A(x!1,y), A(x,y!1)' ode\_with\_bwd\_sym.m }}
+\lstinputlisting[language=Octave]{generated_img/rule_bwd.txt}
+ the production of an asymmetric dimer, is replaced with the production of a dimer in which the bond is on both sites \texttt{y}.
+
+Now we explain how the values of the obervavles are computed.
+The code for the function \texttt{obs} is the following one:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 'function obs' ode\_with\_bwd\_sym.m --after-context 12}}
+\lstinputlisting[language=Octave]{generated_img/obs_bwd.txt}
+ We are interested in asymetric dimers only. We notice that their concentration is obtained by dividing the overall quantity of dimers by $4$. To understand why, we shall have a closer look at the meaning of each variable. As indicated here:
+\ITE{
+\item[\$] \ttt{grep -n -m 1 '\%\% variables' ode\_with\_bwd\_sym.m}}
+\lstinputlisting[language=Octave]{generated_img/convention_bwd.txt}
+the convention is to count in number of embeddings. Thus the total number of dimers is $\frac{y(2)}{2}$. Then half of them only is an asymetric dimer, which gives $\frac{y(2)}{4}$.
+
+Let us check the soundness of our tools, by integrating our three  ODEs systems.
 
 Firsly we define the file \texttt{plot.gplot} as follows:
-\begin{lstlisting}
+\begin{lstlisting}[language=Gnuplot]
 set xlabel 'Asymetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
@@ -2680,7 +2461,7 @@ set output 'plot.png'
 plot 'data.csv' using 1:2 w l
 \end{lstlisting}
 the file \texttt{plot\_fwd.gplot} as follows:
-\begin{lstlisting}
+\begin{lstlisting}[language=Gnuplot]
 set xlabel 'Asymetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
@@ -2693,7 +2474,7 @@ set output 'plot_fwd.png'
 plot 'data_fwd.csv' using 1:2 w l
 \end{lstlisting}
 and the file \texttt{plot\_bwd.gplot} as follows:
-\begin{lstlisting}
+\begin{lstlisting}[language=Gnuplot]
 set xlabel 'Asymetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
@@ -2706,34 +2487,33 @@ set output 'plot_bwd.png'
 plot 'data.csv' using 1:2 w l
 \end{lstlisting}
 
-Then we can integrate our three differential systems and plot their respective  solutions thanks to the following instrucations:
-\begin{verbatim}
-  octave ode.m
-  octave ode_fwd.m
-  octave ode_bwd.m
-  gnuplot plot.gplot
-  gnuplot plot_fwd.gplot
-  gnuplot plot_bwd.gplot
-\end{verbatim}
+Then we can integrate our three differential systems and plot their respective  solutions thanks to the following instructions:
+\ITE{
+\item[\$] \ttt{octave ode.m}
+\item[\$] \ttt{octave ode\_with\_fwd\_sym.m}
+\item[\$] \ttt{octave ode\_with\_bwd\_sym.m}
+\item[\$] \ttt{gnuplot plot.gplot}
+\item[\$] \ttt{gnuplot plot\_fwd.gplot}
+\item[\$] \ttt{gnuplot plot\_bwd.gplot}}
 
 We obtain the following plots:
 \begin{figure}[htp]
-\centering  \begin{minipage}{0.25\linewidth}
-   \scalebox{0.25}{\includegraphics{img/plot.png}}
+\centering  \begin{minipage}{0.35\linewidth}
+   \scalebox{0.35}{\includegraphics{img/plot.png}}
 \end{minipage}
 \caption{Initial model (without reduction).}
 \end{figure}
 
 \begin{figure}[htp]
-\centering\begin{minipage}{0.25\linewidth}
-  \scalebox{0.25}{\includegraphics{img/plot_fwd.png}}
+\centering\begin{minipage}{0.35\linewidth}
+  \scalebox{0.35}{\includegraphics{img/plot_fwd.png}}
 \end{minipage}
 \caption{Reduced model (fwd bisimulation).}
 \end{figure}
 
 \begin{figure}[htp]
-\centering\begin{minipage}{0.25\linewidth}
-  \scalebox{0.25}{\includegraphics{img/plot_bwd.png}}
+\centering\begin{minipage}{0.35\linewidth}
+  \scalebox{0.35}{\includegraphics{img/plot_bwd.png}}
 \end{minipage}\caption{Reduced model (bwd bisimulation).}
 \end{figure}
 
