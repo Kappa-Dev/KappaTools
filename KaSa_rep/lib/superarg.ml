@@ -168,7 +168,7 @@ let order (a:t) =
   let ordered = ref StringIntMap.empty in
   List.iter
     (fun (a,b,c,cat,lvl) ->
-       if accept_level_display lvl then
+       if accept_level_use lvl then
          List.iter
            (fun (cat,i) ->
               let asso,old_lvl =
