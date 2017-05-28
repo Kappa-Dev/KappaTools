@@ -1,0 +1,17 @@
+#sym.ka
+
+%agent: A(x,y)
+
+%init: 100 A()
+
+%var: 'k' 1
+%obs: 'asym' |A(x!1),A(y!1)|
+
+A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @'k'
+A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @'k'
+A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @'k'
+
+#We use the third convention (consider only the automorphisms in the lhs
+#that are preserved in the rhs). There are two of them in the first and
+#in the third rule. Only one in the second one. Hence the rate of the first
+#and third are divided by 2.
