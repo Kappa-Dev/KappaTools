@@ -1170,7 +1170,7 @@ let dump_initial_species ?units loggers logger_err network_handler k name specie
   in
   ()
 
-let dump_species_reference loggers logger_err species i =
+let dump_species_reference ?dotnet_sep:(dotnet_sep="") loggers logger_err species i =
   let s =
     Format.sprintf
       "metaid=\"%s\" species=\"s%i\"%s"
@@ -1184,9 +1184,18 @@ let dump_species_reference loggers logger_err species i =
       )
   in
   let () =
-    do_dotnet loggers logger_err (fun loggers _ ->
-        Loggers.fprintf loggers "%i" species
-      )
+      do_dotnet loggers logger_err (fun loggers _ ->
+        let rec aux k =
+          let () =
+            Loggers.fprintf loggers "%i" species
+          in
+          if k>=i then ()
+          else
+            let () = Loggers.fprintf loggers "%s" dotnet_sep in
+            aux (k+1)
+        in
+        aux 1
+        )
   in
   ()
 
@@ -1220,7 +1229,7 @@ let dump_list_of_species_reference
              do_dotnet loggers logger_err
                (fun logger _ -> Loggers.fprintf logger "%s" dotnet_sep)
          in
-         let () = dump_species_reference loggers logger_err s (i*j) in
+         let () = dump_species_reference ~dotnet_sep loggers logger_err s (i*j) in
          (* check what to do when stochiometric coefficients are bigger than 1*)
          true
       )

@@ -34,7 +34,7 @@ end parameters
 begin reactions
 # rule    : A(), A() -> A() 
 # A() + A() -> A()  
-1 1 1 0.5*k3_
+1 1,1 1 0.5*k3_
 
 # rule    : A() ->  
 # A() ->   
