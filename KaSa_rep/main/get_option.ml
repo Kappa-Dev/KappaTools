@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <May 24 2017>
+  * Last modification: Time-stamp: <May 28 2017>
   * *
   * primitive to parse command-line options
   *
@@ -348,7 +348,8 @@ let options =
     ]
 
 let get_option error =
-  let () = SuperargTk.parse options FileNames.input in
+  let title = Version.version_kasa_full_name in
+  let () = SuperargTk.parse ~title options FileNames.input in
   let parameters =
     Remanent_parameters.get_parameters
       ~called_from:Remanent_parameters_sig.KaSa () in
