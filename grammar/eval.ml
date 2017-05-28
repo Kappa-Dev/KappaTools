@@ -309,7 +309,7 @@ let effects_of_modif
     (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
   | PLOTENTRY ->
     (domain, (Primitives.PLOTENTRY)::rev_effects)
-  | SPECIES_OF (on,pexpr,(ast,_)) ->
+  | SPECIES_OF (on,pexpr,(ast,pos)) ->
     let (domain',pexpr') =
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
     let adds tests l x =
@@ -318,6 +318,13 @@ let effects_of_modif
     let domain'',ccs =
       Snip.connected_components_sum_of_ambiguous_mixture
         ~compileModeOn contact_map domain' ~origin ast in
+    let () =
+      List.iter
+        (fun (arr,_) ->
+          if Array.length arr > 1 then
+            raise (ExceptionDefn.Malformed_Decl
+                     ("SPECIES_OF can only be applied to one connected component",
+                      pos))) ccs in
     (domain'',
      List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
