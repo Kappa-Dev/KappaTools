@@ -81,8 +81,8 @@ begin reaction rules
     gLacI(cI1,cI2) + pCI(lac) <-> gLacI(cI1!1,cI2).pCI(lac!1)                c0/Na/V*tF/pF, c1*tF
     gLacI(cI2,cI1) + pCI(lac) <-> gLacI(cI2!1,cI1).pCI(lac!1)                c0/Na/V*tF/pF, c1*tF
 
-    gLacI(cI1!+,cI) + pCI(lac) <-> gLacI(cI1!+,cI!1).pCI(lac!1)            c0/Na/V*tF/pF, c2*tF
-    gLacI(cI2!+,cI) + pCI(lac) <-> gLacI(cI2!+,cI!1).pCI(lac!1)            c0/Na/V*tF/pF, c2*tF
+    gLacI(cI1!+,cI2) + pCI(lac) <-> gLacI(cI1!+,cI2!1).pCI(lac!1)            c0/Na/V*tF/pF, c2*tF
+    gLacI(cI2!+,cI1) + pCI(lac) <-> gLacI(cI2!+,cI1!1).pCI(lac!1)            c0/Na/V*tF/pF, c2*tF
 
     gLacI(cI1,cI2) -> gLacI(cI1,cI2) + mLacI()                               c3*rF
 
