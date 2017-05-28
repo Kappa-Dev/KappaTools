@@ -1148,6 +1148,7 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
     && | \tcb{\$PLOTENTRY} \\
     && | \tcb{\$PRINT} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
+    && | \tcb{\$SPECIES\_OFF} \textit{string\_expression} \textit{kappa\_expression} \textit{boolean} \\
     \\
     \textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
     && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
@@ -1330,6 +1331,13 @@ its value gets below 0.
 The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
 \lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY until [false]!
 will store the value of observables every 10 productive events.
+
+\subsection{Print species of an observable}
+The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example,
+\lstinline[language=kappa]!%mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true]!
+prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} and the time of occurrence.
+
+Note that this perturbation can only be applied to if the observale is a connected component.
 
 \section{Implicit signature}
 \KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
