@@ -1,0 +1,117 @@
+# The model consists of a monovalent extracellular ligand, 
+# a monovalent cell-surface receptor, a bivalent cytosolic adapter protein, 
+# and a cytosolic kinase.  The receptor dimerizes through a 
+# receptor-receptor interaction that depends on ligand binding.  
+# The adapter binds the receptor and the kinase.  
+# When two kinases are juxtaposed through binding to 
+# receptor-associated adapter proteins, one of the kinases can 
+# transphosphorylate the second kinase. 
+
+begin model
+begin parameters
+    L_tot  1
+    R_tot  1
+    A_tot  1
+    K_tot  1
+
+    kpL    0.1
+    kmL    0.1
+    # kpD and kmD were divided by two from their values in toy.in
+    # give the right symmetry factor.
+    kpD    1.0
+    kmD    0.1
+    kpA    0.1
+    kmA    0.1
+    kpK    0.1
+    kmK    0.1
+    pK     1
+    pKs    10
+    dM     1
+    dC     10
+end parameters
+
+begin seed species
+    # Set to zero for equilibration    
+    L(r)        0 
+    # r binds to l of R
+
+    R(l,r,a)    R_tot 
+    # l binds to r of L
+    # r binds to r of R
+
+    A(r,k)      A_tot
+    # r binds to a of R
+    # k binds to a of K
+
+    K(a,Y~U)    K_tot
+    # a binds to k of A
+    # Y is phosphorylation site that is either unphosphorylated (U) or
+    #   phosphorylated (P)
+    
+    Null()     0
+end seed species
+
+begin reaction rules
+    # Ligand binding (L+R)
+    # Note: specifying r in R here means that the r component must not 
+    #       be bound.  This prevents dissociation of ligand from R
+    #       when R is in a dimer.
+    L(r) + R(l,r) <-> L(r!1).R(l!1,r) kpL, kmL
+
+    # Aggregation (R+R)
+    # Note:  R must be bound to ligand to dimerize.
+    L(r!1).R(l!1,r) + L(r!1).R(l!1,r) <-> L(r!1).R(l!1,r!3).L(r!2).R(l!2,r!3) kpD,kmD
+
+    # Receptor binding to adaptor (R+A)
+    # Note: A and R can bind independent of whether A is bound to K or 
+    #       whether R is in a dimer.
+    A(r) + R(a) <-> A(r!1).R(a!1) kpA,kmA
+
+    # Adaptor binding kinase 
+    # Note: Doesn't depend on phosphorylation state of K or whether A is bound to
+    #       receptor, i.e. binding rate is same whether A is on membrane (bound to
+    #        R) or in cytosol.
+    A(k) + K(a) <-> A(k!1).K(a!1) kpK,kmK
+
+    # Kinase transphosphorylation by inactive kinase
+    # Note: Rule doesn't specify how two K's are associated
+    K(Y~U).K(Y~U) -> K(Y~U).K(Y~P) pK
+
+    # Kinase transphosphorylation by active kinase
+    # Note: Rule doesn't specify how two K's are associated
+    K(Y~P).K(Y~U) -> K(Y~P).K(Y~P) pKs
+
+    # Dephosphorylation of kinase in membrane complex
+    R(a!1).A(r!1,k!2).K(a!2,Y~P) -> R(a!1).A(r!1,k!2).K(a!2,Y~U) dM
+
+    # Dephosphorylation of kinase in cytosol
+    K(a,Y~P) -> K(a,Y~U) dC
+end reaction rules
+
+begin observables
+    Molecules    RecDim     R(r!+)
+    Molecules    Rec_A      R(a!1).A(r!1)
+    Molecules    Rec_K      R(a!1).A(r!1,k!2).K(a!2)
+    Molecules    Rec_Kp     R(a!1).A(r!1,k!2).K(a!2,Y~P)
+    Molecules    RecDim_Kp  R.R(a!1).A(r!1,k!2).K(a!2,Y~P)
+    Molecules    L_total    L
+    Molecules    A_total    A
+    Molecules    K_total    K
+    Molecules    R_total    R
+end observables
+end model
+
+## actions ##
+generate_network({overwrite=>1})
+
+# Equilibration
+simulate({method=>"ode",suffix=>"equil",t_end=>1000,n_steps=>10,atol=>1e-10,rtol=>1e-8,sparse=>1,steady_state=>1})
+writeSBML()
+
+# Kinetics
+setConcentration("L(r)","L_tot")
+simulate({method=>"ode",t_end=>120,n_steps=>120,atol=>1e-10,rtol=>1e-8})
+
+# Modified Kinetics, starts from end point of previous simulate command
+#setParameter("pKs",0)
+#simulate({method=>"ode",suffix=>"kinetics2",t_end=>100,n_steps=>10,atol=>1e-10,rtol=>1e-8})

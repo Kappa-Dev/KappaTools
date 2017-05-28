@@ -1,0 +1,52 @@
+%var: 'Stot' 100
+%var: 'kKS' 0.01
+%var: 'kdKS' 1.
+%var: 'kpS' 0.1
+%var: 'kPS' 0.01
+%var: 'kdPS' 1.
+%var: 'kuS' 0.1
+%agent: K(s) 
+%agent: P(s) 
+%agent: S(x1~u~p,x2~u~p,x3~u~p,x4~u~p,x5~u~p,x6~u~p,x7~u~p,x8~u~p,x9~u~p)
+
+%init: 'Stot' K(s)
+%init: 'Stot' P(s)
+%init: 'Stot' S(x1~u,x2~u,x3~u,x4~u,x5~u,x6~u,x7~u,x8~u,x9~u)
+
+
+K(s) , S(x1~u) <-> K(s!1) , S(x1~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x1~u!1) -> K(s) , S(x1~p) @ 'kpS' 
+P(s) , S(x1~p) <-> P(s!1) , S(x1~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x1~p!1) -> P(s) , S(x1~u) @ 'kuS' 
+K(s) , S(x2~u) <-> K(s!1) , S(x2~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x2~u!1) -> K(s) , S(x2~p) @ 'kpS' 
+P(s) , S(x2~p) <-> P(s!1) , S(x2~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x2~p!1) -> P(s) , S(x2~u) @ 'kuS' 
+K(s) , S(x3~u) <-> K(s!1) , S(x3~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x3~u!1) -> K(s) , S(x3~p) @ 'kpS' 
+P(s) , S(x3~p) <-> P(s!1) , S(x3~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x3~p!1) -> P(s) , S(x3~u) @ 'kuS' 
+K(s) , S(x4~u) <-> K(s!1) , S(x4~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x4~u!1) -> K(s) , S(x4~p) @ 'kpS' 
+P(s) , S(x4~p) <-> P(s!1) , S(x4~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x4~p!1) -> P(s) , S(x4~u) @ 'kuS' 
+K(s) , S(x5~u) <-> K(s!1) , S(x5~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x5~u!1) -> K(s) , S(x5~p) @ 'kpS' 
+P(s) , S(x5~p) <-> P(s!1) , S(x5~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x5~p!1) -> P(s) , S(x5~u) @ 'kuS' 
+K(s) , S(x6~u) <-> K(s!1) , S(x6~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x6~u!1) -> K(s) , S(x6~p) @ 'kpS' 
+P(s) , S(x6~p) <-> P(s!1) , S(x6~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x6~p!1) -> P(s) , S(x6~u) @ 'kuS' 
+K(s) , S(x7~u) <-> K(s!1) , S(x7~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x7~u!1) -> K(s) , S(x7~p) @ 'kpS' 
+P(s) , S(x7~p) <-> P(s!1) , S(x7~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x7~p!1) -> P(s) , S(x7~u) @ 'kuS' 
+K(s) , S(x8~u) <-> K(s!1) , S(x8~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x8~u!1) -> K(s) , S(x8~p) @ 'kpS' 
+P(s) , S(x8~p) <-> P(s!1) , S(x8~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x8~p!1) -> P(s) , S(x8~u) @ 'kuS' 
+K(s) , S(x9~u) <-> K(s!1) , S(x9~u!1) @ 'kKS','kdKS' 
+K(s!1) , S(x9~u!1) -> K(s) , S(x9~p) @ 'kpS' 
+P(s) , S(x9~p) <-> P(s!1) , S(x9~p!1) @ 'kPS','kdPS' 
+P(s!1) , S(x9~p!1) -> P(s) , S(x9~u) @ 'kuS' 

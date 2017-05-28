@@ -1,0 +1,22 @@
+%var: 'kon' 10
+%var: 'koff' 5
+%var: 'kcat' 0.7
+%var: 'dephos' 0.5
+
+%init: 5000    X(y,p~0)
+%init: 100 X(y,p~1)
+%init: 500 Y(x)
+
+# This is a very simple system indeed.  The only rules that are defined
+# tell us that X can bind Y if X is dephosphorylated.  Then the XY complex
+# can either disassociate, or a phosphorylation reaction can occur.  Finally, X
+# will dephosphorylate regardless of whether or not it is bound to Y, although
+# for these rules, it will always be unbound to Y if it is phosphorylated.
+# Here are the rule definitions:
+
+
+    X(y,p~0) , Y(x) -> X(y!1,p~0), Y(x!1)   @'kon'{0}
+    X(y!1,p~0), Y(x!1) -> X(y,p~0) , Y(x)   @'koff'
+    X(y!1,p~0), Y(x!1) -> X(y,p~1) , Y(x)   @'kcat'
+
+    X(p~1) -> X(p~0)                       @'dephos'

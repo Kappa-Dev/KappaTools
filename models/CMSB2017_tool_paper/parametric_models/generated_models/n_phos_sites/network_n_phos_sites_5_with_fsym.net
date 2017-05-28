@@ -1,0 +1,120 @@
+# command line:  
+#       KaDE   n_phos_sites_5.ka    -print-efficiency    -ode-backend   DOTNET   -with-symmetries   Forward    -propagate-constants    -dotnet-output  network_n_phos_sites_5_with_fsym.net  
+# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+# 
+# init - the initial abundances of each species and token
+# tinit - the initial simulation time (likely 0)
+# tend - the final simulation time 
+# initialstep - initial time step at the beginning of numerical integration
+# maxstep - maximal time step for numerical integration
+# reltol - relative error tolerance;
+# abstol - absolute error tolerance;
+# period - the time period between points to return
+#
+# variables (init(i),y(i)) denote numbers of embeddings 
+# rule rates are corrected by the number of automorphisms in the lhs of rules
+
+begin species
+ 1 A(s1~u,s2~u,s3~u,s4~u,s5~u) 100
+ 2 A(s1~u,s2~u,s3~u,s4~u,s5~p) 0
+ 3 A(s1~u,s2~u,s3~u,s4~p,s5~p) 0
+ 4 A(s1~u,s2~u,s3~p,s4~p,s5~p) 0
+ 5 A(s1~u,s2~p,s3~p,s4~p,s5~p) 0
+ 6 A(s1~p,s2~p,s3~p,s4~p,s5~p) 0
+end species
+
+
+
+
+begin reactions
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+1 6 5 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+2 6 5 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+3 6 5 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+4 6 5 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+5 6 5 33614
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p)  
+6 5 6 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+7 5 4 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+8 5 4 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+9 5 4 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+10 5 4 4802
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+11 4 5 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p)  
+12 4 5 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+13 4 3 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+14 4 3 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+15 4 3 686
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+16 3 4 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+17 3 4 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p)  
+18 3 4 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+19 3 2 98
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+20 3 2 98
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+21 2 3 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+22 2 3 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+23 2 3 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p)  
+24 2 3 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u)  
+25 2 1 14
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+26 1 2 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+27 1 2 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+28 1 2 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+29 1 2 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p)  
+30 1 2 3
+end reactions

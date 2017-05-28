@@ -1,6 +1,9 @@
 WWWDIR=$(HOME)/www/shtml/CMSB2017-tool-paper/
+OUTPUT= parametric_models_models_only.tgz parametric_models_all_files.tgz kinase_phosphatase.tgz n_phos_sites.tgz n_phos_sites_with_counter.tgz other_examples_models_only.tgz other_examples_all_files.tgz
+all: clean $(OUTPUT)
 
-all: parametric_models_models_only.tgz parametric_models_all_files.tgz kinase_phosphatase.tgz n_phos_sites.tgz n_phos_sites_with_counter.tgz other_examples_models_only.tgz other_examples_all_files.tgz
+clean:
+	rm -f $(OUTPUT)
 
 parametric_models_models_only.tgz:
 	rm -rf tmp

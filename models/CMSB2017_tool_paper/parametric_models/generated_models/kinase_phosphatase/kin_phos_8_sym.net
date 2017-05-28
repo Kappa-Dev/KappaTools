@@ -1,0 +1,901 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.001  # Constant
+    6 kdPS  0.1  # Constant
+    7 kuS   0.01  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    6 S(x~p,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    7 K(s!1).K(s!2).K(s!3).S(x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+    8 K(s!1).S(x~p,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    9 P(s!1).S(x~p!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   10 K(s!1).K(s!2).K(s!3).K(s!4).S(x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   11 K(s!1).K(s!2).S(x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   12 K(s!1).P(s!2).S(x~p!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   13 S(x~p,x~p,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   14 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   15 K(s!1).K(s!2).K(s!3).S(x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   16 K(s!1).K(s!2).P(s!3).S(x~p!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   17 K(s!1).S(x~p,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   18 P(s!1).S(x~p!1,x~p,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   19 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   20 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   21 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   22 K(s!1).K(s!2).S(x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   23 K(s!1).P(s!2).S(x~p!2,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   24 S(x~p,x~p,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   25 P(s!1).P(s!2).S(x~p!2,x~p!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   26 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).S(x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   27 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   28 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   29 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   30 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   31 K(s!1).S(x~p,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   32 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   33 P(s!1).S(x~p!1,x~p,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   34 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).K(s!8).S(x~u!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   35 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   36 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   37 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   38 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   39 K(s!1).K(s!2).S(x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   40 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   41 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   42 S(x~p,x~p,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   43 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   44 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).S(x~p,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   45 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).S(x~p!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   46 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   47 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   48 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   49 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   50 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   51 K(s!1).S(x~p,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+   52 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   53 P(s!1).S(x~p!1,x~p,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   54 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~u,x~u,x~u,x~u,x~u) 0
+   55 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).P(s!8).S(x~p!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   56 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~p,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   57 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   58 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   59 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   60 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   61 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+   62 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   63 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+   64 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   65 S(x~p,x~p,x~p,x~p,x~p,x~u,x~u,x~u) 0
+   66 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   67 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).S(x~p!7,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   68 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   69 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   70 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   71 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+   72 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   73 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+   74 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   75 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+   76 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+   77 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~u,x~u,x~u) 0
+   78 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~u,x~u,x~u,x~u) 0
+   79 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   80 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   81 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   82 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   83 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+   84 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   85 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+   86 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+   87 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+   88 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u,x~u,x~u) 0
+   89 S(x~p,x~p,x~p,x~p,x~p,x~p,x~u,x~u) 0
+   90 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~u,x~u,x~u) 0
+   91 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u,x~u,x~u) 0
+   92 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   93 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   94 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   95 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+   96 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+   97 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+   98 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u,x~u) 0
+   99 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  100 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+  101 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u,x~u) 0
+  102 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  103 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~u,x~u,x~u) 0
+  104 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  105 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  106 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  107 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  108 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  109 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  110 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u) 0
+  111 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  112 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1,x~u,x~u) 0
+  113 S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  114 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  115 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u,x~u,x~u) 0
+  116 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  117 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  118 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  119 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  120 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  121 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  122 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  123 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u,x~u) 0
+  124 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  125 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~u,x~u) 0
+  126 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u,x~u) 0
+  127 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  128 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  129 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  130 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u) 0
+  131 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  132 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~u!1,x~u) 0
+  133 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u) 0
+  134 S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  135 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  136 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~u,x~u) 0
+  137 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1) 0
+  138 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  139 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u) 0
+  140 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  141 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1,x~u) 0
+  142 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  143 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~u) 0
+  144 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u,x~u) 0
+  145 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1) 0
+  146 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1) 0
+  147 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~u!1) 0
+  148 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u) 0
+  149 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  150 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~u) 0
+  151 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u) 0
+  152 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1) 0
+  153 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~u!1) 0
+  154 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u) 0
+  155 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p) 0
+  156 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~u) 0
+  157 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1) 0
+  158 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1) 0
+  159 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p) 0
+  160 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u) 0
+  161 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1) 0
+  162 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p) 0
+  163 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u) 0
+  164 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1) 0
+  165 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p) 0
+  166 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p) 0
+  167 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 64*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29,_R29,_R29
+    2 1,4 5 56*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29,_R29
+    3 4 1,3 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+    4 4 1,6 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+    5 1,5 7 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+    6 1,6 8 56*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29,_R29
+    7 5 1,4 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+    8 5 1,8 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+    9 2,6 9 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   10 1,7 10 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   11 1,8 11 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+   12 1,9 12 56*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29,_R29
+   13 7 1,5 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+   14 8 1,6 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   15 7 1,11 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+   16 8 1,13 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+   17 2,8 12 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   18 9 2,6 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   19 9 2,3 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   20 1,10 14 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   21 1,11 15 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   22 1,12 16 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+   23 1,13 17 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+   24 10 1,7 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   25 11 1,8 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+   26 12 1,9 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   27 10 1,15 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+   28 11 1,17 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+   29 12 1,18 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+   30 2,11 16 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   31 2,13 18 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+   32 12 2,8 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   33 12 2,4 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   34 1,14 19 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+   35 1,15 20 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   36 1,16 21 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   37 1,17 22 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   38 1,18 23 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+   39 14 1,10 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   40 15 1,11 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+   41 16 1,12 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+   42 17 1,13 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   43 14 1,20 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+   44 15 1,22 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+   45 16 1,23 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+   46 17 1,24 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+   47 2,15 21 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   48 2,17 23 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+   49 2,18 25 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   50 16 2,11 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   51 18 2,13 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   52 16 2,5 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   53 18 2,6 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   54 1,19 26 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+   55 1,20 27 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+   56 1,21 28 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   57 1,22 29 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   58 1,23 30 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   59 1,24 31 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   60 1,25 32 48*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29,_R29
+   61 19 1,14 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   62 20 1,15 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   63 21 1,16 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+   64 22 1,17 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+   65 23 1,18 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   66 19 1,27 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+   67 20 1,29 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+   68 21 1,30 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+   69 22 1,31 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+   70 23 1,33 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+   71 2,20 28 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   72 2,22 30 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+   73 2,23 32 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+   74 2,24 33 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+   75 21 2,15 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   76 23 2,17 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+   77 25 2,18 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+   78 21 2,7 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   79 23 2,8 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+   80 25 2,9 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+   81 1,26 34 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+   82 1,27 35 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+   83 1,28 36 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+   84 1,29 37 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+   85 1,30 38 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   86 1,31 39 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+   87 1,32 40 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   88 1,33 41 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+   89 26 1,19 56*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   90 27 1,20 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   91 28 1,21 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+   92 29 1,22 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+   93 30 1,23 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+   94 31 1,24 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   95 32 1,25 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+   96 26 1,35 56*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30,_R30
+   97 27 1,37 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+   98 28 1,38 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+   99 29 1,39 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  100 30 1,41 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  101 31 1,42 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  102 32 1,43 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  103 2,27 36 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  104 2,29 38 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  105 2,30 40 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  106 2,31 41 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  107 2,33 43 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  108 28 2,20 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  109 30 2,22 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  110 32 2,23 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  111 33 2,24 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  112 28 2,10 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  113 30 2,11 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  114 32 2,12 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  115 33 2,13 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  116 1,35 44 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  117 1,36 45 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  118 1,37 46 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  119 1,38 47 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  120 1,39 48 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  121 1,40 49 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  122 1,41 50 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  123 1,42 51 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  124 1,43 52 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+  125 34 1,26 64*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  126 35 1,27 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  127 36 1,28 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  128 37 1,29 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  129 38 1,30 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  130 39 1,31 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  131 40 1,32 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  132 41 1,33 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  133 34 1,44 64*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30,_R30,_R30
+  134 35 1,46 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+  135 36 1,47 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  136 37 1,48 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  137 38 1,50 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  138 39 1,51 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  139 40 1,52 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  140 41 1,53 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  141 2,35 45 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  142 2,37 47 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  143 2,38 49 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  144 2,39 50 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  145 2,41 52 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  146 2,42 53 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  147 2,43 54 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  148 36 2,27 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  149 38 2,29 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  150 40 2,30 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  151 41 2,31 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  152 43 2,33 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  153 36 2,14 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  154 38 2,15 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  155 40 2,16 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  156 41 2,17 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  157 43 2,18 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  158 1,45 55 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  159 1,46 56 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  160 1,47 57 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  161 1,48 58 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  162 1,49 59 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  163 1,50 60 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  164 1,51 61 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  165 1,52 62 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  166 1,53 63 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  167 1,54 64 40*kKS #_R1,_R5,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29,_R29
+  168 44 1,35 56*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  169 45 1,36 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  170 46 1,37 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  171 47 1,38 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  172 48 1,39 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  173 49 1,40 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  174 50 1,41 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  175 51 1,42 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  176 52 1,43 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  177 44 1,56 56*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30,_R30
+  178 45 1,57 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+  179 46 1,58 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  180 47 1,60 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  181 48 1,61 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  182 49 1,62 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  183 50 1,63 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  184 51 1,65 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  185 52 1,66 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  186 2,44 55 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  187 2,46 57 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  188 2,47 59 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  189 2,48 60 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  190 2,50 62 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  191 2,51 63 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  192 2,52 64 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  193 2,53 66 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  194 45 2,35 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  195 47 2,37 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  196 49 2,38 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  197 50 2,39 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  198 52 2,41 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  199 53 2,42 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  200 54 2,43 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  201 45 2,19 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  202 47 2,20 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  203 49 2,21 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  204 50 2,22 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  205 52 2,23 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  206 53 2,24 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  207 54 2,25 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  208 1,57 67 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  209 1,58 68 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  210 1,59 69 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  211 1,60 70 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  212 1,61 71 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  213 1,62 72 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  214 1,63 73 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  215 1,64 74 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  216 1,65 75 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  217 1,66 76 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  218 55 1,45 56*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  219 56 1,46 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  220 57 1,47 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  221 58 1,48 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  222 59 1,49 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  223 60 1,50 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  224 61 1,51 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  225 62 1,52 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  226 63 1,53 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  227 64 1,54 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  228 55 1,67 56*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30,_R30
+  229 56 1,68 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+  230 57 1,70 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  231 58 1,71 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  232 59 1,72 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  233 60 1,73 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  234 61 1,75 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  235 62 1,76 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  236 63 1,77 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  237 64 1,78 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  238 2,56 67 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  239 2,57 69 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  240 2,58 70 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  241 2,60 72 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  242 2,61 73 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  243 2,62 74 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  244 2,63 76 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  245 2,65 77 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  246 2,66 78 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  247 55 2,44 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  248 57 2,46 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  249 59 2,47 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  250 60 2,48 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  251 62 2,50 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  252 63 2,51 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  253 64 2,52 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  254 66 2,53 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  255 55 2,26 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  256 57 2,27 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  257 59 2,28 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  258 60 2,29 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  259 62 2,30 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  260 63 2,31 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  261 64 2,32 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  262 66 2,33 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  263 1,69 79 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  264 1,70 80 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  265 1,71 81 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  266 1,72 82 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  267 1,73 83 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  268 1,74 84 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  269 1,75 85 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  270 1,76 86 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  271 1,77 87 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  272 1,78 88 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  273 67 1,57 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  274 68 1,58 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  275 69 1,59 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  276 70 1,60 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  277 71 1,61 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  278 72 1,62 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  279 73 1,63 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  280 74 1,64 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  281 75 1,65 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  282 76 1,66 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  283 67 1,80 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+  284 68 1,81 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  285 69 1,82 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  286 70 1,83 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  287 71 1,85 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  288 72 1,86 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  289 73 1,87 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  290 74 1,88 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  291 75 1,89 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  292 76 1,90 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  293 2,67 79 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  294 2,68 80 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  295 2,70 82 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  296 2,71 83 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  297 2,72 84 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  298 2,73 86 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  299 2,75 87 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  300 2,76 88 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  301 2,77 90 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  302 2,78 91 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  303 67 2,56 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  304 69 2,57 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  305 70 2,58 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  306 72 2,60 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  307 73 2,61 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  308 74 2,62 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  309 76 2,63 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  310 77 2,65 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  311 78 2,66 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  312 67 2,35 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  313 69 2,36 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  314 70 2,37 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  315 72 2,38 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  316 73 2,39 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  317 74 2,40 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  318 76 2,41 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  319 77 2,42 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  320 78 2,43 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  321 1,82 92 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  322 1,83 93 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  323 1,84 94 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  324 1,85 95 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  325 1,86 96 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  326 1,87 97 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  327 1,88 98 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  328 1,89 99 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  329 1,90 100 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  330 1,91 101 32*kKS #_R1,_R5,_R5,_R5,_R5,_R9,_R9,_R9,_R9,_R13,_R13,_R13,_R13,_R17,_R17,_R17,_R17,_R21,_R21,_R21,_R21,_R25,_R25,_R25,_R25,_R29,_R29,_R29,_R29
+  331 79 1,69 48*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  332 80 1,70 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  333 81 1,71 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  334 82 1,72 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  335 83 1,73 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  336 84 1,74 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  337 85 1,75 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  338 86 1,76 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  339 87 1,77 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  340 88 1,78 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  341 79 1,92 48*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30,_R30
+  342 80 1,93 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  343 81 1,95 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  344 82 1,96 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  345 83 1,97 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  346 84 1,98 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  347 85 1,99 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  348 86 1,100 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  349 87 1,102 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  350 88 1,103 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  351 2,80 92 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  352 2,81 93 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  353 2,82 94 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  354 2,83 96 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  355 2,85 97 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  356 2,86 98 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  357 2,87 100 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  358 2,88 101 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  359 2,89 102 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  360 2,90 103 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  361 79 2,67 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  362 80 2,68 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  363 82 2,70 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  364 83 2,71 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  365 84 2,72 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  366 86 2,73 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  367 87 2,75 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  368 88 2,76 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  369 90 2,77 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  370 91 2,78 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  371 79 2,45 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  372 80 2,46 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  373 82 2,47 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  374 83 2,48 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  375 84 2,49 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  376 86 2,50 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  377 87 2,51 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  378 88 2,52 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  379 90 2,53 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  380 91 2,54 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  381 1,94 104 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  382 1,96 105 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  383 1,97 106 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  384 1,98 107 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  385 1,99 108 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  386 1,100 109 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  387 1,101 110 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  388 1,102 111 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  389 1,103 112 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  390 92 1,82 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  391 93 1,83 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  392 94 1,84 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  393 95 1,85 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  394 96 1,86 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  395 97 1,87 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  396 98 1,88 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  397 99 1,89 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  398 100 1,90 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  399 101 1,91 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  400 92 1,105 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  401 93 1,106 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  402 94 1,107 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  403 95 1,108 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  404 96 1,109 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  405 97 1,111 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  406 98 1,112 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  407 99 1,113 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  408 100 1,114 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  409 101 1,115 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  410 2,92 104 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  411 2,93 105 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  412 2,95 106 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  413 2,96 107 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  414 2,97 109 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  415 2,98 110 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  416 2,99 111 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  417 2,100 112 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  418 2,102 114 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  419 2,103 115 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  420 92 2,80 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  421 93 2,81 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  422 94 2,82 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  423 96 2,83 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  424 97 2,85 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  425 98 2,86 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  426 100 2,87 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  427 101 2,88 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  428 102 2,89 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  429 103 2,90 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  430 92 2,57 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  431 93 2,58 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  432 94 2,59 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  433 96 2,60 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  434 97 2,61 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  435 98 2,62 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  436 100 2,63 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  437 101 2,64 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  438 102 2,65 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  439 103 2,66 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  440 1,107 116 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  441 1,109 117 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  442 1,110 118 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  443 1,111 119 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  444 1,112 120 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  445 1,113 121 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  446 1,114 122 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  447 1,115 123 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  448 104 1,94 40*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  449 105 1,96 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  450 106 1,97 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  451 107 1,98 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  452 108 1,99 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  453 109 1,100 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  454 110 1,101 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  455 111 1,102 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  456 112 1,103 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  457 104 1,116 40*kpS #_R2,_R6,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30,_R30
+  458 105 1,117 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  459 106 1,119 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  460 107 1,120 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  461 108 1,121 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  462 109 1,122 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  463 110 1,123 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  464 111 1,124 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  465 112 1,125 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  466 2,105 116 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  467 2,106 117 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  468 2,107 118 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  469 2,108 119 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  470 2,109 120 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  471 2,111 122 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  472 2,112 123 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  473 2,113 124 56*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31,_R31
+  474 2,114 125 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  475 2,115 126 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  476 104 2,92 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  477 105 2,93 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  478 106 2,95 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  479 107 2,96 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  480 109 2,97 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  481 110 2,98 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  482 111 2,99 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  483 112 2,100 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  484 114 2,102 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  485 115 2,103 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  486 104 2,69 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  487 105 2,70 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  488 106 2,71 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  489 107 2,72 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  490 109 2,73 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  491 110 2,74 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  492 111 2,75 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  493 112 2,76 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  494 114 2,77 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  495 115 2,78 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  496 1,118 127 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  497 1,120 128 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  498 1,122 129 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  499 1,123 130 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  500 1,124 131 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  501 1,125 132 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  502 1,126 133 24*kKS #_R1,_R5,_R5,_R5,_R9,_R9,_R9,_R13,_R13,_R13,_R17,_R17,_R17,_R21,_R21,_R21,_R25,_R25,_R25,_R29,_R29,_R29
+  503 116 1,107 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  504 117 1,109 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  505 118 1,110 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  506 119 1,111 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  507 120 1,112 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  508 121 1,113 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  509 122 1,114 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  510 123 1,115 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  511 116 1,128 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  512 117 1,129 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  513 118 1,130 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  514 119 1,131 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  515 120 1,132 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  516 121 1,134 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  517 122 1,135 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  518 123 1,136 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  519 2,116 127 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  520 2,117 128 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  521 2,119 129 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  522 2,120 130 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  523 2,121 131 56*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31,_R31
+  524 2,122 132 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  525 2,123 133 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  526 2,124 135 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  527 2,125 136 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  528 116 2,105 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  529 117 2,106 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  530 118 2,107 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  531 119 2,108 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  532 120 2,109 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  533 122 2,111 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  534 123 2,112 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  535 124 2,113 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  536 125 2,114 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  537 126 2,115 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  538 116 2,82 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  539 117 2,83 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  540 118 2,84 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  541 119 2,85 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  542 120 2,86 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  543 122 2,87 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  544 123 2,88 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  545 124 2,89 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  546 125 2,90 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  547 126 2,91 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  548 1,130 137 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  549 1,132 138 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  550 1,133 139 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  551 1,135 140 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  552 1,136 141 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  553 127 1,118 32*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29,_reverse__R29
+  554 128 1,120 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  555 129 1,122 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  556 130 1,123 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  557 131 1,124 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  558 132 1,125 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  559 133 1,126 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  560 127 1,137 32*kpS #_R2,_R6,_R6,_R6,_R6,_R10,_R10,_R10,_R10,_R14,_R14,_R14,_R14,_R18,_R18,_R18,_R18,_R22,_R22,_R22,_R22,_R26,_R26,_R26,_R26,_R30,_R30,_R30,_R30
+  561 128 1,138 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  562 129 1,140 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  563 130 1,141 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  564 131 1,142 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  565 132 1,143 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  566 133 1,144 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  567 2,128 137 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  568 2,129 138 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  569 2,130 139 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  570 2,131 140 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  571 2,132 141 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  572 2,134 142 64*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31,_R31,_R31
+  573 2,135 143 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  574 2,136 144 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  575 127 2,116 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  576 128 2,117 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  577 129 2,119 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  578 130 2,120 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  579 131 2,121 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  580 132 2,122 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  581 133 2,123 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  582 135 2,124 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  583 136 2,125 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  584 127 2,94 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  585 128 2,96 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  586 129 2,97 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  587 130 2,98 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  588 131 2,99 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  589 132 2,100 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  590 133 2,101 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  591 135 2,102 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  592 136 2,103 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  593 1,139 145 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  594 1,141 146 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  595 1,143 147 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  596 1,144 148 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  597 137 1,130 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  598 138 1,132 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  599 139 1,133 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  600 140 1,135 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  601 141 1,136 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  602 137 1,146 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  603 138 1,147 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  604 139 1,148 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  605 140 1,149 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  606 141 1,150 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  607 2,137 145 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  608 2,138 146 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  609 2,140 147 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  610 2,141 148 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  611 2,142 149 56*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31,_R31
+  612 2,143 150 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  613 2,144 151 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  614 137 2,128 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  615 138 2,129 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  616 139 2,130 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  617 140 2,131 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  618 141 2,132 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  619 142 2,134 8*kdPS #_reverse__R3,_reverse__R7,_reverse__R11,_reverse__R15,_reverse__R19,_reverse__R23,_reverse__R27,_reverse__R31
+  620 143 2,135 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  621 144 2,136 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  622 137 2,107 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  623 138 2,109 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  624 139 2,110 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  625 140 2,111 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  626 141 2,112 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  627 142 2,113 8*kuS #_R4,_R8,_R12,_R16,_R20,_R24,_R28,_R32
+  628 143 2,114 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  629 144 2,115 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  630 1,148 152 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  631 1,150 153 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  632 1,151 154 16*kKS #_R1,_R5,_R5,_R9,_R9,_R13,_R13,_R17,_R17,_R21,_R21,_R25,_R25,_R29,_R29
+  633 145 1,139 24*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29,_reverse__R29
+  634 146 1,141 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  635 147 1,143 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  636 148 1,144 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  637 145 1,152 24*kpS #_R2,_R6,_R6,_R6,_R10,_R10,_R10,_R14,_R14,_R14,_R18,_R18,_R18,_R22,_R22,_R22,_R26,_R26,_R26,_R30,_R30,_R30
+  638 146 1,153 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  639 147 1,155 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  640 148 1,156 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  641 2,146 152 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  642 2,147 153 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  643 2,148 154 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  644 2,149 155 48*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31,_R31
+  645 2,150 156 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  646 145 2,137 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  647 146 2,138 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  648 147 2,140 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  649 148 2,141 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  650 149 2,142 16*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31
+  651 150 2,143 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  652 151 2,144 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  653 145 2,118 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  654 146 2,120 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  655 147 2,122 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  656 148 2,123 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  657 149 2,124 16*kuS #_R4,_R8,_R8,_R12,_R12,_R16,_R16,_R20,_R20,_R24,_R24,_R28,_R28,_R32,_R32
+  658 150 2,125 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  659 151 2,126 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  660 1,154 157 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  661 1,156 158 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  662 152 1,148 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  663 153 1,150 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  664 154 1,151 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  665 152 1,158 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  666 153 1,159 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  667 154 1,160 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  668 2,152 157 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  669 2,153 158 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  670 2,155 159 40*kPS #_R3,_R7,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31,_R31
+  671 2,156 160 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  672 152 2,146 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  673 153 2,147 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  674 154 2,148 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  675 155 2,149 24*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31
+  676 156 2,150 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  677 152 2,130 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  678 153 2,132 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  679 154 2,133 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  680 155 2,135 24*kuS #_R4,_R8,_R8,_R8,_R12,_R12,_R12,_R16,_R16,_R16,_R20,_R20,_R20,_R24,_R24,_R24,_R28,_R28,_R28,_R32,_R32,_R32
+  681 156 2,136 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  682 1,160 161 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  683 157 1,154 16*kdKS #_reverse__R1,_reverse__R5,_reverse__R5,_reverse__R9,_reverse__R9,_reverse__R13,_reverse__R13,_reverse__R17,_reverse__R17,_reverse__R21,_reverse__R21,_reverse__R25,_reverse__R25,_reverse__R29,_reverse__R29
+  684 158 1,156 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  685 157 1,161 16*kpS #_R2,_R6,_R6,_R10,_R10,_R14,_R14,_R18,_R18,_R22,_R22,_R26,_R26,_R30,_R30
+  686 158 1,162 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  687 2,158 161 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  688 2,159 162 32*kPS #_R3,_R7,_R7,_R7,_R7,_R11,_R11,_R11,_R11,_R15,_R15,_R15,_R15,_R19,_R19,_R19,_R19,_R23,_R23,_R23,_R23,_R27,_R27,_R27,_R27,_R31,_R31,_R31,_R31
+  689 2,160 163 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  690 157 2,152 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  691 158 2,153 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  692 159 2,155 32*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  693 160 2,156 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  694 157 2,139 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  695 158 2,141 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  696 159 2,143 32*kuS #_R4,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32
+  697 160 2,144 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  698 1,163 164 8*kKS #_R1,_R5,_R9,_R13,_R17,_R21,_R25,_R29
+  699 161 1,160 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  700 161 1,165 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  701 2,161 164 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  702 2,162 165 24*kPS #_R3,_R7,_R7,_R7,_R11,_R11,_R11,_R15,_R15,_R15,_R19,_R19,_R19,_R23,_R23,_R23,_R27,_R27,_R27,_R31,_R31,_R31
+  703 161 2,158 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  704 162 2,159 40*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  705 163 2,160 56*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  706 161 2,148 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  707 162 2,150 40*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32
+  708 163 2,151 56*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32,_R32
+  709 164 1,163 8*kdKS #_reverse__R1,_reverse__R5,_reverse__R9,_reverse__R13,_reverse__R17,_reverse__R21,_reverse__R25,_reverse__R29
+  710 164 1,166 8*kpS #_R2,_R6,_R10,_R14,_R18,_R22,_R26,_R30
+  711 2,165 166 16*kPS #_R3,_R7,_R7,_R11,_R11,_R15,_R15,_R19,_R19,_R23,_R23,_R27,_R27,_R31,_R31
+  712 164 2,161 56*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  713 165 2,162 48*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  714 164 2,154 56*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32,_R32
+  715 165 2,156 48*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32
+  716 2,166 167 8*kPS #_R3,_R7,_R11,_R15,_R19,_R23,_R27,_R31
+  717 166 2,165 56*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  718 166 2,160 56*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32,_R32
+  719 167 2,166 64*kdPS #_reverse__R3,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R7,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R11,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R15,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R19,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R23,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R27,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31,_reverse__R31
+  720 167 2,163 64*kuS #_R4,_R8,_R8,_R8,_R8,_R8,_R8,_R8,_R8,_R12,_R12,_R12,_R12,_R12,_R12,_R12,_R12,_R16,_R16,_R16,_R16,_R16,_R16,_R16,_R16,_R20,_R20,_R20,_R20,_R20,_R20,_R20,_R20,_R24,_R24,_R24,_R24,_R24,_R24,_R24,_R24,_R28,_R28,_R28,_R28,_R28,_R28,_R28,_R28,_R32,_R32,_R32,_R32,_R32,_R32,_R32,_R32
+end reactions

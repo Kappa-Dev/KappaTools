@@ -1,0 +1,65 @@
+begin parameters
+Stot 100
+kp0 3
+ku1 14
+kp1 15
+ku2 98
+kp2 75
+ku3 686
+kp3 375
+ku4 4802
+end parameters
+
+begin molecule types
+A(s1~u~p,s2~u~p,s3~u~p)
+end molecule types
+
+begin seed species
+%init: A(s1~u,s2~u,s3~u) Stot
+end seed species
+
+
+begin reaction rules
+A(s1~p,s2~u,s3~p) -> A(s1~p,s2~u,s3~u) ku2
+A(s1~p,s2~u,s3~p) -> A(s1~p,s2~p,s3~p) kp2
+A(s1~p,s2~u,s3~p) -> A(s1~u,s2~u,s3~p) ku2
+
+
+A(s1~p,s2~u,s3~u) -> A(s1~p,s2~u,s3~p) kp1
+A(s1~p,s2~u,s3~u) -> A(s1~p,s2~p,s3~u) kp1
+A(s1~p,s2~u,s3~u) -> A(s1~u,s2~u,s3~u) ku1
+
+
+A(s1~p,s2~p,s3~p) -> A(s1~p,s2~p,s3~u) ku3
+A(s1~p,s2~p,s3~p) -> A(s1~p,s2~u,s3~p) ku3
+A(s1~p,s2~p,s3~p) -> A(s1~u,s2~p,s3~p) ku3
+
+
+A(s1~p,s2~p,s3~u) -> A(s1~p,s2~p,s3~p) kp2
+A(s1~p,s2~p,s3~u) -> A(s1~p,s2~u,s3~u) ku2
+A(s1~p,s2~p,s3~u) -> A(s1~u,s2~p,s3~u) ku2
+
+
+A(s1~u,s2~u,s3~p) -> A(s1~u,s2~u,s3~u) ku1
+A(s1~u,s2~u,s3~p) -> A(s1~u,s2~p,s3~p) kp1
+A(s1~u,s2~u,s3~p) -> A(s1~p,s2~u,s3~p) kp1
+
+
+A(s1~u,s2~u,s3~u) -> A(s1~u,s2~u,s3~p) kp0
+A(s1~u,s2~u,s3~u) -> A(s1~u,s2~p,s3~u) kp0
+A(s1~u,s2~u,s3~u) -> A(s1~p,s2~u,s3~u) kp0
+
+
+A(s1~u,s2~p,s3~p) -> A(s1~u,s2~p,s3~u) ku2
+A(s1~u,s2~p,s3~p) -> A(s1~u,s2~u,s3~p) ku2
+A(s1~u,s2~p,s3~p) -> A(s1~p,s2~p,s3~p) kp2
+
+
+A(s1~u,s2~p,s3~u) -> A(s1~u,s2~p,s3~p) kp1
+A(s1~u,s2~p,s3~u) -> A(s1~u,s2~u,s3~u) ku1
+A(s1~u,s2~p,s3~u) -> A(s1~p,s2~p,s3~u) kp1
+
+
+end reaction rules
+
+generate_network({overwrite=>1});

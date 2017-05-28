@@ -1,0 +1,20 @@
+%var: 'kp0' 3
+%var: 'ku1' 14
+%var: 'kp1' 15
+%var: 'ku2' 98
+%agent: A(s1~u~p,s2~u~p,p)
+%agent: P(l,r)
+
+%init: 100 A(p!1) , P(l!1,r)
+
+
+
+
+A(s1~u,p!1) , P(l!1,r) -> A(s1~p,p!1) , P(l!2,r) , P(l!1,r!2) @kp0
+A(s2~u,p!1) , P(l!1,r) -> A(s2~p,p!1) , P(l!2,r) , P(l!1,r!2) @kp0
+A(s1~u,p!1) , P(l!1,r!2) , P(l!2,r) -> A(s1~p,p!1) , P(l!2,r!3) , P(l!3,r) , P(l!1,r!2) @kp1
+A(s1~p,p!1) , P(l!2,r) , P(l!1,r!2) -> A(s1~u,p!1) , P(l!1,r) @ku1
+A(s2~u,p!1) , P(l!1,r!2) , P(l!2,r) -> A(s2~p,p!1) , P(l!2,r!3) , P(l!3,r) , P(l!1,r!2) @kp1
+A(s2~p,p!1) , P(l!2,r) , P(l!1,r!2) -> A(s2~u,p!1) , P(l!1,r) @ku1
+A(s1~p,p!1) , P(l!2,r!3) , P(l!3,r) , P(l!1,r!2) -> A(s1~u,p!1) , P(l!1,r!2) , P(l!2,r) @ku2
+A(s2~p,p!1) , P(l!2,r!3) , P(l!3,r) , P(l!1,r!2) -> A(s2~u,p!1) , P(l!1,r!2) , P(l!2,r) @ku2

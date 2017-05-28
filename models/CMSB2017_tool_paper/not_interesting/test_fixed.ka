@@ -1,0 +1,8 @@
+%var:  'kp1'  1
+%var: 'km1'  100
+
+%init: 100 A(a)
+%init: 100 B(b)
+
+
+  A(a), B(b) -> A(a!1), B(b!1)  @'kp1'{0}

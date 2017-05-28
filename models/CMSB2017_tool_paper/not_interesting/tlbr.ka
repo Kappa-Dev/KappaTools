@@ -1,0 +1,57 @@
+
+## Sol-gel Phase
+%var: 'Lig_tot'  4200
+%var: 'Rec_tot'  300
+%var: 'cTot'     0.84
+%var: 'beta'     50
+%var: 'koff'     0.01
+
+%var: 'kp1' ('cTot'*'koff')/(3.0*'Lig_tot')  #FREE BINDING RATE
+%var: 'kp2' ('beta'*'koff')/'Rec_tot'        #CROSSLINKING RATE
+
+%init: 100 R(l1,l2)
+%init: 100 L(r1,r2,r3)
+
+R(l1) , L(r1,r2,r3)     <-> R(l1!1),L(r1!1,r2,r3)      @'kp1'{0}, 'koff'
+R(l1) , L(r1,r3,r2)     <-> R(l1!1),L(r1!1,r3,r2)      @'kp1'{0}, 'koff'
+R(l1) , L(r2,r1,r3)     <-> R(l1!1),L(r2!1,r1,r3)      @'kp1'{0}, 'koff'
+R(l1) , L(r2,r3,r1)     <-> R(l1!1),L(r2!1,r3,r1)      @'kp1'{0}, 'koff'
+R(l1) , L(r3,r1,r2)     <-> R(l1!1),L(r3!1,r1,r2)      @'kp1'{0}, 'koff'
+R(l1) , L(r3,r2,r1)     <-> R(l1!1),L(r3!1,r2,r1)      @'kp1'{0}, 'koff'
+
+R(l2) , L(r1,r2,r3)     <-> R(l2!1),L(r1!1,r2,r3)      @'kp1'{0}, 'koff'
+R(l2) , L(r1,r3,r2)     <-> R(l2!1),L(r1!1,r3,r2)      @'kp1'{0}, 'koff'
+R(l2) , L(r2,r1,r3)     <-> R(l2!1),L(r2!1,r1,r3)      @'kp1'{0}, 'koff'
+R(l2) , L(r2,r3,r1)     <-> R(l2!1),L(r2!1,r3,r1)      @'kp1'{0}, 'koff'
+R(l2) , L(r3,r1,r2)     <-> R(l2!1),L(r3!1,r1,r2)      @'kp1'{0}, 'koff'
+R(l2) , L(r3,r2,r1)     <-> R(l2!1),L(r3!1,r2,r1)      @'kp1'{0}, 'koff'
+
+# set rule 2
+R(l1) , L(r1,r2,r3!_)   <-> R(l1!1),L(r1!1,r2,r3!_)    @'kp2'{0}, 'koff'
+R(l1) , L(r1,r3,r2!_)   <-> R(l1!1),L(r1!1,r3,r2!_)    @'kp2'{0}, 'koff'
+R(l1) , L(r2,r1,r3!_)   <-> R(l1!1),L(r2!1,r1,r3!_)    @'kp2'{0}, 'koff'
+R(l1) , L(r2,r3,r1!_)   <-> R(l1!1),L(r2!1,r3,r1!_)    @'kp2'{0}, 'koff'
+R(l1) , L(r3,r2,r1!_)   <-> R(l1!1),L(r3!1,r2,r1!_)    @'kp2'{0}, 'koff'
+R(l1) , L(r3,r1,r2!_)   <-> R(l1!1),L(r3!1,r1,r2!_)    @'kp2'{0}, 'koff'
+
+R(l2) , L(r1,r2,r3!_)   <-> R(l2!1),L(r1!1,r2,r3!_)    @'kp2'{0}, 'koff'
+R(l2) , L(r1,r3,r2!_)   <-> R(l2!1),L(r1!1,r3,r2!_)    @'kp2'{0}, 'koff'
+R(l2) , L(r2,r1,r3!_)   <-> R(l2!1),L(r2!1,r1,r3!_)    @'kp2'{0}, 'koff'
+R(l2) , L(r2,r3,r1!_)   <-> R(l2!1),L(r2!1,r3,r1!_)    @'kp2'{0}, 'koff'
+R(l2) , L(r3,r2,r1!_)   <-> R(l2!1),L(r3!1,r2,r1!_)    @'kp2'{0}, 'koff'
+R(l2) , L(r3,r1,r2!_)   <-> R(l2!1),L(r3!1,r1,r2!_)    @'kp2'{0}, 'koff'
+
+# set rule 3
+R(l1) , L(r1,r2!_,r3!_) <-> R(l1!1),L(r1!1,r2!_,r3!_)  @'kp2'{0}, 'koff'
+R(l1) , L(r1,r3!_,r2!_) <-> R(l1!1),L(r1!1,r3!_,r2!_)  @'kp2'{0}, 'koff'
+R(l1) , L(r2,r1!_,r3!_) <-> R(l1!1),L(r2!1,r1!_,r3!_)  @'kp2'{0}, 'koff'
+R(l1) , L(r2,r3!_,r1!_) <-> R(l1!1),L(r2!1,r3!_,r1!_)  @'kp2'{0}, 'koff'
+R(l1) , L(r3,r1!_,r2!_) <-> R(l1!1),L(r3!1,r1!_,r2!_)  @'kp2'{0}, 'koff'
+R(l1) , L(r3,r2!_,r1!_) <-> R(l1!1),L(r3!1,r2!_,r1!_)  @'kp2'{0}, 'koff'
+
+R(l2) , L(r1,r2!_,r3!_) <-> R(l2!1),L(r1!1,r2!_,r3!_)  @'kp2'{0}, 'koff'
+R(l2) , L(r1,r3!_,r2!_) <-> R(l2!1),L(r1!1,r3!_,r2!_)  @'kp2'{0}, 'koff'
+R(l2) , L(r2,r1!_,r3!_) <-> R(l2!1),L(r2!1,r1!_,r3!_)  @'kp2'{0}, 'koff'
+R(l2) , L(r2,r3!_,r1!_) <-> R(l2!1),L(r2!1,r3!_,r1!_)  @'kp2'{0}, 'koff'
+R(l2) , L(r3,r1!_,r2!_) <-> R(l2!1),L(r3!1,r1!_,r2!_)  @'kp2'{0}, 'koff'
+R(l2) , L(r3,r2!_,r1!_) <-> R(l2!1),L(r3!1,r2!_,r1!_)  @'kp2'{0}, 'koff'
