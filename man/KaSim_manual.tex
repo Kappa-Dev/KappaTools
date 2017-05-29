@@ -1970,7 +1970,6 @@ before the last reset, before the last quit, or before the last analysis.
 
 Two fields defines the repository and the name of the output:
 \begin{itemize}
-ica, ".m" in Matlab and Octave, and ".xml" in SBML.
 \item The field \texttt{-d} sets  the repository where output file are written. \KaDE~will create this repository, if it does not exist.
 \item The field \texttt{-{}-output} sets the name of the output file.
 The following extension will be added automatically according to the choice of the backend format: ".net" in DOTNET format, ".mws" in Maple, ".nb" in Mathematica, ".m" in Matlab and Octave, and ".xml" in SBML. When the output file already exists, {\KaDE} will ask for confirmation before overwritting it, unless the tool is set in batch mode (e.g.~see Sect.~\ref{kade:debug}).
@@ -2324,6 +2323,9 @@ The inference of equivalent sites is more precise when dead rules are discarded.
 \item The option \verb?--(no-)views-domain? can be used to switch on/off the views domains.
 
 \item The option \verb?--(no-)double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between proteins.
+
+\item The option \verb?--(no-)site-across-bonds-domain? can be used to switch on/off the analysis of the relations among the states of the sites in connected proteins.
+\end{itemize}
 
 
 \section{Tutorial}
