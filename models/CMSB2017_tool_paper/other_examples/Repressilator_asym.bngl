@@ -68,8 +68,8 @@ begin reaction rules
     #
     gCI(tet1,tet2) + pTetR(cI) <-> gCI(tet1!1,tet2).pTetR(cI!1)              c0/Na/V*tF/pF, c1*tF
     gCI(tet2,tet1) + pTetR(cI) <-> gCI(tet2!1,tet1).pTetR(cI!1)              c0/Na/V*tF/pF, c1*tF
-    gCI(tet1,tet2) + pTetR(cI) <-> gCI(tet1!1,tet2).pTetR(cI!1)              c0/Na/V*tF/pF, c1*tF
-    gCI(tet2,tet1) + pTetR(cI) <-> gCI(tet2!1,tet1).pTetR(cI!1)              c0/Na/V*tF/pF, c1*tF
+    gCI(tet1!+,tet2) + pTetR(cI) <-> gCI(tet1!+,tet2!1).pTetR(cI!1)          c0/Na/V*tF/pF, c2*tF
+    gCI(tet2!+,tet1) + pTetR(cI) <-> gCI(tet2!+,tet1!1).pTetR(cI!1)          c0/Na/V*tF/pF, c2*tF
     gCI(tet1,tet2) -> gCI(tet1,tet2) + mCI()                                 c3*rF
     gCI(tet1!+) -> gCI(tet1!+) + mCI()                                     c4*rF
     gCI(tet2!+) -> gCI(tet2!+) + mCI()                                     c4*rF
