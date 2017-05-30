@@ -2071,8 +2071,8 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
-    \centering%\scalebox{0.7}
-    {\includegraphics[width=12cm,bb=0 0 198 28]{img/sect1-bind.pdf}}
+    \centering\scalebox{0.7}%
+    {\includegraphics[bb=0 0 198 28]{img/sect1-bind.pdf}}
   \end{minipage}
   \caption{Proteins \texttt{K} and \texttt{S} may bind. }
   \label{fig:sec1:bind}
@@ -2084,17 +2084,8 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 \caption{The protein \texttt{K} may activate the protein \texttt{S}.}
 \label{fig:sec1:phos}
 \end{figure}
-\newcommand{\gbind}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 198 28]{img/sect1-bind.pdf}}\end{minipage}}
-\newcommand{\gbindu}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 209 28]{img/sect1-bind-ref-u.pdf}}\end{minipage}}
-\newcommand{\gbindp}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 209 28]{img/sect1-bind-ref-p.pdf}}\end{minipage}}
 \begin{figure}[t]
-%  \begin{equation*}
-%    \xymatrix@C=10mm@R=2mm{%
-%& \gbindu  \cr
-%\gbind\ar@{->}[rd]\ar@{->}[ru] & \cr
-%& \gbindp \cr
-%}
-%  \end{equation*}
+\centering\hspace*{5mm}\includegraphics[width=1.3\linewidth,bb=0 0 789 132]{img/ref.pdf}
   \caption{From rules to reactions. The rule in Fig.~\ref{fig:sec1:bind} is refined into two reactions according to whether the site \texttt{r} of the protein \texttt{S} is phosphorylated or not.}
   \label{fig:refinement}
 \end{figure}
