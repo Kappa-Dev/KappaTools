@@ -2069,7 +2069,7 @@ This option is ignored in the other backend format.
 
 \item The option \texttt{-{}-(no)-backtrace} provides more/less information about internal exceptions.
 \item The option \texttt{-{}-(no)-glutonny} tunes the parameters of the garbage collector.
-\item The field \texttt{-mode} allows for the choice among batch and interactive mode. In interactive mode, {\KaDE} always asks  permission to  overwrite files. In batch mode, {\KaDE} may overwrite output files, without permission.
+\item The field \texttt{-mode} allows for the choice among batch and interactive mode. In interactive mode, {\KaDE} always asks  permission to  overwrite files. In batch mode, {\KaDE} may overwrite output files, without permission.
 \end{itemize}
 
 
@@ -2083,7 +2083,8 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
-    \centering\scalebox{0.7}{\includegraphics{img/sect1-bind.pdf}}
+    \centering%\scalebox{0.7}
+    {\includegraphics[width=12cm,bb=0 0 198 28]{img/sect1-bind.pdf}}
   \end{minipage}
   \caption{Proteins \texttt{K} and \texttt{S} may bind. }
   \label{fig:sec1:bind}
@@ -2095,17 +2096,17 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 \caption{The protein \texttt{K} may activate the protein \texttt{S}.}
 \label{fig:sec1:phos}
 \end{figure}
-\newcommand{\gbind}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind.pdf}}\end{minipage}}
-\newcommand{\gbindu}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-u.pdf}}\end{minipage}}
-\newcommand{\gbindp}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics{img/sect1-bind-ref-p.pdf}}\end{minipage}}
+\newcommand{\gbind}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 198 28]{img/sect1-bind.pdf}}\end{minipage}}
+\newcommand{\gbindu}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 209 28]{img/sect1-bind-ref-u.pdf}}\end{minipage}}
+\newcommand{\gbindp}{\begin{minipage}{0.4\linewidth}\scalebox{0.6}{\includegraphics[bb=0 0 209 28]{img/sect1-bind-ref-p.pdf}}\end{minipage}}
 \begin{figure}[t]
-  \begin{equation*}
-    \xymatrix@C=10mm@R=2mm{%
-& \gbindu  \cr
-\gbind\ar@{->}[rd]\ar@{->}[ru] & \cr
-& \gbindp \cr
-}
-  \end{equation*}
+%  \begin{equation*}
+%    \xymatrix@C=10mm@R=2mm{%
+%& \gbindu  \cr
+%\gbind\ar@{->}[rd]\ar@{->}[ru] & \cr
+%& \gbindp \cr
+%}
+%  \end{equation*}
   \caption{From rules to reactions. The rule in Fig.~\ref{fig:sec1:bind} is refined into two reactions according to whether the site \texttt{r} of the protein \texttt{S} is phosphorylated or not.}
   \label{fig:refinement}
 \end{figure}
@@ -2175,7 +2176,7 @@ A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p) @
     \end{lstlisting}
 which is depicted as follows:
 \begin{center}
-  \scalebox{0.8}{\includegraphics{img/auto.pdf}}
+  \scalebox{0.8}{\includegraphics[bb=0 0 381 32]{img/auto.pdf}}
 \end{center}
 
   with the first convention (that is the one of the simulator), rates of rules are not corrected, hence the effective rate of this rule is $k$;
@@ -2190,9 +2191,9 @@ To account for this, {\KaDE} never applies a binary rule in a
 
 \begin{figure}[t]
   \hfill\begin{minipage}{0.4\linewidth}
-  \scalebox{0.7}{\includegraphics{img/ambigus_crossed.pdf}}
+  \scalebox{0.7}{\includegraphics[bb=0 0 222 120]{img/ambigus_crossed.pdf}}
 \end{minipage}\hfill\begin{minipage}{0.4\linewidth}
-\scalebox{0.7}{\includegraphics{img/ambigus.pdf}}
+\scalebox{0.7}{\includegraphics[bb=0 0 222 118]{img/ambigus.pdf}}
 \end{minipage}\hfill\mbox{}
 \caption{The rule \texttt{A(x),A(x) -> A(x!1),A(x!1)} may bind two agents that are already in the same connected component, only if a second rate constant is given explictly.}
 \end{figure}
@@ -2281,13 +2282,13 @@ A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
 
 \begin{figure}[t]
   \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics{img/symtt.pdf}}
+    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symtt.pdf}}
   \end{minipage}\hspace*{5mm}
   \begin{minipage}{0.3\linewidth}
-    \scalebox{0.7}{\includegraphics{img/symff.pdf}}
+    \scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symff.pdf}}
   \end{minipage}\hspace*{5mm}
 \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics{img/symtf.pdf}}
+    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symtf.pdf}}
   \end{minipage}
   \caption{Sites are equivalent, if the corrected rates of the third rule is twice the corrected rate of each other rule.}
   \label{fig:symetric:rules}
@@ -2351,17 +2352,17 @@ The rules of this models are depicted as follows:
 
 \begin{center}
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics{img/symtt.pdf}}
+    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symtt.pdf}}
   \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-  \centering\scalebox{0.85}{\includegraphics{img/symff.pdf}}
+  \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symff.pdf}}
 \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics{img/symtf.pdf}}
+    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symtf.pdf}}
   \end{minipage}
 
 \end{center}
@@ -2514,21 +2515,21 @@ Then we can integrate our three differential systems and plot their respective  
 We obtain the following plots:
 \begin{figure}[htp]
 \centering  \begin{minipage}{0.35\linewidth}
-   \scalebox{0.35}{\includegraphics{img/plot.png}}
+   \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot.png}}
 \end{minipage}
 \caption{Initial model (without reduction).}
 \end{figure}
 
 \begin{figure}[htp]
 \centering\begin{minipage}{0.35\linewidth}
-  \scalebox{0.35}{\includegraphics{img/plot_fwd.png}}
+  \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot_fwd.png}}
 \end{minipage}
 \caption{Reduced model (fwd bisimulation).}
 \end{figure}
 
 \begin{figure}[htp]
 \centering\begin{minipage}{0.35\linewidth}
-  \scalebox{0.35}{\includegraphics{img/plot_bwd.png}}
+  \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot_bwd.png}}
 \end{minipage}\caption{Reduced model (bwd bisimulation).}
 \end{figure}
 
