@@ -298,7 +298,7 @@ type modification =
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
   | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | SPECIES_OFF of Pattern.id array
+  | SPECIES_OFF of Alg_expr.t print_expr list
 
 let print_t_expr_to_yojson =
   print_expr_to_yojson
@@ -363,9 +363,9 @@ let modification_to_yojson = function
         (JsonUtil.of_list
            (Instantiation.test_to_json Matching.Agent.to_yojson))
         tests ]
-  | SPECIES_OFF ids ->
+  | SPECIES_OFF f ->
     `Assoc [ "action", `String "SPECIES_OFF";
-             "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
+             "file", `List (List.map print_t_expr_to_yojson f)]
 
 
 let modification_of_yojson = function
@@ -437,9 +437,9 @@ let modification_of_yojson = function
       JsonUtil.to_list (JsonUtil.to_list
                           (Instantiation.test_of_json Matching.Agent.of_yojson))
         (Yojson.Basic.Util.member "tests" l))
-  | `Assoc [ "action", `String "SPECIES_OFF"; "pattern", p ]
-  | `Assoc [ "pattern", p; "action", `String "SPECIES_OFF" ] ->
-    SPECIES_OFF(JsonUtil.to_array Pattern.id_of_yojson p)
+  | `Assoc [ "action", `String "SPECIES_OFF"; "file", p ]
+  | `Assoc [ "file", p; "action", `String "SPECIES_OFF" ] ->
+    SPECIES_OFF(JsonUtil.to_list print_t_expr_of_yojson p)
   | `Assoc _ as l when Yojson.Basic.Util.member "action" l = `String "SPECIES" ->
     SPECIES (
        JsonUtil.to_list print_t_expr_of_yojson
@@ -545,12 +545,12 @@ let extract_connected_components_modification acc = function
     extract_connected_components_rule
       (extract_connected_components_expr acc e) r
   | UPDATE (_,e) -> extract_connected_components_expr acc e
-  | SNAPSHOT p | STOP p
+  | SNAPSHOT p | STOP p | SPECIES_OFF p
   | FLUX (_,p) | FLUXOFF p -> extract_connected_components_print acc p
   | PRINT (fn,p) ->
     extract_connected_components_print
       (extract_connected_components_print acc p) fn
-  | CFLOW (_,x,_) | CFLOWOFF x | SPECIES (_,x,_) | SPECIES_OFF x ->
+  | CFLOW (_,x,_) | CFLOWOFF x | SPECIES (_,x,_) ->
      List.rev_append (Array.to_list x) acc
   | PLOTENTRY -> acc
 

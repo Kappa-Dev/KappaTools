@@ -136,8 +136,9 @@ let do_modification ~outputs env counter graph state extra modification =
      extra)
   | Primitives.CFLOWOFF cc ->
     ((false, Rule_interpreter.remove_tracked cc graph, state),extra)
-  | Primitives.SPECIES_OFF cc ->
-    ((false, Rule_interpreter.remove_tracked_species cc graph, state),extra)
+  | Primitives.SPECIES_OFF fn ->
+    let file = Format.asprintf "@[<h>%a@]" print_expr_val fn in
+    ((false, Rule_interpreter.remove_tracked_species file graph, state),extra)
   | Primitives.FLUX (rel,s) ->
     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
     let () =

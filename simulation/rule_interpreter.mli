@@ -96,7 +96,7 @@ val remove_tracked : Pattern.id array -> t -> t
 val add_tracked_species :
   Pattern.id array -> string ->
   Instantiation.abstract Instantiation.test list list -> t -> t
-val remove_tracked_species : Pattern.id array -> t -> t
+val remove_tracked_species : string -> t -> t
 
 (** {6 Debugging} *)
 

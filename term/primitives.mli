@@ -107,7 +107,7 @@ type modification =
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
   | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | SPECIES_OFF of Pattern.id array
+  | SPECIES_OFF of Alg_expr.t print_expr list
 
 type perturbation =
   { precondition:

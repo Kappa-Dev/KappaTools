@@ -314,7 +314,7 @@ let effects_of_modif
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in
     let adds tests l x =
       if on then Primitives.SPECIES (pexpr',x,tests) :: l
-      else Primitives.SPECIES_OFF x :: l in
+      else Primitives.SPECIES_OFF pexpr' :: l in
     let domain'',ccs =
       Snip.connected_components_sum_of_ambiguous_mixture
         ~compileModeOn contact_map domain' ~origin ast in

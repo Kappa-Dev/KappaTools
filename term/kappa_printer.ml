@@ -176,12 +176,10 @@ let modification ?env f m =
       (Pp.array
          Pp.comma
          (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
-  | Primitives.SPECIES_OFF cc ->
+  | Primitives.SPECIES_OFF fn ->
     Format.fprintf
       f "$SPECIES_OFF %a [false]"
-      (Pp.array
-         Pp.comma
-         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
+      (print_expr ?env) fn
 
 let perturbation ?env f pert =
   let aux f =

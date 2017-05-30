@@ -1002,7 +1002,15 @@ let remove_tracked patterns state =
 
 let add_tracked_species patterns name tests state =
   aux_add_tracked patterns name tests state state.species
-let remove_tracked_species patterns state =
-  aux_remove_tracked patterns state state.species
+
+let remove_tracked_species pname state =
+  let () = state.outdated <- true in
+  let tester (n,_,_) = (String.compare pname n) = 0 in
+  let () =
+    Pattern.ObsMap.fold_lefti
+      (fun pid _ plist ->
+        Pattern.ObsMap.set state.species pid (List.filter tester plist))
+      () state.species in
+  { state with outdated = false }
 
 let get_random_state state = state.random_state
