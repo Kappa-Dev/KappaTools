@@ -293,7 +293,7 @@ type modification =
              Instantiation.abstract Instantiation.test list list
   | FLUX of flux_kind * Alg_expr.t print_expr list
   | FLUXOFF of Alg_expr.t print_expr list
-  | CFLOWOFF of Pattern.id array
+  | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
   | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
@@ -337,8 +337,9 @@ let modification_to_yojson = function
         (JsonUtil.of_list
            (Instantiation.test_to_json Matching.Agent.to_yojson))
         tests ]
-  | CFLOWOFF ids ->
+  | CFLOWOFF (name,ids) ->
     `Assoc [ "action", `String "CFLOWOFF";
+             "name", JsonUtil.of_option JsonUtil.of_string name;
              "pattern", JsonUtil.of_array Pattern.id_to_yojson ids ]
   | FLUX(kind,f) ->
     `Assoc [ "action", `String "FLUX";
@@ -392,9 +393,6 @@ let modification_of_yojson = function
   | `Assoc [ "file", `List f; "action", `String "FLUX"; "kind", kind ]
   | `Assoc [ "file", `List f; "kind", kind; "action", `String "FLUX" ] ->
     FLUX(flux_kind_of_yojson kind, List.map print_t_expr_of_yojson f)
-  | `Assoc [ "action", `String "CFLOWOFF"; "pattern", p ]
-  | `Assoc [ "pattern", p; "action", `String "CFLOWOFF" ] ->
-    CFLOWOFF(JsonUtil.to_array Pattern.id_of_yojson p)
   | `Assoc [ "action", `String "UPDATE"; "var", `Int v; "value", e ]
   | `Assoc [ "var", `Int v; "action", `String "UPDATE"; "value", e ]
   | `Assoc [ "action", `String "UPDATE"; "value", e; "var", `Int v ]
@@ -437,6 +435,12 @@ let modification_of_yojson = function
       JsonUtil.to_list (JsonUtil.to_list
                           (Instantiation.test_of_json Matching.Agent.of_yojson))
         (Yojson.Basic.Util.member "tests" l))
+  | `Assoc _ as l when Yojson.Basic.Util.member "action" l = `String "CFLOWOFF" ->
+    CFLOWOFF(
+      JsonUtil.to_option (JsonUtil.to_string ?error_msg:None)
+        (Yojson.Basic.Util.member "name" l),
+      JsonUtil.to_array Pattern.id_of_yojson
+        (Yojson.Basic.Util.member "pattern" l))
   | `Assoc [ "action", `String "SPECIES_OFF"; "file", p ]
   | `Assoc [ "file", p; "action", `String "SPECIES_OFF" ] ->
     SPECIES_OFF(JsonUtil.to_list print_t_expr_of_yojson p)
@@ -550,7 +554,7 @@ let extract_connected_components_modification acc = function
   | PRINT (fn,p) ->
     extract_connected_components_print
       (extract_connected_components_print acc p) fn
-  | CFLOW (_,x,_) | CFLOWOFF x | SPECIES (_,x,_) ->
+  | CFLOW (_,x,_) | CFLOWOFF (_,x) | SPECIES (_,x,_) ->
      List.rev_append (Array.to_list x) acc
   | PLOTENTRY -> acc
 

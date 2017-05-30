@@ -102,7 +102,7 @@ type modification =
   (** First string is the named used by the user *)
   | FLUX of flux_kind * Alg_expr.t print_expr list
   | FLUXOFF of Alg_expr.t print_expr list
-  | CFLOWOFF of Pattern.id array
+  | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
   | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
   | SPECIES of Alg_expr.t print_expr list * Pattern.id array *

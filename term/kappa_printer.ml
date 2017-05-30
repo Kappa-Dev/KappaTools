@@ -163,7 +163,7 @@ let modification ?env f m =
       (Pp.array
          Pp.comma
          (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
-  | Primitives.CFLOWOFF cc ->
+  | Primitives.CFLOWOFF (_,cc) ->
     Format.fprintf
       f "$TRACK %a [false]"
       (Pp.array

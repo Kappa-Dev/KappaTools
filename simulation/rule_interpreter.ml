@@ -968,20 +968,6 @@ let aux_add_tracked patterns name tests state tpattern =
                            pattern ((name,patterns,tests)::acc))
       patterns in
   { state with outdated = false }
-let aux_remove_tracked patterns state tpattern =
-  let () = state.outdated <- true in
-  let tester (_,el,_) =
-    not @@
-      Tools.array_fold_lefti
-        (fun i b x -> b && Pattern.is_equal_canonicals x el.(i))
-        true patterns in
-  let () =
-    Array.iter
-      (fun pattern ->
-        let acc = Pattern.ObsMap.get tpattern pattern in
-        Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
-      patterns in
-  { state with outdated = false }
 
 let add_tracked patterns name tests state =
   let () = assert (not state.outdated) in
@@ -994,23 +980,43 @@ let add_tracked patterns name tests state =
             name) in
     state
   | Some tpattern -> aux_add_tracked patterns name tests state tpattern
-let remove_tracked patterns state =
+let remove_tracked patterns name state =
   let () = assert (not state.outdated) in
   match state.story_machinery with
   | None -> state
-  | Some tpattern -> aux_remove_tracked patterns state tpattern
+  | Some tpattern ->
+     match name with
+     | None ->
+        let () = state.outdated <- true in
+        let tester (_,el,_) =
+          not @@
+            Tools.array_fold_lefti
+              (fun i b x -> b && Pattern.is_equal_canonicals x el.(i))
+              true patterns in
+        let () =
+          Array.iter
+            (fun pattern ->
+              let acc = Pattern.ObsMap.get tpattern pattern in
+              Pattern.ObsMap.set tpattern pattern (List.filter tester acc))
+            patterns in
+        { state with outdated = false }
+     | Some name ->
+        let () = state.outdated <- true in
+        let tester (n,_,_) = not((String.compare name n) = 0) in
+        let tpattern' =
+          Pattern.ObsMap.map
+            (fun plist -> List.filter tester plist) tpattern in
+        { state with outdated = false; story_machinery = Some tpattern' }
 
 let add_tracked_species patterns name tests state =
   aux_add_tracked patterns name tests state state.species
 
-let remove_tracked_species pname state =
+let remove_tracked_species name state =
   let () = state.outdated <- true in
-  let tester (n,_,_) = (String.compare pname n) = 0 in
-  let () =
-    Pattern.ObsMap.fold_lefti
-      (fun pid _ plist ->
-        Pattern.ObsMap.set state.species pid (List.filter tester plist))
-      () state.species in
-  { state with outdated = false }
+  let tester (n,_,_) = not((String.compare name n) = 0) in
+  let species' =
+    Pattern.ObsMap.map
+      (fun plist -> List.filter tester plist) state.species in
+  { state with outdated = false; species = species' }
 
 let get_random_state state = state.random_state

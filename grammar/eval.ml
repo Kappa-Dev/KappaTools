@@ -202,7 +202,7 @@ let cflows_of_label
     contact_map domain on algs rules (label,pos) rev_effects =
   let adds tests l x =
     if on then Primitives.CFLOW (Some label,x,tests) :: l
-    else Primitives.CFLOWOFF x :: l in
+    else Primitives.CFLOWOFF (Some label,x) :: l in
   let mix =
     try
       let (_,(rule,_)) =
@@ -287,7 +287,7 @@ let effects_of_modif
   | CFLOWMIX (on,(ast,_)) ->
     let adds tests l x =
       if on then Primitives.CFLOW (None,x,tests) :: l
-      else Primitives.CFLOWOFF x :: l in
+      else Primitives.CFLOWOFF (None,x) :: l in
     let domain',ccs =
       Snip.connected_components_sum_of_ambiguous_mixture
         ~compileModeOn contact_map domain ~origin ast in

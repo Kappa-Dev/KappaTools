@@ -89,7 +89,7 @@ val get_random_state : t -> Random.State.t
 val add_tracked :
   Pattern.id array -> string ->
   Instantiation.abstract Instantiation.test list list -> t -> t
-val remove_tracked : Pattern.id array -> t -> t
+val remove_tracked : Pattern.id array -> string option -> t -> t
 
 (** {6 Species} *)
 
