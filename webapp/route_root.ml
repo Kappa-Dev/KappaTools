@@ -126,19 +126,21 @@ let route
             )
          )
      };
-     { Webapp_common.path =
+(*     { Webapp_common.path =
          "/v2/projects/{projectid}/dead_rules" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#project_dead_rules project_id) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(fun out -> Yojson.Safe.to_string
-                                      (`List (List.map (fun x -> `String x) out)))
-            )
+            (manager#get_dead_rules project_id) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
          )
-     };
+       };*)
      { Webapp_common.path =
          "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;

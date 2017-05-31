@@ -46,11 +46,7 @@ let result_response
           (ok : 'a) ->
           let body : string = string_of_success ok in
           let status = status_of_code code in
-          Server.respond_string
-            ?headers:(Some headers)
-            ~status:status
-            ~body:body
-            ())
+          Server.respond_string ~headers ~status ~body ())
     ~error:(fun
              (code : Api.manager_code)
              (errors : Api_types_j.errors) ->

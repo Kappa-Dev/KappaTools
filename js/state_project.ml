@@ -98,6 +98,7 @@ let update_state
     (Api_common.result_map
        ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
            me.project_manager#init_static_analyser_raw
+             project_id
              project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
              set_state {
@@ -185,6 +186,7 @@ let sync () : unit Api.result Lwt.t =
     (Api_common.result_bind_lwt
        ~ok:(fun (project_parse : Api_types_j.project_parse) ->
            current.project_manager#init_static_analyser_raw
+             current.project_id
              project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
              set_state {

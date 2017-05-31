@@ -37,20 +37,20 @@ let raw_message post request =
 let message post request =
   raw_message post (Yojson.Basic.to_string request)
 
-class new_client ~post =
+class new_client ~post : Api.manager_static_analysis =
   object(self)
-    method init_static_analyser_raw compil =
+    method init_static_analyser_raw _project_id compil =
       Lwt_result.bind_result
         (raw_message post ("[ \"INIT\", "^compil^"]"))
         (function `Null -> Result.Ok ()
                 | x -> Result.Error
                          ("Not a KaSa INIT response: "^
                           Yojson.Basic.to_string x))
-    method init_static_analyser compil =
+    method init_static_analyser _project_id compil =
       self#init_static_analyser_raw
-        (Yojson.Basic.to_string (Ast.compil_to_json compil))
+        _project_id (Yojson.Basic.to_string (Ast.compil_to_json compil))
 
-    method get_contact_map accuracy =
+    method get_contact_map _project_id accuracy =
       let request =
         `List ( `String "CONTACT_MAP" :: match accuracy with
           | None -> []
@@ -58,7 +58,7 @@ class new_client ~post =
       Lwt_result.bind_result
         (message post request)
         (fun x -> Result.Ok x)
-    method get_influence_map accuracy =
+    method get_influence_map _project_id accuracy =
       let request =
         `List ( `String "INFLUENCE_MAP" :: match accuracy with
           | None -> []
@@ -66,12 +66,12 @@ class new_client ~post =
       Lwt_result.bind_result
         (message post request)
         (fun x -> Result.Ok x)
-    method get_dead_rules =
+    method get_dead_rules _project_id =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result
         (message post request)
         (fun x -> Result.Ok x)
-    method get_constraints_list =
+    method get_constraints_list _project_id =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result
         (message post request)

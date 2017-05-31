@@ -321,9 +321,9 @@ class manager
   inherit Mpi_api.manager_base ()
   method terminate () = () (*TODO*)
 
-  method init_static_analyser_raw data =
+  method init_static_analyser_raw project_id data =
     send
-      (Format.sprintf "%s/v2/analyses" url)
+      (Format.sprintf "%s/v2/projects/%s/analyses" url project_id)
       `PUT ~data
       (fun x ->
          match Yojson.Basic.from_string x with
@@ -337,17 +337,19 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method init_static_analyser compil =
+  method init_static_analyser project_id compil =
     self#init_static_analyser_raw
-      (Yojson.Basic.to_string (Ast.compil_to_json compil))
+      project_id (Yojson.Basic.to_string (Ast.compil_to_json compil))
 
-  method get_contact_map accuracy =
+  method get_contact_map project_id accuracy =
     send
       (match accuracy with
        | Some accuracy ->
-         Format.sprintf "%s/v2/analyses/contact_map/%s" url
+         Format.sprintf "%s/v2/projects/%s/analyses/contact_map/%s" url
+           project_id
            (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
-       | None -> Format.sprintf "%s/v2/analyses/contact_map" url)
+       | None ->
+         Format.sprintf "%s/v2/projects/%s/analyses/contact_map" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
@@ -356,11 +358,12 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_influence_map accuracy =
+  method get_influence_map project_id accuracy =
     send
       (match accuracy with
        | Some accuracy ->
-         Format.sprintf "%s/v2/analyses/influence_map/%s" url
+         Format.sprintf "%s/v2/projects/%s/analyses/influence_map/%s" url
+           project_id
            (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
@@ -371,9 +374,9 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_dead_rules =
+  method get_dead_rules project_id =
     send
-      (Format.sprintf "%s/v2/analyses/dead_rules" url)
+      (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map
@@ -382,9 +385,9 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method  get_constraints_list =
+  method  get_constraints_list project_id =
     send
-      (Format.sprintf "%s/v2/analyses/constraints" url)
+      (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map

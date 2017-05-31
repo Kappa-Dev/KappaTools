@@ -18,11 +18,11 @@ sig
   val init: ?compil:Ast.parsing_compil -> unit -> state
 
   val get_contact_map:
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Yojson.Basic.json
 
   val get_influence_map:
-    ?accuracy_level:Remanent_state.accuracy_level ->
+    ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Yojson.Basic.json
 
   val get_dead_rules: state -> state * Yojson.Basic.json
@@ -36,8 +36,10 @@ sig
   val of_json:
     Yojson.Basic.json ->
     Exception_without_parameter.method_handler *
-    Remanent_state.contact_map Remanent_state.AccuracyMap.t * Remanent_state.influence_map Remanent_state.AccuracyMap.t * Ckappa_sig.c_rule_id list option * Remanent_state.constraints_list option
-    * Remanent_state.separating_transitions option
+    Public_data.contact_map Public_data.AccuracyMap.t *
+    Remanent_state.influence_map Public_data.AccuracyMap.t *
+    int list option * Remanent_state.constraints_list option *
+    Public_data.separating_transitions option
 end
 
 module Export =
@@ -50,12 +52,12 @@ functor (A:Analyzer.Analyzer) ->
       init ?compil ~called_from:Remanent_parameters_sig.Server ()
 
     let get_contact_map
-        ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+        ?accuracy_level:(accuracy_level=Public_data.Low) state =
       let state, cm = get_contact_map ~accuracy_level state in
-      state, Remanent_state.contact_map_to_json (accuracy_level,cm)
+      state, Public_data.contact_map_to_json (accuracy_level,cm)
 
     let get_influence_map
-        ?accuracy_level:(accuracy_level=Remanent_state.Low) state =
+        ?accuracy_level:(accuracy_level=Public_data.Low) state =
       let state, influence_map = get_influence_map ~accuracy_level state in
       state, Remanent_state.influence_map_to_json (accuracy_level,influence_map)
 

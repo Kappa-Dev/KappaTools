@@ -31,7 +31,7 @@ let route_handler
     (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
   =
   let sytem_process : Kappa_facade.system_process = new system_process () in
-  let manager : Api.manager = new Api_runtime.manager sytem_process in
+  let manager = new Api_runtime.manager sytem_process in
   let intermediate =
     (Webapp_common.route_handler
        ((Route_root.route
