@@ -1,3 +1,5 @@
+"use strict"
+
 var errorsDom = document.getElementById("errors");
 var domainFileDom = document.getElementById("domainFile");
 var rootSelectDom = document.getElementById("rootSelect");
