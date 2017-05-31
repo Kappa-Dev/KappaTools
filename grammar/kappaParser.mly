@@ -154,6 +154,8 @@ instruction:
 init_declaration:
     | alg_expr non_empty_mixture
 	       {(None,$1,(Ast.INIT_MIX $2,rhs_pos 2))}
+    | alg_expr OP_PAR non_empty_mixture CL_PAR
+	       {(None,$1,(Ast.INIT_MIX $3,rhs_pos 3))}
     | ID LAR alg_expr {(None,$3,(Ast.INIT_TOK $1,rhs_pos 1))}
     | ID OP_CUR init_declaration CL_CUR
 	 {let _,alg,init = $3 in (Some ($1,rhs_pos 1),alg,init)}
