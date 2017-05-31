@@ -217,7 +217,7 @@ effect:
     | STOP print_expr {Ast.STOP $2}
     | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4) }
     | PLOTENTRY { Ast.PLOTENTRY }
-    | SPECIES_OF print_expr non_empty_mixture boolean { Ast.SPECIES_OF ($4,$2,($3, rhs_pos 3))}
+    | SPECIES_OF nonempty_print_expr non_empty_mixture boolean { Ast.SPECIES_OF ($4,$2,($3, rhs_pos 3))}
     ;
 
 nonempty_print_expr:
@@ -400,7 +400,6 @@ mixture:
 ;
 
 non_empty_mixture:
-    | OP_PAR non_empty_mixture CL_PAR {$2}
     | ID OP_PAR interface_expression CL_PAR
     { [($1,rhs_pos 1), $3, None] }
     | ID OP_PAR interface_expression CL_PAR COMMA mixture
