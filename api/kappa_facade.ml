@@ -73,6 +73,7 @@ type t =
     mutable plot : Api_types_j.plot ;
     mutable snapshots : Api_types_j.snapshot list ;
     mutable flux_maps : Api_types_j.flux_map list ;
+    mutable species : (float*Raw_mixture.t) list Mods.StringMap.t;
     mutable files : Api_types_j.file_line list ;
     mutable error_messages : Api_types_j.errors ;
     mutable trace : Trace.t ;
@@ -95,6 +96,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
            Api_types_j.plot_time_series = [] ; } ;
   snapshots = [];
   flux_maps = [];
+  species = Mods.StringMap.empty;
   files = [];
   error_messages = [];
   trace = [];
@@ -216,6 +218,7 @@ let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
                    Format.fprintf log_form "%s@." s
                  | Data.Snapshot _
                  | Data.Flux _
+                 | Data.Species _
                  | Data.DeltaActivities _
                  | Data.Plot _
                  | Data.TraceStep _
@@ -276,6 +279,10 @@ let outputs (simulation : t) =
       {simulation.plot with
        Api_types_j.plot_time_series =
          new_values :: simulation.plot.Api_types_j.plot_time_series }
+  | Data.Species(file,time,mix) ->
+    let p = Mods.StringMap.find_default [] file simulation.species in
+    simulation.species <-
+      Mods.StringMap.add file ((time,mix)::p) simulation.species
   | Data.Print file_line ->
     simulation.files <- file_line::simulation.files
   | Data.Snapshot snapshot ->
