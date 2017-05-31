@@ -46,12 +46,12 @@ GENERATED=$(VERSION) \
 RESOURCES_HTML=$(wildcard js/*.js) $(wildcard shared/*.js) \
 		$(wildcard js/*.css) js/favicon.ico js/package.json
 
-ifeq ($(NO_CDN),1)
+APP_EXT?=cdn
+INDEX_HTML=js/use-$(APP_EXT).html
+ifeq ($(APP_EXT),local)
 SITE_EXTRAS= site/external site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist site/external/codemirror-$(CODEMIRROR_VERSION) site/external/d3 site/external/jquery
-INDEX_HTML=js/no-cdn.html
 else
 SITE_EXTRAS=
-INDEX_HTML=js/use-cdn.html
 endif
 
 .PHONY: all agents clean check build-tests doc clean_doc fetch_version debug
@@ -280,7 +280,7 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 KappaBin.zip:
 	+$(MAKE) clean
-	+$(MAKE) NO_CDN=1 site/index.html
+	+$(MAKE) APP_EXT=local site/index.html
 	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native KaSimAgent.native KaSaAgent.native
 	mkdir KappaBin
 	mkdir KappaBin/bin
@@ -296,7 +296,7 @@ KappaBin.zip:
 
 Kappapp.app:
 	+$(MAKE) clean
-	+$(MAKE) NO_CDN=1 site/index.html
+	+$(MAKE) APP_EXT=local site/index.html
 	+$(MAKE) all agents
 	+$(MAKE) ide/Kappa.icns ide/Info.plist
 	FILE=$$(mktemp -t nwjsXXXX); \
