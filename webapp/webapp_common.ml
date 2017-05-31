@@ -10,9 +10,6 @@ open Lwt
 open Cohttp_lwt_unix
 open Cohttp
 open Request
-open Conduit_lwt_unix
-open Lwt_log
-open Re
 
 type context = { arguments : (string * string) list
                ; connection : Cohttp_lwt_unix.Server.conn
@@ -117,12 +114,11 @@ type url_matcher =
     labels : string list ;
     route : string }
 
-let variable_pattern = Re.compile (Re_perl.re "\\{\\w+\\}")
-let label_pattern = Re.compile (Re_perl.re "\\w+")
+let variable_pattern = Re.compile (Re.seq [Re.char '{'; Re.rep1 (Re.alt [Re.alnum; Re.char '_']); Re.char '}'])
+let label_pattern = Re.compile (Re.rep1 (Re.alt [Re.alnum; Re.char '_']))
 
 let create_url_matcher (url : string) : url_matcher =
-  let labels =
-    Re.matches variable_pattern url in
+  let labels = Re.matches variable_pattern url in
   let labels =
     List.flatten
       (List.map
