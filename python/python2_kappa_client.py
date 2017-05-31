@@ -15,7 +15,7 @@ def main():
 
     # default arguments
     inputfile = None  # if missing input file just get version
-    url = "../bin/StdSim"
+    url = "../bin/KaSimAgent"
     pause_condition = "[false]"
     plot_period = 0.1
     seed = None

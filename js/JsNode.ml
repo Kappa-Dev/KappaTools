@@ -67,13 +67,13 @@ class manager
     ?(message_delimiter : char = Tools.default_message_delimter)
     (command : string)
     (args : string list) =
-  let sim_re = Re.compile (Re.str "StdSim") in
+  let sim_re = Re.compile (Re.str "KaSimAgent") in
   let sa_re = Re.compile (Re.str "KaSaAgent") in
   let sim_command,sa_command =
     if Re.execp sim_re command then
       command, Re.replace_string  sim_re ~by:"KaSaAgent" command
     else if Re.execp sa_re command then
-      Re.replace_string sa_re ~by:"StdSim" command, command
+      Re.replace_string sa_re ~by:"KaSimAgent" command, command
     else
       failwith ("Unrecognized command: "^command) in
   let sa_configuration : process_configuration Js.t  =

@@ -54,9 +54,9 @@ SITE_EXTRAS=
 INDEX_HTML=js/use-cdn.html
 endif
 
-.PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests doc clean_doc fetch_version KappaBin.zip debug
-.PHONY: profiling Kappapp.app kappalib install-lib
+.PHONY: all agents clean check build-tests doc clean_doc fetch_version debug
+.PHONY: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
+.PHONY: profiling Kappapp.app kappalib install-lib KappaBin.zip
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -182,7 +182,7 @@ WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
-StdSim.native StdSim.byte %Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+%Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I api -I agents \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt.unix),package(atdgen)" \
@@ -231,6 +231,8 @@ profiling:
 
 all: bin/KaSim bin/KaSa bin/KaStor bin/KaDE
 
+agents: bin/KaSimAgent bin/KaSaAgent
+
 kappalib: KappaLib.cma
 ifeq ($(OCAMLBEST),native)
 	@+$(MAKE) KappaLib.cmxa
@@ -240,7 +242,7 @@ install-lib:
 	ocamlfind install KappaLib META _build/KappaLib.cma $(wildcard _build/*/*.cmi) $(wildcard _build/*/*.mli) -optional _build/KappaLib.cmxa _build/KappaLib.a $(wildcard _build/*/*.cmx)
 
 clean_ide:
-	rm -f StdSim bin/StdSim
+	rm -f KaSimAgent bin/KaSimAgent
 	rm -f KaSaAgent bin/KaSaAgent
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
@@ -279,7 +281,7 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 KappaBin.zip:
 	+$(MAKE) clean
 	+$(MAKE) NO_CDN=1 site/index.html
-	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native StdSim.native
+	+$(MAKE) OCAMLFIND_TOOLCHAIN=windows KaSim.native KaSa.native KaStor.native KaDE.native KaSimAgent.native KaSaAgent.native
 	mkdir KappaBin
 	mkdir KappaBin/bin
 	mv site KappaBin/package.nw
@@ -287,14 +289,15 @@ KappaBin.zip:
 	mv _build/KaSa_rep/main/KaSa.native KappaBin/bin/KaSa.exe
 	mv _build/cflow/KaStor.native KappaBin/bin/KaStor.exe
 	mv _build/odes/KaDE.native KappaBin/bin/KaDE.exe
-	mv _build/agents/StdSim.native KappaBin/bin/StdSim.exe
+	mv _build/agents/KaSimAgent.native KappaBin/bin/KaSimAgent.exe
+	mv _build/agents/KaSaAgent.native KappaBin/bin/KaSaAgent.exe
 	zip -r $@ KappaBin
 	rm -r KappaBin
 
 Kappapp.app:
 	+$(MAKE) clean
 	+$(MAKE) NO_CDN=1 site/index.html
-	+$(MAKE) all bin/StdSim
+	+$(MAKE) all agents
 	+$(MAKE) ide/Kappa.icns ide/Info.plist
 	FILE=$$(mktemp -t nwjsXXXX); \
 	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-osx-x64.zip && \

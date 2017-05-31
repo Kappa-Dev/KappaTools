@@ -21,7 +21,7 @@ def scratch():
     project_id_1 = "1"
     project_id_2 = "2"
     project_id_3 = "3"
-    kappaStd = kappa_std.KappaStd("/home/mwm1/Work/KaSim/StdSim.native")
+    kappaStd = kappa_std.KappaStd("../bin/KaSimAgent")
     print(kappaStd.info())
     print(kappaStd.project_create(project_id_1))
     # print(kappaStd.project_create(project_id_2))

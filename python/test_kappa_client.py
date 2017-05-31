@@ -201,7 +201,7 @@ class StdClientTest(KappaClientTest,unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """ set up unit test by launching client"""
-        self.stdsim = "../StdSim.native"
+        self.stdsim = "../bin/KaSimAgent"
 
     def getRuntime(self):
         return(kappa_std.KappaStd(self.stdsim))
