@@ -2073,20 +2073,20 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
     \centering\scalebox{0.7}%
-    {\includegraphics[bb=0 0 198 28]{img/sect1-bind.pdf}}
+    {\includegraphics[bb=0 0 198 28]{gkappa_img/sect1-bind.pdf}}
   \end{minipage}
   \caption{Proteins \texttt{K} and \texttt{S} may bind. }
   \label{fig:sec1:bind}
 \end{figure}
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
-\centering\scalebox{0.7}{\includegraphics{img/sect1-phos.pdf}}
+\centering\scalebox{0.7}{\includegraphics{gkappa_img/sect1-phos.pdf}}
 \end{minipage}
 \caption{The protein \texttt{K} may activate the protein \texttt{S}.}
 \label{fig:sec1:phos}
 \end{figure}
 \begin{figure}[t]
-\centering\hspace*{5mm}\includegraphics[width=1.3\linewidth,bb=0 0 789 132]{img/ref.pdf}
+\centering\hspace*{5mm}\includegraphics[width=1.3\linewidth,bb=0 0 789 132]{gkappa_img/ref.pdf}
   \caption{From rules to reactions. The rule in Fig.~\ref{fig:sec1:bind} is refined into two reactions according to whether the site \texttt{r} of the protein \texttt{S} is phosphorylated or not.}
   \label{fig:refinement}
 \end{figure}
@@ -2157,7 +2157,7 @@ A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p) @
     \end{lstlisting}
 which is depicted as follows:
 \begin{center}
-  \scalebox{0.8}{\includegraphics[bb=0 0 381 32]{img/auto.pdf}}
+  \scalebox{0.8}{\includegraphics[bb=0 0 381 32]{gkappa_img/auto.pdf}}
 \end{center}
 
   with the first convention (that is the one of the simulator), rates of rules are not corrected, hence the effective rate of this rule is $k$;
@@ -2171,10 +2171,8 @@ To account for this, {\KaDE} never applies a binary rule in a
   unary context, unless two rate constants have been provided explicitly.
 
 \begin{figure}[t]
-  \hfill\begin{minipage}{0.4\linewidth}
-  \scalebox{0.7}{\includegraphics[bb=0 0 222 120]{img/ambigus_crossed.pdf}}
-\end{minipage}\hfill\begin{minipage}{0.4\linewidth}
-\scalebox{0.7}{\includegraphics[bb=0 0 222 118]{img/ambigus.pdf}}
+  \hfill\begin{minipage}{0.9\linewidth}
+  \scalebox{0.7}{\includegraphics[bb=0 0 714 167]{gkappa_img/amb_noamb.pdf}}
 \end{minipage}\hfill\mbox{}
 \caption{The rule \texttt{A(x),A(x) -> A(x!1),A(x!1)} may bind two agents that are already in the same connected component, only if a second rate constant is given explictly.}
 \end{figure}
@@ -2265,13 +2263,13 @@ A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
 
 \begin{figure}[t]
   \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symtt.pdf}}
+    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtt.pdf}}
   \end{minipage}\hspace*{5mm}
   \begin{minipage}{0.3\linewidth}
-    \scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symff.pdf}}
+    \scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symff.pdf}}
   \end{minipage}\hspace*{5mm}
 \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{img/symtf.pdf}}
+    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtf.pdf}}
   \end{minipage}
   \caption{Sites are equivalent, if the corrected rates of the third rule is twice the corrected rate of each other rule.}
   \label{fig:symetric:rules}
@@ -2337,17 +2335,17 @@ The rules of this models are depicted as follows:
 
 \begin{center}
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symtt.pdf}}
+    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtt.pdf}}
   \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-  \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symff.pdf}}
+  \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symff.pdf}}
 \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{img/symtf.pdf}}
+    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtf.pdf}}
   \end{minipage}
 
 \end{center}
