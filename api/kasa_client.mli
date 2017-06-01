@@ -6,8 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type mailbox
 
 val reply_of_string : string -> (Yojson.Basic.json,string) Result.result
-val receive : string -> unit
+val receive : mailbox -> string -> unit
 
-class new_client : post:(string -> unit) -> Api.manager_static_analysis
+val new_mailbox : unit -> mailbox
+
+class new_client :
+  post:(string -> unit) -> mailbox -> Api.manager_static_analysis

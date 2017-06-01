@@ -6,7 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-let mailbox = ref None
+type mailbox = (Yojson.Basic.json, string) Result.result Lwt.u option ref
 
 let reply_of_string x =
   match Yojson.Basic.from_string x with
@@ -17,14 +17,14 @@ let reply_of_string x =
   | x ->
     Result.Error ("Invalid response from KaSa: "^Yojson.Basic.to_string x)
 
-let receive x =
+let receive mailbox x =
   match !mailbox with
   | None -> ()
   | Some t ->
     let out = reply_of_string x in
     let () = Lwt.wakeup t out in mailbox := None
 
-let raw_message post request =
+let raw_message mailbox post request =
   match !mailbox with
   | None ->
     let result,feeder = Lwt.task () in
@@ -34,14 +34,16 @@ let raw_message post request =
   | Some _ ->
     Lwt.return_error "KaSa agent already busy"
 
-let message post request =
-  raw_message post (Yojson.Basic.to_string request)
+let message mailbox post request =
+  raw_message mailbox post (Yojson.Basic.to_string request)
 
-class new_client ~post : Api.manager_static_analysis =
+let new_mailbox () = ref None
+
+class new_client ~post mailbox : Api.manager_static_analysis =
   object(self)
     method init_static_analyser_raw _project_id compil =
       Lwt_result.bind_result
-        (raw_message post ("[ \"INIT\", "^compil^"]"))
+        (raw_message mailbox post ("[ \"INIT\", "^compil^"]"))
         (function `Null -> Result.Ok ()
                 | x -> Result.Error
                          ("Not a KaSa INIT response: "^
@@ -56,7 +58,7 @@ class new_client ~post : Api.manager_static_analysis =
           | None -> []
           | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
-        (message post request)
+        (message mailbox post request)
         (fun x -> Result.Ok x)
     method get_influence_map _project_id accuracy =
       let request =
@@ -64,16 +66,16 @@ class new_client ~post : Api.manager_static_analysis =
           | None -> []
           | Some a -> [Public_data.accuracy_to_json a]) in
       Lwt_result.bind_result
-        (message post request)
+        (message mailbox post request)
         (fun x -> Result.Ok x)
     method get_dead_rules _project_id =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result
-        (message post request)
+        (message mailbox post request)
         (fun x -> Result.Ok x)
     method get_constraints_list _project_id =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result
-        (message post request)
+        (message mailbox post request)
         (fun x -> Result.Ok x)
   end

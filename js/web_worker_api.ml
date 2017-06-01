@@ -8,6 +8,7 @@
 
 class manager ()  =
   let kasa_worker = Worker.create "KaSaWorker.js" in
+  let kasa_mailbox = Kasa_client.new_mailbox () in
   object(self)
     val sim_worker = Worker.create "WebWorker.js"
     initializer
@@ -16,7 +17,7 @@ class manager ()  =
              (fun response_message ->
                 let response_text = response_message##.data in
                 let () = Common.debug response_text in
-                let () = Kasa_client.receive response_text in
+                let () = Kasa_client.receive kasa_mailbox response_text in
                 Js._true
              )) in
       let () = sim_worker##.onmessage :=
@@ -35,6 +36,7 @@ class manager ()  =
         ~post:(fun message_text ->
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
+        kasa_mailbox
     method terminate () =
       let () = sim_worker##terminate in
       kasa_worker##terminate

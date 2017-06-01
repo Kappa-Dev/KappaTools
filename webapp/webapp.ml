@@ -36,13 +36,15 @@ let route_handler
   let re = Re.compile (Re.str "WebSim") in
   let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
   let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
+  let sa_mailbox = Kasa_client.new_mailbox () in
   let manager = object
     initializer
       let () =
         Lwt.ignore_result
           (Agent_common.serve
              sa_process#stdout Tools.default_message_delimter
-             (fun r -> let () = Kasa_client.receive r in Lwt.return_unit)) in
+             (fun r ->
+                let ()= Kasa_client.receive sa_mailbox r in Lwt.return_unit)) in
       ()
     inherit Api_runtime.manager sytem_process
     inherit Kasa_client.new_client
@@ -53,6 +55,7 @@ let route_handler
                     Lwt_io.write f message_text >>= fun () ->
                     Lwt_io.write_char f Tools.default_message_delimter)
                  sa_process#stdin))
+        sa_mailbox
     method terminate () =
       sa_process#terminate
   end in

@@ -76,9 +76,10 @@ class manager
       Re.replace_string sa_re ~by:"KaSimAgent" command, command
     else
       failwith ("Unrecognized command: "^command) in
+  let sa_mailbox = Kasa_client.new_mailbox () in
   let sa_configuration : process_configuration Js.t  =
     create_process_configuration
-      ~onStdout:(fun msg -> Kasa_client.receive (Js.to_string msg))
+      ~onStdout:(fun msg -> Kasa_client.receive sa_mailbox (Js.to_string msg))
       sa_command args in
   let sa_process =
     Js.Opt.case
@@ -144,4 +145,5 @@ class manager
                     "%s%c"
                     message_text
                     message_delimiter)))
+        sa_mailbox
   end
