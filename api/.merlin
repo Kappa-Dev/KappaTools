@@ -1,4 +1,5 @@
 PKG lwt
+PKG re
 PKG atdgen
 
 REC

@@ -324,7 +324,7 @@ class manager
   method init_static_analyser_raw project_id data =
     send
       (Format.sprintf "%s/v2/projects/%s/analyses" url project_id)
-      `PUT ~data
+      `POST ~data
       (fun x ->
          match Yojson.Basic.from_string x with
          | `Null -> ()

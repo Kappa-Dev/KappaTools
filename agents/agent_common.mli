@@ -6,6 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val route :
-  manager:Api.concrete_manager -> shutdown_key:string option ->
-  Webapp_common.route_handler list
+val serve : Lwt_io.input_channel -> char -> (string -> unit Lwt.t) -> unit Lwt.t

@@ -18,7 +18,7 @@ let field_ref context field =
    List.assoc field context.Webapp_common.arguments)
 
 let route
-    ~(manager: Api.manager)
+    ~(manager: Api.concrete_manager)
     ~(shutdown_key: string option)
   : Webapp_common.route_handler list =
   [  { Webapp_common.path = "/v2" ;
@@ -126,21 +126,6 @@ let route
             )
          )
      };
-(*     { Webapp_common.path =
-         "/v2/projects/{projectid}/dead_rules" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
-            (manager#get_dead_rules project_id) >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-       };*)
      { Webapp_common.path =
          "/v2/projects/{projectid}/files" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
@@ -488,4 +473,118 @@ let route
             )
          )
      };
+     (** Static analyses *)
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses" ;
+       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
+       Webapp_common.operation =
+         (fun ~context ->
+            let project_id = project_ref context in
+            Cohttp_lwt_body.to_string context.Webapp_common.body >|=
+            (fun x -> Ast.compil_of_json (Yojson.Basic.from_string x)) >>=
+            (manager#init_static_analyser project_id) >>= function
+            | Result.Ok () ->
+              let body = "null" in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/contact_map/{accuracy}" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id,raw_accuracy = field_ref context "accuracy" in
+            let accuracy = Some
+                (Public_data.accuracy_of_json
+                   (Yojson.Basic.from_string raw_accuracy)) in
+            (manager#get_contact_map project_id accuracy) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/contact_map" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#get_contact_map project_id None) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/influence_map/{accuracy}" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id,raw_accuracy = field_ref context "accuracy" in
+            let accuracy = Some
+                (Public_data.accuracy_of_json
+                   (Yojson.Basic.from_string raw_accuracy)) in
+            (manager#get_influence_map project_id accuracy) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/influence_map" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#get_influence_map project_id None) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+     };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/dead_rules" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#get_dead_rules project_id) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+       };
+     { Webapp_common.path =
+         "/v2/projects/{projectid}/analyses/constraints" ;
+       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.operation =
+         (fun ~context:context ->
+            let project_id = project_ref context in
+            (manager#get_constraints_list project_id) >>= function
+            | Result.Ok r ->
+              let body = Yojson.Basic.to_string r in
+              Webapp_common.string_response ?headers:None ?code:None ~body
+            | Result.Error e ->
+              Webapp_common.error_response
+                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
+         )
+       };
   ]

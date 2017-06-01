@@ -8,25 +8,13 @@
 
 open Lwt.Infix
 (* system process for v2 *)
-let process_command (message_delimter : char) : string -> unit Lwt.t =
+let process_command (message_delimiter : char) : string -> unit Lwt.t =
   Kasa_mpi.on_message
     (fun message ->
-       Lwt_io.write Lwt_io.stdout (message^(String.make 1 message_delimter)))
-
-(*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
-let serve process_command delimiter : unit Lwt.t =
-  (* read and handle messages *)
-  let buffer = Buffer.create 512 in
-  let rec aux_serve () =
-    Lwt_io.read_char Lwt_io.stdin >>= fun char ->
-    if char = delimiter then
-      let m = Buffer.contents buffer in
-      process_command m >>= fun () ->
-      let () = Buffer.reset buffer in aux_serve ()
-    else
-      let () = Buffer.add_char buffer char in
-      aux_serve () in
-  aux_serve ()
+       Lwt_io.atomic (fun f ->
+           Lwt_io.write f message >>= fun () ->
+           Lwt_io.write_char f message_delimiter)
+         Lwt_io.stdout)
 
 (* start server *)
 let () =
@@ -38,5 +26,5 @@ let () =
   let () = Arg.parse options (fun _ -> ()) usage_msg in
   let () = Printexc.record_backtrace common_args.Common_args.backtrace in
   Lwt_main.run
-    (serve (process_command stdsim_args.Agent_args.delimiter)
-       stdsim_args.Agent_args.delimiter)
+    (Agent_common.serve Lwt_io.stdin stdsim_args.Agent_args.delimiter
+       (process_command stdsim_args.Agent_args.delimiter))

@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
+
 class system_process () : Kappa_facade.system_process =
   let () =
     Lwt.async
@@ -31,14 +33,34 @@ let route_handler
     (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
   =
   let sytem_process : Kappa_facade.system_process = new system_process () in
-  let manager = new Api_runtime.manager sytem_process in
+  let re = Re.compile (Re.str "WebSim") in
+  let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
+  let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
+  let manager = object
+    initializer
+      let () =
+        Lwt.ignore_result
+          (Agent_common.serve
+             sa_process#stdout Tools.default_message_delimter
+             (fun r -> let () = Kasa_client.receive r in Lwt.return_unit)) in
+      ()
+    inherit Api_runtime.manager sytem_process
+    inherit Kasa_client.new_client
+        ~post:(fun message_text ->
+            Lwt.ignore_result
+              (Lwt_io.atomic
+                 (fun f ->
+                    Lwt_io.write f message_text >>= fun () ->
+                    Lwt_io.write_char f Tools.default_message_delimter)
+                 sa_process#stdin))
+    method terminate () =
+      sa_process#terminate
+  end in
   let intermediate =
     (Webapp_common.route_handler
-       ((Route_root.route
-           ~manager:manager
-           ~shutdown_key:shutdown_key)
-        @ Route_sessions.route
-          ~manager:manager)) in
+       ((Route_root.route ~manager ~shutdown_key)
+        (*@ Route_sessions.route
+          ~manager:manager*))) in
   fun (conn : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
     (body : Cohttp_lwt_body.t)

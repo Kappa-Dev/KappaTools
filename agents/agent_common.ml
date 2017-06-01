@@ -6,6 +6,20 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-val route :
-  manager:Api.concrete_manager -> shutdown_key:string option ->
-  Webapp_common.route_handler list
+open Lwt.Infix
+
+(*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
+let serve chan delimiter process_command : unit Lwt.t =
+  (* read and handle messages *)
+  let buffer = Buffer.create 512 in
+  let rec aux_serve () =
+    Lwt_io.read_char chan >>= fun char ->
+    if char = delimiter then
+      let m = Buffer.contents buffer in
+      process_command m >>= fun () ->
+      let () = Buffer.reset buffer in aux_serve ()
+    else
+      let () = Buffer.add_char buffer char in
+      aux_serve () in
+  aux_serve ()
+

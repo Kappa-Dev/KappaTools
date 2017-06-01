@@ -6,7 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-open Lwt.Infix
 (* system process for v2 *)
 class system_process () : Kappa_facade.system_process =
   object
@@ -27,22 +26,6 @@ let process_comand_v2
     (fun message ->
        Lwt_io.write Lwt_io.stdout (message^(String.make 1 message_delimter)))
 
-(*  http://ocsigen.org/lwt/2.5.2/api/Lwt_io *)
-let serve process_command delimiter : unit Lwt.t =
-  (* read and handle messages *)
-  let buffer = Buffer.create 512 in
-  let rec aux_serve () =
-    Lwt_io.read_char Lwt_io.stdin >>=
-    (fun (char : char) ->
-       if char = delimiter then
-         let m = Buffer.contents buffer in
-         process_command m <&>
-         let () = Buffer.reset buffer in aux_serve ()
-       else
-         let () = Buffer.add_char buffer char in
-         aux_serve ()) in
-  aux_serve ()
-
 (* start server *)
 let () =
   let app_args = App_args.default in
@@ -62,4 +45,6 @@ let () =
     (match app_args.App_args.api with
      | App_args.V2 -> process_comand_v2
     ) stdsim_args.Agent_args.delimiter in
-  Lwt_main.run (serve process_comand stdsim_args.Agent_args.delimiter)
+  Lwt_main.run
+    (Agent_common.serve
+       Lwt_io.stdin stdsim_args.Agent_args.delimiter process_comand)
