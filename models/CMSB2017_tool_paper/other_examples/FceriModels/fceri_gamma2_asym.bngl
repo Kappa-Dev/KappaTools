@@ -157,4 +157,5 @@ begin reaction rules
     Syk(tSH2,l~pY) -> Syk(tSH2,l~Y) dc
     Syk(tSH2,a~pY) -> Syk(tSH2,a~Y) dc
 end reaction rules
+generate_network({overwrite=>1,max_iter=>100})
 end model

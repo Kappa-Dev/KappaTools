@@ -55,11 +55,11 @@ clean:
 	touch $@
 
 %.bngl_with_sym: %.bngl
-	echo Process BNGL with symmetries---------- >> $(LOG)
+	echo Process BNGL without symmetries------- >> $(LOG)
 	$(TIMEOUTBIN) $(BNGL) $*_asym.bngl >> log.txt |exit 0
 	touch $@
 
 %.bngl_wo_sym: %_asym.bngl
-	echo Process BNGL withoutsymmetries-------- >> $(LOG)
+	echo Process BNGL with symmetries---------- >> $(LOG)
 	$(TIMEOUTBIN) $(BNGL) $*.bngl >> log.txt |exit 0
 	touch $@
