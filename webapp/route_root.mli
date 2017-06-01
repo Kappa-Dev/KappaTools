@@ -7,5 +7,4 @@
 (******************************************************************************)
 
 val route :
-  manager:Api.concrete_manager -> shutdown_key:string option ->
-  Webapp_common.route_handler list
+  shutdown_key:string option -> Webapp_common.route_handler list

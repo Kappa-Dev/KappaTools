@@ -128,23 +128,17 @@ let add_project is_new (project_id : Api_types_j.project_id) : unit Api.result L
                     catalog,
                    (React.S.value state).project_parameters))
    with Not_found ->
-     State_runtime.create_manager project_id >>=
+     State_runtime.create_manager ~is_new project_id >>=
      (Api_common.result_bind_lwt
         ~ok:(fun project_manager ->
-            (if is_new then
-               project_manager#project_create
-                 { Api_types_j.project_parameter_project_id = project_id }
-             else Lwt.return (Api_common.result_ok ())) >>=
-            Api_common.result_bind_lwt
-              ~ok:(fun () ->
-                  let me = {project_id; project_manager } in
-                  let default_parameters =
-                    (React.S.value state).default_parameters in
-                  let params =
-                    Mods.StringMap.add project_id default_parameters
-                      (React.S.value state).project_parameters in
-                  Lwt.return
-                    (Api_common.result_ok (me,me::catalog,params)))))) >>=
+            let me = {project_id; project_manager } in
+            let default_parameters =
+              (React.S.value state).default_parameters in
+            let params =
+              Mods.StringMap.add project_id default_parameters
+                (React.S.value state).project_parameters in
+            Lwt.return
+              (Api_common.result_ok (me,me::catalog,params))))) >>=
   Api_common.result_bind_lwt
     ~ok:(fun (me,catalog,params) ->
         update_state project_id me catalog default_parameters params)
@@ -218,7 +212,6 @@ let remove_project project_id =
       List.find (fun x -> x.project_id = project_id)
         state.project_catalog in
     remove_files current.project_manager current.project_id >>=
-    fun out -> current.project_manager#project_delete current.project_id >>=
     (fun out' ->
        let () = current.project_manager#terminate () in
        let project_catalog =
@@ -240,7 +233,7 @@ let remove_project project_id =
                Mods.StringMap.remove project_id state.project_parameters;
              project_version = -1; project_contact_map = None } in
        sync () >>= fun out'' ->
-       Lwt.return (Api_common.result_combine [out;out';out'']))
+       Lwt.return (Api_common.result_combine [out';out'']))
   with Not_found ->
     Lwt.return (Api_common.result_error_msg
                   ("Project "^project_id^" does not exists"))

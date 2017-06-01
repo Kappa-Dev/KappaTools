@@ -55,7 +55,7 @@ let send
 
 class manager
     ?(timeout:float = 30.0)
-    (url:string) =
+    ~url ~project_id =
   object(self)
   method message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
@@ -319,7 +319,8 @@ class manager
                         (Mpi_message_j.simulation_artifact_of_string result)))
 
   inherit Mpi_api.manager_base ()
-  method terminate () = () (*TODO*)
+  method terminate () =
+    Lwt.ignore_result (self#project_delete project_id)
 
   method init_static_analyser_raw project_id data =
     send

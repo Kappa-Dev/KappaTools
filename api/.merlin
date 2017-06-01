@@ -1,5 +1,6 @@
+B ../_build/api
+
 PKG lwt
-PKG re
 PKG atdgen
 
 REC

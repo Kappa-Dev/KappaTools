@@ -34,7 +34,7 @@ val create_spec : load:bool -> string -> unit Api.result
 (** Create a runtime to be used by the system *)
 
 val create_manager :
-  Api_types_t.project_id -> Api.concrete_manager Api.result Lwt.t
+  is_new:bool -> Api_types_t.project_id -> Api.concrete_manager Api.result Lwt.t
 (** Get the current manager.  It is assumed that
     when the system is initalized this is set to a
     default, which is currently default web worker

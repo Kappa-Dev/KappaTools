@@ -17,34 +17,129 @@ let field_ref context field =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc field context.Webapp_common.arguments)
 
+class system_process () : Kappa_facade.system_process =
+  let () =
+    Lwt.async
+      (fun () ->
+         Lwt_log_core.log
+           ~level:Lwt_log_core.Debug
+           (Format.sprintf " + system process"))
+  in
+  object
+    method log ?exn (msg : string) =
+      Lwt_log_core.log ~level:Lwt_log_core.Info ?exn msg
+    method yield () : unit Lwt.t = Lwt_main.yield ()
+    method min_run_duration () = 0.1
+  end
+
+class new_manager : Api.concrete_manager =
+  let sytem_process : Kappa_facade.system_process = new system_process () in
+  let re = Re.compile (Re.str "WebSim") in
+  let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
+  let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
+  let sa_mailbox = Kasa_client.new_mailbox () in
+  object
+    initializer
+      let () =
+        Lwt.ignore_result
+          (Agent_common.serve
+             sa_process#stdout Tools.default_message_delimter
+             (fun r ->
+                let ()= Kasa_client.receive sa_mailbox r in Lwt.return_unit)) in
+      ()
+    inherit Api_runtime.manager sytem_process
+    inherit Kasa_client.new_client
+        ~post:(fun message_text ->
+            Lwt.ignore_result
+              (Lwt_io.atomic
+                 (fun f ->
+                    Lwt_io.write f message_text >>= fun () ->
+                    Lwt_io.write_char f Tools.default_message_delimter)
+                 sa_process#stdin))
+        sa_mailbox
+    method terminate () =
+      sa_process#terminate
+  end
+
+let bind_projects f id projects =
+  match Mods.StringMap.find_option id !projects with
+  | Some p -> f p
+  | None ->
+    let m = "Project '"^id^"' not found" in
+    Lwt.return (Api_common.result_error_msg ~result_code:`NOT_FOUND m)
+
+let tmp_bind_projects f id projects =
+  match Mods.StringMap.find_option id !projects with
+  | Some p -> f p
+  | None ->
+    let m = "Project '"^id^"' not found" in
+    Lwt.return (Result.Error m)
+
+
+let add_projects parameter projects =
+  let project_id = parameter.Api_types_j.project_parameter_project_id in
+  if Mods.StringMap.mem project_id !projects then
+    let message = "project "^project_id^" exists" in
+    Lwt.return
+      (Api_common.result_error_msg ~result_code:`CONFLICT message)
+  else
+    let manager = new new_manager in
+    let () = projects := Mods.StringMap.add project_id manager !projects in
+    Lwt.return (Api_common.result_ok ())
+
+let delete_projects (project_id : Api_types_j.project_id) projects :
+  unit Api.result Lwt.t =
+  match Mods.StringMap.pop project_id !projects with
+  | None,_ ->
+    let m = "Project '"^project_id^"' not found" in
+    Lwt.return (Api_common.result_error_msg ~result_code:`NOT_FOUND m)
+  | Some m, p ->
+    let () = projects := p in
+    let () = m#terminate () in
+    Lwt.return (Api_common.result_ok ())
+
 let route
-    ~(manager: Api.concrete_manager)
     ~(shutdown_key: string option)
   : Webapp_common.route_handler list =
+  let projects = ref Mods.StringMap.empty in
   [  { Webapp_common.path = "/v2" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
          (fun ~context ->
-            (manager#environment_info ()) >>=
-            (fun (info : Api_types_j.environment_info Api.result)
-              -> Webapp_common.result_response
-                  ~string_of_success:(Api_types_j.string_of_environment_info ?len:None)
-                  info
-            )
+            let () = ignore(context) in
+            let simulations =
+              (*Mods.StringMap.fold
+                (fun _ manager acc ->
+                   match m#get_simulation () with
+                   | None -> acc
+                   | Some _ -> succ acc)
+                !projects*) 0 in
+            let info =
+              { Api_types_j.environment_simulations = simulations;
+                Api_types_j.environment_projects = Mods.StringMap.size !projects;
+                Api_types_j.environment_build = Version.version_string; } in
+            Webapp_common.result_response
+              ~string_of_success:(Api_types_j.string_of_environment_info ?len:None)
+              (Api_common.result_ok info)
          )
      };
      { Webapp_common.path = "/v2/shutdown" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
-         fun ~context:context ->
+         fun ~context ->
            (Cohttp_lwt_body.to_string context.Webapp_common.body)
            >>= (fun body ->
                match shutdown_key with
                | Some shutdown_key when shutdown_key = body ->
                  let () =
                    Lwt.async
-                     (fun () -> Lwt_unix.sleep 1.0 >>=
-                       fun () -> exit 0)
+                     (fun () ->
+                        let () =
+                          Mods.StringMap.iter
+                            (fun _ p -> p#terminate ())
+                            !projects in
+                        Lwt_unix.sleep 1.0 >>=
+                        fun () -> exit 0)
                  in
                  Lwt.return
                    { Api_types_j.result_data = Result.Ok "shutting down" ;
@@ -53,8 +148,8 @@ let route
                  Lwt.return
                    { Api_types_j.result_data =
                        Result.Error [{ Api_types_j.message_severity = `Error ;
-                                 Api_types_j.message_text = "invalid key";
-                                 Api_types_j.message_range = None ; }] ;
+                                       Api_types_j.message_text = "invalid key";
+                                       Api_types_j.message_range = None ; }] ;
                      Api_types_j.result_code = `ERROR })
            >>= (fun (msg) ->
                Webapp_common.result_response
@@ -66,25 +161,36 @@ let route
          "/v2/projects" ;
        Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
        Webapp_common.operation =
-         (fun ~context:context ->
+         (fun ~context ->
             let () = ignore(context) in
-            (manager#project_catalog ()) >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_project_catalog ?len:None)
-            )
+            Mods.StringMap.fold
+              (fun project_id manager acc ->
+                 acc >>= Api_common.result_bind_lwt
+                   ~ok:(fun acc ->
+                       manager#project_get project_id >>=
+                       Api_common.result_bind_lwt
+                         ~ok:(fun x ->
+                             Lwt.return (Api_common.result_ok (x::acc)))
+                     ))
+              !projects (Lwt.return (Api_common.result_ok [])) >>=
+            Api_common.result_bind_lwt
+              ~ok:(fun project_list ->
+                  Lwt.return
+                    (Api_common.result_ok { Api_types_j.project_list })) >>=
+            Webapp_common.result_response
+              ~string_of_success:(Mpi_message_j.string_of_project_catalog ?len:None)
          )
      };
      { Webapp_common.path =
          "/v2/projects" ;
        Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
-         (fun ~context:context ->
-            let () = ignore(context) in
+         (fun ~context ->
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Mpi_message_j.project_parameter_of_string
             >>=
-            (manager#project_create) >>=
+            (fun param -> add_projects param projects) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
@@ -96,7 +202,7 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#project_delete project_id) >>=
+            (delete_projects project_id projects) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
@@ -108,7 +214,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#project_get project_id) >>=
+            bind_projects
+              (fun manager -> manager#project_get project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_project ?len:None)
             )
@@ -120,7 +228,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#project_parse project_id) >>=
+            bind_projects
+              (fun manager -> manager#project_parse project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_project_parse ?len:None)
             )
@@ -135,8 +245,10 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Mpi_message_j.file_of_string
-            >>=
-            (manager#file_create project_id) >>=
+            >>= fun file ->
+            bind_projects
+              (fun manager -> manager#file_create project_id file)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
             )
@@ -148,7 +260,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#file_catalog project_id) >>=
+            bind_projects
+              (fun manager -> manager#file_catalog project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_catalog ?len:None))
          )
@@ -159,7 +273,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,file_id) = file_ref context in
-            (manager#file_delete project_id file_id) >>=
+            bind_projects
+              (fun manager -> manager#file_delete project_id file_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
             )
@@ -171,7 +287,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let (project_id,file_id) = file_ref context in
-            (manager#file_get project_id file_id) >>=
+            bind_projects
+              (fun manager -> manager#file_get project_id file_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file ?len:None)
             )
@@ -186,8 +304,10 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Mpi_message_j.file_modification_of_string
-            >>=
-            (manager#file_update project_id file_id) >>=
+            >>= fun modif ->
+            bind_projects
+              (fun manager -> manager#file_update project_id file_id modif)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
             )
@@ -199,7 +319,9 @@ let route
        Webapp_common.operation =
          (fun ~context ->
             let project_id = project_ref context in
-            (manager#simulation_delete project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_delete project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
                                      ?len:None)
@@ -212,7 +334,9 @@ let route
        Webapp_common.operation =
          (fun ~context ->
             let project_id = project_ref context in
-            (manager#simulation_raw_trace project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_raw_trace project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(fun out -> out)
             )
@@ -224,7 +348,9 @@ let route
        Webapp_common.operation =
          (fun ~context ->
             let project_id = project_ref context in
-            (manager#simulation_parameter project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_parameter project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_simulation_parameter
@@ -241,9 +367,11 @@ let route
               field_ref
                 context
                 "filelinesid" in
-            (manager#simulation_detail_file_line
+            bind_projects
+              (fun manager -> manager#simulation_detail_file_line
                project_id
-               (Some filelines_id)) >>=
+               (Some filelines_id))
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_file_line_detail
@@ -260,9 +388,11 @@ let route
               field_ref
                 context
                 "fluxmapsid" in
-            (manager#simulation_detail_flux_map
+            bind_projects
+              (fun manager -> manager#simulation_detail_flux_map
                project_id
-               fluxmaps_id) >>=
+               fluxmaps_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map
                                      ?len:None)
@@ -275,7 +405,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_detail_log_message project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_detail_log_message project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_log_message ?len:None)
             )
@@ -313,11 +445,11 @@ let route
                   } )) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun plot_parameter ->
-                   manager#simulation_detail_plot
-                     project_id
-                     plot_parameter
-               )
-            )>>=
+                   bind_projects
+                     (fun manager -> manager#simulation_detail_plot
+                         project_id
+                         plot_parameter)
+                     project_id projects)) >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_plot_detail ?len:None)
             )
@@ -332,9 +464,11 @@ let route
               field_ref
                 context
                 "snapshotid" in
-            (manager#simulation_detail_snapshot
+            bind_projects
+              (fun manager -> manager#simulation_detail_snapshot
                project_id
-               snapshot_id) >>=
+               snapshot_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_detail
                                      ?len:None)
@@ -347,7 +481,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_info project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_info project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_info
                                      ?len:None)
@@ -360,7 +496,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_efficiency project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_efficiency project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Counter.Efficiency.string_of_t
                                      ?len:None)
@@ -373,7 +511,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_catalog_file_line project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_catalog_file_line project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_line_catalog
                                      ?len:None)
@@ -386,7 +526,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_catalog_flux_map project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_catalog_flux_map project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
                                      ?len:None)
@@ -399,7 +541,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_catalog_snapshot project_id) >>=
+            bind_projects
+              (fun manager -> manager#simulation_catalog_snapshot project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog
                                      ?len:None)
@@ -416,9 +560,10 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Api_types_j.simulation_parameter_of_string
-            >>=
-            (manager#simulation_continue project_id)
-            >>=
+            >>= fun params ->
+            bind_projects
+              (fun manager -> manager#simulation_continue project_id params)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
                                      ?len:None)
@@ -431,8 +576,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#simulation_pause project_id)
-            >>=
+            bind_projects
+              (fun manager -> manager#simulation_pause project_id)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
                                      ?len:None)
@@ -448,9 +594,10 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Api_types_j.simulation_perturbation_of_string
-            >>=
-            (manager#simulation_perturbation project_id)
-            >>=
+            >>= fun pert ->
+            bind_projects
+              (fun manager -> manager#simulation_perturbation project_id pert)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
                                      ?len:None)
@@ -465,8 +612,10 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body)
             >|=
             Mpi_message_j.simulation_parameter_of_string
-            >>=
-            (manager#simulation_start project_id) >>=
+            >>= fun params ->
+            bind_projects
+              (fun manager -> manager#simulation_start project_id params)
+              project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
                                      ?len:None)
@@ -482,7 +631,9 @@ let route
             let project_id = project_ref context in
             Cohttp_lwt_body.to_string context.Webapp_common.body >|=
             (fun x -> Ast.compil_of_json (Yojson.Basic.from_string x)) >>=
-            (manager#init_static_analyser project_id) >>= function
+            fun compil -> tmp_bind_projects
+              (fun manager -> manager#init_static_analyser project_id compil)
+              project_id projects >>= function
             | Result.Ok () ->
               let body = "null" in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -500,7 +651,9 @@ let route
             let accuracy = Some
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
-            (manager#get_contact_map project_id accuracy) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_contact_map project_id accuracy)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -515,7 +668,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#get_contact_map project_id None) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_contact_map project_id None)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -533,7 +688,9 @@ let route
             let accuracy = Some
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
-            (manager#get_influence_map project_id accuracy) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_influence_map project_id accuracy)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -548,7 +705,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#get_influence_map project_id None) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_influence_map project_id None)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -563,7 +722,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#get_dead_rules project_id) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_dead_rules project_id)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
@@ -578,7 +739,9 @@ let route
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
-            (manager#get_constraints_list project_id) >>= function
+            tmp_bind_projects
+              (fun manager -> manager#get_constraints_list project_id)
+              project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
               Webapp_common.string_response ?headers:None ?code:None ~body
