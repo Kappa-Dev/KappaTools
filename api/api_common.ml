@@ -177,27 +177,6 @@ struct
 
 end;;
 
-module ProjectCollection =
-struct
-  type id = Api_types_t.project_id
-  type collection = Api_environment.environment
-  type item = Api_environment.project
-  let label : string = "project"
-  let list
-      (workspace : Api_environment.environment) =
-    workspace#get_projects ()
-  let update
-      (workspace : Api_environment.environment)
-      (projects : Api_environment.project list) : unit =
-    workspace#set_projects projects
-  let identifier (project : Api_environment.project) =
-    project#get_project_id ()
-  let id_to_string (project_id : Api_types_t.project_id) : string =
-    Format.sprintf "%s" project_id
-end;;
-
-module ProjectOperations = CollectionOperations(ProjectCollection)
-
 module FileCollection : COLLECTION_TYPE
   with type id = Api_types_t.file_id
   and type collection = Api_environment.project
@@ -219,29 +198,12 @@ end;;
 
 module FileOperations = CollectionOperations(FileCollection)
 
-let bind_simulation
-    environment
-    (project_id : Api_types_t.project_id)
-    handler
-    =
-    ProjectOperations.bind
-      (project_id : Api_types_t.project_id)
-      environment
-      (fun project ->
-         match project#get_simulation () with
-         | Some simulation -> handler project simulation
-         | None ->
-           let m  = project_id^" : simulation not found" in
-           Lwt.return (result_error_msg ~result_code:`NOT_FOUND m))
-let bind_file
-    environment
-    (project_id : Api_types_t.project_id)
-    (file_id : Api_types_t.file_id)
-    handler
-    =
-    ProjectOperations.bind
-      (project_id : Api_types_t.project_id)
-      environment
-      (fun project -> FileOperations.bind file_id
-          project
-          (fun file -> handler project file))
+let bind_simulation project_id project handler =
+  match project#get_simulation () with
+  | Some simulation -> handler simulation
+  | None ->
+    let m  = project_id^": No simulation" in
+    Lwt.return (result_error_msg ~result_code:`NOT_FOUND m)
+
+let bind_file project (file_id : Api_types_t.file_id) handler =
+  FileOperations.bind file_id project (fun file -> handler file)

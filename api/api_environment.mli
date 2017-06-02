@@ -11,7 +11,6 @@ class type simulation = object
 end
 
 class type project = object
-  method get_project_id : unit -> Api_types_j.project_id
   method unset_simulation : unit -> unit
   method set_simulation :
     Api_types_j.simulation_parameter -> Kappa_facade.t -> unit

@@ -6,6 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+exception BadResponse of Mpi_message_j.rest_response_content
 exception BadResponseCode of int
 exception TimeOut
 
@@ -60,13 +61,6 @@ class manager
   method message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t =
     function
-    | `EnvironmentInfo  () ->
-      send
-        ~timeout
-        (Format.sprintf "%s/v2" url)
-        `GET
-        (fun result ->
-             (`EnvironmentInfo (Mpi_message_j.environment_info_of_string result)))
     | `FileCreate (project_id,file) ->
       send
         ~timeout
@@ -100,25 +94,6 @@ class manager
         ~data:(Api_types_j.string_of_file_modification file_modification)
         (fun result ->
              (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
-    | `ProjectCatalog () ->
-      send
-        (Format.sprintf "%s/v2/projects" url)
-        `GET
-        (fun result ->
-             (`ProjectCatalog (Mpi_message_j.project_catalog_of_string result)))
-    | `ProjectCreate project_parameter ->
-      send
-        (Format.sprintf "%s/v2/projects" url)
-        `POST
-        ~data:(Api_types_j.string_of_project_parameter project_parameter)
-        (fun result ->
-             (`ProjectCreate (Api_types_j.unit_t_of_string result)))
-    | `ProjectDelete project_id ->
-      send
-        (Format.sprintf "%s/v2/projects/%s" url project_id)
-        `DELETE
-        (fun result ->
-             (`ProjectDelete (Api_types_j.unit_t_of_string result)))
     | `ProjectParse project_id ->
       send
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
@@ -319,6 +294,86 @@ class manager
                         (Mpi_message_j.simulation_artifact_of_string result)))
 
   inherit Mpi_api.manager_base ()
+
+  method rest_message = function
+    | `EnvironmentInfo  () ->
+      send
+        ~timeout
+        (Format.sprintf "%s/v2" url)
+        `GET
+        (fun result ->
+           (`EnvironmentInfo (Mpi_message_j.environment_info_of_string result)))
+    | `ProjectCatalog () ->
+      send
+        (Format.sprintf "%s/v2/projects" url)
+        `GET
+        (fun result ->
+             (`ProjectCatalog (Mpi_message_j.project_catalog_of_string result)))
+    | `ProjectCreate project_parameter ->
+      send
+        (Format.sprintf "%s/v2/projects" url)
+        `POST
+        ~data:(Api_types_j.string_of_project_parameter project_parameter)
+        (fun result ->
+             (`ProjectCreate (Api_types_j.unit_t_of_string result)))
+    | `ProjectDelete project_id ->
+      send
+        (Format.sprintf "%s/v2/projects/%s" url project_id)
+        `DELETE
+        (fun result ->
+             (`ProjectDelete (Api_types_j.unit_t_of_string result)))
+
+  method environment_info () :
+    Api_types_j.environment_info Api.result Lwt.t =
+    self#rest_message (`EnvironmentInfo ()) >>=
+    Api_common.result_bind_lwt
+      ~ok:(function
+          | `EnvironmentInfo
+              (result : Mpi_message_t.environment_info) ->
+            Lwt.return (Api_common.result_ok result)
+          | response ->
+            Lwt.return
+              (Api_common.result_error_exception
+                 (BadResponse response)))
+
+    method project_delete
+        (project_id : Api_types_j.project_id) :
+      unit Api.result Lwt.t =
+      self#rest_message (`ProjectDelete project_id) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `ProjectDelete result ->
+              Lwt.return (Api_common.result_ok result)
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response))
+
+          )
+
+    method project_catalog () : Api_types_j.project_catalog Api.result Lwt.t =
+      self#rest_message (`ProjectCatalog ()) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `ProjectCatalog result ->
+              Lwt.return (Api_common.result_ok result)
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
+    method project_create
+        (project_parameter : Api_types_j.project_parameter) : unit Api.result Lwt.t =
+      self#rest_message (`ProjectCreate project_parameter) >>=
+      Api_common.result_bind_lwt
+        ~ok:(function
+            | `ProjectCreate result ->
+              Lwt.return (Api_common.result_ok result)
+            | response ->
+              Lwt.return
+                (Api_common.result_error_exception
+                   (BadResponse response)))
+
   method terminate () =
     Lwt.ignore_result (self#project_delete project_id)
 

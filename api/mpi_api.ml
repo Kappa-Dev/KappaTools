@@ -25,9 +25,6 @@ let on_message
        post_message text)
   in
   match message.Mpi_message_j.data with
-  | `EnvironmentInfo () ->
-    (manager#environment_info ()) >>=
-    (handler (fun result -> `EnvironmentInfo result))
   | `FileCreate (project_id,file) ->
     (manager#file_create project_id file) >>=
     (handler (fun result -> `FileCreate result))
@@ -43,15 +40,6 @@ let on_message
   | `FileUpdate (project_id,file_id,file_modification) ->
     (manager#file_update project_id file_id file_modification) >>=
     (handler (fun result -> `FileUpdate result))
-  | `ProjectCreate project_parameter ->
-    (manager#project_create project_parameter) >>=
-    (handler (fun result -> `ProjectCreate result))
-  | `ProjectDelete project_id ->
-    (manager#project_delete project_id) >>=
-    (handler (fun result -> `ProjectDelete result))
-  | `ProjectCatalog () ->
-    (manager#project_catalog ()) >>=
-    (handler (fun result -> `ProjectCatalog result))
   |  `ProjectGet project_id ->
     (manager#project_get project_id) >>=
     (handler (fun result -> `ProjectGet result))
@@ -125,20 +113,6 @@ class virtual  manager_base () : manager_base_type =
     method virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
-    method environment_info () :
-      Api_types_j.environment_info Api.result Lwt.t =
-      self#message (`EnvironmentInfo ())
-      >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `EnvironmentInfo
-                (result : Mpi_message_t.environment_info) ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
     method file_create
         (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
@@ -182,7 +156,6 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-
     method file_catalog
       (project_id : Api_types_j.project_id) :
       Api_types_j.file_catalog Api.result Lwt.t =
@@ -196,7 +169,6 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-
     method file_update
         (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id)
@@ -206,18 +178,6 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileUpdate result ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method project_create
-      (project_parameter : Api_types_j.project_parameter) : unit Api.result Lwt.t =
-      self#message (`ProjectCreate project_parameter) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectCreate result ->
               Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return
@@ -245,34 +205,6 @@ class virtual  manager_base () : manager_base_type =
               Lwt.return
                 (Api_common.result_error_exception
                    (BadResponse response)))
-
-    method project_delete
-        (project_id : Api_types_j.project_id) :
-      unit Api.result Lwt.t =
-      self#message (`ProjectDelete project_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectDelete result ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response))
-
-          )
-
-
-    method project_catalog () : Api_types_j.project_catalog Api.result Lwt.t =
-      self#message (`ProjectCatalog ()) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectCatalog result ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
 
     method simulation_continue
       (project_id : Api_types_j.project_id)

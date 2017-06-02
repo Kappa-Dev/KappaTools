@@ -125,73 +125,61 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 
 (* modified from : https://searchcode.com/file/1109908/commons/common.ml *)
 
-class manager_file
-    (environment : Api_environment.environment) : Api.manager_file =
+class manager_file (project : Api_environment.project) : Api.manager_file =
   object
     method file_catalog
         (project_id : Api_types_j.project_id) :
       Api_types_j.file_catalog Api.result Lwt.t =
-    Api_common.ProjectOperations.bind
-      project_id
-      environment
-      (fun (project : Api_environment.project) ->
-         let files : Api_types_j.file list = (project#get_files ()) in
-         let file_catalog : Api_types_j.file_catalog =
-           { Api_types_j.file_metadata_list =
-               List.map (fun file -> file.Api_types_j.file_metadata) files }
-         in
-         Lwt.return (Api_common.result_ok file_catalog)
-      )
+      let files : Api_types_j.file list = (project#get_files ()) in
+      let file_catalog : Api_types_j.file_catalog =
+        { Api_types_j.file_metadata_list =
+            List.map (fun file -> file.Api_types_j.file_metadata) files }
+      in
+      Lwt.return (Api_common.result_ok file_catalog)
 
     method file_create
         (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
       Api_types_j.file_metadata Api.result Lwt.t =
-      Api_common.ProjectOperations.bind
-        project_id
-        environment
-        (fun (project : Api_environment.project) ->
-           let file_list : Api_types_j.file list = (project#get_files ()) in
-           let file_eq : Api_types_j.file -> bool =
-             fun f -> (get_file_id file) = (get_file_id f) in
-           if List.exists file_eq file_list then
-             let message : string =
-               Format.sprintf
-                 "file id %s exists"
-                 (Api_common.FileCollection.identifier file)
-             in
-             Lwt.return
-               (Api_common.result_error_msg
-                  ~result_code:`CONFLICT message)
-           else
-             let file_list : Api_types_j.file list = project#get_files () in
-             let version =
-               file.Api_types_j.file_metadata.Api_types_j.file_metadata_version in
-             let file =
-               { file with
-                 Api_types_j.file_metadata =
-                   { file.Api_types_j.file_metadata
-                     with Api_types_j.file_metadata_version = version } } in
-             update_text
-               project
-               (file::file_list)
-               (fun
-                 (_project_version : Api_types_j.project_version) ->
-                 Lwt.return
-                   (Api_common.result_ok
-                      file.Api_types_j.file_metadata)
-               )
-        )
+      let file_list : Api_types_j.file list = (project#get_files ()) in
+      let file_eq : Api_types_j.file -> bool =
+        fun f -> (get_file_id file) = (get_file_id f) in
+      if List.exists file_eq file_list then
+        let message : string =
+          Format.sprintf
+            "file id %s exists"
+            (Api_common.FileCollection.identifier file)
+        in
+        Lwt.return
+          (Api_common.result_error_msg
+             ~result_code:`CONFLICT message)
+      else
+        let file_list : Api_types_j.file list = project#get_files () in
+        let version =
+          file.Api_types_j.file_metadata.Api_types_j.file_metadata_version in
+        let file =
+          { file with
+            Api_types_j.file_metadata =
+              { file.Api_types_j.file_metadata
+                with Api_types_j.file_metadata_version = version } } in
+        update_text
+          project
+          (file::file_list)
+          (fun
+            (_project_version : Api_types_j.project_version) ->
+            Lwt.return
+              (Api_common.result_ok
+                 file.Api_types_j.file_metadata)
+          )
 
     method file_get
       (project_id : Api_types_j.project_id)
       (file_id : Api_types_j.file_id) :
       Api_types_j.file Api.result Lwt.t =
       Api_common.bind_file
-        environment
-        project_id
+        project
         file_id
-        (fun _ (file : Api_types_j.file) ->
+        (fun (file : Api_types_j.file) ->
            Lwt.return (Api_common.result_ok file))
 
     method file_update
@@ -200,11 +188,9 @@ class manager_file
       (file_modification : Api_types_j.file_modification) :
       Api_types_j.file_metadata Api.result Lwt.t =
       Api_common.bind_file
-        environment
-        project_id
+        project
         file_id
         (fun
-          (project : Api_environment.project)
           (file : Api_types_j.file) ->
           let () = update_file file file_modification in
           let file_list : Api_types_j.file list = (project#get_files ()) in
@@ -224,10 +210,9 @@ class manager_file
         (file_id : Api_types_j.file_id) :
       unit Api.result Lwt.t =
       Api_common.bind_file
-        environment
-        project_id
+        project
         file_id
-        (fun (project : Api_environment.project) _ ->
+        (fun _ ->
            let updated_directory = excavate file_id (project#get_files ()) in
            update_text
              project

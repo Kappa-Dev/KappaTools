@@ -11,23 +11,16 @@ let patch_parameter (simulation_parameter : Api_types_j.simulation_parameter) :
   | Some seed -> (simulation_parameter,seed)
 
 
-let detail_projection :
-  environment:Api_environment.environment ->
-  system_process:Kappa_facade.system_process ->
-  project_id:Api_types_j.project_id ->
-  projection:(Api_types_j.simulation_detail -> 'a Api.result) ->
-  'a Api.result Lwt.t
-  =
-  (fun
-    ~(environment:Api_environment.environment)
+let detail_projection
+    ~(project : Api_environment.project)
     ~(system_process:Kappa_facade.system_process)
     ~(project_id:Api_types_j.project_id)
     ~(projection:(Api_types_j.simulation_detail -> 'a Api.result))
-    ->
+  : 'a Api.result Lwt.t =
   Api_common.bind_simulation
-    environment
     project_id
-    (fun _ simulation ->
+    project
+    (fun simulation ->
        let t : Kappa_facade.t = simulation#get_runtime_state () in
        (Kappa_facade.info
           ~system_process:system_process
@@ -41,10 +34,9 @@ let detail_projection :
                     Api_types_j.errors -> 'a Api.result Lwt.t)
        )
     )
-  )
 
 class manager_file_line
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) : Api.manager_file_line =
   object(self)
 
@@ -87,7 +79,7 @@ class manager_file_line
         (project_id : Api_types_j.project_id) :
       Api_types_j.file_line_catalog Api.result Lwt.t =
       detail_projection
-          ~environment:environment
+        ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:self#info_file_line
@@ -98,7 +90,7 @@ class manager_file_line
         (file_line_id : Api_types_j.file_line_id) :
       (Api_types_j.file_line list) Api.result Lwt.t =
       detail_projection
-          ~environment:environment
+        ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:(self#get_file_line file_line_id)
@@ -106,7 +98,7 @@ class manager_file_line
   end;;
 
 class manager_flux_map
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) : Api.manager_flux_map =
   object(self)
     method private info_flux_map (detail : Api_types_j.simulation_detail) :
@@ -140,8 +132,7 @@ class manager_flux_map
         (project_id : Api_types_j.project_id) :
       Api_types_j.flux_map_catalog Api.result Lwt.t =
       detail_projection
-          ~environment:environment
-          ~system_process:system_process
+        ~project ~system_process:system_process
           ~project_id:project_id
           ~projection:self#info_flux_map
 
@@ -150,7 +141,7 @@ class manager_flux_map
         (flux_map_id : Api_types_j.flux_map_id) :
       Api_types_j.flux_map Api.result Lwt.t =
       detail_projection
-          ~environment:environment
+        ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:(self#get_flux_map flux_map_id)
@@ -158,7 +149,7 @@ class manager_flux_map
   end;;
 
 class manager_log_message
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) : Api.manager_log_message =
   object(self)
 
@@ -170,7 +161,7 @@ class manager_log_message
         (project_id : Api_types_j.project_id) :
       Api_types_j.log_message Api.result Lwt.t =
       detail_projection
-          ~environment:environment
+          ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:self#log_message
@@ -216,7 +207,7 @@ let select_observables
       Api_types_j.plot_detail_size = plot_detail_size ; }
 
 class manager_plot
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) :
   Api.manager_plot =
   object(self)
@@ -248,14 +239,14 @@ class manager_plot
         (plot_parameter : Api_types_j.plot_parameter) :
       Api_types_j.plot_detail Api.result Lwt.t =
       detail_projection
-          ~environment:environment
+          ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:(self#get_plot plot_parameter)
   end;;
 
 class manager_snapshot
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) :
   Api.manager_snapshot =
   object(self)
@@ -286,7 +277,7 @@ class manager_snapshot
         (project_id : Api_types_j.project_id) :
       Api_types_j.snapshot_catalog Api.result Lwt.t =
       (detail_projection
-          ~environment:environment
+          ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:self#info_snapshot
@@ -297,7 +288,7 @@ class manager_snapshot
         (snapshot_id : Api_types_j.snapshot_id):
       Api_types_j.snapshot Api.result Lwt.t =
       ((detail_projection
-          ~environment:environment
+          ~project
           ~system_process:system_process
           ~project_id:project_id
           ~projection:(self#get_snapshot snapshot_id))
@@ -306,7 +297,7 @@ class manager_snapshot
   end;;
 
 class manager_simulation
-    (environment : Api_environment.environment)
+    (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) :
   Api.manager_simulation =
   object(self)
@@ -314,9 +305,9 @@ class manager_simulation
       (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun project _ -> (self#simulation_stop project_id) >>=
+        project
+        (fun _ -> (self#simulation_stop project_id) >>=
           (fun _ ->
              let () = project#unset_simulation () in
              Lwt.return (Api_common.result_ok ()) : (unit, Api.manager_code)
@@ -328,69 +319,64 @@ class manager_simulation
       Api_types_j.simulation_artifact Api.result Lwt.t =
       let (simulation_parameter,simulation_seed) =
         patch_parameter simulation_parameter in
-      Api_common.ProjectOperations.bind
-        project_id
-        environment
-        (fun project ->
-           let simulation_id = simulation_parameter.Api_types_j.simulation_id in
-           match project#get_simulation () with
-           | Some _ ->
-             let message : string =
-               Format.sprintf
-                 "simulation id %s exists" simulation_id in
-             Lwt.return
-               (Api_common.result_error_msg ~result_code:`CONFLICT message)
-           | None ->
-             project#get_state () >>= function
-             | None ->
-               Lwt.return (Api_common.result_error_msg
-                             "Cannot start simulation: Parse not done")
-             | Some parse ->
-               Result_util.map
-                 ~ok:
-                   (fun (facade : Kappa_facade.t) ->
-                      let facade = Kappa_facade.clone_t facade in
-                      (Kappa_facade.start
-                         ~system_process:system_process
-                         ~parameter:simulation_parameter
-                         ~t:facade)
-                      >>=
-                      (Result_util.map
-                         ~ok:
-                           (fun () ->
-                              let () =
-                                project#set_simulation simulation_parameter facade in
-                              Lwt.return
-                                (Api_common.result_ok
-                                   { Api_types_j.simulation_artifact_simulation_id = simulation_id ;
-                                     Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
-                                   }))
-                         ~error:
-                           (fun (errors : Api_types_j.errors) ->
-                              Lwt.return (Api_common.result_messages errors)))
-                   )
-                 ~error:
-                   (fun (errors : Api_types_j.errors) ->
-                      Lwt.return (Api_common.result_messages errors))
-                 parse
-        )
+      let simulation_id = simulation_parameter.Api_types_j.simulation_id in
+      match project#get_simulation () with
+      | Some _ ->
+        let message : string =
+          Format.sprintf
+            "simulation id %s exists" simulation_id in
+        Lwt.return
+          (Api_common.result_error_msg ~result_code:`CONFLICT message)
+      | None ->
+        project#get_state () >>= function
+        | None ->
+          Lwt.return (Api_common.result_error_msg
+                        "Cannot start simulation: Parse not done")
+        | Some parse ->
+          Result_util.map
+            ~ok:
+              (fun (facade : Kappa_facade.t) ->
+                 let facade = Kappa_facade.clone_t facade in
+                 (Kappa_facade.start
+                    ~system_process:system_process
+                    ~parameter:simulation_parameter
+                    ~t:facade)
+                 >>=
+                 (Result_util.map
+                    ~ok:
+                      (fun () ->
+                         let () =
+                           project#set_simulation simulation_parameter facade in
+                         Lwt.return
+                           (Api_common.result_ok
+                              { Api_types_j.simulation_artifact_simulation_id = simulation_id ;
+                                Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
+                              }))
+                    ~error:
+                      (fun (errors : Api_types_j.errors) ->
+                         Lwt.return (Api_common.result_messages errors)))
+              )
+            ~error:
+              (fun (errors : Api_types_j.errors) ->
+                 Lwt.return (Api_common.result_messages errors))
+            parse
 
     method simulation_parameter
       (project_id : Api_types_j.project_id) :
       Api_types_j.simulation_parameter Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation(* project simulation *) ->
+        project
+        (fun simulation(* project simulation *) ->
            let parameter = simulation#get_simulation_parameter() in
            Lwt.return (Api_common.result_ok parameter))
 
     method simulation_raw_trace
       (project_id : Api_types_j.project_id) : string Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation ->
+        project
+        (fun simulation ->
            let t = simulation#get_runtime_state() in
            Lwt.return (Api_common.result_ok
                          (Kappa_facade.get_raw_trace t)))
@@ -399,9 +385,9 @@ class manager_simulation
         (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation(* project simulation *) ->
+        project
+        (fun simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.pause
              ~system_process:system_process
@@ -413,9 +399,9 @@ class manager_simulation
         (project_id : Api_types_j.project_id) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation(* project simulation *) ->
+        project
+        (fun simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
            (Result_util.map
@@ -432,9 +418,9 @@ class manager_simulation
         (simulation_perturbation : Api_types_j.simulation_perturbation) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation ->
+        project
+        (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.perturbation
               ~system_process:system_process
@@ -453,9 +439,9 @@ class manager_simulation
         (simulation_parameter : Api_types_j.simulation_parameter) :
       unit Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation ->
+        project
+        (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.continue
               ~system_process:system_process
@@ -473,9 +459,9 @@ class manager_simulation
       (project_id : Api_types_j.project_id)
       : Api_types_j.simulation_info Api.result Lwt.t =
       Api_common.bind_simulation
-        environment
         project_id
-        (fun _ simulation ->
+        project
+        (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.info
               ~system_process:system_process
@@ -494,14 +480,14 @@ class manager_simulation
         )
 
     method simulation_efficiency project_id =
-      Api_common.bind_simulation environment project_id
-        (fun _ simulation ->
+      Api_common.bind_simulation project_id project
+        (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            Lwt.return (Api_common.result_ok (Kappa_facade.efficiency t)))
 
-    inherit  manager_file_line environment system_process
-    inherit  manager_flux_map environment system_process
-    inherit  manager_log_message environment system_process
-    inherit  manager_plot environment system_process
-    inherit  manager_snapshot environment system_process
+    inherit  manager_file_line project system_process
+    inherit  manager_flux_map project system_process
+    inherit  manager_log_message project system_process
+    inherit  manager_plot project system_process
+    inherit  manager_snapshot project system_process
   end;;

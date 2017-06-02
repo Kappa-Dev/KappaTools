@@ -64,29 +64,6 @@ module CollectionOperations :
       id ->
       collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
   end
-module ProjectCollection :
-sig
-  type id = Api_types_j.project_id
-  type collection = Api_environment.environment
-  type item = Api_environment.project
-  val label : string
-  val list : collection -> item list
-  val update : collection -> item list -> unit
-  val identifier : item -> id
-  val id_to_string : id -> string
-end
-module ProjectOperations :
-sig
-  type id = ProjectCollection.id
-  type collection = ProjectCollection.collection
-  type item = ProjectCollection.item
-  val refs : id -> item -> bool
-  val exists : id -> collection -> bool
-  val filter : id -> collection -> item list
-  val bind :
-    id ->
-    collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
-end
 module FileCollection :
 sig
   type id = Api_types_j.file_id
@@ -110,14 +87,12 @@ sig
     collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
 end
 val bind_simulation :
-  ProjectOperations.collection ->
   Api_types_j.project_id ->
-  (ProjectOperations.item ->
-   Api_environment.simulation -> 'a Api.result Lwt.t) ->
+  Api_environment.project ->
+  (Api_environment.simulation -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t
 val bind_file :
-  ProjectOperations.collection ->
-  Api_types_j.project_id ->
+  Api_environment.project ->
   Api_types_j.file_id ->
-  (ProjectOperations.item -> FileOperations.item -> 'a Api.result Lwt.t) ->
+  (FileOperations.item -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t

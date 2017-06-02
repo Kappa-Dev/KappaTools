@@ -152,23 +152,21 @@ let create_manager ~is_new project_id =
        let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
        if is_valid_server then
          let () = State_settings.set_synch true in
-         Lwt.return
-           (Api_common.result_ok (new Rest_api.manager
-                                   ?timeout:None ~url ~project_id :> Api.concrete_manager))
+         let manager = new Rest_api.manager
+           ?timeout:None ~url ~project_id in
+         (if is_new then
+            manager#project_create
+              { Api_types_j.project_parameter_project_id = project_id }
+          else Lwt.return (Api_common.result_ok ())) >>=
+         Api_common.result_bind_lwt
+           ~ok:(fun () -> Lwt.return (Api_common.result_ok
+                                        (manager :> Api.concrete_manager)))
        else
          let error_msg : string =
            Format.sprintf "Bad Response %d from %s "
              frame.XmlHttpRequest.code url in
          Lwt.return (Api_common.result_error_msg error_msg)
-    ) >>=
-    Api_common.result_bind_lwt
-      ~ok:(fun manager ->
-          (if is_new then
-             manager#project_create
-               { Api_types_j.project_parameter_project_id = project_id }
-           else Lwt.return (Api_common.result_ok ())) >>=
-          Api_common.result_bind_lwt
-            ~ok:(fun () -> Lwt.return (Api_common.result_ok manager)))
+    )
 
   | Remote { label ; protocol = CLI cli } ->
     let () = Common.debug (Js.string ("set_runtime_url: "^cli.url)) in
@@ -229,14 +227,26 @@ let init () =
       | { Api_types_j.result_data = Result.Error _; _ } -> add_urls urls load
   in
   let () = add_urls hosts true in
-  create_manager ~is_new:true "" >>=
-  Api_common.result_map
-    ~ok:(fun _ manager ->
-        manager#project_catalog () >>=
-        Api_common.result_map
-          ~ok:(fun _ projects -> Lwt.return projects.Api_types_t.project_list)
-          ~error:(fun _ _ -> Lwt.return_nil))
-    ~error:(fun _ _ -> Lwt.return_nil)
+  match (React.S.value state).state_current with
+  | Remote { protocol = CLI _ ; _ } | WebWorker | Embedded -> Lwt.return_nil
+  | Remote { label = _ ; protocol = HTTP url } ->
+    let version_url : string = Format.sprintf "%s/v2" url in
+    let () = Common.debug
+        (Js.string (Format.sprintf "set_runtime_url: %s" version_url)) in
+    (XmlHttpRequest.perform_raw
+       ~response_type:XmlHttpRequest.Text
+       version_url) >>=
+    (fun frame ->
+       let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
+       if is_valid_server then
+         let () = State_settings.set_synch true in
+         let manager = new Rest_api.manager
+           ?timeout:None ~url ~project_id:"" in
+         manager#project_catalog () >>=
+         Api_common.result_map
+           ~ok:(fun _ projects -> Lwt.return projects.Api_types_t.project_list)
+           ~error:(fun _ _ -> Lwt.return_nil)
+       else Lwt.return_nil)
 
 (* to sync state of application with runtime *)
 let sync () = Lwt.return_unit

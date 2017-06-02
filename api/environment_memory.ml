@@ -16,9 +16,7 @@ class simulation
       _simulation_parameter <- simulation_parameter
   end
 
-class project
-    (project_id : Api_types_j.project_id) :
-  Api_environment.project =
+class project : Api_environment.project =
   object
     val mutable _simulation = None
     val mutable _files = []
@@ -26,8 +24,6 @@ class project
       Lwt.return_none
     val mutable _version : Api_types_j.project_version = 0
 
-    method get_project_id () : Api_types_j.project_id =
-      project_id
     method get_simulation () = _simulation
     method unset_simulation () = _simulation <- None
     method set_simulation
@@ -56,13 +52,3 @@ class project
       _state
 
   end
-
-class environment () : Api_environment.environment =
-  object
-    val mutable _projects : Api_environment.project list = []
-    method get_projects () = _projects
-    method set_projects (projects : Api_environment.project list) =
-      _projects <- projects
-    method create_project
-        (project_id : Api_types_j.project_id) = new project project_id
-  end;;

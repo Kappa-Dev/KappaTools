@@ -5,7 +5,7 @@ val on_message : Api.manager -> (string -> unit Lwt.t) -> string -> unit Lwt.t
 class type virtual manager_base_type =
   object
     method virtual message :
-      Mpi_message_j.request -> Mpi_message_j.response Lwt.t
+      Mpi_message_j.request -> Mpi_message_j.response_content Mpi_message_j.result Lwt.t
 
     inherit Api.manager
 end

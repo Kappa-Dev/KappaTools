@@ -18,17 +18,10 @@ class type manager_environment =
 
 class type manager_project =
   object
-    method project_catalog :
-      unit -> Api_types_j.project_catalog result Lwt.t
     method project_get :
       project_id -> Api_types_j.project result Lwt.t
     method project_parse :
       project_id -> Api_types_j.project_parse result Lwt.t
-    method project_create :
-      Api_types_j.project_parameter -> unit result Lwt.t
-    method project_delete :
-      project_id ->
-      unit result Lwt.t
   end
 (* The type is parameterized here are there are
    implementations of the file manager that cannot
@@ -179,7 +172,6 @@ class type manager_static_analysis =
 
 class type manager =
   object
-    inherit manager_environment
     inherit manager_project
     inherit manager_file
     inherit manager_simulation
@@ -190,4 +182,17 @@ class type concrete_manager =
     inherit manager
     inherit manager_static_analysis
     method terminate : unit -> unit
+  end
+
+class type rest_manager =
+  object
+    inherit manager_environment
+    inherit concrete_manager
+    method project_catalog :
+      unit -> Api_types_j.project_catalog result Lwt.t
+    method project_create :
+      Api_types_j.project_parameter -> unit result Lwt.t
+    method project_delete :
+      project_id ->
+      unit result Lwt.t
   end

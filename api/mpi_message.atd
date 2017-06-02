@@ -55,15 +55,12 @@ type simulation_artifact <ocaml from="Api_types"> = abstract
 
 type unit_t <ocaml_biniou t="unit"> = unit
 
-type request = [ EnvironmentInfo of unit
+type request = [
                | FileCreate of (project_id * file)
                | FileDelete of (project_id * file_id)
                | FileGet of (project_id * file_id)
                | FileCatalog of project_id
                | FileUpdate of (project_id * file_id * file_modification)
-               | ProjectCatalog of unit
-               | ProjectCreate of project_parameter
-               | ProjectDelete of project_id
 	       | ProjectParse of project_id
 	       | ProjectGet of project_id
                | SimulationContinue of (project_id * simulation_parameter)
@@ -85,16 +82,19 @@ type request = [ EnvironmentInfo of unit
                | SimulationStart of (project_id * simulation_parameter)
                ]
 
+type rest_request = [
+     inherit request
+     | EnvironmentInfo of unit
+     | ProjectCatalog of unit
+     | ProjectCreate of project_parameter
+     | ProjectDelete of project_id
+     ]
 type response_content = [
-     EnvironmentInfo of environment_info
    | FileCreate of file_metadata
    | FileDelete of unit
    | FileGet of file
    | FileCatalog of file_catalog
    | FileUpdate of file_metadata
-   | ProjectCatalog of project_catalog
-   | ProjectCreate of unit
-   | ProjectDelete of unit
    | ProjectParse of project_parse
    | ProjectGet of project
    | SimulationContinue of unit
@@ -116,4 +116,14 @@ type response_content = [
    | SimulationStart of simulation_artifact
 ]
 
+type rest_response_content = [
+     inherit response_content
+     | EnvironmentInfo of environment_info
+     | ProjectCreate of unit
+     | ProjectDelete of unit
+     | ProjectParse of project_parse
+     | ProjectCatalog of project_catalog
+]
+
 type response = response_content result
+type rest_response = rest_response_content result
