@@ -20,14 +20,14 @@ let content () =
       (fun _ ->
          State_project.with_project
            ~label:__LOC__
-           (fun (manager : Api.concrete_manager) project_id ->
+           (fun (manager : Api.concrete_manager) ->
               (Lwt_result.map
                  (fun dead_json ->
                     let () = ReactiveData.RList.set set_dead_rules
                         [ Html.p [Html.pcdata
                                     (Yojson.Basic.to_string dead_json) ] ] in
                     ())
-                 (manager#get_dead_rules project_id)) >>=
+                 manager#get_dead_rules) >>=
               fun out -> Lwt.return (Api_common.result_lift out)
            )
       )

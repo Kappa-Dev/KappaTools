@@ -87,7 +87,6 @@ sig
     collection -> (item -> 'a Api.result Lwt.t) -> 'a Api.result Lwt.t
 end
 val bind_simulation :
-  Api_types_j.project_id ->
   Api_environment.project ->
   (Api_environment.simulation -> 'a Api.result Lwt.t) ->
   'a Api.result Lwt.t

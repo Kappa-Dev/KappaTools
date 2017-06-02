@@ -120,7 +120,7 @@ class embedded () : Api.concrete_manager =
     inherit Kasa_client.new_client
         ~post:(fun message_text -> kasa_worker##postMessage(message_text))
         kasa_mailbox
-    method terminate () =
+    method terminate =
       let () = kasa_worker##terminate in
       ()(*TODO*)
   end
@@ -242,7 +242,7 @@ let init () =
          let () = State_settings.set_synch true in
          let manager = new Rest_api.manager
            ?timeout:None ~url ~project_id:"" in
-         manager#project_catalog () >>=
+         manager#project_catalog >>=
          Api_common.result_map
            ~ok:(fun _ projects -> Lwt.return projects.Api_types_t.project_list)
            ~error:(fun _ _ -> Lwt.return_nil)

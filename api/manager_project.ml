@@ -25,7 +25,7 @@ object
     Api_types_j.project Api.result Lwt.t =
     Lwt.return (Api_common.result_ok (to_project project_id project))
 
-  method project_parse (project_id : Api_types_j.project_id) :
+  method project_parse :
     Api_types_j.project_parse Api.result Lwt.t =
     (project#get_state () >>= function
       | Some x -> Lwt.return x

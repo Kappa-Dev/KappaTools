@@ -243,13 +243,9 @@ let plot_parameter () : Api_types_j.plot_parameter =
 let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
   State_simulation.when_ready
     ~label:__LOC__
-    (fun
-      manager
-      project_id ->
+    (fun manager ->
       let () = update_offset true in
-      (manager#simulation_detail_plot
-         project_id
-         (plot_parameter ())) >>=
+      (manager#simulation_detail_plot (plot_parameter ())) >>=
       (Api_common.result_bind_lwt
          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
              let plot = plot_detail.Api_types_j.plot_detail_plot in

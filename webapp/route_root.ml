@@ -57,7 +57,7 @@ class new_manager : Api.concrete_manager =
                     Lwt_io.write_char f Tools.default_message_delimter)
                  sa_process#stdin))
         sa_mailbox
-    method terminate () =
+    method terminate =
       sa_process#terminate
   end
 
@@ -74,7 +74,6 @@ let tmp_bind_projects f id projects =
   | None ->
     let m = "Project '"^id^"' not found" in
     Lwt.return (Result.Error m)
-
 
 let add_projects parameter projects =
   let project_id = parameter.Api_types_j.project_parameter_project_id in
@@ -95,7 +94,7 @@ let delete_projects (project_id : Api_types_j.project_id) projects :
     Lwt.return (Api_common.result_error_msg ~result_code:`NOT_FOUND m)
   | Some m, p ->
     let () = projects := p in
-    let () = m#terminate () in
+    let () = m#terminate in
     Lwt.return (Api_common.result_ok ())
 
 let route
@@ -136,7 +135,7 @@ let route
                      (fun () ->
                         let () =
                           Mods.StringMap.iter
-                            (fun _ p -> p#terminate ())
+                            (fun _ p -> p#terminate)
                             !projects in
                         Lwt_unix.sleep 1.0 >>=
                         fun () -> exit 0)
@@ -229,7 +228,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#project_parse project_id)
+              (fun manager -> manager#project_parse)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_project_parse ?len:None)
@@ -247,7 +246,7 @@ let route
             Mpi_message_j.file_of_string
             >>= fun file ->
             bind_projects
-              (fun manager -> manager#file_create project_id file)
+              (fun manager -> manager#file_create file)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
@@ -261,7 +260,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#file_catalog project_id)
+              (fun manager -> manager#file_catalog)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_catalog ?len:None))
@@ -274,7 +273,7 @@ let route
          (fun ~context:context ->
             let (project_id,file_id) = file_ref context in
             bind_projects
-              (fun manager -> manager#file_delete project_id file_id)
+              (fun manager -> manager#file_delete file_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
@@ -288,7 +287,7 @@ let route
          (fun ~context:context ->
             let (project_id,file_id) = file_ref context in
             bind_projects
-              (fun manager -> manager#file_get project_id file_id)
+              (fun manager -> manager#file_get file_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file ?len:None)
@@ -306,7 +305,7 @@ let route
             Mpi_message_j.file_modification_of_string
             >>= fun modif ->
             bind_projects
-              (fun manager -> manager#file_update project_id file_id modif)
+              (fun manager -> manager#file_update file_id modif)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
@@ -320,7 +319,7 @@ let route
          (fun ~context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_delete project_id)
+              (fun manager -> manager#simulation_delete)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
@@ -335,7 +334,7 @@ let route
          (fun ~context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_raw_trace project_id)
+              (fun manager -> manager#simulation_raw_trace)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(fun out -> out)
@@ -349,7 +348,7 @@ let route
          (fun ~context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_parameter project_id)
+              (fun manager -> manager#simulation_parameter)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:
@@ -369,8 +368,7 @@ let route
                 "filelinesid" in
             bind_projects
               (fun manager -> manager#simulation_detail_file_line
-               project_id
-               (Some filelines_id))
+                  (Some filelines_id))
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:
@@ -389,9 +387,7 @@ let route
                 context
                 "fluxmapsid" in
             bind_projects
-              (fun manager -> manager#simulation_detail_flux_map
-               project_id
-               fluxmaps_id)
+              (fun manager -> manager#simulation_detail_flux_map fluxmaps_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map
@@ -406,7 +402,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_detail_log_message project_id)
+              (fun manager -> manager#simulation_detail_log_message)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_log_message ?len:None)
@@ -447,7 +443,6 @@ let route
                ~ok:(fun plot_parameter ->
                    bind_projects
                      (fun manager -> manager#simulation_detail_plot
-                         project_id
                          plot_parameter)
                      project_id projects)) >>=
             (Webapp_common.result_response
@@ -465,9 +460,7 @@ let route
                 context
                 "snapshotid" in
             bind_projects
-              (fun manager -> manager#simulation_detail_snapshot
-               project_id
-               snapshot_id)
+              (fun manager -> manager#simulation_detail_snapshot snapshot_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_detail
@@ -482,7 +475,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_info project_id)
+              (fun manager -> manager#simulation_info)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_info
@@ -497,7 +490,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_efficiency project_id)
+              (fun manager -> manager#simulation_efficiency)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Counter.Efficiency.string_of_t
@@ -512,7 +505,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_catalog_file_line project_id)
+              (fun manager -> manager#simulation_catalog_file_line)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_line_catalog
@@ -527,7 +520,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_catalog_flux_map project_id)
+              (fun manager -> manager#simulation_catalog_flux_map)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
@@ -542,7 +535,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_catalog_snapshot project_id)
+              (fun manager -> manager#simulation_catalog_snapshot)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog
@@ -562,7 +555,7 @@ let route
             Api_types_j.simulation_parameter_of_string
             >>= fun params ->
             bind_projects
-              (fun manager -> manager#simulation_continue project_id params)
+              (fun manager -> manager#simulation_continue params)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
@@ -577,7 +570,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             bind_projects
-              (fun manager -> manager#simulation_pause project_id)
+              (fun manager -> manager#simulation_pause)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
@@ -596,7 +589,7 @@ let route
             Api_types_j.simulation_perturbation_of_string
             >>= fun pert ->
             bind_projects
-              (fun manager -> manager#simulation_perturbation project_id pert)
+              (fun manager -> manager#simulation_perturbation pert)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_unit_t
@@ -614,7 +607,7 @@ let route
             Mpi_message_j.simulation_parameter_of_string
             >>= fun params ->
             bind_projects
-              (fun manager -> manager#simulation_start project_id params)
+              (fun manager -> manager#simulation_start params)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
@@ -632,7 +625,7 @@ let route
             Cohttp_lwt_body.to_string context.Webapp_common.body >|=
             (fun x -> Ast.compil_of_json (Yojson.Basic.from_string x)) >>=
             fun compil -> tmp_bind_projects
-              (fun manager -> manager#init_static_analyser project_id compil)
+              (fun manager -> manager#init_static_analyser compil)
               project_id projects >>= function
             | Result.Ok () ->
               let body = "null" in
@@ -652,7 +645,7 @@ let route
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
             tmp_bind_projects
-              (fun manager -> manager#get_contact_map project_id accuracy)
+              (fun manager -> manager#get_contact_map accuracy)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
@@ -669,7 +662,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             tmp_bind_projects
-              (fun manager -> manager#get_contact_map project_id None)
+              (fun manager -> manager#get_contact_map None)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
@@ -689,7 +682,7 @@ let route
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
             tmp_bind_projects
-              (fun manager -> manager#get_influence_map project_id accuracy)
+              (fun manager -> manager#get_influence_map accuracy)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
@@ -706,7 +699,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             tmp_bind_projects
-              (fun manager -> manager#get_influence_map project_id None)
+              (fun manager -> manager#get_influence_map None)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
@@ -723,7 +716,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             tmp_bind_projects
-              (fun manager -> manager#get_dead_rules project_id)
+              (fun manager -> manager#get_dead_rules)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
@@ -740,7 +733,7 @@ let route
          (fun ~context:context ->
             let project_id = project_ref context in
             tmp_bind_projects
-              (fun manager -> manager#get_constraints_list project_id)
+              (fun manager -> manager#get_constraints_list)
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in

@@ -24,27 +24,21 @@ val init : unit -> unit Lwt.t
 val refresh : unit -> unit Api.result Lwt.t
 
 val with_simulation :
-  label:string ->
-  (Api.concrete_manager -> Api_types_j.project_id ->
-   t -> 'a  Api.result Lwt.t) ->
-  'a  Api.result Lwt.t
+  label:string -> (Api.concrete_manager -> t -> 'a  Api.result Lwt.t) ->
+  'a Api.result Lwt.t
 
 val with_simulation_info :
   label:string ->
-  ?stopped:(Api.concrete_manager ->
-            Api_types_j.project_id -> unit Api.result Lwt.t) ->
-  ?initializing:(Api.concrete_manager ->
-                 Api_types_j.project_id -> unit Api.result Lwt.t) ->
+  ?stopped:(Api.concrete_manager -> unit Api.result Lwt.t) ->
+  ?initializing:(Api.concrete_manager -> unit Api.result Lwt.t) ->
   ?ready:(Api.concrete_manager ->
-          Api_types_j.project_id ->
           Api_types_j.simulation_info -> unit Api.result Lwt.t) ->
   unit -> unit Api.result Lwt.t
 
 val when_ready :
   label:string ->
   ?handler:(unit Api.result -> unit Lwt.t) ->
-  (Api.concrete_manager -> Api_types_j.project_id -> unit Api.result Lwt.t) ->
-  unit
+  (Api.concrete_manager -> unit Api.result Lwt.t) -> unit
 
 val continue_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t
 val pause_simulation : unit -> unit Api.result Lwt.t

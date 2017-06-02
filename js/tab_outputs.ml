@@ -22,13 +22,8 @@ let update_outputs key : unit =
   let file_line_info_id = if key = "/dev/stdout" then None else Some key in
   State_simulation.when_ready
     ~label:__LOC__
-    (fun
-      manager
-      project_id ->
-      (manager#simulation_detail_file_line
-         project_id
-         file_line_info_id
-      ) >>=
+    (fun manager ->
+      (manager#simulation_detail_file_line file_line_info_id) >>=
       (Api_common.result_bind_lwt
          ~ok:(fun (file_line_detail : Api_types_j.file_line_detail) ->
              let () = set_current_file (Some file_line_detail) in
@@ -87,27 +82,27 @@ let xml () =
            (fun _ ->
               State_simulation.when_ready
                 ~label:__LOC__
-                (fun manager project_id ->
-                  (manager#simulation_catalog_file_line project_id) >>=
-                  (Api_common.result_bind_lwt
-                     ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
-                         let () = ReactiveData.RList.set
-                             handle
-                             (match file_line_info.Api_types_j.file_line_ids with
-                              | [] -> []
-                              | key::[] ->
-                                let () = update_outputs
-                                    (Option_util.unsome "/dev/stdout" key) in
-                                [Html.h4
-                                   [ Html.pcdata
-                                       (Ui_common.option_label
-                                          (Option_util.unsome "" key)
-                                       )]]
-                              | _ :: _ :: _ -> [select file_line_info])
-                         in
-                         Lwt.return (Api_common.result_ok ())
-                       )
-                  )
+                (fun manager ->
+                   manager#simulation_catalog_file_line >>=
+                   (Api_common.result_bind_lwt
+                      ~ok:(fun (file_line_info : Api_types_j.file_line_catalog) ->
+                          let () = ReactiveData.RList.set
+                              handle
+                              (match file_line_info.Api_types_j.file_line_ids with
+                               | [] -> []
+                               | key::[] ->
+                                 let () = update_outputs
+                                     (Option_util.unsome "/dev/stdout" key) in
+                                 [Html.h4
+                                    [ Html.pcdata
+                                        (Ui_common.option_label
+                                           (Option_util.unsome "" key)
+                                        )]]
+                               | _ :: _ :: _ -> [select file_line_info])
+                          in
+                          Lwt.return (Api_common.result_ok ())
+                        )
+                   )
                 )
            )
            (React.S.on

@@ -37,7 +37,7 @@ class manager ()  =
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
         kasa_mailbox
-    method terminate () =
+    method terminate =
       let () = sim_worker##terminate in
       kasa_worker##terminate
   end

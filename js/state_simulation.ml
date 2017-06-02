@@ -60,13 +60,11 @@ let model : model React.signal = state
 
 let with_simulation :
   'a . label:string ->
-  (Api.concrete_manager -> Api_types_j.project_id ->
-   t -> 'a  Api.result Lwt.t) ->
+  (Api.concrete_manager -> t -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t  =
   fun ~label handler ->
-    let project_handler manager project_id =
-      handler manager project_id (React.S.value state)
-    in
+    let project_handler manager =
+      handler manager (React.S.value state) in
     State_project.with_project ~label project_handler
 
 let fail_lwt error_msg = Lwt.return (Api_common.result_error_msg error_msg)
@@ -74,66 +72,59 @@ let fail_lwt error_msg = Lwt.return (Api_common.result_error_msg error_msg)
 let with_simulation_info
   ~(label : string)
   ?(stopped : Api.concrete_manager ->
-    Api_types_j.project_id ->
     unit Api.result Lwt.t =
-    fun _ _ -> fail_lwt "Simulation stopped")
+    fun _ -> fail_lwt "Simulation stopped")
   ?(initializing : Api.concrete_manager ->
-    Api_types_j.project_id ->
     unit Api.result Lwt.t =
-    fun _ _ -> fail_lwt "Simulation initalizing")
+    fun _ -> fail_lwt "Simulation initalizing")
   ?(ready : Api.concrete_manager ->
-    Api_types_j.project_id ->
     Api_types_j.simulation_info ->
     unit Api.result Lwt.t =
-    fun _ _ _ -> fail_lwt "Simulation ready")
+    fun _ _ -> fail_lwt "Simulation ready")
   () =
   with_simulation
   ~label
-  (fun manager (project_id : Api_types_j.project_id) s ->
+  (fun manager s ->
      match s.simulation_state with
-     | SIMULATION_STATE_STOPPED -> stopped manager project_id
-     | SIMULATION_STATE_INITALIZING -> initializing manager project_id
-     | SIMULATION_STATE_READY simulation_info ->
-       ready manager project_id simulation_info)
+     | SIMULATION_STATE_STOPPED -> stopped manager
+     | SIMULATION_STATE_INITALIZING -> initializing manager
+     | SIMULATION_STATE_READY simulation_info -> ready manager simulation_info)
 
 let when_ready
     ~(label : string)
     ?(handler : unit Api.result -> unit Lwt.t = fun _ -> Lwt.return_unit)
-    (operation : Api.concrete_manager -> Api_types_j.project_id ->
-     unit Api.result Lwt.t) : unit =
+    (operation : Api.concrete_manager -> unit Api.result Lwt.t) : unit =
     Common.async
       (fun () ->
          with_simulation_info
            ~label
-           ~stopped:(fun _ _-> Lwt.return (Api_common.result_ok ()))
-           ~initializing:(fun _ _ -> Lwt.return (Api_common.result_ok ()))
-           ~ready:(fun manager project_id _ ->
-               (operation manager project_id : unit Api.result Lwt.t)
+           ~stopped:(fun _-> Lwt.return (Api_common.result_ok ()))
+           ~initializing:(fun _ -> Lwt.return (Api_common.result_ok ()))
+           ~ready:(fun manager _ ->
+               (operation manager : unit Api.result Lwt.t)
              )
            () >>= handler
       )
 
 (* to synch state of application with runtime *)
 let sleep_time = 1.0
-let rec sync ~project_id =
+let rec sync () =
   match (React.S.value state).simulation_state with
   | SIMULATION_STATE_STOPPED | SIMULATION_STATE_INITALIZING ->
     Lwt.return (Api_common.result_ok ())
   | SIMULATION_STATE_READY _ ->
     State_project.with_project ~label:"sync"
-      (fun manager new_project_id ->
+      (fun manager ->
          (* get current directory *)
-         (manager#simulation_info new_project_id) >>=
+         manager#simulation_info >>=
          (Api_common.result_bind_lwt
             ~ok:(fun simulation_info ->
                 let () = set_state
                     {simulation_state =
                        SIMULATION_STATE_READY simulation_info} in
                 if simulation_info.Api_types_t.simulation_info_progress
-                   .Api_types_t.simulation_progress_is_running &&
-                project_id = new_project_id then
-                  Lwt_js.sleep sleep_time >>=
-                  fun  () -> sync ~project_id:new_project_id
+                   .Api_types_t.simulation_progress_is_running then
+                  Lwt_js.sleep sleep_time >>= sync
                 else Lwt.return (Api_common.result_ok ())
               )
          )
@@ -141,15 +132,15 @@ let rec sync ~project_id =
 
 let refresh () =
   State_project.with_project ~label:"sync"
-    (fun manager project_id ->
+    (fun manager ->
        (* get current directory *)
-       (manager#simulation_info project_id) >>=
+       manager#simulation_info >>=
        (Api_common.result_map
           ~ok:(fun _ simulation_info ->
               let () = set_state
                   {simulation_state =
                      SIMULATION_STATE_READY simulation_info} in
-              sync ~project_id)
+              sync ())
           ~error:(fun _ _ ->
               let () = set_state
                   {simulation_state = SIMULATION_STATE_STOPPED} in
@@ -162,83 +153,76 @@ let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter
   with_simulation_info
     ~label:"continue_simulation"
     ~stopped:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
            "Failed to continue simulation, simulation stopped"
          in
          Lwt.return (Api_common.result_error_msg error_msg))
     ~initializing:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
             "Failed to continue simulation, simulation initializing"
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun manager (project_id : Api_types_j.project_id) _ ->
-          manager#simulation_continue
-          project_id
-          simulation_parameter
-        >>=
-        (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id)))
+      (fun manager _ ->
+          manager#simulation_continue simulation_parameter >>=
+        (Api_common.result_bind_lwt ~ok:sync))
     ()
 
 let pause_simulation () : unit Api.result Lwt.t =
   with_simulation_info
     ~label:"pause_simulation"
     ~stopped:
-      (fun _ _ ->
+      (fun _ ->
         let error_msg : string =
           "Failed to pause simulation, simulation stopped"
          in
          Lwt.return (Api_common.result_error_msg error_msg))
     ~initializing:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
            "Failed to pause simulation, simulation initializing"
         in
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun manager (project_id : Api_types_j.project_id)
-        (_ : Api_types_j.simulation_info) ->
-        manager#simulation_pause project_id)
+      (fun manager (_ : Api_types_j.simulation_info) ->
+        manager#simulation_pause)
     ()
 
 let stop_simulation () : unit Api.result Lwt.t =
   with_simulation_info
     ~label:"stop_simulation"
     ~stopped:
-      (fun _ _ ->
-        let error_msg : string =
-          "Failed to pause simulation, simulation stopped"
+      (fun _ ->
+         let error_msg : string =
+           "Failed to pause simulation, simulation stopped"
          in
          Lwt.return (Api_common.result_error_msg error_msg))
     ~initializing:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
            "Failed to stop simulation, simulation initializing"
-        in
-        Lwt.return (Api_common.result_error_msg error_msg))
+         in
+         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun manager (project_id : Api_types_j.project_id)
-        (_ : Api_types_j.simulation_info)
-        ->
-          manager#simulation_delete project_id >>=
-          (Api_common.result_bind_lwt ~ok:(fun () ->
-               let () = update_simulation_state SIMULATION_STATE_STOPPED in
-               Lwt.return (Api_common.result_ok ()))))
+      (fun manager (_ : Api_types_j.simulation_info) ->
+         manager#simulation_delete >>=
+         (Api_common.result_bind_lwt ~ok:(fun () ->
+              let () = update_simulation_state SIMULATION_STATE_STOPPED in
+              Lwt.return (Api_common.result_ok ()))))
     ()
 
 let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
   with_simulation_info
     ~label:"start_simulation"
     ~stopped:
-      (fun manager
-        (project_id : Api_types_j.project_id) ->
+      (fun manager ->
         let on_error (error_msgs : Api_types_j.errors) : unit Api.result Lwt.t =
           let () =
             update_simulation_state SIMULATION_STATE_STOPPED in
           (* turn the lights off *)
-          (manager#simulation_delete project_id)>>=
+          manager#simulation_delete >>=
           (fun _ -> Lwt.return (Api_common.result_messages error_msgs))
         in
         Lwt.catch
@@ -246,10 +230,10 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
              (* set state to initalize *)
              let () =
                update_simulation_state SIMULATION_STATE_INITALIZING in
-             (manager#simulation_start project_id simulation_parameter)
+             (manager#simulation_start simulation_parameter)
              >>=
              (Api_common.result_bind_lwt
-                ~ok:(fun _ -> manager#simulation_info project_id))
+                ~ok:(fun _ -> manager#simulation_info))
              >>=
              (Api_common.result_bind_lwt
                 ~ok:(fun simulation_status ->
@@ -268,7 +252,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
                       update_simulation_state SIMULATION_STATE_STOPPED in
                     on_error error_msg))
              >>=
-             (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id))
+             (Api_common.result_bind_lwt ~ok:sync)
           )
           (function
             | Invalid_argument error ->
@@ -278,16 +262,14 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
             | _ -> on_error [(Api_common.error_msg "Initialization error")])
       )
     ~initializing:
+      (fun _ ->
+         let error_msg : string =
+           "Failed to start simulation, simulation initializing" in
+         Lwt.return (Api_common.result_error_msg error_msg))
+    ~ready:
       (fun _ _ ->
          let error_msg : string =
-           "Failed to start simulation, simulation initializing"
-        in
-        Lwt.return (Api_common.result_error_msg error_msg))
-    ~ready:
-      (fun _ _ _ ->
-         let error_msg : string =
-           "Failed to start simulation, simulation running"
-         in
+           "Failed to start simulation, simulation running" in
          Lwt.return (Api_common.result_error_msg error_msg))
     ()
 
@@ -295,23 +277,18 @@ let perturb_simulation (code : string) : unit Api.result Lwt.t =
   with_simulation_info
     ~label:"perturb_simulation"
     ~stopped:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
-           "Failed to start simulation, simulation running"
-         in
+           "Failed to start simulation, simulation running" in
          Lwt.return (Api_common.result_error_msg error_msg))
     ~initializing:
-      (fun _ _ ->
+      (fun _ ->
          let error_msg : string =
-           "Failed to start simulation, simulation initializing"
-        in
-        Lwt.return (Api_common.result_error_msg error_msg))
+           "Failed to start simulation, simulation initializing" in
+         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
-      (fun manager (project_id : Api_types_j.project_id)
-        _ ->
+      (fun manager _ ->
         manager#simulation_perturbation
-          project_id
-          { Api_types_j.perturbation_code = code }
-        >>=
-        (Api_common.result_bind_lwt ~ok:(fun () -> sync ~project_id)))
+          { Api_types_j.perturbation_code = code } >>=
+        (Api_common.result_bind_lwt ~ok:sync))
     ()

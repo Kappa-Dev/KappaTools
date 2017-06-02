@@ -156,33 +156,30 @@ let select_snapshot () =
       let () =
         State_simulation.when_ready
           ~label:__LOC__
-          (fun manager project_id ->
-            (manager#simulation_catalog_snapshot project_id) >>=
-            (Api_common.result_bind_lwt
-               ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
-                   try
-                     let snapshot_id : string =
-                       List.nth snapshot_info.Api_types_t.snapshot_ids index in
-                     (manager#simulation_detail_snapshot
-                        project_id snapshot_id)
-                   with
-                   | Failure f ->
-                     Lwt.return
-                       (Api_common.result_error_msg f)
-                   | Invalid_argument f ->
-                     Lwt.return
-                       (Api_common.result_error_msg f)
-                 )
-            ) >>=
-            (Api_common.result_bind_lwt
-               ~ok:(fun (snapshot : Api_types_j.snapshot) ->
-                   let () = set_current_snapshot (Some snapshot) in
-                   let () = render_snapshot_graph
-                       snapshot_js
-                       snapshot
-                   in
-                   Lwt.return (Api_common.result_ok ()))
-            )
+          (fun manager ->
+             manager#simulation_catalog_snapshot >>=
+             (Api_common.result_bind_lwt
+                ~ok:(fun  (snapshot_info : Api_types_t.snapshot_catalog) ->
+                    try
+                      let snapshot_id : string =
+                        List.nth snapshot_info.Api_types_t.snapshot_ids index in
+                      (manager#simulation_detail_snapshot snapshot_id)
+                    with
+                    | Failure f ->
+                      Lwt.return (Api_common.result_error_msg f)
+                    | Invalid_argument f ->
+                      Lwt.return (Api_common.result_error_msg f)
+                  )
+             ) >>=
+             (Api_common.result_bind_lwt
+                ~ok:(fun (snapshot : Api_types_j.snapshot) ->
+                    let () = set_current_snapshot (Some snapshot) in
+                    let () = render_snapshot_graph
+                        snapshot_js
+                        snapshot
+                    in
+                    Lwt.return (Api_common.result_ok ()))
+             )
           )
       in
       ()
@@ -227,15 +224,15 @@ let xml () =
       (fun _ ->
          State_simulation.when_ready
            ~label:__LOC__
-           (fun manager project_id ->
-             (manager#simulation_catalog_snapshot project_id) >>=
-             (Api_common.result_bind_lwt
-                ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
-                    let () = select_snapshot () in
-                    let () = ReactiveData.RList.set
-                        handle (select data.Api_types_t.snapshot_ids) in
-                    Lwt.return (Api_common.result_ok ()))
-             )
+           (fun manager ->
+              manager#simulation_catalog_snapshot >>=
+              (Api_common.result_bind_lwt
+                 ~ok:(fun (data : Api_types_t.snapshot_catalog) ->
+                     let () = select_snapshot () in
+                     let () = ReactiveData.RList.set
+                         handle (select data.Api_types_t.snapshot_ids) in
+                     Lwt.return (Api_common.result_ok ()))
+              )
            )
       )
       (React.S.on

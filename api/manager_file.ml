@@ -127,8 +127,7 @@ type file_index = { file_index_file_id : Api_types_j.file_id ;
 
 class manager_file (project : Api_environment.project) : Api.manager_file =
   object
-    method file_catalog
-        (project_id : Api_types_j.project_id) :
+    method file_catalog :
       Api_types_j.file_catalog Api.result Lwt.t =
       let files : Api_types_j.file list = (project#get_files ()) in
       let file_catalog : Api_types_j.file_catalog =
@@ -138,7 +137,6 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
       Lwt.return (Api_common.result_ok file_catalog)
 
     method file_create
-        (project_id : Api_types_j.project_id)
         (file : Api_types_j.file) :
       Api_types_j.file_metadata Api.result Lwt.t =
       let file_list : Api_types_j.file list = (project#get_files ()) in
@@ -173,7 +171,6 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
           )
 
     method file_get
-      (project_id : Api_types_j.project_id)
       (file_id : Api_types_j.file_id) :
       Api_types_j.file Api.result Lwt.t =
       Api_common.bind_file
@@ -183,7 +180,6 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
            Lwt.return (Api_common.result_ok file))
 
     method file_update
-      (project_id : Api_types_j.project_id)
       (file_id : Api_types_j.file_id)
       (file_modification : Api_types_j.file_modification) :
       Api_types_j.file_metadata Api.result Lwt.t =
@@ -206,7 +202,6 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
         )
 
     method file_delete
-        (project_id : Api_types_j.project_id)
         (file_id : Api_types_j.file_id) :
       unit Api.result Lwt.t =
       Api_common.bind_file

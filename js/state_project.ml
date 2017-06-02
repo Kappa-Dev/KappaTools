@@ -92,13 +92,11 @@ let set_seed seed =
 let set_store_trace store_trace =
   update_parameters (fun param -> { param with store_trace })
 
-let update_state
-    project_id me project_catalog default_parameters project_parameters =
-    me.project_manager#project_parse project_id >>=
+let update_state me project_catalog default_parameters project_parameters =
+    me.project_manager#project_parse >>=
     (Api_common.result_map
        ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
            me.project_manager#init_static_analyser_raw
-             project_id
              project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
              set_state {
@@ -141,7 +139,7 @@ let add_project is_new (project_id : Api_types_j.project_id) : unit Api.result L
               (Api_common.result_ok (me,me::catalog,params))))) >>=
   Api_common.result_bind_lwt
     ~ok:(fun (me,catalog,params) ->
-        update_state project_id me catalog default_parameters params)
+        update_state me catalog default_parameters params)
 
 let create_project project_id = add_project true project_id
 let set_project project_id = add_project false project_id
@@ -176,11 +174,10 @@ let sync () : unit Api.result Lwt.t =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Api_common.result_ok ())
   | Some current ->
-    current.project_manager#project_parse current.project_id >>=
+    current.project_manager#project_parse >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (project_parse : Api_types_j.project_parse) ->
            current.project_manager#init_static_analyser_raw
-             current.project_id
              project_parse.Api_types_j.project_parse_raw_ast >>= fun out ->
            let () =
              set_state {
@@ -194,13 +191,13 @@ let sync () : unit Api.result Lwt.t =
 let remove_simulations manager project_id =
   manager#simulation_delete project_id
 
-let remove_files manager project_id =
-  (manager#file_catalog project_id) >>=
+let remove_files manager =
+  manager#file_catalog >>=
   (Api_common.result_bind_lwt
      ~ok:(fun (catalog : Api_types_t.file_catalog) ->
          Lwt_list.iter_p
            (fun m ->
-              manager#file_delete project_id m.Api_types_j.file_metadata_id>>=
+              manager#file_delete m.Api_types_j.file_metadata_id>>=
               (fun _ -> Lwt.return_unit))
            catalog.Api_types_t.file_metadata_list >>=
          (fun () -> Lwt.return (Api_common.result_ok ()))))
@@ -211,9 +208,9 @@ let remove_project project_id =
     let current =
       List.find (fun x -> x.project_id = project_id)
         state.project_catalog in
-    remove_files current.project_manager current.project_id >>=
+    remove_files current.project_manager >>=
     (fun out' ->
-       let () = current.project_manager#terminate () in
+       let () = current.project_manager#terminate in
        let project_catalog =
          List.filter (fun x -> x.project_id <> current.project_id)
            state.project_catalog in
@@ -237,18 +234,6 @@ let remove_project project_id =
   with Not_found ->
     Lwt.return (Api_common.result_error_msg
                   ("Project "^project_id^" does not exists"))
-
-let create_simulation_parameter project_id :
-  Api_types_j.simulation_parameter =
-  let st = React.S.value state in
-  let param = Mods.StringMap.find_default
-      st.default_parameters project_id st.project_parameters in
-  { Api_types_j.simulation_plot_period = param.plot_period ;
-    Api_types_j.simulation_pause_condition = param.pause_condition ;
-    Api_types_j.simulation_seed = param.seed;
-    Api_types_j.simulation_id = "default" ;
-    Api_types_j.simulation_store_trace = param.store_trace ;
-  }
 
 let rec init_plot_period (arg : string list) : unit =
   match arg with
@@ -310,7 +295,7 @@ let init existing_projects : unit Lwt.t =
 
 let with_project :
   'a . label:string ->
-  (Api.concrete_manager -> Api_types_j.project_id -> 'a  Api.result Lwt.t) ->
+  (Api.concrete_manager -> 'a  Api.result Lwt.t) ->
   'a  Api.result Lwt.t  =
   fun ~label handler ->
     match (React.S.value state).project_current with
@@ -320,5 +305,4 @@ let with_project :
           "Failed %s due to unavailable project."
           label in
       Lwt.return (Api_common.result_error_msg error_msg)
-    | Some current ->
-      handler current.project_manager current.project_id
+    | Some current -> handler current.project_manager

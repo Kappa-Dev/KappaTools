@@ -59,15 +59,14 @@ let refresh_file , set_refresh_file = React.S.create (None : refresh option)
 
 let get_file () : Api_types_j.file Api.result Lwt.t =
   State_project.with_project ~label:"get_file"
-    (fun manager project_id ->
+    (fun manager ->
        (match (React.S.value directory_state).state_current with
         | None ->
           let error_msg : string =
             "Attempt to fetch file with none selected."
           in
           Lwt.return (Api_common.result_error_msg error_msg)
-           | Some filename ->
-             manager#file_get project_id filename
+           | Some filename -> manager#file_get filename
        )
     )
 
@@ -107,9 +106,8 @@ let model : model React.signal =
     )
 let update_directory
     (manager : Api.concrete_manager)
-    (project_id : Api_types_j.project_id)
   : unit Api.result Lwt.t =
-  (manager#file_catalog project_id) >>=
+  manager#file_catalog >>=
   (Api_common.result_bind_lwt
      ~ok:(fun (catalog : Api_types_j.file_catalog) ->
          let directory = React.S.value directory_state in
@@ -170,8 +168,8 @@ let create_file
     ~(content:string) :
   unit Api.result Lwt.t =
   State_project.with_project ~label:"create_file"
-    (fun manager project_id ->
-       (manager#file_catalog project_id) >>=
+    (fun manager ->
+       manager#file_catalog >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (catalog : Api_types_j.file_catalog) ->
               (let matching_file : Api_types_j.file_metadata list =
@@ -181,7 +179,7 @@ let create_file
                    catalog.Api_types_j.file_metadata_list in
                (match matching_file with
                 | [] ->
-                  manager#file_create project_id
+                  manager#file_create
                     (new_file
                        ~position:(List.length
                                     catalog.Api_types_j.file_metadata_list)
@@ -195,7 +193,7 @@ let create_file
                       ?position:None
                       ()
                   in
-                  manager#file_update project_id filename file_modification)
+                  manager#file_update filename file_modification)
                >>=
                (Api_common.result_bind_lwt
                   ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))) >>=
@@ -203,7 +201,7 @@ let create_file
                   let () = set_directory_state
                       { (React.S.value directory_state) with
                         state_current = Some filename } in
-                  let r_dir_t = update_directory manager project_id in
+                  let r_dir_t = update_directory manager in
                   send_refresh filename None >>=
                   fun r_txt -> r_dir_t >>=
                   fun r_dir -> Lwt.return (Api_common.result_combine [r_create; r_dir; r_txt])
@@ -226,8 +224,8 @@ let choose_file
 
 let select_file (filename : string) (line : int option) : unit Api.result Lwt.t =
   State_project.with_project ~label:"select_file"
-    (fun manager project_id ->
-       (manager#file_catalog project_id) >>=
+    (fun manager ->
+       manager#file_catalog >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (catalog : Api_types_j.file_catalog) ->
               let current = choose_file filename catalog.Api_types_j.file_metadata_list in
@@ -264,7 +262,7 @@ let modify_file
     (file_id : Api_types_j.file_id option)
     (file_modification : Api_types_j.file_metadata -> Api_types_j.file_modification) : unit Api.result Lwt.t =
   State_project.with_project ~label:"select_file"
-    (fun manager project_id ->
+    (fun manager ->
        match file_id with
        | None ->
          let error_msg : string =
@@ -272,7 +270,7 @@ let modify_file
          in
          Lwt.return (Api_common.result_error_msg error_msg)
        | Some filename ->
-         (manager#file_catalog project_id) >>=
+         manager#file_catalog >>=
          (Api_common.result_bind_lwt
             ~ok:(fun (catalog : Api_types_j.file_catalog) ->
                 (* lets fetch the latest metadata to get the verison *)
@@ -291,16 +289,14 @@ let modify_file
                   Lwt.return (Api_common.result_error_msg error_msg)
                 | Some metadata ->
                   (manager#file_update
-                     project_id
-                     filename
-                     (file_modification metadata))
+                     filename (file_modification metadata))
                   >>=
                   (Api_common.result_bind_lwt
                      ~ok:(fun _ ->
                          if skip_directory_update then
                            Lwt.return (Api_common.result_ok ())
                          else
-                           update_directory manager project_id )
+                           update_directory manager)
                   )
               )
          )
@@ -364,15 +360,14 @@ let order_files (filenames : string list) : unit Api.result Lwt.t =
 
 let get_file () : Api_types_j.file Api.result Lwt.t =
   State_project.with_project ~label:"get_file"
-    (fun manager project_id ->
+    (fun manager ->
        (match (React.S.value directory_state).state_current with
         | None ->
           let error_msg : string =
             "Attempt to fetch file with none selected."
           in
           Lwt.return (Api_common.result_error_msg error_msg)
-           | Some filename ->
-             manager#file_get project_id filename
+           | Some filename -> manager#file_get filename
        )
     )
 
@@ -402,9 +397,9 @@ let sync ?(reset=false) () : unit Api.result Lwt.t =
   (* Save the current state of the directory.*)
   let old_state = React.S.value directory_state in
   State_project.with_project ~label:"synch"
-    (fun manager project_id ->
+    (fun manager ->
        (* get current directory *)
-       (manager#file_catalog project_id) >>=
+       manager#file_catalog >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (catalog : Api_types_j.file_catalog) ->
               (* Save the new state of the directory.*)
@@ -468,7 +463,7 @@ let sync ?(reset=false) () : unit Api.result Lwt.t =
 
 let remove_file () : unit Api.result Lwt.t =
   State_project.with_project ~label:"remove_file"
-    (fun manager project_id ->
+    (fun manager ->
        (match (React.S.value directory_state).state_current with
         | None ->
           let error_msg : string =
@@ -476,7 +471,7 @@ let remove_file () : unit Api.result Lwt.t =
           in
           Lwt.return (Api_common.result_error_msg error_msg)
            | Some filename ->
-             (manager#file_delete project_id filename) >>=
+             (manager#file_delete filename) >>=
              (Api_common.result_bind_lwt
                 ~ok:(fun _ -> sync ())   )
        )

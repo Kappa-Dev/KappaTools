@@ -54,8 +54,8 @@ let _ = React.S.map
     (fun _ ->
        State_simulation.when_ready
          ~label:__LOC__
-         (fun manager project_id ->
-           (manager#simulation_catalog_flux_map project_id) >>=
+         (fun manager ->
+           manager#simulation_catalog_flux_map >>=
            (Api_common.result_bind_lwt
               ~ok:(fun (data : Api_types_t.flux_map_catalog) ->
                   let () = ReactiveData.RList.set
@@ -147,14 +147,14 @@ let update_flux_map
     (index : int ): unit =
   State_simulation.when_ready
     ~label:__LOC__
-    (fun manager project_id ->
-      (manager#simulation_catalog_flux_map project_id) >>=
+    (fun manager ->
+      manager#simulation_catalog_flux_map >>=
       (Api_common.result_bind_lwt
          ~ok:(fun  (flux_map_info : Api_types_j.flux_map_catalog) ->
              try
                let fluxmap_id : string =
                  List.nth flux_map_info.Api_types_t.flux_map_ids index in
-               (manager#simulation_detail_flux_map project_id fluxmap_id)
+               (manager#simulation_detail_flux_map fluxmap_id)
              with
              | Failure f ->
                Lwt.return

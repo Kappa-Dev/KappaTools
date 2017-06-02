@@ -678,9 +678,8 @@ module RunningPanelLayout : Ui_common.Div = struct
            State_simulation.with_simulation_info
              ~label:__LOC__
              ~ready:
-               (fun manager project_id status ->
-                  (manager#simulation_efficiency project_id)
-                  >>=
+               (fun manager status ->
+                  manager#simulation_efficiency >>=
                   (Api_common.result_bind_lwt
                      ~ok:(fun eff ->
                          let current_event =
@@ -692,7 +691,7 @@ module RunningPanelLayout : Ui_common.Div = struct
                          Lwt.return (Api_common.result_ok ()))
                   )
                )
-             ~stopped:(fun _ _ ->
+             ~stopped:(fun _ ->
                  let () = ReactiveData.RList.set set_state_log [] in
                  Lwt.return (Api_common.result_ok ()))
              ()

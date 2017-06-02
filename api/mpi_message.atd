@@ -56,30 +56,30 @@ type simulation_artifact <ocaml from="Api_types"> = abstract
 type unit_t <ocaml_biniou t="unit"> = unit
 
 type request = [
-               | FileCreate of (project_id * file)
-               | FileDelete of (project_id * file_id)
-               | FileGet of (project_id * file_id)
-               | FileCatalog of project_id
-               | FileUpdate of (project_id * file_id * file_modification)
-	       | ProjectParse of project_id
+               | FileCreate of file
+               | FileDelete of file_id
+               | FileGet of file_id
+               | FileCatalog
+               | FileUpdate of (file_id * file_modification)
+	       | ProjectParse
 	       | ProjectGet of project_id
-               | SimulationContinue of (project_id * simulation_parameter)
-               | SimulationDelete of project_id
-               | SimulationDetailFileLine of (project_id * file_line_id)
-               | SimulationDetailFluxMap of (project_id * flux_map_id)
-               | SimulationDetailLogMessage of project_id
-               | SimulationDetailPlot of (project_id * plot_parameter)
-               | SimulationDetailSnapshot of (project_id * snapshot_id)
-               | SimulationInfo of project_id
-	       | SimulationEfficiency of project_id
-               | SimulationCatalogFileLine of project_id
-               | SimulationCatalogFluxMap of project_id
-               | SimulationCatalogSnapshot of project_id
-	       | SimulationTrace of project_id
-	       | SimulationParameter of project_id
-               | SimulationPause of project_id
-               | SimulationPerturbation of (project_id * simulation_perturbation)
-               | SimulationStart of (project_id * simulation_parameter)
+               | SimulationContinue of simulation_parameter
+               | SimulationDelete
+               | SimulationDetailFileLine of file_line_id
+               | SimulationDetailFluxMap of flux_map_id
+               | SimulationDetailLogMessage
+               | SimulationDetailPlot of plot_parameter
+               | SimulationDetailSnapshot of snapshot_id
+               | SimulationInfo
+	       | SimulationEfficiency
+               | SimulationCatalogFileLine
+               | SimulationCatalogFluxMap
+               | SimulationCatalogSnapshot
+	       | SimulationTrace
+	       | SimulationParameter
+               | SimulationPause
+               | SimulationPerturbation of simulation_perturbation
+               | SimulationStart of simulation_parameter
                ]
 
 type rest_request = [
@@ -89,6 +89,7 @@ type rest_request = [
      | ProjectCreate of project_parameter
      | ProjectDelete of project_id
      ]
+
 type response_content = [
    | FileCreate of file_metadata
    | FileDelete of unit

@@ -130,7 +130,7 @@ class manager
       | Some _ -> true
       | None -> false
 
-    method terminate () =
+    method terminate =
       let () = sa_process##kill in
       match sim_process with
       | Some process -> process##kill

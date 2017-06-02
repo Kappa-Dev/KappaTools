@@ -198,11 +198,11 @@ end;;
 
 module FileOperations = CollectionOperations(FileCollection)
 
-let bind_simulation project_id project handler =
+let bind_simulation project handler =
   match project#get_simulation () with
   | Some simulation -> handler simulation
   | None ->
-    let m  = project_id^": No simulation" in
+    let m  = "No simulation available" in
     Lwt.return (result_error_msg ~result_code:`NOT_FOUND m)
 
 let bind_file project (file_id : Api_types_t.file_id) handler =

@@ -8,29 +8,31 @@
 
 open Lwt.Infix
 
+let create_simulation_parameter param :
+  Api_types_j.simulation_parameter = {
+  Api_types_j.simulation_plot_period = param.State_project.plot_period ;
+  Api_types_j.simulation_pause_condition = param.State_project.pause_condition ;
+  Api_types_j.simulation_seed = param.State_project.seed;
+  Api_types_j.simulation_id = "default" ;
+  Api_types_j.simulation_store_trace = param.State_project.store_trace ;
+}
+
 let continue_simulation () =
   Common.async
     (fun () ->
+       let simulation_parameter =
+         create_simulation_parameter
+           (React.S.value State_project.model).State_project.model_parameters in
        State_error.wrap
          __LOC__
-         (State_simulation.with_simulation
-            ~label:__LOC__
-            (fun _ p_id _ ->
-               let simulation_parameter =
-                 State_project.create_simulation_parameter p_id in
-               State_simulation.continue_simulation simulation_parameter))
+         (State_simulation.continue_simulation simulation_parameter)
        >>= (fun _ -> Lwt.return_unit)
     )
 
 let pause_simulation () =
   Common.async
     (fun () ->
-       State_error.wrap
-         __LOC__
-         (State_simulation.with_simulation
-            ~label:__LOC__
-            (fun _ _ _ ->
-               State_simulation.pause_simulation ()))
+       State_error.wrap __LOC__ (State_simulation.pause_simulation ())
        >>= (fun _ -> Lwt.return_unit)
     )
 
@@ -38,40 +40,29 @@ let stop_simulation () =
   Common.async
     (fun () ->
        let () = Common.debug (Js.string "subpanel_editor_controller.stop") in
-       State_error.wrap
-         __LOC__
-         (State_simulation.with_simulation
-            ~label:__LOC__
-            (fun _ _ _ ->
-               State_simulation.stop_simulation ()))
+       State_error.wrap __LOC__ (State_simulation.stop_simulation ())
        >>= (fun _ -> Lwt.return_unit)
     )
 
 let start_simulation () =
   Common.async
     (fun () ->
+       let simulation_parameter =
+         create_simulation_parameter
+           (React.S.value State_project.model).State_project.model_parameters in
        State_error.wrap
-         __LOC__
-         (State_simulation.with_simulation
-            ~label:__LOC__
-            (fun _ p_id _t ->
-               let simulation_parameter =
-                 State_project.create_simulation_parameter p_id in
-               State_simulation.start_simulation simulation_parameter))
+         __LOC__ (State_simulation.start_simulation simulation_parameter)
        >>= (fun _ -> Lwt.return_unit)
     )
 
 let perturb_simulation () =
     Common.async
     (fun () ->
-       State_error.wrap
-         __LOC__
-         (State_simulation.with_simulation
-            ~label:__LOC__
-            (fun _ _ _ ->
-               let model_perturbation = React.S.value State_perturbation.model_perturbation in
-               State_simulation.perturb_simulation model_perturbation))
-       >>= (fun _ -> Lwt.return_unit)
+      let model_perturbation =
+        React.S.value State_perturbation.model_perturbation in
+      State_error.wrap
+        __LOC__ (State_simulation.perturb_simulation model_perturbation)
+      >>= (fun _ -> Lwt.return_unit)
     )
 
 let focus_range (range : Locality.t) : unit =
@@ -89,10 +80,10 @@ let focus_range (range : Locality.t) : unit =
 let simulation_trace () =
   State_simulation.when_ready
     ~label:__LOC__
-      (fun manager project_id ->
+      (fun manager ->
          State_error.wrap
            __LOC__
-           (manager#simulation_raw_trace project_id) >>=
+           manager#simulation_raw_trace >>=
          (Api_common.result_bind_lwt
             ~ok:(fun data ->
                 let () =
