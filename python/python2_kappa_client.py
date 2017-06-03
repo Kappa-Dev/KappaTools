@@ -66,17 +66,14 @@ def main():
 
     try:
         runtime = kappa_std.KappaStd(url)
-        project_id = str(uuid.uuid1())
-        runtime.project_create(project_id)
-        print("project_id : {0}".format(project_id))
         if inputfile:
             with open(inputfile) as f:
                 code = f.read()
                 file_content = str(code)
                 file_metadata = kappa_common.FileMetadata(inputfile,0)
                 file_object = kappa_common.File(file_metadata,file_content)
-                runtime.file_create(project_id,file_object)
-                runtime.project_parse(project_id)
+                runtime.file_create(file_object)
+                runtime.project_parse()
                 simulation_id = str(uuid.uuid1())
                 print("simulation_id : {0}".format(simulation_id))
 
@@ -86,9 +83,9 @@ def main():
                                                                         simulation_id,
                                                                         pause_condition,
                                                                         seed)
-                runtime.simulation_start(project_id,simulation_parameter)
+                runtime.simulation_start(simulation_parameter)
 
-                simulation_info = runtime.simulation_info(project_id)
+                simulation_info = runtime.simulation_info()
 
                 while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
                     time.sleep(1)
@@ -104,16 +101,14 @@ def main():
 
                     sys.stdout.write("..{0}.. ".format(percentage))
                     sys.stdout.flush()
-                    simulation_info = runtime.simulation_info(project_id)
+                    simulation_info = runtime.simulation_info()
 
                 print("")
                 print("info")
                 print(simulation_info)
-                plot_detail = runtime.simulation_detail_plot(project_id)
+                plot_detail = runtime.simulation_detail_plot()
                 print("plot")
                 print(plot_detail)
-        else:
-            print(runtime.info())
     except kappa_common.KappaError as exception:
         print(exception.errors)
     return None

@@ -28,12 +28,17 @@ class KappaStd(object):
         self.message_id += 1
         return self.message_id
 
-    def dispatch(self, method, args):
+    def dispatch(self, method, args=None):
+        if args :
+            data = [method, args]
+        else:
+            data = method
+
         try:
             self.lock.acquire()
             message_id = self.get_message_id()
             message = {'id': message_id,
-                       'data': [method, args]}
+                       'data': data}
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.popen.stdin.write(message.encode('utf-8'))
             self.popen.stdin.flush()
@@ -67,87 +72,67 @@ class KappaStd(object):
         else:
             raise kappa_common.KappaError(data)
 
-    def info(self):
-        return(self.dispatch("EnvironmentInfo",None))
+    def project_parse(self):
+        return(self.dispatch("ProjectParse"))
 
-    def project_create(self,project_id):
-        project_parameter = { "project_parameter_project_id" : project_id }
-        return(self.dispatch("ProjectCreate",project_parameter))
-    def project_info(self):
-        return(self.dispatch("ProjectCatalog",None))
-
-    def project_delete(self,project_id):
-        return(self.dispatch("ProjectDelete",project_id))
-
-    def project_parse(self,project_id):
-        return(self.dispatch("ProjectParse",project_id))
-
-    def file_create(self,project_id,file_object):
+    def file_create(self,file_object):
         file_data = file_object.toJSON()
-        return(self.dispatch("FileCreate",[project_id,file_data]))
+        return(self.dispatch("FileCreate",file_data))
 
-    def file_delete(self,project_id,file_id):
-        return(self.dispatch("FileDelete",[project_id,file_id]))
+    def file_delete(self,file_id):
+        return(self.dispatch("FileDelete",file_id))
 
-    def file_get(self,project_id,file_id):
-        f = self.dispatch("FileGet",[project_id,file_id])
+    def file_get(self,file_id):
+        f = self.dispatch("FileGet",file_id)
         return(kappa_common.hydrate_file(f))
 
-    def file_info(self,project_id):
-        info = self.dispatch("FileCatalog",project_id)
+    def file_info(self):
+        info = self.dispatch("FileCatalog")
         #return(list(map(hydrate_filemetadata,info)))
         return(info)
 
-    def simulation_delete(self,project_id):
-        return(self.dispatch("SimulationDelete",[project_id]))
+    def simulation_delete(self):
+        return(self.dispatch("SimulationDelete"))
 
-    def simulation_detail_file_line(self,project_id,file_line_id):
-        return(self.dispatch("SimulationDetailFileLine",
-                             [project_id,file_line_id]))
+    def simulation_detail_file_line(self,file_line_id):
+        return(self.dispatch("SimulationDetailFileLine",file_line_id))
 
-    def simulation_detail_flux_map(self,project_id,flux_map_id):
-        return(self.dispatch("SimulationDetailFluxMap",
-                             [project_id,flux_map_id]))
+    def simulation_detail_flux_map(self,flux_map_id):
+        return(self.dispatch("SimulationDetailFluxMap",flux_map_id))
 
-    def simulation_detail_log_message(self,project_id):
-        return(self.dispatch("SimulationDetailLogMessage",
-                             [project_id]))
+    def simulation_detail_log_message(self):
+        return(self.dispatch("SimulationDetailLogMessage"))
 
-    def simulation_detail_plot(self,project_id,plot_parameter = None):
+    def simulation_detail_plot(self,plot_parameter = None):
         if plot_parameter :
             parameter = plot_parameter.toJSON()
         else:
             parameter = kappa_common.PlotParameter().toJSON()
 
-        return(self.dispatch("SimulationDetailPlot",
-                             [project_id,parameter]))
+        return(self.dispatch("SimulationDetailPlot",parameter))
 
-    def simulation_detail_snapshot(self,project_id,snapshot_id):
-        return(self.dispatch("SimulationDetailSnapshot",
-                             [project_id,snapshot_id]))
+    def simulation_detail_snapshot(self,snapshot_id):
+        return(self.dispatch("SimulationDetailSnapshot",snapshot_id))
 
-    def simulation_info(self,project_id):
-        return(self.dispatch("SimulationInfo",project_id))
+    def simulation_info(self):
+        return(self.dispatch("SimulationInfo"))
 
-    def simulation_info_file_line(self,project_id):
-        return(self.dispatch("SimulationCatalogFileLine",project_id))
+    def simulation_info_file_line(self):
+        return(self.dispatch("SimulationCatalogFileLine"))
 
-    def simulation_info_flux_map(self,project_id):
-        return(self.dispatch("SimulationCatalogFluxMap",project_id))
+    def simulation_info_flux_map(self):
+        return(self.dispatch("SimulationCatalogFluxMap"))
 
-    def simulation_info_snapshot(self,project_id):
-        return(self.dispatch("SimulationCatalogSnapshot",
-                             project_id))
+    def simulation_info_snapshot(self):
+        return(self.dispatch("SimulationCatalogSnapshot"))
 
-    def simulation_pause(self,project_id):
+    def simulation_pause(self):
+        return(self.dispatch("SimulationPause"))
+
+    def simulation_perturbation(self,perturbation_code):
         return(self.dispatch("SimulationPause",
-                             project_id))
+                              { "perturbation_code" : perturbation_code }))
 
-    def simulation_perturbation(self,project_id,perturbation_code):
-        return(self.dispatch("SimulationPause",
-                             [project_id ,
-                              { "perturbation_code" : perturbation_code }]))
-
-    def simulation_start(self,project_id,simulation_parameter):
+    def simulation_start(self,simulation_parameter):
         return(self.dispatch("SimulationStart",
-                             [project_id,simulation_parameter.toJSON()]))
+                             simulation_parameter.toJSON()))

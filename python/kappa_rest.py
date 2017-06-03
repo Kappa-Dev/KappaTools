@@ -8,8 +8,8 @@ import json
 import kappa_common
 
 class KappaRest(object):
-    def __init__(self, endpoint):
-        self.url = "{0}/v2".format(endpoint)
+    def __init__(self, endpoint, project_id):
+        self.url = "{0}/v2/projects/{1}".format(endpoint,project_id)
 
     def dispatch(self, method, url, data):
         handler = urllib.request.HTTPHandler()
@@ -65,29 +65,23 @@ class KappaRest(object):
         else:
             raise exception
 
-    def info(self):
-        method = "GET"
-        url = "{0}".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
+    # def project_create(self,project_id):
+    #     method = "POST"
+    #     url = "{0}/projects".format(self.url)
+    #     body = { "project_parameter_project_id" : project_id }
+    #     return(self.dispatch(method,url,body))
 
-    def project_create(self,project_id):
-        method = "POST"
-        url = "{0}/projects".format(self.url)
-        body = { "project_parameter_project_id" : project_id }
-        return(self.dispatch(method,url,body))
+    # def project_info(self):
+    #     method = "GET"
+    #     url = "{0}/projects".format(self.url)
+    #     body = None
+    #     return(self.dispatch(method,url,body))
 
-    def project_info(self):
-        method = "GET"
-        url = "{0}/projects".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
-
-    def project_delete(self,project_id):
-        method = "DELETE"
-        url = "{0}/projects/{1}".format(self.url,project_id)
-        body = None
-        return(self.dispatch(method,url,body))
+    # def project_delete(self,project_id):
+    #     method = "DELETE"
+    #     url = "{0}/projects/{1}".format(self.url,project_id)
+    #     body = None
+    #     return(self.dispatch(method,url,body))
 
     def project_parse(self,project_id):
         method = "GET"
