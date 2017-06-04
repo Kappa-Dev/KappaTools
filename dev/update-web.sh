@@ -10,6 +10,7 @@ case $1 in
             mkdir -p ${PLAYGROUND}/docs/KaSim-manual-master/generated_img
         cp man/*.htm man/*.css ${PLAYGROUND}/docs/KaSim-manual-master/
         cp -r man/img ${PLAYGROUND}/docs/KaSim-manual-master/
+        cp -r man/gkappa_img ${PLAYGROUND}/docs/KaSim-manual-master/
         cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
         cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
         ;;
