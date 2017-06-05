@@ -34,59 +34,55 @@ class KappaClientTest(object):
         self.assertEqual(connection.code, integration_test['code'])
 
 
-    def test_info(self):
-        """ the the ability of the server to return
-            information about the service.
-        """
-        runtime = self.getRuntime()
-        info = runtime.info()
-        self.assertIsNotNone('environment_simulations' in info)
-        self.assertEqual(info['environment_simulations'], 0)
-        self.assertIsNotNone('environment_projects' in info)
-        self.assertIsNotNone('environment_build' in info)
+    # def test_info(self):
+    #     """ the the ability of the server to return
+    #         information about the service.
+    #     """
+    #     runtime = self.getRuntime()
+    #     info = runtime.info()
+    #     self.assertIsNotNone('environment_simulations' in info)
+    #     self.assertEqual(info['environment_simulations'], 0)
+    #     self.assertIsNotNone('environment_projects' in info)
+    #     self.assertIsNotNone('environment_build' in info)
 
-    def test_project_crud(self):
-        runtime = self.getRuntime()
-        project_id = str(uuid.uuid1())
-        runtime.project_create(project_id)
-        print(project_id)
-        project_ids = kappa_client.project_catalog_project_id(runtime.project_info())
-        self.assertIn(project_id,project_ids)
-        print(runtime.project_info())
-        runtime.project_delete(project_id)
-        self.assertNotIn(project_id,runtime.project_info())
-        try:
-            runtime.project_delete(project_id)
-            self.fail()
-        except kappa_common.KappaError as exception:
-            None
+    # def test_project_crud(self):
+    #     runtime = self.getRuntime()
+    #     project_id = str(uuid.uuid1())
+    #     runtime.project_create(project_id)
+    #     print(project_id)
+    #     project_ids = kappa_client.project_catalog_project_id(runtime.project_info())
+    #     self.assertIn(project_id,project_ids)
+    #     print(runtime.project_info())
+    #     runtime.project_delete(project_id)
+    #     self.assertNotIn(project_id,runtime.project_info())
+    #     try:
+    #         runtime.project_delete(project_id)
+    #         self.fail()
+    #     except kappa_common.KappaError as exception:
+    #         None
 
     def test_file_crud(self):
-        runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        runtime.project_create(project_id)
+        runtime = self.getRuntime(project_id)
         file_id = str(uuid.uuid1())
         file_content = str("")
         file_metadata = kappa_common.FileMetadata(file_id,0)
         file_object = kappa_common.File(file_metadata,file_content)
-        runtime.file_create(project_id,file_object)
-        file_names = kappa_client.file_catalog_file_id(runtime.file_info(project_id))
-        #file_info = runtime.file_info(project_id)
-        #file_names = list(map(lambda x: x.get_file_id(),file_info))
+        runtime.file_create(file_object)
+        file_names = kappa_client.file_catalog_file_id(runtime.file_info())
         self.assertIn(file_id,file_names)
-        self.assertEqual(runtime.file_get(project_id,file_id).get_content(),
+        self.assertEqual(runtime.file_get(file_id).get_content(),
                          file_content)
-        runtime.file_delete(project_id,file_id)
+        runtime.file_delete(file_id)
         try:
-            runtime.file_delete(project_id,file_id)
+            runtime.file_delete(file_id)
             self.fail()
         except:
             None
 
     def parse_multiple_files(self):
-        runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        runtime.project_create(project_id)
+        runtime = self.getRuntime(project_id)
         file_1_id = str(uuid.uuid1())
         file_2_id = str(uuid.uuid1())
         test_dir = "../models/test_suite/compiler/file_order/"
@@ -95,41 +91,41 @@ class KappaClientTest(object):
                 data_1 = file_1.read()
                 file_1_metadata = kappa_common.FileMetadata(file_1_id,0)
                 file_1_object = kappa_common.File(file_1_metadata,data_1)
-                runtime.file_create(project_id,file_1_object)
+                runtime.file_create(file_1_object)
 
                 data_2 = file_2.read()
                 file_2_metadata = kappa_common.FileMetadata(file_2_id,0)
                 file_2_object = kappa_common.File(file_2_metadata,data_2)
+                runtime.project_parse()
                 with self.assertRaises(kappa_common.KappaError):
-                    runtime.file_create(project_id,file_2_object)
-                file_names = list(kappa_client.file_catalog_file_id(runtime.file_info(project_id)))
+                    runtime.file_create(file_2_object)
+                file_names = list(kappa_client.file_catalog_file_id(runtime.file_info()))
                 self.assertIn(file_1_id,file_names)
                 self.assertIn(file_2_id,file_names)
 
     def test_run_simulationd(self):
-        runtime = self.getRuntime()
         project_id = str(uuid.uuid1())
-        runtime.project_create(project_id)
+        runtime = self.getRuntime(project_id)
         file_id = str(uuid.uuid1())
         with open("../models/abc-pert.ka") as kappa_file:
             data = kappa_file.read()
             file_content = str(data)
             file_metadata = kappa_common.FileMetadata(file_id,0)
             file_object = kappa_common.File(file_metadata,file_content)
-            runtime.file_create(project_id,file_object)
-            runtime.project_parse(project_id)
+            runtime.file_create(file_object)
+            runtime.project_parse()
             pause_condition = "[T] > 10.0"
             simulation_parameter = kappa_common.SimulationParameter(0.1,"default",pause_condition)
-            runtime.simulation_start(project_id,simulation_parameter)
+            runtime.simulation_start(simulation_parameter)
 
-            simulation_info = runtime.simulation_info(project_id)
+            simulation_info = runtime.simulation_info()
 
             while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
                 time.sleep(1)
-                simulation_info = runtime.simulation_info(project_id)
+                simulation_info = runtime.simulation_info()
 
             # test that no limit returns all entries
-            last_status = runtime.simulation_detail_plot(project_id)
+            last_status = runtime.simulation_detail_plot()
             test_count = 101
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
 
@@ -138,7 +134,7 @@ class KappaClientTest(object):
             test_time = 10.0
             test_count = 1
             limit = kappa_common.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_detail_plot(project_id,kappa_common.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(kappa_common.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
@@ -147,7 +143,7 @@ class KappaClientTest(object):
             test_time = 1.0
             test_count = 1
             limit = kappa_common.PlotLimit(plot_limit_offset,plot_limit_points)
-            last_status = runtime.simulation_detail_plot(project_id,kappa_common.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(kappa_common.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
@@ -156,7 +152,7 @@ class KappaClientTest(object):
             test_time = 10.0
             test_count = 51
             limit = kappa_common.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_detail_plot(project_id,kappa_common.PlotParameter(limit))
+            last_status = runtime.simulation_detail_plot(kappa_common.PlotParameter(limit))
             self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
             self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
 
@@ -173,12 +169,12 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
         subprocess.Popen(command_format.format(self.websim, self.key, self.port).split())
         time.sleep(1)
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
-    def getRuntime(self):
-        return(kappa_rest.KappaRest(self.endpoint))
+    def getRuntime(self,project_id):
+        return(kappa_rest.KappaRest(self.endpoint,project_id))
     @classmethod
     def tearDownClass(self):
         """ tear down test by shutting down"""
-        runtime = self.getRuntime(self)
+        runtime = self.getRuntime(self,"__foo")
         print(runtime.shutdown(self.key))
 
     @classmethod
@@ -203,7 +199,7 @@ class StdClientTest(KappaClientTest,unittest.TestCase):
         """ set up unit test by launching client"""
         self.stdsim = "../bin/KaSimAgent"
 
-    def getRuntime(self):
+    def getRuntime(self,project_id):
         return(kappa_std.KappaStd(self.stdsim))
     @classmethod
     def tearDownClass(self):

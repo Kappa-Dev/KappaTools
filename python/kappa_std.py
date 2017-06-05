@@ -24,12 +24,15 @@ class KappaStd(object):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT)
 
+    def __del__(self):
+        self.shutdown()
+
     def get_message_id(self):
         self.message_id += 1
         return self.message_id
 
     def dispatch(self, method, args=None):
-        if args :
+        if args:
             data = [method, args]
         else:
             data = method
@@ -37,8 +40,7 @@ class KappaStd(object):
         try:
             self.lock.acquire()
             message_id = self.get_message_id()
-            message = {'id': message_id,
-                       'data': data}
+            message = {'id': message_id,'data': data}
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.popen.stdin.write(message.encode('utf-8'))
             self.popen.stdin.flush()
@@ -59,7 +61,7 @@ class KappaStd(object):
     @abc.abstractmethod
     def projection(self, response): pass
 
-    def shutdown(self,):
+    def shutdown(self):
         self.popen.stdin.close()
         self.popen.stdout.close()
         self.popen.kill()
