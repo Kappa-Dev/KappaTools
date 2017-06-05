@@ -2,16 +2,8 @@ begin model
 begin parameters
     Lig_tot  6.0e3
     Rec_tot  4.0e2
-
-
-     kp11  1.32845238e-7
-     km11  0
-     kp21  1.32845238e-7
-     km21  0
-     kp12  1.32845238e-7
-     km12 0
-     kp13  1.32845238e-7
-     km13 0
+    kp11  1.32845238e-7
+    km11  0
 
 end parameters
 

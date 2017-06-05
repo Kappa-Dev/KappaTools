@@ -1,12 +1,12 @@
 Process with: fceri_fyn_trimer
 Process without symmetries------------
-CPU time: 0.009028 s.; 18 rules; 8 species; 18 reactions.
+CPU time: 0.007903 s.; 18 rules; 8 species; 18 reactions.
 Process symmetries computation--------
-CPU time: 0.027093 s.; rules: 18; dead rules: 0.
+CPU time: 0.022258 s.; rules: 18; dead rules: 0.
 Process with forward symmetries-------
-CPU time: 0.012771 s.; 18 rules; 4 species; 8 reactions.
+CPU time: 0.013719 s.; 18 rules; 4 species; 8 reactions.
 Process with backward symmetries------
-CPU time: 0.016293 s.; 18 rules; 4 species; 8 reactions.
+CPU time: 0.016355 s.; 18 rules; 4 species; 8 reactions.
 Process BNGL withoutsymmetries--------
 Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     3 species      1 rxns  0.00e+00 CPU s
@@ -18,16 +18,32 @@ Total   :     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
 CPU TIME: generate_network 0.01 s.
 CPU TIME: total 0.01 s.
 Process BNGL with symmetries----------
-CPU TIME: total 0.00 s.
+Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   2:     8 species     12 rxns  1.00e-02 CPU s
+Iteration   3:     8 species     18 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   3:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   6:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   8:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   9:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Total   :    18 reactions 3.00e-02 CPU s 1.67e-03 CPU s/rxn
+CPU TIME: generate_network 0.04 s.
+CPU TIME: total 0.07 s.
 Process with: fceri_gamma2
 Process without symmetries------------
-CPU time: 0.007094 s.; 8 rules; 5 species; 8 reactions.
+CPU time: 0.006509 s.; 8 rules; 5 species; 8 reactions.
 Process symmetries computation--------
-CPU time: 0.009136 s.; rules: 8; dead rules: 0.
+CPU time: 0.008065 s.; rules: 8; dead rules: 0.
 Process with forward symmetries-------
-CPU time: 0.008205 s.; 8 rules; 4 species; 6 reactions.
+CPU time: 0.010658 s.; 8 rules; 4 species; 6 reactions.
 Process with backward symmetries------
-CPU time: 0.009067 s.; 8 rules; 4 species; 6 reactions.
+CPU time: 0.010683 s.; 8 rules; 4 species; 6 reactions.
 Process BNGL withoutsymmetries--------
 Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     3 species      1 rxns  0.00e+00 CPU s
@@ -37,18 +53,18 @@ Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   2:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-CPU TIME: generate_network 0.00 s.
-CPU TIME: total 0.01 s.
+CPU TIME: generate_network 0.01 s.
+CPU TIME: total 0.02 s.
 Process BNGL with symmetries----------
 Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
-Iteration   1:     4 species      2 rxns  0.00e+00 CPU s
-Iteration   2:     5 species      6 rxns  1.00e-02 CPU s
+Iteration   1:     4 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     5 species      6 rxns  0.00e+00 CPU s
 Iteration   3:     5 species      8 rxns  0.00e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   2:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   4:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
 CPU TIME: generate_network 0.01 s.
-CPU TIME: total 0.03 s.
+CPU TIME: total 0.02 s.

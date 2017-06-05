@@ -1,52 +1,34 @@
-%agent: Lig(l1,l2,l3,a~1~2)
-%agent: Lyn(U,SH2,a~Y~pY)
-%agent: Fyn(SH2,a~Y~pY,t~Y)
-%agent: Syk(tSH2,l~Y~pY,a~Y~pY)
-%agent: Rec(a,b~Y~pY,g~Y~pY)
 
+begin model
+begin parameters
+    Lig_tot  6.0e3
+    Rec_tot  4.0e2
+    kp11  1.32845238e-7
+    km11  0
 
-    %var: 'Lig_tot'  6.0e3
-    %var: 'Rec_tot'  4.0e2
-    %var: 'Lyn_tot'  2.8e1
-    %var: 'Fyn_tot'  4.0e2
-    %var: 'Syk_tot'  4.0e2
+end parameters
 
-     %var: 'kp1'  1.32845238e-7
-     %var: 'km1'  0
-     %var: 'kp2'  2.5e-1
-     %var: 'km2'  0
-     %var: 'kpL'  5e-2
-     %var: 'kmL'  20
-    %var: 'kpLs'  5e-2
-    %var: 'kmLs'  0.12
-     %var: 'kpF'  5e-2
-     %var: 'kmF'  20
-     %var: 'kpS'  6e-2
-     %var: 'kmS'  0.13
-    %var: 'kpSs'  6e-2
-    %var: 'kmSs'  0.13
-     %var: 'pLb'  30
-    %var: 'pLbs'  100
-     %var: 'pLg'    1
-    %var: 'pLgs'    3
-     %var: 'pLS'   30
-    %var: 'pLSs'  100
-     %var: 'pSS'  100
-    %var: 'pSSs'  200
-     %var: 'pLF'   30
-    %var: 'pLFs'  100
-      %var: 'dm'   20
-      %var: 'dc'   20
+begin seed species
+    Lig(l1,l2,l3)      Lig_tot
+    Rec(a,b~Y,g~Y)     Rec_tot
 
+end seed species
 
-
-    %init: 100 Lig(l1,l2,l3)
-    %init: 100 Rec(a,b~Y,g~Y)
-
+begin reaction rules
     # Ligand-receptor binding
-    Rec(a), Lig(l1,l2) <-> Rec(a!1),Lig(l1!1,l2) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l2,l1) <-> Rec(a!1),Lig(l2!1,l1) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l1,l3) <-> Rec(a!1),Lig(l1!1,l3) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l3,l1) <-> Rec(a!1),Lig(l3!1,l1) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l2,l3) <-> Rec(a!1),Lig(l2!1,l3) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l3,l2) <-> Rec(a!1),Lig(l3!1,l2) @'kp1'{0}, 'km1'
+    Rec(a) + Lig(l1,l2,l3) <-> Rec(a!1).Lig(l1!1,l2,l3) kp11/3, km11
+    Rec(a) + Lig(l2,l1,l3) <-> Rec(a!1).Lig(l2!1,l1,l3) kp11/3, km11
+    Rec(a) + Lig(l3,l1,l2) <-> Rec(a!1).Lig(l3!1,l1,l2) kp11/3, km11
+
+    Rec(a) + Lig(l1,l2!+,l3) <-> Rec(a!1).Lig(l1!1,l2!+,l3) kp11/2, km11
+    Rec(a) + Lig(l2,l1!+,l3) <-> Rec(a!1).Lig(l2!1,l1!+,l3) kp11/2, km11
+    Rec(a) + Lig(l3,l1!+,l2) <-> Rec(a!1).Lig(l3!1,l1!+,l2) kp11/2, km11
+    Rec(a) + Lig(l1,l2,l3!+) <-> Rec(a!1).Lig(l1!1,l2,l3!+) kp11/2, km11
+    Rec(a) + Lig(l2,l1,l3!+) <-> Rec(a!1).Lig(l2!1,l1,l3!+) kp11/2, km11
+    Rec(a) + Lig(l3,l1,l2!+) <-> Rec(a!1).Lig(l3!1,l1,l2!+) kp11/2, km11
+
+end reaction rules
+end model
+
+## actions ##
+generate_network({overwrite=>1,max_iter=>100})

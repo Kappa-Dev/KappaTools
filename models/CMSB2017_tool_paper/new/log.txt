@@ -28,10 +28,10 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.009028 s.; 18 rules; 8 species; 18 reactions.
+CPU time: 0.007903 s.; 18 rules; 8 species; 18 reactions.
 Process symmetries computation--------
 Kappa Static Analyzer (DomainBased-3158-gc8da1d13f-dirty) (without Tk interface)
-Analysis launched at 2017/06/05 12:23:16 (GMT+2) on quyen
+Analysis launched at 2017/06/05 14:06:13 (GMT+2) on quyen
 Parsing fceri_fyn_trimer.ka...
 done
 + simulation parameters
@@ -137,7 +137,7 @@ Agent: Rec
 Flow of information in the CTMC semantcs:...
 Flow of information in the ODE semantcs:...
 execution finished without any exception
-CPU time: 0.027093 s.; rules: 18; dead rules: 0.
+CPU time: 0.022258 s.; rules: 18; dead rules: 0.
 Process with forward symmetries-------
 Parsing fceri_fyn_trimer.ka...
 done
@@ -167,7 +167,7 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.012771 s.; 18 rules; 4 species; 8 reactions.
+CPU time: 0.013719 s.; 18 rules; 4 species; 8 reactions.
 Process with backward symmetries------
 Parsing fceri_fyn_trimer.ka...
 done
@@ -207,11 +207,11 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.016293 s.; 18 rules; 4 species; 8 reactions.
+CPU time: 0.016355 s.; 18 rules; 4 species; 8 reactions.
 Process BNGL withoutsymmetries--------
 BioNetGen version 2.2.6
 Reading from file fceri_fyn_trimer.bngl (level 0)
-Read 10 parameters.
+Read 4 parameters.
 Read 2 species.
 Read 1 reaction rule(s).
 ACTION: generate_network( fceri_fyn_trimer )
@@ -229,96 +229,29 @@ CPU TIME: total 0.01 s.
 Process BNGL with symmetries----------
 BioNetGen version 2.2.6
 Reading from file fceri_fyn_trimer_asym.bngl (level 0)
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 1
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 2
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 3
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 4
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 5
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 8
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 9
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 10
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 11
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 12
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 14
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 15
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 16
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 17
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 18
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 19
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 20
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 21
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 22
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 23
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 24
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 25
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 26
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 27
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 28
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 29
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 30
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 31
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 32
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 33
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 34
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 35
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 36
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 37
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 38
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 39
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 43
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 44
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 47
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 48
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 49
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 50
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 51
-WARNING: Unidentified input! Will not attempt to execute as Perl.
-  at line 52
+Read 4 parameters.
+Read 2 species.
+Read 9 reaction rule(s).
+ACTION: generate_network( fceri_fyn_trimer_asym )
+Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   2:     8 species     12 rxns  1.00e-02 CPU s
+Iteration   3:     8 species     18 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   3:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   6:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   8:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   9:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Total   :    18 reactions 3.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./fceri_fyn_trimer_asym.net.
+CPU TIME: generate_network 0.04 s.
 Finished processing file fceri_fyn_trimer_asym.bngl.
-CPU TIME: total 0.00 s.
+CPU TIME: total 0.07 s.
 --------------------------------------
 Process with: fceri_gamma2
 --------------------------------------
@@ -349,10 +282,10 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.007094 s.; 8 rules; 5 species; 8 reactions.
+CPU time: 0.006509 s.; 8 rules; 5 species; 8 reactions.
 Process symmetries computation--------
 Kappa Static Analyzer (DomainBased-3158-gc8da1d13f-dirty) (without Tk interface)
-Analysis launched at 2017/06/05 12:23:17 (GMT+2) on quyen
+Analysis launched at 2017/06/05 14:06:14 (GMT+2) on quyen
 Parsing fceri_gamma2.ka...
 done
 + simulation parameters
@@ -447,7 +380,7 @@ Agent: Rec
 Flow of information in the CTMC semantcs:...
 Flow of information in the ODE semantcs:...
 execution finished without any exception
-CPU time: 0.009136 s.; rules: 8; dead rules: 0.
+CPU time: 0.008065 s.; rules: 8; dead rules: 0.
 Process with forward symmetries-------
 Parsing fceri_gamma2.ka...
 done
@@ -477,7 +410,7 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.008205 s.; 8 rules; 4 species; 6 reactions.
+CPU time: 0.010658 s.; 8 rules; 4 species; 6 reactions.
 Process with backward symmetries------
 Parsing fceri_gamma2.ka...
 done
@@ -517,7 +450,7 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.009067 s.; 8 rules; 4 species; 6 reactions.
+CPU time: 0.010683 s.; 8 rules; 4 species; 6 reactions.
 Process BNGL withoutsymmetries--------
 BioNetGen version 2.2.6
 Reading from file fceri_gamma2.bngl (level 0)
@@ -534,9 +467,9 @@ Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   2:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Wrote network in net format to ./fceri_gamma2.net.
-CPU TIME: generate_network 0.00 s.
+CPU TIME: generate_network 0.01 s.
 Finished processing file fceri_gamma2.bngl.
-CPU TIME: total 0.01 s.
+CPU TIME: total 0.02 s.
 Process BNGL with symmetries----------
 BioNetGen version 2.2.6
 Reading from file fceri_gamma2_asym.bngl (level 0)
@@ -545,16 +478,16 @@ Read 2 species.
 Read 4 reaction rule(s).
 ACTION: generate_network( fceri_gamma2_asym )
 Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
-Iteration   1:     4 species      2 rxns  0.00e+00 CPU s
-Iteration   2:     5 species      6 rxns  1.00e-02 CPU s
+Iteration   1:     4 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     5 species      6 rxns  0.00e+00 CPU s
 Iteration   3:     5 species      8 rxns  0.00e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   2:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   4:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
 Wrote network in net format to ./fceri_gamma2_asym.net.
 CPU TIME: generate_network 0.01 s.
 Finished processing file fceri_gamma2_asym.bngl.
-CPU TIME: total 0.03 s.
+CPU TIME: total 0.02 s.

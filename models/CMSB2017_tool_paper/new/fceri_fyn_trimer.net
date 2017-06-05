@@ -4,12 +4,6 @@ begin parameters
     2 Rec_tot  4.0e2  # Constant
     3 kp11     1.32845238e-7  # Constant
     4 km11     0  # Constant
-    5 kp21     1.32845238e-7  # Constant
-    6 km21     0  # Constant
-    7 kp12     1.32845238e-7  # Constant
-    8 km12     0  # Constant
-    9 kp13     1.32845238e-7  # Constant
-   10 km13     0  # Constant
 end parameters
 begin species
     1 Lig(l,l,l) Lig_tot
