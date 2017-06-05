@@ -4,20 +4,26 @@ begin parameters
     Rec_tot  4.0e2
 
 
-     kp1  1.32845238e-7
-     km1  0
-
+     kp11  1.32845238e-7
+     km11  0
+     kp21  1.32845238e-7
+     km21  0
+     kp12  1.32845238e-7
+     km12 0
+     kp13  1.32845238e-7
+     km13 0
 
 end parameters
 
 begin seed species
     Lig(l,l,l)         Lig_tot
     Rec(a,b~Y,g~Y)     Rec_tot
+
 end seed species
 
 begin reaction rules
     # Ligand-receptor binding
-    Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp1, km1
+    Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp11, km11
 
 end reaction rules
 end model

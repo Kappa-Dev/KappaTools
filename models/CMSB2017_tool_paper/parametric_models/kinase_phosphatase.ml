@@ -250,13 +250,14 @@ let print_module fmt format n =
   let () = doit "P" "p" "u" in
   ()
 
-let declare_rules fmt format n =
+(*let declare_rules fmt format n =
   let () =
     match format with
     | Kappa -> ()
     | BNGL | BNGL_compact ->
       Format.fprintf fmt "begin reaction rules\n"
   in
+  (*print BNGL*)
   let rec aux k =
     if k>n then ()
     else
@@ -266,6 +267,48 @@ let declare_rules fmt format n =
       end
   in
   let () = aux 1 in
+  (*print BNGL_compact*)
+  let () =
+    match format with
+    | Kappa -> ()
+    | BNGL | BNGL_compact ->
+      Format.fprintf fmt
+        "end reaction rules\n\ngenerate_network({overwrite=>1});"
+  in
+  ()*)
+
+let declare_rules fmt format n =
+  let () =
+    match format with
+    | Kappa ->
+      let rec aux k =
+        if k>n then ()
+        else
+          begin
+            print_module fmt format k ;
+            aux (k+1)
+          end
+      in
+      let () = aux 1 in
+      ()
+    | BNGL ->
+      let () = Format.fprintf fmt "begin reaction rules\n" in
+      (*print BNGL*)
+      let rec aux k =
+        if k>n then ()
+        else
+          begin
+            print_module fmt format k ;
+            aux (k+1)
+          end
+      in
+      let () = aux 1 in
+      ()
+    | BNGL_compact ->
+      let () = Format.fprintf fmt "begin reaction rules\n" in
+      print_module fmt format 1
+  in
+  (*print BNGL_compact*)
   let () =
     match format with
     | Kappa -> ()
@@ -274,6 +317,7 @@ let declare_rules fmt format n =
         "end reaction rules\n\ngenerate_network({overwrite=>1});"
   in
   ()
+
 (******************************************************)
 (*main function*)
 

@@ -26,38 +26,6 @@ K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS
 K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
 P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
 P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
-K(s)+S(x~u) <-> K(s!1).S(x~u!1)  kKS,kdKS 
-K(s!1).S(x~u!1) -> K(s)+S(x~p)  kpS 
-P(s)+S(x~p) <-> P(s!1).S(x~p!1)  kPS,kdPS 
-P(s!1).S(x~p!1) -> P(s)+S(x~u)  kuS 
 end reaction rules
 
 generate_network({overwrite=>1});

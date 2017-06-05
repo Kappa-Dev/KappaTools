@@ -1,22 +1,28 @@
-%agent: Lig(l1,l2,l3,a~1~2)
-%agent: Rec(a,b~Y~pY,g~Y~pY)
 
+
+    %agent: Lig(l1,l2,l3,a~1~2)
+    %agent: Rec(a,b~Y~pY,g~Y~pY)
 
     %var: 'Lig_tot'  6.0e3
     %var: 'Rec_tot'  4.0e2
+    %var: 'kp1'  1.32845238e-7
+    %var: 'km1'  0
 
-     %var: 'kp1'  1.32845238e-7
-     %var: 'km1'  0
-
-
-
-  %init: 100 Lig(l1,l2,l3)
+    %init: 100 Lig(l1,l2,l3)
     %init: 100 Rec(a,b~Y,g~Y)
 
     # Ligand-receptor binding
-    Rec(a), Lig(l1,l2) <-> Rec(a!1),Lig(l1!1,l2) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l2,l1) <-> Rec(a!1),Lig(l2!1,l1) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l1,l3) <-> Rec(a!1),Lig(l1!1,l3) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l3,l1) <-> Rec(a!1),Lig(l3!1,l1) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l2,l3) <-> Rec(a!1),Lig(l2!1,l3) @'kp1'{0}, 'km1'
-    Rec(a), Lig(l3,l2) <-> Rec(a!1),Lig(l3!1,l2) @'kp1'{0}, 'km1'
+    Rec(a), Lig(l1,l2,l3) <-> Rec(a!1),Lig(l1!1,l2,l3) @('kp1'/3){0}, 'km1'
+    Rec(a), Lig(l2,l1,l3) <-> Rec(a!1),Lig(l2!1,l1,l3) @('kp1'/3){0}, 'km1'
+    Rec(a), Lig(l3,l1,l2) <-> Rec(a!1),Lig(l3!1,l1,l2) @('kp1'/3){0}, 'km1'
+
+    Rec(a), Lig(l1,l2!_,l3) <-> Rec(a!1),Lig(l1!1,l2!_,l3) @('kp1'/2){0}, 'km1'
+    Rec(a), Lig(l2,l1!_,l3) <-> Rec(a!1),Lig(l2!1,l1!_,l3) @('kp1'/2){0}, 'km1'
+    Rec(a), Lig(l3,l1!_,l2) <-> Rec(a!1),Lig(l3!1,l1!_,l2) @('kp1'/2){0}, 'km1'
+    Rec(a), Lig(l1,l2,l3!_) <-> Rec(a!1),Lig(l1!1,l2,l3!_) @('kp1'/2){0}, 'km1'
+    Rec(a), Lig(l2,l1,l3!_) <-> Rec(a!1),Lig(l2!1,l1,l3!_) @('kp1'/2){0}, 'km1'
+    Rec(a), Lig(l3,l1,l2!_) <-> Rec(a!1),Lig(l3!1,l1,l2!_) @('kp1'/2){0}, 'km1'
+
+    #Rec(a), Lig(l1,l2!_,l3!_) <-> Rec(a!1),Lig(l1!1,l2!_,l3!_) @'kp1'{0}, 'km1'
+    #Rec(a), Lig(l2,l1!_,l3!_) <-> Rec(a!1),Lig(l2!1,l1!_,l3!_) @'kp1'{0}, 'km1'
+    #Rec(a), Lig(l3,l1!_,l2!_) <-> Rec(a!1),Lig(l3!1,l1!_,l2!_) @'kp1'{0}, 'km1'

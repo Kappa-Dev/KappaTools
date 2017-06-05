@@ -2,8 +2,14 @@
 begin parameters
     1 Lig_tot  6.0e3  # Constant
     2 Rec_tot  4.0e2  # Constant
-    3 kp1      1.32845238e-7  # Constant
-    4 km1      0  # Constant
+    3 kp11     1.32845238e-7  # Constant
+    4 km11     0  # Constant
+    5 kp21     1.32845238e-7  # Constant
+    6 km21     0  # Constant
+    7 kp12     1.32845238e-7  # Constant
+    8 km12     0  # Constant
+    9 kp13     1.32845238e-7  # Constant
+   10 km13     0  # Constant
 end parameters
 begin species
     1 Lig(l,l,l) Lig_tot
@@ -12,8 +18,8 @@ begin species
     4 Lig(l!1,l!2,l).Rec(a!2,b~Y,g~Y).Rec(a!1,b~Y,g~Y) 0
 end species
 begin reactions
-    1 1,2 3 3*kp1 #_R1
-    2 2,3 4 2*kp1 #_R1
-    3 3 1,2 km1 #_reverse__R1
-    4 4 2,3 2*km1 #_reverse__R1
+    1 1,2 3 3*kp11 #_R1
+    2 2,3 4 2*kp11 #_R1
+    3 3 1,2 km11 #_reverse__R1
+    4 4 2,3 2*km11 #_reverse__R1
 end reactions

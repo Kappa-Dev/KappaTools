@@ -13,7 +13,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
-	 25 (sub)observables 18 navigation steps
+	 24 (sub)observables 48 navigation steps
 	 -initial conditions
 + generate the network... 
 	 -initial states 
@@ -28,10 +28,10 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.008642 s.; 12 rules; 8 species; 24 reactions.
+CPU time: 0.014235 s.; 24 rules; 9 species; 24 reactions.
 Process symmetries computation--------
-Kappa Static Analyzer (DomainBased-3151-g56b49a765) (without Tk interface)
-Analysis launched at 2017/05/31 15:54:33 (GMT+2) on wf102.di.ens.fr
+Kappa Static Analyzer (DomainBased-3154-g20ebae706-dirty) (without Tk interface)
+Analysis launched at 2017/06/01 15:50:08 (GMT+2) on wf102.di.ens.fr
 Parsing fceri_fyn_trimer.ka...
 done
 + simulation parameters
@@ -43,7 +43,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
-	 25 (sub)observables 18 navigation steps
+	 24 (sub)observables 48 navigation steps
 	 -initial conditions
 Parsing fceri_fyn_trimer.ka...
 done
@@ -127,7 +127,7 @@ Agent: Rec
 Flow of information in the CTMC semantcs:...
 Flow of information in the ODE semantcs:...
 execution finished without any exception
-CPU time: 0.020853 s.; rules: 12; dead rules: 0.
+CPU time: 0.049642 s.; rules: 24; dead rules: 0.
 Process with forward symmetries-------
 Parsing fceri_fyn_trimer.ka...
 done
@@ -141,7 +141,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
-	 25 (sub)observables 18 navigation steps
+	 24 (sub)observables 48 navigation steps
 	 -initial conditions
 + compute symmetric sites... 
 + generate the network... 
@@ -157,7 +157,7 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.012478 s.; 12 rules; 4 species; 12 reactions.
+CPU time: 0.022058 s.; 24 rules; 5 species; 12 reactions.
 Process with backward symmetries------
 Parsing fceri_fyn_trimer.ka...
 done
@@ -171,7 +171,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
-	 25 (sub)observables 18 navigation steps
+	 24 (sub)observables 48 navigation steps
 	 -initial conditions
 + compute symmetric sites... 
 + restart compilation to account for ~-equivalent patterns in algebraic expressions... 
@@ -182,7 +182,7 @@ done
 	 -perturbations
 	 -observables
 	 -update_domain construction
-	 25 (sub)observables 18 navigation steps
+	 24 (sub)observables 48 navigation steps
 	 -initial conditions
 + generate the network... 
 	 -initial states 
@@ -197,25 +197,25 @@ done
 	 -ode system 
 	 -jacobian 
 	 -observables 
-CPU time: 0.018626 s.; 12 rules; 4 species; 12 reactions.
+CPU time: 0.024504 s.; 24 rules; 5 species; 12 reactions.
 Process BNGL withoutsymmetries--------
 BioNetGen version 2.2.6
 Reading from file fceri_fyn_trimer.bngl (level 0)
-Read 4 parameters.
+Read 10 parameters.
 Read 2 species.
 Read 1 reaction rule(s).
 ACTION: generate_network( fceri_fyn_trimer )
 Iteration   0:     2 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     3 species      1 rxns  0.00e+00 CPU s
-Iteration   2:     4 species      3 rxns  0.00e+00 CPU s
-Iteration   3:     4 species      4 rxns  1.00e-02 CPU s
+Iteration   2:     4 species      3 rxns  1.00e-02 CPU s
+Iteration   3:     4 species      4 rxns  0.00e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
 Total   :     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
 Wrote network in net format to ./fceri_fyn_trimer.net.
 CPU TIME: generate_network 0.01 s.
 Finished processing file fceri_fyn_trimer.bngl.
-CPU TIME: total 0.01 s.
+CPU TIME: total 0.02 s.
 Process BNGL with symmetries----------
 BioNetGen version 2.2.6
 Reading from file fceri_fyn_trimer_asym.bngl (level 0)
@@ -308,4 +308,4 @@ WARNING: Unidentified input! Will not attempt to execute as Perl.
 WARNING: Unidentified input! Will not attempt to execute as Perl.
   at line 52
 Finished processing file fceri_fyn_trimer_asym.bngl.
-CPU TIME: total 0.00 s.
+CPU TIME: total 0.01 s.
