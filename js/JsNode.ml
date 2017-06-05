@@ -78,9 +78,18 @@ class manager
       failwith ("Unrecognized command: "^command) in
   let sa_mailbox = Kasa_client.new_mailbox () in
   let sa_configuration : process_configuration Js.t  =
-    create_process_configuration
-      ~onStdout:(fun msg -> Kasa_client.receive sa_mailbox (Js.to_string msg))
-      sa_command args in
+    let rec onStdout =
+      let buffer = Buffer.create 512 in
+      fun msg ->
+        match Utility.split (Js.to_string msg) message_delimiter with
+        | (prefix,None) ->
+          Buffer.add_string buffer prefix
+        | (prefix,Some suffix) ->
+          let () = Buffer.add_string buffer prefix in
+          let () = Kasa_client.receive sa_mailbox (Buffer.contents buffer) in
+          let () = Buffer.reset buffer in
+          onStdout (Js.string suffix) in
+    create_process_configuration ~onStdout sa_command args in
   let sa_process =
     Js.Opt.case
       (spawn_process sa_configuration)

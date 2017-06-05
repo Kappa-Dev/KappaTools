@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 open Lwt.Infix
-(* system process for v2 *)
+
 let process_command (message_delimiter : char) : string -> unit Lwt.t =
   Kasa_mpi.on_message
     (fun message ->
