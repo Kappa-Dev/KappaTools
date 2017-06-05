@@ -8,8 +8,8 @@
     %var: 'kp2'  2.5e-1
     %var: 'km2'  0
 
-   %init: 100 Lig(l1,l2)
-   %init: 100 Rec(a,b~Y,g1~Y,g2~Y)
+   %init: 1 Lig(l1,l2)
+   %init: 1 Rec(a,b~Y,g1~Y,g2~Y)
 
 
    # Ligand-receptor binding
