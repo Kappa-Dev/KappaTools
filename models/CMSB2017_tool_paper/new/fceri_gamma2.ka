@@ -1,0 +1,21 @@
+%var: 'Lig_tot'  6.0e3
+   %var: 'Rec_tot'  4.0e2
+   %var: 'Lyn_tot'  2.8e1
+   %var: 'Syk_tot'  4.0e2
+
+    %var: 'kp1'  1.32845238e-7
+    %var: 'km1'  0
+    %var: 'kp2'  2.5e-1
+    %var: 'km2'  0
+
+   %init: 100 Lig(l1,l2)
+   %init: 100 Rec(a,b~Y,g1~Y,g2~Y)
+
+
+   # Ligand-receptor binding
+   Rec(a) , Lig(l1,l2) <-> Rec(a!1),Lig(l1!1,l2) @('kp1'/2){0}, 'km1'
+   Rec(a) , Lig(l2,l1) <-> Rec(a!1),Lig(l2!1,l1) @('kp1'/2){0}, 'km1'
+
+   # Receptor-aggregation
+   Rec(a) , Lig(l1,l2!_) <-> Rec(a!2),Lig(l1!2,l2!_) @'kp2'{0},'km2'
+   Rec(a) , Lig(l2,l1!_) <-> Rec(a!2),Lig(l2!2,l1!_) @'kp2'{0},'km2'
