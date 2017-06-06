@@ -27,10 +27,10 @@
       %var: 'dm'   20
       %var: 'dc'   20
 
-    %init: 100 Lig(l1,l2)
-    %init: 100 Lyn(U,SH2)
-    %init: 100 Syk(tSH2,l~Y,a~Y)
-    %init: 100 Rec(a,b~Y,g1~Y,g2~Y)
+    %init: 1 Lig(l1,l2)
+    %init: 1 Lyn(U,SH2)
+    %init: 1 Syk(tSH2,l~Y,a~Y)
+    %init: 1 Rec(a,b~Y,g1~Y,g2~Y)
 
 
     # Ligand-receptor binding

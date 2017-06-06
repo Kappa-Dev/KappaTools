@@ -15,7 +15,8 @@ end seed species
 
 begin reaction rules
     # Ligand-receptor binding
-    Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp11, km11
+    Rec(a) + Lig(l,l) -> Rec(a!1).Lig(l!1,l) kp11
+    Rec(a!1).Lig(l!1,l) -> Rec(a) + Lig(l,l) km11
 
 end reaction rules
 end model
