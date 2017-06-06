@@ -26,16 +26,16 @@
 %agent: mLacI()
 %agent: pCI(lac )
 
-    %init: 100 Null()
-    %init: 100 gTetR(lac1!1,lac2!2),pLacI(tet!1),pLacI(tet!2)
-    %init: 100 gCI(tet1!1,tet2!2),pTetR(cI!1),pTetR(cI!2)
-    %init: 100 gLacI(cI1!1,cI2!2),pCI(lac!1),pCI(lac!2)
-    %init: 100 mTetR()
-    %init: 100 mCI()
-    %init: 100 mLacI()
-    %init: 100 pTetR(cI)
-    %init: 100 pCI(lac)
-    %init: 100 pLacI(tet)
+    %init: 1 Null()
+    %init: 1 gTetR(lac1!1,lac2!2),pLacI(tet!1),pLacI(tet!2)
+    %init: 1 gCI(tet1!1,tet2!2),pTetR(cI!1),pTetR(cI!2)
+    %init: 1 gLacI(cI1!1,cI2!2),pCI(lac!1),pCI(lac!2)
+    %init: 3163 mTetR()
+    %init: 6819 mCI()
+    %init: 129 mLacI()
+    %init: 183453 pTetR(cI)
+    %init: 2006198 pCI(lac)
+    %init: 165670 pLacI(tet)
 
     %var: 'k0' 'c0'/'Na'/'V'*'tF'/'pF'
     %var: 'k1' 'c1'*'tF'

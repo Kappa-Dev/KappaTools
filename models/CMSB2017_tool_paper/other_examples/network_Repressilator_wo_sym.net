@@ -15,16 +15,16 @@
 # rule rates are corrected by the number of automorphisms in the lhs of rules
 
 begin species
- 1 pLacI(tet) 100
- 2 pCI(lac) 100
- 3 pTetR(cI) 100
- 4 mLacI() 100
- 5 mCI() 100
- 6 mTetR() 100
- 7 pCI(lac!1).gLacI(cI1!2,cI2!1).pCI(lac!2) 100
- 8 pTetR(cI!1).gCI(tet1!2,tet2!1).pTetR(cI!2) 100
- 9 gTetR(lac1!1,lac2!2).pLacI(tet!2).pLacI(tet!1) 100
- 10 Null() 100
+ 1 pLacI(tet) 165670
+ 2 pCI(lac) 2006198
+ 3 pTetR(cI) 183453
+ 4 mLacI() 129
+ 5 mCI() 6819
+ 6 mTetR() 3163
+ 7 pCI(lac!1).gLacI(cI1!2,cI2!1).pCI(lac!2) 1
+ 8 pTetR(cI!1).gCI(tet1!2,tet2!1).pTetR(cI!2) 1
+ 9 gTetR(lac1!1,lac2!2).pLacI(tet!2).pLacI(tet!1) 1
+ 10 Null() 1
  11 gTetR(lac1!1,lac2).pLacI(tet!1) 0
  12 gTetR(lac1,lac2!1).pLacI(tet!1) 0
  13 gTetR(lac1,lac2) 0

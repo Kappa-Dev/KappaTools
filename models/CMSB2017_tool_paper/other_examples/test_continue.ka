@@ -26,10 +26,10 @@
 %var: 'deg'  0.01          # degradation of receptor dimers
 
     # Convert EGF conc. from nM to molecule/cell
-%init: 1000     EGF(R)
-%init: 1000     EGFR(L,CR1,Y1068~U)
-%init: 1000 Grb2(SH2,SH3)
-%init: 1000 Sos1(PxxP)
+%init: 0     EGF(R)
+%init: 'EGFR_init'     EGFR(L,CR1,Y1068~U)
+%init: 'Grb2_init' Grb2(SH2,SH3)
+%init: 'Sos1_init' Sos1(PxxP)
 
     # Ligand-receptor binding
     'R1' EGFR(L,CR1) , EGF(R) <-> EGFR(L!1,CR1),EGF(R!1)  @'kp1'{0},'km1'

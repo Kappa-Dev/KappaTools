@@ -15,10 +15,10 @@
 # rule rates are corrected by the number of automorphisms in the lhs of rules
 
 begin species
- 1 Sos1(PxxP) 1000
- 2 Grb2(SH2,SH3) 1000
- 3 EGFR(L,CR1,Y1068~U) 1000
- 4 EGF(R) 1000
+ 1 Sos1(PxxP) 620.
+ 2 Grb2(SH2,SH3) 1500.
+ 3 EGFR(L,CR1,Y1068~U) 1800.
+ 4 EGF(R) 0
  5 EGFR(L!1,CR1,Y1068~U).EGF(R!1) 0
  6 EGFR(L!1,CR1!2,Y1068~U).EGF(R!1).EGFR(L!3,CR1!2,Y1068~U).EGF(R!3) 0
  7 EGFR(L!1,CR1!2,Y1068~P).EGF(R!1).EGFR(L!3,CR1!2,Y1068~U).EGF(R!3) 0

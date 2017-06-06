@@ -15,13 +15,13 @@
 # rule rates are corrected by the number of automorphisms in the lhs of rules
 
 begin species
- 1 Sos(dom) 1000
- 2 Shc(PTB,Y317~Y) 1000
- 3 Grb2(SH2,SH3) 1000
- 4 egfr_3(l,r,Y1148~Y) 1000
- 5 egfr_2(l,r,Y1068~Y) 1000
- 6 egfr_1(l,r) 1000
- 7 egf(r) 1000
+ 1 Sos(dom) 13000.
+ 2 Shc(PTB,Y317~Y) 270000.
+ 3 Grb2(SH2,SH3) 100000.
+ 4 egfr_3(l,r,Y1148~Y) 180000.
+ 5 egfr_2(l,r,Y1068~Y) 180000.
+ 6 egfr_1(l,r) 180000.
+ 7 egf(r) 1200000.
  8 egf(r!1).egfr_1(l!1,r) 0
  9 egf(r!1).egfr_2(l!1,r,Y1068~Y) 0
  10 egf(r!1).egfr_1(l!2,r!3).egfr_2(l!1,r!3,Y1068~Y).egf(r!2) 0
