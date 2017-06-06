@@ -6,9 +6,9 @@ begin parameters
     Syk_tot  4.0e2
 
      kp1  1.32845238e-7
-     km1  0
+     km1  0.005
      kp2  2.5e-1
-     km2  0
+     km2  0.005
 end parameters
 
 begin seed species

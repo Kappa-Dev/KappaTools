@@ -4,9 +4,9 @@
    %var: 'Syk_tot'  4.0e2
 
     %var: 'kp1'  1.32845238e-7
-    %var: 'km1'  0
+    %var: 'km1'  0.005
     %var: 'kp2'  2.5e-1
-    %var: 'km2'  0
+    %var: 'km2'  0.005
 
    %init: 1 Lig(l1,l2)
    %init: 1 Rec(a,b~Y,g1~Y,g2~Y)

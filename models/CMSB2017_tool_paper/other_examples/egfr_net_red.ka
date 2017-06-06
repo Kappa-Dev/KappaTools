@@ -63,13 +63,13 @@
 %var: 'km22'         0.064 # diss. of ShcP-Grb2 and Sos in cytosol, units: /s
 
 
-%init: 1000 egf(r)
-%init: 1000 egfr_1(l,r)
-%init: 1000 egfr_2(l,r,Y1068~Y)
-%init: 1000 egfr_3(l,r,Y1148~Y)
-%init: 1000 Grb2(SH2,SH3)
-%init: 1000 Shc(PTB,Y317~Y)
-%init: 1000 Sos(dom)
+%init: 'egf_tot' egf(r)
+%init: 'egfr_tot' egfr_1(l,r)
+%init: 'egfr_tot' egfr_2(l,r,Y1068~Y)
+%init: 'egfr_tot' egfr_3(l,r,Y1148~Y)
+%init: 'Grb2_tot' Grb2(SH2,SH3)
+%init: 'Shc_tot' Shc(PTB,Y317~Y)
+%init: 'Sos_tot' Sos(dom)
 
 # Ligand-receptor binding
 egfr_1(l,r) , egf(r) <-> egfr_1(l!1,r),egf(r!1)   @'kp1'{0}, 'km1'   #ligand-monomer

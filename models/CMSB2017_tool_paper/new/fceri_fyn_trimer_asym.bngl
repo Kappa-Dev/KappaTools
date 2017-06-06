@@ -4,7 +4,7 @@ begin parameters
     Lig_tot  6.0e3
     Rec_tot  4.0e2
     kp11  1.32845238e-7
-    km11  0
+    km11  0.005
 
 end parameters
 

@@ -1,10 +1,10 @@
 
-%var: 'egf_tot'       1.2e6    # molecule counts
-%var: 'egfr_tot'      1.8e5    # molecule counts
-%var: 'Grb2_tot'      1.0e5    # molecule counts
-%var: 'Shc_tot'       2.7e5    # molecule counts
-%var: 'Sos_tot'       1.3e4    # molecule counts
-%var: 'Grb2_Sos_tot'  4.9e4    # molecule counts
+%var: 'egf_tot'       1200000    # molecule counts
+%var: 'egfr_tot'      180000    # molecule counts
+%var: 'Grb2_tot'      100000    # molecule counts
+%var: 'Shc_tot'       270000    # molecule counts
+%var: 'Sos_tot'       13000    # molecule counts
+%var: 'Grb2_Sos_tot'  49000    # molecule counts
 
 %var: 'kp1'      1.667e-06 # ligand-monomer binding (scaled), units: /molecule/s
 %var: 'km1'           0.06 # ligand-monomer dissociation, units: /s
@@ -62,12 +62,12 @@
 %var: 'kp22'     1.667e-05 # binding of ShcP-Grb2 to Sos in cytosol (scaled), units: /molecule/s
 %var: 'km22'         0.064 # diss. of ShcP-Grb2 and Sos in cytosol, units: /s
 
-%init: 100 egf(r)
-%init: 100 Grb2(SH2,SH3)
-%init: 100 Shc(PTB,Y317~Y)
-%init: 100 Sos(dom)
-%init: 100 egfr(l,r,Y1068~Y,Y1148~Y)
-%init: 100 Grb2(SH2,SH3!1),Sos(dom!1)    
+%init: 'egf_tot' egf(r)
+%init: 'Grb2_tot' Grb2(SH2,SH3)
+%init: 'Shc_tot' Shc(PTB,Y317~Y)
+%init: 'Sos_tot' Sos(dom)
+%init: 'egfr_tot' egfr(l,r,Y1068~Y,Y1148~Y)
+%init: 'Grb2_Sos_tot' Grb2(SH2,SH3!1),Sos(dom!1)
 
 
 # Ligand-receptor binding (ligand-monomer)
