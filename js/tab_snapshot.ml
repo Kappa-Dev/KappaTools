@@ -129,7 +129,7 @@ let render_snapshot_graph
     let contact_map = model.State_project.model_contact_map in
     snapshot_js##setData
       (Js.string json)
-      (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
+      (*Js.Opt.option (Option_util.map Api_data.agent_count contact_map)*)
   | Kappa -> ()
 
 let select_snapshot () =

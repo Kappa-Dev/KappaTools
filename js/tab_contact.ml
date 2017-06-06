@@ -46,11 +46,9 @@ let xml () =
     Widget_export.content configuration
   in
   [%html {|<div>
-             <div class="row">
-                <div id="|}display_id{|" class="col-sm-8">
+                <div id="|}display_id{|">
                  |}[ Html.entity "nbsp" ]{|
 	        </div>
-	    </div>
 	   |}[ export_controls ]{|
         </div>|}]
 
@@ -68,7 +66,7 @@ let update
   let () = Common.debug (Js.string json) in
     contactmap##setData
       (Js.string json)
-      (Js.Opt.option (Option_util.map Api_data.agent_count contact_map))
+      (*Js.Opt.option (Option_util.map Api_data.agent_count contact_map)*)
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active

@@ -9,7 +9,7 @@
 class type contact_map =
   object
     method exportJSON  : Js.js_string Js.t -> unit Js.meth
-    method setData : Js.js_string Js.t -> int Js.Opt.t -> unit Js.meth
+    method setData : Js.js_string Js.t -> (*int Js.Opt.t ->*) unit Js.meth
     method clearData : unit Js.meth
   end;;
 
