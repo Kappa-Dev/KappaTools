@@ -22,7 +22,8 @@ let receive mailbox x =
   | None -> ()
   | Some t ->
     let out = reply_of_string x in
-    let () = Lwt.wakeup t out in mailbox := None
+    let () = mailbox := None in
+    Lwt.wakeup t out
 
 let raw_message mailbox post request =
   match !mailbox with
