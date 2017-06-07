@@ -1,4 +1,5 @@
 (**
+
    * LKappa_group_action.ml
    * openkappa
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
@@ -23,12 +24,8 @@
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
 val check_orbit_internal_state_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?sigs:Signature.s ->
-  agent_type:int ->
-  site1:int ->
-  site2:int ->
-  LKappa.rule ->
+  ?logger:Loggers.t -> ?sigs:Signature.s -> agent_type:int ->
+  site1:int -> site2:int -> LKappa.rule ->
   correct:(int array) -> (*what i have to divide to get gamma *)
   ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
@@ -46,8 +43,7 @@ val check_orbit_internal_state_permutation:
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
 val check_orbit_binding_state_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?sigs:Signature.s ->
+  ?logger:Loggers.t -> ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -69,7 +65,7 @@ val check_orbit_binding_state_permutation:
      true, means that there is a rule corresponding to this hash, and it does not belong to a visited orbit *)
 
 val check_orbit_full_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
+  ?logger:Loggers.t ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -82,7 +78,7 @@ val check_orbit_full_permutation:
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
 
 val is_invariant_internal_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
+  ?logger:Loggers.t ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -92,7 +88,7 @@ val is_invariant_internal_states_permutation:
   LKappa_auto.cache * bool
 
 val is_invariant_binding_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
+  ?logger:Loggers.t ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -102,7 +98,7 @@ val is_invariant_binding_states_permutation:
   LKappa_auto.cache * bool
 
 val is_invariant_full_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
+  ?logger:Loggers.t ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -112,7 +108,7 @@ val is_invariant_full_states_permutation:
   LKappa_auto.cache * bool
 
 val equiv_class:
-  ?parameters:Remanent_parameters_sig.parameters ->
+  ?logger:Loggers.t ->
   ?sigs:Signature.s ->
   LKappa_auto.cache ->
   bool Mods.DynArray.t ->

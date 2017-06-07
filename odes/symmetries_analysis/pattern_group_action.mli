@@ -14,17 +14,14 @@
    * under the terms of the GNU Library General Public License *)
 
 val normalize_species:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
-  LKappa_auto.cache ->
+  ?fmt:Format.formatter -> sigs:Signature.s -> LKappa_auto.cache ->
   Pattern.PreEnv.t ->
   int Symmetries_sig.site_partition array ->
   Pattern.cc ->
   LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 
 val is_pattern_invariant_internal_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  env:Model.t ->
+  ?logger:Loggers.t -> env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -33,8 +30,7 @@ val is_pattern_invariant_internal_states_permutation:
   LKappa_auto.cache * bool
 
 val is_pattern_invariant_binding_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  env:Model.t ->
+  ?logger:Loggers.t -> env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -43,8 +39,7 @@ val is_pattern_invariant_binding_states_permutation:
   LKappa_auto.cache * bool
 
 val is_pattern_invariant_full_states_permutation:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  env:Model.t ->
+  ?logger:Loggers.t -> env:Model.t ->
   agent_type:int ->
   site1:int ->
   site2:int ->
@@ -53,8 +48,7 @@ val is_pattern_invariant_full_states_permutation:
   LKappa_auto.cache * bool
 
 val equiv_class_of_a_pattern:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  env:Model.t ->
+  ?logger:Loggers.t -> env:Model.t ->
   partitions_internal_states:(int -> int list list) ->
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->
@@ -67,8 +61,7 @@ val equiv_class_of_a_pattern:
 
 
 val equiv_class_of_a_species:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  sigs:Signature.s ->
+  ?logger:Loggers.t -> sigs:Signature.s ->
   partitions_internal_states:(int -> int list list) ->
   partitions_binding_states:(int -> int list list) ->
   partitions_full_states:(int -> int list list) ->

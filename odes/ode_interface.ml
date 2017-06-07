@@ -55,9 +55,13 @@ let hash_rule_weight get set f cache compil rule =
 
 let get_representative parameters compil cache symmetries species =
   let sigs = Model.signatures compil.environment in
+  let fmt =
+    if Remanent_parameters.get_trace parameters
+    then Loggers.formatter_of_logger (Remanent_parameters.get_logger parameters)
+    else None in
   let rep_cache, rule_cache, cc_cache, species =
     Symmetries.representative
-      ~parameters
+      ?fmt
       ~sigs
       cache.representative_cache
       cache.rule_cache
@@ -72,9 +76,13 @@ let get_representative parameters compil cache symmetries species =
 
 let equiv_class_of_pattern parameters compil cache symmetries pattern =
   let env = compil.environment in
+  let logger =
+    if Remanent_parameters.get_trace parameters
+    then Some (Remanent_parameters.get_logger parameters)
+    else None in
   let rep_cache, rule_cache, cc_cache, seen_pattern,  equiv_class =
     Symmetries.equiv_class
-      ~parameters
+      ?logger
       env
       cache.seen_pattern
       cache.representative_cache
@@ -596,9 +604,13 @@ let divide_rule_rate_by cache compil rule =
 
 let detect_symmetries parameters compil cache chemical_species contact_map =
   let rule_cache = cache.rule_cache in
+  let logger =
+    if Remanent_parameters.get_trace parameters
+    then Some (Remanent_parameters.get_logger parameters)
+    else None in
   let rule_cache, symmetries =
     Symmetries.detect_symmetries
-      parameters
+      ?logger
       compil.environment
       rule_cache
       compil.rate_convention
@@ -611,7 +623,8 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
 
 let print_symmetries parameters compil symmetries =
   let env = compil.environment in
-  Symmetries.print_symmetries parameters env symmetries
+  let logger = Remanent_parameters.get_logger parameters in
+  Symmetries.print_symmetries logger env symmetries
 
 let valid_mixture compil cc_cache  ?max_size mixture =
   match max_size
