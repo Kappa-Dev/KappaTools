@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <May 13 2017>
+   * Last modification: Time-stamp: <Jun 08 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -449,9 +449,12 @@ let check_orbit
               Rule_modes.RuleModeMap.monadic_fold2
                 () ()
                 (fun () () _ w_ref w () ->
-                   if Alg_expr_extra.necessarily_equal w_ref w
-                   then (),()
-                   else raise False)
+                    match w_ref, w with
+                        Some w_ref,Some w ->
+                        if Affine_combinations.necessarily_equal w_ref w
+                        then (),()
+                        else raise False
+                      | None,_ | _,None -> raise False)
                 (fun () () _ _ () -> raise False)
                 (fun () () _ _ () -> raise False)
                 w_ref
@@ -485,12 +488,9 @@ let check_orbit
   else
     (cache, counter, to_be_checked), false
 
-let weight ~correct ~card_stabilizer ~rate :
-  ('a, 'b) Alg_expr_extra.corrected_rate_const option =
-  Alg_expr_extra.get_corrected_rate
-    (Alg_expr_extra.divide_expr_by_int
-       rate
-       (correct * card_stabilizer))
+let weight ~correct ~card_stabilizer ~rate =
+  Affine_combinations.div_scal
+          rate (correct * card_stabilizer)
 
 let check_orbit_internal_state_permutation
     ?logger ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache

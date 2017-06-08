@@ -36,7 +36,7 @@ and anonamise_bool bool =
 module AnonamisedExprSetMap =
   (SetMap.Make
     (struct
-      type t = (unit,unit) anonamised_expr
+      type t = (Pattern.id array list, int) anonamised_expr
       let compare = compare
       let print _ _ = ()
     end))
