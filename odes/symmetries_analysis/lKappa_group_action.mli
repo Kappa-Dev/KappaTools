@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <May 13 2017>
+   * Last modification: Time-stamp: <Jun 08 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -30,7 +30,7 @@ val check_orbit_internal_state_permutation:
   site2:int ->
   LKappa.rule ->
   correct:(int array) -> (*what i have to divide to get gamma *)
-  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
+  Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
   counter:(int array) -> (*counter the number of array of orbit*)
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
@@ -52,7 +52,7 @@ val check_orbit_binding_state_permutation:
   site2:int ->
   LKappa.rule ->
   correct:(int array) ->
-  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
+  Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
   counter:(int array) ->
   bool array -> (LKappa_auto.cache * int array * bool array) * bool
@@ -75,7 +75,7 @@ val check_orbit_full_permutation:
   site2:int ->
   LKappa.rule ->
   correct:(int array) ->
-  ('a, 'b) Alg_expr.e Locality.annot Rule_modes.RuleModeMap.t array ->
+  Affine_combinations.aff_combination Rule_modes.RuleModeMap.t array ->
   LKappa_auto.cache ->
   counter:(int array) ->
   bool array -> (LKappa_auto.cache * int array * bool array) * bool

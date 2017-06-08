@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <May 21 2017>
+   * Last modification: Time-stamp: <Jun 08 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -448,7 +448,9 @@ let cannonic_form_from_syntactic_rule
           match rate_opt with
           | None -> rate_map
           | Some rate ->
-            Rule_modes.RuleModeMap.add (a,b) rate rate_map
+            Rule_modes.RuleModeMap.add (a,b)
+              (Affine_combinations.linearise rate)
+              rate_map
         in
         rate_map
       ) Rule_modes.RuleModeMap.empty rule_id_with_mode_list
@@ -642,7 +644,7 @@ let print_symmetries_gen parameters env contact_map
          in
          let () =
            rates.(i) <-
-             (Rule_modes.add_map (rates.(i)) rate_map)
+             (Rule_modes.sum_map (Affine_combinations.sum) (rates.(i)) rate_map)
          in
          let () =
            to_be_checked.(i) <- true
