@@ -45,7 +45,7 @@ val refine_partitioned_contact_map_in_lkappa_representation :
   'a * 'b Symmetries_sig.site_partition array
 
 val detect_symmetries:
-  ?logger:Loggers.t ->
+  Remanent_parameters_sig.parameters ->
   Model.t ->
   LKappa_auto.cache ->
   Remanent_parameters_sig.rate_convention ->
@@ -55,23 +55,22 @@ val detect_symmetries:
     Mods.StringMap.t -> LKappa_auto.cache * symmetries
 
 val print_symmetries:
-  Loggers.t -> Model.t -> symmetries -> unit
+  Remanent_parameters_sig.parameters -> Model.t -> symmetries -> unit
 
 type cache
 
 val empty_cache: unit -> cache
 
 val representative:
-  ?fmt:Format.formatter ->
+  ?parameters:Remanent_parameters_sig.parameters ->
   sigs:Signature.s -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.cc
   ->  cache * LKappa_auto.cache * Pattern.PreEnv.t * Pattern.cc
 
 val equiv_class:
-  ?logger:Loggers.t -> Model.t  ->
-  bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t ->
-  reduction -> Pattern.id ->
-  cache * LKappa_auto.cache * Pattern.PreEnv.t *
-  bool Mods.DynArray.t  * (int * (Pattern.id * int) list)
+  ?parameters:Remanent_parameters_sig.parameters ->
+  Model.t  ->
+  bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.id ->
+  cache * LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t  * (int * (Pattern.id * int) list)
 
 val saturate_domain_with_symmetric_patterns:
   compileModeOn:bool ->

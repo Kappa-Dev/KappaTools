@@ -361,9 +361,9 @@ let normalize_raw_mixture rule_cache symmetries raw_mixture =
   let raw_mixture = normalize_internal_states symmetries raw_mixture in
   normalize_binding_states rule_cache symmetries raw_mixture
 
-let normalize_species ?fmt ~sigs rule_cache cache symmetries cc =
+let normalize_species ?parameters ~sigs rule_cache cache symmetries cc =
   match
-    Patterns_extra.species_to_raw_mixture ?fmt ~sigs cc
+    Patterns_extra.species_to_raw_mixture ?parameters ~sigs cc
   with
   | Some (raw_mixture, unspec) ->
     let rule_cache, raw_mixture =
@@ -372,7 +372,7 @@ let normalize_species ?fmt ~sigs rule_cache cache symmetries cc =
     in
     let a, b, _ =
       Patterns_extra.raw_mixture_to_species
-        ?fmt ~sigs cache raw_mixture unspec
+        ?parameters ~sigs cache raw_mixture unspec
     in
     rule_cache, a, b
   | None -> rule_cache, cache, cc
@@ -380,16 +380,15 @@ let normalize_species ?fmt ~sigs rule_cache cache symmetries cc =
 (******************************************************)
 
 let is_pattern_invariant_internal_states_permutation
-    ?logger ~env
+    ?parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
-  let fmt = Option_util.bind Loggers.formatter_of_logger logger in
   let lkappa_rule =
-    Patterns_extra.pattern_id_to_lkappa_rule ?fmt env id
+    Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
   let sigs = Model.signatures env in
   LKappa_group_action.is_invariant_internal_states_permutation
-    ?logger
+    ?parameters
     ~sigs
     ~agent_type
     ~site1
@@ -398,16 +397,15 @@ let is_pattern_invariant_internal_states_permutation
     cache
 
 let is_pattern_invariant_binding_states_permutation
-    ?logger ~env
+    ?parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
   let sigs = Model.signatures env in
-  let fmt = Option_util.bind Loggers.formatter_of_logger logger in
   let lkappa_rule =
-    Patterns_extra.pattern_id_to_lkappa_rule ?fmt env id
+    Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
   LKappa_group_action.is_invariant_binding_states_permutation
-    ?logger
+    ?parameters
     ~sigs
     ~agent_type
     ~site1
@@ -416,16 +414,15 @@ let is_pattern_invariant_binding_states_permutation
     cache
 
 let is_pattern_invariant_full_states_permutation
-    ?logger ~env
+    ?parameters ~env
     ~agent_type ~site1 ~site2
     id cache =
   let sigs = Model.signatures env in
-  let fmt = Option_util.bind Loggers.formatter_of_logger logger in
   let lkappa_rule =
-    Patterns_extra.pattern_id_to_lkappa_rule ?fmt env id
+    Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
   LKappa_group_action.is_invariant_full_states_permutation
-    ?logger
+    ?parameters
     ~sigs
     ~agent_type
     ~site1
@@ -434,7 +431,7 @@ let is_pattern_invariant_full_states_permutation
     cache
 
 let equiv_class_gen
-    ?logger ~sigs
+    ?parameters ?sigs
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
@@ -445,13 +442,12 @@ let equiv_class_gen
     preenv
     seen
     species =
-  let fmt = Option_util.bind Loggers.formatter_of_logger logger in
   let convention = Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs in
-  let rule, unspec = to_rule ?fmt species in
+  let rule, unspec = to_rule  species in
   let cache, seen, rule_class =
     LKappa_group_action.equiv_class
-      ?logger
-      ~sigs
+      ?parameters
+      ?sigs
       cache seen rule
       ~partitions_internal_states
       ~partitions_binding_states
@@ -509,7 +505,7 @@ let equiv_class_of_a_species
 *)
 
 let equiv_class_of_a_species
-    ?logger ~sigs
+    ?parameters ~sigs
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
@@ -518,12 +514,12 @@ let equiv_class_of_a_species
     seen
     species =
   equiv_class_gen
-    ?logger
+    ?parameters
     ~sigs
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
-    (Patterns_extra.species_to_lkappa_rule_and_unspec ~sigs)
+    (Patterns_extra.species_to_lkappa_rule_and_unspec ?parameters ~sigs)
     (fun a b c ->
        Patterns_extra.raw_mixture_to_species a b.LKappa.r_created c)
     (fun (a,_,_) -> a)
@@ -562,7 +558,7 @@ let equiv_class_of_a_pattern
 
 
 let equiv_class_of_a_pattern
-    ?logger
+    ?parameters
     ~env
     ~partitions_internal_states
     ~partitions_binding_states
@@ -571,18 +567,17 @@ let equiv_class_of_a_pattern
     preenv
     seen
     species =
-  let sigs = Model.signatures env in
-  let fmt = Option_util.bind Loggers.formatter_of_logger logger in
+  let sigs = Some (Model.signatures env) in
   equiv_class_gen
-    ?logger
-    ~sigs
+    ?parameters
     ~partitions_internal_states
     ~partitions_binding_states
     ~partitions_full_states
-    (fun ?fmt pattern ->
-       Patterns_extra.pattern_id_to_lkappa_rule_and_unspec ?fmt env pattern)
+    (fun pattern ->
+       Patterns_extra.pattern_id_to_lkappa_rule_and_unspec
+         ?parameters env pattern)
     (fun a b c ->
-       Patterns_extra.mixture_to_pattern ?fmt ~sigs a b.LKappa.r_mix c)
+       Patterns_extra.mixture_to_pattern ?parameters ?sigs a b.LKappa.r_mix c)
     (fun (_,a,b) -> (a,b))
     cache
     preenv

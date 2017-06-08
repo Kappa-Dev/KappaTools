@@ -1,16 +1,33 @@
-let trace_print ?fmt x =
-  match fmt with
-  | Some fmt -> Format.fprintf fmt "%s\n" x
-  | None -> ()
+let local_trace = false
 
-let safe_print_str (i,j,k,l) ?fmt print print2 =
-  match fmt with
-  | None -> ()
-  | Some _ ->
+let do_trace parameters =
+  local_trace ||
+    (match parameters with
+     | None -> false
+     | Some p -> Remanent_parameters.get_trace p)
+
+let trace_print ?parameters x =
+  let get_trace, fmt_opt =
+    match parameters with
+    | None -> false, Some Format.err_formatter
+    | Some parameters ->
+      Remanent_parameters.get_trace parameters,
+      Loggers.formatter_of_logger (Remanent_parameters.get_logger parameters)
+  in
+  if local_trace || get_trace
+    then
+      match fmt_opt with
+      | Some fmt ->
+        Format.fprintf fmt "%s\n" x
+      | None -> ()
+
+let safe_print_str (i,j,k,l) ?parameters print print2 =
+  if do_trace parameters
+  then
     try
       let () = print Format.str_formatter in
       let s = Format.flush_str_formatter () in
-      let () = trace_print ?fmt s in
+      let () = trace_print ?parameters s in
       ()
     with
     | _ ->
@@ -20,10 +37,10 @@ let safe_print_str (i,j,k,l) ?fmt print print2 =
           "An error has been encountered (%s,%i,%i,%i)\n Dumping while ignoring the signature\n" i j k l
       in
       let s = Format.flush_str_formatter () in
-      let () = trace_print ?fmt s in
+      let () = trace_print ?parameters s in
       let () = print2 Format.str_formatter in
       let s = Format.flush_str_formatter () in
-      let () = trace_print ?fmt s in
+      let () = trace_print ?parameters s in
       ()
 
 let declare_bond work ag_pos site bond_id map =
@@ -40,16 +57,16 @@ let declare_bond work ag_pos site bond_id map =
       | [] | _ :: _ :: _ -> assert false
     end
 
-let raw_mixture_to_species ?fmt ?sigs preenv mix unspec =
-  let () = trace_print ?fmt "Translation from raw_mixture to pattern" in
-  let () = trace_print ?fmt "INPUT:" in
+let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
+  let () = trace_print ?parameters "Translation from raw_mixture to pattern" in
+  let () = trace_print ?parameters "INPUT:" in
   let () =
     match sigs with
     | None -> ()
     | Some sigs ->
       safe_print_str
         __POS__
-        ?fmt
+        ?parameters
         (fun fmt ->
            Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
              ~sigs fmt mix)
@@ -110,25 +127,25 @@ let raw_mixture_to_species ?fmt ?sigs preenv mix unspec =
     match sigs with
     | None -> ()
     | Some sigs ->
-      let () = trace_print ?fmt "OUTPUT:" in
+      let () = trace_print ?parameters "OUTPUT:" in
       let () =
-        safe_print_str __POS__ ?fmt
+        safe_print_str __POS__ ?parameters
           (fun fmt ->
             Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt b )
           (fun fmt -> Pattern.print_cc ~new_syntax:true ~with_id:false fmt b)
       in ()
   in (a, b, c)
 
-let mixture_to_pattern ?fmt ?sigs preenv mix unspec =
-  let () = trace_print ?fmt "Translation from mixture to pattern" in
-  let () = trace_print ?fmt "INPUT:" in
+let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
+  let () = trace_print ?parameters "Translation from mixture to pattern" in
+  let () = trace_print ?parameters "INPUT:" in
   let () =
     match sigs with
     | None -> Format.fprintf Format.std_formatter "No sigs @."
     | Some sigs ->
       safe_print_str
         __POS__
-        ?fmt
+        ?parameters
         (fun fmt ->
            LKappa.print_rule_mixture ~ltypes:true sigs fmt mix)
         (fun fmt ->
@@ -198,10 +215,10 @@ let mixture_to_pattern ?fmt ?sigs preenv mix unspec =
     match sigs with
     | None -> ()
     | Some sigs ->
-      let () = trace_print ?fmt "OUTPUT:" in
+      let () = trace_print ?parameters "OUTPUT:" in
       let () = if !Parameter.debugModeOn then let _ = Pattern.id_to_yojson c in () in
       let () =
-        safe_print_str __POS__ ?fmt
+        safe_print_str __POS__ ?parameters
           (fun fmt ->
              Pattern.print_cc ~new_syntax:true ~sigs ~with_id:true fmt b )
           (fun fmt -> Pattern.print_cc ~new_syntax:true ~with_id:true fmt b)
@@ -320,14 +337,14 @@ let parse pattern =
   in
   agent_list, site_list, agent_type_map, bond_map
 
-let species_to_raw_mixture ?fmt ~sigs pattern =
-  let () = trace_print ?fmt
+let species_to_raw_mixture ?parameters ~sigs pattern =
+  let () = trace_print ?parameters
       "Translation from patten to raw_mixture" in
   let () =
-    let () = trace_print ?fmt "INPUT:" in
+    let () = trace_print ?parameters "INPUT:" in
     let () =
       safe_print_str
-        __POS__ ?fmt
+        __POS__ ?parameters
         (fun fmt ->
           Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
         (fun fmt ->
@@ -425,24 +442,24 @@ let species_to_raw_mixture ?fmt ~sigs pattern =
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ ?fmt (fun _fmt -> raise Exit)
+                 __POS__ ?parameters (fun _fmt -> raise Exit)
                  (fun _fmt -> ())
                  in
              (), agent_list)
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ ?fmt (fun _fmt -> raise Exit)
+                 __POS__ ?parameters (fun _fmt -> raise Exit)
                  (fun _fmt -> ())
              in
              (), agent_list)
           agent_type_map agent_map []
       in
       let output = top_sort_raw_mixture list in
-      let () = trace_print ?fmt "OUTPUT:" in
+      let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str
-          __POS__ ?fmt
+          __POS__ ?parameters
           (fun fmt ->
              Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
                ~sigs fmt output)
@@ -453,12 +470,12 @@ let species_to_raw_mixture ?fmt ~sigs pattern =
       Some (output, unspec)
     end
 
-let pattern_to_mixture ?fmt ~sigs pattern =
-  let () = trace_print ?fmt "Translation from pattern to mixture" in
-  let () = trace_print ?fmt "INPUT:" in
+let pattern_to_mixture ?parameters ~sigs pattern =
+  let () = trace_print ?parameters "Translation from pattern to mixture" in
+  let () = trace_print ?parameters "INPUT:" in
   let () =
     safe_print_str
-        __POS__ ?fmt
+        __POS__ ?parameters
         (fun fmt ->
            Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
         (fun fmt ->
@@ -564,14 +581,14 @@ let pattern_to_mixture ?fmt ~sigs pattern =
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ ?fmt (fun _fmt -> raise Exit)
+                 __POS__ ?parameters (fun _fmt -> raise Exit)
                  (fun _fmt -> ())
              in
              (), agent_list)
           (fun () () _ _ agent_list ->
              let () =
                safe_print_str
-                 __POS__ ?fmt (fun _fmt -> raise Exit)
+                 __POS__ ?parameters (fun _fmt -> raise Exit)
                  (fun _fmt -> ())
              in
              (), agent_list)
@@ -580,10 +597,10 @@ let pattern_to_mixture ?fmt ~sigs pattern =
           []
       in
       let output = top_sort_mixture list in
-      let () = trace_print ?fmt "OUTPUT:" in
+      let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str
-          __POS__ ?fmt
+          __POS__ ?parameters
           (fun fmt ->
              LKappa.print_rule_mixture sigs ~ltypes:false fmt output)
           (fun fmt ->
@@ -592,7 +609,7 @@ let pattern_to_mixture ?fmt ~sigs pattern =
       Some (output, unspec)
     end
 
-let pattern_id_to_mixture ?fmt env id =
+let pattern_id_to_mixture ?parameters env id =
   let sigs = Model.signatures env in
   let point_opt  =
     try
@@ -603,7 +620,7 @@ let pattern_id_to_mixture ?fmt env id =
   match point_opt with
   | None -> None
   | Some point ->
-    pattern_to_mixture ?fmt ~sigs (Pattern.Env.content point)
+    pattern_to_mixture ?parameters ~sigs (Pattern.Env.content point)
 
 let pattern_id_to_cc env id =
   let point_opt  =
@@ -648,10 +665,10 @@ let rule_mixture_to_lkappa_rule rule_mixture =
 (*convert a species into lkappa rule signature*)
 
 
-let species_to_lkappa_rule_and_unspec ?fmt ~sigs species =
+let species_to_lkappa_rule_and_unspec ?parameters ~sigs species =
   let some_pair =
         species_to_raw_mixture
-          ?fmt
+          ?parameters
           ~sigs
           species
       in
@@ -663,13 +680,13 @@ let species_to_lkappa_rule_and_unspec ?fmt ~sigs species =
         in
         lkappa_rule, unspec
 
-let species_to_lkappa_rule ?fmt ~sigs species =
-  fst (species_to_lkappa_rule_and_unspec ?fmt ~sigs species)
+let species_to_lkappa_rule ?parameters ~sigs species =
+  fst (species_to_lkappa_rule_and_unspec ?parameters ~sigs species)
 
-let pattern_to_lkappa_rule_and_unspec ?fmt ~sigs cc =
+let pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc =
   let some_pair =
     pattern_to_mixture
-      ?fmt
+      ?parameters
       ~sigs
       cc
   in
@@ -681,22 +698,22 @@ let pattern_to_lkappa_rule_and_unspec ?fmt ~sigs cc =
     in
     lkappa_rule,unspec
 
-let pattern_to_lkappa_rule ?fmt ~sigs cc =
-  fst (pattern_to_lkappa_rule_and_unspec ?fmt ~sigs cc)
+let pattern_to_lkappa_rule ?parameters ~sigs cc =
+  fst (pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc)
 
-let pattern_id_to_lkappa_rule ?fmt env id =
+let pattern_id_to_lkappa_rule ?parameters env id =
   let sigs = Model.signatures env in
   match pattern_id_to_cc env id with
   | None -> lkappa_init
   | Some cc ->
-    let lkappa_rule = pattern_to_lkappa_rule ?fmt ~sigs cc in
+    let lkappa_rule = pattern_to_lkappa_rule ?parameters ~sigs cc in
     lkappa_rule
 
-let pattern_id_to_lkappa_rule_and_unspec ?fmt env id =
+let pattern_id_to_lkappa_rule_and_unspec ?parameters env id =
   let sigs = Model.signatures env in
   match pattern_id_to_cc env id with
   | None -> lkappa_init,[]
-  | Some cc -> pattern_to_lkappa_rule_and_unspec ?fmt ~sigs cc
+  | Some cc -> pattern_to_lkappa_rule_and_unspec ?parameters ~sigs cc
 
 let copy_agent_in_raw_mixture agent =
   {

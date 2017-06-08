@@ -158,6 +158,7 @@ let cut_list (s:string) : string list =
   List.rev (doit [] 0)
 
 (* order by category *)
+let error = Exception.empty_error_handler
 let p (_,_,_,l,_) (_,_,_,l',_) =
   match l,l' with
     [_,i],[_,i'] -> compare i i'

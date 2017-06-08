@@ -1475,10 +1475,6 @@ let compute_symmetries
         Model.fold_rules (fun _ acc r -> r :: acc) [] env
       in
       let parameters = get_parameters state in
-      let logger =
-        if Remanent_parameters.get_trace parameters
-        then Some (Remanent_parameters.get_logger parameters)
-        else None in
       let cache = LKappa_auto.init_cache () in
       let cc_cache = Pattern.PreEnv.of_env (Model.domain env) in
       let _cc_cache, chemical_species =
@@ -1504,7 +1500,7 @@ let compute_symmetries
       in
       let _cache, symmetries =
         Symmetries.detect_symmetries
-          ?logger
+          parameters
           env
           cache
           rate_convention
@@ -1536,8 +1532,7 @@ let output_symmetries
   match sym, env with
   | None, _ | _, None -> state
   | Some sym, Some env ->
-    let () = Symmetries.print_symmetries
-        (Remanent_parameters.get_logger parameters)  env sym in
+    let () = Symmetries.print_symmetries parameters env sym in
     state
 
 let get_data = Remanent_state.get_data

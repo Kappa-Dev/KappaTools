@@ -333,25 +333,30 @@ let for_all_over_orbit
 
 exception False
 
-let do_print ?logger ?sigs f =
-  match logger,sigs with
-  | None, _ | _, None  -> ()
-  | Some logger, Some sigs ->
-    let fmt_opt = Loggers.formatter_of_logger logger in
-    match fmt_opt with
-    | None -> ()
-    | Some fmt -> f sigs logger fmt
+let do_print ?parameters ?sigs f =
+  match parameters,sigs with
+| Some parameters, Some sigs ->
+  begin
+    if Remanent_parameters.get_trace parameters
+    then
+      let logger = Remanent_parameters.get_logger parameters in
+      let fmt_opt = Loggers.formatter_of_logger logger in
+      match fmt_opt with
+      | None -> ()
+      | Some fmt -> f sigs logger fmt
+  end
+| None, _ | _, None  -> ()
 
 (*
 get_positions: (int -> int -> int -> LKappa.rule -> int list)
 *)
 let check_orbit
-    ?logger ?sigs
+    ?parameters ?sigs
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
     to_be_checked : (LKappa_auto.cache * int array * bool array) * bool =
   let () =
-    do_print ?logger ?sigs
+    do_print ?parameters ?sigs
       (fun sigs logger fmt ->
           let () = Loggers.fprintf logger "Check an orbit" in
           let () = Loggers.print_newline logger in
@@ -378,7 +383,7 @@ let check_orbit
   let accu = cache, [], counter, to_be_checked in
   let f rule (cache, l, counter, to_be_checked) =
     let () =
-      do_print ?logger ?sigs
+      do_print ?parameters ?sigs
         (fun sigs logger fmt ->
             let () = Loggers.fprintf logger " rule:   " in
             let () =
@@ -397,7 +402,7 @@ let check_orbit
     then
       begin
         let () =
-          do_print ?logger ?sigs
+          do_print ?parameters ?sigs
             (fun _ logger _ ->
                let () = Loggers.fprintf logger "Existing rule" in
                Loggers.print_newline logger)
@@ -412,7 +417,7 @@ let check_orbit
       end
     else
     let () =
-      do_print ?logger ?sigs
+      do_print ?parameters ?sigs
         (fun _ logger _ ->
            let () = Loggers.fprintf logger "Unknown rule" in
            Loggers.print_newline logger)
@@ -493,10 +498,10 @@ let weight ~correct ~card_stabilizer ~rate =
           rate (correct * card_stabilizer)
 
 let check_orbit_internal_state_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?logger ?sigs
+    ?parameters ?sigs
     (potential_positions_for_swapping_internal_states,
      swap_internal_state_regular,
      swap_internal_state_regular,
@@ -505,10 +510,10 @@ let check_orbit_internal_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?logger ?sigs
+    ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,
      swap_binding_state_regular,
@@ -517,10 +522,10 @@ let check_orbit_binding_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?logger ?sigs
+    ?parameters ?sigs
     (potential_positions_for_swapping_full,
      swap_full_regular,
      swap_full_regular,
@@ -529,11 +534,11 @@ let check_orbit_full_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_invariance
-    ?logger ?sigs
+    ?parameters ?sigs
     (get_positions, is_equal, is_equal_raw)
     agent_type site1 site2 rule cache
   =
-  let _ = sigs,logger in
+  let _ = sigs in
   for_all_elt_permutation
     (get_positions agent_type site1 site2 rule)
     is_equal
@@ -542,10 +547,10 @@ let check_invariance
     cache
 
 let is_invariant_internal_states_permutation
-    ?logger
+    ?parameters
     ?sigs
     ~agent_type ~site1 ~site2 rule cache =
-  let _ = sigs,logger in
+  let _ = sigs,parameters in
   let positions =
     potential_positions_for_swapping_internal_states
       agent_type site1 site2 rule
@@ -572,10 +577,10 @@ let check_gen swap agent_type site1 site2 agent rule cache =
   cache, i=i'
 
 let is_invariant_binding_states_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache =
   check_invariance
-    ?logger ?sigs
+    ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
      (check_gen
         swap_binding_state_regular
@@ -586,16 +591,16 @@ let is_invariant_binding_states_permutation
     agent_type site1 site2 rule cache
 
 let is_invariant_full_states_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache =
   let cache, b1 =
     is_invariant_internal_states_permutation
-      ?logger ?sigs ~agent_type ~site1 ~site2
+      ?parameters ?sigs ~agent_type ~site1 ~site2
       rule cache
   in
   if b1 then
     is_invariant_binding_states_permutation
-    ?logger ?sigs ~agent_type ~site1 ~site2
+    ?parameters ?sigs ~agent_type ~site1 ~site2
     rule cache
   else
     cache, false
@@ -733,7 +738,7 @@ let copy_lkappa_rule rule =
   }
 
 let equiv_class
-    ?logger
+    ?parameters
     ?sigs
     cache
     seen
@@ -743,7 +748,7 @@ let equiv_class
     ~partitions_full_states
     ~convention
   =
-  let _ = sigs, logger in
+  let _ = sigs, parameters in
   let to_visit = [rule] in
    let rec aux cache to_visit seen visited =
      match
