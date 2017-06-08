@@ -125,11 +125,7 @@ let render_snapshot_graph
   match React.S.value display_format with
   | Graph ->
     let json : string = Api_types_j.string_of_site_graph site_graph in
-    let model = React.S.value State_project.model in
-    let contact_map = model.State_project.model_contact_map in
-    snapshot_js##setData
-      (Js.string json)
-      (*Js.Opt.option (Option_util.map Api_data.agent_count contact_map)*)
+    snapshot_js##setData (Js.string json)
   | Kappa -> ()
 
 let select_snapshot () =

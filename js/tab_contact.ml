@@ -61,12 +61,8 @@ let update
   (* quick cheat to get the count of the agents *)
   let json : string =
     Api_types_j.string_of_site_graph data in
-  let model = React.S.value State_project.model in
-  let contact_map = model.State_project.model_contact_map in
   let () = Common.debug (Js.string json) in
-    contactmap##setData
-      (Js.string json)
-      (*Js.Opt.option (Option_util.map Api_data.agent_count contact_map)*)
+    contactmap##setData (Js.string json)
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active

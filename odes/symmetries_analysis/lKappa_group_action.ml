@@ -13,18 +13,19 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-(** Swapping sites in regular (tested/modified/deleted) agents *)
-
 let get_binding_precondition x = fst (fst x)
 
 let get_binding_mod x = snd x
 
-let care_binding_regular binding =
-  (match get_binding_mod binding with
+let binding_equal ((a_t,_),a_m) ((b_t,_),b_m) =
+  a_t = b_t && a_m = b_m
+
+let care_binding_regular ((test,_),mods) =
+  (match mods with
    | LKappa.Maintained | LKappa.Erased -> false
    | LKappa.Freed | LKappa.Linked _ -> true)
   ||
-  (match get_binding_precondition binding with
+  (match test with
    | Ast.LNK_VALUE _
    | Ast.LNK_FREE
    | Ast.ANY_FREE
@@ -40,11 +41,6 @@ let care_internal_regular =
     | LKappa.I_ANY_CHANGED _
     | LKappa.I_VAL_CHANGED _
     | LKappa.I_VAL_ERASED _ -> true
-
-let binding_equal a b =
-  (get_binding_precondition a = get_binding_precondition b)
-   &&
-   (get_binding_mod a = get_binding_mod b)
 
 let may_swap_internal_state_regular ag_type site1 site2 ag =
   ag_type = ag.LKappa.ra_type
@@ -72,25 +68,6 @@ let may_swap_full_regular ag_type site1 site2 ag =
   may_swap_binding_state_regular ag_type site1 site2 ag
   || may_swap_internal_state_regular ag_type site1 site2 ag
 
-let swap_binding_state_regular _ag_type site1 site2 ag =
-  let tmp = ag.LKappa.ra_ports.(site1) in
-  let () =
-    ag.LKappa.ra_ports.(site1) <- ag.LKappa.ra_ports.(site2) in
-  let () = ag.LKappa.ra_ports.(site2) <- tmp in
-  ()
-
-let swap_internal_state_regular _ag_type site1 site2 (ag:LKappa.rule_agent) =
-  let tmp = ag.LKappa.ra_ints.(site1) in
-  let () = ag.LKappa.ra_ints.(site1) <- ag.LKappa.ra_ints.(site2) in
-  let () = ag.LKappa.ra_ints.(site2) <- tmp in
-  ()
-
-let swap_full_regular ag_type site1 site2 ag =
-  let () = swap_internal_state_regular ag_type site1 site2 ag in
-  swap_binding_state_regular ag_type site1 site2 ag
-
-(** Swapping sites in created agents *)
-
 let may_swap_internal_state_created ag_type site1 site2 ag =
   ag_type = ag.Raw_mixture.a_type
   &&
@@ -104,27 +81,6 @@ let may_swap_binding_state_created ag_type site1 site2 ag =
 let may_swap_full_created ag_type site1 site2 ag =
   may_swap_internal_state_created ag_type site1 site2 ag
   || may_swap_binding_state_created ag_type site1 site2 ag
-
-let swap_binding_state_created _ag_type site1 site2 ag =
-  let tmp = ag.Raw_mixture.a_ports.(site1) in
-  let () =
-    ag.Raw_mixture.a_ports.(site1) <- ag.Raw_mixture.a_ports.(site2)
-  in
-  let () = ag.Raw_mixture.a_ports.(site2) <- tmp in
-  ()
-
-let swap_internal_state_created _ag_type site1 site2 ag =
-  let tmp = ag.Raw_mixture.a_ints.(site1) in
-  let () =
-    ag.Raw_mixture.a_ints.(site1) <- ag.Raw_mixture.a_ints.(site2) in
-  let () = ag.Raw_mixture.a_ints.(site2) <- tmp in
-  ()
-
-let swap_full_created ag_type site1 site2 ag =
-  let () = swap_internal_state_created ag_type site1 site2 ag in
-  swap_binding_state_created ag_type site1 site2 ag
-
-(*******************************************************************)
 
 let of_rule rule = (rule.LKappa.r_mix, rule.LKappa.r_created)
 
@@ -503,10 +459,10 @@ let check_orbit_internal_state_permutation
   check_orbit
     ?parameters ?sigs
     (potential_positions_for_swapping_internal_states,
-     swap_internal_state_regular,
-     swap_internal_state_regular,
-     swap_internal_state_created,
-     swap_internal_state_created)
+     LKappa_auto.swap_internal_state_regular,
+     LKappa_auto.swap_internal_state_regular,
+     LKappa_auto.swap_internal_state_created,
+     LKappa_auto.swap_internal_state_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
@@ -515,10 +471,10 @@ let check_orbit_binding_state_permutation
   check_orbit
     ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
-     swap_binding_state_regular,
-     swap_binding_state_regular,
-     swap_binding_state_created,
-     swap_binding_state_created)
+     LKappa_auto.swap_binding_state_regular,
+     LKappa_auto.swap_binding_state_regular,
+     LKappa_auto.swap_binding_state_created,
+     LKappa_auto.swap_binding_state_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation
@@ -527,10 +483,10 @@ let check_orbit_full_permutation
   check_orbit
     ?parameters ?sigs
     (potential_positions_for_swapping_full,
-     swap_full_regular,
-     swap_full_regular,
-     swap_full_created,
-     swap_full_created)
+     LKappa_auto.swap_full_regular,
+     LKappa_auto.swap_full_regular,
+     LKappa_auto.swap_full_created,
+     LKappa_auto.swap_full_created)
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_invariance
@@ -538,7 +494,7 @@ let check_invariance
     (get_positions, is_equal, is_equal_raw)
     agent_type site1 site2 rule cache
   =
-  let _ = sigs in
+  let _ = parameters,sigs in
   for_all_elt_permutation
     (get_positions agent_type site1 site2 rule)
     is_equal
@@ -583,11 +539,11 @@ let is_invariant_binding_states_permutation
     ?parameters ?sigs
     (potential_positions_for_swapping_binding_states,
      (check_gen
-        swap_binding_state_regular
+        LKappa_auto.swap_binding_state_regular
         agent_type
         site1
         site2),
-     (check_gen swap_binding_state_created agent_type site1 site2))
+     (check_gen LKappa_auto.swap_binding_state_created agent_type site1 site2))
     agent_type site1 site2 rule cache
 
 let is_invariant_full_states_permutation
@@ -604,187 +560,3 @@ let is_invariant_full_states_permutation
     rule cache
   else
     cache, false
-
-(******************************************************************)
-(*fold over each element transformation*)
-
-let fold_elt_pair f l accu =
-  match l with
-  | [] -> accu
-  | h::t ->
-    List.fold_left
-      (fun accu s2 -> f h s2 accu)
-      accu
-      t
-
-let fold_one_kind_of_sym_over_an_agent
-    sigma sigma_inv partition f agent_type agent rule accu =
-  List.fold_left
-    (fun accu equ_class ->
-       fold_elt_pair
-         (fun s1 s2 accu ->
-            let () = sigma agent_type s1 s2 agent in
-            let accu  = f rule accu in
-            let () = sigma_inv agent_type s1 s2 agent in
-            accu)
-         equ_class
-         accu)
-    accu
-    partition
-
-let fold_over_elt_transformation
-    get_sym_internal_states
-    get_sym_binding_states
-    get_sym_full_states
-    (rule: LKappa.rule)
-    (f:LKappa.rule -> 'a -> 'a)
-    (*acc*)
-    (accu: 'a) : 'a =
-  (*position is a list of agent*)
-  let accu =
-    List.fold_left
-      (fun accu agent ->
-         let agent_type = agent.LKappa.ra_type in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_internal_state_regular
-             swap_internal_state_regular
-             (get_sym_internal_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_binding_state_regular
-             swap_binding_state_regular
-             (get_sym_binding_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_full_regular
-             swap_full_regular
-             (get_sym_full_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         accu
-      )
-      accu
-      rule.LKappa.r_mix
-  in
-  let accu =
-    List.fold_left
-      (fun accu (agent:Raw_mixture.agent) ->
-         let agent_type = agent.Raw_mixture.a_type in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_internal_state_created
-             swap_internal_state_created
-             (get_sym_internal_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_binding_state_created
-             swap_binding_state_created
-             (get_sym_binding_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         let accu =
-           fold_one_kind_of_sym_over_an_agent
-             swap_full_created
-             swap_full_created
-             (get_sym_full_states agent_type)
-             f
-             agent_type
-             agent
-             rule
-             accu
-         in
-         accu
-      )
-      accu
-      rule.LKappa.r_created
-  in
-  accu
-
-let copy_lkappa_rule rule =
-  {rule with
-   LKappa.r_mix =
-     List.rev_map Patterns_extra.copy_agent_in_lkappa
-       (List.rev rule.LKappa.r_mix);
-   r_created =
-     List.rev_map Patterns_extra.copy_agent_in_raw_mixture
-       (List.rev rule.LKappa.r_created);
-  }
-
-let equiv_class
-    ?parameters
-    ?sigs
-    cache
-    seen
-    rule
-    ~partitions_internal_states
-    ~partitions_binding_states
-    ~partitions_full_states
-    ~convention
-  =
-  let _ = sigs, parameters in
-  let to_visit = [rule] in
-   let rec aux cache to_visit seen visited =
-     match
-       to_visit
-     with
-     | [] -> cache, seen, visited
-     | h::q ->
-       let cache, hashed_list = LKappa_auto.cannonic_form cache h in
-       let hash = LKappa_auto.RuleCache.int_of_hashed_list hashed_list in
-       if Mods.DynArray.get seen hash
-       then aux cache q seen visited
-      else
-        let visited = h::visited in
-        let () = Mods.DynArray.set seen hash true in
-        let to_visit =
-          fold_over_elt_transformation
-            partitions_internal_states
-            partitions_binding_states
-            partitions_full_states
-            h
-            (fun rule list -> (copy_lkappa_rule rule::list))
-            q
-        in
-        aux cache to_visit seen visited
-   in
-   let cache,seen,equ_class = aux cache to_visit seen [] in
-   let cache, equ_class =
-     List.fold_left
-       (fun (cache, list) elt ->
-          let cache, nauto =
-            LKappa_auto.nauto
-              convention
-              cache
-              elt
-          in
-          (cache, (elt,nauto)::list))
-       (cache,[]) equ_class
-   in
-   cache, seen, equ_class

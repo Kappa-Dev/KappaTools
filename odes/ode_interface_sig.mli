@@ -133,7 +133,7 @@ sig
   val preprocess: Run_cli_args.t -> ast -> preprocessed_ast
 
   val get_compil:
-    ?bwd_bisim:Symmetries_sig.bwd_bisim_info ->
+    ?bwd_bisim:LKappa_auto.bwd_bisim_info ->
     rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> preprocessed_ast -> compil
@@ -206,6 +206,6 @@ sig
   val init_bwd_bisim_info:
     compil ->
     Symmetries.equivalence_classes ->
-    Symmetries_sig.bwd_bisim_info
+    LKappa_auto.bwd_bisim_info
 
 end

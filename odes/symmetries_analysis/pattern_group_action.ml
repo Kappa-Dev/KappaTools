@@ -445,9 +445,7 @@ let equiv_class_gen
   let convention = Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs in
   let rule, unspec = to_rule  species in
   let cache, seen, rule_class =
-    LKappa_group_action.equiv_class
-      ?parameters
-      ?sigs
+    LKappa_auto.equiv_class
       cache seen rule
       ~partitions_internal_states
       ~partitions_binding_states

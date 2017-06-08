@@ -21,9 +21,6 @@ type 'a site_partition =
       over_full_states: 'a list list ;
     }
 
-type bwd_bisim_info =
-  int site_partition array * bool Mods.DynArray.t * Signature.s * (LKappa_auto.cache ref)
-
 let empty =
   {
     over_binding_states = []  ;

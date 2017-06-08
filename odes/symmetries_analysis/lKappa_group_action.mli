@@ -110,16 +110,3 @@ val is_invariant_full_states_permutation:
   LKappa.rule ->
   LKappa_auto.cache ->
   LKappa_auto.cache * bool
-
-val equiv_class:
-  ?parameters:Remanent_parameters_sig.parameters ->
-  ?sigs:Signature.s ->
-  LKappa_auto.cache ->
-  bool Mods.DynArray.t ->
-  LKappa.rule ->
-  partitions_internal_states:(int -> int list list) ->
-  partitions_binding_states:(int -> int list list) ->
-  partitions_full_states:(int -> int list list) ->
-  convention:Remanent_parameters_sig.rate_convention ->
-  LKappa_auto.cache * bool Mods.DynArray.t *
-  (LKappa.rule * int) list

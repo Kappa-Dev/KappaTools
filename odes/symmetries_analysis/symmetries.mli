@@ -71,12 +71,3 @@ val equiv_class:
   Model.t  ->
   bool Mods.DynArray.t  -> cache -> LKappa_auto.cache -> Pattern.PreEnv.t -> reduction -> Pattern.id ->
   cache * LKappa_auto.cache * Pattern.PreEnv.t * bool Mods.DynArray.t  * (int * (Pattern.id * int) list)
-
-val saturate_domain_with_symmetric_patterns:
-  compileModeOn:bool ->
-  ?origin:Operator.rev_dep ->
-  Contact_map.t ->
-  Symmetries_sig.bwd_bisim_info ->
-  (('a * Pattern.cc) array * 'b) list ->
-  Pattern.PreEnv.t ->
-  Pattern.PreEnv.t
