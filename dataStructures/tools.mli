@@ -38,6 +38,7 @@ val max_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
 
 val fold_over_permutations: (int list -> 'a -> 'a) -> int list -> 'a -> 'a
 
+val gcd_2: int -> int -> int 
 val lcm: int list -> int
 
 val get_interval_list: (int -> bool) -> int -> int -> (int * int) list

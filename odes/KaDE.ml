@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 18 2017>
+  * Last modification: Time-stamp: <Jun 08 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -365,3 +365,4 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     raise e
 
 let () = main ~called_from:Remanent_parameters_sig.KaSa ()
+let _ = Affine_combinations.sum
