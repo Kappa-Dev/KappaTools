@@ -1,16 +1,5 @@
 open Lwt.Infix
 
-module A =
-  (val Domain_selection.select_domain
-      ~reachability_parameters:{
-        Remanent_parameters_sig.views = true;
-        Remanent_parameters_sig.site_across_bonds = true;
-        Remanent_parameters_sig.parallel_bonds = true;
-        Remanent_parameters_sig.dynamic_contact_map = true;
-      } ())
-
-module KaSa = Export_to_KaSim.Export(A)
-
 (** Interface to kappa runtime *)
 (* Error messages *)
 let msg_process_not_running =
