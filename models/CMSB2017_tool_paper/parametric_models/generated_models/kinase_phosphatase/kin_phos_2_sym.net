@@ -1,0 +1,50 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.001  # Constant
+    6 kdPS  0.1  # Constant
+    7 kuS   0.01  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1) 0
+    6 S(x~p,x~u) 0
+    7 K(s!1).S(x~p,x~u!1) 0
+    8 P(s!1).S(x~p!1,x~u) 0
+    9 K(s!1).P(s!2).S(x~p!2,x~u!1) 0
+   10 S(x~p,x~p) 0
+   11 P(s!1).S(x~p!1,x~p) 0
+   12 P(s!1).P(s!2).S(x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 2*kKS #_R1
+    2 1,4 5 kKS #_R1
+    3 4 1,3 kdKS #_reverse__R1
+    4 4 1,6 kpS #_R2
+    5 1,6 7 kKS #_R1
+    6 5 1,4 2*kdKS #_reverse__R1
+    7 5 1,7 2*kpS #_R2
+    8 2,6 8 kPS #_R3
+    9 1,8 9 kKS #_R1
+   10 7 1,6 kdKS #_reverse__R1
+   11 7 1,10 kpS #_R2
+   12 2,7 9 kPS #_R3
+   13 8 2,6 kdPS #_reverse__R3
+   14 8 2,3 kuS #_R4
+   15 9 1,8 kdKS #_reverse__R1
+   16 9 1,11 kpS #_R2
+   17 2,10 11 2*kPS #_R3
+   18 9 2,7 kdPS #_reverse__R3
+   19 9 2,4 kuS #_R4
+   20 2,11 12 kPS #_R3
+   21 11 2,10 kdPS #_reverse__R3
+   22 11 2,6 kuS #_R4
+   23 12 2,11 2*kdPS #_reverse__R3
+   24 12 2,8 2*kuS #_R4
+end reactions

@@ -1,0 +1,32 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot       100  # Constant
+    2 n_k0       0  # Constant
+    3 kp0        3  # Constant
+    4 ku1        14  # Constant
+    5 n_k1       1  # Constant
+    6 kp1        15  # Constant
+    7 ku2        98  # Constant
+    8 n_k2       2  # Constant
+    9 kp2        75  # Constant
+   10 ku3        686  # Constant
+   11 _rateLaw1  kp0/n_k2  # ConstantExpression
+   12 _rateLaw2  kp0/n_k2  # ConstantExpression
+   13 _rateLaw3  kp1/n_k1  # ConstantExpression
+   14 _rateLaw4  ku1/n_k1  # ConstantExpression
+   15 _rateLaw5  ku2/n_k2  # ConstantExpression
+   16 _rateLaw6  ku2/n_k2  # ConstantExpression
+end parameters
+begin species
+    1 %init::A(s~u,s~u) Stot
+    2 A(s~p,s~u) 0
+    3 A(s~p,s~p) 0
+end species
+begin reactions
+    1 1 2 2*_rateLaw1 #_R1
+    2 1 2 2*_rateLaw2 #_R2
+    3 2 3 _rateLaw3 #_R3
+    4 2 1 _rateLaw4 #_R4
+    5 3 2 2*_rateLaw5 #_R5
+    6 3 2 2*_rateLaw6 #_R6
+end reactions

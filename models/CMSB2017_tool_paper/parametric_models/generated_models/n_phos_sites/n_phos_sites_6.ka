@@ -1,0 +1,537 @@
+%var: 'n_k0' 0
+%var: 'kp0' 3
+%var: 'ku1' 14
+%var: 'n_k1' 1
+%var: 'kp1' 15
+%var: 'ku2' 98
+%var: 'n_k2' 2
+%var: 'kp2' 75
+%var: 'ku3' 686
+%var: 'n_k3' 3
+%var: 'kp3' 375
+%var: 'ku4' 4802
+%var: 'n_k4' 4
+%var: 'kp4' 1875
+%var: 'ku5' 33614
+%var: 'n_k5' 5
+%var: 'kp5' 9375
+%var: 'ku6' 235298
+%var: 'n_k6' 6
+%var: 'kp6' 46875
+%var: 'ku7' 1647086
+%agent: A(s1~u~p,s2~u~p,s3~u~p,s4~u~p,s5~u~p,s6~u~p)
+
+%init: 100 A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u)
+
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku3'
+
+
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku4'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'ku4'
+
+
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'kp2'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'kp2'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'kp2'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'kp2'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku2'
+
+
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp3'
+A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku3'
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp4'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'ku4'
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'ku5'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'ku5'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'ku5'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'ku5'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'ku5'
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp3'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku3'
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku4'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp4'
+A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'ku4'
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku2'
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku3'
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'kp1'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'kp1'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'kp1'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'kp1'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'kp1'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku2'
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku3'
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku4'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku4'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku4'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'ku4'
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'kp2'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'kp2'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku2'
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku3'
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp4'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'ku4'
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'ku5'
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp3'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp3'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp3'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku3'
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp4'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'ku4'
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'ku5'
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'ku6'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'ku6'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'ku6'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'ku6'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'ku6'
+A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'ku6'
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp4'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp4'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'ku4'
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'ku5'
+A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'ku5'
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku3'
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku4'
+A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'ku4'
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'kp2'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'kp2'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'kp2'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'kp2'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku2'
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp3'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku3'
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp4'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'ku4'
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'ku5'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'ku5'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'ku5'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'ku5'
+A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'ku5'
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp3'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp3'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp3'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku3'
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp4'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp4'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku4'
+A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'ku4'
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku2'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) @'kp2'
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku3'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp3'
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'kp1'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'kp1'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'kp1'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'kp1'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) @'kp1'
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku2'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp2'
+A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) @'kp2'
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp3'
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'ku4'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'ku4'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'ku4'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'ku4'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp4'
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp2'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) @'kp2'
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku3'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp3'
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) @'kp1'
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku2'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku2'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) @'kp2'
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'kp0'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'kp0'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'kp0'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'kp0'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'kp0'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) @'kp0'
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) @'kp1'
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku2'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) @'kp2'
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku3'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku3'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku3'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp3'
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'kp1'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'kp1'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) @'kp1'
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku2'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku2'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) @'kp2'
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp3'
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp4'
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp2'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp2'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp2'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) @'kp2'
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp3'
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp4'
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'ku5'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'ku5'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'ku5'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'ku5'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) @'ku5'
+A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp5'
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp3'
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) @'ku4'
+A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp4'
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) @'ku2'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) @'kp2'
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) @'ku3'
+A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp3'
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'kp1'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'kp1'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'kp1'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) @'kp1'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) @'ku1'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) @'kp1'
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) @'kp2'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) @'ku2'
+A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) @'kp2'
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) @'kp3'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp3'
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'ku4'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'ku4'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) @'ku4'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) @'kp4'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) @'ku4'
+A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp4'
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp2'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) @'kp2'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) @'kp2'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) @'ku2'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) @'kp2'
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) @'kp3'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) @'kp3'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) @'ku3'
+A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) @'kp3'
+
+

@@ -1,0 +1,54 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 kp0   3  # Constant
+    2 ku1   14  # Constant
+    3 kp1   15  # Constant
+    4 ku2   98  # Constant
+    5 kp2   75  # Constant
+    6 ku3   686  # Constant
+    7 kp3   375  # Constant
+    8 ku4   4802  # Constant
+    9 kp4   1875  # Constant
+   10 ku5   33614  # Constant
+   11 kp5   9375  # Constant
+   12 ku6   235298  # Constant
+   13 kp6   46875  # Constant
+   14 ku7   1647086  # Constant
+   15 kp7   234375  # Constant
+   16 ku8   11529602  # Constant
+   17 kp8   1171875  # Constant
+   18 ku9   80707214  # Constant
+   19 Stot  100  # Constant
+end parameters
+begin species
+    1 A(p!1,s~u,s~u,s~u,s~u,s~u,s~u,s~u,s~u,s~u).P(l!1,r) Stot
+    2 A(p!1,s~p,s~u,s~u,s~u,s~u,s~u,s~u,s~u,s~u).P(l!1,r!2).P(l!2,r) 0
+    3 A(p!1,s~p,s~p,s~u,s~u,s~u,s~u,s~u,s~u,s~u).P(l!2,r!3).P(l!1,r!2).P(l!3,r) 0
+    4 A(p!1,s~p,s~p,s~p,s~u,s~u,s~u,s~u,s~u,s~u).P(l!2,r!3).P(l!4,r!2).P(l!1,r!4).P(l!3,r) 0
+    5 A(p!1,s~p,s~p,s~p,s~p,s~u,s~u,s~u,s~u,s~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!1,r!5).P(l!3,r) 0
+    6 A(p!1,s~p,s~p,s~p,s~p,s~p,s~u,s~u,s~u,s~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!1,r!6).P(l!3,r) 0
+    7 A(p!1,s~p,s~p,s~p,s~p,s~p,s~p,s~u,s~u,s~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!1,r!7).P(l!3,r) 0
+    8 A(p!1,s~p,s~p,s~p,s~p,s~p,s~p,s~p,s~u,s~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!1,r!8).P(l!3,r) 0
+    9 A(p!1,s~p,s~p,s~p,s~p,s~p,s~p,s~p,s~p,s~u).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!1,r!9).P(l!3,r) 0
+   10 A(p!1,s~p,s~p,s~p,s~p,s~p,s~p,s~p,s~p,s~p).P(l!2,r!3).P(l!4,r!2).P(l!5,r!4).P(l!6,r!5).P(l!7,r!6).P(l!8,r!7).P(l!9,r!8).P(l!10,r!9).P(l!1,r!10).P(l!3,r) 0
+end species
+begin reactions
+    1 1 2 9*kp0 #_R1
+    2 2 3 8*kp1 #_R2
+    3 2 1 ku1 #_R3
+    4 3 4 7*kp2 #_R4
+    5 3 2 2*ku2 #_R5
+    6 4 5 6*kp3 #_R6
+    7 4 3 3*ku3 #_R7
+    8 5 6 5*kp4 #_R8
+    9 5 4 4*ku4 #_R9
+   10 6 7 4*kp5 #_R10
+   11 6 5 5*ku5 #_R11
+   12 7 8 3*kp6 #_R12
+   13 7 6 6*ku6 #_R13
+   14 8 9 2*kp7 #_R14
+   15 8 7 7*ku7 #_R15
+   16 9 10 kp8 #_R16
+   17 9 8 8*ku8 #_R17
+   18 10 9 9*ku9 #_R18
+end reactions

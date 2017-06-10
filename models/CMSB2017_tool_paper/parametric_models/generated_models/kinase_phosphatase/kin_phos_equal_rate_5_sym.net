@@ -1,0 +1,282 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.01  # Constant
+    6 kdPS  1.0  # Constant
+    7 kuS   0.1  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u,x~u,x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u,x~u,x~u,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1,x~u,x~u,x~u) 0
+    6 S(x~p,x~u,x~u,x~u,x~u) 0
+    7 K(s!1).K(s!2).K(s!3).S(x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+    8 K(s!1).S(x~p,x~u!1,x~u,x~u,x~u) 0
+    9 P(s!1).S(x~p!1,x~u,x~u,x~u,x~u) 0
+   10 K(s!1).K(s!2).K(s!3).K(s!4).S(x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   11 K(s!1).K(s!2).S(x~p,x~u!2,x~u!1,x~u,x~u) 0
+   12 K(s!1).P(s!2).S(x~p!2,x~u!1,x~u,x~u,x~u) 0
+   13 S(x~p,x~p,x~u,x~u,x~u) 0
+   14 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   15 K(s!1).K(s!2).K(s!3).S(x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+   16 K(s!1).K(s!2).P(s!3).S(x~p!3,x~u!2,x~u!1,x~u,x~u) 0
+   17 K(s!1).S(x~p,x~p,x~u!1,x~u,x~u) 0
+   18 P(s!1).S(x~p!1,x~p,x~u,x~u,x~u) 0
+   19 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   20 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   21 K(s!1).K(s!2).S(x~p,x~p,x~u!2,x~u!1,x~u) 0
+   22 K(s!1).P(s!2).S(x~p!2,x~p,x~u!1,x~u,x~u) 0
+   23 S(x~p,x~p,x~p,x~u,x~u) 0
+   24 P(s!1).P(s!2).S(x~p!2,x~p!1,x~u,x~u,x~u) 0
+   25 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   26 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+   27 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~u!2,x~u!1,x~u) 0
+   28 K(s!1).S(x~p,x~p,x~p,x~u!1,x~u) 0
+   29 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~u!1,x~u,x~u) 0
+   30 P(s!1).S(x~p!1,x~p,x~p,x~u,x~u) 0
+   31 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~u!3,x~u!2,x~u!1) 0
+   32 K(s!1).K(s!2).S(x~p,x~p,x~p,x~u!2,x~u!1) 0
+   33 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~u!2,x~u!1,x~u) 0
+   34 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~u!1,x~u) 0
+   35 S(x~p,x~p,x~p,x~p,x~u) 0
+   36 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~u,x~u) 0
+   37 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~u!3,x~u!2,x~u!1) 0
+   38 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~u!2,x~u!1) 0
+   39 K(s!1).S(x~p,x~p,x~p,x~p,x~u!1) 0
+   40 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~u!1,x~u) 0
+   41 P(s!1).S(x~p!1,x~p,x~p,x~p,x~u) 0
+   42 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~u,x~u) 0
+   43 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~u!2,x~u!1) 0
+   44 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~u!1) 0
+   45 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~u!1,x~u) 0
+   46 S(x~p,x~p,x~p,x~p,x~p) 0
+   47 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~u) 0
+   48 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~u!2,x~u!1) 0
+   49 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~u!1) 0
+   50 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p) 0
+   51 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~u) 0
+   52 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~u!1) 0
+   53 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p) 0
+   54 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~u) 0
+   55 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~u!1) 0
+   56 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p) 0
+   57 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p) 0
+   58 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 5*kKS #_R1
+    2 1,4 5 4*kKS #_R1
+    3 4 1,3 kdKS #_reverse__R1
+    4 4 1,6 kpS #_R2
+    5 1,5 7 3*kKS #_R1
+    6 1,6 8 4*kKS #_R1
+    7 5 1,4 2*kdKS #_reverse__R1
+    8 5 1,8 2*kpS #_R2
+    9 2,6 9 kPS #_R3
+   10 1,7 10 2*kKS #_R1
+   11 1,8 11 3*kKS #_R1
+   12 1,9 12 4*kKS #_R1
+   13 7 1,5 3*kdKS #_reverse__R1
+   14 8 1,6 kdKS #_reverse__R1
+   15 7 1,11 3*kpS #_R2
+   16 8 1,13 kpS #_R2
+   17 2,8 12 kPS #_R3
+   18 9 2,6 kdPS #_reverse__R3
+   19 9 2,3 kuS #_R4
+   20 1,10 14 kKS #_R1
+   21 1,11 15 2*kKS #_R1
+   22 1,12 16 3*kKS #_R1
+   23 1,13 17 3*kKS #_R1
+   24 10 1,7 4*kdKS #_reverse__R1
+   25 11 1,8 2*kdKS #_reverse__R1
+   26 12 1,9 kdKS #_reverse__R1
+   27 10 1,15 4*kpS #_R2
+   28 11 1,17 2*kpS #_R2
+   29 12 1,18 kpS #_R2
+   30 2,11 16 kPS #_R3
+   31 2,13 18 2*kPS #_R3
+   32 12 2,8 kdPS #_reverse__R3
+   33 12 2,4 kuS #_R4
+   34 1,15 19 kKS #_R1
+   35 1,16 20 2*kKS #_R1
+   36 1,17 21 2*kKS #_R1
+   37 1,18 22 3*kKS #_R1
+   38 14 1,10 5*kdKS #_reverse__R1
+   39 15 1,11 3*kdKS #_reverse__R1
+   40 16 1,12 2*kdKS #_reverse__R1
+   41 17 1,13 kdKS #_reverse__R1
+   42 14 1,19 5*kpS #_R2
+   43 15 1,21 3*kpS #_R2
+   44 16 1,22 2*kpS #_R2
+   45 17 1,23 kpS #_R2
+   46 2,15 20 kPS #_R3
+   47 2,17 22 2*kPS #_R3
+   48 2,18 24 kPS #_R3
+   49 16 2,11 kdPS #_reverse__R3
+   50 18 2,13 kdPS #_reverse__R3
+   51 16 2,5 kuS #_R4
+   52 18 2,6 kuS #_R4
+   53 1,20 25 kKS #_R1
+   54 1,21 26 kKS #_R1
+   55 1,22 27 2*kKS #_R1
+   56 1,23 28 2*kKS #_R1
+   57 1,24 29 3*kKS #_R1
+   58 19 1,15 4*kdKS #_reverse__R1
+   59 20 1,16 3*kdKS #_reverse__R1
+   60 21 1,17 2*kdKS #_reverse__R1
+   61 22 1,18 kdKS #_reverse__R1
+   62 19 1,26 4*kpS #_R2
+   63 20 1,27 3*kpS #_R2
+   64 21 1,28 2*kpS #_R2
+   65 22 1,30 kpS #_R2
+   66 2,19 25 kPS #_R3
+   67 2,21 27 2*kPS #_R3
+   68 2,22 29 kPS #_R3
+   69 2,23 30 3*kPS #_R3
+   70 20 2,15 kdPS #_reverse__R3
+   71 22 2,17 kdPS #_reverse__R3
+   72 24 2,18 2*kdPS #_reverse__R3
+   73 20 2,7 kuS #_R4
+   74 22 2,8 kuS #_R4
+   75 24 2,9 2*kuS #_R4
+   76 1,27 31 kKS #_R1
+   77 1,28 32 kKS #_R1
+   78 1,29 33 2*kKS #_R1
+   79 1,30 34 2*kKS #_R1
+   80 25 1,20 4*kdKS #_reverse__R1
+   81 26 1,21 3*kdKS #_reverse__R1
+   82 27 1,22 2*kdKS #_reverse__R1
+   83 28 1,23 kdKS #_reverse__R1
+   84 29 1,24 kdKS #_reverse__R1
+   85 25 1,31 4*kpS #_R2
+   86 26 1,32 3*kpS #_R2
+   87 27 1,34 2*kpS #_R2
+   88 28 1,35 kpS #_R2
+   89 29 1,36 kpS #_R2
+   90 2,26 31 2*kPS #_R3
+   91 2,27 33 kPS #_R3
+   92 2,28 34 3*kPS #_R3
+   93 2,30 36 2*kPS #_R3
+   94 25 2,19 kdPS #_reverse__R3
+   95 27 2,21 kdPS #_reverse__R3
+   96 29 2,22 2*kdPS #_reverse__R3
+   97 30 2,23 kdPS #_reverse__R3
+   98 25 2,10 kuS #_R4
+   99 27 2,11 kuS #_R4
+  100 29 2,12 2*kuS #_R4
+  101 30 2,13 kuS #_R4
+  102 1,33 37 kKS #_R1
+  103 1,34 38 kKS #_R1
+  104 1,35 39 kKS #_R1
+  105 1,36 40 2*kKS #_R1
+  106 31 1,27 3*kdKS #_reverse__R1
+  107 32 1,28 2*kdKS #_reverse__R1
+  108 33 1,29 2*kdKS #_reverse__R1
+  109 34 1,30 kdKS #_reverse__R1
+  110 31 1,38 3*kpS #_R2
+  111 32 1,39 2*kpS #_R2
+  112 33 1,40 2*kpS #_R2
+  113 34 1,41 kpS #_R2
+  114 2,31 37 kPS #_R3
+  115 2,32 38 3*kPS #_R3
+  116 2,34 40 2*kPS #_R3
+  117 2,35 41 4*kPS #_R3
+  118 2,36 42 kPS #_R3
+  119 31 2,26 kdPS #_reverse__R3
+  120 33 2,27 2*kdPS #_reverse__R3
+  121 34 2,28 kdPS #_reverse__R3
+  122 36 2,30 2*kdPS #_reverse__R3
+  123 31 2,15 kuS #_R4
+  124 33 2,16 2*kuS #_R4
+  125 34 2,17 kuS #_R4
+  126 36 2,18 2*kuS #_R4
+  127 1,40 43 kKS #_R1
+  128 1,41 44 kKS #_R1
+  129 1,42 45 2*kKS #_R1
+  130 37 1,33 3*kdKS #_reverse__R1
+  131 38 1,34 2*kdKS #_reverse__R1
+  132 39 1,35 kdKS #_reverse__R1
+  133 40 1,36 kdKS #_reverse__R1
+  134 37 1,43 3*kpS #_R2
+  135 38 1,44 2*kpS #_R2
+  136 39 1,46 kpS #_R2
+  137 40 1,47 kpS #_R2
+  138 2,38 43 2*kPS #_R3
+  139 2,39 44 4*kPS #_R3
+  140 2,40 45 kPS #_R3
+  141 2,41 47 3*kPS #_R3
+  142 37 2,31 2*kdPS #_reverse__R3
+  143 38 2,32 kdPS #_reverse__R3
+  144 40 2,34 2*kdPS #_reverse__R3
+  145 41 2,35 kdPS #_reverse__R3
+  146 42 2,36 3*kdPS #_reverse__R3
+  147 37 2,20 2*kuS #_R4
+  148 38 2,21 kuS #_R4
+  149 40 2,22 2*kuS #_R4
+  150 41 2,23 kuS #_R4
+  151 42 2,24 3*kuS #_R4
+  152 1,45 48 kKS #_R1
+  153 1,47 49 kKS #_R1
+  154 43 1,40 2*kdKS #_reverse__R1
+  155 44 1,41 kdKS #_reverse__R1
+  156 45 1,42 kdKS #_reverse__R1
+  157 43 1,49 2*kpS #_R2
+  158 44 1,50 kpS #_R2
+  159 45 1,51 kpS #_R2
+  160 2,43 48 kPS #_R3
+  161 2,44 49 3*kPS #_R3
+  162 2,46 50 5*kPS #_R3
+  163 2,47 51 2*kPS #_R3
+  164 43 2,38 2*kdPS #_reverse__R3
+  165 44 2,39 kdPS #_reverse__R3
+  166 45 2,40 3*kdPS #_reverse__R3
+  167 47 2,41 2*kdPS #_reverse__R3
+  168 43 2,27 2*kuS #_R4
+  169 44 2,28 kuS #_R4
+  170 45 2,29 3*kuS #_R4
+  171 47 2,30 2*kuS #_R4
+  172 1,51 52 kKS #_R1
+  173 48 1,45 2*kdKS #_reverse__R1
+  174 49 1,47 kdKS #_reverse__R1
+  175 48 1,52 2*kpS #_R2
+  176 49 1,53 kpS #_R2
+  177 2,49 52 2*kPS #_R3
+  178 2,50 53 4*kPS #_R3
+  179 2,51 54 kPS #_R3
+  180 48 2,43 3*kdPS #_reverse__R3
+  181 49 2,44 2*kdPS #_reverse__R3
+  182 50 2,46 kdPS #_reverse__R3
+  183 51 2,47 3*kdPS #_reverse__R3
+  184 48 2,33 3*kuS #_R4
+  185 49 2,34 2*kuS #_R4
+  186 50 2,35 kuS #_R4
+  187 51 2,36 3*kuS #_R4
+  188 1,54 55 kKS #_R1
+  189 52 1,51 kdKS #_reverse__R1
+  190 52 1,56 kpS #_R2
+  191 2,52 55 kPS #_R3
+  192 2,53 56 3*kPS #_R3
+  193 52 2,49 3*kdPS #_reverse__R3
+  194 53 2,50 2*kdPS #_reverse__R3
+  195 54 2,51 4*kdPS #_reverse__R3
+  196 52 2,40 3*kuS #_R4
+  197 53 2,41 2*kuS #_R4
+  198 54 2,42 4*kuS #_R4
+  199 55 1,54 kdKS #_reverse__R1
+  200 55 1,57 kpS #_R2
+  201 2,56 57 2*kPS #_R3
+  202 55 2,52 4*kdPS #_reverse__R3
+  203 56 2,53 3*kdPS #_reverse__R3
+  204 55 2,45 4*kuS #_R4
+  205 56 2,47 3*kuS #_R4
+  206 2,57 58 kPS #_R3
+  207 57 2,56 4*kdPS #_reverse__R3
+  208 57 2,51 4*kuS #_R4
+  209 58 2,57 5*kdPS #_reverse__R3
+  210 58 2,54 5*kuS #_R4
+end reactions

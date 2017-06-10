@@ -1,0 +1,29 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 n_k0  0  # Constant
+    3 kp0   3  # Constant
+    4 ku1   14  # Constant
+    5 n_k1  1  # Constant
+    6 kp1   15  # Constant
+    7 ku2   98  # Constant
+    8 n_k2  2  # Constant
+    9 kp2   75  # Constant
+   10 ku3   686  # Constant
+end parameters
+begin species
+    1 %init::A(s1~u,s2~u) Stot
+    2 A(s1~u,s2~p) 0
+    3 A(s1~p,s2~u) 0
+    4 A(s1~p,s2~p) 0
+end species
+begin reactions
+    1 1 2 kp0 #_R5
+    2 1 3 kp0 #_R6
+    3 3 4 kp1 #_R1
+    4 3 1 ku1 #_R2
+    5 2 1 ku1 #_R7
+    6 2 4 kp1 #_R8
+    7 4 3 ku2 #_R3
+    8 4 2 ku2 #_R4
+end reactions

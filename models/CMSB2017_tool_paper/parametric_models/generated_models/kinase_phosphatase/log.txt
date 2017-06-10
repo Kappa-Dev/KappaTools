@@ -1,0 +1,5089 @@
+--------------------------------------
+Process with: kin_phos_1
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.006447 s.; 6 rules; 6 species; 6 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:17:49 (GMT+2) on quyen
+Parsing kin_phos_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
+Parsing kin_phos_1.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) ]
+P() => [ P(s) v P(s!S.x1) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+In rules and initial states:
+In rules and algebraic expression:
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.011435 s.; rules: 6; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.010439 s.; 6 rules; 6 species; 6 reactions.
+Process with backward symmetries------
+Parsing kin_phos_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.01102 s.; 6 rules; 6 species; 6 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_1.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_1 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Wrote network in net format to ./kin_phos_1.net.
+CPU TIME: generate_network 0.00 s.
+Finished processing file kin_phos_1.bngl.
+CPU TIME: total 0.01 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_1_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_1_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_1_sym.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file kin_phos_1_sym.bngl.
+CPU TIME: total 0.01 s.
+--------------------------------------
+Process with: kin_phos_10
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:27:50 (GMT+2) on quyen
+Parsing kin_phos_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
+Parsing kin_phos_10.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) v K(s!S.x9) v K(s!S.x10) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) v P(s!S.x9) v P(s!S.x10) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x10~u?) v S(x10~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x10) v S(x10!K.s) v S(x10!P.s) ]
+S() => [ S(x9~u?) v S(x9~p?) ]
+S() => [ S(x9) v S(x9!K.s) v S(x9!P.s) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x10~p?) => [ S(x10~p) v S(x10~p!P.s) ]
+S(x10~u?) => [ S(x10~u) v S(x10~u!K.s) ]
+S(x9~p?) => [ S(x9~p) v S(x9~p!P.s) ]
+S(x9~u?) => [ S(x9~u) v S(x9~u!K.s) ]
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.124606 s.; rules: 60; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process with backward symmetries------
+Parsing kin_phos_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_10.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 40 reaction rule(s).
+ACTION: generate_network( kin_phos_10 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    13 species     10 rxns  2.00e-02 CPU s
+Iteration   2:    68 species    120 rxns  1.50e-01 CPU s
+Iteration   3:   288 species    760 rxns  1.07e+00 CPU s
+Iteration   4:   993 species   3420 rxns  5.17e+00 CPU s
+Iteration   5:  2895 species  12210 rxns  2.25e+01 CPU s
+Iteration   6:  7350 species  36540 rxns  9.17e+01 CPU s
+Iteration   7: 16590 species  94800 rxns  3.35e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_10_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_10_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  3.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  4.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  5.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  1.00e-01 CPU s
+Iteration   7:    33 species     80 rxns  1.30e-01 CPU s
+Iteration   8:    43 species    115 rxns  1.50e-01 CPU s
+Iteration   9:    55 species    158 rxns  2.30e-01 CPU s
+Iteration  10:    69 species    212 rxns  2.70e-01 CPU s
+Iteration  11:    84 species    275 rxns  3.40e-01 CPU s
+Iteration  12:   101 species    347 rxns  3.60e-01 CPU s
+Iteration  13:   118 species    427 rxns  4.20e-01 CPU s
+Iteration  14:   136 species    512 rxns  4.00e-01 CPU s
+Iteration  15:   154 species    600 rxns  4.60e-01 CPU s
+Iteration  16:   172 species    690 rxns  4.40e-01 CPU s
+Iteration  17:   189 species    779 rxns  4.50e-01 CPU s
+Iteration  18:   206 species    865 rxns  4.30e-01 CPU s
+Iteration  19:   221 species    947 rxns  4.20e-01 CPU s
+Iteration  20:   235 species   1022 rxns  3.90e-01 CPU s
+Iteration  21:   247 species   1088 rxns  3.50e-01 CPU s
+Iteration  22:   257 species   1145 rxns  3.10e-01 CPU s
+Iteration  23:   265 species   1192 rxns  2.90e-01 CPU s
+Iteration  24:   272 species   1229 rxns  2.40e-01 CPU s
+Iteration  25:   277 species   1259 rxns  2.30e-01 CPU s
+Iteration  26:   281 species   1281 rxns  1.90e-01 CPU s
+Iteration  27:   284 species   1297 rxns  1.60e-01 CPU s
+Iteration  28:   286 species   1308 rxns  1.20e-01 CPU s
+Iteration  29:   287 species   1315 rxns  9.00e-02 CPU s
+Iteration  30:   288 species   1318 rxns  6.00e-02 CPU s
+Iteration  31:   288 species   1320 rxns  6.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   440 reactions 2.33e+00 CPU s 5.30e-03 CPU s/rxn
+Rule   2:   220 reactions 1.32e+00 CPU s 6.00e-03 CPU s/rxn
+Rule   3:   440 reactions 2.29e+00 CPU s 5.20e-03 CPU s/rxn
+Rule   4:   220 reactions 1.28e+00 CPU s 5.82e-03 CPU s/rxn
+Total   :  1320 reactions 7.22e+00 CPU s 5.47e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_10_sym.net.
+CPU TIME: generate_network 7.34 s.
+Finished processing file kin_phos_10_sym.bngl.
+CPU TIME: total 7.35 s.
+--------------------------------------
+Process with: kin_phos_2
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.009131 s.; 12 rules; 18 species; 48 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:58:00 (GMT+2) on quyen
+Parsing kin_phos_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing kin_phos_2.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.013546 s.; rules: 12; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.010041 s.; 12 rules; 12 species; 30 reactions.
+Process with backward symmetries------
+Parsing kin_phos_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.00972 s.; 12 rules; 12 species; 30 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_2.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 8 reaction rule(s).
+ACTION: generate_network( kin_phos_2 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     8 species      8 rxns  0.00e+00 CPU s
+Iteration   3:    12 species     16 rxns  1.00e-02 CPU s
+Iteration   4:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     38 rxns  0.00e+00 CPU s
+Iteration   6:    18 species     44 rxns  1.00e-02 CPU s
+Iteration   7:    18 species     48 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   2:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   6:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   8:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    48 reactions 4.00e-02 CPU s 8.33e-04 CPU s/rxn
+Wrote network in net format to ./kin_phos_2.net.
+CPU TIME: generate_network 0.04 s.
+Finished processing file kin_phos_2.bngl.
+CPU TIME: total 0.05 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_2_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_2_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     8 species      8 rxns  1.00e-02 CPU s
+Iteration   4:    10 species     14 rxns  0.00e+00 CPU s
+Iteration   5:    11 species     19 rxns  0.00e+00 CPU s
+Iteration   6:    12 species     22 rxns  1.00e-02 CPU s
+Iteration   7:    12 species     24 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    24 reactions 2.00e-02 CPU s 8.33e-04 CPU s/rxn
+Wrote network in net format to ./kin_phos_2_sym.net.
+CPU TIME: generate_network 0.02 s.
+Finished processing file kin_phos_2_sym.bngl.
+CPU TIME: total 0.03 s.
+--------------------------------------
+Process with: kin_phos_3
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.033577 s.; 18 rules; 66 species; 288 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:58:00 (GMT+2) on quyen
+Parsing kin_phos_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
+Parsing kin_phos_3.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.013935 s.; rules: 18; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.023125 s.; 18 rules; 22 species; 90 reactions.
+Process with backward symmetries------
+Parsing kin_phos_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.021483 s.; 18 rules; 22 species; 90 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_3.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 12 reaction rule(s).
+ACTION: generate_network( kin_phos_3 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      3 rxns  0.00e+00 CPU s
+Iteration   2:    12 species     15 rxns  1.00e-02 CPU s
+Iteration   3:    22 species     39 rxns  2.00e-02 CPU s
+Iteration   4:    34 species     81 rxns  4.00e-02 CPU s
+Iteration   5:    46 species    135 rxns  7.00e-02 CPU s
+Iteration   6:    56 species    189 rxns  6.00e-02 CPU s
+Iteration   7:    62 species    237 rxns  7.00e-02 CPU s
+Iteration   8:    65 species    267 rxns  3.00e-02 CPU s
+Iteration   9:    66 species    282 rxns  2.00e-02 CPU s
+Iteration  10:    66 species    288 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    32 reactions 7.00e-02 CPU s 2.19e-03 CPU s/rxn
+Rule   2:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   3:    32 reactions 2.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   4:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   5:    32 reactions 1.00e-02 CPU s 3.12e-04 CPU s/rxn
+Rule   6:    16 reactions 4.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   7:    32 reactions 5.00e-02 CPU s 1.56e-03 CPU s/rxn
+Rule   8:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   9:    32 reactions 2.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule  10:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  11:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  12:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Total   :   288 reactions 3.30e-01 CPU s 1.15e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_3.net.
+CPU TIME: generate_network 0.34 s.
+Finished processing file kin_phos_3.bngl.
+CPU TIME: total 0.37 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_3_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_3_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  0.00e+00 CPU s
+Iteration   4:    12 species     18 rxns  1.00e-02 CPU s
+Iteration   5:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     39 rxns  1.00e-02 CPU s
+Iteration   7:    20 species     48 rxns  1.00e-02 CPU s
+Iteration   8:    21 species     55 rxns  1.00e-02 CPU s
+Iteration   9:    22 species     58 rxns  1.00e-02 CPU s
+Iteration  10:    22 species     60 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:    20 reactions 6.00e-02 CPU s 3.00e-03 CPU s/rxn
+Rule   2:    10 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:    20 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:    10 reactions 1.00e-02 CPU s 1.00e-03 CPU s/rxn
+Total   :    60 reactions 7.00e-02 CPU s 1.17e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_3_sym.net.
+CPU TIME: generate_network 0.07 s.
+Finished processing file kin_phos_3_sym.bngl.
+CPU TIME: total 0.08 s.
+--------------------------------------
+Process with: kin_phos_4
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.22913 s.; 24 rules; 258 species; 1536 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:58:02 (GMT+2) on quyen
+Parsing kin_phos_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
+Parsing kin_phos_4.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.019125 s.; rules: 24; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.043905 s.; 24 rules; 37 species; 210 reactions.
+Process with backward symmetries------
+Parsing kin_phos_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.044336 s.; 24 rules; 37 species; 210 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_4.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 16 reaction rule(s).
+ACTION: generate_network( kin_phos_4 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      4 rxns  1.00e-02 CPU s
+Iteration   2:    17 species     24 rxns  2.00e-02 CPU s
+Iteration   3:    37 species     76 rxns  5.00e-02 CPU s
+Iteration   4:    68 species    184 rxns  1.20e-01 CPU s
+Iteration   5:   108 species    360 rxns  1.70e-01 CPU s
+Iteration   6:   152 species    592 rxns  2.50e-01 CPU s
+Iteration   7:   192 species    856 rxns  2.50e-01 CPU s
+Iteration   8:   223 species   1104 rxns  3.00e-01 CPU s
+Iteration   9:   243 species   1300 rxns  2.30e-01 CPU s
+Iteration  10:   253 species   1432 rxns  1.50e-01 CPU s
+Iteration  11:   257 species   1500 rxns  1.00e-01 CPU s
+Iteration  12:   258 species   1528 rxns  5.00e-02 CPU s
+Iteration  13:   258 species   1536 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   128 reactions 1.50e-01 CPU s 1.17e-03 CPU s/rxn
+Rule   2:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   3:   128 reactions 1.40e-01 CPU s 1.09e-03 CPU s/rxn
+Rule   4:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule   5:   128 reactions 1.30e-01 CPU s 1.02e-03 CPU s/rxn
+Rule   6:    64 reactions 6.00e-02 CPU s 9.38e-04 CPU s/rxn
+Rule   7:   128 reactions 1.60e-01 CPU s 1.25e-03 CPU s/rxn
+Rule   8:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule   9:   128 reactions 1.30e-01 CPU s 1.02e-03 CPU s/rxn
+Rule  10:    64 reactions 9.00e-02 CPU s 1.41e-03 CPU s/rxn
+Rule  11:   128 reactions 1.20e-01 CPU s 9.38e-04 CPU s/rxn
+Rule  12:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule  13:   128 reactions 1.50e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  14:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  15:   128 reactions 1.30e-01 CPU s 1.02e-03 CPU s/rxn
+Rule  16:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Total   :  1536 reactions 1.71e+00 CPU s 1.11e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_4.net.
+CPU TIME: generate_network 1.77 s.
+Finished processing file kin_phos_4.bngl.
+CPU TIME: total 1.80 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_4_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_4_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    17 species     32 rxns  2.00e-02 CPU s
+Iteration   6:    22 species     48 rxns  3.00e-02 CPU s
+Iteration   7:    26 species     66 rxns  2.00e-02 CPU s
+Iteration   8:    30 species     83 rxns  2.00e-02 CPU s
+Iteration   9:    33 species     97 rxns  3.00e-02 CPU s
+Iteration  10:    35 species    108 rxns  2.00e-02 CPU s
+Iteration  11:    36 species    115 rxns  2.00e-02 CPU s
+Iteration  12:    37 species    118 rxns  0.00e+00 CPU s
+Iteration  13:    37 species    120 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    40 reactions 8.00e-02 CPU s 2.00e-03 CPU s/rxn
+Rule   2:    20 reactions 4.00e-02 CPU s 2.00e-03 CPU s/rxn
+Rule   3:    40 reactions 5.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:    20 reactions 3.00e-02 CPU s 1.50e-03 CPU s/rxn
+Total   :   120 reactions 2.00e-01 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_4_sym.net.
+CPU TIME: generate_network 0.21 s.
+Finished processing file kin_phos_4_sym.bngl.
+CPU TIME: total 0.22 s.
+--------------------------------------
+Process with: kin_phos_5
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.91076 s.; 30 rules; 1026 species; 7680 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:58:06 (GMT+2) on quyen
+Parsing kin_phos_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
+Parsing kin_phos_5.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.026365 s.; rules: 30; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.107302 s.; 30 rules; 58 species; 420 reactions.
+Process with backward symmetries------
+Parsing kin_phos_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.093259 s.; 30 rules; 58 species; 420 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_5.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 20 reaction rule(s).
+ACTION: generate_network( kin_phos_5 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     8 species      5 rxns  1.00e-02 CPU s
+Iteration   2:    23 species     35 rxns  3.00e-02 CPU s
+Iteration   3:    58 species    130 rxns  1.20e-01 CPU s
+Iteration   4:   123 species    360 rxns  2.70e-01 CPU s
+Iteration   5:   224 species    805 rxns  5.70e-01 CPU s
+Iteration   6:   359 species   1515 rxns  8.80e-01 CPU s
+Iteration   7:   514 species   2490 rxns  1.29e+00 CPU s
+Iteration   8:   669 species   3640 rxns  1.48e+00 CPU s
+Iteration   9:   804 species   4815 rxns  1.55e+00 CPU s
+Iteration  10:   905 species   5865 rxns  1.43e+00 CPU s
+Iteration  11:   970 species   6670 rxns  1.14e+00 CPU s
+Iteration  12:  1005 species   7200 rxns  8.00e-01 CPU s
+Iteration  13:  1020 species   7495 rxns  5.20e-01 CPU s
+Iteration  14:  1025 species   7625 rxns  2.40e-01 CPU s
+Iteration  15:  1026 species   7670 rxns  1.10e-01 CPU s
+Iteration  16:  1026 species   7680 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   512 reactions 6.40e-01 CPU s 1.25e-03 CPU s/rxn
+Rule   2:   256 reactions 3.60e-01 CPU s 1.41e-03 CPU s/rxn
+Rule   3:   512 reactions 6.70e-01 CPU s 1.31e-03 CPU s/rxn
+Rule   4:   256 reactions 3.30e-01 CPU s 1.29e-03 CPU s/rxn
+Rule   5:   512 reactions 6.80e-01 CPU s 1.33e-03 CPU s/rxn
+Rule   6:   256 reactions 3.50e-01 CPU s 1.37e-03 CPU s/rxn
+Rule   7:   512 reactions 7.10e-01 CPU s 1.39e-03 CPU s/rxn
+Rule   8:   256 reactions 3.10e-01 CPU s 1.21e-03 CPU s/rxn
+Rule   9:   512 reactions 7.10e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  10:   256 reactions 3.30e-01 CPU s 1.29e-03 CPU s/rxn
+Rule  11:   512 reactions 6.70e-01 CPU s 1.31e-03 CPU s/rxn
+Rule  12:   256 reactions 3.90e-01 CPU s 1.52e-03 CPU s/rxn
+Rule  13:   512 reactions 7.30e-01 CPU s 1.43e-03 CPU s/rxn
+Rule  14:   256 reactions 3.30e-01 CPU s 1.29e-03 CPU s/rxn
+Rule  15:   512 reactions 7.10e-01 CPU s 1.39e-03 CPU s/rxn
+Rule  16:   256 reactions 3.50e-01 CPU s 1.37e-03 CPU s/rxn
+Rule  17:   512 reactions 7.60e-01 CPU s 1.48e-03 CPU s/rxn
+Rule  18:   256 reactions 3.10e-01 CPU s 1.21e-03 CPU s/rxn
+Rule  19:   512 reactions 7.60e-01 CPU s 1.48e-03 CPU s/rxn
+Rule  20:   256 reactions 3.40e-01 CPU s 1.33e-03 CPU s/rxn
+Total   :  7680 reactions 1.04e+01 CPU s 1.36e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_5.net.
+CPU TIME: generate_network 10.76 s.
+Finished processing file kin_phos_5.bngl.
+CPU TIME: total 10.79 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_5_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_5_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  2.00e-02 CPU s
+Iteration   6:    24 species     52 rxns  4.00e-02 CPU s
+Iteration   7:    30 species     75 rxns  5.00e-02 CPU s
+Iteration   8:    36 species    101 rxns  5.00e-02 CPU s
+Iteration   9:    42 species    126 rxns  4.00e-02 CPU s
+Iteration  10:    47 species    151 rxns  5.00e-02 CPU s
+Iteration  11:    51 species    171 rxns  4.00e-02 CPU s
+Iteration  12:    54 species    187 rxns  3.00e-02 CPU s
+Iteration  13:    56 species    198 rxns  3.00e-02 CPU s
+Iteration  14:    57 species    205 rxns  3.00e-02 CPU s
+Iteration  15:    58 species    208 rxns  1.00e-02 CPU s
+Iteration  16:    58 species    210 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    70 reactions 1.50e-01 CPU s 2.14e-03 CPU s/rxn
+Rule   2:    35 reactions 8.00e-02 CPU s 2.29e-03 CPU s/rxn
+Rule   3:    70 reactions 1.40e-01 CPU s 2.00e-03 CPU s/rxn
+Rule   4:    35 reactions 8.00e-02 CPU s 2.29e-03 CPU s/rxn
+Total   :   210 reactions 4.50e-01 CPU s 2.14e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_5_sym.net.
+CPU TIME: generate_network 0.47 s.
+Finished processing file kin_phos_5_sym.bngl.
+CPU TIME: total 0.48 s.
+--------------------------------------
+Process with: kin_phos_6
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 34.1107 s.; 36 rules; 4098 species; 36864 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 17:58:53 (GMT+2) on quyen
+Parsing kin_phos_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
+Parsing kin_phos_6.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.040447 s.; rules: 36; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.275254 s.; 36 rules; 86 species; 756 reactions.
+Process with backward symmetries------
+Parsing kin_phos_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.261636 s.; 36 rules; 86 species; 756 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_6.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 24 reaction rule(s).
+ACTION: generate_network( kin_phos_6 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     9 species      6 rxns  1.00e-02 CPU s
+Iteration   2:    30 species     48 rxns  6.00e-02 CPU s
+Iteration   3:    86 species    204 rxns  2.20e-01 CPU s
+Iteration   4:   206 species    636 rxns  6.60e-01 CPU s
+Iteration   5:   422 species   1596 rxns  1.66e+00 CPU s
+Iteration   6:   758 species   3372 rxns  3.05e+00 CPU s
+Iteration   7:  1214 species   6204 rxns  4.25e+00 CPU s
+Iteration   8:  1760 species  10140 rxns  6.08e+00 CPU s
+Iteration   9:  2340 species  14952 rxns  7.45e+00 CPU s
+Iteration  10:  2886 species  20172 rxns  8.17e+00 CPU s
+Iteration  11:  3342 species  25188 rxns  8.39e+00 CPU s
+Iteration  12:  3678 species  29460 rxns  8.30e+00 CPU s
+Iteration  13:  3894 species  32676 rxns  6.21e+00 CPU s
+Iteration  14:  4014 species  34788 rxns  4.43e+00 CPU s
+Iteration  15:  4070 species  35988 rxns  2.79e+00 CPU s
+Iteration  16:  4091 species  36564 rxns  1.53e+00 CPU s
+Iteration  17:  4097 species  36786 rxns  7.90e-01 CPU s
+Iteration  18:  4098 species  36852 rxns  5.00e-01 CPU s
+Iteration  19:  4098 species  36864 rxns  2.20e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  2048 reactions 3.49e+00 CPU s 1.70e-03 CPU s/rxn
+Rule   2:  1024 reactions 1.75e+00 CPU s 1.71e-03 CPU s/rxn
+Rule   3:  2048 reactions 3.54e+00 CPU s 1.73e-03 CPU s/rxn
+Rule   4:  1024 reactions 1.69e+00 CPU s 1.65e-03 CPU s/rxn
+Rule   5:  2048 reactions 3.49e+00 CPU s 1.70e-03 CPU s/rxn
+Rule   6:  1024 reactions 1.60e+00 CPU s 1.56e-03 CPU s/rxn
+Rule   7:  2048 reactions 3.39e+00 CPU s 1.66e-03 CPU s/rxn
+Rule   8:  1024 reactions 1.68e+00 CPU s 1.64e-03 CPU s/rxn
+Rule   9:  2048 reactions 3.51e+00 CPU s 1.71e-03 CPU s/rxn
+Rule  10:  1024 reactions 1.67e+00 CPU s 1.63e-03 CPU s/rxn
+Rule  11:  2048 reactions 3.62e+00 CPU s 1.77e-03 CPU s/rxn
+Rule  12:  1024 reactions 1.69e+00 CPU s 1.65e-03 CPU s/rxn
+Rule  13:  2048 reactions 3.82e+00 CPU s 1.87e-03 CPU s/rxn
+Rule  14:  1024 reactions 1.60e+00 CPU s 1.56e-03 CPU s/rxn
+Rule  15:  2048 reactions 3.84e+00 CPU s 1.88e-03 CPU s/rxn
+Rule  16:  1024 reactions 1.69e+00 CPU s 1.65e-03 CPU s/rxn
+Rule  17:  2048 reactions 3.94e+00 CPU s 1.92e-03 CPU s/rxn
+Rule  18:  1024 reactions 1.61e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  19:  2048 reactions 3.90e+00 CPU s 1.90e-03 CPU s/rxn
+Rule  20:  1024 reactions 1.72e+00 CPU s 1.68e-03 CPU s/rxn
+Rule  21:  2048 reactions 4.00e+00 CPU s 1.95e-03 CPU s/rxn
+Rule  22:  1024 reactions 1.68e+00 CPU s 1.64e-03 CPU s/rxn
+Rule  23:  2048 reactions 3.96e+00 CPU s 1.93e-03 CPU s/rxn
+Rule  24:  1024 reactions 1.82e+00 CPU s 1.78e-03 CPU s/rxn
+Total   : 36864 reactions 6.47e+01 CPU s 1.76e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_6.net.
+CPU TIME: generate_network 66.30 s.
+Finished processing file kin_phos_6.bngl.
+CPU TIME: total 66.34 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_6_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_6_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  3.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  4.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  6.00e-02 CPU s
+Iteration   7:    32 species     79 rxns  8.00e-02 CPU s
+Iteration   8:    40 species    110 rxns  9.00e-02 CPU s
+Iteration   9:    48 species    144 rxns  1.20e-01 CPU s
+Iteration  10:    56 species    180 rxns  1.10e-01 CPU s
+Iteration  11:    63 species    215 rxns  1.10e-01 CPU s
+Iteration  12:    70 species    247 rxns  9.00e-02 CPU s
+Iteration  13:    75 species    275 rxns  1.10e-01 CPU s
+Iteration  14:    79 species    297 rxns  9.00e-02 CPU s
+Iteration  15:    82 species    313 rxns  8.00e-02 CPU s
+Iteration  16:    84 species    324 rxns  6.00e-02 CPU s
+Iteration  17:    85 species    331 rxns  5.00e-02 CPU s
+Iteration  18:    86 species    334 rxns  2.00e-02 CPU s
+Iteration  19:    86 species    336 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   112 reactions 3.80e-01 CPU s 3.39e-03 CPU s/rxn
+Rule   2:    56 reactions 2.00e-01 CPU s 3.57e-03 CPU s/rxn
+Rule   3:   112 reactions 3.80e-01 CPU s 3.39e-03 CPU s/rxn
+Rule   4:    56 reactions 2.30e-01 CPU s 4.11e-03 CPU s/rxn
+Total   :   336 reactions 1.19e+00 CPU s 3.54e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_6_sym.net.
+CPU TIME: generate_network 1.22 s.
+Finished processing file kin_phos_6_sym.bngl.
+CPU TIME: total 1.23 s.
+--------------------------------------
+Process with: kin_phos_7
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 18:10:04 (GMT+2) on quyen
+Parsing kin_phos_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
+Parsing kin_phos_7.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.058849 s.; rules: 42; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.01137 s.; 42 rules; 122 species; 1260 reactions.
+Process with backward symmetries------
+Parsing kin_phos_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.990989 s.; 42 rules; 122 species; 1260 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_7.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 28 reaction rule(s).
+ACTION: generate_network( kin_phos_7 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    10 species      7 rxns  1.00e-02 CPU s
+Iteration   2:    38 species     63 rxns  6.00e-02 CPU s
+Iteration   3:   122 species    301 rxns  3.30e-01 CPU s
+Iteration   4:   325 species   1043 rxns  1.19e+00 CPU s
+Iteration   5:   738 species   2898 rxns  3.03e+00 CPU s
+Iteration   6:  1466 species   6776 rxns  6.98e+00 CPU s
+Iteration   7:  2594 species  13776 rxns  1.28e+01 CPU s
+Iteration   8:  4148 species  24864 rxns  1.98e+01 CPU s
+Iteration   9:  6066 species  40446 rxns  2.64e+01 CPU s
+Iteration  10:  8194 species  60046 rxns  3.27e+01 CPU s
+Iteration  11: 10322 species  82194 rxns  3.70e+01 CPU s
+Iteration  12: 12240 species 104734 rxns  3.82e+01 CPU s
+Iteration  13: 13794 species 125412 rxns  3.59e+01 CPU s
+Iteration  14: 14922 species 142464 rxns  3.06e+01 CPU s
+Iteration  15: 15650 species 155064 rxns  2.41e+01 CPU s
+Iteration  16: 16063 species 163352 rxns  1.71e+01 CPU s
+Iteration  17: 16266 species 168147 rxns  1.13e+01 CPU s
+Iteration  18: 16350 species 170555 rxns  7.37e+00 CPU s
+Iteration  19: 16378 species 171577 rxns  4.47e+00 CPU s
+Iteration  20: 16385 species 171927 rxns  2.71e+00 CPU s
+Iteration  21: 16386 species 172018 rxns  2.29e+00 CPU s
+Iteration  22: 16386 species 172032 rxns  9.40e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  8192 reactions 1.29e+01 CPU s 1.58e-03 CPU s/rxn
+Rule   2:  4096 reactions 6.71e+00 CPU s 1.64e-03 CPU s/rxn
+Rule   3:  8192 reactions 1.28e+01 CPU s 1.56e-03 CPU s/rxn
+Rule   4:  4096 reactions 6.58e+00 CPU s 1.61e-03 CPU s/rxn
+Rule   5:  8192 reactions 1.42e+01 CPU s 1.73e-03 CPU s/rxn
+Rule   6:  4096 reactions 6.67e+00 CPU s 1.63e-03 CPU s/rxn
+Rule   7:  8192 reactions 1.41e+01 CPU s 1.72e-03 CPU s/rxn
+Rule   8:  4096 reactions 6.60e+00 CPU s 1.61e-03 CPU s/rxn
+Rule   9:  8192 reactions 1.53e+01 CPU s 1.87e-03 CPU s/rxn
+Rule  10:  4096 reactions 6.85e+00 CPU s 1.67e-03 CPU s/rxn
+Rule  11:  8192 reactions 1.45e+01 CPU s 1.77e-03 CPU s/rxn
+Rule  12:  4096 reactions 6.63e+00 CPU s 1.62e-03 CPU s/rxn
+Rule  13:  8192 reactions 1.66e+01 CPU s 2.02e-03 CPU s/rxn
+Rule  14:  4096 reactions 6.80e+00 CPU s 1.66e-03 CPU s/rxn
+Rule  15:  8192 reactions 1.54e+01 CPU s 1.87e-03 CPU s/rxn
+Rule  16:  4096 reactions 6.68e+00 CPU s 1.63e-03 CPU s/rxn
+Rule  17:  8192 reactions 1.74e+01 CPU s 2.12e-03 CPU s/rxn
+Rule  18:  4096 reactions 6.61e+00 CPU s 1.61e-03 CPU s/rxn
+Rule  19:  8192 reactions 1.62e+01 CPU s 1.98e-03 CPU s/rxn
+Rule  20:  4096 reactions 6.68e+00 CPU s 1.63e-03 CPU s/rxn
+Rule  21:  8192 reactions 1.83e+01 CPU s 2.24e-03 CPU s/rxn
+Rule  22:  4096 reactions 6.76e+00 CPU s 1.65e-03 CPU s/rxn
+Rule  23:  8192 reactions 1.68e+01 CPU s 2.05e-03 CPU s/rxn
+Rule  24:  4096 reactions 6.58e+00 CPU s 1.61e-03 CPU s/rxn
+Rule  25:  8192 reactions 1.95e+01 CPU s 2.38e-03 CPU s/rxn
+Rule  26:  4096 reactions 6.59e+00 CPU s 1.61e-03 CPU s/rxn
+Rule  27:  8192 reactions 1.77e+01 CPU s 2.16e-03 CPU s/rxn
+Rule  28:  4096 reactions 6.63e+00 CPU s 1.62e-03 CPU s/rxn
+Total   : 172032 reactions 3.15e+02 CPU s 1.83e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_7.net.
+CPU TIME: generate_network 322.15 s.
+Finished processing file kin_phos_7.bngl.
+CPU TIME: total 322.20 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_7_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_7_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  4.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  7.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  9.00e-02 CPU s
+Iteration   8:    42 species    114 rxns  1.10e-01 CPU s
+Iteration   9:    52 species    153 rxns  1.20e-01 CPU s
+Iteration  10:    62 species    198 rxns  1.40e-01 CPU s
+Iteration  11:    72 species    244 rxns  1.30e-01 CPU s
+Iteration  12:    82 species    291 rxns  1.30e-01 CPU s
+Iteration  13:    91 species    336 rxns  1.40e-01 CPU s
+Iteration  14:    99 species    378 rxns  1.20e-01 CPU s
+Iteration  15:   106 species    413 rxns  1.20e-01 CPU s
+Iteration  16:   111 species    443 rxns  1.10e-01 CPU s
+Iteration  17:   115 species    465 rxns  7.00e-02 CPU s
+Iteration  18:   118 species    481 rxns  7.00e-02 CPU s
+Iteration  19:   120 species    492 rxns  6.00e-02 CPU s
+Iteration  20:   121 species    499 rxns  5.00e-02 CPU s
+Iteration  21:   122 species    502 rxns  3.00e-02 CPU s
+Iteration  22:   122 species    504 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   168 reactions 5.40e-01 CPU s 3.21e-03 CPU s/rxn
+Rule   2:    84 reactions 3.00e-01 CPU s 3.57e-03 CPU s/rxn
+Rule   3:   168 reactions 5.40e-01 CPU s 3.21e-03 CPU s/rxn
+Rule   4:    84 reactions 3.00e-01 CPU s 3.57e-03 CPU s/rxn
+Total   :   504 reactions 1.68e+00 CPU s 3.33e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_7_sym.net.
+CPU TIME: generate_network 1.71 s.
+Finished processing file kin_phos_7_sym.bngl.
+CPU TIME: total 1.73 s.
+--------------------------------------
+Process with: kin_phos_8
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 18:25:37 (GMT+2) on quyen
+Parsing kin_phos_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
+Parsing kin_phos_8.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.08081 s.; rules: 48; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 6.36452 s.; 48 rules; 167 species; 1980 reactions.
+Process with backward symmetries------
+Parsing kin_phos_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 6.62286 s.; 48 rules; 167 species; 1980 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_8.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 32 reaction rule(s).
+ACTION: generate_network( kin_phos_8 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    11 species      8 rxns  1.00e-02 CPU s
+Iteration   2:    47 species     80 rxns  1.00e-01 CPU s
+Iteration   3:   167 species    424 rxns  5.20e-01 CPU s
+Iteration   4:   489 species   1616 rxns  2.04e+00 CPU s
+Iteration   5:  1217 species   4920 rxns  6.75e+00 CPU s
+Iteration   6:  2645 species  12592 rxns  1.88e+01 CPU s
+Iteration   7:  5117 species  27992 rxns  4.32e+01 CPU s
+Iteration   8:  8940 species  55216 rxns  7.70e+01 CPU s
+Iteration   9: 14268 species  98128 rxns  1.08e+02 CPU s
+Iteration  10: 20996 species 159008 rxns  1.46e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_8_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_8_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  3.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  5.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  6.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  1.00e-01 CPU s
+Iteration   8:    43 species    115 rxns  1.20e-01 CPU s
+Iteration   9:    54 species    157 rxns  1.60e-01 CPU s
+Iteration  10:    66 species    207 rxns  1.80e-01 CPU s
+Iteration  11:    78 species    262 rxns  2.10e-01 CPU s
+Iteration  12:    91 species    320 rxns  2.00e-01 CPU s
+Iteration  13:   103 species    380 rxns  2.30e-01 CPU s
+Iteration  14:   115 species    439 rxns  1.90e-01 CPU s
+Iteration  15:   126 species    495 rxns  2.10e-01 CPU s
+Iteration  16:   136 species    547 rxns  1.80e-01 CPU s
+Iteration  17:   144 species    592 rxns  1.90e-01 CPU s
+Iteration  18:   151 species    629 rxns  1.50e-01 CPU s
+Iteration  19:   156 species    659 rxns  1.50e-01 CPU s
+Iteration  20:   160 species    681 rxns  1.00e-01 CPU s
+Iteration  21:   163 species    697 rxns  9.00e-02 CPU s
+Iteration  22:   165 species    708 rxns  8.00e-02 CPU s
+Iteration  23:   166 species    715 rxns  6.00e-02 CPU s
+Iteration  24:   167 species    718 rxns  3.00e-02 CPU s
+Iteration  25:   167 species    720 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   240 reactions 9.10e-01 CPU s 3.79e-03 CPU s/rxn
+Rule   2:   120 reactions 4.80e-01 CPU s 4.00e-03 CPU s/rxn
+Rule   3:   240 reactions 9.60e-01 CPU s 4.00e-03 CPU s/rxn
+Rule   4:   120 reactions 4.90e-01 CPU s 4.08e-03 CPU s/rxn
+Total   :   720 reactions 2.84e+00 CPU s 3.94e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_8_sym.net.
+CPU TIME: generate_network 2.90 s.
+Finished processing file kin_phos_8_sym.bngl.
+CPU TIME: total 2.91 s.
+--------------------------------------
+Process with: kin_phos_9
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 18:45:57 (GMT+2) on quyen
+Parsing kin_phos_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
+Parsing kin_phos_9.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) v K(s!S.x9) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) v P(s!S.x9) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x9~u?) v S(x9~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x9) v S(x9!K.s) v S(x9!P.s) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x9~p?) => [ S(x9~p) v S(x9~p!P.s) ]
+S(x9~u?) => [ S(x9~u) v S(x9~u!K.s) ]
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.08621 s.; rules: 54; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 56.7141 s.; 54 rules; 222 species; 2970 reactions.
+Process with backward symmetries------
+Parsing kin_phos_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 57.9789 s.; 54 rules; 222 species; 2970 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_9.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 36 reaction rule(s).
+ACTION: generate_network( kin_phos_9 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    12 species      9 rxns  1.00e-02 CPU s
+Iteration   2:    57 species     99 rxns  1.30e-01 CPU s
+Iteration   3:   222 species    576 rxns  6.90e-01 CPU s
+Iteration   4:   708 species   2394 rxns  3.24e+00 CPU s
+Iteration   5:  1914 species   7920 rxns  1.23e+01 CPU s
+Iteration   6:  4512 species  21996 rxns  4.37e+01 CPU s
+Iteration   7:  9462 species  53010 rxns  1.25e+02 CPU s
+Iteration   8: 17913 species 113310 rxns  2.94e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_9_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_9_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  3.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  5.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  8.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  1.00e-01 CPU s
+Iteration   8:    43 species    115 rxns  1.40e-01 CPU s
+Iteration   9:    55 species    158 rxns  2.10e-01 CPU s
+Iteration  10:    68 species    211 rxns  2.70e-01 CPU s
+Iteration  11:    82 species    271 rxns  2.50e-01 CPU s
+Iteration  12:    97 species    338 rxns  3.00e-01 CPU s
+Iteration  13:   112 species    409 rxns  3.10e-01 CPU s
+Iteration  14:   127 species    483 rxns  3.10e-01 CPU s
+Iteration  15:   142 species    556 rxns  3.10e-01 CPU s
+Iteration  16:   156 species    629 rxns  3.20e-01 CPU s
+Iteration  17:   169 species    697 rxns  2.80e-01 CPU s
+Iteration  18:   181 species    760 rxns  2.80e-01 CPU s
+Iteration  19:   191 species    815 rxns  2.50e-01 CPU s
+Iteration  20:   199 species    862 rxns  2.40e-01 CPU s
+Iteration  21:   206 species    899 rxns  1.80e-01 CPU s
+Iteration  22:   211 species    929 rxns  1.80e-01 CPU s
+Iteration  23:   215 species    951 rxns  1.40e-01 CPU s
+Iteration  24:   218 species    967 rxns  1.20e-01 CPU s
+Iteration  25:   220 species    978 rxns  9.00e-02 CPU s
+Iteration  26:   221 species    985 rxns  7.00e-02 CPU s
+Iteration  27:   222 species    988 rxns  4.00e-02 CPU s
+Iteration  28:   222 species    990 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   330 reactions 1.47e+00 CPU s 4.45e-03 CPU s/rxn
+Rule   2:   165 reactions 8.30e-01 CPU s 5.03e-03 CPU s/rxn
+Rule   3:   330 reactions 1.50e+00 CPU s 4.55e-03 CPU s/rxn
+Rule   4:   165 reactions 8.20e-01 CPU s 4.97e-03 CPU s/rxn
+Total   :   990 reactions 4.62e+00 CPU s 4.67e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_9_sym.net.
+CPU TIME: generate_network 4.69 s.
+Finished processing file kin_phos_9_sym.bngl.
+CPU TIME: total 4.71 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_1
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.004652 s.; 6 rules; 6 species; 6 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 18:58:03 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_1.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) ]
+P() => [ P(s) v P(s!S.x1) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+In rules and initial states:
+In rules and algebraic expression:
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.007957 s.; rules: 6; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.005764 s.; 6 rules; 6 species; 6 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_1.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 8 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.005514 s.; 6 rules; 6 species; 6 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_1.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_1 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_1.net.
+CPU TIME: generate_network 0.00 s.
+Finished processing file kin_phos_equal_rate_1.bngl.
+CPU TIME: total 0.02 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_1_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_1_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     5 species      3 rxns  0.00e+00 CPU s
+Iteration   3:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   4:     6 species      6 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_1_sym.net.
+CPU TIME: generate_network 0.01 s.
+Finished processing file kin_phos_equal_rate_1_sym.bngl.
+CPU TIME: total 0.02 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_10
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:08:04 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_10.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) v K(s!S.x9) v K(s!S.x10) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) v P(s!S.x9) v P(s!S.x10) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x10~u?) v S(x10~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x10) v S(x10!K.s) v S(x10!P.s) ]
+S() => [ S(x9~u?) v S(x9~p?) ]
+S() => [ S(x9) v S(x9!K.s) v S(x9!P.s) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x10~p?) => [ S(x10~p) v S(x10~p!P.s) ]
+S(x10~u?) => [ S(x10~u) v S(x10~u!K.s) ]
+S(x9~p?) => [ S(x9~p) v S(x9~p!P.s) ]
+S(x9~u?) => [ S(x9~u) v S(x9~u!K.s) ]
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x10,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.110212 s.; rules: 60; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_10.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 92 (sub)observables 80 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_10.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 40 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_10 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    13 species     10 rxns  2.00e-02 CPU s
+Iteration   2:    68 species    120 rxns  1.30e-01 CPU s
+Iteration   3:   288 species    760 rxns  8.80e-01 CPU s
+Iteration   4:   993 species   3420 rxns  4.83e+00 CPU s
+Iteration   5:  2895 species  12210 rxns  2.08e+01 CPU s
+Iteration   6:  7350 species  36540 rxns  8.25e+01 CPU s
+Iteration   7: 16590 species  94800 rxns  3.13e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_10_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_10_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  4.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  6.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  8.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  1.10e-01 CPU s
+Iteration   8:    43 species    115 rxns  1.20e-01 CPU s
+Iteration   9:    55 species    158 rxns  1.90e-01 CPU s
+Iteration  10:    69 species    212 rxns  2.50e-01 CPU s
+Iteration  11:    84 species    275 rxns  3.20e-01 CPU s
+Iteration  12:   101 species    347 rxns  3.60e-01 CPU s
+Iteration  13:   118 species    427 rxns  3.60e-01 CPU s
+Iteration  14:   136 species    512 rxns  4.00e-01 CPU s
+Iteration  15:   154 species    600 rxns  4.30e-01 CPU s
+Iteration  16:   172 species    690 rxns  4.20e-01 CPU s
+Iteration  17:   189 species    779 rxns  4.30e-01 CPU s
+Iteration  18:   206 species    865 rxns  3.40e-01 CPU s
+Iteration  19:   221 species    947 rxns  3.80e-01 CPU s
+Iteration  20:   235 species   1022 rxns  3.80e-01 CPU s
+Iteration  21:   247 species   1088 rxns  3.60e-01 CPU s
+Iteration  22:   257 species   1145 rxns  3.10e-01 CPU s
+Iteration  23:   265 species   1192 rxns  2.60e-01 CPU s
+Iteration  24:   272 species   1229 rxns  2.30e-01 CPU s
+Iteration  25:   277 species   1259 rxns  2.30e-01 CPU s
+Iteration  26:   281 species   1281 rxns  1.50e-01 CPU s
+Iteration  27:   284 species   1297 rxns  1.50e-01 CPU s
+Iteration  28:   286 species   1308 rxns  1.20e-01 CPU s
+Iteration  29:   287 species   1315 rxns  8.00e-02 CPU s
+Iteration  30:   288 species   1318 rxns  3.00e-02 CPU s
+Iteration  31:   288 species   1320 rxns  4.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   440 reactions 2.15e+00 CPU s 4.89e-03 CPU s/rxn
+Rule   2:   220 reactions 1.18e+00 CPU s 5.36e-03 CPU s/rxn
+Rule   3:   440 reactions 2.16e+00 CPU s 4.91e-03 CPU s/rxn
+Rule   4:   220 reactions 1.18e+00 CPU s 5.36e-03 CPU s/rxn
+Total   :  1320 reactions 6.67e+00 CPU s 5.05e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_10_sym.net.
+CPU TIME: generate_network 6.76 s.
+Finished processing file kin_phos_equal_rate_10_sym.bngl.
+CPU TIME: total 6.77 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_2
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.009109 s.; 12 rules; 18 species; 48 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:38:13 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_2.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.008718 s.; rules: 12; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.009842 s.; 12 rules; 12 species; 30 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_2.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 20 (sub)observables 16 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.01033 s.; 12 rules; 12 species; 30 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_2.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 8 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_2 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     5 species      2 rxns  1.00e-02 CPU s
+Iteration   2:     8 species      8 rxns  0.00e+00 CPU s
+Iteration   3:    12 species     16 rxns  1.00e-02 CPU s
+Iteration   4:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     38 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     44 rxns  1.00e-02 CPU s
+Iteration   7:    18 species     48 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     8 reactions 4.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   6:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   8:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Total   :    48 reactions 6.00e-02 CPU s 1.25e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_2.net.
+CPU TIME: generate_network 0.06 s.
+Finished processing file kin_phos_equal_rate_2.bngl.
+CPU TIME: total 0.08 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_2_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_2_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     8 species      8 rxns  0.00e+00 CPU s
+Iteration   4:    10 species     14 rxns  0.00e+00 CPU s
+Iteration   5:    11 species     19 rxns  1.00e-02 CPU s
+Iteration   6:    12 species     22 rxns  0.00e+00 CPU s
+Iteration   7:    12 species     24 rxns  0.00e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   2:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   3:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   4:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    24 reactions 2.00e-02 CPU s 8.33e-04 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_2_sym.net.
+CPU TIME: generate_network 0.03 s.
+Finished processing file kin_phos_equal_rate_2_sym.bngl.
+CPU TIME: total 0.04 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_3
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.030318 s.; 18 rules; 66 species; 288 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:38:13 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_3.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.014817 s.; rules: 18; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.02681 s.; 18 rules; 22 species; 90 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_3.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 29 (sub)observables 24 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.022419 s.; 18 rules; 22 species; 90 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_3.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 12 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_3 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     6 species      3 rxns  0.00e+00 CPU s
+Iteration   2:    12 species     15 rxns  1.00e-02 CPU s
+Iteration   3:    22 species     39 rxns  2.00e-02 CPU s
+Iteration   4:    34 species     81 rxns  3.00e-02 CPU s
+Iteration   5:    46 species    135 rxns  5.00e-02 CPU s
+Iteration   6:    56 species    189 rxns  6.00e-02 CPU s
+Iteration   7:    62 species    237 rxns  5.00e-02 CPU s
+Iteration   8:    65 species    267 rxns  3.00e-02 CPU s
+Iteration   9:    66 species    282 rxns  1.00e-02 CPU s
+Iteration  10:    66 species    288 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    32 reactions 3.00e-02 CPU s 9.38e-04 CPU s/rxn
+Rule   2:    16 reactions 3.00e-02 CPU s 1.88e-03 CPU s/rxn
+Rule   3:    32 reactions 1.00e-02 CPU s 3.13e-04 CPU s/rxn
+Rule   4:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   5:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   6:    16 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   7:    32 reactions 3.00e-02 CPU s 9.38e-04 CPU s/rxn
+Rule   8:    16 reactions 3.00e-02 CPU s 1.88e-03 CPU s/rxn
+Rule   9:    32 reactions 4.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  10:    16 reactions 1.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule  11:    32 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  12:    16 reactions 2.00e-02 CPU s 1.25e-03 CPU s/rxn
+Total   :   288 reactions 2.60e-01 CPU s 9.03e-04 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_3.net.
+CPU TIME: generate_network 0.28 s.
+Finished processing file kin_phos_equal_rate_3.bngl.
+CPU TIME: total 0.31 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_3_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_3_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  0.00e+00 CPU s
+Iteration   4:    12 species     18 rxns  1.00e-02 CPU s
+Iteration   5:    15 species     28 rxns  1.00e-02 CPU s
+Iteration   6:    18 species     39 rxns  1.00e-02 CPU s
+Iteration   7:    20 species     48 rxns  1.00e-02 CPU s
+Iteration   8:    21 species     55 rxns  1.00e-02 CPU s
+Iteration   9:    22 species     58 rxns  0.00e+00 CPU s
+Iteration  10:    22 species     60 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    20 reactions 2.00e-02 CPU s 1.00e-03 CPU s/rxn
+Rule   2:    10 reactions 2.00e-02 CPU s 2.00e-03 CPU s/rxn
+Rule   3:    20 reactions 3.00e-02 CPU s 1.50e-03 CPU s/rxn
+Rule   4:    10 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Total   :    60 reactions 7.00e-02 CPU s 1.17e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_3_sym.net.
+CPU TIME: generate_network 0.07 s.
+Finished processing file kin_phos_equal_rate_3_sym.bngl.
+CPU TIME: total 0.08 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_4
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.202151 s.; 24 rules; 258 species; 1536 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:38:14 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_4.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.021865 s.; rules: 24; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.042656 s.; 24 rules; 37 species; 210 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_4.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 38 (sub)observables 32 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.042478 s.; 24 rules; 37 species; 210 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_4.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 16 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_4 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      4 rxns  1.00e-02 CPU s
+Iteration   2:    17 species     24 rxns  2.00e-02 CPU s
+Iteration   3:    37 species     76 rxns  6.00e-02 CPU s
+Iteration   4:    68 species    184 rxns  1.10e-01 CPU s
+Iteration   5:   108 species    360 rxns  1.80e-01 CPU s
+Iteration   6:   152 species    592 rxns  2.40e-01 CPU s
+Iteration   7:   192 species    856 rxns  2.70e-01 CPU s
+Iteration   8:   223 species   1104 rxns  2.90e-01 CPU s
+Iteration   9:   243 species   1300 rxns  2.10e-01 CPU s
+Iteration  10:   253 species   1432 rxns  1.50e-01 CPU s
+Iteration  11:   257 species   1500 rxns  7.00e-02 CPU s
+Iteration  12:   258 species   1528 rxns  3.00e-02 CPU s
+Iteration  13:   258 species   1536 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   128 reactions 1.30e-01 CPU s 1.02e-03 CPU s/rxn
+Rule   2:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   3:   128 reactions 1.40e-01 CPU s 1.09e-03 CPU s/rxn
+Rule   4:    64 reactions 6.00e-02 CPU s 9.37e-04 CPU s/rxn
+Rule   5:   128 reactions 1.60e-01 CPU s 1.25e-03 CPU s/rxn
+Rule   6:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule   7:   128 reactions 1.40e-01 CPU s 1.09e-03 CPU s/rxn
+Rule   8:    64 reactions 4.00e-02 CPU s 6.25e-04 CPU s/rxn
+Rule   9:   128 reactions 1.50e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  10:    64 reactions 7.00e-02 CPU s 1.09e-03 CPU s/rxn
+Rule  11:   128 reactions 1.20e-01 CPU s 9.38e-04 CPU s/rxn
+Rule  12:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  13:   128 reactions 1.40e-01 CPU s 1.09e-03 CPU s/rxn
+Rule  14:    64 reactions 8.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule  15:   128 reactions 1.30e-01 CPU s 1.02e-03 CPU s/rxn
+Rule  16:    64 reactions 6.00e-02 CPU s 9.38e-04 CPU s/rxn
+Total   :  1536 reactions 1.65e+00 CPU s 1.07e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_4.net.
+CPU TIME: generate_network 1.71 s.
+Finished processing file kin_phos_equal_rate_4.bngl.
+CPU TIME: total 1.74 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_4_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_4_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     32 rxns  3.00e-02 CPU s
+Iteration   6:    22 species     48 rxns  2.00e-02 CPU s
+Iteration   7:    26 species     66 rxns  2.00e-02 CPU s
+Iteration   8:    30 species     83 rxns  2.00e-02 CPU s
+Iteration   9:    33 species     97 rxns  2.00e-02 CPU s
+Iteration  10:    35 species    108 rxns  1.00e-02 CPU s
+Iteration  11:    36 species    115 rxns  1.00e-02 CPU s
+Iteration  12:    37 species    118 rxns  1.00e-02 CPU s
+Iteration  13:    37 species    120 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    40 reactions 5.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   2:    20 reactions 2.00e-02 CPU s 1.00e-03 CPU s/rxn
+Rule   3:    40 reactions 9.00e-02 CPU s 2.25e-03 CPU s/rxn
+Rule   4:    20 reactions 1.00e-02 CPU s 5.00e-04 CPU s/rxn
+Total   :   120 reactions 1.70e-01 CPU s 1.42e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_4_sym.net.
+CPU TIME: generate_network 0.18 s.
+Finished processing file kin_phos_equal_rate_4_sym.bngl.
+CPU TIME: total 0.20 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_5
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 1.72103 s.; 30 rules; 1026 species; 7680 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:38:19 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_5.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.031844 s.; rules: 30; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.099374 s.; 30 rules; 58 species; 420 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_5.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 47 (sub)observables 40 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.094063 s.; 30 rules; 58 species; 420 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_5.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 20 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_5 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     8 species      5 rxns  0.00e+00 CPU s
+Iteration   2:    23 species     35 rxns  3.00e-02 CPU s
+Iteration   3:    58 species    130 rxns  1.00e-01 CPU s
+Iteration   4:   123 species    360 rxns  2.60e-01 CPU s
+Iteration   5:   224 species    805 rxns  4.80e-01 CPU s
+Iteration   6:   359 species   1515 rxns  7.60e-01 CPU s
+Iteration   7:   514 species   2490 rxns  1.10e+00 CPU s
+Iteration   8:   669 species   3640 rxns  1.31e+00 CPU s
+Iteration   9:   804 species   4815 rxns  1.33e+00 CPU s
+Iteration  10:   905 species   5865 rxns  1.21e+00 CPU s
+Iteration  11:   970 species   6670 rxns  9.60e-01 CPU s
+Iteration  12:  1005 species   7200 rxns  6.60e-01 CPU s
+Iteration  13:  1020 species   7495 rxns  3.90e-01 CPU s
+Iteration  14:  1025 species   7625 rxns  1.90e-01 CPU s
+Iteration  15:  1026 species   7670 rxns  9.00e-02 CPU s
+Iteration  16:  1026 species   7680 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   512 reactions 5.90e-01 CPU s 1.15e-03 CPU s/rxn
+Rule   2:   256 reactions 2.80e-01 CPU s 1.09e-03 CPU s/rxn
+Rule   3:   512 reactions 5.80e-01 CPU s 1.13e-03 CPU s/rxn
+Rule   4:   256 reactions 2.70e-01 CPU s 1.05e-03 CPU s/rxn
+Rule   5:   512 reactions 6.10e-01 CPU s 1.19e-03 CPU s/rxn
+Rule   6:   256 reactions 2.60e-01 CPU s 1.02e-03 CPU s/rxn
+Rule   7:   512 reactions 6.00e-01 CPU s 1.17e-03 CPU s/rxn
+Rule   8:   256 reactions 2.70e-01 CPU s 1.05e-03 CPU s/rxn
+Rule   9:   512 reactions 6.00e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  10:   256 reactions 2.70e-01 CPU s 1.05e-03 CPU s/rxn
+Rule  11:   512 reactions 6.00e-01 CPU s 1.17e-03 CPU s/rxn
+Rule  12:   256 reactions 2.90e-01 CPU s 1.13e-03 CPU s/rxn
+Rule  13:   512 reactions 6.10e-01 CPU s 1.19e-03 CPU s/rxn
+Rule  14:   256 reactions 2.50e-01 CPU s 9.77e-04 CPU s/rxn
+Rule  15:   512 reactions 6.10e-01 CPU s 1.19e-03 CPU s/rxn
+Rule  16:   256 reactions 2.80e-01 CPU s 1.09e-03 CPU s/rxn
+Rule  17:   512 reactions 6.80e-01 CPU s 1.33e-03 CPU s/rxn
+Rule  18:   256 reactions 2.80e-01 CPU s 1.09e-03 CPU s/rxn
+Rule  19:   512 reactions 6.70e-01 CPU s 1.31e-03 CPU s/rxn
+Rule  20:   256 reactions 2.70e-01 CPU s 1.05e-03 CPU s/rxn
+Total   :  7680 reactions 8.87e+00 CPU s 1.15e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_5.net.
+CPU TIME: generate_network 9.16 s.
+Finished processing file kin_phos_equal_rate_5.bngl.
+CPU TIME: total 9.19 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_5_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_5_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  1.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  3.00e-02 CPU s
+Iteration   6:    24 species     52 rxns  3.00e-02 CPU s
+Iteration   7:    30 species     75 rxns  4.00e-02 CPU s
+Iteration   8:    36 species    101 rxns  5.00e-02 CPU s
+Iteration   9:    42 species    126 rxns  4.00e-02 CPU s
+Iteration  10:    47 species    151 rxns  4.00e-02 CPU s
+Iteration  11:    51 species    171 rxns  4.00e-02 CPU s
+Iteration  12:    54 species    187 rxns  4.00e-02 CPU s
+Iteration  13:    56 species    198 rxns  3.00e-02 CPU s
+Iteration  14:    57 species    205 rxns  3.00e-02 CPU s
+Iteration  15:    58 species    208 rxns  1.00e-02 CPU s
+Iteration  16:    58 species    210 rxns  1.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:    70 reactions 1.40e-01 CPU s 2.00e-03 CPU s/rxn
+Rule   2:    35 reactions 9.00e-02 CPU s 2.57e-03 CPU s/rxn
+Rule   3:    70 reactions 1.60e-01 CPU s 2.29e-03 CPU s/rxn
+Rule   4:    35 reactions 4.00e-02 CPU s 1.14e-03 CPU s/rxn
+Total   :   210 reactions 4.30e-01 CPU s 2.05e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_5_sym.net.
+CPU TIME: generate_network 0.44 s.
+Finished processing file kin_phos_equal_rate_5_sym.bngl.
+CPU TIME: total 0.45 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_6
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 30.4844 s.; 36 rules; 4098 species; 36864 reactions.
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:39:00 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_6.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.033907 s.; rules: 36; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.231179 s.; 36 rules; 86 species; 756 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_6.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 56 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.223458 s.; 36 rules; 86 species; 756 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_6.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 24 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_6 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     9 species      6 rxns  1.00e-02 CPU s
+Iteration   2:    30 species     48 rxns  4.00e-02 CPU s
+Iteration   3:    86 species    204 rxns  1.60e-01 CPU s
+Iteration   4:   206 species    636 rxns  5.00e-01 CPU s
+Iteration   5:   422 species   1596 rxns  1.26e+00 CPU s
+Iteration   6:   758 species   3372 rxns  2.44e+00 CPU s
+Iteration   7:  1214 species   6204 rxns  3.72e+00 CPU s
+Iteration   8:  1760 species  10140 rxns  5.46e+00 CPU s
+Iteration   9:  2340 species  14952 rxns  6.61e+00 CPU s
+Iteration  10:  2886 species  20172 rxns  6.72e+00 CPU s
+Iteration  11:  3342 species  25188 rxns  6.92e+00 CPU s
+Iteration  12:  3678 species  29460 rxns  6.57e+00 CPU s
+Iteration  13:  3894 species  32676 rxns  5.21e+00 CPU s
+Iteration  14:  4014 species  34788 rxns  3.53e+00 CPU s
+Iteration  15:  4070 species  35988 rxns  2.16e+00 CPU s
+Iteration  16:  4091 species  36564 rxns  1.18e+00 CPU s
+Iteration  17:  4097 species  36786 rxns  6.50e-01 CPU s
+Iteration  18:  4098 species  36852 rxns  4.20e-01 CPU s
+Iteration  19:  4098 species  36864 rxns  1.40e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  2048 reactions 2.67e+00 CPU s 1.30e-03 CPU s/rxn
+Rule   2:  1024 reactions 1.40e+00 CPU s 1.37e-03 CPU s/rxn
+Rule   3:  2048 reactions 2.68e+00 CPU s 1.31e-03 CPU s/rxn
+Rule   4:  1024 reactions 1.37e+00 CPU s 1.34e-03 CPU s/rxn
+Rule   5:  2048 reactions 2.80e+00 CPU s 1.37e-03 CPU s/rxn
+Rule   6:  1024 reactions 1.38e+00 CPU s 1.35e-03 CPU s/rxn
+Rule   7:  2048 reactions 2.84e+00 CPU s 1.39e-03 CPU s/rxn
+Rule   8:  1024 reactions 1.41e+00 CPU s 1.38e-03 CPU s/rxn
+Rule   9:  2048 reactions 2.98e+00 CPU s 1.46e-03 CPU s/rxn
+Rule  10:  1024 reactions 1.37e+00 CPU s 1.34e-03 CPU s/rxn
+Rule  11:  2048 reactions 3.03e+00 CPU s 1.48e-03 CPU s/rxn
+Rule  12:  1024 reactions 1.44e+00 CPU s 1.41e-03 CPU s/rxn
+Rule  13:  2048 reactions 3.21e+00 CPU s 1.57e-03 CPU s/rxn
+Rule  14:  1024 reactions 1.40e+00 CPU s 1.37e-03 CPU s/rxn
+Rule  15:  2048 reactions 3.11e+00 CPU s 1.52e-03 CPU s/rxn
+Rule  16:  1024 reactions 1.44e+00 CPU s 1.41e-03 CPU s/rxn
+Rule  17:  2048 reactions 3.29e+00 CPU s 1.61e-03 CPU s/rxn
+Rule  18:  1024 reactions 1.45e+00 CPU s 1.42e-03 CPU s/rxn
+Rule  19:  2048 reactions 3.14e+00 CPU s 1.53e-03 CPU s/rxn
+Rule  20:  1024 reactions 1.44e+00 CPU s 1.41e-03 CPU s/rxn
+Rule  21:  2048 reactions 3.48e+00 CPU s 1.70e-03 CPU s/rxn
+Rule  22:  1024 reactions 1.47e+00 CPU s 1.44e-03 CPU s/rxn
+Rule  23:  2048 reactions 3.46e+00 CPU s 1.69e-03 CPU s/rxn
+Rule  24:  1024 reactions 1.40e+00 CPU s 1.37e-03 CPU s/rxn
+Total   : 36864 reactions 5.37e+01 CPU s 1.46e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_6.net.
+CPU TIME: generate_network 55.06 s.
+Finished processing file kin_phos_equal_rate_6.bngl.
+CPU TIME: total 55.10 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_6_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_6_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  0.00e+00 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  1.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  3.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  4.00e-02 CPU s
+Iteration   7:    32 species     79 rxns  6.00e-02 CPU s
+Iteration   8:    40 species    110 rxns  8.00e-02 CPU s
+Iteration   9:    48 species    144 rxns  7.00e-02 CPU s
+Iteration  10:    56 species    180 rxns  8.00e-02 CPU s
+Iteration  11:    63 species    215 rxns  8.00e-02 CPU s
+Iteration  12:    70 species    247 rxns  7.00e-02 CPU s
+Iteration  13:    75 species    275 rxns  7.00e-02 CPU s
+Iteration  14:    79 species    297 rxns  6.00e-02 CPU s
+Iteration  15:    82 species    313 rxns  5.00e-02 CPU s
+Iteration  16:    84 species    324 rxns  5.00e-02 CPU s
+Iteration  17:    85 species    331 rxns  3.00e-02 CPU s
+Iteration  18:    86 species    334 rxns  1.00e-02 CPU s
+Iteration  19:    86 species    336 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   112 reactions 2.40e-01 CPU s 2.14e-03 CPU s/rxn
+Rule   2:    56 reactions 1.80e-01 CPU s 3.21e-03 CPU s/rxn
+Rule   3:   112 reactions 2.70e-01 CPU s 2.41e-03 CPU s/rxn
+Rule   4:    56 reactions 1.50e-01 CPU s 2.68e-03 CPU s/rxn
+Total   :   336 reactions 8.40e-01 CPU s 2.50e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_6_sym.net.
+CPU TIME: generate_network 0.86 s.
+Finished processing file kin_phos_equal_rate_6_sym.bngl.
+CPU TIME: total 0.88 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_7
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 19:49:57 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_7.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.057032 s.; rules: 42; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.948688 s.; 42 rules; 122 species; 1260 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_7.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 65 (sub)observables 56 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 0.934191 s.; 42 rules; 122 species; 1260 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_7.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 28 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_7 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    10 species      7 rxns  1.00e-02 CPU s
+Iteration   2:    38 species     63 rxns  5.00e-02 CPU s
+Iteration   3:   122 species    301 rxns  3.10e-01 CPU s
+Iteration   4:   325 species   1043 rxns  1.08e+00 CPU s
+Iteration   5:   738 species   2898 rxns  2.76e+00 CPU s
+Iteration   6:  1466 species   6776 rxns  6.53e+00 CPU s
+Iteration   7:  2594 species  13776 rxns  1.21e+01 CPU s
+Iteration   8:  4148 species  24864 rxns  1.79e+01 CPU s
+Iteration   9:  6066 species  40446 rxns  2.48e+01 CPU s
+Iteration  10:  8194 species  60046 rxns  2.99e+01 CPU s
+Iteration  11: 10322 species  82194 rxns  3.46e+01 CPU s
+Iteration  12: 12240 species 104734 rxns  3.53e+01 CPU s
+Iteration  13: 13794 species 125412 rxns  3.33e+01 CPU s
+Iteration  14: 14922 species 142464 rxns  2.82e+01 CPU s
+Iteration  15: 15650 species 155064 rxns  2.22e+01 CPU s
+Iteration  16: 16063 species 163352 rxns  1.57e+01 CPU s
+Iteration  17: 16266 species 168147 rxns  1.05e+01 CPU s
+Iteration  18: 16350 species 170555 rxns  6.89e+00 CPU s
+Iteration  19: 16378 species 171577 rxns  4.17e+00 CPU s
+Iteration  20: 16385 species 171927 rxns  2.55e+00 CPU s
+Iteration  21: 16386 species 172018 rxns  2.20e+00 CPU s
+Iteration  22: 16386 species 172032 rxns  7.70e-01 CPU s
+Cumulative CPU time for each rule
+Rule   1:  8192 reactions 1.21e+01 CPU s 1.48e-03 CPU s/rxn
+Rule   2:  4096 reactions 6.23e+00 CPU s 1.52e-03 CPU s/rxn
+Rule   3:  8192 reactions 1.20e+01 CPU s 1.47e-03 CPU s/rxn
+Rule   4:  4096 reactions 6.19e+00 CPU s 1.51e-03 CPU s/rxn
+Rule   5:  8192 reactions 1.27e+01 CPU s 1.55e-03 CPU s/rxn
+Rule   6:  4096 reactions 6.09e+00 CPU s 1.49e-03 CPU s/rxn
+Rule   7:  8192 reactions 1.27e+01 CPU s 1.55e-03 CPU s/rxn
+Rule   8:  4096 reactions 6.21e+00 CPU s 1.52e-03 CPU s/rxn
+Rule   9:  8192 reactions 1.37e+01 CPU s 1.67e-03 CPU s/rxn
+Rule  10:  4096 reactions 6.13e+00 CPU s 1.50e-03 CPU s/rxn
+Rule  11:  8192 reactions 1.34e+01 CPU s 1.64e-03 CPU s/rxn
+Rule  12:  4096 reactions 6.18e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  13:  8192 reactions 1.49e+01 CPU s 1.82e-03 CPU s/rxn
+Rule  14:  4096 reactions 6.29e+00 CPU s 1.54e-03 CPU s/rxn
+Rule  15:  8192 reactions 1.42e+01 CPU s 1.73e-03 CPU s/rxn
+Rule  16:  4096 reactions 6.20e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  17:  8192 reactions 1.62e+01 CPU s 1.97e-03 CPU s/rxn
+Rule  18:  4096 reactions 6.11e+00 CPU s 1.49e-03 CPU s/rxn
+Rule  19:  8192 reactions 1.51e+01 CPU s 1.84e-03 CPU s/rxn
+Rule  20:  4096 reactions 6.08e+00 CPU s 1.48e-03 CPU s/rxn
+Rule  21:  8192 reactions 1.73e+01 CPU s 2.12e-03 CPU s/rxn
+Rule  22:  4096 reactions 6.17e+00 CPU s 1.51e-03 CPU s/rxn
+Rule  23:  8192 reactions 1.58e+01 CPU s 1.93e-03 CPU s/rxn
+Rule  24:  4096 reactions 6.34e+00 CPU s 1.55e-03 CPU s/rxn
+Rule  25:  8192 reactions 1.84e+01 CPU s 2.24e-03 CPU s/rxn
+Rule  26:  4096 reactions 6.28e+00 CPU s 1.53e-03 CPU s/rxn
+Rule  27:  8192 reactions 1.65e+01 CPU s 2.01e-03 CPU s/rxn
+Rule  28:  4096 reactions 6.10e+00 CPU s 1.49e-03 CPU s/rxn
+Total   : 172032 reactions 2.92e+02 CPU s 1.69e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_7.net.
+CPU TIME: generate_network 297.96 s.
+Finished processing file kin_phos_equal_rate_7.bngl.
+CPU TIME: total 298.01 s.
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_7_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_7_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  3.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  3.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  5.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  7.00e-02 CPU s
+Iteration   8:    42 species    114 rxns  9.00e-02 CPU s
+Iteration   9:    52 species    153 rxns  1.00e-01 CPU s
+Iteration  10:    62 species    198 rxns  1.30e-01 CPU s
+Iteration  11:    72 species    244 rxns  1.20e-01 CPU s
+Iteration  12:    82 species    291 rxns  1.20e-01 CPU s
+Iteration  13:    91 species    336 rxns  1.20e-01 CPU s
+Iteration  14:    99 species    378 rxns  1.10e-01 CPU s
+Iteration  15:   106 species    413 rxns  1.10e-01 CPU s
+Iteration  16:   111 species    443 rxns  9.00e-02 CPU s
+Iteration  17:   115 species    465 rxns  7.00e-02 CPU s
+Iteration  18:   118 species    481 rxns  6.00e-02 CPU s
+Iteration  19:   120 species    492 rxns  5.00e-02 CPU s
+Iteration  20:   121 species    499 rxns  3.00e-02 CPU s
+Iteration  21:   122 species    502 rxns  2.00e-02 CPU s
+Iteration  22:   122 species    504 rxns  2.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   168 reactions 4.80e-01 CPU s 2.86e-03 CPU s/rxn
+Rule   2:    84 reactions 2.70e-01 CPU s 3.21e-03 CPU s/rxn
+Rule   3:   168 reactions 4.80e-01 CPU s 2.86e-03 CPU s/rxn
+Rule   4:    84 reactions 2.20e-01 CPU s 2.62e-03 CPU s/rxn
+Total   :   504 reactions 1.45e+00 CPU s 2.88e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_7_sym.net.
+CPU TIME: generate_network 1.48 s.
+Finished processing file kin_phos_equal_rate_7_sym.bngl.
+CPU TIME: total 1.49 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_8
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 20:05:01 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_8.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.059202 s.; rules: 48; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 5.55358 s.; 48 rules; 167 species; 1980 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_8.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 74 (sub)observables 64 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 5.49168 s.; 48 rules; 167 species; 1980 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_8.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 32 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_8 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    11 species      8 rxns  1.00e-02 CPU s
+Iteration   2:    47 species     80 rxns  7.00e-02 CPU s
+Iteration   3:   167 species    424 rxns  4.00e-01 CPU s
+Iteration   4:   489 species   1616 rxns  1.65e+00 CPU s
+Iteration   5:  1217 species   4920 rxns  5.75e+00 CPU s
+Iteration   6:  2645 species  12592 rxns  1.62e+01 CPU s
+Iteration   7:  5117 species  27992 rxns  3.84e+01 CPU s
+Iteration   8:  8940 species  55216 rxns  6.75e+01 CPU s
+Iteration   9: 14268 species  98128 rxns  9.57e+01 CPU s
+Iteration  10: 20996 species 159008 rxns  1.32e+02 CPU s
+Iteration  11: 28724 species 237200 rxns  1.54e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_8_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_8_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  0.00e+00 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  2.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  4.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  6.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  7.00e-02 CPU s
+Iteration   8:    43 species    115 rxns  1.10e-01 CPU s
+Iteration   9:    54 species    157 rxns  1.50e-01 CPU s
+Iteration  10:    66 species    207 rxns  2.00e-01 CPU s
+Iteration  11:    78 species    262 rxns  1.80e-01 CPU s
+Iteration  12:    91 species    320 rxns  1.70e-01 CPU s
+Iteration  13:   103 species    380 rxns  1.80e-01 CPU s
+Iteration  14:   115 species    439 rxns  1.70e-01 CPU s
+Iteration  15:   126 species    495 rxns  1.80e-01 CPU s
+Iteration  16:   136 species    547 rxns  1.60e-01 CPU s
+Iteration  17:   144 species    592 rxns  1.50e-01 CPU s
+Iteration  18:   151 species    629 rxns  1.20e-01 CPU s
+Iteration  19:   156 species    659 rxns  1.10e-01 CPU s
+Iteration  20:   160 species    681 rxns  1.00e-01 CPU s
+Iteration  21:   163 species    697 rxns  8.00e-02 CPU s
+Iteration  22:   165 species    708 rxns  7.00e-02 CPU s
+Iteration  23:   166 species    715 rxns  4.00e-02 CPU s
+Iteration  24:   167 species    718 rxns  2.00e-02 CPU s
+Iteration  25:   167 species    720 rxns  3.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   240 reactions 8.00e-01 CPU s 3.33e-03 CPU s/rxn
+Rule   2:   120 reactions 4.20e-01 CPU s 3.50e-03 CPU s/rxn
+Rule   3:   240 reactions 7.80e-01 CPU s 3.25e-03 CPU s/rxn
+Rule   4:   120 reactions 4.40e-01 CPU s 3.67e-03 CPU s/rxn
+Total   :   720 reactions 2.44e+00 CPU s 3.39e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_8_sym.net.
+CPU TIME: generate_network 2.48 s.
+Finished processing file kin_phos_equal_rate_8_sym.bngl.
+CPU TIME: total 2.49 s.
+--------------------------------------
+Process with: kin_phos_equal_rate_9
+--------------------------------------
+Process without symmetries------------
+Parsing kin_phos_equal_rate_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+Process symmetries computation--------
+Kappa Static Analyzer (DomainBased-3171-ga89b3d11c-dirty) (without Tk interface)
+Analysis launched at 2017/06/10 20:25:17 (GMT+2) on quyen
+Parsing kin_phos_equal_rate_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
+Parsing kin_phos_equal_rate_9.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+K() => [ K(s) v K(s!S.x1) v K(s!S.x2) v K(s!S.x3) v K(s!S.x4) v K(s!S.x5) v K(s!S.x6) v K(s!S.x7) v K(s!S.x8) v K(s!S.x9) ]
+P() => [ P(s) v P(s!S.x1) v P(s!S.x2) v P(s!S.x3) v P(s!S.x4) v P(s!S.x5) v P(s!S.x6) v P(s!S.x7) v P(s!S.x8) v P(s!S.x9) ]
+S() => [ S(x2~u?) v S(x2~p?) ]
+S() => [ S(x1~u?) v S(x1~p?) ]
+S() => [ S(x9~u?) v S(x9~p?) ]
+S() => [ S(x3~u?) v S(x3~p?) ]
+S() => [ S(x9) v S(x9!K.s) v S(x9!P.s) ]
+S() => [ S(x8~u?) v S(x8~p?) ]
+S() => [ S(x8) v S(x8!K.s) v S(x8!P.s) ]
+S() => [ S(x7~u?) v S(x7~p?) ]
+S() => [ S(x7) v S(x7!K.s) v S(x7!P.s) ]
+S() => [ S(x6~u?) v S(x6~p?) ]
+S() => [ S(x6) v S(x6!K.s) v S(x6!P.s) ]
+S() => [ S(x5~u?) v S(x5~p?) ]
+S() => [ S(x5) v S(x5!K.s) v S(x5!P.s) ]
+S() => [ S(x4~u?) v S(x4~p?) ]
+S() => [ S(x4) v S(x4!K.s) v S(x4!P.s) ]
+S() => [ S(x3) v S(x3!K.s) v S(x3!P.s) ]
+S() => [ S(x2) v S(x2!K.s) v S(x2!P.s) ]
+S() => [ S(x1) v S(x1!K.s) v S(x1!P.s) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+S(x9~p?) => [ S(x9~p) v S(x9~p!P.s) ]
+S(x9~u?) => [ S(x9~u) v S(x9~u!K.s) ]
+S(x8~p?) => [ S(x8~p) v S(x8~p!P.s) ]
+S(x8~u?) => [ S(x8~u) v S(x8~u!K.s) ]
+S(x7~p?) => [ S(x7~p) v S(x7~p!P.s) ]
+S(x7~u?) => [ S(x7~u) v S(x7~u!K.s) ]
+S(x6~p?) => [ S(x6~p) v S(x6~p!P.s) ]
+S(x6~u?) => [ S(x6~u) v S(x6~u!K.s) ]
+S(x5~p?) => [ S(x5~p) v S(x5~p!P.s) ]
+S(x5~u?) => [ S(x5~u) v S(x5~u!K.s) ]
+S(x4~p?) => [ S(x4~p) v S(x4~p!P.s) ]
+S(x4~u?) => [ S(x4~u) v S(x4~u!K.s) ]
+S(x3~p?) => [ S(x3~p) v S(x3~p!P.s) ]
+S(x3~u?) => [ S(x3~u) v S(x3~u!K.s) ]
+S(x2~p?) => [ S(x2~p) v S(x2~p!P.s) ]
+S(x2~u?) => [ S(x2~u) v S(x2~u!K.s) ]
+S(x1~p?) => [ S(x1~p) v S(x1~p!P.s) ]
+S(x1~u?) => [ S(x1~u) v S(x1~u!K.s) ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Compute the contact map...
+Symmetries:
+In rules:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and initial states:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+In rules and algebraic expression:
+************
+Agent: S
+  -Equivalence classes of sites (both):
+      {x1,x2,x3,x4,x5,x6,x7,x8,x9}
+************
+Flow of information in the CTMC semantcs:...
+Flow of information in the ODE semantcs:...
+execution finished without any exception
+CPU time: 0.075346 s.; rules: 54; dead rules: 0.
+Process with forward symmetries-------
+Parsing kin_phos_equal_rate_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 50.1701 s.; 54 rules; 222 species; 2970 reactions.
+Process with backward symmetries------
+Parsing kin_phos_equal_rate_9.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute contact map ... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ compute symmetric sites... 
++ restart compilation to account for ~-equivalent patterns in algebraic expressions... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 83 (sub)observables 72 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+CPU time: 52.5465 s.; 54 rules; 222 species; 2970 reactions.
+Process BNGL withoutsymmetries--------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_9.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 36 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_9 )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:    12 species      9 rxns  1.00e-02 CPU s
+Iteration   2:    57 species     99 rxns  1.00e-01 CPU s
+Iteration   3:   222 species    576 rxns  6.20e-01 CPU s
+Iteration   4:   708 species   2394 rxns  3.04e+00 CPU s
+Iteration   5:  1914 species   7920 rxns  1.10e+01 CPU s
+Iteration   6:  4512 species  21996 rxns  3.79e+01 CPU s
+Iteration   7:  9462 species  53010 rxns  1.10e+02 CPU s
+Iteration   8: 17913 species 113310 rxns  2.73e+02 CPU s
+Process BNGL with symmetries----------
+BioNetGen version 2.2.6
+Reading from file kin_phos_equal_rate_9_sym.bngl (level 0)
+Read 7 parameters.
+Read 3 molecule types.
+Read 3 species.
+Read 4 reaction rule(s).
+ACTION: generate_network( kin_phos_equal_rate_9_sym )
+Iteration   0:     3 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     4 species      1 rxns  1.00e-02 CPU s
+Iteration   2:     6 species      4 rxns  1.00e-02 CPU s
+Iteration   3:     9 species      9 rxns  2.00e-02 CPU s
+Iteration   4:    13 species     19 rxns  3.00e-02 CPU s
+Iteration   5:    18 species     33 rxns  5.00e-02 CPU s
+Iteration   6:    25 species     53 rxns  6.00e-02 CPU s
+Iteration   7:    33 species     80 rxns  9.00e-02 CPU s
+Iteration   8:    43 species    115 rxns  1.20e-01 CPU s
+Iteration   9:    55 species    158 rxns  1.70e-01 CPU s
+Iteration  10:    68 species    211 rxns  2.30e-01 CPU s
+Iteration  11:    82 species    271 rxns  2.40e-01 CPU s
+Iteration  12:    97 species    338 rxns  2.60e-01 CPU s
+Iteration  13:   112 species    409 rxns  2.90e-01 CPU s
+Iteration  14:   127 species    483 rxns  2.90e-01 CPU s
+Iteration  15:   142 species    556 rxns  3.20e-01 CPU s
+Iteration  16:   156 species    629 rxns  2.90e-01 CPU s
+Iteration  17:   169 species    697 rxns  2.60e-01 CPU s
+Iteration  18:   181 species    760 rxns  2.50e-01 CPU s
+Iteration  19:   191 species    815 rxns  2.40e-01 CPU s
+Iteration  20:   199 species    862 rxns  2.00e-01 CPU s
+Iteration  21:   206 species    899 rxns  1.90e-01 CPU s
+Iteration  22:   211 species    929 rxns  1.70e-01 CPU s
+Iteration  23:   215 species    951 rxns  1.30e-01 CPU s
+Iteration  24:   218 species    967 rxns  1.10e-01 CPU s
+Iteration  25:   220 species    978 rxns  8.00e-02 CPU s
+Iteration  26:   221 species    985 rxns  7.00e-02 CPU s
+Iteration  27:   222 species    988 rxns  3.00e-02 CPU s
+Iteration  28:   222 species    990 rxns  4.00e-02 CPU s
+Cumulative CPU time for each rule
+Rule   1:   330 reactions 1.37e+00 CPU s 4.15e-03 CPU s/rxn
+Rule   2:   165 reactions 7.40e-01 CPU s 4.48e-03 CPU s/rxn
+Rule   3:   330 reactions 1.37e+00 CPU s 4.15e-03 CPU s/rxn
+Rule   4:   165 reactions 7.60e-01 CPU s 4.61e-03 CPU s/rxn
+Total   :   990 reactions 4.24e+00 CPU s 4.28e-03 CPU s/rxn
+Wrote network in net format to ./kin_phos_equal_rate_9_sym.net.
+CPU TIME: generate_network 4.31 s.
+Finished processing file kin_phos_equal_rate_9_sym.bngl.
+CPU TIME: total 4.32 s.

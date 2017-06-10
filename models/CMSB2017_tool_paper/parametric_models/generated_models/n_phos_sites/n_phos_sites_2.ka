@@ -1,0 +1,29 @@
+%var: 'n_k0' 0
+%var: 'kp0' 3
+%var: 'ku1' 14
+%var: 'n_k1' 1
+%var: 'kp1' 15
+%var: 'ku2' 98
+%var: 'n_k2' 2
+%var: 'kp2' 75
+%var: 'ku3' 686
+%agent: A(s1~u~p,s2~u~p)
+
+%init: 100 A(s1~u,s2~u)
+
+A(s1~p,s2~u) -> A(s1~p,s2~p) @'kp1'
+A(s1~p,s2~u) -> A(s1~u,s2~u) @'ku1'
+
+
+A(s1~p,s2~p) -> A(s1~p,s2~u) @'ku2'
+A(s1~p,s2~p) -> A(s1~u,s2~p) @'ku2'
+
+
+A(s1~u,s2~u) -> A(s1~u,s2~p) @'kp0'
+A(s1~u,s2~u) -> A(s1~p,s2~u) @'kp0'
+
+
+A(s1~u,s2~p) -> A(s1~u,s2~u) @'ku1'
+A(s1~u,s2~p) -> A(s1~p,s2~p) @'kp1'
+
+

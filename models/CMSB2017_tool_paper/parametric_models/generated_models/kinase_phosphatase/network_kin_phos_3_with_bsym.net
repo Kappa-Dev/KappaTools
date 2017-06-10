@@ -1,0 +1,316 @@
+# command line:  
+#       KaDE   kin_phos_3.ka    -print-efficiency    -ode-backend   DOTNET   -with-symmetries   Backward    -propagate-constants    -dotnet-output  network_kin_phos_3_with_bsym.net  
+# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+# 
+# init - the initial abundances of each species and token
+# tinit - the initial simulation time (likely 0)
+# tend - the final simulation time 
+# initialstep - initial time step at the beginning of numerical integration
+# maxstep - maximal time step for numerical integration
+# reltol - relative error tolerance;
+# abstol - absolute error tolerance;
+# period - the time period between points to return
+#
+# variables (init(i),y(i)) denote numbers of embeddings 
+# rule rates are corrected by the number of automorphisms in the lhs of rules
+
+begin species
+ 1 S(x1~u,x2~u,x3~u) 100
+ 2 P(s) 100
+ 3 K(s) 100
+ 4 K(s!1).S(x1~u,x2~u,x3~u!1) 0
+ 5 K(s!1).S(x1~u,x2~u!2,x3~u!1).K(s!2) 0
+ 6 S(x1~u,x2~u,x3~p) 0
+ 7 K(s!1).S(x1~u,x2~u!1,x3~p) 0
+ 8 S(x1~u,x2~u,x3~p!1).P(s!1) 0
+ 9 K(s!1).S(x1~u,x2~u!1,x3~p!2).P(s!2) 0
+ 10 K(s!1).S(x1~u!1,x2~u!2,x3~p!3).P(s!3).K(s!2) 0
+ 11 S(x1~u,x2~p,x3~p!1).P(s!1) 0
+ 12 K(s!1).S(x1~u!1,x2~p,x3~p!2).P(s!2) 0
+ 13 S(x1~u,x2~p!1,x3~p!2).P(s!1).P(s!2) 0
+ 14 S(x1~u,x2~p,x3~p) 0
+ 15 K(s!1).S(x1~u!1,x2~p,x3~p) 0
+ 16 S(x1~p,x2~p,x3~p) 0
+ 17 S(x1~p,x2~p,x3~p!1).P(s!1) 0
+ 18 S(x1~p,x2~p!1,x3~p!2).P(s!2).P(s!1) 0
+ 19 S(x1~p!1,x2~p!2,x3~p!3).P(s!1).P(s!3).P(s!2) 0
+ 20 K(s!1).S(x1~u!1,x2~p!2,x3~p!3).P(s!3).P(s!2) 0
+ 21 K(s!1).S(x1~u!1,x2~u!2,x3~p).K(s!2) 0
+ 22 K(s!1).S(x1~u!1,x2~u!2,x3~u!3).K(s!3).K(s!2) 0
+end species
+
+
+
+
+begin reactions
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) + K(s)  
+1 22 3,21 0.1
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) + K(s)  
+2 22 3,5 1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) + K(s)  
+3 22 3,21 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) + K(s)  
+4 22 3,5 1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) + K(s)  
+5 22 3,21 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) + K(s)  
+6 22 3,5 1
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~p) 
+# K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + K(s)  
+7 5 3,7 0.1
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~u) 
+# K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) -> K(s!1), S(x1~u, x2~u, x3~u!1) + K(s)  
+8 5 3,4 1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + K(s)  
+9 5 3,7 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) -> K(s!1), S(x1~u, x2~u, x3~u!1) + K(s)  
+10 5 3,4 1
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) + K(s) -> K(s!1), S(x1~u!1, x2~u!2, x3~u!3), K(s!3), K(s!2)  
+11 3,5 22 0.01
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# K(s!1), S(x1~u, x2~u!1, x3~p) + P(s) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2)  
+12 2,7 9 0.001
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u, x2~u!1, x3~p) -> S(x1~u, x2~p, x3~p) + K(s)  
+13 7 3,14 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u, x2~u!1, x3~p) -> S(x1~u, x2~u, x3~p) + K(s)  
+14 7 3,6 1
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# K(s!1), S(x1~u, x2~u!1, x3~p) + K(s) -> K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2)  
+15 3,7 21 0.01
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) + P(s) -> K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2)  
+16 2,21 10 0.001
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p) + K(s)  
+17 21 3,15 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + K(s)  
+18 21 3,7 1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p) + K(s)  
+19 21 3,15 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + K(s)  
+20 21 3,7 1
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2) + P(s)  
+21 10 2,5 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~u!2, x3~p), K(s!2) + P(s)  
+22 10 2,21 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) + K(s)  
+23 10 3,12 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) + K(s)  
+24 10 3,9 1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) + K(s)  
+25 10 3,12 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) + K(s)  
+26 10 3,9 1
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + P(s)  
+27 12 2,7 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p) + P(s)  
+28 12 2,15 0.1
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) + P(s) -> K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2)  
+29 2,12 20 0.001
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) -> S(x1~p, x2~p, x3~p!1), P(s!1) + K(s)  
+30 12 3,17 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) -> S(x1~u, x2~p, x3~p!1), P(s!1) + K(s)  
+31 12 3,11 1
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) + P(s)  
+32 20 2,9 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) + P(s)  
+33 20 2,12 0.1
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~u) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) + P(s)  
+34 20 2,9 0.01
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~p) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2) + P(s)  
+35 20 2,12 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) + K(s)  
+36 20 3,18 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2) -> S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) + K(s)  
+37 20 3,13 1
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) -> S(x1~u, x2~u, x3~p!1), P(s!1) + P(s)  
+38 13 2,8 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) -> S(x1~u, x2~p, x3~p!1), P(s!1) + P(s)  
+39 13 2,11 0.1
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~u) 
+# S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) -> S(x1~u, x2~u, x3~p!1), P(s!1) + P(s)  
+40 13 2,8 0.01
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~p) 
+# S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) -> S(x1~u, x2~p, x3~p!1), P(s!1) + P(s)  
+41 13 2,11 0.1
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) + K(s) -> K(s!1), S(x1~u!1, x2~p!2, x3~p!3), P(s!3), P(s!2)  
+42 3,13 20 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) + P(s)  
+43 19 2,13 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) + P(s)  
+44 19 2,18 0.1
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~u) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) + P(s)  
+45 19 2,13 0.01
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~p) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) + P(s)  
+46 19 2,18 0.1
+# rule    : P(s!1), S(x1~p!1) -> P(s), S(x1~u) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2) + P(s)  
+47 19 2,13 0.01
+# rule    : P(s!1), S(x1~p!1) -> P(s), S(x1~p) 
+# S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) + P(s)  
+48 19 2,18 0.1
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) -> S(x1~u, x2~p, x3~p!1), P(s!1) + P(s)  
+49 18 2,11 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) -> S(x1~p, x2~p, x3~p!1), P(s!1) + P(s)  
+50 18 2,17 0.1
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~u) 
+# S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) -> S(x1~u, x2~p, x3~p!1), P(s!1) + P(s)  
+51 18 2,11 0.01
+# rule    : P(s!1), S(x2~p!1) -> P(s), S(x2~p) 
+# S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) -> S(x1~p, x2~p, x3~p!1), P(s!1) + P(s)  
+52 18 2,17 0.1
+# rule    : P(s), S(x1~p) -> P(s!1), S(x1~p!1) 
+# S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1) + P(s) -> S(x1~p!1, x2~p!2, x3~p!3), P(s!1), P(s!3), P(s!2)  
+53 2,18 19 0.001
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~p, x2~p, x3~p!1), P(s!1) -> S(x1~u, x2~p, x3~p) + P(s)  
+54 17 2,14 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~p, x2~p, x3~p!1), P(s!1) -> S(x1~p, x2~p, x3~p) + P(s)  
+55 17 2,16 0.1
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# S(x1~p, x2~p, x3~p!1), P(s!1) + P(s) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1)  
+56 2,17 18 0.001
+# rule    : P(s), S(x1~p) -> P(s!1), S(x1~p!1) 
+# S(x1~p, x2~p, x3~p!1), P(s!1) + P(s) -> S(x1~p, x2~p!1, x3~p!2), P(s!2), P(s!1)  
+57 2,17 18 0.001
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# S(x1~p, x2~p, x3~p) + P(s) -> S(x1~p, x2~p, x3~p!1), P(s!1)  
+58 2,16 17 0.001
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# S(x1~p, x2~p, x3~p) + P(s) -> S(x1~p, x2~p, x3~p!1), P(s!1)  
+59 2,16 17 0.001
+# rule    : P(s), S(x1~p) -> P(s!1), S(x1~p!1) 
+# S(x1~p, x2~p, x3~p) + P(s) -> S(x1~p, x2~p, x3~p!1), P(s!1)  
+60 2,16 17 0.001
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# K(s!1), S(x1~u!1, x2~p, x3~p) + P(s) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2)  
+61 2,15 12 0.001
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# K(s!1), S(x1~u!1, x2~p, x3~p) + P(s) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2)  
+62 2,15 12 0.001
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~p) 
+# K(s!1), S(x1~u!1, x2~p, x3~p) -> S(x1~p, x2~p, x3~p) + K(s)  
+63 15 3,16 0.1
+# rule    : K(s!1), S(x1~u!1) -> K(s), S(x1~u) 
+# K(s!1), S(x1~u!1, x2~p, x3~p) -> S(x1~u, x2~p, x3~p) + K(s)  
+64 15 3,14 1
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# S(x1~u, x2~p, x3~p) + P(s) -> S(x1~u, x2~p, x3~p!1), P(s!1)  
+65 2,14 11 0.001
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# S(x1~u, x2~p, x3~p) + P(s) -> S(x1~u, x2~p, x3~p!1), P(s!1)  
+66 2,14 11 0.001
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~p, x3~p) + K(s) -> K(s!1), S(x1~u!1, x2~p, x3~p)  
+67 3,14 15 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~u, x2~p, x3~p!1), P(s!1) -> S(x1~u, x2~u, x3~p) + P(s)  
+68 11 2,6 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~u, x2~p, x3~p!1), P(s!1) -> S(x1~u, x2~p, x3~p) + P(s)  
+69 11 2,14 0.1
+# rule    : P(s), S(x2~p) -> P(s!1), S(x2~p!1) 
+# S(x1~u, x2~p, x3~p!1), P(s!1) + P(s) -> S(x1~u, x2~p!1, x3~p!2), P(s!1), P(s!2)  
+70 2,11 13 0.001
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~p, x3~p!1), P(s!1) + K(s) -> K(s!1), S(x1~u!1, x2~p, x3~p!2), P(s!2)  
+71 3,11 12 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) -> K(s!1), S(x1~u, x2~u, x3~u!1) + P(s)  
+72 9 2,4 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) -> K(s!1), S(x1~u, x2~u!1, x3~p) + P(s)  
+73 9 2,7 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~p) 
+# K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) -> S(x1~u, x2~p, x3~p!1), P(s!1) + K(s)  
+74 9 3,11 0.1
+# rule    : K(s!1), S(x2~u!1) -> K(s), S(x2~u) 
+# K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) -> S(x1~u, x2~u, x3~p!1), P(s!1) + K(s)  
+75 9 3,8 1
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2) + K(s) -> K(s!1), S(x1~u!1, x2~u!2, x3~p!3), P(s!3), K(s!2)  
+76 3,9 10 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~u) 
+# S(x1~u, x2~u, x3~p!1), P(s!1) -> S(x1~u, x2~u, x3~u) + P(s)  
+77 8 1,2 0.01
+# rule    : P(s!1), S(x3~p!1) -> P(s), S(x3~p) 
+# S(x1~u, x2~u, x3~p!1), P(s!1) -> S(x1~u, x2~u, x3~p) + P(s)  
+78 8 2,6 0.1
+# rule    : K(s), S(x2~u) -> K(s!1), S(x2~u!1) 
+# S(x1~u, x2~u, x3~p!1), P(s!1) + K(s) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2)  
+79 3,8 9 0.01
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~u, x3~p!1), P(s!1) + K(s) -> K(s!1), S(x1~u, x2~u!1, x3~p!2), P(s!2)  
+80 3,8 9 0.01
+# rule    : P(s), S(x3~p) -> P(s!1), S(x3~p!1) 
+# S(x1~u, x2~u, x3~p) + P(s) -> S(x1~u, x2~u, x3~p!1), P(s!1)  
+81 2,6 8 0.001
+# rule    : K(s), S(x2~u) -> K(s!1), S(x2~u!1) 
+# S(x1~u, x2~u, x3~p) + K(s) -> K(s!1), S(x1~u, x2~u!1, x3~p)  
+82 3,6 7 0.01
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~u, x3~p) + K(s) -> K(s!1), S(x1~u, x2~u!1, x3~p)  
+83 3,6 7 0.01
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~p) 
+# K(s!1), S(x1~u, x2~u, x3~u!1) -> S(x1~u, x2~u, x3~p) + K(s)  
+84 4 3,6 0.1
+# rule    : K(s!1), S(x3~u!1) -> K(s), S(x3~u) 
+# K(s!1), S(x1~u, x2~u, x3~u!1) -> S(x1~u, x2~u, x3~u) + K(s)  
+85 4 1,3 1
+# rule    : K(s), S(x2~u) -> K(s!1), S(x2~u!1) 
+# K(s!1), S(x1~u, x2~u, x3~u!1) + K(s) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2)  
+86 3,4 5 0.01
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# K(s!1), S(x1~u, x2~u, x3~u!1) + K(s) -> K(s!1), S(x1~u, x2~u!2, x3~u!1), K(s!2)  
+87 3,4 5 0.01
+# rule    : K(s), S(x3~u) -> K(s!1), S(x3~u!1) 
+# S(x1~u, x2~u, x3~u) + K(s) -> K(s!1), S(x1~u, x2~u, x3~u!1)  
+88 1,3 4 0.01
+# rule    : K(s), S(x2~u) -> K(s!1), S(x2~u!1) 
+# S(x1~u, x2~u, x3~u) + K(s) -> K(s!1), S(x1~u, x2~u, x3~u!1)  
+89 1,3 4 0.01
+# rule    : K(s), S(x1~u) -> K(s!1), S(x1~u!1) 
+# S(x1~u, x2~u, x3~u) + K(s) -> K(s!1), S(x1~u, x2~u, x3~u!1)  
+90 1,3 4 0.01
+end reactions

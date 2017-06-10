@@ -1,0 +1,12 @@
+%var: 'kp0' 3
+%var: 'ku1' 14
+%agent: A(s1~u~p,p)
+%agent: P(l,r)
+
+%init: 100 A(p!1) , P(l!1,r)
+
+
+
+
+A(s1~u,p!1) , P(l!1,r) -> A(s1~p,p!1) , P(l!2,r) , P(l!1,r!2) @kp0
+A(s1~p,p!1) , P(l!2,r) , P(l!1,r!2) -> A(s1~u,p!1) , P(l!1,r) @ku1

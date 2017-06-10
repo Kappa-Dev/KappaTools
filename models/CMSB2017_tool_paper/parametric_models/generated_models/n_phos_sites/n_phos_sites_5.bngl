@@ -1,0 +1,259 @@
+begin parameters
+Stot 100
+n_k0 0
+kp0 3
+ku1 14
+n_k1 1
+kp1 15
+ku2 98
+n_k2 2
+kp2 75
+ku3 686
+n_k3 3
+kp3 375
+ku4 4802
+n_k4 4
+kp4 1875
+ku5 33614
+n_k5 5
+kp5 9375
+ku6 235298
+end parameters
+
+begin molecule types
+A(s1~u~p,s2~u~p,s3~u~p,s4~u~p,s5~u~p)
+end molecule types
+
+begin seed species
+%init: A(s1~u,s2~u,s3~u,s4~u,s5~u) Stot
+end seed species
+
+
+begin reaction rules
+A(s1~p,s2~u,s3~p,s4~u,s5~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u) ku3
+A(s1~p,s2~u,s3~p,s4~u,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) kp3
+A(s1~p,s2~u,s3~p,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) ku3
+A(s1~p,s2~u,s3~p,s4~u,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) kp3
+A(s1~p,s2~u,s3~p,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) ku3
+
+
+A(s1~p,s2~u,s3~p,s4~u,s5~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p) kp2
+A(s1~p,s2~u,s3~p,s4~u,s5~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u) kp2
+A(s1~p,s2~u,s3~p,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) ku2
+A(s1~p,s2~u,s3~p,s4~u,s5~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u) kp2
+A(s1~p,s2~u,s3~p,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) ku2
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u) ku4
+A(s1~p,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p) ku4
+A(s1~p,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) ku4
+A(s1~p,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) kp4
+A(s1~p,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) ku4
+
+
+A(s1~p,s2~u,s3~p,s4~p,s5~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) kp3
+A(s1~p,s2~u,s3~p,s4~p,s5~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u) ku3
+A(s1~p,s2~u,s3~p,s4~p,s5~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u) ku3
+A(s1~p,s2~u,s3~p,s4~p,s5~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) kp3
+A(s1~p,s2~u,s3~p,s4~p,s5~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) ku3
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) ku2
+A(s1~p,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) kp2
+A(s1~p,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p) kp2
+A(s1~p,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p) kp2
+A(s1~p,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) ku2
+
+
+A(s1~p,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) kp1
+A(s1~p,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u) kp1
+A(s1~p,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u) kp1
+A(s1~p,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u) kp1
+A(s1~p,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) ku1
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u) ku3
+A(s1~p,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) ku3
+A(s1~p,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) kp3
+A(s1~p,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) kp3
+A(s1~p,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) ku3
+
+
+A(s1~p,s2~u,s3~u,s4~p,s5~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) kp2
+A(s1~p,s2~u,s3~u,s4~p,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) ku2
+A(s1~p,s2~u,s3~u,s4~p,s5~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u) kp2
+A(s1~p,s2~u,s3~u,s4~p,s5~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u) kp2
+A(s1~p,s2~u,s3~u,s4~p,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) ku2
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u) ku4
+A(s1~p,s2~p,s3~p,s4~u,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) kp4
+A(s1~p,s2~p,s3~p,s4~u,s5~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p) ku4
+A(s1~p,s2~p,s3~p,s4~u,s5~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p) ku4
+A(s1~p,s2~p,s3~p,s4~u,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) ku4
+
+
+A(s1~p,s2~p,s3~p,s4~u,s5~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) kp3
+A(s1~p,s2~p,s3~p,s4~u,s5~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) kp3
+A(s1~p,s2~p,s3~p,s4~u,s5~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u) ku3
+A(s1~p,s2~p,s3~p,s4~u,s5~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u) ku3
+A(s1~p,s2~p,s3~p,s4~u,s5~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u) ku3
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) ku5
+A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) ku5
+A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) ku5
+A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) ku5
+A(s1~p,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) ku5
+
+
+A(s1~p,s2~p,s3~p,s4~p,s5~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) kp4
+A(s1~p,s2~p,s3~p,s4~p,s5~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u) ku4
+A(s1~p,s2~p,s3~p,s4~p,s5~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u) ku4
+A(s1~p,s2~p,s3~p,s4~p,s5~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u) ku4
+A(s1~p,s2~p,s3~p,s4~p,s5~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) ku4
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u) ku3
+A(s1~p,s2~p,s3~u,s4~u,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) kp3
+A(s1~p,s2~p,s3~u,s4~u,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) kp3
+A(s1~p,s2~p,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) ku3
+A(s1~p,s2~p,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) ku3
+
+
+A(s1~p,s2~p,s3~u,s4~u,s5~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p) kp2
+A(s1~p,s2~p,s3~u,s4~u,s5~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u) kp2
+A(s1~p,s2~p,s3~u,s4~u,s5~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u) kp2
+A(s1~p,s2~p,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) ku2
+A(s1~p,s2~p,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) ku2
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u) ku4
+A(s1~p,s2~p,s3~u,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p) ku4
+A(s1~p,s2~p,s3~u,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) kp4
+A(s1~p,s2~p,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) ku4
+A(s1~p,s2~p,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) ku4
+
+
+A(s1~p,s2~p,s3~u,s4~p,s5~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) kp3
+A(s1~p,s2~p,s3~u,s4~p,s5~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u) ku3
+A(s1~p,s2~p,s3~u,s4~p,s5~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) kp3
+A(s1~p,s2~p,s3~u,s4~p,s5~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u) ku3
+A(s1~p,s2~p,s3~u,s4~p,s5~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u) ku3
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) ku2
+A(s1~u,s2~u,s3~p,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) kp2
+A(s1~u,s2~u,s3~p,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) ku2
+A(s1~u,s2~u,s3~p,s4~u,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) kp2
+A(s1~u,s2~u,s3~p,s4~u,s5~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p) kp2
+
+
+A(s1~u,s2~u,s3~p,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) kp1
+A(s1~u,s2~u,s3~p,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) kp1
+A(s1~u,s2~u,s3~p,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) ku1
+A(s1~u,s2~u,s3~p,s4~u,s5~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u) kp1
+A(s1~u,s2~u,s3~p,s4~u,s5~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u) kp1
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) ku3
+A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) ku3
+A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) ku3
+A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) kp3
+A(s1~u,s2~u,s3~p,s4~p,s5~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p) kp3
+
+
+A(s1~u,s2~u,s3~p,s4~p,s5~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) kp2
+A(s1~u,s2~u,s3~p,s4~p,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) ku2
+A(s1~u,s2~u,s3~p,s4~p,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) ku2
+A(s1~u,s2~u,s3~p,s4~p,s5~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) kp2
+A(s1~u,s2~u,s3~p,s4~p,s5~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u) kp2
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) ku1
+A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) kp1
+A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) kp1
+A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) kp1
+A(s1~u,s2~u,s3~u,s4~u,s5~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p) kp1
+
+
+A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) kp0
+A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) kp0
+A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) kp0
+A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) kp0
+A(s1~u,s2~u,s3~u,s4~u,s5~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u) kp0
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) ku2
+A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) ku2
+A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) kp2
+A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) kp2
+A(s1~u,s2~u,s3~u,s4~p,s5~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p) kp2
+
+
+A(s1~u,s2~u,s3~u,s4~p,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) kp1
+A(s1~u,s2~u,s3~u,s4~p,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) ku1
+A(s1~u,s2~u,s3~u,s4~p,s5~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) kp1
+A(s1~u,s2~u,s3~u,s4~p,s5~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u) kp1
+A(s1~u,s2~u,s3~u,s4~p,s5~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u) kp1
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u) ku3
+A(s1~u,s2~p,s3~p,s4~u,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) kp3
+A(s1~u,s2~p,s3~p,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) ku3
+A(s1~u,s2~p,s3~p,s4~u,s5~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p) ku3
+A(s1~u,s2~p,s3~p,s4~u,s5~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p) kp3
+
+
+A(s1~u,s2~p,s3~p,s4~u,s5~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) kp2
+A(s1~u,s2~p,s3~p,s4~u,s5~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) kp2
+A(s1~u,s2~p,s3~p,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) ku2
+A(s1~u,s2~p,s3~p,s4~u,s5~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u) ku2
+A(s1~u,s2~p,s3~p,s4~u,s5~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u) kp2
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) ku4
+A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) ku4
+A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) ku4
+A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p) ku4
+A(s1~u,s2~p,s3~p,s4~p,s5~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p) kp4
+
+
+A(s1~u,s2~p,s3~p,s4~p,s5~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) kp3
+A(s1~u,s2~p,s3~p,s4~p,s5~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u) ku3
+A(s1~u,s2~p,s3~p,s4~p,s5~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u) ku3
+A(s1~u,s2~p,s3~p,s4~p,s5~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u) ku3
+A(s1~u,s2~p,s3~p,s4~p,s5~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u) kp3
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) ku2
+A(s1~u,s2~p,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) kp2
+A(s1~u,s2~p,s3~u,s4~u,s5~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p) kp2
+A(s1~u,s2~p,s3~u,s4~u,s5~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p) ku2
+A(s1~u,s2~p,s3~u,s4~u,s5~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p) kp2
+
+
+A(s1~u,s2~p,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) kp1
+A(s1~u,s2~p,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u) kp1
+A(s1~u,s2~p,s3~u,s4~u,s5~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u) kp1
+A(s1~u,s2~p,s3~u,s4~u,s5~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u) ku1
+A(s1~u,s2~p,s3~u,s4~u,s5~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u) kp1
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u) ku3
+A(s1~u,s2~p,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p) ku3
+A(s1~u,s2~p,s3~u,s4~p,s5~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p) kp3
+A(s1~u,s2~p,s3~u,s4~p,s5~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p) ku3
+A(s1~u,s2~p,s3~u,s4~p,s5~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p) kp3
+
+
+A(s1~u,s2~p,s3~u,s4~p,s5~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p) kp2
+A(s1~u,s2~p,s3~u,s4~p,s5~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u) ku2
+A(s1~u,s2~p,s3~u,s4~p,s5~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u) kp2
+A(s1~u,s2~p,s3~u,s4~p,s5~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u) ku2
+A(s1~u,s2~p,s3~u,s4~p,s5~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u) kp2
+
+
+end reaction rules
+
+generate_network({overwrite=>1});

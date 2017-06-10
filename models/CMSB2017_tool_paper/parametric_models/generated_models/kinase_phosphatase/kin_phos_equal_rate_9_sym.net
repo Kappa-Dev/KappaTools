@@ -1,0 +1,1226 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot  100  # Constant
+    2 kKS   0.01  # Constant
+    3 kdKS  1.0  # Constant
+    4 kpS   0.1  # Constant
+    5 kPS   0.01  # Constant
+    6 kdPS  1.0  # Constant
+    7 kuS   0.1  # Constant
+end parameters
+begin species
+    1 K(s) Stot
+    2 P(s) Stot
+    3 S(x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u) Stot
+    4 K(s!1).S(x~u!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    5 K(s!1).K(s!2).S(x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    6 S(x~p,x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    7 K(s!1).K(s!2).K(s!3).S(x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    8 K(s!1).S(x~p,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+    9 P(s!1).S(x~p!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   10 K(s!1).K(s!2).K(s!3).K(s!4).S(x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   11 K(s!1).K(s!2).S(x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   12 K(s!1).P(s!2).S(x~p!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   13 S(x~p,x~p,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   14 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   15 K(s!1).K(s!2).K(s!3).S(x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   16 K(s!1).K(s!2).P(s!3).S(x~p!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   17 K(s!1).S(x~p,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   18 P(s!1).S(x~p!1,x~p,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   19 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   20 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   21 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   22 K(s!1).K(s!2).S(x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   23 K(s!1).P(s!2).S(x~p!2,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   24 S(x~p,x~p,x~p,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   25 P(s!1).P(s!2).S(x~p!2,x~p!1,x~u,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   26 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).S(x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   27 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   28 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   29 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   30 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   31 K(s!1).S(x~p,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   32 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~u!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   33 P(s!1).S(x~p!1,x~p,x~p,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   34 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).K(s!8).S(x~u!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   35 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   36 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   37 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   38 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   39 K(s!1).K(s!2).S(x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   40 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   41 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   42 S(x~p,x~p,x~p,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   43 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   44 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).K(s!8).K(s!9).S(x~u!9,x~u!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   45 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).S(x~p,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   46 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).S(x~p!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   47 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   48 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   49 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   50 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   51 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   52 K(s!1).S(x~p,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   53 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   54 P(s!1).S(x~p!1,x~p,x~p,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   55 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~u,x~u,x~u,x~u,x~u,x~u) 0
+   56 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).K(s!8).S(x~p,x~u!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   57 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).P(s!8).S(x~p!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   58 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~p,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   59 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   60 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   61 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   62 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   63 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   64 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   65 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   66 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u,x~u,x~u,x~u) 0
+   67 S(x~p,x~p,x~p,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   68 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   69 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).K(s!8).P(s!9).S(x~p!9,x~u!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   70 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).S(x~p,x~p,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   71 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).S(x~p!7,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   72 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   73 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   74 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   75 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   76 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   77 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   78 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u,x~u,x~u) 0
+   79 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+   80 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   81 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   82 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~u,x~u,x~u,x~u,x~u) 0
+   83 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).P(s!8).S(x~p!8,x~p,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   84 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).S(x~p,x~p,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   85 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   86 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   87 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+   88 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   89 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+   90 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   91 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+   92 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+   93 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+   94 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u,x~u,x~u,x~u) 0
+   95 S(x~p,x~p,x~p,x~p,x~p,x~p,x~u,x~u,x~u) 0
+   96 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~u,x~u,x~u,x~u) 0
+   97 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u,x~u,x~u,x~u) 0
+   98 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).K(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~u!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+   99 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).S(x~p!7,x~p,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  100 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).S(x~p,x~p,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  101 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  102 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  103 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+  104 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  105 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+  106 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+  107 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u,x~u,x~u) 0
+  108 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+  109 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+  110 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u,x~u,x~u) 0
+  111 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~u,x~u,x~u) 0
+  112 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~u,x~u,x~u,x~u) 0
+  113 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  114 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).S(x~p!6,x~p,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  115 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  116 K(s!1).K(s!2).K(s!3).K(s!4).S(x~p,x~p,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  117 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  118 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  119 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+  120 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  121 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+  122 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u,x~u) 0
+  123 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+  124 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1,x~u,x~u,x~u) 0
+  125 S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  126 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~u,x~u,x~u) 0
+  127 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u,x~u,x~u,x~u) 0
+  128 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).K(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~u!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  129 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  130 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).S(x~p!5,x~p,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  131 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  132 K(s!1).K(s!2).K(s!3).S(x~p,x~p,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  133 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  134 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u,x~u) 0
+  135 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  136 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1,x~u,x~u) 0
+  137 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  138 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+  139 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u,x~u,x~u) 0
+  140 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  141 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~u,x~u,x~u) 0
+  142 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u,x~u,x~u) 0
+  143 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  144 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  145 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  146 K(s!1).K(s!2).K(s!3).P(s!4).S(x~p!4,x~p,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  147 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  148 K(s!1).K(s!2).S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  149 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  150 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u,x~u) 0
+  151 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  152 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~u!1,x~u,x~u) 0
+  153 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u,x~u) 0
+  154 S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  155 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  156 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~u,x~u,x~u) 0
+  157 K(s!1).K(s!2).K(s!3).K(s!4).K(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~u!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  158 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  159 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  160 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1,x~u) 0
+  161 K(s!1).K(s!2).P(s!3).S(x~p!3,x~p,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  162 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  163 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u,x~u) 0
+  164 K(s!1).S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  165 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  166 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1,x~u,x~u) 0
+  167 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  168 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~u,x~u) 0
+  169 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u,x~u,x~u) 0
+  170 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  171 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  172 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1,x~u) 0
+  173 K(s!1).K(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  174 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1,x~u) 0
+  175 K(s!1).P(s!2).S(x~p!2,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  176 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~u!1,x~u) 0
+  177 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u,x~u) 0
+  178 S(x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  179 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  180 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~u,x~u) 0
+  181 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u,x~u) 0
+  182 K(s!1).K(s!2).K(s!3).K(s!4).P(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~p!5,x~u!4,x~u!3,x~u!2,x~u!1) 0
+  183 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p,x~p,x~u!3,x~u!2,x~u!1) 0
+  184 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  185 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1,x~u) 0
+  186 K(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  187 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~u!1,x~u) 0
+  188 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u,x~u) 0
+  189 P(s!1).S(x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  190 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~u) 0
+  191 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~u,x~u) 0
+  192 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p,x~u!3,x~u!2,x~u!1) 0
+  193 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~p,x~p,x~u!2,x~u!1) 0
+  194 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1,x~u) 0
+  195 K(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~p,x~u!1) 0
+  196 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1,x~u) 0
+  197 P(s!1).P(s!2).S(x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  198 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~u) 0
+  199 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u,x~u) 0
+  200 K(s!1).K(s!2).K(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~u!3,x~u!2,x~u!1) 0
+  201 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~p,x~u!2,x~u!1) 0
+  202 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~p,x~u!1) 0
+  203 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1,x~u) 0
+  204 P(s!1).P(s!2).P(s!3).S(x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p,x~p) 0
+  205 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~u) 0
+  206 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u,x~u) 0
+  207 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p,x~u!2,x~u!1) 0
+  208 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~p,x~u!1) 0
+  209 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1,x~u) 0
+  210 P(s!1).P(s!2).P(s!3).P(s!4).S(x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p,x~p) 0
+  211 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~u) 0
+  212 K(s!1).K(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~u!2,x~u!1) 0
+  213 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~p,x~u!1) 0
+  214 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).S(x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p,x~p) 0
+  215 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~u) 0
+  216 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p,x~u!1) 0
+  217 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).S(x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p,x~p) 0
+  218 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~u) 0
+  219 K(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~u!1) 0
+  220 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).S(x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p,x~p) 0
+  221 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).S(x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1,x~p) 0
+  222 P(s!1).P(s!2).P(s!3).P(s!4).P(s!5).P(s!6).P(s!7).P(s!8).P(s!9).S(x~p!9,x~p!8,x~p!7,x~p!6,x~p!5,x~p!4,x~p!3,x~p!2,x~p!1) 0
+end species
+begin reactions
+    1 1,3 4 9*kKS #_R1
+    2 1,4 5 8*kKS #_R1
+    3 4 1,3 kdKS #_reverse__R1
+    4 4 1,6 kpS #_R2
+    5 1,5 7 7*kKS #_R1
+    6 1,6 8 8*kKS #_R1
+    7 5 1,4 2*kdKS #_reverse__R1
+    8 5 1,8 2*kpS #_R2
+    9 2,6 9 kPS #_R3
+   10 1,7 10 6*kKS #_R1
+   11 1,8 11 7*kKS #_R1
+   12 1,9 12 8*kKS #_R1
+   13 7 1,5 3*kdKS #_reverse__R1
+   14 8 1,6 kdKS #_reverse__R1
+   15 7 1,11 3*kpS #_R2
+   16 8 1,13 kpS #_R2
+   17 2,8 12 kPS #_R3
+   18 9 2,6 kdPS #_reverse__R3
+   19 9 2,3 kuS #_R4
+   20 1,10 14 5*kKS #_R1
+   21 1,11 15 6*kKS #_R1
+   22 1,12 16 7*kKS #_R1
+   23 1,13 17 7*kKS #_R1
+   24 10 1,7 4*kdKS #_reverse__R1
+   25 11 1,8 2*kdKS #_reverse__R1
+   26 12 1,9 kdKS #_reverse__R1
+   27 10 1,15 4*kpS #_R2
+   28 11 1,17 2*kpS #_R2
+   29 12 1,18 kpS #_R2
+   30 2,11 16 kPS #_R3
+   31 2,13 18 2*kPS #_R3
+   32 12 2,8 kdPS #_reverse__R3
+   33 12 2,4 kuS #_R4
+   34 1,14 19 4*kKS #_R1
+   35 1,15 20 5*kKS #_R1
+   36 1,16 21 6*kKS #_R1
+   37 1,17 22 6*kKS #_R1
+   38 1,18 23 7*kKS #_R1
+   39 14 1,10 5*kdKS #_reverse__R1
+   40 15 1,11 3*kdKS #_reverse__R1
+   41 16 1,12 2*kdKS #_reverse__R1
+   42 17 1,13 kdKS #_reverse__R1
+   43 14 1,20 5*kpS #_R2
+   44 15 1,22 3*kpS #_R2
+   45 16 1,23 2*kpS #_R2
+   46 17 1,24 kpS #_R2
+   47 2,15 21 kPS #_R3
+   48 2,17 23 2*kPS #_R3
+   49 2,18 25 kPS #_R3
+   50 16 2,11 kdPS #_reverse__R3
+   51 18 2,13 kdPS #_reverse__R3
+   52 16 2,5 kuS #_R4
+   53 18 2,6 kuS #_R4
+   54 1,19 26 3*kKS #_R1
+   55 1,20 27 4*kKS #_R1
+   56 1,21 28 5*kKS #_R1
+   57 1,22 29 5*kKS #_R1
+   58 1,23 30 6*kKS #_R1
+   59 1,24 31 6*kKS #_R1
+   60 1,25 32 7*kKS #_R1
+   61 19 1,14 6*kdKS #_reverse__R1
+   62 20 1,15 4*kdKS #_reverse__R1
+   63 21 1,16 3*kdKS #_reverse__R1
+   64 22 1,17 2*kdKS #_reverse__R1
+   65 23 1,18 kdKS #_reverse__R1
+   66 19 1,27 6*kpS #_R2
+   67 20 1,29 4*kpS #_R2
+   68 21 1,30 3*kpS #_R2
+   69 22 1,31 2*kpS #_R2
+   70 23 1,33 kpS #_R2
+   71 2,20 28 kPS #_R3
+   72 2,22 30 2*kPS #_R3
+   73 2,23 32 kPS #_R3
+   74 2,24 33 3*kPS #_R3
+   75 21 2,15 kdPS #_reverse__R3
+   76 23 2,17 kdPS #_reverse__R3
+   77 25 2,18 2*kdPS #_reverse__R3
+   78 21 2,7 kuS #_R4
+   79 23 2,8 kuS #_R4
+   80 25 2,9 2*kuS #_R4
+   81 1,26 34 2*kKS #_R1
+   82 1,27 35 3*kKS #_R1
+   83 1,28 36 4*kKS #_R1
+   84 1,29 37 4*kKS #_R1
+   85 1,30 38 5*kKS #_R1
+   86 1,31 39 5*kKS #_R1
+   87 1,32 40 6*kKS #_R1
+   88 1,33 41 6*kKS #_R1
+   89 26 1,19 7*kdKS #_reverse__R1
+   90 27 1,20 5*kdKS #_reverse__R1
+   91 28 1,21 4*kdKS #_reverse__R1
+   92 29 1,22 3*kdKS #_reverse__R1
+   93 30 1,23 2*kdKS #_reverse__R1
+   94 31 1,24 kdKS #_reverse__R1
+   95 32 1,25 kdKS #_reverse__R1
+   96 26 1,35 7*kpS #_R2
+   97 27 1,37 5*kpS #_R2
+   98 28 1,38 4*kpS #_R2
+   99 29 1,39 3*kpS #_R2
+  100 30 1,41 2*kpS #_R2
+  101 31 1,42 kpS #_R2
+  102 32 1,43 kpS #_R2
+  103 2,27 36 kPS #_R3
+  104 2,29 38 2*kPS #_R3
+  105 2,30 40 kPS #_R3
+  106 2,31 41 3*kPS #_R3
+  107 2,33 43 2*kPS #_R3
+  108 28 2,20 kdPS #_reverse__R3
+  109 30 2,22 kdPS #_reverse__R3
+  110 32 2,23 2*kdPS #_reverse__R3
+  111 33 2,24 kdPS #_reverse__R3
+  112 28 2,10 kuS #_R4
+  113 30 2,11 kuS #_R4
+  114 32 2,12 2*kuS #_R4
+  115 33 2,13 kuS #_R4
+  116 1,34 44 kKS #_R1
+  117 1,35 45 2*kKS #_R1
+  118 1,36 46 3*kKS #_R1
+  119 1,37 47 3*kKS #_R1
+  120 1,38 48 4*kKS #_R1
+  121 1,39 49 4*kKS #_R1
+  122 1,40 50 5*kKS #_R1
+  123 1,41 51 5*kKS #_R1
+  124 1,42 52 5*kKS #_R1
+  125 1,43 53 6*kKS #_R1
+  126 34 1,26 8*kdKS #_reverse__R1
+  127 35 1,27 6*kdKS #_reverse__R1
+  128 36 1,28 5*kdKS #_reverse__R1
+  129 37 1,29 4*kdKS #_reverse__R1
+  130 38 1,30 3*kdKS #_reverse__R1
+  131 39 1,31 2*kdKS #_reverse__R1
+  132 40 1,32 2*kdKS #_reverse__R1
+  133 41 1,33 kdKS #_reverse__R1
+  134 34 1,45 8*kpS #_R2
+  135 35 1,47 6*kpS #_R2
+  136 36 1,48 5*kpS #_R2
+  137 37 1,49 4*kpS #_R2
+  138 38 1,51 3*kpS #_R2
+  139 39 1,52 2*kpS #_R2
+  140 40 1,53 2*kpS #_R2
+  141 41 1,54 kpS #_R2
+  142 2,35 46 kPS #_R3
+  143 2,37 48 2*kPS #_R3
+  144 2,38 50 kPS #_R3
+  145 2,39 51 3*kPS #_R3
+  146 2,41 53 2*kPS #_R3
+  147 2,42 54 4*kPS #_R3
+  148 2,43 55 kPS #_R3
+  149 36 2,27 kdPS #_reverse__R3
+  150 38 2,29 kdPS #_reverse__R3
+  151 40 2,30 2*kdPS #_reverse__R3
+  152 41 2,31 kdPS #_reverse__R3
+  153 43 2,33 2*kdPS #_reverse__R3
+  154 36 2,14 kuS #_R4
+  155 38 2,15 kuS #_R4
+  156 40 2,16 2*kuS #_R4
+  157 41 2,17 kuS #_R4
+  158 43 2,18 2*kuS #_R4
+  159 1,45 56 kKS #_R1
+  160 1,46 57 2*kKS #_R1
+  161 1,47 58 2*kKS #_R1
+  162 1,48 59 3*kKS #_R1
+  163 1,49 60 3*kKS #_R1
+  164 1,50 61 4*kKS #_R1
+  165 1,51 62 4*kKS #_R1
+  166 1,52 63 4*kKS #_R1
+  167 1,53 64 5*kKS #_R1
+  168 1,54 65 5*kKS #_R1
+  169 1,55 66 6*kKS #_R1
+  170 44 1,34 9*kdKS #_reverse__R1
+  171 45 1,35 7*kdKS #_reverse__R1
+  172 46 1,36 6*kdKS #_reverse__R1
+  173 47 1,37 5*kdKS #_reverse__R1
+  174 48 1,38 4*kdKS #_reverse__R1
+  175 49 1,39 3*kdKS #_reverse__R1
+  176 50 1,40 3*kdKS #_reverse__R1
+  177 51 1,41 2*kdKS #_reverse__R1
+  178 52 1,42 kdKS #_reverse__R1
+  179 53 1,43 kdKS #_reverse__R1
+  180 44 1,56 9*kpS #_R2
+  181 45 1,58 7*kpS #_R2
+  182 46 1,59 6*kpS #_R2
+  183 47 1,60 5*kpS #_R2
+  184 48 1,62 4*kpS #_R2
+  185 49 1,63 3*kpS #_R2
+  186 50 1,64 3*kpS #_R2
+  187 51 1,65 2*kpS #_R2
+  188 52 1,67 kpS #_R2
+  189 53 1,68 kpS #_R2
+  190 2,45 57 kPS #_R3
+  191 2,47 59 2*kPS #_R3
+  192 2,48 61 kPS #_R3
+  193 2,49 62 3*kPS #_R3
+  194 2,51 64 2*kPS #_R3
+  195 2,52 65 4*kPS #_R3
+  196 2,53 66 kPS #_R3
+  197 2,54 68 3*kPS #_R3
+  198 46 2,35 kdPS #_reverse__R3
+  199 48 2,37 kdPS #_reverse__R3
+  200 50 2,38 2*kdPS #_reverse__R3
+  201 51 2,39 kdPS #_reverse__R3
+  202 53 2,41 2*kdPS #_reverse__R3
+  203 54 2,42 kdPS #_reverse__R3
+  204 55 2,43 3*kdPS #_reverse__R3
+  205 46 2,19 kuS #_R4
+  206 48 2,20 kuS #_R4
+  207 50 2,21 2*kuS #_R4
+  208 51 2,22 kuS #_R4
+  209 53 2,23 2*kuS #_R4
+  210 54 2,24 kuS #_R4
+  211 55 2,25 3*kuS #_R4
+  212 1,57 69 kKS #_R1
+  213 1,58 70 kKS #_R1
+  214 1,59 71 2*kKS #_R1
+  215 1,60 72 2*kKS #_R1
+  216 1,61 73 3*kKS #_R1
+  217 1,62 74 3*kKS #_R1
+  218 1,63 75 3*kKS #_R1
+  219 1,64 76 4*kKS #_R1
+  220 1,65 77 4*kKS #_R1
+  221 1,66 78 5*kKS #_R1
+  222 1,67 79 4*kKS #_R1
+  223 1,68 80 5*kKS #_R1
+  224 56 1,45 8*kdKS #_reverse__R1
+  225 57 1,46 7*kdKS #_reverse__R1
+  226 58 1,47 6*kdKS #_reverse__R1
+  227 59 1,48 5*kdKS #_reverse__R1
+  228 60 1,49 4*kdKS #_reverse__R1
+  229 61 1,50 4*kdKS #_reverse__R1
+  230 62 1,51 3*kdKS #_reverse__R1
+  231 63 1,52 2*kdKS #_reverse__R1
+  232 64 1,53 2*kdKS #_reverse__R1
+  233 65 1,54 kdKS #_reverse__R1
+  234 66 1,55 kdKS #_reverse__R1
+  235 56 1,70 8*kpS #_R2
+  236 57 1,71 7*kpS #_R2
+  237 58 1,72 6*kpS #_R2
+  238 59 1,74 5*kpS #_R2
+  239 60 1,75 4*kpS #_R2
+  240 61 1,76 4*kpS #_R2
+  241 62 1,77 3*kpS #_R2
+  242 63 1,79 2*kpS #_R2
+  243 64 1,80 2*kpS #_R2
+  244 65 1,81 kpS #_R2
+  245 66 1,82 kpS #_R2
+  246 2,56 69 kPS #_R3
+  247 2,58 71 2*kPS #_R3
+  248 2,59 73 kPS #_R3
+  249 2,60 74 3*kPS #_R3
+  250 2,62 76 2*kPS #_R3
+  251 2,63 77 4*kPS #_R3
+  252 2,64 78 kPS #_R3
+  253 2,65 80 3*kPS #_R3
+  254 2,67 81 5*kPS #_R3
+  255 2,68 82 2*kPS #_R3
+  256 57 2,45 kdPS #_reverse__R3
+  257 59 2,47 kdPS #_reverse__R3
+  258 61 2,48 2*kdPS #_reverse__R3
+  259 62 2,49 kdPS #_reverse__R3
+  260 64 2,51 2*kdPS #_reverse__R3
+  261 65 2,52 kdPS #_reverse__R3
+  262 66 2,53 3*kdPS #_reverse__R3
+  263 68 2,54 2*kdPS #_reverse__R3
+  264 57 2,26 kuS #_R4
+  265 59 2,27 kuS #_R4
+  266 61 2,28 2*kuS #_R4
+  267 62 2,29 kuS #_R4
+  268 64 2,30 2*kuS #_R4
+  269 65 2,31 kuS #_R4
+  270 66 2,32 3*kuS #_R4
+  271 68 2,33 2*kuS #_R4
+  272 1,71 83 kKS #_R1
+  273 1,72 84 kKS #_R1
+  274 1,73 85 2*kKS #_R1
+  275 1,74 86 2*kKS #_R1
+  276 1,75 87 2*kKS #_R1
+  277 1,76 88 3*kKS #_R1
+  278 1,77 89 3*kKS #_R1
+  279 1,78 90 4*kKS #_R1
+  280 1,79 91 3*kKS #_R1
+  281 1,80 92 4*kKS #_R1
+  282 1,81 93 4*kKS #_R1
+  283 1,82 94 5*kKS #_R1
+  284 69 1,57 8*kdKS #_reverse__R1
+  285 70 1,58 7*kdKS #_reverse__R1
+  286 71 1,59 6*kdKS #_reverse__R1
+  287 72 1,60 5*kdKS #_reverse__R1
+  288 73 1,61 5*kdKS #_reverse__R1
+  289 74 1,62 4*kdKS #_reverse__R1
+  290 75 1,63 3*kdKS #_reverse__R1
+  291 76 1,64 3*kdKS #_reverse__R1
+  292 77 1,65 2*kdKS #_reverse__R1
+  293 78 1,66 2*kdKS #_reverse__R1
+  294 79 1,67 kdKS #_reverse__R1
+  295 80 1,68 kdKS #_reverse__R1
+  296 69 1,83 8*kpS #_R2
+  297 70 1,84 7*kpS #_R2
+  298 71 1,86 6*kpS #_R2
+  299 72 1,87 5*kpS #_R2
+  300 73 1,88 5*kpS #_R2
+  301 74 1,89 4*kpS #_R2
+  302 75 1,91 3*kpS #_R2
+  303 76 1,92 3*kpS #_R2
+  304 77 1,93 2*kpS #_R2
+  305 78 1,94 2*kpS #_R2
+  306 79 1,95 kpS #_R2
+  307 80 1,96 kpS #_R2
+  308 2,70 83 2*kPS #_R3
+  309 2,71 85 kPS #_R3
+  310 2,72 86 3*kPS #_R3
+  311 2,74 88 2*kPS #_R3
+  312 2,75 89 4*kPS #_R3
+  313 2,76 90 kPS #_R3
+  314 2,77 92 3*kPS #_R3
+  315 2,79 93 5*kPS #_R3
+  316 2,80 94 2*kPS #_R3
+  317 2,81 96 4*kPS #_R3
+  318 2,82 97 kPS #_R3
+  319 69 2,56 kdPS #_reverse__R3
+  320 71 2,58 kdPS #_reverse__R3
+  321 73 2,59 2*kdPS #_reverse__R3
+  322 74 2,60 kdPS #_reverse__R3
+  323 76 2,62 2*kdPS #_reverse__R3
+  324 77 2,63 kdPS #_reverse__R3
+  325 78 2,64 3*kdPS #_reverse__R3
+  326 80 2,65 2*kdPS #_reverse__R3
+  327 81 2,67 kdPS #_reverse__R3
+  328 82 2,68 3*kdPS #_reverse__R3
+  329 69 2,34 kuS #_R4
+  330 71 2,35 kuS #_R4
+  331 73 2,36 2*kuS #_R4
+  332 74 2,37 kuS #_R4
+  333 76 2,38 2*kuS #_R4
+  334 77 2,39 kuS #_R4
+  335 78 2,40 3*kuS #_R4
+  336 80 2,41 2*kuS #_R4
+  337 81 2,42 kuS #_R4
+  338 82 2,43 3*kuS #_R4
+  339 1,85 98 kKS #_R1
+  340 1,86 99 kKS #_R1
+  341 1,87 100 kKS #_R1
+  342 1,88 101 2*kKS #_R1
+  343 1,89 102 2*kKS #_R1
+  344 1,90 103 3*kKS #_R1
+  345 1,91 104 2*kKS #_R1
+  346 1,92 105 3*kKS #_R1
+  347 1,93 106 3*kKS #_R1
+  348 1,94 107 4*kKS #_R1
+  349 1,95 108 3*kKS #_R1
+  350 1,96 109 4*kKS #_R1
+  351 1,97 110 5*kKS #_R1
+  352 83 1,71 7*kdKS #_reverse__R1
+  353 84 1,72 6*kdKS #_reverse__R1
+  354 85 1,73 6*kdKS #_reverse__R1
+  355 86 1,74 5*kdKS #_reverse__R1
+  356 87 1,75 4*kdKS #_reverse__R1
+  357 88 1,76 4*kdKS #_reverse__R1
+  358 89 1,77 3*kdKS #_reverse__R1
+  359 90 1,78 3*kdKS #_reverse__R1
+  360 91 1,79 2*kdKS #_reverse__R1
+  361 92 1,80 2*kdKS #_reverse__R1
+  362 93 1,81 kdKS #_reverse__R1
+  363 94 1,82 kdKS #_reverse__R1
+  364 83 1,99 7*kpS #_R2
+  365 84 1,100 6*kpS #_R2
+  366 85 1,101 6*kpS #_R2
+  367 86 1,102 5*kpS #_R2
+  368 87 1,104 4*kpS #_R2
+  369 88 1,105 4*kpS #_R2
+  370 89 1,106 3*kpS #_R2
+  371 90 1,107 3*kpS #_R2
+  372 91 1,108 2*kpS #_R2
+  373 92 1,109 2*kpS #_R2
+  374 93 1,111 kpS #_R2
+  375 94 1,112 kpS #_R2
+  376 2,83 98 kPS #_R3
+  377 2,84 99 3*kPS #_R3
+  378 2,86 101 2*kPS #_R3
+  379 2,87 102 4*kPS #_R3
+  380 2,88 103 kPS #_R3
+  381 2,89 105 3*kPS #_R3
+  382 2,91 106 5*kPS #_R3
+  383 2,92 107 2*kPS #_R3
+  384 2,93 109 4*kPS #_R3
+  385 2,94 110 kPS #_R3
+  386 2,95 111 6*kPS #_R3
+  387 2,96 112 3*kPS #_R3
+  388 83 2,70 kdPS #_reverse__R3
+  389 85 2,71 2*kdPS #_reverse__R3
+  390 86 2,72 kdPS #_reverse__R3
+  391 88 2,74 2*kdPS #_reverse__R3
+  392 89 2,75 kdPS #_reverse__R3
+  393 90 2,76 3*kdPS #_reverse__R3
+  394 92 2,77 2*kdPS #_reverse__R3
+  395 93 2,79 kdPS #_reverse__R3
+  396 94 2,80 3*kdPS #_reverse__R3
+  397 96 2,81 2*kdPS #_reverse__R3
+  398 97 2,82 4*kdPS #_reverse__R3
+  399 83 2,45 kuS #_R4
+  400 85 2,46 2*kuS #_R4
+  401 86 2,47 kuS #_R4
+  402 88 2,48 2*kuS #_R4
+  403 89 2,49 kuS #_R4
+  404 90 2,50 3*kuS #_R4
+  405 92 2,51 2*kuS #_R4
+  406 93 2,52 kuS #_R4
+  407 94 2,53 3*kuS #_R4
+  408 96 2,54 2*kuS #_R4
+  409 97 2,55 4*kuS #_R4
+  410 1,101 113 kKS #_R1
+  411 1,102 114 kKS #_R1
+  412 1,103 115 2*kKS #_R1
+  413 1,104 116 kKS #_R1
+  414 1,105 117 2*kKS #_R1
+  415 1,106 118 2*kKS #_R1
+  416 1,107 119 3*kKS #_R1
+  417 1,108 120 2*kKS #_R1
+  418 1,109 121 3*kKS #_R1
+  419 1,110 122 4*kKS #_R1
+  420 1,111 123 3*kKS #_R1
+  421 1,112 124 4*kKS #_R1
+  422 98 1,85 7*kdKS #_reverse__R1
+  423 99 1,86 6*kdKS #_reverse__R1
+  424 100 1,87 5*kdKS #_reverse__R1
+  425 101 1,88 5*kdKS #_reverse__R1
+  426 102 1,89 4*kdKS #_reverse__R1
+  427 103 1,90 4*kdKS #_reverse__R1
+  428 104 1,91 3*kdKS #_reverse__R1
+  429 105 1,92 3*kdKS #_reverse__R1
+  430 106 1,93 2*kdKS #_reverse__R1
+  431 107 1,94 2*kdKS #_reverse__R1
+  432 108 1,95 kdKS #_reverse__R1
+  433 109 1,96 kdKS #_reverse__R1
+  434 110 1,97 kdKS #_reverse__R1
+  435 98 1,113 7*kpS #_R2
+  436 99 1,114 6*kpS #_R2
+  437 100 1,116 5*kpS #_R2
+  438 101 1,117 5*kpS #_R2
+  439 102 1,118 4*kpS #_R2
+  440 103 1,119 4*kpS #_R2
+  441 104 1,120 3*kpS #_R2
+  442 105 1,121 3*kpS #_R2
+  443 106 1,123 2*kpS #_R2
+  444 107 1,124 2*kpS #_R2
+  445 108 1,125 kpS #_R2
+  446 109 1,126 kpS #_R2
+  447 110 1,127 kpS #_R2
+  448 2,99 113 2*kPS #_R3
+  449 2,100 114 4*kPS #_R3
+  450 2,101 115 kPS #_R3
+  451 2,102 117 3*kPS #_R3
+  452 2,104 118 5*kPS #_R3
+  453 2,105 119 2*kPS #_R3
+  454 2,106 121 4*kPS #_R3
+  455 2,107 122 kPS #_R3
+  456 2,108 123 6*kPS #_R3
+  457 2,109 124 3*kPS #_R3
+  458 2,111 126 5*kPS #_R3
+  459 2,112 127 2*kPS #_R3
+  460 98 2,83 2*kdPS #_reverse__R3
+  461 99 2,84 kdPS #_reverse__R3
+  462 101 2,86 2*kdPS #_reverse__R3
+  463 102 2,87 kdPS #_reverse__R3
+  464 103 2,88 3*kdPS #_reverse__R3
+  465 105 2,89 2*kdPS #_reverse__R3
+  466 106 2,91 kdPS #_reverse__R3
+  467 107 2,92 3*kdPS #_reverse__R3
+  468 109 2,93 2*kdPS #_reverse__R3
+  469 110 2,94 4*kdPS #_reverse__R3
+  470 111 2,95 kdPS #_reverse__R3
+  471 112 2,96 3*kdPS #_reverse__R3
+  472 98 2,57 2*kuS #_R4
+  473 99 2,58 kuS #_R4
+  474 101 2,59 2*kuS #_R4
+  475 102 2,60 kuS #_R4
+  476 103 2,61 3*kuS #_R4
+  477 105 2,62 2*kuS #_R4
+  478 106 2,63 kuS #_R4
+  479 107 2,64 3*kuS #_R4
+  480 109 2,65 2*kuS #_R4
+  481 110 2,66 4*kuS #_R4
+  482 111 2,67 kuS #_R4
+  483 112 2,68 3*kuS #_R4
+  484 1,115 128 kKS #_R1
+  485 1,117 129 kKS #_R1
+  486 1,118 130 kKS #_R1
+  487 1,119 131 2*kKS #_R1
+  488 1,120 132 kKS #_R1
+  489 1,121 133 2*kKS #_R1
+  490 1,122 134 3*kKS #_R1
+  491 1,123 135 2*kKS #_R1
+  492 1,124 136 3*kKS #_R1
+  493 1,125 137 2*kKS #_R1
+  494 1,126 138 3*kKS #_R1
+  495 1,127 139 4*kKS #_R1
+  496 113 1,101 6*kdKS #_reverse__R1
+  497 114 1,102 5*kdKS #_reverse__R1
+  498 115 1,103 5*kdKS #_reverse__R1
+  499 116 1,104 4*kdKS #_reverse__R1
+  500 117 1,105 4*kdKS #_reverse__R1
+  501 118 1,106 3*kdKS #_reverse__R1
+  502 119 1,107 3*kdKS #_reverse__R1
+  503 120 1,108 2*kdKS #_reverse__R1
+  504 121 1,109 2*kdKS #_reverse__R1
+  505 122 1,110 2*kdKS #_reverse__R1
+  506 123 1,111 kdKS #_reverse__R1
+  507 124 1,112 kdKS #_reverse__R1
+  508 113 1,129 6*kpS #_R2
+  509 114 1,130 5*kpS #_R2
+  510 115 1,131 5*kpS #_R2
+  511 116 1,132 4*kpS #_R2
+  512 117 1,133 4*kpS #_R2
+  513 118 1,135 3*kpS #_R2
+  514 119 1,136 3*kpS #_R2
+  515 120 1,137 2*kpS #_R2
+  516 121 1,138 2*kpS #_R2
+  517 122 1,139 2*kpS #_R2
+  518 123 1,140 kpS #_R2
+  519 124 1,141 kpS #_R2
+  520 2,113 128 kPS #_R3
+  521 2,114 129 3*kPS #_R3
+  522 2,116 130 5*kPS #_R3
+  523 2,117 131 2*kPS #_R3
+  524 2,118 133 4*kPS #_R3
+  525 2,119 134 kPS #_R3
+  526 2,120 135 6*kPS #_R3
+  527 2,121 136 3*kPS #_R3
+  528 2,123 138 5*kPS #_R3
+  529 2,124 139 2*kPS #_R3
+  530 2,125 140 7*kPS #_R3
+  531 2,126 141 4*kPS #_R3
+  532 2,127 142 kPS #_R3
+  533 113 2,99 2*kdPS #_reverse__R3
+  534 114 2,100 kdPS #_reverse__R3
+  535 115 2,101 3*kdPS #_reverse__R3
+  536 117 2,102 2*kdPS #_reverse__R3
+  537 118 2,104 kdPS #_reverse__R3
+  538 119 2,105 3*kdPS #_reverse__R3
+  539 121 2,106 2*kdPS #_reverse__R3
+  540 122 2,107 4*kdPS #_reverse__R3
+  541 123 2,108 kdPS #_reverse__R3
+  542 124 2,109 3*kdPS #_reverse__R3
+  543 126 2,111 2*kdPS #_reverse__R3
+  544 127 2,112 4*kdPS #_reverse__R3
+  545 113 2,71 2*kuS #_R4
+  546 114 2,72 kuS #_R4
+  547 115 2,73 3*kuS #_R4
+  548 117 2,74 2*kuS #_R4
+  549 118 2,75 kuS #_R4
+  550 119 2,76 3*kuS #_R4
+  551 121 2,77 2*kuS #_R4
+  552 122 2,78 4*kuS #_R4
+  553 123 2,79 kuS #_R4
+  554 124 2,80 3*kuS #_R4
+  555 126 2,81 2*kuS #_R4
+  556 127 2,82 4*kuS #_R4
+  557 1,131 143 kKS #_R1
+  558 1,133 144 kKS #_R1
+  559 1,134 145 2*kKS #_R1
+  560 1,135 146 kKS #_R1
+  561 1,136 147 2*kKS #_R1
+  562 1,137 148 kKS #_R1
+  563 1,138 149 2*kKS #_R1
+  564 1,139 150 3*kKS #_R1
+  565 1,140 151 2*kKS #_R1
+  566 1,141 152 3*kKS #_R1
+  567 1,142 153 4*kKS #_R1
+  568 128 1,115 6*kdKS #_reverse__R1
+  569 129 1,117 5*kdKS #_reverse__R1
+  570 130 1,118 4*kdKS #_reverse__R1
+  571 131 1,119 4*kdKS #_reverse__R1
+  572 132 1,120 3*kdKS #_reverse__R1
+  573 133 1,121 3*kdKS #_reverse__R1
+  574 134 1,122 3*kdKS #_reverse__R1
+  575 135 1,123 2*kdKS #_reverse__R1
+  576 136 1,124 2*kdKS #_reverse__R1
+  577 137 1,125 kdKS #_reverse__R1
+  578 138 1,126 kdKS #_reverse__R1
+  579 139 1,127 kdKS #_reverse__R1
+  580 128 1,143 6*kpS #_R2
+  581 129 1,144 5*kpS #_R2
+  582 130 1,146 4*kpS #_R2
+  583 131 1,147 4*kpS #_R2
+  584 132 1,148 3*kpS #_R2
+  585 133 1,149 3*kpS #_R2
+  586 134 1,150 3*kpS #_R2
+  587 135 1,151 2*kpS #_R2
+  588 136 1,152 2*kpS #_R2
+  589 137 1,154 kpS #_R2
+  590 138 1,155 kpS #_R2
+  591 139 1,156 kpS #_R2
+  592 2,129 143 2*kPS #_R3
+  593 2,130 144 4*kPS #_R3
+  594 2,131 145 kPS #_R3
+  595 2,132 146 6*kPS #_R3
+  596 2,133 147 3*kPS #_R3
+  597 2,135 149 5*kPS #_R3
+  598 2,136 150 2*kPS #_R3
+  599 2,137 151 7*kPS #_R3
+  600 2,138 152 4*kPS #_R3
+  601 2,139 153 kPS #_R3
+  602 2,140 155 6*kPS #_R3
+  603 2,141 156 3*kPS #_R3
+  604 128 2,113 3*kdPS #_reverse__R3
+  605 129 2,114 2*kdPS #_reverse__R3
+  606 130 2,116 kdPS #_reverse__R3
+  607 131 2,117 3*kdPS #_reverse__R3
+  608 133 2,118 2*kdPS #_reverse__R3
+  609 134 2,119 4*kdPS #_reverse__R3
+  610 135 2,120 kdPS #_reverse__R3
+  611 136 2,121 3*kdPS #_reverse__R3
+  612 138 2,123 2*kdPS #_reverse__R3
+  613 139 2,124 4*kdPS #_reverse__R3
+  614 140 2,125 kdPS #_reverse__R3
+  615 141 2,126 3*kdPS #_reverse__R3
+  616 142 2,127 5*kdPS #_reverse__R3
+  617 128 2,85 3*kuS #_R4
+  618 129 2,86 2*kuS #_R4
+  619 130 2,87 kuS #_R4
+  620 131 2,88 3*kuS #_R4
+  621 133 2,89 2*kuS #_R4
+  622 134 2,90 4*kuS #_R4
+  623 135 2,91 kuS #_R4
+  624 136 2,92 3*kuS #_R4
+  625 138 2,93 2*kuS #_R4
+  626 139 2,94 4*kuS #_R4
+  627 140 2,95 kuS #_R4
+  628 141 2,96 3*kuS #_R4
+  629 142 2,97 5*kuS #_R4
+  630 1,145 157 kKS #_R1
+  631 1,147 158 kKS #_R1
+  632 1,149 159 kKS #_R1
+  633 1,150 160 2*kKS #_R1
+  634 1,151 161 kKS #_R1
+  635 1,152 162 2*kKS #_R1
+  636 1,153 163 3*kKS #_R1
+  637 1,154 164 kKS #_R1
+  638 1,155 165 2*kKS #_R1
+  639 1,156 166 3*kKS #_R1
+  640 143 1,131 5*kdKS #_reverse__R1
+  641 144 1,133 4*kdKS #_reverse__R1
+  642 145 1,134 4*kdKS #_reverse__R1
+  643 146 1,135 3*kdKS #_reverse__R1
+  644 147 1,136 3*kdKS #_reverse__R1
+  645 148 1,137 2*kdKS #_reverse__R1
+  646 149 1,138 2*kdKS #_reverse__R1
+  647 150 1,139 2*kdKS #_reverse__R1
+  648 151 1,140 kdKS #_reverse__R1
+  649 152 1,141 kdKS #_reverse__R1
+  650 153 1,142 kdKS #_reverse__R1
+  651 143 1,158 5*kpS #_R2
+  652 144 1,159 4*kpS #_R2
+  653 145 1,160 4*kpS #_R2
+  654 146 1,161 3*kpS #_R2
+  655 147 1,162 3*kpS #_R2
+  656 148 1,164 2*kpS #_R2
+  657 149 1,165 2*kpS #_R2
+  658 150 1,166 2*kpS #_R2
+  659 151 1,167 kpS #_R2
+  660 152 1,168 kpS #_R2
+  661 153 1,169 kpS #_R2
+  662 2,143 157 kPS #_R3
+  663 2,144 158 3*kPS #_R3
+  664 2,146 159 5*kPS #_R3
+  665 2,147 160 2*kPS #_R3
+  666 2,148 161 7*kPS #_R3
+  667 2,149 162 4*kPS #_R3
+  668 2,150 163 kPS #_R3
+  669 2,151 165 6*kPS #_R3
+  670 2,152 166 3*kPS #_R3
+  671 2,154 167 8*kPS #_R3
+  672 2,155 168 5*kPS #_R3
+  673 2,156 169 2*kPS #_R3
+  674 143 2,129 3*kdPS #_reverse__R3
+  675 144 2,130 2*kdPS #_reverse__R3
+  676 145 2,131 4*kdPS #_reverse__R3
+  677 146 2,132 kdPS #_reverse__R3
+  678 147 2,133 3*kdPS #_reverse__R3
+  679 149 2,135 2*kdPS #_reverse__R3
+  680 150 2,136 4*kdPS #_reverse__R3
+  681 151 2,137 kdPS #_reverse__R3
+  682 152 2,138 3*kdPS #_reverse__R3
+  683 153 2,139 5*kdPS #_reverse__R3
+  684 155 2,140 2*kdPS #_reverse__R3
+  685 156 2,141 4*kdPS #_reverse__R3
+  686 143 2,101 3*kuS #_R4
+  687 144 2,102 2*kuS #_R4
+  688 145 2,103 4*kuS #_R4
+  689 146 2,104 kuS #_R4
+  690 147 2,105 3*kuS #_R4
+  691 149 2,106 2*kuS #_R4
+  692 150 2,107 4*kuS #_R4
+  693 151 2,108 kuS #_R4
+  694 152 2,109 3*kuS #_R4
+  695 153 2,110 5*kuS #_R4
+  696 155 2,111 2*kuS #_R4
+  697 156 2,112 4*kuS #_R4
+  698 1,160 170 kKS #_R1
+  699 1,162 171 kKS #_R1
+  700 1,163 172 2*kKS #_R1
+  701 1,165 173 kKS #_R1
+  702 1,166 174 2*kKS #_R1
+  703 1,167 175 kKS #_R1
+  704 1,168 176 2*kKS #_R1
+  705 1,169 177 3*kKS #_R1
+  706 157 1,145 5*kdKS #_reverse__R1
+  707 158 1,147 4*kdKS #_reverse__R1
+  708 159 1,149 3*kdKS #_reverse__R1
+  709 160 1,150 3*kdKS #_reverse__R1
+  710 161 1,151 2*kdKS #_reverse__R1
+  711 162 1,152 2*kdKS #_reverse__R1
+  712 163 1,153 2*kdKS #_reverse__R1
+  713 164 1,154 kdKS #_reverse__R1
+  714 165 1,155 kdKS #_reverse__R1
+  715 166 1,156 kdKS #_reverse__R1
+  716 157 1,170 5*kpS #_R2
+  717 158 1,171 4*kpS #_R2
+  718 159 1,173 3*kpS #_R2
+  719 160 1,174 3*kpS #_R2
+  720 161 1,175 2*kpS #_R2
+  721 162 1,176 2*kpS #_R2
+  722 163 1,177 2*kpS #_R2
+  723 164 1,178 kpS #_R2
+  724 165 1,179 kpS #_R2
+  725 166 1,180 kpS #_R2
+  726 2,158 170 2*kPS #_R3
+  727 2,159 171 4*kPS #_R3
+  728 2,160 172 kPS #_R3
+  729 2,161 173 6*kPS #_R3
+  730 2,162 174 3*kPS #_R3
+  731 2,164 175 8*kPS #_R3
+  732 2,165 176 5*kPS #_R3
+  733 2,166 177 2*kPS #_R3
+  734 2,167 179 7*kPS #_R3
+  735 2,168 180 4*kPS #_R3
+  736 2,169 181 kPS #_R3
+  737 157 2,143 4*kdPS #_reverse__R3
+  738 158 2,144 3*kdPS #_reverse__R3
+  739 159 2,146 2*kdPS #_reverse__R3
+  740 160 2,147 4*kdPS #_reverse__R3
+  741 161 2,148 kdPS #_reverse__R3
+  742 162 2,149 3*kdPS #_reverse__R3
+  743 163 2,150 5*kdPS #_reverse__R3
+  744 165 2,151 2*kdPS #_reverse__R3
+  745 166 2,152 4*kdPS #_reverse__R3
+  746 167 2,154 kdPS #_reverse__R3
+  747 168 2,155 3*kdPS #_reverse__R3
+  748 169 2,156 5*kdPS #_reverse__R3
+  749 157 2,115 4*kuS #_R4
+  750 158 2,117 3*kuS #_R4
+  751 159 2,118 2*kuS #_R4
+  752 160 2,119 4*kuS #_R4
+  753 161 2,120 kuS #_R4
+  754 162 2,121 3*kuS #_R4
+  755 163 2,122 5*kuS #_R4
+  756 165 2,123 2*kuS #_R4
+  757 166 2,124 4*kuS #_R4
+  758 167 2,125 kuS #_R4
+  759 168 2,126 3*kuS #_R4
+  760 169 2,127 5*kuS #_R4
+  761 1,172 182 kKS #_R1
+  762 1,174 183 kKS #_R1
+  763 1,176 184 kKS #_R1
+  764 1,177 185 2*kKS #_R1
+  765 1,179 186 kKS #_R1
+  766 1,180 187 2*kKS #_R1
+  767 1,181 188 3*kKS #_R1
+  768 170 1,160 4*kdKS #_reverse__R1
+  769 171 1,162 3*kdKS #_reverse__R1
+  770 172 1,163 3*kdKS #_reverse__R1
+  771 173 1,165 2*kdKS #_reverse__R1
+  772 174 1,166 2*kdKS #_reverse__R1
+  773 175 1,167 kdKS #_reverse__R1
+  774 176 1,168 kdKS #_reverse__R1
+  775 177 1,169 kdKS #_reverse__R1
+  776 170 1,183 4*kpS #_R2
+  777 171 1,184 3*kpS #_R2
+  778 172 1,185 3*kpS #_R2
+  779 173 1,186 2*kpS #_R2
+  780 174 1,187 2*kpS #_R2
+  781 175 1,189 kpS #_R2
+  782 176 1,190 kpS #_R2
+  783 177 1,191 kpS #_R2
+  784 2,170 182 kPS #_R3
+  785 2,171 183 3*kPS #_R3
+  786 2,173 184 5*kPS #_R3
+  787 2,174 185 2*kPS #_R3
+  788 2,175 186 7*kPS #_R3
+  789 2,176 187 4*kPS #_R3
+  790 2,177 188 kPS #_R3
+  791 2,178 189 9*kPS #_R3
+  792 2,179 190 6*kPS #_R3
+  793 2,180 191 3*kPS #_R3
+  794 170 2,158 4*kdPS #_reverse__R3
+  795 171 2,159 3*kdPS #_reverse__R3
+  796 172 2,160 5*kdPS #_reverse__R3
+  797 173 2,161 2*kdPS #_reverse__R3
+  798 174 2,162 4*kdPS #_reverse__R3
+  799 175 2,164 kdPS #_reverse__R3
+  800 176 2,165 3*kdPS #_reverse__R3
+  801 177 2,166 5*kdPS #_reverse__R3
+  802 179 2,167 2*kdPS #_reverse__R3
+  803 180 2,168 4*kdPS #_reverse__R3
+  804 181 2,169 6*kdPS #_reverse__R3
+  805 170 2,131 4*kuS #_R4
+  806 171 2,133 3*kuS #_R4
+  807 172 2,134 5*kuS #_R4
+  808 173 2,135 2*kuS #_R4
+  809 174 2,136 4*kuS #_R4
+  810 175 2,137 kuS #_R4
+  811 176 2,138 3*kuS #_R4
+  812 177 2,139 5*kuS #_R4
+  813 179 2,140 2*kuS #_R4
+  814 180 2,141 4*kuS #_R4
+  815 181 2,142 6*kuS #_R4
+  816 1,185 192 kKS #_R1
+  817 1,187 193 kKS #_R1
+  818 1,188 194 2*kKS #_R1
+  819 1,190 195 kKS #_R1
+  820 1,191 196 2*kKS #_R1
+  821 182 1,172 4*kdKS #_reverse__R1
+  822 183 1,174 3*kdKS #_reverse__R1
+  823 184 1,176 2*kdKS #_reverse__R1
+  824 185 1,177 2*kdKS #_reverse__R1
+  825 186 1,179 kdKS #_reverse__R1
+  826 187 1,180 kdKS #_reverse__R1
+  827 188 1,181 kdKS #_reverse__R1
+  828 182 1,192 4*kpS #_R2
+  829 183 1,193 3*kpS #_R2
+  830 184 1,195 2*kpS #_R2
+  831 185 1,196 2*kpS #_R2
+  832 186 1,197 kpS #_R2
+  833 187 1,198 kpS #_R2
+  834 188 1,199 kpS #_R2
+  835 2,183 192 2*kPS #_R3
+  836 2,184 193 4*kPS #_R3
+  837 2,185 194 kPS #_R3
+  838 2,186 195 6*kPS #_R3
+  839 2,187 196 3*kPS #_R3
+  840 2,189 197 8*kPS #_R3
+  841 2,190 198 5*kPS #_R3
+  842 2,191 199 2*kPS #_R3
+  843 182 2,170 5*kdPS #_reverse__R3
+  844 183 2,171 4*kdPS #_reverse__R3
+  845 184 2,173 3*kdPS #_reverse__R3
+  846 185 2,174 5*kdPS #_reverse__R3
+  847 186 2,175 2*kdPS #_reverse__R3
+  848 187 2,176 4*kdPS #_reverse__R3
+  849 188 2,177 6*kdPS #_reverse__R3
+  850 189 2,178 kdPS #_reverse__R3
+  851 190 2,179 3*kdPS #_reverse__R3
+  852 191 2,180 5*kdPS #_reverse__R3
+  853 182 2,145 5*kuS #_R4
+  854 183 2,147 4*kuS #_R4
+  855 184 2,149 3*kuS #_R4
+  856 185 2,150 5*kuS #_R4
+  857 186 2,151 2*kuS #_R4
+  858 187 2,152 4*kuS #_R4
+  859 188 2,153 6*kuS #_R4
+  860 189 2,154 kuS #_R4
+  861 190 2,155 3*kuS #_R4
+  862 191 2,156 5*kuS #_R4
+  863 1,194 200 kKS #_R1
+  864 1,196 201 kKS #_R1
+  865 1,198 202 kKS #_R1
+  866 1,199 203 2*kKS #_R1
+  867 192 1,185 3*kdKS #_reverse__R1
+  868 193 1,187 2*kdKS #_reverse__R1
+  869 194 1,188 2*kdKS #_reverse__R1
+  870 195 1,190 kdKS #_reverse__R1
+  871 196 1,191 kdKS #_reverse__R1
+  872 192 1,201 3*kpS #_R2
+  873 193 1,202 2*kpS #_R2
+  874 194 1,203 2*kpS #_R2
+  875 195 1,204 kpS #_R2
+  876 196 1,205 kpS #_R2
+  877 2,192 200 kPS #_R3
+  878 2,193 201 3*kPS #_R3
+  879 2,195 202 5*kPS #_R3
+  880 2,196 203 2*kPS #_R3
+  881 2,197 204 7*kPS #_R3
+  882 2,198 205 4*kPS #_R3
+  883 2,199 206 kPS #_R3
+  884 192 2,183 5*kdPS #_reverse__R3
+  885 193 2,184 4*kdPS #_reverse__R3
+  886 194 2,185 6*kdPS #_reverse__R3
+  887 195 2,186 3*kdPS #_reverse__R3
+  888 196 2,187 5*kdPS #_reverse__R3
+  889 197 2,189 2*kdPS #_reverse__R3
+  890 198 2,190 4*kdPS #_reverse__R3
+  891 199 2,191 6*kdPS #_reverse__R3
+  892 192 2,160 5*kuS #_R4
+  893 193 2,162 4*kuS #_R4
+  894 194 2,163 6*kuS #_R4
+  895 195 2,165 3*kuS #_R4
+  896 196 2,166 5*kuS #_R4
+  897 197 2,167 2*kuS #_R4
+  898 198 2,168 4*kuS #_R4
+  899 199 2,169 6*kuS #_R4
+  900 1,203 207 kKS #_R1
+  901 1,205 208 kKS #_R1
+  902 1,206 209 2*kKS #_R1
+  903 200 1,194 3*kdKS #_reverse__R1
+  904 201 1,196 2*kdKS #_reverse__R1
+  905 202 1,198 kdKS #_reverse__R1
+  906 203 1,199 kdKS #_reverse__R1
+  907 200 1,207 3*kpS #_R2
+  908 201 1,208 2*kpS #_R2
+  909 202 1,210 kpS #_R2
+  910 203 1,211 kpS #_R2
+  911 2,201 207 2*kPS #_R3
+  912 2,202 208 4*kPS #_R3
+  913 2,203 209 kPS #_R3
+  914 2,204 210 6*kPS #_R3
+  915 2,205 211 3*kPS #_R3
+  916 200 2,192 6*kdPS #_reverse__R3
+  917 201 2,193 5*kdPS #_reverse__R3
+  918 202 2,195 4*kdPS #_reverse__R3
+  919 203 2,196 6*kdPS #_reverse__R3
+  920 204 2,197 3*kdPS #_reverse__R3
+  921 205 2,198 5*kdPS #_reverse__R3
+  922 206 2,199 7*kdPS #_reverse__R3
+  923 200 2,172 6*kuS #_R4
+  924 201 2,174 5*kuS #_R4
+  925 202 2,176 4*kuS #_R4
+  926 203 2,177 6*kuS #_R4
+  927 204 2,179 3*kuS #_R4
+  928 205 2,180 5*kuS #_R4
+  929 206 2,181 7*kuS #_R4
+  930 1,209 212 kKS #_R1
+  931 1,211 213 kKS #_R1
+  932 207 1,203 2*kdKS #_reverse__R1
+  933 208 1,205 kdKS #_reverse__R1
+  934 209 1,206 kdKS #_reverse__R1
+  935 207 1,213 2*kpS #_R2
+  936 208 1,214 kpS #_R2
+  937 209 1,215 kpS #_R2
+  938 2,207 212 kPS #_R3
+  939 2,208 213 3*kPS #_R3
+  940 2,210 214 5*kPS #_R3
+  941 2,211 215 2*kPS #_R3
+  942 207 2,201 6*kdPS #_reverse__R3
+  943 208 2,202 5*kdPS #_reverse__R3
+  944 209 2,203 7*kdPS #_reverse__R3
+  945 210 2,204 4*kdPS #_reverse__R3
+  946 211 2,205 6*kdPS #_reverse__R3
+  947 207 2,185 6*kuS #_R4
+  948 208 2,187 5*kuS #_R4
+  949 209 2,188 7*kuS #_R4
+  950 210 2,190 4*kuS #_R4
+  951 211 2,191 6*kuS #_R4
+  952 1,215 216 kKS #_R1
+  953 212 1,209 2*kdKS #_reverse__R1
+  954 213 1,211 kdKS #_reverse__R1
+  955 212 1,216 2*kpS #_R2
+  956 213 1,217 kpS #_R2
+  957 2,213 216 2*kPS #_R3
+  958 2,214 217 4*kPS #_R3
+  959 2,215 218 kPS #_R3
+  960 212 2,207 7*kdPS #_reverse__R3
+  961 213 2,208 6*kdPS #_reverse__R3
+  962 214 2,210 5*kdPS #_reverse__R3
+  963 215 2,211 7*kdPS #_reverse__R3
+  964 212 2,194 7*kuS #_R4
+  965 213 2,196 6*kuS #_R4
+  966 214 2,198 5*kuS #_R4
+  967 215 2,199 7*kuS #_R4
+  968 1,218 219 kKS #_R1
+  969 216 1,215 kdKS #_reverse__R1
+  970 216 1,220 kpS #_R2
+  971 2,216 219 kPS #_R3
+  972 2,217 220 3*kPS #_R3
+  973 216 2,213 7*kdPS #_reverse__R3
+  974 217 2,214 6*kdPS #_reverse__R3
+  975 218 2,215 8*kdPS #_reverse__R3
+  976 216 2,203 7*kuS #_R4
+  977 217 2,205 6*kuS #_R4
+  978 218 2,206 8*kuS #_R4
+  979 219 1,218 kdKS #_reverse__R1
+  980 219 1,221 kpS #_R2
+  981 2,220 221 2*kPS #_R3
+  982 219 2,216 8*kdPS #_reverse__R3
+  983 220 2,217 7*kdPS #_reverse__R3
+  984 219 2,209 8*kuS #_R4
+  985 220 2,211 7*kuS #_R4
+  986 2,221 222 kPS #_R3
+  987 221 2,220 8*kdPS #_reverse__R3
+  988 221 2,215 8*kuS #_R4
+  989 222 2,221 9*kdPS #_reverse__R3
+  990 222 2,218 9*kuS #_R4
+end reactions

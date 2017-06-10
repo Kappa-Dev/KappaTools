@@ -1,0 +1,1240 @@
+# command line:  
+#       KaDE   n_phos_sites_6.ka    -print-efficiency    -ode-backend   DOTNET   -dotnet-output   network_n_phos_sites_6_wo_sym.net   -propagate-constants  
+# THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+# 
+# init - the initial abundances of each species and token
+# tinit - the initial simulation time (likely 0)
+# tend - the final simulation time 
+# initialstep - initial time step at the beginning of numerical integration
+# maxstep - maximal time step for numerical integration
+# reltol - relative error tolerance;
+# abstol - absolute error tolerance;
+# period - the time period between points to return
+#
+# variables (init(i),y(i)) denote numbers of embeddings 
+# rule rates are corrected by the number of automorphisms in the lhs of rules
+
+begin species
+ 1 A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 100
+ 2 A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 0
+ 3 A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 0
+ 4 A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 0
+ 5 A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 0
+ 6 A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 0
+ 7 A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 0
+ 8 A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 0
+ 9 A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 0
+ 10 A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 0
+ 11 A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 0
+ 12 A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 0
+ 13 A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 0
+ 14 A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 0
+ 15 A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 0
+ 16 A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 0
+ 17 A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 0
+ 18 A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 0
+ 19 A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 0
+ 20 A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 0
+ 21 A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 0
+ 22 A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 0
+ 23 A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 0
+ 24 A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 0
+ 25 A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 0
+ 26 A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 0
+ 27 A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 0
+ 28 A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 0
+ 29 A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 0
+ 30 A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 0
+ 31 A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 0
+ 32 A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 0
+ 33 A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 0
+ 34 A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 0
+ 35 A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 0
+ 36 A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 0
+ 37 A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 0
+ 38 A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 0
+ 39 A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 0
+ 40 A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 0
+ 41 A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 0
+ 42 A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 0
+ 43 A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 0
+ 44 A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 0
+ 45 A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 0
+ 46 A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 0
+ 47 A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 0
+ 48 A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 0
+ 49 A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 0
+ 50 A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 0
+ 51 A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 0
+ 52 A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 0
+ 53 A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 0
+ 54 A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 0
+ 55 A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 0
+ 56 A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 0
+ 57 A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 0
+ 58 A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 0
+ 59 A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 0
+ 60 A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 0
+ 61 A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 0
+ 62 A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 0
+ 63 A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 0
+ 64 A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 0
+end species
+
+
+
+
+begin reactions
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+1 2 8 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+2 2 55 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+3 2 60 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+4 2 45 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+5 2 46 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+6 2 1 14
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+7 3 9 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+8 3 42 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+9 3 59 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+10 3 43 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+11 3 1 14
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+12 3 46 15
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+13 4 10 15
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+14 4 26 15
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+15 4 27 15
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+16 4 1 14
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+17 4 43 15
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+18 4 45 15
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+19 5 11 15
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+20 5 20 15
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+21 5 1 14
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+22 5 27 15
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+23 5 59 15
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+24 5 60 15
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+25 6 12 15
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+26 6 1 14
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+27 6 20 15
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+28 6 26 15
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+29 6 42 15
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+30 6 55 15
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+31 8 2 98
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+32 8 13 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+33 8 61 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+34 8 49 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+35 8 50 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+36 8 7 98
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+37 9 3 98
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+38 9 14 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+39 9 34 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+40 9 35 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+41 9 7 98
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+42 9 50 75
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+43 10 4 98
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+44 10 15 75
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+45 10 30 75
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+46 10 7 98
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+47 10 35 75
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+48 10 49 75
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+49 11 5 98
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+50 11 16 75
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+51 11 7 98
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+52 11 30 75
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+53 11 34 75
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+54 11 61 75
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+55 13 55 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+56 13 8 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+57 13 17 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+58 13 63 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+59 13 52 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+60 13 12 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+61 14 42 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+62 14 9 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+63 14 18 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+64 14 38 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+65 14 12 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+66 14 52 375
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+67 15 26 686
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+68 15 10 686
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+69 15 19 375
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+70 15 12 686
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+71 15 38 375
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+72 15 63 375
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+73 17 21 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+74 17 61 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+75 17 13 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+76 17 64 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+77 17 53 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+78 17 16 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+79 18 22 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+80 18 34 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+81 18 14 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+82 18 36 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+83 18 16 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+84 18 53 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+85 19 23 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+86 19 30 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+87 19 15 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+88 19 16 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+89 19 36 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+90 19 64 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+91 21 17 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+92 21 60 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+93 21 55 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+94 21 24 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+95 21 56 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+96 21 20 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+97 22 18 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+98 22 59 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+99 22 42 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+100 22 25 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+101 22 20 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+102 22 56 375
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+103 24 64 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+104 24 28 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+105 24 62 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+106 24 21 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+107 24 57 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+108 24 23 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+109 25 36 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+110 25 29 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+111 25 40 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+112 25 22 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+113 25 23 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+114 25 57 1875
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+115 26 15 75
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+116 26 4 98
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+117 26 23 75
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+118 26 6 98
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+119 26 40 75
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+120 26 62 75
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+121 28 31 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+122 28 24 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+123 28 45 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+124 28 60 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+125 28 47 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+126 28 27 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+127 29 32 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+128 29 25 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+129 29 43 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+130 29 59 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+131 29 27 686
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+132 29 47 375
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+133 31 28 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+134 31 64 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+135 31 49 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+136 31 61 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+137 31 33 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+138 31 30 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+139 33 47 33614
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+140 33 37 9375
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+141 33 48 33614
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+142 33 51 33614
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+143 33 31 33614
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+144 33 32 33614
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+145 34 59 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+146 34 18 375
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+147 34 9 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+148 34 32 375
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+149 34 11 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+150 34 51 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+151 35 43 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+152 35 38 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+153 35 32 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+154 35 9 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+155 35 10 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+156 35 48 375
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+157 37 57 235298
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+158 37 33 235298
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+159 37 39 235298
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+160 37 53 235298
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+161 37 64 235298
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+162 37 36 235298
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+163 39 41 33614
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+164 39 48 33614
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+165 39 37 9375
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+166 39 52 33614
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+167 39 63 33614
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+168 39 38 33614
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+169 41 39 1875
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+170 41 44 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+171 41 57 1875
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+172 41 54 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+173 41 62 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+174 41 40 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+175 42 14 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+176 42 3 98
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+177 42 22 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+178 42 40 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+179 42 6 98
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+180 42 54 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+181 45 49 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+182 45 62 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+183 45 28 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+184 45 2 98
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+185 45 44 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+186 45 4 98
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+187 46 50 75
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+188 46 54 75
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+189 46 58 75
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+190 46 44 75
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+191 46 2 98
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+192 46 3 98
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+193 47 33 1875
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+194 47 57 1875
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+195 47 44 4802
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+196 47 58 4802
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+197 47 28 4802
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+198 47 29 4802
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+199 49 45 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+200 49 63 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+201 49 31 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+202 49 8 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+203 49 48 375
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+204 49 10 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+205 51 58 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+206 51 53 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+207 51 50 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+208 51 33 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+209 51 61 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+210 51 34 4802
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+211 53 56 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+212 53 51 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+213 53 52 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+214 53 37 9375
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+215 53 17 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+216 53 18 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+217 64 24 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+218 64 31 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+219 64 63 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+220 64 17 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+221 64 37 9375
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+222 64 19 33614
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+223 63 62 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+224 63 49 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~p)  
+225 63 64 1875
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+226 63 13 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+227 63 39 1875
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+228 63 15 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~p)  
+229 62 63 375
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+230 62 45 686
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+231 62 24 375
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+232 62 55 686
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+233 62 41 375
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+234 62 26 686
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+235 55 13 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+236 55 2 98
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+237 55 21 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~p)  
+238 55 62 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+239 55 54 75
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+240 55 6 98
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+241 57 37 9375
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+242 57 47 33614
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+243 57 41 33614
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+244 57 56 33614
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+245 57 24 33614
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+246 57 25 33614
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+247 59 34 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+248 59 22 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+249 59 3 98
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+250 59 29 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+251 59 5 98
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+252 59 58 75
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+253 61 60 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+254 61 17 375
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+255 61 8 686
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+256 61 31 375
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+257 61 51 375
+# rule    : A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+258 61 11 686
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~p)  
+259 60 61 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+260 60 21 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+261 60 2 98
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+262 60 28 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+263 60 58 75
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+264 60 5 98
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+265 58 51 375
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+266 58 56 375
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+267 58 46 686
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+268 58 47 375
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~p)  
+269 58 60 686
+# rule    : A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~u)  
+270 58 59 686
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+271 56 53 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~u, s5~p, s6~p)  
+272 56 58 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+273 56 54 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~p)  
+274 56 57 1875
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+275 56 21 4802
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+276 56 22 4802
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+277 54 52 375
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+278 54 46 686
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~p)  
+279 54 56 375
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+280 54 41 375
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~p)  
+281 54 55 686
+# rule    : A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+282 54 42 686
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~p)  
+283 52 54 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+284 52 50 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~p)  
+285 52 53 1875
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+286 52 39 1875
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+287 52 13 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+288 52 14 4802
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+289 50 46 686
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~p)  
+290 50 52 375
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~p)  
+291 50 51 375
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+292 50 48 375
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+293 50 8 686
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+294 50 9 686
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+295 48 44 4802
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+296 48 39 1875
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+297 48 33 1875
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~p)  
+298 48 50 4802
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~p)  
+299 48 49 4802
+# rule    : A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+300 48 35 4802
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~p)  
+301 44 48 375
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+302 44 41 375
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~p)  
+303 44 47 375
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~p)  
+304 44 46 686
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~p)  
+305 44 45 686
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+306 44 43 686
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+307 43 35 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+308 43 40 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+309 43 29 75
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+310 43 3 98
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+311 43 4 98
+# rule    : A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~p)  
+312 43 44 75
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+313 40 38 375
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~p, s6~u)  
+314 40 43 686
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+315 40 25 375
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~p, s6~u)  
+316 40 42 686
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+317 40 26 686
+# rule    : A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~p)  
+318 40 41 375
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~p, s6~u)  
+319 38 40 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+320 38 35 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+321 38 36 1875
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+322 38 14 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+323 38 15 4802
+# rule    : A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~p)  
+324 38 39 1875
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+325 36 25 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+326 36 32 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~p, s6~u)  
+327 36 38 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+328 36 18 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+329 36 19 33614
+# rule    : A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~p)  
+330 36 37 9375
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+331 32 29 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~p, s6~u)  
+332 32 36 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~p, s6~u)  
+333 32 35 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~p, s6~u)  
+334 32 34 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+335 32 30 4802
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~p)  
+336 32 33 1875
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+337 30 27 686
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+338 30 19 375
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+339 30 10 686
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+340 30 11 686
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~p, s6~u)  
+341 30 32 375
+# rule    : A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~p)  
+342 30 31 375
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~p, s5~u, s6~u)  
+343 27 30 75
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+344 27 23 75
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+345 27 4 98
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+346 27 5 98
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~p, s6~u)  
+347 27 29 75
+# rule    : A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~p)  
+348 27 28 75
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+349 23 19 375
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~p, s5~u, s6~u)  
+350 23 27 686
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~p, s5~u, s6~u)  
+351 23 26 686
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+352 23 20 686
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~p, s6~u)  
+353 23 25 375
+# rule    : A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~p)  
+354 23 24 375
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+355 20 16 75
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+356 20 5 98
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+357 20 6 98
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~p, s5~u, s6~u)  
+358 20 23 75
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~p, s6~u)  
+359 20 22 75
+# rule    : A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~p)  
+360 20 21 75
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~p, s4~u, s5~u, s6~u)  
+361 16 20 686
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+362 16 11 686
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+363 16 12 686
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~p, s5~u, s6~u)  
+364 16 19 375
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~p, s6~u)  
+365 16 18 375
+# rule    : A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~p)  
+366 16 17 375
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+367 12 6 98
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+368 12 7 98
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~p, s4~u, s5~u, s6~u)  
+369 12 16 75
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~p, s5~u, s6~u)  
+370 12 15 75
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~p, s6~u)  
+371 12 14 75
+# rule    : A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~p)  
+372 12 13 75
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u)  
+373 7 1 14
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~p, s3~u, s4~u, s5~u, s6~u)  
+374 7 12 15
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~p, s4~u, s5~u, s6~u)  
+375 7 11 15
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~p, s5~u, s6~u)  
+376 7 10 15
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~p, s6~u)  
+377 7 9 15
+# rule    : A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~p)  
+378 7 8 15
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~p,s2~u,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~p, s2~u, s3~u, s4~u, s5~u, s6~u)  
+379 1 7 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~p,s3~u,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~p, s3~u, s4~u, s5~u, s6~u)  
+380 1 6 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~p,s4~u,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~p, s4~u, s5~u, s6~u)  
+381 1 5 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~p,s5~u,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~p, s5~u, s6~u)  
+382 1 4 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~p,s6~u) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~p, s6~u)  
+383 1 3 3
+# rule    : A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~u) -> A(s1~u,s2~u,s3~u,s4~u,s5~u,s6~p) 
+# A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~u) -> A(s1~u, s2~u, s3~u, s4~u, s5~u, s6~p)  
+384 1 2 3
+end reactions

@@ -1,0 +1,152 @@
+# Created by BioNetGen 2.2.6-stable
+begin parameters
+    1 Stot        100  # Constant
+    2 n_k0        0  # Constant
+    3 kp0         3  # Constant
+    4 ku1         14  # Constant
+    5 n_k1        1  # Constant
+    6 kp1         15  # Constant
+    7 ku2         98  # Constant
+    8 n_k2        2  # Constant
+    9 kp2         75  # Constant
+   10 ku3         686  # Constant
+   11 n_k3        3  # Constant
+   12 kp3         375  # Constant
+   13 ku4         4802  # Constant
+   14 n_k4        4  # Constant
+   15 kp4         1875  # Constant
+   16 ku5         33614  # Constant
+   17 n_k5        5  # Constant
+   18 kp5         9375  # Constant
+   19 ku6         235298  # Constant
+   20 n_k6        6  # Constant
+   21 kp6         46875  # Constant
+   22 ku7         1647086  # Constant
+   23 n_k7        7  # Constant
+   24 kp7         234375  # Constant
+   25 ku8         11529602  # Constant
+   26 _rateLaw1   kp0/n_k7  # ConstantExpression
+   27 _rateLaw2   kp0/n_k7  # ConstantExpression
+   28 _rateLaw3   kp0/n_k7  # ConstantExpression
+   29 _rateLaw4   kp0/n_k7  # ConstantExpression
+   30 _rateLaw5   kp0/n_k7  # ConstantExpression
+   31 _rateLaw6   kp0/n_k7  # ConstantExpression
+   32 _rateLaw7   kp0/n_k7  # ConstantExpression
+   33 _rateLaw8   kp1/n_k6  # ConstantExpression
+   34 _rateLaw9   kp1/n_k6  # ConstantExpression
+   35 _rateLaw10  kp1/n_k6  # ConstantExpression
+   36 _rateLaw11  kp1/n_k6  # ConstantExpression
+   37 _rateLaw12  kp1/n_k6  # ConstantExpression
+   38 _rateLaw13  kp1/n_k6  # ConstantExpression
+   39 _rateLaw14  ku1/n_k1  # ConstantExpression
+   40 _rateLaw15  kp2/n_k5  # ConstantExpression
+   41 _rateLaw16  kp2/n_k5  # ConstantExpression
+   42 _rateLaw17  kp2/n_k5  # ConstantExpression
+   43 _rateLaw18  kp2/n_k5  # ConstantExpression
+   44 _rateLaw19  kp2/n_k5  # ConstantExpression
+   45 _rateLaw20  ku2/n_k2  # ConstantExpression
+   46 _rateLaw21  ku2/n_k2  # ConstantExpression
+   47 _rateLaw22  kp3/n_k4  # ConstantExpression
+   48 _rateLaw23  kp3/n_k4  # ConstantExpression
+   49 _rateLaw24  kp3/n_k4  # ConstantExpression
+   50 _rateLaw25  kp3/n_k4  # ConstantExpression
+   51 _rateLaw26  ku3/n_k3  # ConstantExpression
+   52 _rateLaw27  ku3/n_k3  # ConstantExpression
+   53 _rateLaw28  ku3/n_k3  # ConstantExpression
+   54 _rateLaw29  kp4/n_k3  # ConstantExpression
+   55 _rateLaw30  kp4/n_k3  # ConstantExpression
+   56 _rateLaw31  kp4/n_k3  # ConstantExpression
+   57 _rateLaw32  ku4/n_k4  # ConstantExpression
+   58 _rateLaw33  ku4/n_k4  # ConstantExpression
+   59 _rateLaw34  ku4/n_k4  # ConstantExpression
+   60 _rateLaw35  ku4/n_k4  # ConstantExpression
+   61 _rateLaw36  kp5/n_k2  # ConstantExpression
+   62 _rateLaw37  kp5/n_k2  # ConstantExpression
+   63 _rateLaw38  ku5/n_k5  # ConstantExpression
+   64 _rateLaw39  ku5/n_k5  # ConstantExpression
+   65 _rateLaw40  ku5/n_k5  # ConstantExpression
+   66 _rateLaw41  ku5/n_k5  # ConstantExpression
+   67 _rateLaw42  ku5/n_k5  # ConstantExpression
+   68 _rateLaw43  kp6/n_k1  # ConstantExpression
+   69 _rateLaw44  ku6/n_k6  # ConstantExpression
+   70 _rateLaw45  ku6/n_k6  # ConstantExpression
+   71 _rateLaw46  ku6/n_k6  # ConstantExpression
+   72 _rateLaw47  ku6/n_k6  # ConstantExpression
+   73 _rateLaw48  ku6/n_k6  # ConstantExpression
+   74 _rateLaw49  ku6/n_k6  # ConstantExpression
+   75 _rateLaw50  ku7/n_k7  # ConstantExpression
+   76 _rateLaw51  ku7/n_k7  # ConstantExpression
+   77 _rateLaw52  ku7/n_k7  # ConstantExpression
+   78 _rateLaw53  ku7/n_k7  # ConstantExpression
+   79 _rateLaw54  ku7/n_k7  # ConstantExpression
+   80 _rateLaw55  ku7/n_k7  # ConstantExpression
+   81 _rateLaw56  ku7/n_k7  # ConstantExpression
+end parameters
+begin species
+    1 %init::A(s~u,s~u,s~u,s~u,s~u,s~u,s~u) Stot
+    2 A(s~p,s~u,s~u,s~u,s~u,s~u,s~u) 0
+    3 A(s~p,s~p,s~u,s~u,s~u,s~u,s~u) 0
+    4 A(s~p,s~p,s~p,s~u,s~u,s~u,s~u) 0
+    5 A(s~p,s~p,s~p,s~p,s~u,s~u,s~u) 0
+    6 A(s~p,s~p,s~p,s~p,s~p,s~u,s~u) 0
+    7 A(s~p,s~p,s~p,s~p,s~p,s~p,s~u) 0
+    8 A(s~p,s~p,s~p,s~p,s~p,s~p,s~p) 0
+end species
+begin reactions
+    1 1 2 7*_rateLaw1 #_R1
+    2 1 2 7*_rateLaw2 #_R2
+    3 1 2 7*_rateLaw3 #_R3
+    4 1 2 7*_rateLaw4 #_R4
+    5 1 2 7*_rateLaw5 #_R5
+    6 1 2 7*_rateLaw6 #_R6
+    7 1 2 7*_rateLaw7 #_R7
+    8 2 3 6*_rateLaw8 #_R8
+    9 2 3 6*_rateLaw9 #_R9
+   10 2 3 6*_rateLaw10 #_R10
+   11 2 3 6*_rateLaw11 #_R11
+   12 2 3 6*_rateLaw12 #_R12
+   13 2 3 6*_rateLaw13 #_R13
+   14 2 1 _rateLaw14 #_R14
+   15 3 4 5*_rateLaw15 #_R15
+   16 3 4 5*_rateLaw16 #_R16
+   17 3 4 5*_rateLaw17 #_R17
+   18 3 4 5*_rateLaw18 #_R18
+   19 3 4 5*_rateLaw19 #_R19
+   20 3 2 2*_rateLaw20 #_R20
+   21 3 2 2*_rateLaw21 #_R21
+   22 4 5 4*_rateLaw22 #_R22
+   23 4 5 4*_rateLaw23 #_R23
+   24 4 5 4*_rateLaw24 #_R24
+   25 4 5 4*_rateLaw25 #_R25
+   26 4 3 3*_rateLaw26 #_R26
+   27 4 3 3*_rateLaw27 #_R27
+   28 4 3 3*_rateLaw28 #_R28
+   29 5 6 3*_rateLaw29 #_R29
+   30 5 6 3*_rateLaw30 #_R30
+   31 5 6 3*_rateLaw31 #_R31
+   32 5 4 4*_rateLaw32 #_R32
+   33 5 4 4*_rateLaw33 #_R33
+   34 5 4 4*_rateLaw34 #_R34
+   35 5 4 4*_rateLaw35 #_R35
+   36 6 7 2*_rateLaw36 #_R36
+   37 6 7 2*_rateLaw37 #_R37
+   38 6 5 5*_rateLaw38 #_R38
+   39 6 5 5*_rateLaw39 #_R39
+   40 6 5 5*_rateLaw40 #_R40
+   41 6 5 5*_rateLaw41 #_R41
+   42 6 5 5*_rateLaw42 #_R42
+   43 7 8 _rateLaw43 #_R43
+   44 7 6 6*_rateLaw44 #_R44
+   45 7 6 6*_rateLaw45 #_R45
+   46 7 6 6*_rateLaw46 #_R46
+   47 7 6 6*_rateLaw47 #_R47
+   48 7 6 6*_rateLaw48 #_R48
+   49 7 6 6*_rateLaw49 #_R49
+   50 8 7 7*_rateLaw50 #_R50
+   51 8 7 7*_rateLaw51 #_R51
+   52 8 7 7*_rateLaw52 #_R52
+   53 8 7 7*_rateLaw53 #_R53
+   54 8 7 7*_rateLaw54 #_R54
+   55 8 7 7*_rateLaw55 #_R55
+   56 8 7 7*_rateLaw56 #_R56
+end reactions
