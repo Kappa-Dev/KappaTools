@@ -152,12 +152,33 @@ let flip (s,state) =
 let count_p interface =
   List.fold_left
     (fun n (_,state) ->
-       match state with P -> n+1 | U -> n)
+       match state with
+       | P -> n+1
+       | U -> n)
     0 interface
 
 let rate_of kind interface =
   let n = count_p interface in
   "k"^(string_of_state kind)^(string_of_int n)
+
+(* kp_i/n-i
+    ku_i/i
+*)
+
+let rate_of_sym kind interface n =
+  let n_p = count_p interface in
+  let s =
+    match kind with
+    | P ->
+      let rec aux k =
+        let i = n - k in
+        "k"^(string_of_state kind)^(string_of_int k)^"/"^"n_k"^(string_of_int i)
+      in
+      aux n_p
+    | U ->
+      "k"^(string_of_state kind)^(string_of_int n_p)^"/"^"n_k"^(string_of_int n_p)
+  in
+  s
 
 let string_of_rate format rate =
   match format with
@@ -205,7 +226,8 @@ let declare_rate fmt format n =
     if k<0 then list
     else
       aux (k-1)
-        (("kp"^(string_of_int k),rate U k)::("ku"^(string_of_int (k+1)),rate P (k+1))::list)
+        (("n_k"^(string_of_int k), k)::
+          ("kp"^(string_of_int k),rate U k)::("ku"^(string_of_int (k+1)),rate P (k+1))::list)
   in
   let list = aux n [] in
   let list =
@@ -217,26 +239,44 @@ let declare_rate fmt format n =
   ()
 
 let deal_with_one_valuation fmt format interface =
-  let rec aux suffix prefix =
-    match suffix with
-    | [] -> ()
-    | (h:string*state)::tl ->
-      let kind,h' = flip h in
-      let interface_post =
-        List.fold_left (fun list elt -> elt::list) (h'::prefix) tl
-      in
-      let rate = rate_of kind interface in
-      let () = print_rule fmt format interface interface_post rate in
-      aux tl (h::prefix)
-  in
-  aux (List.rev interface) []
+  match format with
+  | Kappa | BNGL ->
+    let rec aux suffix prefix =
+      match suffix with
+      | [] -> ()
+      | (h:string*state)::tl ->
+        let kind,h' = flip h in
+        let interface_post =
+          List.fold_left (fun list elt -> elt::list) (h'::prefix) tl
+        in
+        let rate = rate_of kind interface in
+        let () = print_rule fmt format interface interface_post rate in
+        aux tl (h::prefix)
+    in
+    aux (List.rev interface) []
+  | BNGL_compact ->
+    let n = List.length interface in
+    let rec aux suffix prefix =
+      match suffix with
+      | [] -> ()
+      | (h:string*state)::tl ->
+        let kind,h' = flip h in
+        let interface_post =
+          List.fold_left (fun list elt -> elt::list) (h'::prefix) tl
+        in
+        let rate = rate_of_sym kind interface n in
+        let () = print_rule fmt format interface interface_post rate in
+        aux tl (h::prefix)
+    in
+    aux (List.rev interface) []
 
 
 let declare_rules fmt format n =
   let () =
     match format with
     | Kappa -> ()
-    | BNGL | BNGL_compact ->
+    | BNGL
+    | BNGL_compact ->
       Format.fprintf fmt "begin reaction rules\n"
   in
   let sites = site_list format n in
