@@ -25,6 +25,7 @@
 val check_orbit_internal_state_permutation:
   ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -49,6 +50,7 @@ val check_orbit_internal_state_permutation:
 val check_orbit_binding_state_permutation:
   ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -73,6 +75,7 @@ val check_orbit_binding_state_permutation:
 val check_orbit_full_permutation:
   ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -87,6 +90,7 @@ val check_orbit_full_permutation:
 val is_invariant_internal_states_permutation:
   ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -98,6 +102,7 @@ val is_invariant_internal_states_permutation:
 val is_invariant_binding_states_permutation:
   ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter ->
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->
@@ -107,8 +112,9 @@ val is_invariant_binding_states_permutation:
   LKappa_auto.cache * bool
 
 val is_invariant_full_states_permutation:
-  ?trace:bool -> 
+  ?trace:bool ->
   ?fmt:Format.formatter ->
+  ?fmt_err:Format.formatter -> 
   ?sigs:Signature.s ->
   agent_type:int ->
   site1:int ->

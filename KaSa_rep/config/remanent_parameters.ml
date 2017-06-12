@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Apr 28 2017>
+  * Last modification: Time-stamp: <Jun 12 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -310,17 +310,17 @@ let open_tasks_profiling =
     | Some channel -> channel
 
 let get_parameters ?html_mode:(html_mode=true) ~called_from () =
-  let channel,html_mode,command  =
+  let channel,channel_err,html_mode,command  =
     match
       called_from
     with
     | Remanent_parameters_sig.Server ->
-      None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
+      None,None,false || html_mode, [|"KaSa";"(Interractive mode)"|]
     | Remanent_parameters_sig.Internalised ->
-      Some stdout,false || html_mode, Sys.argv
+      Some stdout,Some Format.err_formatter, false || html_mode, Sys.argv
 
     | Remanent_parameters_sig.KaSim ->
-      Some (open_tasks_profiling ()), false || html_mode, Sys.argv
+      Some (open_tasks_profiling ()), None, false || html_mode, Sys.argv
     | Remanent_parameters_sig.KaSa ->
       begin
         match
@@ -330,7 +330,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
          | _,"",_ -> Some stdout
          | "",a,ext -> Some (open_out a ext)
          | a,b,ext -> Some (open_out (a^"/"^b) ext)
-      end, false || html_mode, Sys.argv
+      end, Some Format.err_formatter, false || html_mode, Sys.argv
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
@@ -407,6 +407,11 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
       (match channel with
        | None -> Loggers.dummy_txt_logger
        | Some _ -> Loggers.open_logger_from_formatter !Config.formatter);
+   Remanent_parameters_sig.logger_err =
+         (match channel_err with
+          | None -> Loggers.dummy_txt_logger
+          | Some fmt -> Loggers.open_logger_from_formatter fmt);
+
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
     Remanent_parameters_sig.print_efficiency = !Config.print_efficiency;
     Remanent_parameters_sig.profiler =
@@ -573,6 +578,7 @@ let get_command_line_1                               marshalisable =
 
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_logger parameter = parameter.Remanent_parameters_sig.logger
+let get_logger_err parameter = parameter.Remanent_parameters_sig.logger_err
 
 (*let get_formatter parameter = parameter.Remanent_parameters_sig.formatter
 let set_formatter parameter logger = {parameter with Remanent_parameters_sig.formatter = logger}*)

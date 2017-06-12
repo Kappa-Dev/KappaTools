@@ -13,6 +13,16 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+let local_trace = false
+
+let do_print ?trace ?fmt ?(sigs:Signature.s option) f =
+  match (local_trace, trace), fmt, sigs with
+  | ((true, _ ) | (_, Some true)), Some fmt, Some sigs ->
+    f sigs fmt
+  | (false, (Some false | None)), _, _
+  | _, None, _
+  | _, _, None  -> ()
+
 let get_binding_precondition x = fst (fst x)
 
 let get_binding_mod x = snd x
@@ -87,16 +97,22 @@ let of_rule rule = (rule.LKappa.r_mix, rule.LKappa.r_created)
 let is_empty (rule_tail,created_tail) =
   rule_tail = [] && created_tail = []
 
-let p_head p p_raw (rule_tail,created_tail) =
+let p_head ~fmt_err ~sigs p p_raw (rule_tail,created_tail) =
   match rule_tail, created_tail with
   | h :: t, _ -> p h, (t, created_tail)
   | _, h :: t -> p_raw h, (rule_tail, t)
   | [], [] ->
     let s1,i1,i2,i3 = __POS__ in
     let s = Format.sprintf "%s %i %i %i" s1 i1 i2 i3 in
+    let fmt = fmt_err in
+    let trace = Some true in
+    let () =
+      do_print ?trace ?fmt ?sigs
+        (fun _ fmt -> Format.fprintf fmt "%s@" s)
+    in
     raise (invalid_arg s)
 
-let apply_head sigma sigma_raw (rule_tail,created_tail) =
+let apply_head ~fmt_err ~sigs sigma sigma_raw (rule_tail,created_tail) =
   match rule_tail, created_tail with
   | h::t, _ ->
     let () = sigma h in
@@ -107,9 +123,15 @@ let apply_head sigma sigma_raw (rule_tail,created_tail) =
   | [], [] ->
     let s1,i1,i2,i3 = __POS__ in
     let s = Format.sprintf "%s %i %i %i" s1 i1 i2 i3 in
+    let fmt = fmt_err in
+    let trace = Some true in
+    let () =
+      do_print ?trace ?fmt ?sigs
+        (fun _ fmt -> Format.fprintf fmt "%s@" s)
+    in
     raise (invalid_arg s)
 
-let apply_head_predicate f f_raw cache (rule_tail,created_tail) rule =
+let apply_head_predicate ~fmt_err ~sigs f f_raw cache (rule_tail,created_tail) rule =
   match rule_tail, created_tail with
   | h::_, _ ->
     f h rule cache
@@ -118,18 +140,24 @@ let apply_head_predicate f f_raw cache (rule_tail,created_tail) rule =
   | [], [] ->
     let s1,i1,i2,i3 = __POS__ in
     let s = Format.sprintf "%s %i %i %i" s1 i1 i2 i3 in
+    let fmt = fmt_err in
+    let trace = Some true in
+    let () =
+      do_print ?trace ?fmt ?sigs
+        (fun _ fmt -> Format.fprintf fmt "%s@" s)
+    in
     raise (invalid_arg s)
 
-let shift tail = apply_head ignore ignore tail
+let shift ~fmt_err ~sigs tail = apply_head ~fmt_err ~sigs ignore ignore tail
 
 (***************************************************************)
 
-let filter_positions p p_raw rule =
+let filter_positions ~fmt_err ~sigs p p_raw rule =
   let rec aux pos_id rule_tail accu =
     if is_empty rule_tail
     then List.rev accu
     else
-      let b, rule_tail = p_head p p_raw rule_tail in
+      let b, rule_tail = p_head ~fmt_err ~sigs p p_raw rule_tail in
       if b then
         aux (pos_id + 1) rule_tail (pos_id :: accu)
       else
@@ -138,36 +166,36 @@ let filter_positions p p_raw rule =
   aux 0 (of_rule rule) []
 
 let potential_positions_for_swapping_internal_states
-    agent_type site1 site2 rule : int list =
-  filter_positions
+    ~fmt_err ~sigs agent_type site1 site2 rule : int list =
+  filter_positions ~fmt_err ~sigs
     (may_swap_internal_state_regular agent_type site1 site2)
     (may_swap_internal_state_created agent_type site1 site2)
     rule
 
 let potential_positions_for_swapping_binding_states
-    agent_type site1 site2 rule =
-  filter_positions
+    ~fmt_err ~sigs agent_type site1 site2 rule =
+  filter_positions ~fmt_err ~sigs
     (may_swap_binding_state_regular agent_type site1 site2)
     (may_swap_binding_state_created agent_type site1 site2)
     rule
 
 let potential_positions_for_swapping_full
-    agent_type site1 site2 rule =
-  filter_positions
+    ~fmt_err ~sigs agent_type site1 site2 rule =
+  filter_positions ~fmt_err ~sigs
     (may_swap_full_regular agent_type site1 site2)
     (may_swap_full_created agent_type site1 site2)
     rule
 
 (******************************************************************)
 
-let backtrack sigma_inv sigma_raw_inv counter positions rule =
-  let rec aux agent_id rule_tail pos_id positions_tail =
+let backtrack ~fmt_err ~sigs sigma_inv sigma_raw_inv counter positions rule =
+  let rec aux ~fmt_err ~sigs agent_id rule_tail pos_id positions_tail =
     match positions_tail with
     | [] -> ()
     | pos_head :: _
       when agent_id < pos_head ->
-      let rule_tail = shift rule_tail in
-      aux (agent_id + 1) rule_tail pos_id positions_tail
+      let rule_tail = shift ~fmt_err ~sigs rule_tail in
+      aux ~fmt_err ~sigs (agent_id + 1) rule_tail pos_id positions_tail
     | pos_head :: pos_tail
       when agent_id = pos_head ->
       begin
@@ -175,78 +203,85 @@ let backtrack sigma_inv sigma_raw_inv counter positions rule =
           if
             counter.(pos_id)
           then
-            apply_head sigma_inv sigma_raw_inv rule_tail
+            apply_head ~fmt_err ~sigs sigma_inv sigma_raw_inv rule_tail
           else
-          shift rule_tail
+          shift ~fmt_err ~sigs rule_tail
         in
-        aux (agent_id + 1) rule_tail (pos_id + 1) pos_tail
+        aux ~fmt_err ~sigs (agent_id + 1) rule_tail (pos_id + 1) pos_tail
       end
     | _ :: pos_tail ->
-      aux agent_id rule_tail (pos_id + 1) pos_tail
+      aux ~fmt_err ~sigs agent_id rule_tail (pos_id + 1) pos_tail
   in
-  aux 0 (of_rule rule) 0 positions
+  aux ~fmt_err ~sigs 0 (of_rule rule) 0 positions
 
 (***************************************************************)
 (*SYMMETRIES*)
 (***************************************************************)
 
 let for_all_elt_permutation
+    ~fmt_err ~sigs
     (positions:int list)
     (f:LKappa.rule_agent -> LKappa.rule -> 'a -> 'a * bool )
     (f_raw:Raw_mixture.agent -> LKappa.rule -> 'a -> 'a * bool)
     (rule:LKappa.rule)
     (init:'a)  =
-  let rec next agent_id rule_tail pos_id positions_tail accu =
+  let rec next ~fmt_err ~sigs agent_id rule_tail pos_id positions_tail accu =
     match positions_tail with
     | [] -> accu, true
     | pos_head :: _
       when agent_id < pos_head ->
-      let rule_tail = shift rule_tail in
-      next (agent_id + 1) rule_tail pos_id positions_tail accu
+      let rule_tail = shift ~fmt_err ~sigs rule_tail in
+      next ~fmt_err ~sigs (agent_id + 1) rule_tail pos_id positions_tail accu
     | pos_head :: pos_tail
       when agent_id = pos_head ->
       begin
         match apply_head_predicate
+                ~fmt_err ~sigs
                 f f_raw
                 accu
                 rule_tail rule
         with
-
         | accu, false -> accu, false
-
         | accu, true ->
-          let rule_tail = shift rule_tail in
-          next (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
+          let rule_tail = shift ~fmt_err ~sigs rule_tail in
+          next ~fmt_err ~sigs (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
       end
     | _::_
       (*when agent_id > pos_head*) ->
       let s1,i1,i2,i3 = __POS__ in
+      let string = Format.sprintf "Internal bug: %s %i %i %i" s1 i1 i2 i3 in
+      let fmt = fmt_err in
+      let trace = Some true in
       let () =
-        Format.fprintf Format.err_formatter
-          "Internal bug: %s %i %i %i" s1 i1 i2 i3
+        do_print ?trace ?fmt ?sigs
+          (fun _ fmt ->
+             Format.fprintf fmt "%s@ " string
+          )
       in
       accu, false
   in
-  next 0 (of_rule rule) 0 positions init
+  next ~fmt_err ~sigs 0 (of_rule rule) 0 positions init
 
 let for_all_over_orbit
+    ~trace ~fmt ~fmt_err ~sigs
     (positions:int list)
     (sigma:LKappa.rule_agent -> unit)
     (sigma_inv:LKappa.rule_agent -> unit)
     (sigma_raw:Raw_mixture.agent -> unit)
     (sigma_raw_inv:Raw_mixture.agent -> unit)
-    (f: LKappa.rule -> 'a -> 'a * bool)
+    (f: trace: bool option -> fmt:Format.formatter option -> fmt_err:Format.formatter option -> sigs:Signature.s option -> LKappa.rule -> 'a -> 'a * bool)
     (rule:LKappa.rule)
     (init:'a) : 'a * bool =
     let n = List.length positions in
     let counter = Array.make n false in
-    let rec next agent_id rule_tail pos_id positions_tail accu =
+    let rec next ~trace ~fmt ~fmt_err ~sigs agent_id rule_tail pos_id positions_tail accu =
       match positions_tail with
-      | [] -> f rule accu
+      | [] -> f ~trace ~fmt ~fmt_err ~sigs rule accu
       | pos_head :: _
         when agent_id < pos_head ->
-        let rule_tail = shift rule_tail in
-        next (agent_id + 1) rule_tail pos_id positions_tail accu
+        let rule_tail = shift ~fmt_err ~sigs rule_tail in
+        next ~trace ~fmt ~fmt_err ~sigs
+          (agent_id + 1) rule_tail pos_id positions_tail accu
       | pos_head :: pos_tail
         when agent_id = pos_head ->
         begin
@@ -255,20 +290,20 @@ let for_all_over_orbit
           then
             let () = counter.(pos_id) <- false in
             let rule_tail =
-              apply_head sigma_inv sigma_raw_inv rule_tail
+              apply_head ~fmt_err ~sigs sigma_inv sigma_raw_inv rule_tail
             in
-            next (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
+            next ~trace ~fmt ~fmt_err ~sigs (agent_id + 1) rule_tail (pos_id + 1) pos_tail accu
           else
             let () = counter.(pos_id) <- true in
-            let _ = apply_head sigma sigma_raw rule_tail in
-            let accu, b = f rule accu in
+            let _ = apply_head ~fmt_err ~sigs sigma sigma_raw rule_tail in
+            let accu, b = f ~trace ~fmt ~fmt_err ~sigs rule accu in
             if b
             then
-              next 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
+              next ~trace ~fmt ~fmt_err ~sigs 0 (rule.LKappa.r_mix,rule.LKappa.r_created) 0
                 positions accu
             else
               let () =
-                backtrack sigma_inv sigma_raw_inv counter
+                backtrack ~fmt_err ~sigs sigma_inv sigma_raw_inv counter
                   positions rule
               in
               accu, false
@@ -276,24 +311,24 @@ let for_all_over_orbit
       | _::_
         (*when agent_id > pos_head*) ->
         let s1,i1,i2,i3 = __POS__ in
-        let () =
-          Format.fprintf Format.err_formatter
+        let s =
+          Format.sprintf
             "Internal bug: %s %i %i %i" s1 i1 i2 i3
         in
+        let fmt = fmt_err in
+        let trace = Some true in
         let () =
-          backtrack sigma_inv sigma_raw_inv counter positions rule
+          do_print ?trace ?fmt ?sigs
+            (fun _ fmt -> Format.fprintf fmt "%s@" s)
+        in
+        let () =
+          backtrack ~fmt_err ~sigs sigma_inv sigma_raw_inv counter positions rule
         in
         accu, false
     in
-    next 0 (of_rule rule) 0 positions init
+    next ~trace ~fmt ~fmt_err ~sigs 0 (of_rule rule) 0 positions init
 
 exception False
-
-let do_print ?trace ?fmt ?sigs f =
-  match trace, fmt, sigs with
-| Some true, Some fmt, Some sigs ->
-   f sigs fmt
-| (Some false | None), _, _ | _, None, _ | _, _, None  -> ()
 
 
 
@@ -574,7 +609,7 @@ let saturate_domain_with_symmetric_patterns
   domain
 
 let check_orbit
-    ?trace ?fmt ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (get_positions, sigma, sigma_inv, sigma_raw, sigma_raw_inv)
     weight agent site1 site2 rule correct rates cache counter
     to_be_checked : (LKappa_auto.cache * int array * bool array) * bool =
@@ -603,7 +638,8 @@ let check_orbit
   in
   let size = Array.length to_be_checked in
   let accu = cache, [], counter, to_be_checked in
-  let f rule (cache, l, counter, to_be_checked) =
+  let f ~trace ~fmt ~fmt_err ~sigs rule (cache, l, counter, to_be_checked) =
+    let _ = fmt_err in
     let () =
       do_print ?trace ?fmt ?sigs
         (fun sigs fmt ->
@@ -648,7 +684,8 @@ let check_orbit
   in
   let (cache, l, counter, to_be_checked), b =
     for_all_over_orbit
-      (get_positions agent site1 site2 rule)
+      ~trace ~fmt ~fmt_err ~sigs
+      (get_positions ~fmt_err ~sigs agent site1 site2 rule)
       (sigma agent site1 site2)
       (sigma_inv agent site1 site2)
       (sigma_raw agent site1 site2)
@@ -720,10 +757,10 @@ let weight ~correct ~card_stabilizer ~rate =
           rate (correct * card_stabilizer)
 
 let check_orbit_internal_state_permutation
-    ?trace ?fmt ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt  ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     (potential_positions_for_swapping_internal_states,
      swap_internal_state_regular,
      swap_internal_state_regular,
@@ -732,10 +769,10 @@ let check_orbit_internal_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_binding_state_permutation
-    ?trace ?fmt  ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,
      swap_binding_state_regular,
@@ -744,10 +781,10 @@ let check_orbit_binding_state_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_orbit_full_permutation
-    ?trace ?fmt ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
+    ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     (potential_positions_for_swapping_full,
      swap_full_regular,
      swap_full_regular,
@@ -756,26 +793,26 @@ let check_orbit_full_permutation
     weight agent_type site1 site2 rule correct rates cache counter to_be_checked
 
 let check_invariance
-    ?trace ?fmt ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (get_positions, is_equal, is_equal_raw)
     agent_type site1 site2 rule cache
   =
   let _ = trace, fmt, sigs in
-  for_all_elt_permutation
-    (get_positions agent_type site1 site2 rule)
+  for_all_elt_permutation ~fmt_err ~sigs
+    (get_positions ~fmt_err ~sigs agent_type site1 site2 rule)
     is_equal
     is_equal_raw
     rule
     cache
 
 let is_invariant_internal_states_permutation
-    ?trace ?fmt
+    ?trace ?fmt ?fmt_err
     ?sigs
     ~agent_type ~site1 ~site2 rule cache =
   let _ = trace, fmt, sigs in
   let positions =
     potential_positions_for_swapping_internal_states
-      agent_type site1 site2 rule
+      ~fmt_err ~sigs agent_type site1 site2 rule
   in
   match positions with
   | [] -> cache, true
@@ -799,10 +836,10 @@ let check_gen swap agent_type site1 site2 agent rule cache =
   cache, i=i'
 
 let is_invariant_binding_states_permutation
-    ?trace ?fmt ?sigs ~agent_type ~site1 ~site2
+    ?(trace:bool option) ?(fmt:Format.formatter option) ?fmt_err ?(sigs:Signature.s option) ~agent_type ~site1 ~site2
     rule cache =
   check_invariance
-    ?trace ?fmt ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (potential_positions_for_swapping_binding_states,
      (check_gen
         swap_binding_state_regular
@@ -813,16 +850,16 @@ let is_invariant_binding_states_permutation
     agent_type site1 site2 rule cache
 
 let is_invariant_full_states_permutation
-    ?trace ?fmt ?sigs ~agent_type ~site1 ~site2
+    ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2
     rule cache =
   let cache, b1 =
     is_invariant_internal_states_permutation
-      ?trace ?fmt ?sigs ~agent_type ~site1 ~site2
+      ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2
       rule cache
   in
   if b1 then
     is_invariant_binding_states_permutation
-    ?trace ?fmt ?sigs ~agent_type ~site1 ~site2
-    rule cache
+      ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2
+      rule cache
   else
     cache, false

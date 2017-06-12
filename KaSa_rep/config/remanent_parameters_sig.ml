@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Apr 28 2017>
+  * Last modification:  Time-stamp: <Jun 12 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -162,6 +162,7 @@ type marshalisable_parameters =
 type parameters =
   {
     logger: Loggers.t;
+    logger_err: Loggers.t;
     profiler: Loggers.t;
     compression_status: Loggers.t;
     print_efficiency: bool;

@@ -519,7 +519,7 @@ let cannonic_form_from_syntactic_rules
 (*detect_symmetries*)
 
 let check_invariance_gen
-    p ?trace ?fmt ?sigs ~to_be_checked ~counter ~correct ~rates
+    p ?trace ?fmt ?fmt_err ?sigs ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     cache agent_type site1 site2 =
@@ -532,7 +532,7 @@ let check_invariance_gen
         to_be_checked.(id)
       then
         let (cache, counter, to_be_checked), b =
-          p ?trace ?fmt ?sigs ~agent_type ~site1 ~site2 rule ~correct
+          p ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
         if b then
@@ -545,36 +545,36 @@ let check_invariance_gen
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
 let check_invariance_internal_states
-    ~correct ~rates ?trace ?fmt ?sigs
+    ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_internal_state_permutation
-    ?trace ?fmt ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_binding_states
-    ~correct ~rates ?trace ?fmt ?sigs
+    ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_binding_state_permutation
-    ?trace ?fmt ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_both
-    ~correct ~rates ?trace ?fmt ?sigs
+    ~correct ~rates ?trace ?fmt ?fmt_err ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_full_permutation
-    ?trace ?fmt ?sigs
+    ?trace ?fmt ?fmt_err ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
@@ -660,6 +660,10 @@ let detect_symmetries
   let fmt =
     Loggers.formatter_of_logger
       (Remanent_parameters.get_logger parameters)
+  in
+  let fmt_err =
+    Loggers.formatter_of_logger
+      (Remanent_parameters.get_logger_err parameters)
   in
   let sigs = Model.signatures env in
   let lkappa_rule_list =
