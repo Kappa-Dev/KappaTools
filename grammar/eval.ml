@@ -23,7 +23,7 @@ let rec compile_alg ?bwd_bisim ~compileModeOn domain (alg,pos) =
             match bwd_bisim with
           | None -> domain'
           | Some bwd_bisim_info ->
-            LKappa_auto.saturate_domain_with_symmetric_patterns
+            LKappa_group_action.saturate_domain_with_symmetric_patterns
               ~compileModeOn ?origin contact_map
               bwd_bisim_info ccs domain'
           in

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jun 08 2017>
+   * Last modification: Time-stamp: <Jun 12 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -519,7 +519,7 @@ let cannonic_form_from_syntactic_rules
 (*detect_symmetries*)
 
 let check_invariance_gen
-    p ?parameters ?sigs ~to_be_checked ~counter ~correct ~rates
+    p ?trace ?fmt ?sigs ~to_be_checked ~counter ~correct ~rates
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     cache agent_type site1 site2 =
@@ -532,7 +532,7 @@ let check_invariance_gen
         to_be_checked.(id)
       then
         let (cache, counter, to_be_checked), b =
-          p ?parameters ?sigs ~agent_type ~site1 ~site2 rule ~correct
+          p ?trace ?fmt ?sigs ~agent_type ~site1 ~site2 rule ~correct
             rates cache ~counter to_be_checked
         in
         if b then
@@ -545,36 +545,36 @@ let check_invariance_gen
   aux hash_and_rule_list (cache, to_be_checked, counter)
 
 let check_invariance_internal_states
-    ~correct ~rates ?parameters ?sigs
+    ~correct ~rates ?trace ?fmt ?sigs
     (hash_and_rule_list: (LKappa_auto.RuleCache.hashed_list *
                           LKappa.rule) list)
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_internal_state_permutation
-    ?parameters ?sigs
+    ?trace ?fmt ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_binding_states
-    ~correct ~rates ?parameters ?sigs
+    ~correct ~rates ?trace ?fmt ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_binding_state_permutation
-    ?parameters ?sigs
+    ?trace ?fmt ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
 let check_invariance_both
-    ~correct ~rates ?parameters ?sigs
+    ~correct ~rates ?trace ?fmt ?sigs
     hash_and_rule_list
     (cache, to_be_checked, counter)
     agent_type site1 site2 =
   check_invariance_gen
     LKappa_group_action.check_orbit_full_permutation
-    ?parameters ?sigs
+    ?trace ?fmt ?sigs
     ~to_be_checked ~counter ~correct ~rates
     hash_and_rule_list cache agent_type site1 site2
 
@@ -656,6 +656,11 @@ let detect_symmetries
     (contact_map:(string list * (string * string) list)
          Mods.StringMap.t Mods.StringMap.t) =
   (*-------------------------------------------------------------*)
+  let trace = Some (Remanent_parameters.get_trace parameters) in
+  let fmt =
+    Loggers.formatter_of_logger
+      (Remanent_parameters.get_logger parameters)
+  in
   let sigs = Model.signatures env in
   let lkappa_rule_list =
     List.fold_left (fun current_list species ->
@@ -713,17 +718,16 @@ let detect_symmetries
   (*-------------------------------------------------------------*)
   (*rules*)
   let (cache, _, _), refined_partitioned_contact_map =
-    let parameters = Some parameters in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
       (check_invariance_internal_states
-         ?parameters
+         ?trace ?fmt
          ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_binding_states
-         ?parameters
+         ?trace ?fmt
          ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_both
-         ?parameters
+         ?trace ?fmt
          ~sigs ~correct ~rates hash_and_rule_list)
       p'
   in
@@ -737,19 +741,18 @@ let detect_symmetries
     Array.copy refined_partitioned_contact_map
   in
   let (cache, _, _), refined_partitioned_contact_map_init =
-    let parameters = Some parameters in
     let correct = correct_init in
     let rates = rates_init in
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked_init, counter_init)
       (check_invariance_internal_states
-         ?parameters
+         ?trace ?fmt
          ~sigs ~correct ~rates hash_and_rule_list_init)
       (check_invariance_binding_states
-         ?parameters
+         ?trace ?fmt
          ~sigs  ~correct ~rates hash_and_rule_list_init)
       (check_invariance_both
-         ?parameters
+         ?trace ?fmt
          ~sigs ~correct ~rates hash_and_rule_list_init)
       refined_partitioned_contact_map_copy
   in

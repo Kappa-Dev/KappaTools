@@ -9,7 +9,7 @@ type preprocessed_ast
 
 val get_compilation :
   ?unit:Kasim_args.directive_unit -> ?max_sharing:bool ->
-  ?bwd_bisim:LKappa_auto.bwd_bisim_info ->
+  ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   ?compileModeOn:bool -> ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
   (Configuration.t * Counter.progressBar * Model.t * Contact_map.t * int list *
    (bool*bool*bool) option * string * string option *
@@ -31,7 +31,7 @@ val preprocess:
 
 val get_compilation_from_preprocessed_ast :
   ?unit:Kasim_args.directive_unit -> ?max_sharing:bool ->
-  ?bwd_bisim:LKappa_auto.bwd_bisim_info ->
+  ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   ?compileModeOn:bool -> ?kasim_args:Kasim_args.t ->
   Run_cli_args.t -> preprocessed_ast ->
   (Configuration.t * Counter.progressBar * Model.t * Contact_map.t * int list *

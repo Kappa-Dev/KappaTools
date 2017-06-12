@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <May 13 2017>
+   * Last modification: Time-stamp: <Jun 12 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -247,19 +247,7 @@ let copy raw_mixture =
        })
     (List.rev raw_mixture)
 
-(*
-(int ->
-Raw_mixture.agent * (int * int) option array -> 'a) ->
-(int -> 'a -> Raw_mixture.agent * (int * int) option array -> unit) ->
-('a -> 'a -> int) ->
-(int -> Raw_mixture.agent -> 'b) ->
-(int -> 'b -> Raw_mixture.agent -> unit) ->
-('c -> int list list) ->
-LKappa_auto.cache ->
-'c array ->
-Raw_mixture.agent list ->
-LKappa_auto.cache * Raw_mixture.agent list
-*)
+
 let normalize_with_binding_states get1 set1 cmp get2 set2 get_partition
     rule_cache symmetries raw_mixture =
   let refined_raw_mixture = enrich_binding_state raw_mixture in
@@ -302,12 +290,6 @@ let normalize_with_binding_states get1 set1 cmp get2 set2 get_partition
   in
   rule_cache, raw_mixture
 
-(*
-LKappa_auto.cache ->
-int Symmetries_sig.site_partition array ->
-Raw_mixture.agent list ->
-LKappa_auto.cache * Raw_mixture.agent list
-*)
 let normalize_binding_states rule_cache symmetries raw_mixture =
   normalize_with_binding_states
     (fun i (agent, agent') ->
@@ -322,12 +304,6 @@ let normalize_binding_states rule_cache symmetries raw_mixture =
     get_binding_state_partition
     rule_cache symmetries raw_mixture
 
-(*
-LKappa_auto.cache ->
-int Symmetries_sig.site_partition array ->
-Raw_mixture.agent list ->
-LKappa_auto.cache * Raw_mixture.agent list
-*)
 let normalize_full rule_cache symmetries raw_mixture =
   normalize_with_binding_states
     (fun i (agent, agent') ->
@@ -348,12 +324,6 @@ let normalize_full rule_cache symmetries raw_mixture =
     get_full_partition
     rule_cache symmetries raw_mixture
 
-(*
-LKappa_auto.cache ->
-int Symmetries_sig.site_partition array ->
-Raw_mixture.agent list ->
-LKappa_auto.cache * Raw_mixture.agent list
-*)
 let normalize_raw_mixture rule_cache symmetries raw_mixture =
   let rule_cache, raw_mixture =
     normalize_full rule_cache symmetries raw_mixture
@@ -378,6 +348,13 @@ let normalize_species ?parameters ~sigs rule_cache cache symmetries cc =
   | None -> rule_cache, cache, cc
 
 (******************************************************)
+let get_trace_opt_fmt_opt parameters_opt =
+  match parameters_opt with
+  | None -> None, None
+  | Some p ->
+    Some (Remanent_parameters.get_trace p),
+    Loggers.formatter_of_logger
+      (Remanent_parameters.get_logger p)
 
 let is_pattern_invariant_internal_states_permutation
     ?parameters ~env
@@ -387,8 +364,9 @@ let is_pattern_invariant_internal_states_permutation
     Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
   let sigs = Model.signatures env in
+  let trace, fmt = get_trace_opt_fmt_opt parameters in
   LKappa_group_action.is_invariant_internal_states_permutation
-    ?parameters
+    ?trace ?fmt
     ~sigs
     ~agent_type
     ~site1
@@ -404,8 +382,9 @@ let is_pattern_invariant_binding_states_permutation
   let lkappa_rule =
     Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
+  let trace, fmt = get_trace_opt_fmt_opt parameters in
   LKappa_group_action.is_invariant_binding_states_permutation
-    ?parameters
+    ?trace ?fmt
     ~sigs
     ~agent_type
     ~site1
@@ -421,8 +400,9 @@ let is_pattern_invariant_full_states_permutation
   let lkappa_rule =
     Patterns_extra.pattern_id_to_lkappa_rule ?parameters env id
   in
+  let trace, fmt = get_trace_opt_fmt_opt parameters in
   LKappa_group_action.is_invariant_full_states_permutation
-    ?parameters
+    ?trace ?fmt
     ~sigs
     ~agent_type
     ~site1
@@ -445,7 +425,7 @@ let equiv_class_gen
   let convention = Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs in
   let rule, unspec = to_rule  species in
   let cache, seen, rule_class =
-    LKappa_auto.equiv_class
+    LKappa_group_action.equiv_class
       cache seen rule
       ~partitions_internal_states
       ~partitions_binding_states
