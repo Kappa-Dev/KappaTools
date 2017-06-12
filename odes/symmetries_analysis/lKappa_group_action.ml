@@ -511,8 +511,6 @@ let copy_lkappa_rule rule =
   }
 
 let equiv_class
-    ?parameters
-    ?sigs
     cache
     seen
     rule
@@ -521,7 +519,6 @@ let equiv_class
     ~partitions_full_states
     ~convention
   =
-  let _ = sigs, parameters in
   let to_visit = [rule] in
    let rec aux cache to_visit seen visited =
      match
