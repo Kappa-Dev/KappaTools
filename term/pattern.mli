@@ -154,7 +154,7 @@ val finalize : max_sharing:bool -> PreEnv.t -> Contact_map.t ->
 val infs : t -> t -> t list
 val matchings : t -> t -> Renaming.t list
 val merge_on_inf : PreEnv.t -> Renaming.t -> t -> t ->
-                   t option * (int * int * link * int) list
+                   t option * (t * int * t * int * int * bool) option
 val length : t -> int
 
 module Set : SetMap.Set with type elt=id
