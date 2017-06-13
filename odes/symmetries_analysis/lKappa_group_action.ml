@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jun 12 2017>
+   * Last modification: Time-stamp: <Jun 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -760,7 +760,7 @@ let check_orbit_internal_state_permutation
     ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt ?fmt_err ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (potential_positions_for_swapping_internal_states,
      swap_internal_state_regular,
      swap_internal_state_regular,
@@ -772,7 +772,7 @@ let check_orbit_binding_state_permutation
     ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt ?fmt_err ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (potential_positions_for_swapping_binding_states,
      swap_binding_state_regular,
      swap_binding_state_regular,
@@ -784,7 +784,7 @@ let check_orbit_full_permutation
     ?trace ?fmt ?fmt_err ?sigs ~agent_type ~site1 ~site2 rule ~correct rates cache
     ~counter to_be_checked =
   check_orbit
-    ?trace ?fmt ?fmt_err ?sigs
+    ~trace ~fmt ~fmt_err ~sigs
     (potential_positions_for_swapping_full,
      swap_full_regular,
      swap_full_regular,

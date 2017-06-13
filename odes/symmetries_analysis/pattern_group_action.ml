@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jun 12 2017>
+   * Last modification: Time-stamp: <Jun 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -422,6 +422,7 @@ let equiv_class_gen
     preenv
     seen
     species =
+  let _ = parameters in 
   let convention = Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs in
   let rule, unspec = to_rule  species in
   let cache, seen, rule_class =

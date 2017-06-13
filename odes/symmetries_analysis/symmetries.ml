@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jun 12 2017>
+   * Last modification: Time-stamp: <Jun 13 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -725,13 +725,13 @@ let detect_symmetries
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked, counter)
       (check_invariance_internal_states
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_binding_states
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs ~correct ~rates hash_and_rule_list)
       (check_invariance_both
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs ~correct ~rates hash_and_rule_list)
       p'
   in
@@ -750,13 +750,13 @@ let detect_symmetries
     refine_partitioned_contact_map_in_lkappa_representation
       (cache, to_be_checked_init, counter_init)
       (check_invariance_internal_states
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs ~correct ~rates hash_and_rule_list_init)
       (check_invariance_binding_states
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs  ~correct ~rates hash_and_rule_list_init)
       (check_invariance_both
-         ?trace ?fmt
+         ?trace ?fmt ?fmt_err
          ~sigs ~correct ~rates hash_and_rule_list_init)
       refined_partitioned_contact_map_copy
   in
