@@ -124,7 +124,7 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
     | None -> ()
     | Some s -> s := Mods.Int2Set.remove x !s in
   let rec aux at_least_one_edge rename = function
-    | [] -> if at_least_one_edge then (Some rename,[]) else (None,[])
+    | [] -> if at_least_one_edge then (Some rename,None) else (None,None)
     | (o,p as pair)::todos ->
       let () = tick pair in
       match Tools.array_fold_left2i
@@ -135,31 +135,37 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
                    if ((not strict && (ix = -1||iy = -1)) || ix = iy) then
                      match lx, ly with
                      | (Link _, Free| Free, Link _) ->
-                        (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                        (None,Some (cc1,o,cc2,p,i,false))
                      | (UnSpec, Free| Free, UnSpec
                        | Link _, UnSpec |UnSpec, Link _) ->
-                        if strict then (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                        if strict then
+                          (None,Some (cc1,o,cc2,p,i,false))
                         else
-                          (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),[])
+                          (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),None)
                      | UnSpec, UnSpec ->
-                       (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),[])
-                     | Free, Free -> (Some (true,todo,ren),[])
+                       (Some (one_edge || (ix <> -1 && ix = iy),todo,ren),None)
+                     | Free, Free -> (Some (true,todo,ren),None)
                      | Link (n1,s1), Link (n2,s2) ->
                        if s1 = s2 then
                          if Renaming.mem n1 ren then
                            if Renaming.apply ren n1 = n2
-                           then (Some (true,todo,ren),[])
-                           else (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                           then (Some (true,todo,ren),None)
+                           else
+                             (None,Some (cc1,o,cc2,p,i,false))
                          else match Renaming.add n1 n2 ren with
-                           | None -> (None,[(o,i,lx,-1);(p,i,ly,-1)])
+                           | None ->
+                              (None,Some (cc1,o,cc2,p,i,false))
                            | Some r' ->
                              if find_ty cc1 n1 = find_ty cc2 n2
-                             then (Some (true,(n1,n2)::todo,r'),[])
-                             else (None,[(o,i,lx,-1);(p,i,ly,-1)])
-                       else (None,[(o,i,lx,-1);(p,i,ly,-1)])
-                   else (None,[(o,i,UnSpec,ix);(p,i,UnSpec,iy)])
+                             then (Some (true,(n1,n2)::todo,r'),None)
+                             else
+                               (None,Some (cc1,o,cc2,p,i,false))
+                       else
+                         (None,Some (cc1,o,cc2,p,i,false))
+                   else
+                     (None,Some (cc1,o,cc2,p,i,true))
               )
-              (Some (at_least_one_edge,todos,rename),[])
+              (Some (at_least_one_edge,todos,rename),None)
               (Mods.IntMap.find_default [||] o cc1.nodes)
               (Mods.IntMap.find_default [||] p cc2.nodes) with
       | (None,conflict) -> (None,conflict)
@@ -1447,7 +1453,7 @@ let merge_on_inf env m g1 g2 =
   | (Some m',_) ->
      let (_,pushout) =
        merge_compatible env.PreEnv.id_by_type env.PreEnv.nb_id m' g1 g2 in
-     (Some pushout,[])
+     (Some pushout,None)
   | (None,conflict) -> (None,conflict)
 
 let length cc = Mods.IntMap.size (cc.nodes)

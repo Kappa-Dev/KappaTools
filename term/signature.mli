@@ -38,6 +38,7 @@ val max_arity : s -> int
 (** [max_arity sigs] returns max {arities sigs i} *)
 
 val num_of_agent : string Locality.annot -> s -> int
+val agent_of_num : int -> s -> string
 
 val id_of_site : string Locality.annot -> string Locality.annot -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
