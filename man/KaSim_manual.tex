@@ -47,7 +47,7 @@
 \def\tcb#1{\textcolor{blue}{\ttt{#1}}}
 \def\ttt#1{\texttt{#1}}
 \def\var#1{{\textquotesingle}#1{\textquotesingle}}
-
+\def\ignore#1{}
 \makeindex
 
 %% END Article customise
@@ -100,7 +100,7 @@
 
 \section{Preamble}
 This manual describes the usage of \KaSim~and \KaSa, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules.
-Although this manual contains a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modelling.
+Although this manual provides a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modelling.
 %%Therefore, in the following of this manual some familiarity with Kappa is assumed and
 %
 
@@ -108,7 +108,7 @@ Although this manual contains a self-contained description of Kappa, it is \emph
 To get an idea of how Kappa is used in a modelling context, the reader can consult the following note \href{http://www.research.ed.ac.uk/portal/files/16869853/Agile_Modelling_of_Cellular_Signalling_Invited_Paper_.pdf}{Agile modelling of cellular signalling (SOS'08)}. A longer article, expounding on causal analysis is also available: \href{http://fontana.med.harvard.edu/www/Documents/WF/Papers/signaling.causality.pdf}{Rule-based modelling of cellular signalling (CONCUR'07)}. See also this tutorial: \href{https://hal.archives-ouvertes.fr/hal-00692430}{Modelling epigenetic information maintenance: a Kappa tutorial}.
 
 \section{The \KaSim~engine}
-\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. The Kappa language describes site graphs and their local transformations. \KaSim~takes one or several \hyperref[chap:kappa]{Kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos \textit{et al}'s implicit state simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models.
+\KaSim~is an open source stochastic simulator of the rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} that are written in Kappa. The Kappa language describes site graphs and their local transformations. \KaSim~takes one or several \hyperref[chap:kappa]{Kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos \textit{et al}'s implicit state simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models.
 
 A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the Kappa files, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}).
 %The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}
@@ -123,7 +123,7 @@ each step (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=14cm]{img/event-loop.png}
-\caption{The event loop}
+\caption{The event loop.}
 \label{fig:event-loop}
 \end{center}
 \end{figure}
@@ -132,7 +132,7 @@ Note that \KaSim~can only render curves in the svg format. However, data outputs
 
 \section{The \KaSa~static analyser}
 
-\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute the contact map and the influence map. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.  Other analyses including  model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon.
+\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute the contact map and the influence map. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaSa. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
@@ -142,7 +142,7 @@ A graphical interface is proposed to navigate through the various options and ut
 It also supports some model reduction techniques, that may reduce the
 dimension of the ODEs (or the number of different bio-molecular species in reaction networks).
 
-\KaDE~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to select a backend format, some semantics options, and some model reduction methods.
+\KaDE~takes one or several \hyperref[chap:kappa]{Kappa files} and uses  some command line options in order to select a backend format, tune the semantics, and call some model reduction methods.
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaDE. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
@@ -151,7 +151,7 @@ A graphical interface is proposed to navigate through the various options and ut
 \ITE{
 \item[-] Kappa language tutorials and downloads: \url{http://kappalanguage.org}
 \item[-] Bug reports should be posted on github: \url{https://github.com/Kappa-Dev/KaSim/issues}
-\item[-] Questions and answers on the kappa-user mailing list: \url{http://groups.google.com/group/kappa-users}
+\item[-] Questions and answers on the Kappa-user mailing list: \url{http://groups.google.com/group/kappa-users}
 \item[-] Want to contribute to the project? \ttt{jean.krivine@irif.fr}
 }
 
@@ -176,8 +176,7 @@ compile) as well as \ttt{ocamlbuild}, \ttt{findlib} and the
 \ttt{yojson} library installed.
 
 You can check if it is the case from a terminal window by typing
-\ttt{ocamlfind ocamlopt -v}. If it fails or prints a version number
-too old, then you need to install OCaml Native compiler that can be
+\ttt{ocamlfind ocamlopt -v}. If it fails or prints an outdated version number, then you need to install OCaml Native compiler that can be
 downloaded from \url{http://caml.inria.fr/download.en.html} and/or
 findlib available at
 \url{http://projects.camlcity.org/projects/findlib.html}.
@@ -239,14 +238,14 @@ Please document the variable \texttt{LABLTKLIBREP} in the Makefile.
 
 \end{enumerate}
 
-\chapter{The kappa language}\label{chap:kappa}
+\chapter{The Kappa language}\label{chap:kappa}
 
 \section{General structure}
-A model is represented in Kappa by a set of \emph{Kappa File}. We use
-KF\index{kappa file} to denote the union of the files that are given
+A model is represented in Kappa by a set of \emph{Kappa Files}. We use
+KF\index{Kappa file} to denote the union of the files that are given
 as input (to either \KaSim~or \KaSa).
 
-Each line of the KF\index{kappa file} is interpreted as a
+Each line of the KF\index{Kappa file} is interpreted as a
 \emph{declaration}\index{declaration}, except if the line ends by
 the~{\textquotesingle} \ttt{$\bs$}{\textquotesingle}
 character. Therefore, in order to write a
@@ -259,7 +258,7 @@ Declarations can be: agent and token \emph{signatures}
 \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and
 \emph{parameter configurations} (Sec.~\ref{sec:param}).
 
-The KF\index{kappa file}'s structure is quite flexible. Neither
+The KF\index{Kappa file}'s structure is quite flexible. Neither
 dividing into several sub-files nor the order of
 declaration\index{declaration}s matters (to the exception of
 perturbations and variable declaration\index{declaration}s, see
@@ -285,10 +284,10 @@ concentration.
 In order to use agents or tokens in a model, one needs to declare them
 first. \emph{Agent signatures}\index{agent signature} constitute a
 form of typing information about the agents that are used in the
-model. It contains information about the name and number of
+model. They contain information about the name and number of
 interaction sites the agent has, and about their possible internal
 states. A signature\index{agent signature} is declared in the
-KF\index{kappa file} by the following line: \ITE{
+KF\index{Kappa file} by the following line: \ITE{
 \item[] \ttt{\%agent: } \textit{signature\_expression} } according to
 the grammar given in Table~\ref{tab:sig} where terminal symbols are
 written in (blue) typed font, and $\varepsilon$ stands for the empty
@@ -299,7 +298,7 @@ expression of the type $[a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep
 \begin{table}[htbp]
   \centering
   \caption{Agent signature %\index{agent signature}
- expression}
+ expression.}
   \begin{tabular}{@{} lcl @{}}
     \textit{signature\_expression} & ::= &
     \tcb{Id}\tcb{(}\textit{sig}\tcb{)} \\
@@ -343,7 +342,7 @@ sites as resources. At most one edge of the graph can use a site of
 a node (representing an agent in our case). %We call this concept the
 %\emph{rigidity of Kappa}. %% JF: I disagree: rigidity = an embedding between two ccs is defined by the image of one node. It relies not only on the fact that there is at most one edge on a node, but also on the fact that sites have pairwisely distinct names.
 
-\subsection{Graph syntax}
+\subsection{Graphs}
 The ASCII syntax we use to represent sited graphs follows the
 skeletons (describe formally in Table \ref{tab:patterns}):
 \begin{itemize}
@@ -366,17 +365,16 @@ skeletons (describe formally in Table \ref{tab:patterns}):
   \ttt{A(x!4,y\intstate{}u!95,z\intstate{}1)},
   \ttt{A(x!95,y\intstate{}u!23,z\intstate{}1)}.
 
-  \Remark{Each link identifier appears exactly twice of course. %this is a consequence of the regidity of Kappa.
+  \Remark{Each link identifier appears exactly twice. %this is a consequence of the regidity of Kappa.
   }
 \end{itemize}
 
-\subsection{Pattern syntax}
+\subsection{Patterns}
 Kappa strength is to describe transformations by only mentionning (and
 storing) the relevant part of the subgraph required for that
-transformation to be possible. It plays a key role in resisting
-combinatorial explosion when writing models. We use the \emph{don't
-  care, don't write} (DCDW)\index{don't care don't write} principle. If a
-transformation occurs independently of the state of a site of an
+transformation to be possible. This is the \emph{don't
+  care, don't write} (DCDW)\index{don't care don't write} principle which  plays a key role in resisting combinatorial explosion when writing models. If a
+transformation occurs independently from the state of a site of an
 agent, don't mention it in the \emph{pattern} to match. The pattern
 A(x,z) represents an agent of type A whose sites x and z are free but
 the sites y and z can be in any internal state and the site y can be
@@ -389,9 +387,9 @@ state 2 is written as A(x,y\intstate{}u?,z\intstate{}2).
 
 \begin{table}[ht!]
   \centering
-  \caption{Kappa expressions}
+  \caption{Kappa expressions.}
   \begin{tabular}{@{} lcl @{}}
-    \textit{kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{kappa\_expression} $\mid\varepsilon$ \\
+    \textit{Kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{Kappa\_expression} $\mid\varepsilon$ \\
     \textit{agent\_expression} & ::= &  \tcb{Id}\tcb{(}\textit{interface}\tcb{)} \\
     \textit{interface} &::=& \tcb{Id} \textit{internal\_state link\_state}  \tcb{,} \textit{interface} $\mid\varepsilon$ \\
     \textit{internal\_state} &::=& $\varepsilon$ | \tcb{\intstate Id} \\
@@ -405,14 +403,15 @@ state 2 is written as A(x,y\intstate{}u?,z\intstate{}2).
 In standard Kappa, in order to require a site to be bound for an
 interaction to occur, one may use the
 \emph{semi-link}\index{semi-link} construct \ttt{!\_} which does not
-specify who the partner of the bond is. For instance in the variable:
-\lstinline[language=kappa]*%var: \var{ab}~|A(x!_),B(y!_)|* will
-count the number of \ttt{A}s and \ttt{B}s connected to some agents,
+specify who the partner of the bond is. For instance in the following instruction:
+\lstinline[language=kappa]*%var: 'ab' |A(x!_),B(y!_)|*,
+the variable \var{ab} will count the number of \ttt{A}s and \ttt{B}s connected to some agents,
 including the limit case \ttt{A(x!1),B(y!1)}. It is sometimes
 convenient to specify the \emph{type}\index{link type} of the
 semi-link, in order to restrict the choice of the binding partner. For
-instance the variable:
-\lstinline[language=kappa]*%var: \var{ab}~|A(x!y.B),B(y!x.A)|!*
+instance, in the following instruction:
+\lstinline[language=kappa]*%var: 'ab' |A(x!y.B),B(y!x.A)|!*,
+the variable \var{ab}
 will count the number of \ttt{A}s whose
 site \ttt{x} is connected to a site \ttt{y} of \ttt{B}, plus the
 number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x}
@@ -427,47 +426,47 @@ of \ttt{A}. Note that this still includes the case
 
 \section{Rules}\label{sec:rules}
 
-Once agents are declared, one may add to the KF\index{kappa file} the
+Once agents are declared, one may add to the KF\index{Kappa file} the
 rules\index{rule} that describe their dynamics.
 
-There are 2 ways of specifying rules:
+There are two ways of specifying rules:
 \begin{enumerate}
-  \item by giving two {\it kappa\_expression}s. The first one, called
+  \item by giving two {\it Kappa\_expression}s. The first one, called
     \emph{left hand side}\index{left hand side} (LHS), represents what
     you need to apply the rule. The second, the \emph{right hand
       side}\index{right hand side} (RHS), describes what you obtain
     once the rule is applied. In Kappa, they are separated by an arrow $\rar$ following the chemical intuition this notation comes from.
-  \item by giving one {\it kappa\_expression} with edition. The kappa
+  \item by giving one {\it Kappa\_expression} with edition. The Kappa
     expression still represents the necessary context for the rule to
     apply. But modifications are specified locally inside the expression.
 \end{enumerate}
 
-Both are allowed in kappa and are described in the 2 next subsections.
+Both are allowed in Kappa and are described in both next subsections.
 
 In any case, rule specification is optionaly prefixed by a rule name
 (written between two symbols \textquotesingle) and always followed by a rule rate.
 Rate expressions (which include algebraic expressions\index{algebraic
   expression}) are given by the grammars Table~\ref{tab:rates} and
-Table~\ref{tab:alg} (respectively) but can be thought of for now as
+Table~\ref{tab:alg} (respectively) but can be thought for now as
 positive real numbers.
 
 A complete rule in the first representation looks like:
 
 \ITE{
 \item[] \ttt{{\textquotesingle}rule name{\textquotesingle} } {\it
-  kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}
+  Kappa\_expression} $\rar$ {\it Kappa\_expression} \ttt{@} {\it rate}
 }
 
 One may also
 declare a \imp{bi-directional rule} using the convention:
 
 \ITE{
-\item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}
+\item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it Kappa\_expression} $\lrar$ {\it Kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}
 }
 
 The above declaration\index{declaration} is equivalent to
-write, in addition to the rule named \ttt{\var{my-rule}} and another rule named
-\ttt{\var{my rule\_op}} which swaps left and right hand sides, and has
+write, in addition to the rule named \ttt{\var{bi-rule}} and another rule named
+\ttt{\var{bi-rule\_op}} which swaps left and right hand sides, and has
 rate \textit{rate$^-$}.
 
 It is possible to mix
@@ -475,7 +474,7 @@ agents and tokens in \imp{hybrid rules} (which may also be
 bi-directional). A hybrid rule has the following form:
 
 \ITE{
-\item[] {\it kappa\_expression} | {\it token\_expression} $\rar$ {\it kappa\_expression}  | {\it token\_expression }\ttt{@} {\it rate}
+\item[] {\it Kappa\_expression} | {\it token\_expression} $\rar$ {\it Kappa\_expression}  | {\it token\_expression }\ttt{@} {\it rate}
 }
 
 Token expressions are also given by the grammar in
@@ -483,7 +482,7 @@ Table~\ref{tab:tokens}.
 %%
 \begin{table}[ht!]
   \centering
-  \caption{Token expressions}
+  \caption{Token expressions.}
   \begin{tabular}{@{} lcl @{}}
    \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
 	&&|  \textit{token\_expression} \tcb{+}\ \textit{token\_expression} \\\\
@@ -495,8 +494,7 @@ Table~\ref{tab:tokens}.
 \subsection{Chemical notation rules}\index{chemical notation}
 
 This is the most intuitive representation. Nevertheless, as explained in the
-second paragraph, it is error prone. It also induce
-duplication of the unmodified context between LHS and RHS which can
+second paragraph, it is error prone. It also induces duplication of the unmodified context between LHS and RHS which can
 lead to even more errors when edition a posteriori on the left are not
 correctly reported on the right.
 
@@ -509,7 +507,7 @@ declares a dimerization rule between two instances of agent \ttt{A}
 provided the second agent is phosphorylated on site \ttt{y} (this is the meaning of \ttt{p}).
 
 Remember that the identifier \ttt{!1} of the bound is arbitrary and
-that following (DCDW)\index{don't care don't write}, the site \ttt{z}
+that following DCDW\index{don't care don't write}, the site \ttt{z}
 of \ttt{A} is not mentioned in the expression because it has no
 influence on the triggering of this rule.
 
@@ -583,7 +581,7 @@ explicitly in the rule. Consider for instance the previous rule:
 The \ttt{A} in the graph that is matched to the second occurrence of
 \ttt{A} in the LHS will be deleted by the rule. As a consequence all
 its sites will disappear together with the bonds that were pointing to
-them. For instance, when applied to the graph \ITE{
+them. For instance, when applied to the following graph: \ITE{
 \item[] $G=$\ttt{A(x!1,y\intstate p,z\intstate2),A(x!2,y\intstate
   u,z\intstate0!1),C(t!2)} } the above rule will result in a new graph
 $G' =\ttt{A(x!1,y{\intstate}p,z\intstate2),C(t)}$ where the site
@@ -605,8 +603,7 @@ Both rules will cause \KaSim~to raise a warning at rule compilation time.
 \subsection{Edit notation rules}\index{edit rules}
 
 Near any modified element, modification is specified. Created agents
-are prefixed by a $+$. Degraded agents are prefixed by a $-$. Site
-modifications are described by writing the new (linking or internal)
+are prefixed by a $+$. Degraded agents are prefixed by a $-$. Site modifications are described by writing the new (linking or internal)
 state after the symbol $/$. Therefore, the symbol $/$ alone means that the site becomes
 free, $/!9$ means that the site becomes part of link $9$ and $/\intstate{}zzz$
 means that the new internal state of the site is $zzz$.
@@ -661,20 +658,20 @@ see in the next section, it is however possible to make its rate
 explicitly depend on the concentrations of the tokens using a
 \imp{variable} rate.
 
-Consuming $t$ tokens is strickly equivalent to produicing $-k$
-tokens. All variation in amount of tokens can be written on the
+Consuming $t$ tokens is strickly equivalent to produicing $-t$
+tokens. All variations in amount of tokens can be written on the
 right hand side of rules. This is what you do when you use tokens in
 edit notation:
 \begin{lstlisting}[language=kappa]
 'hybrid rule' S(x~u/~p!1/),K(y!1/) | (-0.1):atp @ 'k'
 \end{lstlisting}
 
-The variation makes clear that the simulator
+The variations make clear that the simulator
 does not check that the consumed amount of token is available. It
 consumes tokens even if the quantity becomes then negative!
 
 \subsection{Rates}\label{sec:kinetics}
-Kappa rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
+Kappa rules are equipped with one (or two) \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
 
 The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered.
@@ -714,13 +711,13 @@ E.\@ Coli cell: $V=10^{-15}l$, and ${\cal A}V=10^{8}$.
 A concentration of $1M$ in a yeast cell volume corresponds to $10^{8}$ molecules; $10nM\approx 1$ molecule per cell.
 \end{itemize}
 
-The table \ref{tab:rates} lists typical ranges for deterministic rate constants and
+The table \ref{tab:kin_rates} lists typical ranges for deterministic rate constants and
 their stochastic counterparts assuming a mammalian cell volume.
 
 \begin{table}[htbp]
 \centering
 \caption{Example of kinetic rates.}
-\label{tab:rates}
+\label{tab:kin_rates}
 \begin{tabular}{@{} lllr @{} }
 \toprule
 process & $k$ & $\gamma$ %& stoch. dimension
@@ -753,9 +750,9 @@ This sort of ambiguity should be resolved, if possible, by refining the ambiguou
 \end{lstlisting}
 
 There exist systems where enumerating unary cases becomes
-impossible or where the approximation on binary instances is wrong. As an alternative, one should use the kappa notation for ambiguous rules:
+impossible or where the approximation on binary instances is wrong. As an alternative, one should use the Kappa notation for ambiguous rules:
 \ITE{
-\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2 \{k_1\}$
+\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it Kappa\_expression} $\rar$ {\it Kappa\_expression} \ttt{@} $\ga_2 \{k_1\}$
 }
 which will tell \KaSim~to apply the rule named  \ttt{{\textquotesingle}my rule{\textquotesingle}} with a rate $\ga_2$ for
 binary instances and a rate $k_1$ for unary instances. The obtained
@@ -782,7 +779,7 @@ that we give in Figure~\ref{fig:species}.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=15cm,bb=0 0 2380 677]{generated_img/poly.png}
-\caption{Final mixture%\index{mixture}
+\caption{Final mixture %\index{mixture}
    obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
 \end{center}
@@ -800,7 +797,7 @@ This feature \emph{can change in the future}.
 
 \begin{table}[ht!]
   \centering
-  \caption{Rate expressions}
+  \caption{Rate expressions.}
   \begin{tabular}{@{} lcl @{}}
     \textit{rate\_expression} &::=& \textit{algebraic\_expression} \\
 &&| \textit{algebraic\_expression} \tcb{\{}\textit{algebraic\_expression}:\textit{algebraic\_expression}\tcb{\}}
@@ -810,16 +807,16 @@ This feature \emph{can change in the future}.
 
 \section{Variables}\label{sec:var}
 
-In the KF\index{kappa file} it is also possible to declare \emph{variables}\index{variable} with the declaration:
+In the KF\index{Kappa file} it is also possible to declare \emph{variables}\index{variable} with the declaration:
 \ITE{
 \item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression})
 }
-where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are defined in Table~\ref{tab:alg} (available symbols for variable, constants and operators are given in  Table~\ref{tab:operators}).
+where \ttt{var\_name} can be any string. Algebraic expressions are defined in Table~\ref{tab:alg} (available symbols for variable, constants and operators are given in  Table~\ref{tab:operators}).
 
 %%
 \begin{table}[htbp]
   \centering
-  \caption{Algebraic expressions}
+  \caption{Algebraic expressions.}
   \begin{tabular}{@{} lcl @{}}
     \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
      &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
@@ -839,7 +836,7 @@ The last item of the list is an
 
 \begin{table}[htbp]
 \centering
-\caption{Symbol usable in algebraic expressions%\index{algebraic expression}
+\caption{Symbols usable in algebraic expressions.%\index{algebraic expression}
 }
 \begin{tabular}{@{} l|l @{} }
 \toprule
@@ -848,15 +845,15 @@ The last item of the list is an
 \ttt{[E]} & the total number of (productive) simulation events\index{event}\\
 & since the beginning of the simulation \\
 \ttt{[E-]} & the total number of null events\index{null event}\\
-\ttt{[Emax]} & the max (productive) event limit as set by \ttt{-l} (in \ttt{-u event} mode). \\ &Note that if unset \ttt{Emax}$=\infty$\\
+\ttt{[Emax]} & the max (productive) event limit as set by \ttt{-l} (in \ttt{-u event} mode) \\ &(note that if unset \ttt{Emax}$=\infty$)\\
 \ttt{[T]} & the bio-time of the simulation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
-\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
-\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p}. \\
+\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l} \\ &(note that if unset \ttt{Tmax}$=\infty$)\\
+\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p} \\
 
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
-\ttt{|\textit{kappa\_expression}|} & number of occurences of the pattern \textit{kappa\_expression}\\
+\ttt{|\textit{Kappa\_expression}|} & number of occurences of the pattern \textit{Kappa\_expression}\\
 \ttt{inf} & symbol for $\infty$ \\\\
 \toprule
 \ttt{\tcb{unary/binary\_op}} & Interpretation \\
@@ -879,7 +876,7 @@ The last item of the list is an
 %var: 'homodimer' |A(x!1),A(x!1)|
 %var: 'aa' 'homodimer'/2
 \end{lstlisting}
-define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. Note that variables that are used in the expression of another variable must be declared beforehand.
+define two variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. Note that variables that are used in the expression of another variable must be declared beforehand.
 \vskip 0.25cm
 \noi It is also possible to use algebraic expressions\index{algebraic expression} as kinetic rates\index{kinetic rate} as in
 \begin{lstlisting}[language=kappa]
@@ -898,17 +895,17 @@ to declare a variable and at the same time require it to be outputted in the dat
 
 \section{Initial conditions}\label{sec:init}\index{initial condition}
 
-The initial mixture\index{mixture} to which rules in the KF\index{kappa file} will be applied are declared as
+The initial mixture\index{mixture} to which rules in the KF\index{Kappa file} will be applied are declared as follows:
 \ITE{
-\item[] \ttt{\%init: } \textit{algebraic\_expression} \textit{kappa\_expression}
+\item[] \ttt{\%init: } \textit{algebraic\_expression} \textit{Kappa\_expression}
 }
-or
+or:
 \ITE{
 \item[] \ttt{\%init: }  \textit{token\_name} \ttt{<-} \textit{algebraic\_expression}
 }
 
 %%
-where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. The DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
+where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and Kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model multiple copies of the graph described by the Kappa expression. The DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \begin{lstlisting}[language=kappa]
 %var: 'n' 1000
 %init: 'n' A(),A(y~p)
@@ -921,7 +918,7 @@ As any other declaration\index{declaration}, \ttt{\%init} can be used multiple t
 \chapter{The command line}\label{chap:cl}
 
 \section{General usage}
-From a terminal window, \KaSim~can be invoked by typing
+From a terminal window, \KaSim~can be invoked by typing:
 \ITE{
 \item[\$] \ttt{KaSim file\_1 ... file\_n [option] } } where
 \ttt{file\_i} are the input Kappa files containing the rules, initial
@@ -931,7 +928,7 @@ should really take advantage of the option \ttt{-d} so that these files  all
 ends in a distinct directory.
 
 In any case, a log called \ttt{inputs.ka} is generated. This is a
-valid kappa files such that \ttt{KaSim inputs.ka} reruns exactly the
+valid Kappa file such that \ttt{KaSim inputs.ka} reruns exactly the
 simulation just ran outputing the exact same outputs (using the same
 pseudo random numbers!). First line of this file contains an \ttt{uuid}
 that is also present in any file output during the same run.
@@ -940,8 +937,8 @@ Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the
 options that can be given to the simulator.
 
 Basically, one can specify an upper bound and a plot period either in
-simulated or bio-time (arbitrary time unit), or in number of
-events. Note that bio-time is computed using
+simulated or bio-time (arbitrary time unit), or in number of events.
+Note that bio-time is computed using
 Gillespie{\textquotesingle}s formula for time advance (see
 Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time
 (it is not even proportional).
@@ -953,7 +950,7 @@ Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time
 \section{Main options}
 
 Table~\ref{tab:options} sumarizes the main options that are
-accessible through the command line. Options that expects an argument
+accessible through the command line. Options that expect an argument
 are preceded by a single dash, options that do not need any argument
 start with a double dash.
 
@@ -963,7 +960,7 @@ quantities can expressed in simulated time (the default) or in number
 of event (using \ttt{-u event}).
 
 \begin{table}[h!]
-\caption{Command line: main options}
+\caption{Command line: main options.}
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -971,7 +968,7 @@ Argument & Description \\ \hline
 \ttt{-u $unit$} & Unit of options (time/event)\\
 \ttt{-l $max$} & Terminates simulation after $max \geq 0$ $unit$\\
 \ttt{-initial $min$} & Starts the simulation at $min$ $unit$ (data outputs convienience only)\\
-\ttt{-p $x$} & plot a line in the data file every $x$ $unit$\\
+\ttt{-p $x$} & Plot a line in the data file every $x$ $unit$\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
 &Use the extension to determine format ('.tsv', '.svg' or csv else)\\
 \ttt{-i} \textit{file} & Interpret \textit{file} as an input file name\\
@@ -987,14 +984,14 @@ Argument & Description \\ \hline
 Table~\ref{tab:add-options} summarizes the advanced options that are accessible through the command line.
 
 \begin{table}[h!]
-\caption{Command line: advanced options}
+\caption{Command line: advanced options.}
 \centering
 \begin{tabular}{|l|l|}
 \hline
 Argument & Description \\ \hline
 \ttt{ -seed $n$} & Seeds the pseudo-random number generator $n>0$ \\
 \ttt{ -rescale $r$} & Multiply each initial quantity by $r$ \\
-\ttt{ -make-sim} \textit{sim\_file} & Makes a simulation package out of the input kappa files \\
+\ttt{ -make-sim} \textit{sim\_file} & Makes a simulation package out of the input KF\index{Kappa file} \\
 \ttt{ -load-sim} \textit{sim\_file} & Use simulation package \textit{sim\_file} as input\\
 \ttt{ \dd gluttony} & Simulation mode that is memory intensive \\ & but that speeds up simulation time\\
 \ttt{ -mode batch} & Set non interactive mode (never halt waiting for an user\\
@@ -1007,39 +1004,39 @@ Argument & Description \\ \hline
 %
 
 \section{Example}
-The command
+The command:
 \ITE{
 \item[\$] \ttt{KaSim model.ka -u event -l 1000000 -p 1000 -o model.out}
 }
-will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. A measure will be taken every 1000 events in file \ttt{model.out}. The command
+will generate a file \ttt{model.out} containing the trajectories of the observables defined in the Kappa file \ttt{model.ka}. A measure will be taken every 1000 events in file \ttt{model.out}. The command:
 \ITE{
 \item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -l 1.5 -p 0.0015}
 }
-will generate a file \ttt{data.csv} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. The input Kappa file is split into four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} ({\eg}see Chapter~\ref{chap:kappa}). %The order in which the files are given does not matter.
+will generate a file \ttt{data.csv} (default name) containing 1,000 data points of a simulation of 1.5 (arbitrary) time units of the model. The input Kappa file is split into four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} ({\eg}see Chapter~\ref{chap:kappa}). %The order in which the files are given does not matter.
 
 \section{Interactivity}
-Simulations are interuptible by sending a \verb:SIGINT: to the
+Simulations are interruptible by sending a \verb:SIGINT: to the
 simulator. (The easiest way to send a \verb:SIGINT: to a process is to
 press Ctrl-c in the terminal window it runs into.)
 
 In batch mode, this stops the simulation. In other circonstances, it
-launches a toplevel in which you can either type
+launches a toplevel in which you can either type:
 \begin{itemize}
 \item \verb:$RUN: (optionally followed by a pause condition) to resume
   simulation or
-\item any of the \emph{effect} described in Section \ref{sec:mod} to trigger it imediately.
+\item any of the \emph{effects} described in Section \ref{sec:mod} to trigger it imediately.
 \end{itemize}
 
 A pause condition is a boolean expression ({\eg}Section \ref{sec:mod}) under which the simulator will stop and fall back in
 the toplevel in order to allow a new interactive session.
 
-The option \ttt{-mode interactive} ``interrupts automaticaly the
-simulation'' (and launches the toplevel) just after the initialization
+The option \ttt{-mode interactive} interrupts automatically the
+simulation (and launches the toplevel) just after the initialization
 of the simulation.
 
 \chapter{A simple model}\label{chap:abc}
 
-We describe below the content of a simple Kappa model and give examples of some typical run\footnote{The corresponding kappa file is included in the distribution of \KaSim, in the directory \ttt{models/}}.
+We describe below the content of a simple Kappa model and give examples of some typical run\footnote{The corresponding Kappa file is included in the distribution of \KaSim, in the directory \ttt{models/}}.
 
 \section{ABC.ka}
 \begin{lstlisting}[language=kappa]
@@ -1067,7 +1064,7 @@ We describe below the content of a simple Kappa model and give examples of some 
 %init: 10000 C()
 \end{lstlisting}
 
-Line 1-4 of this KF\index{kappa file} contains signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by
+Lines 1-4 of this KF\index{Kappa file} contain signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have two sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u} (unphosphorylated) or \ttt{p} (phosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by
 \begin{lstlisting}[language=kappa]
 'alt_ab.c' A(x!1,c),B(x!1),C(x1~u) -> ...
 \end{lstlisting}
@@ -1079,7 +1076,7 @@ We try first a coarse simulation of $100,000$ events (10 times the number of age
 \ITE{
 \item[\$] KaSim ABC.ka -u event -l 100000 -p 1000 -o abc.csv
 }}
-Plotting the content of the \ttt{abc.csv} file one notices that nothing of significant interest happen to the observables after 250s. So we can now specify a meaningful time limit by running
+Plotting the content of the \ttt{abc.csv} file one notices that nothing  significantly  interesting happens to the observables after 250s. So we can now specify a meaningful time limit by running:
 \ttt{
 \ITE{
 \item[\$] KaSim ABC.ka -l 250 -p 0.25 -o abc.out
@@ -1109,9 +1106,9 @@ re-apply the same perturbation each time its precondition is
 satisfied and until a certain condition is met, using the \ttt{repeat
   ... until} constructors.
 
-When the precondition of several perturbations are satisfied at the
-same time. Perturbations are triggered in the order in which they have
-been declared in the KF\index{kappa file}. A perturbation can only be
+When the preconditions of several perturbations are satisfied at the
+same time, perturbations are triggered in the order in which they have
+been declared in the KF\index{Kappa file}. A perturbation can only be
 fired once per event loop.
 
 Basic perturbations are obtained using the declaration \index{declaration}:
@@ -1126,7 +1123,7 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
 
 \begin{table}[htbp]
   \centering
-  \caption{Perturbation expressions}
+  \caption{Perturbation expressions.}
   \begin{tabular}{@{} lcl @{}}
   	\textit{perturbation\_expression} &::=& \tcb{\ttt{\%mod:}} \textit{perturbation} \\
 	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\
@@ -1147,8 +1144,7 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
     && | \tcb{\$PLOTENTRY} \\
-    && | \tcb{\$PRINT} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
-    \\
+    && | \tcb{\$PRINT} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\\\
     \textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
     && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
 	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
@@ -1161,13 +1157,13 @@ A example of boolean expression used as a precondition is
 %mod: ([T]>10) && ('v1' / 'v2') > 1 do ...
 \end{lstlisting}
 
-It indicate the wish to trigger a perturbation whenever the simulation
+It indicates the wish to trigger a perturbation whenever the simulation
 time has passed 10 time units and the ratio of variables \ttt{v1} over
 \ttt{v2} is above 1. Recall that the perturbations are "one shot"
 interventions on the simulation. Possible interventions are described
 in the following sections using examples.
 
-\textbf{Note on time dependent preconditions:}
+\textbf{Note on time dependent preconditions.}
 \\Consider a perturbation of the form:
 \ITE{
 \item[] \ttt{\%mod: {\it f}(t)={\it x} do $\dots$}
@@ -1184,10 +1180,10 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 \lstinline[language=kappa]*$DEL |B(x!_)| B(x!_)*
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
 
-There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
-\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*
+There are various ways one can use perturbations to study more deeply a given Kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
+\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
 
-The modified kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
+The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
 Running again a simulation (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
@@ -1207,7 +1203,7 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 
 A snapshot is an instant photography of the current state of the mixture (a dump of the state at a given moment in the simulation).
 
-In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) kappa file.
+In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) Kappa file.
 For instance, the declaration\index{declaration}:
 \lstinline[language=kappa]*%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
 will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables.
@@ -1218,14 +1214,14 @@ in which case the default prefix \ttt{snap.ka} will be used for naming snapshots
 
 If the name already exists a counter will be appended at the end of
 the file to prevent overwriting. Snapshots can be performed multiple
-times, for instance every 1000 events, using the
+times, for instance every 1,000 events, using the
 declaration\index{declaration}:
 \begin{lstlisting}[language=kappa]
 %mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" until [false]
 \end{lstlisting}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
 
-Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
+Note that instead of producing Kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
 
 \subsection{Interrupt simulation}
 The perturbation \ttt{\$STOP "final\_state.ka"} will terminate the
@@ -1241,12 +1237,12 @@ will double the concentration of token \ttt{a} each time it gets below 100.
 
 In our ABC example, adding the instruction:
 \lstinline[language=kappa]!%mod:  [true] do $TRACK 'Cpp' [true]!
-\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{{\textquotesingle}r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule applications ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{{\textquotesingle}r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=5cm]{generated_img/cflow.png}
-\caption{Causal flow for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflict between rule occurrences. Here the \ttt{{\textquotesingle}ab.c{\textquotesingle}} rule has to occur before the \ttt{{\textquotesingle}a.b{\textquotesingle}} rule. Red observable indicate that the last rule allowed one to observe a new instance of \ttt{{\textquotesingle}Cpp{\textquotesingle}}.}
+\caption{Causal flow for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflicts between rule occurrences. Here the \ttt{{\textquotesingle}ab.c{\textquotesingle}} rule has to occur before the \ttt{{\textquotesingle}a.b{\textquotesingle}} rule. The red observable indicates that the last rule allowed one to observe a new instance of \ttt{{\textquotesingle}Cpp{\textquotesingle}}.}
 \label{fig:cflow}
 \end{center}
 \end{figure}
@@ -1273,12 +1269,12 @@ will ask \KaSim~to output 3 versions of each computed causal flow, with all poss
    \label{fig:flux}
 \end{figure}
 %%
-The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) a every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
+The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) at every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
 \begin{lstlisting}[language=kappa]
 %mod: [true] do $FLUX "flux.dot" [true]
 %mod: [T]>20 do $FLUX "flux.dot" [false]
 \end{lstlisting}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produce a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
+The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
 
 
 \subsection{Updating kinetic rates on the fly}
@@ -1306,25 +1302,26 @@ The above declaration will ask \KaSim~to analyze each new occurrence of \var{Cpp
 %mod: [T]>20 || ('x' > 0 && 'Cpp' - 'x' > 9) do $TRACK 'Cpp' [false]
 \end{lstlisting}
 The first line is a declaration of an $x$ variable that is initially set to 0. Note that the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
-The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$.
+The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
 
 \subsection{Printing values during a simulation}
 The effect \ttt{\$PRINT \textit{string\_expression}
   <\textit{string\_expression}>} enables one to output values during a
-computation to
+computation to:
 \begin{itemize}
-\item standard output if the first \textit{string\_expression} is empty
-\item to to the file specified by the first \textit{string\_expression} else
+\item standard output if the first \textit{string\_expression} is empty,
+\item to the file specified by the first \textit{string\_expression} otherwise.
 \end{itemize}
 For instance:
-\begin{lstlisting}[language=kappa]
+{\begin{lstlisting}[language=kappa]
 %mod: repeat \
-|A|<0 do $PRINT "token_".[E].".dat" <"Token A is: " . |A| . " at time=". [T]>\
+ |A|<0 do $PRINT "token_".[E].".dat" <"Token A is: " . |A| . " at time=". [T]>\
 until [false]
-\end{lstlisting}
-will ask \KaSim~to output the value of token \ttt{A} in a file
+\end{lstlisting}} will ask \KaSim~to output the value of token \ttt{A} in a file
 "token\_$n$.dat" which changes at each new productive event, each time
 its value gets below 0.
+
+\ignore$
 
 \subsection{Add an entry in the output data}
 The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
@@ -1332,11 +1329,11 @@ The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observable
 will store the value of observables every 10 productive events.
 
 \section{Implicit signature}
-\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
+\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{Kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
 
 \section{Simulation packages}
 
-The simulation algorithm that is implemented in \KaSim~requires an initialization phase whose complexity is proportional to $R*G$ where $R$ is the cardinal of the rule set and $G$ the size of the initial mixture\index{mixture}. Thus for large systems, initialization may take a while. Whenever a user wishes to run several simulations of the \emph{same} kappa model, it is possible to skip this initialization phase by creating a \emph{simulation package}\index{simulation package}. For instance:
+The simulation algorithm that is implemented in \KaSim~requires an initialization phase whose complexity is proportional to $R*G$ where $R$ is the cardinal of the rule set and $G$ the size of the initial mixture\index{mixture}. Thus for large systems, initialization may take a while. Whenever a user wishes to run several simulations of the \emph{same} Kappa model, it is possible to skip this initialization phase by creating a \emph{simulation package}\index{simulation package}. For instance:
 \ttt{\ITE{
 \item [] KaSim abc.ka -l $n$ -make-sim abc.kasim
 }}
@@ -1348,14 +1345,14 @@ Note that this simulation is now run for $k$ time units instead of $n$. Importan
 
 \section{Simulation parameters configuration}\label{sec:param}
 
-In the KF\index{kappa file} (usually in a dedicated file) one may use expressions of the form:
+In the KF\index{Kappa file} (usually in a dedicated file) one may use expressions of the form:
 \[
 \hbox{\ttt{\%def: "}\textit{parameter\_name}\ttt{" "}\textit{parameter\_value}\ttt{"}}
 \]
 where tunable parameters are described table~\ref{tab:parameters} (default values are given first in the possible values column).
 %%
 \begin{table}[ht]
-\caption{User defined parameters}
+\caption{User defined parameters.}
 \begin{tabular}{l|l|l}
 parameter & possible values & description \\
 \hline
@@ -1373,7 +1370,7 @@ parameter & possible values & description \\
 \ttt{"outputFileName"} & string & \small data file name\\
 \ttt{"plotPeriod"} & number then optionally& \small interval between\\
 & \ttt{"events"} & plot lines\\
-\textit{Causality analysis}&\textbf{Deprecated}&Please use KaStor\\
+\textit{Causality analysis}&\textbf{deprecated}&\textbf{please use KaStor}\\
 \ttt{"displayCompression"} & any combination of & \small type of compression \\
 &  \ttt{"none", "strong", "weak"} & \\
 \ttt{"cflowFileName"} & \ttt{"cflow"}, any string & \small file name prefix for causal flows\\
@@ -1381,7 +1378,7 @@ parameter & possible values & description \\
 & \ttt{"yes", "dot"} & \small generate causal flows in dot \\
 & \ttt{"json"} & \small generate causal flows in json\\ \hline
 \textit{Pretty printing}& &\\
-\ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
+\ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small snapshot when simulation \\&&\small is stalled\\
 \ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
 \ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\
@@ -1394,7 +1391,7 @@ parameter & possible values & description \\
 
 \section{General usage}
 
-From a terminal window, \KaSa~can be invoked by typing
+From a terminal window, \KaSa~can be invoked by typing the following command line:
 \ITE{
 \item[\$] \ttt{KaSa file\_1 ... file\_n  [option]}
 }
@@ -1412,7 +1409,7 @@ More options are available in the OCaml file \texttt{KaSa\_rep/config/config.ml}
 
 \subsection{Launching the interface}
 
-The graphical interface can be launched by typing
+The graphical interface can be launched by typing the following command line:
 \ITE{\item[\$] \ttt{KaSa}}
 
 without any option.
@@ -1420,7 +1417,7 @@ without any option.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_0.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{Actions}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Actions}.}
 \label{fig:kasa:0}
 \end{figure}
 
@@ -1432,7 +1429,7 @@ There are five different areas of importance in the graphical interface:
 In expert mode, more options are available in the graphical interface.
 \item On the top center/right, some button allows for the selection of the tab. There are currently six sub-tabs available: \texttt{Actions}, \texttt{Output}, \texttt{Reachability analysis}, \texttt{Trace analysis}, \texttt{Contact map}, \texttt{Influence map}.
 
-\item Center: The options of the selected sub-tab are displayed and can be tuned.
+\item In the center, the options of the selected sub-tab are displayed and can be tuned.
 
 Contextual help is provided when the mouse is hovered over an element.
 
@@ -1441,8 +1438,8 @@ When launched, the analysis interprets these options in the order they have been
 
 Some options appear in several sub-tabs. They denote the same option and share the same value.
 
-\item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
-\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tunes all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options.
+\item File selector: The file selector can be used to upload as many Kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tunes all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launches \KaSa\ with the current options.
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
 before the last reset, before the last quit, or before the last analysis.
@@ -1452,6 +1449,7 @@ before the last reset, before the last quit, or before the last analysis.
 
 The sub-tab \texttt{Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed.
 
+The following options are available:
 \begin{itemize}
 \item The button \texttt{-{}-do-all} activates all the functionalities.
 \item The button \texttt{-{}-reset-all} inactivates all the functionalities.
@@ -1466,21 +1464,22 @@ The sub-tab \texttt{Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actio
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_1.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{output}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{output}.}
 \label{fig:kasa:1}
 \end{figure}
 
 
 The sub-tab \texttt{Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files and their format.
 
+The following options are available:
 \begin{itemize}
 \item The field \texttt{-{}-output-directory} can be used to set the repository where output file are written. \KaSa~will create this repository, if it does not exist.
-\item The field \texttt{-{}-output-contact-map-directory} can be used to set the reporitory where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-contact-map-directory} can be used to set the repository where the output file for the contact map is written, if a contact map is requested. \KaSa~will create this repository, if it does not exist.
 \item The field \texttt{-{}-output-contact-map} contains the name of the file for the contact map. If the file name does not end by it, the proper extension will be added to the file name.
-\item The field \texttt{-{}-output-influence-map-directory} can be used to set the reporitory where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-influence-map-directory} can be used to set the repository where the output file for the influence map is written, if an influence map is requested. \KaSa~will create this repository, if it does not exist.
 \item The field \texttt{-{}-output-influence-map} contains the name of the file for the influence map. If the file name does not end by it, the proper extension will be added to the file name.
 \item The format for the influence map can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-influence-map-format}.
-\item The field \texttt{-{}-output-local-traces-directory} can be used to set the reporitory where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
+\item The field \texttt{-{}-output-local-traces-directory} can be used to set the repository where the output file for the result of trace analysis is written, if this analysis is requested. \KaSa~will create this repository, if it does not exist.
 \item The format for the local traces can be chosen among \texttt{DOT} and \texttt{HTML} thanks to the option \texttt{-{}-local-traces-format}.
 
 
@@ -1493,19 +1492,19 @@ When a file already exists, it is overwritten without any warning.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_2.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{Reachability\_analysis}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Reachability\_analysis}.}
 \label{fig:kasa:2}
 \end{figure}
 
 Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model.
-Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret:SASB2016}, the abstraction consists in:
+Knowing whether, or not, a given bio-molecular species can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08,Feret:SASB2016}, the abstraction consists in:
 \begin{enumerate}
 \item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary),
 \item secondly, abstracting a bio-molecular species by the set of its properties.
 \end{enumerate}
 The analysis takes into account also the chemical species that may be introduced in a perturbation.
 
-The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicates information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{CousotEtAl06-ASIAN}.
+The classes of properties of interest are encoded in so called abstract domains, which can be independently enabled/disabled. The whole analysis can be understood as a mutual recursion between smaller analyses (one per abstract domain), that communicate information between each other at each step of the analysis. We took the same scheme of collaboration between abstract domains as in  \cite{CousotEtAl06-ASIAN}.
 % local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
 %\end{enumerate}
 
@@ -1526,7 +1525,7 @@ As an example, we consider the following model:
 'obs' R(x,c,cr!_,n!_) -> R(x,c,cr,n) @1
 \end{lstlisting}
 
-Typing the following instruction:
+Typing the following command line:
 \begin{verbatim}
 KaSa reachability.ka --reset-all --compute-reachability-analysis
 \end{verbatim}
@@ -1563,16 +1562,16 @@ In our example, the site \texttt{cr} of \texttt{R} may be free, or bound to the 
 
 \item \textbf{Relational properties.} The analysis detects some relationships among the states of packs of sites within each agent, hence capturing potential valuations for local views \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08}.
  %Simple properties are reported in natural languages. More complex properties are reported in extension, by enumerating the states that these site can take simultaneously within a given instance of an agent.
-Due to the over-approximation of the analysis, the analysis may fail in discovering a relationship. But each relationship that is found by the analysis, is satisfied.
+Due to the over-approximation of the analysis, the analysis may fail in discovering a relationship. But each relationship that is found by the analysis is satisfied.
 
 In our example, the states of the sites \texttt{c}, \texttt{cr}, \texttt{n}, and \texttt{x} of \texttt{R} are entangled with a relational property (othewise, we would have $5^2$ elements in the post-condition).
 
 
-\item \textbf{Properties in connected agent.}
+\item \textbf{Properties in connected agents.}
 When two agents are connected, there may be a relation among the states of theirs respective sites.  This abstraction \cite{Feret:SASB2016} collects for each kind of bonds, the relation between the state of one site in the first agent and the state of one site in the second agent.  Due to the over-approximation, the analysis reports a super-set of the set of the potential pairs of states.
 
 This abstraction aimed at capturing information about protein transportation.
-It is quite common to model the location of a protein as the internal state of  a fictitious site. With such an encoding, it might be important to ensure that two connected proteins, are always located in the same location. This abstraction focuses on this kind of properties.
+It is quite common to model the location of a protein as the internal state of  a fictitious site. With such an encoding, it might be important to ensure that two connected proteins are always located in the same location. This abstraction focuses on this kind of properties.
 
 \item \textbf{Properties of pairs of bonds.}
 
@@ -1602,7 +1601,7 @@ In our example, when a \texttt{R} has its sites \texttt{cr} and \texttt{c} bound
 
 \begin{figure}[t]
 \input{generated_img/LOG_medium_OK.txt}
-\caption{Reachability analysis: one rule successfully applied}
+\caption{Reachability analysis: one rule successfully applied.}
 \label{fig:reachability_medium_ok}
 \end{figure}
 
@@ -1630,12 +1629,12 @@ The option \verb?--compute-reachability-analysis? can be used to switch on/off t
 
 The option \verb?--enable-every-domain? can be used to switch on every abstract domain, whereas the option \verb?--disable-every-domain? can be used to switch off every abstract domain.
 
-The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in initial state, in the rhs of a rule, or in a introduction directive of a perturbation, may be released by side-effects.
+The option \verb?--contact-map-domain? impacts the way side-effects are handled with during the analysis. In \verb?static? mode, we consider that every bond that occurs syntactically in the initial state, in the rhs of a rule, or in a introduction directive of a perturbation, may be released by side-effects.
 In \verb?dynamic? mode, only the bond that has been encountered so far during the analysis are considered.
 
 The option \verb?--views-domain? can be used to switch on/off the views domains that combine the non-relational analysis and the relational analysis.
 
-The option \verb?--double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between between proteins.
+The option \verb?--double-bonds-domain? can be used to switch on/off the analysis of potential double bonds between proteins.
 
 The option \verb?--site-across-bonds-domain? can be used to switch on/off the analysis of the relations among the states of the sites in connected proteins.
 
@@ -1654,18 +1653,17 @@ When trying to apply a rule, the analysis may detect that the rule cannot be app
 
 \item With the option \verb?--verbosity-level-for-reachability-analysis High?, the analysis also describes which patterns are discovered.
 
-In particular, at the beginning of the iteration, the analysis prompts the patterns of interest that occur in initial state (eg.~see Fig.~\ref{fig:reachability_high_init}). Then, each time a rule is applied successfully, the analysis shows which new patterns have been discovered (eg.~see Fig.~\ref{fig:reachability_high_rule}).
+In particular, at the beginning of the iteration, the analysis prompts the patterns of interest that occur in the initial state (eg.~see Fig.~\ref{fig:reachability_high_init}). Then, each time a rule is applied successfully, the analysis shows which new patterns have been discovered (eg.~see Fig.~\ref{fig:reachability_high_rule}).
 
 
-\item When new patterns are discovered, then, it is necessary to apply again any rule that may operate over these patterns.
-
-With the option \verb?--verbosity-level-for-reachability-analysis Full?, the analysis also describes which rules are awaken by the discovery of a new pattern (see Fig.~\ref{fig:reachability_full}).
+\item When new patterns are discovered, then, it is necessary to apply again any rule that may operate over these patterns. With the following option:\\ {\hfill  \hspace*{2cm}\verb?--verbosity-level-for-reachability-analysis Full?, \hfill\mbox{}}\\
+the analysis also describes which rules are awaken by the discovery of a new pattern (see Fig.~\ref{fig:reachability_full}).
 
 \end{itemize}
 
 The option \verb?--output-mode-for-reachability-analysis? can be used to tune the output of the analysis. The default mode is \verb?kappa?.
-In mode, \verb?raw?, patterns of interest are displayed extensionally.
-In mode, \verb?english?, properties of interest are explained in English.
+In mode \verb?raw?, patterns of interest are displayed extensionally.
+In mode \verb?english?, properties of interest are explained in English.
 The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension.
 
 \section{Local traces}
@@ -1675,7 +1673,7 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_3.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{Trace analysis}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Trace analysis}.}
 \label{fig:kasa:3}
 \end{figure}
 
@@ -1699,21 +1697,21 @@ We consider the following example:
   'P/K' P(a1~p,a2~p,b1~p,b2~p,g!1),K(x!1) -> P(a1~p,a2~p,b1~p,b2~p,g),K(x) @1
 \end{lstlisting}
 
-Typing the following instruction:
+Typing the following command line:
 
 \begin{verbatim}
 KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}. Moreover, file names is made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
+two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}. Moreover, file names are made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
 
 The transition system that describes the local traces for the agents of kind $P$ is descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site $x$ is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site $x$ is denoted as $x!\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=10cm,bb=0 0 1939 1027]{generated_img/trace_raw.png}
-\caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}}
+\caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}.}
 \label{fig:trace-raw}
 \end{figure}
 
@@ -1721,7 +1719,7 @@ We notice that the transition system that is given in Fig.~\ref{fig:trace-raw}  
 \begin{center}
 \texttt{-{}-use-macrotransitions-in-local-traces}.
 \end{center}
-Typing the following instruction:
+Typing the following command line:
 
 \begin{verbatim}
 KaSa protein2x2.ka --reset-all --compute-local-traces
@@ -1732,17 +1730,17 @@ will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
 two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{-{}-output-directory} and \texttt{-{}-output-local-trace-directory}.
 This time, the files describe a coarse-graining of the corresponding transition systems.
 
-For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$, is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $g$ can get bound.
+For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$ is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $g$ can get bound.
 
 
 More formally, in that transition system, some states are microstates (in a microstate, the state of each site is documented); some others are macrostates: (in a macrostate, the states of only a subset of site is documented).
-Thus a macrostate $v^{\sharp}$ can be seen intensionally as a part  of a local view, but also extensionnaly as the set $\gamma(v^{\sharp})$ of the local views they are a subpart of. A microstate $v$ can be described by any sequence $(v_i^{\sharp})$ of macrostates prodiding that the intersection $\bigcap \gamma(v^{\sharp}_i)$ of the extensional denotation $\gamma(v^{\sharp}_i)$ of these macrostates $v^{\sharp}_i$, is equal to the singleton $\{v\}$;
+Thus a macrostate $v^{\sharp}$ can be seen intensionally as a part  of a local view, but also extensionnaly as the set $\gamma(v^{\sharp})$ of the local views they are a subpart of. A microstate $v$ can be described by any sequence $(v_i^{\sharp})$ of macrostates providing that the intersection $\bigcap \gamma(v^{\sharp}_i)$ of the extensional denotation $\gamma(v^{\sharp}_i)$ of these macrostates $v^{\sharp}_i$ is equal to the singleton $\{v\}$;
 moreover a transition between two microstates $v$ and $v'$ can be described by any transition between one macro state $v^{\sharp}$ and another one $v'{}^{\sharp}$, provided that there exists a sequence of macrostate $(v^{\sharp}_i)$ such that the sequence $(v^{\sharp},(v^{\sharp}_i))$ denotes the microstate $v$ and the sequence $(v'{}^{\sharp},(v^{\sharp}_i))$ denotes the microstate $v'$.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=10cm,bb=0 0 1155 453]{generated_img/trace_macro.png}
-\caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}}
+\caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}.}
 \label{fig:trace-macro}
 \end{figure}
 
@@ -1760,14 +1758,14 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_4.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}.}
 \label{fig:kasa:4}
 \end{figure}
 
 The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
 
 
-Typing the following instruction:
+Typing the following command line:
 
 \texttt{KaSa abc.ka --reset-all --compute-contact-map}
 
@@ -1779,7 +1777,7 @@ sub-tab \texttt{Contact map} of the graphical interface (see Fig.~\ref{fig:kasa:
 
 
 
-The contact map summarises the different types of agent, their interface and the potential binding between sites. It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.
+The contact map summarises the different types of agent, their interface and the potential bindings between sites. It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.
 
 
 The contact map for the \ttt{abc.ka} model  defined in Chapter~\ref{chap:abc} is given in Figure~\ref{fig:abc-contact}. On this map, we notice that there are three kinds of agent, namely $A$, $B$, and $C$.
@@ -1788,7 +1786,7 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=8cm,bb=0 0 452 247]{generated_img/abc_contact.png}
-\caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
+\caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}.}
 \label{fig:abc-contact}
 \end{figure}
 
@@ -1798,7 +1796,7 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 
 The influence map of a model is an object that may help modelers checking the consistency of the rule set they use.
 
-Typing the following instruction:
+Typing the following command line:
 
 \texttt{KaSa abc.ka --reset-all --compute-influence-map}
 
@@ -1809,12 +1807,12 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_5.png}
-\caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}.}
 \label{fig:kasa:4}
 \end{figure}
 
-Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise it is made of a unique identifier allocated by \KaSa~followed by the kappa definition of the rule/observable.
-Edges are decorated with the list of embeddings (separated by a semi-colon) allowing the identification of agents in both rules{\textquotesingle}s right hand sides/left hand sides.
+Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor the quantities in initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise they are made of a unique identifier allocated by \KaSa~followed by the Kappa definition of the rule/observable.
+Edges are decorated with the list of embeddings (separated by a semi-colon) allowing the identification of agents in both rules' right hand sides/left hand sides.
 More precisely, for positive influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s right hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side; for negative influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s left hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side;
  Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value.
 
@@ -1835,7 +1833,7 @@ In Fig.~\ref{fig:imbis}, we illustrate the construction of positive influences d
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
 \includegraphics[width=8cm,bb=0 0 1462 756]{img/im.png}
-   \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
+   \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rule embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:imbis}
 \end{figure}
 
@@ -1853,12 +1851,12 @@ Lastly, KaSa\ computes an over-approximation of the influence map. They may show
 Three levels of precision are available: \texttt{Low}, \texttt{Medium}, and
 \texttt{High}. The level of precision can be changed thanks to the command line option \texttt{-{}-influence-map-accuracy-level}.
 
-At low precision, an influence is detected if one rule change at least one bit of information (the internal state of a site, the binding state of a site), in favor/defavor of the application another rule. This abstraction level ignore completely the context of application of rules, and just focuses on modifications.
+At low precision, an influence is detected if one rule change at least one bit of information (the internal state of a site, the binding state of a site), in favor/defavor of the application of another rule. This abstraction level ignores completely the context of application of rules, and just focuses on modifications.
 
 At medium precision, the analysis checks that both rules have a common context.
 
 At high precision, the analysis checks that such common context is realizable taking into account the species that have been declared as initial states
-and the potential species introduction in perturbations. High resolution influence is parameterized by the accuracy of the reachability analysis.
+and the potential introduction of species in perturbations. High resolution influence is parameterized by the accuracy of the reachability analysis.
 It may happen that a given context is infeasible, but that this is not detected by the analysis.
 
 Let us illustrate these three levels of accuracy by a case study.
@@ -1881,7 +1879,7 @@ The low resolution influence map is given in Fig.~\ref{fig:low-res}.
 There is a positive arc (in green) from a rule to another one whenever the application of the former pushes at least one bit of information towards the application of the later; whereas there is a negative arc (in red) from a rule to another one whenever the former pulls at least one bit of information away from the application of the later.
 
 The medium resolution influence map is given in Fig.~\ref{fig:medium-res}.
-Every arc corresponding to incompatible contexts have been removed.
+Every arc corresponding to incompatible contexts has been removed.
 In our example, these are the arcs from the rule $3$ and the rule $5$ (in both direction). Despite the fact that the rule $3$ may phosphorylate the site \texttt{w} which is required to apply the rule $5$, no instance of the rule $5$ may be applied thanks to the application of the rule $3$ right after, because after the application of the rule $3$ the state of the site $x$ is necessarily unphosphorylated, whereas it has to be phosphorylated for the rule $5$ to be applied. The same kind of explanation holds to remove the arc from the rule $5$ to the rule $3$.
 
 There are some structural invariants in these models. We give in Fig.~\ref{fig:reachability_influence} the log of the computation of the high resolution contact map. It turns out that whenever the site \texttt{y} of an agent is phosphorylated, then the site \texttt{x} of this protein is phosphorylated as well. Thus we can deduce that the positive arc from the rules $2$ and $3$, and the negative arcs from the rules $2$ and $4$ (in both direction) are false positive unless we change the set of the species in the initial state or in the perturbations. Thus we obtain the high resolution influence map given in Fig.~\ref{fig:high-res}.
@@ -1893,21 +1891,21 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{generated_img/inf_map_low_res.png}
-\caption{Low resolution influence map}
+\caption{Low resolution influence map.}
 \label{fig:low-res}
 \end{center}
 \end{figure}
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{generated_img/inf_map_medium_res.png}
-\caption{Medium resolution influence map}
+\caption{Medium resolution influence map.}
 \label{fig:medium-res}
 \end{center}
 \end{figure}
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{generated_img/inf_map_high_res.png}
-\caption{High resolution influence map}
+\caption{High resolution influence map.}
 \label{fig:high-res}
 \end{center}
 \end{figure}
@@ -1922,7 +1920,7 @@ There are some structural invariants in these models. We give in Fig.~\ref{fig:r
 
 \section{General usage}
 
-From a terminal window, \KaDE~can be invoked by typing:
+From a terminal window, \KaDE~can be invoked by typing the following command line:
 \ITE{
 \item[\$] \ttt{KaDE file\_1 ... file\_n  [option]}
 }
@@ -1938,7 +1936,7 @@ The options are interpreted from left to right.
 
 \subsection{Launching the interface}
 
-The graphical interface can be launched by typing
+The graphical interface can be launched by typing the following command line:
 \ITE{\item[\$] \ttt{KaDE}}
 
 without any option.
@@ -1946,7 +1944,7 @@ without any option.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_0.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{Data set}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Data set}.}
 \label{fig:kade:0}
 \end{figure}
 
@@ -1965,7 +1963,7 @@ The interface will store the options that are checked or filled and the order in
 When launched, the analysis interprets these options in the order they have been entered.
 Some options appear in several sub-tabs. They denote the same option and share the same value.
 
-\item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
+\item File selector: The file selector can be used to upload as many Kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
 \item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tunes all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaDE\ with the current options.
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options
@@ -1985,7 +1983,11 @@ Both fields may be modified from every sub-tab.
 
 \subsection{The sub-tab \texttt{Data set}}
 
-The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots.
+
+The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options to tune the time range for the numerical integration and the frequency of sample plots. These fields are used only in Maple, Mathematica, Matlab, and Octave backend formats.
+They are ignored in SBML and DOTNET backend formats.
+
+The following options are available:
 \begin{itemize}
 \item The field \texttt{-{}-initial} defines the starting date of the simulation.
 \item The field \texttt{-l} defines the final date of the simulation.
@@ -1997,13 +1999,14 @@ The sub-tab \texttt{Data set} (see Fig.~\ref{fig:kade:0}) contains the options t
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_1.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{Output}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Output}.}
 \label{fig:kade:1}
 \end{figure}
 
 
 The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of the output files and their format.
 
+The following options are available:
 \begin{itemize}
 \item The field \texttt{-{}-ode-backend} allows for the choice among the different backend formats among DOTNET, Maple, Mathematica, Matlab, Octave and SBML.
 \item The field \texttt{-{}-output-plot} sets the name of the file where the plots will be dumped when it applies. Only the Maple, Mathematica, Matlab and Octave dump plots. The option is ignored in the other backend formats.
@@ -2018,13 +2021,14 @@ The sub-tab \texttt{Output} (see Fig.~\ref{fig:kade:1}) contains the names of th
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{Integration settings}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Integration settings}.}
 \label{fig:kade:3}
 \end{figure}
 
 The sub-tab \texttt{Integration settings} (see Fig.~\ref{fig:kade:3}) contains the parameters to guide the numerical integration engine. Except the option \texttt{-{}-smash-reaction}, these options are ignored in the SBML and the
 DOTNET backend format.
 
+The following options are available:
 \begin{itemize}
   \item The option \texttt{-{}-compute-jacobian} switches on the computation of the Jacobian of the system of ordinary differential equations.
   The Jacobian is computed symbolically. It speeds up the numerical integration. The computation of the Jacobian is implemented only in two backend formats:  Matlab and Octave. Other formats will ignore this option.
@@ -2052,7 +2056,14 @@ DOTNET backend format.
 \subsection{The sub-tab \texttt{Debug}}
 
 In expert mode, the last sub-tab provides options to tune the amount of debugging information that is displaied.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}.}
+\label{fig:kade:6}
+\end{figure}
 
+The following options are available:
 \begin{itemize}
 \item The option \texttt{-{}-(no)-show-time-advance} includes some
 instructions in the output file, so as to track the progress during numerical integration in the Maple, Mathematica, Matlab, and Octave backend.
@@ -2079,7 +2090,7 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
     \centering\scalebox{0.7}%
     {\includegraphics[bb=0 0 198 28]{gkappa_img/sect1-bind.pdf}}
   \end{minipage}
-  \caption{Proteins \texttt{K} and \texttt{S} may bind. }
+  \caption{Proteins \texttt{K} and \texttt{S} may bind.}
   \label{fig:sec1:bind}
 \end{figure}
 \begin{figure}[t]
@@ -2133,7 +2144,7 @@ the one in the sequence $R_1,\ldots,R_m$.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_2.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{2\_semantics}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{2\_semantics}.}
 \label{fig:kade:2}
 \end{figure}
 
@@ -2146,8 +2157,7 @@ the one in the sequence $R_1,\ldots,R_m$.
 The options in the sub-tab \texttt{Semantics} allow for the choice among several possibilities for the meaning of the ODEs variables and for the meaning of the rate constants.
 
 
-
- \KaDE~corrects the rate constant of each  according to a convention about the number of automorphisms in this rule. {\KaDE} offers the choice among three conventions:
+ \KaDE~corrects each rate constant according to a convention about the number of automorphisms in this rule. {\KaDE}~offers the choice among three conventions:
 \begin{enumerate}
   \item with the convention \texttt{KaSim}, there is no correction, as it is done in the simulator;
   \item with the convention \texttt{Divide\_by\_the\_number\_of\_autos\_in\_lhs}, each rate constant is divided by the number of automorphisms in the lhs of the rule, as it was done in previous version of the simulator;
@@ -2169,7 +2179,7 @@ which is depicted as follows:
 
   \subsubsection{Ambiguous molecularity}
 
-The differential semantics is defined as the limit of the stochastic semantics when the temperature diverges toward the infinity. Thus a rate constant stands indeed for a function mapping the temperature to an effective rate constant the expression of which depends on the arity of the reaction. Even if the unary rate and the binary rate of a rule may be equal for a given temperature, it is never the case at all temperature. Another insight, is that rate constants for a unary reaction and rate constants for a binary reaction are not expressed in the same physical units.
+The differential semantics is defined as the limit of the stochastic semantics when the temperature diverges toward the infinity. Thus a rate constant stands indeed for a function mapping the temperature to an effective rate constant the expression of which depends on the arity of the reaction. Even if the unary rate and the binary rate of a rule may be equal for a given temperature, it is never the case at all temperatures. Another insight is that rate constants for a unary reaction and rate constants for a binary reaction are not expressed in the same physical units.
 
 To account for this, {\KaDE} never applies a binary rule in a
   unary context, unless two rate constants have been provided explicitly.
@@ -2198,23 +2208,23 @@ A(x,y!2),A(x,y!2)
   \begin{lstlisting}[language=kappa]
 A(x),A(x) -> A(x!1),A(x!1) @ 1{1}
   \end{lstlisting}
-   shall be used instead:
+   shall be used instead.
 
-  This way, when a rule is given with one rate constant only, the connected components in its left hand side have to be refined into pair-wisely disjoint bio-molecular species. When a rule is binary and when it is given with two rate constants,  it may be apply in a unary context (which consists in embedding its left hand side into a single bio-molecular species) with the second rate constant, or in a binary context (which consists in embedding each connected components in its left hand side into two disjoint bio-molecular species (which may be two isomorphic copies of the same species).
+  This way, when a rule is given with one rate constant only, the connected components in its left hand side have to be refined into pair-wisely disjoint bio-molecular species. When a rule is binary and when it is given with two rate constants,  it may be apply in a unary context (which consists in embedding its left hand side into a single bio-molecular species) with the second rate constant, or in a binary context (which consists in embedding each connected component in its left hand side into two disjoint bio-molecular species (which may be two isomorphic copies of the same species)).
 
   \subsubsection{Embeddings VS occurrences}
 
 In a Kappa file, a pattern may denote two different quantities.
-At initialisation, a pattern denotes an occurence of a bio-molecular species. In an algebraic expressions (which includes functional rates,
+At initialisation, a pattern denotes an occurence of a bio-molecular species. In an algebraic expression (which includes functional rates,
 stoichiometric coefficients for tokens, observables), a pattern denotes a number of embeddings from this pattern to a mixture.
 
 Formally, we define the number (resp.~the concentration) of embeddings from a pattern to a mixture (resp.~to a concentration function) as
 the sum, for each bio-molecular species,
- of the number of occurrences (resp.~concentration) of that bio-molecular species and the number of occurrence of the pattern in that bio-molecular species. We also define the number (resp.~the concentration) of occurrences of a pattern in a mixture (resp.~in a concentration function) as the quotient between the number (resp.~the concentration) of embeddings from this pattern to a mixture (resp.~to a concentration function) and the number of automorphisms in this pattern.
+ of the number of occurrences (resp.~concentration) of that bio-molecular species and the number of occurrences of the pattern in that bio-molecular species. We also define the number (resp.~the concentration) of occurrences of a pattern in a mixture (resp.~in a concentration function) as the quotient between the number (resp.~the concentration) of embeddings from this pattern to a mixture (resp.~to a concentration function) and the number of automorphisms in this pattern.
 
 To illustrate this, we assume that the file \texttt{occ.ka} contains the following code:
 \lstinputlisting[language=kappa]{kappa/occ.ka}
-We use the following instruction to get the value of the observable.
+We use the following command line to get the value of the observable:
 \ITE{\item[\$] \ttt{KaSim} occ.ka -l 1 -p 0.5 -o occ.csv}
 
 The file \texttt{csv} contains the following data set:
@@ -2240,7 +2250,7 @@ For instance, we can consider the model \texttt{poly.ka} that is defined as foll
   A(r), A(l) -> A(r!1),A(l!1) @ 1
 \end{lstlisting}
 
-The instruction:
+The command line:
 \ITE{\item[\$] \ttt{KaDE} poly.ka}
 will not terminate, wheareas the following one:
 \ITE{\item[\$] \ttt{KaDe} poly.ka --truncate 10}
@@ -2276,11 +2286,11 @@ A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
     \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtf.pdf}}
   \end{minipage}
   \caption{Sites are equivalent, if the corrected rates of the third rule is twice the corrected rate of each other rule.}
-  \label{fig:symetric:rules}
+  \label{fig:symmetric:rules}
 \end{figure}
 
 
-The rules are depicted in Fig.~\ref{fig:symetric:rules}. We notice that each rule may be obtained from one another by swapping the sites in agents.  So we say that sites are equivalent in this set of rules. Equivalent sites may be used to induce forward and backward bisimulations \cite{buchholz_bisimulation,Feret_IJSI2013,Feret-MFPSXXVII,CAMPORESI201073,Feret201545} over the stochastic and the differential semantics of Kappa.
+The rules are depicted in Fig.~\ref{fig:symmetric:rules}. We notice that each rule may be obtained from one another by swapping the sites in agents.  So we say that sites are equivalent in this set of rules. Equivalent sites may be used to induce forward and backward bisimulations \cite{buchholz_bisimulation,Feret_IJSI2013,Feret-MFPSXXVII,CAMPORESI201073,Feret201545} over the stochastic and the differential semantics of Kappa.
 
 Let us consider two site names \ttt{x} and \ttt{y} in the signature of an agent type \ttt{A}.
 A \emph{set of rules} is symmetric with respect to \ttt{x} and \ttt{y}, if for every two rules that may be obtained one from the other one by permuting the sites \ttt{x} and \ttt{y} in some agents of type \ttt{A}, their corrected rates is inversely proportional to their number of automorphisms.
@@ -2288,6 +2298,7 @@ In our example,  the set of rules is symmetric with respect to \ttt{x} and \ttt{
 
 If the set of rules and the initial state of the model are symmetric with respect to two sites, ignoring the difference among these two sites in bio-molecular species induces a backward bisimulation (that is to say, the state of the system remains symmetric at every time \cite{buchholz_lump}). If the set of rules and every algebraic expression that occurs in rates or stoichiometric coefficients are symmetric, then ignoring the difference between these two sites in bio-molecular species induces a forward bisimulation (we can define the ODEs directly over the equivalence-classes of bio-molecular species \cite{buchholz_lump}).
 
+The following option is available:
 \begin{itemize}
   \item
 The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
@@ -2298,11 +2309,12 @@ The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_4.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{4\_model\_reduction}}
+
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Model reduction}.}
 \label{fig:kade:4}
 \end{figure}
 
-
+The following options are available:
 \begin{itemize}
   \item The option \texttt{-{}-show-symmetries} itemizes the sites that are equivalent with respect to the rules of the models, with respect to the rules of the model and the initial state (backward bisimulation), and with respect to the rules of the models and the algebraic expressions (forward bisimulation).
   \item The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward ]} sets which kind of bisimulation is used to reduce the system of ordinary differential equations.
@@ -2313,13 +2325,14 @@ The command line option \texttt{-{}-with-symmetries [ None | Backward | Forward 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
-\caption{\KaDE~ graphical interface - sub-tab \texttt{5\_static\_analysis}}
+\caption{\KaDE~ graphical interface - sub-tab \texttt{Static analysis}.}
 \label{fig:kade:5}
 \end{figure}
 
 
 The inference of equivalent sites is more precise when dead rules are discarded. Dead rules can be computed thanks to {\KaSa}. The sub-tab \texttt{Static analysis} allows the end-user to switch on/switch off abstract domains in order to tune the trade-off between accuracy and efficiency of  static analysis.
 
+The following options are available:
 \begin{itemize}
 \item The option \verb?--(no-)views-domain? can be used to switch on/off the views domains.
 
@@ -2412,7 +2425,7 @@ We now wonder whether the sites are equivalent or not. We use the following comm
 The status of equivalent sites is described in the log:
 \lstinputlisting[language=Octave]{generated_img/sym.txt}
 
-The set of rules and the initial state are symmetric with respect to the pair of sites. This is not the case of the observable. Thus, only backward bisimulation may be used to reduce the system. Indeed, if we ignore the difference between sites \texttt{x} and \texttt{y}, we can no longer express the concentration of asymetric dimers. This  excludes forward bisimulation. Backward bisimulations may still be used since the concentration of each species can be computed by from the overall concentration of its equivalence class,  since the concentration of two equivalent species are always inversely proportional to their number of automorphisms.
+The set of rules and the initial state are symmetric with respect to the pair of sites. This is not the case of the observable. Thus, only backward bisimulation may be used to reduce the system. Indeed, if we ignore the difference between sites \texttt{x} and \texttt{y}, we can no longer express the concentration of asymmetric dimers. This  excludes forward bisimulation. Backward bisimulations may still be used since the concentration of each species can be computed by from the overall concentration of its equivalence class,  since the concentration of two equivalent species are always inversely proportional to their number of automorphisms.
 
 The command line:
 \ITE{
@@ -2442,17 +2455,17 @@ The code for the function \texttt{obs} is the following one:
 \ITE{
 \item[\$] \ttt{grep -n -m 1 'function obs' ode\_with\_bwd\_sym.m --after-context 12}}
 \lstinputlisting[language=Octave]{generated_img/obs_bwd.txt}
- We are interested in asymetric dimers only. We notice that their concentration is obtained by dividing the overall quantity of dimers by $4$. To understand why, we shall have a closer look at the meaning of each variable. As indicated here:
+ We are interested in asymmetric dimers only. We notice that their concentration is obtained by dividing the overall quantity of dimers by $4$. To understand why, we shall have a closer look at the meaning of each variable. As indicated here:
 \ITE{
 \item[\$] \ttt{grep -n -m 1 '\%\% variables' ode\_with\_bwd\_sym.m}}
 \lstinputlisting[language=Octave]{generated_img/convention_bwd.txt}
-the convention is to count in number of embeddings. Thus the total number of dimers is $\frac{y(2)}{2}$. Then half of them only is an asymetric dimer, which gives $\frac{y(2)}{4}$.
+the convention is to count in number of embeddings. Thus the total number of dimers is $\frac{y(2)}{2}$. Then half of them only is an asymmetric dimer, which gives $\frac{y(2)}{4}$.
 
 Let us check the soundness of our tools, by integrating our three  ODEs systems.
 
 Firsly we define the file \texttt{plot.gplot} as follows:
 \begin{lstlisting}[language=Gnuplot]
-set xlabel 'Asymetric dimer concentration'
+set xlabel 'Asymmetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
 set title 'Initial model'
@@ -2465,7 +2478,7 @@ plot 'data.csv' using 1:2 w l
 \end{lstlisting}
 the file \texttt{plot\_fwd.gplot} as follows:
 \begin{lstlisting}[language=Gnuplot]
-set xlabel 'Asymetric dimer concentration'
+set xlabel 'Asymmetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
 set title 'reduced model (fwd)'
@@ -2478,7 +2491,7 @@ plot 'data_fwd.csv' using 1:2 w l
 \end{lstlisting}
 and the file \texttt{plot\_bwd.gplot} as follows:
 \begin{lstlisting}[language=Gnuplot]
-set xlabel 'Asymetric dimer concentration'
+set xlabel 'Asymmetric dimer concentration'
 set ylabel 'CPU time (s.)'
 set datafile separator ','
 set term png
@@ -2490,7 +2503,7 @@ set output 'plot_bwd.png'
 plot 'data.csv' using 1:2 w l
 \end{lstlisting}
 
-Then we can integrate our three differential systems and plot their respective  solutions thanks to the following instructions:
+Then we can integrate our three differential systems and plot their respective  solutions thanks to the following command lines:
 \ITE{
 \item[\$] \ttt{octave ode.m}
 \item[\$] \ttt{octave ode\_with\_fwd\_sym.m}
@@ -2528,13 +2541,13 @@ In order to make sure that \KaSim~is not incorrectly blocked you may wish to plo
 
 \section*{What do null events mean, why do I have any?}
 
-Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E]}) should tend to 0 when models have a lot of agents.
+Using null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order to deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
-Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use a reasonable value for the \ttt{-p} option in the command line to tell KaSim how often you wish to have points on your curves.
+Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{Kappa file}. Also make sure to use a reasonable value for the \ttt{-p} option in the command line to tell KaSim how often you wish to have points on your curves.
 
 \section*{Too many instances of an observable}
-The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}.
+The value of a Kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}.
 \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
 
 %\section*{The computed influence map is incorrect, it misses some activation or has too much of them}
