@@ -776,7 +776,7 @@ let json_of_grid enriched_grid grid_story steps =
                     (eid, eid')::ls'
                   else ls' in
                 (prec,ls'')
-              ) cflct_set (prec,[])
+              ) cflct_set (prec,ls)
           in ls'
         else ls
       ) config.conflict [] in
@@ -828,9 +828,16 @@ let pretty_print
                (0.,[],0) (List.rev stories)
            in
            let () =   (*dump grid fic state env ; *)
+             let () =
+               if (dotFormat = Json) then
+                 (let (_,grid_story,_) = List.nth grid_list cpt in
+                  Kappa_files.with_cflow_file
+                    [compression_type;(string_of_int cpt)] "json"
+                    (fun f -> Format.fprintf f "%s@."
+                      (Yojson.Basic.to_string
+                         (json_of_grid enriched_config grid_story steps)))) in
              match dotFormat with
              | Dot | Json ->
-                let () =
                 let profiling desc =
                   Format.fprintf
                     desc "/* @[Compression of %d causal flows" n;
@@ -845,14 +852,6 @@ let pretty_print
                 Kappa_files.with_cflow_file
                   [compression_type;string_of_int cpt] "dot"
                   (dot_of_grid profiling env enriched_config)
-                in
-                if (dotFormat = Json) then
-                  (let (_,grid_story,_) = List.nth grid_list cpt in
-                   Kappa_files.with_cflow_file
-                     [compression_type;(string_of_int cpt)] "json"
-                     (fun f -> Format.fprintf f "%s@."
-                      (Yojson.Basic.to_string
-                         (json_of_grid enriched_config grid_story steps))))
              | Html ->
                 let profiling desc =
                   Format.fprintf
