@@ -199,7 +199,7 @@ let route
          "/v2/projects/{projectid}" ;
        Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
        Webapp_common.operation =
-         (fun ~context:context ->
+         (fun ~context ->
             let project_id = project_ref context in
             (delete_projects project_id projects) >>=
             (Webapp_common.result_response

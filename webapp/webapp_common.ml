@@ -165,8 +165,11 @@ let rec match_url
               (Re.Group.all
                  (Re.exec matcher.re url)))
        in
-       let get_parameters : (string * string) list = List.combine matcher.labels matching in
-       let text_parameters : string = String.concat " , " (List.map (fun (key,value) -> key^" : "^value) get_parameters) in
+       let get_parameters : (string * string) list =
+         List.combine matcher.labels matching in
+       let text_parameters : string =
+         String.concat " , "
+           (List.map (fun (key,value) -> key^" : "^value) get_parameters) in
        let () =
          async
            (fun () ->

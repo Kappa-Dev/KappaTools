@@ -210,7 +210,6 @@ let remove_project project_id =
         state.project_catalog in
     remove_files current.project_manager >>=
     (fun out' ->
-       let () = current.project_manager#terminate in
        let project_catalog =
          List.filter (fun x -> x.project_id <> current.project_id)
            state.project_catalog in
@@ -229,6 +228,7 @@ let remove_project project_id =
              project_parameters =
                Mods.StringMap.remove project_id state.project_parameters;
              project_version = -1; project_contact_map = None } in
+       let () = current.project_manager#terminate in
        sync () >>= fun out'' ->
        Lwt.return (Api_common.result_combine [out';out'']))
   with Not_found ->

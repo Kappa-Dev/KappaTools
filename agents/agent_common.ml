@@ -13,13 +13,15 @@ let serve chan delimiter process_command : unit Lwt.t =
   (* read and handle messages *)
   let buffer = Buffer.create 512 in
   let rec aux_serve () =
-    Lwt_io.read_char chan >>= fun char ->
-    if char = delimiter then
-      let m = Buffer.contents buffer in
-      process_command m >>= fun () ->
-      let () = Buffer.reset buffer in aux_serve ()
-    else
-      let () = Buffer.add_char buffer char in
-      aux_serve () in
+    Lwt_io.read_char_opt chan >>= function
+    | Some char ->
+      if char = delimiter then
+        let m = Buffer.contents buffer in
+        process_command m >>= fun () ->
+        let () = Buffer.reset buffer in aux_serve ()
+      else
+        let () = Buffer.add_char buffer char in
+        aux_serve ()
+    | None -> Lwt.return_unit in
   aux_serve ()
 
