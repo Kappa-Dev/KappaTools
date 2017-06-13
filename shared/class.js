@@ -30,17 +30,8 @@ class D3Object {
     constructor(label) {
         this.label = label;
         this.dimension = new Dimension(0, 0);
-        this.contentDimension = new Dimension(0, 0);
     }
     
-    anchor(point) {
-        //console.log(this.dimension);
-        let newPoint = this.dimension.toPoint();
-        newPoint.scale(-0.5);
-        newPoint.translate(point, translate.ADD);
-        return newPoint;
-    }
-
     setDimension(dimension) {
         this.dimension = dimension;
     }
@@ -53,17 +44,20 @@ class D3Object {
 class Site extends D3Object {
     constructor (siteData, agent) {
         super(siteData.site_name);
+        let site = this;
         this.links = siteData.site_links.map(function(link)
             { 
                 return new SiteLink(link[0],link[1]); 
             });
         this.agent = agent;
         this.states = siteData.site_states.map(function(state) {
-                return new State(state);
+                return new State(state, site);
             });
         this.currentState = null;
         this.startAngle = 0;
         this.endAngle = 0;
+        this.clicked = 0;
+        this.hover = 0;
     }
 
     setId(id) {
@@ -93,7 +87,7 @@ class Site extends D3Object {
     generateTreeObj() {
         let treeObj = {};
         treeObj.name = this.label;
-        console.log(this.states);
+        //console.log(this.states);
         let childArray = [];
         if(this.states !== undefined) {
             for (let state in this.states) {
@@ -173,9 +167,11 @@ class Node extends D3Object {
 }
 
 class State {
-    constructor(name) {
+    constructor(name, site) {
         this.name = name;
+        this.site = site;
     }
+
 }
 
 class SiteLink {
@@ -256,6 +252,8 @@ class DataStorage {
             //console.log(siteList[sites]);
             let entry = {};
             entry.name = 'root.' + siteList[sites].getAgent().label + '.' + siteList[sites].label;
+            entry.parentId = siteList[sites].getAgent().id;
+            entry.id = siteList[sites].id;
             let links = siteList[sites].listLinks();
             let linkArray = [];
 
@@ -314,6 +312,7 @@ class DataStorage {
             });
         });
 
+        //console.log(links);
         return links;
     }
 }
