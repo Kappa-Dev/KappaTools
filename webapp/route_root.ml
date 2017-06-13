@@ -33,12 +33,13 @@ class system_process () : Kappa_facade.system_process =
   end
 
 class new_manager : Api.concrete_manager =
-  let sytem_process : Kappa_facade.system_process = new system_process () in
   let re = Re.compile (Re.str "WebSim") in
   let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
   let sa_process = Lwt_process.open_process (sa_command,[|sa_command|]) in
+  let sim_command = Re.replace_string re ~by:"KaSimAgent" Sys.argv.(0) in
+  let sim_process = Lwt_process.open_process (sim_command,[|sim_command|]) in
   let sa_mailbox = Kasa_client.new_mailbox () in
-  object
+  object(self)
     initializer
       let () =
         Lwt.ignore_result
@@ -46,8 +47,21 @@ class new_manager : Api.concrete_manager =
              sa_process#stdout Tools.default_message_delimter
              (fun r ->
                 let ()= Kasa_client.receive sa_mailbox r in Lwt.return_unit)) in
+      let () =
+        Lwt.ignore_result
+          (Agent_common.serve
+             sim_process#stdout Tools.default_message_delimter
+             (fun r -> let () = self#receive r in Lwt.return_unit)) in
       ()
-    inherit Api_runtime.manager sytem_process
+    method private sleep t = Lwt_unix.sleep t
+    method private post_message message_text =
+      Lwt.ignore_result
+        (Lwt_io.atomic
+           (fun f ->
+              Lwt_io.write f message_text >>= fun () ->
+              Lwt_io.write_char f Tools.default_message_delimter)
+           sim_process#stdin)
+    inherit Mpi_api.manager ()
     inherit Kasa_client.new_client
         ~post:(fun message_text ->
             Lwt.ignore_result
@@ -58,6 +72,7 @@ class new_manager : Api.concrete_manager =
                  sa_process#stdin))
         sa_mailbox
     method terminate =
+      let () = sim_process#terminate in
       sa_process#terminate
   end
 

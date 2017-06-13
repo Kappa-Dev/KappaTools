@@ -101,7 +101,7 @@ let on_message
 
 class type virtual manager_base_type =
   object
-    method virtual message :
+    method private virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
     inherit Api.manager
@@ -110,7 +110,7 @@ end
 class virtual  manager_base () : manager_base_type =
   object(self)
 
-    method virtual message :
+    method private virtual message :
       Mpi_message_j.request -> Mpi_message_j.response Lwt.t
 
     method file_create
@@ -417,11 +417,10 @@ type context = { mailboxes : Mpi_message_j.response Lwt.u IntMap.t ;
 
 class type virtual manager_mpi_type =
   object
-    method virtual post_message : string -> unit
-    method virtual sleep : float -> unit Lwt.t
-    method virtual post_message : string -> unit
-    method message : Mpi_message_j.request -> Mpi_message_j.response Lwt.t
-    method receive : string -> unit
+    method private virtual sleep : float -> unit Lwt.t
+    method private virtual post_message : string -> unit
+    method private message : Mpi_message_j.request -> Mpi_message_j.response Lwt.t
+    method private receive : string -> unit
 
     inherit Api.manager
   end
@@ -431,10 +430,10 @@ class virtual manager () : manager_mpi_type =
     val mutable context =
       { mailboxes = IntMap.empty ; id = 0 }
 
-    method virtual sleep : float -> unit Lwt.t
-    method virtual post_message : string -> unit
+    method private virtual sleep : float -> unit Lwt.t
+    method private virtual post_message : string -> unit
 
-    method receive (response_text : string) =
+    method private receive (response_text : string) =
       let message : Mpi_message_j.response Mpi_message_j.message =
         Mpi_message_j.message_of_string
           Mpi_message_j.read_response response_text in
@@ -444,7 +443,7 @@ class virtual manager () : manager_mpi_type =
         Lwt.wakeup value message.Mpi_message_j.data
       | None, mailboxes -> context <- { context with mailboxes }
 
-    method message (request : Mpi_message_j.request) :
+    method private message (request : Mpi_message_j.request) :
       Mpi_message_j.response Lwt.t =
       let result,feeder = Lwt.task () in
       let () = context <- { context with id = context.id + 1 } in
