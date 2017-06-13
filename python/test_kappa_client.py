@@ -204,7 +204,7 @@ class StdClientTest(KappaClientTest,unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         """ tear down test by shutting down"""
-        runtime = self.getRuntime(self)
+        runtime = self.getRuntime(self,"__foo")
         print(runtime.shutdown())
 
     def __init__(self, *args, **kwargs):
