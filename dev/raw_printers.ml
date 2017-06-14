@@ -16,4 +16,3 @@ let print_rule = Kappa_printer.elementary_rule ?env:None
 let print_modification = Kappa_printer.modification ?env:None
 let print_perturbation = Kappa_printer.perturbation ?env:None
 let print_path = Edges.print_path ?sigs:None
-let print_injections = Rule_interpreter.print_injections ?domain:None
