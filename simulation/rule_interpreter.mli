@@ -12,6 +12,12 @@ type t (**Abstract graph*)
 
 type result = Clash | Corrected | Success of t
 
+module Instances : sig
+  type t
+
+  val empty : Model.t -> t
+end
+
 (** {6 Initialisation} *)
 
 val empty :
@@ -105,25 +111,21 @@ type stats = { mixture_stats : Edges.stats }
 val stats : t -> stats
 val print_stats : Format.formatter -> t -> unit
 
-val print_injections :
-  ?domain:Pattern.Env.t -> Format.formatter ->
-  IntCollection.t Pattern.ObsMap.t -> unit
 val debug_print : Format.formatter -> t -> unit
 
 (** {6 Internals } *)
 val apply_negative_transformation :
   (int,unit) Hashtbl.t -> (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
+  Instances.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
-  (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t
+  (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t
 val apply_positive_transformation :
   Signature.s -> (int,unit) Hashtbl.t ->
   (Matching.t * int Mods.IntMap.t) *
   (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
+  Instances.t * Edges.t ->
   Instantiation.abstract Primitives.Transformation.t ->
   ((Matching.t * int Mods.IntMap.t) *
    (Instantiation.concrete Instantiation.site) list *
-   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t) *
+   Instances.t * Edges.t) *
   Instantiation.concrete Primitives.Transformation.t

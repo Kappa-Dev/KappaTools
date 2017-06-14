@@ -31,6 +31,5 @@ install_printer Matching.debug_print
 install_printer Edges.debug_print
 install_printer Raw_printers.print_path
 install_printer Causal.debug_print_grid
-install_printer Raw_printers.print_injections
 install_printer Rule_interpreter.debug_print
 install_printer Pattern.PreEnv.debug_print
