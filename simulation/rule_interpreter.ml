@@ -613,6 +613,29 @@ let apply_positive_transformation
       (ExceptionDefn.Internal_Error
          (Locality.dummy_annot "NegativeInternalized in positive update"))
 
+let apply_concrete_positive_transformation
+    sigs mod_connectivity (stuff4unaries,edges) = function
+  | Primitives.Transformation.Agent (id,ty) ->
+    let _,edges' = Edges.add_agent ~id sigs ty edges in
+    (stuff4unaries,edges')
+  | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
+    let edges' = Edges.add_free id s edges in
+    (stuff4unaries,edges')
+  | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
+    let edges',modif_cc = Edges.add_link nc s nc' s' edges in
+    (Instances.merge_cc stuff4unaries mod_connectivity modif_cc,edges')
+  | Primitives.Transformation.NegativeWhatEver _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeWhatEver in positive update"))
+  | Primitives.Transformation.PositiveInternalized ((id,_),s,i) ->
+    let edges' = Edges.add_internal id s i edges in
+    (stuff4unaries,edges')
+  | Primitives.Transformation.NegativeInternalized _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeInternalized in positive update"))
+
 let obs_from_transformation domain edges acc = function
   | Primitives.Transformation.Agent nc ->
     Matching.observables_from_agent domain edges acc nc
@@ -745,7 +768,7 @@ let update_edges
       outputs counter domain inj_nodes state event_kind ?path rule sigs =
   let () = assert (not state.outdated) in
   let () = state.outdated <- true in
-  let former_deps,mod_connectivity  = state.outdated_elements in
+  let former_deps,mod_connectivity = state.outdated_elements in
   (*Negative update*)
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
@@ -817,6 +840,75 @@ let update_edges
     variables_cache = state.variables_cache;
     variables_overwrite = state.variables_overwrite;
     edges = edges''; tokens = state.tokens;
+    outdated_elements = rev_deps,mod_connectivity;
+    random_state = state.random_state;
+    story_machinery = state.story_machinery;
+    species = state.species;
+  }
+
+let update_edges_from_actions
+    ~outputs sigs counter domain state (actions,side_effect_dst) =
+  let () = assert (not state.outdated) in
+  let () = state.outdated <- true in
+  let former_deps,mod_connectivity = state.outdated_elements in
+  (*Negative update*)
+  let concrete_removed =
+    Primitives.Transformation.negative_transformations_of_actions
+      sigs state.edges actions in
+  let ((del_obs,del_deps),_) =
+    List.fold_left
+      (obs_from_transformation domain state.edges)
+      (([],Operator.DepSet.empty),Matching.empty_cache)
+      concrete_removed in
+  let (_side_effects,instances,edges_after_neg) =
+    List.fold_left
+      (apply_negative_transformation mod_connectivity)
+      ([],(state.instances),state.edges)
+      concrete_removed in
+  let () =
+    List.iter
+      (fun (pat,(root,_)) ->
+         Instances.update_roots instances false state.precomputed.unary_patterns
+           edges_after_neg mod_connectivity pat root)
+      del_obs in
+  (*Positive update*)
+  let concrete_inserted =
+    Primitives.Transformation.positive_transformations_of_actions
+      sigs side_effect_dst actions in
+  let (instances',edges') =
+    List.fold_left
+      (fun x h ->
+         apply_concrete_positive_transformation
+           (Pattern.Env.signatures domain) mod_connectivity x h)
+      (instances,edges_after_neg)
+      concrete_inserted in
+  let ((new_obs,new_deps),_) =
+    List.fold_left
+      (obs_from_transformation domain edges')
+      (([],Operator.DepSet.empty),Matching.empty_cache)
+      concrete_inserted in
+  let () =
+    List.iter
+      (fun (pat,(root,_)) ->
+         Instances.update_roots instances' true state.precomputed.unary_patterns
+           edges' mod_connectivity pat root)
+      new_obs in
+  (*Print species*)
+  let species =
+    get_species_obs sigs edges' new_obs [] state.species in
+  let () =
+    List.iter
+      (fun (file,_,mixture) ->
+        outputs (Data.Species
+                   (file,(Counter.current_time counter),mixture))) species in
+  let rev_deps = Operator.DepSet.union
+      former_deps (Operator.DepSet.union del_deps new_deps) in
+  { outdated = false;
+    precomputed = state.precomputed;
+    instances = instances';
+    variables_cache = state.variables_cache;
+    variables_overwrite = state.variables_overwrite;
+    edges = edges'; tokens = state.tokens;
     outdated_elements = rev_deps,mod_connectivity;
     random_state = state.random_state;
     story_machinery = state.story_machinery;

@@ -34,6 +34,14 @@ sig
     (int * Raw_mixture.agent) list *
     (Instantiation.abstract * Instantiation.site_name * int) list *
     Instantiation.abstract t list
+
+  val negative_transformations_of_actions :
+    Signature.s -> Edges.t -> Instantiation.concrete Instantiation.action list ->
+    Instantiation.concrete t list
+  val positive_transformations_of_actions :
+    Signature.s -> Instantiation.concrete Instantiation.site list ->
+    Instantiation.concrete Instantiation.action list ->
+    Instantiation.concrete t list
 end
 
 type elementary_rule = {

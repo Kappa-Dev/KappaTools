@@ -147,6 +147,54 @@ module Transformation = struct
       Format.fprintf
         f "@[%a.%a~ =@]" (Matching.Agent.print ?sigs) p
         (Matching.Agent.print_site ?sigs p) s
+
+  let get_negative_part graph ((a,_),s as p) (don,out) =
+    if List.mem p don then don,out
+    else
+      match Edges.link_destination a s graph with
+      | None -> p::don, Freed p::out
+      | Some p' -> p::p'::don, Linked (p,p')::out
+
+  let negative_transformations_of_actions sigs graph actions =
+    snd
+      (List.fold_right
+         (fun x (don,out as acc) -> match x with
+            | Instantiation.Create (_,_) -> acc
+            | Instantiation.Mod_internal (p,_) ->
+              don, NegativeInternalized p::out
+            | Instantiation.Bind (p1,p2)
+            | Instantiation.Bind_to (p1,p2) ->
+              get_negative_part graph p1 (get_negative_part graph p2 acc)
+            | Instantiation.Free p ->
+              get_negative_part graph p acc
+            | Instantiation.Remove (_,ty as a) ->
+              Tools.recti (fun st s -> get_negative_part graph (a,s) st)
+                (don,Agent a::out) (Signature.arity sigs ty)
+         )
+         actions ([],[]))
+
+  let positive_transformations_of_actions sigs side_effect_dsts actions =
+    let rem,rev =
+      List.fold_left
+        (fun (rem,out as acc) -> function
+           | Instantiation.Create ((_,ty as a),_) ->
+             Tools.recti (fun st s -> (a,s)::st)
+               rem (Signature.arity sigs ty), Agent a::out
+           | Instantiation.Mod_internal ((a,s),i) ->
+             rem, PositiveInternalized (a,s,i)::out
+           | Instantiation.Bind (p1,p2)
+           | Instantiation.Bind_to (p1,p2) ->
+             List.filter (fun p -> p <> p1 && p <> p2) rem,
+             Linked (p1,p2)::out
+           | Instantiation.Free p ->
+             List.filter (fun p' -> p' <> p) rem, Freed p::out
+           | Instantiation.Remove _ -> acc
+        )
+        ([],[]) actions in
+    List.rev_append rev
+      (List_util.rev_map_append (fun p -> Freed p) rem
+         (List.map (fun p -> Freed p) side_effect_dsts))
+
 end
 
 type elementary_rule = {

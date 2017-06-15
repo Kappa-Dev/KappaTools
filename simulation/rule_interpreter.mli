@@ -76,6 +76,11 @@ val print : Model.t -> Format.formatter -> t -> unit
 
 val get_random_state : t -> Random.State.t
 
+val update_edges_from_actions :
+  outputs:(Data.t -> unit) -> Signature.s -> Counter.t -> Pattern.Env.t -> t ->
+  Instantiation.concrete Instantiation.action list *
+  Instantiation.concrete Instantiation.site list -> t
+
 (** {6 Stories} *)
 
 val add_tracked :
