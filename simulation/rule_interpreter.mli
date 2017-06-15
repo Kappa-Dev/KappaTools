@@ -32,19 +32,19 @@ val value_alg : Counter.t -> t -> Alg_expr.t -> Nbr.t
 val value_bool :
   Counter.t -> t -> (Pattern.id array list,int) Alg_expr.bool -> bool
 
+val activity : t -> float
+
 (** {6 Core} *)
 
-val apply_rule :
+val apply_given_rule :
   outputs:(Data.t -> unit) -> ?rule_id:int -> Model.t ->
   Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
-val apply_unary_rule :
-  outputs:(Data.t -> unit) -> rule_id:int -> Model.t ->
-  Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> result
-(** Returns the graph obtained by applying the rule.
-    [rule_id] is mandatory if the rule has an unary rate.*)
+val apply_rule :
+  outputs:(Data.t -> unit) -> maxConsecutiveClash:int ->
+  Model.t -> Counter.t -> t -> int option * bool * t
 
 val force_rule :
   outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
@@ -53,25 +53,11 @@ val force_rule :
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)
 
-val adjust_rule_instances :
-  rule_id:int -> (int -> int -> float -> unit) ->
-  Model.t -> Counter.t -> t -> Primitives.elementary_rule -> t
-(** Compute the exact number of instances of rule [rule_id]
-
-    Said differently: unplug rectangular approximation for [rule_id]
-    (up to the next application of a rule impacting the number of
-    instances of [rule_id] *)
-
-val adjust_unary_rule_instances :
-  rule_id:int -> (int -> int -> float -> unit) ->
-  Model.t -> Counter.t -> t -> Primitives.elementary_rule -> t
-(** Compute the exact number of unary instances of rule [rule_id] *)
-
 val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
 
 val overwrite_var : int -> Counter.t -> t -> Alg_expr.t -> t
 val update_outdated_activities :
-  (int -> int -> float -> unit) ->
+  (int -> float -> float -> unit) ->
   Model.t -> Counter.t -> t -> (t * int list)
 (** Resynchronize the state after a rule application.
 
