@@ -395,6 +395,7 @@ class manager
   method terminate =
     Lwt.ignore_result (self#project_delete project_id)
 
+  method is_running = true (*TODO*)
   method init_static_analyser_raw data =
     send
       ?timeout

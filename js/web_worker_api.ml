@@ -6,11 +6,12 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-class manager ()  =
+class manager () =
   let kasa_worker = Worker.create "KaSaWorker.js" in
   let kasa_mailbox = Kasa_client.new_mailbox () in
   object(self)
     val sim_worker = Worker.create "WebWorker.js"
+    val mutable is_running = true
     initializer
       let () = kasa_worker##.onmessage :=
           (Dom.handler
@@ -26,10 +27,16 @@ class manager ()  =
                 let response_text : string = response_message##.data in
                 let () = self#receive response_text  in
                 Js._true
-             ))
-      in ()
-    method sleep timeout = Lwt_js.sleep timeout
-    method post_message (message_text : string) : unit =
+             )) in
+      let () = sim_worker##.onerror :=
+          (Dom.handler
+             (fun _ -> let () = is_running <- false in Js._true)) in
+      let () = kasa_worker##.onerror :=
+          (Dom.handler
+             (fun _ -> let () = is_running <- false in Js._true)) in
+        ()
+    method private sleep timeout = Lwt_js.sleep timeout
+    method private post_message (message_text : string) : unit =
       sim_worker##postMessage(message_text)
     inherit Mpi_api.manager ()
     inherit Kasa_client.new_client
@@ -37,6 +44,7 @@ class manager ()  =
             let () = Common.debug (Js.string message_text) in
             kasa_worker##postMessage(message_text))
         kasa_mailbox
+    method is_running = is_running
     method terminate =
       let () = sim_worker##terminate in
       kasa_worker##terminate

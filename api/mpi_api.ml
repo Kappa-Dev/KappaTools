@@ -423,15 +423,16 @@ class type virtual manager_mpi_type =
     method private receive : string -> unit
 
     inherit Api.manager
+    method virtual is_running : bool
   end
 
 class virtual manager () : manager_mpi_type =
   object(self)
-    val mutable context =
-      { mailboxes = IntMap.empty ; id = 0 }
+    val mutable context = { mailboxes = IntMap.empty ; id = 0 }
 
     method private virtual sleep : float -> unit Lwt.t
     method private virtual post_message : string -> unit
+    method virtual is_running : bool
 
     method private receive (response_text : string) =
       let message : Mpi_message_j.response Mpi_message_j.message =
@@ -445,20 +446,24 @@ class virtual manager () : manager_mpi_type =
 
     method private message (request : Mpi_message_j.request) :
       Mpi_message_j.response Lwt.t =
-      let result,feeder = Lwt.task () in
-      let () = context <- { context with id = context.id + 1 } in
-      let message : Mpi_message_j.request Mpi_message_j.message =
-        { Mpi_message_j.id = context.id ;
-          Mpi_message_j.data = request } in
-      let message_text : string =
-        Mpi_message_j.string_of_message
-          Mpi_message_j.write_request message
-      in
-      let () = self#post_message message_text in
-      let () = context <-
-          { context with
-            mailboxes = IntMap.add context.id feeder context.mailboxes } in
-      result
+      if self#is_running then
+        let result,feeder = Lwt.task () in
+        let () = context <- { context with id = context.id + 1 } in
+        let message : Mpi_message_j.request Mpi_message_j.message =
+          { Mpi_message_j.id = context.id ;
+            Mpi_message_j.data = request } in
+        let message_text : string =
+          Mpi_message_j.string_of_message
+            Mpi_message_j.write_request message
+        in
+        let () = self#post_message message_text in
+        let () = context <-
+            { context with
+              mailboxes = IntMap.add context.id feeder context.mailboxes } in
+        result
+      else
+        Lwt.return
+          (Api_common.result_error_msg "Kappa has died")
 
     inherit manager_base ()
   end

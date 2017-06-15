@@ -97,7 +97,8 @@ class type manager_simulation = object
   inherit manager_snapshot
 end
 
-class type manager_static_analysis = object
+class type virtual manager_static_analysis = object
+  method virtual is_running : bool
   method init_static_analyser :
     Ast.parsing_compil -> (unit, string) Lwt_result.t
   method init_static_analyser_raw :
@@ -121,6 +122,7 @@ end
 class type concrete_manager = object
   inherit manager
   inherit manager_static_analysis
+  method is_running : bool
   method terminate : unit
 end
 

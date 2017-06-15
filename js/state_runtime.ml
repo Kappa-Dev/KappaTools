@@ -120,6 +120,7 @@ class embedded () : Api.concrete_manager =
     inherit Kasa_client.new_client
         ~post:(fun message_text -> kasa_worker##postMessage(message_text))
         kasa_mailbox
+    method is_running = true
     method terminate =
       let () = kasa_worker##terminate in
       ()(*TODO*)
@@ -137,10 +138,10 @@ let create_manager ~is_new project_id =
   | WebWorker ->
     let () = State_settings.set_synch false in
     Lwt.return
-      (Api_common.result_ok (new Web_worker_api.manager () :> Api.concrete_manager))
+      (Api_common.result_ok (new Web_worker_api.manager () : Api.concrete_manager))
   | Embedded ->
     let () = State_settings.set_synch false in
-    Lwt.return (Api_common.result_ok (new embedded () :> Api.concrete_manager))
+    Lwt.return (Api_common.result_ok (new embedded () : Api.concrete_manager))
   | Remote { label = _ ; protocol = HTTP url } ->
     let version_url : string = Format.sprintf "%s/v2" url in
     let () = Common.debug
@@ -172,7 +173,7 @@ let create_manager ~is_new project_id =
     let () = Common.debug (Js.string ("set_runtime_url: "^cli.url)) in
     try
       let js_node_runtime = new JsNode.manager cli.command cli.args in
-      if js_node_runtime#is_running () then
+      if js_node_runtime#is_running then
         let () = Common.debug (Js.string "set_runtime_url:sucess") in
         let () = State_settings.set_synch false in
         Lwt.return (Api_common.result_ok (js_node_runtime :> Api.concrete_manager))

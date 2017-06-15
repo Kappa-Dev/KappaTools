@@ -66,7 +66,7 @@ let spawn_process (configuration : process_configuration  Js.t) : process Js.t J
 class manager
     ?(message_delimiter : char = Tools.default_message_delimter)
     (command : string)
-    (args : string list) =
+    (args : string list) : Api.concrete_manager =
   let sim_re = Re.compile (Re.str "KaSimAgent") in
   let sa_re = Re.compile (Re.str "KaSaAgent") in
   let sim_command,sa_command =
@@ -77,6 +77,8 @@ class manager
     else
       failwith ("Unrecognized command: "^command) in
   let sa_mailbox = Kasa_client.new_mailbox () in
+  let running_ref = ref true in
+  let onClose () = running_ref := false in
   let sa_configuration : process_configuration Js.t  =
     let rec onStdout =
       let buffer = Buffer.create 512 in
@@ -89,11 +91,13 @@ class manager
           let () = Kasa_client.receive sa_mailbox (Buffer.contents buffer) in
           let () = Buffer.reset buffer in
           onStdout (Js.string suffix) in
-    create_process_configuration ~onStdout sa_command args in
+    create_process_configuration ~onStdout ~onClose sa_command args in
   let sa_process =
     Js.Opt.case
       (spawn_process sa_configuration)
-      (fun () -> failwith ("Launching '"^sa_command^"' failed"))
+      (fun () ->
+         let () = onClose () in
+         failwith ("Launching '"^sa_command^"' failed"))
       (fun x -> x) in
   object(self)
     val mutable sim_process : process Js.t option = None
@@ -102,9 +106,7 @@ class manager
       let sim_configuration : process_configuration Js.t  =
         create_process_configuration
           ~onStdout:(fun msg -> self#onSimStdout (Js.to_string msg))
-          sim_command
-          args
-      in
+          ~onClose sim_command args in
       let p : process Js.t Js.opt = spawn_process sim_configuration in
       let () = sim_process <- Js.Opt.to_option p in
       ()
@@ -122,7 +124,7 @@ class manager
         Buffer.reset buffer;
         self#onSimStdout suffix
 
-    method sleep timeout = Lwt_js.sleep timeout
+    method private sleep timeout = Lwt_js.sleep timeout
     method private post_message (message_text : string) : unit =
       match sim_process with
       | None -> ()
@@ -134,9 +136,9 @@ class manager
                 message_text
                 message_delimiter))
 
-    method is_running () : bool =
+    method is_running : bool =
       match sim_process with
-      | Some _ -> true
+      | Some _ -> !running_ref
       | None -> false
 
     method terminate =

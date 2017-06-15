@@ -40,17 +40,6 @@ let set_file (file_id : string) : unit =
        >>= (fun _ -> Lwt.return_unit)
     )
 
-let set_content (content : string) : unit =
-  Common.async
-    (fun () ->
-       State_error.wrap
-         __LOC__
-         (State_file.set_content content
-          >>= (fun r -> State_project.sync () >>=
-                fun r' -> Lwt.return (Api_common.result_combine [r; r']))) (* get new contact map *)
-       >>= (fun _ -> Lwt.return_unit)
-    )
-
 let close_file () : unit =
   Common.async
     (fun () ->

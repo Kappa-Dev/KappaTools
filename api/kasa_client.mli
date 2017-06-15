@@ -13,5 +13,5 @@ val receive : mailbox -> string -> unit
 
 val new_mailbox : unit -> mailbox
 
-class new_client :
+class virtual new_client :
   post:(string -> unit) -> mailbox -> Api.manager_static_analysis

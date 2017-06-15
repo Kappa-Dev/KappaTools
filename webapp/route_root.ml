@@ -53,6 +53,9 @@ class new_manager : Api.concrete_manager =
              sim_process#stdout Tools.default_message_delimter
              (fun r -> let () = self#receive r in Lwt.return_unit)) in
       ()
+    method is_running =
+      sim_process#state = Lwt_process.Running &&
+      sa_process#state = Lwt_process.Running
     method private sleep t = Lwt_unix.sleep t
     method private post_message message_text =
       Lwt.ignore_result
