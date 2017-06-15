@@ -14,27 +14,11 @@ type t = {
   mutable active_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
-  activities : Random_tree.tree;
-  (* pair numbers are regular rule, odd unary instances *)
   mutable flux: (Data.flux_data) list;
   with_delta_activities : bool;
 }
 
-let initial_activity env counter graph activities =
-  Model.fold_rules
-    (fun i () rule ->
-       if Array.length rule.Primitives.connected_components = 0 then
-         match Nbr.to_float @@ Rule_interpreter.value_alg
-             counter graph (fst rule.Primitives.rate) with
-         | None ->
-           ExceptionDefn.warning ~pos:(snd rule.Primitives.rate)
-             (fun f -> Format.fprintf f "Problematic rule rate replaced by 0")
-         | Some rate -> Random_tree.add (2*i) rate activities)
-    () env
-
 let empty ~with_delta_activities env stopping_times =
-  let activity_tree =
-    Random_tree.create (2*Model.nb_rules env) in
   let stops =
     List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times in
   let time_dependent_perts =
@@ -58,7 +42,6 @@ let empty ~with_delta_activities env stopping_times =
     time_dependent_perts;
     perturbations_not_done_yet =
       Array.make (Model.nb_perturbations env) true;
-    activities = activity_tree;
     flux = [];
     with_delta_activities;
   }
@@ -85,15 +68,13 @@ let do_modification ~outputs env counter graph state extra modification =
         graph (Rule_interpreter.value_alg counter graph v) in
     let graph'',extra' =
       Rule_interpreter.update_outdated_activities
-        (fun x _ y -> Random_tree.add x y state.activities)
-        env counter graph' in
+        (fun _ _ _  -> ()) env counter graph' in
     ((false,graph'',state),List_util.merge_uniq Mods.int_compare  extra' extra)
   | Primitives.UPDATE (i,(expr,_)) ->
     let graph' = Rule_interpreter.overwrite_var i counter graph expr in
     let graph'',extra' =
         Rule_interpreter.update_outdated_activities
-          (fun x _ y -> Random_tree.add x y state.activities)
-          env counter graph' in
+          (fun _ _ _  -> ()) env counter graph' in
     ((false, graph'', state),List_util.merge_uniq Mods.int_compare  extra' extra)
   | Primitives.STOP pexpr ->
     let () = if pexpr <> [] then
@@ -230,7 +211,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
               return (stop,
                 Nbr.iteri
                   (fun _ s ->
-                     match Rule_interpreter.apply_rule
+                     match Rule_interpreter.apply_given_rule
                              ~outputs env counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success s -> s
@@ -241,12 +222,9 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
   bind
     mgraph
     (fun (_,graph,state0) ->
-       let () =
-         initial_activity env counter graph state0.activities in
        let mid_graph,_ =
          Rule_interpreter.update_outdated_activities
-           (fun x _ y -> Random_tree.add x y state0.activities)
-           env counter graph in
+           (fun _ _ _  -> ()) env counter graph in
        let everybody =
          let t  = Array.length state0.perturbations_alive in
          Tools.recti (fun l i -> (t-i-1)::l) [] t in
@@ -257,29 +235,62 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
        return out)
 
 let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
-  let choice,_ = Random_tree.random
-      (Rule_interpreter.get_random_state graph) state.activities in
-  let rule_id = choice/2 in
-  let rule = Model.get_rule env rule_id in
-  let prev_activity = Random_tree.total state.activities in
+  let prev_activity = Rule_interpreter.activity graph in
   let act_stack = ref [] in
-  let register_new_activity rd_id syntax_rd_id new_act =
-    let () =
+  let finalize_registration my_syntax_rd_id =
+    match state.flux, state.with_delta_activities with
+    | [], false -> ()
+    | l, _ ->
+      let () =
+        if state.with_delta_activities then
+          outputs (Data.DeltaActivities
+                     (my_syntax_rd_id,!act_stack)) in
+      let n_activity = Rule_interpreter.activity graph in
+      let () =
+        List.iter
+          (fun fl ->
+             let () = Fluxmap.incr_flux_hit my_syntax_rd_id fl in
+             match fl.Data.flux_kind with
+             | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
+             | Primitives.PROBABILITY ->
+               List.iter
+                 (fun (syntax_rd_id,(_,new_act)) ->
+                    Fluxmap.incr_flux_flux
+                      my_syntax_rd_id syntax_rd_id
+                      (let cand = new_act /. n_activity in
+                       match classify_float cand with
+                       | (FP_nan | FP_infinite) ->
+                         let () =
+                           let ct = Counter.current_time counter in
+                           ExceptionDefn.warning
+                             (fun f -> Format.fprintf
+                                 f "An infinite (or NaN) activity variation has been ignored at t=%f"
+                                 ct) in 0.
+                       | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
+                 !act_stack) l in
+      act_stack := [] in
+  (* let () = *)
+  (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
+
+  let applied_rid_syntax,final_step,graph' =
+    Rule_interpreter.apply_rule ~outputs ~maxConsecutiveClash env counter graph in
+  match applied_rid_syntax with
+  | None -> (final_step,graph',state)
+  | Some syntax_rid ->
+    let register_new_activity syntax_rd_id old_act new_act =
       match state.flux, state.with_delta_activities with
       | [], false -> ()
       | l,_ ->
-        let old_act = Random_tree.find rd_id state.activities in
         let () = act_stack := (syntax_rd_id,(old_act,new_act))::!act_stack in
         List.iter
           (fun fl ->
-             Fluxmap.incr_flux_flux
-               rule.Primitives.syntactic_rule syntax_rd_id
+             Fluxmap.incr_flux_flux syntax_rid syntax_rd_id
                (
                  let cand =
                    match fl.Data.flux_kind with
                    | Primitives.ABSOLUTE -> new_act -. old_act
                    | Primitives.PROBABILITY ->
-                    -. (old_act /. prev_activity)
+                     -. (old_act /. prev_activity)
                    | Primitives.RELATIVE ->
                      if (match classify_float old_act with
                          | (FP_zero | FP_nan | FP_infinite) -> false
@@ -295,61 +306,11 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
                            f "An infinite (or NaN) activity variation has been ignored at t=%f"
                            ct) in 0.
                  | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
-          l
-    in Random_tree.add rd_id new_act state.activities in
-  let finalize_registration () =
-    match state.flux, state.with_delta_activities with
-    | [], false -> ()
-    | l, _ ->
-      let () =
-        if state.with_delta_activities then
-          outputs (Data.DeltaActivities
-                     (rule.Primitives.syntactic_rule,!act_stack)) in
-      let n_activity = Random_tree.total state.activities in
-      let () =
-        List.iter
-          (fun fl ->
-             let () = Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl in
-             match fl.Data.flux_kind with
-             | Primitives.ABSOLUTE | Primitives.RELATIVE -> ()
-             | Primitives.PROBABILITY ->
-               List.iter
-                 (fun (syntax_rd_id,(_,new_act)) ->
-                    Fluxmap.incr_flux_flux
-                      rule.Primitives.syntactic_rule syntax_rd_id
-                      (let cand = new_act /. n_activity in
-                       match classify_float cand with
-                       | (FP_nan | FP_infinite) ->
-                         let () =
-                           let ct = Counter.current_time counter in
-                           ExceptionDefn.warning
-                             (fun f -> Format.fprintf
-                                 f "An infinite (or NaN) activity variation has been ignored at t=%f"
-                                 ct) in 0.
-                       | (FP_zero | FP_normal | FP_subnormal) -> cand) fl)
-                 !act_stack) l in
-      act_stack := [] in
-  let () =
-    if !Parameter.debugModeOn then
-      Format.printf
-        "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
-        (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-        rule_id (Kappa_printer.elementary_rule ~env) rule
-        (*Rule_interpreter.print_dist env graph rule_id*) in
-  (* let () = *)
-  (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-  let cause = Trace.RULE rule_id in
-  let apply_rule =
-    if choice mod 2 = 1
-    then Rule_interpreter.apply_unary_rule ~outputs ~rule_id
-    else Rule_interpreter.apply_rule ~outputs ~rule_id in
-  match apply_rule env counter graph cause rule with
-  | Rule_interpreter.Success (graph') ->
-    let final_step = not (Counter.one_constructive_event counter) in
+          l in
     let graph'',extra_pert =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
-    let () = finalize_registration () in
+    let () = finalize_registration syntax_rid in
     let actives = state.active_perturbations in
     let () = state.active_perturbations <- [] in
     let (stop,graph''',state') =
@@ -360,34 +321,12 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
         state.perturbations_not_done_yet in
     let () =
       if !Parameter.debugModeOn then
-        Format.printf "@[<v>Obtained@ %a@]@."
-          (Rule_interpreter.print env) graph'' in
+        Format.printf "@[<v>Obtained@ %a@]@." (Rule_interpreter.print env) graph''' in
     (final_step||stop,graph''',state')
-  | (Rule_interpreter.Clash | Rule_interpreter.Corrected) as out ->
-    let continue =
-      if out = Rule_interpreter.Clash then
-        Counter.one_clashing_instance_event counter
-      else if choice mod 2 = 1
-      then Counter.one_no_more_unary_event counter
-      else Counter.one_no_more_binary_event counter in
-    if Counter.consecutive_null_event counter < maxConsecutiveClash
-    then (not continue,graph,state)
-    else
-      let register_new_activity rd_id _ new_act =
-        Random_tree.add rd_id new_act state.activities in
-      (not continue,
-       (if choice mod 2 = 1
-        then Rule_interpreter.adjust_unary_rule_instances
-            ~rule_id register_new_activity env counter graph rule
-        else Rule_interpreter.adjust_rule_instances
-            ~rule_id register_new_activity env counter graph rule),
-       state)
-
-let activity state = Random_tree.total state.activities
 
 let a_loop
     ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state =
-  let activity = activity state in
+  let activity = Rule_interpreter.activity graph in
   let rd = Random.State.float (Rule_interpreter.get_random_state graph) 1.0 in
   let dt = abs_float (log rd /. activity) in
 

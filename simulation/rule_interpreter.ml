@@ -52,6 +52,12 @@ module Instances : sig
   val pick_an_unary_instance :
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> int ->
     Primitives.elementary_rule -> Matching.t option * Edges.path option
+
+  val activity : t -> float
+  val get_activity : int -> t -> float
+  val set_activity : int -> float -> t -> unit
+
+  val pick_rule : Random.State.t -> t -> int
 end = struct
   type t = {
     (* With rectangular approximation *)
@@ -66,6 +72,9 @@ end = struct
       (Matching.t * Edges.path option) list Mods.IntMap.t;
 
     nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
+
+    activities : Random_tree.tree;
+    (* pair numbers are regular rule, odd unary instances *)
   }
 
   let size_rin state pattern =
@@ -78,15 +87,19 @@ end = struct
   let number state patterns_l =
     Nbr.I (raw_number state patterns_l)
 
-  let empty env = {
-    roots_of_patterns = Pattern.Env.new_obs_map
-        (Model.domain env) (fun _ -> IntCollection.create 64);
-    roots_of_unary_patterns = Pattern.Env.new_obs_map
-        (Model.domain env) (fun _ -> Mods.IntMap.empty);
-    matchings_of_rule = Mods.IntMap.empty;
-    unary_candidates = Mods.IntMap.empty;
-    nb_rectangular_instances_by_cc = Mods.IntMap.empty;
-  }
+  let empty env =
+    let activity_tree =
+      Random_tree.create (2*Model.nb_rules env) in
+    {
+      roots_of_patterns = Pattern.Env.new_obs_map
+          (Model.domain env) (fun _ -> IntCollection.create 64);
+      roots_of_unary_patterns = Pattern.Env.new_obs_map
+          (Model.domain env) (fun _ -> Mods.IntMap.empty);
+      matchings_of_rule = Mods.IntMap.empty;
+      unary_candidates = Mods.IntMap.empty;
+      nb_rectangular_instances_by_cc = Mods.IntMap.empty;
+      activities = activity_tree;
+    }
 
   let incorporate_extra_pattern state pattern matchings =
       if IntCollection.is_empty
@@ -376,6 +389,12 @@ end = struct
   let debug_print f state =
     let () = print_injections ?domain:None f state.roots_of_patterns in
     print_unary_injections ?domain:None f state.roots_of_unary_patterns
+
+  let activity state = Random_tree.total state.activities
+  let get_activity rule state = Random_tree.find rule state.activities
+  let set_activity rule v state = Random_tree.add rule v state.activities
+
+  let pick_rule rt state = fst (Random_tree.random rt state.activities)
 end
 
 type t =
@@ -426,9 +445,23 @@ let value_alg counter state alg =
     ~get_tok:(fun i -> state.tokens.(i))
     alg
 
+let activity g = Instances.activity g.instances
+
 let recompute env counter state i =
   state.variables_cache.(i) <-
     value_alg counter state (raw_get_alg env state.variables_overwrite i)
+
+let initial_activity env counter state =
+  Model.fold_rules
+    (fun i () rule ->
+       if Array.length rule.Primitives.connected_components = 0 then
+         match Nbr.to_float @@ value_alg
+             counter state (fst rule.Primitives.rate) with
+         | None ->
+           ExceptionDefn.warning ~pos:(snd rule.Primitives.rate)
+             (fun f -> Format.fprintf f "Problematic rule rate replaced by 0")
+         | Some rate -> Instances.set_activity (2*i) rate state.instances)
+    () env
 
 let empty ~with_trace random_state env counter =
   let unary_patterns =
@@ -466,7 +499,33 @@ let empty ~with_trace random_state env counter =
                   (Model.domain env) (fun _ -> []);
     } in
   let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
+  let () = initial_activity env counter cand in
   cand
+
+let print env f state =
+  let sigs = Model.signatures env in
+  Format.fprintf
+    f "@[<v>%a@,%a@]"
+    (Pp.list Pp.space (fun f (i,mix) ->
+         Format.fprintf f "%%init: %i @[<h>%a@]" i
+           (Raw_mixture.print ~new_syntax:false ~compact:false ~created:false ~sigs)
+           mix))
+    (Edges.build_snapshot sigs state.edges)
+    (Pp.array Pp.space (fun i f el ->
+         Format.fprintf
+           f "%%init: %a <- %a"
+           (Model.print_token ~env) i Nbr.print el))
+    state.tokens
+
+let debug_print f state =
+  Format.fprintf
+    f "@[<v>%a@,%a@,%a@]"
+    Edges.debug_print state.edges
+    (Pp.array Pp.space (fun i f el ->
+         Format.fprintf f "token_%i <- %a"
+           i Nbr.print el))
+    state.tokens
+    Instances.debug_print state.instances
 
 type stats = { mixture_stats : Edges.stats }
 
@@ -787,7 +846,9 @@ let store_activity store env counter state id syntax_id rate cc_va =
                (if unary then "Unary " else "")
                (Model.print_rule ~env) id act),
             Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
-  store id syntax_id act
+  let old_act = Instances.get_activity id state.instances in
+  let () = Instances.set_activity id act state.instances in
+  store syntax_id old_act act
 
 let update_outdated_activities store env counter state =
   let () = assert (not state.outdated) in
@@ -862,7 +923,7 @@ let transform_by_a_rule outputs env counter state event_kind ?path rule inj =
   update_edges outputs counter (Model.domain env) inj
     state' event_kind ?path rule (Model.signatures env)
 
-let apply_unary_rule ~outputs ~rule_id env counter state event_kind rule =
+let apply_given_unary_rule ~outputs ~rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let inj,path = Instances.pick_an_unary_instance
@@ -894,7 +955,7 @@ let apply_unary_rule ~outputs ~rule_id env counter state event_kind rule =
         Success (transform_by_a_rule
                    outputs env counter state' event_kind ?path rule inj)
 
-let apply_rule ~outputs ?rule_id env counter state event_kind rule =
+let apply_given_rule ~outputs ?rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   match Instances.pick_an_instance
@@ -935,7 +996,7 @@ let apply_rule ~outputs ?rule_id env counter state event_kind rule =
          | Some _ -> Corrected
 
 let force_rule ~outputs env counter state event_kind rule =
-  match apply_rule ~outputs env counter state event_kind rule with
+  match apply_given_rule ~outputs env counter state event_kind rule with
   | Success out -> Some out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
@@ -961,7 +1022,7 @@ let force_rule ~outputs env counter state event_kind rule =
        Some (transform_by_a_rule
                outputs env counter state event_kind rule h)
 
-let adjust_rule_instances ~rule_id store env counter state rule =
+let adjust_rule_instances ~rule_id env counter state rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let unary_rate = match rule.Primitives.unary_rate with
@@ -976,11 +1037,11 @@ let adjust_rule_instances ~rule_id store env counter state rule =
       ~rule_id ?unary_rate state.instances domain state.edges
       rule.Primitives.connected_components in
   let () =
-    store_activity store env counter state (2*rule_id)
+    store_activity (fun _ _ _ -> ()) env counter state (2*rule_id)
       rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
   { state with instances }
 
-let adjust_unary_rule_instances ~rule_id store env counter state rule =
+let adjust_unary_rule_instances ~rule_id env counter state rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let max_distance =
@@ -993,7 +1054,7 @@ let adjust_unary_rule_instances ~rule_id store env counter state rule =
       ~rule_id ?max_distance state.instances domain state.edges
       rule.Primitives.connected_components in
   let () =
-    store_activity store env counter state (2*rule_id+1)
+    store_activity (fun _ _ _ -> ()) env counter state (2*rule_id+1)
       rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
   { state with instances }
 
@@ -1013,30 +1074,40 @@ let snapshot env counter fn state = {
       (Format.asprintf "%a" (Model.print_token ~env) i,x)) state.tokens;
 }
 
-let print env f state =
-  let sigs = Model.signatures env in
-  Format.fprintf
-    f "@[<v>%a@,%a@]"
-    (Pp.list Pp.space (fun f (i,mix) ->
-         Format.fprintf f "%%init: %i @[<h>%a@]" i
-           (Raw_mixture.print ~new_syntax:false ~compact:false ~created:false ~sigs)
-           mix))
-    (Edges.build_snapshot sigs state.edges)
-    (Pp.array Pp.space (fun i f el ->
-         Format.fprintf
-           f "%%init: %a <- %a"
-           (Model.print_token ~env) i Nbr.print el))
-    state.tokens
-
-let debug_print f state =
-  Format.fprintf
-    f "@[<v>%a@,%a@,%a@]"
-    Edges.debug_print state.edges
-    (Pp.array Pp.space (fun i f el ->
-         Format.fprintf f "token_%i <- %a"
-           i Nbr.print el))
-    state.tokens
-    Instances.debug_print state.instances
+let apply_rule ~outputs ~maxConsecutiveClash env counter graph =
+  let choice = Instances.pick_rule graph.random_state graph.instances in
+  let rule_id = choice/2 in
+  let rule = Model.get_rule env rule_id in
+  let cause = Trace.RULE rule_id in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf
+        "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
+        (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
+        rule_id (Kappa_printer.elementary_rule ~env) rule
+        (*Rule_interpreter.print_dist env graph rule_id*) in
+  let apply_rule =
+    if choice mod 2 = 1
+    then apply_given_unary_rule ~outputs ~rule_id
+    else apply_given_rule ~outputs ~rule_id in
+  match apply_rule env counter graph cause rule with
+  | Success (graph') ->
+    let final_step = not (Counter.one_constructive_event counter) in
+    (Some rule.Primitives.syntactic_rule,final_step,graph')
+  | (Clash | Corrected) as out ->
+    let continue =
+      if out = Clash then
+        Counter.one_clashing_instance_event counter
+      else if choice mod 2 = 1
+      then Counter.one_no_more_unary_event counter
+      else Counter.one_no_more_binary_event counter in
+    if Counter.consecutive_null_event counter < maxConsecutiveClash
+    then (None,not continue,graph)
+    else
+      (None,not continue,
+       (if choice mod 2 = 1
+        then adjust_unary_rule_instances ~rule_id env counter graph rule
+        else adjust_rule_instances ~rule_id env counter graph rule))
 
 let aux_add_tracked patterns name tests state tpattern =
   let () = state.outdated <- true in
