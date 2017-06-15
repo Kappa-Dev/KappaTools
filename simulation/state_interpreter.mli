@@ -31,9 +31,6 @@ val do_modifications :
   Rule_interpreter.t -> t -> Primitives.modification list ->
   (bool * Rule_interpreter.t * t)
 
-val activity : t -> float
-(** Returns the current activity *)
-
 val a_loop :
   outputs:(Data.t -> unit) -> dumpIfDeadlocked:bool ->
   maxConsecutiveClash:int -> Model.t -> Counter.t ->

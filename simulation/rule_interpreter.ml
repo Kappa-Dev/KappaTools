@@ -776,9 +776,9 @@ let apply_rule ~outputs ?rule_id env counter state event_kind rule =
   match inj_roots with
   | None -> Clash
   | Some (inj,rev_roots) ->
-    let roots = Tools.array_rev_of_list rev_roots in
     let () =
       if !Parameter.debugModeOn then
+        let roots = Tools.array_rev_of_list rev_roots in
         Format.printf "@[On roots:@ @[%a@]@]@."
           (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
     match rule.Primitives.unary_rate with
@@ -789,11 +789,14 @@ let apply_rule ~outputs ?rule_id env counter state event_kind rule =
     | Some (_,max_distance) ->
       match max_distance with
       | None ->
-        if Edges.in_same_connected_component roots.(0) roots.(1) state.edges then
-          Corrected
-        else
-          Success
-            (transform_by_a_rule outputs env counter state event_kind rule inj)
+        (match rev_roots with
+         | root1 :: root0 :: [] ->
+           if Edges.in_same_connected_component root0 root1 state.edges then
+             Corrected
+           else
+             Success
+               (transform_by_a_rule outputs env counter state event_kind rule inj)
+         | _ -> failwith "apply_given_rule unary rule without 2 patterns")
       | Some dist ->
          let dist' = Some (max_dist_to_int counter state dist) in
          let nodes = Matching.elements_with_types
