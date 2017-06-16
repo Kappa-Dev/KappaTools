@@ -57,6 +57,9 @@ type elementary_rule = {
   (** In the reverse order on purpose so that we rev_map when we
       concretize *)
 }
+(** If [unary_rate] is [Some _], [rate] means binary rate. Else [rate]
+    is the rate independently of the connectivity *)
+
 val extract_cc_ids : elementary_rule -> Pattern.id array
 val extract_abstract_event :
   elementary_rule -> Instantiation.abstract Instantiation.event

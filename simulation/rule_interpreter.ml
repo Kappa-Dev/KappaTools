@@ -21,41 +21,74 @@ module Instances : sig
 
   val incorporate_extra_pattern : t -> Pattern.id -> IntCollection.t -> unit
 
+  (* returns the rectangular approximated quantity of instances of an
+     observable *)
   val raw_number : t -> Pattern.id array list -> int
   val number : t -> Pattern.id array list -> Nbr.t
+  (** Can be used *)
 
+  (* Redistrubute instances per connected component whien the
+     connectivity changes
+
+     None means connectivity has not changed (aka nothing to do)
+
+     The hash table is there for delayed update of activity. It stores all
+     the connected component that have changed during this event
+     loop.*)
   val break_apart_cc :
     t -> Edges.t -> (int, unit) Hashtbl.t -> (int * int) option -> t
   val merge_cc :
     t -> (int, unit) Hashtbl.t -> (int * int) option -> t
+
   val update_roots :
     t -> bool -> Pattern.Set.t -> Edges.t -> (int, unit) Hashtbl.t ->
     Pattern.id -> int -> unit
+  (** [update_roots state is_positive_update domain graph cc_cache id root] *)
 
   val all_injections :
     ?excp:Pattern.id * int -> ?unary_rate:'a * int option -> t ->
     Pattern.Env.t -> Edges.t -> Pattern.id array -> (Matching.t * int list) list
+  (** ~excp(pattern,root) constraints [pattern] to be injected only on
+      [root].  Only the horizon part (the int option one) is important
+      of unary_rate returns the matching into the mixture and the
+      roots of the patterns (for conviencience to check binary
+      instances of rules with molecular ambiguity) *)
+
   val adjust_rule_instances :
     rule_id:int -> ?unary_rate:'a * int option ->
     t -> Pattern.Env.t -> Edges.t -> Pattern.id array -> int * t
+  (** returns the Instances.t where you've stored the exact (binary when
+      unary_rate is Some) matchings and the number of these
+      matchings *)
+
   val adjust_unary_rule_instances :
     rule_id:int -> ?max_distance:int -> t -> Pattern.Env.t -> Edges.t ->
     Pattern.id array -> int * t
+  (** returns the Instances.t where you've stored the exact unary
+      matchings and the number of these matchings *)
 
-  val new_unary_activity :
+  val compute_unary_number :
     t -> (int, unit) Hashtbl.t -> Primitives.elementary_rule -> int -> int * t
+  (** [compute_unary_number state modified_ccs_cache rule cc] *)
+
   val pop_exact_matchings : t -> int -> t
+  (** exact matchings of [rule_id] are not valid anymore *)
 
   val pick_an_instance :
-    t -> Random.State.t -> Pattern.Env.t -> Edges.t -> int option ->
+    t -> Random.State.t -> Pattern.Env.t -> Edges.t -> ?rule_id:int ->
     Primitives.elementary_rule -> (Matching.t * int list) option
+
   val pick_an_unary_instance :
-    t -> Random.State.t -> Pattern.Env.t -> Edges.t -> int ->
+    t -> Random.State.t -> Pattern.Env.t -> Edges.t -> rule_id:int ->
     Primitives.elementary_rule -> Matching.t option * Edges.path option
 
   val activity : t -> float
+  (** total activity of the all system *)
+
   val get_activity : int -> t -> float
   val set_activity : int -> float -> t -> unit
+  (** of a given rule (pair numbers for unary instances, odd for
+      binary (or ambiguous case) *)
 
   val pick_rule : Random.State.t -> t -> int
 end = struct
@@ -175,7 +208,7 @@ end = struct
             cc_map in
       Pattern.ObsMap.set state.roots_of_unary_patterns pattern cc_map'
 
-  let new_unary_activity state modified_cc rule cc =
+  let compute_unary_number state modified_cc rule cc =
     let map1 =
       Pattern.ObsMap.get state.roots_of_unary_patterns
         rule.Primitives.connected_components.(0) in
@@ -210,7 +243,7 @@ end = struct
     | None,_ -> state
     | Some _, match' -> { state with matchings_of_rule = match' }
 
-  let pick_an_unary_instance state random_state domain edges rule_id rule =
+  let pick_an_unary_instance state random_state domain edges ~rule_id rule =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
       let inj,path = List_util.random random_state l in Some inj,path
@@ -244,7 +277,7 @@ end = struct
       | None -> None,None
       | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
 
-  let pick_an_instance state random_state domain edges rule_id rule =
+  let pick_an_instance state random_state domain edges ?rule_id rule =
     let from_patterns () =
       Tools.array_fold_lefti
         (fun id inj_rev_roots pattern ->
@@ -950,7 +983,7 @@ let update_outdated_activities store env counter state =
     | None -> state
     | Some (unrate, _) ->
       let va, instances =
-        Instances.new_unary_activity state.instances modified_cc rule i in
+        Instances.compute_unary_number state.instances modified_cc rule i in
       let () =
         store_activity
           store env counter state (2*i+1)
@@ -1019,7 +1052,7 @@ let apply_given_unary_rule ~outputs ~rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   let inj,path = Instances.pick_an_unary_instance
-      state.instances state.random_state domain state.edges rule_id rule in
+      state.instances state.random_state domain state.edges ~rule_id rule in
   let rdeps,changed_c = state.outdated_elements in
   let state' =
     {state with
@@ -1051,7 +1084,7 @@ let apply_given_rule ~outputs ?rule_id env counter state event_kind rule =
   let () = assert (not state.outdated) in
   let domain = Model.domain env in
   match Instances.pick_an_instance
-          state.instances state.random_state domain state.edges rule_id rule with
+          state.instances state.random_state domain state.edges ?rule_id rule with
   | None -> Clash
   | Some (inj,rev_roots) ->
     let () =
