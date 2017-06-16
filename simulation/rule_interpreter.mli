@@ -11,6 +11,8 @@
 type t (**Abstract graph*)
 
 type result = Clash | Corrected | Success of t
+(** Clash means rectangular approximation failure
+Corrected means molecular ambiguity failure *)
 
 module Instances : sig
   type t
