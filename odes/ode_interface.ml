@@ -430,7 +430,7 @@ let apply_sigs env rule inj_nodes mix =
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
       (Rule_interpreter.apply_negative_transformation dummy_htbl)
-      ([], Rule_interpreter.Instances.empty env, mix)
+      ([], Instances.empty env, mix)
       concrete_removed
   in
   let (_, remaining_side_effects, _, edges'), concrete_inserted =

@@ -46,5 +46,7 @@ Snip
 Edges
 Trace
 Expr_interpreter
+Instances
+Generic_rule_interpreter
 Rule_interpreter
 Replay
