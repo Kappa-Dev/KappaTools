@@ -78,13 +78,4 @@ module type S = sig
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> rule_id:int ->
     Primitives.elementary_rule -> Matching.t option * Edges.path option
 
-  val activity : t -> float
-  (** total activity of the all system *)
-
-  val get_activity : int -> t -> float
-  val set_activity : int -> float -> t -> unit
-  (** of a given rule (pair numbers for unary instances, odd for
-      binary (or ambiguous case) *)
-
-  val pick_rule : Random.State.t -> t -> int
 end

@@ -27,6 +27,9 @@ module Make (Instances:Instances_sig.S) = struct
       tokens: Nbr.t array;
       outdated_elements: Operator.DepSet.t * (int,unit) Hashtbl.t;
 
+      activities : Random_tree.tree;
+      (* pair numbers are regular rule, odd unary instances *)
+
       random_state : Random.State.t;
 
       story_machinery :
@@ -67,7 +70,11 @@ module Make (Instances:Instances_sig.S) = struct
       ~get_tok:(fun i -> state.tokens.(i))
       alg
 
-  let activity g = Instances.activity g.instances
+let activity state = Random_tree.total state.activities
+let get_activity rule state = Random_tree.find rule state.activities
+let set_activity rule v state = Random_tree.add rule v state.activities
+let pick_rule rt state = fst (Random_tree.random rt state.activities)
+
 
   let recompute env counter state i =
     state.variables_cache.(i) <-
@@ -82,10 +89,11 @@ module Make (Instances:Instances_sig.S) = struct
            | None ->
              ExceptionDefn.warning ~pos:(snd rule.Primitives.rate)
                (fun f -> Format.fprintf f "Problematic rule rate replaced by 0")
-           | Some rate -> Instances.set_activity (2*i) rate state.instances)
+           | Some rate -> set_activity (2*i) rate state)
       () env
 
   let empty ~with_trace random_state env counter =
+    let activity_tree = Random_tree.create (2*Model.nb_rules env) in
     let unary_patterns =
       Model.fold_rules
         (fun _ acc r ->
@@ -104,6 +112,7 @@ module Make (Instances:Instances_sig.S) = struct
     let variables_cache = Array.make (Model.nb_algs env) Nbr.zero in
     let cand =
       {
+        activities = activity_tree ;
         outdated = false;
         precomputed = { unary_patterns; always_outdated};
         instances = Instances.empty env;
@@ -456,7 +465,8 @@ module Make (Instances:Instances_sig.S) = struct
                       (file,(Counter.current_time counter),mixture))) species in
     let rev_deps = Operator.DepSet.union
         former_deps (Operator.DepSet.union del_deps new_deps) in
-    { outdated = false;
+    { state with
+      outdated = false;
       precomputed = state.precomputed;
       instances = instances';
       variables_cache = state.variables_cache;
@@ -525,7 +535,8 @@ module Make (Instances:Instances_sig.S) = struct
                       (file,(Counter.current_time counter),mixture))) species in
     let rev_deps = Operator.DepSet.union
         former_deps (Operator.DepSet.union del_deps new_deps) in
-    { outdated = false;
+    { activities = state.activities ; 
+      outdated = false;
       precomputed = state.precomputed;
       instances = instances';
       variables_cache = state.variables_cache;
@@ -539,6 +550,8 @@ module Make (Instances:Instances_sig.S) = struct
 
   let max_dist_to_int counter state d = Nbr.to_int (value_alg counter state d)
 
+  (* cc_va is the number of embeddings. It only has 
+  to be multiplied by the rate constant of the rule *)
   let store_activity store env counter state id syntax_id rate cc_va =
     let () =
       if !Parameter.debugModeOn then
@@ -560,8 +573,8 @@ module Make (Instances:Instances_sig.S) = struct
                  (if unary then "Unary " else "")
                  (Model.print_rule ~env) id act),
               Model.get_ast_rule_rate_pos ~unary env syntax_id)) in
-    let old_act = Instances.get_activity id state.instances in
-    let () = Instances.set_activity id act state.instances in
+    let old_act = get_activity id state in
+    let () = set_activity id act state in
     store syntax_id old_act act
 
   let update_outdated_activities store env counter state =
@@ -789,7 +802,7 @@ module Make (Instances:Instances_sig.S) = struct
   }
 
   let apply_rule ~outputs ~maxConsecutiveClash env counter graph =
-    let choice = Instances.pick_rule graph.random_state graph.instances in
+    let choice = pick_rule graph.random_state graph in
     let rule_id = choice/2 in
     let rule = Model.get_rule env rule_id in
     let cause = Trace.RULE rule_id in

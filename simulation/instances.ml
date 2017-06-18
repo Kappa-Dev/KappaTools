@@ -19,9 +19,6 @@ type t = {
     (Matching.t * Edges.path option) list Mods.IntMap.t;
 
   nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
-
-  activities : Random_tree.tree;
-  (* pair numbers are regular rule, odd unary instances *)
 }
 
 type message = unit
@@ -35,10 +32,7 @@ let number state patterns =
       (fun acc pattern ->  acc * (size_rin state  pattern)) 1 patterns
 
 
-let empty env =
-  let activity_tree =
-    Random_tree.create (2*Model.nb_rules env) in
-  {
+let empty env = {
     roots_of_patterns = Pattern.Env.new_obs_map
         (Model.domain env) (fun _ -> IntCollection.create 64);
     roots_of_unary_patterns = Pattern.Env.new_obs_map
@@ -46,7 +40,6 @@ let empty env =
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
     nb_rectangular_instances_by_cc = Mods.IntMap.empty;
-    activities = activity_tree;
   }
 
 let incorporate_extra_pattern state pattern matchings =
@@ -337,9 +330,3 @@ let print_unary_injections ?domain f roots_of_patterns =
 let debug_print f state =
   let () = print_injections ?domain:None f state.roots_of_patterns in
   print_unary_injections ?domain:None f state.roots_of_unary_patterns
-
-let activity state = Random_tree.total state.activities
-let get_activity rule state = Random_tree.find rule state.activities
-let set_activity rule v state = Random_tree.add rule v state.activities
-
-let pick_rule rt state = fst (Random_tree.random rt state.activities)
