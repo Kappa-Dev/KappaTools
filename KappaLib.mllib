@@ -47,4 +47,7 @@ Edges
 Trace
 Expr_interpreter
 Rule_interpreter
+Instances_sig
+Instances
+Generic_rule_interpreter
 Replay

@@ -8,8 +8,11 @@
 
 module type S = sig
   type t
+  type message
 
   val empty : Model.t -> t
+
+  val send_message : message -> t -> t
 
   val debug_print : Format.formatter -> t -> unit
 
@@ -17,8 +20,7 @@ module type S = sig
 
   (* returns the rectangular approximated quantity of instances of an
      observable *)
-  val raw_number : t -> Pattern.id array list -> int
-  val number : t -> Pattern.id array list -> Nbr.t
+  val number : t -> Pattern.id array -> int
   (** Can be used *)
 
   (* Redistrubute instances per connected component whien the

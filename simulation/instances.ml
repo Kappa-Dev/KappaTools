@@ -24,15 +24,16 @@ type t = {
   (* pair numbers are regular rule, odd unary instances *)
 }
 
+type message = unit
+
+let send_message _ st = st
+
 let size_rin state pattern =
   IntCollection.size (Pattern.ObsMap.get state.roots_of_patterns pattern)
-let raw_number state patterns_l =
-  let rect_approx patterns =
+let number state patterns =
     Array.fold_left
-      (fun acc pattern ->  acc * (size_rin state  pattern)) 1 patterns in
-  List.fold_left (fun acc patterns -> acc + (rect_approx patterns)) 0 patterns_l
-let number state patterns_l =
-  Nbr.I (raw_number state patterns_l)
+      (fun acc pattern ->  acc * (size_rin state  pattern)) 1 patterns
+
 
 let empty env =
   let activity_tree =

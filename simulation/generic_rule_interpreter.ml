@@ -39,6 +39,12 @@ module Make (Instances:Instances_sig.S) = struct
           Pattern.ObsMap.t;
     }
 
+  (* Utilities to deal with Instances.t *)
+
+  let instances_sum_numbers insts l = 
+    List.map (Instances.number insts) l
+    |> List.fold_left (+) 0
+
   type result = Clash | Corrected | Success of t
 
   let raw_get_alg env overwr i =
@@ -50,14 +56,14 @@ module Make (Instances:Instances_sig.S) = struct
     let () = assert (not state.outdated) in
     Expr_interpreter.value_bool
       counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Instances.number state.instances patterns)
+      ~get_mix:(fun patterns -> Nbr.I (instances_sum_numbers state.instances patterns))
       ~get_tok:(fun i -> state.tokens.(i))
       expr
   let value_alg counter state alg =
     let () = assert (not state.outdated) in
     Expr_interpreter.value_alg
       counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Instances.number state.instances patterns)
+      ~get_mix:(fun patterns -> Nbr.I (instances_sum_numbers state.instances patterns))
       ~get_tok:(fun i -> state.tokens.(i))
       alg
 
@@ -583,8 +589,8 @@ module Make (Instances:Instances_sig.S) = struct
              (state,List_util.merge_uniq Mods.int_compare [p] perts)
            | Operator.RULE i ->
              let rule = Model.get_rule env i in
-             let pattern_va = Instances.raw_number
-                 state.instances [rule.Primitives.connected_components] in
+             let pattern_va = Instances.number
+                 state.instances rule.Primitives.connected_components in
              let () =
                store_activity store env counter state (2*i)
                  rule.Primitives.syntactic_rule
@@ -879,4 +885,9 @@ module Make (Instances:Instances_sig.S) = struct
     { state with outdated = false; species = species' }
 
   let get_random_state state = state.random_state
+
+
+  let send_instances_message msg state = 
+    { state with instances = Instances.send_message msg state.instances}
+
 end
