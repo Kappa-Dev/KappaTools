@@ -20,6 +20,10 @@ module Make (Instances:Instances_sig.S) = struct
       precomputed: precomputed;
       instances: Instances.t;
 
+      (* Without rectangular approximation *)
+      matchings_of_rule:
+        (Matching.t * int list) list Mods.IntMap.t;
+
       variables_cache: Nbr.t array;
       variables_overwrite: Alg_expr.t option array;
 
@@ -70,15 +74,16 @@ module Make (Instances:Instances_sig.S) = struct
       ~get_tok:(fun i -> state.tokens.(i))
       alg
 
-let activity state = Random_tree.total state.activities
-let get_activity rule state = Random_tree.find rule state.activities
-let set_activity rule v state = Random_tree.add rule v state.activities
-let pick_rule rt state = fst (Random_tree.random rt state.activities)
-
 
   let recompute env counter state i =
     state.variables_cache.(i) <-
       value_alg counter state (raw_get_alg env state.variables_overwrite i)
+
+
+  let activity state = Random_tree.total state.activities
+  let get_activity rule state = Random_tree.find rule state.activities
+  let set_activity rule v state = Random_tree.add rule v state.activities
+  let pick_rule rt state = fst (Random_tree.random rt state.activities)
 
   let initial_activity env counter state =
     Model.fold_rules
@@ -116,6 +121,7 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
         outdated = false;
         precomputed = { unary_patterns; always_outdated};
         instances = Instances.empty env;
+        matchings_of_rule = Mods.IntMap.empty;
         variables_overwrite; variables_cache;
         edges = Edges.empty ~with_connected_components;
         tokens = Array.make (Model.nb_tokens env) Nbr.zero;
@@ -132,6 +138,46 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
     let () = Tools.iteri (recompute env counter cand) (Model.nb_algs env) in
     let () = initial_activity env counter cand in
     cand
+
+
+  (* @Jonathan: reimported from Instances *)
+
+  let pop_exact_matchings state rule =
+    match Mods.IntMap.pop rule state.matchings_of_rule with
+    | None,_ -> state
+    | Some _, match' -> { state with matchings_of_rule = match' }
+
+  let pick_a_rule_instance state random_state domain edges ?rule_id rule =
+    let from_patterns () =
+        Instances.pick_an_instance state.instances random_state domain edges
+        rule.Primitives.connected_components in
+    match rule_id with
+    | None -> from_patterns ()
+    | Some id ->
+      match Mods.IntMap.find_option id state.matchings_of_rule with
+      | Some [] -> None
+      | Some l -> Some (List_util.random random_state l)
+      | None -> from_patterns ()
+
+  let adjust_rule_instances ~rule_id ?unary_rate state domain edges ccs =
+    let matches = Instances.all_injections state.instances ?unary_rate domain edges ccs in
+    List.length matches,
+    { state with
+      matchings_of_rule =
+        Mods.IntMap.add rule_id matches state.matchings_of_rule }
+
+  (*
+  val adjust_rule_instances :
+    rule_id:int -> ?unary_rate:'a * int option ->
+    t -> Pattern.Env.t -> Edges.t -> Pattern.id array -> int * t
+  (** returns the Instances.t where you've stored the exact (binary when
+      unary_rate is Some) matchings and the number of these
+      matchings *)*)
+
+  
+
+
+
 
   let print env f state =
     let sigs = Model.signatures env in
@@ -539,6 +585,7 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
       outdated = false;
       precomputed = state.precomputed;
       instances = instances';
+      matchings_of_rule = state.matchings_of_rule ;
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
       edges = edges'; tokens = state.tokens;
@@ -608,9 +655,8 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
                store_activity store env counter state (2*i)
                  rule.Primitives.syntactic_rule
                  (fst rule.Primitives.rate) pattern_va in
-             let instances = Instances.pop_exact_matchings state.instances i in
-             ((if state.instances == instances
-               then state else { state with instances }),perts))
+             let state = pop_exact_matchings state i in
+             (state,perts))
         dep acc in
     let state',perts = aux deps (state,[]) in
     let state'' =
@@ -685,8 +731,8 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
   let apply_given_rule ~outputs ?rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
-    match Instances.pick_an_instance
-            state.instances state.random_state domain state.edges ?rule_id rule with
+    match pick_a_rule_instance
+            state state.random_state domain state.edges ?rule_id rule with
     | None -> Clash
     | Some (inj,rev_roots) ->
       let () =
@@ -759,14 +805,14 @@ let pick_rule rt state = fst (Random_tree.random rt state.activities)
          | None -> Some (loc,None)
          | Some d ->
            Some (loc,Some (max_dist_to_int counter state d))) in
-    let act,instances =
-      Instances.adjust_rule_instances
-        ~rule_id ?unary_rate state.instances domain state.edges
+    let act,state =
+      adjust_rule_instances
+        ~rule_id ?unary_rate state domain state.edges
         rule.Primitives.connected_components in
     let () =
       store_activity (fun _ _ _ -> ()) env counter state (2*rule_id)
         rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
-    { state with instances }
+    state
 
   let adjust_unary_rule_instances ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
