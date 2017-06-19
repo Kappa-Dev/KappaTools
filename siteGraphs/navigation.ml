@@ -237,3 +237,26 @@ let injection_for_one_more_edge ?root inj graph = function
        | None -> None
        | Some inj' -> dst_is_okay inj' graph root site dst)
     | _ -> None
+
+let concretize_port inj = function
+  | (Existing id,site) -> (Renaming.apply inj id,site)
+  | (Fresh (id,_),site) -> (Renaming.apply inj id,site)
+
+let concretize_arrow inj = function
+  | ToNothing | ToInternal _ as x -> x
+  | ToNode x -> ToNode (concretize_port inj x)
+
+let concretize root graph nav =
+  let out =
+    List.fold_left
+      (fun out (p,dst as step) ->
+         match out with
+         | None -> out
+         | Some (root,acc,inj) ->
+           match injection_for_one_more_edge ?root inj graph step with
+           | None -> None
+           | Some inj' ->
+             let st = (concretize_port inj' p, concretize_arrow inj' dst) in
+             Some (None,st::acc,inj'))
+      (Some (Some root,[],Renaming.empty)) nav in
+  Option_util.map (fun (_,l,_) -> List.rev l) out
