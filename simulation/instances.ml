@@ -13,8 +13,6 @@ type t = {
     Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t;
 
   (* Without rectangular approximation *)
-  matchings_of_rule:
-    (Matching.t * int list) list Mods.IntMap.t;
   unary_candidates:
     (Matching.t * Edges.path option) list Mods.IntMap.t;
 
@@ -27,13 +25,11 @@ let number state patterns =
     Array.fold_left
       (fun acc pattern ->  acc * (size_rin state  pattern)) 1 patterns
 
-
 let empty env = {
     roots_of_patterns = Pattern.Env.new_obs_map
         (Model.domain env) (fun _ -> IntCollection.create 64);
     roots_of_unary_patterns = Pattern.Env.new_obs_map
         (Model.domain env) (fun _ -> Mods.IntMap.empty);
-    matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
     nb_rectangular_instances_by_cc = Mods.IntMap.empty;
   }
@@ -142,10 +138,6 @@ let compute_unary_number state modified_cc rule cc =
   | Some _, unary_candidates ->
     { state with nb_rectangular_instances_by_cc; unary_candidates; }
 
-let pop_exact_matchings state rule =
-  match Mods.IntMap.pop rule state.matchings_of_rule with
-  | None,_ -> state
-  | Some _, match' -> { state with matchings_of_rule = match' }
 
 let pick_an_unary_instance state random_state domain edges ~rule_id rule =
   match Mods.IntMap.find_option rule_id state.unary_candidates with
@@ -181,9 +173,9 @@ let pick_an_unary_instance state random_state domain edges ~rule_id rule =
     | None -> None,None
     | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
 
-let pick_an_instance state random_state domain edges ?rule_id rule =
-  let from_patterns () =
-    Tools.array_fold_lefti
+
+let pick_an_instance state random_state domain edges pats = 
+  Tools.array_fold_lefti
       (fun id inj_rev_roots pattern ->
          match inj_rev_roots with
          | None -> None
@@ -198,14 +190,8 @@ let pick_an_instance state random_state domain edges ?rule_id rule =
              | None -> None
              | Some inj' -> Some (inj',root::rev_roots))
       (Some (Matching.empty,[]))
-      rule.Primitives.connected_components in
-  match rule_id with
-  | None -> from_patterns ()
-  | Some id ->
-    match Mods.IntMap.find_option id state.matchings_of_rule with
-    | Some [] -> None
-    | Some l -> Some (List_util.random random_state l)
-    | None -> from_patterns ()
+      pats
+
 
 let all_injections ?excp ?unary_rate state domain edges patterna =
   let _,out =
@@ -248,13 +234,6 @@ let all_injections ?excp ?unary_rate state domain edges patterna =
          None =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
-
-let adjust_rule_instances ~rule_id ?unary_rate state domain edges ccs =
-  let matches = all_injections state ?unary_rate domain edges ccs in
-  List.length matches,
-  { state with
-    matchings_of_rule =
-      Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
 let adjust_unary_rule_instances ~rule_id ?max_distance state domain edges ccs=
   let pattern1 = ccs.(0) in let pattern2 = ccs.(1) in
