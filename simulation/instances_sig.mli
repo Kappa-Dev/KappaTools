@@ -47,12 +47,6 @@ module type S = sig
       roots of the patterns (for conviencience to check binary
       instances of rules with molecular ambiguity) *)
 
-  val adjust_unary_rule_instances :
-    rule_id:int -> ?max_distance:int -> t -> Pattern.Env.t -> Edges.t ->
-    Pattern.id array -> int * t
-  (** returns the Instances.t where you've stored the exact unary
-      matchings and the number of these matchings *)
-
   val compute_unary_number :
     t -> (int, unit) Hashtbl.t -> Primitives.elementary_rule -> int -> int * t
   (** [compute_unary_number state modified_ccs_cache rule cc] *)
@@ -61,9 +55,23 @@ module type S = sig
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> Pattern.id array -> 
     (Matching.t * int list) option
 
-  val pick_an_unary_instance :
+  val pick_a_unary_instance :
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> rule_id:int ->
     Primitives.elementary_rule -> Matching.t option * Edges.path option
+
+
+
+  
+  (* Should be ultimately removed ! This is SUPER dirty *)
+
+
+  val update_unary_candidates :
+    rule_id:int -> ?max_distance:int -> t -> Pattern.Env.t -> Edges.t ->
+    Pattern.id array -> 
+    (Matching.t * Edges.path option) list Mods.IntMap.t ->
+    int * (Matching.t * Edges.path option) list Mods.IntMap.t
+  (** returns the Instances.t where you've stored the exact unary
+      matchings and the number of these matchings *)
 
 end
 
