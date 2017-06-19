@@ -74,3 +74,6 @@ META
 
 \#*#
 .\#*
+
+# MacOS
+.DS_Store
