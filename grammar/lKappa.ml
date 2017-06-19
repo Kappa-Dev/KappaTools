@@ -1788,9 +1788,15 @@ let create_sig_for_counters l with_counters =
   else l'
 
 let create_sig l with_counters =
-  Tools.array_map_of_list
+  let t = Tools.array_map_of_list
     (fun (name,intf,_) -> (name,create_t intf))
-    (create_sig_for_counters l with_counters)
+    (create_sig_for_counters l with_counters) in
+  let with_contact_map =
+    Array.fold_left (fun acc (_,nd) ->
+      acc ||
+      Array.fold_left (fun acc (_,(_,x)) -> acc || not(x = []))
+        false nd.NamedDecls.decls) false t in
+  Signature.create with_contact_map t
 
 let compil_of_ast ~syntax_version overwrite c =
   let (c,with_counters) = Ast.compile_counters c in
@@ -1803,7 +1809,7 @@ let compil_of_ast ~syntax_version overwrite c =
                   Locality.dummy))
       else Ast.implicit_signature c
     else c in
-  let sigs = Signature.create (create_sig c.Ast.signatures with_counters) in
+  let sigs = create_sig c.Ast.signatures with_counters in
   let contact_map =
     Array.init
       (Signature.size sigs)

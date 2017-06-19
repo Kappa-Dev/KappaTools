@@ -22,6 +22,7 @@ val internal_state_of_num : int -> int -> t -> string
 type s (** Store of all the agents *)
 
 val create :
+  bool ->
   (string Locality.annot *
    (unit NamedDecls.t *
     (string Locality.annot * string Locality.annot) list) NamedDecls.t) array ->

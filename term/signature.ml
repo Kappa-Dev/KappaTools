@@ -119,17 +119,13 @@ let rec allowed_link ag1 s1 ag2 s2 sigs =
     | Invalid_argument _ ->
       invalid_arg "Signature.allowed_link: invalid site identifier"
 
-let create t =
+let create contact_map t =
   let raw = NamedDecls.create t in
-  let no_contact_map = Array.fold_left (fun acc (_,nd) ->
-      acc &&
-      Array.fold_left (fun acc (_,(_,x)) -> acc && x = [])
-        true nd.NamedDecls.decls) true t in
   let s = Array.length t in
   NamedDecls.mapi
     (fun ag ag_na -> NamedDecls.mapi
         (fun _ si_na (ints,links) ->
-           if no_contact_map then (ints, None) else
+           if not(contact_map) then (ints, None) else
              let out =
                Array.init
                  (s-ag)

@@ -68,7 +68,7 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
   let n,w,s = story_compression in
   let () =  Format.printf "+ Compiling...@." in
   let outputs =
-    Outputs.go (Signature.create [||])
+    Outputs.go (Signature.create false [||])
   in
   let (env, has_tracking,init_l) =
     Eval.compile

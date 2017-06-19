@@ -1591,7 +1591,7 @@ let compute_signature show_title state =
           ))::list)
       (state,[]) l
   in
-  let signature = Signature.create (Array.of_list l) in
+  let signature = Signature.create true (Array.of_list l) in
   Remanent_state.set_signature signature state,
   signature
 
