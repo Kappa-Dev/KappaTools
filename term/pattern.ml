@@ -18,7 +18,7 @@ type cc =
     nodes: (link * int) array Mods.IntMap.t;
   (*pattern graph id -> [|... (link_j,state_j)...|] i.e agent_id on site_j has
     a link link_j and internal state state_j (-1 means any) *)
-    recogn_nav: Navigation.t;
+    recogn_nav: Navigation.abstract Navigation.t;
   }
 
 type t = cc
@@ -746,7 +746,7 @@ let build_navigation_between inj_d_to_o cc_o cc_d =
 
 module Env : sig
   type transition = {
-    next: Navigation.t;
+    next: Navigation.abstract Navigation.t;
     dst: id (* id of cc and also address in the Env.domain map*);
     inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   }
@@ -768,16 +768,17 @@ module Env : sig
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
-    elementaries: (Navigation.step * id) list array array;
+    elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
 
   val get : t -> id -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
-  val to_navigation : t -> id -> Navigation.t
+  val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
-  val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option
+  val get_elementary :
+    t -> Navigation.abstract Navigation.step -> (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
@@ -787,7 +788,7 @@ module Env : sig
   val of_yojson : Yojson.Basic.json -> t
 end = struct
   type transition = {
-    next: Navigation.t;
+    next: Navigation.abstract Navigation.t;
     dst: id (* id of cc and also address in the Env.domain map*);
     inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   }
@@ -809,7 +810,7 @@ end = struct
     id_by_type: int list array;
     max_obs: int;
     domain: point array;
-    elementaries: (Navigation.step * id) list array array;
+    elementaries: (Navigation.abstract Navigation.step * id) list array array;
     single_agent_points: (id*Operator.DepSet.t) option array;
   }
 

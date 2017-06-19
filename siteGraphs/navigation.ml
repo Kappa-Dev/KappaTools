@@ -6,17 +6,15 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type id_upto_alpha =
-    Existing of int
-  | Fresh of Agent.t
+type abstract = Existing of int | Fresh of Agent.t
 
-type port = id_upto_alpha * int
+type 'a port = 'a * int
 
-type arrow = ToNode of port | ToNothing | ToInternal of int
+type 'a arrow = ToNode of 'a port | ToNothing | ToInternal of int
 
-type step = port * arrow
+type 'a step = 'a port * 'a arrow
 
-type t = step list
+type 'a t = 'a step list
 
 let print_id sigs f = function
   | Existing id -> Format.pp_print_int f id

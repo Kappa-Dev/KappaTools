@@ -239,6 +239,7 @@ let add_free ag s graph =
     free_id = graph.free_id;
     connected_component = graph.connected_component;
   }
+
 let add_internal ag s i graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in

@@ -35,7 +35,7 @@ end
 
 module Env : sig
   type transition = private {
-    next: Navigation.t;
+    next: Navigation.abstract Navigation.t;
     dst: id; (** id of cc and also address in the Env.domain map *)
     inj: Renaming.t; (** From dst To ("this" cc + extra edge) *)
   }
@@ -56,14 +56,14 @@ module Env : sig
 
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
-  val get_elementary : t -> Navigation.step ->
+  val get_elementary : t -> Navigation.abstract Navigation.step ->
     (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
 
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
-  val to_navigation : t -> id -> Navigation.t
+  val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
   val print : Format.formatter -> t -> unit
 
@@ -130,7 +130,7 @@ val id_to_yojson : id -> Yojson.Basic.json
 
 val id_of_yojson : Yojson.Basic.json -> id
 
-val reconstruction_navigation : t -> Navigation.t
+val reconstruction_navigation : t -> Navigation.abstract Navigation.t
 
 val find_ty : cc -> int -> int (** Abstraction leak, please do not use *)
 
