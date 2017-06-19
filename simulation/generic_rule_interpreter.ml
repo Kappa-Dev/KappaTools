@@ -23,6 +23,8 @@ module Make (Instances:Instances_sig.S) = struct
       (* Without rectangular approximation *)
       matchings_of_rule:
         (Matching.t * int list) list Mods.IntMap.t;
+      unary_candidates:
+       (Matching.t * Edges.path option) list Mods.IntMap.t;
 
       variables_cache: Nbr.t array;
       variables_overwrite: Alg_expr.t option array;
@@ -122,6 +124,7 @@ module Make (Instances:Instances_sig.S) = struct
         precomputed = { unary_patterns; always_outdated};
         instances = Instances.empty env;
         matchings_of_rule = Mods.IntMap.empty;
+        unary_candidates = Mods.IntMap.empty;
         variables_overwrite; variables_cache;
         edges = Edges.empty ~with_connected_components;
         tokens = Array.make (Model.nb_tokens env) Nbr.zero;
@@ -166,15 +169,34 @@ module Make (Instances:Instances_sig.S) = struct
       matchings_of_rule =
         Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
-  (*
-  val adjust_rule_instances :
-    rule_id:int -> ?unary_rate:'a * int option ->
-    t -> Pattern.Env.t -> Edges.t -> Pattern.id array -> int * t
-  (** returns the Instances.t where you've stored the exact (binary when
-      unary_rate is Some) matchings and the number of these
-      matchings *)*)
+  let compute_unary_number state modified_cc rule cc =
+    let va, instances = Instances.compute_unary_number state.instances modified_cc rule cc in
+    let state = 
+      match Mods.IntMap.pop cc state.unary_candidates with
+      | None, _ -> { state with instances }
+      | Some _, unary_candidates -> { state with instances ; unary_candidates } in
+    (va, state)
 
-  
+
+
+
+    
+    
+  let pick_a_unary_rule_instance state random_state domain edges ~rule_id rule =
+    match Mods.IntMap.find_option rule_id state.unary_candidates with
+    | Some l ->
+       let inj,path = List_util.random random_state l in 
+       Some inj,path
+    | None -> 
+      Instances.pick_a_unary_instance state.instances 
+        random_state domain edges ~rule_id rule
+
+
+  let adjust_unary_rule_instances ~rule_id ?max_distance state domain graph pats =
+    let a, unary_candidates = 
+      Instances.update_unary_candidates ~rule_id ?max_distance 
+        state.instances domain graph pats state.unary_candidates in
+    a, { state with unary_candidates }
 
 
 
@@ -586,6 +608,7 @@ module Make (Instances:Instances_sig.S) = struct
       precomputed = state.precomputed;
       instances = instances';
       matchings_of_rule = state.matchings_of_rule ;
+      unary_candidates = state.unary_candidates ;
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
       edges = edges'; tokens = state.tokens;
@@ -631,13 +654,13 @@ module Make (Instances:Instances_sig.S) = struct
       match rule.Primitives.unary_rate with
       | None -> state
       | Some (unrate, _) ->
-        let va, instances =
-          Instances.compute_unary_number state.instances modified_cc rule i in
+        let va, state =
+          compute_unary_number state modified_cc rule i in
         let () =
           store_activity
             store env counter state (2*i+1)
             rule.Primitives.syntactic_rule (fst unrate) va in
-        { state with instances } in
+        state in
     let rec aux dep acc =
       Operator.DepSet.fold
         (fun dep (state,perts as acc) ->
@@ -699,7 +722,7 @@ module Make (Instances:Instances_sig.S) = struct
   let apply_given_unary_rule ~outputs ~rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
-    let inj,path = Instances.pick_an_unary_instance
+    let inj,path = Instances.pick_a_unary_instance
         state.instances state.random_state domain state.edges ~rule_id rule in
     let rdeps,changed_c = state.outdated_elements in
     let state' =
@@ -795,6 +818,7 @@ module Make (Instances:Instances_sig.S) = struct
         Some (transform_by_a_rule
                 outputs env counter state event_kind rule h)
 
+  (* Redefines `adjust_rule_instances` *)
   let adjust_rule_instances ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
@@ -814,6 +838,7 @@ module Make (Instances:Instances_sig.S) = struct
         rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
     state
 
+  (* Redefines `adjust_unary_rule_instances` *)
   let adjust_unary_rule_instances ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
@@ -822,14 +847,14 @@ module Make (Instances:Instances_sig.S) = struct
         (fun (_, dist_opt) ->
            Option_util.map (max_dist_to_int counter state) dist_opt)
         rule.Primitives.unary_rate in
-    let act,instances =
-      Instances.adjust_unary_rule_instances
-        ~rule_id ?max_distance state.instances domain state.edges
+    let act,state =
+      adjust_unary_rule_instances
+        ~rule_id ?max_distance state domain state.edges
         rule.Primitives.connected_components in
     let () =
       store_activity (fun _ _ _ -> ()) env counter state (2*rule_id+1)
         rule.Primitives.syntactic_rule (fst rule.Primitives.rate) act in
-    { state with instances }
+    state
 
   let incorporate_extra_pattern domain state pattern =
     let () = assert (not state.outdated) in

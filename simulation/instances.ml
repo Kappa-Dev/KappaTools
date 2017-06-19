@@ -11,11 +11,6 @@ type t = {
   roots_of_patterns: IntCollection.t Pattern.ObsMap.t;
   roots_of_unary_patterns:
     Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t;
-
-  (* Without rectangular approximation *)
-  unary_candidates:
-    (Matching.t * Edges.path option) list Mods.IntMap.t;
-
   nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
 }
 
@@ -34,7 +29,6 @@ let empty env = {
         (Model.domain env) (fun _ -> IntCollection.create 64);
     roots_of_unary_patterns = Pattern.Env.new_obs_map
         (Model.domain env) (fun _ -> Mods.IntMap.empty);
-    unary_candidates = Mods.IntMap.empty;
     nb_rectangular_instances_by_cc = Mods.IntMap.empty;
   }
 
@@ -136,46 +130,38 @@ let compute_unary_number state modified_cc rule cc =
     if va = 0 then
       Mods.IntMap.remove cc state.nb_rectangular_instances_by_cc
     else Mods.IntMap.add cc new_pack state.nb_rectangular_instances_by_cc in
-  va,
-  match Mods.IntMap.pop cc state.unary_candidates with
-  | None,_ -> { state with nb_rectangular_instances_by_cc }
-  | Some _, unary_candidates ->
-    { state with nb_rectangular_instances_by_cc; unary_candidates; }
+  va, { state with nb_rectangular_instances_by_cc }
 
 
-let pick_an_unary_instance state random_state domain edges ~rule_id rule =
-  match Mods.IntMap.find_option rule_id state.unary_candidates with
-  | Some l ->
-    let inj,path = List_util.random random_state l in Some inj,path
-  | None ->
-    let map1 =
-      Pattern.ObsMap.get state.roots_of_unary_patterns
-        rule.Primitives.connected_components.(0) in
-    let map2 =
-      Pattern.ObsMap.get state.roots_of_unary_patterns
-        rule.Primitives.connected_components.(1) in
-    let cc_id = ValMap.random
-        random_state
-        (Mods.IntMap.find_default
-           ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
-    let root1 =
-      Option_util.unsome (-1)
-        (Mods.IntSet.random random_state
-           (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
-    let root2 =
-      Option_util.unsome (-1)
-        (Mods.IntSet.random random_state
-           (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
-    let () =
-      if !Parameter.debugModeOn then
-        Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
-    let pattern1 = rule.Primitives.connected_components.(0) in
-    let pattern2 = rule.Primitives.connected_components.(1) in
-    let inj1 =
-      Matching.reconstruct domain edges Matching.empty 0 pattern1 root1 in
-    match inj1 with
-    | None -> None,None
-    | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
+let pick_a_unary_instance state random_state domain edges ~rule_id rule =
+  let map1 =
+    Pattern.ObsMap.get state.roots_of_unary_patterns
+      rule.Primitives.connected_components.(0) in
+  let map2 =
+    Pattern.ObsMap.get state.roots_of_unary_patterns
+      rule.Primitives.connected_components.(1) in
+  let cc_id = ValMap.random
+      random_state
+      (Mods.IntMap.find_default
+          ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
+  let root1 =
+    Option_util.unsome (-1)
+      (Mods.IntSet.random random_state
+          (Mods.IntMap.find_default Mods.IntSet.empty cc_id map1)) in
+  let root2 =
+    Option_util.unsome (-1)
+      (Mods.IntSet.random random_state
+          (Mods.IntMap.find_default Mods.IntSet.empty cc_id map2)) in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
+  let pattern1 = rule.Primitives.connected_components.(0) in
+  let pattern2 = rule.Primitives.connected_components.(1) in
+  let inj1 =
+    Matching.reconstruct domain edges Matching.empty 0 pattern1 root1 in
+  match inj1 with
+  | None -> None,None
+  | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
 
 
 let pick_an_instance state random_state domain edges pats = 
@@ -239,7 +225,7 @@ let all_injections ?excp ?unary_rate state domain edges patterna =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
 
-let adjust_unary_rule_instances ~rule_id ?max_distance state domain edges ccs=
+let update_unary_candidates ~rule_id ?max_distance state domain edges ccs unary_candidates =
   let pattern1 = ccs.(0) in let pattern2 = ccs.(1) in
   let (),(cands,len) =
     Mods.IntMap.monadic_fold2_sparse
@@ -275,11 +261,8 @@ let adjust_unary_rule_instances ~rule_id ?max_distance state domain edges ccs=
       (Pattern.ObsMap.get state.roots_of_unary_patterns pattern2)
       ([],0) in
   len,
-  { state with
-    unary_candidates =
-      if len = 0 then Mods.IntMap.remove rule_id state.unary_candidates
-      else Mods.IntMap.add rule_id cands state.unary_candidates;
-  }
+      if len = 0 then Mods.IntMap.remove rule_id unary_candidates
+      else Mods.IntMap.add rule_id cands unary_candidates
 
 let print_injections ?domain f roots_of_patterns =
   Format.fprintf
