@@ -1335,11 +1335,13 @@ The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observable
 will store the value of observables every 10 productive events.
 
 \subsection{Print species of an observable}
-The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example,
-\lstinline[language=kappa]!%mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true]!
-prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} and the time of occurrence.
+The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example
+{\begin{lstlisting}[language=kappa]
+%mod:$SPECIES_OF "species.ka" A(a!1), B(a!1) [true]
+\end{lstlisting}}
+prints in the file \ttt{"species.ka"} a new line for each new occurrence of \ttt{A(a!1), B(a!1)} with the time of occurrence and the species in which it occurred.
 
-Note that this perturbation can only be applied to if the observale is a connected component.
+Note that this perturbation can only be applied if the observable is a connected component.
 
 \section{Implicit signature}
 \KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{Kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents.
