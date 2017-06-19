@@ -775,6 +775,8 @@ module Env : sig
   val get : t -> id -> point
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
+  val to_navigation : t -> id -> Navigation.t
+
   val get_elementary : t -> Navigation.step -> (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
@@ -841,6 +843,10 @@ end = struct
   let get_single_agent ty env = env.single_agent_points.(ty)
 
   let get env cc_id = env.domain.(cc_id)
+
+  let to_navigation env id =
+    let cc = (get env id).content in
+    raw_to_navigation true cc.nodes_by_type cc.nodes
 
   let transition_to_yojson t =
     `Assoc [

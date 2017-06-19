@@ -63,6 +63,8 @@ module Env : sig
 
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
 
+  val to_navigation : t -> id -> Navigation.t
+
   val print : Format.formatter -> t -> unit
 
   val to_yojson : t -> Yojson.Basic.json
