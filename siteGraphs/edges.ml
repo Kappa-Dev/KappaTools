@@ -325,6 +325,13 @@ let get_sites ag graph =
   let arr = Mods.DynArray.get graph.state ag in
   Array.length arr
 
+let get_sort ag graph = 
+  match Mods.DynArray.get graph.sort ag with
+  | Some ty -> ty
+  | None -> 
+    failwith ("Agent "^string_of_int ag^
+              " has no type in the current graph.")
+
 let remove_internal ag s graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
