@@ -18,6 +18,7 @@ module Make (Instances:Instances_sig.S) = struct
       mutable outdated : bool;
 
       precomputed: precomputed;
+
       instances: Instances.t;
 
       (* Without rectangular approximation *)
@@ -25,6 +26,8 @@ module Make (Instances:Instances_sig.S) = struct
         (Matching.t * int list) list Mods.IntMap.t;
       unary_candidates: (* rule_id -> list of matchings *)
        (Matching.t * Edges.path option) list Mods.IntMap.t;
+      (* rule -> cc -> number_instances (activity per cc) *)
+      nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
 
       variables_cache: Nbr.t array;
       variables_overwrite: Alg_expr.t option array;
@@ -52,8 +55,8 @@ module Make (Instances:Instances_sig.S) = struct
 
   (* Utilities to deal with Instances.t *)
 
-  let instances_sum_numbers insts l = 
-    List.map (Instances.number insts) l
+  let sum_instances_numbers insts l = 
+    List.map (Instances.number_of_instances insts) l
     |> List.fold_left (+) 0
 
   type result = Clash | Corrected | Success of t
@@ -67,14 +70,14 @@ module Make (Instances:Instances_sig.S) = struct
     let () = assert (not state.outdated) in
     Expr_interpreter.value_bool
       counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Nbr.I (instances_sum_numbers state.instances patterns))
+      ~get_mix:(fun patterns -> Nbr.I (sum_instances_numbers state.instances patterns))
       ~get_tok:(fun i -> state.tokens.(i))
       expr
   let value_alg counter state alg =
     let () = assert (not state.outdated) in
     Expr_interpreter.value_alg
       counter ~get_alg:(fun i -> Alg_expr.CONST state.variables_cache.(i))
-      ~get_mix:(fun patterns -> Nbr.I (instances_sum_numbers state.instances patterns))
+      ~get_mix:(fun patterns -> Nbr.I (sum_instances_numbers state.instances patterns))
       ~get_tok:(fun i -> state.tokens.(i))
       alg
 
@@ -127,6 +130,7 @@ module Make (Instances:Instances_sig.S) = struct
         instances = Instances.empty env;
         matchings_of_rule = Mods.IntMap.empty;
         unary_candidates = Mods.IntMap.empty;
+        nb_rectangular_instances_by_cc = Mods.IntMap.empty;
         variables_overwrite; variables_cache;
         edges = Edges.empty ~with_connected_components;
         tokens = Array.make (Model.nb_tokens env) Nbr.zero;
@@ -145,7 +149,51 @@ module Make (Instances:Instances_sig.S) = struct
     cand
 
 
-  (* @Jonathan: reimported from Instances *)
+  (* @pirbo: here is everything I put back from Instances. *)
+
+
+  let instance_to_matching domain edges instance patterns =
+    let rec aux i matching roots =
+      match matching, roots with
+      | None, _ -> None
+      | Some matching, [] -> Some matching
+      | Some matching, root::next_roots ->
+        let new_acc = 
+          Matching.reconstruct 
+            domain edges matching i patterns.(i) root in
+        aux (i+1) new_acc next_roots in
+    aux 0 (Some Matching.empty) instance
+
+  let all_injections ?excp ?unary_rate state_insts domain edges patterna =
+    let out =
+      Instances.fold_instances ?excp state_insts patterna ~init:[] (fun instance acc ->
+        match instance_to_matching domain edges instance patterna with
+        | None -> acc
+        | Some matching ->
+          let rev_roots = instance |> List.rev in
+          (matching, rev_roots) :: acc
+      ) 
+      |> List.rev
+    in
+    match unary_rate with
+    | None -> out
+    | Some (_,None) ->
+      List.filter
+        (function
+          | _, [ r1; r2 ] -> not (Edges.in_same_connected_component r1 r2 edges)
+          | _, _ -> false)
+        out
+    | Some (_,(Some _ as max_distance)) ->
+      List.filter
+        (fun (inj,_) ->
+          let nodes = Matching.elements_with_types
+              domain patterna inj in
+          None =
+          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
+        out
+
+
+
 
   let pop_exact_matchings state rule =
     match Mods.IntMap.pop rule state.matchings_of_rule with
@@ -154,8 +202,13 @@ module Make (Instances:Instances_sig.S) = struct
 
   let pick_a_rule_instance state random_state domain edges ?rule_id rule =
     let from_patterns () =
-        Instances.pick_an_instance state.instances random_state domain edges
-        rule.Primitives.connected_components in
+      let pats = rule.Primitives.connected_components in
+      Instances.fold_picked_instance state.instances random_state pats ~init:(Matching.empty,[])
+      (fun id pattern root (inj, rev_roots) ->
+        match Matching.reconstruct domain edges inj id pattern root with
+        | None -> None
+        | Some inj' -> Some (inj',root::rev_roots)
+      ) in
     match rule_id with
     | None -> from_patterns ()
     | Some id ->
@@ -164,20 +217,43 @@ module Make (Instances:Instances_sig.S) = struct
       | Some l -> Some (List_util.random random_state l)
       | None -> from_patterns ()
 
+
   let adjust_rule_instances ~rule_id ?unary_rate state domain edges ccs =
-    let matches = Instances.all_injections state.instances ?unary_rate domain edges ccs in
+    let matches =all_injections ?unary_rate state.instances domain edges ccs in
     List.length matches,
     { state with
       matchings_of_rule =
         Mods.IntMap.add rule_id matches state.matchings_of_rule }
+  
 
-  let compute_unary_number state modified_cc rule rule_id =
-    let va, instances = Instances.compute_unary_number state.instances modified_cc rule rule_id in
+  let compute_unary_number state modified_ccs rule rule_id =
+
+    let pat1 = rule.Primitives.connected_components.(0) in
+    let pat2 = rule.Primitives.connected_components.(1) in
+
+    let number_of_unary_instances_in_cc = 
+      Instances.number_of_unary_instances_in_cc state.instances (pat1, pat2) in
+
+    let old_pack =
+      Mods.IntMap.find_default
+        ValMap.empty rule_id state.nb_rectangular_instances_by_cc in
+    let new_pack =
+      Hashtbl.fold
+        (fun cc () i_inst ->
+          let new_v = number_of_unary_instances_in_cc cc in
+          if new_v = 0 then ValMap.remove cc i_inst
+          else ValMap.add cc new_v i_inst)
+        modified_ccs old_pack in
+    let va = ValMap.total new_pack in
+    let nb_rectangular_instances_by_cc =
+      if va = 0 then
+        Mods.IntMap.remove rule_id state.nb_rectangular_instances_by_cc
+      else Mods.IntMap.add rule_id new_pack state.nb_rectangular_instances_by_cc in
     let state =
       (* Invalidates the cache *)
       match Mods.IntMap.pop rule_id state.unary_candidates with
-      | None, _ -> { state with instances }
-      | Some _, unary_candidates -> { state with instances ; unary_candidates } in
+      | None, _ -> { state with nb_rectangular_instances_by_cc }
+      | Some _, unary_candidates -> { state with nb_rectangular_instances_by_cc ; unary_candidates } in
     (va, state)
 
 
@@ -191,15 +267,62 @@ module Make (Instances:Instances_sig.S) = struct
        let inj,path = List_util.random random_state l in 
        Some inj,path
     | None -> 
-      Instances.pick_a_unary_instance state.instances 
-        random_state domain edges ~rule_id rule
+      begin
+        let pat1 = rule.Primitives.connected_components.(0) in
+        let pat2 = rule.Primitives.connected_components.(1) in
+
+        let pick_unary_instance_in_cc = 
+            Instances.pick_unary_instance_in_cc state.instances random_state (pat1, pat2) in
+
+        let cc_id = ValMap.random
+            random_state
+            (Mods.IntMap.find_default
+                ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
+        let root1, root2 = pick_unary_instance_in_cc cc_id in
+        
+        let () =
+          if !Parameter.debugModeOn then
+            Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
+        let pattern1 = rule.Primitives.connected_components.(0) in
+        let pattern2 = rule.Primitives.connected_components.(1) in
+        let inj1 =
+          Matching.reconstruct domain edges Matching.empty 0 pattern1 root1 in
+        match inj1 with
+        | None -> None,None
+        | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
+      end
+     (*) Instances.pick_a_unary_instance state.instances 
+        random_state domain edges ~rule_id rule *)
 
 
   let adjust_unary_rule_instances ~rule_id ?max_distance state domain graph pats =
-    let a, unary_candidates = 
-      Instances.update_unary_candidates ~rule_id ?max_distance 
-        state.instances domain graph pats state.unary_candidates in
-    a, { state with unary_candidates }
+    let pattern1 = pats.(0) in let pattern2 = pats.(1) in
+    let cands,len = 
+      Instances.fold_unary_instances state.instances (pattern1, pattern2) ~init:([], 0)
+      (fun (root1, root2) (list,len as out) ->
+        let inj1 = Matching.reconstruct domain graph Matching.empty 0 pattern1 root1 in
+        match inj1 with
+        | None -> out
+        | Some inj ->
+          match Matching.reconstruct
+                  domain graph inj 1 pattern2 root2 with
+          | None -> out
+          | Some inj' ->
+            match max_distance with
+            | None -> (inj',None)::list,succ len
+            | Some _ ->
+              let nodes =
+                Matching.elements_with_types domain pats inj' in
+              match Edges.are_connected ?max_distance
+                      graph nodes.(0) nodes.(1) with
+              | None -> out
+              | Some _ as p -> (inj',p)::list,succ len
+      ) in
+    let unary_candidates = 
+      if len = 0 then Mods.IntMap.remove rule_id state.unary_candidates
+      else Mods.IntMap.add rule_id cands state.unary_candidates in
+
+    len, { state with unary_candidates }
 
 
 
@@ -460,7 +583,7 @@ module Make (Instances:Instances_sig.S) = struct
                                         (inj,Mods.IntMap.empty))) tests in
                        (ev,tests') :: acc)
                     acc
-                    (Instances.all_injections
+                    (all_injections
                        instances ~excp:(pattern,root) domain edges patterns))
                acc (Pattern.ObsMap.get tracked pattern)
            with Not_found -> acc)
@@ -611,6 +734,7 @@ module Make (Instances:Instances_sig.S) = struct
       precomputed = state.precomputed;
       instances = instances';
       matchings_of_rule = state.matchings_of_rule ;
+      nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc ;
       unary_candidates = state.unary_candidates ;
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
@@ -675,7 +799,7 @@ module Make (Instances:Instances_sig.S) = struct
              (state,List_util.merge_uniq Mods.int_compare [p] perts)
            | Operator.RULE i ->
              let rule = Model.get_rule env i in
-             let pattern_va = Instances.number
+             let pattern_va = Instances.number_of_instances
                  state.instances rule.Primitives.connected_components in
              let () =
                store_activity store env counter state (2*i)
@@ -725,8 +849,8 @@ module Make (Instances:Instances_sig.S) = struct
   let apply_given_unary_rule ~outputs ~rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
-    let inj,path = Instances.pick_a_unary_instance
-        state.instances state.random_state domain state.edges ~rule_id rule in
+    let inj,path = pick_a_unary_rule_instance
+        state state.random_state domain state.edges ~rule_id rule in
     let rdeps,changed_c = state.outdated_elements in
     let state' =
       {state with
@@ -806,7 +930,7 @@ module Make (Instances:Instances_sig.S) = struct
            | None -> Some (loc,None)
            | Some d ->
              Some (loc,Some (max_dist_to_int counter state d))) in
-      match Instances.all_injections
+      match all_injections
               ?unary_rate state.instances (Model.domain env) state.edges
               rule.Primitives.connected_components with
       | [] ->
