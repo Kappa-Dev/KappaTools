@@ -36,7 +36,7 @@ module type S = sig
   val update_roots :
     t -> bool -> Pattern.Set.t -> Edges.t -> (int, unit) Hashtbl.t ->
     Pattern.id -> int -> unit
-  (** [update_roots state is_positive_update domain graph cc_cache id root] *)
+  (** [update_roots state is_positive_update unary_ccs graph cc_cache id root] *)
 
   val all_injections :
     ?excp:Pattern.id * int -> ?unary_rate:'a * int option -> t ->
@@ -49,11 +49,12 @@ module type S = sig
 
   val compute_unary_number :
     t -> (int, unit) Hashtbl.t -> Primitives.elementary_rule -> int -> int * t
-  (** [compute_unary_number state modified_ccs_cache rule cc] *)
+  (** [compute_unary_number state modified_ccs_cache rule rule_id] *)
 
   val pick_an_instance :
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> Pattern.id array -> 
     (Matching.t * int list) option
+  (* roots are returned in the reverse order... *)
 
   val pick_a_unary_instance :
     t -> Random.State.t -> Pattern.Env.t -> Edges.t -> rule_id:int ->

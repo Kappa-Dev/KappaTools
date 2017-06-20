@@ -23,7 +23,7 @@ module Make (Instances:Instances_sig.S) = struct
       (* Without rectangular approximation *)
       matchings_of_rule:
         (Matching.t * int list) list Mods.IntMap.t;
-      unary_candidates:
+      unary_candidates: (* rule_id -> list of matchings *)
        (Matching.t * Edges.path option) list Mods.IntMap.t;
 
       variables_cache: Nbr.t array;
@@ -31,6 +31,8 @@ module Make (Instances:Instances_sig.S) = struct
 
       edges: Edges.t;
       tokens: Nbr.t array;
+
+      (* Right component: set of ccs that have changed *)
       outdated_elements: Operator.DepSet.t * (int,unit) Hashtbl.t;
 
       activities : Random_tree.tree;
@@ -168,10 +170,11 @@ module Make (Instances:Instances_sig.S) = struct
       matchings_of_rule =
         Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
-  let compute_unary_number state modified_cc rule cc =
-    let va, instances = Instances.compute_unary_number state.instances modified_cc rule cc in
-    let state = 
-      match Mods.IntMap.pop cc state.unary_candidates with
+  let compute_unary_number state modified_cc rule rule_id =
+    let va, instances = Instances.compute_unary_number state.instances modified_cc rule rule_id in
+    let state =
+      (* Invalidates the cache *)
+      match Mods.IntMap.pop rule_id state.unary_candidates with
       | None, _ -> { state with instances }
       | Some _, unary_candidates -> { state with instances ; unary_candidates } in
     (va, state)
