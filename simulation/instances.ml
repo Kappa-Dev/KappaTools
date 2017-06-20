@@ -6,17 +6,9 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-
-(** Count, enumerate and pick. 
-    To enumerate, no need for folding functions... 
-    The rest is to be seen outside. *)
-
-
 type t = {
-
   (* For counterfactual simulation, there would be two of these. *)
   roots : Roots.t ;
-
 }
 
 type mod_ccs_cache = (int, unit) Hashtbl.t
@@ -33,11 +25,11 @@ let empty env = {
 let incorporate_extra_pattern state pattern matchings =
   Roots.incorporate_extra_pattern state.roots pattern matchings
 
-let break_apart_cc state edges mod_conn ccs = { state with
+let break_apart_cc state edges mod_conn ccs = {
   roots = Roots.break_apart_cc state.roots edges mod_conn ccs
 }
 
-let merge_cc state mod_connectivity ccs = { state with
+let merge_cc state mod_connectivity ccs = {
   roots = Roots.merge_cc state.roots mod_connectivity ccs
 }
 
@@ -47,7 +39,7 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
 
 
 
-(* Compute number of instances *)
+(** {6 Compute the number of instances } *)
 
 let number_of_instances st pats =
   Array.fold_left
@@ -63,7 +55,7 @@ let number_of_unary_instances_in_cc st (pat1, pat2) =
 
 
 
-(* Pick instances *)
+(* {6 Pick instances } *)
 
 let pick_unary_instance_in_cc st random_state (pat1, pat2) =
   let map1 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat1 in
@@ -79,7 +71,8 @@ let pick_unary_instance_in_cc st random_state (pat1, pat2) =
             (Mods.IntMap.find_default Mods.IntSet.empty cc map2)) in
     (root1, root2)
 
-(* To avoid computing more random numbers than necessary *)
+(* We provide a custom monadic fold function to be 
+   lazy in drawing random numbers *)
 let fold_picked_instance st random_state pats ~init f = 
   let rec aux i acc =
     if i >= Array.length pats then acc else
@@ -99,19 +92,7 @@ let fold_picked_instance st random_state pats ~init f =
 
 
 
-(* Enumerate instances *)
-
-let fold_enumerated_instances' st pats ~init f =
-  let rec aux i acc =
-    if i >= Array.length pats then acc else
-    let pat = pats.(i) in
-    let get_candidates () = Pattern.ObsMap.get st.roots.Roots.of_patterns pat in
-    let acc = f i pats.(i) get_candidates acc in
-    aux (i+1) acc in
-  aux 0 init
-
-(* Previous is not ok. We need to go through each possibility in order 
-   This code is designed to allocate as little memory as possible. *)
+(** {6 Enumerate instances} *)
 
 let process_excp pats = function
   | None -> (fun _ -> false), (-1)
@@ -126,7 +107,7 @@ let process_excp pats = function
     sent_to_fixed_root, root
 
 
-(* This is the legitimate and efficient version *)
+(* This is the legitimate and efficient version. *)
 let fold_instances' ?excp st pats ~init f =
 
   let sent_to_excp_root, excp_root = process_excp pats excp in
@@ -146,8 +127,8 @@ let fold_instances' ?excp st pats ~init f =
   in aux 0 init
 
 
-
-  (* This is an inefficient and weird version for back-compatibility*)
+  (* This is an inefficient and weird version that is 
+     backward-compatibility. *)
   let fold_instances ?excp st pats ~init f =
 
     let sent_to_excp_root, excp_root = process_excp pats excp in
@@ -176,8 +157,6 @@ let fold_instances' ?excp st pats ~init f =
     ) init
 
 
-
-
 let map_fold2 map1 map2 ~init f =
   Mods.IntMap.monadic_fold2_sparse () () 
     (fun () () key x1 x2 acc -> (), f key x1 x2 acc)
@@ -196,6 +175,7 @@ let fold_unary_instances st (pat1, pat2) ~init f =
   )
 
 
+(** {6 Debug functions} *)
 
 let print_injections ?domain f roots_of_patterns =
   Format.fprintf

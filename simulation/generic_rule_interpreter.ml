@@ -53,8 +53,6 @@ module Make (Instances:Instances_sig.S) = struct
           Pattern.ObsMap.t;
     }
 
-  (* Utilities to deal with Instances.t *)
-
   let sum_instances_numbers insts l = 
     List.map (Instances.number_of_instances insts) l
     |> List.fold_left (+) 0
@@ -149,7 +147,9 @@ module Make (Instances:Instances_sig.S) = struct
     cand
 
 
-  (* @pirbo: here is everything I put back from Instances. *)
+  (* BEGIN old_instances
+     @pirbo: from here to the corresponding END tag 
+     is everything that used to be in the old Instances module. *)
 
 
   let instance_to_matching domain edges instance patterns =
@@ -191,8 +191,6 @@ module Make (Instances:Instances_sig.S) = struct
           None =
           Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
         out
-
-
 
 
   let pop_exact_matchings state rule =
@@ -257,10 +255,6 @@ module Make (Instances:Instances_sig.S) = struct
     (va, state)
 
 
-
-
-    
-    
   let pick_a_unary_rule_instance state random_state domain edges ~rule_id rule =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
@@ -291,8 +285,6 @@ module Make (Instances:Instances_sig.S) = struct
         | None -> None,None
         | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
       end
-     (*) Instances.pick_a_unary_instance state.instances 
-        random_state domain edges ~rule_id rule *)
 
 
   let adjust_unary_rule_instances ~rule_id ?max_distance state domain graph pats =
@@ -324,7 +316,7 @@ module Make (Instances:Instances_sig.S) = struct
 
     len, { state with unary_candidates }
 
-
+    (* END old_instances *)
 
 
   let print env f state =

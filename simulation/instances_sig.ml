@@ -21,6 +21,8 @@ val send_message : message -> t -> t
 
 val empty : Model.t -> t
 
+val debug_print : Format.formatter -> t -> unit
+
 
 (** {6 Updating the roots} *)
 
@@ -79,7 +81,5 @@ val fold_unary_instances :
   t -> Pattern.id * Pattern.id -> init:'a -> (int * int -> 'a -> 'a) -> 'a
 (** [fold_unary_instances state (pat1, pat2) ~init f ]
     with [f (root1, root2) acc]. *)
-
-val debug_print : Format.formatter -> t -> unit
 
 end
