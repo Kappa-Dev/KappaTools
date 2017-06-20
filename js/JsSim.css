@@ -164,27 +164,34 @@ rect { stroke-width: 2; }
                    border-radius : 4px;
                    opacity : 0.8; }
 
-									 .link {
-									   stroke: steelblue;
-									   stroke-opacity: 0.4;
-									   fill: none;
-									   pointer-events: none;
-									 }
+.link {
+stroke: steelblue;
+stroke-opacity: 0.4;
+fill: none;
+pointer-events: none;
+}
 
-									 .node { cursor: pointer; }
-									 #graph {
-									     transition:transform 200ms ease;
-									     transform:translateX(100%);
-									     width:33%;
-									     height:100%;
-									     background:#fafaea;
-									     position:fixed;
-									     top:0;
-									     right:0;
-									 }
+.node { cursor: pointer; }
 
-									 .monthText {
-									 			fill: #6B6B6B;
-									 			font-size: 13px;
-									 			font-family: 'Courgette', sans-serif;
-									 		}
+.tooltip {
+  position: absolute;
+  text-align: center;
+  border: 0px;
+  border-radius: 8px;
+}
+
+.stateButtonDiv {
+    position: absolute;
+    text-align: center;   
+}
+
+.stateButton {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
