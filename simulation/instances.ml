@@ -253,35 +253,75 @@ let pick_an_instance state random_state domain edges pats =
 
 
 
+let process_excp pats = function
+  | None -> (fun _ -> false), (-1)
+  | Some (pat, root) ->
+    let fixed_is = 
+        pats
+        |> Array.to_list
+        |> List.mapi (fun i x -> (i, x))
+        |> List.filter (fun (_, pat') -> Pattern.is_equal_canonicals pat pat')
+        |> List.map fst in
+    let sent_to_fixed_root j = List.mem j fixed_is in
+    sent_to_fixed_root, root
+
+  (* This is an inefficient and weird version for back-compatibility*)
+  let fold_instances ?excp st pats ~init f =
+
+    let sent_to_excp_root, excp_root = process_excp pats excp in
+
+    let instances = 
+      pats |> Tools.array_fold_lefti (fun i instances pat ->
+        let candidates = 
+          if sent_to_excp_root i then
+            let c = IntCollection.create 1 in
+            let () = IntCollection.add excp_root c in
+            c
+          else 
+            Pattern.ObsMap.get st.roots_of_patterns pat in
+
+        IntCollection.fold (fun root new_instances ->
+          instances |> List.fold_left (fun new_instances instance ->
+            (root :: instance) :: new_instances
+          ) new_instances
+        ) candidates []
+      ) [[]] in
+    (* Injections have been generated in the reverse order *)
+    let instances = List.map List.rev instances in
+
+    instances |> List.fold_left (fun acc instance ->
+      f instance acc
+    ) init
+
+
+let instance_to_matching domain edges instance patterns =
+  let rec aux i matching roots =
+    match matching, roots with
+    | None, _ -> None
+    | Some matching, [] -> Some matching
+    | Some matching, root::next_roots ->
+      let new_acc = 
+        Matching.reconstruct 
+          domain edges matching i patterns.(i) root in
+      aux (i+1) new_acc next_roots in
+  aux 0 (Some Matching.empty) instance
+
+
 (* Get rid of the rectangular approximation for nonunary rules.
    There is real work to do here. We just want to change the fold. 
    Defines a fold function that enumerate every instance.
  *)
 let all_injections ?excp ?unary_rate state domain edges patterna =
-  let _,out =
-    Tools.array_fold_lefti
-      (fun id (excp,inj_list) pattern ->
-         let cands,excp' =
-           match excp with
-           | Some (cc',root)
-             when Pattern.is_equal_canonicals pattern cc' ->
-             let foo = IntCollection.create 1 in
-             let () = IntCollection.add root foo in
-             foo,None
-           | (Some _ | None) ->
-             Pattern.ObsMap.get state.roots_of_patterns pattern, excp in
-         (excp',
-          IntCollection.fold
-            (fun root new_injs ->
-               List.fold_left
-                 (fun corrects (inj,roots) ->
-                    match Matching.reconstruct
-                            domain edges inj id pattern root with
-                    | None -> corrects
-                    | Some new_inj -> (new_inj,root::roots) :: corrects)
-                 new_injs inj_list)
-            cands []))
-      (excp,[Matching.empty,[]]) patterna in
+  let out =
+    fold_instances ?excp state patterna ~init:[] (fun instance acc ->
+      match instance_to_matching domain edges instance patterna with
+      | None -> acc
+      | Some matching ->
+        let rev_roots = instance |> List.rev in
+        (matching, rev_roots) :: acc
+    ) 
+    |> List.rev
+  in
   match unary_rate with
   | None -> out
   | Some (_,None) ->
@@ -298,7 +338,6 @@ let all_injections ?excp ?unary_rate state domain edges patterna =
          None =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
-
 
 
 
