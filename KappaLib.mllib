@@ -48,6 +48,7 @@ Trace
 Expr_interpreter
 Rule_interpreter
 Instances_sig
+Roots
 Instances
 Generic_rule_interpreter
 Replay
