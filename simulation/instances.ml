@@ -298,7 +298,7 @@ let process_excp pats = function
     ) init
 
 
-let injection_to_matching domain edges instance patterns =
+let instance_to_matching domain edges instance patterns =
   let rec aux i matching roots =
     match matching, roots with
     | None, _ -> None
@@ -310,10 +310,6 @@ let injection_to_matching domain edges instance patterns =
       aux (i+1) new_acc next_roots in
   aux 0 (Some Matching.empty) instance
 
-let rec flatten_option_list = function
-  | [] -> []
-  | Some x :: xs -> x :: flatten_option_list xs
-  | None :: xs -> flatten_option_list xs
 
 (* Get rid of the rectangular approximation for nonunary rules.
    There is real work to do here. We just want to change the fold. 
@@ -321,31 +317,15 @@ let rec flatten_option_list = function
  *)
 let all_injections ?excp ?unary_rate state domain edges patterna =
   let out =
-    Tools.array_fold_lefti
-      (fun id (excp,inj_list) pattern ->
-         let cands,excp' =
-           match excp with
-           | Some (cc',root)
-             when Pattern.is_equal_canonicals pattern cc' ->
-             let foo = IntCollection.create 1 in
-             let () = IntCollection.add root foo in
-             foo,None
-           | (Some _ | None) ->
-             Pattern.ObsMap.get state.roots_of_patterns pattern, excp in
-         (excp',
-          IntCollection.fold
-            (fun root new_injs ->
-               List.fold_left
-                 (fun corrects (inj,roots) ->
-                    match Matching.reconstruct
-                            domain edges inj id pattern root with
-                    | None -> corrects
-                    | Some new_inj -> (new_inj,root::roots) :: corrects
-                  )
-                 new_injs inj_list)
-            cands [])
-        )
-        (excp,[Matching.empty,[]]) patterna in
+    fold_instances ?excp state patterna ~init:[] (fun instance acc ->
+      match instance_to_matching domain edges (Array.to_list instance) patterna with
+      | None -> acc
+      | Some matching ->
+        let rev_roots = instance |> Array.to_list |> List.rev in
+        (matching, rev_roots) :: acc
+    ) 
+    |> List.rev
+  in
   match unary_rate with
   | None -> out
   | Some (_,None) ->
