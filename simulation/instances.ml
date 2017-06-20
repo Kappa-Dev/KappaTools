@@ -294,7 +294,7 @@ let process_excp pats = function
     let instances = List.map List.rev instances in
 
     instances |> List.fold_left (fun acc instance ->
-      f (Array.of_list instance) acc
+      f instance acc
     ) init
 
 
@@ -318,10 +318,10 @@ let instance_to_matching domain edges instance patterns =
 let all_injections ?excp ?unary_rate state domain edges patterna =
   let out =
     fold_instances ?excp state patterna ~init:[] (fun instance acc ->
-      match instance_to_matching domain edges (Array.to_list instance) patterna with
+      match instance_to_matching domain edges instance patterna with
       | None -> acc
       | Some matching ->
-        let rev_roots = instance |> Array.to_list |> List.rev in
+        let rev_roots = instance |> List.rev in
         (matching, rev_roots) :: acc
     ) 
     |> List.rev
@@ -342,55 +342,6 @@ let all_injections ?excp ?unary_rate state domain edges patterna =
          None =
          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
       out
-
-
-(*
-
-
-let all_injections ?excp ?unary_rate state domain edges patterna =
-  let _,out =
-    Tools.array_fold_lefti
-      (fun id (excp,inj_list) pattern ->
-         let cands,excp' =
-           match excp with
-           | Some (cc',root)
-             when Pattern.is_equal_canonicals pattern cc' ->
-             let foo = IntCollection.create 1 in
-             let () = IntCollection.add root foo in
-             foo,None
-           | (Some _ | None) ->
-             Pattern.ObsMap.get state.roots_of_patterns pattern, excp in
-         (excp',
-          IntCollection.fold
-            (fun root new_injs ->
-               List.fold_left
-                 (fun corrects (inj,roots) ->
-                    match Matching.reconstruct
-                            domain edges inj id pattern root with
-                    | None -> corrects
-                    | Some new_inj -> (new_inj,root::roots) :: corrects)
-                 new_injs inj_list)
-            cands []))
-      (excp,[Matching.empty,[]]) patterna in
-  match unary_rate with
-  | None -> out
-  | Some (_,None) ->
-    List.filter
-      (function
-        | _, [ r1; r2 ] -> not (Edges.in_same_connected_component r1 r2 edges)
-        | _, _ -> false)
-      out
-  | Some (_,(Some _ as max_distance)) ->
-    List.filter
-      (fun (inj,_) ->
-         let nodes = Matching.elements_with_types
-             domain patterna inj in
-         None =
-         Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
-      out
-
-
-*)
 
 
 
