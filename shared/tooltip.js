@@ -12,13 +12,12 @@ class UIManager {
             .attr("class", "tooltip")	
             .style("font-size", "2em")			
             .style("opacity", 0)
-            .style("padding", "4em");
+            .style("padding", "2em");
 
         this.stateToggle = renderer.root.append("div")
             .attr("class", "stateButtonDiv")
             .style("right" , 0)
             .style("bottom", 0)
-            .style("padding", "4em")
         .append("input")
             .attr("class", "stateButton")
             .attr("type", "button")
@@ -60,7 +59,7 @@ class UIManager {
             .style("opacity", 1);
         this.tip
             .text("agent: " + d.data.label)
-            .style('color', d.data.color.brighter());
+            .style('color', d.data.color);
             
     }
 
