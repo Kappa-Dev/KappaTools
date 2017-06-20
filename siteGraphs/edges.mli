@@ -61,6 +61,8 @@ val get_internal : int -> int -> t -> int
 
 val get_sites : int -> t -> int
 
+val get_sort : int -> t -> int
+
 val get_connected_component : int -> t -> int option
 
 val in_same_connected_component : int -> int -> t -> bool
