@@ -49,12 +49,13 @@ let content () =
                            ~a:[Html.a_class ["close"]] [ Html.entity "times" ] in
                        let () = (Tyxml_js.To_dom.of_button span_close)##.onclick :=
                            Dom.handler
-                             (fun _ ->
+                             (fun event ->
                                 let () = Panel_projects_controller.close_project
                                     project_id in
-                                Js._true) in
+                                let () = Dom_html.stopPropagation event in
+                                Js._false) in
                        let a_project =
-                         Html.a [ Html.cdata project_id ; span_close] in
+                         Html.a [ Html.cdata project_id; span_close] in
                        let () = (Tyxml_js.To_dom.of_a a_project)##.onclick :=
                            Dom.handler
                              (fun _ ->
