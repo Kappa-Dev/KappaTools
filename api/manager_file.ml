@@ -150,7 +150,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
         in
         Lwt.return
           (Api_common.result_error_msg
-             ~result_code:`CONFLICT message)
+             ~result_code:`Conflict message)
       else
         let file_list : Api_types_j.file list = project#get_files () in
         let version =

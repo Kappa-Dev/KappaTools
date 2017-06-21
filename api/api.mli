@@ -4,7 +4,8 @@
 *)
 
 type manager_code =
-  [ `ACCEPTED | `CONFLICT | `CREATED | `ERROR | `NOT_FOUND | `OK ]
+  [ `OK | `Accepted | `Created |
+    `Bad_request | `Conflict | `Not_found | `Request_timeout ]
 type result_code = manager_code
 type 'ok result = ('ok,manager_code) Api_types_t.result
 

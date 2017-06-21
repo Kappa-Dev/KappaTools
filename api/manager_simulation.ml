@@ -70,7 +70,7 @@ class manager_file_line
       | [] -> let m : string = Format.sprintf "id %s not found"
                   (match file_line_id with Some id -> id | None -> "None")
         in
-        Api_common.result_error_msg ~result_code:`NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`Not_found m
       | lines -> Api_common.result_ok lines
 
     method simulation_catalog_file_line :
@@ -113,7 +113,7 @@ class manager_flux_map
       try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
       let m : string = Format.sprintf "id %s not found" flux_map_id in
-      Api_common.result_error_msg ~result_code:`NOT_FOUND m
+      Api_common.result_error_msg ~result_code:`Not_found m
 
 
     method simulation_catalog_flux_map :
@@ -207,7 +207,7 @@ class manager_plot
                plot
           )
       | None -> let m : string = "plot not available" in
-        Api_common.result_error_msg ~result_code:`NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`Not_found m
 
     method simulation_detail_plot
         (plot_parameter : Api_types_j.plot_parameter) :
@@ -242,7 +242,7 @@ class manager_snapshot
       try Api_common.result_ok (List.find snapshot_eq snapshot_list)
       with Not_found ->
         let m : string = Format.sprintf "id %s not found" snapshot_id in
-        Api_common.result_error_msg ~result_code:`NOT_FOUND m
+        Api_common.result_error_msg ~result_code:`Not_found m
 
     method simulation_catalog_snapshot :
       Api_types_j.snapshot_catalog Api.result Lwt.t =
@@ -282,7 +282,7 @@ class manager_simulation
           Format.sprintf
             "simulation id %s exists" simulation_id in
         Lwt.return
-          (Api_common.result_error_msg ~result_code:`CONFLICT message)
+          (Api_common.result_error_msg ~result_code:`Conflict message)
       | None ->
         project#get_state () >>= function
         | None ->

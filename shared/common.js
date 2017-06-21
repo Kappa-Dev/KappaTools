@@ -268,7 +268,11 @@ function ajaxRequest(url,type,data,handler,timeout){
      .fail(function(jqXHR, textStatus, errorThrown )
 	   { var status = jqXHR.status;
 	     var response_text = jqXHR.responseText;
-	     wrap(handler(status,response_text));
+	     if(textStatus==="timeout") {
+		 wrap(handler(408,"Timeout"));
+	     } else {
+		 wrap(handler(status,response_text));
+	     }
 	   });
 
 }

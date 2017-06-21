@@ -66,7 +66,7 @@ let bind_projects f id projects =
   | Some p -> f p
   | None ->
     let m = "Project '"^id^"' not found" in
-    Lwt.return (Api_common.result_error_msg ~result_code:`NOT_FOUND m)
+    Lwt.return (Api_common.result_error_msg ~result_code:`Not_found m)
 
 let tmp_bind_projects f id projects =
   match Mods.StringMap.find_option id !projects with
@@ -80,7 +80,7 @@ let add_projects parameter projects =
   if Mods.StringMap.mem project_id !projects then
     let message = "project "^project_id^" exists" in
     Lwt.return
-      (Api_common.result_error_msg ~result_code:`CONFLICT message)
+      (Api_common.result_error_msg ~result_code:`Conflict message)
   else
     let manager = new new_manager in
     let () = projects := Mods.StringMap.add project_id manager !projects in
@@ -91,7 +91,7 @@ let delete_projects (project_id : Api_types_j.project_id) projects :
   match Mods.StringMap.pop project_id !projects with
   | None,_ ->
     let m = "Project '"^project_id^"' not found" in
-    Lwt.return (Api_common.result_error_msg ~result_code:`NOT_FOUND m)
+    Lwt.return (Api_common.result_error_msg ~result_code:`Not_found m)
   | Some m, p ->
     let () = projects := p in
     let () = m#terminate in
@@ -149,7 +149,7 @@ let route
                        Result.Error [{ Api_types_j.message_severity = `Error ;
                                        Api_types_j.message_text = "invalid key";
                                        Api_types_j.message_range = None ; }] ;
-                     Api_types_j.result_code = `ERROR })
+                     Api_types_j.result_code = `Bad_request })
            >>= (fun (msg) ->
                Webapp_common.result_response
                  ~string_of_success:(fun x -> x)
@@ -629,7 +629,7 @@ let route
               project_id projects >>= function
             | Result.Ok () ->
               let body = "null" in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -649,7 +649,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -666,7 +666,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -686,7 +686,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -703,7 +703,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -720,7 +720,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]
@@ -737,7 +737,7 @@ let route
               project_id projects >>= function
             | Result.Ok r ->
               let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ?code:None ~body
+              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
             | Result.Error e ->
               Webapp_common.error_response
                 ?headers:None ?status:None ~errors:[Api_common.error_msg e]

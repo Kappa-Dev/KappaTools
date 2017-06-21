@@ -8,7 +8,6 @@
 
 open Lwt
 open Cohttp_lwt_unix
-open Cohttp
 open Request
 
 type context = { arguments : (string * string) list
@@ -19,18 +18,9 @@ type context = { arguments : (string * string) list
    added for CORS headers.
 *)
 let headers =
-  let h = Header.init_with "Access-Control-Allow-Origin" "*" in
-  let h = Header.add h "content-type" "application/json" in
+  let h = Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
+  let h = Cohttp.Header.add h "content-type" "application/json" in
   h
-
-let status_of_code : Api.manager_code -> Cohttp.Code.status_code =
-  function
-    `OK -> `OK
-  | `CREATED -> `Created
-  | `ERROR -> `Bad_request
-  | `CONFLICT -> `Conflict
-  | `NOT_FOUND ->`Not_found
-  | `ACCEPTED -> `Accepted
 
 (* Given a result and a way to serialize a success result, return
    to client the the http response.
@@ -42,13 +32,13 @@ let result_response
     ~ok:(fun (code : Api.manager_code)
           (ok : 'a) ->
           let body : string = string_of_success ok in
-          let status = status_of_code code in
+          let status :> Cohttp.Code.status_code = code in
           Server.respond_string ~headers ~status ~body ())
     ~error:(fun
              (code : Api.manager_code)
              (errors : Api_types_j.errors) ->
              let error_msg : string = Api_types_j.string_of_errors errors in
-             let status = status_of_code code in
+             let status :> Cohttp.Code.status_code = code in
              (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
              >>= (fun _ ->
                  Server.respond_string
@@ -57,20 +47,11 @@ let result_response
                    ~body:error_msg
                    ()))
 
-let string_response
-    ?(headers = headers)
-    ?(code :int = 200)
-    ~(body : string)
-  : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
-  Server.respond_string
-    ?headers:(Some headers)
-    ~status:(Code.status_of_code code)
-    ~body:body
-    ()
+let string_response ?(headers=headers) = Server.respond_string ~headers
 
 let error_response
     ?(headers = headers)
-    ?(status : Cohttp.Code.status_code = `Internal_server_error)
+    ?(status = `Internal_server_error)
     ~(errors : Api_types_j.errors)
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   let error_msg : string = Api_types_j.string_of_errors errors in
@@ -82,16 +63,17 @@ let error_response
            (Format.sprintf " + error : %s" error_msg))
   in
   Server.respond_string
-    ?headers:(Some headers)
-    ~status:status
+    ~headers
+    ~status
     ~body:error_msg
     ()
 
 let not_found : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
-  string_response
+  Server.respond_string
     ?headers:None
-    ~code:(Code.code_of_status `Not_found)
+    ~status:`Not_found
     ~body:""
+    ()
 
 type 'a route =
   { path : string ;
@@ -190,20 +172,20 @@ let option_handler _ matches =
          (List.map fst matches))
   in
   let h =
-    Header.init_with
+    Cohttp.Header.init_with
       "Access-Control-Allow-Origin"
                  "*"
   in
   let h =
-    Header.add
+    Cohttp.Header.add
       h
       "Access-Control-Allow-Methods"
       (String.concat
          " , "
-         (List.map Code.string_of_method methods))
+         (List.map Cohttp.Code.string_of_method methods))
   in
   let h =
-    Header.add
+    Cohttp.Header.add
       h
       "Access-Control-Request-Headers" "X-Custom-Header"
   in

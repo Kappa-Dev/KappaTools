@@ -13,7 +13,7 @@ let error_msg
     Api_types_t.message_range = None }
 let result_error_msg
     ?(severity:Api_types_t.severity = `Error)
-    ?(result_code:Api.manager_code = `ERROR)
+    ?(result_code:Api.manager_code = `Bad_request)
     (message:string) : 'ok Api.result =
   { Api_types_t.result_data =
       Result.Error [{ Api_types_t.message_severity = severity;
@@ -22,14 +22,14 @@ let result_error_msg
     Api_types_t.result_code = result_code }
 
 let result_messages
-    ?(result_code:Api.manager_code = `ERROR)
+    ?(result_code:Api.manager_code = `Bad_request)
     (messages : Api_types_t.errors) : 'ok Api.result =
   { Api_types_t.result_data = Result.Error messages ;
     Api_types_t.result_code = result_code }
 
 let result_error_exception
     ?(severity:Api_types_t.severity = `Error)
-    ?(result_code:Api.manager_code = `ERROR)
+    ?(result_code:Api.manager_code = `Bad_request)
     (e : exn) : 'ok Api.result =
   let message = (try  (Printexc.to_string e)
                  with _ -> "unspecified exception thrown")
@@ -173,7 +173,7 @@ struct
   | item::_ -> operation item
   | [] ->
      let m : string = Format.sprintf "%s : %s id not found" (C.id_to_string id) C.label in
-     Lwt.return (result_error_msg ~result_code:`NOT_FOUND m)
+     Lwt.return (result_error_msg ~result_code:`Not_found m)
 
 end;;
 
@@ -203,7 +203,7 @@ let bind_simulation project handler =
   | Some simulation -> handler simulation
   | None ->
     let m  = "No simulation available" in
-    Lwt.return (result_error_msg ~result_code:`NOT_FOUND m)
+    Lwt.return (result_error_msg ~result_code:`Not_found m)
 
 let bind_file project (file_id : Api_types_t.file_id) handler =
   FileOperations.bind file_id project (fun file -> handler file)

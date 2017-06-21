@@ -24,11 +24,12 @@ let send
     let result_code : Api.manager_code option =
       match status with
       | 200 -> Some `OK
-      | 201 -> Some `CREATED
-      | 202 -> Some `ACCEPTED
-      | 400 -> Some `ERROR
-      | 404 -> Some `NOT_FOUND
-      | 409 -> Some `CONFLICT
+      | 201 -> Some `Created
+      | 202 -> Some `Accepted
+      | 400 -> Some `Bad_request
+      | 404 -> Some `Not_found
+      | 408 -> Some `Request_timeout
+      | 409 -> Some `Conflict
       | _ -> None in
     let result =
       match result_code with
@@ -41,21 +42,14 @@ let send
             (Api_types_j.errors_of_string response_text)
         else
           let response = hydrate response_text in
-          let () = Common.debug response in
           Api_common.result_ok response in
     let () = Lwt.wakeup feeder result in ()
   in
-  let () =
-    Common.ajax_request
-      ~url:url
-      ~meth:meth
-      ?timeout
-      ?data
-      ~handler:handler in
-   reply
+  let () = Common.ajax_request ~url ~meth ?timeout ?data ~handler in
+  reply
 
 class manager
-    ?(timeout:float = 30.0)
+    ?(timeout:float option)
     ~url ~project_id =
   object(self)
   method message :
@@ -63,7 +57,7 @@ class manager
     function
     | `FileCreate file ->
       send
-        ~timeout
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `POST
         ~data:(Api_types_j.string_of_file file)
@@ -71,24 +65,28 @@ class manager
            (`FileCreate (Mpi_message_j.file_metadata_of_string result)))
     | `FileDelete file_id ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
         (fun result ->
            (`FileDelete (Api_types_j.unit_t_of_string result)))
     | `FileGet file_id ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `GET
         (fun result ->
            (`FileGet (Mpi_message_j.file_of_string result)))
     | `FileCatalog ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/files" url project_id)
         `GET
         (fun result ->
            (`FileCatalog (Mpi_message_j.file_catalog_of_string result)))
     | `FileUpdate (file_id,file_modification) ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `PUT
         ~data:(Api_types_j.string_of_file_modification file_modification)
@@ -96,18 +94,21 @@ class manager
              (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
     | `ProjectParse ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `GET
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
     | `ProjectGet project_id ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `GET
         (fun result ->
              (`ProjectGet (Mpi_message_j.project_of_string result)))
     | `SimulationContinue simulation_parameter ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/continue"
            url project_id)
@@ -117,6 +118,7 @@ class manager
         (fun _ -> (`SimulationContinue ()))
     | `SimulationDelete ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -125,6 +127,7 @@ class manager
         (fun _ -> (`SimulationDelete ()))
     | `SimulationDetailFileLine file_line_id ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/filelines/%s"
            url
@@ -139,6 +142,7 @@ class manager
                         (Mpi_message_j.file_line_detail_of_string result)))
     | `SimulationDetailFluxMap flux_map_id ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/fluxmaps/%s"
            url
@@ -149,6 +153,7 @@ class manager
              (`SimulationDetailFluxMap (Mpi_message_j.flux_map_of_string result)))
     | `SimulationDetailLogMessage ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/logmessages"
            url
@@ -175,6 +180,7 @@ class manager
                  | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
              )) in
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/plot"
            url
@@ -185,6 +191,7 @@ class manager
              (`SimulationDetailPlot (Mpi_message_j.plot_detail_of_string result)))
     | `SimulationDetailSnapshot snapshot_id ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/snapshots/%s"
            url
@@ -196,6 +203,7 @@ class manager
               (Mpi_message_j.snapshot_detail_of_string result)))
     | `SimulationInfo ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -205,6 +213,7 @@ class manager
              (`SimulationInfo (Mpi_message_j.simulation_info_of_string result)))
     | `SimulationEfficiency ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/efficiency"
            url
@@ -215,6 +224,7 @@ class manager
                         (Mpi_message_j.simulation_efficiency_of_string result)))
     | `SimulationTrace ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/trace"
            url
@@ -223,6 +233,7 @@ class manager
         (fun s -> (`SimulationTrace s))
     | `SimulationCatalogFileLine ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/filelines"
            url
@@ -233,6 +244,7 @@ class manager
                         (Mpi_message_j.file_line_catalog_of_string result)))
     | `SimulationCatalogFluxMap ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/fluxmaps"
            url
@@ -243,6 +255,7 @@ class manager
                         (Mpi_message_j.flux_map_catalog_of_string result)))
     | `SimulationCatalogSnapshot ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/snapshots"
            url
@@ -253,6 +266,7 @@ class manager
                         (Mpi_message_j.snapshot_catalog_of_string result)))
     | `SimulationPause ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/pause"
            url
@@ -261,6 +275,7 @@ class manager
         (fun _ -> (`SimulationPause ()))
     | `SimulationParameter ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/parameter"
            url
@@ -271,6 +286,7 @@ class manager
                         (Mpi_message_j.simulation_parameter_of_string result)))
     | `SimulationPerturbation simulation_perturbation ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/perturbation"
            url
@@ -281,6 +297,7 @@ class manager
         (fun _ -> (`SimulationPerturbation ()))
     | `SimulationStart simulation_parameter ->
       send
+        ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation"
            url
@@ -296,19 +313,21 @@ class manager
   method rest_message = function
     | `EnvironmentInfo ->
       send
-        ~timeout
+        ?timeout
         (Format.sprintf "%s/v2" url)
         `GET
         (fun result ->
            (`EnvironmentInfo (Mpi_message_j.environment_info_of_string result)))
     | `ProjectCatalog ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects" url)
         `GET
         (fun result ->
              (`ProjectCatalog (Mpi_message_j.project_catalog_of_string result)))
     | `ProjectCreate project_parameter ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects" url)
         `POST
         ~data:(Api_types_j.string_of_project_parameter project_parameter)
@@ -316,6 +335,7 @@ class manager
              (`ProjectCreate (Api_types_j.unit_t_of_string result)))
     | `ProjectDelete project_id ->
       send
+        ?timeout
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
         (fun result ->
@@ -377,6 +397,7 @@ class manager
 
   method init_static_analyser_raw data =
     send
+      ?timeout
       (Format.sprintf "%s/v2/projects/%s/analyses" url project_id)
       `POST ~data
       (fun x ->
@@ -397,6 +418,7 @@ class manager
 
   method get_contact_map accuracy =
     send
+      ?timeout
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map/%s" url
@@ -414,6 +436,7 @@ class manager
 
   method get_influence_map accuracy =
     send
+      ?timeout
       (match accuracy with
        | Some accuracy ->
          Format.sprintf "%s/v2/projects/%s/analyses/influence_map/%s" url
@@ -430,6 +453,7 @@ class manager
 
   method get_dead_rules =
     send
+      ?timeout
       (Format.sprintf "%s/v2/projects/%s/analyses/dead_rules" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -441,6 +465,7 @@ class manager
 
   method  get_constraints_list =
     send
+      ?timeout
       (Format.sprintf "%s/v2/projects/%s/analyses/constraints" url project_id)
       `GET
       (fun x -> Yojson.Basic.from_string x)

@@ -4,7 +4,8 @@ type 'data message = { id : id ; data : 'data }
 type manager_code
      <ocaml module="Api">
      (* <ocaml_biniou module="Api"> *) =
-      [ OK | CREATED | ERROR | CONFLICT | NOT_FOUND | ACCEPTED ] <json repr="object">
+       [ OK | Accepted | Created |
+       Bad_request | Conflict | Not_found | Request_timeout ] <json repr="object">
 
 type ('ok,'error) api_result
      <ocaml from="Api_types" t="result"> =

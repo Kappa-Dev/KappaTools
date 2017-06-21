@@ -130,8 +130,9 @@ let ajax_request
        Js.Unsafe.inject
          (Js.wrap_callback
             (fun status response ->
-               let () = debug (Js.string "ajax_request") in
-               let () = debug status in
+               let () =
+                 debug
+                   (Js.string ("request "^url^" answer: "^string_of_int status)) in
                let () = debug response in
                handler
                  status
