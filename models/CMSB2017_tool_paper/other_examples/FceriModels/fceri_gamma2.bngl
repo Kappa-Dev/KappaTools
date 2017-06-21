@@ -11,7 +11,7 @@ begin parameters
      km2  0
      kpL  5e-2
      kmL  20
-    kpLs  5e-2 
+    kpLs  5e-2
     kmLs  0.12
      kpS  6e-2
      kmS  0.13
@@ -24,7 +24,7 @@ begin parameters
      pLS   30
     pLSs  100
      pSS  100
-    pSSs  200 
+    pSSs  200
       dm   20
       dc   20
 end parameters
@@ -37,7 +37,7 @@ begin seed species
 end seed species
 
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp1, km1
 
     # Receptor-aggregation
@@ -65,20 +65,16 @@ begin reaction rules
     Rec(g~pY) + Syk(tSH2) <-> Rec(g~pY!1).Syk(tSH2!1) kpS, kmS
 
     # Transphosphorylation of Syk by constitutive Lyn
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+    Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l!1,l!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
 
     # Transphosphorylation of Syk by SH2-bound Lyn
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+    Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l!1,l!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
-    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
 
     # Transphosphorylation of Syk by Syk phosphorylated on aloop
-    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
 
     # Dephosphorylation of Rec beta
     Rec(b~pY) -> Rec(b~Y)  dm
@@ -93,7 +89,8 @@ begin reaction rules
     # Dephosphorylation of Syk in cytosol
     Syk(tSH2,l~pY) -> Syk(tSH2,l~Y)  dc
     Syk(tSH2,a~pY) -> Syk(tSH2,a~Y)  dc
-end reaction rules
+
+  end reaction rules
 end model
 
 ## actions ##
