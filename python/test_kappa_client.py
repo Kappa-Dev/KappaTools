@@ -162,7 +162,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """ set up unit test by launching client"""
-        self.websim = "../WebSim.native"
+        self.websim = "../bin/WebSim"
         self.key = self.generate_key()
         self.port = 6666
         command_format = "{0} --shutdown-key {1} --port {2} --level debug"
