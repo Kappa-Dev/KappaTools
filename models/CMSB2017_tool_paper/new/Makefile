@@ -23,7 +23,7 @@ $(SUMMARY):
 		grep "CPU\|Process" log.txt>$(SUMMARY)
 
 clean:
-	rm -f *.txt *.net *.done *.title *.kade *.kade_fwd *.kade_bwd *.bngl_wo_sym *.bngl_with_sym *.kasa
+	rm -f *.txt *.net *.done *.title *.kade *.kade_fwd *.kade_bwd *.bngl_wo_sym *.kasa  *.bngl_with_sym
 
 %.done: %.ka %.title %.kade %.kasa %.kade_fwd %.kade_bwd %.bngl_wo_sym %.bngl_with_sym
 	touch $@
