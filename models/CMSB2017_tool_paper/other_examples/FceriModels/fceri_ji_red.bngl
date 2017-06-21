@@ -11,7 +11,7 @@ begin parameters
      km2  0
      kpL  5e-2
      kmL  20
-    kpLs  5e-2 
+    kpLs  5e-2
     kmLs  0.12
      kpS  6e-2
      kmS  0.13
@@ -24,7 +24,7 @@ begin parameters
      pLS   30
     pLSs  100
      pSS  100
-    pSSs  200 
+    pSSs  200
       dm   20
       dc   20
 end parameters
@@ -37,7 +37,7 @@ begin seed species
 end seed species
 
 begin reaction rules
-    # Ligand-receptor binding      
+    # Ligand-receptor binding
     R1: Rec(a) + Lig(l,l) <-> Rec(a!1).Lig(l!1,l) kp1, km1
 
     # Receptor-aggregation
@@ -74,11 +74,11 @@ begin reaction rules
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
     R12: Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-       Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l!1,l!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
 
     # Transphosphorylation of Syk by Syk phosphorylated on aloop
     R13: Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-       Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l!1,l!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
 
     # Dephosphorylation of Rec beta
     R14: Rec(b~pY) -> Rec(b~Y)  dm
@@ -98,8 +98,8 @@ end reaction rules
 begin observables
     Molecules     LynFree     Lyn(U,SH2)
     Molecules     RecMon	  Rec(a), Rec(a!1).Lig(l!1,l)
-    Molecules     RecDim      Rec.Rec    
-                   
+    Molecules     RecDim      Rec.Rec
+
     Molecules     RecPbeta    Rec(b~pY!?)
     Molecules     RecPgamma   Rec(g~pY), Rec(g~pY!+)
     Molecules     RecSyk      Rec(g~pY!1).Syk(tSH2!1)

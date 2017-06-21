@@ -53,10 +53,12 @@ begin reaction rules
 
     # Transphosphorylation of beta by constitutive Lyn
     R4: Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
     R4a: Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
 
     # Transphosphorylation of gamma by constitutive Lyn
     R5: Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
     R5a: Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
 
     # Lyn-receptor binding through SH2 domain
@@ -64,10 +66,12 @@ begin reaction rules
 
     # Transphosphorylation of beta by SH2-bound Lyn
     R7: Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
     R7a: Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
 
     # Transphosphorylation of gamma by SH2-bound Lyn
     R8: Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
     R8a: Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
 
     # Syk-receptor binding through tSH2 domain
@@ -76,15 +80,18 @@ begin reaction rules
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
     R12: Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-       Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
     R12a: Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-          Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
 
     # Transphosphorylation of Syk by Syk phosphorylated on aloop
     R13: Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-       Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
     R13a: Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-          Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
     # Dephosphorylation of Rec beta
     R14: Rec(b~pY) -> Rec(b~Y)  dm
 
