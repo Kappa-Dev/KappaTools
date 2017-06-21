@@ -174,6 +174,37 @@ let store_distances r graph = function
     | None -> None
     | Some path -> Some (r,List.length path)
 
+
+let test_pass_on graph = function
+  | Instantiation.Is_Here ag -> Edges.is_agent ag graph
+  | Instantiation.Has_Internal ((ag, s), st) ->
+    Edges.is_agent ag graph
+    && Edges.is_internal st (Agent.id ag) s graph
+  | Instantiation.Is_Free (ag, s) ->
+    Edges.is_agent ag graph
+    && Edges.is_free (Agent.id ag) s graph
+  | Instantiation.Is_Bound (ag, s) ->
+    Edges.is_agent ag graph
+    && not (Edges.is_free (Agent.id ag) s graph)
+  | Instantiation.Is_Bound_to ((ag, s), (ag', s')) ->
+    Edges.is_agent ag graph && Edges.is_agent ag' graph
+    && Edges.link_exists (Agent.id ag) s (Agent.id ag') s' graph
+  | Instantiation.Has_Binding_type ((ag, s), (ag_ty, s')) ->
+    Edges.is_agent ag graph &&
+    begin match Edges.link_destination (Agent.id ag) s graph with
+    | None -> false
+    | Some ((_, dst_ag_ty), dst_s) -> dst_ag_ty = ag_ty && dst_s = s'
+    end
+    
+let tests_pass_on graph tests =
+  List.for_all (test_pass_on graph) (List.concat tests)
+
+let is_step_triggerable state = function
+  | Trace.Subs _ | Trace.Init _
+  | Trace.Pert _ | Trace.Obs _ | Trace.Dummy _ -> true
+  | Trace.Rule (r, event, _info) ->
+    tests_pass_on state.graph event.Instantiation.tests
+
 let do_step sigs state = function
   | Trace.Subs _ -> state,{ unary_distances = None }
   | Trace.Rule (kind,event,info) ->
