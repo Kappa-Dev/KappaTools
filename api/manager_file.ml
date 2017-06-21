@@ -146,7 +146,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
         let message : string =
           Format.sprintf
             "file id %s exists"
-            (Api_common.FileCollection.identifier file)
+            (Model_storage.FileCollection.identifier file)
         in
         Lwt.return
           (Api_common.result_error_msg
@@ -173,7 +173,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
     method file_get
       (file_id : Api_types_j.file_id) :
       Api_types_j.file Api.result Lwt.t =
-      Api_common.bind_file
+      Model_storage.bind_file
         project
         file_id
         (fun (file : Api_types_j.file) ->
@@ -183,7 +183,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
       (file_id : Api_types_j.file_id)
       (file_modification : Api_types_j.file_modification) :
       Api_types_j.file_metadata Api.result Lwt.t =
-      Api_common.bind_file
+      Model_storage.bind_file
         project
         file_id
         (fun
@@ -204,7 +204,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
     method file_delete
         (file_id : Api_types_j.file_id) :
       unit Api.result Lwt.t =
-      Api_common.bind_file
+      Model_storage.bind_file
         project
         file_id
         (fun _ ->

@@ -16,7 +16,7 @@ let detail_projection
     ~(system_process:Kappa_facade.system_process)
     ~(projection:(Api_types_j.simulation_detail -> 'a Api.result))
   : 'a Api.result Lwt.t =
-  Api_common.bind_simulation
+  Model_storage.bind_simulation
     project
     (fun simulation ->
        let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -319,14 +319,14 @@ class manager_simulation
 
     method simulation_parameter :
       Api_types_j.simulation_parameter Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation(* project simulation *) ->
            let parameter = simulation#get_simulation_parameter() in
            Lwt.return (Api_common.result_ok parameter))
 
     method simulation_raw_trace : string Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation ->
            let t = simulation#get_runtime_state() in
@@ -334,7 +334,7 @@ class manager_simulation
                          (Kappa_facade.get_raw_trace t)))
 
     method simulation_pause : unit Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -343,7 +343,7 @@ class manager_simulation
              Lwt.return (Api_common.result_ok ())))
 
     method private simulation_stop : unit Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -360,7 +360,7 @@ class manager_simulation
     method simulation_perturbation
         (simulation_perturbation : Api_types_j.simulation_perturbation) :
       unit Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -379,7 +379,7 @@ class manager_simulation
     method simulation_continue
         (simulation_parameter : Api_types_j.simulation_parameter) :
       unit Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -396,7 +396,7 @@ class manager_simulation
         )
 
     method simulation_info : Api_types_j.simulation_info Api.result Lwt.t =
-      Api_common.bind_simulation
+      Model_storage.bind_simulation
         project
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
@@ -417,7 +417,7 @@ class manager_simulation
         )
 
     method simulation_efficiency =
-      Api_common.bind_simulation project
+      Model_storage.bind_simulation project
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            Lwt.return (Api_common.result_ok (Kappa_facade.efficiency t)))

@@ -17,21 +17,6 @@ let field_ref context field =
   (List.assoc "projectid" context.Webapp_common.arguments,
    List.assoc field context.Webapp_common.arguments)
 
-class system_process () : Kappa_facade.system_process =
-  let () =
-    Lwt.async
-      (fun () ->
-         Lwt_log_core.log
-           ~level:Lwt_log_core.Debug
-           (Format.sprintf " + system process"))
-  in
-  object
-    method log ?exn (msg : string) =
-      Lwt_log_core.log ~level:Lwt_log_core.Info ?exn msg
-    method yield () : unit Lwt.t = Lwt_main.yield ()
-    method min_run_duration () = 0.1
-  end
-
 class new_manager : Api.concrete_manager =
   let re = Re.compile (Re.str "WebSim") in
   let sa_command = Re.replace_string re ~by:"KaSaAgent" Sys.argv.(0) in
@@ -640,10 +625,9 @@ let route
        Webapp_common.operation =
          (fun ~context ->
             let project_id = project_ref context in
-            Cohttp_lwt_body.to_string context.Webapp_common.body >|=
-            (fun x -> Ast.compil_of_json (Yojson.Basic.from_string x)) >>=
+            Cohttp_lwt_body.to_string context.Webapp_common.body >>=
             fun compil -> tmp_bind_projects
-              (fun manager -> manager#init_static_analyser compil)
+              (fun manager -> manager#init_static_analyser_raw compil)
               project_id projects >>= function
             | Result.Ok () ->
               let body = "null" in
