@@ -39,15 +39,15 @@
 
 
     # Ligand-receptor binding
-    Rec(a) , Lig(l1,l2) <-> Rec(a!1),Lig(l1!1,l2)  @'kp1'{0}, 'km1'
-    Rec(a) , Lig(l2,l1) <-> Rec(a!1),Lig(l2!1,l1)  @'kp1'{0}, 'km1'
+    Rec(a) , Lig(l1,l2) <-> Rec(a!1),Lig(l1!1,l2)  @'kp1', 'km1'
+    Rec(a) , Lig(l2,l1) <-> Rec(a!1),Lig(l2!1,l1)  @'kp1', 'km1'
 
     # Receptor-aggregation
-    Rec(a) , Lig(l1,l2!_) <-> Rec(a!2),Lig(l1!2,l2!_)  @'kp2'{0}, 'km2'
-    Rec(a) , Lig(l2,l1!_) <-> Rec(a!2),Lig(l2!2,l1!_)  @'kp2'{0}, 'km2'
+    Rec(a) , Lig(l1,l2!_) <-> Rec(a!2),Lig(l1!2,l2!_)  @'kp2', 'km2'
+    Rec(a) , Lig(l2,l1!_) <-> Rec(a!2),Lig(l2!2,l1!_)  @'kp2', 'km2'
 
     # Constitutive Lyn-receptor binding
-    Rec(b~Y) , Lyn(U,SH2) <-> Rec(b~Y!1),Lyn(U!1,SH2)  @'kpL'{0}, 'kmL'
+    Rec(b~Y) , Lyn(U,SH2) <-> Rec(b~Y!1),Lyn(U!1,SH2)  @'kpL', 'kmL'
 
     # Transphosphorylation of beta by constitutive Lyn
     Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~Y) -> Lig(l1!1,l2!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,b~pY) @'pLb'
@@ -60,7 +60,7 @@
     Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~Y) -> Lig(l2!1,l1!2),Lyn(U!3,SH2),Rec(a!2,b~Y!3),Rec(a!1,g~pY) @'pLg'
 
     # Lyn-receptor binding through SH2 domain
-    Rec(b~pY) , Lyn(U,SH2) <-> Rec(b~pY!1),Lyn(U,SH2!1) @'kpLs'{0}, 'kmLs'
+    Rec(b~pY) , Lyn(U,SH2) <-> Rec(b~pY!1),Lyn(U,SH2!1) @'kpLs', 'kmLs'
 
     # Transphosphorylation of beta by SH2-bound Lyn
     Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~Y) -> Lig(l1!1,l2!2),Lyn(U,SH2!3),Rec(a!2,b~pY!3),Rec(a!1,b~pY) @'pLbs'
