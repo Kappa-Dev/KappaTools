@@ -32,7 +32,7 @@ begin parameters
 end parameters
 
 begin seed species
-    Lig(l1,l2,l3)         1
+    Lig(l1,l2,l3)      1
     Lyn(U,SH2)         1
     Syk(tSH2,l~Y,a~Y)  1
     Rec(a,b~Y,g~Y)     1
@@ -46,112 +46,327 @@ begin reaction rules
     Rec(a) + Lig(l3,l1,l2) <-> Rec(a!1).Lig(l3!1,l1,l2)  0.5*kp1, 0.5*km1
 
 
-
     # Receptor-aggregation
-    Rec(a) + Lig(l2,l1!+) <-> Rec(a!2).Lig(l2!2,l1!+)  kp2, km2
-    Rec(a) + Lig(l3,l1!+) <-> Rec(a!2).Lig(l3!2,l1!+)  kp2, km2
-    Rec(a) + Lig(l1,l2!+) <-> Rec(a!2).Lig(l1!2,l2!+)  kp2, km2
-    Rec(a) + Lig(l3,l2!+) <-> Rec(a!2).Lig(l3!2,l2!+)  kp2, km2
-    Rec(a) + Lig(l1,l3!+) <-> Rec(a!2).Lig(l1!2,l3!+)  kp2, km2
-    Rec(a) + Lig(l2,l3!+) <-> Rec(a!2).Lig(l2!2,l3!+)  kp2, km2
+    Rec(a). Lig(l1,l2!+,l3) <-> Rec(a!2).Lig(l1!2,l2!+,l3)  kp2, km2
+    Rec(a). Lig(l2,l1!+,l3) <-> Rec(a!2).Lig(l2!2,l1!+,l3)  kp2, km2
+    Rec(a). Lig(l3,l1!+,l2) <-> Rec(a!2).Lig(l3!2,l1!+,l2)  kp2, km2
+
+    Rec(a). Lig(l1,l2!+,l3!+) <-> Rec(a!2).Lig(l1!2,l2!+,l3!+)  kp2,km2
+    Rec(a). Lig(l2,l1!+,l3!+) <-> Rec(a!2).Lig(l2!2,l1!+,l3!+)  kp2,km2
+    Rec(a). Lig(l3,l1!+,l2!+) <-> Rec(a!2).Lig(l3!2,l1!+,l2!+)  kp2,km2
+
+    Rec(a). Lig(l1,l2,l3!+) <-> Rec(a!2).Lig(l1!2,l2,l3!+)  kp2,km2
+    Rec(a). Lig(l2,l1,l3!+) <-> Rec(a!2).Lig(l2!2,l1,l3!+)  kp2,km2
+    Rec(a). Lig(l3,l1,l2!+) <-> Rec(a!2).Lig(l3!2,l1,l2!+)  kp2,km2
 
     # Constitutive Lyn-receptor binding
     Rec(b~Y) + Lyn(U,SH2) <-> Rec(b~Y!1).Lyn(U!1,SH2)  kpL, kmL
 
     # Transphosphorylation of beta by constitutive Lyn
-    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
-    Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
-    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
-    Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
-    Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
-    Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
 
+    Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    #2
+    Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y) -> Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY) pLb
+
+    #3
+    Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
+
+    #4
+    Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b) pLb
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b) pLb
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~Y).Rec(a!4,b)-> Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,b~pY).Rec(a!4,b) pLb
+
+    #5
+    Lig(l1!1,l2!2,l3!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l1!1,l2!2,l3!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
+
+    Lig(l2!1,l1!2,l3!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l2!1,l1!2,l3!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
+
+    Lig(l3!1,l1!2,l2!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~Y!5).Lyn(U!5,SH2) -> Lig(l3!1,l1!2,l2!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~Y!5).Lyn(U!5,SH2) pLb
 
     # Transphosphorylation of gamma by constitutive Lyn
-    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
-    Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
-    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
-    Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
-    Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
-    Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+    Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    #2
+    Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y) -> Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY) pLg
+
+    #3
+    Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Lyn(U!5,SH2).Rec(a!4,b~Y!5) -> Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Lyn(U!5,SH2).Rec(a!4,b~Y!5) pLg
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Lyn(U!5,SH2).Rec(a!4,b~Y!5) -> Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Lyn(U!5,SH2).Rec(a!4,b~Y!5) pLg
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Lyn(U!5,SH2).Rec(a!4,b~Y!5) -> Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Lyn(U!5,SH2).Rec(a!4,b~Y!5) pLg
+
+    #4
+    Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l3!1,l1!2,l2!4).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
+    #5
+    Lig(l1!1,l2!4,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l1!1,l2!4,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
+    Lig(l2!1,l1!4,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l2!1,l1!4,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
+    Lig(l3!1,l1!4,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l3!1,l1!4,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY).Rec(a!4,b) pLg
+
 
     # Lyn-receptor binding through SH2 domain
     Rec(b~pY) + Lyn(U,SH2) <-> Rec(b~pY!1).Lyn(U,SH2!1) kpLs, kmLs
 
     # Transphosphorylation of beta by SH2-bound Lyn
-    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
-    Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
-    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
-    Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
-    Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
-    Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+    Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    #2
+    Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) -> Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) pLbs
+
+    #3
+
+    Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) .Lyn(U,SH2!5).Rec(a!4,b~pY!5)-> Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLbs
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) .Lyn(U,SH2!5).Rec(a!4,b~pY!5)-> Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLbs
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y) .Lyn(U,SH2!5).Rec(a!4,b~pY!5)-> Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLbs
+
+    #4
+    Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y).Rec(a!4,b)-> Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Rec(a!4,b) pLbs
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y).Rec(a!4,b)-> Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Rec(a!4,b) pLbs
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~Y).Rec(a!4,b)-> Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,b~pY) .Rec(a!4,b) pLbs
+
+    #5
+    Lig(l1!1,l2!2,l3!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~pY!5).Lyn(U,SH2!5)-> Lig(l1!1,l2!2,l3!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~pY!5).Lyn(U,SH2!5) pLbs
+
+    Lig(l2!1,l1!2,l3!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~pY!5).Lyn(U,SH2!5)-> Lig(l2!1,l1!2,l3!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~pY!5).Lyn(U,SH2!5) pLbs
+
+    Lig(l3!1,l1!2,l2!4).Rec(a!2,b).Rec(a!1,b~Y).Rec(a!4,b~pY!5).Lyn(U,SH2!5)-> Lig(l3!1,l1!2,l2!4).Rec(a!2,b).Rec(a!1,b~pY).Rec(a!4,b~pY!5).Lyn(U,SH2!5) pLbs
+
 
     # Transphosphorylation of gamma by SH2-bound Lyn
-    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
-    Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
-    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
-    Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
-    Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
-    Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+    Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    #2
+    Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y) -> Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) pLgs
+
+    #3
+
+    Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Lyn(U,SH2!5).Rec(a!4,b~pY!5) -> Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLgs
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Lyn(U,SH2!5).Rec(a!4,b~pY!5) -> Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLgs
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Lyn(U,SH2!5).Rec(a!4,b~pY!5) -> Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY) .Lyn(U,SH2!5).Rec(a!4,b~pY!5) pLgs
+
+    #4
+    Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY).Rec(a!4,b) pLgs
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY).Rec(a!4,b) pLgs
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~Y).Rec(a!4,b) -> Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY).Rec(a!4,b) pLgs
+
+    #5
+
+    Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~Y).Rec(a!2,b) -> Lig(l1!1,l2!2,l3!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~pY).Rec(a!2,b) pLgs
+
+    Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~Y).Rec(a!2,b) -> Lig(l2!1,l1!2,l3!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~pY).Rec(a!2,b) pLgs
+
+    Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~Y).Rec(a!2,b) -> Lig(l3!1,l1!2,l2!4).Lyn(U,SH2!5).Rec(a!4,b~pY!5).Rec(a!1,g~pY).Rec(a!2,b) pLgs
 
     # Syk-receptor binding through tSH2 domain
     Rec(g~pY) + Syk(tSH2) <-> Rec(g~pY!1).Syk(tSH2!1) kpS, kmS
 
     # Transphosphorylation of Syk by constitutive Lyn
-    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l1!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
-    Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l1!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
-    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l2!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
-    Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l2!1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
-    Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l3!1,l1!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
-    Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l3!1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+    Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2,l3).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l3!1,l1!2,l2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    #2
+
+    Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l1!1,l2,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l2!1,l1,l3!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l3!1,l1,l2!2).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLS
+
+    #3
+
+    Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U!6,SH2).Rec(a!5,b~Y!6) -> Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U!6,SH2).Rec(a!5,b~Y!6) pLS
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U!6,SH2).Rec(a!5,b~Y!6) -> Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U!6,SH2).Rec(a!5,b~Y!6) pLS
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U!6,SH2).Rec(a!5,b~Y!6) -> Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U!6,SH2).Rec(a!5,b~Y!6) pLS
+
+    #4
+    Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLS
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLS
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!2,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLS
+
+    #5
+    Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l1!1,l2!2,l3!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLS
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l2!1,l1!2,l3!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLS
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l3!1,l1!2,l2!5).Lyn(U!3,SH2).Rec(a!5,b~Y!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLS
+
 
     # Transphosphorylation of Syk by SH2-bound Lyn
-    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l1!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
-    Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l1!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
-    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l2!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
-    Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l2!1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
-    Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l3!1,l1!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
-    Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> \
-    Lig(l3!1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+    Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l1!1,l2!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l2!1,l1!2,l3).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l3!1,l1!2,l2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    #2
+
+    Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l1!1,l2,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l2!1,l1,l3!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y) -> Lig(l3!1,l1,l2!2).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY) pLSs
+
+    #3
+
+    Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U,SH2!6).Rec(a!5,b~pY!6) -> Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U,SH2!6).Rec(a!5,b~pY!6) pLSs
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U,SH2!6).Rec(a!5,b~pY!6) -> Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U,SH2!6).Rec(a!5,b~pY!6) pLSs
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Lyn(U,SH2!6).Rec(a!5,b~pY!6) -> Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Lyn(U,SH2!6).Rec(a!5,b~pY!6) pLSs
+
+    #4
+    Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLSs
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLSs
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!5,b) -> Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!2,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!5,b) pLSs
+
+    #5
+
+    Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l1!1,l2!2,l3!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLSs
+
+    Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l2!1,l1!2,l3!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLSs
+
+    Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~Y).Rec(a!2,b) -> Lig(l3!1,l1!2,l2!5).Lyn(U,SH2!3).Rec(a!5,b~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,l~pY).Rec(a!2,b) pLSs
+
 
     # Transphosphorylation of Syk by Syk not phosphorylated on aloop
-    Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l1!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
-    Lig(l1!1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l1!1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
-    Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l2!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
-    Lig(l2!1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l2!1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
-    Lig(l3!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l3!1,l1!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
-    Lig(l3!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l3!1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    Lig(l1!1,l2!2,l3).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l1!1,l2!2,l3).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    Lig(l2!1,l1!2,l3).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l2!1,l1!2,l3).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    Lig(l3!1,l1!2,l2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l3!1,l1!2,l2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    #2
+    Lig(l1!1,l2,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l1!1,l2,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    Lig(l2!1,l1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l2!1,l1,l3!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    Lig(l3!1,l1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l3!1,l1,l2!2).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSS
+
+    #3
+
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) pSS
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) pSS
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~Y).Rec(a!5,g~pY!6) pSS
+
+    #4
+
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g) pSS
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g) pSS
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g) pSS
+
+    #5
+
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSS
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSS
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~Y).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSS
 
     # Transphosphorylation of Syk by Syk phosphorylated on aloop
-    Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l1!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
-    Lig(l1!1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l1!1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
-    Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l2!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
-    Lig(l2!1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l2!1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
-    Lig(l3!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l3!1,l1!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
-    Lig(l3!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> \
-    Lig(l3!1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+    Lig(l1!1,l2!2,l3).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l1!1,l2!2,l3).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    Lig(l2!1,l1!2,l3).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l2!1,l1!2,l3).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    Lig(l3!1,l1!2,l2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l3!1,l1!2,l2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    #2
+
+    Lig(l1!1,l2,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l1!1,l2,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    Lig(l2!1,l1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l2!1,l1,l3!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    Lig(l3!1,l1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y) -> Lig(l3!1,l1,l2!2).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY) pSSs
+
+    #3
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) pSSs
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) pSSs
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Syk(tSH2!6,a~pY).Rec(a!5,g~pY!6) pSSs
+
+    #4
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g)  pSSs
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g)  pSSs
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!5,g) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!2,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!5,g) pSSs
+
+    #5
+
+    Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l1!1,l2!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSSs
+
+    Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l2!1,l1!2,l3!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSSs
+
+    Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~Y).Rec(a!2,g) -> Lig(l3!1,l1!2,l2!5).Syk(tSH2!3,a~pY).Rec(a!5,g~pY!3).Rec(a!1,g~pY!4).Syk(tSH2!4,a~pY).Rec(a!2,g) pSSs
+
 
     # Dephosphorylation of Rec beta
     Rec(b~pY) -> Rec(b~Y)  dm
