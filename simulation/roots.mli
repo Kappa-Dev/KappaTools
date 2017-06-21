@@ -28,3 +28,7 @@ val update_roots :
 val number : t -> Pattern.id -> int
 
 val debug_print : Format.formatter -> t -> unit
+
+val of_patterns : Pattern.id -> t -> IntCollection.t
+
+val of_unary_patterns : Pattern.id -> t -> Mods.IntSet.t Mods.IntMap.t
