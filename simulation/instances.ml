@@ -158,7 +158,7 @@ let fold_instances' ?excp st pats ~init f =
 
 
 let map_fold2 map1 map2 ~init f =
-  Mods.IntMap.monadic_fold2_sparse () () 
+  Mods.IntMap.monadic_fold2_sparse () ()
     (fun () () key x1 x2 acc -> (), f key x1 x2 acc)
     map1 map2 init
   |> snd
