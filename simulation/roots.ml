@@ -150,10 +150,10 @@ let print_unary_injections ?domain f roots_of_patterns =
 
 (* Useful shortcuts *)
 
-let of_patterns pat_id state = 
+let of_pattern pat_id state = 
   try Pattern.ObsMap.get state.of_patterns pat_id
   with Not_found -> IntCollection.create 1
 
-let of_unary_patterns pat_id state = 
+let of_unary_pattern pat_id state = 
   try Pattern.ObsMap.get state.of_unary_patterns pat_id
   with Not_found -> Mods.IntMap.empty

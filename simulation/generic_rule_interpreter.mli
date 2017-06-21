@@ -42,6 +42,11 @@ module Make (Instances:Instances_sig.S) : sig
   val apply_rule :
     outputs:(Data.t -> unit) -> maxConsecutiveClash:int ->
     Model.t -> Counter.t -> t -> int option * bool * t
+  (** [apply_rule ~outputs ~maxConsecutiveClash model counter state]
+      Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
+      [is_final_step] is determined by the counter. 
+      [corresponding_syntactic_rule] is equal to None if and only if 
+      a null event occured *)
 
   val force_rule :
     outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
