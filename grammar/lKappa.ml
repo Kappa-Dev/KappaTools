@@ -1745,57 +1745,76 @@ let assemble_rule ~syntax_version ~r_editStyle
         un_rate;
   }
 
-let create_t ast_intf =
-  NamedDecls.create (
-    Tools.array_map_of_list
-      (fun p ->
+let create_t sites incr_info =
+  let (aux,counters) =
+    List.fold_right
+    (fun site (acc,counts) ->
+      match site with
+      | Ast.Port p ->
          (p.Ast.port_nme,
           (NamedDecls.create
              (Tools.array_map_of_list (fun x -> (x,())) p.Ast.port_int),
-           List.fold_left (fun acc -> function
-               | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc
+           List.fold_left
+             (fun acc' -> function
+               | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc'
                | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
-                 raise (ExceptionDefn.Malformed_Decl
-                          ("Forbidden link status inside a definition of signature",
-                           pos))
-               | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc) [] p.Ast.port_lnk))
-      ) (ast_intf))
+                  raise
+                    (ExceptionDefn.Malformed_Decl
+                       ("Forbidden link status inside a definition of signature",
+                        pos))
+               | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc')
+             [] p.Ast.port_lnk))::acc,counts
+      | Ast.Counter c ->
+         (c.Ast.count_nme,
+          (NamedDecls.create [||], [incr_info]))::acc,c.Ast.count_nme::counts)
+    sites ([],[]) in
+  NamedDecls.create (Array.of_list aux),counters
 
-let counters_to_ports counters =
-  List.map
-    (fun c ->
-      {Ast.port_nme = c.Ast.count_nme; port_int = [];port_int_mod =None;
-       port_lnk=[];port_lnk_mod = None}) counters
+let add_incr counters =
+  let annot = Locality.dummy in
+  let a_port = ("a",annot) in
+  let b_port = ("b",annot) in
+  let incr = ("__incr",Locality.dummy) in
+  let after = (a_port,(NamedDecls.create [||],[(b_port,incr)])) in
+  let before_lnks =
+    List.fold_right
+      (fun (ag,counts) acc ->
+        (List.map (fun c -> (c,ag)) counts)@acc) counters [(a_port,incr)] in
+  let before = (b_port,(NamedDecls.create [||],before_lnks)) in
+  let lnks = NamedDecls.create [|after;before|] in
+  let counter_agent = (incr,lnks) in
+  counter_agent
 
-let create_sig_for_counters l with_counters =
-  let l'=
-    List.map
-      (fun (name,intf,r) ->
-        let ports,counters = separate_sites intf in
-        let ports' = counters_to_ports counters in
-        name,ports@ports',r)  l in
-  if (with_counters) then
-    let annot = Locality.dummy in
-    let after =
-      {Ast.port_nme=("a",annot);Ast.port_int=[];Ast.port_int_mod =None;
-       Ast.port_lnk=[];Ast.port_lnk_mod=None} in
-    let before =
-      {Ast.port_nme=("b",Locality.dummy);Ast.port_int=[];Ast.port_int_mod =None;
-       Ast.port_lnk=[];Ast.port_lnk_mod=None} in
-    let counter_agent =
-      (("__incr",Locality.dummy),[after;before],None) in
-    counter_agent::l'
-  else l'
-
-let create_sig l with_counters =
-  let t = Tools.array_map_of_list
-    (fun (name,intf,_) -> (name,create_t intf))
-    (create_sig_for_counters l with_counters) in
-  let with_contact_map =
-    Array.fold_left (fun acc (_,nd) ->
-      acc ||
-      Array.fold_left (fun acc (_,(_,x)) -> acc || not(x = []))
-        false nd.NamedDecls.decls) false t in
+let create_sig l =
+  let (with_counters,with_contact_map) =
+    List.fold_left
+      (fun (count,contact) (_,sites,_) ->
+        List.fold_left
+          (fun (count',contact') site ->
+            match site with
+            | Ast.Counter _ -> (true,contact')
+            | Ast.Port p ->
+               let contact'' =
+                 List.fold_left (fun acc -> function
+                 | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc
+                 | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
+                 raise
+                   (ExceptionDefn.Malformed_Decl
+                      ("Forbidden link status inside a definition of signature",
+                       pos))
+                 | Ast.LNK_TYPE (_,_), _ -> true) false p.Ast.port_lnk in
+               (count',contact''||contact')) (count,contact) sites)
+      (false,false) l in
+  let annot = Locality.dummy in
+  let (sigs,counters) =
+    List.fold_right
+      (fun (name,sites,_) (acc,counters) ->
+        let (lnks,counters') =
+          create_t sites (("b",annot),("__incr",annot)) in
+        ((name,lnks)::acc,(name,counters')::counters))
+       l ([],[]) in
+  let sigs' = if with_counters then (add_incr counters)::sigs else sigs in
+  let t = Array.of_list sigs' in
   Signature.create with_contact_map t
 
 let compil_of_ast ~syntax_version overwrite c =
@@ -1809,7 +1828,7 @@ let compil_of_ast ~syntax_version overwrite c =
                   Locality.dummy))
       else Ast.implicit_signature c
     else c in
-  let sigs = create_sig c.Ast.signatures with_counters in
+  let sigs = create_sig c.Ast.signatures in
   let contact_map =
     Array.init
       (Signature.size sigs)

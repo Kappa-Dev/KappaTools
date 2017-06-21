@@ -34,17 +34,17 @@ File "counters.ka", line 21, characters 39-40:
 Warning: rule induces a link permutation on site 'c' of agent 'A'
 File "counters.ka", line 21, characters 11-12:
 Warning: rule induces a link permutation on site 'b' of agent '__incr'
+File "counters.ka", line 22, characters 15-16:
+Warning: rule induces a link permutation on site 'b' of agent '__incr'
 File "counters.ka", line 22, characters 11-12:
-Warning: rule induces a link permutation on site 'b' of agent '__incr'
-File "counters.ka", line 22, characters 15-16:
-Warning: rule induces a link permutation on site 'b' of agent '__incr'
-File "counters.ka", line 22, characters 45-46:
-Warning: rule induces a link permutation on site 'd' of agent 'A'
-File "counters.ka", line 22, characters 15-16:
 Warning: rule induces a link permutation on site 'b' of agent '__incr'
 File "counters.ka", line 22, characters 39-40:
 Warning: rule induces a link permutation on site 'c' of agent 'A'
 File "counters.ka", line 22, characters 11-12:
+Warning: rule induces a link permutation on site 'b' of agent '__incr'
+File "counters.ka", line 22, characters 45-46:
+Warning: rule induces a link permutation on site 'd' of agent 'A'
+File "counters.ka", line 22, characters 15-16:
 Warning: rule induces a link permutation on site 'b' of agent '__incr'
 File "counters.ka", line 23, characters 11-12:
 Warning: rule induces a link permutation on site 'b' of agent '__incr'
