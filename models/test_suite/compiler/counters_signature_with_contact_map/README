@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim -l 10 -seed 92067277 -d output sigs_contact.ka || true

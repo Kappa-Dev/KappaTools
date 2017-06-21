@@ -1,0 +1,22 @@
+Parsing sigs_contact.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 17 (sub)observables 36 navigation steps
+	 -initial conditions
++ Building initial state (64 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '10' '-seed' '92067277' '-d' 'output' 'sigs_contact.ka'
+____________________________________________________________
+############
+Counter c of agent B reached maximum
+
+################################################
+Simulation ended
