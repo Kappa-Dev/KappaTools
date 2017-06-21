@@ -199,7 +199,7 @@ let test_pass_on graph = function
 let tests_pass_on graph tests =
   List.for_all (test_pass_on graph) (List.concat tests)
 
-let is_step_triggerable sigs state = function
+let is_step_triggerable state = function
   | Trace.Subs _ | Trace.Init _
   | Trace.Pert _ | Trace.Obs _ | Trace.Dummy _ -> true
   | Trace.Rule (r, event, _info) ->
