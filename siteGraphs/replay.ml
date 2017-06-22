@@ -199,11 +199,14 @@ let test_pass_on graph = function
 let tests_pass_on graph tests =
   List.for_all (test_pass_on graph) (List.concat tests)
 
-let is_step_triggerable state = function
+let is_step_triggerable_on_edges graph = function
   | Trace.Subs _ | Trace.Init _
-  | Trace.Pert _ | Trace.Obs _ | Trace.Dummy _ -> true
-  | Trace.Rule (r, event, _info) ->
-    tests_pass_on state.graph event.Instantiation.tests
+  | Trace.Pert _ | Trace.Dummy _ -> true
+  | Trace.Rule (_r, event, _info) ->
+    tests_pass_on graph event.Instantiation.tests
+  | Trace.Obs (_, tests, _) -> tests_pass_on graph tests
+
+let is_step_triggerable state = is_step_triggerable_on_edges state.graph
 
 let do_step sigs state = function
   | Trace.Subs _ -> state,{ unary_distances = None }
