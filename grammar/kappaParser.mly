@@ -57,11 +57,21 @@ newline:
 
 start_rule:
     | newline {$1}
+    | LABEL rule_expression newline
+        {let out = (Some ($1, rhs_pos 1),$2) in
+	fun c -> let r = $3 c in {r with Ast.rules = out::r.Ast.rules}}
+    | LABEL edit_rule_expression newline
+        {let out = (Some ($1, rhs_pos 1),$2) in
+	fun c -> let r = $3 c in
+	{r with Ast.edit_rules = out::r.Ast.edit_rules}}
     | rule_expression newline
-        {fun c -> let r = $2 c in {r with Ast.rules = $1::r.Ast.rules}}
+        {fun c -> let r = $2 c in {r with Ast.rules = (None,$1)::r.Ast.rules}}
     | edit_rule_expression newline
         {fun c -> let r = $2 c in
-	{r with Ast.edit_rules = $1::r.Ast.edit_rules}}
+	{r with Ast.edit_rules = (None,$1)::r.Ast.edit_rules}}
+    | LABEL EQUAL alg_expr newline
+        {let out = (($1,rhs_pos 1),$3) in
+	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
     | instruction newline
 		  { fun c -> let r = $2 c in
 		      match $1 with
@@ -275,13 +285,6 @@ bool_expr:
 
 standalone_bool_expr: bool_expr EOF {$1}
 
-rule_label:
-  /*empty */
-      {None}
-    | LABEL
-	{Some (add_pos $1)}
-    ;
-
 lhs_rhs:
   mixture token_expr {($1,$2)};
 
@@ -299,20 +302,20 @@ sum_token:
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
 edit_rule_expression:
-	rule_label mixture token_expr AT rate
-	{ let (act,un_act) = $5 in
-	$1, {Ast.mix = $2; Ast.delta_token = $3; Ast.act; Ast.un_act} };
+	mixture token_expr AT rate
+	{ let (act,un_act) = $4 in
+	{Ast.mix = $1; Ast.delta_token = $2; Ast.act; Ast.un_act} };
 
 rule_expression:
-    | rule_label lhs_rhs arrow lhs_rhs birate
+    | lhs_rhs arrow lhs_rhs birate
 		 { let pos =
-		     Locality.of_pos (Parsing.rhs_start_pos 2)
+		     Locality.of_pos (Parsing.rhs_start_pos 1)
 				     (Parsing.symbol_end_pos ()) in
-		   let (k2,k1,kback,kback1) = $5 in
-		   let lhs,token_l = $2 and rhs,token_r = $4 in
-		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.bidirectional=$3;
+		   let (k2,k1,kback,kback1) = $4 in
+		   let lhs,token_l = $1 and rhs,token_r = $3 in
+		   ({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.bidirectional=$2;
 			 Ast.rhs=rhs; Ast.add_token = token_r;
-			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback; Ast.k_op_un=kback1},pos))
+			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback; Ast.k_op_un=kback1},pos)
 		 }
     ;
 
