@@ -53,6 +53,8 @@ module Make (Instances:Instances_sig.S) = struct
           Pattern.ObsMap.t;
     }
 
+  let get_edges st = st.edges
+
   let sum_instances_numbers insts l = 
     List.map (Instances.number_of_instances insts) l
     |> List.fold_left (+) 0
@@ -475,6 +477,14 @@ module Make (Instances:Instances_sig.S) = struct
       | Some (nc',s') ->
         Matching.observables_from_link
           domain edges acc nc s nc' s'
+
+
+  let obs_from_transformations domain state trans = 
+    List.fold_left
+      (obs_from_transformation domain state.edges)
+      (([],Operator.DepSet.empty),Matching.empty_cache)
+      trans
+    |> fst
 
   let path_tests path tests =
     let known_agents =
@@ -1092,5 +1102,10 @@ module Make (Instances:Instances_sig.S) = struct
 
   let send_instances_message msg state = 
     { state with instances = Instances.send_message msg state.instances}
+
+  let add_outdated_dependencies new_deps state = 
+    let former_deps,mod_connectivity = state.outdated_elements in
+    let deps = Operator.DepSet.union new_deps former_deps in
+    { state with outdated_elements = deps, mod_connectivity }
 
 end

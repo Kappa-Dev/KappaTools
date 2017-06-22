@@ -31,6 +31,8 @@ module Make (Instances:Instances_sig.S) : sig
 
   val activity : t -> float
 
+  val get_edges : t -> Edges.t
+
   (** {6 Core} *)
 
   val apply_given_rule :
@@ -124,4 +126,13 @@ module Make (Instances:Instances_sig.S) : sig
      (Instantiation.concrete Instantiation.site) list *
      Instances.t * Edges.t) *
     Instantiation.concrete Primitives.Transformation.t
+
+val obs_from_transformations : 
+  Pattern.Env.t -> t -> Agent.t Primitives.Transformation.t list ->
+  (Pattern.id * Agent.t) list * Operator.DepSet.t
+(** [obs_from_transformations domain state transformations]
+    @return [(obs, deps)] *)
+
+val add_outdated_dependencies : Operator.DepSet.t -> t -> t
+
 end

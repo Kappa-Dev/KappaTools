@@ -42,6 +42,7 @@ sig
     Signature.s -> Instantiation.concrete Instantiation.site list ->
     Instantiation.concrete Instantiation.action list ->
     Instantiation.concrete t list
+  (** [positive_transformations_of_actions signature side_effect_dsts actions] *)
 end
 
 type elementary_rule = {
