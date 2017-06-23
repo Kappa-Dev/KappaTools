@@ -148,27 +148,38 @@ module Transformation = struct
         f "@[%a.%a~ =@]" (Matching.Agent.print ?sigs) p
         (Matching.Agent.print_site ?sigs p) s
 
-  let get_negative_part graph ((a,_),s as p) (don,out) =
-    if List.mem p don then don,out
+  let get_negative_part created_agents graph ((a,_),s as p) (don,out) =
+    if List.mem p don || List.mem a created_agents then don,out
     else
       match Edges.link_destination a s graph with
       | None -> p::don, Freed p::out
       | Some p' -> p::p'::don, Linked (p,p')::out
 
+  let agents_created_by_action = function
+    | Instantiation.Create ((ag_id, _), _) -> [ag_id]
+    | _ -> []
+
+  let agents_created_by_actions actions = 
+    List.concat (List.map agents_created_by_action actions)
+
+
   let negative_transformations_of_actions sigs graph actions =
+    let created_agents = agents_created_by_actions actions in
     snd
       (List.fold_right
          (fun x (don,out as acc) -> match x with
             | Instantiation.Create (_,_) -> acc
-            | Instantiation.Mod_internal (p,_) ->
+            | Instantiation.Mod_internal (((id, _), _ as p),_) ->
+              if List.mem id created_agents then don, out else
               don, NegativeInternalized p::out
             | Instantiation.Bind (p1,p2)
             | Instantiation.Bind_to (p1,p2) ->
-              get_negative_part graph p1 (get_negative_part graph p2 acc)
+              get_negative_part created_agents graph p1
+                (get_negative_part created_agents graph p2 acc)
             | Instantiation.Free p ->
-              get_negative_part graph p acc
+              get_negative_part created_agents graph p acc
             | Instantiation.Remove (_,ty as a) ->
-              Tools.recti (fun st s -> get_negative_part graph (a,s) st)
+              Tools.recti (fun st s -> get_negative_part created_agents graph (a,s) st)
                 (don,Agent a::out) (Signature.arity sigs ty)
          )
          actions ([],[]))
