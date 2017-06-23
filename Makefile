@@ -247,6 +247,8 @@ clean_ide:
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
 	rm -rf Kappapp.app
+	rm -rf site
+	rm -rf python/__pycache__/
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
@@ -261,13 +263,12 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc cl
 	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
 	rm -f KaDE bin/KaDE META KappaLib.cm*
 	rm -rf KappaBin KappaBin.zip
-	rm -rf site generated
+	rm -rf generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 
 check:
 	@+$(MAKE) bin/sanity_test
-	@+$(MAKE) bin/KaSa_json
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
 
