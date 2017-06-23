@@ -1,2 +1,0 @@
-#Command-line:
-"${KAPPABIN}"KaSa ../dimer.ka --no-views-domain --no-sites-across-bonds-domain --output-directory output || exit 0
