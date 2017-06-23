@@ -6,10 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type t = {
-  of_patterns : IntCollection.t Pattern.ObsMap.t;
-  of_unary_patterns : Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t;
-}
+type t
 
 type mod_ccs_cache = (int, unit) Hashtbl.t
 

@@ -46,8 +46,8 @@ let number_of_instances st pats =
     (fun acc pattern ->  acc * (Roots.number st.roots pattern)) 1 pats
 
 let number_of_unary_instances_in_cc st (pat1, pat2) = 
-  let map1 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat1 in
-  let map2 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat2 in
+  let map1 = Roots.of_unary_pattern pat1 st.roots in
+  let map2 = Roots.of_unary_pattern pat2 st.roots in
   fun cc -> 
     let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc map1 in
     let set2 = Mods.IntMap.find_default Mods.IntSet.empty cc map2 in
@@ -58,8 +58,8 @@ let number_of_unary_instances_in_cc st (pat1, pat2) =
 (* {6 Pick instances } *)
 
 let pick_unary_instance_in_cc st random_state (pat1, pat2) =
-  let map1 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat1 in
-  let map2 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat2 in
+  let map1 = Roots.of_unary_pattern pat1 st.roots in
+  let map2 = Roots.of_unary_pattern pat2 st.roots in
   fun cc ->
     let root1 =
       Option_util.unsome (-1)
@@ -81,7 +81,7 @@ let fold_picked_instance st random_state pats ~init f =
       | Some acc -> 
         let pat = pats.(i) in
         let root_opt = IntCollection.random random_state
-          (Pattern.ObsMap.get st.roots.Roots.of_patterns pat) in
+          (Roots.of_pattern pat st.roots) in
           begin match root_opt with
           | None -> None
           | Some root ->
@@ -119,7 +119,7 @@ let fold_instances' ?excp st pats ~init f =
       f (Array.to_list tab) acc
     else
       if sent_to_excp_root i then begin tab.(i) <- excp_root ; aux (i+1) acc end else
-      let ith_roots = Pattern.ObsMap.get st.roots.Roots.of_patterns pats.(i) in
+      let ith_roots = Roots.of_pattern pats.(i) st.roots  in
       IntCollection.fold (fun r acc ->
         tab.(i) <- r ;
         aux (i + 1) acc
@@ -141,7 +141,7 @@ let fold_instances' ?excp st pats ~init f =
             let () = IntCollection.add excp_root c in
             c
           else 
-            Pattern.ObsMap.get st.roots.Roots.of_patterns pat in
+            Roots.of_pattern pat st.roots in
 
         IntCollection.fold (fun root new_instances ->
           instances |> List.fold_left (fun new_instances instance ->
@@ -164,8 +164,8 @@ let map_fold2 map1 map2 ~init f =
   |> snd
 
 let fold_unary_instances st (pat1, pat2) ~init f =
-  let map1 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat1 in
-  let map2 = Pattern.ObsMap.get st.roots.Roots.of_unary_patterns pat2 in
+  let map1 = Roots.of_unary_pattern pat1 st.roots in
+  let map2 = Roots.of_unary_pattern pat2 st.roots in
   map_fold2 map1 map2 ~init (fun _ set1 set2 acc ->
     Mods.IntSet.fold (fun root1 acc ->
       Mods.IntSet.fold (fun root2 acc ->
