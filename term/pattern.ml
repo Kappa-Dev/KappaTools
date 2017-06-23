@@ -917,11 +917,12 @@ end = struct
              (point_to_yojson x)::acc) env.domain []);
       "id_by_type", `List
          (Array.fold_right (fun x acc ->
-             `List (List.map (fun i -> `Int i) x)::acc) env.id_by_type [])
+             `List (List.map (fun i -> `Int i) x)::acc) env.id_by_type []);
+      "max_obs", `Int env.max_obs
     ]
 
   let of_yojson = function
-    | `Assoc l as x when List.length l = 5 ->
+    | `Assoc l as x when List.length l = 6 ->
       begin
         let sig_decl = Signature.of_json (List.assoc "signatures" l) in
         try
@@ -960,7 +961,9 @@ end = struct
                            | _ -> raise Not_found) l
                        | _ -> raise Not_found) l
                 | _ -> raise Not_found);
-            max_obs = -1;
+            max_obs = (match List.assoc "max_obs" l with 
+                        | `Int i -> i 
+                        | _ -> raise Not_found)
           }
         with Not_found ->
           raise (Yojson.Basic.Util.Type_error ("Incorrect update domain",x))
