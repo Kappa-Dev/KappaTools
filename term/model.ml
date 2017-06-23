@@ -347,3 +347,14 @@ let of_yojson = function
         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
+
+let unary_patterns env = 
+  fold_rules
+    (fun _ acc r ->
+        match r.Primitives.unary_rate with
+        | None -> acc
+        | Some _ ->
+          Pattern.Set.add
+            r.Primitives.connected_components.(0)
+            (Pattern.Set.add r.Primitives.connected_components.(1) acc)
+    ) Pattern.Set.empty env
