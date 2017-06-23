@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa sep_transitions2.ka  --compute-separating-transitions --output-directory output || exit 0
+"${KAPPABIN}"KaSa sep_transitions2.ka  --compute-separating-transitions --output-directory output || exit 0
