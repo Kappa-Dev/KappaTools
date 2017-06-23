@@ -95,3 +95,5 @@ val propagate_constant :
   ?max_time:float -> ?max_events:int ->
   int list -> (int * Alg_expr.t) list -> t -> t
 (** [propagate_constant updated_vars overwrite_vars env] *)
+
+val unary_patterns : t -> Pattern.Set.t

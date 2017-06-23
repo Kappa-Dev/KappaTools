@@ -105,16 +105,7 @@ module Make (Instances:Instances_sig.S) = struct
 
   let empty ~with_trace random_state env counter =
     let activity_tree = Random_tree.create (2*Model.nb_rules env) in
-    let unary_patterns =
-      Model.fold_rules
-        (fun _ acc r ->
-           match r.Primitives.unary_rate with
-           | None -> acc
-           | Some _ ->
-             Pattern.Set.add
-               r.Primitives.connected_components.(0)
-               (Pattern.Set.add r.Primitives.connected_components.(1) acc)
-        ) Pattern.Set.empty env in
+    let unary_patterns = Model.unary_patterns env in
     let always_outdated =
       let (deps_in_t,deps_in_e,_,_) = Model.all_dependencies env in
       Operator.DepSet.union deps_in_t deps_in_e in
