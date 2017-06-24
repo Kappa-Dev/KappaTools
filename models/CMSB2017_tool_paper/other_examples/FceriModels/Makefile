@@ -36,17 +36,17 @@ clean:
 
 %.kade: %.ka
 	echo Process without symmetries------------ >> $(LOG)
-	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --dotnet-output network_$*_wo_sym.net --propagate-constants >> $(LOG) |exit 0
+	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --dotnet-output network_$*_wo_sym.net  >> $(LOG) |exit 0
 	touch $@
 
 %.kade_fwd: %.ka
 	echo Process with forward symmetries------- >> $(LOG)
-	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --with-symmetries Forward  --propagate-constants --dotnet-output network_$*_with_fsym.net >> $(LOG) |exit 0
+	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --with-symmetries Forward   --dotnet-output network_$*_with_fsym.net >> $(LOG) |exit 0
 	touch $@
 
 %.kade_bwd: %.ka
 	echo Process with backward symmetries------ >> $(LOG)
-	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --with-symmetries Backward --propagate-constants --dotnet-output network_$*_with_bsym.net >> $(LOG) |exit 0
+	$(TIMEOUTBIN) $(KADE) $<  --print-efficiency --ode-backend DOTNET --with-symmetries Backward  --dotnet-output network_$*_with_bsym.net >> $(LOG) |exit 0
 	touch $@
 
 %.kasa: %.ka
