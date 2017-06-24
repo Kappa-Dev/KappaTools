@@ -177,30 +177,4 @@ let fold_unary_instances st (pat1, pat2) ~init f =
 
 (** {6 Debug functions} *)
 
-let print_injections ?domain f roots_of_patterns =
-  Format.fprintf
-    f "@[<v>%a@]"
-    (Pattern.ObsMap.print Pp.space
-       (fun pattern f roots ->
-          Format.fprintf
-            f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
-            IntCollection.print roots
-       )
-    ) roots_of_patterns
-let print_unary_injections ?domain f roots_of_patterns =
-  Format.fprintf
-    f "@[<v>%a@]"
-    (Pattern.ObsMap.print Pp.space
-       (fun pattern f root_maps ->
-          Format.fprintf
-            f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
-            (Pp.set Mods.IntMap.bindings Pp.space
-               (fun f (_cc_id, roots) -> Mods.IntSet.print f roots))
-            root_maps
-       )
-    ) roots_of_patterns
-
-let debug_print f state =
-  Roots.debug_print f state.roots
+let debug_print f state = Roots.debug_print f state.roots

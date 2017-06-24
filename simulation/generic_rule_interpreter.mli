@@ -128,11 +128,13 @@ module Make (Instances:Instances_sig.S) : sig
     Instantiation.concrete Primitives.Transformation.t
 
 val obs_from_transformations : 
-  Pattern.Env.t -> t -> Agent.t Primitives.Transformation.t list ->
+  Pattern.Env.t -> Edges.t -> Agent.t Primitives.Transformation.t list ->
   (Pattern.id * Agent.t) list * Operator.DepSet.t
 (** [obs_from_transformations domain state transformations]
     @return [(obs, deps)] *)
 
 val add_outdated_dependencies : Operator.DepSet.t -> t -> t
+
+val debug_print_instances : Format.formatter -> t -> unit
 
 end

@@ -14,6 +14,8 @@ type t = cc (**type for domain points*)
 
 type id
 
+val debug_print_id : Format.formatter -> id -> unit
+
 module ObsMap : sig
   (** Maps from patterns to something *)
 
