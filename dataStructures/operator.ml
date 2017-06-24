@@ -140,3 +140,16 @@ module DepSetMap = SetMap.Make (struct type t = rev_dep
     let compare = compare
     let print = print_rev_dep end)
 module DepSet = DepSetMap.Set
+
+let depset_to_yojson x =
+  `List (DepSet.fold
+           (fun x a -> rev_dep_to_yojson x :: a) x [])
+
+let depset_of_yojson = function
+  | `Null -> DepSet.empty
+  | `List l ->
+    List.fold_left
+      (fun acc x -> DepSet.add (rev_dep_of_yojson x) acc)
+      DepSet.empty l
+  | x -> raise (Yojson.Basic.Util.Type_error("Invalid depset",x))
+

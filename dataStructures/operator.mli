@@ -43,3 +43,6 @@ module DepSet : SetMap.Set with type elt = rev_dep
 val print_rev_dep : Format.formatter -> rev_dep -> unit
 val rev_dep_to_yojson : rev_dep -> Yojson.Basic.json
 val rev_dep_of_yojson : Yojson.Basic.json -> rev_dep
+
+val depset_to_yojson : DepSet.t -> Yojson.Basic.json
+val depset_of_yojson : Yojson.Basic.json -> DepSet.t

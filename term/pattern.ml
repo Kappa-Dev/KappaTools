@@ -874,7 +874,7 @@ end = struct
       "roots", JsonUtil.of_option
         (fun (ids,ty) ->
            `List [`List (List.map JsonUtil.of_int ids); `Int ty]) p.roots;
-      "deps", `Bool (not @@ Operator.DepSet.is_empty p.deps);
+      "deps", Operator.depset_to_yojson p.deps;
       "sons", `List (List.map transition_to_yojson p.sons);
     ]
 
@@ -888,7 +888,7 @@ end = struct
               | `List [ `List ids; `Int ty ] ->
                 Some (List.map Yojson.Basic.Util.to_int ids,ty)
               | _ -> raise Not_found);
-          deps = Operator.DepSet.empty;
+          deps = Operator.depset_of_yojson (List.assoc "deps" l);
           sons = (match List.assoc "sons" l with
               | `List l -> List.map transition_of_yojson l
               | _ -> raise Not_found);
