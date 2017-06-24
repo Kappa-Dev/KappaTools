@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jun 08 2017>
+  * Last modification: Time-stamp: <Jun 24 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -290,8 +290,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
     in
     let logger_buffer =
       match backend with
-      | Loggers.DOTNET
       | Loggers.SBML -> Loggers.open_infinite_buffer ~mode:backend ()
+      | Loggers.DOTNET
       | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
       | Loggers.HTML_Tabular
       | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular

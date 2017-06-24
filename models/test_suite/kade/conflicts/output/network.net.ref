@@ -14,11 +14,6 @@
 # variables (init(i),y(i)) denote numbers of embeddings 
 # rule rates are corrected by the number of automorphisms in the lhs of rules
 
-begin species
- 1 A() 0
- 2 I() 0
-end species
-
 begin parameters
 1 tinit 0
 2 tend 1
@@ -29,6 +24,11 @@ begin parameters
 7 k2_ 3
 8 k3 k2+k1
 end parameters
+
+begin species
+ 1 A() 0
+ 2 I() 0
+end species
 
 
 begin reactions
