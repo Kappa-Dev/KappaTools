@@ -129,9 +129,20 @@ let print_injections ?domain f roots_of_patterns =
        )
     ) roots_of_patterns
 
+let print_injections' ?domain f roots_of_patterns =
+  Format.fprintf f "@[<v>" ;
+  Pattern.ObsMap.fold_lefti (fun pattern () roots ->
+    if IntCollection.size roots > 0 then
+      Format.fprintf f "@[# @[%a@] ==>@ @[%a@]@]@;"
+            (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
+            IntCollection.print roots
+  ) () roots_of_patterns ;
+  Format.fprintf f "@]@."
+
+
 let print_unary_injections ?domain f roots_of_patterns =
   Format.fprintf
-    f "@[<v>%a@]"
+    f "@[<hov>%a@]"
     (Pattern.ObsMap.print Pp.space
        (fun pattern f root_maps ->
           Format.fprintf
@@ -144,8 +155,8 @@ let print_unary_injections ?domain f roots_of_patterns =
     ) roots_of_patterns
 
   let debug_print f state =
-    let () = print_injections ?domain:None f state.of_patterns in
-    print_unary_injections ?domain:None f state.of_unary_patterns
+    print_injections' ?domain:None f state.of_patterns
+    (* print_unary_injections ?domain:None f state.of_unary_patterns *)
 
 
 (* Useful shortcuts *)
