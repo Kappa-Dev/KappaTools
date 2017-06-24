@@ -234,7 +234,7 @@ let file_select_handler _ _ : unit Lwt.t =
   in
   let file_id = Js.to_string file##.name in
   let () = Menu_editor_file_controller.create_file
-      ~text:(File.readAsText file) file_id in
+      ~text:(Lwt_file.readAsText file) file_id in
   let () = open_input_dom##.value := Js.string "" in
   Lwt.return_unit
 

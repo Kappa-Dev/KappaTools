@@ -146,11 +146,11 @@ let create_manager ~is_new project_id =
     let version_url : string = Format.sprintf "%s/v2" url in
     let () = Common.debug
         (Js.string (Format.sprintf "set_runtime_url: %s" version_url)) in
-    (XmlHttpRequest.perform_raw
+    (Lwt_xmlHttpRequest.perform_raw
        ~response_type:XmlHttpRequest.Text
        version_url) >>=
     (fun frame ->
-       let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
+       let is_valid_server : bool = frame.Lwt_xmlHttpRequest.code = 200 in
        if is_valid_server then
          let () = State_settings.set_synch true in
          let manager = new Rest_api.manager
@@ -165,7 +165,7 @@ let create_manager ~is_new project_id =
        else
          let error_msg : string =
            Format.sprintf "Bad Response %d from %s "
-             frame.XmlHttpRequest.code url in
+             frame.Lwt_xmlHttpRequest.code url in
          Lwt.return (Api_common.result_error_msg error_msg)
     )
 
@@ -234,11 +234,11 @@ let init () =
     let version_url : string = Format.sprintf "%s/v2" url in
     let () = Common.debug
         (Js.string (Format.sprintf "set_runtime_url: %s" version_url)) in
-    (XmlHttpRequest.perform_raw
+    (Lwt_xmlHttpRequest.perform_raw
        ~response_type:XmlHttpRequest.Text
        version_url) >>=
     (fun frame ->
-       let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
+       let is_valid_server : bool = frame.Lwt_xmlHttpRequest.code = 200 in
        if is_valid_server then
          let () = State_settings.set_synch true in
          let manager = new Rest_api.manager
