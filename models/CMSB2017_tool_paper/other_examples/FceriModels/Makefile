@@ -51,7 +51,7 @@ clean:
 
 %.kasa: %.ka
 	echo Process symmetries computation-------- >> $(LOG)
-	$(TIMEOUTBIN) $(KASA) $<  --print-efficiency --no-do-all --compute-symmetries >> $(LOG) |exit 0
+	$(TIMEOUTBIN) $(KASA) $<  --print-efficiency --reset-all --compute-symmetries >> $(LOG) |exit 0
 	touch $@
 
 %.bngl_with_sym: %.bngl
