@@ -1,5 +1,5 @@
 WWWDIR=$(HOME)/www/shtml/CMSB2017-tool-paper/
-OUTPUT= parametric_models_models_only.tgz parametric_models_all_files.tgz kinase_phosphatase.tgz n_phos_sites.tgz n_phos_sites_with_counter.tgz other_examples_models_only.tgz other_examples_all_files.tgz
+OUTPUT= parametric_models_models_only.tgz parametric_models_all_files.tgz kinase_phosphatase.tgz n_phos_sites.tgz n_phos_sites_with_counter.tgz other_examples_models_only.tgz other_examples_all_files.tgz other_examples_individual_files kinase_phosphatase_individual_files n_phos_sites_individual_files n_phos_sites_with_counter_individual_files
 all: clean $(OUTPUT)
 
 clean:
@@ -86,3 +86,26 @@ other_examples_all_files.tgz:
 	cp tmp/$@ .
 	cp $@ $(WWWDIR)
 	rm -rf tmp
+
+other_examples_individual_files:
+	cp other_examples/*.ka $(WWWDIR)bngl_models/
+	cp other_examples/*.bngl $(WWWDIR)bngl_models/
+	cp other_examples/*.net $(WWWDIR)bngl_models/
+	cp other_examples/FceriModels/*.ka $(WWWDIR)bngl_models/FceriModels/
+	cp other_examples/FceriModels/*.bngl $(WWWDIR)bngl_models/FceriModels/
+	cp other_examples/FceriModels/*.net $(WWWDIR)bngl_models/FceriModels/
+
+kinase_phosphatase_individual_files:
+	cp parametric_models/generated_models/kinase_phosphatase/*.ka $(WWWDIR)parametric_models/generated_models/kinase_phosphatase/
+	cp parametric_models/generated_models/kinase_phosphatase/*.bngl $(WWWDIR)parametric_models/generated_models/kinase_phosphatase/
+	cp parametric_models/generated_models/kinase_phosphatase/*.net $(WWWDIR)parametric_models/generated_models/kinase_phosphatase/
+
+n_phos_sites_individual_files:
+	cp parametric_models/generated_models/n_phos_sites/*.ka $(WWWDIR)parametric_models/generated_models/n_phos_sites/
+	cp parametric_models/generated_models/n_phos_sites/*.bngl $(WWWDIR)parametric_models/generated_models/n_phos_sites/
+	cp parametric_models/generated_models/n_phos_sites/*.net $(WWWDIR)parametric_models/generated_models/n_phos_sites/
+
+n_phos_sites_with_counter_individual_files:
+	cp parametric_models/generated_models/n_phos_sites_with_counter/*.ka $(WWWDIR)parametric_models/generated_models/n_phos_sites_with_counter/
+	cp parametric_models/generated_models/n_phos_sites_with_counter/*.bngl $(WWWDIR)parametric_models/generated_models/n_phos_sites_with_counter/
+	cp parametric_models/generated_models/n_phos_sites_with_counter/*.net $(WWWDIR)parametric_models/generated_models/n_phos_sites_with_counter/
