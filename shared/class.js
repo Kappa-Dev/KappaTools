@@ -1,5 +1,14 @@
 /*jshint esversion: 6*/
 
+var opacity = {
+    node_normal: 1,
+    node_hidden: 0.25,
+    line_highlight: 0.9, 
+    line_normal: 0.4,
+    line_side: 0.15,
+    line_hidden: 0.1
+};
+
 /* Contains classes required for the SiteGraph visualization */
 
 class Dimension {
@@ -117,7 +126,6 @@ class Site extends D3Object {
     generateTreeObj() {
         let treeObj = {};
         treeObj.name = this.label;
-        console.log(this.states);
         let childArray = [];
         if(this.states !== undefined) {
             for (let state in this.states) {
@@ -149,6 +157,8 @@ class Node extends D3Object {
     constructor (nodeData) {
         super(nodeData.site_node_name);
         let node = this;
+        this.clicked = 0; // for detect cycle
+        this.side = 0; // for detect cycle
         this.sites = nodeData.site_node_sites.map(function(siteData, i) {
             let site = new Site(siteData, node);
             site.setId(i); 

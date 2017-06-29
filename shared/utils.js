@@ -19,3 +19,9 @@ function calculateTextWidth(size) {
         return tWidth;
 
     }
+
+function dedup(array) {
+  return array.filter((elem, pos, arr) => {
+    return array.indexOf(elem) == pos;
+  });
+}

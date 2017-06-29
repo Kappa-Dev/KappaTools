@@ -4,7 +4,9 @@
 html { position: relative;
        min-height: 100%; }
 
-body { margin-bottom: 60px; }
+
+body { 
+    margin-bottom: 60px; }
 
 
 span.filler:empty:before {
@@ -164,34 +166,77 @@ rect { stroke-width: 2; }
                    border-radius : 4px;
                    opacity : 0.8; }
 
+
 .link {
-stroke: steelblue;
-stroke-opacity: 0.4;
-fill: none;
-pointer-events: none;
+  stroke: steelblue;
+  stroke-opacity: 0.4;
+  stroke-width:2;
+  fill: none;
 }
 
 .node { cursor: pointer; }
 
-.tooltip {
-  position: absolute;
-  text-align: center;
-  border: 0px;
-  border-radius: 8px;
+.offset {
+  transition: stroke-dashoffset 3000ms ease;
+  stroke-dashoffset: 100%;
 }
 
-.stateButtonDiv {
-    position: absolute;
-    text-align: center;   
+.tooltip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  white-space: pre;
+  text-align: right;
+}
+.toolbox {
+  position: absolute;
+  bottom: 0;
+  right : 0;
+  text-align:right;
+  padding-right:10px;
 }
 
 .stateButton {
-    background-color: #4CAF50; /* Green */
-    border: none;
-    color: white;
-    padding: 10px 16px;
+    background-color: rgba(182, 255, 165, 0.5);
+    border: 1px solid #4CAF50;
+    border-radius:6px;
+    color: #333;
+    cursor:pointer;
+    padding: 10px 14px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 14px;
+    outline:none;
+    margin-top:10px;
+}
+
+.stateButton:hover {
+  background-color: rgb(182,255,165);
+}
+
+
+#cycleCheckbox + label {
+  margin-left:5px;
+  margin-right:5px;
+}
+
+#toggleLines + label {
+  margin-left:5px;
+}
+
+#toggleLines[disabled] + label {
+  color: #ccc;
+}
+
+#contact-map-display {
+    -moz-osx-font-smoothing:grayscale;
+    -webkit-font-smoothing:antialiased;
+    font: 14px helvetica, arial, sans-serif;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 0%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
 }
