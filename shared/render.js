@@ -50,7 +50,6 @@ class ContactMap {
 
 }
 
-
 class Render {
     constructor(root, layout) {
         this.root = root;
@@ -377,16 +376,17 @@ class Render {
     }
 
     renderStates() {
+        let paddingSite = calculateTextWidth("110%") / 2;
         let siteRadius = this.siteRadius;
         let lineScale = this.radius/60;
         let lineLength;   
         let width = this.width;
         let height = this.height;
         let outerRadius = this.outerRadius;
-        let siteNum = this.siteList.length;
+        let siteNum = this.siteNum = this.siteList.length;
         for (let sIndex in this.siteList) {
             let site = this.siteList[sIndex];
-            let textLength = this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.label === site.label && d.data.agent.label === site.agent.label ;}).node().getComputedTextLength() * 1.4;
+            let textLength = this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.label === site.label && d.data.agent.label === site.agent.label ;}).node().getComputedTextLength() + paddingSite;
                 let gState = this.svg.selectAll('.stateLink')
                     .data(this.siteList);
 
@@ -395,7 +395,7 @@ class Render {
                     .filter( d => d.label === site.label && d.agent.label === site.agent.label )   
                     .append('g') 
                     .attr('class','stateLink')
-                    .attr('id', function(d) { return "stateLink" + d.agent.id + d.id; })
+                    .attr('id', function(d) { return "stateLink" + "a" + d.agent.id + "s" + d.id; })
                     .attr('opacity', 0);
                 
                 if (site.states.length > 0) { 
@@ -403,19 +403,29 @@ class Render {
                         .attr('transform', d => 'rotate(' + d.getAngle() * 180/Math.PI + ')')
                         .attr('stroke', d => site.agent.color.darker() )
                         .attr('stroke-width', 2)
-                        .attr('x1', this.outerRadius + siteRadius + textLength)
                         .attr('x2', d => {
-                            lineLength = lineScale * 3 * site.states.length + lineScale/8 * siteNum;
-                            if(lineLength < this.radius/4) {
+                            lineLength = lineScale * 6 * site.states.length + lineScale/8 * siteNum;
+                            if (lineLength < textLength) {
+                                lineLength = textLength + 5;
+                            }
+                            else if(lineLength < this.radius/4) {
                                 lineLength = this.radius/4;
                             }
-                            return outerRadius + siteRadius + textLength + (lineLength - textLength);
+                            return outerRadius + siteRadius + lineLength;
+                        })
+                        .attr('x1', d => {
+                            let lineStart;
+                            lineStart = this.outerRadius + siteRadius + textLength;
+                            if (textLength > lineLength) {
+                                lineStart = textLength;
+                            }
+                            return lineStart;
                         })
                         .transition();
 
                     let stateArc = d3.arc()
-                            .outerRadius(this.outerRadius + siteRadius + textLength + (lineLength - textLength) + 1.5 )
-                            .innerRadius(this.outerRadius + siteRadius + textLength + (lineLength - textLength))
+                            .outerRadius(this.outerRadius + siteRadius + lineLength + 1.5 )
+                            .innerRadius(this.outerRadius + siteRadius + lineLength)
                             .startAngle( d => d.startAngle )
                             .endAngle( d => d.endAngle )
                             .padAngle(Math.PI/(10 * siteNum));
@@ -423,10 +433,9 @@ class Render {
                     
                     stateLine.append('path')
                         .attr("d", stateArc)
+                        .attr("id", d => "stateArc" + "a" + site.agent.id + "s" + site.id)
                         .style("fill", d => site.agent.color.darker() );
 
-                    
-                    
                     for ( let state in site.states ) {
                         if (state) {
                             stateLine.append("text")
@@ -437,11 +446,12 @@ class Render {
                                         return "end"; 
                                     })
                                 .attr("class", "stateText")
+                                .attr("id", "stateText" + "a" + site.agent.id + "s" + site.id + "id" + state)
                                 .attr('alignment-baseline', "middle")
                                 .style("fill", d => site.agent.color.darker() )
                                 .style('font-size', '110%')
                                 .attr("transform", d => {
-                                    let r = (outerRadius + textLength + siteRadius + (lineLength - textLength) + 10);
+                                    let r = (outerRadius + siteRadius + lineLength  + 10);
                                     
                                     let offset = (d.endAngle - d.startAngle)/(site.states.length + 1);
                                     let angle = d.startAngle + 3/2 * Math.PI + (state) * offset + offset;
@@ -799,9 +809,6 @@ class Render {
                 let innerSite = d;
                 let links = innerSite.links;
                 let targetSites = [];
-                d3.select(this)
-                    .style("stroke", () => innerSite.currentColor );
-
                 renderer.resetLinksAndEdges();
             }
         }
@@ -882,14 +889,17 @@ class Render {
     }
 
     adjustState(site, circle, hide, text, textMove) {
-        let paddingSite = calculateTextWidth("150%") * 2;
+        let paddingSite = calculateTextWidth("110%") / 2;
         let siteRadius = this.siteRadius;
+        let radius = this.radius;
         let outerRadius = this.outerRadius;
+        let siteNum = this.siteNum;
+        let lineScale = radius/60;
         d3.select(circle).style("fill", function() {                
                 return site.currentColor;
             }).attr("r", function() { 
                 if(!hide) {
-                    return siteRadius * 2.5; }
+                    return siteRadius * 2; }
                 else {
                     return siteRadius; 
                 }
@@ -927,19 +937,68 @@ class Render {
                                                     }); 
             }
 
-            let stateLine = d3.select("#stateLink" + site.agent.id + site.id);
-            let siteLength = siteText.node().getComputedTextLength() * 1.4 + this.radius/30;
-
+            let stateLine = d3.select("#stateLink" + "a" + site.agent.id + "s" + site.id);
+            let textLength = siteText.node().getComputedTextLength() + paddingSite + this.radius/30;
+            let lineLength;
             if (!hide) {
-                stateLine.selectAll("line")
-                    .attr("x1", () => outerRadius + siteLength + 2.5 * siteRadius);
+                adjustStateLines(true)
                 stateLine.attr("opacity", 1);
             }
             else {
-                stateLine.selectAll("line")
-                .attr("x1", () => outerRadius + siteLength + siteRadius);
+                adjustStateLines(false);
                 if (!site.clicked) {
                     stateLine.attr('opacity', 0);   
+            }
+
+            
+        }
+    
+        function adjustStateLines(mouseover) {
+            stateLine.selectAll("line")
+                .attr('x2', d => {
+                        lineLength = lineScale * 6 * site.states.length + lineScale/8 * siteNum;
+                        if (lineLength < textLength) {
+                            lineLength = textLength + 5;
+                        }
+                        else if(lineLength < radius/4) {
+                            lineLength = radius/4;
+                        }
+                        return outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength;
+                    })
+                .attr('x1', d => {
+                    let lineStart;
+                    lineStart = outerRadius + 2 * siteRadius + textLength;
+                    if (textLength > lineLength) {
+                        lineStart = textLength + siteRadius;
+                    }
+                    return lineStart;
+                });
+            
+            let stateArc = d3.arc()
+                        .outerRadius(outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength + 1.5 )
+                        .innerRadius(outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength)
+                        .startAngle( site.startAngle )
+                        .endAngle( site.endAngle )
+                        .padAngle(Math.PI/(10 * siteNum));
+            
+            let arcPath = d3.select("#stateArc" + "a" + site.agent.id + "s" + site.id);
+                arcPath.attr("d", stateArc);
+            
+            for (let state in site.states) {
+                let stateText = d3.selectAll("#stateText" + "a" + site.agent.id + "s" + site.id + "id" + state);
+                    stateText
+                            .attr("transform", d => {
+                                let r = (outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength  + 10);
+                                let offset = (d.endAngle - d.startAngle)/(site.states.length + 1);
+                                let angle = d.startAngle + 3/2 * Math.PI + (state) * offset + offset;
+                                let newX = r * Math.cos(angle) ;
+                                let newY = r * Math.sin(angle) ;
+                                if ( ((d.startAngle + d.endAngle + 3 * Math.PI ) / 2 >= 5 * Math.PI/2)) {
+                                    angle += Math.PI;
+                                } 
+                                return "translate(" + newX + "," + newY + ") rotate(" + angle * 180/Math.PI + ")";
+                            });
+            
             }
         }
     }

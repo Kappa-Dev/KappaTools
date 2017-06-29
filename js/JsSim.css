@@ -187,6 +187,7 @@ rect { stroke-width: 2; }
   right: 0;
   white-space: pre;
   text-align: right;
+  background-color: white;
 }
 .toolbox {
   position: absolute;
