@@ -21,7 +21,6 @@ class ContactMap {
     setData(response) {
         let map = this;
 	    let root = d3.select(this.id);
-        console.log(this.id);
         map.data = new DataStorage(JSON.parse(response),0);
         map.data.sortNodes();
         map.data.sortSites();
@@ -115,6 +114,7 @@ class Render {
         this.renderLinks();
         this.renderSitetoEdgeLinks();
         this.renderStates();
+        this.checkStateCollusion(110);
     }
 
     rerender() {
@@ -411,7 +411,8 @@ class Render {
                             else if(lineLength < this.radius/4) {
                                 lineLength = this.radius/4;
                             }
-                            return outerRadius + siteRadius + lineLength;
+                            d.x2 = outerRadius + siteRadius + lineLength;
+                            return d.x2;
                         })
                         .attr('x1', d => {
                             let lineStart;
@@ -419,7 +420,8 @@ class Render {
                             if (textLength > lineLength) {
                                 lineStart = textLength;
                             }
-                            return lineStart;
+                            d.x1 = lineStart;
+                            return d.x1;
                         })
                         .transition();
 
@@ -452,9 +454,8 @@ class Render {
                                 .style('font-size', '110%')
                                 .attr("transform", d => {
                                     let r = (outerRadius + siteRadius + lineLength  + 10);
-                                    
-                                    let offset = (d.endAngle - d.startAngle)/(site.states.length + 1);
-                                    let angle = d.startAngle + 3/2 * Math.PI + (state) * offset + offset;
+                                    let offset = (d.endAngle - d.startAngle - 2 * Math.PI/(10 * siteNum))/(site.states.length);
+                                    let angle = d.startAngle + Math.PI/(10 * siteNum) + 3/2 * Math.PI + (state) * offset + offset/2;
                                     let newX = r * Math.cos(angle) ;
                                     let newY = r * Math.sin(angle) ;
                                     if ( ((d.startAngle + d.endAngle + 3 * Math.PI ) / 2 >= 5 * Math.PI/2)) {
@@ -463,14 +464,41 @@ class Render {
                                     return "translate(" + newX + "," + newY + ") rotate(" + angle * 180/Math.PI + ")";
                                 })
                                 .text(site.states[state].name);
-                        }
-                    
+                        }                    
                     }
+
+                  
+                    
                 }
-            }        
+
+            } 
+           
         
         }
 
+    checkStateCollusion(textSize) {
+         /* collision detection from stackoverflow https://stackoverflow.com/questions/19681724/how-to-avoid-labels-overlapping-in-a-d3-js-pie-chart */
+            let prev;
+            let count = 0;
+                    this.svg.selectAll(".stateText").each( function(d,i) {
+                        if (i > 0) {
+                            let thisbb = this.getBoundingClientRect(),
+                                prevbb = prev.getBoundingClientRect();
+
+                            if(!(thisbb.right < prevbb.left || 
+                                thisbb.left > prevbb.right || 
+                                thisbb.bottom < prevbb.top || 
+                                thisbb.top > prevbb.bottom)) {
+                                    d3.select(this).style("font-size", ( textSize - 10 )+ "%");                                    
+                                    d3.select(prev).style("font-size", ( textSize - 10 )+ "%");
+                                    count += 1;
+                                }
+                        }
+                        prev = this;
+                    });       
+            if (count > 0)
+                this.checkStateCollusion(textSize - 20);
+    }
     renderDonut() {
         let siteRadius = this.siteRadius;
         let siteList = this.siteList;
@@ -963,7 +991,7 @@ class Render {
                         else if(lineLength < radius/4) {
                             lineLength = radius/4;
                         }
-                        return outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength;
+                        return mouseover ? outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength: d.x2;
                     })
                 .attr('x1', d => {
                     let lineStart;
@@ -971,8 +999,9 @@ class Render {
                     if (textLength > lineLength) {
                         lineStart = textLength + siteRadius;
                     }
-                    return lineStart;
+                    return mouseover ? lineStart: d.x1;
                 });
+            
             
             let stateArc = d3.arc()
                         .outerRadius(outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength + 1.5 )
@@ -989,8 +1018,8 @@ class Render {
                     stateText
                             .attr("transform", d => {
                                 let r = (outerRadius + (mouseover ? 2: 1) * siteRadius + lineLength  + 10);
-                                let offset = (d.endAngle - d.startAngle)/(site.states.length + 1);
-                                let angle = d.startAngle + 3/2 * Math.PI + (state) * offset + offset;
+                                let offset = (d.endAngle - d.startAngle - 2 * Math.PI/(10 * siteNum))/(site.states.length);
+                                let angle = d.startAngle + Math.PI/(10 * siteNum) + 3/2 * Math.PI + (state) * offset + offset/2;
                                 let newX = r * Math.cos(angle) ;
                                 let newY = r * Math.sin(angle) ;
                                 if ( ((d.startAngle + d.endAngle + 3 * Math.PI ) / 2 >= 5 * Math.PI/2)) {
