@@ -114,7 +114,7 @@ class Render {
         this.renderLinks();
         this.renderSitetoEdgeLinks();
         this.renderStates();
-        this.checkStateCollusion(110);
+        //this.checkStateCollusion(110);
     }
 
     rerender() {
@@ -451,7 +451,11 @@ class Render {
                                 .attr("id", "stateText" + "a" + site.agent.id + "s" + site.id + "id" + state)
                                 .attr('alignment-baseline', "middle")
                                 .style("fill", d => site.agent.color.darker() )
-                                .style('font-size', '110%')
+                                .style('font-size', d => {
+                                    let textSize = 2000 / (siteNum/4 + 6 * site.states.length - this.radius/25);
+                                    textSize = textSize > 110 ? 110: textSize;
+                                    return textSize + "%";
+                                })
                                 .attr("transform", d => {
                                     let r = (outerRadius + siteRadius + lineLength  + 10);
                                     let offset = (d.endAngle - d.startAngle - 2 * Math.PI/(10 * siteNum))/(site.states.length);
@@ -475,10 +479,10 @@ class Render {
            
         
         }
-
+/*
     checkStateCollusion(textSize) {
          /* collision detection from stackoverflow https://stackoverflow.com/questions/19681724/how-to-avoid-labels-overlapping-in-a-d3-js-pie-chart */
-            let prev;
+/*            let prev;
             let count = 0;
                     this.svg.selectAll(".stateText").each( function(d,i) {
                         if (i > 0) {
@@ -499,6 +503,7 @@ class Render {
             if (count > 0)
                 this.checkStateCollusion(textSize - 10);
     }
+    */
     renderDonut() {
         let siteRadius = this.siteRadius;
         let siteList = this.siteList;
