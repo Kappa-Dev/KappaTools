@@ -10,11 +10,10 @@ function getTransform(selection) {
 function calculateTextWidth(size) {
         let svg = d3.select("svg");
         let text = svg.append("text")
-	        .attr("x", 10)
-	        .attr("y", 30)
+            .attr("id", "calculateText")
             .style('font-size', size)
 	        .text("a");
-        let tWidth = svg.select("text").node().getComputedTextLength();
+        let tWidth = svg.select("#calculateText").node().getComputedTextLength();
         text.remove();
         return tWidth;
 
