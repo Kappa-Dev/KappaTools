@@ -406,7 +406,7 @@ class Render {
                         .attr('x2', d => {
                             lineLength = lineScale * 6 * site.states.length + lineScale/8 * siteNum;
                             if (lineLength < textLength) {
-                                lineLength = textLength + 5;
+                                lineLength = textLength + paddingSite;
                             }
                             else if(lineLength < this.radius/4) {
                                 lineLength = this.radius/4;
@@ -986,7 +986,7 @@ class Render {
                 .attr('x2', d => {
                         lineLength = lineScale * 6 * site.states.length + lineScale/8 * siteNum;
                         if (lineLength < textLength) {
-                            lineLength = textLength + 5;
+                            lineLength = textLength + paddingSite;
                         }
                         else if(lineLength < radius/4) {
                             lineLength = radius/4;
