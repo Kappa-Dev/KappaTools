@@ -376,7 +376,7 @@ class Render {
     }
 
     renderStates() {
-        let paddingSite = calculateTextWidth("110%") / 2;
+        let paddingSite = calculateTextWidth("110%") * 1.5;
         let siteRadius = this.siteRadius;
         let lineScale = this.radius/60;
         let lineLength;   
@@ -386,7 +386,7 @@ class Render {
         let siteNum = this.siteNum = this.siteList.length;
         for (let sIndex in this.siteList) {
             let site = this.siteList[sIndex];
-            let textLength = this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.label === site.label && d.data.agent.label === site.agent.label ;}).node().getComputedTextLength() + paddingSite;
+            let textLength = this.radius/30 + this.svg.selectAll(".siteText").filter( function(d) { return d.data.id === site.id && d.data.agent.id === site.agent.id ;}).node().getComputedTextLength() + paddingSite;
                 let gState = this.svg.selectAll('.stateLink')
                     .data(this.siteList);
 
@@ -917,7 +917,7 @@ class Render {
     }
 
     adjustState(site, circle, hide, text, textMove) {
-        let paddingSite = calculateTextWidth("110%") / 2;
+        let paddingSite = calculateTextWidth("110%") * 1.5;
         let siteRadius = this.siteRadius;
         let radius = this.radius;
         let outerRadius = this.outerRadius;
