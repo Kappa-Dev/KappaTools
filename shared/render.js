@@ -497,7 +497,7 @@ class Render {
                         prev = this;
                     });       
             if (count > 0)
-                this.checkStateCollusion(textSize - 20);
+                this.checkStateCollusion(textSize - 10);
     }
     renderDonut() {
         let siteRadius = this.siteRadius;
