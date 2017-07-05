@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Apr 28 2017>
+ * Last modification: Time-stamp: <Jul 05 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -63,6 +63,29 @@ let main () =
     else
       state
   in
+  (*-----------------------------------------------------------------------*)
+  (*WORK IN PROCESS:
+    get contact_map to compute strongly connected component*)
+  (* let _ =
+    let state, output = Export_to_KaSa.get_graph_scc state in
+    state, Some output
+  in*)
+  (*let state, contact_map_int =
+      Export_to_KaSa.get_contact_map_int state
+    in
+    let
+    let _ =
+      match contact_map_int with
+      | Some i ->
+        let error, dic, _, _ =
+          Contact_map_scc.convert_int_to_nodes parameters errors i
+        in
+        error, dic
+      | None -> errors, Contact_map_scc.Dictionary_of_agent_site.init()
+    in*)
+
+  (*-----------------------------------------------------------------------*)
+  (**)
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then

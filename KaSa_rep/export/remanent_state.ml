@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <Jul 05 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -466,7 +466,15 @@ type ('static,'dynamic) state =
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
+    graph_scc : Graphs.node list option
   }
+
+let get_graph_scc state =
+  state.graph_scc
+
+let set_graph_scc scc state =
+  {state with graph_scc = Some scc }
+
 
 let get_data state =
   state.handler, state.dead_rules, state.separating_transitions
@@ -510,6 +518,7 @@ let create_state ?errors ?env ?init_state parameters init =
     constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
+    graph_scc = None
   }
 
 (**************)

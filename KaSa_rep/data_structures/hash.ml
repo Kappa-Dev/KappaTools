@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 18/10/2010
-    * Last modification: Time-stamp: <Aug 06 2016>
+    * Last modification: Time-stamp: <Jul 04 2017>
     * *
     * This library provides signature for hash tables and several implementations
     * *
@@ -18,21 +18,21 @@ sig
   type 'a hash
 
   val create: int -> 'a hash
+
   val add: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash
-  val overwrite: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash							     val add_or_overwrite:Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash
-  val find_option:              Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a hash -> Exception.method_handler * (int*'a)  option
+
+  val overwrite: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash
+
+  val add_or_overwrite:Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash
+
+  val find_option: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a hash -> Exception.method_handler * (int*'a)  option
+
   val find_option_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a hash ->  Exception.method_handler * (int*'a)  option
+
   val find_option_log_on_the_fly: key -> 'a hash -> (int*'a) option
 
-
-
-
-
-
-
-
-
   val iter: (key -> 'a -> int -> unit) -> 'a hash -> unit
+
   val fold: (key -> 'b -> int -> 'a -> 'a) -> 'b hash -> 'a -> 'a
 end
 
@@ -43,8 +43,11 @@ module Hash =
        type 'a hash = (int*'a) Map.Map.t
 
        let create _ = Map.Map.empty
+
        let add parameter error key asso int = Map.Map.add parameter error key (int,asso)
+
        let overwrite parameter error key asso int = Map.Map.overwrite parameter error key (int,asso)
+
        let add_or_overwrite parameter error key asso int = Map.Map.add_or_overwrite parameter error key (int,asso)
 
        let find_option parameter error a b  =

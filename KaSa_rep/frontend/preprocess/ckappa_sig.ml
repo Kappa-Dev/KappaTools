@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Apr 12 2017>
+ * Last modification: Time-stamp: <Jul 05 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -15,6 +15,26 @@
 module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 
 let local_trace = true
+
+(****************************************************************************)
+(*work in process*)
+
+module Node_id =
+struct
+  type t = int * int
+  let compare = compare
+  let print _ _ = ()
+end
+
+module Dictionary_of_agent_site =
+  (
+    Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
+    with type key = int
+     and type value = int * int (*agent * site*)
+  )
+
+  type agent_site_dic =
+    (unit, unit) Dictionary_of_agent_site.dictionary
 
 (****************************************************************************)
 
@@ -954,6 +974,8 @@ let compare_agent_id = compare
 let compare_site_name = compare
 let compare_state_index = compare
 let compare_agent_name = compare
+
+let compare_unit_agent_site _ _ = 0
 
 let compare_unit _ _ = 0
 let compare_unit_agent_name _ _ = dummy_agent_name

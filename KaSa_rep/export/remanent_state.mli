@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Apr 25 2017>
+  * Last modification: Time-stamp: <Jul 05 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -39,7 +39,6 @@ type separating_transitions =
 
 val separating_transitions_to_json:
   separating_transitions -> Yojson.Basic.json
-
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
@@ -113,6 +112,14 @@ type symmetric_sites = Symmetries.symmetries option
 (*******************************************************************)
 
 type ('static, 'dynamic) state
+
+(*******************************************************************)
+(*work in process*)
+
+val get_graph_scc : ('static, 'dynamic)  state -> Graphs.node list option
+
+val set_graph_scc : Graphs.node list -> ('static, 'dynamic)  state ->
+  ('static, 'dynamic)  state
 
 (*******************************************************************)
 val to_json: ('static, 'dynamic) state -> Yojson.Basic.json

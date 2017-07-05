@@ -1,6 +1,7 @@
 type node
 
 val node_of_int: int -> node
+val int_of_node : node -> int
 
 module NodeMap: SetMap.Map with type elt = node
 
@@ -31,4 +32,15 @@ val add_bridges:
   ('a  * 'b * 'a) list ->
   Exception.method_handler *
   int Nodearray.t * int Nodearray.t * bool Nodearray.t * int Nodearray.t *
-   ('a * 'b * 'a) list
+  ('a * 'b * 'a) list
+
+val compute_scc :
+  ?low:int Nodearray.t ->
+  ?pre:int Nodearray.t ->
+  ?on_stack:bool Nodearray.t ->
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  ('a -> string) ->
+  ('a, 'b) graph ->
+  Exception.method_handler * int Nodearray.t * int Nodearray.t *
+  bool Nodearray.t * Nodearray.key list list

@@ -1,3 +1,18 @@
+(**
+  * contact_map.ml
+  * openkappa
+  * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
+  *
+  * Creation: 2017, the 23rd of June
+  * Last modification: Time-stamp: <Jul 05 2017>
+  *
+  * Compute strongly connected component in contact map
+  *
+  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+  * en Informatique et en Automatique.
+  * All rights reserved.  This file is distributed
+  * under the terms of the GNU Library General Public License *)
+
 type t = ((int list) * (int*int) list) array array
 
 let to_yojson a =

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2010, the 18th of October
- * Last modification: Time-stamp: <Aug 15 2016>
+ * Last modification: Time-stamp: <Jul 05 2017>
  * *
  * This library provides primitives to deal indexed set of values
  * During the construction membership, tranduction, and new key can
@@ -142,7 +142,16 @@ module Dictionary =
            is_stabilized = true
          }
 
-       let member parameters error value dictionary =
+       (*(*insert *)
+       let insert parameters error k v =
+         {
+           is_stabilized = true;
+           stabilized = Array.add Some (v, )
+
+         }*)
+
+
+         let member parameters error value dictionary =
          premember parameters error value dictionary.in_construction
 
        let stabilize dictionary =

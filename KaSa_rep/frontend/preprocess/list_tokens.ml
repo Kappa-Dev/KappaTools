@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 17th of January
-   * Last modification: Time-stamp: <Aug 06 2016>
+   * Last modification: Time-stamp: <Jul 05 2017>
    * *
    * Number agents, sites, states in ckappa represenations
    *
@@ -57,7 +57,8 @@ let empty_handler parameters error =
     Cckappa_sig.interface_constraints = int_constraints;
     Cckappa_sig.sites = sites;
     Cckappa_sig.states_dic = states_dic;
-    Cckappa_sig.dual = dual
+    Cckappa_sig.dual = dual;
+    Cckappa_sig.agents_sites_dic = Ckappa_sig.Dictionary_of_agent_site.init ()
   }
 
 let create_binding_state_dictionary parameters error =

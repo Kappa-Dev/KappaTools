@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <May 16 2017>
+  * Last modification: Time-stamp: <Jul 05 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1252,6 +1252,33 @@ let compute_ode_flow show_title state =
     error
     (Remanent_state.set_ode_flow output state),
   output
+
+(******************************************************************)
+(*work in process*)
+
+let compute_graph_scc show_title state =
+  let state, handler = get_handler state in
+  let state, contact_map = get_contact_map_int state in
+  let () = show_title state in
+  let parameters = Remanent_state.get_parameters state in
+  let error = Remanent_state.get_errors state in
+  let error, output =
+    match contact_map with
+    | None -> error, []
+    | Some cm ->
+      let error, output =
+        Contact_map_scc.convert_int_to_nodes parameters error handler cm in
+      error, output
+  in
+  Remanent_state.set_errors error
+    (Remanent_state.set_graph_scc output state), output
+
+let get_graph_scc =
+  get_gen
+    ~log_prefix:"Graphs scc:"
+    ~log_title:"Graphs scc"
+    Remanent_state.get_graph_scc
+    compute_graph_scc
 
 (******************************************************************)
 
