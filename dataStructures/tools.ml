@@ -221,3 +221,11 @@ let smash_duplicate_in_ordered_list p l =
   | (h,n)::t -> aux t n h []
 
 let default_message_delimter : char = '\x1e' (* "\t" *)
+
+let rec list_map_filter f = function
+  | [] -> []
+  | x :: xs ->
+    begin match f x with
+    | Some y -> y :: list_map_filter f xs
+    | None -> list_map_filter f xs
+    end

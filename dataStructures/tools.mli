@@ -26,6 +26,9 @@ val array_fold_left2i :
 val array_min_equal_not_null :
   (int * 'a list) array -> (int * 'b list) array -> ('a list * 'b list) option
 
+val list_map_filter :
+  ('a -> 'b option) -> 'a list -> 'b list
+
 (** {5 Misc utilities } *)
 
 val float_is_zero : float -> bool

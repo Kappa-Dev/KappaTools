@@ -246,7 +246,7 @@ module Agent = struct
     | Fresh (ty,id) ->
       match Mods.IntMap.find_option id inj_fresh with
       | Some x -> (x,ty)
-      | None -> failwith "Instantiation.from_place"
+      | None -> raise Not_found
 
   let to_yojson = function
     | Existing (n,ty) ->

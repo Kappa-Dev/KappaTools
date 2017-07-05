@@ -35,24 +35,32 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Core} *)
 
+  type blocking_predicate = 
+    int option -> Matching.t -> 
+    (Instantiation.concrete Instantiation.action) list ->
+    bool
+
   val apply_given_rule :
-    outputs:(Data.t -> unit) -> ?rule_id:int -> Model.t ->
-    Counter.t -> t -> Trace.event_kind -> Primitives.elementary_rule -> result
+    outputs:(Data.t -> unit) -> ?is_blocked:blocking_predicate ->
+    ?rule_id:int -> Model.t -> Counter.t -> t -> Trace.event_kind ->
+    Primitives.elementary_rule -> result
   (** Returns the graph obtained by applying the rule.
       [rule_id] is mandatory if the rule has an unary rate.*)
 
   val apply_rule :
     outputs:(Data.t -> unit) -> maxConsecutiveClash:int ->
+    ?is_blocked:blocking_predicate ->
     Model.t -> Counter.t -> t -> int option * bool * t
-  (** [apply_rule ~outputs ~maxConsecutiveClash model counter state]
+  (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
       Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
       [is_final_step] is determined by the counter. 
       [corresponding_syntactic_rule] is equal to None if and only if 
       a null event occured *)
 
   val force_rule :
-    outputs:(Data.t -> unit) -> Model.t -> Counter.t ->
-    t -> Trace.event_kind -> Primitives.elementary_rule -> t option
+    outputs:(Data.t -> unit) -> ?is_blocked:blocking_predicate ->
+    Model.t -> Counter.t -> t -> Trace.event_kind -> 
+    ?rule_id:int ->  Primitives.elementary_rule -> t option
   (** Apply the rule for sure if it is possible. Try [apply_rule] but in
       case of null_event, it computes the exact injections of the left hand
       side to do apply the rule and returns the remaining exact injections. *)
