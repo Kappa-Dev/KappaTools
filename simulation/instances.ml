@@ -11,12 +11,9 @@ type t = {
   roots : Roots.t ;
 }
 
-type mod_ccs_cache = (int, unit) Hashtbl.t
-
 type message = unit
 
-let send_message _ st = st
-
+let receive_message _ st = st
 
 let empty env = {
   roots = Roots.empty env ;
@@ -45,6 +42,7 @@ let number_of_instances st pats =
   Array.fold_left
     (fun acc pattern ->  acc * (Roots.number st.roots pattern)) 1 pats
 
+
 let number_of_unary_instances_in_cc st (pat1, pat2) = 
   let map1 = Roots.of_unary_pattern pat1 st.roots in
   let map2 = Roots.of_unary_pattern pat2 st.roots in
@@ -52,7 +50,6 @@ let number_of_unary_instances_in_cc st (pat1, pat2) =
     let set1 = Mods.IntMap.find_default Mods.IntSet.empty cc map1 in
     let set2 = Mods.IntMap.find_default Mods.IntSet.empty cc map2 in
     Mods.IntSet.size set1 * Mods.IntSet.size set2
-
 
 
 (* {6 Pick instances } *)
@@ -70,6 +67,7 @@ let pick_unary_instance_in_cc st random_state (pat1, pat2) =
         (Mods.IntSet.random random_state
             (Mods.IntMap.find_default Mods.IntSet.empty cc map2)) in
     (root1, root2)
+
 
 (* We provide a custom monadic fold function to be 
    lazy in drawing random numbers *)
@@ -89,7 +87,6 @@ let fold_picked_instance st random_state pats ~init f =
             aux (i+1) acc
           end
   in aux 0 (Some init)
-
 
 
 (** {6 Enumerate instances} *)

@@ -468,7 +468,6 @@ module Make (Instances:Instances_sig.S) = struct
         Matching.observables_from_link
           domain edges acc nc s nc' s'
 
-
   let obs_from_transformations domain edges trans =
     List.fold_left
       (obs_from_transformation domain edges)
@@ -1095,7 +1094,7 @@ module Make (Instances:Instances_sig.S) = struct
   let get_random_state state = state.random_state
 
   let send_instances_message msg state =
-    { state with instances = Instances.send_message msg state.instances }
+    { state with instances = Instances.receive_message msg state.instances }
 
   let add_outdated_dependencies new_deps state =
     let former_deps,mod_connectivity = state.outdated_elements in

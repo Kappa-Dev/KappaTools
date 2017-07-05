@@ -13,11 +13,9 @@ module type S = sig
 
 type t
 
-type mod_ccs_cache = (int, unit) Hashtbl.t
-
 type message
 
-val send_message : message -> t -> t
+val receive_message : message -> t -> t
 
 val empty : Model.t -> t
 
@@ -29,13 +27,13 @@ val debug_print : Format.formatter -> t -> unit
 val incorporate_extra_pattern : t -> Pattern.id -> IntCollection.t -> unit
 
 val break_apart_cc :
-  t -> Edges.t -> mod_ccs_cache -> (int * int) option -> t
+  t -> Edges.t -> Roots.mod_ccs_cache -> (int * int) option -> t
 
-val merge_cc : t -> mod_ccs_cache -> (int * int) option -> t
+val merge_cc : t -> Roots.mod_ccs_cache -> (int * int) option -> t
 
 val update_roots :
   t -> bool -> Pattern.Set.t -> Edges.t ->
-  mod_ccs_cache -> Pattern.Set.elt -> int -> unit
+  Roots.mod_ccs_cache -> Pattern.Set.elt -> int -> unit
 
 
 (** {6 Counting instances} *)
