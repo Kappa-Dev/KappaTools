@@ -215,7 +215,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                              ~outputs env counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success s -> s
-                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
+                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected | Rule_interpreter.Blocked) ->
                        raise (ExceptionDefn.Internal_Error
                                 ("Bugged initial rule",pos)))
                   state value,state0))) (return (false,graph0,state0)) init_l in

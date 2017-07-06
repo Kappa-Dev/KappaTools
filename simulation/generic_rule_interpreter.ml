@@ -66,7 +66,7 @@ module Make (Instances:Instances_sig.S) = struct
   let sum_instances_numbers insts l =
     List.fold_left (fun ac x -> ac + Instances.number_of_instances insts x) 0 l
 
-  type result = Clash | Corrected | Success of t
+  type result = Clash | Corrected | Blocked | Success of t
 
   let raw_get_alg env overwr i =
     match overwr.(i) with
@@ -244,7 +244,7 @@ module Make (Instances:Instances_sig.S) = struct
     let matches = all_injections ?unary_rate state.instances domain edges ccs in
     let matches = 
       if state.events_to_block = None then matches
-      else matches |> List.filter (fun ((matching, _) as m) ->
+      else matches |> List.filter (fun (matching, _) ->
        not (is_blocked state ~rule_id rule matching)) in
 
     List.length matches,
@@ -879,7 +879,7 @@ module Make (Instances:Instances_sig.S) = struct
 
 
   let transform_by_a_rule outputs env counter state event_kind ?path rule ?rule_id inj =
-    if is_blocked state ?rule_id rule inj then Corrected
+    if is_blocked state ?rule_id rule inj then Blocked
     else
       let state =
         update_tokens
@@ -962,7 +962,7 @@ module Make (Instances:Instances_sig.S) = struct
   let force_rule ~outputs env counter state event_kind ?rule_id rule =
     match apply_given_rule ~outputs ?rule_id env counter state event_kind rule with
     | Success out -> Some out
-    | Corrected | Clash ->
+    | Corrected | Blocked | Clash ->
       let () = assert (not state.outdated) in
       let unary_rate = match rule.Primitives.unary_rate with
         | None -> None
@@ -988,8 +988,8 @@ module Make (Instances:Instances_sig.S) = struct
             outputs env counter state event_kind rule ?rule_id h in
         match out with
           | Success out -> Some out
-          | Corrected -> None
-          | Clash -> assert false
+          | Blocked -> None
+          | Clash | Corrected -> assert false
         
 
   let adjust_rule_instances ~rule_id env counter state rule =
@@ -1065,9 +1065,9 @@ module Make (Instances:Instances_sig.S) = struct
     | Success (graph') ->
       let final_step = not (Counter.one_constructive_event counter) in
       (Some rule.Primitives.syntactic_rule,final_step,graph')
-    | (Clash | Corrected) as out ->
+    | (Clash | Corrected | Blocked) as out ->
       let continue =
-        if out = Clash then
+        if out = Clash || out = Blocked then
           Counter.one_clashing_instance_event counter
         else if choice mod 2 = 1
         then Counter.one_no_more_unary_event counter
