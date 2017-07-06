@@ -11,7 +11,7 @@
 module Make (Instances:Instances_sig.S) : sig
   type t (**Abstract graph*)
 
-  type result = Clash | Corrected | Success of t
+  type result = Clash | Corrected | Blocked | Success of t
   (** Clash means rectangular approximation failure
       Corrected means molecular ambiguity failure *)
 
