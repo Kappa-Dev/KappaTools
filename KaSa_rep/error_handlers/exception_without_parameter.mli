@@ -32,8 +32,10 @@ val stringlist_of_caught_light: caught_exception -> string list -> string list
 
 
 val empty_error_handler: method_handler
+val is_empty_error_handler: method_handler -> bool
+
 val get_caught_exception_list: method_handler -> caught_exception list
 val get_uncaught_exception_list: method_handler -> uncaught_exception list
 
 val to_json: method_handler -> Yojson.Basic.json
-val of_json: Yojson.Basic.json -> method_handler 
+val of_json: Yojson.Basic.json -> method_handler

@@ -3,6 +3,7 @@
 type method_handler = Exception_without_parameter.method_handler
 
 val empty_error_handler : method_handler
+val is_empty_error_handler : method_handler -> bool
 
 val warn_with_exn :
   Remanent_parameters_sig.parameters -> method_handler ->

@@ -46,7 +46,7 @@ let onload () =
       "#navconstraints" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
   let () = Common.jquery_on
-      "#navcontraints" "shown.bs.tab"
+      "#navconstraints" "shown.bs.tab"
       (fun _ -> let () = tab_was_active := true in set_tab_is_active true) in
   ()
 let onresize () : unit = ()

@@ -31,12 +31,12 @@ let send_exception post e =
 
 let send_response post x =
   let reply =
-    if false (*TODO: there_are_errors_in !gState*)
-    then `Assoc [
+    if Exception_without_parameter.is_empty_error_handler (get_errors !gState)
+    then `Assoc [ "code", `String "SUCCESS"; "data", x ]
+    else `Assoc [
         "code", `String "ERROR";
         "data", Exception_without_parameter.to_json (get_errors !gState)
-      ]
-    else  `Assoc [ "code", `String "SUCCESS"; "data", x ] in
+      ] in
   post (Yojson.Basic.to_string reply)
 
 let on_message post text =

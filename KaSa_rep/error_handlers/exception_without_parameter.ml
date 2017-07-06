@@ -289,3 +289,6 @@ let empty_error_handler =
 let add_uncaught_error uncaught error = {error with mh_uncaught_error_list = uncaught::error.mh_uncaught_error_list}
 let get_caught_exception_list error = error.mh_caught_error_list
 let get_uncaught_exception_list error = error.mh_uncaught_error_list
+
+let is_empty_error_handler x =
+  x.mh_caught_error_list=[] && x.mh_uncaught_error_list=[]

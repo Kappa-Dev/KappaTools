@@ -15,6 +15,7 @@
 
 type method_handler = Exception_without_parameter.method_handler
 let empty_error_handler = Exception_without_parameter.empty_error_handler
+let is_empty_error_handler = Exception_without_parameter.is_empty_error_handler
 
 let safe_warn parameters _error_handler file message exn _default =
   let uncaught = Exception_without_parameter.build_uncaught_exception file message exn in
