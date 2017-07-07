@@ -201,9 +201,10 @@ let tests_pass_on graph tests =
 
 let is_step_triggerable_on_edges graph = function
   | Trace.Subs _ | Trace.Init _
-  | Trace.Pert _ | Trace.Obs _ | Trace.Dummy _ -> true
+  | Trace.Pert _ | Trace.Dummy _ -> true
   | Trace.Rule (_r, event, _info) ->
     tests_pass_on graph event.Instantiation.tests
+  | Trace.Obs (_, tests, _) -> tests_pass_on graph tests
 
 let is_step_triggerable state = is_step_triggerable_on_edges state.graph
 
