@@ -1,24 +1,24 @@
 Process with: Repressilator
 Process without symmetries------------
-CPU time: 0.011366 s.; 42 rules; 19 species; 48 reactions.
+CPU time: 0.01216 s.; 42 rules; 19 species; 48 reactions.
 Process symmetries computation--------
-CPU time: 0.045203 s.; rules: 42; dead rules: 0.
+CPU time: 0.024969 s.; rules: 42.
 Process with forward symmetries-------
-CPU time: 0.035095 s.; 42 rules; 16 species; 39 reactions.
+CPU time: 0.036048 s.; 42 rules; 16 species; 39 reactions.
 Process with backward symmetries------
-CPU time: 0.036932 s.; 42 rules; 16 species; 39 reactions.
+CPU time: 0.03794 s.; 42 rules; 16 species; 39 reactions.
 Process BNGL with symmetries----------
 Iteration   0:    10 species      0 rxns  0.00e+00 CPU s
-Iteration   1:    13 species     15 rxns  2.00e-02 CPU s
-Iteration   2:    16 species     24 rxns  0.00e+00 CPU s
-Iteration   3:    16 species     30 rxns  1.00e-02 CPU s
+Iteration   1:    13 species     15 rxns  1.00e-02 CPU s
+Iteration   2:    16 species     24 rxns  1.00e-02 CPU s
+Iteration   3:    16 species     30 rxns  0.00e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   2:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   3:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   5:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   6:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule   6:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   7:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   8:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   9:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
@@ -28,25 +28,25 @@ Rule  12:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  13:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  14:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  15:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  16:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  16:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule  17:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  18:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  19:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule  18:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  19:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  20:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  21:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Total   :    30 reactions 3.00e-02 CPU s 1.00e-03 CPU s/rxn
+Total   :    30 reactions 2.00e-02 CPU s 6.67e-04 CPU s/rxn
 CPU TIME: generate_network 0.03 s.
-CPU TIME: total 0.06 s.
+CPU TIME: total 0.05 s.
 Process BNGL without symmetries-------
 Iteration   0:    10 species      0 rxns  0.00e+00 CPU s
-Iteration   1:    16 species     21 rxns  1.00e-02 CPU s
+Iteration   1:    16 species     21 rxns  2.00e-02 CPU s
 Iteration   2:    19 species     39 rxns  2.00e-02 CPU s
-Iteration   3:    19 species     48 rxns  1.00e-02 CPU s
+Iteration   3:    19 species     48 rxns  0.00e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   2:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule   3:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   4:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   4:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule   5:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   6:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   7:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
@@ -56,15 +56,15 @@ Rule  10:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  11:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  12:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  13:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  14:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  14:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  15:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  16:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  17:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  18:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  18:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
 Rule  19:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  20:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  21:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  22:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  22:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  23:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  24:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule  25:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
@@ -78,57 +78,14 @@ CPU TIME: generate_network 0.05 s.
 CPU TIME: total 0.09 s.
 Process with: egfr_net
 Process without symmetries------------
-CPU time: 0.836956 s.; 39 rules; 356 species; 4445 reactions.
+CPU time: 0.843543 s.; 39 rules; 356 species; 4445 reactions.
 Process symmetries computation--------
-CPU time: 0.043792 s.; rules: 39; dead rules: 0.
+CPU time: 0.00762 s.; rules: 39.
 Process with forward symmetries-------
-CPU time: 0.915538 s.; 39 rules; 356 species; 4445 reactions.
+CPU time: 0.905837 s.; 39 rules; 356 species; 4445 reactions.
 Process with backward symmetries------
-CPU time: 0.902857 s.; 39 rules; 356 species; 4445 reactions.
+CPU time: 0.905887 s.; 39 rules; 356 species; 4445 reactions.
 Process BNGL with symmetries----------
-Iteration   0:     6 species      0 rxns  0.00e+00 CPU s
-Iteration   1:     7 species      3 rxns  0.00e+00 CPU s
-Iteration   2:     8 species      5 rxns  1.00e-02 CPU s
-Iteration   3:    10 species      8 rxns  1.00e-02 CPU s
-Iteration   4:    19 species     21 rxns  2.00e-02 CPU s
-Iteration   5:    37 species     76 rxns  8.00e-02 CPU s
-Iteration   6:    69 species    213 rxns  1.90e-01 CPU s
-Iteration   7:   131 species    494 rxns  4.30e-01 CPU s
-Iteration   8:   295 species   1260 rxns  1.39e+00 CPU s
-Iteration   9:   356 species   3088 rxns  3.59e+00 CPU s
-Iteration  10:   356 species   3749 rxns  1.62e+00 CPU s
-Cumulative CPU time for each rule
-Rule   1:    48 reactions 7.00e-02 CPU s 1.46e-03 CPU s/rxn
-Rule   2:   600 reactions 1.81e+00 CPU s 3.02e-03 CPU s/rxn
-Rule   3:   144 reactions 2.20e-01 CPU s 1.53e-03 CPU s/rxn
-Rule   4:    96 reactions 1.20e-01 CPU s 1.25e-03 CPU s/rxn
-Rule   5:   156 reactions 2.00e-01 CPU s 1.28e-03 CPU s/rxn
-Rule   6:   104 reactions 1.20e-01 CPU s 1.15e-03 CPU s/rxn
-Rule   7:    96 reactions 1.70e-01 CPU s 1.77e-03 CPU s/rxn
-Rule   8:   104 reactions 1.40e-01 CPU s 1.35e-03 CPU s/rxn
-Rule   9:   312 reactions 5.00e-01 CPU s 1.60e-03 CPU s/rxn
-Rule  10:   312 reactions 5.40e-01 CPU s 1.73e-03 CPU s/rxn
-Rule  11:   312 reactions 5.50e-01 CPU s 1.76e-03 CPU s/rxn
-Rule  12:   208 reactions 3.20e-01 CPU s 1.54e-03 CPU s/rxn
-Rule  13:   208 reactions 3.20e-01 CPU s 1.54e-03 CPU s/rxn
-Rule  14:   208 reactions 4.30e-01 CPU s 2.07e-03 CPU s/rxn
-Rule  15:   208 reactions 4.50e-01 CPU s 2.16e-03 CPU s/rxn
-Rule  16:   208 reactions 3.80e-01 CPU s 1.83e-03 CPU s/rxn
-Rule  17:   208 reactions 4.40e-01 CPU s 2.12e-03 CPU s/rxn
-Rule  18:   208 reactions 4.00e-01 CPU s 1.92e-03 CPU s/rxn
-Rule  19:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
-Rule  20:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
-Rule  21:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
-Rule  22:     2 reactions 3.00e-02 CPU s 1.50e-02 CPU s/rxn
-Rule  23:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
-Total   :  3749 reactions 7.34e+00 CPU s 1.96e-03 CPU s/rxn
-CPU TIME: generate_network 7.46 s.
-Initialization took 0.02 CPU seconds
-Propagation took 9.00e-02 CPU seconds
-Program times:  0.11 CPU s 0.00 clock s 
-CPU TIME: simulate 0.23 s.
-CPU TIME: total 7.74 s.
-Process BNGL without symmetries-------
 Iteration   0:     6 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     7 species      3 rxns  1.00e-02 CPU s
 Iteration   2:     8 species      5 rxns  0.00e+00 CPU s
@@ -136,54 +93,97 @@ Iteration   3:    10 species      8 rxns  1.00e-02 CPU s
 Iteration   4:    19 species     21 rxns  2.00e-02 CPU s
 Iteration   5:    37 species     76 rxns  8.00e-02 CPU s
 Iteration   6:    69 species    213 rxns  1.90e-01 CPU s
-Iteration   7:   131 species    494 rxns  4.30e-01 CPU s
-Iteration   8:   295 species   1260 rxns  1.37e+00 CPU s
+Iteration   7:   131 species    494 rxns  4.40e-01 CPU s
+Iteration   8:   295 species   1260 rxns  1.38e+00 CPU s
 Iteration   9:   356 species   3088 rxns  3.57e+00 CPU s
-Iteration  10:   356 species   3749 rxns  1.60e+00 CPU s
+Iteration  10:   356 species   3749 rxns  1.62e+00 CPU s
 Cumulative CPU time for each rule
 Rule   1:    48 reactions 9.00e-02 CPU s 1.87e-03 CPU s/rxn
-Rule   2:   600 reactions 1.76e+00 CPU s 2.93e-03 CPU s/rxn
-Rule   3:   144 reactions 2.40e-01 CPU s 1.67e-03 CPU s/rxn
-Rule   4:    96 reactions 1.20e-01 CPU s 1.25e-03 CPU s/rxn
-Rule   5:   156 reactions 2.00e-01 CPU s 1.28e-03 CPU s/rxn
-Rule   6:   104 reactions 1.30e-01 CPU s 1.25e-03 CPU s/rxn
-Rule   7:    96 reactions 1.50e-01 CPU s 1.56e-03 CPU s/rxn
-Rule   8:   104 reactions 1.30e-01 CPU s 1.25e-03 CPU s/rxn
-Rule   9:   312 reactions 5.00e-01 CPU s 1.60e-03 CPU s/rxn
+Rule   2:   600 reactions 1.80e+00 CPU s 3.00e-03 CPU s/rxn
+Rule   3:   144 reactions 2.10e-01 CPU s 1.46e-03 CPU s/rxn
+Rule   4:    96 reactions 1.50e-01 CPU s 1.56e-03 CPU s/rxn
+Rule   5:   156 reactions 1.80e-01 CPU s 1.15e-03 CPU s/rxn
+Rule   6:   104 reactions 1.10e-01 CPU s 1.06e-03 CPU s/rxn
+Rule   7:    96 reactions 1.80e-01 CPU s 1.88e-03 CPU s/rxn
+Rule   8:   104 reactions 1.60e-01 CPU s 1.54e-03 CPU s/rxn
+Rule   9:   312 reactions 4.80e-01 CPU s 1.54e-03 CPU s/rxn
 Rule  10:   312 reactions 5.30e-01 CPU s 1.70e-03 CPU s/rxn
 Rule  11:   312 reactions 5.60e-01 CPU s 1.79e-03 CPU s/rxn
 Rule  12:   208 reactions 3.10e-01 CPU s 1.49e-03 CPU s/rxn
-Rule  13:   208 reactions 3.20e-01 CPU s 1.54e-03 CPU s/rxn
+Rule  13:   208 reactions 3.30e-01 CPU s 1.59e-03 CPU s/rxn
 Rule  14:   208 reactions 4.10e-01 CPU s 1.97e-03 CPU s/rxn
-Rule  15:   208 reactions 4.70e-01 CPU s 2.26e-03 CPU s/rxn
-Rule  16:   208 reactions 4.10e-01 CPU s 1.97e-03 CPU s/rxn
-Rule  17:   208 reactions 4.30e-01 CPU s 2.07e-03 CPU s/rxn
-Rule  18:   208 reactions 3.80e-01 CPU s 1.83e-03 CPU s/rxn
+Rule  15:   208 reactions 4.60e-01 CPU s 2.21e-03 CPU s/rxn
+Rule  16:   208 reactions 3.90e-01 CPU s 1.87e-03 CPU s/rxn
+Rule  17:   208 reactions 4.40e-01 CPU s 2.12e-03 CPU s/rxn
+Rule  18:   208 reactions 4.00e-01 CPU s 1.92e-03 CPU s/rxn
 Rule  19:     2 reactions 3.00e-02 CPU s 1.50e-02 CPU s/rxn
-Rule  20:     2 reactions 5.00e-02 CPU s 2.50e-02 CPU s/rxn
-Rule  21:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  22:     2 reactions 5.00e-02 CPU s 2.50e-02 CPU s/rxn
-Rule  23:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
-Total   :  3749 reactions 7.28e+00 CPU s 1.94e-03 CPU s/rxn
+Rule  20:     2 reactions 3.00e-02 CPU s 1.50e-02 CPU s/rxn
+Rule  21:     1 reactions 2.00e-02 CPU s 2.00e-02 CPU s/rxn
+Rule  22:     2 reactions 3.00e-02 CPU s 1.50e-02 CPU s/rxn
+Rule  23:     2 reactions 2.00e-02 CPU s 1.00e-02 CPU s/rxn
+Total   :  3749 reactions 7.32e+00 CPU s 1.95e-03 CPU s/rxn
+CPU TIME: generate_network 7.43 s.
+Initialization took 0.02 CPU seconds
+Propagation took 8.00e-02 CPU seconds
+Program times:  0.10 CPU s 0.00 clock s 
+CPU TIME: simulate 0.23 s.
+CPU TIME: total 7.71 s.
+Process BNGL without symmetries-------
+Iteration   0:     6 species      0 rxns  0.00e+00 CPU s
+Iteration   1:     7 species      3 rxns  0.00e+00 CPU s
+Iteration   2:     8 species      5 rxns  1.00e-02 CPU s
+Iteration   3:    10 species      8 rxns  0.00e+00 CPU s
+Iteration   4:    19 species     21 rxns  2.00e-02 CPU s
+Iteration   5:    37 species     76 rxns  8.00e-02 CPU s
+Iteration   6:    69 species    213 rxns  1.90e-01 CPU s
+Iteration   7:   131 species    494 rxns  4.40e-01 CPU s
+Iteration   8:   295 species   1260 rxns  1.37e+00 CPU s
+Iteration   9:   356 species   3088 rxns  3.56e+00 CPU s
+Iteration  10:   356 species   3749 rxns  1.60e+00 CPU s
+Cumulative CPU time for each rule
+Rule   1:    48 reactions 9.00e-02 CPU s 1.87e-03 CPU s/rxn
+Rule   2:   600 reactions 1.80e+00 CPU s 3.00e-03 CPU s/rxn
+Rule   3:   144 reactions 1.90e-01 CPU s 1.32e-03 CPU s/rxn
+Rule   4:    96 reactions 1.40e-01 CPU s 1.46e-03 CPU s/rxn
+Rule   5:   156 reactions 1.90e-01 CPU s 1.22e-03 CPU s/rxn
+Rule   6:   104 reactions 1.30e-01 CPU s 1.25e-03 CPU s/rxn
+Rule   7:    96 reactions 1.50e-01 CPU s 1.56e-03 CPU s/rxn
+Rule   8:   104 reactions 1.60e-01 CPU s 1.54e-03 CPU s/rxn
+Rule   9:   312 reactions 4.80e-01 CPU s 1.54e-03 CPU s/rxn
+Rule  10:   312 reactions 5.40e-01 CPU s 1.73e-03 CPU s/rxn
+Rule  11:   312 reactions 5.40e-01 CPU s 1.73e-03 CPU s/rxn
+Rule  12:   208 reactions 3.20e-01 CPU s 1.54e-03 CPU s/rxn
+Rule  13:   208 reactions 3.20e-01 CPU s 1.54e-03 CPU s/rxn
+Rule  14:   208 reactions 4.20e-01 CPU s 2.02e-03 CPU s/rxn
+Rule  15:   208 reactions 4.30e-01 CPU s 2.07e-03 CPU s/rxn
+Rule  16:   208 reactions 4.00e-01 CPU s 1.92e-03 CPU s/rxn
+Rule  17:   208 reactions 4.30e-01 CPU s 2.07e-03 CPU s/rxn
+Rule  18:   208 reactions 4.10e-01 CPU s 1.97e-03 CPU s/rxn
+Rule  19:     2 reactions 3.00e-02 CPU s 1.50e-02 CPU s/rxn
+Rule  20:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
+Rule  21:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule  22:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  23:     2 reactions 4.00e-02 CPU s 2.00e-02 CPU s/rxn
+Total   :  3749 reactions 7.27e+00 CPU s 1.94e-03 CPU s/rxn
 CPU TIME: generate_network 7.39 s.
-Initialization took 0.03 CPU seconds
-Propagation took 9.00e-02 CPU seconds
-Program times:  0.12 CPU s 0.00 clock s 
-CPU TIME: simulate 0.24 s.
-CPU TIME: total 7.68 s.
+Initialization took 0.02 CPU seconds
+Propagation took 8.00e-02 CPU seconds
+Program times:  0.10 CPU s 0.00 clock s 
+CPU TIME: simulate 0.21 s.
+CPU TIME: total 7.65 s.
 Process with: egfr_net_red
 Process without symmetries------------
-CPU time: 0.02786 s.; 45 rules; 40 species; 123 reactions.
+CPU time: 0.027658 s.; 45 rules; 40 species; 123 reactions.
 Process symmetries computation--------
-CPU time: 0.04823 s.; rules: 45; dead rules: 0.
+CPU time: 0.008915 s.; rules: 45.
 Process with forward symmetries-------
-CPU time: 0.053012 s.; 45 rules; 40 species; 123 reactions.
+CPU time: 0.045229 s.; 45 rules; 40 species; 123 reactions.
 Process with backward symmetries------
-CPU time: 0.049733 s.; 45 rules; 40 species; 123 reactions.
+CPU time: 0.051383 s.; 45 rules; 40 species; 123 reactions.
 Process BNGL with symmetries----------
 Iteration   0:     7 species      0 rxns  0.00e+00 CPU s
-Iteration   1:    11 species      4 rxns  0.00e+00 CPU s
-Iteration   2:    13 species     10 rxns  1.00e-02 CPU s
+Iteration   1:    11 species      4 rxns  1.00e-02 CPU s
+Iteration   2:    13 species     10 rxns  0.00e+00 CPU s
 Iteration   3:    15 species     14 rxns  1.00e-02 CPU s
 Iteration   4:    20 species     21 rxns  1.00e-02 CPU s
 Iteration   5:    26 species     39 rxns  2.00e-02 CPU s
@@ -194,119 +194,119 @@ Iteration   9:    40 species    123 rxns  1.00e-02 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   2:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
-Rule   3:    12 reactions 2.00e-02 CPU s 1.67e-03 CPU s/rxn
-Rule   4:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
-Rule   5:    12 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   6:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule   3:    12 reactions 1.00e-02 CPU s 8.33e-04 CPU s/rxn
+Rule   4:     8 reactions 2.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   5:    12 reactions 1.00e-02 CPU s 8.33e-04 CPU s/rxn
+Rule   6:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   7:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   8:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   9:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  10:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
-Rule  11:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  12:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  10:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  11:     3 reactions 1.00e-02 CPU s 3.33e-03 CPU s/rxn
+Rule  12:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  13:     6 reactions 2.00e-02 CPU s 3.33e-03 CPU s/rxn
-Rule  14:     6 reactions 2.00e-02 CPU s 3.33e-03 CPU s/rxn
+Rule  14:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  15:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  16:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  17:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  18:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  19:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
-Rule  20:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  20:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  21:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  22:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
-Rule  23:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  23:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  24:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  25:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  25:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
 Rule  26:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :   123 reactions 1.40e-01 CPU s 1.14e-03 CPU s/rxn
-CPU TIME: generate_network 0.16 s.
+CPU TIME: generate_network 0.15 s.
 CPU TIME: total 0.21 s.
 Process BNGL without symmetries-------
 Iteration   0:     7 species      0 rxns  0.00e+00 CPU s
 Iteration   1:    11 species      4 rxns  1.00e-02 CPU s
 Iteration   2:    13 species     10 rxns  1.00e-02 CPU s
-Iteration   3:    15 species     14 rxns  0.00e+00 CPU s
+Iteration   3:    15 species     14 rxns  1.00e-02 CPU s
 Iteration   4:    20 species     21 rxns  1.00e-02 CPU s
-Iteration   5:    26 species     39 rxns  3.00e-02 CPU s
+Iteration   5:    26 species     39 rxns  2.00e-02 CPU s
 Iteration   6:    33 species     62 rxns  2.00e-02 CPU s
 Iteration   7:    38 species     90 rxns  3.00e-02 CPU s
 Iteration   8:    40 species    115 rxns  3.00e-02 CPU s
 Iteration   9:    40 species    123 rxns  1.00e-02 CPU s
 Cumulative CPU time for each rule
 Rule   1:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
-Rule   2:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   3:    12 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   4:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
-Rule   5:    12 reactions 2.00e-02 CPU s 1.67e-03 CPU s/rxn
+Rule   2:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   3:    12 reactions 1.00e-02 CPU s 8.33e-04 CPU s/rxn
+Rule   4:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   5:    12 reactions 3.00e-02 CPU s 2.50e-03 CPU s/rxn
 Rule   6:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   7:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   8:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   9:     3 reactions 2.00e-02 CPU s 6.67e-03 CPU s/rxn
-Rule  10:     1 reactions 1.00e-02 CPU s 1.00e-02 CPU s/rxn
+Rule   9:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  10:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  11:     3 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  12:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  13:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  14:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  15:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  16:     6 reactions 2.00e-02 CPU s 3.33e-03 CPU s/rxn
-Rule  17:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  14:     6 reactions 2.00e-02 CPU s 3.33e-03 CPU s/rxn
+Rule  15:     6 reactions 3.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  16:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule  17:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  18:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  19:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
-Rule  20:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
+Rule  20:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  21:     6 reactions 1.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule  22:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  23:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  23:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  24:     1 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule  25:     2 reactions 1.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule  25:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule  26:     2 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Total   :   123 reactions 1.50e-01 CPU s 1.22e-03 CPU s/rxn
 CPU TIME: generate_network 0.15 s.
-CPU TIME: total 0.21 s.
+CPU TIME: total 0.20 s.
 Process with: test_continue
 Process without symmetries------------
-CPU time: 0.013518 s.; 10 rules; 22 species; 100 reactions.
+CPU time: 0.01578 s.; 10 rules; 22 species; 100 reactions.
 Process symmetries computation--------
-CPU time: 0.006634 s.; rules: 10; dead rules: 0.
+CPU time: 0.003176 s.; rules: 10.
 Process with forward symmetries-------
-CPU time: 0.019162 s.; 10 rules; 22 species; 100 reactions.
+CPU time: 0.016377 s.; 10 rules; 22 species; 100 reactions.
 Process with backward symmetries------
-CPU time: 0.017032 s.; 10 rules; 22 species; 100 reactions.
+CPU time: 0.0169 s.; 10 rules; 22 species; 100 reactions.
 Process BNGL with symmetries----------
 Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
 Iteration   2:     7 species      5 rxns  0.00e+00 CPU s
-Iteration   3:     8 species      7 rxns  1.00e-02 CPU s
-Iteration   4:    12 species     12 rxns  0.00e+00 CPU s
-Iteration   5:    17 species     30 rxns  2.00e-02 CPU s
-Iteration   6:    22 species     59 rxns  4.00e-02 CPU s
+Iteration   3:     8 species      7 rxns  0.00e+00 CPU s
+Iteration   4:    12 species     12 rxns  1.00e-02 CPU s
+Iteration   5:    17 species     30 rxns  3.00e-02 CPU s
+Iteration   6:    22 species     59 rxns  3.00e-02 CPU s
 Iteration   7:    22 species     76 rxns  2.00e-02 CPU s
 Cumulative CPU time for each rule
-Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
-Rule   2:    20 reactions 2.00e-02 CPU s 1.00e-03 CPU s/rxn
-Rule   3:     4 reactions 2.00e-02 CPU s 5.00e-03 CPU s/rxn
+Rule   1:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:    20 reactions 4.00e-02 CPU s 2.00e-03 CPU s/rxn
+Rule   3:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   4:     6 reactions 2.00e-02 CPU s 3.33e-03 CPU s/rxn
-Rule   5:    24 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   6:    14 reactions 2.00e-02 CPU s 1.43e-03 CPU s/rxn
+Rule   5:    24 reactions 2.00e-02 CPU s 8.33e-04 CPU s/rxn
+Rule   6:    14 reactions 1.00e-02 CPU s 7.14e-04 CPU s/rxn
 Total   :    76 reactions 9.00e-02 CPU s 1.18e-03 CPU s/rxn
-CPU TIME: generate_network 0.09 s.
-CPU TIME: total 0.11 s.
+CPU TIME: generate_network 0.11 s.
+CPU TIME: total 0.12 s.
 Process BNGL without symmetries-------
 Iteration   0:     4 species      0 rxns  0.00e+00 CPU s
 Iteration   1:     6 species      2 rxns  0.00e+00 CPU s
 Iteration   2:     7 species      5 rxns  0.00e+00 CPU s
-Iteration   3:     8 species      7 rxns  1.00e-02 CPU s
-Iteration   4:    12 species     12 rxns  0.00e+00 CPU s
+Iteration   3:     8 species      7 rxns  0.00e+00 CPU s
+Iteration   4:    12 species     12 rxns  1.00e-02 CPU s
 Iteration   5:    17 species     30 rxns  2.00e-02 CPU s
 Iteration   6:    22 species     59 rxns  4.00e-02 CPU s
 Iteration   7:    22 species     76 rxns  2.00e-02 CPU s
 Cumulative CPU time for each rule
-Rule   1:     8 reactions 1.00e-02 CPU s 1.25e-03 CPU s/rxn
-Rule   2:    20 reactions 2.00e-02 CPU s 1.00e-03 CPU s/rxn
-Rule   3:     4 reactions 1.00e-02 CPU s 2.50e-03 CPU s/rxn
+Rule   1:     8 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
+Rule   2:    20 reactions 3.00e-02 CPU s 1.50e-03 CPU s/rxn
+Rule   3:     4 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
 Rule   4:     6 reactions 0.00e+00 CPU s 0.00e+00 CPU s/rxn
-Rule   5:    24 reactions 3.00e-02 CPU s 1.25e-03 CPU s/rxn
+Rule   5:    24 reactions 4.00e-02 CPU s 1.67e-03 CPU s/rxn
 Rule   6:    14 reactions 2.00e-02 CPU s 1.43e-03 CPU s/rxn
 Total   :    76 reactions 9.00e-02 CPU s 1.18e-03 CPU s/rxn
-CPU TIME: generate_network 0.09 s.
+CPU TIME: generate_network 0.10 s.
 CPU TIME: resetConcentrations 0.00 s.
 CPU TIME: total 0.11 s.
