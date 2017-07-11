@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 05 2017>
+  * Last modification: Time-stamp: <Jul 11 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -479,7 +479,7 @@ let set_graph_scc scc state =
 let get_data state =
   state.handler, state.dead_rules, state.separating_transitions
 
-let create_state ?errors ?env ?init_state parameters init =
+let create_state ?errors ?env ?init_state ?reset parameters init =
   let error =
     match
       errors
@@ -487,7 +487,17 @@ let create_state ?errors ?env ?init_state parameters init =
     | None -> Exception.empty_error_handler
     | Some error -> error
   in
-  let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
+  let error, handler_bdu =
+    if Mvbdu_wrapper.Mvbdu.is_init ()
+    then
+      match reset with
+      | Some true ->
+        Mvbdu_wrapper.Mvbdu.reset parameters error 
+      | None | Some false ->
+        Mvbdu_wrapper.Mvbdu.get_handler parameters error
+    else
+      Mvbdu_wrapper.Mvbdu.init parameters error
+  in
   {
     parameters = parameters;
     log_info = StoryProfiling.StoryStats.init_log_info ();

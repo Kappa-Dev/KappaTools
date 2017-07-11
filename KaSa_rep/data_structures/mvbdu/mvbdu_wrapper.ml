@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 08/03/2010
-   * Last modification: Time-stamp: <Jan 01 2017>
+   * Last modification: Time-stamp: <Jul 11 2017>
    * *
    * This library provides test benchmarks for the library of sets of finite maps from integers to integers
    *
@@ -31,6 +31,8 @@ sig
 
   val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
   val is_init: unit -> bool
+  val get_handler: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
+  val reset: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
   val equal: mvbdu -> mvbdu -> bool
   val equal_with_logs: (mvbdu,mvbdu,bool) binary
   val mvbdu_false: mvbdu constant
@@ -267,7 +269,7 @@ module Make (M:Nul)  =
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
-    let init,is_init =
+    let init,is_init,reset,get_handler =
       let used = ref None in
       let init parameter error =
         match
@@ -284,9 +286,41 @@ module Make (M:Nul)  =
             error,handler
           end
       in
-      let is_init () = !used != None
+      let is_init () = !used != None in
+      let get_handler parameter error =
+        match !used with
+        | None ->
+          let error,handler = init parameter error in
+          Exception.warn
+            parameter error __POS__
+            ~message:"Uninitialised handler"
+            Exit handler
+        | Some a -> error,a
       in
-      init,is_init
+      let reset parameter error =
+        match
+          !used
+        with
+        | None ->
+          begin
+            let error,handler = init parameter error in
+            Exception.warn
+              parameter error __POS__
+              ~message:"Uninitialised handler"
+              Exit handler
+          end
+        | Some _ ->
+          begin
+            let error,handler = Boolean_mvbdu.init_remanent parameter error in
+            let () = used := Some handler in
+            error,handler
+          end
+      in
+      init,is_init,reset,get_handler
+
+
+
+
 
     let equal = Mvbdu_core.mvbdu_equal
     let equal_with_logs _p h e a b = e,h,equal a b
