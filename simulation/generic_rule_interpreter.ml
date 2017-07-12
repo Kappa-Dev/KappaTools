@@ -13,8 +13,6 @@ type precomputed =
   }
 
 module Make (Instances:Instances_sig.S) = struct
-
-
   type blocking_predicate =
     int option -> Matching.t ->
     (Instantiation.concrete Instantiation.action) list -> bool
@@ -147,34 +145,26 @@ module Make (Instances:Instances_sig.S) = struct
     let () = initial_activity env counter cand in
     cand
 
-
-
-  let concrete_actions_for_incomplete_inj rule matching = 
+  let concrete_actions_for_incomplete_inj rule matching =
     let abstract_actions =
       rule.Primitives.instantiations.Instantiation.actions in
     let inj = (matching, Mods.IntMap.empty) in
     List_util.map_option
       (Instantiation.try_concretize_action inj) abstract_actions
 
-  let is_blocked state ?rule_id rule matching = 
+  let is_blocked state ?rule_id rule matching =
     match state.events_to_block with
-      | None -> false
-      | Some to_block ->
-        let actions = concrete_actions_for_incomplete_inj rule matching in
-        to_block rule_id matching actions
+    | None -> false
+    | Some to_block ->
+      let actions = concrete_actions_for_incomplete_inj rule matching in
+      to_block rule_id matching actions
 
-  let set_events_to_block predicate state = 
-    { state with 
+  let set_events_to_block predicate state =
+    { state with
       events_to_block = predicate ;
       matchings_of_rule = Mods.IntMap.empty ;
       unary_candidates = Mods.IntMap.empty ;
     }
-
-
-  (* BEGIN old_instances
-     @pirbo: from here to the corresponding END tag 
-     is everything that used to be in the old Instances module. *)
-
 
   let instance_to_matching domain edges instance patterns =
     let rec aux i matching roots =
@@ -182,23 +172,22 @@ module Make (Instances:Instances_sig.S) = struct
       | None, _ -> None
       | Some matching, [] -> Some matching
       | Some matching, root::next_roots ->
-        let new_acc = 
-          Matching.reconstruct 
-            domain edges matching i patterns.(i) root in
+        let new_acc =
+          Matching.reconstruct domain edges matching i patterns.(i) root in
         aux (i+1) new_acc next_roots in
     aux 0 (Some Matching.empty) instance
 
   let all_injections ?excp ?unary_rate state_insts domain edges patterna =
     let out =
-      Instances.fold_instances ?excp state_insts patterna ~init:[] (fun instance acc ->
-        match instance_to_matching domain edges instance patterna with
-        | None -> acc
-        | Some matching ->
-          let rev_roots = instance |> List.rev in
-          (matching, rev_roots) :: acc
-      ) 
-      |> List.rev
-    in
+      Instances.fold_instances ?excp state_insts patterna ~init:[]
+        (fun instance acc ->
+           match instance_to_matching domain edges instance patterna with
+           | None -> acc
+           | Some matching ->
+             let rev_roots = instance |> List.rev in
+             (matching, rev_roots) :: acc
+        )
+      |> List.rev in
     match unary_rate with
     | None -> out
     | Some (_,None) ->
@@ -210,12 +199,10 @@ module Make (Instances:Instances_sig.S) = struct
     | Some (_,(Some _ as max_distance)) ->
       List.filter
         (fun (inj,_) ->
-          let nodes = Matching.elements_with_types
-              domain patterna inj in
-          None =
-          Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
+           let nodes = Matching.elements_with_types domain patterna inj in
+           None =
+           Edges.are_connected ?max_distance edges nodes.(0) nodes.(1))
         out
-
 
   let pop_exact_matchings state rule =
     match Mods.IntMap.pop rule state.matchings_of_rule with
@@ -225,12 +212,13 @@ module Make (Instances:Instances_sig.S) = struct
   let pick_a_rule_instance state random_state domain edges ?rule_id rule =
     let from_patterns () =
       let pats = rule.Primitives.connected_components in
-      Instances.fold_picked_instance state.instances random_state pats ~init:(Matching.empty,[])
-      (fun id pattern root (inj, rev_roots) ->
-        match Matching.reconstruct domain edges inj id pattern root with
-        | None -> None
-        | Some inj' -> Some (inj',root::rev_roots)
-      ) in
+      Instances.fold_picked_instance
+        state.instances random_state pats ~init:(Matching.empty,[])
+        (fun id pattern root (inj, rev_roots) ->
+           match Matching.reconstruct domain edges inj id pattern root with
+           | None -> None
+           | Some inj' -> Some (inj',root::rev_roots)
+        ) in
     match rule_id with
     | None -> from_patterns ()
     | Some id ->
@@ -239,27 +227,23 @@ module Make (Instances:Instances_sig.S) = struct
       | Some l -> Some (List_util.random random_state l)
       | None -> from_patterns ()
 
-
   let adjust_rule_instances ~rule_id ?unary_rate state domain edges ccs rule =
     let matches = all_injections ?unary_rate state.instances domain edges ccs in
-    let matches = 
+    let matches =
       if state.events_to_block = None then matches
       else matches |> List.filter (fun (matching, _) ->
-       not (is_blocked state ~rule_id rule matching)) in
-
+          not (is_blocked state ~rule_id rule matching)) in
     List.length matches,
     { state with
       matchings_of_rule =
         Mods.IntMap.add rule_id matches state.matchings_of_rule }
-  
 
   (* With rectangular approximation *)
   let compute_unary_number state modified_ccs rule rule_id =
-
     let pat1 = rule.Primitives.connected_components.(0) in
     let pat2 = rule.Primitives.connected_components.(1) in
 
-    let number_of_unary_instances_in_cc = 
+    let number_of_unary_instances_in_cc =
       Instances.number_of_unary_instances_in_cc state.instances (pat1, pat2) in
 
     let old_pack =
@@ -281,76 +265,69 @@ module Make (Instances:Instances_sig.S) = struct
       (* Invalidates the cache *)
       match Mods.IntMap.pop rule_id state.unary_candidates with
       | None, _ -> { state with nb_rectangular_instances_by_cc }
-      | Some _, unary_candidates -> { state with nb_rectangular_instances_by_cc ; unary_candidates } in
+      | Some _, unary_candidates ->
+        { state with nb_rectangular_instances_by_cc ; unary_candidates } in
     (va, state)
-
 
   let pick_a_unary_rule_instance state random_state domain edges ~rule_id rule =
     match Mods.IntMap.find_option rule_id state.unary_candidates with
     | Some l ->
-       let inj,path = List_util.random random_state l in 
-       Some inj,path
-    | None -> 
-      begin
-        let pat1 = rule.Primitives.connected_components.(0) in
-        let pat2 = rule.Primitives.connected_components.(1) in
+      let inj,path = List_util.random random_state l in
+      Some inj,path
+    | None ->
+      let pat1 = rule.Primitives.connected_components.(0) in
+      let pat2 = rule.Primitives.connected_components.(1) in
+      let pick_unary_instance_in_cc =
+        Instances.pick_unary_instance_in_cc
+          state.instances random_state (pat1, pat2) in
+      let cc_id = ValMap.random
+          random_state
+          (Mods.IntMap.find_default
+             ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
+      let root1, root2 = pick_unary_instance_in_cc cc_id in
 
-        let pick_unary_instance_in_cc = 
-            Instances.pick_unary_instance_in_cc state.instances random_state (pat1, pat2) in
-
-        let cc_id = ValMap.random
-            random_state
-            (Mods.IntMap.find_default
-                ValMap.empty rule_id state.nb_rectangular_instances_by_cc) in
-        let root1, root2 = pick_unary_instance_in_cc cc_id in
-        
-        let () =
-          if !Parameter.debugModeOn then
-            Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
-        let pattern1 = rule.Primitives.connected_components.(0) in
-        let pattern2 = rule.Primitives.connected_components.(1) in
-        let inj1 =
-          Matching.reconstruct domain edges Matching.empty 0 pattern1 root1 in
-        match inj1 with
-        | None -> None,None
-        | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
-      end
-
+      let () =
+        if !Parameter.debugModeOn then
+          Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
+      let pattern1 = rule.Primitives.connected_components.(0) in
+      let pattern2 = rule.Primitives.connected_components.(1) in
+      let inj1 =
+        Matching.reconstruct domain edges Matching.empty 0 pattern1 root1 in
+      match inj1 with
+      | None -> None,None
+      | Some inj -> Matching.reconstruct domain edges inj 1 pattern2 root2,None
 
   let adjust_unary_rule_instances ~rule_id ?max_distance state domain graph pats rule =
     let pattern1 = pats.(0) in let pattern2 = pats.(1) in
-    let cands,len = 
-      Instances.fold_unary_instances state.instances (pattern1, pattern2) ~init:([], 0)
-      (fun (root1, root2) (list,len as out) ->
-        let inj1 = Matching.reconstruct domain graph Matching.empty 0 pattern1 root1 in
-        match inj1 with
-        | None -> out
-        | Some inj ->
-          match Matching.reconstruct
-                  domain graph inj 1 pattern2 root2 with
-          | None -> out
-          | Some inj' ->
-            match max_distance with
-            | None -> (inj',None)::list,succ len
-            | Some _ ->
-              let nodes =
-                Matching.elements_with_types domain pats inj' in
-              match Edges.are_connected ?max_distance
-                      graph nodes.(0) nodes.(1) with
-              | None -> out
-              | Some _ as p -> 
-                if is_blocked state ~rule_id rule inj' then out
-                else (inj',p)::list,succ len
-      ) in
-    let unary_candidates = 
+    let cands,len =
+      Instances.fold_unary_instances
+        state.instances (pattern1, pattern2) ~init:([], 0)
+        (fun (root1, root2) (list,len as out) ->
+           let inj1 = Matching.reconstruct
+               domain graph Matching.empty 0 pattern1 root1 in
+           match inj1 with
+           | None -> out
+           | Some inj ->
+             match Matching.reconstruct
+                     domain graph inj 1 pattern2 root2 with
+             | None -> out
+             | Some inj' ->
+               match max_distance with
+               | None -> (inj',None)::list,succ len
+               | Some _ ->
+                 let nodes =
+                   Matching.elements_with_types domain pats inj' in
+                 match Edges.are_connected ?max_distance
+                         graph nodes.(0) nodes.(1) with
+                 | None -> out
+                 | Some _ as p ->
+                   if is_blocked state ~rule_id rule inj' then out
+                   else (inj',p)::list,succ len
+        ) in
+    let unary_candidates =
       if len = 0 then Mods.IntMap.remove rule_id state.unary_candidates
       else Mods.IntMap.add rule_id cands state.unary_candidates in
-
     len, { state with unary_candidates }
-
-  (* END old_instances *)
-
-
 
   let print env f state =
     let sigs = Model.signatures env in
@@ -921,7 +898,6 @@ module Make (Instances:Instances_sig.S) = struct
           transform_by_a_rule
             outputs env counter state' event_kind ?path rule ~rule_id inj
 
-
   let apply_given_rule ~outputs ?rule_id env counter state event_kind rule =
     let () = assert (not state.outdated) in
     let domain = Model.domain env in
@@ -936,7 +912,8 @@ module Make (Instances:Instances_sig.S) = struct
             (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
       match rule.Primitives.unary_rate with
       | None ->
-            transform_by_a_rule outputs env counter state event_kind rule ?rule_id inj
+        transform_by_a_rule
+          outputs env counter state event_kind rule ?rule_id inj
       | Some (_,max_distance) ->
         match max_distance with
         | None ->
@@ -945,7 +922,8 @@ module Make (Instances:Instances_sig.S) = struct
              if Edges.in_same_connected_component root0 root1 state.edges then
                Corrected
              else
-               transform_by_a_rule outputs env counter state event_kind rule ?rule_id inj
+               transform_by_a_rule
+                 outputs env counter state event_kind rule ?rule_id inj
            | _ -> failwith "apply_given_rule unary rule without 2 patterns")
         | Some dist ->
           let dist' = Some (max_dist_to_int counter state dist) in
@@ -983,14 +961,13 @@ module Make (Instances:Instances_sig.S) = struct
         None
       | l ->
         let (h,_) = List_util.random state.random_state l in
-        let out = 
+        let out =
           transform_by_a_rule
             outputs env counter state event_kind rule ?rule_id h in
         match out with
           | Success out -> Some out
           | Blocked -> None
           | Clash | Corrected -> assert false
-        
 
   let adjust_rule_instances ~rule_id env counter state rule =
     let () = assert (not state.outdated) in
