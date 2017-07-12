@@ -659,17 +659,21 @@ module Make (Instances:Instances_sig.S) = struct
     let rev_deps = Operator.DepSet.union
         former_deps (Operator.DepSet.union del_deps new_deps) in
     {
-      activities = state.activities;
       outdated = false;
       precomputed = state.precomputed;
       instances = instances';
+      matchings_of_rule = state.matchings_of_rule;
+      unary_candidates = state.unary_candidates;
+      nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
       variables_cache = state.variables_cache;
       variables_overwrite = state.variables_overwrite;
       edges = edges''; tokens = state.tokens;
       outdated_elements = rev_deps,mod_connectivity;
+      activities = state.activities;
       random_state = state.random_state;
       story_machinery = state.story_machinery;
       species = state.species;
+      events_to_block = state.events_to_block;
     }
 
   let update_edges_from_actions
