@@ -78,6 +78,8 @@ module Make (Instances:Instances_sig.S) : sig
     Instantiation.concrete Instantiation.action list *
     Instantiation.concrete Instantiation.site list -> t
 
+  val send_instances_message : Instances.message -> t -> t
+
   (** {6 Stories} *)
 
   val add_tracked :
