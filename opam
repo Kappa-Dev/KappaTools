@@ -24,8 +24,8 @@ depopts: [
 
 build: [
   [ make "USE_TK=1" {labltk:installed} "all" ]
-  [ make "agents" ] {atdgen:installed & lwt:installed}
   [ make "META" "kappalib" ]
+  [ make "agents" ] {atdgen:installed & lwt:installed}
   [ make "bin/WebSim" ] {atdgen:installed & lwt:installed & cohttp:installed}
 ]
 
