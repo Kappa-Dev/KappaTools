@@ -1,0 +1,121 @@
+swagger: '2.0'
+info:
+  title: Kasim API
+  description: Kasim API
+  contact:
+    email: admin@executableknowledge.org
+  license:
+    name: LGPL
+    url: 'http://www.gnu.org/licenses/lgpl-3.0.en.html'
+  version: 1.0.0
+host: api.executableknowledge.org
+schemes:
+  - https
+basePath: /kappa/v2
+produces:
+  - application/json
+paths:
+  /projects:
+    get:
+      summary: List of projets
+      responses:
+        '200':
+          description: list of project id
+    post:
+      parameters:
+        - in: body
+          name: project
+          schema:
+            $ref: '#/definitions/Project_parameter'
+          required: true
+      summary: Create project
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Project already exists
+  '/projects/{project_id}':
+    get:
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      summary: Get project info
+      responses:
+        '200':
+          description: Information
+        '404':
+          description: Project does not exist
+    delete:
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      summary: Create project
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Project does not exist
+  '/projects/{project_id}/files':
+    post:
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: file
+          schema:
+            $ref: '#/definitions/File'
+          required: true
+      summary: Add a file to the project
+      responses:
+        '200':
+          description: OK
+definitions:
+  Project_parameter:
+    type: object
+    required:
+      - project_id
+    properties:
+      project_id:
+        type: string
+  File_version:
+    type: object
+    properties:
+      client_id:
+        type: string
+      local_version_file_version:
+        type: integer
+  File_metadata:
+    type: object
+    required:
+      - compile
+      - id
+      - position
+    properties:
+      compile:
+        type: boolean
+      hash:
+        type: string
+      id:
+        type: string
+      position:
+        type: integer
+      version:
+        type: array
+        items:
+          $ref: '#/definitions/File_version'
+  File:
+    type: object
+    required:
+      - metadata
+      - content
+    properties:
+      metadata:
+        $ref: '#/definitions/File_metadata'
+      content:
+        type: string
