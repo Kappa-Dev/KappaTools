@@ -306,13 +306,18 @@ let xml () =
              (React.S.map
                 (fun display_format ->
                    match display_format with
-                   | Graph -> ["visible" ; "kappa-code" ]
+                   | Graph -> ["visible" ]
                    | Kappa -> ["hidden"])
                 display_format
-             ) ;
-           Html.a_id display_id
-         ]
-      [ Html.entity "nbsp" ]
+             ) ]
+      [%html {|
+<form  class="form-inline">
+  <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
+  <label><input type="radio" name="mode" value="sumByCount" > Count</label>
+  <label><input type="radio" name="mode" value="sumBySize"> Size</label>
+  <button id="resetButton" type="button"> Reset </button>
+</form>
+<div id="|}{|">&nbsp;</div>|}]
   in
   let format_chooser =
     [%html
@@ -327,7 +332,7 @@ let xml () =
                </div>
                <div class="col-sm-10 col-xs-8"> |}[ snapshot_chooser ]{| </div>
              </div>
-                |}[ kappa_snapshot_display; kappa_graph_display ]{|
+                |} [kappa_snapshot_display; kappa_graph_display] {|
           </div>
           <div class="navcontent-controls">
           |}export_controls{|
