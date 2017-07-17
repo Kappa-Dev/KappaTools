@@ -19,25 +19,21 @@ type t = {
 type mod_ccs_cache = (int, unit) Hashtbl.t
 
 let empty env = {
-    of_patterns = Pattern.Env.new_obs_map
-        (Model.domain env) (fun _ -> IntCollection.create 64);
-    of_unary_patterns = Pattern.Env.new_obs_map
-        (Model.domain env) (fun _ -> Mods.IntMap.empty);
-  }
+  of_patterns = Pattern.Env.new_obs_map
+      (Model.domain env) (fun _ -> IntCollection.create 64);
+  of_unary_patterns = Pattern.Env.new_obs_map
+      (Model.domain env) (fun _ -> Mods.IntMap.empty);
+}
 
 let incorporate_extra_pattern state pattern matchings =
   if IntCollection.is_empty
       (Pattern.ObsMap.get state.of_patterns pattern) then
-    Pattern.ObsMap.set
-      state.of_patterns
-      pattern matchings
-
+    Pattern.ObsMap.set state.of_patterns pattern matchings
 
 let add_intset_in_intmap id set map =
   if Mods.IntSet.is_empty set
   then Mods.IntMap.remove id map
   else Mods.IntMap.add id set map
-
 
 (*  Break apart connected component:
     Update "roots of unary patterns"
@@ -50,7 +46,8 @@ let break_apart_cc state edges mod_conn = function
   | Some (origin_cc,new_cc) ->
     let () = Hashtbl.replace mod_conn origin_cc () in
     let () = Hashtbl.replace mod_conn new_cc () in
-    { state with
+    {
+      of_patterns = state.of_patterns;
       of_unary_patterns =
         Pattern.ObsMap.map
           (fun cc_map ->
@@ -65,7 +62,7 @@ let break_apart_cc state edges mod_conn = function
                add_intset_in_intmap
                  new_cc nset (add_intset_in_intmap origin_cc oset' cc_map)
           )
-          state.of_unary_patterns
+          state.of_unary_patterns;
     }
 
 (* Same: not very subtle. You just propagate. *)
@@ -74,7 +71,8 @@ let merge_cc state mod_connectivity = function
   | Some (cc1,cc2) ->
     let () = Hashtbl.replace mod_connectivity cc1 () in
     let () = Hashtbl.replace mod_connectivity  cc2 () in
-    { state with
+    {
+      of_patterns = state.of_patterns;
       of_unary_patterns =
         Pattern.ObsMap.map
           (fun cc_map ->
@@ -83,7 +81,7 @@ let merge_cc state mod_connectivity = function
              | None,_ -> cc_map
              | Some set2, cc_map' ->
                add_intset_in_intmap cc1 (Mods.IntSet.union set1 set2) cc_map')
-          state.of_unary_patterns
+          state.of_unary_patterns;
     }
 
 (* Most of the code is to deal with unary_instances.
@@ -111,34 +109,21 @@ let update_roots state is_add unary_ccs edges mod_connectivity pattern root =
           cc_map in
     Pattern.ObsMap.set state.of_unary_patterns pattern cc_map'
 
-
-let number r pat = 
+let number r pat =
   IntCollection.size (Pattern.ObsMap.get r.of_patterns pat)
-
-
 
 let print_injections ?domain f roots_of_patterns =
   Format.fprintf
     f "@[<v>%a@]"
     (Pattern.ObsMap.print Pp.space
        (fun pattern f roots ->
-          Format.fprintf
-            f "@[# @[%a@] ==>@ @[%a@]@]"
-            (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
-            IntCollection.print roots
+          if IntCollection.size roots > 0 then
+            Format.fprintf
+              f "@[# @[%a@] ==>@ @[%a@]@]"
+              (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
+              IntCollection.print roots
        )
     ) roots_of_patterns
-
-let print_injections' ?domain f roots_of_patterns =
-  Format.fprintf f "@[<v>" ;
-  Pattern.ObsMap.fold_lefti (fun pattern () roots ->
-    if IntCollection.size roots > 0 then
-      Format.fprintf f "@[# @[%a@] ==>@ @[%a@]@]@;"
-            (Pattern.print ~new_syntax:true ?domain ~with_id:true) pattern
-            IntCollection.print roots
-  ) () roots_of_patterns ;
-  Format.fprintf f "@]@."
-
 
 let print_unary_injections ?domain f roots_of_patterns =
   Format.fprintf
@@ -154,17 +139,16 @@ let print_unary_injections ?domain f roots_of_patterns =
        )
     ) roots_of_patterns
 
-  let debug_print f state =
-    print_injections' ?domain:None f state.of_patterns
-    (* print_unary_injections ?domain:None f state.of_unary_patterns *)
-
+let debug_print f state =
+  let () = print_injections ?domain:None f state.of_patterns in
+  print_unary_injections ?domain:None f state.of_unary_patterns
 
 (* Useful shortcuts *)
 
-let of_pattern pat_id state = 
+let of_pattern pat_id state =
   try Pattern.ObsMap.get state.of_patterns pat_id
   with Not_found -> IntCollection.create 1
 
-let of_unary_pattern pat_id state = 
+let of_unary_pattern pat_id state =
   try Pattern.ObsMap.get state.of_unary_patterns pat_id
   with Not_found -> Mods.IntMap.empty
