@@ -71,18 +71,18 @@ class Render {
             .attr("preserveAspectRatio", "xMinYMin meet")
             .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight );  
         
-        this.svg = container.append('g')
+         let svg = this.svg = container.append('g')
                 .attr('transform', 'translate(' + [width/2, height/2] + ')')
                 .append('g');
 
-        container.call(d3.zoom().on('zoom', () => this.svg.attr('transform', d3.event.transform)));
-        container.call(d3.drag().on('drag', () => this.svg.attr('transform', 'translate(' + d3.event.x + ',' + d3.event.y +')')));
-        
-        this.agentNames = layout.contactMap.data
-                              .listNodes()
-                              .map(function(node){
-                                return node.label;
-                              });
+        function zoomed() {
+            svg.attr('transform', d => d3.event.transform );
+        }
+
+        let zoom = d3.zoom().scaleExtent([0.5, 10]).on('zoom', zoomed);
+
+        container.call(zoom);
+        container.call(d3.drag().on('drag', () => svg.attr('transform', 'translate(' + d3.event.x + ',' + d3.event.y +')')));
                         
         this.siteList = [];
         let data = this.layout.contactMap.data;
@@ -97,6 +97,20 @@ class Render {
         }
 
         let tip = this.tip = new UIManager(this);
+
+         /* add behavior for reset zoom button */
+        d3.select("#resetZoomButton").on("click", reset);
+
+        function reset() {
+            console.log("reset");
+            container.transition().duration(750)
+            .call(zoom.transform, d3.zoomIdentity);
+        }
+
+        this.agentNames = layout.contactMap.data
+                              .listNodes()
+                              .map( node => node.label );
+
         this.cycleDetect = false;
         this.toggleLines = false;
     }   
@@ -116,7 +130,6 @@ class Render {
         this.renderStates();
         //this.checkStateCollusion(110);
     }
-
     rerender() {
         this.rerenderNodes();
         this.rerenderLinks();

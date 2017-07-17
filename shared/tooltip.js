@@ -33,13 +33,21 @@ class UIManager {
             .attr('for', 'toggleLines')
             .text("Hide Guide Lines");
 
-        this.stateToggle = toolbox.append("div")
+        this.toggles = toolbox.append("div")
             .attr("class", "stateButtonDiv")
-        .append("input")
+
+        this.toggles.append("input")
             .attr("class", "stateButton")
             .attr("type", "button")
             .attr("value", "Show All States")
             .on("click", showStates);
+            
+        this.toggles.append("input")
+            .attr("id", "resetZoomButton")
+            .attr("class", "stateButton")
+            .attr("type", "button")
+            .attr("value", "Reset Zoom");
+
 
         function toggleCycleDetection() {
             //console.log("checked");
