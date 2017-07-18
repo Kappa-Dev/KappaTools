@@ -8,6 +8,8 @@
 
 module Html = Tyxml_js.Html5
 
+open Lwt.Infix
+
 let navli () = []
 
 let display_id = "contact-map-display"

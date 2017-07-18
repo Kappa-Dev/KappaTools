@@ -28,10 +28,9 @@ let content () =
                         constraints_json
                     in
                     let () = ReactiveData.RList.set set_constraints
-                        [ Html.p (Html.pcdata
-                                    ()
-                                    (Yojson.Basic.to_string constraints_json))::(List.map (fun (a,b) -> a) constraints)
-                               ] in
+                        (Html.p [Html.pcdata
+                                    (Yojson.Basic.to_string constraints_json)]::(List.map (fun (a,b) -> Html. p [Html.pcdata a]) constraints
+                               )) in
                     ())
                  manager#get_constraints_list) >>=
               fun out -> Lwt.return (Api_common.result_lift out)
