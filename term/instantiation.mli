@@ -75,6 +75,13 @@ val concretize_test :
   (Matching.t * int Mods.IntMap.t) -> abstract test -> concrete test
 val concretize_action :
   (Matching.t * int Mods.IntMap.t) -> abstract action -> concrete action
+
+val try_concretize_action :
+  (Matching.t * int Mods.IntMap.t) -> abstract action -> (concrete action) option
+(** Same than [concretize_action], except that it returns [None]
+    if the provided injection's domain does not contain a fresh agent
+    that is involved in the action that is being concretized. *)
+
 val concretize_event :
   (Matching.t * int Mods.IntMap.t) -> abstract event -> concrete event
 val matching_abstract_concrete :

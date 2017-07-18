@@ -309,6 +309,7 @@ let xml () =
                 display_format
              ) ]
       [%html {|
+<<<<<<< HEAD
         <form  class="form-inline" id="snap-form">
         <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
         <label><input type="radio" name="mode" value="sumByCount" > Count</label>
@@ -316,6 +317,15 @@ let xml () =
         <button id="resetButton" class="stateButton" type="button"> Reset Zoom </button>
         </form>
         <div id="|}display_id{|">&nbsp;</div>|}]
+=======
+<form  class="form-inline">
+  <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
+  <label><input type="radio" name="mode" value="sumByCount" > Count</label>
+  <label><input type="radio" name="mode" value="sumBySize"> Size</label>
+  <button id="resetButton" type="button"> Reset </button>
+</form>
+<div id="|}{|">&nbsp;</div>|}]
+>>>>>>> 92b6f149d4d063f0d1ade93bbca93c1c6b3960ca
   in
   let format_chooser =
     [%html
@@ -330,7 +340,7 @@ let xml () =
                </div>
                <div class="col-sm-10 col-xs-8"> |}[ snapshot_chooser ]{| </div>
              </div>
-                |}[ kappa_snapshot_display; kappa_graph_display ]{|
+                |} [kappa_snapshot_display; kappa_graph_display] {|
           </div>
           <div class="navcontent-controls">
           |}export_controls{|

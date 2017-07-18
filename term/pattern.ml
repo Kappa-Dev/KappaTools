@@ -25,6 +25,8 @@ type t = cc
 
 type id = int
 
+let debug_print_id fmt id = Format.fprintf fmt "%d" id
+
 let size_of_cc cc = Mods.IntMap.size cc.nodes
 
 let compare_canonicals cc cc' = Mods.int_compare cc cc'

@@ -671,7 +671,7 @@ internal_states:p;u;
   site:y
 internal_states:p;u;
   site:z
-binding_states:A.z;
+binding_states:0.2;
 Partitioned contact map
 ************
 Agent: A

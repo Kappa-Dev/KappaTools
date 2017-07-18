@@ -76,6 +76,8 @@ val actions_of_step :
   (Instantiation.concrete Instantiation.action list *
    (Instantiation.concrete Instantiation.site *
     Instantiation.concrete Instantiation.binding_state) list)
+(** @return (actions, side_effects) *)
+
 val side_effects_of_step :
   step -> Instantiation.concrete Instantiation.site list
 val simulation_info_of_step: step -> unit Simulation_info.t option

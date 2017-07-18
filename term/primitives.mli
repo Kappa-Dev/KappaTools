@@ -34,6 +34,15 @@ sig
     (int * Raw_mixture.agent) list *
     (Instantiation.abstract * Instantiation.site_name * int) list *
     Instantiation.abstract t list
+
+  val negative_transformations_of_actions :
+    Signature.s -> Edges.t -> Instantiation.concrete Instantiation.action list ->
+    Instantiation.concrete t list
+  val positive_transformations_of_actions :
+    Signature.s -> Instantiation.concrete Instantiation.site list ->
+    Instantiation.concrete Instantiation.action list ->
+    Instantiation.concrete t list
+  (** [positive_transformations_of_actions signature side_effect_dsts actions] *)
 end
 
 type elementary_rule = {
@@ -49,6 +58,9 @@ type elementary_rule = {
   (** In the reverse order on purpose so that we rev_map when we
       concretize *)
 }
+(** If [unary_rate] is [Some _], [rate] means binary rate. Else [rate]
+    is the rate independently of the connectivity *)
+
 val extract_cc_ids : elementary_rule -> Pattern.id array
 val extract_abstract_event :
   elementary_rule -> Instantiation.abstract Instantiation.event

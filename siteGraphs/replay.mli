@@ -26,6 +26,17 @@ val do_step : Signature.s -> state -> Trace.step -> state * summary
     binary rule, the id of the rule and the distance between its 2
     connected patterns. *)
 
+val is_step_triggerable : state -> Trace.step -> bool
+(** determines whether or not a step can be applied
+    from a given state. *)
+
+val is_step_triggerable_on_edges : Edges.t -> Trace.step -> bool
+(** same function but takes a graph of type Edges.t directly. *)
+
+val tests_pass_on : Edges.t -> 
+  Instantiation.concrete Instantiation.test list list -> bool
+(** exported for convenience. *)
+
 val cc_of_state :
   state -> Pattern.PreEnv.t ->
   Pattern.PreEnv.t * ((int*int) list * Pattern.cc * Pattern.id) list

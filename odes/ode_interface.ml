@@ -421,7 +421,7 @@ let rate_name compil rule rule_id =
 
 let dummy_htbl = Hashtbl.create 0
 
-let apply_sigs sigs rule inj_nodes mix =
+let apply_sigs env rule inj_nodes mix =
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
                 (inj_nodes, Mods.IntMap.empty))
@@ -430,7 +430,7 @@ let apply_sigs sigs rule inj_nodes mix =
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
       (Rule_interpreter.apply_negative_transformation dummy_htbl)
-      ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
+      ([], Instances.empty env, mix)
       concrete_removed
   in
   let (_, remaining_side_effects, _, edges'), concrete_inserted =
@@ -438,7 +438,7 @@ let apply_sigs sigs rule inj_nodes mix =
       (fun (x,p) h ->
          let (x',h') =
            Rule_interpreter.apply_positive_transformation
-             sigs dummy_htbl x h in
+             (Model.signatures env) dummy_htbl x h in
          (x', h' :: p))
       (((inj_nodes, Mods.IntMap.empty),
         side_effects, dummy, edges_after_neg), [])
@@ -454,8 +454,7 @@ let apply_sigs sigs rule inj_nodes mix =
   edges''
 
 let apply compil rule inj_nodes mix =
-  let sigs = Model.signatures compil.environment in
-  apply_sigs sigs rule inj_nodes mix
+  apply_sigs compil.environment rule inj_nodes mix
 
 let get_rules compil =
   Model.fold_rules
@@ -534,9 +533,9 @@ let mixture_of_init compil c =
   let m = apply compil c emb m in
   m
 
-let mixture_of_init_sigs sigs c =
-  let _, emb, m = disjoint_union_sigs sigs [] in
-  let m = apply_sigs sigs c emb m in
+let mixture_of_init_sigs env c =
+  let _, emb, m = disjoint_union_sigs (Model.signatures env) [] in
+  let m = apply_sigs env c emb m in
   m
 
 let species_of_initial_state_env env contact_map_int cache list =
@@ -544,7 +543,7 @@ let species_of_initial_state_env env contact_map_int cache list =
   let cache, list =
     List.fold_left
       (fun (cache,list) (_,r,_) ->
-         let b = mixture_of_init_sigs sigs r in
+         let b = mixture_of_init_sigs env r in
          let cache', acc =
            connected_components_of_mixture_sigs sigs cache
              contact_map_int b

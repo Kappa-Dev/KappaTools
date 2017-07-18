@@ -136,8 +136,7 @@ let print_init ~compact ?env log actions =
     | Some env -> Some (Model.signatures env) in
   if compact then
     Format.fprintf
-      log "INIT:%a"
-      (Pp.list Pp.space (Instantiation.print_concrete_action ?sigs)) actions
+      log "INIT"
   else
     Format.fprintf
       log "***@[<1>INIT:%a@]***"
