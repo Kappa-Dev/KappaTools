@@ -24,7 +24,7 @@ let string_to_display_format =
   | "Graph" -> Some Graph
   | _ -> None
 
-let display_format, set_display_format = React.S.create Graph
+let display_format, set_display_format = React.S.create Kappa
 
 let snapshot_count
     (state : Api_types_j.simulation_info option) :
@@ -113,24 +113,22 @@ let configuration_graph () : Widget_export.configuration =
 let format_select_id = "format_select_id"
 
 let render_snapshot_graph
-    (snapshot_js : Js_contact.contact_map Js.t)
+    (snapshot_js : Js_snapshot.snapshot Js.t)
     (snapshot : Api_types_j.snapshot) : unit =
   let () =
     Common.debug
       (Js.string
          (Api_types_j.string_of_snapshot snapshot))
   in
-  let site_graph : Api_types_j.site_graph =
-    Api_data.api_snapshot_site_graph snapshot in
   match React.S.value display_format with
   | Graph ->
-    let json : string = Api_types_j.string_of_site_graph site_graph in
+    let json : string = Api_types_j.string_of_snapshot snapshot in
     snapshot_js##setData (Js.string json)
   | Kappa -> ()
 
 let select_snapshot () =
-  let snapshot_js : Js_contact.contact_map Js.t =
-    Js_contact.create_contact_map display_id true in
+  let snapshot_js : Js_snapshot.snapshot Js.t =
+    Js_snapshot.create_snapshot display_id in
   let index = Js.Opt.bind
       (Ui_common.document##getElementById (Js.string select_id))
       (fun dom ->
@@ -306,19 +304,24 @@ let xml () =
              (React.S.map
                 (fun display_format ->
                    match display_format with
-                   | Graph -> ["visible" ; "kappa-code" ]
+                   | Graph -> ["visible" ]
                    | Kappa -> ["hidden"])
                 display_format
-             ) ;
-           Html.a_id display_id
-         ]
-      [ Html.entity "nbsp" ]
+             ) ]
+      [%html {|
+        <form  class="form-inline" id="snap-form">
+        <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
+        <label><input type="radio" name="mode" value="sumByCount" > Count</label>
+        <label><input type="radio" name="mode" value="sumBySize"> Size</label>
+        <button id="resetButton" class="stateButton" type="button"> Reset Zoom </button>
+        </form>
+        <div id="|}display_id{|">&nbsp;</div>|}]
   in
   let format_chooser =
     [%html
       {| <select class="form-control" id="|}
         format_select_id
-        {|"><option value="Kappa">kappa</option><option value="Graph">graph</option></select> |} ]
+        {|"><option value="Kappa" selected>kappa</option><option value="Graph">graph</option></select> |} ]
   in
   [%html {|<div class="navcontent-view">
              <div class="row" style="margin : 5px;">
@@ -356,16 +359,15 @@ let onload () : unit =
     let format_text : string = (Js.to_string format_select_dom##.value) in
     match string_to_display_format format_text with
     | Some format ->
-      let snapshot_js : Js_contact.contact_map Js.t =
-        Js_contact.create_contact_map display_id true in
+      let snapshot_js : Js_snapshot.snapshot Js.t =
+        Js_snapshot.create_snapshot display_id in
       let () =
-        (match React.S.value current_snapshot with
-         | None -> ()
-         | Some snapshot -> render_snapshot_graph
-                              (snapshot_js : Js_contact.contact_map Js.t)
-                              (snapshot : Api_types_j.snapshot))
-      in
-      set_display_format format
+        set_display_format format in
+      (match React.S.value current_snapshot with
+      | None -> ()
+      | Some snapshot -> render_snapshot_graph
+                            (snapshot_js : Js_snapshot.snapshot Js.t)
+                            (snapshot : Api_types_j.snapshot))
     | None -> assert false
   in
   (* get initial value for display format *)
