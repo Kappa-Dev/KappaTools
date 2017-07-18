@@ -28,10 +28,51 @@ let content () =
                         constraints_json
                     in
                     let () = ReactiveData.RList.set set_constraints
-                        [ Html.p (Html.pcdata
-                                    ()
-                                    (Yojson.Basic.to_string constraints_json))::(List.map (fun (a,b) -> a) constraints)
-                               ] in
+                        [ Html.p
+                            (List.fold_left
+                               (fun list (a,b) ->
+
+                                  (Html.pcdata a)::
+                                  (Html.pcdata "\n")::
+                                  (Html.pcdata "\n")::
+                                  (List.fold_left
+                                     (fun list lemma ->
+                                        let hyp =
+                                          Remanent_state.get_hyp
+                                            lemma
+                                        in
+                                        let conclusion =
+                                          Remanent_state.get_refinement lemma in
+                                        (Html.pcdata ".")::
+                                        (Html.pcdata " => ")::
+                                        (if List.length conclusion = 1
+                                         then
+                                           (Html.pcdata ".\n")::list
+                                         else
+                                           (Html.pcdata "   [ \n   ")::
+                                           (snd
+                                              (
+                                               List.fold_left
+
+                                                 (fun (bool,list) a ->
+                                                    let l =
+                                                      (Html.pcdata ".")::list
+                                                    in                          true,
+                                                    if bool then
+                                                      (Html.pcdata "\n v ")::
+                                                      (Html.pcdata ".")::list
+                                                    else
+                                                      (Html.pcdata ".")::list)
+                                                 (false,
+                                                  (Html.pcdata "\n]\n")::list)
+                                                 conclusion
+                                              ))))
+                                     ((Html.pcdata "\n")::(Html.pcdata "\n")::list)
+                                     b))
+                               [] constraints)
+
+                        ] in
+
                     ())
                  manager#get_constraints_list) >>=
               fun out -> Lwt.return (Api_common.result_lift out)
