@@ -20,7 +20,11 @@ let site="site name"
 let stateslist="states list"
 let props="property states"
 let binds="binding states"
-
+let sitename = site
+let sitelinks = binds
+let sitestates = props
+let sitenodename = agent
+let sitenodesites = "interface"
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -85,9 +89,109 @@ module AccuracyMap = AccuracySetMap.Map
 (* Contact map *)
 (***************)
 
-type contact_map =
-  ((string list) * (string*string) list)
-    Mods.StringSetMap.Map.t Mods.StringSetMap.Map.t
+type site = {
+     site_name: string;
+     site_links: (int * int) list;
+     site_states: string list;
+}
+
+type site_node = {
+     site_node_name: string;
+     site_node_sites: site list (*ocaml repr="array">*);
+}
+
+type site_graph = site_node list (*ocaml repr="array"*)
+type contact_map = site_graph
+
+let site_to_json site =
+  `Assoc
+    [
+      sitename,
+      JsonUtil.of_string site.site_name;
+
+      sitelinks,
+      JsonUtil.of_list (JsonUtil.of_pair JsonUtil.of_int JsonUtil.of_int) site.site_links;
+
+      sitestates,
+      JsonUtil.of_list JsonUtil.of_string site.site_states
+    ]
+
+let site_of_json =
+  function
+    | `Assoc l as x ->
+      begin
+        try
+          let site_name =
+            let json = List.assoc sitename l in
+            JsonUtil.to_string json
+          in
+          let site_links =
+            let json = List.assoc sitelinks l in
+            JsonUtil.to_list ~error_msg:"link list"
+              (JsonUtil.to_pair ~error_msg:"link"
+                 (JsonUtil.to_int ~error_msg:"agent id")
+                 (JsonUtil.to_int ~error_msg:"site id"))
+              json
+          in
+          let site_states =
+            let json = List.assoc sitestates l in
+            JsonUtil.to_list ~error_msg:"state list"
+              (JsonUtil.to_string ~error_msg:"state")
+              json
+          in
+          {
+            site_name;
+            site_links;
+            site_states;
+          }
+        with
+        | _ ->
+          raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node",x))
+      end
+    | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node",x))
+
+
+let site_node_sites_to_json list =
+  JsonUtil.of_list site_to_json list
+
+let site_node_sites_of_json =
+  JsonUtil.to_list
+    ~error_msg:"site node sites"
+    site_of_json
+
+
+
+let site_node_to_json node =
+  `Assoc
+    [ sitenodename,
+      JsonUtil.of_string node.site_node_name;
+
+      sitenodesites,
+      site_node_sites_to_json node.site_node_sites]
+
+
+let site_node_of_json =
+function
+| `Assoc l as x ->
+  begin
+    try
+      let site_node_name =
+        let json = List.assoc sitenodename l in
+        JsonUtil.to_string json
+      in
+      let site_node_sites =
+        let json = List.assoc sitenodesites l in
+        site_node_sites_of_json json
+      in
+      {
+        site_node_name;
+        site_node_sites
+      }
+    with
+    | _ ->
+      raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node",x))
+  end
+| x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node",x))
 
 let contact_map_to_json contact_map=
   `Assoc
@@ -95,21 +199,11 @@ let contact_map_to_json contact_map=
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
        accuracy_to_json
-       (Mods.StringSetMap.Map.to_json
-       ~lab_key:agent ~lab_value:interface
-       JsonUtil.of_string
-       (Mods.StringSetMap.Map.to_json
-          ~lab_key:site ~lab_value:stateslist
-          JsonUtil.of_string
-          (JsonUtil.of_pair
-             ~lab1:props ~lab2:binds
-             (JsonUtil.of_list JsonUtil.of_string)
-             (JsonUtil.of_list
-                (JsonUtil.of_pair
-                   ~lab1:agent ~lab2:site
-                   JsonUtil.of_string
-                   JsonUtil.of_string)
-             )))) contact_map]
+       (JsonUtil.of_list
+          site_node_to_json)
+       contact_map
+    ]
+
 
 let contact_map_of_json =
   function
@@ -121,7 +215,15 @@ let contact_map_of_json =
           ~lab1:accuracy_string ~lab2:map
           ~error_msg:(JsonUtil.build_msg "contact map")
           accuracy_of_json
-          (Mods.StringSetMap.Map.of_json
+          (JsonUtil.to_list
+             ~error_msg:(JsonUtil.build_msg "site nodes list")
+             site_node_of_json
+          )
+          json
+
+
+(*
+             Mods.StringSetMap.Map.of_json
              ~lab_key:agent ~lab_value:interface
              (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
              (Mods.StringSetMap.Map.of_json
@@ -144,7 +246,7 @@ let contact_map_of_json =
                                                              "agent name"))
                            (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
                                                              "site")))))))
-          json
+          json*)
       with
       | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
     end
@@ -191,4 +293,3 @@ let separating_transitions_of_json =
         (JsonUtil.to_string ?error_msg:None)
         (JsonUtil.to_int ?error_msg:None)
         (JsonUtil.to_string ?error_msg:None))
-

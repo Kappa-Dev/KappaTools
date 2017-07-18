@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 05 2017>
+  * Last modification: Time-stamp: <Jul 18 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -115,10 +115,15 @@ let print_contact_map parameters contact_map =
   let log = (Remanent_parameters.get_logger parameters) in
   Loggers.fprintf log  "Contact map: ";
   Loggers.print_newline log;
-  Mods.StringSetMap.Map.iter
-    (fun x ->
-       Mods.StringSetMap.Map.iter
-         (fun y (l1,l2) ->
+  List.iter
+    (fun node ->
+       let x = node.Public_data.site_node_name in
+       let interface = node.Public_data.site_node_sites in
+       List.iter
+         (fun site ->
+            let y = site.Public_data.site_name in
+            let l1 = site.Public_data.site_states in
+            let l2 = site.Public_data.site_links in
             if l1<>[]
             then
               begin
@@ -137,14 +142,16 @@ let print_contact_map parameters contact_map =
             List.iter
               (fun (z,t) ->
                  Loggers.fprintf log
-                   "%s@%s--%s@%s" x y z t;
+                   "%s@%s--%i@%i" x y z t;
                  Loggers.print_newline log
               ) l2
          )
+         interface
     ) contact_map
 
 (*---------------------------------------------------------------------------*)
 (*operations of module signatures*)
+
 
 let init ?compil ~called_from () =
   match compil with
@@ -475,6 +482,48 @@ let get_handler =
     ~phase:StoryProfiling.KaSa_linking
     Remanent_state.get_handler (choose snd)
 
+
+let simplify_site site =
+  match site with
+  | Ckappa_sig.Binding site_name
+  | Ckappa_sig.Internal site_name -> site_name
+
+let translate_agent ~message ~ml_pos state agent =
+  let state,handler = get_handler state in
+  let error = get_errors state in
+  let parameters = get_parameters state in
+  let error,ag =
+    Handler.translate_agent
+      ~message ~ml_pos
+      parameters error handler agent
+  in
+  let state = set_errors error state in
+  state, ag
+
+let translate_site ~message ~ml_pos state agent site =
+  let state,handler = get_handler state in
+  let error = get_errors state in
+  let parameters = get_parameters state in
+  let error,site =
+    Handler.translate_site ~message ~ml_pos parameters error handler agent site
+  in
+  let state = set_errors error state in
+  state, site
+
+let translate_state ~message ~ml_pos state agent site prop =
+  let state,handler = get_handler state in
+  let error = get_errors state in
+  let parameters = get_parameters state in
+  let error,site =
+    Handler.translate_state ~message ~ml_pos parameters error handler agent site prop
+  in
+  let state = set_errors error state in
+  state, site
+
+let translate_and_simplify_site ~message ~ml_pos state agent site =
+  let state, site = translate_site ~message ~ml_pos state agent site in
+  state, simplify_site site
+
 let dump_c_compil state c_compil =
   let state, handler = get_handler state in
   let parameters = Remanent_state.get_parameters state in
@@ -517,18 +566,38 @@ let get_raw_internal_contact_map  =
     (Remanent_state.get_internal_contact_map Public_data.Low)
     compute_raw_internal_contact_map
 
+let convert_contact_map_map_to_list sol =
+  List.rev
+    (Mods.StringSetMap.Map.fold
+       (fun a data l ->
+          { Public_data.site_node_name= a;
+            Public_data.site_node_sites=
+              List.rev
+                (Mods.StringSetMap.Map.fold
+                   (fun a (props,links) l ->
+                      {
+                        Public_data.site_name=a;
+                        Public_data.site_links=links;
+                        Public_data.site_states=props
+                      }::l) data [])}::l)
+       sol [])
+
 let compute_raw_contact_map show_title state =
   let sol        = ref Mods.StringSetMap.Map.empty in
   let state, handler = get_prehandler state in
   let parameters = Remanent_state.get_parameters state in
   let error      = Remanent_state.get_errors state in
-  let add_link (a,b) (c,d) sol =
+  let add_link (a,b) (c_id,d_id) sol =
     let sol_a = Mods.StringSetMap.Map.find_default
         Mods.StringSetMap.Map.empty a sol in
     let l,old = Mods.StringSetMap.Map.find_default
         ([],[]) b sol_a in
     Mods.StringSetMap.Map.add a
-      (Mods.StringSetMap.Map.add b (l,((c,d)::old)) sol_a) sol
+      (Mods.StringSetMap.Map.add b (l,((Ckappa_sig.int_of_agent_name c_id,Ckappa_sig.int_of_site_name d_id)::old)) sol_a) sol
+  in
+  let add_link (a,b)   (a_id,b_id) (c,d) (c_id,d_id) sol =
+    add_link (a,b) (c_id,d_id)
+      (add_link (c,d) (a_id,b_id) sol)
   in
   (*----------------------------------------------------------------*)
   let add_internal_state (a,b) c sol =
@@ -540,12 +609,6 @@ let compute_raw_contact_map show_title state =
       let old,l = Mods.StringSetMap.Map.find_default ([],[]) b sol_a in
       Mods.StringSetMap.Map.add a
         (Mods.StringSetMap.Map.add b (state::old,l) sol_a) sol
-  in
-  (*----------------------------------------------------------------*)
-  let simplify_site site =
-    match site with
-    | Ckappa_sig.Binding site_name
-    | Ckappa_sig.Internal site_name -> site_name
   in
   (*----------------------------------------------------------------*)
   let () = show_title state in
@@ -599,13 +662,16 @@ let compute_raw_contact_map show_title state =
            Handler.translate_site parameters error handler i' j'
          in
          let site_j' = simplify_site site_j' in
-         let sol = add_link (ag_i,site_j) (ag_i',site_j') sol in
+         let sol = add_link (ag_i,site_j) (i,j) (ag_i',site_j') (i',j') sol in
          error, sol)
       handler.Cckappa_sig.dual sol
   in
   let sol =
     Mods.StringSetMap.Map.map
       (Mods.StringSetMap.Map.map (fun (l,x) -> List.rev l,x)) sol
+  in
+  let sol =
+    convert_contact_map_map_to_list sol
   in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Public_data.Low sol state),
@@ -805,20 +871,16 @@ let convert_contact_map show_title state contact_map =
               let error, list_b'' =
                 List.fold_left
                   (fun (error, list) (agent,site) ->
-                     let error, ag =
-                       Handler.translate_agent
-                         ~message:"unknown agent type" ~ml_pos:(Some __POS__)
-                         parameters error handler agent
-                     in
-                     let error, site = Handler.translate_site parameters error
-                         handler agent site in
-                     let st = Handler.print_site_contact_map site in
-                     error, (ag,st)::list)
+                     error, (Ckappa_sig.int_of_agent_name agent,
+                             Ckappa_sig.int_of_site_name site)::list)
                   (error, list_b) (List.rev list_b')
               in
               error, (list_a'', list_b''))
            sitemap)
       contact_map
+  in
+  let contact_map =
+    convert_contact_map_map_to_list contact_map
   in
   Remanent_state.set_errors error state,
   contact_map
@@ -1187,26 +1249,53 @@ let get_internal_contact_map
 let compute_signature show_title state =
   let state,l = get_contact_map state in
   let () = show_title state in
-  let l =
-    Mods.StringSetMap.Map.fold
-      (fun a interface list ->
-         (Locality.dummy_annot a,
+  let state, l =
+    List.fold_left
+      (fun (state,list) site_node ->
+         let a = site_node.Public_data.site_node_name in
+         let interface = site_node.Public_data.site_node_sites in
+         let state,acc =
+           List.fold_left
+             (fun (state,acc) site ->
+                let x = site.Public_data.site_name in
+                let states = site.Public_data.site_states in
+                let binding = site.Public_data.site_links in
+                let state, binding' =
+                  List.fold_left
+                    (fun (state,list) (x,y) ->
+                       let state,sx =
+                         translate_agent state
+                           ~message:"unknown agent name id" ~ml_pos:(Some __POS__)
+                           (Ckappa_sig.agent_name_of_int x)
+                       in
+                       let state,sy =
+                         translate_and_simplify_site
+                           ~message:"unknown site name id" ~ml_pos:(Some __POS__)
+                           state
+                           (Ckappa_sig.agent_name_of_int x)
+                           (Ckappa_sig.site_name_of_int y)
+                       in
+                       state,(Locality.dummy_annot sx, Locality.dummy_annot sy)::list)
+                    (state,[]) (List.rev binding)
+                in
+                let states' =
+                  NamedDecls.create
+                    (Tools.array_map_of_list
+                       (fun i -> (Locality.dummy_annot i,())) states)
+                in
+                state,
+                (Locality.dummy_annot x,
+                  (states',
+                   binding'))::acc)
+             (state,[]) interface
+         in
+         state,
+         ((Locality.dummy_annot a,
           NamedDecls.create
-            (Array.of_list
-               (Mods.StringSetMap.Map.fold
-                  (fun x (states,binding) acc ->
-                     let binding' =
-                       List.map
-                         (fun (x,y) ->
-                            (Locality.dummy_annot x, Locality.dummy_annot y))
-                         binding in
-                     (Locality.dummy_annot x,
-                      (NamedDecls.create
-                         (Tools.array_map_of_list
-                            (fun i -> (Locality.dummy_annot i,())) states),
-                       binding'))::acc)
-                  interface [])))::list)
-      l [] in
+            (Array.of_list acc)
+         ))::list)
+      (state,[]) l
+  in
   let signature = Signature.create (Array.of_list l) in
   Remanent_state.set_signature signature state,
   signature
@@ -1535,7 +1624,7 @@ let compute_symmetries
           rules
           contact_map
       in
-      state, Some symmetries
+        state, Some symmetries
     end
 
 let get_symmetric_sites

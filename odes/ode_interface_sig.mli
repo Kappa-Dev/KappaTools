@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jun 12 2017>
+  * Last modification: Time-stamp: <Jul 18 2017>
 *)
 
 module type Interface =
@@ -175,8 +175,7 @@ sig
   compil ->
   cache ->
   chemical_species list ->
-  (string list * (string * string) list) Mods.StringMap.t
-    Mods.StringMap.t -> cache * Symmetries.symmetries
+  Public_data.contact_map -> cache * Symmetries.symmetries
 
 
   val print_symmetries:

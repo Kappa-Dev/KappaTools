@@ -1119,9 +1119,9 @@ Existing rule
 Contact map
 agent:A
   site:x
-binding_states:A.x;A.y;
+binding_states:0.0;0.1;
   site:y
-binding_states:A.x;A.y;
+binding_states:0.0;0.1;
 Partitioned contact map
 ************
 Agent: A

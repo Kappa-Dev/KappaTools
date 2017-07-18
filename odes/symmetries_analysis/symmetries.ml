@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 5th of December
-   * Last modification: Time-stamp: <Jun 13 2017>
+   * Last modification: Time-stamp: <Jul 18 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -58,11 +58,16 @@ let add_gen add find_option k data map =
   add k (data::old) map
 
 let partition_gen
-    empty add find_option fold sort empty_range cache hash int_of_hash f map =
+    empty add find_option fold sort empty_range cache hash int_of_hash f list =
   let map =
     fst
-      (Mods.StringMap.fold
-         (fun key data (inverse,cache) ->
+      (List.fold_left
+         (fun (inverse,cache) site ->
+            let key = site.Public_data.site_name in
+            let data =
+              site.Public_data.site_states,
+              site.Public_data.site_links
+            in
             let range = f data in
             if range = empty_range
             then inverse, cache
@@ -74,7 +79,7 @@ let partition_gen
                   add find_option (int_of_hash hash) key inverse
               in
               inverse, cache
-         ) map (empty, cache))
+         ) (empty, cache) list)
   in
   List.rev (fold (fun _ l sol -> (List.rev l)::sol) map [])
 
@@ -112,19 +117,21 @@ end
 module StateList = Hashed_list.Make (State)
 
 module BindingType: SetMap.OrderedType
-  with type t = string * string
+  with type t = int * int
  =
 struct
-  type t = string*string
+  type t = int*int
   let compare = compare
-  let print f (s1,s2) = Format.fprintf f "%s.%s" s1 s2
+  let print f (s1,s2) = Format.fprintf f "%i.%i" s1 s2
 end
 
 module BindingTypeList = Hashed_list.Make (BindingType)
 
 let collect_partitioned_contact_map contact_map =
-  Mods.StringMap.map
-    (fun sitemap ->
+  List.fold_left
+    (fun map site_node ->
+       let ag = site_node.Public_data.site_node_name in
+       let site_list = site_node.Public_data.site_node_sites in
        let cache1 = StateList.init () in
        let cache2 = BindingTypeList.init () in
        let (internal_state_partition: string list list) =
@@ -133,7 +140,7 @@ let collect_partitioned_contact_map contact_map =
            StateList.hash
            StateList.int_of_hashed_list
            fst
-           sitemap
+           site_list
        in
        let (binding_state_partition: string list list) =
          partition
@@ -141,7 +148,7 @@ let collect_partitioned_contact_map contact_map =
            BindingTypeList.hash
            BindingTypeList.int_of_hashed_list
            snd
-           sitemap
+           site_list
        in
        let full_state_partition =
          partition_pair
@@ -156,14 +163,15 @@ let collect_partitioned_contact_map contact_map =
               StateList.int_of_hashed_list a,
               BindingTypeList.int_of_hashed_list b)
            (fun x->x)
-           sitemap
+           site_list
        in
-       {
+       Mods.StringMap.add ag
+         {
          Symmetries_sig.over_internal_states = internal_state_partition ;
          Symmetries_sig.over_binding_states = binding_state_partition ;
          Symmetries_sig.over_full_states = full_state_partition ;
-       }
-    ) contact_map
+       } map
+    ) Mods.StringMap.empty contact_map
 
 (*****************************************************************)
 (*PRINT*)
@@ -197,29 +205,34 @@ let print_partitioned_contact_map_in_lkappa logger env partitioned_contact_map =
 
 let print_contact_map parameters contact_map =
   let log = Remanent_parameters.get_logger parameters in
-  Mods.StringMap.iter
-    (fun agent sitemap ->
+  List.iter
+    (fun site_node ->
+       let agent = site_node.Public_data.site_node_name in
+       let interface = site_node.Public_data.site_node_sites in
        let () = Loggers.fprintf log "agent:%s\n" agent in
-       Mods.StringMap.iter
-         (fun site (l1,l2) ->
-         let () = Loggers.fprintf log "  site:%s\n" site in
-         let () =
-           if l1 <> []
-           then
-             let () = Loggers.fprintf log "internal_states:" in
-             let () = List.iter (Loggers.fprintf log "%s;") l1 in
-             let () = Loggers.print_newline log in ()
-         in
-         let () =
-           if l2 <> []
-           then
-             let () = Loggers.fprintf log "binding_states:" in
-             let () =
-               List.iter (fun (s1,s2) ->
-                   Loggers.fprintf log "%s.%s;" s1 s2) l2
-             in
-             let () = Loggers.print_newline log in ()
-         in ()) sitemap) contact_map
+       List.iter
+         (fun site ->
+            let site_name = site.Public_data.site_name in
+            let l1 = site.Public_data.site_states in
+            let l2 = site.Public_data.site_links in
+            let () = Loggers.fprintf log "  site:%s\n" site_name in
+            let () =
+              if l1 <> []
+              then
+                let () = Loggers.fprintf log "internal_states:" in
+                let () = List.iter (Loggers.fprintf log "%s;") l1 in
+                let () = Loggers.print_newline log in ()
+            in
+            let () =
+              if l2 <> []
+              then
+                let () = Loggers.fprintf log "binding_states:" in
+                let () =
+                  List.iter (fun (s1,s2) ->
+                      Loggers.fprintf log "%i.%i;" s1 s2) l2
+                in
+                let () = Loggers.print_newline log in ()
+            in ()) interface) contact_map
 
 (****************************************************************)
 
@@ -653,8 +666,8 @@ let detect_symmetries
     rate_convention
     chemical_species
     get_rules
-    (contact_map:(string list * (string * string) list)
-         Mods.StringMap.t Mods.StringMap.t) =
+    contact_map
+  =
   (*-------------------------------------------------------------*)
   let trace = Some (Remanent_parameters.get_trace parameters) in
   let fmt =
