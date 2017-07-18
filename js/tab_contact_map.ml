@@ -9,6 +9,8 @@
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
+open Lwt.Infix
+
 let navli () = []
 
 let tab_is_active, set_tab_is_active = React.S.create false

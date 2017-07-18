@@ -72,7 +72,6 @@ let content () =
                                [] constraints)
 
                         ] in
-
                     ())
                  manager#get_constraints_list) >>=
               fun out -> Lwt.return (Api_common.result_lift out)

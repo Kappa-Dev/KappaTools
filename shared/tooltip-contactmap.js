@@ -34,7 +34,7 @@ class UIManager {
             .text("Hide Guide Lines");
 
         this.toggles = toolbox.append("div")
-            .attr("class", "stateButtonDiv")
+            .attr("class", "stateButtonDiv");
 
         this.toggles.append("input")
             .attr("class", "stateButton")
