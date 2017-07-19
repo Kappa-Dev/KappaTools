@@ -1,16 +1,28 @@
 .error-span { display: inline; }
 .alert-sm { padding: 5px !important;
 	    margin-bottom: 0px; }
-html { position: relative;
-       min-height: 100%; }
-
-
-body { 
-    margin-bottom: 60px; }
-
-
-span.filler:empty:before {
+html {
+    position: relative;
+    height: 100%;
 }
+
+body {
+    height: 100%;
+}
+
+
+.flex-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+}
+
+#editor {
+    display: flex;
+    flex-direction: row;
+}
+
 .kappa-code {
     white-space : pre;
     font-family: monospace;
@@ -88,10 +100,7 @@ rect { stroke-width: 2; }
     word-wrap: break-word
 }
 .tab-log {
-    height: calc(100% - 350px);
-    height: -webkit-calc(100% - 350px);
-    height: -moz-calc(100vh - 430px);
-
+    flex:1;
 }
 .filename {
     overflow: hidden;
@@ -151,11 +160,7 @@ rect { stroke-width: 2; }
 .CodeMirror {
     border: 1px solid #eee;
     min-height: 40px;
-
-    height: calc(100% - 350px);
-    height: -webkit-calc(100% - 350px);
-    height: -moz-calc(100vh - 430px);
-
+    flex: 1;
 }
 
 .plot-legend-swatch { stroke-width : 1; }
