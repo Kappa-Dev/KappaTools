@@ -7,43 +7,82 @@
 (******************************************************************************)
 
 module Html = Tyxml_js.Html5
-open Lwt.Infix
 
 open Lwt.Infix
+
+let display_id = "contact-bis-map-display"
+let export_id = "contact-bis-export"
 
 let navli () = []
 
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let contact_map_text,set_contact_map_text = React.S.create None
+
+let configuration : Widget_export.configuration = {
+  Widget_export.id = export_id ;
+  Widget_export.handlers =
+    [ Widget_export.export_svg ~svg_div_id:display_id ();
+      Widget_export.export_png ~svg_div_id:display_id ();
+      Widget_export.export_json
+        ~serialize_json:(fun () ->
+            Option_util.unsome "null" (React.S.value contact_map_text)
+          )
+    ];
+  Widget_export.show = React.S.map
+      ((<>) None)
+      (React.S.on tab_is_active None contact_map_text)
+}
+
 let content () =
-  let contact,set_contact = ReactiveData.RList.create [] in
-  let _ = React.S.l1
-      (fun _ ->
-         State_project.with_project
-           ~label:__LOC__
-           (fun (manager : Api.concrete_manager) ->
-              (Lwt_result.map
-                 (fun contact_json ->
-                    let () = ReactiveData.RList.set set_contact
-                        [ Html.p [Html.pcdata
-                                    (Yojson.Basic.to_string contact_json) ] ] in
-                    ())
-                 (manager#get_contact_map None)) >>=
-              fun out -> Lwt.return (Api_common.result_lift out)
-           )
-      )
-      (React.S.on tab_is_active
-         State_project.dummy_model State_project.model) in
-  [ Tyxml_js.R.Html5.div
-      ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
-      contact
-  ]
+  let export_controls =
+    Widget_export.content configuration
+  in
+  [[%html {|<div>
+                <div id="|}display_id{|">
+                 |}[ Html.entity "nbsp" ]{|
+	        </div>
+	   |}[ export_controls ]{|
+        </div>|}]]
+
+let extract_contact_map = function
+  | `Assoc [ "contact map", `Assoc [ "accuracy", acc; "map", contact ] ] -> acc,contact
+  | `Assoc [ "contact map", `Assoc [ "map", contact; "accuracy", acc ] ] -> acc,contact
+  | _ -> failwith "Wrong ugly contact_map extractor"
+
+let _ = React.S.l1
+    (fun _ ->
+       State_project.with_project
+         ~label:__LOC__
+         (fun (manager : Api.concrete_manager) ->
+            (Lwt_result.map
+               (fun contact_json ->
+                  let _,map_json = extract_contact_map contact_json in
+                  set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
+               (manager#get_contact_map None)) >>=
+            fun out -> Lwt.return (Api_common.result_lift out)
+         )
+    )
+    (React.S.on tab_is_active
+       State_project.dummy_model State_project.model)
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
 let onload () =
+  let () = Widget_export.onload configuration in
+  let contactmap : Js_contact.contact_map Js.t =
+    Js_contact.create_contact_map display_id in
+  let _ =
+    React.S.map
+      (function
+        | None -> (contactmap##clearData)
+        | Some data ->
+          contactmap##setData (Js.string data))
+      (React.S.on
+         tab_is_active None contact_map_text)
+  in
   let () = Common.jquery_on
       "#navcontact_map" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in

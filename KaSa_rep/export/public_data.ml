@@ -20,11 +20,11 @@ let site="site name"
 let stateslist="states list"
 let prop="property states"
 let bind="binding states"
-let sitename = site
-let sitelinks = bind
-let sitestates = prop
-let sitenodename = agent
-let sitenodesites = "interface"
+let sitename = "site_name"
+let sitelinks = "site_links"
+let sitestates = "site_states"
+let sitenodename = "site_node_name"
+let sitenodesites = "site_node_sites"
 let hyp = "site graph"
 let refinement = "site graph list"
 let domain_name = "domain name"
@@ -115,7 +115,7 @@ let site_to_json site =
       JsonUtil.of_string site.site_name;
 
       sitelinks,
-      JsonUtil.of_list (JsonUtil.of_pair JsonUtil.of_int JsonUtil.of_int) site.site_links;
+      JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y]) site.site_links;
 
       sitestates,
       JsonUtil.of_list JsonUtil.of_string site.site_states
@@ -133,9 +133,10 @@ let site_of_json =
           let site_links =
             let json = List.assoc sitelinks l in
             JsonUtil.to_list ~error_msg:"link list"
-              (JsonUtil.to_pair ~error_msg:"link"
-                 (JsonUtil.to_int ~error_msg:"agent id")
-                 (JsonUtil.to_int ~error_msg:"site id"))
+              (function
+                | `List [ `Int ag; `Int si ] -> (ag,si)
+                | x -> raise (Yojson.Basic.Util.Type_error
+                                (JsonUtil.build_msg "sites_links",x)))
               json
           in
           let site_states =

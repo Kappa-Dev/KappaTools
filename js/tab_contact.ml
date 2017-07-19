@@ -70,7 +70,7 @@ let parent_shown () = set_tab_is_active !tab_was_active
 let onload () =
   let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
-    Js_contact.create_contact_map display_id false in
+    Js_contact.create_contact_map display_id in
   let _ =
     React.S.map
       (fun model->

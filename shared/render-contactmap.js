@@ -14,19 +14,18 @@ class Layout {
 
 
 class ContactMap {
-    constructor(id, isSnapShot) {
+    constructor(id) {
         this.id = '#'+id;
-        this.isSnapShot = isSnapShot;
     }
     setData(response) {
         let map = this;
-	    let root = d3.select(this.id);
+	let root = d3.select(this.id);
         map.data = new DataStorage(JSON.parse(response),0);
         map.data.sortNodes();
         map.data.sortSites();
         let margin = { top: 10, right: 10,
-        bottom: 10, left: 10 };
-        
+		       bottom: 10, left: 10 };
+
         let w = d3.select("#editor-panel").node().getBoundingClientRect().width - margin.left - margin.right;
         let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5;
 

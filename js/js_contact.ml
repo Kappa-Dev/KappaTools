@@ -14,10 +14,6 @@ class type contact_map =
   end;;
 
 let create_contact_map
-    (id : string)
-    (is_snapshot : bool) : contact_map Js.t =
+    (id : string) : contact_map Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "ContactMap")
-    [| Js.Unsafe.inject (Js.string id) ;
-       Js.Unsafe.inject (Js.bool is_snapshot)
-
-    |]
+    [| Js.Unsafe.inject (Js.string id) |]
