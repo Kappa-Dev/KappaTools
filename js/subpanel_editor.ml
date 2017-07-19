@@ -68,7 +68,7 @@ let content () =
       (Html.pcdata "")
   in
   Html.div
-    ~a:[Html.a_id "editor-col-panel"; Html.a_class ["panel";"panel-default"]]
+    ~a:[Html.a_class ["flex-content";"panel";"panel-default"]]
     [ Html.div
         ~a:[Html.a_class ["panel-heading"]]
         [ panel_heading ] ;
@@ -77,8 +77,8 @@ let content () =
                (React.S.map
                   (fun model ->
                      match model.State_file.model_current with
-                     | None -> ["no-panel-body" ; ]
-                     | Some _ -> ["panel-body" ; ])
+                     | None -> ["no-panel-body" ; "flex-content" ]
+                     | Some _ -> ["panel-body" ; "flex-content" ])
                   State_file.model) ;
              Html.a_id editor_panel_id
            ]
