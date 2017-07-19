@@ -68,7 +68,7 @@ let content () =
       (Html.pcdata "")
   in
   Html.div
-    ~a:[Html.a_class ["panel";"panel-default"]]
+    ~a:[Html.a_id "editor-col-panel"; Html.a_class ["panel";"panel-default"]]
     [ Html.div
         ~a:[Html.a_class ["panel-heading"]]
         [ panel_heading ] ;

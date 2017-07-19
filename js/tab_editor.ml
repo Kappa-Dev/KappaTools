@@ -45,18 +45,18 @@ let rightsubpanel () =
 
 let content () =
   [Html.div
-     ~a:[ Tyxml_js.R.Html.a_class
-            (React.S.bind
-               Subpanel_editor.editor_full
-               (fun editor_full ->
-                  React.S.const
-                    (if editor_full then
-                       ["col-md-12"]
-                     else
-                       ["col-md-6"])
-               )
+     ~a:[
+       Html.a_id "editor-col";
+       Tyxml_js.R.Html.a_class
+         (React.S.bind
+            Subpanel_editor.editor_full
+            (fun editor_full ->
+               React.S.const
+                 (if editor_full then ["col-md-12"]
+                  else ["col-md-6"])
             )
-        ]
+         )
+     ]
      [Subpanel_editor.content ()];
    (rightsubpanel ()) ]
 
