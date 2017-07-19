@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 11 2017>
+  * Last modification: Time-stamp: <Jul 19 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -291,11 +291,76 @@ let interface_of_json
               Ckappa_backend.Ckappa_backend.binding_state_of_json)
         )
 
+let free = ""
+let wildcard = "?"
+let bound = "!_"
+let bond_id = "bond id"
+let bound_to = "bound to"
+let binding_type = "binding type"
+
+type binding_state =
+  | Free
+  | Wildcard
+  | Bound_to_unknown
+  | Bound_to of int
+  | Binding_type of string * string
+
+let binding_state_light_of_json =
+  function
+  | `Assoc [s, `Null] when s = free -> Free
+  | `Assoc [s, `Null] when s = wildcard -> Wildcard
+  | `Assoc [s, `Null] when s = bound_to -> Bound_to_unknown
+  | `Assoc [s, j] when s = bond_id ->
+    let i =
+      JsonUtil.to_int ~error_msg:"wrong binding id" j
+    in
+    let bond_index = i in
+    Bound_to bond_index
+  | `Assoc [s, j] when s = binding_type ->
+    let (agent_name, site_name) =
+      JsonUtil.to_pair
+        ~lab1:agent ~lab2:site ~error_msg:"binding type"
+        (JsonUtil.to_string ~error_msg:"agent name") (JsonUtil.to_string
+                                                      ~error_msg:"site name")
+        j
+    in
+    Binding_type (agent_name, site_name)
+  | x -> raise
+           (Yojson.Basic.Util.Type_error ("wrong binding state",x))
+
+
+let interface_light_of_json json
+  =
+  JsonUtil.to_map
+    ~lab_key:site ~lab_value:stateslist ~error_msg:interface
+    ~empty:[]
+    ~add:(fun k (a,b) list -> (k,a,b)::list)
+    (*json -> elt*)
+    (fun json -> JsonUtil.to_string ~error_msg:site json)
+    (*json -> 'value*)
+    (JsonUtil.to_pair
+       ~lab1:prop ~lab2:bind ~error_msg:"wrong binding state"
+       (JsonUtil.to_option
+          (JsonUtil.to_string ~error_msg:prop)
+
+       )
+       (JsonUtil.to_option
+          binding_state_light_of_json)
+    )
+    json
+
+
+
 type agent =
   (string * (* agent name *)
    (string option (* internal state *) *
     Ckappa_backend.Ckappa_backend.binding_state option (*binding state*) )
      Wrapped_modules.LoggedStringMap.t)
+
+type agent_light =
+  string * (*agent name*)
+  (string * string option *  binding_state option)
+    list
 
 let agent_to_json =
   JsonUtil.of_pair
@@ -303,11 +368,14 @@ let agent_to_json =
     JsonUtil.of_string
     interface_to_json
 
-let agent_of_json =
+let agent_gen_of_json interface_of_json =
   JsonUtil.to_pair
     ~lab1:agent ~lab2:interface ~error_msg:"agent"
     (JsonUtil.to_string ~error_msg:"agent name")
     interface_of_json
+
+let agent_of_json json = agent_gen_of_json interface_of_json json
+let agent_light_of_json json = agent_gen_of_json interface_light_of_json json
 (***************************************************************************)
 
 let pair_to_json (p: string * string): Yojson.Basic.json =
@@ -358,6 +426,7 @@ let get_refinement r = r.refinement
 
 type 'site_graph poly_constraints_list =
   (string (*domain name*) * 'site_graph lemma list) list
+type constraints_list_light = agent_light list poly_constraints_list
 
 let poly_constraints_list_to_json site_graph_to_json =
   JsonUtil.of_list
@@ -384,7 +453,7 @@ let lemmas_list_to_json constraints =
         (JsonUtil.of_list agent_to_json) constraints
     ]
 
-let lemmas_list_of_json =
+let lemmas_list_of_json_gen agent_of_json =
 function
 | `Assoc l as x ->
   begin
@@ -403,6 +472,11 @@ function
 | x ->
   raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "refinement lemmas list",x))
 
+let lemmas_list_of_json json =
+  lemmas_list_of_json_gen agent_of_json json
+
+let lemmas_list_of_json_light json =
+  lemmas_list_of_json_gen agent_light_of_json json
 
 (******************************************************************************)
 (******************************************************************************)
@@ -492,7 +566,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     then
       match reset with
       | Some true ->
-        Mvbdu_wrapper.Mvbdu.reset parameters error 
+        Mvbdu_wrapper.Mvbdu.reset parameters error
       | None | Some false ->
         Mvbdu_wrapper.Mvbdu.get_handler parameters error
     else

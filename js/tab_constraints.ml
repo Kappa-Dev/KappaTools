@@ -14,6 +14,72 @@ let navli () = []
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let non_relational = ref true
+let relational = ref true
+let site_accross = ref true
+let parallel_bond = ref true
+
+let print_string s list = (Html.pcdata s)::list
+let print_newline list = print_string "\n" list
+let print_int i l = print_string (string_of_int i) l
+let print_site site list =
+  let site_name, prop_opt, binding_opt = site in
+  let list =
+    match binding_opt with
+    | Some Remanent_state.Free | None -> list
+    | Some Remanent_state.Wildcard -> print_string "?" list
+    | Some Remanent_state.Bound_to_unknown -> print_string "!_" list
+    | Some (Remanent_state.Binding_type (ag,site)) ->
+      print_string "!"
+        (print_string ag (
+            print_string "." (
+              print_string site list)))
+    | Some (Remanent_state.Bound_to i) ->
+      print_string "!"
+        (print_int i list)
+  in
+  let list =
+    match prop_opt with
+    | None -> list
+    | Some a ->
+      print_string a list
+  in
+  print_string site_name list
+
+let print_agent agent list =
+  let agent_name, interface = agent in
+  let list = print_string ")" list in
+  let list =
+    snd
+      (List.fold_left
+         (fun (b,list) site ->
+            let list =
+              if b then
+                print_string "," list
+              else
+                list
+            in
+            let list = print_site site list in
+            true,list)
+         (false,list) (List.rev interface))
+  in
+  let list = (Html.pcdata "(")::list in
+  let list = (Html.pcdata agent_name)::list in
+  list
+
+let print_site_graph agent_list list =
+  snd (
+    List.fold_left
+      (fun (b,list) agent ->
+         let list =
+           if b then
+             print_string "," list
+           else list
+         in
+         true, print_agent agent list)
+    (false,list)
+    (List.rev agent_list))
+
 let content () =
   let constraints,set_constraints = ReactiveData.RList.create [] in
   let _ = React.S.l1
@@ -24,51 +90,64 @@ let content () =
               (Lwt_result.map
                  (fun constraints_json ->
                     let constraints =
-                      Remanent_state.lemmas_list_of_json
+                      Remanent_state.lemmas_list_of_json_light
                         constraints_json
                     in
                     let () = ReactiveData.RList.set set_constraints
                         [ Html.p
                             (List.fold_left
                                (fun list (a,b) ->
-
-                                  (Html.pcdata a)::
-                                  (Html.pcdata "\n")::
-                                  (Html.pcdata "\n")::
-                                  (List.fold_left
-                                     (fun list lemma ->
-                                        let hyp =
-                                          Remanent_state.get_hyp
-                                            lemma
-                                        in
-                                        let conclusion =
-                                          Remanent_state.get_refinement lemma in
-                                        (Html.pcdata ".")::
-                                        (Html.pcdata " => ")::
-                                        (if List.length conclusion = 1
-                                         then
-                                           (Html.pcdata ".\n")::list
-                                         else
-                                           (Html.pcdata "   [ \n   ")::
+                                  let list =
+                                    List.fold_left
+                                      (fun list lemma ->
+                                         let hyp =
+                                           Remanent_state.get_hyp
+                                             lemma
+                                         in
+                                         let conclusion =
+                                           Remanent_state.get_refinement lemma
+                                         in
+                                         let list = print_newline list in
+                                         let list = print_newline list in
+                                         let list =              (
+                                           match conclusion with
+                                           | [site_graph] ->
+                                             print_site_graph site_graph list
+                                           | _::_ | [] ->
+                                             let list = print_newline list in
                                            (snd
                                               (
                                                List.fold_left
 
                                                  (fun (bool,list) a ->
-                                                    let l =
-                                                      (Html.pcdata ".")::list
+                                                    let list =
+                                                      if bool then
+                                                        (print_newline (print_string " v " list))
+                                                      else
+                                                        list
+                                                    in
+                                                    let list =
+                                                      print_site_graph a list
                                                     in                          true,
-                                                    if bool then
-                                                      (Html.pcdata "\n v ")::
-                                                      (Html.pcdata ".")::list
-                                                    else
-                                                      (Html.pcdata ".")::list)
-                                                 (false,
-                                                  (Html.pcdata "\n]\n")::list)
-                                                 conclusion
-                                              ))))
-                                     ((Html.pcdata "\n")::(Html.pcdata "\n")::list)
-                                     b))
+                                                    list)
+                                                 (false,list)
+                                                 (List.rev conclusion)
+                                              )))
+                                         in
+                                         let list = print_string "    [" list in
+                                         let list = print_newline list in
+                                         let list = print_string "  =>  " list in
+                                         let list = print_site_graph hyp list in
+
+
+                                        list)
+                                      list
+                                      b
+                    in
+                    let list = print_newline list in
+                    let list = print_newline list in
+                    let list = print_string a list in
+                                  list)
                                [] constraints)
 
                         ] in

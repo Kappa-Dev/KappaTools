@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 11 2017>
+  * Last modification: Time-stamp: <Jul 19 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -98,11 +98,24 @@ type agent =
      (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
        Wrapped_modules.LoggedStringMap.t
 
-type constraints_list = agent list poly_constraints_list
+type binding_state =
+  | Free
+  | Wildcard
+  | Bound_to_unknown
+  | Bound_to of int
+  | Binding_type of string * string
 
+type agent_light =
+  string * (*agent name*)
+  (string * string option *  binding_state option)
+    list
+
+type constraints_list = agent list poly_constraints_list
+type constraints_list_light = agent_light list poly_constraints_list
 val lemmas_list_to_json : constraints_list -> Yojson.Basic.json
 
 val lemmas_list_of_json : Yojson.Basic.json -> constraints_list
+val lemmas_list_of_json_light : Yojson.Basic.json -> constraints_list_light
 
 val get_hyp : 'site_graph lemma -> 'site_graph
 val get_refinement : 'site_graph lemma -> 'site_graph list
@@ -134,7 +147,7 @@ val of_json: Yojson.Basic.json ->
 
 val create_state:
   ?errors:Exception.method_handler -> ?env:Model.t option ->
-  ?init_state:initial_state option -> ?reset:bool -> 
+  ?init_state:initial_state option -> ?reset:bool ->
   Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
 
 val set_parameters: Remanent_parameters_sig.parameters -> ('static, 'dynamic) state -> ('static, 'dynamic) state

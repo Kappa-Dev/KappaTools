@@ -7,7 +7,7 @@ sig
 
   type binding_state =
     | Free | Wildcard | Bound_to_unknown
-    | Binding_type of Ckappa_sig.agent_name * Ckappa_sig.site_name
+    | Binding_type of string * string 
     | Bound_to of bond_index
 
   val binding_state_to_json : binding_state -> Yojson.Basic.json
