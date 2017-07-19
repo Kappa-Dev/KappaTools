@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 19 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -582,6 +582,70 @@ let convert_contact_map_map_to_list sol =
                       }::l) data [])}::l)
        sol [])
 
+let rename_link parameters handler error map (i,j) =
+  let error, agent =
+    Handler.translate_agent
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error handler (Ckappa_sig.agent_name_of_int i)
+  in
+  let error, site =
+    Handler.translate_site
+      ~message:"unknown agent type" ~ml_pos:(Some __POS__)
+      parameters error handler (Ckappa_sig.agent_name_of_int i) (Ckappa_sig.site_name_of_int j) in
+  match
+      Mods.String2Map.find_option (agent,simplify_site site) map
+  with
+  | None ->
+    Exception.warn parameters error __POS__ Exit (0,0)
+  | Some (i,j) -> error, (i,j)
+
+let rename_links parameter handler error map l =
+  List.fold_left
+    (fun (error, l) link ->
+       let error, link = rename_link parameter handler error map link in
+       error, link::l)
+    (error,[]) (List.rev l)
+
+let reindex parameters error handler list =
+  let map,_ =
+    List.fold_left
+      (fun (map,counter_ag) site_node ->
+         let ag = site_node.Public_data.site_node_name in
+         let interface = site_node.Public_data.site_node_sites in
+         let map,_ =
+           List.fold_left
+             (fun (map,counter_site) site ->
+                let site_name = site.Public_data.site_name in
+                Mods.String2Map.add (ag,site_name) (counter_ag,counter_site)
+                map,
+              counter_site+1)
+           (map,0) interface
+       in
+       map, counter_ag+1
+    )
+    (Mods.String2Map.empty, 0)
+    list
+  in
+  List.fold_left
+    (fun (error,agent_list) site_node ->
+       let error, interface =
+         List.fold_left
+           (fun (error,interface) site ->
+              let error, new_links =
+                  rename_links
+                    parameters handler error map
+                    site.Public_data.site_links
+              in
+              let site = {site with Public_data.site_links = new_links} in
+              error, (site::interface))
+           (error,[]) (List.rev site_node.Public_data.site_node_sites)
+       in
+       let agent = {site_node with Public_data.site_node_sites = interface}
+       in
+       error, agent::agent_list)
+    (error,[]) (List.rev list)
+
+
 let compute_raw_contact_map show_title state =
   let sol        = ref Mods.StringSetMap.Map.empty in
   let state, handler = get_prehandler state in
@@ -672,6 +736,9 @@ let compute_raw_contact_map show_title state =
   in
   let sol =
     convert_contact_map_map_to_list sol
+  in
+  let error, sol =
+    reindex parameters error handler sol
   in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Public_data.Low sol state),
@@ -881,6 +948,9 @@ let convert_contact_map show_title state contact_map =
   in
   let contact_map =
     convert_contact_map_map_to_list contact_map
+  in
+  let error, contact_map =
+    reindex parameters error handler contact_map
   in
   Remanent_state.set_errors error state,
   contact_map
