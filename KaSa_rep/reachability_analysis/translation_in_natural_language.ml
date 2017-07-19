@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 2016
- * Last modification: Time-stamp: <Apr 08 2017>
+ * Last modification: Time-stamp: <Jul 19 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -1052,8 +1052,8 @@ let rec convert_views_internal_constraints_list_aux
               let lemma =
                 {
                   (*Remanent_state.hyp = site_graph;*)
-                  Remanent_state.hyp = t;
-                  Remanent_state.refinement = refinement
+                  Public_data.hyp = t;
+                  Public_data.refinement = refinement
                 }
               in
               let current_list = lemma :: current_list in
@@ -1139,8 +1139,8 @@ let rec convert_views_internal_constraints_list_aux
               {
                 (*Remanent_state.hyp = site_graph;
                   Remanent_state.refinement = [site_graph'']*)
-                Remanent_state.hyp = t';
-                Remanent_state.refinement = [t'']
+                Public_data.hyp = t';
+                Public_data.refinement = [t'']
               }
             in
             let current_list = lemma :: current_list in
@@ -1213,8 +1213,8 @@ let rec convert_views_internal_constraints_list_aux
               {
                 (*Remanent_state.hyp = site_graph ;
                   Remanent_state.refinement = [site_graph']*)
-                Remanent_state.hyp = t;
-                Remanent_state.refinement = [t']
+                Public_data.hyp = t;
+                Public_data.refinement = [t']
               }
             in
             let current_list = lemma :: current_list in
@@ -1329,9 +1329,8 @@ let rec convert_views_internal_constraints_list_aux
               (*----------------------------------------*)
               let lemma =
                 {
-                  (*Remanent_state.hyp = site_graph (*t*) ;*)
-                  Remanent_state.hyp = t ;
-                  Remanent_state.refinement = refinement
+                  Public_data.hyp = t ;
+                  Public_data.refinement = refinement
                 }
               in
               let current_list = lemma :: current_list in

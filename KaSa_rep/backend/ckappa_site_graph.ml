@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 17th of November
-   * Last modification: Time-stamp: <Nov 27 2016>
+   * Last modification: Time-stamp: <Jul 19 2017>
    *
    * Site graph
    *
@@ -35,8 +35,8 @@ let print_internal_pattern_aux ?logger parameters error kappa_handler
       "------------------------------------------------------------\n";
   in
   List.fold_left (fun (error, bool) lemma ->
-      let hyp = Remanent_state.get_hyp lemma in
-      let refinement = Remanent_state.get_refinement lemma in
+      let hyp = Public_data.get_hyp lemma in
+      let refinement = Public_data.get_refinement lemma in
       let error =
         Ckappa_backend.Ckappa_backend.print
           logger parameters error
@@ -135,8 +135,8 @@ let print_pattern_aux ?logger
       "------------------------------------------------------------\n";
   in
   List.fold_left (fun (error, bool) lemma ->
-      let hyp = Remanent_state.get_hyp lemma in
-      let refinement = Remanent_state.get_refinement lemma in
+      let hyp = Public_data.get_hyp lemma in
+      let refinement = Public_data.get_refinement lemma in
       let error =
         print_for_list logger parameters error
           kappa_handler

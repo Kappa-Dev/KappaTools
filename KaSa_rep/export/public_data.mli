@@ -6,6 +6,16 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+(* JSon labels *)
+val prop:string
+val bind:string
+val domain_name:string
+val refinements_list:string
+val refinement_lemmas:string
+val free:string
+val bound:string
+val wildcard:string
+
 type accuracy_level = Low | Medium | High | Full
 
 val accuracy_to_json : accuracy_level -> Yojson.Basic.json
@@ -38,3 +48,46 @@ val dead_rules_of_json : Yojson.Basic.json -> int (*rule_id*) list
 type separating_transitions = (string * int (*rule_id*) * string) list
 
 val separating_transitions_of_json: Yojson.Basic.json -> separating_transitions
+
+type 'site_graph lemma =
+  {
+    hyp : 'site_graph ;
+    refinement : 'site_graph list
+  }
+
+type binding_state =
+  | Free
+  | Wildcard
+  | Bound_to_unknown
+  | Bound_to of int
+  | Binding_type of string * string
+
+
+type agent = string * (string * string option * binding_state option) list
+
+val lemma_to_json:
+  ('site_graph -> Yojson.Basic.json) -> 'site_graph lemma -> Yojson.Basic.json
+
+val lemma_of_json:
+  (Yojson.Basic.json -> 'site_graph) -> Yojson.Basic.json -> 'site_graph lemma
+
+val lemmas_list_of_json:
+  Yojson.Basic.json -> (string * agent list lemma list ) list
+
+val agent_gen_of_json:
+  (Yojson.Basic.json -> 'interface) -> Yojson.Basic.json -> string * 'interface
+
+
+
+val agent_of_json:
+  Yojson.Basic.json -> agent
+
+type 'site_graph poly_constraints_list =
+  (string * 'site_graph lemma list) list
+
+val poly_constraints_list_of_json:
+  (Yojson.Basic.json -> 'site_graph) ->
+  Yojson.Basic.json -> 'site_graph poly_constraints_list
+
+val get_hyp: 'site_graph lemma -> 'site_graph
+val get_refinement: 'site_graph lemma -> 'site_graph list

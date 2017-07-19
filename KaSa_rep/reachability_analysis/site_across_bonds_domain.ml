@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <May 25 2017>
+   * Last modification: Time-stamp: <Jul 19 2017>
    *
    * Abstract domain to record relations between pair of sites in connected agents.
    *
@@ -1881,8 +1881,8 @@ struct
                  in
                  let lemma_internal =
                    {
-                     Remanent_state.hyp = pattern;
-                     Remanent_state.refinement = refine;
+                     Public_data.hyp = pattern;
+                     Public_data.refinement = refine;
                    }
                  in
                  let current_list = lemma_internal :: current_list in

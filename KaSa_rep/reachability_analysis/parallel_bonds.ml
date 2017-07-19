@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Jul 19 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -1523,8 +1523,8 @@ struct
                        in
                        let lemma =
                          {
-                           Remanent_state.hyp = site_graph;
-                           Remanent_state.refinement = refinement
+                           Public_data.hyp = site_graph;
+                           Public_data.refinement = refinement
                          }
                        in
                        let current_list = lemma :: current_list in*)
@@ -1532,8 +1532,8 @@ struct
                        let refine = List.rev list_same in
                        let lemma_internal =
                          {
-                           Remanent_state.hyp = t_precondition;
-                           Remanent_state.refinement = refine;
+                           Public_data.hyp = t_precondition;
+                           Public_data.refinement = refine;
                          }
                        in
                        let current_list = lemma_internal :: current_list in
@@ -1553,8 +1553,8 @@ struct
                        Ckappa_site_graph.site_graph_list_to_list error list_same in
                      let lemma =
                        {
-                         Remanent_state.hyp = site_graph;
-                         Remanent_state.refinement = refinement
+                         Public_data.hyp = site_graph;
+                         Public_data.refinement = refinement
                        }
                      in
                      let current_list = lemma :: current_list in*)
@@ -1562,8 +1562,8 @@ struct
                      let refine = List.rev list_same in
                      let lemma_internal =
                        {
-                         Remanent_state.hyp = t_same;
-                         Remanent_state.refinement = refine
+                         Public_data.hyp = t_same;
+                         Public_data.refinement = refine
                        }
                      in
                      let current_list = lemma_internal :: current_list in
@@ -1584,8 +1584,8 @@ struct
                        Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                      let lemma =
                        {
-                         Remanent_state.hyp = site_graph;
-                         Remanent_state.refinement = refinement
+                         Public_data.hyp = site_graph;
+                         Public_data.refinement = refinement
                        }
                      in
                      let current_list = lemma :: current_list in*)
@@ -1593,8 +1593,8 @@ struct
                      let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
-                         Remanent_state.hyp = t_precondition;
-                         Remanent_state.refinement = refine
+                         Public_data.hyp = t_precondition;
+                         Public_data.refinement = refine
                        }
                      in
                      let current_list = lemma_internal :: current_list in
@@ -1610,8 +1610,8 @@ struct
                        Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                      let lemma =
                        {
-                         Remanent_state.hyp = site_graph;
-                         Remanent_state.refinement = refinement
+                         Public_data.hyp = site_graph;
+                         Public_data.refinement = refinement
                        }
                      in
                      let current_list = lemma :: current_list in*)
@@ -1619,8 +1619,8 @@ struct
                      let refine = List.rev list_distinct in
                      let lemma_internal =
                        {
-                         Remanent_state.hyp = t_distinct;
-                         Remanent_state.refinement = refine
+                         Public_data.hyp = t_distinct;
+                         Public_data.refinement = refine
                        }
                      in
                      let current_list = lemma_internal :: current_list in
@@ -1642,8 +1642,8 @@ struct
                      Ckappa_site_graph.site_graph_list_to_list error list_same in
                    let lemma =
                      {
-                       Remanent_state.hyp = site_graph;
-                       Remanent_state.refinement = refinement
+                       Public_data.hyp = site_graph;
+                       Public_data.refinement = refinement
                      }
                    in
                    let current_list = lemma :: current_list in*)
@@ -1651,8 +1651,8 @@ struct
                    let refine = List.rev list_same in
                    let lemma_internal =
                      {
-                       Remanent_state.hyp = t_same;
-                       Remanent_state.refinement = refine
+                       Public_data.hyp = t_same;
+                       Public_data.refinement = refine
                      }
                    in
                    let current_list = lemma_internal :: current_list in
@@ -1667,8 +1667,8 @@ struct
                      Ckappa_site_graph.site_graph_list_to_list error list_distinct in
                    let lemma =
                      {
-                       Remanent_state.hyp = site_graph;
-                       Remanent_state.refinement = refinement
+                       Public_data.hyp = site_graph;
+                       Public_data.refinement = refinement
                      }
                    in
                    let current_list = lemma :: current_list in*)
@@ -1678,8 +1678,8 @@ struct
                        list_distinct
                    in
                    let lemma_internal =
-                     {Remanent_state.hyp = t_distinct;
-                      Remanent_state.refinement = refine}
+                     {Public_data.hyp = t_distinct;
+                      Public_data.refinement = refine}
                    in
                    let current_list = lemma_internal :: current_list in
                    error, current_list
@@ -1751,8 +1751,8 @@ struct
                 let error, refinement =
                   Ckappa_site_graph.site_graph_list_to_list error refine in
                 let lemma =
-                  {Remanent_state.hyp = site_graph;
-                   Remanent_state.refinement = refinement}
+                  {Public_data.hyp = site_graph;
+                   Public_data.refinement = refinement}
                 in
                 let current_list = lemma :: current_list in
                 error, current_list

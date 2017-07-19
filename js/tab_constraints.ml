@@ -14,6 +14,7 @@ let navli () = []
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+(* todo add button to switch on/off the display of the information of each abstract domain *)
 let non_relational = ref true
 let relational = ref true
 let site_accross = ref true
@@ -26,15 +27,15 @@ let print_site site list =
   let site_name, prop_opt, binding_opt = site in
   let list =
     match binding_opt with
-    | Some Remanent_state.Free | None -> list
-    | Some Remanent_state.Wildcard -> print_string "?" list
-    | Some Remanent_state.Bound_to_unknown -> print_string "!_" list
-    | Some (Remanent_state.Binding_type (ag,site)) ->
+    | Some Public_data.Free | None -> print_string Public_data.free list
+    | Some Public_data.Wildcard -> print_string Public_data.wildcard list
+    | Some Public_data.Bound_to_unknown -> print_string Public_data.bound list
+    | Some (Public_data.Binding_type (ag,site)) ->
       print_string "!"
         (print_string ag (
             print_string "." (
               print_string site list)))
-    | Some (Remanent_state.Bound_to i) ->
+    | Some (Public_data.Bound_to i) ->
       print_string "!"
         (print_int i list)
   in
@@ -90,39 +91,41 @@ let content () =
               (Lwt_result.map
                  (fun constraints_json ->
                     let constraints =
-                      Remanent_state.lemmas_list_of_json_light
+                      Public_data.lemmas_list_of_json
                         constraints_json
                     in
                     let () = ReactiveData.RList.set set_constraints
                         [ Html.p
                             (List.fold_left
                                (fun list (a,b) ->
+                                  let list = print_newline list in
                                   let list =
                                     List.fold_left
                                       (fun list lemma ->
                                          let hyp =
-                                           Remanent_state.get_hyp
+                                           Public_data.get_hyp
                                              lemma
                                          in
                                          let conclusion =
-                                           Remanent_state.get_refinement lemma
+                                           Public_data.get_refinement lemma
                                          in
-                                         let list = print_newline list in
-                                         let list = print_newline list in
                                          let list =              (
                                            match conclusion with
                                            | [site_graph] ->
-                                             print_site_graph site_graph list
+                                             print_site_graph site_graph
+                                               (print_newline list)
                                            | _::_ | [] ->
                                              let list = print_newline list in
-                                           (snd
+                                             let list = print_string " ]" list in
+                                             let list =
+                                               (snd
                                               (
                                                List.fold_left
 
                                                  (fun (bool,list) a ->
                                                     let list =
                                                       if bool then
-                                                        (print_newline (print_string " v " list))
+                                                        (print_string " v " list)
                                                       else
                                                         list
                                                     in
@@ -132,11 +135,13 @@ let content () =
                                                     list)
                                                  (false,list)
                                                  (List.rev conclusion)
-                                              )))
+                                              )) in
+                                             let list = print_string " [ " list
+                                             in
+                                             list)
                                          in
-                                         let list = print_string "    [" list in
-                                         let list = print_newline list in
-                                         let list = print_string "  =>  " list in
+
+                                         let list = print_string " =>  " list in
                                          let list = print_site_graph hyp list in
 
 

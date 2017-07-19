@@ -81,44 +81,19 @@ type flow =
 
 (*******************************************************************)
 
-type 'site_graph lemma =
-  {
-    hyp : 'site_graph ;
-    refinement : 'site_graph list
-  }
-
-type 'site_graph poly_constraints_list =
-  (string * 'site_graph lemma list) list
-
 type internal_constraints_list =
-  Ckappa_backend.Ckappa_backend.t poly_constraints_list
+  Ckappa_backend.Ckappa_backend.t Public_data.poly_constraints_list
 
 type agent =
     string * (*agent name*)
      (string option *  Ckappa_backend.Ckappa_backend.binding_state option)
        Wrapped_modules.LoggedStringMap.t
 
-type binding_state =
-  | Free
-  | Wildcard
-  | Bound_to_unknown
-  | Bound_to of int
-  | Binding_type of string * string
-
-type agent_light =
-  string * (*agent name*)
-  (string * string option *  binding_state option)
-    list
-
-type constraints_list = agent list poly_constraints_list
-type constraints_list_light = agent_light list poly_constraints_list
+type constraints_list = agent list Public_data.poly_constraints_list
 val lemmas_list_to_json : constraints_list -> Yojson.Basic.json
 
 val lemmas_list_of_json : Yojson.Basic.json -> constraints_list
-val lemmas_list_of_json_light : Yojson.Basic.json -> constraints_list_light
 
-val get_hyp : 'site_graph lemma -> 'site_graph
-val get_refinement : 'site_graph lemma -> 'site_graph list
 
 (*******************************************************************)
 type symmetric_sites = Symmetries.symmetries option

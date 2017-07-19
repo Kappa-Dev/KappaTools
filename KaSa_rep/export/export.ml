@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Jul 18 2017>
+  * Last modification: Time-stamp: <Jul 19 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1509,8 +1509,8 @@ let compute_constraints_list _show_title state =
       (fun (error, constraints_list) (domain_name, lemma_list) ->
         let error, current_list =
           List.fold_left (fun (error, current_list) lem ->
-              let hyp = Remanent_state.get_hyp lem in
-              let refine = Remanent_state.get_refinement lem in
+              let hyp = Public_data.get_hyp lem in
+              let refine = Public_data.get_refinement lem in
               let string_version =
                 Ckappa_backend.Ckappa_backend.get_string_version
                   hyp
@@ -1524,8 +1524,10 @@ let compute_constraints_list _show_title state =
                   refine
               in
               let lemma =
-                {Remanent_state.hyp = site_graph;
-                 Remanent_state.refinement = refinement}
+                {
+                  Public_data.hyp = site_graph;
+                  Public_data.refinement = refinement
+                }
               in
               let current_list = lemma :: current_list in
               error, current_list
