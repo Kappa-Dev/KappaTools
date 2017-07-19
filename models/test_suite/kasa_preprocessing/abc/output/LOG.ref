@@ -1810,26 +1810,11 @@ A()=> [
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x1~p?)
-		v C(x2~u?)
-		v C(x1)
-		v C(x2)
-		v C(x1~p?)
-		v C(x2~u?)
-		v C(x1)
-		v C(x2!A.c)
-		v C(x1~p?)
-		v C(x2~p?)
-		v C(x1)
-		v C(x2)
-		v C(x1~u?)
-		v C(x2~u?)
-		v C(x1!A.c)
-		v C(x2)
-		v C(x1~u?)
-		v C(x2~u?)
-		v C(x1)
-		v C(x2)]
+		  C(x1~p,x2~u)
+		v C(x1~p,x2~u!A.c)
+		v C(x1~p,x2~p)
+		v C(x1~u!A.c,x2~u)
+		v C(x1~u,x2~u)]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

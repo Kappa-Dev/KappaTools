@@ -1289,13 +1289,15 @@ let rec convert_views_internal_constraints_list_aux
                   __POS__ Exit
               in
               let error'', refinement =
-                List.fold_left (fun (error, current_list) state_list ->
-                    List.fold_left
-                      (fun (error, current_list) (site, state) ->
+                List.fold_left
+                  (fun (error, current_list) state_list ->
+                     let error, t' =
+                       List.fold_left
+                         (fun (error, t') (site, state) ->
                          let error', t' =
                            Ckappa_backend.Ckappa_backend.add_state
                              parameters error handler_kappa
-                             agent_id site state t
+                             agent_id site state t'
                          in
                          let error =
                            Exception.check_point
@@ -1316,9 +1318,11 @@ let rec convert_views_internal_constraints_list_aux
                              __POS__ Exit
                          in
                          (*let refinement = site_graph' :: current_list in*)
-                         let refinement = t' :: current_list in
+                         error, t')
+                         (error, t) state_list
+                     in
+                   let refinement = t' :: current_list in
                          error, refinement
-                      ) (error, current_list) state_list
                   ) (error, []) list
               in
               let error =

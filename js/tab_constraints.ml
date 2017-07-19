@@ -62,7 +62,7 @@ let print_agent agent list =
             in
             let list = print_site site list in
             true,list)
-         (false,list) (List.rev interface))
+         (false,list) interface)
   in
   let list = (Html.pcdata "(")::list in
   let list = (Html.pcdata agent_name)::list in
