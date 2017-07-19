@@ -18,8 +18,13 @@ body {
     width: 100%;
 }
 
+<<<<<<< HEAD
 #editor.flex-content.tab-pane.row.active {
     display: flex; 
+=======
+#editor {
+    display: flex;
+>>>>>>> flex class
     flex-direction: row;
 }
 
@@ -160,7 +165,10 @@ rect { stroke-width: 2; }
     border: 1px solid #eee;
     min-height: 40px;
     flex: 1;
+<<<<<<< HEAD
     overflow: auto;
+=======
+>>>>>>> flex class
 }
 
 .plot-legend-swatch { stroke-width : 1; }
