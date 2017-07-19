@@ -19,7 +19,7 @@ body {
 }
 
 #editor.flex-content.tab-pane.row.active {
-    display: flex; 
+    display: flex;
     flex-direction: row;
 }
 
