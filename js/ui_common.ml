@@ -251,18 +251,19 @@ let navtabs nav_tab_id = function
          ; Html.Unsafe.string_attrib "role" "tablist" ]
       (navli ti true l :: List.map (fun (t,li) -> navli t false li) t)
 
-let onenavcontent label active content =
+let onenavcontent label active classes content =
   Html.div
     ~a:[ Html.a_id label
-       ; if active then
-           Html.a_class ["tab-pane";"active"]
-         else
-           Html.a_class ["tab-pane"]
+       ; Html.a_class
+           (if active then
+              "tab-pane" :: "active" :: classes
+            else
+              "tab-pane" :: classes)
        ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
 
-let navcontent ?id (classes : string list) = function
+let navcontent ?id classes = function
   | [] -> Common.toss "ui_common.navcontent : missing content"
-  | (t,c) :: l ->
+  | (t,cl,c) :: l ->
     let id : [> `Id ] Html.attrib list =
       match id with
       | None -> []
@@ -271,8 +272,8 @@ let navcontent ?id (classes : string list) = function
     Html.div
       ~a:([ Html.a_class
               (["panel-content";"tab-content"]@classes) ; ]@id)
-      (onenavcontent t true c ::
-       List.map (fun (t,c) -> onenavcontent t false c) l)
+      (onenavcontent t true cl c ::
+       List.map (fun (t,cl,c) -> onenavcontent t false cl c) l)
 
 let level
     ?debug

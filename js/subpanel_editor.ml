@@ -63,10 +63,9 @@ let editor_panel_id = "editor-panel"
 
 let content () =
   let textarea =
-    Html.div
-      [ Html.textarea
-          ~a:[Html.a_id codemirror_id]
-          (Html.pcdata "") ]
+    Html.textarea
+      ~a:[Html.a_id codemirror_id]
+      (Html.pcdata "")
   in
   Html.div
     ~a:[Html.a_class ["panel";"panel-default"]]

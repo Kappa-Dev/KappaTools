@@ -29,12 +29,12 @@ let navcontents () =
   Ui_common.navcontent
     ~id:navcontents_id
     []
-    ([ "editor",    (Tab_editor.content ())
-     ; "plot",      (Tab_plot.content ())
-     ; "flux",      (Tab_flux.content ())
-     ; "snapshot",  (Tab_snapshot.content ())
-     ; "outputs",   (Tab_outputs.content ())
-     ; "about",     (Tab_about.content ())
+    ([ "editor",   ["row"], (Tab_editor.content ())
+     ; "plot",     [],      (Tab_plot.content ())
+     ; "flux",     [],      (Tab_flux.content ())
+     ; "snapshot", [],      (Tab_snapshot.content ())
+     ; "outputs",  [],      (Tab_outputs.content ())
+     ; "about",    [],      (Tab_about.content ())
   ])
 
 let onload () =

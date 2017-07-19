@@ -35,31 +35,30 @@ let rightsubpanel () =
      Ui_common.navcontent
        ~id:rightsubpanel_id
        []
-       [ "contact",    (Tab_contact.content ())
-       ; "log",        (Tab_log.content ())
-       ; "contact_map", (Tab_contact_map.content ())
-       ; "influences", (Tab_influences.content ())
-       ; "dead_rules", (Tab_dead_rules.content ())
-       ; "constraints", (Tab_constraints.content ())
+       [ "contact",     [], (Tab_contact.content ())
+       ; "log",         [], (Tab_log.content ())
+       ; "contact_map", [], (Tab_contact_map.content ())
+       ; "influences",  [], (Tab_influences.content ())
+       ; "dead_rules",  [], (Tab_dead_rules.content ())
+       ; "constraints", [], (Tab_constraints.content ())
        ]]
 
 let content () =
-  [Html.div ~a:[Html.a_class ["row"]]
-     [Html.div
-        ~a:[ Tyxml_js.R.Html.a_class
-               (React.S.bind
-                  Subpanel_editor.editor_full
-                  (fun editor_full ->
-                     React.S.const
-                       (if editor_full then
-                          ["col-md-12"]
-                        else
-                          ["col-md-6"])
-                  )
+  [Html.div
+     ~a:[ Tyxml_js.R.Html.a_class
+            (React.S.bind
+               Subpanel_editor.editor_full
+               (fun editor_full ->
+                  React.S.const
+                    (if editor_full then
+                       ["col-md-12"]
+                     else
+                       ["col-md-6"])
                )
-           ]
-        [Subpanel_editor.content ()];
-      (rightsubpanel ()) ]]
+            )
+        ]
+     [Subpanel_editor.content ()];
+   (rightsubpanel ()) ]
 
 let childs_hide b =
   if b then
