@@ -18,6 +18,8 @@ let navli () = []
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
+
 let contact_map_text,set_contact_map_text = React.S.create None
 
 let configuration : Widget_export.configuration = {
@@ -35,11 +37,24 @@ let configuration : Widget_export.configuration = {
       (React.S.on tab_is_active None contact_map_text)
 }
 
+let accuracy_chooser =
+  let option_gen x =
+    Html.option
+      ~a:
+        ((fun l -> if React.S.value accuracy = Some x
+           then Html.a_selected () :: l else l)
+           [ Html.a_value (Public_data.accuracy_to_string x) ])
+      (Html.pcdata
+         (Public_data.accuracy_to_string x)) in
+  Html.select
+    ~a:[Html.a_class [ "form-control" ]]
+    (List.map option_gen Public_data.accuracy_levels)
+
 let content () =
   let export_controls =
-    Widget_export.content configuration
-  in
+    Widget_export.content configuration in
   [[%html {|<div>
+|} [accuracy_chooser] {|
                 <div id="|}display_id{|">
                  |}[ Html.entity "nbsp" ]{|
 	        </div>
@@ -53,16 +68,20 @@ let extract_contact_map = function
 
 let _ = React.S.l1
     (fun _ ->
-       State_project.with_project
-         ~label:__LOC__
-         (fun (manager : Api.concrete_manager) ->
-            (Lwt_result.map
-               (fun contact_json ->
-                  let _,map_json = extract_contact_map contact_json in
-                  set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
-               (manager#get_contact_map None)) >>=
-            fun out -> Lwt.return (Api_common.result_lift out)
+       React.S.l1
+         (fun acc ->
+            State_project.with_project
+              ~label:__LOC__
+              (fun (manager : Api.concrete_manager) ->
+                 (Lwt_result.map
+                    (fun contact_json ->
+                       let _,map_json = extract_contact_map contact_json in
+                       set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
+                    (manager#get_contact_map acc)) >>=
+                 fun out -> Lwt.return (Api_common.result_lift out)
+              )
          )
+         accuracy
     )
     (React.S.on tab_is_active
        State_project.dummy_model State_project.model)
@@ -83,6 +102,12 @@ let onload () =
       (React.S.on
          tab_is_active None contact_map_text)
   in
+  let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
+      Dom_html.full_handler
+        (fun va _ ->
+           let va = Js.to_string va##.value in
+           let () = set_accuracy (Public_data.accuracy_of_string va) in
+           Js._true) in
   let () = Common.jquery_on
       "#navcontact_map" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
