@@ -19,12 +19,17 @@ body {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #editor.flex-content.tab-pane.row.active {
     display: flex; 
 =======
 #editor {
     display: flex;
 >>>>>>> flex class
+=======
+#editor.flex-content.tab-pane.row.active {
+    display: flex; 
+>>>>>>> fixed css for interactive flexbox behavior
     flex-direction: row;
 }
 
@@ -166,9 +171,13 @@ rect { stroke-width: 2; }
     min-height: 40px;
     flex: 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
     overflow: auto;
 =======
 >>>>>>> flex class
+=======
+    overflow: auto;
+>>>>>>> fixed css for interactive flexbox behavior
 }
 
 .plot-legend-swatch { stroke-width : 1; }
