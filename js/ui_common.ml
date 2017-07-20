@@ -342,6 +342,12 @@ module type Tab = sig
   val onresize : unit -> unit
 end;;
 
+module type SubTab = sig
+  include Tab
+  val parent_hide : unit -> unit
+  val parent_shown : unit -> unit
+end
+
 module type Panel = sig
   val content : unit -> Html_types.div Tyxml_js.Html5.elt
   val onload : unit -> unit

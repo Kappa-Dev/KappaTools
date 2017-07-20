@@ -10,13 +10,13 @@ module Html = Tyxml_js.Html5
 
 open Lwt.Infix
 
-let display_id = "contact-bis-map-display"
-let export_id = "contact-bis-export"
+let display_id = "contact-map-display"
+let export_id = "contact-export"
 
 let navli () = []
 
-let tab_is_active, set_tab_is_active = React.S.create false
-let tab_was_active = ref false
+let tab_is_active, set_tab_is_active = React.S.create true
+let tab_was_active = ref true
 
 let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 

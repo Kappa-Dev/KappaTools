@@ -6,7 +6,4 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-include Ui_common.Tab
-
-val parent_hide : unit -> unit
-val parent_shown : unit -> unit
+include Ui_common.SubTab

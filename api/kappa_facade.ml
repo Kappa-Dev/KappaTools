@@ -603,8 +603,3 @@ let get_raw_trace t =
 
 let get_raw_ast t =
   Yojson.Basic.to_string (Ast.compil_to_json t.ast)
-
-let get_contact_map (t : t) : Api_types_j.site_node array =
-  Api_data.api_contact_map
-    (Model.signatures t.env)
-    t.contact_map
