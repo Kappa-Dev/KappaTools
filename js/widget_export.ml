@@ -80,13 +80,9 @@ let content
   in
   Html.div
     ~a:[Tyxml_js.R.Html.a_class
-          (React.S.bind
-             configuration.show
-             (fun show ->
-                React.S.const
-                  (if show then ["row"] else ["hidden"])
-             )
-          )
+          (React.S.map
+             (fun show -> if show then ["row"] else ["hidden"])
+             configuration.show)
        ]
     [xml_div]
 

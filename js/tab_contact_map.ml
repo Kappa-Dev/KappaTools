@@ -32,9 +32,7 @@ let configuration : Widget_export.configuration = {
             Option_util.unsome "null" (React.S.value contact_map_text)
           )
     ];
-  Widget_export.show = React.S.map
-      ((<>) None)
-      (React.S.on tab_is_active None contact_map_text)
+  Widget_export.show = React.S.const true;
 }
 
 let accuracy_chooser =
@@ -53,13 +51,9 @@ let accuracy_chooser =
 let content () =
   let export_controls =
     Widget_export.content configuration in
-  [[%html {|<div>
-|} [accuracy_chooser] {|
-                <div id="|}display_id{|">
-                 |}[ Html.entity "nbsp" ]{|
-	        </div>
-	   |}[ export_controls ]{|
-        </div>|}]]
+  [ accuracy_chooser;
+    [%html {|<div id="|}display_id{|">|}[ Html.entity "nbsp" ]{|</div>|}];
+    export_controls ]
 
 let extract_contact_map = function
   | `Assoc [ "contact map", `Assoc [ "accuracy", acc; "map", contact ] ] -> acc,contact
