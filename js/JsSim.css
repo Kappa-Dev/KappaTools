@@ -19,9 +19,13 @@ body {
 }
 
 
-#editor.flex-content.tab-pane.row.active {
+.tab-pane.row.active {
     display: flex; 
     flex-direction: row;
+}
+
+.tab-pane.active {
+    display: flex;
 }
 
 .kappa-code {
