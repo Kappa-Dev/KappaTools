@@ -18,8 +18,8 @@ body {
     width: 100%;
 }
 
-#editor {
-    display: flex;
+#editor.flex-content.tab-pane.row.active {
+    display: flex; 
     flex-direction: row;
 }
 
@@ -161,6 +161,7 @@ rect { stroke-width: 2; }
     border: 1px solid #eee;
     min-height: 40px;
     flex: 1;
+    overflow: auto;
 }
 
 .plot-legend-swatch { stroke-width : 1; }
