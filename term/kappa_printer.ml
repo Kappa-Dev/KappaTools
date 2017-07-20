@@ -48,7 +48,7 @@ let elementary_rule ?env f r =
     | Some e -> Some (Model.domain e), Some (Model.signatures e) in
   let pr_alg f (a,_) = alg_expr ?env f a in
   let pr_tok f (va,tok) =
-    Format.fprintf f "%a <- %a" (Model.print_token ?env) tok pr_alg va in
+    Format.fprintf f "%a %a" pr_alg va (Model.print_token ?env) tok in
   let pr_trans f t = Primitives.Transformation.print ?sigs f t in
   let pr_mixte f (a,s,i) =
     Format.fprintf f "@[%a.%a!%i@]"

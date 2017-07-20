@@ -350,7 +350,7 @@ let init_of_json f_mix f_var = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Ast init statement",x))
 
 let print_tok pr_mix pr_tok pr_var f ((nb,_),(n,_)) =
-  Format.fprintf f "%a:%a" (Alg_expr.print pr_mix pr_tok pr_var) nb pr_tok n
+  Format.fprintf f "%a %a" (Alg_expr.print pr_mix pr_tok pr_var) nb pr_tok n
 let print_one_size tk f mix =
   Format.fprintf
     f "%a%t%a" print_ast_mix mix
