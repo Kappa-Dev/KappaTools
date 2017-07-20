@@ -484,7 +484,7 @@ Table~\ref{tab:tokens}.
   \centering
   \caption{Token expressions.}
   \begin{tabular}{@{} lcl @{}}
-   \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
+   \textit{token\_expression} &::=&  \textit{algebraic\_expression} \textit{token\_name} \\
 	&&|  \textit{token\_expression} \tcb{+}\ \textit{token\_expression} \\\\
    \textit{token\_name} &::=& \tcb{Id}\\
   \end{tabular}
@@ -636,14 +636,14 @@ declarations\index{declaration} of the form:
 One may then use these tokens in conjunction with a classical rule
 using the hybrid format:
 \begin{lstlisting}[language=kappa]
-'hybrid rule' S(x~u!1),K(y!1) | 0.2:atp -> S(x~p),K(y) | 0.1:adp @ 'k'
+'hybrid rule' S(x~u!1),K(y!1) | 0.2 atp -> S(x~p),K(y) | 0.1 adp @ 'k'
 \end{lstlisting}
 When applied, the above rule will consume 0.2 \ttt{atp} token and
 produce 0.1 \ttt{adp} token. Note that as specified by the grammar
 given in Table~\ref{tab:tokens}, the number of consumed (and produced)
 tokens can be given by a sum of the form: \ITE{
-\item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$
-  \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$ @ r} } where each
+\item[] \ttt{\textit{lhs} | a$_1$ t$_1$ + ... + a$_n$ t$_n$ $\rar$
+  \textit{rhs} | a$_1'$ t$_1'$ + ... + a$_k'$ t$_k'$ @ r} } where each
 $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic
   expression} ({\eg}see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a
 declared token. In the above hybrid rule, denoting by  $n_i,n_i'$ the
@@ -663,7 +663,7 @@ tokens. All variations in amount of tokens can be written on the
 right hand side of rules. This is what you do when you use tokens in
 edit notation:
 \begin{lstlisting}[language=kappa]
-'hybrid rule' S(x~u/~p!1/),K(y!1/) | (-0.1):atp @ 'k'
+'hybrid rule' S(x~u/~p!1/),K(y!1/) | (-0.1) atp @ 'k'
 \end{lstlisting}
 
 The variations make clear that the simulator

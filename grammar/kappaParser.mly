@@ -298,6 +298,8 @@ token_expr:
 
 sum_token:
     | OP_PAR sum_token CL_PAR {$2}
+    | alg_expr ID {[($1,($2,rhs_pos 2))]}
+    | alg_expr ID PLUS sum_token {let l = $4 in ($1,($2,rhs_pos 2))::l}
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
