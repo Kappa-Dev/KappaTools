@@ -24,7 +24,6 @@ type state = {
   project_current : a_project option;
   project_catalog : a_project list;
   project_version : int ;
-  project_contact_map : Api_types_j.contact_map option;
   default_parameters : parameters;
   project_parameters : parameters Mods.StringMap.t;
 }
@@ -33,7 +32,6 @@ type model = {
   model_project_id : Api_types_j.project_id option ;
   model_project_ids : Api_types_j.project_id list ;
   model_project_version : int ;
-  model_contact_map : Api_types_j.contact_map option ;
   model_parameters : parameters ;
 }
 
@@ -59,7 +57,6 @@ let state , set_state =
     project_current = None;
     project_catalog = [];
     project_version = -1;
-    project_contact_map = None;
     default_parameters;
     project_parameters = Mods.StringMap.empty;
   }
@@ -79,7 +76,6 @@ let update_parameters handler =
     project_current = st.project_current;
     project_catalog = st.project_catalog;
     project_version = st.project_version;
-    project_contact_map = st.project_contact_map;
     default_parameters; project_parameters;
   }
 
@@ -102,8 +98,6 @@ let update_state me project_catalog default_parameters project_parameters =
              set_state {
                project_current = Some me;
                project_catalog; default_parameters; project_parameters;
-               project_contact_map =
-                 Some project_parse.Api_types_j.project_parse_contact_map ;
                project_version =
                  project_parse.Api_types_j.project_parse_project_version ;
              } in
@@ -113,7 +107,6 @@ let update_state me project_catalog default_parameters project_parameters =
                project_current = Some me ;
                project_catalog; default_parameters; project_parameters;
                project_version = -1;
-               project_contact_map = None ;
              } in
            Lwt.return (Api_common.result_messages errors))
     )
@@ -148,7 +141,6 @@ let dummy_model = {
   model_project_id = None;
   model_project_ids = [];
   model_project_version = -1;
-  model_contact_map = None;
   model_parameters = default_parameters;
 }
 
@@ -165,7 +157,6 @@ let model : model React.signal =
            Option_util.map (fun x -> x.project_id) state.project_current;
          model_project_ids = model_project_ids ;
          model_project_version = state.project_version ;
-         model_contact_map = state.project_contact_map ;
          model_parameters;
        })
     state
@@ -184,8 +175,7 @@ let sync () : unit Api.result Lwt.t =
                (React.S.value state) with
                project_version =
                  project_parse.Api_types_j.project_parse_project_version;
-               project_contact_map =
-                 Some project_parse.Api_types_j.project_parse_contact_map; } in
+             } in
            Lwt.return (Api_common.result_lift out)))
 
 let remove_simulations manager project_id =
@@ -222,12 +212,13 @@ let remove_project project_id =
            | h :: _ -> Some h
          else state.project_current in
        let () =
-         set_state
-           { project_current; project_catalog;
-             default_parameters = state.default_parameters;
-             project_parameters =
-               Mods.StringMap.remove project_id state.project_parameters;
-             project_version = -1; project_contact_map = None } in
+         set_state {
+           project_current; project_catalog;
+           default_parameters = state.default_parameters;
+           project_parameters =
+             Mods.StringMap.remove project_id state.project_parameters;
+           project_version = -1;
+         } in
        let () = current.project_manager#terminate in
        sync () >>= fun out'' ->
        Lwt.return (Api_common.result_combine [out';out'']))

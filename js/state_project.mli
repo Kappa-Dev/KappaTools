@@ -17,7 +17,6 @@ type model = {
   model_project_id : Api_types_t.project_id option ;
   model_project_ids : Api_types_t.project_id list ;
   model_project_version : Api_types_t.project_version ;
-  model_contact_map : Api_types_t.contact_map option ;
   model_parameters : parameters ;
 }
 

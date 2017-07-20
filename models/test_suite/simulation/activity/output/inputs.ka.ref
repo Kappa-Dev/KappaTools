@@ -17,10 +17,10 @@
 %plot: T
 
 'expo' T(), +T() @ 1
-'expo2'  | -(1):t + 2:t @ expo2_rate
+'expo2'  | -(1) t + 2 t @ expo2_rate
 
 
 %init: nT T()
-%init: 1 
+%init: (1 * 10) t
 
 %mod: [E] = 1000 do $STOP

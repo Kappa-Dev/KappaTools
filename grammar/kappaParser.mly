@@ -162,11 +162,17 @@ instruction:
     ;
 
 init_declaration:
-    | alg_expr non_empty_mixture
-	       {(None,$1,(Ast.INIT_MIX $2,rhs_pos 2))}
-    | alg_expr OP_PAR non_empty_mixture CL_PAR
-	       {(None,$1,(Ast.INIT_MIX $3,rhs_pos 3))}
+    | alg_expr ID OP_PAR interface_expression CL_PAR
+    { (None,$1,(Ast.INIT_MIX [($2,rhs_pos 2), $4, None],
+        Locality.of_pos (Parsing.rhs_start_pos 2) (Parsing.rhs_end_pos 5))) }
+    | alg_expr ID OP_PAR interface_expression CL_PAR COMMA mixture
+    { (None,$1,(Ast.INIT_MIX ((($2,rhs_pos 2), $4, None) :: $7),
+          Locality.of_pos (Parsing.rhs_start_pos 2) (Parsing.rhs_end_pos 7))) }
+    | alg_expr OP_PAR ID OP_PAR interface_expression CL_PAR COMMA mixture CL_PAR
+    { (None,$1,(Ast.INIT_MIX ((($3,rhs_pos 3), $5, None) :: $8),
+          Locality.of_pos (Parsing.rhs_start_pos 3) (Parsing.rhs_end_pos 8))) }
     | ID LAR alg_expr {(None,$3,(Ast.INIT_TOK $1,rhs_pos 1))}
+    | alg_expr ID {(None,$1,(Ast.INIT_TOK $2,rhs_pos 2))}
     | ID OP_CUR init_declaration CL_CUR
 	 {let _,alg,init = $3 in (Some ($1,rhs_pos 1),alg,init)}
     ;
@@ -298,6 +304,8 @@ token_expr:
 
 sum_token:
     | OP_PAR sum_token CL_PAR {$2}
+    | alg_expr ID {[($1,($2,rhs_pos 2))]}
+    | alg_expr ID PLUS sum_token {let l = $4 in ($1,($2,rhs_pos 2))::l}
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 

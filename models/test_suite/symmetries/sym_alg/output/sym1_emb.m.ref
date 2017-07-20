@@ -78,10 +78,10 @@ var(1)=init(3)+2*init(6)+2*init(14)+2*init(10)+init(7)+2*init(13)+2*init(9)+init
 k(1)=1; % A(z), A(z) -> A(z!1), A(z!1)
 k(2)=1; % A(x~u) -> A(x~p)
 k(3)=1; % A(y~u) -> A(y~p)
-k(4)=1; % B(y~u) -> B(y~p) | |A(z!_)|:d
-k(5)=1; % B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
-k(6)=1; % B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)|:d
-k(7)=1; % B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+k(4)=1; % B(y~u) -> B(y~p) | |A(z!_)| d
+k(5)=1; % B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
+k(6)=1; % B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)| d
+k(7)=1; % B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -238,28 +238,28 @@ stoc(7,1)=y(12);
 
 dydt=zeros(nodevar,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~p?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(1)=dydt(1)-k(7)*y(1);
 dydt(16)=dydt(16)+k(7)*y(1);
 dydt(17)=dydt(17)+k(7)*y(1)*stoc(7,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~u?, y~p?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(1)=dydt(1)-k(6)*y(1);
 dydt(16)=dydt(16)+k(6)*y(1);
 dydt(17)=dydt(17)+k(6)*y(1)*stoc(6,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(1)=dydt(1)-k(5)*y(1);
 dydt(16)=dydt(16)+k(5)*y(1);
 dydt(17)=dydt(17)+k(5)*y(1)*stoc(5,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(z!_)|:d
+% rule    : B(y~u) -> B(y~p) | |A(z!_)| d
 % reaction: B(y~u) -> B(y~p) | |A(z!1),A(z!1)|:d 
 
 dydt(1)=dydt(1)-k(4)*y(1);
@@ -591,7 +591,7 @@ jacstoc(7,1,12)=1;
 
 jac=sparse(nodevar,nodevar);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~p!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~p?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(1,1)=jac(1,1)-k(7);
@@ -599,7 +599,7 @@ jac(16,1)=jac(16,1)+k(7);
 jac(17,12)=jac(17,12)+k(7)*y(1)*jacstoc(7,1,12);
 jac(17,1)=jac(17,1)+k(7)*y(1)*stoc(7,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~p!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~u?, y~p?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(1,1)=jac(1,1)-k(6);
@@ -607,7 +607,7 @@ jac(16,1)=jac(16,1)+k(6);
 jac(17,9)=jac(17,9)+k(6)*y(1)*jacstoc(6,1,9);
 jac(17,1)=jac(17,1)+k(6)*y(1)*stoc(6,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : B(y~u) -> B(y~p) | |A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: B(y~u) -> B(y~p) | |A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(1,1)=jac(1,1)-k(5);
@@ -615,7 +615,7 @@ jac(16,1)=jac(16,1)+k(5);
 jac(17,10)=jac(17,10)+k(5)*y(1)*jacstoc(5,1,10);
 jac(17,1)=jac(17,1)+k(5)*y(1)*stoc(5,1);
 
-% rule    : B(y~u) -> B(y~p) | |A(z!_)|:d
+% rule    : B(y~u) -> B(y~p) | |A(z!_)| d
 % reaction: B(y~u) -> B(y~p) | |A(z!1),A(z!1)|:d 
 
 jac(1,1)=jac(1,1)-k(4);

@@ -70,13 +70,13 @@ dydt3[t_]=0;
 dydt4[t_]=0;
 dydt5[t_]=0;
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~p, y~u) -> A(x~p, y~u) | ((a * a) * [T]):tt  *)
 
 dydt2[t_]=dydt2[t]-k6[t]*y2[t];
 dydt2[t_]=dydt2[t]+k6[t]*y2[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~p, y~u) -> A(x~p, y~u) | ((a * a) * [T]):tt  *)
 
 dydt2[t_]=dydt2[t]-k5[t]*y2[t];
@@ -94,13 +94,13 @@ dydt5[t_]=dydt5[t]+k3[t]*y2[t];
 dydt2[t_]=dydt2[t]-k2[t]*y2[t];
 dydt1[t_]=dydt1[t]+k2[t]*y2[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~p, y~p) -> A(x~p, y~p) | ((a * a) * [T]):tt  *)
 
 dydt5[t_]=dydt5[t]-k6[t]*y5[t];
 dydt5[t_]=dydt5[t]+k6[t]*y5[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~p, y~p) -> A(x~p, y~p) | ((a * a) * [T]):tt  *)
 
 dydt5[t_]=dydt5[t]-k5[t]*y5[t];
@@ -118,13 +118,13 @@ dydt2[t_]=dydt2[t]+k4[t]*y5[t];
 dydt5[t_]=dydt5[t]-k2[t]*y5[t];
 dydt3[t_]=dydt3[t]+k2[t]*y5[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~u, y~p) -> A(x~u, y~p) | ((a * a) * [T]):tt  *)
 
 dydt3[t_]=dydt3[t]-k6[t]*y3[t];
 dydt3[t_]=dydt3[t]+k6[t]*y3[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~u, y~p) -> A(x~u, y~p) | ((a * a) * [T]):tt  *)
 
 dydt3[t_]=dydt3[t]-k5[t]*y3[t];
@@ -142,13 +142,13 @@ dydt1[t_]=dydt1[t]+k4[t]*y3[t];
 dydt3[t_]=dydt3[t]-k1[t]*y3[t];
 dydt5[t_]=dydt5[t]+k1[t]*y3[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~u, y~u) -> A(x~u, y~u) | ((a * a) * [T]):tt  *)
 
 dydt1[t_]=dydt1[t]-k6[t]*y1[t];
 dydt1[t_]=dydt1[t]+k6[t]*y1[t];
 
-(* rule    : A() -> A() | ((a * a) * [T]):tt *)
+(* rule    : A() -> A() | ((a * a) * [T]) tt *)
 (* reaction: A(x~u, y~u) -> A(x~u, y~u) | ((a * a) * [T]):tt  *)
 
 dydt1[t_]=dydt1[t]-k5[t]*y1[t];

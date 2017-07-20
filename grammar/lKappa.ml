@@ -282,7 +282,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
        (fun f -> Format.pp_print_string f " + ")
        (fun f ((nb,_),tk) ->
           Format.fprintf
-            f "%a:%a"
+            f "%a %a"
             (Alg_expr.print
                (fun f m -> Format.fprintf
                    f "|%a|" (print_rule_mixture sigs ~ltypes:false) m)

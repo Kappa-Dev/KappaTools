@@ -22,8 +22,6 @@ type file <ocaml from="Api_types"> = abstract
 type file_modification <ocaml from="Api_types"> = abstract
 type file_catalog <ocaml from="Api_types"> = abstract
 
-type contact_map <ocaml from="Api_types"> = abstract
-
 type project_parse <ocaml from="Api_types"> = abstract
 
 type project_parameter <ocaml from="Api_types"> = abstract

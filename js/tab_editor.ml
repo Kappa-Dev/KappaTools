@@ -25,9 +25,8 @@ let rightsubpanel () =
            )
        ]
     [Ui_common.navtabs "subnavtab"
-       [ "contact",    (Tab_contact.navli ())
+       [ "contact_map", (Tab_contact_map.navli ())
        ; "log",        (Tab_log.navli ())
-       ; "contact_map", (Tab_contact_map.navli ())
        ; "influences", (Tab_influences.navli ())
        ; "dead_rules", (Tab_dead_rules.navli ())
        ; "constraints", (Tab_constraints.navli ())
@@ -35,9 +34,8 @@ let rightsubpanel () =
      Ui_common.navcontent
        ~id:rightsubpanel_id
        []
-       [ "contact",     [], (Tab_contact.content ())
+       [ "contact_map", [], (Tab_contact_map.content ())
        ; "log",         [], (Tab_log.content ())
-       ; "contact_map", [], (Tab_contact_map.content ())
        ; "influences",  [], (Tab_influences.content ())
        ; "dead_rules",  [], (Tab_dead_rules.content ())
        ; "constraints", [], (Tab_constraints.content ())
@@ -61,14 +59,12 @@ let content () =
 
 let childs_hide b =
   if b then
-    let () = Tab_contact.parent_hide () in
     let () = Tab_contact_map.parent_hide () in
     let () = Tab_influences.parent_hide () in
     let () = Tab_dead_rules.parent_hide () in
     let () = Tab_constraints.parent_hide () in
     Tab_log.parent_hide ()
   else
-    let () = Tab_contact.parent_shown () in
     let () = Tab_contact_map.parent_shown () in
     let () = Tab_influences.parent_shown () in
     let () = Tab_dead_rules.parent_shown () in
@@ -77,7 +73,6 @@ let childs_hide b =
 
 let onload () =
   let () = Subpanel_editor.onload () in
-  let () = Tab_contact.onload () in
   let () = Tab_log.onload () in
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in
@@ -91,7 +86,6 @@ let onload () =
   ()
 
 let onresize () : unit =
-  let () = Tab_contact.onresize () in
   let () = Tab_log.onresize () in
   let () = Tab_contact_map.onresize () in
   let () = Tab_influences.onresize () in

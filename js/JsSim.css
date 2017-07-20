@@ -18,8 +18,11 @@ body {
     width: 100%;
 }
 
+.col-md-6 {
+    width: 50%;
+}
 
-.tab-pane.row.active {
+#editor.tab-pane.row.active {
     display: flex; 
     flex-direction: row;
 }

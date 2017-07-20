@@ -71,7 +71,7 @@ var(1)=init(2)+2*init(6)+2*init(14)+2*init(10)+init(7)+2*init(9)+2*init(13)+init
 
 k(1)=1; % A(z), A(z) -> A(z!1), A(z!1)
 k(2)=1; % A(x~u) -> A(x~p)
-k(3)=1; % A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+k(3)=1; % A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -217,14 +217,14 @@ stoc(3,1)=(y(2)+2*y(6)+2*y(14)+2*y(10)+y(7)+2*y(9)+2*y(13)+y(15)+2*y(12)+y(11))*
 
 dydt=zeros(nodevar,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(2)=dydt(2)-k(3)*y(2);
 dydt(6)=dydt(6)+k(3)*y(2);
 dydt(5)=dydt(5)+k(3)*y(2)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(2)=dydt(2)-k(3)*y(2);
@@ -243,14 +243,14 @@ dydt(14)=dydt(14)+k(2)*y(2);
 dydt(2)=dydt(2)-k(2)*y(2);
 dydt(14)=dydt(14)+k(2)*y(2);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~u, z!1) -> A(x~u, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(14)=dydt(14)-k(3)*y(14);
 dydt(10)=dydt(10)+k(3)*y(14);
 dydt(5)=dydt(5)+k(3)*y(14)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(14)=dydt(14)-k(3)*y(14);
@@ -263,21 +263,21 @@ dydt(5)=dydt(5)+k(3)*y(14)*stoc(3,1);
 dydt(14)=dydt(14)-k(2)*y(14);
 dydt(15)=dydt(15)+k(2)*y(14);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(15)=dydt(15)-k(3)*y(15);
 dydt(12)=dydt(12)+k(3)*y(15);
 dydt(5)=dydt(5)+k(3)*y(15)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(15)=dydt(15)-k(3)*y(15);
 dydt(12)=dydt(12)+k(3)*y(15);
 dydt(5)=dydt(5)+k(3)*y(15)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z) -> A(x~p, y~p, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(3)=dydt(3)-k(3)*y(3);
@@ -333,7 +333,7 @@ dydt(3)=dydt(3)-1/2*k(1)*y(3)*y(8);
 dydt(8)=dydt(8)-1/2*k(1)*y(3)*y(8);
 dydt(12)=dydt(12)+1/2*k(1)*y(3)*y(8);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(13)=dydt(13)-k(3)*y(13);
@@ -346,7 +346,7 @@ dydt(5)=dydt(5)+k(3)*y(13)*stoc(3,1);
 dydt(13)=dydt(13)-k(2)*y(13);
 dydt(12)=dydt(12)+k(2)*y(13);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(6)=dydt(6)-k(3)*y(6);
@@ -383,14 +383,14 @@ dydt(9)=dydt(9)+k(2)*y(7);
 dydt(9)=dydt(9)-k(2)*y(9);
 dydt(11)=dydt(11)+k(2)*y(9);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~p, z!1) -> A(x~p, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(12)=dydt(12)-k(3)*y(12);
 dydt(11)=dydt(11)+k(3)*y(12);
 dydt(5)=dydt(5)+k(3)*y(12)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(10)=dydt(10)-k(3)*y(10);
@@ -465,7 +465,7 @@ dydt(4)=dydt(4)-1/2*k(1)*y(4)*y(1);
 dydt(1)=dydt(1)-1/2*k(1)*y(4)*y(1);
 dydt(6)=dydt(6)+1/2*k(1)*y(4)*y(1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 dydt(1)=dydt(1)-k(3)*y(1);
@@ -547,7 +547,7 @@ jacstoc(3,1,15)=y(10)*2;
 
 jac=sparse(nodevar,nodevar);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(2,2)=jac(2,2)-k(3);
@@ -564,7 +564,7 @@ jac(5,14)=jac(5,14)+k(3)*y(2)*jacstoc(3,1,14);
 jac(5,15)=jac(5,15)+k(3)*y(2)*jacstoc(3,1,15);
 jac(5,2)=jac(5,2)+k(3)*y(2)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(2,2)=jac(2,2)-k(3);
@@ -593,7 +593,7 @@ jac(14,2)=jac(14,2)+k(2);
 jac(2,2)=jac(2,2)-k(2);
 jac(14,2)=jac(14,2)+k(2);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~u, z!1) -> A(x~u, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(14,14)=jac(14,14)-k(3);
@@ -610,7 +610,7 @@ jac(5,14)=jac(5,14)+k(3)*y(14)*jacstoc(3,1,14);
 jac(5,15)=jac(5,15)+k(3)*y(14)*jacstoc(3,1,15);
 jac(5,14)=jac(5,14)+k(3)*y(14)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(14,14)=jac(14,14)-k(3);
@@ -633,7 +633,7 @@ jac(5,14)=jac(5,14)+k(3)*y(14)*stoc(3,1);
 jac(14,14)=jac(14,14)-k(2);
 jac(15,14)=jac(15,14)+k(2);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(15,15)=jac(15,15)-k(3);
@@ -650,7 +650,7 @@ jac(5,14)=jac(5,14)+k(3)*y(15)*jacstoc(3,1,14);
 jac(5,15)=jac(5,15)+k(3)*y(15)*jacstoc(3,1,15);
 jac(5,15)=jac(5,15)+k(3)*y(15)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~u, z!1) -> A(x~p, y~u, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(15,15)=jac(15,15)-k(3);
@@ -667,7 +667,7 @@ jac(5,14)=jac(5,14)+k(3)*y(15)*jacstoc(3,1,14);
 jac(5,15)=jac(5,15)+k(3)*y(15)*jacstoc(3,1,15);
 jac(5,15)=jac(5,15)+k(3)*y(15)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z) -> A(x~p, y~p, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(3,3)=jac(3,3)-k(3);
@@ -754,7 +754,7 @@ jac(8,8)=jac(8,8)-1/2*k(1)*y(3);
 jac(12,3)=jac(12,3)+1/2*k(1)*y(8);
 jac(12,8)=jac(12,8)+1/2*k(1)*y(3);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(13,13)=jac(13,13)-k(3);
@@ -777,7 +777,7 @@ jac(5,13)=jac(5,13)+k(3)*y(13)*stoc(3,1);
 jac(13,13)=jac(13,13)-k(2);
 jac(12,13)=jac(12,13)+k(2);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(6,6)=jac(6,6)-k(3);
@@ -824,7 +824,7 @@ jac(9,7)=jac(9,7)+k(2);
 jac(9,9)=jac(9,9)-k(2);
 jac(11,9)=jac(11,9)+k(2);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~p, y~u, z!1), A(x~p, y~p, z!1) -> A(x~p, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(12,12)=jac(12,12)-k(3);
@@ -841,7 +841,7 @@ jac(5,14)=jac(5,14)+k(3)*y(12)*jacstoc(3,1,14);
 jac(5,15)=jac(5,15)+k(3)*y(12)*jacstoc(3,1,15);
 jac(5,12)=jac(5,12)+k(3)*y(12)*stoc(3,1);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) | |A(z!1), A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(10,10)=jac(10,10)-k(3);
@@ -950,7 +950,7 @@ jac(1,1)=jac(1,1)-1/2*k(1)*y(4);
 jac(6,4)=jac(6,4)+1/2*k(1)*y(1);
 jac(6,1)=jac(6,1)+1/2*k(1)*y(4);
 
-% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)|:d
+% rule    : A(y~u) -> A(y~p) | |A(z!_), A(x~u!., y~u!., z!1), A(x~p!., y~p!., z!1)| d
 % reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) | |A(z!1),A(z!1) , A(x~u?, y~u?, z!1),A(x~p?, y~p?, z!1)|:d 
 
 jac(1,1)=jac(1,1)-k(3);

@@ -66,7 +66,7 @@ t = 0.000000;
 init(5)=t;
 init(1)=10; % A(x~u, y~u)
 
-k(1)=1; % A(x~u) -> A(x~p) | |A()|:d
+k(1)=1; % A(x~u) -> A(x~p) | |A()| d
 k(2)=1; % A(x~p,y~u) -> A(x~p,y~p)
 
 uiIsOctave = false;
@@ -205,7 +205,7 @@ dydt=zeros(nodevar,1);
 dydt(2)=dydt(2)-k(2)*y(2);
 dydt(4)=dydt(4)+k(2)*y(2);
 
-% rule    : A(x~u) -> A(x~p) | |A()|:d
+% rule    : A(x~u) -> A(x~p) | |A()| d
 % reaction: A(x~u, y~u) -> A(x~p, y~u) | |A()|:d 
 
 dydt(1)=dydt(1)-k(1)*y(1);
@@ -249,7 +249,7 @@ jac=sparse(nodevar,nodevar);
 jac(2,2)=jac(2,2)-k(2);
 jac(4,2)=jac(4,2)+k(2);
 
-% rule    : A(x~u) -> A(x~p) | |A()|:d
+% rule    : A(x~u) -> A(x~p) | |A()| d
 % reaction: A(x~u, y~u) -> A(x~p, y~u) | |A()|:d 
 
 jac(1,1)=jac(1,1)-k(1);

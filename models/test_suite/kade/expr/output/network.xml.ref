@@ -63,9 +63,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <parameter metaid="CMD12" id="k3" value="1"/>
 </listOfParameters>
 <listOfReactions>
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~p, y~u) -> A(x~p, y~u) | ((a * a) * [T]):tt  -->
-<reaction id="re1" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re1" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD19" species="s2"/>
 </listOfReactants>
@@ -87,9 +87,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~p, y~u) -> A(x~p, y~u) | ((a * a) * [T]):tt  -->
-<reaction id="re2" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re2" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD25" species="s2"/>
 </listOfReactants>
@@ -148,9 +148,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~p, y~p) -> A(x~p, y~p) | ((a * a) * [T]):tt  -->
-<reaction id="re5" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re5" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD38" species="s5"/>
 </listOfReactants>
@@ -172,9 +172,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~p, y~p) -> A(x~p, y~p) | ((a * a) * [T]):tt  -->
-<reaction id="re6" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re6" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD44" species="s5"/>
 </listOfReactants>
@@ -233,9 +233,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~u, y~p) -> A(x~u, y~p) | ((a * a) * [T]):tt  -->
-<reaction id="re9" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re9" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD57" species="s3"/>
 </listOfReactants>
@@ -257,9 +257,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~u, y~p) -> A(x~u, y~p) | ((a * a) * [T]):tt  -->
-<reaction id="re10" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re10" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD63" species="s3"/>
 </listOfReactants>
@@ -313,9 +313,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~u, y~u) -> A(x~u, y~u) | ((a * a) * [T]):tt  -->
-<reaction id="re13" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re13" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD73" species="s1"/>
 </listOfReactants>
@@ -337,9 +337,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
 <!-- File "expr.ka", line 12, characters 14-25:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
-<!-- rule    : A() -> A() | ((a * a) * [T]):tt -->
+<!-- rule    : A() -> A() | ((a * a) * [T]) tt -->
 <!-- reaction: A(x~u, y~u) -> A(x~u, y~u) | ((a * a) * [T]):tt  -->
-<reaction id="re14" name="A() -> A() | ((a * a) * [T]):tt" reversible="false" fast="false">
+<reaction id="re14" name="A() -> A() | ((a * a) * [T]) tt" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD79" species="s1"/>
 </listOfReactants>

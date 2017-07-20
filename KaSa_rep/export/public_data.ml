@@ -35,28 +35,27 @@ let refinement_lemmas="refinement lemmas"
 (*******************)
 
 type accuracy_level = Low | Medium | High | Full
+let accuracy_levels = [ Low; Medium; High; Full ]
 
-let accuracy_to_json accuracy =
-  JsonUtil.of_string
-    (
-      match
-        accuracy
-      with
-      | Low -> "low"
-      | Medium -> "medium"
-      | High -> "high"
-      | Full -> "full"
-    )
+let accuracy_to_string = function
+  | Low -> "low"
+  | Medium -> "medium"
+  | High -> "high"
+  | Full -> "full"
+
+let accuracy_to_json x = JsonUtil.of_string (accuracy_to_string x)
+
+let accuracy_of_string = function
+  | "low" -> Some Low
+  | "medium" -> Some Medium
+  | "high" -> Some High
+  | "full" -> Some Full
+  | _ -> None
 
 let accuracy_of_json json =
-  match
-    JsonUtil.to_string json
-  with
-  | "low" -> Low
-  | "medium" -> Medium
-  | "high" -> High
-  | "full" -> Full
-  | _ ->
+  match accuracy_of_string (JsonUtil.to_string json) with
+  | Some x -> x
+  | None ->
     raise
       (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "accuracy level",json))
 

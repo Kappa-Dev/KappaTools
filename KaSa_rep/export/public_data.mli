@@ -17,6 +17,10 @@ val bound:string
 val wildcard:string
 
 type accuracy_level = Low | Medium | High | Full
+val accuracy_levels : accuracy_level list
+
+val accuracy_to_string : accuracy_level -> string
+val accuracy_of_string : string -> accuracy_level option
 
 val accuracy_to_json : accuracy_level -> Yojson.Basic.json
 val accuracy_of_json : Yojson.Basic.json -> accuracy_level

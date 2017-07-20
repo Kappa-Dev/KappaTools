@@ -264,5 +264,4 @@ let plot_values
     (List.rev plot.Api_types_t.plot_time_series)
 
 (* return the agent count *)
-let agent_count (contact_map : Api_types_t.contact_map) : int =
-    Array.length contact_map
+let agent_count (species : Api_types_t.site_graph) : int = Array.length species

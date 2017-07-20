@@ -23,4 +23,4 @@ val api_contact_map :
 val api_simulation_status :
   Api_types_t.simulation_detail -> Api_types_t.simulation_info
 val plot_values : ?separator:string -> Api_types_t.plot -> string
-val agent_count : Api_types_t.contact_map -> int
+val agent_count : Api_types_t.site_graph -> int
