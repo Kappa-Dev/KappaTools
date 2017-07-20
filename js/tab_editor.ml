@@ -20,7 +20,7 @@ let rightsubpanel () =
                    (if editor_full then
                       ["hidden"]
                     else
-                      ["col-md-6"; "hidden-xs"; "hidden-sm"])
+                      ["col-md-6"; "hidden-xs"; "hidden-sm"; "flex-content"])
               )
            )
        ]
