@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jun 08 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
 *)
 
 module A = Odes.Make (Ode_interface)
@@ -41,13 +41,34 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
           exit 0
         end
     in
-    let rate_convention =
-      match Tools.lowercase !(ode_args.Ode_args.rate_convention) with
+    let rule_rate_convention =
+      match Tools.lowercase !(ode_args.Ode_args.rule_rate_convention) with
     | "kasim" -> Remanent_parameters_sig.No_correction
     | "divide_by_nbr_of_autos_in_lhs" ->
       Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
     | "biochemist" -> Remanent_parameters_sig.Biochemist
     | s ->
+      begin
+        (*Arg.usage options usage_msg;*)
+        Debug.tag
+          Format.std_formatter
+          ("Wrong option "^s^".\nOnly KaSim and Biochemist are supported.");
+        exit 0
+      end
+    in
+    let reaction_rate_convention =
+      match backend,Tools.lowercase !(ode_args.Ode_args.reaction_rate_convention) with
+      |
+        (Loggers.Octave
+        | Loggers.Matlab
+        | Loggers.Mathematica
+        | Loggers.Maple),
+        ("kasim" | "divide_by_nbr_of_autos_in_lhs" | "biochemist")
+     | _,"kasim" -> Remanent_parameters_sig.No_correction
+      | (Loggers.SBML | Loggers.DOTNET),"divide_by_nbr_of_autos_in_lhs" ->
+      Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs
+    | (Loggers.SBML | Loggers.DOTNET),"biochemist" -> Remanent_parameters_sig.Biochemist
+    | _,s ->
       begin
         (*Arg.usage options usage_msg;*)
         Debug.tag
@@ -217,7 +238,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
         in
         let compil =
           A.get_compil
-            ~rate_convention ~show_reactions ~count ~compute_jacobian
+            ~reaction_rate_convention ~rule_rate_convention
+            ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast
         in
         let network = A.init compil in
@@ -241,7 +263,7 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
             let () = Format.printf "+ restart compilation to account for ~-equivalent patterns in algebraic expressions... @." in
             let compil =
               A.get_compil ?bwd_bisim
-                ~rate_convention ~show_reactions ~count ~compute_jacobian
+                ~reaction_rate_convention ~rule_rate_convention ~show_reactions ~count ~compute_jacobian
                 cli_args preprocessed_ast
             in
             let network = A.reset compil network in
@@ -268,7 +290,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       else
         let compil =
           A.get_compil
-            ~rate_convention ~show_reactions ~count ~compute_jacobian
+            ~reaction_rate_convention ~rule_rate_convention
+            ~show_reactions ~count ~compute_jacobian
             cli_args preprocessed_ast
         in
         let network = A.init compil in
@@ -278,7 +301,8 @@ let main ?called_from:(called_from=Remanent_parameters_sig.Server) () =
       !(ode_args.Ode_args.smash_reactions)
     in
     let network =
-      A.network_from_compil ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network
+      A.network_from_compil
+        ?max_size ~dotnet ~smash_reactions ~ignore_obs parameters compil network
     in
     (*************************************************************)
     let out_channel =

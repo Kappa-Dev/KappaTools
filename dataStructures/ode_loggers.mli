@@ -30,7 +30,8 @@ val print_ode_preamble:
   (Loggers.t -> unit) ->
   may_be_not_time_homogeneous:bool ->
   count:Ode_args.count ->
-  rate_convention:Remanent_parameters_sig.rate_convention ->
+  rule_rate_convention:Remanent_parameters_sig.rate_convention ->
+  ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
   ?filter_in:Loggers.encoding list option ->
   ?filter_out:Loggers.encoding list -> unit ->
   unit
@@ -111,4 +112,4 @@ val print_alg_expr_few_parenthesis:
   (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Network_handler.t
   -> unit
 
-val is_time: (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> bool 
+val is_time: (Ode_loggers_sig.ode_var_id, Ode_loggers_sig.ode_var_id) Alg_expr.e Locality.annot -> bool

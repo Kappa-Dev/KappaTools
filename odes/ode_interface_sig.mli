@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 18 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
 *)
 
 module type Interface =
@@ -47,8 +47,10 @@ sig
     ?dotnet:bool
     -> ?compil:compil -> Format.formatter -> canonic_species -> unit
 
-  val rate_convention: compil ->
+  val rule_rate_convention: compil ->
     Remanent_parameters_sig.rate_convention
+  val reaction_rate_convention: compil ->
+      Remanent_parameters_sig.rate_convention option
   val what_do_we_count: compil -> Ode_args.count
   val do_we_count_in_embeddings: compil -> bool
   val do_we_prompt_reactions: compil -> bool
@@ -134,7 +136,8 @@ sig
 
   val get_compil:
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
-    rate_convention:Remanent_parameters_sig.rate_convention ->
+    rule_rate_convention:Remanent_parameters_sig.rate_convention ->
+    ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> preprocessed_ast -> compil
 

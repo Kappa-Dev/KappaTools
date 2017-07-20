@@ -23,6 +23,60 @@ let pow i j =
   in
   aux i j 1
 
+let fact i =
+  let rec aux i accu =
+      if i<2 then accu
+      else aux (i-1) (i*accu)
+  in
+  aux i 1
+
+let get_product_image_occ start combine f l =
+  let l = List.sort compare l in
+  let rec aux l old occ accu =
+    match l with
+    | h::t when h=old -> aux t old (1+occ) accu
+    | _ ->
+      begin
+        let accu = combine accu (f occ) in
+        match l with
+        | h::t -> aux t h 1 accu
+        | [] -> accu
+      end
+  in match l with
+  | [] -> 1
+  | h::t -> aux t h 1 start
+
+let get_product_image_occ_2 start combine f l1 l2 =
+  let l1 = List.sort compare l1 in
+  let l2 = List.sort compare l2 in
+  let count_head_and_get_tail l =
+    match l with
+    | [] -> [],0
+    | h::t ->
+      let rec aux l h occ =
+        match l with
+        | [] -> [],occ
+        | h'::t when h=h' -> aux t h (occ+1)
+        | _ -> l,occ
+      in
+      aux t h 1
+  in
+  let rec aux l1 l2 accu =
+    match l1,l2 with
+    | h1::_,h2::_ when h1=h2 ->
+      let l1,occ1 = count_head_and_get_tail l1 in
+      let l2,occ2 = count_head_and_get_tail l2 in
+      aux l1 l2 (combine accu (f occ1 occ2))
+    | h1::_,h2::_ when compare h1 h2 < 0 ->
+      let l1,occ1 = count_head_and_get_tail l1 in
+      aux l1 l2 (combine accu (f occ1 0))
+    | _::_,_::_ ->
+      let l2,occ2 = count_head_and_get_tail l2 in
+        aux l1 l2 (combine accu (f 0 occ2))
+      | [],_ | _,[] -> accu
+    in
+    aux l1 l2 start
+
 let div2 x = Int64.div x (Int64.add Int64.one Int64.one)
 let pow64 x n =
   assert (n >= Int64.zero);

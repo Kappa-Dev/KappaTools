@@ -41,6 +41,21 @@ val fold_over_permutations: (int list -> 'a -> 'a) -> int list -> 'a -> 'a
 val gcd_2: int -> int -> int
 val lcm: int list -> int
 
+val fact: int -> int
+val get_product_image_occ:
+  int ->
+  (int -> int -> int) ->
+  (int -> int) ->
+  'a list ->
+  int
+
+val get_product_image_occ_2:
+  int ->
+  (int -> int -> int) ->
+  (int -> int -> int) ->
+  'a list -> 'a list ->
+  int
+
 val get_interval_list: (int -> bool) -> int -> int -> (int * int) list
 
 val lowercase: string -> string

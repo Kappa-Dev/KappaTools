@@ -17,6 +17,7 @@ period - the time period between points to return
 
 variables denote number of embeddings 
 rule rates are corrected by the number of automorphisms in the lhs of rules
+reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
 -->
 <listOfUnitDefinitions>
 <unitDefinition metaid="substance" id="substance" name="substance">
@@ -296,10 +297,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply>
-<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
-</apply>
-<apply>
+<times/><ci> k4 </ci><apply>
 <times/><ci> s3 </ci><ci> s3 </ci></apply>
 </apply>
 </math>
@@ -408,10 +406,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply>
-<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
-</apply>
-<apply>
+<times/><ci> k4 </ci><apply>
 <times/><ci> s4 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
@@ -429,10 +424,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply>
-<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
-</apply>
-<apply>
+<times/><ci> k4 </ci><apply>
 <times/><ci> s4 </ci><ci> s4 </ci></apply>
 </apply>
 </math>
@@ -450,10 +442,7 @@ rule rates are corrected by the number of automorphisms in the lhs of rules
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><apply>
-<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
-</apply>
-<apply>
+<times/><ci> k4 </ci><apply>
 <times/><ci> s4 </ci><ci> s4 </ci></apply>
 </apply>
 </math>

@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jun 12 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
 *)
 module Make(I:Ode_interface_sig.Interface) :
 sig
@@ -17,7 +17,8 @@ sig
 
   val get_compil :
     ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
-    rate_convention:Remanent_parameters_sig.rate_convention ->
+    rule_rate_convention:Remanent_parameters_sig.rate_convention ->
+    ?reaction_rate_convention:Remanent_parameters_sig.rate_convention ->  
     show_reactions:bool -> count:Ode_args.count ->
     compute_jacobian:bool -> Run_cli_args.t -> I.preprocessed_ast -> I.compil
 

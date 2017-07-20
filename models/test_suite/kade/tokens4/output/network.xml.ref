@@ -17,6 +17,7 @@ period - the time period between points to return
 
 variables denote number of embeddings 
 rule rates are corrected by the number of automorphisms in the lhs of rules
+reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
 -->
 <listOfUnitDefinitions>
 <unitDefinition metaid="substance" id="substance" name="substance">

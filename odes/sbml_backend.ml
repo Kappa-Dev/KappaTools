@@ -1274,9 +1274,10 @@ let promote nbr =
   match nbr with Nbr.F f when can_be_cast f  -> Nbr.I (int_of_float f)
                | Nbr.I _ | Nbr.F _ | Nbr.I64 _ -> nbr
 
+
 let dump_kinetic_law
     ~propagate_constants
-    print_alg_expr string_of_var_id logger logger_err network reactants var_rule correct nocc =
+    print_alg_expr string_of_var_id logger logger_err network reactants products var_rule correct nocc =
   let () =
     do_dotnet logger logger_err
       (fun logger logger_err ->
@@ -1848,6 +1849,7 @@ let dump_sbml_reaction
                        logger_err
                        network
                        reactants
+                       products
                        var_rule
                        correct
                        nocc

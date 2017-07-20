@@ -4,7 +4,8 @@ type count = Embeddings | Occurrences
 
 type t = {
   backend : string ref ;
-  rate_convention : string ref ;
+  rule_rate_convention : string ref ;
+  reaction_rate_convention : string ref ;
   count : string ref ;
   show_reactions : bool ref ;
   compute_jacobian : bool ref ;
@@ -35,7 +36,8 @@ type t = {
 let default : t =
   {
     backend = ref "octave" ;
-    rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
+    rule_rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
+    reaction_rate_convention = ref "Divide_by_nbr_of_autos_in_lhs" ;
     count = ref "Embeddings" ;
     show_reactions = ref true ;
     compute_jacobian = ref true ;
@@ -152,24 +154,40 @@ let options (t :t)  : (Superarg.key * Superarg.spec * Superarg.msg *
     [ "KaSim","do not divide by anything";
       "Divide_by_nbr_of_autos_in_lhs","divide by the number of autos in the lhs of rules";
       "Biochemist","divide by the number of autos in the lhs of rules that induce an auto also in the rhs"],
-    ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rate_convention),
+    ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rule_rate_convention),
     "convention for dividing constant rates",
+  [Common_args.semantics,1],Hidden;
+    "--rule-rate-convention",
+    Superarg.Choice (
+      [ "KaSim","do not divide by anything";
+        "Divide_by_nbr_of_autos_in_lhs","divide by the number of autos in the lhs of rules";
+        "Biochemist","divide by the number of autos in the lhs of rules that induce an auto also in the rhs"],
+    ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.rule_rate_convention),
+    "convention for dividing constant rates (for rules)",
     [Common_args.semantics,1],Normal;
+    "--reaction-rate-convention",
+  Superarg.Choice (
+    [ "KaSim","do not divide by anything";
+      "Divide_by_nbr_of_autos_in_lhs","divide by the number of autos in the lhs of reactions";
+      "Biochemist","divide by the number of autos in the lhs of reactions that induce an auto also in the rhs"],
+    ["kasim";"KASIM";"Kasim";"DIVIDE_BY_NBR_OF_AUTOS_IN_LHS";"divide_by_nbr_of_autos_in_lhs";"biobhemist";"BIOCHEMIST"],t.reaction_rate_convention),
+    "convention for dividing constant rates (for reactions)",
+    [Common_args.semantics,2],Normal;
   "--count",
   Superarg.Choice (
     [ "Embeddings","count the number of embeddings of patterns into species";
       "Occurrences","count the number of occurrences of species"],
     ["embeddings";"EMBEDDINGS";"occurrences";"OCCURRENCES"],t.count),
     "tune whether we cound in embeddings or in occurrences",
-  [Common_args.semantics,2],Normal;
+  [Common_args.semantics,3],Normal;
   "--truncate",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
-  [Common_args.semantics,3],Normal;
+  [Common_args.semantics,4],Normal;
   "--max-size-for-species",
   Superarg.Int_opt t.max_size_for_species,
   "truncate the network by discarding species with size greater than the argument",
-  [Common_args.semantics,4],Hidden;
+  [Common_args.semantics,5],Hidden;
   "--show-reactions",
   Superarg.Bool t.show_reactions,
     "Annotate ODEs by the corresponding chemical reactions",

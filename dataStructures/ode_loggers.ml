@@ -249,7 +249,8 @@ let print_ode_preamble
     command_line
     ~may_be_not_time_homogeneous
     ~count
-    ~rate_convention
+    ~rule_rate_convention
+    ?reaction_rate_convention
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
     ()
   =
@@ -283,7 +284,7 @@ let print_ode_preamble
                | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
               "%% "^
               (match
-                 rate_convention
+                 rule_rate_convention
                with
                | Remanent_parameters_sig.Common ->
                  "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
@@ -322,16 +323,28 @@ let print_ode_preamble
                | Ode_args.Occurrences -> "variables (init(i),y(i)) denote numbers occurrences");
               "# "^
               (match
-                 rate_convention
+                 rule_rate_convention
                with
                | Remanent_parameters_sig.Common ->
-                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
+                 "rule rates are corrected by automorphisms common to the lhs and the rhs"
                | Remanent_parameters_sig.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
                | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
                | Remanent_parameters_sig.No_correction ->
-                 "no correcion is applied on rule rates")
+                 "no correcion is applied on rule rates");
+                 "# "^
+                 (match
+                    reaction_rate_convention
+                  with
+                  | Some Remanent_parameters_sig.Common
+                  | Some Remanent_parameters_sig.Biochemist ->
+                    "reaction rates are corrected by the product, for each species, of the factorial of the min number of occurrence of this species in the lhs and in the rhs"
+                  | Some Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
+                  "reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs"
+                  | None | Some (Remanent_parameters_sig.No_correction) ->
+                    "no correcion is applied on reaction rates");
+
             ])
         in ()
       end
@@ -363,18 +376,30 @@ let print_ode_preamble
                with
                | Ode_args.Embeddings -> "variables denote number of embeddings "
                | Ode_args.Occurrences -> "variables denote numbers occurrences");
-              ""^
+
               (match
-                 rate_convention
+                 rule_rate_convention
                with
                | Remanent_parameters_sig.Common ->
-                 "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
+                 "rule rates are corrected by automorphisms common to the lhs and the rhs"
                | Remanent_parameters_sig.Biochemist ->
                  "rule rates are corrected by the number of automorphisms that induce an automorphism in the rhs as well"
                | Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
                  "rule rates are corrected by the number of automorphisms in the lhs of rules"
                | Remanent_parameters_sig.No_correction ->
                  "no correcion is applied on rule rates");
+
+              (match
+                 reaction_rate_convention
+               with
+               | Some Remanent_parameters_sig.Common
+               | Some Remanent_parameters_sig.Biochemist ->
+                 "reaction rates are corrected by the product, for each species, of the factorial of the min number of occurrence of this species in the lhs and in the rhs"
+               | Some Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs ->
+                 "reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs"
+               | None | Some (Remanent_parameters_sig.No_correction) ->
+                 "no correcion is applied on reaction rates");
+
               "-->";
               "<listOfUnitDefinitions>";
               "<unitDefinition metaid=\"substance\" id=\"substance\" name=\"substance\">";
@@ -430,7 +455,7 @@ let print_ode_preamble
                | Ode_args.Occurrences -> "variables (initi(t)),yi(t)) denote numbers occurrences");
               "## "^
               (match
-                 rate_convention
+                 rule_rate_convention
                with
                | Remanent_parameters_sig.Common ->
                  "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well "
@@ -469,7 +494,7 @@ let print_ode_preamble
                | Ode_args.Occurrences -> "variables (initi[t]),yi[t]) denote numbers occurrences *)");
               "(* "^
               (match
-                 rate_convention
+                 rule_rate_convention
                with
                | Remanent_parameters_sig.Common ->
                  "rule rates are corrected by automorphisms of the lhs that induce an automorphism in the rhs as weel; and by the automorphisms of the rhs that induce an automorphism in the lhs as well *)"

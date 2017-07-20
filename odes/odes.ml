@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <May 21 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
 *)
 
 let local_trace = false
@@ -1019,6 +1019,38 @@ struct
       else
         network
     in
+    let network =
+      match I.reaction_rate_convention compil with
+      | None | Some Remanent_parameters_sig.No_correction -> network
+      | Some Remanent_parameters_sig.Biochemist
+      | Some Remanent_parameters_sig.Common    ->
+        let reactions = network.reactions in
+        let reactions =
+          List.rev_map
+            (fun (reaction,nocc) ->
+               let (reactants,products,_,_) = reaction in
+               let correct =
+                 Tools.get_product_image_occ_2 1 (fun i j -> i*j) (fun i j -> Tools.fact (min i j))
+                   reactants products
+               in
+               (reaction,nocc*correct))
+            (List.rev reactions) in
+        {network with reactions = reactions}
+      | Some Remanent_parameters_sig.Divide_by_nbr_of_autos_in_lhs  ->
+        let reactions = network.reactions in
+        let reactions =
+          List.rev_map
+            (fun (reaction,nocc) ->
+               let (reactants,products,_,_) = reaction in
+               let correct =
+                 Tools.get_product_image_occ 1
+                   (fun i j -> i*j) (fun i -> Tools.fact i)
+                   reactants
+               in
+               (reaction,nocc*correct))
+            (List.rev reactions) in
+        {network with reactions = reactions}
+    in
     let () = debug "@]@." in
     network
 
@@ -1354,7 +1386,7 @@ struct
                  Rule_modes.RuleModeIdSet.add
                    (flatten_rate enriched_rule.rule_id_with_mode)
                    rate_set
-               in            
+               in
                let const_list = [] in
                let var_list = [] in
                let network,rate =
@@ -1811,7 +1843,9 @@ struct
           ("     "^command_line_quotes) in ()
     in
     let count = I.what_do_we_count compil in
-    let rate_convention = I.rate_convention compil in
+    let rule_rate_convention = I.rule_rate_convention compil in
+    let reaction_rate_convention =
+      I.reaction_rate_convention compil in
     let may_be_not_time_homogeneous =
       may_be_not_time_homogeneous network
     in
@@ -1821,7 +1855,7 @@ struct
       then
         let () =
           Ode_loggers.print_ode_preamble ~may_be_not_time_homogeneous
-        ~count ~rate_convention logger command_line_closure ()
+        ~count ~rule_rate_convention ?reaction_rate_convention logger command_line_closure ()
         in
         let () = Ode_loggers.print_newline logger in
         (*---------------------------------------------------------------*)

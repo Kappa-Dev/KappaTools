@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <May 27 2017>
+  * Last modification: Time-stamp: <Jul 20 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -15,7 +15,8 @@ type compil =
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
     init: (Alg_expr.t * rule * Locality.t) list;
-    rate_convention: Remanent_parameters_sig.rate_convention ;
+    rule_rate_convention: Remanent_parameters_sig.rate_convention ;
+    reaction_rate_convention: Remanent_parameters_sig.rate_convention option;
     show_reactions: bool ;
     count: Ode_args.count ;
     compute_jacobian: bool
@@ -141,7 +142,9 @@ type connected_component = Pattern.id
 let dummy_chemical_species compil =
   Pattern.empty_cc (Pattern.Env.signatures (domain compil))
 
-let rate_convention compil = compil.rate_convention
+let rule_rate_convention compil = compil.rule_rate_convention
+
+let reaction_rate_convention compil = compil.reaction_rate_convention
 
 let what_do_we_count compil = compil.count
 
@@ -490,7 +493,8 @@ let to_ast x = x
 let preprocess cli_args ast = Cli_init.preprocess cli_args ast
 let get_compil
     ?bwd_bisim
-    ~rate_convention  ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
+    ~rule_rate_convention ?reaction_rate_convention
+    ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
     Cli_init.get_compilation_from_preprocessed_ast ?bwd_bisim cli_args preprocessed_ast
   in
@@ -498,7 +502,8 @@ let get_compil
     environment = env ;
     contact_map = contact_map ;
     init = init ;
-    rate_convention = rate_convention ;
+    rule_rate_convention = rule_rate_convention ;
+    reaction_rate_convention = reaction_rate_convention ;
     show_reactions = show_reactions ;
     count = count ;
     compute_jacobian = compute_jacobian ;
@@ -564,7 +569,7 @@ let nb_tokens compil = Model.nb_tokens (environment compil)
 
 
 let divide_rule_rate_by cache compil rule =
-  match compil.rate_convention with
+  match compil.rule_rate_convention with
   | Remanent_parameters_sig.Common -> assert false
 (* this is not a valid parameterization *)
 (* Common can be used only to compute normal forms *)
@@ -576,7 +581,7 @@ let divide_rule_rate_by cache compil rule =
       Model.get_ast_rule compil.environment rule_id
     in
     let rule_cache, output =
-      LKappa_auto.nauto compil.rate_convention cache.rule_cache
+      LKappa_auto.nauto compil.rule_rate_convention cache.rule_cache
         lkappa_rule
     in
     {cache with rule_cache = rule_cache}, output
@@ -600,7 +605,7 @@ let detect_symmetries parameters compil cache chemical_species contact_map =
       parameters
       compil.environment
       rule_cache
-      compil.rate_convention
+      compil.rule_rate_convention
       chemical_species
       (get_rules compil)
       contact_map

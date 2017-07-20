@@ -13,6 +13,7 @@
 #
 # variables (init(i),y(i)) denote numbers of embeddings 
 # rule rates are corrected by the number of automorphisms in the lhs of rules
+# reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
 
 begin species
  1 A() 0
@@ -34,8 +35,7 @@ end parameters
 begin reactions
 # rule    : A(), A() -> A() 
 # A() + A() -> A()  
-1 1,1 1 0.5*k3_
-
+1 1,1 1 k3_
 # rule    : A() ->  
 # A() ->   
 2 1 k1_
