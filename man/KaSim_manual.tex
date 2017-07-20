@@ -899,9 +899,13 @@ The initial mixture\index{mixture} to which rules in the KF\index{Kappa file} wi
 \ITE{
 \item[] \ttt{\%init: } \textit{algebraic\_expression} \textit{Kappa\_expression}
 }
+%% or:
+%% \ITE{
+%% \item[] \ttt{\%init: }  \textit{token\_name} \ttt{<-} \textit{algebraic\_expression}
+%% }
 or:
 \ITE{
-\item[] \ttt{\%init: }  \textit{token\_name} \ttt{<-} \textit{algebraic\_expression}
+\item[] \ttt{\%init: }  \textit{algebraic\_expression} \textit{token\_name}
 }
 
 %%
@@ -909,7 +913,7 @@ where \textit{algebraic\_expression} is evaluated before initialization of the s
 \begin{lstlisting}[language=kappa]
 %var: 'n' 1000
 %init: 'n' A(),A(y~p)
-%init: ca2+ <- 0.39 #mM
+%init: 0.39 ca2+ #mM
 \end{lstlisting}
 will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation by using the expression \ttt{|ca2+|}.
 As any other declaration\index{declaration}, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.

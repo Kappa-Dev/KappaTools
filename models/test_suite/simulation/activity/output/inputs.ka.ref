@@ -21,6 +21,6 @@
 
 
 %init: nT T()
-%init: 1 
+%init: (1 * 10) t
 
 %mod: [E] = 1000 do $STOP

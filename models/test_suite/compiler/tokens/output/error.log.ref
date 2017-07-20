@@ -19,4 +19,4 @@ Domain:
   /*cc1*/ A/*1*/(x!.) -> ()
 Intial graph;
   
-  %init: tt <- 33
+  %init: 33 tt

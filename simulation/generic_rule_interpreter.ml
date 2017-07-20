@@ -340,8 +340,8 @@ module Make (Instances:Instances_sig.S) = struct
       (Edges.build_snapshot sigs state.edges)
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf
-             f "%%init: %a <- %a"
-             (Model.print_token ~env) i Nbr.print el))
+             f "%%init: %a %a"
+             Nbr.print el (Model.print_token ~env) i))
       state.tokens
 
   let debug_print f state =
@@ -349,8 +349,8 @@ module Make (Instances:Instances_sig.S) = struct
       f "@[<v>%a@,%a@,%a@]"
       Edges.debug_print state.edges
       (Pp.array Pp.space (fun i f el ->
-           Format.fprintf f "token_%i <- %a"
-             i Nbr.print el))
+           Format.fprintf f "%a token_%i"
+             Nbr.print el i))
       state.tokens
       Instances.debug_print state.instances
 

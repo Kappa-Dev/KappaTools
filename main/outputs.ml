@@ -285,7 +285,7 @@ let print_snapshot sigs f s =
     s.Data.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->
          Format.fprintf
-           f "%%init: %s <- %a" na Nbr.print el))
+           f "%%init: %a %s" Nbr.print el na))
     s.Data.snapshot_tokens
 
 let print_dot_snapshot sigs f s =
@@ -382,11 +382,19 @@ let initial_inputs conf env contact_map init ~filename =
             let ins_fresh,_,_ =
               Primitives.Transformation.raw_mixture_of_fresh
                 sigs r.Primitives.inserted in
-            Format.fprintf f "@[<h>%%init: %a %a@]"
-              (Kappa_printer.alg_expr ~env) n
-              (Raw_mixture.print
-                 ~new_syntax:true ~compact:false ~created:false ~sigs)
-              (List.map snd ins_fresh))) init in
+            if ins_fresh = [] then
+              Pp.list Pp.space (fun f (nb,tk) ->
+                  Format.fprintf f "@[<h>%%init: %a %a@]"
+                    (Kappa_printer.alg_expr ~env)
+                    (fst (Alg_expr.mult (Locality.dummy_annot n) nb))
+                    (Model.print_token ~env) tk)
+                f r.Primitives.delta_tokens
+              else
+                Format.fprintf f "@[<h>%%init: %a %a@]"
+                  (Kappa_printer.alg_expr ~env) n
+                  (Raw_mixture.print
+                     ~new_syntax:true ~compact:false ~created:false ~sigs)
+                  (List.map snd ins_fresh))) init in
   inputsDesc := Some inputs
 
 let input_modifications env event mods =
