@@ -84,7 +84,8 @@ rect { stroke-width: 2; }
     white-space : pre;
 }
 .panel-scroll {
-	   overflow: scroll;
+    overflow: scroll;
+    word-wrap: break-word
 }
 .tab-log {
     height: calc(100% - 350px);

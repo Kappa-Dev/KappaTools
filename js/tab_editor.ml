@@ -26,19 +26,19 @@ let rightsubpanel () =
        ]
     [Ui_common.navtabs "subnavtab"
        [ "contact_map", (Tab_contact_map.navli ())
-       ; "log",        (Tab_log.navli ())
        ; "influences", (Tab_influences.navli ())
        ; "dead_rules", (Tab_dead_rules.navli ())
        ; "constraints", (Tab_constraints.navli ())
+       ; "log",        (Tab_log.navli ())
        ];
      Ui_common.navcontent
        ~id:rightsubpanel_id
        []
        [ "contact_map", [], (Tab_contact_map.content ())
-       ; "log",         [], (Tab_log.content ())
        ; "influences",  [], (Tab_influences.content ())
        ; "dead_rules",  [], (Tab_dead_rules.content ())
        ; "constraints", [], (Tab_constraints.content ())
+       ; "log",         [], (Tab_log.content ())
        ]]
 
 let content () =

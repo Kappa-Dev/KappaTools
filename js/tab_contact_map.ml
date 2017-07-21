@@ -35,6 +35,8 @@ let configuration : Widget_export.configuration = {
   Widget_export.show = React.S.const true;
 }
 
+let accuracy_chooser_id = "contact_map-accuracy"
+
 let accuracy_chooser =
   let option_gen x =
     Html.option
@@ -45,13 +47,20 @@ let accuracy_chooser =
       (Html.pcdata
          (Public_data.accuracy_to_string x)) in
   Html.select
-    ~a:[Html.a_class [ "form-control" ]]
+    ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
     (List.map option_gen Public_data.accuracy_levels)
 
 let content () =
+  let accuracy_form =
+    Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
+      [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
+              [Html.pcdata "Accuracy"];
+            Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
+      ] in
   let export_controls =
     Widget_export.content configuration in
-  [ accuracy_chooser;
+  [ accuracy_form;
     [%html {|<div id="|}display_id{|">|}[ Html.entity "nbsp" ]{|</div>|}];
     export_controls ]
 
