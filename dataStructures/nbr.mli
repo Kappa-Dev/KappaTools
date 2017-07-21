@@ -58,9 +58,24 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Failure "float_of_string" *)
 
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val to_yojson : t -> Yojson.Basic.json
+val of_yojson : Yojson.Basic.json -> t
 (** @raise Yojson.Basic.Util.Type_error if incorrect *)
+
+val write_t : Bi_outbuf.t -> t -> unit
+(** Output a JSON value of type {!t}. *)
+
+val string_of_t : ?len:int -> t -> string
+(** Serialize a value of type {!t} into a JSON string.
+    @param len specifies the initial length
+               of the buffer used internally.
+               Default: 1024. *)
+
+val read_t : Yojson.Safe.lexer_state -> Lexing.lexbuf -> t
+(** Input JSON data of type {!t}. *)
+
+val t_of_string : string -> t
+(** Deserialize JSON data of type {!t}. *)
 
 val of_un_alg_op : Operator.un_alg_op -> t -> t
 val of_bin_alg_op : Operator.bin_alg_op -> t -> t -> t

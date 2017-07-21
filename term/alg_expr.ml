@@ -44,7 +44,7 @@ let rec e_to_yojson f_mix f_id = function
   | ALG_VAR i -> `List [`String "VAR"; f_id i]
   | KAPPA_INSTANCE cc -> `List [`String "MIX"; f_mix cc]
   | TOKEN_ID i -> `List [`String "TOKEN"; f_id i]
-  | CONST n -> Nbr.to_json n
+  | CONST n -> Nbr.to_yojson n
   | IF (cond,yes,no) ->
     `List [`String "IF";
            Locality.annot_to_json (bool_to_yojson f_mix f_id) cond;
@@ -98,7 +98,7 @@ let rec e_of_yojson f_mix f_id = function
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
-    try  CONST (Nbr.of_json x)
+    try  CONST (Nbr.of_yojson x)
     with Yojson.Basic.Util.Type_error _ ->
       raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
 and bool_of_yojson f_mix f_id = function

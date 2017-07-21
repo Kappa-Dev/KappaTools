@@ -68,8 +68,7 @@ class manager
         ?timeout
         (Format.sprintf "%s/v2/projects/%s/files/%s" url project_id file_id)
         `DELETE
-        (fun result ->
-           (`FileDelete (Api_types_j.unit_t_of_string result)))
+        (fun _ -> `FileDelete)
     | `FileGet file_id ->
       send
         ?timeout
@@ -92,11 +91,12 @@ class manager
         ~data:(Api_types_j.string_of_file_modification file_modification)
         (fun result ->
              (`FileUpdate (Mpi_message_j.file_metadata_of_string result)))
-    | `ProjectParse ->
+    | `ProjectParse (overwrite) ->
       send
         ?timeout
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
-        `GET
+        `POST
+        ~data:(overwrite)
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
     | `ProjectGet project_id ->
@@ -115,7 +115,7 @@ class manager
         `PUT
         ~data:(Api_types_j.string_of_simulation_parameter
                  simulation_parameter)
-        (fun _ -> (`SimulationContinue ()))
+        (fun _ -> (`SimulationContinue))
     | `SimulationDelete ->
       send
         ?timeout
@@ -124,7 +124,7 @@ class manager
            url
            project_id)
         `DELETE
-        (fun _ -> (`SimulationDelete ()))
+        (fun _ -> (`SimulationDelete))
     | `SimulationDetailFileLine file_line_id ->
       send
         ?timeout
@@ -272,7 +272,7 @@ class manager
            url
            project_id)
         `PUT
-        (fun _ -> (`SimulationPause ()))
+        (fun _ -> `SimulationPause)
     | `SimulationParameter ->
       send
         ?timeout
@@ -294,7 +294,7 @@ class manager
         `PUT
         ~data:(Api_types_j.string_of_simulation_perturbation
                  simulation_perturbation)
-        (fun _ -> (`SimulationPerturbation ()))
+        (fun _ -> `SimulationPerturbation)
     | `SimulationStart simulation_parameter ->
       send
         ?timeout
@@ -331,15 +331,13 @@ class manager
         (Format.sprintf "%s/v2/projects" url)
         `POST
         ~data:(Api_types_j.string_of_project_parameter project_parameter)
-        (fun result ->
-             (`ProjectCreate (Api_types_j.unit_t_of_string result)))
+        (fun _ -> `ProjectCreate)
     | `ProjectDelete project_id ->
       send
         ?timeout
         (Format.sprintf "%s/v2/projects/%s" url project_id)
         `DELETE
-        (fun result ->
-             (`ProjectDelete (Api_types_j.unit_t_of_string result)))
+        (fun _ -> `ProjectDelete)
 
   method environment_info () :
     Api_types_j.environment_info Api.result Lwt.t =
@@ -360,8 +358,8 @@ class manager
       self#rest_message (`ProjectDelete project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `ProjectDelete result ->
-              Lwt.return (Api_common.result_ok result)
+            | `ProjectDelete ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -385,8 +383,8 @@ class manager
       self#rest_message (`ProjectCreate project_parameter) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `ProjectCreate result ->
-              Lwt.return (Api_common.result_ok result)
+            | `ProjectCreate ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception

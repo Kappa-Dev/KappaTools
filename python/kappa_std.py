@@ -32,7 +32,7 @@ class KappaStd(object):
         return self.message_id
 
     def dispatch(self, method, args=None):
-        if args:
+        if args is not None:
             data = [method, args]
         else:
             data = method
@@ -74,8 +74,8 @@ class KappaStd(object):
         else:
             raise kappa_common.KappaError(data)
 
-    def project_parse(self):
-        return(self.dispatch("ProjectParse"))
+    def project_parse(self,overwrites=[]):
+        return(self.dispatch("ProjectParse",overwrites))
 
     def file_create(self,file_object):
         file_data = file_object.toJSON()

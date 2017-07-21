@@ -174,14 +174,14 @@ let rec compile_file
          )
       )
 
-let build_ast (kappa_files : file list) (yield : unit -> unit Lwt.t) =
+let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let log_buffer = Buffer.create 512 in
   let log_form = Format.formatter_of_buffer log_buffer in
   let post_parse ast =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
     let new_syntax = conf.Configuration.newSyntax in
-    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) [] ast) >>=
+    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -285,6 +285,7 @@ let outputs (simulation : t) =
 let parse
     ~(system_process : system_process)
     ~(kappa_files : Api_types_t.file list)
+    ~overwrites
   : (t,Api_types_j.errors) Result.result Lwt.t
   =
 
@@ -300,7 +301,7 @@ let parse
          [] kappa_files in
   Lwt.bind
     (build_ast
-       kappa_files system_process#yield)
+       kappa_files overwrites system_process#yield)
     (Result_util.map
        ~ok:(fun simulation -> Lwt.return (Result_util.ok simulation))
        ~error:(fun e -> Lwt.return (Result_util.error e)))

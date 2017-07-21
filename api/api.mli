@@ -19,7 +19,8 @@ end
 class type manager_project = object
   method project_get :
     project_id -> Api_types_j.project result Lwt.t
-  method project_parse : Api_types_j.project_parse result Lwt.t
+  method project_parse :
+    (string * Nbr.t) list -> Api_types_j.project_parse result Lwt.t
 end
 
 class type manager_file = object

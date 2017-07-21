@@ -89,7 +89,7 @@ let set_store_trace store_trace =
   update_parameters (fun param -> { param with store_trace })
 
 let update_state me project_catalog default_parameters project_parameters =
-    me.project_manager#project_parse >>=
+    me.project_manager#project_parse [] >>=
     (Api_common.result_map
        ~ok:(fun _ (project_parse : Api_types_j.project_parse) ->
            me.project_manager#init_static_analyser_raw
@@ -165,7 +165,7 @@ let sync () : unit Api.result Lwt.t =
   match (React.S.value state).project_current with
   | None -> Lwt.return (Api_common.result_ok ())
   | Some current ->
-    current.project_manager#project_parse >>=
+    current.project_manager#project_parse [] >>=
     (Api_common.result_bind_lwt
        ~ok:(fun (project_parse : Api_types_j.project_parse) ->
            current.project_manager#init_static_analyser_raw
