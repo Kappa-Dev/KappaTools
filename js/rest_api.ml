@@ -96,7 +96,10 @@ class manager
         ?timeout
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `POST
-        ~data:(overwrite)
+        ~data:(Yojson.Safe.to_string
+                 (`List (List.map (fun (v,n) ->
+                      `Tuple [`String v;(Nbr.to_yojson n :> Yojson.Safe.json)])
+                           overwrite)))
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
     | `ProjectGet project_id ->
