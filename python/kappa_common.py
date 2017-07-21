@@ -26,6 +26,9 @@ class FileMetadata(object):
     def get_file_id(self):
         return(self.file_metadata_id)
 
+def stringAsFile(content,position=1):
+    return(File(FileMetadata("inlined_input",position),content))
+
 class File(object):
 
     def __init__(self,
