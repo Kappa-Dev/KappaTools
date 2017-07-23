@@ -35,7 +35,7 @@ end species
 begin reactions
 # rule    : A(), A() -> A() 
 # A() + A() -> A()  
-1 1,1 1 k3_
+1 1,1 1 k3
 # rule    : A() ->  
 # A() ->   
 2 1 k1_

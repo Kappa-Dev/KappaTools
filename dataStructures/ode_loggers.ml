@@ -1007,7 +1007,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
         if fst (modf f) = 0.
         then
           Loggers.fprintf logger "%i" (int_of_float f)
-        else 
+        else
           Loggers.fprintf logger "%g" f
       | Alg_expr.ALG_VAR x ->
         if octave_matlab format then
@@ -1618,7 +1618,7 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
           else
             id_init
         in
-        let () = Loggers.allocate logger id_init in
+        (*  let () = Loggers.allocate logger id_init in*)
         let () = Loggers.flag_dangerous logger variable id in
         if not (Loggers.is_dangerous_ode_variable logger variable)
         then
