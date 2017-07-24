@@ -300,8 +300,8 @@ let parse pattern =
   let agent_list, site_list =
     Pattern.fold
       (fun ~pos ~agent_type (agent_list, site_list) ->
-         (pos, agent_type) :: agent_list, site_list)
-      (fun ~pos ~site state (agent_list, site_list) ->
+         (((pos, agent_type) :: agent_list, site_list),()))
+      (fun ~pos ~site () state (agent_list, site_list) ->
          agent_list, (pos, site, state) :: site_list)
       pattern ([], [])
   in

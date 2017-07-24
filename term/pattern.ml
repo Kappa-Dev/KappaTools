@@ -1355,26 +1355,19 @@ let minimal_env env contact_map =
     env contact_map
 
 let fold f_agent f_site cc acc =
-  let acc =
-    Tools.array_fold_lefti
-      (fun agent_type acc list_pos ->
-        List.fold_left
-          (fun acc pos -> f_agent ~pos ~agent_type acc)
-          acc
-          list_pos
-      )
-      acc
-      cc.nodes_by_type
-  in
-  Mods.IntMap.fold
-    (fun pos intf acc ->
-       Tools.array_fold_lefti
-         (fun site acc state -> f_site ~pos ~site state acc)
+  Tools.array_fold_lefti
+    (fun agent_type acc list_pos ->
+       List.fold_left
+         (fun acc pos ->
+             let acc',extra = f_agent ~pos ~agent_type acc in
+             Tools.array_fold_lefti
+               (fun site acc state -> f_site ~pos ~site extra state acc)
+               acc'
+               (Mods.IntMap.find_default [||] pos cc.nodes))
          acc
-         intf
-    )
-    cc.nodes
+         list_pos)
     acc
+    cc.nodes_by_type
 
 let finalize ~max_sharing env contact_map =
   let env = minimal_env env contact_map in
