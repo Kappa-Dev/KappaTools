@@ -309,31 +309,6 @@ let n_cc cache compil rule  =
     n_cc
     cache compil rule
 
-
-let valid_modes cache compil rule =
-  let id = rule.Primitives.syntactic_rule in
-  let cache, arity =n_cc cache compil rule in
-  let arity' = Array.length rule.Primitives.connected_components in
-  let mode = mode_of_rule compil rule in
-  let () = assert (arity' <= arity) in
-  cache,
-  if arity = arity' then
-    List.rev_map
-      (fun x -> id,x,mode)
-      (List.rev
-         (add_not_zero Rule_modes.Usual rule.Primitives.rate
-            (add_not_none_not_zero Rule_modes.Unary rule.Primitives.unary_rate [])))
-  else if arity'=1 && arity=2
-  then
-    let lkappa_rule = Model.get_ast_rule compil.environment id in
-    match lkappa_rule.LKappa.r_un_rate
-    with None -> []
-       | Some (e,_) ->
-         if is_zero e then []
-         else [id,Rule_modes.Unary_refinement,mode]
-  else
-    []
-
 let valid_modes cache compil rule =
   let id = rule.Primitives.syntactic_rule in
   let cache, arity =n_cc cache compil rule in
@@ -470,7 +445,9 @@ let get_obs compil =
     (Model.map_observables (fun r -> r) (environment compil))
 
 let remove_escape_char =
-  (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are more knowledgeable *)
+  (* I do not know anything about it be single quote are not allowed
+     in Octave, please correct this function if you are more
+     knowledgeable *)
   String.map
     (function '\'' -> '|' | x -> x)
 
@@ -496,7 +473,8 @@ let get_compil
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
-    Cli_init.get_compilation_from_preprocessed_ast ?bwd_bisim cli_args preprocessed_ast
+    Cli_init.get_compilation_from_preprocessed_ast
+      ?bwd_bisim cli_args preprocessed_ast
   in
   {
     environment = env ;
@@ -631,4 +609,7 @@ let valid_mixture compil cc_cache  ?max_size mixture =
         cc_list
 
 let init_bwd_bisim_info compil red =
-  red, Mods.DynArray.create 1 false, Model.signatures (compil.environment), ref (LKappa_auto.init_cache ())
+  red,
+  Mods.DynArray.create 1 false,
+  Model.signatures (compil.environment),
+  ref (LKappa_auto.init_cache ())
