@@ -212,6 +212,50 @@ let lift_embedding x =
     Matching.empty
     (Matching.add_cc Matching.empty 0 x)
 
+let species_to_positive_transformations cc =
+  let _,tr =
+    Pattern.fold
+      (fun ~pos ~agent_type (emb,g) ->
+         let a = (pos,agent_type) in
+         let g' = Primitives.Transformation.Agent a::g in
+         let emb' = Mods.IntMap.add pos a emb in
+         ((emb',g'),a))
+      (fun ~pos ~site a (l,i) (emb',acc) ->
+         let acc' =
+           if i <> -1 then
+             Primitives.Transformation.PositiveInternalized (a,site,i)::acc
+           else acc in
+         (emb',
+          match l with
+          | Pattern.UnSpec -> acc'
+          | Pattern.Free ->
+            Primitives.Transformation.Freed (a,site)::acc'
+          | Pattern.Link (x',s') ->
+            match Mods.IntMap.find_option x' emb' with
+            | None -> acc'
+            | Some ag' ->
+              Primitives.Transformation.Linked ((a,site),(ag',s'))::acc'))
+      cc
+      (Mods.IntMap.empty,[]) in
+  List.rev tr
+
+let dummy_htbl = Hashtbl.create 0
+
+let find_all_embeddings compil species =
+  let tr = species_to_positive_transformations species in
+  let env = environment compil in
+  let domain = Model.domain env in
+  let _,graph = List.fold_left
+      (Rule_interpreter.apply_concrete_positive_transformation
+         (Model.signatures env) dummy_htbl)
+      (Instances.empty env,
+       Edges.empty ~with_connected_components:false)
+      tr in
+  let out,_ = Rule_interpreter.obs_from_transformations domain graph tr in
+  List.map
+    (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
+    out
+
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
@@ -396,8 +440,6 @@ let rate_name compil rule rule_id =
   in
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
-
-let dummy_htbl = Hashtbl.create 0
 
 let apply_sigs env rule inj_nodes mix =
   let concrete_removed =

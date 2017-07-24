@@ -30,16 +30,13 @@ let debug_print f (m,_co) =
             (fun f (node,dst) ->
                Format.fprintf f "%i:%i->%i" ccid node dst) f nm)) m
 
-(*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
-let reconstruct domain graph inj id cc_id root =
+let reconstruct_renaming domain graph cc_id root =
   let point = Pattern.Env.get domain cc_id in
   match Pattern.Env.roots point with
   | None -> failwith "Matching.reconstruct cc error"
   (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
   | Some (rids,rty) ->
-    (* -rm - full_rename: Renaming.t option *)
-    let _,full_rename =
-      (*- rm - to_navigation: bool -> cc -> list *)
+    let full_rename =
       match Pattern.reconstruction_navigation (Pattern.Env.content point) with
       | _::_ as nav ->
         List.fold_left
@@ -53,12 +50,18 @@ let reconstruct domain graph inj id cc_id root =
       | [] -> None, match rids with
         | [rid] -> Renaming.add rid root Renaming.empty
         | _ -> None in
-    match full_rename with
-    | None -> failwith "Matching.reconstruct renaming error"
-    | Some rename ->
-      match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
-      | None -> None
-      | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
+  match full_rename with
+  | _, None ->
+    failwith ("Matching.reconstruct renaming error at root "^string_of_int root)
+  | _, Some rename -> rename
+
+(* reconstruct: Pattern.Env.t -> Edges.t -> t -> int -> Pattern.id ->
+   int -> t option*)
+let reconstruct domain graph inj id cc_id root =
+let rename = reconstruct_renaming domain graph cc_id root in
+    match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
+    | None -> None
+    | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
 
 let rec aux_is_root_of graph root inj = function
   | [] -> true

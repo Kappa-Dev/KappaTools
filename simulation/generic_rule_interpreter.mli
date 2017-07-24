@@ -47,13 +47,13 @@ module Make (Instances:Instances_sig.S) : sig
     Model.t -> Counter.t -> t -> int option * bool * t
   (** [apply_rule ~outputs ~maxConsecutiveClash ?is_blocked model counter st]
       Returns [(corresponding_syntactic_rule, is_final_step, new_state)].
-      [is_final_step] is determined by the counter. 
-      [corresponding_syntactic_rule] is equal to None if and only if 
+      [is_final_step] is determined by the counter.
+      [corresponding_syntactic_rule] is equal to None if and only if
       a null event occured *)
 
   val force_rule :
     outputs:(Data.t -> unit) ->
-    Model.t -> Counter.t -> t -> Trace.event_kind -> 
+    Model.t -> Counter.t -> t -> Trace.event_kind ->
     ?rule_id:int ->  Primitives.elementary_rule -> t option
   (** Apply the rule for sure if it is possible. Try [apply_rule] but in
       case of null_event, it computes the exact injections of the left hand
@@ -83,16 +83,16 @@ module Make (Instances:Instances_sig.S) : sig
   val get_random_state : t -> Random.State.t
 
   val update_edges_from_actions :
-    outputs:(Data.t -> unit) -> Signature.s -> Counter.t -> Pattern.Env.t -> t ->
-    Instantiation.concrete Instantiation.action list *
-    Instantiation.concrete Instantiation.site list -> t
+    outputs:(Data.t -> unit) -> Signature.s -> Counter.t -> Pattern.Env.t ->
+    t -> Instantiation.concrete Instantiation.action list *
+         Instantiation.concrete Instantiation.site list -> t
 
   val send_instances_message : Instances.message -> t -> t
 
   (** {6 Blocking events} *)
 
-  type blocking_predicate = 
-    int option -> Matching.t -> 
+  type blocking_predicate =
+    int option -> Matching.t ->
     (Instantiation.concrete Instantiation.action) list ->
     bool
 
@@ -123,8 +123,8 @@ module Make (Instances:Instances_sig.S) : sig
 
   (** {6 Internals } *)
   val apply_negative_transformation :
-    (int,unit) Hashtbl.t -> (Instantiation.concrete Instantiation.site) list *
-                            Instances.t * Edges.t ->
+    (int,unit) Hashtbl.t ->
+    (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t ->
     Instantiation.concrete Primitives.Transformation.t ->
     (Instantiation.concrete Instantiation.site) list * Instances.t * Edges.t
   val apply_positive_transformation :
@@ -137,9 +137,14 @@ module Make (Instances:Instances_sig.S) : sig
      (Instantiation.concrete Instantiation.site) list *
      Instances.t * Edges.t) *
     Instantiation.concrete Primitives.Transformation.t
+  val apply_concrete_positive_transformation :
+    Signature.s -> (int,unit) Hashtbl.t -> Instances.t * Edges.t ->
+    Instantiation.concrete Primitives.Transformation.t ->
+    Instances.t * Edges.t
 
-val obs_from_transformations : 
-  Pattern.Env.t -> Edges.t -> Agent.t Primitives.Transformation.t list ->
+val obs_from_transformations :
+  Pattern.Env.t -> Edges.t ->
+  Instantiation.concrete Primitives.Transformation.t list ->
   (Pattern.id * Agent.t) list * Operator.DepSet.t
 (** [obs_from_transformations domain state transformations]
     @return [(obs, deps)] *)
