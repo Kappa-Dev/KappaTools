@@ -227,7 +227,7 @@ let species_to_positive_transformations cc =
            else acc in
          (emb',
           match l with
-          | Pattern.UnSpec -> acc'
+          | Pattern.UnSpec 
           | Pattern.Free ->
             Primitives.Transformation.Freed (a,site)::acc'
           | Pattern.Link (x',s') ->
