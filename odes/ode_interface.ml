@@ -256,12 +256,37 @@ let find_all_embeddings compil species =
     (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
     out
 
+let add_fully_specified_to_graph sigs graph cc =
+  let e,g =
+    Pattern.fold
+      (fun ~pos ~agent_type (emb,g) ->
+         let a, g' = Edges.add_agent sigs agent_type g in
+         let ag = (a,agent_type) in
+         let emb' = Mods.IntMap.add pos ag emb in
+         ((emb',g'),ag))
+      (fun ~pos ~site (a,_ as ag) (l,i) (emb',acc) ->
+         let acc' =
+           if i <> -1 then Edges.add_internal a site i acc else acc in
+         (emb',
+          match l with
+          | Pattern.UnSpec | Pattern.Free -> Edges.add_free a site acc'
+          | Pattern.Link (x',s') ->
+            match Mods.IntMap.find_option x' emb' with
+            | None -> acc'
+            | Some ag' -> fst @@ Edges.add_link ag site ag' s' acc'))
+      cc (Mods.IntMap.empty,graph) in
+  let r =
+    Mods.IntMap.fold
+      (fun i (a,_) r -> Option_util.unsome Renaming.empty (Renaming.add i a r))
+      e Renaming.empty  in
+  (g,r)
+
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
 let find_embeddings_unary_binary compil p x =
   let mix,ren =
-    Pattern.add_fully_specified_to_graph
+    add_fully_specified_to_graph
       (Model.signatures compil.environment)
       (Edges.empty ~with_connected_components:false) x in
   let matc =
@@ -285,7 +310,7 @@ let disjoint_union_sigs  sigs l =
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           Pattern.add_fully_specified_to_graph sigs mix cc  in
+           add_fully_specified_to_graph sigs mix cc  in
          let r'' = Renaming.compose false r r' in
          (i,
           Option_util.unsome
