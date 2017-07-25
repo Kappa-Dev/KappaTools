@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jul 20 2017>
+  * Last modification: Time-stamp: <Jul 25 2017>
 *)
 
 let local_trace = false
@@ -141,6 +141,7 @@ struct
   type ('a,'b) network =
     {
       rules : enriched_rule list ;
+      cc_to_rules : (enriched_rule * int) list I.ObsMap.t ;
       ode_variables : VarSet.t ;
       reactions:
         ((id list * id list * (id Locality.annot) list * enriched_rule) * int)
@@ -273,6 +274,7 @@ struct
   let init compil =
     {
       rules = [] ;
+      cc_to_rules = I.ObsMap.empty [];
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
@@ -801,10 +803,25 @@ struct
         ((cache:I.cache), network.max_stoch_coef, [])
         (List.rev rules)
     in
+    let obsmap = network.cc_to_rules in
+    let obsmap =
+      List.fold_left
+        (fun obsmap ext_rule ->
+           let cc_list = ext_rule.lhs_cc in
+           List.fold_left
+             (fun obs_map (cc_id,cc) ->
+                I.ObsMap.add cc (ext_rule,cc_id) obs_map
+             )
+             obsmap
+             cc_list)
+        obsmap
+        rules_rev
+    in
     let network =
       {network
        with cache = cache ;
-            max_stoch_coef = max_coef}
+            max_stoch_coef = max_coef;
+      }
     in
     let rules = List.rev rules_rev in
     let to_be_visited, network =
@@ -815,7 +832,8 @@ struct
       {
         network with
         n_rules = n_rules;
-        rules = rules
+        rules = rules;
+        cc_to_rules = obsmap
       }
     in
     let store = StoreMap.empty in
@@ -834,15 +852,23 @@ struct
            for unary application of binary rule, the dictionary of
            species is updated, and the reaction entered directly *)
         let store, to_be_visited, network  =
+          let all_ccs = I.find_all_embeddings compil new_species in
           List.fold_left
             (fun
               (store_old_embeddings, to_be_visited, network)
-              enriched_rule ->
-              (* regular application of tules, we store the
+              (cc,embed) ->
+              let pairs_rule_pos =
+                I.ObsMap.get cc network.cc_to_rules
+              in
+              List.fold_left
+                (fun (store_old_embeddings, to_be_visited, network)
+                  (enriched_rule,pos) ->
+
+                  (* regular application of tules, we store the
                  embeddings*)
               let () = debug
-                  "@[<v 2>test for rule %i (Aut:%i)@[%a@]"
-                  (rule_id_of enriched_rule)
+                  "@[<v 2>test for rule %i at pos %i (Aut:%i)@[%a@]"
+                  (rule_id_of enriched_rule) pos
                   enriched_rule.divide_rate_by
                   (I.print_rule ~compil) enriched_rule.rule
               in
@@ -851,7 +877,7 @@ struct
                 begin
                   let () = debug "regular case" in
                   let store_new_embeddings =
-                    List.fold_left
+                    (*List.fold_left
                       (fun store (cc_id,cc) ->
                          let () = debug "find embeddings" in
                          let lembed =
@@ -862,7 +888,10 @@ struct
                            (List.rev_map (fun a -> a,new_species)
                               (List.rev lembed))
                            store
-                      ) StoreMap.empty enriched_rule.lhs_cc
+                      ) StoreMap.empty enriched_rule.lhs_cc*)
+                    add_embedding_list
+                      (enriched_rule.rule_id_with_mode,pos,cc)
+                      [embed,new_species] StoreMap.empty
                   in
                   let (), store_all_embeddings =
                     StoreMap.map2_with_logs
@@ -979,6 +1008,9 @@ struct
                         enriched_rule.lhs new_species in
                     fold_left_swap
                       (fun embed ->
+                        let () =
+                          debug "add new reaction (unary)"
+                        in
                          add_reaction ?max_size
                            parameters compil enriched_rule embed mix)
                       lembed
@@ -986,10 +1018,12 @@ struct
                   in
                   let () = debug "@]" in
                   store_old_embeddings, to_be_visited, network
-                end
+                end)
+                (store_old_embeddings, to_be_visited, network)
+                pairs_rule_pos
             )
             (store, to_be_visited, network)
-            rules
+            all_ccs
         in
         let () = debug "@]" in
         aux to_be_visited network store

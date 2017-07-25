@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 20 2017>
+  * Last modification: Time-stamp: <Jul 25 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -680,3 +680,27 @@ let init_bwd_bisim_info compil red =
   Mods.DynArray.create 1 false,
   Model.signatures (compil.environment),
   ref (LKappa_auto.init_cache ())
+
+module type ObsMap =
+sig
+  type 'a t
+  val empty: 'a  -> 'a t
+  val add: connected_component -> 'a -> 'a list t -> 'a list t
+  val get: connected_component -> 'a list t -> 'a list
+end
+
+module ObsMap  =
+(struct
+  type 'a t = 'a Pattern.ObsMap.t
+  let empty a =
+    Pattern.ObsMap.dummy a
+
+  let get cc map =
+      Pattern.ObsMap.get map cc
+
+  let add cc data map =
+    let old = get cc map in
+    let () = Pattern.ObsMap.set map cc (data::old) in
+    map
+
+end: ObsMap)
