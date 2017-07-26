@@ -105,8 +105,11 @@ class KappaStd(object):
     def simulation_detail_log_message(self):
         return(self.dispatch("SimulationDetailLogMessage"))
 
-    def simulation_detail_plot(self,offset = None,nb_points = None):
-        parameter = kappa_common.PlotParameter(offset,nb_points).toJSON()
+    def simulation_detail_plot(self,limit=None):
+        if limit is not None:
+            parameter = limit.toJSON()
+        else:
+            parameter = kappa_common.PlotLimit().toJSON()
         return(self.dispatch("SimulationDetailPlot",parameter))
 
     def simulation_detail_snapshot(self,snapshot_id):
