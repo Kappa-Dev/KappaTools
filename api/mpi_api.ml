@@ -30,7 +30,7 @@ let on_message
     (handler (fun result -> `FileCreate result))
   | `FileDelete file_id ->
     (manager#file_delete file_id) >>=
-    (handler (fun result -> `FileDelete result))
+    (handler (fun () -> `FileDelete))
   | `FileGet file_id ->
     (manager#file_get file_id) >>=
     (handler (fun result -> `FileGet result))
@@ -43,15 +43,15 @@ let on_message
   |  `ProjectGet project_id ->
     (manager#project_get project_id) >>=
     (handler (fun result -> `ProjectGet result))
-  |  `ProjectParse ->
-    manager#project_parse >>=
+  |  `ProjectParse overwrites ->
+    manager#project_parse overwrites >>=
     (handler (fun result -> `ProjectParse result))
   | `SimulationContinue simulation_parameter ->
     (manager#simulation_continue simulation_parameter) >>=
-    (handler (fun result -> `SimulationContinue result))
+    (handler (fun () -> `SimulationContinue))
   | `SimulationDelete ->
     manager#simulation_delete >>=
-    (handler (fun result -> `SimulationDelete result))
+    (handler (fun () -> `SimulationDelete))
   | `SimulationDetailFileLine file_line_id ->
     (manager#simulation_detail_file_line file_line_id) >>=
     (handler (fun result -> `SimulationDetailFileLine result))
@@ -90,10 +90,10 @@ let on_message
     (handler (fun result -> `SimulationTrace result))
   | `SimulationPause ->
     manager#simulation_pause >>=
-    (handler (fun result -> `SimulationPause result))
+    (handler (fun () -> `SimulationPause))
   | `SimulationPerturbation simulation_perturbation ->
     (manager#simulation_perturbation simulation_perturbation) >>=
-    (handler (fun result -> `SimulationPerturbation result))
+    (handler (fun () -> `SimulationPerturbation))
   | `SimulationStart simulation_parameter ->
     (manager#simulation_start simulation_parameter) >>=
     (handler (fun result -> `SimulationStart result))
@@ -132,8 +132,8 @@ class virtual  manager_base () : manager_base_type =
       self#message (`FileDelete file_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `FileDelete result ->
-              Lwt.return (Api_common.result_ok result)
+            | `FileDelete ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -190,8 +190,8 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method project_parse : Api_types_j.project_parse Api.result Lwt.t =
-      self#message `ProjectParse >>=
+    method project_parse overwrite : Api_types_j.project_parse Api.result Lwt.t =
+      self#message (`ProjectParse overwrite) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `ProjectParse result ->
@@ -207,8 +207,8 @@ class virtual  manager_base () : manager_base_type =
       self#message (`SimulationContinue simulation_parameter) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationContinue result ->
-              Lwt.return (Api_common.result_ok result)
+            | `SimulationContinue ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -219,8 +219,8 @@ class virtual  manager_base () : manager_base_type =
       self#message `SimulationDelete >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationDelete result ->
-              Lwt.return (Api_common.result_ok result)
+            | `SimulationDelete ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -354,8 +354,8 @@ class virtual  manager_base () : manager_base_type =
       self#message `SimulationPause >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationPause result ->
-              Lwt.return (Api_common.result_ok result)
+            | `SimulationPause ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception
@@ -389,8 +389,8 @@ class virtual  manager_base () : manager_base_type =
       self#message (`SimulationPerturbation simulation_perturbation) >>=
       Api_common.result_bind_lwt
         ~ok:(function
-            | `SimulationPerturbation result ->
-              Lwt.return (Api_common.result_ok result)
+            | `SimulationPerturbation ->
+              Lwt.return (Api_common.result_ok ())
             | response ->
               Lwt.return
                 (Api_common.result_error_exception

@@ -19,7 +19,7 @@ class KappaRest(object):
     def dispatch(self, method, url, data):
         handler = urllib.request.HTTPHandler()
         opener = urllib.request.build_opener(handler)
-        if data:
+        if data is not None:
             code = json.dumps(data)
             request = urllib.request.Request(url,
                                              data=code.encode("utf-8"))
@@ -94,10 +94,10 @@ class KappaRest(object):
         body = None
         return(self.dispatch(method,url,body))
 
-    def project_parse(self):
-        method = "GET"
+    def project_parse(self,overwrites=[]):
+        method = "POST"
         url = "{0}/projects/{1}/parse".format(self.url,self.project_id)
-        body = None
+        body = overwrites
         return(self.dispatch(method,url,body))
 
     def file_create(self,file_object):
@@ -145,13 +145,9 @@ class KappaRest(object):
         url = "{0}/projects/{1}/simulation/logmessages".format(self.url,self.project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_plot(self,plot_parameter = None):
-        if plot_parameter :
-            parameter = "?{0}".format(plot_parameter.toURL())
-        else:
-            parameter =  ""
-        url = "{0}/projects/{1}/simulation/plot{2}".format(self.url,self.project_id,parameter)
-        print(url)
+    def simulation_detail_plot(self, offset = None, nb_points = None) :
+        parameter = kappa_common.PlotParameter(offset,nb_points).toURL()
+        url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
         return(self.dispatch("GET",url,None))
 
     def simulation_detail_snapshot(self,snapshot_id):

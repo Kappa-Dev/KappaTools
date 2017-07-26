@@ -14,9 +14,14 @@ type matching = t
 val empty : t
 val debug_print : Format.formatter -> t -> unit
 val get : (Agent.t * int) -> t -> int
+
+val reconstruct_renaming :
+  Pattern.Env.t -> Edges.t -> Pattern.id -> int -> Renaming.t
+(** [reconstruct_renaming domain graph cc root] *)
+
 val reconstruct :
   Pattern.Env.t -> Edges.t -> t -> int -> Pattern.id -> int -> t option
-(** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
+(** [reconstruct domain graph matching_of_previous_cc cc_id_in_rule cc root] *)
 
 val add_cc : t -> int -> Renaming.t -> t option
 

@@ -23,8 +23,8 @@ maxstep=0.02;
 reltol=0.001;
 abstol=0.001;
 period=0.01;
-
 nonnegative=false;
+
 global nodevar
 nodevar=16;
 global max_stoc_coef

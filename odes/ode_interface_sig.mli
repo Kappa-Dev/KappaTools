@@ -76,6 +76,9 @@ sig
     compil -> connected_component -> chemical_species ->
     embedding list
 
+  val find_all_embeddings:
+    compil -> chemical_species -> (connected_component * embedding) list
+
   val find_embeddings_unary_binary:
     compil -> pattern -> chemical_species -> embedding_forest list * mixture
 

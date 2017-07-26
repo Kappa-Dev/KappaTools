@@ -541,34 +541,6 @@ let of_yojson sig_decl = function
   | `Null -> empty_cc sig_decl
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a pattern",x))
 
-let add_fully_specified_to_graph sigs graph cc =
-  let e,g =
-    Tools.array_fold_lefti
-      (fun ty ->
-         List.fold_left
-           (fun (emb,g) x ->
-              let a, g' = Edges.add_agent sigs ty g in
-              let emb' = Mods.IntMap.add x (a,ty) emb in
-              let g'' =
-                Tools.array_fold_lefti
-                  (fun s acc (l,i) ->
-                     let acc' =
-                       if i <> -1 then Edges.add_internal a s i acc else acc in
-                     match l with
-                     | UnSpec | Free -> Edges.add_free a s acc'
-                     | Link (x',s') ->
-                       match Mods.IntMap.find_option x' emb' with
-                       | None -> acc'
-                       | Some ag' -> fst @@ Edges.add_link (a,ty) s ag' s' acc')
-                  g' (Mods.IntMap.find_default [||] x cc.nodes) in
-              (emb',g'')))
-      (Mods.IntMap.empty,graph) cc.nodes_by_type in
-  let r =
-    Mods.IntMap.fold
-      (fun i (a,_) r -> Option_util.unsome Renaming.empty (Renaming.add i a r))
-      e Renaming.empty  in
-  (g,r)
-
 let merge_compatible reserved_ids free_id inj1_to_2 cc1 cc2 =
   let img = Renaming.image inj1_to_2 in
   let available_ids =
@@ -1355,26 +1327,19 @@ let minimal_env env contact_map =
     env contact_map
 
 let fold f_agent f_site cc acc =
-  let acc =
-    Tools.array_fold_lefti
-      (fun agent_type acc list_pos ->
-        List.fold_left
-          (fun acc pos -> f_agent ~pos ~agent_type acc)
-          acc
-          list_pos
-      )
-      acc
-      cc.nodes_by_type
-  in
-  Mods.IntMap.fold
-    (fun pos intf acc ->
-       Tools.array_fold_lefti
-         (fun site acc state -> f_site ~pos ~site state acc)
+  Tools.array_fold_lefti
+    (fun agent_type acc list_pos ->
+       List.fold_left
+         (fun acc pos ->
+             let acc',extra = f_agent ~pos ~agent_type acc in
+             Tools.array_fold_lefti
+               (fun site acc state -> f_site ~pos ~site extra state acc)
+               acc'
+               (Mods.IntMap.find_default [||] pos cc.nodes))
          acc
-         intf
-    )
-    cc.nodes
+         list_pos)
     acc
+    cc.nodes_by_type
 
 let finalize ~max_sharing env contact_map =
   let env = minimal_env env contact_map in

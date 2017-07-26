@@ -15,11 +15,6 @@
 # rule rates are corrected by the number of automorphisms in the lhs of rules
 # reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
 
-begin species
- 1 A() 0
- 2 I() 0
-end species
-
 begin parameters
 1 tinit 0
 2 tend 1
@@ -31,11 +26,16 @@ begin parameters
 8 k3 k2+k1
 end parameters
 
+begin species
+ 1 A() 0
+ 2 I() 0
+end species
+
 
 begin reactions
 # rule    : A(), A() -> A() 
 # A() + A() -> A()  
-1 1,1 1 k3_
+1 1,1 1 k3
 # rule    : A() ->  
 # A() ->   
 2 1 k1_

@@ -212,12 +212,81 @@ let lift_embedding x =
     Matching.empty
     (Matching.add_cc Matching.empty 0 x)
 
+let species_to_positive_transformations cc =
+  let _,tr =
+    Pattern.fold
+      (fun ~pos ~agent_type (emb,g) ->
+         let a = (pos,agent_type) in
+         let g' = Primitives.Transformation.Agent a::g in
+         let emb' = Mods.IntMap.add pos a emb in
+         ((emb',g'),a))
+      (fun ~pos ~site a (l,i) (emb',acc) ->
+         let acc' =
+           if i <> -1 then
+             Primitives.Transformation.PositiveInternalized (a,site,i)::acc
+           else acc in
+         (emb',
+          match l with
+          | Pattern.UnSpec -> acc'
+          | Pattern.Free ->
+            Primitives.Transformation.Freed (a,site)::acc'
+          | Pattern.Link (x',s') ->
+            match Mods.IntMap.find_option x' emb' with
+            | None -> acc'
+            | Some ag' ->
+              Primitives.Transformation.Linked ((a,site),(ag',s'))::acc'))
+      cc
+      (Mods.IntMap.empty,[]) in
+  List.rev tr
+
+let dummy_htbl = Hashtbl.create 0
+
+let find_all_embeddings compil species =
+  let tr = species_to_positive_transformations species in
+  let env = environment compil in
+  let domain = Model.domain env in
+  let _,graph = List.fold_left
+      (Rule_interpreter.apply_concrete_positive_transformation
+         (Model.signatures env) dummy_htbl)
+      (Instances.empty env,
+       Edges.empty ~with_connected_components:false)
+      tr in
+  let out,_ = Rule_interpreter.obs_from_transformations domain graph tr in
+  List.map
+    (fun (p,(root,_)) -> (p, Matching.reconstruct_renaming domain graph p root))
+    out
+
+let add_fully_specified_to_graph sigs graph cc =
+  let e,g =
+    Pattern.fold
+      (fun ~pos ~agent_type (emb,g) ->
+         let a, g' = Edges.add_agent sigs agent_type g in
+         let ag = (a,agent_type) in
+         let emb' = Mods.IntMap.add pos ag emb in
+         ((emb',g'),ag))
+      (fun ~pos ~site (a,_ as ag) (l,i) (emb',acc) ->
+         let acc' =
+           if i <> -1 then Edges.add_internal a site i acc else acc in
+         (emb',
+          match l with
+          | Pattern.UnSpec | Pattern.Free -> Edges.add_free a site acc'
+          | Pattern.Link (x',s') ->
+            match Mods.IntMap.find_option x' emb' with
+            | None -> acc'
+            | Some ag' -> fst @@ Edges.add_link ag site ag' s' acc'))
+      cc (Mods.IntMap.empty,graph) in
+  let r =
+    Mods.IntMap.fold
+      (fun i (a,_) r -> Option_util.unsome Renaming.empty (Renaming.add i a r))
+      e Renaming.empty  in
+  (g,r)
+
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
 let find_embeddings_unary_binary compil p x =
   let mix,ren =
-    Pattern.add_fully_specified_to_graph
+    add_fully_specified_to_graph
       (Model.signatures compil.environment)
       (Edges.empty ~with_connected_components:false) x in
   let matc =
@@ -241,7 +310,7 @@ let disjoint_union_sigs  sigs l =
       (fun (i,em,mix) (_,r,cc) ->
          let i = pred i in
          let (mix',r') =
-           Pattern.add_fully_specified_to_graph sigs mix cc  in
+           add_fully_specified_to_graph sigs mix cc  in
          let r'' = Renaming.compose false r r' in
          (i,
           Option_util.unsome
@@ -308,31 +377,6 @@ let n_cc cache compil rule  =
        cache)
     n_cc
     cache compil rule
-
-
-let valid_modes cache compil rule =
-  let id = rule.Primitives.syntactic_rule in
-  let cache, arity =n_cc cache compil rule in
-  let arity' = Array.length rule.Primitives.connected_components in
-  let mode = mode_of_rule compil rule in
-  let () = assert (arity' <= arity) in
-  cache,
-  if arity = arity' then
-    List.rev_map
-      (fun x -> id,x,mode)
-      (List.rev
-         (add_not_zero Rule_modes.Usual rule.Primitives.rate
-            (add_not_none_not_zero Rule_modes.Unary rule.Primitives.unary_rate [])))
-  else if arity'=1 && arity=2
-  then
-    let lkappa_rule = Model.get_ast_rule compil.environment id in
-    match lkappa_rule.LKappa.r_un_rate
-    with None -> []
-       | Some (e,_) ->
-         if is_zero e then []
-         else [id,Rule_modes.Unary_refinement,mode]
-  else
-    []
 
 let valid_modes cache compil rule =
   let id = rule.Primitives.syntactic_rule in
@@ -422,8 +466,6 @@ let rate_name compil rule rule_id =
   Format.asprintf "%a%s%s" (print_rule_name ~compil) rule
     arity_tag direction_tag
 
-let dummy_htbl = Hashtbl.create 0
-
 let apply_sigs env rule inj_nodes mix =
   let concrete_removed =
     List.map (Primitives.Transformation.concretize
@@ -470,7 +512,9 @@ let get_obs compil =
     (Model.map_observables (fun r -> r) (environment compil))
 
 let remove_escape_char =
-  (* I do not know anything about it be single quote are not allowed in Octave, please correct this function if you are more knowledgeable *)
+  (* I do not know anything about it be single quote are not allowed
+     in Octave, please correct this function if you are more
+     knowledgeable *)
   String.map
     (function '\'' -> '|' | x -> x)
 
@@ -496,7 +540,8 @@ let get_compil
     ~rule_rate_convention ?reaction_rate_convention
     ~show_reactions ~count ~compute_jacobian cli_args preprocessed_ast =
   let (_,_,env, contact_map,  _, _, _, _, init), _ =
-    Cli_init.get_compilation_from_preprocessed_ast ?bwd_bisim cli_args preprocessed_ast
+    Cli_init.get_compilation_from_preprocessed_ast
+      ?bwd_bisim cli_args preprocessed_ast
   in
   {
     environment = env ;
@@ -631,4 +676,7 @@ let valid_mixture compil cc_cache  ?max_size mixture =
         cc_list
 
 let init_bwd_bisim_info compil red =
-  red, Mods.DynArray.create 1 false, Model.signatures (compil.environment), ref (LKappa_auto.init_cache ())
+  red,
+  Mods.DynArray.create 1 false,
+  Model.signatures (compil.environment),
+  ref (LKappa_auto.init_cache ())

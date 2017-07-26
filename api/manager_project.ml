@@ -25,7 +25,7 @@ object
     Api_types_j.project Api.result Lwt.t =
     Lwt.return (Api_common.result_ok (to_project project_id project))
 
-  method project_parse :
+  method project_parse overwrites :
     Api_types_j.project_parse Api.result Lwt.t =
     (project#get_state () >>= function
       | Some x -> Lwt.return x
@@ -35,7 +35,8 @@ object
           Lwt.pick [
             Kappa_facade.parse
               ~system_process
-              ~kappa_files:(project#get_files ());
+              ~kappa_files:(project#get_files ())
+              ~overwrites;
             harakiri >>= fun () ->
             Lwt.return (Result_util.error
                           [Api_common.error_msg

@@ -26,6 +26,9 @@ class FileMetadata(object):
     def get_file_id(self):
         return(self.file_metadata_id)
 
+def stringAsFile(content,position=1):
+    return(File(FileMetadata("inlined_input",position),content))
+
 class File(object):
 
     def __init__(self,
@@ -71,19 +74,19 @@ class SimulationParameter(object):
 class PlotLimit(object):
 
     def __init__(self,
-                 plot_limit_offset,
+                 plot_limit_offset = None,
                  plot_limit_points = None) :
         self.plot_limit_offset = plot_limit_offset
         self.plot_limit_points = plot_limit_points
 
     def toURL(self):
 
-        if self.plot_limit_offset :
+        if self.plot_limit_offset is not None :
             url_plot_limit_offset = "&plot_limit_offset={0}".format(self.plot_limit_offset)
         else :
             url_plot_limit_offset = ""
 
-        if self.plot_limit_points :
+        if self.plot_limit_points is not None :
             url_plot_limit_points = "&plot_limit_points={0}".format(self.plot_limit_points)
         else :
             url_plot_limit_points = ""
@@ -96,24 +99,9 @@ class PlotLimit(object):
         return({ "plot_limit_offset" : self.plot_limit_offset ,
                  "plot_limit_points" : self.plot_limit_points })
 
-class PlotParameter(object):
-    def __init__(self,
-                 plot_parameter_plot_limit = None) :
-        self.plot_parameter_plot_limit = plot_parameter_plot_limit
-
-    def toJSON(self):
-        if self.plot_parameter_plot_limit :
-            limit = self.plot_parameter_plot_limit.toJSON()
-        else:
-            limit =  None
-        return({ "plot_parameter_plot_limit" : limit })
-
-    def toURL(self):
-        if self.plot_parameter_plot_limit :
-            url = self.plot_parameter_plot_limit.toURL()
-        else:
-            url = ""
-        return url
+def PlotParameter(plot_limit_offset = None,
+                  plot_limit_points = None) :
+    return(PlotLimit(plot_limit_offset,plot_limit_points))
 
 class KappaError(Exception):
     """ Error returned from the Kappa server

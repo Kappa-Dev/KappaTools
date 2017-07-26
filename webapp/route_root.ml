@@ -194,7 +194,7 @@ let route
             >>=
             (fun param -> add_projects param projects) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -206,7 +206,7 @@ let route
             let project_id = project_ref context in
             (delete_projects project_id projects) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -226,12 +226,23 @@ let route
      };
      { Webapp_common.path =
          "/v2/projects/{projectid}/parse" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
+       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
        Webapp_common.operation =
          (fun ~context:context ->
             let project_id = project_ref context in
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (fun s ->
+               Yojson.Safe.read_list
+                 (Yojson.Safe.read_tuple
+                    (fun k (a,b) x y ->
+                       if k = 0 then (Yojson.Safe.read_string x y,b)
+                       else if k = 1 then (a,Nbr.read_t x y)
+                       else failwith "Wrong parse overwrites")
+                    ("",Nbr.zero))
+                 (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
+            >>= fun overwrites ->
             bind_projects
-              (fun manager -> manager#project_parse)
+              (fun manager -> manager#project_parse overwrites)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_project_parse ?len:None)
@@ -279,7 +290,7 @@ let route
               (fun manager -> manager#file_delete file_id)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -325,8 +336,7 @@ let route
               (fun manager -> manager#simulation_delete)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t
-                                     ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -440,8 +450,7 @@ let route
             (* handle malformed *)
             (Lwt.return
                (Api_common.result_ok
-                  { Api_types_j.plot_parameter_plot_limit  = Some plot_limit ;
-                  } )) >>=
+                  plot_limit )) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun plot_parameter ->
                    bind_projects
@@ -561,8 +570,7 @@ let route
               (fun manager -> manager#simulation_continue params)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t
-                                     ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -576,8 +584,7 @@ let route
               (fun manager -> manager#simulation_pause)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t
-                                     ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };
@@ -595,8 +602,7 @@ let route
               (fun manager -> manager#simulation_perturbation pert)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_unit_t
-                                     ?len:None)
+               ~string_of_success:(fun () -> "null")
             )
          )
      };

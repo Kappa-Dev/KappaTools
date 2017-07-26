@@ -1003,7 +1003,12 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
       match fst alg_expr with
       | Alg_expr.CONST (Nbr.I n)  -> Loggers.fprintf logger "%i" n
       | Alg_expr.CONST (Nbr.I64 n) -> Loggers.fprintf logger "%i" (Int64.to_int n)
-      | Alg_expr.CONST (Nbr.F f) -> Loggers.fprintf logger "%g" f
+      | Alg_expr.CONST (Nbr.F f) ->
+        if fst (modf f) = 0.
+        then
+          Loggers.fprintf logger "%i" (int_of_float f)
+        else
+          Loggers.fprintf logger "%g" f
       | Alg_expr.ALG_VAR x ->
         if octave_matlab format then
             Loggers.fprintf
@@ -1613,7 +1618,7 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
           else
             id_init
         in
-        let () = Loggers.allocate logger id_init in
+        (*  let () = Loggers.allocate logger id_init in*)
         let () = Loggers.flag_dangerous logger variable id in
         if not (Loggers.is_dangerous_ode_variable logger variable)
         then

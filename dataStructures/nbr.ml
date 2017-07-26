@@ -166,7 +166,7 @@ let of_string x =
   try I (int_of_string x)
   with Failure _ -> F (float_of_string x)
 
-let to_json = function
+let to_yojson = function
   | I x -> `Int x
   | I64 x -> `String (Int64.to_string x)
   | F x ->
@@ -174,7 +174,7 @@ let to_json = function
     | FP_zero | FP_normal | FP_subnormal -> `Float x
     | FP_infinite | FP_nan -> `String (string_of_float x)
 
-let of_json = function
+let of_yojson = function
   | `Int x -> I x
   | `Float x -> F x
   | `String n as x ->
@@ -185,6 +185,20 @@ let of_json = function
           raise (Yojson.Basic.Util.Type_error ("Not an Nbr",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an Nbr",x))
+
+let write_t ob f =
+  Yojson.Basic.to_outbuf ob (to_yojson f)
+
+let string_of_t ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_t ob x;
+  Bi_outbuf.contents ob
+
+let read_t p lb =
+  of_yojson (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+let t_of_string s =
+  read_t (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
 let of_bin_alg_op = function
   | Operator.MULT -> mult

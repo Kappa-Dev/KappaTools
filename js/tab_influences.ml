@@ -16,6 +16,8 @@ let tab_was_active = ref false
 
 let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 
+let accuracy_chooser_id = "influence-accuracy"
+
 let accuracy_chooser =
   let option_gen x =
     Html.option
@@ -26,10 +28,17 @@ let accuracy_chooser =
       (Html.pcdata
          (Public_data.accuracy_to_string x)) in
   Html.select
-    ~a:[Html.a_class [ "form-control" ]]
+    ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
     (List.map option_gen Public_data.accuracy_levels)
 
 let content () =
+  let accuracy_form =
+    Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
+      [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
+              [Html.pcdata "Accuracy"];
+            Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
+      ] in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ = React.S.l1
       (fun _ ->
@@ -52,7 +61,7 @@ let content () =
          State_project.dummy_model State_project.model) in
   [ Html.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
-      [ accuracy_chooser; Tyxml_js.R.Html5.p influences ]
+      [ accuracy_form; Tyxml_js.R.Html5.p influences ]
   ]
 
 let parent_hide () = set_tab_is_active false

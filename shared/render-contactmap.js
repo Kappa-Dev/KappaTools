@@ -27,7 +27,7 @@ class ContactMap {
 		       bottom: 10, left: 10 };
 
         let w = d3.select("#editor-panel").node().getBoundingClientRect().width - margin.left - margin.right;
-        let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5;
+        let h = d3.select("#editor-panel").node().getBoundingClientRect().height - margin.top - margin.bottom - 34.5 - 34 - 15;
 
         if (map.data) {
 	    map.clearData();
@@ -212,7 +212,7 @@ class Render {
             .attr("d", line)
             .attr("stroke", "steelblue")
             .attr("stroke-width", 2)
-            .attr("fill", "none")
+            .attr("fill", "white")
             .style("stroke-opacity", opacity.line_normal)
             .on("mouseover", mouseoverLink)
             .on("mouseout", mouseoutLink)
@@ -590,8 +590,11 @@ class Render {
         /* render invisible text arc path */
         gNode.append("path")
             .attr("d", nodeTextArc)
+            .attr("class", "nodeTextArc")
             .attr("id", function(d,i) { return "nodeTextArc_" + i;})
-            .style("fill", "transparent");
+            .style("fill", "none")
+            .style("stroke-width", 0)
+            .style("stroke", "transparent");
 
         /* render node text */
         gNode.append("text")
@@ -618,7 +621,6 @@ class Render {
                     return "";
                 }
                 return label; });
-
 
         
         /* render site text */

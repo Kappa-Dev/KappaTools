@@ -104,7 +104,8 @@ rect { stroke-width: 2; }
     white-space : pre;
 }
 .panel-scroll {
-	   overflow: scroll;
+    overflow: scroll;
+    word-wrap: break-word
 }
 .tab-log {
     flex:1;
@@ -275,6 +276,11 @@ form {
     margin-left: 10px;
 }
 
+.nodeTextArc {
+    fill: none;
+    stroke-width: 0;
+    stroke: transparent;
+}
 .snap-tooltip {
     position: absolute;			
     text-align: right;		

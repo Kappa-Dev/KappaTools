@@ -130,12 +130,10 @@ site/%.js: %.byte site
 	js_of_ocaml $(JSOFOCAMLFLAGS) _build/js/$< -o $@
 	sed -i.bak 's/.process.argv.length>0/.process.argv.length>1/' $@
 
-ounit: TestJsSim TestWebSim
+ounit: TestJsSim
 
 TestJsSim: TestJsSim.byte
 	./TestJsSim.byte
-TestWebSim: TestWebSim.byte
-	./TestWebSim.byte -runner sequential
 
 site/index.html: $(INDEX_HTML) $(SITE_EXTRAS) site/JsSim.js site/WebWorker.js  site/KaSaWorker.js
 	cat $< | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" | sed "s/JQUERY_VERSION/$(JQUERY_VERSION)/g" | sed "s/JQUERY_UI_VERSION/$(JQUERY_UI_VERSION)/g" |  sed "s/CODEMIRROR_VERSION/$(CODEMIRROR_VERSION)/g" | sed "s/BOOTSTRAP_VERSION/$(BOOTSTRAP_VERSION)/g" > $@
@@ -155,14 +153,6 @@ TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
 	-tag-line "<js/*> : thread, package(qcheck.ounit), package(atdgen), package(js_of_ocaml.ppx), package(lwt_react)" \
-	$@
-
-TestWebSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug -I webapp -I api \
-	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(qcheck.ounit), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
 %Worker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)

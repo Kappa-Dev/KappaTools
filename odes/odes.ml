@@ -1915,9 +1915,9 @@ struct
                 logger logger_buffer logger_err Ode_loggers_sig.Period_t_points
                 (Alg_expr.float plot_period) handler_expr
             in
-            let () = Ode_loggers.print_newline logger_buffer in
             let () =
               Ode_loggers.associate_nonnegative logger_buffer nonnegative in
+            let () = Ode_loggers.print_newline logger_buffer in
             let () =
               Ode_loggers.declare_global logger_buffer Ode_loggers_sig.N_ode_var
             in

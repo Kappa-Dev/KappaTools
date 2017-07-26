@@ -52,7 +52,7 @@ type snapshot_catalog <ocaml from="Api_types"> = abstract
 
 type simulation_artifact <ocaml from="Api_types"> = abstract
 
-type unit_t <ocaml_biniou t="unit"> = unit
+type nbr <ocaml module="Nbr" t="t"> = abstract
 
 type request = [
                | FileCreate of file
@@ -60,7 +60,7 @@ type request = [
                | FileGet of file_id
                | FileCatalog
                | FileUpdate of (file_id * file_modification)
-	       | ProjectParse
+	       | ProjectParse of (string * nbr) list
 	       | ProjectGet of project_id
                | SimulationContinue of simulation_parameter
                | SimulationDelete
@@ -83,22 +83,20 @@ type request = [
 
 type rest_request = [
      inherit request
-     | EnvironmentInfo of unit
-     | ProjectCatalog of unit
+     | EnvironmentInfo
+     | ProjectCatalog
      | ProjectCreate of project_parameter
      | ProjectDelete of project_id
      ]
 
 type response_content = [
    | FileCreate of file_metadata
-   | FileDelete of unit
+   | FileDelete
    | FileGet of file
    | FileCatalog of file_catalog
    | FileUpdate of file_metadata
    | ProjectParse of project_parse
    | ProjectGet of project
-   | SimulationContinue of unit
-   | SimulationDelete of unit
    | SimulationDetailFileLine of file_line_detail
    | SimulationDetailFluxMap of flux_map
    | SimulationDetailLogMessage of log_message
@@ -111,17 +109,18 @@ type response_content = [
    | SimulationCatalogSnapshot of snapshot_catalog
    | SimulationTrace of string
    | SimulationParameter of simulation_parameter
-   | SimulationPause of unit
-   | SimulationPerturbation of unit
+   | SimulationContinue
+   | SimulationDelete
+   | SimulationPause
+   | SimulationPerturbation
    | SimulationStart of simulation_artifact
 ]
 
 type rest_response_content = [
      inherit response_content
      | EnvironmentInfo of environment_info
-     | ProjectCreate of unit
-     | ProjectDelete of unit
-     | ProjectParse of project_parse
+     | ProjectCreate
+     | ProjectDelete
      | ProjectCatalog of project_catalog
 ]
 
