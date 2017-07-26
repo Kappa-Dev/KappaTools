@@ -63,7 +63,7 @@ install:
   - opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
   - opam install -y ocamlbuild yojson
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp-lwt-unix ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
 
 script:

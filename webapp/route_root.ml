@@ -450,8 +450,7 @@ let route
             (* handle malformed *)
             (Lwt.return
                (Api_common.result_ok
-                  { Api_types_j.plot_parameter_plot_limit  = Some plot_limit ;
-                  } )) >>=
+                  plot_limit )) >>=
             (Api_common.result_bind_lwt
                ~ok:(fun plot_parameter ->
                    bind_projects
