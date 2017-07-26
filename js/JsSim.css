@@ -262,6 +262,11 @@ form {
     margin-left: 10px;
 }
 
+.nodeTextArc {
+    fill: none;
+    stroke-width: 0;
+    stroke: transparent;
+}
 .snap-tooltip {
     position: absolute;			
     text-align: right;		
