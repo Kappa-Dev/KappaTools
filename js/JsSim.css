@@ -264,7 +264,6 @@ form {
 
 .nodeTextArc {
     fill: none;
-    stroke-width: 0;
     stroke: transparent;
 }
 .snap-tooltip {

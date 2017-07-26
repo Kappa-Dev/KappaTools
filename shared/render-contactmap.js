@@ -65,6 +65,7 @@ class Render {
                             this.layout.margin.bottom;
         let container = this.root
             .append("svg")
+            .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
             .attr("class", "svg-group")
             .attr("id", "map-container")
             .attr("preserveAspectRatio", "xMinYMin meet")
