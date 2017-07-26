@@ -34,6 +34,10 @@ let export_data_label
     (configuration :  configuration) : string =
   Format.sprintf "export_%s_label" configuration.id
 
+let export_form_id
+    (configuration :  configuration) : string =
+  Format.sprintf "export_%s_form" configuration.id
+
 let content
     (configuration :  configuration) =
   let export_filename =
@@ -59,9 +63,7 @@ let content
       configuration.handlers
   in
   let xml_div =
-    [%html {|<div class="col-sm-12">
-	     <div class="form-inline">
-             <div class="form-group">
+    [%html {|<div class="form-group">
              <select class="form-control"
              id="|}(export_format_id configuration){|">|}export_formats_select{|</select>
 										</div>
@@ -74,17 +76,17 @@ let content
            <label class="checkbox-inline">
               |}[export_button]{|
            </label>
-        </div>
-     </div>
-  </div>|}]
+        </div>|}]
   in
-  Html.div
-    ~a:[Tyxml_js.R.Html.a_class
-          (React.S.map
-             (fun show -> if show then ["row"] else ["hidden"])
-             configuration.show)
-       ]
-    [xml_div]
+  Html.form
+    ~a:[
+      Html.a_id (export_form_id configuration);
+      Tyxml_js.R.Html.a_class
+        (React.S.map
+           (fun show -> "form-inline" :: if show then [] else ["hidden"])
+           configuration.show)
+    ]
+    xml_div
 
 let onload (configuration :  configuration) =
   let export_button : Dom_html.buttonElement Js.t =

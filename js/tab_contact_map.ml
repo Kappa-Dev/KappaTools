@@ -52,7 +52,8 @@ let accuracy_chooser =
 
 let content () =
   let accuracy_form =
-    Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
+    Html.form ~a:[ Html.a_class [ "form-horizontal" ];
+                   Html.a_id "contact_map_accuracy_form" ]
       [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
               [Html.pcdata "Accuracy"];
