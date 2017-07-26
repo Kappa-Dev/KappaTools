@@ -243,21 +243,12 @@ let update_offset (update_offset_input : bool) : unit =
           None
       in set_offset new_offset
 
-let plot_limit_offset () : int =
-  match React.S.value offset with
-  | None ->
-    let simulation_model = React.S.value State_simulation.model in
-    let simulation_info = State_simulation.t_simulation_info simulation_model in
-    (match simulation_info with
-     | None -> 0
-     | Some t -> simulation_info_offset_max t)
-  | Some offset -> offset.offset_current
-
-
 let plot_parameter () : Api_types_j.plot_parameter =
-  let point = React.S.value point in
-  { Api_types_j.plot_limit_offset = Some (plot_limit_offset ()) ;
-    Api_types_j.plot_limit_points = Some point ; }
+  let point = React.S.value point in {
+    Api_types_j.plot_limit_offset =
+      Option_util.map (fun x -> x.offset_current) (React.S.value offset) ;
+    Api_types_j.plot_limit_points = Some point ;
+  }
 
 let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
   State_simulation.when_ready
