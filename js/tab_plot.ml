@@ -36,26 +36,47 @@ let plot_time
            Api_types_j.
            simulation_progress_time
 
-let serialize_json : (unit -> string) ref = ref (fun _ -> "null")
-let serialize_csv : (unit -> string) ref = ref (fun _ -> "")
+let export_json filename =
+  State_simulation.when_ready
+    ~label:__LOC__
+    (fun manager ->
+       (manager#simulation_detail_plot
+          { Api_types_j.plot_limit_offset = None ;
+            Api_types_j.plot_limit_points = None }) >>=
+       (Api_common.result_bind_lwt
+          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
+              let plot = plot_detail.Api_types_j.plot_detail_plot in
+              let data = Api_types_j.string_of_plot plot in
+              let () =
+                Common.saveFile ~data ~mime:"application/json" ~filename in
+              Lwt.return (Api_common.result_ok ()))))
+
+let export_csv filename =
+  State_simulation.when_ready
+    ~label:__LOC__
+    (fun manager ->
+       (manager#simulation_detail_plot
+          { Api_types_j.plot_limit_offset = None ;
+            Api_types_j.plot_limit_points = None }) >>=
+       (Api_common.result_bind_lwt
+          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
+              let plot = plot_detail.Api_types_j.plot_detail_plot in
+              let data = Api_data.plot_values plot in
+              let () = Common.saveFile ~data ~mime:"text/csv" ~filename in
+              Lwt.return (Api_common.result_ok ()))))
 
 let configuration () : Widget_export.configuration =
   { Widget_export.id = export_id
   ; Widget_export.handlers =
       [ Widget_export.export_svg ~svg_div_id:display_id ()
       ; Widget_export.export_png ~svg_div_id:display_id ()
-      ; Widget_export.export_json
-          ~serialize_json:!serialize_json
+      ;  { Widget_export.suffix = "json"
+        ; Widget_export.label = "json"
+        ; Widget_export.export = export_json
+        }
       ; { Widget_export.suffix = "csv"
         ; Widget_export.label = "csv"
-        ; Widget_export.export =
-            fun (filename : string) ->
-              let data = !serialize_csv ()
-              in
-              Common.saveFile
-                ~data:data
-                ~mime:"text/csv"
-                ~filename:filename
+        ; Widget_export.export = export_csv
         }
       ];
     show =
@@ -247,9 +268,7 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
       (Api_common.result_bind_lwt
          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
              let plot = plot_detail.Api_types_j.plot_detail_plot in
-             let () = serialize_json := (fun _ -> Api_types_j.string_of_plot plot) in
              let () = js_plot##setDimensions(get_dimension ()) in
-             let () = serialize_csv := fun _ -> Api_data.plot_values plot in
              let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
              let () = js_plot##setPlot(data) in
              Lwt.return (Api_common.result_ok ())
