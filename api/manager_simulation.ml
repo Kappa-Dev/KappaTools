@@ -146,7 +146,7 @@ class manager_log_message
 let select_observables
     (plot_limit : Api_types_j.plot_limit)
     (plot : Api_types_j.plot) : Api_types_j.plot_detail =
-  let plot_time_series = Array.of_list (List.rev plot.Api_types_j.plot_time_series) in
+  let plot_time_series = Tools.array_rev_of_list plot.Api_types_j.plot_time_series in
   let plot_detail_size = Array.length plot_time_series in
   let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
   let plot_limit_points = plot_limit.Api_types_j.plot_limit_points in
@@ -187,25 +187,13 @@ class manager_plot
   Api.manager_plot =
   object(self)
     method private get_plot
-        (plot_parameter : Api_types_j.plot_parameter)
+        (plot_limit : Api_types_j.plot_parameter)
         (detail : Api_types_j.simulation_detail) :
       Api_types_j.plot_detail Api.result =
       match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_plot with
       | Some plot ->
-        let plot_detail_size = List.length plot.Api_types_j.plot_time_series  in
         Api_common.result_ok
-          (match  plot_parameter.Api_types_j.plot_parameter_plot_limit with
-           | None ->
-             { Api_types_j.plot_detail_plot = plot ;
-               Api_types_j.plot_detail_range =
-               Some { Api_types_j.plot_range_begin = 0 ;
-                      Api_types_j.plot_range_end = plot_detail_size - 1 ; } ;
-               Api_types_j.plot_detail_size = plot_detail_size ; }
-           | Some plot_limit ->
-             select_observables
-               plot_limit
-               plot
-          )
+          (select_observables plot_limit plot)
       | None -> let m : string = "plot not available" in
         Api_common.result_error_msg ~result_code:`Not_found m
 

@@ -91,7 +91,7 @@ type observable = float nullable list
 type plot_limit = { plot_limit_offset : int nullable <json name="start_time"> ;
                     plot_limit_points : int nullable <json name="max_points"> ; }
 
-type plot_parameter = { plot_parameter_plot_limit : plot_limit nullable <json name="plot_limit">  ; }
+type plot_parameter = plot_limit
 
 type plot = { plot_legend : string list <json name="legend"> ;
       	      plot_time_series : observable list <json name="time_series"> ; }

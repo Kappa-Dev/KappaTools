@@ -235,10 +235,8 @@ let plot_limit_offset () : int =
 
 let plot_parameter () : Api_types_j.plot_parameter =
   let point = React.S.value point in
-  { Api_types_j.plot_parameter_plot_limit =
-      Some { Api_types_j.plot_limit_offset = Some (plot_limit_offset ()) ;
-             Api_types_j.plot_limit_points = Some point ; } }
-
+  { Api_types_j.plot_limit_offset = Some (plot_limit_offset ()) ;
+    Api_types_j.plot_limit_points = Some point ; }
 
 let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
   State_simulation.when_ready

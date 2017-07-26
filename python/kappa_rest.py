@@ -145,13 +145,9 @@ class KappaRest(object):
         url = "{0}/projects/{1}/simulation/logmessages".format(self.url,self.project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_plot(self,plot_parameter = None):
-        if plot_parameter :
-            parameter = "?{0}".format(plot_parameter.toURL())
-        else:
-            parameter =  ""
-        url = "{0}/projects/{1}/simulation/plot{2}".format(self.url,self.project_id,parameter)
-        print(url)
+    def simulation_detail_plot(self, offset = None, nb_points = None) :
+        parameter = kappa_common.PlotParameter(offset,nb_points).toURL()
+        url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
         return(self.dispatch("GET",url,None))
 
     def simulation_detail_snapshot(self,snapshot_id):

@@ -165,22 +165,19 @@ class manager
         (fun result ->
            (`SimulationDetailLogMessage
                         (Mpi_message_j.log_message_of_string result)))
-    | `SimulationDetailPlot plot_parameters ->
+    | `SimulationDetailPlot plot_limit ->
       let args =
         String.concat
           "&"
           (List.map
              (fun (key,value) -> Format.sprintf "%s=%s" key value)
-             (match plot_parameters.Api_types_j.plot_parameter_plot_limit with
-              | None -> []
-              | Some plot_limit ->
-                (match plot_limit.Api_types_j.plot_limit_offset with
+             ((match plot_limit.Api_types_j.plot_limit_offset with
                  | None -> []
                  | Some plot_limit_offset -> [("plot_limit_offset",string_of_int plot_limit_offset)])
-                @
-                (match plot_limit.Api_types_j.plot_limit_points with
-                 | None -> []
-                 | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
+              @
+              (match plot_limit.Api_types_j.plot_limit_points with
+               | None -> []
+               | Some plot_limit_points -> [("plot_limit_points",string_of_int plot_limit_points)])
              )) in
       send
         ?timeout
