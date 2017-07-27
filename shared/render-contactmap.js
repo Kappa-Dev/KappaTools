@@ -384,7 +384,7 @@ class Render {
             .attr('stroke-dasharray', [2,2])
             .attr('stroke-width', 2)
             .attr('x1', this.innerRadius + siteRadius)
-            .attr('x2', this.outerRadius - siteRadius)
+            .attr('x2', this.outerRadius)
             .style('pointer-events', 'none');
     }
 
@@ -653,6 +653,7 @@ class Render {
         let gSiteNodes = gSite.data(siteList);
 
         // render inner sites
+        /*
         gSiteNodes
             .append("circle")
             .attr('cx', function(d) {
@@ -662,21 +663,19 @@ class Render {
                 return d.cartY(innerRadius);
             })
             .attr('r', siteRadius)
-            .attr("fill", function(d) {
-                return d.agent.color; 
-            })
+            .attr("fill", "none")
             .on("mouseover", mouseoverInnerSite)
             .on("mouseout", mouseoutInnerSite);
-
+        */
         // render outer sites
         gSiteNodes
             .append("circle")
             .attr('class', 'outerSite')
             .attr('cx', function(d) {
-                return d.cartX(outerRadius);
+                return d.cartX(innerRadius);
             })
             .attr('cy', function(d) {
-                return d.cartY(outerRadius);
+                return d.cartY(innerRadius);
             })
             .attr('r', siteRadius)
             .attr("stroke", function(d) { 
@@ -800,7 +799,7 @@ class Render {
 
             tip.hide();
         }
-
+/*
         function mouseoverInnerSite(d) {
             if(d.links.length > 0) {
                 let event = this;
@@ -860,18 +859,73 @@ class Render {
                 renderer.resetLinksAndEdges();
             }
         }
-
+*/
         function mouseoverSite(d) {
             let site = d;   
             //console.log(this);
             tip.showSite(site);
-            renderer.adjustState(site, this, false, true, true);            
+            
+            renderer.adjustState(site, this, false, true, true); 
+            if(d.links.length > 0) {
+                let event = this;
+                let innerSite = d;
+                let targetSites = [];
+                if(d == null) {
+                    return;
+                }
+
+                svg.selectAll(".link").style("stroke-opacity", opacity.line_hidden);
+                svg.selectAll(".selfLoop").style("stroke-opacity", opacity.line_hidden);
+                svg.selectAll(".siteText").filter(".siteText--normal").attr("opacity", 0.4);
+                let links = svg.selectAll(".link").filter( d => { 
+                    let siteS = {};
+                    let siteT = {};
+                    if(d.target.data.parentId === innerSite.getAgent().id && d.target.data.id === innerSite.id) {
+                        siteT.id = d.target.data.id ;
+                        siteT.parentId = d.target.data.parentId;
+                        siteS.id = d.source.data.id ;
+                        siteS.parentId = d.source.data.parentId;
+                        targetSites.push(siteS);
+                        targetSites.push(siteT);  
+                    }
+                    return d.target.data.parentId === innerSite.getAgent().id && d.target.data.id === innerSite.id;
+                });  
+
+                let selfLoops = svg.selectAll(".selfLoop").filter( d => { 
+                    return d.getAgent().id === innerSite.getAgent().id && d.id === innerSite.id;
+                });  
+
+                links
+                    .style("stroke", d => data.getNode(d.source.data.parentId).color.brighter() )
+                    .style("stroke-width", 8)
+                    .style("stroke-opacity", opacity.line_highlight); 
+
+                selfLoops
+                    .style("stroke", innerSite.getAgent().color.brighter())
+                    .style("stroke-width", 8)
+                    .style("stroke-opacity", opacity.line_highlight); 
+
+                targetSites = targetSites.map( d => data.getSite(d.parentId, d.id) );
+                let targetTexts = svg.selectAll(".siteText").filter( d => targetSites.includes( d.data ) );
+            
+                targetTexts
+                    .attr("opacity", 1)
+                    .style("font-weight", "bold")
+                    .style("font-size", "150%");
+            }           
         }
 
         function mouseoutSite(d) {
             let site = d;          
             tip.hide(); 
-            renderer.adjustState(site, this, true, true, false);    
+            renderer.adjustState(site, this, true, true, false);   
+            if(d.links.length > 0) {
+                let event = this;
+                let innerSite = d;
+                let links = innerSite.links;
+                let targetSites = [];
+                renderer.resetLinksAndEdges();
+            } 
         }
 
         function clickSite(d) {
@@ -943,15 +997,15 @@ class Render {
         let outerRadius = this.outerRadius;
         let siteNum = this.siteNum;
         let lineScale = radius/60;
-        d3.select(circle).style("fill", function() {                
-                return site.currentColor;
-            }).attr("r", function() { 
+        d3.select(circle).style("fill", () => site.currentColor)
+            .style("opacity", 1)
+            .attr("r", () => { 
                 if(!hide) {
                     return siteRadius * 2; }
                 else {
                     return siteRadius; 
                 }
-            });
+            }).raise();
             
             let siteText = this.svg.selectAll(".siteText").filter( d => { return d.data.label === site.label && d.data.agent.label === site.agent.label; });
             let transform = getTransform(siteText);
