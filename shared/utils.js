@@ -24,3 +24,15 @@ function dedup(array) {
     return array.indexOf(elem) == pos;
   });
 }
+
+function getBoundingBoxCenterX (selection) {
+  let element = selection.node();
+  let bbox = element.getBBox();
+  return bbox.x + bbox.width/2;
+} 
+
+function getBoundingBoxCenterY (selection) {
+  let element = selection.node();
+  let bbox = element.getBBox();
+  return bbox.y + bbox.height/2;
+} 

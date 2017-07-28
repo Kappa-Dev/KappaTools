@@ -51,12 +51,13 @@ class ContactMap {
 class Render {
     constructor(root, layout) {
         this.root = root;
+        let renderer = this;
         let width = layout.dimension.width;
         let height = layout.dimension.height;
-        this.layout = layout;
-        //console.log(layout);
-        /* create svg to draw contact maps on */
+        this.layout = layout;      
+        this.centerZoom = true;
 
+        /* create svg to draw contact maps on */
         let svgWidth = width +
                             this.layout.margin.left +
                             this.layout.margin.right;
@@ -75,15 +76,33 @@ class Render {
                 .attr('transform', 'translate(' + [width/2, height/2] + ')')
                 .append('g');
 
+        container.style("transform-origin", "50% 50% 0");
+        
         function zoomed() {
+            let centerX = getBoundingBoxCenterX(container);
+            let centerY = getBoundingBoxCenterY(container);
+            let containerWidth = (2 * centerX) ;
+            let containerHeight = (2 * centerY) ;
+            if (renderer.centerZoom) {
+                d3.event.transform.x = centerX - containerWidth / 2;
+                d3.event.transform.y = centerY - containerHeight / 2;
+            }
+
             svg.attr('transform', d => d3.event.transform );
+//            console.log("zoom called");
+            if (d3.event.sourceEvent && d3.event.sourceEvent.constructor.name === "MouseEvent") {
+                renderer.centerZoom = false;
+            }
+            
         }
 
-        let zoom = d3.zoom().scaleExtent([0.5, 10]).on('zoom', zoomed);
+        let zoom = d3.zoom()
+            //.center([svgWidth / 2, svgHeight / 2])
+            .scaleExtent([0.5, 10])
+            .on('zoom', zoomed);
 
         container.call(zoom);
-        container.call(d3.drag().on('drag', () => svg.attr('transform', 'translate(' + d3.event.x + ',' + d3.event.y +')')));
-                        
+         
         this.siteList = [];
         let data = this.layout.contactMap.data;
         
@@ -102,9 +121,10 @@ class Render {
         d3.select("#resetZoomButton").on("click", reset);
 
         function reset() {
-            console.log("reset");
+            //console.log("reset");
             container.transition().duration(750)
-            .call(zoom.transform, d3.zoomIdentity);
+                .call(zoom.transform, d3.zoomIdentity);
+            renderer.centerZoom = true;
         }
 
         this.agentNames = layout.contactMap.data
