@@ -619,9 +619,14 @@ function observable_plot(configuration){
 
     this.dimensions = { width : 960 , height : 500 };
     this.setDimensions = function(dimensions) {
+        /*
         that.dimensions = dimensions;
+        */
     }
     this.getDimensions = function(){
+        let display_dimensions = d3.select("#plot-display").node().getBoundingClientRect();
+        that.dimensions.width = display_dimensions.width;
+        that.dimensions.height = display_dimensions.height;
         return that.dimensions;
     }
 
