@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 19 2017>
+  * Last modification: Time-stamp: <Jul 31 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -62,11 +62,16 @@ let direct = "direct"
 let side_effect = "side effect"
 let errors = "errors"
 
-type dead_rules = Ckappa_sig.c_rule_id list
 
-let dead_rules_to_json json =
-  `Assoc
-    [dead_rules, JsonUtil.of_list Ckappa_sig.rule_id_to_json json]
+type dead_rules = Public_data.dead_rules
+
+let info_to_rule (s1,loc,s2,id) =
+  {
+    Public_data.rule_id = Ckappa_sig.int_of_rule_id id ;
+    Public_data.rule_position = loc;
+    Public_data.rule_label = s1 ;
+    Public_data.rule_ast=s2
+  }
 
 type dead_agents = Ckappa_sig.c_agent_name list
 
@@ -559,7 +564,7 @@ let add_dead_rules_to_json state l =
   with
   | None -> l
   | Some rules ->
-    (dead_rules , dead_rules_to_json rules)::l
+    (dead_rules , Public_data.dead_rules_to_json rules)::l
 
 let add_refinements_lemmas_to_json state l =
   match

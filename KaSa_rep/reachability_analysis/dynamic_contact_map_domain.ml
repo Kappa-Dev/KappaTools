@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    *
    * Abstract domain to record live rules
    *
@@ -299,7 +299,6 @@ struct
   let collect_events static error map_diff event_list =
     let bonds_to_rules = get_bounds_to_rule static in
     let parameter = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
     Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
       (fun pair (error,event_list) ->
          let error, event_list =
@@ -322,8 +321,7 @@ struct
                             let compiled = get_compil static in
                             let error, rule_id_string =
                               try
-                                Handler.string_of_rule parameter error kappa_handler
-                                  compiled rule_id
+                                Handler.string_of_rule parameter error compiled rule_id
                               with
                               | _ ->
                                 Exception.warn
@@ -728,7 +726,8 @@ struct
         ) store_result error
     in error
 
-  let print ?dead_rules static dynamic error _loggers =
+  let print ?dead_rules _static dynamic error _loggers =
+    let _ = dead_rules in
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable _static dynamic error _lkappa =

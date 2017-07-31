@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <Apr 12 2017>
+  * Last modification: Time-stamp: <Jul 31 2017>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -164,11 +164,11 @@ let add_creation parameters error r_id ag_id mvbdu transition_system =
     nodes_creation = (mvbdu,(r_id,ag_id,0))::transition_system.nodes_creation
   }
 
-let dump_edge logger parameters error handler_kappa compil key key' label =
+let dump_edge logger parameters error compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameters
     then
-      Handler.string_of_rule ~with_loc:false ~with_rule:false parameters error handler_kappa compil (fst label)
+      Handler.string_of_rule ~with_loc:false ~with_rule:false ~with_ast:false parameters error compil (fst label)
     else error,""
   in
   let () =
@@ -517,12 +517,12 @@ let pw parameters error list =
          acc acc)
     map [[]]
 
-let smash_side_effect parameters error static rules dead_rules =
+let smash_side_effect parameters error static dead_rules =
   let error, init =
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
   Ckappa_sig.AgentRule_map_and_set.Map.fold
-    (fun (agent_name,rule_id) list (error,map) ->
+    (fun (agent_name,rule_id) _ (error,map) ->
        let error, b = dead_rules parameters error rule_id in
        if b then error, map
        else
@@ -1080,8 +1080,8 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
-                   ~with_loc:false ~with_rule:false
-                   parameters error handler_kappa compil r
+                   ~with_loc:false ~with_rule:false ~with_ast:false
+                   parameters error compil r
                | Init _,_,_ ->
                  error, ""
              end
@@ -1117,8 +1117,8 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
-                   ~with_loc:false ~with_rule:false
-                   parameters error handler_kappa compil r
+                   ~with_loc:false ~with_rule:false ~with_ast:false
+                   parameters error compil r
                | Init _,_,_ ->  error, ""
              end
            else
@@ -1153,8 +1153,8 @@ let print logger parameters compil handler_kappa handler error transition_system
                with
                | Rule r,_,_ ->
                  Handler.string_of_rule
-                   ~with_loc:false ~with_rule:false
-                   parameters error handler_kappa compil r
+                   ~with_loc:false ~with_rule:false ~with_ast:false
+                   parameters error compil r
                | Init _,_,_ ->  error, ""
              end
            else
@@ -1210,7 +1210,7 @@ let agent_trace
   let init = compil.Cckappa_sig.init in
   let error, side_effects =
     smash_side_effect
-      parameters error static rules dead_rules
+      parameters error static dead_rules
   in
   let error, (support, creation, degradation) =
     build_support parameters error rules dead_rules
@@ -1259,7 +1259,7 @@ let agent_trace
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let error, (pre, low, on_stack, scc, bridges, log_info) =
+  let error, (_, _, _, _, bridges, log_info) =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameters
       error
@@ -1659,7 +1659,7 @@ let agent_trace
                   in
                   let edges =
                     Mods.IntMap.fold
-                      (fun key l edges ->
+                      (fun _ l edges ->
                          if Mods.IntSet.is_empty l
                          then
                            edges

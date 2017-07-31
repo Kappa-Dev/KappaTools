@@ -493,15 +493,15 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~u,a~u,b~u)
 
 
-	Applying rule File "essai.ka", line 5, characters 0-28::
+	Applying rule  -> A(x~u,y~u,z~u,a~u,b~u) @ 1 (File "essai.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 5, characters 0-28: is applied for the first time
+		rule  -> A(x~u,y~u,z~u,a~u,b~u) @ 1 (File "essai.ka", line 5, characters 0-28:) is applied for the first time
 
-	Applying rule File "essai.ka", line 6, characters 0-19::
+	Applying rule A(x~u) -> A(x~p) @ 1 (File "essai.ka", line 6, characters 0-19:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 6, characters 0-19: is applied for the first time
+		rule A(x~u) -> A(x~p) @ 1 (File "essai.ka", line 6, characters 0-19:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
@@ -563,10 +563,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~u,a~u,b~u)
 
 
-	Applying rule File "essai.ka", line 7, characters 0-27::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "essai.ka", line 7, characters 0-27:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 7, characters 0-27: is applied for the first time
+		rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "essai.ka", line 7, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
@@ -628,24 +628,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~u,a~u,b~u)
 
 
-	Applying rule File "essai.ka", line 8, characters 0-35::
+	Applying rule A(x~p,y~u,b~u) -> A(x~u,y~u,b~u) @ 1 (File "essai.ka", line 8, characters 0-35:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 8, characters 0-35: is applied for the first time
+		rule A(x~p,y~u,b~u) -> A(x~u,y~u,b~u) @ 1 (File "essai.ka", line 8, characters 0-35:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 9, characters 0-19::
+	Applying rule A(y~p) -> A(y~u) @ 1 (File "essai.ka", line 9, characters 0-19:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 9, characters 0-19: is applied for the first time
+		rule A(y~p) -> A(y~u) @ 1 (File "essai.ka", line 9, characters 0-19:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 10, characters 0-19::
+	Applying rule A(z~u) -> A(z~p) @ 1 (File "essai.ka", line 10, characters 0-19:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 10, characters 0-19: is applied for the first time
+		rule A(z~u) -> A(z~p) @ 1 (File "essai.ka", line 10, characters 0-19:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
@@ -754,10 +754,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~p,a~u,b~u)
 
 
-	Applying rule File "essai.ka", line 11, characters 0-27::
+	Applying rule A(z~p,a~u) -> A(z~p,a~p) @ 1 (File "essai.ka", line 11, characters 0-27:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 11, characters 0-27: is applied for the first time
+		rule A(z~p,a~u) -> A(z~p,a~p) @ 1 (File "essai.ka", line 11, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
@@ -866,24 +866,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~p,a~p,b~u)
 
 
-	Applying rule File "essai.ka", line 12, characters 0-35::
+	Applying rule A(z~p,a~u,b~u) -> A(z~u,a~u,b~u) @ 1 (File "essai.ka", line 12, characters 0-35:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 12, characters 0-35: is applied for the first time
+		rule A(z~p,a~u,b~u) -> A(z~u,a~u,b~u) @ 1 (File "essai.ka", line 12, characters 0-35:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 13, characters 0-19::
+	Applying rule A(a~p) -> A(a~u) @ 1 (File "essai.ka", line 13, characters 0-19:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 13, characters 0-19: is applied for the first time
+		rule A(a~p) -> A(a~u) @ 1 (File "essai.ka", line 13, characters 0-19:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 14, characters 0-51::
+	Applying rule A(x~p,y~p,z~p,a~p,b~u) -> A(x~p,y~p,z~p,a~p,b~p) @ 1 (File "essai.ka", line 14, characters 0-51:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 14, characters 0-51: is applied for the first time
+		rule A(x~p,y~p,z~p,a~p,b~u) -> A(x~p,y~p,z~p,a~p,b~p) @ 1 (File "essai.ka", line 14, characters 0-51:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
@@ -945,32 +945,32 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p,a~p,b~p)
 
 
-	Applying rule File "essai.ka", line 15, characters 0-19::
+	Applying rule A(b~p) -> A(b~u) @ 1 (File "essai.ka", line 15, characters 0-19:):
 		the precondition is satisfied
 
-		rule File "essai.ka", line 15, characters 0-19: is applied for the first time
+		rule A(b~p) -> A(b~u) @ 1 (File "essai.ka", line 15, characters 0-19:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 5, characters 0-28::
+	Applying rule  -> A(x~u,y~u,z~u,a~u,b~u) @ 1 (File "essai.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-	Applying rule File "essai.ka", line 6, characters 0-19::
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule File "essai.ka", line 7, characters 0-27::
+	Applying rule A(x~u) -> A(x~p) @ 1 (File "essai.ka", line 6, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 8, characters 0-35::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "essai.ka", line 7, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 9, characters 0-19::
+	Applying rule A(x~p,y~u,b~u) -> A(x~u,y~u,b~u) @ 1 (File "essai.ka", line 8, characters 0-35:):
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule A(y~p) -> A(y~u) @ 1 (File "essai.ka", line 9, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1033,22 +1033,22 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~p,a~p,b~p)
 
 
-	Applying rule File "essai.ka", line 10, characters 0-19::
+	Applying rule A(z~u) -> A(z~p) @ 1 (File "essai.ka", line 10, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 11, characters 0-27::
+	Applying rule A(z~p,a~u) -> A(z~p,a~p) @ 1 (File "essai.ka", line 11, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 12, characters 0-35::
+	Applying rule A(z~p,a~u,b~u) -> A(z~u,a~u,b~u) @ 1 (File "essai.ka", line 12, characters 0-35:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 13, characters 0-19::
+	Applying rule A(a~p) -> A(a~u) @ 1 (File "essai.ka", line 13, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
@@ -1112,55 +1112,55 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p,a~u,b~p)
 
 
-	Applying rule File "essai.ka", line 14, characters 0-51::
+	Applying rule A(x~p,y~p,z~p,a~p,b~u) -> A(x~p,y~p,z~p,a~p,b~p) @ 1 (File "essai.ka", line 14, characters 0-51:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 5, characters 0-28::
+	Applying rule  -> A(x~u,y~u,z~u,a~u,b~u) @ 1 (File "essai.ka", line 5, characters 0-28:):
 		the precondition is satisfied
 
-	Applying rule File "essai.ka", line 6, characters 0-19::
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~,a~,b~)
-
-	Applying rule File "essai.ka", line 7, characters 0-27::
+	Applying rule A(x~u) -> A(x~p) @ 1 (File "essai.ka", line 6, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 8, characters 0-35::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "essai.ka", line 7, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 9, characters 0-19::
+	Applying rule A(x~p,y~u,b~u) -> A(x~u,y~u,b~u) @ 1 (File "essai.ka", line 8, characters 0-35:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 15, characters 0-19::
+	Applying rule A(y~p) -> A(y~u) @ 1 (File "essai.ka", line 9, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 10, characters 0-19::
+	Applying rule A(b~p) -> A(b~u) @ 1 (File "essai.ka", line 15, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 11, characters 0-27::
+	Applying rule A(z~u) -> A(z~p) @ 1 (File "essai.ka", line 10, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 12, characters 0-35::
+	Applying rule A(z~p,a~u) -> A(z~p,a~p) @ 1 (File "essai.ka", line 11, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)
 
-	Applying rule File "essai.ka", line 13, characters 0-19::
+	Applying rule A(z~p,a~u,b~u) -> A(z~u,a~u,b~u) @ 1 (File "essai.ka", line 12, characters 0-35:):
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~,a~,b~)
+
+	Applying rule A(a~p) -> A(a~u) @ 1 (File "essai.ka", line 13, characters 0-19:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~,a~,b~)

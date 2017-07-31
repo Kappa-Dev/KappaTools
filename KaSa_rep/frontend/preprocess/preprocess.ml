@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Apr 12 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -80,7 +80,9 @@ let empty_e_rule handler error =
         Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX;
         Ckappa_sig.k_def = Alg_expr.const Nbr.zero;
         (*Ckappa_sig.k_un_radius = None ; *)
-        Ckappa_sig.k_un = None};
+        Ckappa_sig.k_un = None ;
+        Ckappa_sig.ast = "";
+      };
     Cckappa_sig.e_rule_c_rule = rule }
 
 let rename_rule_rlhs handler error id_agent tab =

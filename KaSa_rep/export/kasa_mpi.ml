@@ -75,7 +75,7 @@ let on_message post text =
   | `List [ `String "DEAD_RULES" ] | `String "DEAD_RULES" ->
     let state, rules = get_dead_rules !gState in
     let () = gState := state in
-    send_response post (Remanent_state.dead_rules_to_json rules)
+    send_response post (Public_data.dead_rules_to_json rules)
   | `List [ `String "CONSTRAINTS" ] | `String "CONSTRAINTS" ->
     let state, out = get_constraints_list_to_json !gState in
     let () = gState := state in

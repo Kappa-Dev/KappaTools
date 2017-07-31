@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    *
    * Abstract domain to record live rules
    *
@@ -190,10 +190,9 @@ struct
     let event_list = [] in
     let dead_rule_array = get_dead_rule dynamic in
     let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
     let compil = get_compil static in
     let error, rule_id_string =
-      try Handler.string_of_rule parameters error kappa_handler compil rule_id
+      try Handler.string_of_rule parameters error compil rule_id
       with
       | _ ->
         Exception.warn
@@ -249,13 +248,18 @@ struct
 
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
+    let compil = get_compil static in
     let array = get_dead_rule dynamic in
     let error, list =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameters
         error
         (fun _parameters error i bool list ->
-           error, if not bool then i::list else list
+           if bool then error, list
+           else
+             let error, info = Handler.info_of_rule parameters error compil i in
+             let rule = Remanent_state.info_to_rule info in
+             error, rule::list
         )
         array []
     in
@@ -267,7 +271,6 @@ struct
     let parameters = get_parameter static in
     let result = get_dead_rule dynamic in
     let compiled = get_compil static in
-    let handler = get_kappa_handler static in
     if Remanent_parameters.get_dump_reachability_analysis_result parameters
     then
       let error, bool =
@@ -306,7 +309,7 @@ struct
              else
                let error', rule_string =
                  try
-                   Handler.string_of_rule parameters error handler compiled k
+                   Handler.string_of_rule parameters error compiled k ~with_ast:false
                  with
                  | _ ->
                    Exception.warn
@@ -338,6 +341,7 @@ struct
       error
 
   let print ?dead_rules static dynamic error _loggers =
+    let _ = dead_rules in
     let error =
       print_dead_rule
         static
@@ -352,7 +356,7 @@ struct
   let cc_mixture_is_reachable _static dynamic error _ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
 
-  let get_dead_rules static dynamic =
+  let get_dead_rules _static dynamic =
     (fun parameters error r_id ->
        match
          Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get

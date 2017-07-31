@@ -139,7 +139,7 @@ let onload (configuration :  configuration) =
            let () =
              handler.export (filename handler.suffix)
            in
-           Js._true)
+           Js._false)
   in
   ()
 

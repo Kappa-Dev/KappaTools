@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 19 2017>
+  * Last modification: Time-stamp: <Jul 31 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -29,10 +29,9 @@ type quark_map = Quark_type.quarks
 type rule_id = int
 type var_id =  int
 
-type dead_rules = Ckappa_sig.c_rule_id list
 type dead_agents = Ckappa_sig.c_agent_name list
 
-val dead_rules_to_json : dead_rules -> Yojson.Basic.json
+val info_to_rule: (string*Locality.t*string*Ckappa_sig.c_rule_id) -> Public_data.rule
 
 type separating_transitions =
   (string * Ckappa_sig.c_rule_id * string) list
@@ -116,7 +115,7 @@ val of_json: Yojson.Basic.json ->
   Exception_without_parameter.method_handler *
   Public_data.contact_map Public_data.AccuracyMap.t *
   influence_map Public_data.AccuracyMap.t *
-  int list option *
+  Public_data.dead_rules option *
   constraints_list option *
   Public_data.separating_transitions option
 
@@ -238,10 +237,10 @@ val get_subviews_info: ('static, 'compile) state -> subviews_info option
 
 val set_subviews_info: subviews_info -> ('static, 'compile) state -> ('static, 'compile) state
 
-val get_dead_rules: ('static, 'compile) state -> dead_rules option
+val get_dead_rules: ('static, 'compile) state -> Public_data.dead_rules option
 
 val set_dead_rules:
-  dead_rules -> ('static, 'compile) state -> ('static, 'compile) state
+  Public_data.dead_rules -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_dead_agents: ('static, 'compile) state -> dead_agents option
 
@@ -291,5 +290,5 @@ val set_symmetries :
 
 val get_data:
   ('static, 'compile) state ->
-  Cckappa_sig.kappa_handler option * dead_rules option *
+  Cckappa_sig.kappa_handler option * Public_data.dead_rules option *
   separating_transitions option

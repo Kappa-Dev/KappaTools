@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 22th of February
-   * Last modification: Time-stamp: <Dec 01 2016>
+   * Last modification: Time-stamp: <Jul 31 2017>
    *
    * Abstract domain to record live rules
    *
@@ -663,8 +663,7 @@ let add_rule ?local_trace:(local_trace=false)
     then
       let error, rule_id_string =
         try
-          Handler.string_of_rule parameters error kappa_handler
-            compiled rule_id
+          Handler.string_of_rule parameters error compiled rule_id
         with
         | _ ->
           Exception.warn

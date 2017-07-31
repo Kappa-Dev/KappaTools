@@ -219,10 +219,10 @@ EXTENSIONAL DESCRIPTION:
 		A(y~p)
 
 
-	Applying rule File "sym_init3.ka", line 7, characters 0-29::
+	Applying rule A(z), A(z) -> A(z!1), A(z!1) @ 1 (File "sym_init3.ka", line 7, characters 0-29:):
 		the precondition is satisfied
 
-		rule File "sym_init3.ka", line 7, characters 0-29: is applied for the first time
+		rule A(z), A(z) -> A(z!1), A(z!1) @ 1 (File "sym_init3.ka", line 7, characters 0-29:) is applied for the first time
 
 		Updating the views for A(z!)
 
@@ -246,7 +246,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(z!)
 
-	Applying rule File "sym_init3.ka", line 7, characters 0-29::
+	Applying rule A(z), A(z) -> A(z!1), A(z!1) @ 1 (File "sym_init3.ka", line 7, characters 0-29:):
 		the precondition is satisfied
 
 		Updating the views for A(z!)

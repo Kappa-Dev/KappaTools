@@ -761,10 +761,10 @@ Influence_map:Inhibition_map:rule(2):'' C()-> -> rule(4):'' C(x!1),E(z!1,t!2),F(
 Influence_map:Inhibition_map:rule(4):'' C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)->G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3) -> rule(2):'' C()->[0->0]
 Reachability analysis...
 
-	Applying rule File "site_accross_bonds_domain.ka", line 9, characters 0-41::
+	Applying rule  -> C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 9, characters 0-41:):
 		the precondition is satisfied
 
-		rule File "site_accross_bonds_domain.ka", line 9, characters 0-41: is applied for the first time
+		rule  -> C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 9, characters 0-41:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -844,10 +844,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x!A@z)
 
 
-	Applying rule File "site_accross_bonds_domain.ka", line 10, characters 0-77::
+	Applying rule C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) -> D(x!1), A(z!1,t!2), B(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 10, characters 0-77:):
 		the precondition is satisfied
 
-		rule File "site_accross_bonds_domain.ka", line 10, characters 0-77: is applied for the first time
+		rule C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) -> D(x!1), A(z!1,t!2), B(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 10, characters 0-77:) is applied for the first time
 
 		Updating the views for C(x!)
 
@@ -935,10 +935,10 @@ EXTENSIONAL DESCRIPTION:
 		D(x!A@z)
 
 
-	Applying rule File "site_accross_bonds_domain.ka", line 12, characters 0-41::
+	Applying rule  -> C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 12, characters 0-41:):
 		the precondition is satisfied
 
-		rule File "site_accross_bonds_domain.ka", line 12, characters 0-41: is applied for the first time
+		rule  -> C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 12, characters 0-41:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1036,10 +1036,10 @@ EXTENSIONAL DESCRIPTION:
 		D(x!F@z)
 
 
-	Applying rule File "site_accross_bonds_domain.ka", line 13, characters 0-77::
+	Applying rule C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) -> G(x!1), E(z!1,t!2), F(t!2,z!3), H(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 13, characters 0-77:):
 		the precondition is satisfied
 
-		rule File "site_accross_bonds_domain.ka", line 13, characters 0-77: is applied for the first time
+		rule C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) -> G(x!1), E(z!1,t!2), F(t!2,z!3), H(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 13, characters 0-77:) is applied for the first time
 
 		Updating the views for C(x!)
 
@@ -1145,10 +1145,10 @@ EXTENSIONAL DESCRIPTION:
 		H(x!F@z)
 
 
-	Applying rule File "site_accross_bonds_domain.ka", line 11, characters 0-10::
+	Applying rule C() ->  @ 1 (File "site_accross_bonds_domain.ka", line 11, characters 0-10:):
 		the precondition is satisfied
 
-		rule File "site_accross_bonds_domain.ka", line 11, characters 0-10: is applied for the first time
+		rule C() ->  @ 1 (File "site_accross_bonds_domain.ka", line 11, characters 0-10:) is applied for the first time
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -1237,10 +1237,10 @@ EXTENSIONAL DESCRIPTION:
 		E(z!free,t!F@t)
 
 
-	Applying rule File "site_accross_bonds_domain.ka", line 9, characters 0-41::
+	Applying rule  -> C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 9, characters 0-41:):
 		the precondition is satisfied
 
-	Applying rule File "site_accross_bonds_domain.ka", line 10, characters 0-77::
+	Applying rule C(x!1), A(z!1,t!2), B(t!2,z!3), C(x!3) -> D(x!1), A(z!1,t!2), B(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 10, characters 0-77:):
 		the precondition is satisfied
 
 		Updating the views for C(x!)
@@ -1251,10 +1251,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x!)
 
-	Applying rule File "site_accross_bonds_domain.ka", line 12, characters 0-41::
+	Applying rule  -> C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 12, characters 0-41:):
 		the precondition is satisfied
 
-	Applying rule File "site_accross_bonds_domain.ka", line 13, characters 0-77::
+	Applying rule C(x!1), E(z!1,t!2), F(t!2,z!3), D(x!3) -> G(x!1), E(z!1,t!2), F(t!2,z!3), H(x!3) @ 1 (File "site_accross_bonds_domain.ka", line 13, characters 0-77:):
 		the precondition is satisfied
 
 		Updating the views for C(x!)
@@ -1265,7 +1265,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for D(x!)
 
-	Applying rule File "site_accross_bonds_domain.ka", line 11, characters 0-10::
+	Applying rule C() ->  @ 1 (File "site_accross_bonds_domain.ka", line 11, characters 0-10:):
 		the precondition is satisfied
 ------------------------------------------------------------
 every rule may be applied

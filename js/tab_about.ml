@@ -16,7 +16,7 @@ let content () = [%html {|
 <p>Kappa Language softwares are distributed under the terms of the <a target="_blank" href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License Version 3</a>.
  Source code is published on <a target="_blank" href="https://github.com/Kappa-Dev/KaSim">https://github.com/Kappa-Dev/KaSim</a>.</p>
 
-<p>This user interface was carried out in the Fontana lab under DARPA grant W911NF-14-1-0367 .</p>
+<p>This user interface was developed in the Fontana lab under DARPA grant W911NF-14-1-0367 .</p>
 
 <p>Reference manual is online at <a target="_blank" href="http://dev.executableknowledge.org">http://dev.executableknowledge.org</a>.</p>
 
@@ -30,6 +30,9 @@ let content () = [%html {|
 <li>Visualizations relies on <a target="_blank" href="https://d3js.org">d3</a>.</li>
 <li>Layout is done thanks to <a target="_blank" href="http://getbootstrap.com">bootstrap</a> and <a target="_blank" href="https://jqueryui.com">jQuery</a>.</li>
 </ul>
+
+<h3>Nominal contribution</h3>
+<dl class="dl-horizontal"><dt>Pierre Boutillier</dt><dd>General design and maintenance, protocols</dd><dt>Xing Li</dt><dd>Outputs visualizations, General layout</dd><dt>Mutaamba Maasha</dt><dd>Transparent multi backend architecture, protocols, Output visualizations, General layout</dd></dl>
 |}]
 
 let onload () = ()

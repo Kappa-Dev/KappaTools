@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 05 2017>
+ * Last modification: Time-stamp: <Jul 31 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -767,6 +767,13 @@ let translate_compil parameters error compil =
            alg_with_pos_map (refine_mixture parameters) error rule.Ast.k_def in
          let error,k_un =
            alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.k_un) in
+         let buf = Buffer.create 0 in
+         let fmt = Format.formatter_of_buffer buf in
+         let () =
+            Ast.print_ast_rule fmt rule
+         in
+         let () = Format.pp_print_flush fmt () in
+         let ast = Buffer.contents buf in
          let error,direct =
            error,
            {
@@ -778,6 +785,7 @@ let translate_compil parameters error compil =
              Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
+             Ckappa_sig.ast = ast ;
            }
          in
          if rule.Ast.bidirectional then
@@ -815,6 +823,13 @@ let translate_compil parameters error compil =
            alg_with_pos_map (refine_mixture parameters) error rule.Ast.act in
          let error,k_un =
            alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.un_act) in
+         let buf = Buffer.create 0 in
+         let fmt = Format.formatter_of_buffer buf in
+         let () =
+           Ast.print_ast_edit_rule fmt rule
+         in
+         let () = Format.pp_print_flush fmt () in
+         let ast = Buffer.contents buf in
          let error,direct =
            error,
            {
@@ -826,6 +841,7 @@ let translate_compil parameters error compil =
              Ckappa_sig.bidirectional = false;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
+             Ckappa_sig.ast = ast
            }
          in
          error,id_set,(id,(Locality.dummy_annot (Ckappa_sig.Direct,direct)))::list)

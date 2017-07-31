@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -1542,9 +1542,6 @@ struct
           | error, None -> error, Ckappa_sig.dummy_agent_name
           | error, Some a -> error, a
         in
-        let error, agent_string =
-          Handler.string_of_agent parameters error kappa_handler agent_type
-        in
         (*---------------------------------------------------------*)
         (*get state information from (agent_type, site)*)
         let error, state_dic =
@@ -2772,7 +2769,7 @@ struct
            (*build bdu_test*)
            let error, (dynamic, list) =
              List.fold_left
-               (fun (error, (dynamic, current_list)) (cv_id, map_res) ->
+               (fun (error, (dynamic, current_list)) (_cv_id, map_res) ->
                  if
                    Ckappa_sig.Site_map_and_set.Map.is_empty
                      map_res
@@ -3023,7 +3020,7 @@ struct
       let error, dynamic =
          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
            parameters error
-           (fun parameters error agent_id agent dynamic ->
+           (fun parameters error _agent_id agent dynamic ->
               match agent with
               | Cckappa_sig.Unknown_agent _
               | Cckappa_sig.Ghost
@@ -3583,7 +3580,7 @@ struct
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
-  let apply_event_list static dynamic error _event_list =
+  let apply_event_list _static dynamic error _event_list =
     error, dynamic, []
 
   (**************************************************************************)
@@ -4002,7 +3999,7 @@ struct
 
   (*****************************************************************)
   let print_separating_edges
-      parameters handler error compil handler_kappa list =
+      parameters handler error compil _handler_kappa list =
     let log = Remanent_parameters.get_logger parameters in
     let () = Loggers.print_newline log in
     let () =
@@ -4021,8 +4018,7 @@ struct
           List.fold_left
             (fun error (s1,r_id,s2) ->
                let error, r =
-                 Handler.string_of_rule parameters error handler_kappa compil
-                  r_id
+                 Handler.string_of_rule parameters error compil r_id
                in
                let () =
                  Loggers.fprintf log "%s: %s -> %s"
@@ -4466,7 +4462,7 @@ struct
     in
     error, dynamic, kasa_state
 
-  let export_separating_edges static dynamic error kasa_state =
+  let export_separating_edges _static dynamic error kasa_state =
     match dynamic.local.separating_edges with
     | None -> error, dynamic, kasa_state
     | Some l ->
