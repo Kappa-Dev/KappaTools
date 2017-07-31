@@ -324,17 +324,17 @@ EXTENSIONAL DESCRIPTION:
 		B(z!A@z)
 
 
-	Applying rule File "parallel_bonds.ka", line 8, characters 0-17::
+	Applying rule A(t!_) -> A(t) @ 1 (File "parallel_bonds.ka", line 8, characters 0-17:):
 		the precondition is satisfied
 
-		rule File "parallel_bonds.ka", line 8, characters 0-17: is applied for the first time
+		rule A(t!_) -> A(t) @ 1 (File "parallel_bonds.ka", line 8, characters 0-17:) is applied for the first time
 
 		Updating the views for A(t!)
 
-	Applying rule File "parallel_bonds.ka", line 9, characters 0-29::
+	Applying rule A(t), B(t) -> A(t!1), B(t!1) @ 1 (File "parallel_bonds.ka", line 9, characters 0-29:):
 		the precondition is satisfied
 
-		rule File "parallel_bonds.ka", line 9, characters 0-29: is applied for the first time
+		rule A(t), B(t) -> A(t!1), B(t!1) @ 1 (File "parallel_bonds.ka", line 9, characters 0-29:) is applied for the first time
 
 		Updating the views for A(t!)
 

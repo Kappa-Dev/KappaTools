@@ -309,10 +309,10 @@ Influence_map:Inhibition_map:rule(4):'' A(x~u)->A(x~q) -> rule(1):'' A(x~u)->A(x
 Influence_map:Inhibition_map:rule(7):'KO' A(x~0,y~q)->A(x~1,y~0) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
 Reachability analysis...
 
-	Applying rule File "../verbosity.ka", line 1, characters 0-21::
+	Applying rule  -> A(x~u,y~u,z~u) @ 1 (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 1, characters 0-21: is applied for the first time
+		rule  -> A(x~u,y~u,z~u) @ 1 (File "../verbosity.ka", line 1, characters 0-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -353,10 +353,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~u)
 
 
-	Applying rule File "../verbosity.ka", line 2, characters 0-17::
+	Applying rule A(x~u) -> A(x~p) @ 1 (File "../verbosity.ka", line 2, characters 0-17:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 2, characters 0-17: is applied for the first time
+		rule A(x~u) -> A(x~p) @ 1 (File "../verbosity.ka", line 2, characters 0-17:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -398,10 +398,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~u)
 
 
-	Applying rule File "../verbosity.ka", line 3, characters 0-27::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "../verbosity.ka", line 3, characters 0-27:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 3, characters 0-27: is applied for the first time
+		rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "../verbosity.ka", line 3, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -443,10 +443,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~u)
 
 
-	Applying rule File "../verbosity.ka", line 4, characters 0-35::
+	Applying rule A(x~p,y~p,z~u) -> A(x~0,y~p,z~q) @ 1 (File "../verbosity.ka", line 4, characters 0-35:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 4, characters 0-35: is applied for the first time
+		rule A(x~p,y~p,z~u) -> A(x~0,y~p,z~q) @ 1 (File "../verbosity.ka", line 4, characters 0-35:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -488,10 +488,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~0,y~p,z~q)
 
 
-	Applying rule File "../verbosity.ka", line 5, characters 0-17::
+	Applying rule A(x~u) -> A(x~q) @ 1 (File "../verbosity.ka", line 5, characters 0-17:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 5, characters 0-17: is applied for the first time
+		rule A(x~u) -> A(x~q) @ 1 (File "../verbosity.ka", line 5, characters 0-17:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -533,10 +533,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~q,y~u,z~u)
 
 
-	Applying rule File "../verbosity.ka", line 6, characters 0-25::
+	Applying rule A(x~q,y~u) -> A(x~q,y~q) @ 1 (File "../verbosity.ka", line 6, characters 0-25:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 6, characters 0-25: is applied for the first time
+		rule A(x~q,y~u) -> A(x~q,y~q) @ 1 (File "../verbosity.ka", line 6, characters 0-25:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -578,10 +578,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~q,y~q,z~u)
 
 
-	Applying rule File "../verbosity.ka", line 7, characters 0-27::
+	Applying rule A(y~q,z~u) -> A(y~q,z~q) @ 1 (File "../verbosity.ka", line 7, characters 0-27:):
 		the precondition is satisfied
 
-		rule File "../verbosity.ka", line 7, characters 0-27: is applied for the first time
+		rule A(y~q,z~u) -> A(y~q,z~q) @ 1 (File "../verbosity.ka", line 7, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -626,35 +626,35 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule KO (File "../verbosity.ka", line 8, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule File "../verbosity.ka", line 1, characters 0-21::
+	Applying rule  -> A(x~u,y~u,z~u) @ 1 (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
-	Applying rule File "../verbosity.ka", line 2, characters 0-17::
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule File "../verbosity.ka", line 3, characters 0-27::
+	Applying rule A(x~u) -> A(x~p) @ 1 (File "../verbosity.ka", line 2, characters 0-17:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule File "../verbosity.ka", line 4, characters 0-35::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 1 (File "../verbosity.ka", line 3, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule File "../verbosity.ka", line 5, characters 0-17::
+	Applying rule A(x~p,y~p,z~u) -> A(x~0,y~p,z~q) @ 1 (File "../verbosity.ka", line 4, characters 0-35:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule File "../verbosity.ka", line 6, characters 0-25::
+	Applying rule A(x~u) -> A(x~q) @ 1 (File "../verbosity.ka", line 5, characters 0-17:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule File "../verbosity.ka", line 7, characters 0-27::
+	Applying rule A(x~q,y~u) -> A(x~q,y~q) @ 1 (File "../verbosity.ka", line 6, characters 0-25:):
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(y~q,z~u) -> A(y~q,z~q) @ 1 (File "../verbosity.ka", line 7, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Mar 16 2017>
+  * Last modification: Time-stamp: <Jul 31 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -147,8 +147,7 @@ struct
             then
               let error, rule_id_string =
                 try
-                  Handler.string_of_rule parameters error kappa_handler
-                    compil rule_id
+                  Handler.string_of_rule parameters error compil rule_id
                 with
                   _ ->
                   Exception.warn

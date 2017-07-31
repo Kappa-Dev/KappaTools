@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Apr 02 2017>
+  * Last modification: Time-stamp: <Jul 31 2017>
   *
   * Compute the relations between sites in the BDU data structures
   *
@@ -177,7 +177,6 @@ struct
     let working_list = get_working_list dynamic in
     let parameters = get_parameter static in
     let compiled = get_compil static in
-    let kappa_handler = get_kappa_handler static in
     let error, rule_working_list =
       Ckappa_sig.Rule_FIFO.push
         parameters
@@ -185,7 +184,7 @@ struct
         r_id
         working_list
     in
-    let () =
+    let error =
       if
         not (rule_working_list == working_list)
         &&
@@ -194,18 +193,20 @@ struct
       then
         let error, rule_id_string =
           try
-            Handler.string_of_rule parameters error kappa_handler
-              compiled r_id
+            Handler.string_of_rule parameters error compiled r_id
           with
           | _ ->
             Exception.warn
               parameters error __POS__ Exit
               (Ckappa_sig.string_of_rule_id r_id)
         in
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "\t\t\t(%s) should be investigated\n"
-          rule_id_string
+        let () =
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "\t\t\t(%s) should be investigated\n"
+            rule_id_string
+        in error
+      else error
     in
     let dynamic = set_working_list rule_working_list dynamic in
     error, dynamic

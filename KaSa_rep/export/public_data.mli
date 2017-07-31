@@ -47,7 +47,18 @@ val contact_map_to_json:
 val contact_map_of_json:
   Yojson.Basic.json -> accuracy_level * contact_map
 
-val dead_rules_of_json : Yojson.Basic.json -> int (*rule_id*) list
+type rule =
+  {
+    rule_id: int;
+    rule_label: string ;
+    rule_ast: string;
+    rule_position: Locality.t
+  }
+
+type dead_rules = rule list
+
+val dead_rules_of_json : Yojson.Basic.json -> dead_rules
+val dead_rules_to_json : dead_rules -> Yojson.Basic.json
 
 type separating_transitions = (string * int (*rule_id*) * string) list
 

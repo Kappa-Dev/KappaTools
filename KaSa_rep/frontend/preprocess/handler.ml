@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Apr 12 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -193,89 +193,136 @@ let complementary_interface
   in
   error, Misc_sa.list_minus l interface
 
-let string_of_rule
-    ?with_rule:(with_rule=true)
-    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
+let info_of_rule
+    parameters error compiled (rule_id: Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
+  let error,rule =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+      parameters
+      error
+      rule_id
+      rules
+  in
+  match rule
+  with
+  | None ->
+    Exception.warn
+      parameters error __POS__ Exit
+      ("",Locality.dummy,"",Ckappa_sig.dummy_rule_id)
+  | Some rule ->
+    let label_opt = rule.Cckappa_sig.e_rule_label in
+    let error, (label, _) =
+      Misc_sa.unsome (error,label_opt)
+        (fun error -> error,Locality.dummy_annot "") in
+    let label =
+      if label="" then ""
+      else
+        match
+          rule.Cckappa_sig.e_rule_initial_direction
+        with
+        | Ckappa_sig.Direct -> label
+        | Ckappa_sig.Reverse -> Ast.flip_label label
+    in
+    let position =
+        rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position
+    in
+    let ast =
+      rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
+    in
+    error, (label, position, ast, rule_id)
+
+let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
-  if
-    Ckappa_sig.compare_rule_id rule_id (Ckappa_sig.rule_id_of_int nrules) < 0
-  then
-    begin
-      let error,rule =
-        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
-          parameters
-          error
-          rule_id
-          rules
-      in
-      match rule
-      with
-      | None -> Exception.warn parameters error __POS__ Exit ""
-      | Some rule ->
-        let label = rule.Cckappa_sig.e_rule_label in
-        let error, (m1, _) = Misc_sa.unsome (error,label)
-            (fun error -> error,Locality.dummy_annot "") in
-        let m1 =
-          if (not with_rule_name) || m1="" then ""
-          else
-            match
-              rule.Cckappa_sig.e_rule_initial_direction
-            with
-            | Ckappa_sig.Direct -> m1
-            | Ckappa_sig.Reverse -> Ast.flip_label m1
-        in
-        let m2 =
-          let pos  = rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position in
-          if (not with_loc) || pos = Locality.dummy
-          then ""
-          else Locality.to_string pos
-        in
-        let m3 =
-          if (not with_rule_id) then "" else Ckappa_sig.string_of_rule_id rule_id
-        in
-        let m4 =
-          if with_rule then "rule " else ""
-        in
-        let s =
-          match m1, m2, m3
-          with
-          | "","", s | "",s,_ | s,"",_ -> m4^s
-          | s1,s2, _ -> m4^s1^" ("^s2^")"
-        in
-        let s =
-          if s =  ""
-          then m4^(Ckappa_sig.string_of_rule_id rule_id)
-          else s
-        in
-        error, s
-    end
-  else
-    begin
-      let var_id = Ckappa_sig.sub_rule_id rule_id nrules in
-      let error,var =
-        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
-          parameters
-          error
-          var_id
-          vars
-      in
-      match var
-      with
-      | None  -> Exception.warn parameters error __POS__ Exit
-                   ("VAR " ^ (Ckappa_sig.string_of_rule_id var_id))
-      | Some _ ->
-        (*TO DO*)
-        error,"ALG"
-    (*
-      Exception.warn parameters error (Some "line 122") Exit "ALG"*)
-        (* | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) -> let m1 = b in let m2 =
-           string_of_int var_id in let m = m1^m2 in error,(if m="" then
-           ("var"^(string_of_int var_id)) else ("var"^(string_of_int
-           var_id)^":"^m))*)
+  let var_id = Ckappa_sig.sub_rule_id rule_id nrules in
+  let error,var =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+      parameters
+      error
+      var_id
+      vars
+  in
+  match var
+  with
+  | None  -> Exception.warn parameters error __POS__ Exit
+               (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,"",var_id)
+  | Some _ ->
+    error,("ALG",Locality.dummy,"",var_id)
 
-    end
+let string_of_info ?with_rule:(with_rule=true)
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) ?kind:(kind="rule ") (label,pos,ast,id) =
+  let label =
+    if with_rule_name then label else ""
+  in
+  let pos =
+    if not with_loc || pos=Locality.dummy
+    then ""
+    else Locality.to_string pos
+  in
+  let ast =
+    if not with_ast then "" else ast
+  in
+  let id =
+    if not with_rule_id
+    then ""
+    else Ckappa_sig.string_of_rule_id id
+  in
+  let prefix =
+    if not with_rule then "" else kind
+  in
+  let s =
+    match label, pos, ast, id
+    with
+    | "","","",s
+    | "","",s,_
+    | "",s,"",_
+    | s,"",_,_ -> prefix^s
+    | "",s2,s1,_
+    | s1,s2,_,_ -> prefix^s1^" ("^s2^")"
+  in
+  s
+
+let string_of_rule ?with_rule:(with_rule=true)
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true)
+    parameters error compiled rule_id =
+  let kind =
+    if with_rule then "rule " else ""
+  in
+  let error, info =
+    info_of_rule parameters error compiled rule_id
+  in
+  error,
+  string_of_info
+    ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
+
+let string_of_var ?with_rule:(with_rule=true)
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
+  let kind =
+    if with_rule then "var " else ""
+  in
+  let error, info =
+    info_of_var
+      parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id)
+  in
+  error,
+  string_of_info
+    ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
+
+
+let string_of_rule_or_var
+    ?with_rule:(with_rule=true)
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
+    let nrules = nrules parameters error handler in
+    if
+      Ckappa_sig.compare_rule_id rule_id (Ckappa_sig.rule_id_of_int nrules) < 0
+    then
+      string_of_rule
+        ~with_rule ~with_rule_name ~with_rule_id ~with_loc ~with_ast
+        parameters error compiled rule_id
+    else
+      string_of_var
+        ~with_rule ~with_rule_name ~with_rule_id ~with_loc ~with_ast
+        parameters error handler compiled rule_id
 
 (*mapping agent of type int to string*)
 let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent_name) =

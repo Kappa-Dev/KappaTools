@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Apr 02 2017>
+   * Last modification: Time-stamp: <Jul 31 2017>
    *
    * Abstract domain to record live rules
    *
@@ -313,7 +313,6 @@ struct
 
   let add_event_list static dynamic error (agent_type: Ckappa_sig.c_agent_name) event_list =
     let parameters = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
     let map = get_agents_without_interface static in
     let log = Remanent_parameters.get_logger parameters in
     let local = get_seen_agent dynamic in
@@ -342,12 +341,11 @@ struct
         || Remanent_parameters.get_dump_reachability_analysis_wl parameters
         then
           List.fold_left
-            (fun (error,bool)  rule_id ->
+            (fun (error,_)  rule_id ->
               let compiled = get_compil static in
               let error, rule_id_string =
                 try
-                  Handler.string_of_rule parameters error kappa_handler
-                    compiled rule_id
+                  Handler.string_of_rule parameters error compiled rule_id
                 with
                 | _ ->
                   Exception.warn
@@ -616,6 +614,7 @@ struct
       error
 
   let print ?dead_rules static dynamic error loggers =
+    let _ = dead_rules in
     let error =
       print_dead_agent loggers static dynamic error
     in

@@ -373,10 +373,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u)
 
 
-	Applying rule File "sym3.ka", line 1, characters 0-28::
+	Applying rule A(x~u,y~u) -> A(x~p,y~u) @ 1 (File "sym3.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 1, characters 0-28: is applied for the first time
+		rule A(x~u,y~u) -> A(x~p,y~u) @ 1 (File "sym3.ka", line 1, characters 0-28:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
@@ -408,10 +408,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u)
 
 
-	Applying rule File "sym3.ka", line 2, characters 0-28::
+	Applying rule A(x~u,y~u) -> A(x~u,y~p) @ 1 (File "sym3.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 2, characters 0-28: is applied for the first time
+		rule A(x~u,y~u) -> A(x~u,y~p) @ 1 (File "sym3.ka", line 2, characters 0-28:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
@@ -443,10 +443,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~p)
 
 
-	Applying rule File "sym3.ka", line 3, characters 0-28::
+	Applying rule A(x~u,y~p) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 3, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 3, characters 0-28: is applied for the first time
+		rule A(x~u,y~p) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 3, characters 0-28:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
@@ -478,17 +478,17 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p)
 
 
-	Applying rule File "sym3.ka", line 4, characters 0-28::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 4, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 4, characters 0-28: is applied for the first time
+		rule A(x~p,y~u) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 4, characters 0-28:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
-	Applying rule File "sym3.ka", line 6, characters 0-28::
+	Applying rule A(w~u,t~u) -> A(w~p,t~u) @ 1 (File "sym3.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 6, characters 0-28: is applied for the first time
+		rule A(w~u,t~u) -> A(w~p,t~u) @ 1 (File "sym3.ka", line 6, characters 0-28:) is applied for the first time
 
 		Updating the views for A(w~,t~)
 
@@ -520,10 +520,10 @@ EXTENSIONAL DESCRIPTION:
 		A(w~p,t~u)
 
 
-	Applying rule File "sym3.ka", line 7, characters 0-28::
+	Applying rule A(w~u,t~u) -> A(w~u,t~p) @ 1 (File "sym3.ka", line 7, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 7, characters 0-28: is applied for the first time
+		rule A(w~u,t~u) -> A(w~u,t~p) @ 1 (File "sym3.ka", line 7, characters 0-28:) is applied for the first time
 
 		Updating the views for A(w~,t~)
 
@@ -555,10 +555,10 @@ EXTENSIONAL DESCRIPTION:
 		A(w~u,t~p)
 
 
-	Applying rule File "sym3.ka", line 8, characters 0-28::
+	Applying rule A(w~u,t~p) -> A(w~p,t~p) @ 2 (File "sym3.ka", line 8, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 8, characters 0-28: is applied for the first time
+		rule A(w~u,t~p) -> A(w~p,t~p) @ 2 (File "sym3.ka", line 8, characters 0-28:) is applied for the first time
 
 		Updating the views for A(w~,t~)
 
@@ -590,44 +590,44 @@ EXTENSIONAL DESCRIPTION:
 		A(w~p,t~p)
 
 
-	Applying rule File "sym3.ka", line 9, characters 0-28::
+	Applying rule A(w~p,t~u) -> A(w~p,t~p) @ 2 (File "sym3.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		rule File "sym3.ka", line 9, characters 0-28: is applied for the first time
+		rule A(w~p,t~u) -> A(w~p,t~p) @ 2 (File "sym3.ka", line 9, characters 0-28:) is applied for the first time
 
 		Updating the views for A(w~,t~)
 
-	Applying rule File "sym3.ka", line 1, characters 0-28::
+	Applying rule A(x~u,y~u) -> A(x~p,y~u) @ 1 (File "sym3.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule File "sym3.ka", line 2, characters 0-28::
+	Applying rule A(x~u,y~u) -> A(x~u,y~p) @ 1 (File "sym3.ka", line 2, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule File "sym3.ka", line 3, characters 0-28::
+	Applying rule A(x~u,y~p) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 3, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule File "sym3.ka", line 4, characters 0-28::
+	Applying rule A(x~p,y~u) -> A(x~p,y~p) @ 2 (File "sym3.ka", line 4, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule File "sym3.ka", line 6, characters 0-28::
-		the precondition is satisfied
-
-		Updating the views for A(w~,t~)
-
-	Applying rule File "sym3.ka", line 7, characters 0-28::
+	Applying rule A(w~u,t~u) -> A(w~p,t~u) @ 1 (File "sym3.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(w~,t~)
 
-	Applying rule File "sym3.ka", line 8, characters 0-28::
+	Applying rule A(w~u,t~u) -> A(w~u,t~p) @ 1 (File "sym3.ka", line 7, characters 0-28:):
+		the precondition is satisfied
+
+		Updating the views for A(w~,t~)
+
+	Applying rule A(w~u,t~p) -> A(w~p,t~p) @ 2 (File "sym3.ka", line 8, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(w~,t~)

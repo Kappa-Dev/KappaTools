@@ -14,6 +14,9 @@ let navli () = []
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
 
+let print_string s list = (Html.pcdata s)::list
+let print_newline list = print_string "\n" list
+
 let content () =
   let dead_rules,set_dead_rules = ReactiveData.RList.create [] in
   let _ = React.S.l1
@@ -23,9 +26,35 @@ let content () =
            (fun (manager : Api.concrete_manager) ->
               (Lwt_result.map
                  (fun dead_json ->
+                    let list = Public_data.dead_rules_of_json dead_json in
+                    let list =
+                      if list = []
+                      then
+                        print_string "No dead rules" []
+                      else
+                        List.fold_left
+                          (fun list rule ->
+                             let string1 =
+                               if rule.Public_data.rule_label <> ""
+                               then ("rule '"^rule.Public_data.rule_label^"'")
+                               else if rule.Public_data.rule_ast <> ""
+                               then rule.Public_data.rule_ast
+                               else ("rule "^string_of_int rule.Public_data.rule_id)
+                             in
+                             let buf = Buffer.create 0 in
+                             let fmt = Format.formatter_of_buffer buf in
+                             let () =
+                                 Locality.print fmt rule.Public_data.rule_position
+                             in
+                             let () = Format.pp_flush_formatter fmt in
+                             let string2 = Buffer.contents buf in
+                             let list = print_newline list in
+                             print_string (string2^" "^string1) list
+                          )
+                          [] list
+                    in
                     let () = ReactiveData.RList.set set_dead_rules
-                        [ Html.p [Html.pcdata
-                                    (Yojson.Basic.to_string dead_json) ] ] in
+                        [ Html.p list ] in
                     ())
                  manager#get_dead_rules) >>=
               fun out -> Lwt.return (Api_common.result_lift out)

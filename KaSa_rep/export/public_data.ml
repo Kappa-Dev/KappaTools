@@ -30,6 +30,12 @@ let refinement = "site graph list"
 let domain_name = "domain name"
 let refinements_list = "refinements list"
 let refinement_lemmas="refinement lemmas"
+let rule_id = "id"
+let label = "label"
+let ast = "ast"
+let position = "location"
+let edit = "edit_rule"
+
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -263,21 +269,58 @@ let contact_map_of_json =
 (* dead rules *)
 (**************)
 
-type dead_rules = int list
+type rule =
+  {
+    rule_id: int;
+    rule_label: string ;
+    rule_ast: string;
+    rule_position: Locality.t
+  }
+
+
+type dead_rules = rule list
+
+let rule_to_json rule =
+  `Assoc
+    [
+      rule_id,JsonUtil.of_int rule.rule_id;
+      label, JsonUtil.of_string rule.rule_label;
+      ast, JsonUtil.of_string rule.rule_ast;
+      position,Locality.annot_to_json
+        JsonUtil.of_unit ((),rule.rule_position)
+    ]
+
+let json_to_rule =
+  function
+  | `Assoc l as x when List.length l = 4 ->
+    begin
+      try
+        {
+          rule_id = JsonUtil.to_int (List.assoc rule_id l) ;
+          rule_label =  JsonUtil.to_string (List.assoc label l) ;
+          rule_ast =  JsonUtil.to_string (List.assoc ast l) ;
+          rule_position =
+            snd (Locality.annot_of_json
+               (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+               (List.assoc position l))}
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " rule",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("rule",x))
+
+let dead_rules_to_json json =
+  `Assoc
+    [dead_rules, JsonUtil.of_list rule_to_json json]
 
 let dead_rules_of_json =
   function
-  | `Assoc l as x ->
+  | `Assoc [s,json] as x when s=dead_rules ->
     begin
       try
-        let json = List.assoc dead_rules l in
-        JsonUtil.to_list
-          ~error_msg:"list of dead rules"
-          (JsonUtil.to_int ~error_msg:"dead rule") json
-      with
-      | _ ->
-        raise
-          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead  rules",x))
+        JsonUtil.to_list json_to_rule json
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))

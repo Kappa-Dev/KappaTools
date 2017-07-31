@@ -4,7 +4,7 @@
     * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
     *
     * Creation: 2015, the 9th of Apirl
-    * Last modification: Time-stamp: <Jul 05 2017>
+    * Last modification: Time-stamp: <Jul 31 2017>
     * *
     * ODE fragmentation
     *
@@ -1181,7 +1181,7 @@ let scan_rule_set parameters error handler_kappa compiled =
              (*Print at each rule:*)
              let error, rule_string =
                try
-                 Handler.string_of_rule parameters error handler_kappa compiled rule_id
+                 Handler.string_of_rule parameters error compiled rule_id
                with
                | _ ->
                  Exception.warn

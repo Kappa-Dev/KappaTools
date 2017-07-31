@@ -171,7 +171,7 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
 Reachability analysis...
 
-	Applying rule File "add_remove.ka", line 7, characters 0-33::
+	Applying rule A(x~u), B(x~p) -> A(x~u), A(x~p) @ 1 (File "add_remove.ka", line 7, characters 0-33:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
