@@ -57,7 +57,7 @@ class SnapRender {
                             this.layout.margin.bottom;
         let container = this.container = this.root
             .append("div")
-            .classed("render-container", true)
+            .classed("render-container flex-content", true)
             .style("position", "relative")
             .append("svg")
             .attr("class", "svg-group")
