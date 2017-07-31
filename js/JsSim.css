@@ -284,3 +284,24 @@ form {
     right: 0;
     pointer-events: none;	
 }
+
+#plot-display {
+    min-height:auto !important;
+    flex:1
+}
+
+.show {
+    display:flex !important;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+}
+
+#plot-legend-div {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#snap-form {
+    margin-bottom: 0.5em;
+}
