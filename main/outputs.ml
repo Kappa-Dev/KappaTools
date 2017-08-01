@@ -278,7 +278,8 @@ let print_snapshot sigs f s =
     uuid
     s.Data.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
-         Format.fprintf f "%%init: %i @[<h>%a@]" i
+         Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
+           (List.length mix)
            (Raw_mixture.print
               ~new_syntax:false ~compact:false ~created:false ~sigs)
            mix))

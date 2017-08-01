@@ -194,7 +194,8 @@ let api_snapshot_kappa (snapshot : Api_types_t.snapshot) : string =
     "@[<v>%%def: \"T0\" \"%g\"@,%a@,%a@]"
     snapshot.Api_types_t.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
-         Format.fprintf f "%%init: %i @[<h>%a@]" i
+         Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
+           (Array.length mix)
            print_site_nodes mix))
     snapshot.Api_types_t.snapshot_agents
     (Pp.array Pp.space (fun _ f (el,na) ->

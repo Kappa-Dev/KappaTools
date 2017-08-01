@@ -1,5 +1,5 @@
 # Snapshot [Event: 99]
 %def: "T0" "4.85787"
 
-%init: 1 A(x)
+%init: 1 /*1 agents*/ A(x)
 
