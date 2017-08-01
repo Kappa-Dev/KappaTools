@@ -46,7 +46,7 @@ let content () =
                              let () =
                                  Locality.print fmt rule.Public_data.rule_position
                              in
-                             let () = Format.pp_flush_formatter fmt in
+                             let () = Format.pp_print_flush fmt () in
                              let string2 = Buffer.contents buf in
                              let list = print_newline list in
                              print_string (string2^" "^string1) list
