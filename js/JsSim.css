@@ -16,6 +16,8 @@ body {
     flex: 1;
     flex-direction: column;
     width: 100%;
+    /* for Firefox */
+    min-height: 0;
 }
 
 .tab-pane.row.active {
@@ -166,6 +168,7 @@ rect { stroke-width: 2; }
     min-height: 40px;
     flex: 1;
     overflow: auto;
+    min-height: 0;
 }
 
 .plot-legend-swatch { stroke-width : 1; }
