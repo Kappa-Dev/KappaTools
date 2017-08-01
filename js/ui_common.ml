@@ -256,9 +256,9 @@ let onenavcontent label active classes content =
     ~a:[ Html.a_id label
        ; Html.a_class
            (if active then
-              "tab-pane" :: "active" :: classes
+              "flex-content" :: "tab-pane" :: "active" :: classes
             else
-              "tab-pane" :: classes)
+              "flex-content" :: "tab-pane" :: classes)
        ; Html.Unsafe.string_attrib "role" "tabpanel" ] content
 
 let navcontent ?id classes = function
@@ -271,7 +271,7 @@ let navcontent ?id classes = function
     in
     Html.div
       ~a:([ Html.a_class
-              (["panel-content";"tab-content"]@classes) ; ]@id)
+              (["panel-content";"tab-content";"flex-content"]@classes) ; ]@id)
       (onenavcontent t true cl c ::
        List.map (fun (t,cl,c) -> onenavcontent t false cl c) l)
 

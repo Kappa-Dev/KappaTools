@@ -20,7 +20,7 @@ let rightsubpanel () =
                    (if editor_full then
                       ["hidden"]
                     else
-                      ["col-md-6"; "hidden-xs"; "hidden-sm"])
+                      ["col-md-6"; "hidden-xs"; "hidden-sm"; "flex-content"])
               )
            )
        ]
@@ -44,14 +44,13 @@ let rightsubpanel () =
 let content () =
   [Html.div
      ~a:[
-       Html.a_id "editor-col";
        Tyxml_js.R.Html.a_class
          (React.S.bind
             Subpanel_editor.editor_full
             (fun editor_full ->
                React.S.const
-                 (if editor_full then ["col-md-12"]
-                  else ["col-md-6"])
+                 (if editor_full then ["col-md-12";"flex-content"]
+                  else ["col-md-6";"flex-content"])
             )
          )
      ]

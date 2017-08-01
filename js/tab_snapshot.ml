@@ -304,7 +304,7 @@ let xml () =
              (React.S.map
                 (fun display_format ->
                    match display_format with
-                   | Graph -> ["visible" ]
+                   | Graph -> ["visible flex-content"]
                    | Kappa -> ["hidden"])
                 display_format
              ) ]
@@ -315,7 +315,7 @@ let xml () =
         <label><input type="radio" name="mode" value="sumBySize"> Size</label>
         <button id="resetButton" class="stateButton" type="button"> Reset Zoom </button>
         </form>
-        <div id="|}display_id{|">&nbsp;</div>|}]
+        <div class="flex-content" id="|}display_id{|">&nbsp;</div>|}]
   in
   let format_chooser =
     [%html
@@ -323,7 +323,7 @@ let xml () =
         format_select_id
         {|"><option value="Kappa" selected>kappa</option><option value="Graph">graph</option></select> |} ]
   in
-  [%html {|<div class="navcontent-view">
+  [%html {|<div class="navcontent-view flex-content">
              <div class="row" style="margin : 5px;">
                 <div class="col-sm-2 col-xs-4">
          |}[ format_chooser ]{|

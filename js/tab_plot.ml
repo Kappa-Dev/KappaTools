@@ -138,17 +138,17 @@ let xml () =
     Widget_export.content (configuration ())
   in
   [%html {|
-  <div class="navcontent-view">
+  <div class="navcontent-view flex-content">
       <div class="row">
          <div id="plot-label-div" class="center-block display-header">
             Plot
          </div>
       </div>
-      <div class="row">
-         <div id="|}display_id{|" class="col-sm-12"> |}[ Html.entity "nbsp"]{|
+      <div class="row flex-content">
+         <div id="|}display_id{|" class="col-sm-12 flex-content"> |}[ Html.entity "nbsp"]{|
          </div>
       </div>
-      <div class="row">
+      <div id="plot-legend-div" class="row" >
         <div class="col-sm-1">
              |}[plot_show_legend]{| Legend
         </div>
