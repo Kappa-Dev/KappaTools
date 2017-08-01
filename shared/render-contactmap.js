@@ -144,8 +144,8 @@ class Render {
         this.outerRadius = this.radius - this.padding;
         this.innerRadius = this.radius - this.nodew - this.padding;
         this.siteRadius = 1.5 * this.radius/(this.siteList.length) > 6 ? 6: 1.5 * this.radius/(this.siteList.length);
-        this.renderDonut();
         this.renderLinks();
+        this.renderDonut();
         this.renderSitetoEdgeLinks();
         this.renderStates();
         //this.checkStateCollusion(110);
@@ -774,8 +774,8 @@ class Render {
             links
                 .style("stroke", d => data.getNode(d.source.data.parentId).color.brighter() )
                 .style("stroke-width", 8)
-                .style("stroke-opacity", opacity.line_highlight)
-                .raise();  
+                .style("stroke-opacity", opacity.line_highlight);
+                //.raise();  
 
             selfLoops
                 .style("stroke", node.data.color.brighter())

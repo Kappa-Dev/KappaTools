@@ -16,6 +16,8 @@ body {
     flex: 1;
     flex-direction: column;
     width: 100%;
+    /* for Firefox */
+    min-height: 0;
 }
 
 .col-md-6 {
@@ -170,6 +172,7 @@ rect { stroke-width: 2; }
     min-height: 40px;
     flex: 1;
     overflow: auto;
+    min-height: 0;
 }
 
 .plot-legend-swatch { stroke-width : 1; }
