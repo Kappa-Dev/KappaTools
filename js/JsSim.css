@@ -96,7 +96,7 @@ rect { stroke-width: 2; }
     min-height:40px;
 }
 .panel-content {
-    min-height: 50% !important;
+    min-height: 15% !important;
 }
 .panel-pre {
     white-space : pre;
