@@ -191,7 +191,8 @@ let print_site_nodes f sn =
 
 let api_snapshot_kappa (snapshot : Api_types_t.snapshot) : string =
   Format.asprintf
-    "@[<v>%a@,%a@]"
+    "@[<v>%%def: \"T0\" \"%g\"@,%a@,%a@]"
+    snapshot.Api_types_t.snapshot_time
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i @[<h>%a@]" i
            print_site_nodes mix))
