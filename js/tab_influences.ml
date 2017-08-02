@@ -60,7 +60,7 @@ let content () =
       (React.S.on tab_is_active
          State_project.dummy_model State_project.model) in
   [ Html.div
-      ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
+      ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
       [ accuracy_form; Tyxml_js.R.Html5.p influences ]
   ]
 

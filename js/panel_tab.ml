@@ -6,8 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module Html = Tyxml_js.Html5
-
 let nav_tab_id = "navtabs"
 
 let navtabs () =
@@ -34,7 +32,7 @@ let navcontents () =
      ; "flux",     [],      (Tab_flux.content ())
      ; "snapshot", [],      (Tab_snapshot.content ())
      ; "outputs",  [],      (Tab_outputs.content ())
-     ; "about",    [],      (Tab_about.content ())
+     ; "about",    ["panel-scroll"],      (Tab_about.content ())
   ])
 
 let onload () =

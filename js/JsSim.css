@@ -10,7 +10,6 @@ body {
     height: 100%;
 }
 
-
 .flex-content {
     display: flex;
     flex: 1;
@@ -30,7 +29,8 @@ body {
 }
 
 .kappa-code {
-    white-space : pre;
+    white-space : pre-wrap;
+    word-break: break-all;
     font-family: monospace;
 }
 
@@ -99,14 +99,11 @@ rect { stroke-width: 2; }
     min-height: 15% !important;
 }
 .panel-pre {
-    white-space : pre;
+    white-space : pre-wrap;
+    word-break: break-all;
 }
 .panel-scroll {
-    overflow: scroll;
-    word-wrap: break-word
-}
-.tab-log {
-    flex:1;
+    overflow: auto;
 }
 .filename {
     overflow: hidden;

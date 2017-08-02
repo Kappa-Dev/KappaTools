@@ -164,7 +164,7 @@ let content () =
       (React.S.on tab_is_active
          State_project.dummy_model State_project.model) in
   [ Tyxml_js.R.Html5.div
-      ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
+      ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
       constraints
   ]
 

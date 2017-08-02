@@ -113,6 +113,7 @@ let xml () =
   in
   let file_content =
     [Tyxml_js.R.Html.div
+       ~a:[Html.a_class ["panel-scroll";"flex-content"]]
        (ReactiveData.RList.from_signal
           (React.S.map
              (fun (file : Api_types_j.file_line_detail option) ->

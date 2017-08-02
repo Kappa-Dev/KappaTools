@@ -37,7 +37,7 @@ let content () =
       (React.S.on
          tab_is_active State_simulation.dummy_model State_simulation.model) in
     [ Html.div
-      ~a:[Html.a_class ["panel-pre" ; "panel-scroll" ; "tab-log" ]]
+      ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
       [ Tyxml_js.R.Html.pcdata state_log ]
     ]
 

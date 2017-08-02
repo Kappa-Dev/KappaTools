@@ -282,8 +282,9 @@ let xml () =
       ~a:[ Tyxml_js.R.Html.a_class
              (React.S.map
                 (fun display_format ->
+                   "panel-scroll"::"kappa-code"::"flex-content"::
                    match display_format with
-                   | Kappa -> ["visible" ; "kappa-code" ]
+                   | Kappa -> ["visible"]
                    | Graph -> ["hidden"])
                 display_format
              )
@@ -303,8 +304,9 @@ let xml () =
       ~a:[ Tyxml_js.R.Html.a_class
              (React.S.map
                 (fun display_format ->
+                   "flex-content"::
                    match display_format with
-                   | Graph -> ["visible flex-content"]
+                   | Graph -> ["visible"]
                    | Kappa -> ["hidden"])
                 display_format
              ) ]
