@@ -35,8 +35,8 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
         Configuration.parse compil.Ast.configurations in
       Some
         (LKappa.init_of_ast
-           ~syntax_version sigs_nd contact_map tk_nd.NamedDecls.finder
-           alg_finder compil.Ast.init),
+           ~syntax_version sigs_nd contact_map ~with_counters:true
+           tk_nd.NamedDecls.finder alg_finder compil.Ast.init),
       conf.Configuration.initial in
   conf, progressConf,
   story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,alg_finder,
@@ -116,8 +116,8 @@ let get_pack_from_marshalizedfile
       let raw_inits =
         LKappa.init_of_ast
           ~syntax_version:conf'.Configuration.syntaxVersion
-          (Model.signatures env) contact (Model.tokens_finder env)
-          (Model.algs_finder env) compil.Ast.init in
+          (Model.signatures env) contact ~with_counters:true
+          (Model.tokens_finder env) (Model.algs_finder env) compil.Ast.init in
       let inits = Eval.compile_inits ?rescale:kasim_args.Kasim_args.rescale
           ~compileModeOn:false contact env raw_inits in
       (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
