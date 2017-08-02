@@ -717,7 +717,10 @@ class Render {
                         .curve(d3.curveBundle.beta(1));
 
         gSiteNodes
-            .filter(function(d) {for (let link in d.links) {return d.links[link].siteId === d.id && d.links[link].nodeId === d.getAgent().id; }})
+            .filter(function(d) {
+                console.log(d);
+                console.log(d.links);
+                for (let link in d.links) {return d.links[link].siteId === d.id && d.links[link].nodeId === d.getAgent().id; }})
             .append("path")
             .attr("d", function(d) {
                 let pathObj = d.generateSelfLoopPath(innerRadius);
