@@ -174,39 +174,6 @@ let xml () =
 let content () : [> Html_types.div ] Html.elt list =
   [Ui_common.toggle_element (fun s -> has_plot s ) (xml ()) ]
 
-let dimension_ref : Js_plot.plot_dimension Js.t option ref = ref None
-let calculate_dimension () =
-  let min_width = 400 in
-  let min_height = 100 in
-  let offset_width = 100 in
-  let offset_height = 250 in
-  let width =
-    max
-      min_width
-      ((Js.Optdef.get
-          (Dom_html.window##.innerWidth)
-          (fun () -> assert false)) - offset_width)
-  in
-  let height =
-    max
-      min_height
-      ((Js.Optdef.get
-          (Dom_html.window##.innerHeight)
-          (fun () -> assert false)) - offset_height)
-  in
-  let dimension =
-    Js_plot.create_dimension
-      ~height:height
-      ~width:width
-  in
-  let () = dimension_ref := Some dimension
-  in dimension
-
-let get_dimension () =
-  match !dimension_ref with
-  | None -> calculate_dimension ()
-  | Some dimension -> dimension
-
 let simulation_info_offset_max (simulation_info : Api_types_j.simulation_info) : int =
   let plot_size = simulation_info.Api_types_j.simulation_info_output.Api_types_j.simulation_output_plot in
   max 0 (plot_size - (React.S.value point))
@@ -259,7 +226,6 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
       (Api_common.result_bind_lwt
          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
              let plot = plot_detail.Api_types_j.plot_detail_plot in
-             let () = js_plot##setDimensions(get_dimension ()) in
              let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
              let () = js_plot##setPlot(data) in
              Lwt.return (Api_common.result_ok ())
@@ -367,7 +333,6 @@ let navli () = []
 
 let onresize () =
   (* recalcuate size *)
-  let _ = calculate_dimension () in
   let () =
     match !plot_ref with
     | None -> ()

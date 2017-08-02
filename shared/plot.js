@@ -206,7 +206,7 @@ function observable_plot(configuration){
     this.renderPlot = function(){
         // set margin
         var margin = {top: 20, right: 80, bottom: 30, left: 80},
-            dimensions = that.getDimensions() ,
+            dimensions = d3.select("#plot-display").node().getBoundingClientRect(),
             width = dimensions.width - margin.left - margin.right,
             height = dimensions.height - margin.top - margin.bottom;
 
@@ -615,19 +615,6 @@ function observable_plot(configuration){
     }
     this.getYAxisLog = function(){
         return that.yAxisLog;
-    }
-
-    this.dimensions = { width : 960 , height : 500 };
-    this.setDimensions = function(dimensions) {
-        /*
-        that.dimensions = dimensions;
-        */
-    }
-    this.getDimensions = function(){
-        let display_dimensions = d3.select("#plot-display").node().getBoundingClientRect();
-        that.dimensions.width = display_dimensions.width;
-        that.dimensions.height = display_dimensions.height;
-        return that.dimensions;
     }
 
     /* define how to export to tsv */

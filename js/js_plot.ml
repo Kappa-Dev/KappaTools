@@ -56,22 +56,6 @@ let create_configuration
     ()
   in configuration
 
-class type plot_dimension = object
-  val height : int Js.t Js.prop
-  val width : int Js.t Js.prop
-end
-
-let constructor_dimension : plot_dimension Js.t Js.constr =
-  (Js.Unsafe.variable "Object")
-let create_dimension ~(height : int)
-    ~(width : int)
-  : plot_dimension Js.t  =
-  let configuration : plot_dimension Js.t = new%js constructor_dimension in
-  let () = (Js.Unsafe.coerce configuration)##.height := height;
-    (Js.Unsafe.coerce configuration)##.width := width;
-    ()
-  in configuration
-
 class type plot_observable =
   object
     method time : float Js.prop
@@ -122,8 +106,6 @@ class type observable_plot =
     method handlePlotTSV : unit -> unit Js.meth
     method getPlotName : (unit -> Js.js_string Js.t) Js.meth
     method setPlotName : Js.js_string Js.t -> unit Js.meth
-    method getDimensions : (unit -> plot_dimension Js.t) Js.meth
-    method setDimensions : plot_dimension Js.t -> unit Js.meth
   end;;
 
 let create_observable_plot
