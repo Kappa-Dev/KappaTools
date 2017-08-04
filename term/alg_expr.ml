@@ -394,7 +394,7 @@ let rec stops_of_bool vars_deps = function
     | Operator.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
       begin match a1,b1 with
         | STATE_ALG_OP (Operator.TIME_VAR), CONST n
-        | CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
+        | CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [(None, n)]
         | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
           | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
           | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |

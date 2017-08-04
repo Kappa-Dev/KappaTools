@@ -125,4 +125,4 @@ val propagate_constant_bool :
 val stops_of_bool :
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ('a,int) bool -> Nbr.t list
+  ('a,int) bool -> (Nbr.t option * Nbr.t) list

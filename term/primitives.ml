@@ -516,7 +516,7 @@ let modification_of_yojson = function
 
 type perturbation =
   { precondition:
-      (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+      Nbr.t option * (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
       Alg_expr.bool Locality.annot option;
@@ -534,7 +534,7 @@ let bool_expr_of_yojson =
 
 let perturbation_to_yojson p =
   JsonUtil.smart_assoc [
-    "condition", Locality.annot_to_json bool_expr_to_yojson p.precondition;
+    "condition", Locality.annot_to_json bool_expr_to_yojson (snd p.precondition);
     "effect", JsonUtil.of_list modification_to_yojson p.effect;
     "abort",
     JsonUtil.of_option (Locality.annot_to_json bool_expr_to_yojson) p.abort ]
@@ -546,26 +546,26 @@ let perturbation_of_yojson = function
   | `Assoc [ "abort", p; "condition", c; "effect", e ]
   | `Assoc [ "effect", e; "abort", p; "condition", c ]
   | `Assoc [ "abort", p; "effect", e; "condition", c ] -> {
-      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      precondition = (None, Locality.annot_of_json bool_expr_of_yojson c);
       effect = JsonUtil.to_list modification_of_yojson e;
       abort =
         JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
     }
   | `Assoc [ "condition", c; "effect", e ]
   | `Assoc [ "effect", e; "condition", c ] -> {
-      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
       effect = JsonUtil.to_list modification_of_yojson e;
       abort = None
     }
   | `Assoc [ "condition", c; "abort", p ]
   | `Assoc [ "abort", p; "condition", c ] -> {
-      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
       effect = [];
       abort =
         JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
     }
   | `Assoc [ "condition", c ] -> {
-      precondition = Locality.annot_of_json bool_expr_of_yojson c;
+      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
       effect = [];
       abort = None
     }
@@ -642,19 +642,19 @@ let map_expr_modification f = function
   | SPECIES (p,x,t) -> SPECIES ((map_expr_print f p),x,t)
 
 let map_expr_perturbation f_alg f_bool x =
-  { precondition = f_bool x.precondition;
+  { precondition = (fst x.precondition), f_bool (snd x.precondition);
     effect = List.map (map_expr_modification f_alg) x.effect;
     abort = Option_util.map f_bool x.abort;
   }
 
 let stops_of_perturbation algs_deps x =
   let stopping_time =
-    try Alg_expr.stops_of_bool algs_deps (fst x.precondition)
+    try Alg_expr.stops_of_bool algs_deps (fst (snd x.precondition))
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl
            ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-           ,snd x.precondition))
+           ,snd (snd x.precondition)))
   in
   match x.abort with
   | None -> stopping_time

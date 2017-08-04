@@ -372,7 +372,7 @@ let pert_of_result
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
         let pert =
-          { Primitives.precondition = pre;
+          { Primitives.precondition = (None, pre);
             Primitives.effect = effects;
             Primitives.abort = opt;
           } in
@@ -558,7 +558,7 @@ let build_initial_state
       (fun i acc p ->
          let s = Primitives.stops_of_perturbation
              (Model.all_dependencies env) p in
-         List.fold_left (fun acc s -> (s,i)::acc) acc s)
+         List.fold_left (fun acc (r,s) -> (r,s,i)::acc) acc s)
       [] env in
   let graph0 = Rule_interpreter.empty
       ~with_trace random_state env counter in

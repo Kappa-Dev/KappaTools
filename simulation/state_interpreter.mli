@@ -10,7 +10,9 @@
 
 type t (** Abstract state *)
 
-val empty : with_delta_activities:bool -> Model.t -> (Nbr.t * int) list -> t
+val empty :
+  with_delta_activities:bool -> Model.t -> (Nbr.t option * Nbr.t * int) list ->
+  t
 (** [empty ~with_delta_activities env stopping_times] *)
 
 val initialize :

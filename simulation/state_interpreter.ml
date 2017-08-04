@@ -7,8 +7,8 @@
 (******************************************************************************)
 
 type t = {
-  init_stopping_times : (Nbr.t * int) list;
-  mutable stopping_times : (Nbr.t * int) list;
+  init_stopping_times : (Nbr.t option * Nbr.t * int) list;
+  mutable stopping_times : (Nbr.t option * Nbr.t * int) list;
   perturbations_alive : bool array;
   time_dependent_perts : int list;
   mutable active_perturbations : int list;
@@ -20,7 +20,7 @@ type t = {
 
 let empty ~with_delta_activities env stopping_times =
   let stops =
-    List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times in
+    List.sort (fun (_,a,_) (_,b,_) -> Nbr.compare a b) stopping_times in
   let time_dependent_perts =
     let rec aux dep acc =
       Operator.DepSet.fold
@@ -159,7 +159,7 @@ let rec perturbate ~outputs env counter graph state = function
     if state.perturbations_alive.(i) &&
        state.perturbations_not_done_yet.(i) &&
        Rule_interpreter.value_bool
-         counter graph (fst pert.Primitives.precondition)
+         counter graph (fst (snd pert.Primitives.precondition))
     then
       let (stop,graph,state as acc,extra) =
         List.fold_left (fun ((stop,graph,state),extra as acc) effect ->
@@ -348,8 +348,11 @@ let a_loop
                  (Counter.current_event counter)
                  (Counter.current_time counter) activity) in
         (true,graph,state)
-      | (ti,pe) :: tail ->
-        let () = state.stopping_times <- tail in
+      | (rt,ti,pe) :: tail ->
+         let tail' = match rt with
+           | None -> tail
+           | Some repeat_time -> (rt,(Nbr.add ti repeat_time),pe)::tail in
+        let () = state.stopping_times <- tail' in
         let continue = Counter.one_time_correction_event counter ti in
         let () =
           Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
@@ -359,9 +362,12 @@ let a_loop
     else
       (*activity is positive*)
       match state.stopping_times with
-      | (ti,pe) :: tail
+      | (rt,ti,pe) :: tail
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-        let () = state.stopping_times <- tail in
+         let tail' = match rt with
+           | None -> tail
+           | Some repeat_time -> (rt,(Nbr.add ti repeat_time),pe)::tail in
+        let () = state.stopping_times <- tail' in
         let continue = Counter.one_time_correction_event counter ti in
         let () =
           Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in

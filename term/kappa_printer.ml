@@ -185,7 +185,7 @@ let perturbation ?env f pert =
   let aux f =
     Format.fprintf
       f "%a do %a"
-      (bool_expr ?env) (fst pert.Primitives.precondition)
+      (bool_expr ?env) (fst (snd pert.Primitives.precondition))
       (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with

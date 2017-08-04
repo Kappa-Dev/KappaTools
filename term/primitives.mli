@@ -123,7 +123,7 @@ type modification =
 
 type perturbation =
   { precondition:
-      (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+      Nbr.t option * (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
         Alg_expr.bool Locality.annot option;
@@ -152,4 +152,4 @@ val map_expr_perturbation :
 val stops_of_perturbation :
   (Operator.DepSet.t * Operator.DepSet.t *
    Operator.DepSet.t array * Operator.DepSet.t array) ->
-  perturbation -> Nbr.t list
+  perturbation -> (Nbr.t option * Nbr.t) list
