@@ -861,7 +861,7 @@ let translate_compil parameters error compil =
     List.fold_left
       (fun (error,list) ((b,m,o),p) ->
          let error,b' =
-           bool_with_pos_map (refine_mixture parameters) error b
+           bool_with_pos_map (refine_mixture parameters) error (snd b)
          in
          let error,o' =
            bool_with_pos_with_option_map (refine_mixture parameters) error o
@@ -908,7 +908,7 @@ let translate_compil parameters error compil =
              (error,[])
              m
          in
-         error,((b',List.rev m'(*,p*),o'),p)::list
+         error,(((fst b,b'),List.rev m'(*,p*),o'),p)::list
       )
       (error,[])
       compil.Ast.perturbations

@@ -158,7 +158,7 @@ instruction:
 	      "perturbation"
 	      (fun f -> Format.pp_print_string
 			  f "use the 'repeat ... until' construction");
-	    Ast.PERT (add_pos ($2,$4,Some $6))}
+	    Ast.PERT (add_pos ((None,$2),$4,Some $6))}
     ;
 
 init_declaration:
@@ -184,7 +184,7 @@ value_list:
 
 perturbation_declaration:
     | OP_PAR perturbation_declaration CL_PAR {$2}
-    | bool_expr DO effect_list {($1,$3)}
+    | bool_expr DO effect_list {((None,$1),$3)}
     | bool_expr SET effect_list
 		{ExceptionDefn.deprecated
 		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
@@ -192,7 +192,7 @@ perturbation_declaration:
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
 			       f "'set' keyword is replaced by 'do'");
-		 ($1,$3)} /*For backward compatibility*/
+		 ((None,$1),$3)} /*For backward compatibility*/
     ;
 
 standalone_effect_list: effect_list EOF {$1}

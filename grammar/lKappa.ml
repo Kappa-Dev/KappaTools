@@ -1297,7 +1297,8 @@ let perturbation_of_ast
   let mods',up_vars' =
     List_util.fold_right_map
       (modif_expr_of_ast ~new_syntax sigs tok algs contact_map) mods up_vars in
-  ((bool_expr_of_ast ~new_syntax sigs tok algs pre,mods',
+  ((((fst pre),bool_expr_of_ast ~new_syntax sigs tok algs (snd pre)),
+    mods',
     match post with
     | None -> None
     | Some post -> Some (bool_expr_of_ast ~new_syntax sigs tok algs post)),pos),

@@ -90,7 +90,7 @@ type ('mixture,'id) modif_expr =
        * 'mixture Locality.annot)
 
 type ('mixture,'id) perturbation =
-  (('mixture,'id) Alg_expr.bool Locality.annot *
+  ((Nbr.t option * ('mixture,'id) Alg_expr.bool Locality.annot) *
    (('mixture,'id) modif_expr list) *
    ('mixture,'id) Alg_expr.bool Locality.annot option) Locality.annot
 
@@ -795,7 +795,7 @@ let compil_to_json c =
            (fun (pre,modif,post) ->
               `List [
                 Locality.annot_to_json
-                  (Alg_expr.bool_to_yojson mix_to_json var_to_json) pre;
+                  (Alg_expr.bool_to_yojson mix_to_json var_to_json) (snd pre);
                 JsonUtil.of_list (modif_to_json mix_to_json var_to_json) modif;
                 JsonUtil.of_option
                   (Locality.annot_to_json
@@ -862,9 +862,9 @@ let compil_of_json = function
               (Locality.annot_of_json
                  (function
                    | `List [pre; modif; post] ->
-                     (Locality.annot_of_json
+                      ((None,(Locality.annot_of_json
                         (Alg_expr.bool_of_yojson mix_of_json var_of_json)
-                        pre,
+                        pre)),
                       JsonUtil.to_list
                         (modif_of_json mix_of_json var_of_json) modif,
                       JsonUtil.to_option

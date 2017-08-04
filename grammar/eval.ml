@@ -347,7 +347,7 @@ let pert_of_result
         ((pre_expr, modif_expr_list, opt_post),_) ->
         let origin = Operator.PERT p_id in
         let (domain',pre) =
-          compile_bool ?bwd_bisim ~compileModeOn ~origin contact_map domain pre_expr in
+          compile_bool ?bwd_bisim ~compileModeOn ~origin contact_map domain (snd pre_expr) in
         let alg_deps' = Alg_expr.add_dep_bool alg_deps origin pre in
         let (domain, effects) =
           effects_of_modifs
@@ -372,7 +372,7 @@ let pert_of_result
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
         let pert =
-          { Primitives.precondition = (None, pre);
+          { Primitives.precondition = (fst pre_expr),pre;
             Primitives.effect = effects;
             Primitives.abort = opt;
           } in

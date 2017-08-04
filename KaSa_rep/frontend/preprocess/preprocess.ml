@@ -1770,7 +1770,7 @@ let bool_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.bool_map
 
 let bool_with_pos_with_option_map = Prepreprocess.with_option_map bool_with_pos_map
 
-let translate_perturb parameters error handler ((bool1,modif,bool2),pos2) =
+let translate_perturb parameters error handler (((rt,bool1),modif,bool2),pos2) =
   let error,bool1' = bool_with_pos_map (lift_allowing_question_marks parameters handler) error bool1 in
   let error,modif' =
     List.fold_left
@@ -1780,7 +1780,7 @@ let translate_perturb parameters error handler ((bool1,modif,bool2),pos2) =
       (error,[]) (List.rev modif)
   in
   let error,bool2' = bool_with_pos_with_option_map (lift_allowing_question_marks parameters handler) error bool2 in
-  error,((bool1',modif',bool2'),pos2)
+  error,(((rt,bool1'),modif',bool2'),pos2)
 
 let translate_c_compil parameters error handler compil =
   let error,c_signatures =
