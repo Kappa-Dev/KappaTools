@@ -794,8 +794,10 @@ let compil_to_json c =
         (Locality.annot_to_json
            (fun (pre,modif,post) ->
               `List [
-                Locality.annot_to_json
-                  (Alg_expr.bool_to_yojson mix_to_json var_to_json) (snd pre);
+                `List [
+                  JsonUtil.of_option (fun n -> Nbr.to_yojson n) (fst pre);
+                  Locality.annot_to_json
+                    (Alg_expr.bool_to_yojson mix_to_json var_to_json) (snd pre)];
                 JsonUtil.of_list (modif_to_json mix_to_json var_to_json) modif;
                 JsonUtil.of_option
                   (Locality.annot_to_json
@@ -862,9 +864,17 @@ let compil_of_json = function
               (Locality.annot_of_json
                  (function
                    | `List [pre; modif; post] ->
-                      ((None,(Locality.annot_of_json
-                        (Alg_expr.bool_of_yojson mix_of_json var_of_json)
-                        pre)),
+                      let pre_of_json = match pre with
+                        | `List [n; c] ->
+                           JsonUtil.to_option (fun n -> Nbr.of_yojson n) n,
+                           (Locality.annot_of_json
+                              (Alg_expr.bool_of_yojson mix_of_json var_of_json)
+                              c)
+                        | x ->
+                           raise
+                             (Yojson.Basic.Util.Type_error
+                                ("Invalid perturbation",x)) in
+                      (pre_of_json,
                       JsonUtil.to_list
                         (modif_of_json mix_of_json var_of_json) modif,
                       JsonUtil.to_option

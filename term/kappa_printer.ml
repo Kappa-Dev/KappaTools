@@ -182,6 +182,11 @@ let modification ?env f m =
       (print_expr ?env) fn
 
 let perturbation ?env f pert =
+  let aux_rtime f =
+    match (fst pert.Primitives.precondition) with
+    | None -> ()
+    | Some n -> Format.fprintf f "every %a " Nbr.print n
+  in
   let aux f =
     Format.fprintf
       f "%a do %a"
@@ -189,7 +194,7 @@ let perturbation ?env f pert =
       (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with
-  | None -> Format.fprintf f "%%mod: %t" aux
+  | None -> Format.fprintf f "%%mod: %t%t" aux_rtime aux
   | Some (ab,_) ->
     Format.fprintf f "%%mod: repeat %t until %a" aux (bool_expr ?env) ab
 

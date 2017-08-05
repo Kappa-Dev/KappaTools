@@ -534,10 +534,19 @@ let bool_expr_of_yojson =
 
 let perturbation_to_yojson p =
   JsonUtil.smart_assoc [
-    "condition", Locality.annot_to_json bool_expr_to_yojson (snd p.precondition);
+    "condition",
+    `List [JsonUtil.of_option (fun n -> Nbr.to_yojson n) (fst p.precondition);
+           Locality.annot_to_json bool_expr_to_yojson (snd p.precondition)];
     "effect", JsonUtil.of_list modification_to_yojson p.effect;
     "abort",
     JsonUtil.of_option (Locality.annot_to_json bool_expr_to_yojson) p.abort ]
+
+let precondition_of_yojson = function
+  | `List [n; c] ->
+     JsonUtil.to_option (fun n -> Nbr.of_yojson n) n,
+     Locality.annot_of_json bool_expr_of_yojson c
+  | x -> raise
+           (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
 
 let perturbation_of_yojson = function
   | `Assoc [ "condition", c; "effect", e; "abort", p ]
@@ -546,26 +555,26 @@ let perturbation_of_yojson = function
   | `Assoc [ "abort", p; "condition", c; "effect", e ]
   | `Assoc [ "effect", e; "abort", p; "condition", c ]
   | `Assoc [ "abort", p; "effect", e; "condition", c ] -> {
-      precondition = (None, Locality.annot_of_json bool_expr_of_yojson c);
+      precondition = precondition_of_yojson c;
       effect = JsonUtil.to_list modification_of_yojson e;
       abort =
         JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
     }
   | `Assoc [ "condition", c; "effect", e ]
   | `Assoc [ "effect", e; "condition", c ] -> {
-      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
+      precondition = precondition_of_yojson c;
       effect = JsonUtil.to_list modification_of_yojson e;
       abort = None
     }
   | `Assoc [ "condition", c; "abort", p ]
   | `Assoc [ "abort", p; "condition", c ] -> {
-      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
+      precondition = precondition_of_yojson c;
       effect = [];
       abort =
         JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
     }
   | `Assoc [ "condition", c ] -> {
-      precondition = (None,Locality.annot_of_json bool_expr_of_yojson c);
+      precondition = precondition_of_yojson c;
       effect = [];
       abort = None
     }
