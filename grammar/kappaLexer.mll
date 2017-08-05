@@ -53,6 +53,7 @@ rule token = parse
 	 | "->" {KAPPA_RAR}
 	 | "<-" {LAR}
 	 | "<>" {DIFF}
+	 | "every" {EVERY}
 	 | pert as s {match s with
 		      | "$DEL" -> DELETE
 		      | "$ADD" -> INTRO

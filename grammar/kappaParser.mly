@@ -19,7 +19,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE
+%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE EVERY
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -122,9 +122,29 @@ instruction:
     | PLOT alg_expr {Ast.PLOT $2}
     | PLOT error {raise (ExceptionDefn.Syntax_Error
 			   (add_pos "Malformed plot instruction, an algebraic expression is expected"))}
+    | PERT EVERY FLOAT perturbation_declaration UNTIL bool_expr
+      	   {let (bool_expr,mod_expr_list) = $4 in
+	    let () = if List.exists
+			  (fun effect ->
+			   match effect with
+			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
+			      | Ast.FLUX _ | Ast.FLUXOFF _
+			      | Ast.SPECIES_OF _) -> true
+			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
+			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
+			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
+			  ) mod_expr_list
+		     then
+		       ExceptionDefn.warning
+			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
+					       (Parsing.symbol_end_pos ()))
+			 (fun f ->
+			  Format.pp_print_string
+			    f "Perturbation need not be applied repeatedly") in
+	    Ast.PERT (add_pos ((Some (Nbr.F $3),bool_expr),mod_expr_list,Some $6))}
     | PERT perturbation_declaration
 	   {let (bool_expr,mod_expr_list) = $2 in
-	    Ast.PERT (add_pos (bool_expr,mod_expr_list,None))}
+	    Ast.PERT (add_pos ((None,bool_expr),mod_expr_list,None))}
     | PERT REPEAT perturbation_declaration UNTIL bool_expr
 	   {let (bool_expr,mod_expr_list) = $3 in
 	    let () = if List.exists
@@ -144,7 +164,7 @@ instruction:
 			 (fun f ->
 			  Format.pp_print_string
 			    f "Perturbation need not be applied repeatedly") in
-	    Ast.PERT (add_pos (bool_expr,mod_expr_list,Some $5))}
+	    Ast.PERT (add_pos ((None,bool_expr),mod_expr_list,Some $5))}
     | PERT REPEAT perturbation_declaration error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Expect \"until\" statement"))}
@@ -184,7 +204,7 @@ value_list:
 
 perturbation_declaration:
     | OP_PAR perturbation_declaration CL_PAR {$2}
-    | bool_expr DO effect_list {((None,$1),$3)}
+    | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
 		{ExceptionDefn.deprecated
 		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
@@ -192,7 +212,7 @@ perturbation_declaration:
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
 			       f "'set' keyword is replaced by 'do'");
-		 ((None,$1),$3)} /*For backward compatibility*/
+		 ($1,$3)} /*For backward compatibility*/
     ;
 
 standalone_effect_list: effect_list EOF {$1}
@@ -274,6 +294,7 @@ variable_declaration:
     ;
 
 bool_expr:
+  /*empty*/ {add_pos Alg_expr.TRUE}
     | OP_PAR bool_expr CL_PAR {$2}
     | TRUE {add_pos Alg_expr.TRUE}
     | FALSE {add_pos Alg_expr.FALSE}
