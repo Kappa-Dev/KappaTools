@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Jul 05 2017>
+  * Last modification: Time-stamp: <Aug 01 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -68,6 +68,28 @@ You will get an identifier.
 Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
+
+(*type t = ((int list) * (int*int) list) array array*)
+
+let convert_contact_map_to_graph parameters error internal_contact_map =
+  Ckappa_sig.Agent_map_and_set.Map.fold
+    (fun agent site_map error ->
+       Ckappa_sig.Site_map_and_set.Map.fold (fun site (sl, ps) error ->
+           List.fold_left (fun error s ->
+               List.fold_left  (fun error (a, si)->
+                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                     "agent:%i:site:%i -> agent:%i:site:%i\n"
+                     (Ckappa_sig.int_of_agent_name agent)
+                     (Ckappa_sig.int_of_site_name site)
+                     (Ckappa_sig.int_of_agent_name a)
+                     (Ckappa_sig.int_of_site_name si)
+                   in
+                   error
+                 ) error ps
+             ) error sl
+         ) site_map error
+    ) internal_contact_map error
+
 
 let convert_int_to_nodes parameters error handler contact_map  =
   let agents_sites_dic = handler.Cckappa_sig.agents_sites_dic in

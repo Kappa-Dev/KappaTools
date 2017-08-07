@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Jul 31 2017>
+  * Last modification: Time-stamp: <Aug 01 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -53,7 +53,7 @@ sig
 
   val get_c_compilation: state -> state * c_compilation
 
-  (*work in process*)
+  (*WORK IN PROCESS*)
   val get_graph_scc : state -> state * Graphs.node list
 
   val get_contact_map:

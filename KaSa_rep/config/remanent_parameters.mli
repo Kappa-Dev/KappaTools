@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Jun 12 2017>
+  * Last modification: Time-stamp: <Aug 01 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -21,9 +21,11 @@ val get_parameters:
   ?html_mode:bool ->
   called_from:Remanent_parameters_sig.called_from ->
   unit -> Remanent_parameters_sig.parameters
+
 val dummy_parameters: called_from:Remanent_parameters_sig.called_from -> unit -> Remanent_parameters_sig.parameters
 
 val get_called_from: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.called_from
+
 val get_logger: Remanent_parameters_sig.parameters -> Loggers.t
 val get_logger_err: Remanent_parameters_sig.parameters -> Loggers.t
 

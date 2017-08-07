@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Apr 26 2017>
+  * Last modification: Time-stamp: <Aug 01 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
