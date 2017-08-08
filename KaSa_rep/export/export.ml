@@ -19,8 +19,7 @@ let warn parameters mh pos exn default =
 (*module signatures*)
 
 module Export =
-  functor (Reachability:Analyzer.Analyzer) ->
-  struct
+  functor (Reachability:Analyzer.Analyzer) -> struct
 
 type state =
   (Reachability.static_information,
@@ -520,6 +519,7 @@ let convert_id x nrules =
 
 (******************************************************************)
 (*quark map *)
+(******************************************************************)
 
 let compute_quark_map show_title state =
   let parameters = Remanent_state.get_parameters state in
@@ -550,33 +550,6 @@ let get_quark_map =
     ~log_prefix:"Quarks:"
     Remanent_state.get_quark_map
     compute_quark_map
-
-(******************************************************************)
-
-let compute_map_gen
-    (get: ?accuracy_level:Public_data.accuracy_level ->
-     (Reachability.static_information,
-      Reachability.dynamic_information)
-       Remanent_state.state ->
-     (Reachability.static_information,
-      Reachability.dynamic_information)
-       Remanent_state.state * 'a )
-    store convert ?(accuracy_level=Public_data.Low)
-    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
-    ?log_title
-    state =
-  let show_title =
-    match log_title with
-    | None -> (fun _ -> ())
-    | Some log_title ->
-      compute_show_title do_we_show_title (log_title accuracy_level)
-  in
-  let () = show_title state in
-  let state, internal =
-    get ~accuracy_level state
-  in
-  let state, rep = convert (fun _ -> ()) state internal in
-  store accuracy_level rep state, rep
 
 (******************************************************************)
 (*Reachability*)
@@ -1013,6 +986,30 @@ let get_internal_influence_map
   | Public_data.High | Public_data.Full ->
     get_high_res_internal_influence_map state
 
+let compute_map_gen
+    (get: ?accuracy_level:Public_data.accuracy_level ->
+     (Reachability.static_information,
+      Reachability.dynamic_information)
+       Remanent_state.state ->
+     (Reachability.static_information,
+      Reachability.dynamic_information)
+       Remanent_state.state * 'a )
+    store convert ?(accuracy_level=Public_data.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title state =
+  let show_title =
+    match log_title with
+    | None -> (fun _ -> ())
+    | Some log_title ->
+      compute_show_title do_we_show_title (log_title accuracy_level)
+  in
+  let () = show_title state in
+  let state, internal =
+    get ~accuracy_level state
+  in
+  let state, rep = convert (fun _ -> ()) state internal in
+  store accuracy_level rep state, rep
+
 let compute_influence_map
     ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
   compute_map_gen
@@ -1077,6 +1074,7 @@ let dump_influence_map ?accuracy_level:(accuracy_level=Public_data.Low) state =
 
 (******************************************************************)
 (*contact map*)
+(******************************************************************)
 
 let get_most_accurate_contact_map state =
   let map = Remanent_state.get_contact_map_map state in
@@ -1283,6 +1281,8 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
+(*internal contact map*)
+
 let output_internal_contact_map ?logger
     ?accuracy_level:(accuracy_level=Public_data.Low) state =
   let parameters = Remanent_state.get_parameters state in
@@ -1293,6 +1293,8 @@ let output_internal_contact_map ?logger
     Preprocess.dot_of_contact_map ?logger parameters error handler contact_map
   in
   set_errors error state
+
+(*contact map interge *)
 
 let compute_contact_map_int show_title state =
   let state, _, _, contactmap =
@@ -1307,7 +1309,6 @@ let get_contact_map_int =
 
 (*Raw contact map*)
 
-
 let compute_raw_contact_map show_title state =
   let sol = ref Mods.StringSetMap.Map.empty in
   let state, handler = get_prehandler state in
@@ -1316,16 +1317,16 @@ let compute_raw_contact_map show_title state =
   let add_link (a,b) (c_id,d_id) sol =
     let sol_a = Mods.StringSetMap.Map.find_default
         Mods.StringSetMap.Map.empty a sol in
-    let l,old = Mods.StringSetMap.Map.find_default
-        ([],[]) b sol_a in
+    let l,old =
+      Mods.StringSetMap.Map.find_default ([],[]) b sol_a
+    in
     Mods.StringSetMap.Map.add a
       (Mods.StringSetMap.Map.add b
          (l,((Ckappa_sig.int_of_agent_name c_id,
               Ckappa_sig.int_of_site_name d_id)::old)) sol_a) sol
   in
-  let add_link (a,b)   (a_id,b_id) (c,d) (c_id,d_id) sol =
-    add_link (a,b) (c_id,d_id)
-      (add_link (c,d) (a_id,b_id) sol)
+  let add_link (a,b) (a_id,b_id) (c,d) (c_id,d_id) sol =
+    add_link (a,b) (c_id,d_id) (add_link (c,d) (a_id,b_id) sol)
   in
   (*----------------------------------------------------------------*)
   let add_internal_state (a,b) c sol =
@@ -1481,7 +1482,7 @@ let get_signature =
 (******************************************************************)
 (*work in process*)
 
-let compute_graph_scc show_title state =
+(*let compute_graph_scc show_title state =
   let state, handler = get_handler state in
   let state, contact_map = get_contact_map_int state in
   let () = show_title state in
@@ -1511,7 +1512,7 @@ let get_graph_scc =
     ~log_prefix:"Graphs scc:"
     ~log_title:"Graphs scc"
     Remanent_state.get_graph_scc
-    compute_graph_scc
+    compute_graph_scc*)
 
 (******************************************************************)
 (*Dump*)
@@ -1553,6 +1554,7 @@ let get_dead_rules  =
 
 (******************************************************************)
 (*Dead agents*)
+(******************************************************************)
 
 let compute_dead_agents _show_title state =
   let state,_ = get_reachability_analysis state in

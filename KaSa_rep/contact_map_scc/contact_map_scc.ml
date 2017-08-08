@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Aug 01 2017>
+  * Last modification: Time-stamp: <Aug 07 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -71,24 +71,17 @@ and conversely, the pair from the id.
 
 (*type t = ((int list) * (int*int) list) array array*)
 
-let convert_contact_map_to_graph parameters error internal_contact_map =
-  Ckappa_sig.Agent_map_and_set.Map.fold
-    (fun agent site_map error ->
-       Ckappa_sig.Site_map_and_set.Map.fold (fun site (sl, ps) error ->
-           List.fold_left (fun error s ->
-               List.fold_left  (fun error (a, si)->
-                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                     "agent:%i:site:%i -> agent:%i:site:%i\n"
-                     (Ckappa_sig.int_of_agent_name agent)
-                     (Ckappa_sig.int_of_site_name site)
-                     (Ckappa_sig.int_of_agent_name a)
-                     (Ckappa_sig.int_of_site_name si)
-                   in
-                   error
-                 ) error ps
-             ) error sl
-         ) site_map error
-    ) internal_contact_map error
+let convert_contact_map_to_graph parameters error string_contact_map =
+  Mods.StringSetMap.Map.iter (fun ag map ->
+      Mods.StringSetMap.Map.iter (fun site (state_list, pair_list) ->
+          List.iter (fun (ag2, site2) ->
+              Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                "agent:%s:site:%s - agent:%s:site:%s\n"
+                ag site
+                ag2 site2
+            ) pair_list
+        ) map
+    ) string_contact_map
 
 
 let convert_int_to_nodes parameters error handler contact_map  =

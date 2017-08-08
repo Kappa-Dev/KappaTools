@@ -36,10 +36,11 @@ let interactive_loop
     pause_criteria env counter graph state =
   let user_interrupted = ref false in
   let old_sigint_behavior =
-    Sys.signal
-      Sys.sigint (Sys.Signal_handle
-                    (fun _ -> if !user_interrupted then raise Sys.Break
-                      else user_interrupted := true)) in
+    Sys.signal Sys.sigint
+      (Sys.Signal_handle
+         (fun _ -> if !user_interrupted then raise Sys.Break
+           else user_interrupted := true))
+  in
   let rec iter graph state =
     if !user_interrupted ||
        Rule_interpreter.value_bool counter graph pause_criteria then
@@ -211,8 +212,8 @@ let () =
                else Some (Counter.init_time counter);
              Configuration.plotPeriod = Some (Counter.plot_period counter);
              Configuration.outputFileName = Some plot_file;}
-            env contact_map init_l ~filename in
-
+            env contact_map init_l ~filename
+    in
     Kappa_files.setCheckFileExists
       ~batchmode:cli_args.Run_cli_args.batchmode
       plot_file;
@@ -245,7 +246,9 @@ let () =
           Kappa_printer.env env
           (Contact_map.print_cycles (Model.signatures env)) contact_map
           Pattern.Env.print (Model.domain env)
-          (Rule_interpreter.print env) graph in
+          (Rule_interpreter.print env) graph
+    in
+    (*------------------------------------------------------------*)
     let () = match kasim_args.Kasim_args.domainOutputFile with
       | None -> ()
       | Some domainOutputFile ->
@@ -262,8 +265,8 @@ let () =
           Outputs.go (Model.signatures env)
             (Data.Plot
                (State_interpreter.observables_values env graph counter))
-      | _ -> () in
-
+      | _ -> ()
+    in
     let () =
       if stop then
         finalize

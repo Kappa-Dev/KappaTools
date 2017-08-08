@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Mar 02 2017>
+  * Last modification: Time-stamp: <Aug 07 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -36,5 +36,3 @@ module type Type =
 module Export:
   functor (Reachability : Analyzer.Analyzer) ->
     Type
-
-(*val get_internal_constraints_list: state -> state * Yojson.Basic.json*)

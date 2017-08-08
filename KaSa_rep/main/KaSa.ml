@@ -4,12 +4,28 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 07 2017>
+ * Last modification: Time-stamp: <Aug 08 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
+
+(*module B =
+  (val Domain_selection.select_domain
+      ~reachability_parameters:{
+        Remanent_parameters_sig.views = true;
+        Remanent_parameters_sig.site_across_bonds = true;
+        Remanent_parameters_sig.parallel_bonds = true;
+        Remanent_parameters_sig.dynamic_contact_map = true;
+      } ())
+
+include Export.Export(B)
+
+let gState =
+  let compil = Ast.empty_compil in
+  ref (init ~compil ~called_from:Remanent_parameters_sig.Server ())*)
+
 
 let main () =
   let start_time = Sys.time () in
@@ -17,10 +33,13 @@ let main () =
   let _, parameters, _ = Get_option.get_option errors in
   let module A =
     (val Domain_selection.select_domain
-        ~reachability_parameters:(Remanent_parameters.get_reachability_analysis_parameters parameters) ())
+        ~reachability_parameters:
+          (Remanent_parameters.get_reachability_analysis_parameters parameters)
+        ())
   in
   let export_to_kasa =
-    (module Export_to_KaSa.Export(A) : Export_to_KaSa.Type) in
+    (module Export_to_KaSa.Export(A) : Export_to_KaSa.Type)
+  in
   let module Export_to_KaSa =
     (val export_to_kasa : Export_to_KaSa.Type)
   in
@@ -64,8 +83,13 @@ let main () =
       state
   in
   (*-----------------------------------------------------------------------*)
-  (*WORK IN PROCESS:
-    get contact_map to compute strongly connected component*)
+  (*WORK IN PROCESS:*)
+  (*let gstate, string_contact_map = get_contact_map !gState in
+  let () =
+    Contact_map_scc.convert_contact_map_to_graph parameters errors
+      string_contact_map
+  in*)
+
   (*let _ =
     let state, output = Export_to_KaSa.get_graph_scc state in
     state, Some output
@@ -76,14 +100,15 @@ let main () =
     if Remanent_parameters.get_do_influence_map parameters
     then
       Export_to_KaSa.output_influence_map
-        ~accuracy_level:(match
-                           Remanent_parameters.get_influence_map_accuracy_level parameters
-                         with
-                         | Remanent_parameters_sig.None
-                         | Remanent_parameters_sig.Low -> Public_data.Low
-                         | Remanent_parameters_sig.Medium -> Public_data.Medium
-                         | Remanent_parameters_sig.High
-                         | Remanent_parameters_sig.Full -> Public_data.High)
+        ~accuracy_level:
+          (match
+             Remanent_parameters.get_influence_map_accuracy_level parameters
+           with
+           | Remanent_parameters_sig.None
+           | Remanent_parameters_sig.Low -> Public_data.Low
+           | Remanent_parameters_sig.Medium -> Public_data.Medium
+           | Remanent_parameters_sig.High
+           | Remanent_parameters_sig.Full -> Public_data.High)
         state
     else
       state

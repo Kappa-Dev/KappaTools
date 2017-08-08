@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 01 2017>
+  * Last modification: Time-stamp: <Aug 07 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -55,7 +55,7 @@ sig
 
   (*WORK IN PROCESS*)
   (*add new function: get contact_map_int*)
-  val get_graph_scc : state -> state * Graphs.node list
+  (*val get_graph_scc : state -> state * Graphs.node list*)
 
   val get_contact_map:
     ?accuracy_level:Public_data.accuracy_level ->
