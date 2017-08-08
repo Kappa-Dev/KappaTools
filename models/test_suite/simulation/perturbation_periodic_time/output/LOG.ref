@@ -1,0 +1,21 @@
+Parsing repeat_time.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 3 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (16384 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '5' '-d' 'output' '-seed' '20543' 'repeat_time.ka'
+____________________________________________________________
+############################################################
+Simulation ended
+98.96% of event loops were productive. Null event cause:
+	Perturbation interrupting time advance: 100.00%
