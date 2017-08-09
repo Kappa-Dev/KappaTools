@@ -387,8 +387,8 @@ let rec stops_of_bool vars_deps is_repeat_time_pert = function
      | _, [], _ -> st2
      | _, _, [] -> st1
      | Operator.OR, n1, n2 -> n1 @ n2
-     | Operator.AND, _, _ ->
-        if is_repeat_time_pert then []
+     | Operator.AND, n1, _ ->
+        if is_repeat_time_pert then n1
         else raise ExceptionDefn.Unsatisfiable
     )
   | COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->

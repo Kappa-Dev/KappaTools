@@ -656,24 +656,23 @@ let map_expr_perturbation f_alg f_bool x =
     abort = Option_util.map f_bool x.abort;
   }
 
-let stops_of_perturbation algs_deps is_repeat_time_pert x =
-  let repeat_stopping_time =
+let stops_of_perturbation algs_deps x =
+  let (stopping_time,is_repeat) =
     match (fst x.precondition) with
-    | Some n -> [(Some n,n)]
-    | None -> [] in
-  let stopping_time =
-    try Alg_expr.stops_of_bool
-          algs_deps is_repeat_time_pert (fst (snd x.precondition))
-    with ExceptionDefn.Unsatisfiable ->
-      raise
-        (ExceptionDefn.Malformed_Decl
-           ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-           ,snd (snd x.precondition)))
+    | Some n -> [(Some n,n)],true
+    | None ->
+       try (Alg_expr.stops_of_bool
+             algs_deps false (fst (snd x.precondition))),false
+       with ExceptionDefn.Unsatisfiable ->
+         raise
+           (ExceptionDefn.Malformed_Decl
+              ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
+              ,snd (snd x.precondition)))
   in
   match x.abort with
   | None -> stopping_time
   | Some (x,pos) ->
-    try stopping_time@(Alg_expr.stops_of_bool algs_deps is_repeat_time_pert x)
+    try stopping_time@(Alg_expr.stops_of_bool algs_deps is_repeat x)
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl
