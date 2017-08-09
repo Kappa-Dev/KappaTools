@@ -151,5 +151,5 @@ val map_expr_perturbation :
 
 val stops_of_perturbation :
   (Operator.DepSet.t * Operator.DepSet.t *
-   Operator.DepSet.t array * Operator.DepSet.t array) ->
+   Operator.DepSet.t array * Operator.DepSet.t array) -> bool ->
   perturbation -> (Nbr.t option * Nbr.t) list

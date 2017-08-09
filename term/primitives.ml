@@ -656,9 +656,14 @@ let map_expr_perturbation f_alg f_bool x =
     abort = Option_util.map f_bool x.abort;
   }
 
-let stops_of_perturbation algs_deps x =
+let stops_of_perturbation algs_deps is_repeat_time_pert x =
+  let repeat_stopping_time =
+    match (fst x.precondition) with
+    | Some n -> [(Some n,n)]
+    | None -> [] in
   let stopping_time =
-    try Alg_expr.stops_of_bool algs_deps (fst (snd x.precondition))
+    try Alg_expr.stops_of_bool
+          algs_deps is_repeat_time_pert (fst (snd x.precondition))
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl
@@ -668,7 +673,7 @@ let stops_of_perturbation algs_deps x =
   match x.abort with
   | None -> stopping_time
   | Some (x,pos) ->
-    try stopping_time@Alg_expr.stops_of_bool algs_deps x
+    try stopping_time@(Alg_expr.stops_of_bool algs_deps is_repeat_time_pert x)
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl
