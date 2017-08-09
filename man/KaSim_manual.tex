@@ -1134,7 +1134,8 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
   \caption{Perturbation expressions.}
   \begin{tabular}{@{} lcl @{}}
   	\textit{perturbation\_expression} &::=& \tcb{\ttt{\%mod:}} \textit{perturbation} \\
-	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\
+	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\
+        && | \tcb{\ttt{\%mod:}} \tcb{\ttt{every}} \tcb{$x\in\Real$} \textit{boolean\_expression} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\
 
     \textit{perturbation} &::=& \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect\_list} \\\\
     \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
@@ -1178,9 +1179,21 @@ in the following sections using examples.
 \ITE{
 \item[] \ttt{\%mod: {\it f}(t)={\it x} do $\dots$}
 }
-where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general with a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve. Therefore the only time dependent precondition with an equality test that is allowed in \KaSim~has to be of the form $\mathtt{[T]=}n$ with $n\in\Nat$. For instance:
-\lstinline[language=kappa]*%mod: [T]=10 do $STOP*
-will interrupt the simulation after exactly 10 time units.
+where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general with a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve.
+
+There are only two types of time dependent precondition allowed in \KaSim~:
+\ITE{
+ \item[-] an equality test of the form $\mathtt{[T]=}n$ with $n\in\Nat$. For instance:
+   \lstinline[language=kappa]*\%mod: [T]=10 do $STOP*
+   will interrupt the simulation after exactly 10 time units.
+ \item[-] a periodic perturbation declared with the keyword \tcb{\ttt{every}}. The following perturbation
+   \lstinline[language=kappa]*\%mod: every 1.5 do $SNAPSHOT ``file.ka'' until ([T] < 14.0)*
+   is applied at the beginning of the simulation and every 1.5 time units, for 14 time units. The user can therefore interrupt the simulation periodically to test the time. A perturbation of the form
+   \ITE{
+   \item[] \ttt{\%mod: every {\it x} {\it f}(t)={\it y} do $\dots$ until $\dots$}}
+   allows the user to apply a function of time every x time units.
+}
+
 
 \subsection{Adding or deleting agents during a simulation}
 
