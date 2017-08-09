@@ -375,7 +375,8 @@ let pert_of_result
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
         let pert =
-          { Primitives.precondition = (fst pre_expr),pre;
+          { Primitives.alarm = (fst pre_expr);
+            Primitives.precondition = pre;
             Primitives.effect = effects;
             Primitives.abort = opt;
           } in

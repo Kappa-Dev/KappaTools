@@ -159,7 +159,7 @@ let rec perturbate ~outputs env counter graph state = function
     if state.perturbations_alive.(i) &&
        state.perturbations_not_done_yet.(i) &&
        Rule_interpreter.value_bool
-         counter graph (fst (snd pert.Primitives.precondition))
+         counter graph (fst pert.Primitives.precondition)
     then
       let (stop,graph,state as acc,extra) =
         List.fold_left (fun ((stop,graph,state),extra as acc) effect ->

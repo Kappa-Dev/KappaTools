@@ -515,8 +515,8 @@ let modification_of_yojson = function
            (Yojson.Basic.Util.Type_error ("Invalid modification",x))
 
 type perturbation =
-  { precondition:
-      Nbr.t option * (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+  { alarm: Nbr.t option;
+    precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
       Alg_expr.bool Locality.annot option;
@@ -533,53 +533,31 @@ let bool_expr_of_yojson =
     (JsonUtil.to_int ?error_msg:None)
 
 let perturbation_to_yojson p =
-  JsonUtil.smart_assoc [
-    "condition",
-    `List [JsonUtil.of_option (fun n -> Nbr.to_yojson n) (fst p.precondition);
-           Locality.annot_to_json bool_expr_to_yojson (snd p.precondition)];
+  `Assoc [
+    "alarm", JsonUtil.of_option (fun n -> Nbr.to_yojson n) p.alarm;
+    "condition", Locality.annot_to_json bool_expr_to_yojson p.precondition;
     "effect", JsonUtil.of_list modification_to_yojson p.effect;
     "abort",
     JsonUtil.of_option (Locality.annot_to_json bool_expr_to_yojson) p.abort ]
 
-let precondition_of_yojson = function
-  | `List [n; c] ->
-     JsonUtil.to_option (fun n -> Nbr.of_yojson n) n,
-     Locality.annot_of_json bool_expr_of_yojson c
-  | x -> raise
-           (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
-
 let perturbation_of_yojson = function
-  | `Assoc [ "condition", c; "effect", e; "abort", p ]
-  | `Assoc [ "condition", c; "abort", p; "effect", e ]
-  | `Assoc [ "effect", e; "condition", c; "abort", p ]
-  | `Assoc [ "abort", p; "condition", c; "effect", e ]
-  | `Assoc [ "effect", e; "abort", p; "condition", c ]
-  | `Assoc [ "abort", p; "effect", e; "condition", c ] -> {
-      precondition = precondition_of_yojson c;
-      effect = JsonUtil.to_list modification_of_yojson e;
-      abort =
-        JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
-    }
-  | `Assoc [ "condition", c; "effect", e ]
-  | `Assoc [ "effect", e; "condition", c ] -> {
-      precondition = precondition_of_yojson c;
-      effect = JsonUtil.to_list modification_of_yojson e;
-      abort = None
-    }
-  | `Assoc [ "condition", c; "abort", p ]
-  | `Assoc [ "abort", p; "condition", c ] -> {
-      precondition = precondition_of_yojson c;
-      effect = [];
-      abort =
-        JsonUtil.to_option (Locality.annot_of_json bool_expr_of_yojson) p
-    }
-  | `Assoc [ "condition", c ] -> {
-      precondition = precondition_of_yojson c;
-      effect = [];
-      abort = None
-    }
-  | x -> raise
-           (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
+  | `Assoc l as x when List.length l = 4 ->
+     begin
+       try {
+           alarm = JsonUtil.to_option Nbr.of_yojson (List.assoc "alarm" l);
+           precondition =
+             Locality.annot_of_json bool_expr_of_yojson (List.assoc "condition" l);
+           effect =
+             JsonUtil.to_list modification_of_yojson (List.assoc "effect" l);
+           abort =
+             JsonUtil.to_option
+               (Locality.annot_of_json bool_expr_of_yojson)
+               (List.assoc "abort" l);
+         }
+       with Not_found ->
+         raise (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
+     end
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
 
 let exists_modification check l =
   Array.fold_left (fun acc p -> acc || List.exists check p.effect) false l
@@ -651,28 +629,27 @@ let map_expr_modification f = function
   | SPECIES (p,x,t) -> SPECIES ((map_expr_print f p),x,t)
 
 let map_expr_perturbation f_alg f_bool x =
-  { precondition = (fst x.precondition), f_bool (snd x.precondition);
+  { alarm = x.alarm;
+    precondition = f_bool x.precondition;
     effect = List.map (map_expr_modification f_alg) x.effect;
     abort = Option_util.map f_bool x.abort;
   }
 
 let stops_of_perturbation algs_deps x =
-  let (stopping_time,is_repeat) =
-    match (fst x.precondition) with
-    | Some n -> [(Some n,n)],true
+  let stopping_time = match x.alarm with
+    | Some n -> [(Some n,n)]
     | None ->
-       try (Alg_expr.stops_of_bool
-             algs_deps false (fst (snd x.precondition))),false
+       try Alg_expr.stops_of_bool algs_deps (fst x.precondition)
        with ExceptionDefn.Unsatisfiable ->
          raise
            (ExceptionDefn.Malformed_Decl
               ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-              ,snd (snd x.precondition)))
+              ,(snd x.precondition)))
   in
   match x.abort with
   | None -> stopping_time
   | Some (x,pos) ->
-    try stopping_time@(Alg_expr.stops_of_bool algs_deps is_repeat x)
+    try stopping_time@(Alg_expr.stops_of_bool algs_deps x)
     with ExceptionDefn.Unsatisfiable ->
       raise
         (ExceptionDefn.Malformed_Decl

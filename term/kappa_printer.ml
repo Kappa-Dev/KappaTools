@@ -182,16 +182,16 @@ let modification ?env f m =
       (print_expr ?env) fn
 
 let perturbation ?env f pert =
-  let aux_rtime f =
-    match (fst pert.Primitives.precondition) with
+  let aux_alarm f =
+    match pert.Primitives.alarm with
     | None -> ()
     | Some n -> Format.fprintf f "alarm %a " Nbr.print n
   in
   let aux f =
     Format.fprintf
       f "%t%a do %a"
-      aux_rtime
-      (bool_expr ?env) (fst (snd pert.Primitives.precondition))
+      aux_alarm
+      (bool_expr ?env) (fst pert.Primitives.precondition)
       (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with

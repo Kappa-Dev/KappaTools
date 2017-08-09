@@ -122,8 +122,8 @@ type modification =
   | SPECIES_OFF of Alg_expr.t print_expr list
 
 type perturbation =
-  { precondition:
-      Nbr.t option * (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+  { alarm: Nbr.t option;
+    precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     abort : (Pattern.id array list,int)
         Alg_expr.bool Locality.annot option;
