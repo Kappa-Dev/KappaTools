@@ -19,7 +19,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR NOT
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE EVERY
+%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE ALARM
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -122,63 +122,9 @@ instruction:
     | PLOT alg_expr {Ast.PLOT $2}
     | PLOT error {raise (ExceptionDefn.Syntax_Error
 			   (add_pos "Malformed plot instruction, an algebraic expression is expected"))}
-    | PERT EVERY FLOAT perturbation_declaration UNTIL bool_expr
-      	   {let (bool_expr,mod_expr_list) = $4 in
-	    let () = if List.exists
-			  (fun effect ->
-			   match effect with
-			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
-			      | Ast.FLUX _ | Ast.FLUXOFF _
-			      | Ast.SPECIES_OF _) -> true
-			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
-			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
-			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
-			  ) mod_expr_list
-		     then
-		       ExceptionDefn.warning
-			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-					       (Parsing.symbol_end_pos ()))
-			 (fun f ->
-			  Format.pp_print_string
-			    f "Perturbation need not be applied repeatedly") in
-	    Ast.PERT (add_pos ((Some (Nbr.F $3),bool_expr),mod_expr_list,Some $6))}
-    | PERT perturbation_declaration
-	   {let (bool_expr,mod_expr_list) = $2 in
-	    Ast.PERT (add_pos ((None,bool_expr),mod_expr_list,None))}
-    | PERT REPEAT perturbation_declaration UNTIL bool_expr
-	   {let (bool_expr,mod_expr_list) = $3 in
-	    let () = if List.exists
-			  (fun effect ->
-			   match effect with
-			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
-			      | Ast.FLUX _ | Ast.FLUXOFF _
-			      | Ast.SPECIES_OF _) -> true
-			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
-			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
-			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
-			  ) mod_expr_list
-		     then
-		       ExceptionDefn.warning
-			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-					       (Parsing.symbol_end_pos ()))
-			 (fun f ->
-			  Format.pp_print_string
-			    f "Perturbation need not be applied repeatedly") in
-	    Ast.PERT (add_pos ((None,bool_expr),mod_expr_list,Some $5))}
-    | PERT REPEAT perturbation_declaration error
-	{ raise (ExceptionDefn.Syntax_Error
-		   (add_pos "Expect \"until\" statement"))}
+    | PERT perturbation_declaration {Ast.PERT (add_pos $2)}
     | CONFIG STRING value_list
 	     {Ast.CONFIG (($2,rhs_pos 2),$3)}
-    | PERT bool_expr DO effect_list UNTIL bool_expr
-      /* backward compatibility */
-	   {ExceptionDefn.deprecated
-	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
-				    (Parsing.symbol_end_pos ()))
-	      "perturbation"
-	      (fun f -> Format.pp_print_string
-			  f "use the 'repeat ... until' construction");
-	    Ast.PERT (add_pos ((None,$2),$4,Some $6))}
     ;
 
 init_declaration:
@@ -202,17 +148,56 @@ value_list:
     | STRING value_list {($1,rhs_pos 1)::$2}
     ;
 
+perturbation_alarm:
+  {None}
+  | ALARM nbr {Some $2}
+
+perturbation_post:
+  {None}
+  | REPEAT bool_expr {Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$2)))}
+  | UNTIL bool_expr
+   /* backward compatibility */
+	 {ExceptionDefn.deprecated
+	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
+				    (Parsing.symbol_end_pos ()))
+	      "perturbation"
+	      (fun f -> Format.pp_print_string
+			  f "use the 'repeat' construction");
+	    Some $2}
+
+
 perturbation_declaration:
-    | OP_PAR perturbation_declaration CL_PAR {$2}
-    | bool_expr DO effect_list {($1,$3)}
-    | bool_expr SET effect_list
+    | perturbation_alarm bool_expr DO effect_list perturbation_post
+    { (($1,$2),$4,$5) }
+    | perturbation_alarm DO effect_list perturbation_post
+    { (($1,Locality.dummy_annot Alg_expr.TRUE),$3,$4) }
+    | REPEAT bool_expr DO effect_list UNTIL bool_expr
+	   {let () = if List.exists
+			  (fun effect ->
+			   match effect with
+			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
+			      | Ast.FLUX _ | Ast.FLUXOFF _
+			      | Ast.SPECIES_OF _) -> true
+			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
+			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
+			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
+			  ) $4
+		     then
+		       ExceptionDefn.warning
+			 ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
+					       (Parsing.symbol_end_pos ()))
+			 (fun f ->
+			  Format.pp_print_string
+			    f "Perturbation need not be applied repeatedly") in
+	    ((None,$2),$4,Some $6)}
+     | perturbation_alarm bool_expr SET effect_list
 		{ExceptionDefn.deprecated
 		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
 					 (Parsing.symbol_end_pos ()))
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
 			       f "'set' keyword is replaced by 'do'");
-		 ($1,$3)} /*For backward compatibility*/
+		 (($1,$2),$4,None)} /*For backward compatibility*/
     ;
 
 standalone_effect_list: effect_list EOF {$1}
@@ -356,10 +341,13 @@ arrow:
     | KAPPA_LRAR {true}
     ;
 
+nbr:
+    | INFINITY { Nbr.F infinity }
+    | FLOAT { Nbr.F $1 }
+    | INT { Nbr.I $1 }
+
 constant:
-    | INFINITY {add_pos (Alg_expr.CONST (Nbr.F infinity))}
-    | FLOAT {add_pos (Alg_expr.CONST (Nbr.F $1))}
-    | INT {add_pos (Alg_expr.CONST (Nbr.I $1))}
+    | nbr {add_pos (Alg_expr.CONST $1)}
     | EMAX {add_pos (Alg_expr.STATE_ALG_OP (Operator.EMAX_VAR))}
     | TMAX {add_pos (Alg_expr.STATE_ALG_OP (Operator.TMAX_VAR))}
     | CPUTIME {add_pos (Alg_expr.STATE_ALG_OP (Operator.CPUTIME))}

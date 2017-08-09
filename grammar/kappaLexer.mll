@@ -28,6 +28,7 @@
  let () = Hashtbl.add keywords "until" UNTIL in
  let () = Hashtbl.add keywords "INF" INFINITY in
  let () = Hashtbl.add keywords "inf" INFINITY in
+ let () = Hashtbl.add keywords "alarm" ALARM in
  fun x ->
  try Hashtbl.find keywords x with Not_found -> ID x
 
@@ -53,7 +54,6 @@ rule token = parse
 	 | "->" {KAPPA_RAR}
 	 | "<-" {LAR}
 	 | "<>" {DIFF}
-	 | "every" {EVERY}
 	 | pert as s {match s with
 		      | "$DEL" -> DELETE
 		      | "$ADD" -> INTRO
