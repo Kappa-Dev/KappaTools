@@ -18,7 +18,7 @@ depends : [
 ]
 
 depopts: [
-  "labltk" "lwt" "cohttp"
+  "labltk" "lwt" "cohttp-lwt-unix"
   "atdgen" {build}
 ]
 
@@ -26,7 +26,7 @@ build: [
   [ make "USE_TK=1" {labltk:installed} "all" ]
   [ make "META" "kappalib" ]
   [ make "agents" ] {atdgen:installed & lwt:installed}
-  [ make "bin/WebSim" ] {atdgen:installed & lwt:installed & cohttp:installed}
+  [ make "bin/WebSim" ] {atdgen:installed & cohttp-lwt-unix:installed}
 ]
 
 install: [ [ make "install-lib" ] ]
