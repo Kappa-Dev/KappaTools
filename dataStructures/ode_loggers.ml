@@ -916,7 +916,7 @@ let parenthesis_needed_in_un_op ?parenthesis_mode logger op =
   else
     true, false, keep_none Always
 
-let parenthesis_needed_in_bool_op ?parenthesis_mode () =
+let parenthesis_needed_in_bin_bool_op ?parenthesis_mode () =
   match parenthesis_mode with
   | None -> true, None
   | Some Never -> false, Some Always
@@ -1262,9 +1262,9 @@ and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger logger_
         let () = print_alg_expr ?parenthesis_mode:mode ?init_mode string_of_var_id logger logger_err b network_handler in
       let () = Loggers.fprintf logger ")" in
         ()
-      | Alg_expr.BOOL_OP (op,a,b) ->
+      | Alg_expr.BIN_BOOL_OP (op,a,b) ->
         let do_paren, mode =
-          parenthesis_needed_in_bool_op ?parenthesis_mode ()
+          parenthesis_needed_in_bin_bool_op ?parenthesis_mode ()
         in
         let () =
           if do_paren then
@@ -1274,12 +1274,19 @@ and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger logger_
           print_bool_expr
             ?parenthesis_mode:mode ?init_mode string_of_var_id logger logger_err a network_handler
         in
-        let () = Loggers.fprintf logger "%s" (Loggers_string_of_op.string_of_bool_op logger op) in
+        let () = Loggers.fprintf logger "%s"
+            (Loggers_string_of_op.string_of_bin_bool_op logger op) in
         let () = print_bool_expr ?init_mode string_of_var_id logger logger_err b network_handler in
         let () =
           if do_paren then
             Loggers.fprintf logger ")"
         in
+        ()
+      | Alg_expr.UN_BOOL_OP (op,a) ->
+        let () = Loggers.fprintf logger "%s"
+            (Loggers_string_of_op.string_of_un_bool_op logger op) in
+        let () = print_bool_expr ~parenthesis_mode:Always ?init_mode
+            string_of_var_id logger logger_err a network_handler in
         ()
     end
    | Loggers.SBML ->

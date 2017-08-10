@@ -308,13 +308,24 @@ let rec simplify ?root_only:(root_only=false) expr =
         match cond with
         | Alg_expr.TRUE,_ -> yes
         | Alg_expr.FALSE, _ -> no
-        | Alg_expr.BOOL_OP (_,_,_),_
+        | Alg_expr.UN_BOOL_OP (_,_),_
+        | Alg_expr.BIN_BOOL_OP (_,_,_),_
         | Alg_expr.COMPARE_OP (_,_,_),_ -> Alg_expr.IF (cond,yes,no),loc
       end
 and simplify_bool expr_bool =
   match expr_bool with
   | Alg_expr.TRUE, _ | Alg_expr.FALSE, _ -> expr_bool
-  | Alg_expr.BOOL_OP (op, a ,b),loc ->
+  | Alg_expr.UN_BOOL_OP (op, a), loc ->
+    begin
+      match simplify_bool a with
+      | Alg_expr.TRUE,_ -> Alg_expr.FALSE, loc
+      | Alg_expr.FALSE,_ -> Alg_expr.TRUE, loc
+      | (Alg_expr.BIN_BOOL_OP (_,_,_), _
+        | Alg_expr.COMPARE_OP (_,_,_), _
+        | Alg_expr.UN_BOOL_OP (_,_), _) as a'
+        -> Alg_expr.UN_BOOL_OP(op,a'),loc
+    end
+  | Alg_expr.BIN_BOOL_OP (op, a ,b),loc ->
     begin
       let a,b = simplify_bool a, simplify_bool b in
       match
@@ -327,11 +338,13 @@ and simplify_bool expr_bool =
           | (Alg_expr.FALSE,_),_ -> a
           | _,(Alg_expr.TRUE,_) -> a
           | _,(Alg_expr.FALSE,_) -> b
-          | ((Alg_expr.BOOL_OP (_,_,_)
-             | Alg_expr.COMPARE_OP (_,_,_)),_),
-            ((Alg_expr.BOOL_OP (_,_,_)
-             | Alg_expr.COMPARE_OP (_,_,_)),_)
-            -> Alg_expr.BOOL_OP(op,a,b),loc
+          | ((Alg_expr.BIN_BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)
+             | Alg_expr.UN_BOOL_OP (_,_)),_),
+            ((Alg_expr.BIN_BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)
+             | Alg_expr.UN_BOOL_OP (_,_)),_)
+            -> Alg_expr.BIN_BOOL_OP(op,a,b),loc
         end
       | Operator.OR ->
         begin
@@ -340,11 +353,13 @@ and simplify_bool expr_bool =
           | (Alg_expr.FALSE,_),_ -> b
           | _,(Alg_expr.TRUE,_) -> b
           | _,(Alg_expr.FALSE,_) -> a
-          | ((Alg_expr.BOOL_OP (_,_,_)
-             | Alg_expr.COMPARE_OP (_,_,_)),_),
-            ((Alg_expr.BOOL_OP (_,_,_)
-             | Alg_expr.COMPARE_OP (_,_,_)),_)
-            -> Alg_expr.BOOL_OP(op,a,b),loc
+          | ((Alg_expr.BIN_BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)
+             | Alg_expr.UN_BOOL_OP (_,_)),_),
+            ((Alg_expr.BIN_BOOL_OP (_,_,_)
+             | Alg_expr.COMPARE_OP (_,_,_)
+             | Alg_expr.UN_BOOL_OP (_,_)),_)
+            -> Alg_expr.BIN_BOOL_OP(op,a,b),loc
         end
     end
   | Alg_expr.COMPARE_OP (op,a,b),loc ->
@@ -429,8 +444,10 @@ and clean_bool expr_bool=
   | Alg_expr.TRUE
   | Alg_expr.FALSE ->
     Locality.dummy_annot expr
-  | Alg_expr.BOOL_OP (op,a,b) ->
-    Locality.dummy_annot (Alg_expr.BOOL_OP (op,clean_bool a,clean_bool b))
+  | Alg_expr.UN_BOOL_OP (op,a) ->
+    Locality.dummy_annot (Alg_expr.UN_BOOL_OP (op,clean_bool a))
+  | Alg_expr.BIN_BOOL_OP (op,a,b) ->
+    Locality.dummy_annot (Alg_expr.BIN_BOOL_OP (op,clean_bool a,clean_bool b))
   | Alg_expr.COMPARE_OP (op,a,b) ->
     Locality.dummy_annot (Alg_expr.COMPARE_OP (op,clean a,clean b))
 
@@ -580,17 +597,28 @@ let rec equal_upto_pos a b =
 and equal_bool_upto_pos a b  =
   match a,b with
   | (Alg_expr.TRUE,_),(Alg_expr.TRUE,_) -> true
-  | (Alg_expr.TRUE,_),((Alg_expr.FALSE | Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_)
-  | ((Alg_expr.FALSE | Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_),
+  | (Alg_expr.TRUE,_),
+    ((Alg_expr.FALSE | Alg_expr.BIN_BOOL_OP _ |
+      Alg_expr.COMPARE_OP _ | Alg_expr.UN_BOOL_OP _),_)
+  | ((Alg_expr.FALSE | Alg_expr.BIN_BOOL_OP _ |
+      Alg_expr.COMPARE_OP _ | Alg_expr.UN_BOOL_OP _),_),
     (Alg_expr.TRUE,_)
     -> false
   | (Alg_expr.FALSE,_),(Alg_expr.FALSE,_) -> true
-  | (Alg_expr.FALSE,_),((Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_)
-  |  ((Alg_expr.BOOL_OP _ | Alg_expr.COMPARE_OP _),_), (Alg_expr.FALSE,_)   -> false
-  | (Alg_expr.BOOL_OP (opa,a1,a2),_),
-    (Alg_expr.BOOL_OP (opb,b1,b2),_) -> opa=opb && equal_bool_upto_pos a1 b1 && equal_bool_upto_pos a2 b2
-  | (Alg_expr.BOOL_OP _,_),(Alg_expr.COMPARE_OP _,_)
-  | (Alg_expr.COMPARE_OP _,_),(Alg_expr.BOOL_OP _,_) -> false
+  | (Alg_expr.FALSE,_),
+    ((Alg_expr.BIN_BOOL_OP _ | Alg_expr.COMPARE_OP _ | Alg_expr.UN_BOOL_OP _),_)
+  |  ((Alg_expr.BIN_BOOL_OP _ | Alg_expr.COMPARE_OP _ | Alg_expr.UN_BOOL_OP _),_),
+     (Alg_expr.FALSE,_)   -> false
+  | (Alg_expr.UN_BOOL_OP (opa,a),_),
+    (Alg_expr.UN_BOOL_OP (opb,b),_) -> opa=opb && equal_bool_upto_pos a b
+  | (Alg_expr.BIN_BOOL_OP (opa,a1,a2),_),
+    (Alg_expr.BIN_BOOL_OP (opb,b1,b2),_) -> opa=opb && equal_bool_upto_pos a1 b1 && equal_bool_upto_pos a2 b2
+  | (Alg_expr.BIN_BOOL_OP _,_),(Alg_expr.UN_BOOL_OP _,_)
+  | (Alg_expr.COMPARE_OP _,_),(Alg_expr.UN_BOOL_OP _,_)
+  | (Alg_expr.UN_BOOL_OP _,_),(Alg_expr.COMPARE_OP _,_)
+  | (Alg_expr.UN_BOOL_OP _,_),(Alg_expr.BIN_BOOL_OP _,_)
+  | (Alg_expr.BIN_BOOL_OP _,_),(Alg_expr.COMPARE_OP _,_)
+  | (Alg_expr.COMPARE_OP _,_),(Alg_expr.BIN_BOOL_OP _,_) -> false
   | (Alg_expr.COMPARE_OP (opa,a1,a2),_),
     (Alg_expr.COMPARE_OP (opb,b1,b2),_) ->
     opa=opb && equal_upto_pos a1 b1 && equal_upto_pos a2 b2

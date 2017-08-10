@@ -29,13 +29,14 @@ type (_,_) stack =
   | TO_EXEC_IF :
       Alg_expr.t * Alg_expr.t * (Nbr.t,'a) stack -> (bool,'a) stack
   | TO_EXEC_BOOL :
-      Operator.bool_op * (Pattern.id array list,int) Alg_expr.bool *
+      Operator.bin_bool_op * (Pattern.id array list,int) Alg_expr.bool *
       (bool,'a) stack -> (bool,'a) stack
   | TO_COMPUTE_ALG :
       Operator.bin_alg_op * Nbr.t * (Nbr.t,'a) stack -> (Nbr.t,'a) stack
   | TO_COMPUTE_COMP :
       Operator.compare_op * Nbr.t * (bool,'a) stack -> (Nbr.t,'a) stack
   | TO_COMPUTE_UN : Operator.un_alg_op * (Nbr.t,'a) stack -> (Nbr.t,'a) stack
+  | TO_COMPUTE_BOOL : Operator.un_bool_op * (bool,'a) stack -> (bool,'a) stack
 
 let rec exec_alg :
   type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
@@ -77,7 +78,9 @@ and exec_bool :
     with_value counter ?time ~get_alg ~get_mix ~get_tok true sk
   | Alg_expr.FALSE ->
     with_value counter ?time ~get_alg ~get_mix ~get_tok false sk
-  | Alg_expr.BOOL_OP (op,(a,_),(b,_)) ->
+  | Alg_expr.UN_BOOL_OP (op,(a,_)) ->
+    exec_bool counter ?time ~get_alg ~get_mix ~get_tok a (TO_COMPUTE_BOOL (op,sk))
+  | Alg_expr.BIN_BOOL_OP (op,(a,_),(b,_)) ->
     exec_bool counter ?time ~get_alg ~get_mix ~get_tok a (TO_EXEC_BOOL (op,b,sk))
   | Alg_expr.COMPARE_OP (op,(a,_),(b,_)) ->
     exec_alg counter ?time ~get_alg ~get_mix ~get_tok a (TO_EXEC_COMP (op,b,sk))
@@ -107,6 +110,8 @@ and with_value :
     with_value counter ?time ~get_alg ~get_mix ~get_tok false sk
   | TO_EXEC_BOOL ((Operator.OR | Operator.AND),expr,sk) ->
     exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr sk
+  | TO_COMPUTE_BOOL (Operator.NOT,sk) ->
+    with_value counter ?time ~get_alg ~get_mix ~get_tok (not n) sk
 
 let value_bool counter ?time ~get_alg ~get_mix ~get_tok expr =
   exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr RETURN

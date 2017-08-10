@@ -668,10 +668,13 @@ struct
       let network, outputa = convert_alg_expr parameter compil network a in
       let network, outputb = convert_alg_expr parameter compil network b in
       network, (Alg_expr.COMPARE_OP (op, outputa, outputb),pos)
-    | Alg_expr.BOOL_OP (op,a,b),pos ->
+    | Alg_expr.BIN_BOOL_OP (op,a,b),pos ->
       let network, outputa = convert_bool_expr parameter compil network a in
       let network, outputb = convert_bool_expr parameter compil network b in
-      network, (Alg_expr.BOOL_OP (op,outputa,outputb),pos)
+      network, (Alg_expr.BIN_BOOL_OP (op,outputa,outputb),pos)
+    | Alg_expr.UN_BOOL_OP (op,a),pos ->
+      let network, outputa = convert_bool_expr parameter compil network a in
+      network, (Alg_expr.UN_BOOL_OP (op,outputa),pos)
 
   let add_reaction ?max_size
       parameters compil enriched_rule embedding_forest mixture remanent =
@@ -1186,7 +1189,9 @@ struct
       | (Alg_expr.TRUE | Alg_expr.FALSE),_ -> ()
       | Alg_expr.COMPARE_OP (_,a,b),_ ->
         aux_alg id a; aux_alg id b
-      | Alg_expr.BOOL_OP (_,a,b),_ ->
+      | Alg_expr.UN_BOOL_OP (_,a),_ ->
+        aux_bool id a
+      | Alg_expr.BIN_BOOL_OP (_,a,b),_ ->
         aux_bool id a; aux_bool id b
     in
     let () =

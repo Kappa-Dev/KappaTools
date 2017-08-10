@@ -16,7 +16,7 @@
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
 %token CPUTIME EMAX TMAX PLOTENTRY DELETE INTRO TRACK DO SET REPEAT SPECIES_OF
 %token UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN POW ABS MODULO
-%token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
+%token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR NOT
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
 %token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE EVERY
@@ -293,13 +293,16 @@ variable_declaration:
 	    }
     ;
 
-bool_expr:
-  /*empty*/ {add_pos Alg_expr.TRUE}
+small_bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
     | TRUE {add_pos Alg_expr.TRUE}
     | FALSE {add_pos Alg_expr.FALSE}
-    | bool_expr AND bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.AND,$1,$3))}
-    | bool_expr OR bool_expr {add_pos (Alg_expr.BOOL_OP(Operator.OR,$1,$3))}
+
+bool_expr:
+    | small_bool_expr { $1 }
+    | NOT small_bool_expr {add_pos (Alg_expr.UN_BOOL_OP(Operator.NOT,$2))}
+    | bool_expr AND bool_expr {add_pos (Alg_expr.BIN_BOOL_OP(Operator.AND,$1,$3))}
+    | bool_expr OR bool_expr {add_pos (Alg_expr.BIN_BOOL_OP(Operator.OR,$1,$3))}
     | alg_expr GREATER alg_expr
       {add_pos (Alg_expr.COMPARE_OP(Operator.GREATER,$1,$3))}
     | alg_expr SMALLER alg_expr

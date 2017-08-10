@@ -10,7 +10,8 @@ type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR
                   | TMAX_VAR | EMAX_VAR
-type bool_op = AND | OR
+type bin_bool_op = AND | OR
+type un_bool_op = NOT
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 type rev_dep = ALG of int | RULE of int | PERT of int
@@ -86,17 +87,27 @@ let state_alg_op_of_json = function
   | `String "[Emax]" -> EMAX_VAR
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect state_alg_op",x))
 
-let bool_op_to_string = function
+let bin_bool_op_to_string = function
   | AND -> "&&"
   | OR -> "||"
 
-let print_bool_op f op =
-  Format.pp_print_string f (bool_op_to_string op)
+let print_bin_bool_op f op =
+  Format.pp_print_string f (bin_bool_op_to_string op)
 
-let bool_op_to_json op = `String (bool_op_to_string op)
-let bool_op_of_json = function
+let bin_bool_op_to_json op = `String (bin_bool_op_to_string op)
+let bin_bool_op_of_json = function
   | `String "&&" -> AND
   | `String "||" -> OR
+  | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect boolean op",x))
+
+let un_bool_op_to_string = function NOT -> "[not]"
+
+let print_un_bool_op f op =
+  Format.pp_print_string f (un_bool_op_to_string op)
+
+let un_bool_op_to_json op = `String (un_bool_op_to_string op)
+let un_bool_op_of_json = function
+  | `String "[not]" -> NOT
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect boolean op",x))
 
 let compare_op_to_string = function

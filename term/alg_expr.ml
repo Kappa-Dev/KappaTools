@@ -24,9 +24,10 @@ type ('mix,'id) e =
 and ('mix,'id) bool =
   | TRUE
   | FALSE
-  | BOOL_OP of
-      Operator.bool_op *
+  | BIN_BOOL_OP of
+      Operator.bin_bool_op *
       ('mix,'id) bool Locality.annot * ('mix,'id) bool Locality.annot
+  | UN_BOOL_OP of Operator.un_bool_op * ('mix,'id) bool Locality.annot
   | COMPARE_OP of Operator.compare_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 
@@ -62,8 +63,11 @@ let rec e_to_yojson f_mix f_id = function
 and bool_to_yojson f_mix f_id = function
   | TRUE -> `Bool true
   | FALSE -> `Bool false
-  | BOOL_OP (op,a,b) ->
-    `List [ Operator.bool_op_to_json op;
+  | UN_BOOL_OP (op,a) ->
+    `List [ Operator.un_bool_op_to_json op;
+            Locality.annot_to_json (bool_to_yojson f_mix f_id) a ]
+  | BIN_BOOL_OP (op,a,b) ->
+    `List [ Operator.bin_bool_op_to_json op;
             Locality.annot_to_json (bool_to_yojson f_mix f_id) a;
             Locality.annot_to_json (bool_to_yojson f_mix f_id) b ]
   | COMPARE_OP (op,a,b) ->
@@ -103,9 +107,12 @@ let rec e_of_yojson f_mix f_id = function
       raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
 and bool_of_yojson f_mix f_id = function
   | `Bool b -> if b then TRUE else FALSE
+  | `List [op; a] ->
+    UN_BOOL_OP (Operator.un_bool_op_of_json op,
+                Locality.annot_of_json (bool_of_yojson f_mix f_id) a)
   | `List [op; a; b] as x ->
     begin
-      try BOOL_OP (Operator.bool_op_of_json op,
+      try BIN_BOOL_OP (Operator.bin_bool_op_of_json op,
                    Locality.annot_of_json (bool_of_yojson f_mix f_id) a,
                    Locality.annot_of_json (bool_of_yojson f_mix f_id) b)
       with Yojson.Basic.Util.Type_error _ ->
@@ -141,9 +148,12 @@ let rec print pr_mix pr_tok pr_var f = function
 and print_bool pr_mix pr_tok pr_var f = function
   | TRUE -> Format.fprintf f "[true]"
   | FALSE -> Format.fprintf f "[false]"
-  | BOOL_OP (op,(a,_), (b,_)) ->
+  | UN_BOOL_OP (op,(a,_)) ->
+    Format.fprintf f "%a (%a)"
+      Operator.print_un_bool_op op (print_bool pr_mix pr_tok pr_var) a
+  | BIN_BOOL_OP (op,(a,_), (b,_)) ->
     Format.fprintf f "(%a %a %a)" (print_bool pr_mix pr_tok pr_var) a
-      Operator.print_bool_op op (print_bool pr_mix pr_tok pr_var) b
+      Operator.print_bin_bool_op op (print_bool pr_mix pr_tok pr_var) b
   | COMPARE_OP (op,(a,_), (b,_)) ->
     Format.fprintf f "(%a %a %a)"
       (print pr_mix pr_tok pr_var) a
@@ -190,7 +200,8 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
 
 and add_dep_bool x d = function
   | (TRUE | FALSE), _ -> x
-  | BOOL_OP (_,a, b), _ -> add_dep_bool (add_dep_bool x d a) d b
+  | UN_BOOL_OP (_,a), _ -> add_dep_bool x d a
+  | BIN_BOOL_OP (_,a, b), _ -> add_dep_bool (add_dep_bool x d a) d b
   | COMPARE_OP (_,a, b), _ -> add_dep (add_dep x d a) d b
 
 let rec has_mix :
@@ -216,8 +227,10 @@ and bool_has_mix :
   | TRUE | FALSE -> false
   | COMPARE_OP (_,(a,_),(b,_)) ->
     has_mix ?var_decls a || has_mix ?var_decls b
-  | BOOL_OP (_,(a,_),(b,_)) ->
+  | BIN_BOOL_OP (_,(a,_),(b,_)) ->
     bool_has_mix ?var_decls a || bool_has_mix ?var_decls b
+  | UN_BOOL_OP (_,(a,_)) ->
+    bool_has_mix ?var_decls a
 
 let rec aux_extract_cc acc = function
   | BIN_ALG_OP (_, a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
@@ -229,7 +242,8 @@ let rec aux_extract_cc acc = function
     aux_extract_cc (aux_extract_cc (extract_cc_bool acc cond) yes) no
 and extract_cc_bool acc = function
   | (TRUE | FALSE), _ -> acc
-  | BOOL_OP (_,a, b), _ -> extract_cc_bool (extract_cc_bool acc a) b
+  | BIN_BOOL_OP (_,a, b), _ -> extract_cc_bool (extract_cc_bool acc a) b
+  | UN_BOOL_OP (_,a), _ -> extract_cc_bool acc a
   | COMPARE_OP (_,a, b), _ -> aux_extract_cc (aux_extract_cc acc a) b
 
 let extract_connected_components x = aux_extract_cc [] x
@@ -315,13 +329,21 @@ let rec propagate_constant ?max_time ?max_events updated_vars vars = function
       propagate_constant ?max_time ?max_events updated_vars vars yes
     | FALSE,_ ->
       propagate_constant ?max_time ?max_events updated_vars vars no
-    | (BOOL_OP _ | COMPARE_OP _),_ as cond' ->
+    | (BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as cond' ->
       (IF (cond', propagate_constant ?max_time ?max_events updated_vars vars yes,
            propagate_constant ?max_time ?max_events updated_vars vars no),pos)
 and propagate_constant_bool
     ?max_time ?max_events updated_vars vars = function
   | (TRUE | FALSE),_ as x -> x
-  | BOOL_OP (op,a,b),pos ->
+  | UN_BOOL_OP (op,a),pos ->
+    begin match propagate_constant_bool
+                  ?max_time ?max_events updated_vars vars a, op with
+      | (TRUE,_), Operator.NOT -> FALSE,pos
+      | (FALSE,_), Operator.NOT -> TRUE,pos
+      | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as a'),_ ->
+        UN_BOOL_OP (op,a'),pos
+    end
+  | BIN_BOOL_OP (op,a,b),pos ->
     begin match propagate_constant_bool
                   ?max_time ?max_events updated_vars vars a, op with
       | (TRUE,_), Operator.OR -> TRUE,pos
@@ -329,15 +351,15 @@ and propagate_constant_bool
       | (TRUE,_), Operator.AND
       | (FALSE,_), Operator.OR ->
         propagate_constant_bool ?max_time ?max_events updated_vars vars b
-      | ((BOOL_OP _ | COMPARE_OP _),_ as a'),_ ->
+      | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as a'),_ ->
         match propagate_constant_bool
                 ?max_time ?max_events updated_vars vars b, op with
         | (TRUE,_), Operator.OR -> TRUE,pos
         | (FALSE,_), Operator.AND -> FALSE,pos
         | (TRUE,_), Operator.AND
         | (FALSE,_), Operator.OR -> a'
-        | ((BOOL_OP _ | COMPARE_OP _),_ as b'),_ ->
-          BOOL_OP (op,a',b'),pos
+        | ((BIN_BOOL_OP _ | COMPARE_OP _ | UN_BOOL_OP _),_ as b'),_ ->
+          BIN_BOOL_OP (op,a',b'),pos
     end
   | COMPARE_OP (op,a,b),pos ->
     let a' = propagate_constant ?max_time ?max_events updated_vars vars a in
@@ -375,12 +397,16 @@ and bool_has_time_dep vars_deps = function
   | (TRUE | FALSE), _ -> false
   | COMPARE_OP (_,a,b),_ ->
     has_time_dep vars_deps a||has_time_dep vars_deps b
-  | BOOL_OP (_,a,b),_ ->
+  | BIN_BOOL_OP (_,a,b),_ ->
     bool_has_time_dep vars_deps a||bool_has_time_dep vars_deps b
+  | UN_BOOL_OP (_,a),_ ->
+    bool_has_time_dep vars_deps a
 
 let rec stops_of_bool vars_deps is_repeat_time_pert = function
   | TRUE | FALSE -> []
-  | BOOL_OP (op,(a,_),(b,_)) ->
+  | UN_BOOL_OP (Operator.NOT,(a,_)) ->
+    stops_of_bool vars_deps is_repeat_time_pert a
+  | BIN_BOOL_OP (op,(a,_),(b,_)) ->
     let st1 = stops_of_bool vars_deps is_repeat_time_pert a in
     let st2 = stops_of_bool vars_deps is_repeat_time_pert b in
     (match op,st1,st2 with

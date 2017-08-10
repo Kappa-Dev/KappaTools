@@ -65,8 +65,9 @@ and is_bool_const expr =
   | Alg_expr.TRUE,_ | Alg_expr.FALSE,_ -> true
   | Alg_expr.COMPARE_OP (_,a,b),_ ->
     is_expr_const a && is_expr_const b
-  | Alg_expr.BOOL_OP (_,a,b),_ ->
+  | Alg_expr.BIN_BOOL_OP (_,a,b),_ ->
     is_bool_const a && is_bool_const b
+  | Alg_expr.UN_BOOL_OP (_,a),_ -> is_bool_const a
 
 let rec is_expr_time_homogeneous expr =
   (* does not take into account symbolic propagation of expression *)
@@ -100,8 +101,10 @@ and is_bool_time_homogeneous expr =
       | Alg_expr.TRUE,_ | Alg_expr.FALSE,_ -> true
       | Alg_expr.COMPARE_OP (_,a,b),_ ->
         is_expr_time_homogeneous a && is_expr_time_homogeneous b
-      | Alg_expr.BOOL_OP (_,a,b),_ ->
+      | Alg_expr.BIN_BOOL_OP (_,a,b),_ ->
         is_bool_time_homogeneous a && is_bool_time_homogeneous b
+      | Alg_expr.UN_BOOL_OP (_,a),_ ->
+        is_bool_time_homogeneous a
 
 let is_expr_alias expr =
   match

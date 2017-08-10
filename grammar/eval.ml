@@ -59,10 +59,13 @@ let rec compile_alg ?bwd_bisim ~compileModeOn domain (alg,pos) =
 and compile_bool ?bwd_bisim ~compileModeOn domain = function
   | Alg_expr.TRUE,pos -> (domain,(Alg_expr.TRUE,pos))
   | Alg_expr.FALSE,pos -> (domain,(Alg_expr.FALSE,pos))
-  | Alg_expr.BOOL_OP (op,a,b), pos ->
+  | Alg_expr.BIN_BOOL_OP (op,a,b), pos ->
     let domain',a' = compile_bool ?bwd_bisim ~compileModeOn domain a in
     let domain'',b' = compile_bool ?bwd_bisim ~compileModeOn domain' b in
-    (domain'',(Alg_expr.BOOL_OP (op,a',b'),pos))
+    (domain'',(Alg_expr.BIN_BOOL_OP (op,a',b'),pos))
+  | Alg_expr.UN_BOOL_OP (op,a), pos ->
+    let domain',a' = compile_bool ?bwd_bisim ~compileModeOn domain a in
+    (domain',(Alg_expr.UN_BOOL_OP (op,a'),pos))
   | Alg_expr.COMPARE_OP (op,a,b),pos ->
     let (domain',a') = compile_alg ?bwd_bisim ~compileModeOn domain a in
     let (domain'',b') = compile_alg ?bwd_bisim ~compileModeOn domain' b in

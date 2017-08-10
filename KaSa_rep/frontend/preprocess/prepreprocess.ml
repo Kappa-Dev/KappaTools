@@ -531,14 +531,17 @@ and bool_map f error alg =
   with
   | Alg_expr.TRUE -> error,Alg_expr.TRUE
   | Alg_expr.FALSE -> error,Alg_expr.FALSE
-  | Alg_expr.BOOL_OP(Operator.AND,(b1,pos1),(b2,pos2)) ->
+  | Alg_expr.UN_BOOL_OP(Operator.NOT,(b1,pos1)) ->
+    let error,b1' = bool_map f error b1 in
+    error,Alg_expr.UN_BOOL_OP(Operator.NOT,(b1',pos1))
+  | Alg_expr.BIN_BOOL_OP(Operator.AND,(b1,pos1),(b2,pos2)) ->
     let error,b1' = bool_map f error b1 in
     let error,b2' = bool_map f error b2 in
-    error,Alg_expr.BOOL_OP(Operator.AND,(b1',pos1),(b2',pos2))
-  | Alg_expr.BOOL_OP(Operator.OR,(b1,pos1),(b2,pos2)) ->
+    error,Alg_expr.BIN_BOOL_OP(Operator.AND,(b1',pos1),(b2',pos2))
+  | Alg_expr.BIN_BOOL_OP(Operator.OR,(b1,pos1),(b2,pos2)) ->
     let error,b1' = bool_map f error b1 in
     let error,b2' = bool_map f error b2 in
-    error,Alg_expr.BOOL_OP(Operator.OR,(b1',pos1),(b2',pos2))
+    error,Alg_expr.BIN_BOOL_OP(Operator.OR,(b1',pos1),(b2',pos2))
   | Alg_expr.COMPARE_OP(Operator.GREATER,(m1,pos1),(m2,pos2)) ->
     let error,m1' = alg_map f error m1 in
     let error,m2' = alg_map f error m2 in

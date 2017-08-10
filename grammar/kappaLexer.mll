@@ -97,6 +97,7 @@ rule token = parse
 		| "Tmax" -> TMAX
 		| "?" -> THEN
 		| ":" -> ELSE
+		| "not" -> NOT
 		| _ as s ->
 		   raise (ExceptionDefn.Syntax_Error
 			    ("Symbol \""^s^"\" is not defined",

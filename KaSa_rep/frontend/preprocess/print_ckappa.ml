@@ -251,7 +251,7 @@ and print_bool parameter (error:Exception.method_handler) = function
     let error = print_alg parameter error alg2 in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
     error
-  | Alg_expr.BOOL_OP (op,b1,b2),_ ->
+  | Alg_expr.BIN_BOOL_OP (op,b1,b2),_ ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
     let error = print_bool parameter error b1 in
     let () =
@@ -259,8 +259,19 @@ and print_bool parameter (error:Exception.method_handler) = function
         Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
       with
       | None -> ()
-      | Some formatter -> Operator.print_bool_op formatter op in
+      | Some formatter -> Operator.print_bin_bool_op formatter op in
     let error = print_bool parameter error b2 in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+    error
+  | Alg_expr.UN_BOOL_OP (op,b1),_ ->
+    let () =
+      match
+        Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
+      with
+      | None -> ()
+      | Some formatter -> Operator.print_un_bool_op formatter op in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "(" in
+    let error = print_bool parameter error b1 in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
     error
 

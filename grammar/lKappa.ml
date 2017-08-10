@@ -1227,10 +1227,14 @@ let rec alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var (alg,pos) =
    pos)
 and bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var = function
   | (Alg_expr.TRUE | Alg_expr.FALSE),_ as x -> x
-  | Alg_expr.BOOL_OP (op,x,y),pos ->
-    Alg_expr.BOOL_OP
+  | Alg_expr.BIN_BOOL_OP (op,x,y),pos ->
+    Alg_expr.BIN_BOOL_OP
       (op, bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var x,
        bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var y),
+    pos
+  | Alg_expr.UN_BOOL_OP (op,x),pos ->
+    Alg_expr.UN_BOOL_OP
+      (op, bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var x),
     pos
   | Alg_expr.COMPARE_OP (op,x,y),pos ->
     Alg_expr.COMPARE_OP
@@ -1303,7 +1307,7 @@ let every_time_perturbation pre =
 	              (Alg_expr.BIN_ALG_OP (Operator.MODULO,t_var,n_const)) in
      let mod_is_zero = Locality.dummy_annot
 	                 (Alg_expr.COMPARE_OP (Operator.EQUAL,modulo_n,zero)) in
-     let time_mod_n = Alg_expr.BOOL_OP (Operator.AND,mod_is_zero,snd pre) in
+     let time_mod_n = Alg_expr.BIN_BOOL_OP (Operator.AND,mod_is_zero,snd pre) in
      (Some n, (time_mod_n, snd(snd pre)))
 
 let perturbation_of_ast

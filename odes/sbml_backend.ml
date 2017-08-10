@@ -466,7 +466,10 @@ and eval_init_bool_expr logger network_handler expr =
     Nbr.of_compare_op op
       (eval_init_alg_expr logger network_handler a)
       (eval_init_alg_expr logger network_handler b)
-  | Alg_expr.BOOL_OP (op,a,b) ->
+  | Alg_expr.UN_BOOL_OP (Operator.NOT,a) ->
+    not
+      (eval_init_bool_expr logger network_handler a)
+  | Alg_expr.BIN_BOOL_OP (op,a,b) ->
     of_bool_op op
       (eval_init_bool_expr logger network_handler a)
       (eval_init_bool_expr logger network_handler b)
@@ -523,11 +526,16 @@ and propagate_def_in_bool_expr_p p logger network_handler expr =
        (propagate_def_in_alg_expr_p p logger network_handler a),
        (propagate_def_in_alg_expr_p p logger network_handler b)),
     loc
-  | Alg_expr.BOOL_OP (op,a,b),loc ->
-    Alg_expr.BOOL_OP
+  | Alg_expr.BIN_BOOL_OP (op,a,b),loc ->
+    Alg_expr.BIN_BOOL_OP
       (op,
        (propagate_def_in_bool_expr_p p logger network_handler a),
        (propagate_def_in_bool_expr_p p logger network_handler b)),
+    loc
+  | Alg_expr.UN_BOOL_OP (op,a),loc ->
+    Alg_expr.UN_BOOL_OP
+      (op,
+       (propagate_def_in_bool_expr_p p logger network_handler a)),
     loc
 
 let propagate_dep_in_alg_expr a b c =
@@ -617,7 +625,9 @@ and eval_const_bool_expr logger network_handler expr =
       | Some a, Some b ->
         Some (Nbr.of_compare_op op a b)
     end
-  | Alg_expr.BOOL_OP (op,a,b) ->
+  | Alg_expr.UN_BOOL_OP (Operator.NOT,a) ->
+    Option_util.map not (eval_const_bool_expr logger network_handler a)
+  | Alg_expr.BIN_BOOL_OP (op,a,b) ->
     let const_a_opt =
       eval_const_bool_expr logger network_handler a
     in
@@ -781,7 +791,7 @@ let rec print_alg_expr_in_sbml string_of_var_id logger logger_err
       | Alg_expr.KAPPA_INSTANCE x ->
         let () =
           do_sbml logger logger_err
-          (fun logger logger_err ->
+          (fun logger _logger_err ->
              Loggers.fprintf logger "<ci>s%i</ci>"
                (network.Network_handler.int_of_kappa_instance x))
         in
@@ -953,10 +963,10 @@ and
               network in
            let () = Loggers.fprintf logger "</apply>" in
            ()
-         | Alg_expr.BOOL_OP (op,a,b) ->
+         | Alg_expr.BIN_BOOL_OP (op,a,b) ->
            let () = Loggers.fprintf logger "<apply>" in
            let () = Loggers.fprintf logger "%s"
-               (Loggers_string_of_op.string_of_bool_op logger op) in
+               (Loggers_string_of_op.string_of_bin_bool_op logger op) in
            let () =
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err a network
@@ -964,6 +974,16 @@ and
            let () =
              print_bool_expr_in_sbml
                string_of_var_id logger logger_err b network
+           in
+           let () = Loggers.fprintf logger "</apply>" in
+           ()
+         | Alg_expr.UN_BOOL_OP (op,a) ->
+           let () = Loggers.fprintf logger "<apply>" in
+           let () = Loggers.fprintf logger "%s"
+               (Loggers_string_of_op.string_of_un_bool_op logger op) in
+           let () =
+             print_bool_expr_in_sbml
+               string_of_var_id logger logger_err a network
            in
            let () = Loggers.fprintf logger "</apply>" in
            ())
@@ -1054,10 +1074,12 @@ and
     Mods.StringSet.union
       (substance_expr_in_sbml logger a network)
       (substance_expr_in_sbml logger b network)
-  | Alg_expr.BOOL_OP (_,a,b) ->
+  | Alg_expr.BIN_BOOL_OP (_,a,b) ->
   Mods.StringSet.union
     (substance_bool_expr_in_sbml logger a network)
     (substance_bool_expr_in_sbml logger b network)
+  | Alg_expr.UN_BOOL_OP (_,a) ->
+    substance_bool_expr_in_sbml logger a network
 
 let rec maybe_time_dependent_alg_expr_in_sbml logger
     (alg_expr:
@@ -1121,9 +1143,11 @@ and
   | Alg_expr.COMPARE_OP (_op,a,b) ->
     maybe_time_dependent_alg_expr_in_sbml logger a network
     || maybe_time_dependent_alg_expr_in_sbml logger b network
-  | Alg_expr.BOOL_OP (_op,a,b) ->
+  | Alg_expr.BIN_BOOL_OP (_op,a,b) ->
     maybe_time_dependent_bool_expr_in_sbml logger a network
     || maybe_time_dependent_bool_expr_in_sbml logger b network
+  | Alg_expr.UN_BOOL_OP (_op,a) ->
+    maybe_time_dependent_bool_expr_in_sbml logger a network
 
 let break = true
 

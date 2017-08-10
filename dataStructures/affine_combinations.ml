@@ -27,8 +27,10 @@ and anonamise_bool bool =
       match fst bool with
   | (Alg_expr.TRUE
     | Alg_expr.FALSE) as e -> e
-  | Alg_expr.BOOL_OP (op,b1,b2) ->
-    Alg_expr.BOOL_OP (op, anonamise_bool b1, anonamise_bool b2)
+  | Alg_expr.BIN_BOOL_OP (op,b1,b2) ->
+    Alg_expr.BIN_BOOL_OP (op, anonamise_bool b1, anonamise_bool b2)
+  | Alg_expr.UN_BOOL_OP (op,b1) ->
+    Alg_expr.UN_BOOL_OP (op, anonamise_bool b1)
   | Alg_expr.COMPARE_OP (op, e1, e2) ->
     Alg_expr.COMPARE_OP (op, anonamise e1, anonamise e2)
     end

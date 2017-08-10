@@ -24,9 +24,10 @@ type ('mix,'id) e =
 and ('mix,'id) bool =
   | TRUE
   | FALSE
-  | BOOL_OP of
-      Operator.bool_op *
+  | BIN_BOOL_OP of
+      Operator.bin_bool_op *
       ('mix,'id) bool Locality.annot * ('mix,'id) bool Locality.annot
+  | UN_BOOL_OP of Operator.un_bool_op * ('mix,'id) bool Locality.annot
   | COMPARE_OP of Operator.compare_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 

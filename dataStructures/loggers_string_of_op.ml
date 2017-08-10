@@ -311,7 +311,7 @@ let string_of_bin_op logger op =
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
     end
 
-let string_of_bool_op logger op =
+let string_of_bin_bool_op logger op =
   let format = Loggers.get_encoding_format logger in
   match op with
   | Operator.AND ->
@@ -340,6 +340,25 @@ let string_of_bool_op logger op =
       | Loggers.Octave | Loggers.Matlab -> "|"
       | Loggers.Matrix
       | Loggers.Json
+      | Loggers.DOT
+      | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+      | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+    end
+
+let string_of_un_bool_op logger op =
+  let format = Loggers.get_encoding_format logger in
+  match op with
+  | Operator.NOT ->
+    begin
+      match
+        format
+      with
+      | Loggers.SBML -> "<not/>"
+      | Loggers.DOTNET
+      | Loggers.Maple | Loggers.Mathematica
+      | Loggers.Octave | Loggers.Matlab -> "!"
+      | Loggers.Json
+      | Loggers.Matrix
       | Loggers.DOT
       | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
       | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
