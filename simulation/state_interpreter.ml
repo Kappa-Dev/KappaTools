@@ -179,9 +179,8 @@ let rec perturbate ~outputs env counter graph state = function
           ((false,graph,state),[]) pert.Primitives.effect in
       let () = state.perturbations_not_done_yet.(i) <- false in
       let alive =
-          match pert.Primitives.abort with
-          | None -> false
-          | Some (ex,_) -> not (Rule_interpreter.value_bool counter graph ex) in
+        not (Rule_interpreter.value_bool
+               counter graph (fst pert.Primitives.abort)) in
       let () = if alive&&(pert.Primitives.alarm = None) then
           state.force_test_perturbations <- List_util.merge_uniq
               Mods.int_compare [i] state.force_test_perturbations in

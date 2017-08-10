@@ -518,8 +518,7 @@ type perturbation =
   { alarm: Nbr.t option;
     precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
-    abort : (Pattern.id array list,int)
-      Alg_expr.bool Locality.annot option;
+    abort : (Pattern.id array list,int) Alg_expr.bool Locality.annot;
   }
 
 let bool_expr_to_yojson =
@@ -537,8 +536,7 @@ let perturbation_to_yojson p =
     "alarm", JsonUtil.of_option (fun n -> Nbr.to_yojson n) p.alarm;
     "condition", Locality.annot_to_json bool_expr_to_yojson p.precondition;
     "effect", JsonUtil.of_list modification_to_yojson p.effect;
-    "abort",
-    JsonUtil.of_option (Locality.annot_to_json bool_expr_to_yojson) p.abort ]
+    "abort", Locality.annot_to_json bool_expr_to_yojson p.abort ]
 
 let perturbation_of_yojson = function
   | `Assoc l as x when List.length l = 4 ->
@@ -550,9 +548,7 @@ let perturbation_of_yojson = function
            effect =
              JsonUtil.to_list modification_of_yojson (List.assoc "effect" l);
            abort =
-             JsonUtil.to_option
-               (Locality.annot_of_json bool_expr_of_yojson)
-               (List.assoc "abort" l);
+             Locality.annot_of_json bool_expr_of_yojson (List.assoc "abort" l);
          }
        with Not_found ->
          raise (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
@@ -632,7 +628,7 @@ let map_expr_perturbation f_alg f_bool x =
   { alarm = x.alarm;
     precondition = f_bool x.precondition;
     effect = List.map (map_expr_modification f_alg) x.effect;
-    abort = Option_util.map f_bool x.abort;
+    abort = f_bool x.abort;
   }
 
 let stops_of_perturbation algs_deps x =
@@ -645,12 +641,10 @@ let stops_of_perturbation algs_deps x =
              (ExceptionDefn.Malformed_Decl
                 ("Equality test on time requires an alarm",(snd x.precondition)))
        in
-       let () = match x.abort with
-         | None -> ()
-         | Some (x,pos) ->
-            if (Alg_expr.is_equality_test_time algs_deps x) then
-              raise
-                (ExceptionDefn.Malformed_Decl
-                   ("Equality test on time requires an alarm",pos)) in
+       let () =
+         if (Alg_expr.is_equality_test_time algs_deps (fst x.abort)) then
+           raise
+             (ExceptionDefn.Malformed_Decl
+                ("Equality test on time requires an alarm",(snd x.abort))) in
        [] in
   stopping_time

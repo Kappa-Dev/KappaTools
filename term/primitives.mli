@@ -125,8 +125,7 @@ type perturbation =
   { alarm: Nbr.t option;
     precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
-    abort : (Pattern.id array list,int)
-        Alg_expr.bool Locality.annot option;
+    abort : (Pattern.id array list,int) Alg_expr.bool Locality.annot;
   }
 
 val perturbation_to_yojson : perturbation -> Yojson.Basic.json
