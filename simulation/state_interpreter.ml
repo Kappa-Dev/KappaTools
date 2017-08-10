@@ -156,10 +156,18 @@ let rec perturbate ~outputs env counter graph state = function
   | [] -> (false,graph,state)
   | i :: tail ->
     let pert = Model.get_perturbation env i in
+    let mod_alarm = match pert.Primitives.alarm with
+      | None -> true
+      | Some n ->
+         match Nbr.to_float n with
+         | None -> false
+         | Some f ->
+            mod_float (Counter.current_time counter) f = 0.0 in
     if state.perturbations_alive.(i) &&
        state.perturbations_not_done_yet.(i) &&
        Rule_interpreter.value_bool
-         counter graph (fst pert.Primitives.precondition)
+         counter graph (fst pert.Primitives.precondition) &&
+         mod_alarm
     then
       let (stop,graph,state as acc,extra) =
         List.fold_left (fun ((stop,graph,state),extra as acc) effect ->
@@ -171,7 +179,7 @@ let rec perturbate ~outputs env counter graph state = function
           match pert.Primitives.abort with
           | None -> false
           | Some (ex,_) -> not (Rule_interpreter.value_bool counter graph ex) in
-      let () = if alive then
+      let () = if alive&&(pert.Primitives.alarm = None) then
           state.force_test_perturbations <- List_util.merge_uniq
               Mods.int_compare [i] state.force_test_perturbations in
       let () = state.perturbations_alive.(i) <- alive in
