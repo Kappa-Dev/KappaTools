@@ -6,5 +6,3 @@ File "rafinements.ka", line 122, characters 6-121:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
 File "rafinements.ka", line 124, characters 6-163:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "rafinements.ka", line 129, characters 12-18:
-Warning: [Emax] constant is evaluated to infinity
