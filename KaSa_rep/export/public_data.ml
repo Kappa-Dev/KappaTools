@@ -42,6 +42,7 @@ let edit = "edit_rule"
 
 type accuracy_level = Low | Medium | High | Full
 let accuracy_levels = [ Low; Medium; High; Full ]
+let contact_map_accuracy_levels = [ Low; High ]
 
 let accuracy_to_string = function
   | Low -> "low"

@@ -48,7 +48,7 @@ let accuracy_chooser =
          (Public_data.accuracy_to_string x)) in
   Html.select
     ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
-    (List.map option_gen Public_data.accuracy_levels)
+    (List.map option_gen Public_data.contact_map_accuracy_levels)
 
 let content () =
   let accuracy_form =
