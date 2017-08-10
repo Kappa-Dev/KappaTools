@@ -18,9 +18,12 @@ type t = {
   with_delta_activities : bool;
 }
 
+let compare_stops (_,t1,p1) (_,t2,p2) =
+  let t = Nbr.compare t1 t2 in
+  if t = 0 then compare p1 p2 else t
+
 let empty ~with_delta_activities env stopping_times =
-  let stops =
-    List.sort (fun (_,a,_) (_,b,_) -> Nbr.compare a b) stopping_times in
+  let stops = List.sort compare_stops stopping_times in
   let time_dependent_perts =
     let rec aux dep acc =
       Operator.DepSet.fold
@@ -359,7 +362,8 @@ let a_loop
       | (rt,ti,pe) :: tail ->
          let tail' = match rt with
            | None -> tail
-           | Some repeat_time -> (rt,(Nbr.add ti repeat_time),pe)::tail in
+           | Some n ->
+              List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail in
         let () = state.stopping_times <- tail' in
         let continue = Counter.one_time_correction_event counter ti in
         let () =
@@ -374,7 +378,9 @@ let a_loop
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
          let tail' = match rt with
            | None -> tail
-           | Some repeat_time -> (rt,(Nbr.add ti repeat_time),pe)::tail in
+           | Some n ->
+              List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail
+        in
         let () = state.stopping_times <- tail' in
         let continue = Counter.one_time_correction_event counter ti in
         let () =
