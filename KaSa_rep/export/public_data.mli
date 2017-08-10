@@ -18,6 +18,8 @@ val wildcard:string
 
 type accuracy_level = Low | Medium | High | Full
 val accuracy_levels : accuracy_level list
+val contact_map_accuracy_levels : accuracy_level list
+
 
 val accuracy_to_string : accuracy_level -> string
 val accuracy_of_string : string -> accuracy_level option
