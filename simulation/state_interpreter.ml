@@ -11,7 +11,7 @@ type t = {
   mutable stopping_times : (Nbr.t option * Nbr.t * int) list;
   perturbations_alive : bool array;
   time_dependent_perts : int list;
-  mutable active_perturbations : int list;
+  mutable force_test_perturbations : int list;
   perturbations_not_done_yet : bool array;
   (* internal array for perturbate function (global to avoid useless alloc) *)
   mutable flux: (Data.flux_data) list;
@@ -38,7 +38,7 @@ let empty ~with_delta_activities env stopping_times =
     stopping_times = stops;
     perturbations_alive =
       Array.make (Model.nb_perturbations env) true;
-    active_perturbations = [];
+    force_test_perturbations = [];
     time_dependent_perts;
     perturbations_not_done_yet =
       Array.make (Model.nb_perturbations env) true;
@@ -172,8 +172,8 @@ let rec perturbate ~outputs env counter graph state = function
           | None -> false
           | Some (ex,_) -> not (Rule_interpreter.value_bool counter graph ex) in
       let () = if alive then
-          state.active_perturbations <- List_util.merge_uniq
-              Mods.int_compare [i] state.active_perturbations in
+          state.force_test_perturbations <- List_util.merge_uniq
+              Mods.int_compare [i] state.force_test_perturbations in
       let () = state.perturbations_alive.(i) <- alive in
       if stop then acc else
         perturbate ~outputs env counter graph state
@@ -311,11 +311,11 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
       Rule_interpreter.update_outdated_activities
         register_new_activity env counter graph' in
     let () = finalize_registration syntax_rid in
-    let actives = state.active_perturbations in
-    let () = state.active_perturbations <- [] in
+    let force_tested = state.force_test_perturbations in
+    let () = state.force_test_perturbations <- [] in
     let (stop,graph''',state') =
       perturbate ~outputs env counter graph'' state
-        (List.rev_append actives extra_pert) in
+        (List.rev_append force_tested extra_pert) in
     let () =
       Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
         state.perturbations_not_done_yet in
