@@ -1,26 +1,38 @@
 From KaSim 3 to KaSim 4
 =======================
 
-- Options '-t' '-e' and '-p' are removed!
+Kappa syntax
+------------
 
-You should specify the limit of simulation by '-l' and the plot period
-(how often you want a data line) by the "new" '-p'. These options are
-by default in "simulated time unit" but you can switch to event using
-'-u event'.
+- BACKWARD INCOMPATIBLE: A free site in a pattern is written
+'!.'. Writting a site name alone means that you don't care about its
+state.
 
-The motivation is interactivity. If you don't specify any limit, the
-simulation will run forever.  (Use Ctrl-c to stop).
+To be clearer:
+semantic      | KaSim3 syntax | KaSim4 syntax
+_____________________________________________
+x is free     |      A(x)     |    A(x!.)
+x is whatever |      A(x?)    |    A(x)
 
-- Data files are printed using the comma separated value format
-  (instead of space separated value) by default.
+Rational: 'A(u~p)' used to mean "u is free and in state p" whereas it
+now only means "u is in state p".
 
-The default name of the output file is therefore 'data.csv'.
+you can specify `%def: "syntaxVersion" "3"` (or '-syntax 3' in the
+command line) to use KaSim4 with a model in KaSim3 syntax. In
+addition, the ouptut log file "inputs.ka" will be a copy of your model
+in KaSim4 syntax.
 
-KaSim can also generate (based on the extension of the output file)
-tsv or svg files.
+- Rates for unary instances of rule involving ambiguous molecularity
+  are in {} instead of ()
 
-The motivation is to deal with weird values (e.g. infinity, not a number) in a
-way understood by (at least) Gnuplot, Python, Matlab, ...
+- Repetitive perturbation syntax is now
+`%mod: [precondition] do [modifications] repeat [condition]`
+
+Beware: the second condition is the negation of the old until clause.
+
+- tokens are initialised like species: `%init: [alg_expr] [token_name]`.
+
+- No need to put ':' in rules between the quantity and the token name.
 
 - There is no special case for "observables"
 
@@ -42,6 +54,31 @@ As a (more or less direct) consequence, you can write
 and
 $TRACK "pattern" [true]
 
+
+Misc
+----
+
+- Options '-t' '-e' and '-p' are removed!
+
+You should specify the limit of simulation by '-l' and the plot period
+(how often you want a data line) by the "new" '-p'. These options are
+by default in "simulated time unit" but you can switch to event using
+'-u event'.
+
+The motivation is interactivity. If you don't specify any limit, the
+simulation will run forever.  (Use Ctrl-c to stop).
+
+- Data files are printed using the comma separated value format
+  (instead of space separated value) by default.
+
+The default name of the output file is therefore 'data.csv'.
+
+KaSim can also generate (based on the extension of the output file)
+tsv or svg files.
+
+The motivation is to deal with weird values (e.g. infinity, not a number) in a
+way understood by (at least) Gnuplot, Python, Matlab, ...
+
 - Modification $STOP without argument does not dump a snapshot
 
 Use $STOP "something" to get one
@@ -58,7 +95,3 @@ phase.
 
 Concretely the old behavior of Ctrl-c and then y(es I want a snapshot)
 is recovered by Ctrl-c and the modification $STOP "dump.ka"
-
-- Rates for unary instances of rule involving ambiguous molecularity
-  are in {} instead of ()
-
