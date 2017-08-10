@@ -639,19 +639,18 @@ let stops_of_perturbation algs_deps x =
   let stopping_time = match x.alarm with
     | Some n -> [(Some n,n)]
     | None ->
-       try Alg_expr.stops_of_bool algs_deps (fst x.precondition)
-       with ExceptionDefn.Unsatisfiable ->
-         raise
-           (ExceptionDefn.Malformed_Decl
-              ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-              ,(snd x.precondition)))
-  in
-  match x.abort with
-  | None -> stopping_time
-  | Some (x,pos) ->
-    try stopping_time@(Alg_expr.stops_of_bool algs_deps x)
-    with ExceptionDefn.Unsatisfiable ->
-      raise
-        (ExceptionDefn.Malformed_Decl
-           ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-           ,pos))
+       let () =
+         if (Alg_expr.is_equality_test_time algs_deps (fst x.precondition)) then
+           raise
+             (ExceptionDefn.Malformed_Decl
+                ("Equality test on time requires an alarm",(snd x.precondition)))
+       in
+       let () = match x.abort with
+         | None -> ()
+         | Some (x,pos) ->
+            if (Alg_expr.is_equality_test_time algs_deps x) then
+              raise
+                (ExceptionDefn.Malformed_Decl
+                   ("Equality test on time requires an alarm",pos)) in
+       [] in
+  stopping_time

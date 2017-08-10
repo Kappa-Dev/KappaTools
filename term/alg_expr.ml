@@ -402,34 +402,14 @@ and bool_has_time_dep vars_deps = function
   | UN_BOOL_OP (_,a),_ ->
     bool_has_time_dep vars_deps a
 
-let rec stops_of_bool vars_deps is_repeat_time_pert = function
-  | TRUE | FALSE -> []
-  | UN_BOOL_OP (Operator.NOT,(a,_)) ->
-    stops_of_bool vars_deps is_repeat_time_pert a
-  | BIN_BOOL_OP (op,(a,_),(b,_)) ->
-    let st1 = stops_of_bool vars_deps is_repeat_time_pert a in
-    let st2 = stops_of_bool vars_deps is_repeat_time_pert b in
-    (match op,st1,st2 with
-     | _, [], _ -> st2
-     | _, _, [] -> st1
-     | Operator.OR, n1, n2 -> n1 @ n2
-     | Operator.AND, n1, _ ->
-        if is_repeat_time_pert then n1
-        else raise ExceptionDefn.Unsatisfiable
-    )
-  | COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->
-    match op with
-    | Operator.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
-      begin match a1,b1 with
-        | STATE_ALG_OP (Operator.TIME_VAR), CONST n
-        | CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [(None, n)]
-        | ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
-          | DIFF_TOKEN _ | DIFF_KAPPA_INSTANCE _
-          | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
-                          Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
-                          Operator.EMAX_VAR |Operator.TMAX_VAR)
-          | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _ | IF _), _ ->
-           if is_repeat_time_pert then []
-           else raise ExceptionDefn.Unsatisfiable
-      end
-    | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) -> []
+let rec is_equality_test_time vars_deps = function
+  | TRUE | FALSE -> false
+  | UN_BOOL_OP (Operator.NOT,(a,_)) -> is_equality_test_time vars_deps a
+  | BIN_BOOL_OP (_,(a,_),(b,_)) ->
+     (is_equality_test_time vars_deps a)||(is_equality_test_time vars_deps b)
+  | COMPARE_OP (op,a,b) ->
+     match op with
+     | Operator.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
+        true
+     | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) ->
+        false

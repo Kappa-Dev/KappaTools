@@ -123,7 +123,7 @@ val propagate_constant_bool :
   (string Locality.annot * ('a,int) e Locality.annot) array ->
   ('a,int) bool Locality.annot -> ('a,int) bool Locality.annot
 
-val stops_of_bool :
+val is_equality_test_time :
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  pervasives_bool -> ('a,int) bool -> (Nbr.t option * Nbr.t) list
+  ('a,int) bool -> pervasives_bool

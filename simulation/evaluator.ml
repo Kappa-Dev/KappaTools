@@ -58,9 +58,8 @@ let get_pause_criteria ~max_sharing ~new_syntax contact_map env graph b =
          (Rule_interpreter.incorporate_extra_pattern fenv)
          graph
          (Primitives.extract_connected_components_bool bpos'')) in
-  let () = if try Alg_expr.stops_of_bool
-                    (Model.all_dependencies env) false b'' <> []
-    with ExceptionDefn.Unsatisfiable -> true then
+  let () =
+    if Alg_expr.is_equality_test_time (Model.all_dependencies env) b'' then
       raise (ExceptionDefn.Malformed_Decl
                ("[T] can only be used in inequalities",pos_b'')) in
   (env',graph',b'')
