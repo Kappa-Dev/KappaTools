@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 31 2017>
+  * Last modification: Time-stamp: <Aug 10 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -395,6 +395,28 @@ type internal_constraints_list =
 type symmetric_sites = Symmetries.symmetries option
 (*******************************************************************)
 
+type influence_edge = Quark_type.Labels.label_set_couple
+
+type bidirectional_influence_map =
+  {
+    positive_influence_rule_fwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_rule_bwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_var_fwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_var_bwd:
+      (influence_node * influence_edge) list array;
+    negative_influence_rule_fwd:
+      (influence_node * influence_edge) list array;
+    negative_influence_rule_bwd:
+      (influence_node * influence_edge) list array;
+    negative_influence_var_fwd:
+      (influence_node * influence_edge) list array;
+    negative_influence_var_bwd:
+      (influence_node * influence_edge) list array;
+  }
+
 type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
@@ -411,6 +433,8 @@ type ('static,'dynamic) state =
     quark_map: quark_map option ;
     internal_influence_map: internal_influence_map Public_data.AccuracyMap.t ;
     influence_map : influence_map Public_data.AccuracyMap.t ;
+    bidirectional_influence_map :
+      bidirectional_influence_map Public_data.AccuracyMap.t ;
     internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
     contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
@@ -473,6 +497,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     quark_map = None ;
     internal_influence_map = Public_data.AccuracyMap.empty ;
     influence_map = Public_data.AccuracyMap.empty ;
+    bidirectional_influence_map = Public_data.AccuracyMap.empty ;
     internal_contact_map = Public_data.AccuracyMap.empty ;
     contact_map = Public_data.AccuracyMap.empty ;
     signature = None ;
@@ -739,6 +764,13 @@ let set_influence_map accuracy map state =
 
 let get_influence_map accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.influence_map
+
+let set_bidirectional_influence_map accuracy map state =
+  {state with bidirectional_influence_map =
+                Public_data.AccuracyMap.add accuracy map state.bidirectional_influence_map}
+
+let get_bidirectional_influence_map accuracy state =
+  Public_data.AccuracyMap.find_option accuracy state.bidirectional_influence_map
 
 let set_internal_influence_map accuracy map state =
   {state

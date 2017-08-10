@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Jul 31 2017>
+  * Last modification: Time-stamp: <Aug 10 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -69,6 +69,28 @@ val influence_map_of_json:
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
   * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
+type influence_edge = Quark_type.Labels.label_set_couple
+
+type bidirectional_influence_map =
+  {
+    positive_influence_rule_fwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_rule_bwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_var_fwd:
+      (influence_node * influence_edge) list array;
+    positive_influence_var_bwd:
+      (influence_node * influence_edge) list array;
+    negative_influence_rule_fwd:
+        (influence_node * influence_edge) list array;
+    negative_influence_rule_bwd:
+        (influence_node * influence_edge) list array;
+    negative_influence_var_fwd:
+        (influence_node * influence_edge) list array;
+    negative_influence_var_bwd:
+        (influence_node * influence_edge) list array;
+  }
 
 type ('static,'dynamic) reachability_result = 'static * 'dynamic
 
@@ -216,6 +238,14 @@ val set_influence_map:
 val get_influence_map:
   Public_data.accuracy_level -> ('static, 'compile) state ->
   influence_map option
+
+val set_bidirectional_influence_map:
+    Public_data.accuracy_level -> bidirectional_influence_map ->
+    ('static, 'compile) state -> ('static, 'compile) state
+
+val get_bidirectional_influence_map:
+    Public_data.accuracy_level -> ('static, 'compile) state ->
+    bidirectional_influence_map option
 
 val set_ode_flow: Ode_fragmentation_type.ode_frag -> ('static, 'compile) state -> ('static, 'compile) state
 
