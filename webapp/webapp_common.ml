@@ -240,8 +240,9 @@ let route_handler
   in
   fun ~(context:context) ->
     let url : string =
-      Uri.path
-        (Request.uri context.request)
+      Uri.pct_decode
+        (Uri.path
+           (Request.uri context.request))
     in
 
     (if context.request.meth = `OPTIONS then
