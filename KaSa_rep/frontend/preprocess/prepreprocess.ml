@@ -862,9 +862,13 @@ let translate_compil parameters error compil =
       compil.Ast.init in
   let error,perturbations_rev =
     List.fold_left
-      (fun (error,list) ((b,m,o),p) ->
-         let error,b' =
-           bool_with_pos_map (refine_mixture parameters) error (snd b)
+      (fun (error,list) ((alarm,b,m,o),p) ->
+         let error,b' = match b with
+           | None -> error,None
+           | Some b ->
+              let error,b' =
+                bool_with_pos_map (refine_mixture parameters) error b in
+              error,Some b'
          in
          let error,o' =
            bool_with_pos_with_option_map (refine_mixture parameters) error o
@@ -911,7 +915,7 @@ let translate_compil parameters error compil =
              (error,[])
              m
          in
-         error,(((fst b,b'),List.rev m'(*,p*),o'),p)::list
+         error,((alarm,b',List.rev m'(*,p*),o'),p)::list
       )
       (error,[])
       compil.Ast.perturbations

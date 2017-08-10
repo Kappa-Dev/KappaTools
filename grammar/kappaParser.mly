@@ -93,10 +93,10 @@ start_rule:
 						 ::r.Ast.observables}
 		      | Ast.PLOT expr ->
 			 {r with Ast.observables = expr::r.Ast.observables}
-		      | Ast.PERT ((pre,effect,opt),pos) ->
+		      | Ast.PERT ((alarm,pre,effect,opt),pos) ->
 			 {r with
 			  Ast.perturbations =
-			   ((pre,effect,opt),pos)::r.Ast.perturbations}
+			   ((alarm,pre,effect,opt),pos)::r.Ast.perturbations}
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
@@ -168,11 +168,18 @@ perturbation_post:
 
 perturbation_declaration:
     | perturbation_alarm bool_expr DO effect_list perturbation_post
-    { (($1,$2),$4,$5) }
+    { ($1,Some $2,$4,$5) }
     | perturbation_alarm DO effect_list perturbation_post
-    { (($1,Locality.dummy_annot Alg_expr.TRUE),$3,$4) }
+    { ($1,None,$3,$4) }
     | REPEAT bool_expr DO effect_list UNTIL bool_expr
-	   {let () = if List.exists
+       /* backward compatibility */
+       	   {ExceptionDefn.deprecated
+	      ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
+				    (Parsing.symbol_end_pos ()))
+	      "perturbation"
+	      (fun f -> Format.pp_print_string
+			  f "deprecated KaSim3 syntax");
+              let () = if List.exists
 			  (fun effect ->
 			   match effect with
 			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
@@ -189,7 +196,7 @@ perturbation_declaration:
 			 (fun f ->
 			  Format.pp_print_string
 			    f "Perturbation need not be applied repeatedly") in
-	    ((None,$2),$4,Some $6)}
+	    (None,Some $2,$4,Some $6)}
      | perturbation_alarm bool_expr SET effect_list
 		{ExceptionDefn.deprecated
 		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())
@@ -197,7 +204,7 @@ perturbation_declaration:
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
 			       f "'set' keyword is replaced by 'do'");
-		 (($1,$2),$4,None)} /*For backward compatibility*/
+		 ($1,Some $2,$4,None)} /*For backward compatibility*/
     ;
 
 standalone_effect_list: effect_list EOF {$1}

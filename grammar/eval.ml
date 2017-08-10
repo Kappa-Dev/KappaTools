@@ -342,15 +342,28 @@ let effects_of_modifs
 let compile_modifications_no_track =
   effects_of_modifs [] [] (Operator.PERT (-1))
 
+(* perturbations without pre and post, but with alarm are not applied
+at initialisation *)
+let pert_not_init = function
+  | (Some _, None, None) ->
+     let t_var = Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
+     let zero = Locality.dummy_annot (Alg_expr.CONST Nbr.zero) in
+     Locality.dummy_annot (Alg_expr.COMPARE_OP (Operator.GREATER,t_var,zero))
+  | (None, None, None) | (Some _, None, Some _) | (None, None, Some _) ->
+     Locality.dummy_annot (Alg_expr.TRUE)
+  | (_, Some p, _) -> p
+
+
 let pert_of_result
     ast_algs ast_rules alg_deps ?bwd_bisim ~compileModeOn contact_map domain res =
   let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
       (fun (domain, alg_deps, p_id, lpert, tracking_enabled)
-        ((pre_expr, modif_expr_list, opt_post),_) ->
+        ((alarm, pre_expr, modif_expr_list, opt_post),_) ->
         let origin = Operator.PERT p_id in
+        let pre_expr' = pert_not_init (alarm,pre_expr,opt_post) in
         let (domain',pre) =
-          compile_bool ?bwd_bisim ~compileModeOn ~origin contact_map domain (snd pre_expr) in
+          compile_bool ?bwd_bisim ~compileModeOn ~origin contact_map domain pre_expr' in
         let alg_deps' = Alg_expr.add_dep_bool alg_deps origin pre in
         let (domain, effects) =
           effects_of_modifs
@@ -375,7 +388,7 @@ let pert_of_result
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
         let pert =
-          { Primitives.alarm = (fst pre_expr);
+          { Primitives.alarm = alarm;
             Primitives.precondition = pre;
             Primitives.effect = effects;
             Primitives.abort = opt;

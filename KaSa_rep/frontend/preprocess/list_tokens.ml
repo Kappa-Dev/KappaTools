@@ -444,7 +444,7 @@ let scan_observables _scan_mixt _parameters remanent _variable = (*TODO*)
 
 let scan_perts scan_mixt parameters =
   List.fold_left
-    (fun remanent ((_,m,_),_) ->
+    (fun remanent ((_,_,m,_),_) ->
        List.fold_left
          (fun remanent m ->
             match m with

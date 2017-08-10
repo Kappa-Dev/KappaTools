@@ -1013,7 +1013,7 @@ let mixture_of_modif =
   | Ast.FLUX _
   | Ast.FLUXOFF _ -> None
 
-let introduceable_species_in_pertubation parameter error f ((_,list,_),_) =
+let introduceable_species_in_pertubation parameter error f ((_,_,list,_),_) =
   List.fold_left
     (fun (error,list) a ->
        match mixture_of_modif a

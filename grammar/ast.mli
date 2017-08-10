@@ -92,7 +92,8 @@ type ('mixture,'id) modif_expr =
        * 'mixture Locality.annot)
 
 type ('mixture,'id) perturbation =
-  ((Nbr.t option * ('mixture,'id) Alg_expr.bool Locality.annot) *
+  (Nbr.t option *
+   ('mixture,'id) Alg_expr.bool Locality.annot option *
    (('mixture,'id) modif_expr list) *
    ('mixture,'id) Alg_expr.bool Locality.annot option)
     Locality.annot

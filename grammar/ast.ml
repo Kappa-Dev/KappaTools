@@ -90,7 +90,8 @@ type ('mixture,'id) modif_expr =
        * 'mixture Locality.annot)
 
 type ('mixture,'id) perturbation =
-  ((Nbr.t option * ('mixture,'id) Alg_expr.bool Locality.annot) *
+  (Nbr.t option *
+   ('mixture,'id) Alg_expr.bool Locality.annot option *
    (('mixture,'id) modif_expr list) *
    ('mixture,'id) Alg_expr.bool Locality.annot option) Locality.annot
 
@@ -704,7 +705,7 @@ let sig_from_rules =
 
 let sig_from_perts =
   List.fold_left
-    (fun acc ((_,p,_),_) ->
+    (fun acc ((_,_,p,_),_) ->
        List.fold_left
          (fun (ags,toks) -> function
             | INTRO (_,(m,_)) ->
@@ -792,12 +793,12 @@ let compil_to_json c =
         (List.map (fun (_,a,i) -> (a,i)) c.init);
       "perturbations", JsonUtil.of_list
         (Locality.annot_to_json
-           (fun (pre,modif,post) ->
+           (fun (alarm,pre,modif,post) ->
               `List [
-                `List [
-                  JsonUtil.of_option (fun n -> Nbr.to_yojson n) (fst pre);
-                  Locality.annot_to_json
-                    (Alg_expr.bool_to_yojson mix_to_json var_to_json) (snd pre)];
+                 JsonUtil.of_option Nbr.to_yojson alarm;
+                 JsonUtil.of_option
+                   (Locality.annot_to_json
+                      (Alg_expr.bool_to_yojson mix_to_json var_to_json)) pre;
                 JsonUtil.of_list (modif_to_json mix_to_json var_to_json) modif;
                 JsonUtil.of_option
                   (Locality.annot_to_json
@@ -863,18 +864,11 @@ let compil_of_json = function
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST perturbations")
               (Locality.annot_of_json
                  (function
-                   | `List [pre; modif; post] ->
-                      let pre_of_json = match pre with
-                        | `List [n; c] ->
-                           JsonUtil.to_option (fun n -> Nbr.of_yojson n) n,
-                           (Locality.annot_of_json
-                              (Alg_expr.bool_of_yojson mix_of_json var_of_json)
-                              c)
-                        | x ->
-                           raise
-                             (Yojson.Basic.Util.Type_error
-                                ("Invalid perturbation",x)) in
-                      (pre_of_json,
+                   | `List [alarm; pre; modif; post] ->
+                      (JsonUtil.to_option Nbr.of_yojson alarm,
+                       JsonUtil.to_option
+                       (Locality.annot_of_json
+                        (Alg_expr.bool_of_yojson mix_of_json var_of_json)) pre,
                       JsonUtil.to_list
                         (modif_of_json mix_of_json var_of_json) modif,
                       JsonUtil.to_option

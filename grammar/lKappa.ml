@@ -1296,27 +1296,15 @@ let modif_expr_of_ast ~new_syntax sigs tok algs contact_map modif acc =
       (b,List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
        (mixture_of_ast ~new_syntax sigs pos m,pos)),acc
 
-let every_time_perturbation pre =
-  match (fst pre) with
-  | None -> pre
-  | Some n ->
-     let t_var = Locality.dummy_annot (Alg_expr.STATE_ALG_OP Operator.TIME_VAR) in
-     let n_const = Locality.dummy_annot (Alg_expr.CONST n) in
-     let zero = Locality.dummy_annot (Alg_expr.CONST Nbr.zero) in
-     let modulo_n = Locality.dummy_annot
-	              (Alg_expr.BIN_ALG_OP (Operator.MODULO,t_var,n_const)) in
-     let mod_is_zero = Locality.dummy_annot
-	                 (Alg_expr.COMPARE_OP (Operator.EQUAL,modulo_n,zero)) in
-     let time_mod_n = Alg_expr.BIN_BOOL_OP (Operator.AND,mod_is_zero,snd pre) in
-     (Some n, (time_mod_n, snd(snd pre)))
-
 let perturbation_of_ast
-    ~new_syntax sigs tok algs contact_map ((pre,mods,post),pos) up_vars =
-  let (a,b) = every_time_perturbation pre in
+    ~new_syntax sigs tok algs contact_map ((alarm,pre,mods,post),pos) up_vars =
   let mods',up_vars' =
     List_util.fold_right_map
       (modif_expr_of_ast ~new_syntax sigs tok algs contact_map) mods up_vars in
-  (((a,bool_expr_of_ast ~new_syntax sigs tok algs b),
+  let pre'= match pre with
+    | None -> None
+    | Some p -> Some (bool_expr_of_ast ~new_syntax sigs tok algs p) in
+  ((alarm,pre',
     mods',
     match post with
     | None -> None
