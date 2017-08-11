@@ -240,3 +240,4 @@ let main () =
   ()
 
 let () = main ()
+let _ = Local_influence_map.explore_influence_map

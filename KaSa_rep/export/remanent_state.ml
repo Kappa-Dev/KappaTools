@@ -399,22 +399,14 @@ type influence_edge = Quark_type.Labels.label_set_couple
 
 type bidirectional_influence_map =
   {
-    positive_influence_rule_fwd:
-      (influence_node * influence_edge) list array;
-    positive_influence_rule_bwd:
-      (influence_node * influence_edge) list array;
-    positive_influence_var_fwd:
-      (influence_node * influence_edge) list array;
-    positive_influence_var_bwd:
-      (influence_node * influence_edge) list array;
-    negative_influence_rule_fwd:
-      (influence_node * influence_edge) list array;
-    negative_influence_rule_bwd:
-      (influence_node * influence_edge) list array;
-    negative_influence_var_fwd:
-      (influence_node * influence_edge) list array;
-    negative_influence_var_bwd:
-      (influence_node * influence_edge) list array;
+    positive_influence_fwd:
+      (Ckappa_sig.c_rule_id * influence_edge) list array;
+    positive_influence_bwd:
+      (Ckappa_sig.c_rule_id * influence_edge) list array;
+    negative_influence_fwd:
+      (Ckappa_sig.c_rule_id * influence_edge) list array;
+    negative_influence_bwd:
+      (Ckappa_sig.c_rule_id * influence_edge) list array;
   }
 
 type ('static,'dynamic) state =
