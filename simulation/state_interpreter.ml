@@ -237,7 +237,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
            (fun _ _ _  -> ()) env counter graph in
        let everybody =
          let t  = Array.length state0.perturbations_alive in
-         Tools.recti (fun l i -> (t-i-1)::l) [] t in
+         Tools.recti (fun l i -> i::l) [] t in
        let out = perturbate ~outputs env counter mid_graph state0 everybody in
        let () =
          Array.iteri (fun i _ -> state0.perturbations_not_done_yet.(i) <- true)
