@@ -16,7 +16,7 @@
 -A(), +B() @ 1
 -B(), +C() @ 1
 
-/*0*/%mod: [true] do $TRACK C() [true]
+/*0*/%mod: [true] do $TRACK C() [true] repeat ([false])
 
 %init: 10000 A()
 

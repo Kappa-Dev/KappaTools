@@ -11,7 +11,7 @@
 'dimmer' A(x!./!12), A(x!./!12) @ 0.01
 'dimmer_op' A(x!12/!.), A(x!12/!.) @ 1
 
-/*0*/%mod: [true] do $PRINTF "stream.txt" <"At ".[E]." ".|A(x!1), A(x!1)|> repeat [not] ([false])
+/*0*/%mod: [true] do $PRINTF "stream.txt" <"At ".[E]." ".|A(x!1), A(x!1)|> repeat ([not] ([false]))
 
 %init: 7 A(x!.)
 

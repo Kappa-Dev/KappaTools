@@ -11,8 +11,8 @@ done
 	 -update_domain construction
 	 3 (sub)observables 0 navigation steps
 	 -initial conditions
-+ Building initial state3rd printing alarm at 0.
-2nd printing alarm at 0.
++ Building initial state2nd printing alarm at 0.
+3rd printing alarm at 0.
  (16384 agents)
 Done
 + Command line to rerun is: 'KaSim' '-l' '5' '-d' 'output' '-seed' '20543' 'repeat_time.ka'

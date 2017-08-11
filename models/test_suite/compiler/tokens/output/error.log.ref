@@ -7,7 +7,7 @@ Environment:
   
   %plot: [T]
   
-  /*0*/%mod: ([E] = 5) do tt <- (22 - |tt|) + |tt|
+  /*0*/%mod: ([E] = 5) do tt <- (22 - |tt|) + |tt| repeat ([false])
   Signatures:
     %agent: A(x)
   Rules:

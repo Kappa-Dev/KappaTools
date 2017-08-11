@@ -11,7 +11,7 @@
 A(a~u/~p!.) @ 0.01
 A(a~p/~u!.) @ 0.01
 
-/*0*/%mod: alarm 1. [true] do $SNAPSHOT "rt.ka" repeat [not] ([not] ([true]))
+/*0*/%mod: alarm 1. [true] do $SNAPSHOT "rt.ka" repeat ([true])
 
 %init: 10000 A(a~u!.)
 

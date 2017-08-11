@@ -18,8 +18,8 @@ A(x!./!1), B(x!./!1) @ 1
 A(x!./!1), B(x!./!1) @ 1
 'GOAL' -A(x!1), -B(x~1!1), -C() @ 1
 
-/*0*/%mod: [true] do $TRACK A(x!1), B(x~1!1), C() [true]
-/*1*/%mod: ([T] > 10) do $UPDATE bad 0; $UPDATE goal 1
+/*0*/%mod: [true] do $TRACK A(x!1), B(x~1!1), C() [true] repeat ([false])
+/*1*/%mod: ([T] > 10) do $UPDATE bad 0; $UPDATE goal 1 repeat ([false])
 
 %init: 1 A(x!1), B(x~1!1)
 %init: 10 B(x~0!.)

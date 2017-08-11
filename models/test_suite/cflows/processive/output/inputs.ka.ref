@@ -15,7 +15,7 @@ A(x!1, y~u/~p!.), K(x!1) @ 1
 A(x!1, z~u/~p!.), K(x!1) @ 1
 'GOAL' A(y~p!., z~p!.) @ 10
 
-/*0*/%mod: [true] do $TRACK A(y~p, z~p) [true]
+/*0*/%mod: [true] do $TRACK A(y~p, z~p) [true] repeat ([false])
 
 %init: 10 A(x!., y~u!., z~u!.)
 %init: 10 K(x!.)

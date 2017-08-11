@@ -18,7 +18,7 @@
 'bc' B(c!./!1), C(c!./!1) @ 0.01
 'up' A(a~u/~p), C() @ 0 {100 :3}
 
-/*0*/%mod: ([E] = [Emax]) do $SNAPSHOT "abc.ka"
+/*0*/%mod: ([E] = [Emax]) do $SNAPSHOT "abc.ka" repeat ([false])
 
 %init: 100 A(a~u!.)
 %init: 100 B(a!., b!., c!.)

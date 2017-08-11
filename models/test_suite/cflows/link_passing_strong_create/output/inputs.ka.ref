@@ -18,7 +18,7 @@ B(x!1/!1), A(x!1/!.), +D(x!1) @ 1
 A(x!./!1), B(x!./!1) @ 1
 'GOAL' D(x!_/!.) @ 1
 
-/*0*/%mod: [true] do $TRACK B(x!1), D(x!1) [true]
+/*0*/%mod: [true] do $TRACK B(x!1), D(x!1) [true] repeat ([false])
 
 %init: 10 A(x!.)
 

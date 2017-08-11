@@ -13,7 +13,7 @@
 'B-' -B(x!_) @ 1
 'B+' +B(x!.) @ 1
 
-/*0*/%mod: [true] do $TRACK A(x!1), B(x!1) [true]
+/*0*/%mod: [true] do $TRACK A(x!1), B(x!1) [true] repeat ([false])
 
 %init: 1000 B(x!.)
 %init: 1 A(x!.)

@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -u t -l 2 -p 0.008 -d output rafinements.ka -o data.tsv -mode batch --max-sharing || exit 0
+"${KAPPABIN}"KaSim -p 0.008 -d output rafinements.ka -o data.tsv -mode batch --max-sharing || exit 0

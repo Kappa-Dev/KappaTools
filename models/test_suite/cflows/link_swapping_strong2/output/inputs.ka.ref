@@ -18,7 +18,7 @@ A(x!1/!1, y!2/!2), B(x!1/!2, y!2/!1) @ 1
 'GOAL' A(x!1/!.), B(y!1/!.) @ 1
 A(y!1/!.), B(x!1/!.) @ 1
 
-/*0*/%mod: [true] do $TRACK A(x!1), B(y!1) [true]
+/*0*/%mod: [true] do $TRACK A(x!1), B(y!1) [true] repeat ([false])
 
 %init: 1 A(x!., y!.)
 %init: 1 B(x!., y!.)

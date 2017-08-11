@@ -16,7 +16,7 @@ C(a!_/!.) @ 2
 +A(a!1, b!.), +B(a!1) @ 10
 +C(a~p!.) @ 10
 
-/*0*/%mod: [true] do $TRACK B(a!1), A(a!1), C(a~u!.) [true]
+/*0*/%mod: [true] do $TRACK B(a!1), A(a!1), C(a~u!.) [true] repeat ([false])
 
 %init: 2 C(a~u!1), C(a~p!1)
 

@@ -16,7 +16,7 @@
 'R2' A(x~b/~a!.) @ 100
 'R3' A(x~b/~c!.) @ 2
 
-/*0*/%mod: [true] do $TRACK A(x~c) [true]
+/*0*/%mod: [true] do $TRACK A(x~c) [true] repeat ([false])
 
 %init: n_a A(x~a!.)
 
