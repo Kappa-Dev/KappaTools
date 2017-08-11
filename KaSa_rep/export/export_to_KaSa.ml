@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 07 2017>
+  * Last modification: Time-stamp: <Aug 11 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -21,6 +21,8 @@ sig
   type internal_influence_map =
     Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
     Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+
+  type bidirectional_influence_map
 
   type internal_constraints_list
 
@@ -65,6 +67,10 @@ sig
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_influence_map
 
+  val get_bidirectional_influence_map:
+    ?accuracy_level:Public_data.accuracy_level ->
+    state -> state * bidirectional_influence_map
+
   val get_reachability_analysis: state -> state * reachability_analysis
 
   val get_constraints_list : state -> state * internal_constraints_list
@@ -106,6 +112,11 @@ module Export =
 
       let get_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map
+      let get_bidirectional_influence_map
+      ?accuracy_level:(accuracy_level=Public_data.Low)
+      (state:state) =
+        ((get_bidirectional_influence_map ~accuracy_level state): state * bidirectional_influence_map)
+
       let get_constraints_list = get_internal_constraints_list
       let output_contact_map = output_internal_contact_map
       let output_influence_map = output_internal_influence_map

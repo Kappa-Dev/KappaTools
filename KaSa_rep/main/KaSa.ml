@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 10 2017>
+ * Last modification: Time-stamp: <Aug 11 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -99,17 +99,20 @@ let main () =
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then
-      Export_to_KaSa.output_influence_map
-        ~accuracy_level:
-          (match
-             Remanent_parameters.get_influence_map_accuracy_level parameters
-           with
-           | Remanent_parameters_sig.None
-           | Remanent_parameters_sig.Low -> Public_data.Low
-           | Remanent_parameters_sig.Medium -> Public_data.Medium
-           | Remanent_parameters_sig.High
-           | Remanent_parameters_sig.Full -> Public_data.High)
-        state
+      let state =
+        Export_to_KaSa.output_influence_map
+          ~accuracy_level:
+            (match
+               Remanent_parameters.get_influence_map_accuracy_level parameters
+             with
+             | Remanent_parameters_sig.None
+             | Remanent_parameters_sig.Low -> Public_data.Low
+             | Remanent_parameters_sig.Medium -> Public_data.Medium
+             | Remanent_parameters_sig.High
+             | Remanent_parameters_sig.Full -> Public_data.High)
+          state
+      in
+      state
     else
       state
   in
@@ -237,4 +240,3 @@ let main () =
   ()
 
 let () = main ()
-let _ = Bidirectional_influence_map.dump 

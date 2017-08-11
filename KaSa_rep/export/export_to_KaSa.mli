@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 07 2017>
+  * Last modification: Time-stamp: <Aug 11 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -23,6 +23,8 @@ sig
     Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
   type internal_constraints_list
+
+  type bidirectional_influence_map
 
   val empty_constraints_list : internal_constraints_list
 
@@ -53,7 +55,7 @@ sig
 
   val get_c_compilation: state -> state * c_compilation
 
-  (*WORK IN PROCESS*)
+  (*WORK IN PROGRESS*)
   (*val get_graph_scc : state -> state * Graphs.node list*)
 
   val get_contact_map:
@@ -63,6 +65,10 @@ sig
   val get_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_influence_map
+
+  val get_bidirectional_influence_map:
+    ?accuracy_level:Public_data.accuracy_level ->
+    state -> state * bidirectional_influence_map
 
   val get_reachability_analysis: state -> state * reachability_analysis
 

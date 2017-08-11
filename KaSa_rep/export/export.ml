@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 07 2017>
+  * Last modification: Time-stamp: <Aug 11 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -49,6 +49,7 @@ type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
+type bidirectional_influence_map = Remanent_state.bidirectional_influence_map
 type handler = Cckappa_sig.kappa_handler
 
 type internal_constraints_list = Remanent_state.internal_constraints_list
@@ -1010,6 +1011,7 @@ let compute_map_gen
   let state, rep = convert (fun _ -> ()) state internal in
   store accuracy_level rep state, rep
 
+
 let compute_influence_map
     ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
   compute_map_gen
@@ -1032,6 +1034,42 @@ let get_influence_map
   get_gen
     (Remanent_state.get_influence_map accuracy_level)
     (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
+
+let convert_to_birectional_influence_map
+    show_title state influence_map =
+  let parameters = Remanent_state.get_parameters state in
+  let state, handler = get_handler state in
+  let error = Remanent_state.get_errors state in
+  let () = show_title state in
+  let nrules = Handler.nrules parameters error handler in
+  let nvars = Handler.nvars parameters error handler in
+  let output =
+    Bidirectional_influence_map.convert ~nrules ~nvars influence_map
+  in
+  state, output
+
+let compute_bidirectional_influence_map
+    ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
+  compute_map_gen
+    get_internal_influence_map
+    Remanent_state.set_bidirectional_influence_map
+    convert_to_birectional_influence_map
+    ~accuracy_level
+
+let get_bidirectional_influence_map
+    ?accuracy_level:(accuracy_level=Public_data.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title:(log_title=
+                (fun x ->
+                   match x with
+                   | Public_data.Low ->
+                     Some "Compute the bidirectional influence map"
+                   | Public_data.Medium
+                   | Public_data.High | Public_data.Full ->
+                     Some "Refine the bidirectional influence map")) =
+  get_gen
+    (Remanent_state.get_bidirectional_influence_map accuracy_level)
+    (compute_bidirectional_influence_map ~accuracy_level ~do_we_show_title ~log_title)
 
 let query_inhibition_map ?accuracy_level state r1 r2 =
   let state,inf_map = get_influence_map ?accuracy_level state in

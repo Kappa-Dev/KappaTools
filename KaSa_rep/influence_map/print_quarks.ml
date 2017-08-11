@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 8th 2011.
- * Last modification: Time-stamp: <Nov 14 2016>
+ * Last modification: Time-stamp: <Aug 11 2017>
  * *
  * Pretty printing of influence map
  *
@@ -268,7 +268,7 @@ let print_inhibition_map parameters error handler compilation print_rule print_v
   print_maps parameters (Remanent_parameters.get_logger parameters) error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
 
 let dot_of_influence_map ?logger parameters error handler compilation (wake_up_map,inhibition_map) =
-  let loggers = logger in 
+  let loggers = logger in
   let parameters_dot =
     match loggers
     with
