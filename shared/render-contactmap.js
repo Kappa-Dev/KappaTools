@@ -399,7 +399,7 @@ class Render {
             .attr('transform', d => 'rotate(' + d.getAngle() * 180/Math.PI + ')');
 
         siteLine.append('line')
-            .attr('opacity', 0.5)
+            .attr('opacity', d => {if (site.label === null) return 0; return 0.5;} )
             .attr('stroke', function(d) { return d.agent.color; })
             .attr('stroke-dasharray', [2,2])
             .attr('stroke-width', 2)
@@ -601,7 +601,7 @@ class Render {
             .attr("class", "nodeArcPath")
             .attr("d", nodeArc)
             //.attr("id", function(d,i) { return "nodeArc_" + i;})
-            .style("fill", function(d,i) { 
+            .style("fill", (d,i) => { 
                 d.clicked = 0;
                 d.data.color = d3.rgb(c20(i)).darker(1);
                 return d3.rgb(c20(i)).brighter(0.5);})
@@ -612,7 +612,7 @@ class Render {
         gNode.append("path")
             .attr("d", nodeTextArc)
             .attr("class", "nodeTextArc")
-            .attr("id", function(d,i) { return "nodeTextArc_" + i;})
+            .attr("id", (d,i) => { return "nodeTextArc_" + i;})
             .style("fill", "none")
             .style("stroke-width", 0)
             .style("stroke", "transparent");
@@ -621,8 +621,8 @@ class Render {
         gNode.append("text")
             .append("textPath")
             .attr('alignment-baseline', "middle")
-            .attr("xlink:href",  function(d,i) { return "#nodeTextArc_" + i;})
-            .attr("startOffset", function (d) {
+            .attr("xlink:href",  (d,i) => { return "#nodeTextArc_" + i;})
+            .attr("startOffset", d => {
                 if ( (d.startAngle + d.endAngle + 3 * Math.PI ) / 2 < 2 * Math.PI) { 
                     return  "25%"; }
                 else if ( (d.startAngle + d.endAngle + 3 * Math.PI ) / 2 >=  2 * Math.PI &&  (d.startAngle + d.endAngle + 3 * Math.PI ) / 2 < 3 * Math.PI) { 
@@ -633,9 +633,9 @@ class Render {
             })
             .style("text-anchor", "middle")
 			.style('font-size', "110%")
-            .style("fill", function(d,i) { return d.data.color.darker(2);})
+            .style("fill", (d,i) => { return d.data.color.darker(2);})
             .style('pointer-events', 'none')
-            .text(function(d) { 
+            .text( d => { 
                 let label = d.data.label;
                 label = label.length > 10 ? label.substring(0,8): label;
                 if (d.endAngle - d.startAngle < label.length/50) {
@@ -646,14 +646,14 @@ class Render {
         
         /* render site text */
         gSite.append("text")
-            .attr("text-anchor", function (d) {
+            .attr("text-anchor", d => {
                 if ( (d.startAngle + d.endAngle + 3 * Math.PI ) / 2 < 5 * Math.PI/2) { 
                     return  "start"; }
                 else 
                     return "end"; })
             .attr("class", "siteText siteText--normal")
             .attr('alignment-baseline', "middle")
-            .attr("transform", function(d) {
+            .attr("transform", d => {
                 let xy = siteArc.centroid(d) ;
                 let angle = ( d.startAngle + d.endAngle + 3 * Math.PI ) / 2;
                 if ( ((d.startAngle + d.endAngle + 3 * Math.PI ) / 2 >= 5 * Math.PI/2)) {
@@ -662,9 +662,12 @@ class Render {
                 return "translate(" + xy + ") rotate(" + angle * 180/Math.PI + ")";
             })
 			.style('font-size', "110%")
-            .style("fill", function(d, i) { return d.data.agent.color; })
-            .text(function(d) { 
+            .style("fill", (d, i) => { return d.data.agent.color; })
+            .text( d => { 
                 let label = d.data.label;
+                if (label === null) {
+                    return;
+                }
                 d.data.startAngle = d.startAngle;
                 d.data.endAngle = d.endAngle;
                 label = label.length > 10 ? label.substring(0,8): label;
@@ -691,17 +694,11 @@ class Render {
         gSiteNodes
             .append("circle")
             .attr('class', 'outerSite')
-            .attr('cx', function(d) {
-                return d.cartX(innerRadius);
-            })
-            .attr('cy', function(d) {
-                return d.cartY(innerRadius);
-            })
-            .attr('r', siteRadius)
-            .attr("stroke", function(d) { 
-                return d.agent.color; 
-            })
-            .attr("fill", function(d,i) {
+            .attr('cx', d => d.cartX(innerRadius))
+            .attr('cy', d => d.cartY(innerRadius))
+            .attr('r', d =>{if (d.label === null) return 0; return siteRadius;})
+            .attr("stroke", d => d.agent.color )
+            .attr("fill", (d,i) => {
                 d.currentColor = d.agent.color; 
                 return d.agent.color; 
 
@@ -712,8 +709,8 @@ class Render {
             
         // render self loops
         var selfLoopLine = d3.line()
-                        .x(function(d){return d.x;})
-                        .y(function(d){return d.y;})
+                        .x( d => d.x )
+                        .y( d => d.y )
                         .curve(d3.curveBundle.beta(1));
 
         gSiteNodes
@@ -726,7 +723,7 @@ class Render {
                     return false;
             }})
             .append("path")
-            .attr("d", function(d) {
+            .attr("d", d => {
                 let pathObj = d.generateSelfLoopPath(innerRadius);
                 return selfLoopLine(pathObj);
             })
