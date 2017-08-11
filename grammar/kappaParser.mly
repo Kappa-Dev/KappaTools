@@ -154,7 +154,7 @@ perturbation_alarm:
 
 perturbation_post:
   {None}
-  | REPEAT bool_expr {Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$2)))}
+  | REPEAT bool_expr {Some $2}
   | UNTIL bool_expr
    /* backward compatibility */
 	 {ExceptionDefn.deprecated
@@ -163,7 +163,7 @@ perturbation_post:
 	      "perturbation"
 	      (fun f -> Format.pp_print_string
 			  f "use the 'repeat' construction");
-	    Some $2}
+	    Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$2)))}
 
 
 perturbation_declaration:
@@ -196,7 +196,7 @@ perturbation_declaration:
 			 (fun f ->
 			  Format.pp_print_string
 			    f "Perturbation need not be applied repeatedly") in
-	    (None,Some $2,$4,Some $6)}
+	    (None,Some $2,$4,Some (add_pos (Alg_expr.UN_BOOL_OP (Operator.NOT,$6))))}
      | perturbation_alarm bool_expr SET effect_list
 		{ExceptionDefn.deprecated
 		   ~pos:(Locality.of_pos (Parsing.symbol_start_pos ())

@@ -387,14 +387,14 @@ let pert_of_result
                 Primitives.PLOTENTRY | Primitives.STOP _ |
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
-        let abort = match opt with
-            None -> Locality.dummy_annot Alg_expr.TRUE
+        let repeat = match opt with
+            None -> Locality.dummy_annot Alg_expr.FALSE
           | Some p -> p in
         let pert =
           { Primitives.alarm = alarm;
             Primitives.precondition = pre;
             Primitives.effect = effects;
-            Primitives.abort = abort;
+            Primitives.repeat = repeat;
           } in
         (domain, alg_deps', succ p_id, pert::lpert,has_tracking)
       )

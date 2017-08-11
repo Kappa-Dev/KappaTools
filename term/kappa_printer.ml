@@ -194,8 +194,8 @@ let perturbation ?env f pert =
       (bool_expr ?env) (fst pert.Primitives.precondition)
       (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
-  Format.fprintf f "%%mod: %t repeat [not] (%a)"
-                 aux (bool_expr ?env) (fst pert.Primitives.abort)
+  Format.fprintf f "%%mod: %t repeat (%a)"
+                 aux (bool_expr ?env) (fst pert.Primitives.repeat)
 
 let env f env =
   Model.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)
