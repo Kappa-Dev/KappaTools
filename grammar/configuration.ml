@@ -10,7 +10,7 @@ type t = {
   dumpIfDeadlocked : bool;
   initial : float option;
   maxConsecutiveClash : int;
-  newSyntax : bool;
+  syntaxVersion : Ast.syntax_version;
   outputFileName : string option;
   plotPeriod : Counter.period option;
   seed : int option;
@@ -22,7 +22,7 @@ let empty = {
   dumpIfDeadlocked = true;
   initial = None;
   maxConsecutiveClash = 2;
-  newSyntax = false;
+  syntaxVersion = Ast.V3;
   seed = None;
   traceFileName = None;
   plotPeriod = None;
@@ -156,9 +156,18 @@ let parse result =
                                    ("Value "^v^" should be a character",p)))
                },story_compression,formatCflow,cflowFile)
 
-      | "newSyntax" ->
-        ({ conf with newSyntax = get_bool_value pos_p param value_list },
-         progress,story_compression,formatCflow,cflowFile)
+      | "syntaxVersion" ->
+        get_value pos_p param value_list
+          (fun v p ->
+             try
+               ({ conf with syntaxVersion = match int_of_string v with
+                    | 3 -> Ast.V3
+                    | 4 -> Ast.V4
+                    | _ -> raise Not_found},
+                progress,story_compression,formatCflow,cflowFile)
+             with _ ->
+               raise (ExceptionDefn.Malformed_Decl
+                        ("Value "^v^" should be either 3 or 4",p)))
       | "dumpIfDeadlocked" ->
         ({ conf with dumpIfDeadlocked = get_bool_value pos_p param value_list },
          progress,story_compression,formatCflow,cflowFile)
@@ -185,7 +194,9 @@ let print f conf =
   let () = Format.pp_open_vbox f 0 in
   let () = Pp.option ~with_space:false
       (fun f -> Format.fprintf f "%%def: \"seed\" \"%i\"@,") f conf.seed in
-  let () = Format.fprintf f "%%def: \"newSyntax\" \"%b\"@," conf.newSyntax in
+  let () = Format.fprintf
+      f "%%def: \"syntaxVersion\" \"%i\"@,"
+      (if conf.syntaxVersion = Ast.V4 then 4 else 3) in
   let () = Format.fprintf
       f "%%def: \"dumpIfDeadlocked\" \"%b\"@," conf.dumpIfDeadlocked in
   let () = Format.fprintf

@@ -73,7 +73,7 @@ let elementary_rule ?env f r =
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (if r.Primitives.connected_components <> [||] && ins_fresh <> []
      then Pp.comma else Pp.empty)
-    (Raw_mixture.print ~new_syntax:false ~compact:true ~created:true ?sigs)
+    (Raw_mixture.print ~explicit_free:true ~compact:true ~created:true ?sigs)
     (List.map snd ins_fresh)
     (if r.Primitives.delta_tokens <> []
      then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
@@ -135,7 +135,7 @@ let modification ?env f m =
           if ins_existing = [] then
             Format.fprintf f "$ADD %a %a" (alg_expr ~env) n
               (Raw_mixture.print
-                 ~new_syntax:false ~compact:false ~created:false ~sigs)
+                 ~explicit_free:false ~compact:false ~created:false ~sigs)
               (List.map snd ins_fresh)
           else
             Format.fprintf f "$APPLY %a %a" (alg_expr ~env) n

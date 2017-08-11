@@ -53,7 +53,7 @@ type t =
   { mutable is_running : bool ;
     mutable run_finalize : bool ;
     mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
-    new_syntax : bool;
+    syntax_version : Ast.syntax_version;
     dumpIfDeadlocked : bool;
     maxConsecutiveClash : int;
     counter : Counter.t ;
@@ -75,12 +75,12 @@ type t =
     mutable lastyield : float ;
   }
 
-let create_t ~log_form ~log_buffer ~contact_map ~new_syntax
+let create_t ~log_form ~log_buffer ~contact_map ~syntax_version
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
     ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
-  new_syntax;
+  syntax_version;
   plot = { Api_types_j.plot_legend = [] ;
            Api_types_j.plot_time_series = [] ; } ;
   snapshots = [];
@@ -110,23 +110,6 @@ let reinitialize random_state t =
       ~with_trace:false
       random_state t.env t.counter;
   t.state <- State_interpreter.empty ~with_delta_activities:false t.env []
-
-let clone_t t =
-  create_t
-    ~log_form:t.log_form ~log_buffer:t.log_buffer
-    (* TODO pirbo: Should I create a new buffer? *)
-    ~contact_map:t.contact_map
-    ~new_syntax:t.new_syntax
-    ~maxConsecutiveClash:t.maxConsecutiveClash
-    ~dumpIfDeadlocked:t.dumpIfDeadlocked
-    ~ast:t.ast ~env:t.env
-    ~counter:t.counter (* FALSE imperatively modified *)
-    ~graph:t.graph (* FALSE imperatively modified *)
-    ~state:t.state (* FALSE imperatively modified *)
-    ~init_l:t.init_l
-    ~lastyield:t.lastyield
-
-
 
 let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
   fun handler ->
@@ -180,8 +163,8 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let post_parse ast =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
-    let new_syntax = conf.Configuration.newSyntax in
-    (Lwt.wrap2 (LKappa.compil_of_ast ~new_syntax) overwrite ast) >>=
+    let syntax_version = conf.Configuration.syntaxVersion in
+    (Lwt.wrap2 (LKappa.compil_of_ast ~syntax_version) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -229,7 +212,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   ~contact_map ~log_form ~log_buffer ~ast ~env ~counter
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
-                  ~new_syntax
+                  ~syntax_version
                   ~graph:(Rule_interpreter.empty
                             ~with_trace
                             random_state env counter)
@@ -393,7 +376,7 @@ let start
       Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
       fun pause ->
       Lwt.wrap4 (Evaluator.get_pause_criteria
-                   ~max_sharing:false ~new_syntax:t.new_syntax)
+                   ~max_sharing:false ~syntax_version:t.syntax_version)
         t.contact_map t.env t.graph pause >>=
       fun (env',graph',b'') ->
       let () = t.env <- env' in
@@ -498,7 +481,7 @@ let perturbation
          fun e ->
          Lwt.wrap6
            (Evaluator.do_interactive_directives
-              ~outputs:(outputs t) ~max_sharing:false ~new_syntax:t.new_syntax)
+              ~outputs:(outputs t) ~max_sharing:false ~syntax_version:t.syntax_version)
            t.contact_map t.env t.counter t.graph t.state e >>=
          fun (_,(env',(_,graph'',state'))) ->
          let () = t.env <- env' in
@@ -522,7 +505,7 @@ let continue
          Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
          fun pause ->
          Lwt.wrap4 (Evaluator.get_pause_criteria
-                      ~max_sharing:false ~new_syntax:t.new_syntax)
+                      ~max_sharing:false ~syntax_version:t.syntax_version)
            t.contact_map t.env t.graph pause >>=
          fun (env',graph',b'') ->
          let () = t.env <- env' in

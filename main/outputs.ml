@@ -281,7 +281,7 @@ let print_snapshot sigs f s =
          Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
            (List.length mix)
            (Raw_mixture.print
-              ~new_syntax:false ~compact:false ~created:false ~sigs)
+              ~explicit_free:false ~compact:false ~created:false ~sigs)
            mix))
     s.Data.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->
@@ -321,7 +321,7 @@ let print_species sigs f time mixture =
   Format.fprintf
     f "%g: @[<h>%a@]@." time
     (Raw_mixture.print
-       ~new_syntax:false ~compact:false ~created:false ~sigs) mixture
+       ~explicit_free:false ~compact:false ~created:false ~sigs) mixture
 
 let go env = function
   | Data.Snapshot s -> snapshot env s
@@ -394,7 +394,7 @@ let initial_inputs conf env contact_map init ~filename =
                 Format.fprintf f "@[<h>%%init: %a %a@]"
                   (Kappa_printer.alg_expr ~env) n
                   (Raw_mixture.print
-                     ~new_syntax:true ~compact:false ~created:false ~sigs)
+                     ~explicit_free:true ~compact:false ~created:false ~sigs)
                   (List.map snd ins_fresh))) init in
   inputsDesc := Some inputs
 

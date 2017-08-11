@@ -7,6 +7,9 @@
 (******************************************************************************)
 
 (** Kappa AST just after parsing *)
+type syntax_version = V3 | V4
+
+val merge_version : syntax_version -> syntax_version -> syntax_version
 
 type ('a,'annot) link =
   | ANY_FREE
@@ -170,7 +173,7 @@ val implicit_signature : parsing_compil -> parsing_compil
 (** {6 Printers} *)
 
 val print_link :
-  new_syntax:bool ->
+  syntax_version:syntax_version ->
   ('a -> Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) ->

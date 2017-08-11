@@ -6,6 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type syntax_version = V3 | V4
+
+let merge_version a b =
+  match a,b with
+  | V4, _ | _, V4 -> V4
+  | V3, V3 -> V3
+
 type ('a,'annot) link =
   | ANY_FREE
   | LNK_VALUE of int * 'annot
@@ -201,11 +208,11 @@ let empty_compil =
         rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link ~new_syntax pr_port pr_type pr_annot f = function
-  | ANY_FREE -> if not new_syntax then Format.fprintf f "?"
+let print_link ~syntax_version pr_port pr_type pr_annot f = function
+  | ANY_FREE -> if syntax_version = V3 then Format.fprintf f "?"
   | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" (pr_port a) p pr_type a
   | LNK_ANY -> Format.fprintf f "?"
-  | LNK_FREE -> if new_syntax then Format.fprintf f "!."
+  | LNK_FREE -> if syntax_version = V4 then Format.fprintf f "!."
   | LNK_SOME -> Format.fprintf f "!_"
   | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
 
@@ -242,7 +249,7 @@ let print_ast_port f p =
           x) in
   Format.fprintf f "%s%a%a%a%a" (fst p.port_nme)
     print_ast_internal p.port_int f_mod_i p.port_int_mod
-    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link ~new_syntax:true f x))
+    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link ~syntax_version:V4 f x))
     p.port_lnk
     f_mod_l p.port_lnk_mod
 

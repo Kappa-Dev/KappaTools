@@ -15,7 +15,7 @@ type t = {
   mutable outputDirectory     : string;
   mutable batchmode           : bool;
   mutable interactive         : bool;
-  mutable newSyntax          : bool;
+  mutable syntaxVersion       : Ast.syntax_version;
 }
 
 type t_gui =
@@ -26,7 +26,7 @@ type t_gui =
     plotPeriod_gui          : float option ref;
     outputDataFile_gui      : string option ref;
     outputDirectory_gui     : string ref;
-    newSyntax_gui           : bool ref;
+    syntaxVersion_gui       : int ref;
     batchmode_gui           : string ref;
   }
 
@@ -37,7 +37,7 @@ let default : t = {
   plotPeriod = None;
   outputDataFile = None;
   outputDirectory = ".";
-  newSyntax = false;
+  syntaxVersion = Ast.V3;
   batchmode = false;
   interactive = false;
 }
@@ -50,7 +50,7 @@ let default_gui =
     plotPeriod_gui = ref (Some 0.01);
     outputDataFile_gui = ref (Some "data.csv");
     outputDirectory_gui = ref ".";
-    newSyntax_gui = ref false;
+    syntaxVersion_gui = ref 3;
     batchmode_gui = ref "interactive";
   }
 
@@ -72,7 +72,7 @@ let get_from_gui t_gui =
     inputKappaFileNames = !(t_gui.inputKappaFileNames_gui);
     outputDataFile = !(t_gui.outputDataFile_gui);
     outputDirectory = !(t_gui.outputDirectory_gui);
-    newSyntax = !(t_gui.newSyntax_gui);
+    syntaxVersion = if !(t_gui.syntaxVersion_gui) = 4 then Ast.V4 else Ast.V3;
     batchmode  = (Tools.lowercase (!(t_gui.batchmode_gui)))="batch" ;
     interactive = (Tools.lowercase (!(t_gui.batchmode_gui)))="interactive";
 }
@@ -85,7 +85,7 @@ let copy_from_gui t_gui t =
   t.inputKappaFileNames <- t_tmp.inputKappaFileNames;
   t.outputDataFile <- t_tmp.outputDataFile;
   t.outputDirectory <- t_tmp.outputDirectory;
-  t.newSyntax <- t_tmp.newSyntax ;
+  t.syntaxVersion <- t_tmp.syntaxVersion ;
   t.batchmode <- t_tmp.batchmode ;
   t.interactive <- t_tmp.interactive
 
@@ -153,9 +153,9 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
       (["batch","batch mode";"interactive","interactive mode"],[],t_gui.batchmode_gui),
     "either \"batch\" to never ask anything to the user or \"interactive\" to ask something before doing anything",
     [Common_args.output,7;Common_args.debug_mode,7], Superarg.Expert) ;
-   ("--new-syntax",
-    Arg.Unit (fun () -> t.newSyntax <- true),
-    Superarg.Bool t_gui.newSyntax_gui,
+   ("-syntax",
+    Arg.Int (fun v -> t.syntaxVersion <- if v = 4 then Ast.V4 else Ast.V3),
+    Superarg.Int t_gui.syntaxVersion_gui,
     "Use explicit notation for free site",
     [], Superarg.Hidden);
 ]

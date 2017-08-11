@@ -18,7 +18,7 @@ val increment_in_snapshot : Signature.s -> t -> snapshot -> snapshot
 val output_snapshot : snapshot -> (int * t) list
 
 val print :
-  new_syntax:bool -> compact:bool -> created:bool ->
+  explicit_free:bool -> compact:bool -> created:bool ->
   ?sigs:Signature.s -> Format.formatter -> t -> unit
 
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit

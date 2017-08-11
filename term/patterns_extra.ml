@@ -68,10 +68,10 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+           Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
              ~sigs fmt mix)
         (fun fmt ->
-           Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+           Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
              fmt mix)
   in
   let unspec =
@@ -461,10 +461,10 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
         safe_print_str
           __POS__ ?parameters
           (fun fmt ->
-             Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+             Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
                ~sigs fmt output)
           (fun fmt ->
-             Raw_mixture.print ~new_syntax:false ~compact:false ~created:false
+             Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
                fmt output)
       in
       Some (output, unspec)

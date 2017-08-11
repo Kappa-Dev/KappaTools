@@ -105,7 +105,7 @@ let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
   Format.fprintf
     f "%a%a"
     (Ast.print_link
-       ~new_syntax:true (Signature.print_site sigs)
+       ~syntax_version:Ast.V4 (Signature.print_site sigs)
        (Signature.print_agent sigs) (print_link_annot ~ltypes sigs))
     e
     (print_switching ~show_erased) s
@@ -150,7 +150,7 @@ let print_internal_rhs sigs ag_ty site f = function
 
 let print_link_lhs ~ltypes sigs f ((e,_),_) =
   Ast.print_link
-    ~new_syntax:false (Signature.print_site sigs)
+    ~syntax_version:Ast.V3 (Signature.print_site sigs)
     (Signature.print_agent sigs) (print_link_annot ~ltypes sigs)
     f e
 
@@ -158,12 +158,12 @@ let print_link_rhs ~ltypes sigs f ((e,_),s) =
   match s with
   | Linked (i,_) ->
     Ast.print_link
-      ~new_syntax:false (Signature.print_site sigs) (Signature.print_agent sigs)
+      ~syntax_version:Ast.V3 (Signature.print_site sigs) (Signature.print_agent sigs)
       (fun _ () -> ()) f (Ast.LNK_VALUE (i,()))
   | Freed -> ()
   | Maintained ->
     Ast.print_link
-      ~new_syntax:false (Signature.print_site sigs)
+      ~syntax_version:Ast.V3 (Signature.print_site sigs)
       (Signature.print_agent sigs) (print_link_annot ~ltypes sigs)
       f e
   | Erased -> assert false
@@ -226,7 +226,7 @@ let print_rhs ~ltypes sigs created f mix =
     | [] ->
       Format.fprintf f "%t%a"
         (if empty || created = [] then Pp.empty else Pp.comma)
-        (Raw_mixture.print ~new_syntax:false ~compact:true ~created:false ~sigs)
+        (Raw_mixture.print ~explicit_free:false ~compact:true ~created:false ~sigs)
         created
     | h :: t ->
       if h.ra_erased then aux empty t
@@ -270,7 +270,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
          Format.fprintf f "%a%t%a"
            (print_rule_mixture sigs ~ltypes:false) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
-           (Raw_mixture.print ~new_syntax:true ~compact:false ~created:true ~sigs)
+           (Raw_mixture.print ~explicit_free:true ~compact:false ~created:true ~sigs)
            r.r_created
        else Format.fprintf f "%a -> %a"
            (Pp.list Pp.comma (print_agent_lhs ~ltypes:false sigs)) r.r_mix
@@ -574,7 +574,7 @@ let of_raw_mixture x =
     x
 
 let annotate_dropped_agent
-    ~new_syntax sigs links_annot (agent_name, _ as ag_ty) intf =
+    ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -628,7 +628,7 @@ let annotate_dropped_agent
            let () = ports.(p_id) <-
                build_l_type sigs pos_lnk dst_ty dst_p Erased in
            (lannot,pset')
-         | [Ast.ANY_FREE,_] | [] when new_syntax ->
+         | [Ast.ANY_FREE,_] | [] when syntax_version = Ast.V4 ->
            let () = ports.(p_id) <- Locality.dummy_annot Ast.ANY_FREE, Erased in
            (lannot,pset')
          | [Ast.ANY_FREE,_] | [] ->
@@ -649,7 +649,7 @@ let annotate_dropped_agent
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
 let annotate_created_agent
-    ~new_syntax sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
+    ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -678,7 +678,7 @@ let annotate_created_agent
          | ([Ast.LNK_ANY, _] | [Ast.LNK_SOME, _] |
             [Ast.LNK_TYPE _, _] | _::_::_) ->
            not_enough_specified agent_name p_na
-         | [Ast.ANY_FREE, _] when new_syntax ->
+         | [Ast.ANY_FREE, _] when syntax_version = Ast.V4 ->
            not_enough_specified agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
@@ -713,7 +713,7 @@ let translate_modification sigs ?contact_map ag_id p_id
       Linked (j,pos_j),(lhs_links,rhs_links')
 
 let annotate_edit_agent
-    ~new_syntax ~is_rule sigs ?contact_map (agent_name, _ as ag_ty) links_annot intf =
+    ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty) links_annot intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -739,7 +739,7 @@ let annotate_edit_agent
             links_annot p.Ast.port_lnk_mod in
         let () = ports.(p_id) <- ((Ast.ANY_FREE,pos), modif) in
         links_annot'
-      | ([] | [Ast.ANY_FREE, _]) when new_syntax ->
+      | ([] | [Ast.ANY_FREE, _]) when syntax_version = Ast.V4 ->
         let (modif,links_annot') = translate_modification
             ~warn:p.Ast.port_nme sigs ?contact_map ag_id p_id
             links_annot p.Ast.port_lnk_mod in
@@ -1019,13 +1019,13 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
                      Format.fprintf
                        f "Rule induced deletion AND creation of the agent %s" lag))
             erased in
-      let new_syntax=false in
+      let syntax_version=Ast.V3 in
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
           (fun (acc,lannot) ((_,pos as na),intf,modif) ->
              let () = forbid_modification pos modif in
              let ra,lannot' =
-               annotate_dropped_agent ~new_syntax sigs lannot na intf in
+               annotate_dropped_agent ~syntax_version sigs lannot na intf in
              (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let () =
@@ -1038,7 +1038,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
           (fun (acc,rannot) ((_,pos as na),intf,modif) ->
              let () = forbid_modification pos modif in
              let rannot',x' = annotate_created_agent
-                 ~new_syntax sigs ?contact_map rannot na intf in
+                 ~syntax_version sigs ?contact_map rannot na intf in
              x'::acc,rannot')
           ([],snd links_annot) added in
       let () =
@@ -1050,22 +1050,22 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
     [] lhs rhs
 
-let annotate_edit_mixture ~new_syntax ~is_rule sigs ?contact_map m =
+let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
   let ((lhs_links_one,lhs_links_two),(rhs_links_one,_)),mix,cmix =
     List.fold_left
       (fun (lannot,acc,news) (ty,intf,modif) ->
          match modif with
          | None ->
            let a,lannot' = annotate_edit_agent
-               ~new_syntax ~is_rule sigs ?contact_map ty lannot intf in
+               ~syntax_version ~is_rule sigs ?contact_map ty lannot intf in
            (lannot',a::acc,news)
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
-               ~new_syntax sigs ?contact_map (snd lannot) ty intf in
+               ~syntax_version sigs ?contact_map (snd lannot) ty intf in
            ((fst lannot,rannot'),acc,x'::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
-               ~new_syntax sigs (fst lannot) ty intf in
+               ~syntax_version sigs (fst lannot) ty intf in
            ((lannot',snd lannot),ra::acc,news))
       (((Mods.IntMap.empty,Mods.IntMap.empty),
         (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
@@ -1163,8 +1163,8 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
     k_def,k_un,r_pos)
    ::rules')
 
-let mixture_of_ast ~new_syntax sigs ?contact_map pos mix =
-  match annotate_edit_mixture ~new_syntax ~is_rule:false sigs ?contact_map mix with
+let mixture_of_ast ~syntax_version sigs ?contact_map pos mix =
+  match annotate_edit_mixture ~syntax_version ~is_rule:false sigs ?contact_map mix with
   | r, [] -> r
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
@@ -1193,70 +1193,70 @@ let convert_token_name tk_nme tok pos =
     raise (ExceptionDefn.Malformed_Decl
              (tk_nme ^ " is not a declared token",pos))
 
-let rec alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var (alg,pos) =
+let rec alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var (alg,pos) =
   ((match alg with
       | Alg_expr.KAPPA_INSTANCE ast ->
-        Alg_expr.KAPPA_INSTANCE (mixture_of_ast ~new_syntax sigs pos ast)
+        Alg_expr.KAPPA_INSTANCE (mixture_of_ast ~syntax_version sigs pos ast)
       | Alg_expr.ALG_VAR lab ->
         Alg_expr.ALG_VAR (convert_alg_var ?max_allowed_var algs lab pos)
       | Alg_expr.TOKEN_ID tk_nme ->
         Alg_expr.TOKEN_ID (convert_token_name tk_nme tok pos)
       | Alg_expr.DIFF_KAPPA_INSTANCE(expr,ast) ->
         Alg_expr.DIFF_KAPPA_INSTANCE
-          (alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var expr,
-           mixture_of_ast ~new_syntax sigs pos ast)
+          (alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var expr,
+           mixture_of_ast ~syntax_version sigs pos ast)
       | Alg_expr.DIFF_TOKEN(expr,tk_nme) ->
         Alg_expr.DIFF_TOKEN
-          (alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var expr,
+          (alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var expr,
            convert_token_name tk_nme tok pos)
       | (Alg_expr.STATE_ALG_OP _ | Alg_expr.CONST _) as x -> x
       | Alg_expr.BIN_ALG_OP (op, a, b) ->
         Alg_expr.BIN_ALG_OP
           (op,
-           alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var a,
-           alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var b)
+           alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var a,
+           alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var b)
       | Alg_expr.UN_ALG_OP (op,a) ->
         Alg_expr.UN_ALG_OP
-          (op,alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var a)
+          (op,alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var a)
       | Alg_expr.IF (cond,yes,no) ->
         Alg_expr.IF
-          (bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var cond,
-           alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var yes,
-           alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var no)
+          (bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var cond,
+           alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var yes,
+           alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var no)
     ),
    pos)
-and bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var = function
+and bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var = function
   | (Alg_expr.TRUE | Alg_expr.FALSE),_ as x -> x
   | Alg_expr.BIN_BOOL_OP (op,x,y),pos ->
     Alg_expr.BIN_BOOL_OP
-      (op, bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var x,
-       bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var y),
+      (op, bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var x,
+       bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var y),
     pos
   | Alg_expr.UN_BOOL_OP (op,x),pos ->
     Alg_expr.UN_BOOL_OP
-      (op, bool_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var x),
+      (op, bool_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var x),
     pos
   | Alg_expr.COMPARE_OP (op,x,y),pos ->
     Alg_expr.COMPARE_OP
-      (op,alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var  x,
-       alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var y),pos
+      (op,alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var  x,
+       alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var y),pos
 
-let print_expr_of_ast ~new_syntax sigs tok algs = function
+let print_expr_of_ast ~syntax_version sigs tok algs = function
   | Primitives.Str_pexpr _ as x -> x
   | Primitives.Alg_pexpr x ->
-    Primitives.Alg_pexpr (alg_expr_of_ast ~new_syntax sigs tok algs x)
+    Primitives.Alg_pexpr (alg_expr_of_ast ~syntax_version sigs tok algs x)
 
-let modif_expr_of_ast ~new_syntax sigs tok algs contact_map modif acc =
+let modif_expr_of_ast ~syntax_version sigs tok algs contact_map modif acc =
   match modif with
   | Ast.INTRO (how,(who,pos)) ->
     Ast.INTRO
-      (alg_expr_of_ast ~new_syntax sigs tok algs how,
-       (mixture_of_ast ~new_syntax sigs ~contact_map pos who,pos)),
+      (alg_expr_of_ast ~syntax_version sigs tok algs how,
+       (mixture_of_ast ~syntax_version sigs ~contact_map pos who,pos)),
     acc
   | Ast.DELETE (how,(who,pos)) ->
     Ast.DELETE
-      (alg_expr_of_ast ~new_syntax sigs tok algs how,
-       (mixture_of_ast ~new_syntax sigs pos who,pos)),
+      (alg_expr_of_ast ~syntax_version sigs tok algs how,
+       (mixture_of_ast ~syntax_version sigs pos who,pos)),
     acc
   | Ast.UPDATE ((lab,pos),how) ->
     let i =
@@ -1265,7 +1265,7 @@ let modif_expr_of_ast ~new_syntax sigs tok algs contact_map modif acc =
       | None ->
         raise (ExceptionDefn.Malformed_Decl
                  ("Variable " ^ (lab ^ " is not defined"),pos)) in
-    Ast.UPDATE ((i,pos),alg_expr_of_ast ~new_syntax sigs tok algs how),
+    Ast.UPDATE ((i,pos),alg_expr_of_ast ~syntax_version sigs tok algs how),
     i::acc
   | Ast.UPDATE_TOK ((lab,pos),how) ->
     let i =
@@ -1274,46 +1274,46 @@ let modif_expr_of_ast ~new_syntax sigs tok algs contact_map modif acc =
       | None ->
         raise (ExceptionDefn.Malformed_Decl
                  (lab ^" is not a declared token",pos)) in
-    Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast ~new_syntax sigs tok algs how),
+    Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast ~syntax_version sigs tok algs how),
     acc
   | Ast.STOP p ->
-    Ast.STOP (List.map (print_expr_of_ast ~new_syntax sigs tok algs) p),acc
+    Ast.STOP (List.map (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
   | Ast.SNAPSHOT p ->
-    Ast.SNAPSHOT (List.map (print_expr_of_ast ~new_syntax sigs tok algs) p),acc
+    Ast.SNAPSHOT (List.map (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
   | Ast.FLUX (rel,p) ->
-    Ast.FLUX (rel,List.map (print_expr_of_ast ~new_syntax sigs tok algs) p),acc
+    Ast.FLUX (rel,List.map (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
   | Ast.FLUXOFF p ->
-    Ast.FLUXOFF (List.map (print_expr_of_ast ~new_syntax sigs tok algs) p),acc
+    Ast.FLUXOFF (List.map (print_expr_of_ast ~syntax_version sigs tok algs) p),acc
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x,acc
   | Ast.PRINT (p,p') ->
     Ast.PRINT
-      (List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
-       List.map (print_expr_of_ast ~new_syntax sigs tok algs) p'),acc
+      (List.map (print_expr_of_ast ~syntax_version sigs tok algs) p,
+       List.map (print_expr_of_ast ~syntax_version sigs tok algs) p'),acc
   | Ast.CFLOWMIX (b,(m,pos)) ->
-    Ast.CFLOWMIX (b,(mixture_of_ast ~new_syntax sigs pos m,pos)),acc
+    Ast.CFLOWMIX (b,(mixture_of_ast ~syntax_version sigs pos m,pos)),acc
   | Ast.SPECIES_OF (b,p,(m,pos)) ->
     Ast.SPECIES_OF
-      (b,List.map (print_expr_of_ast ~new_syntax sigs tok algs) p,
-       (mixture_of_ast ~new_syntax sigs pos m,pos)),acc
+      (b,List.map (print_expr_of_ast ~syntax_version sigs tok algs) p,
+       (mixture_of_ast ~syntax_version sigs pos m,pos)),acc
 
 let perturbation_of_ast
-    ~new_syntax sigs tok algs contact_map ((alarm,pre,mods,post),pos) up_vars =
+    ~syntax_version sigs tok algs contact_map ((alarm,pre,mods,post),pos) up_vars =
   let mods',up_vars' =
     List_util.fold_right_map
-      (modif_expr_of_ast ~new_syntax sigs tok algs contact_map) mods up_vars in
+      (modif_expr_of_ast ~syntax_version sigs tok algs contact_map) mods up_vars in
   let pre'= match pre with
     | None -> None
-    | Some p -> Some (bool_expr_of_ast ~new_syntax sigs tok algs p) in
+    | Some p -> Some (bool_expr_of_ast ~syntax_version sigs tok algs p) in
   ((alarm,pre',
     mods',
     match post with
     | None -> None
-    | Some post -> Some (bool_expr_of_ast ~new_syntax sigs tok algs post)),pos),
+    | Some post -> Some (bool_expr_of_ast ~syntax_version sigs tok algs post)),pos),
   up_vars'
 
-let init_of_ast ~new_syntax sigs tok contact_map = function
+let init_of_ast ~syntax_version sigs tok contact_map = function
   | Ast.INIT_MIX who,pos ->
-    Ast.INIT_MIX (mixture_of_ast ~new_syntax sigs ~contact_map pos who),pos
+    Ast.INIT_MIX (mixture_of_ast ~syntax_version sigs ~contact_map pos who),pos
   | Ast.INIT_TOK lab,pos ->
     match Mods.StringMap.find_option lab tok with
     | Some x -> Ast.INIT_TOK x,pos
@@ -1321,30 +1321,30 @@ let init_of_ast ~new_syntax sigs tok contact_map = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
-let assemble_rule ~new_syntax ~r_editStyle
+let assemble_rule ~syntax_version ~r_editStyle
     sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
   let tok = tk_nd.NamedDecls.finder in
   let tks =
     List.rev_map (fun (al,tk) ->
-        (alg_expr_of_ast ~new_syntax sigs tok algs
+        (alg_expr_of_ast ~syntax_version sigs tok algs
            (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
          NamedDecls.elt_id ~kind:"token" tk_nd tk))
       rm_tk in
   let tks' =
     List_util.rev_map_append (fun (al,tk) ->
-          (alg_expr_of_ast ~new_syntax sigs tok algs al,
+          (alg_expr_of_ast ~syntax_version sigs tok algs al,
            NamedDecls.elt_id ~kind:"token" tk_nd tk))
       add_tk tks in
   { r_mix; r_created; r_editStyle;
     r_delta_tokens = List.rev tks';
-    r_rate = alg_expr_of_ast ~new_syntax sigs tok algs rate;
+    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs rate;
     r_un_rate =
       let r_dist d =
-        alg_expr_of_ast ~new_syntax sigs tok algs ?max_allowed_var:None d in
+        alg_expr_of_ast ~syntax_version sigs tok algs ?max_allowed_var:None d in
       Option_util.map
         (fun (un_rate',dist) ->
            let un_rate'' =
-             alg_expr_of_ast ~new_syntax sigs tok algs
+             alg_expr_of_ast ~syntax_version sigs tok algs
                ?max_allowed_var:None un_rate' in
            match dist with
            | Some d -> (un_rate'', Some (r_dist d))
@@ -1372,7 +1372,7 @@ let create_sig l =
   Tools.array_map_of_list
     (fun (name,intf,_) -> (name,create_t intf)) l
 
-let compil_of_ast ~new_syntax overwrite c =
+let compil_of_ast ~syntax_version overwrite c =
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then Ast.implicit_signature c
@@ -1407,7 +1407,7 @@ let compil_of_ast ~new_syntax overwrite c =
   let tok = tk_nd.NamedDecls.finder in
   let perts',updated_vars =
     List_util.fold_right_map
-      (perturbation_of_ast ~new_syntax sigs tok algs contact_map)
+      (perturbation_of_ast ~syntax_version sigs tok algs contact_map)
       c.Ast.perturbations [] in
   let old_style_rules =
     List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
@@ -1415,18 +1415,18 @@ let compil_of_ast ~new_syntax overwrite c =
           annotate_lhs_with_diff sigs ~contact_map lhs rhs in
         label,
         (assemble_rule
-           ~new_syntax ~r_editStyle:false
+           ~syntax_version ~r_editStyle:false
            sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
          r_pos))
       cleaned_rules in
   let edit_rules =
     List.rev_map (fun (label,r) ->
         let mix,cmix = annotate_edit_mixture
-            ~new_syntax:true ~is_rule:true sigs ~contact_map r.Ast.mix in
+            ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map r.Ast.mix in
         (label,
          Locality.dummy_annot
            (assemble_rule
-              ~new_syntax:true ~r_editStyle:true
+              ~syntax_version:Ast.V4 ~r_editStyle:true
               sigs tk_nd algs mix cmix [] r.Ast.delta_token
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
@@ -1437,18 +1437,18 @@ let compil_of_ast ~new_syntax overwrite c =
       List_util.mapi
         (fun i (lab,expr) ->
            (lab,alg_expr_of_ast
-              ~new_syntax ~max_allowed_var:(pred i) sigs tok algs expr))
+              ~syntax_version ~max_allowed_var:(pred i) sigs tok algs expr))
         alg_vars_over;
     Ast.rules ;
     Ast.edit_rules = [];
     Ast.observables =
       List.map (fun expr ->
-          alg_expr_of_ast ~new_syntax sigs tok algs expr)
+          alg_expr_of_ast ~syntax_version sigs tok algs expr)
         c.Ast.observables;
     Ast.init =
       List.map (fun (lab,expr,ini) ->
-          lab,alg_expr_of_ast ~new_syntax sigs tok algs expr,
-          init_of_ast ~new_syntax sigs tok contact_map ini)
+          lab,alg_expr_of_ast ~syntax_version sigs tok algs expr,
+          init_of_ast ~syntax_version sigs tok contact_map ini)
         c.Ast.init;
     Ast.perturbations = perts';
     Ast.volumes = c.Ast.volumes;
@@ -1457,8 +1457,8 @@ let compil_of_ast ~new_syntax overwrite c =
     Ast.configurations = c.Ast.configurations;
   }
 
-let init_of_ast ~new_syntax sigs contact_map tok algs inits =
+let init_of_ast ~syntax_version sigs contact_map tok algs inits =
   List.map (fun (lab,expr,ini) ->
-      lab,alg_expr_of_ast ~new_syntax sigs tok algs expr,
-      init_of_ast ~new_syntax sigs tok contact_map ini)
+      lab,alg_expr_of_ast ~syntax_version sigs tok algs expr,
+      init_of_ast ~syntax_version sigs tok contact_map ini)
     inits

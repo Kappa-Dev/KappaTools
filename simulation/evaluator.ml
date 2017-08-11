@@ -7,14 +7,14 @@
 (******************************************************************************)
 
 let do_interactive_directives
-    ~outputs ~max_sharing ~new_syntax contact_map env counter graph state e =
+    ~outputs ~max_sharing ~syntax_version contact_map env counter graph state e =
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
   let contact_map' = Array.map Array.copy contact_map in
   let e',_ =
     List_util.fold_right_map
       (LKappa.modif_expr_of_ast
-         ~new_syntax
+         ~syntax_version
          (Model.signatures env)
          (Model.tokens_finder env)
          (Model.algs_finder env) contact_map') e [] in
@@ -40,11 +40,11 @@ let do_interactive_directives
   (env',
    State_interpreter.do_modifications ~outputs env' counter graph' state e'')
 
-let get_pause_criteria ~max_sharing ~new_syntax contact_map env graph b =
+let get_pause_criteria ~max_sharing ~syntax_version contact_map env graph b =
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
   let b' =
-    LKappa.bool_expr_of_ast ~new_syntax
+    LKappa.bool_expr_of_ast ~syntax_version
       (Model.signatures env) (Model.tokens_finder env)
       (Model.algs_finder env) b in
   let cc_preenv',(b'',pos_b'' as bpos'') =

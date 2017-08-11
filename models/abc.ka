@@ -1,5 +1,5 @@
 ####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
-%def: "newSyntax" "true"
+%def: "syntaxVersion" "4"
 
 #### Signatures 
 %agent: A(x,c) # Declaration of agent A 

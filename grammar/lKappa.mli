@@ -69,23 +69,25 @@ val rule_to_json : rule -> Yojson.Basic.json
 val rule_of_json : Yojson.Basic.json -> rule
 
 val bool_expr_of_ast :
-  new_syntax:bool ->  Signature.s -> int Mods.StringMap.t ->
+  syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
   int Mods.StringMap.t -> ?max_allowed_var: int ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (rule_agent list, int) Alg_expr.bool Locality.annot
 
 val modif_expr_of_ast :
-  new_syntax:bool -> Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
-  Contact_map.t -> (Ast.mixture, string) Ast.modif_expr -> int list ->
-  (rule_agent list, int) Ast.modif_expr * int list
+  syntax_version:Ast.syntax_version -> Signature.s -> int Mods.StringMap.t ->
+  int Mods.StringMap.t -> Contact_map.t -> (Ast.mixture, string) Ast.modif_expr
+  -> int list -> (rule_agent list, int) Ast.modif_expr * int list
 
 val init_of_ast :
-  new_syntax:bool -> Signature.s -> Contact_map.t -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> (Ast.mixture,string) Ast.init_statment list ->
+  syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->
+  int Mods.StringMap.t -> int Mods.StringMap.t ->
+  (Ast.mixture,string) Ast.init_statment list ->
   (rule_agent list, int) Ast.init_statment list
 
 val compil_of_ast :
-  new_syntax:bool -> (string * Nbr.t) list -> Ast.parsing_compil ->
+  syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
+  Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
   int list * (Ast.agent, rule_agent list, int, rule, unit) Ast.compil
 (** [compil_of_ast variable_overwrite ast]

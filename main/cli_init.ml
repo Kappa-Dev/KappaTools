@@ -16,11 +16,12 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
       story_compression, formatCflow, cflowFile =
     Configuration.parse ast.Ast.configurations in
   let () = Format.printf "+ Sanity checks@." in
-  let new_syntax =
-    (cli_args.Run_cli_args.newSyntax || conf.Configuration.newSyntax) in
+  let syntax_version =
+    Ast.merge_version
+      cli_args.Run_cli_args.syntaxVersion conf.Configuration.syntaxVersion in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa.compil_of_ast
-      ~new_syntax
+      ~syntax_version
       kasim_args.Kasim_args.alg_var_overwrite ast in
   let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
     | None -> None,None
@@ -31,7 +32,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
         Configuration.parse compil.Ast.configurations in
       Some
         (LKappa.init_of_ast
-           ~new_syntax sigs_nd contact_map tk_nd.NamedDecls.finder
+           ~syntax_version sigs_nd contact_map tk_nd.NamedDecls.finder
            alg_finder compil.Ast.init),
       conf.Configuration.initial in
   conf, progressConf,
@@ -51,7 +52,7 @@ let get_preprocessed_ast_from_cli_args
   let ast =
     get_ast_from_list_of_files cli_args.Run_cli_args.inputKappaFileNames
   in
-  preprocess  cli_args ~kasim_args ast
+  preprocess cli_args ~kasim_args ast
 
 let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     ~max_sharing ?bwd_bisim ~compileModeOn preprocessed_ast
@@ -77,7 +78,6 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     if has_tracking && (n||w||s) then Some story_compression else None in
   (conf, progressConf, env, contact_map, updated_vars, story_compression,
  formatCflow, cflowFile,init_l),[],overwrite_t0
-
 
 let get_pack_from_marshalizedfile
    kasim_args cli_args marshalized_file =
@@ -108,13 +108,13 @@ let get_pack_from_marshalizedfile
     | None -> pack,alg_overwrite,None
     | Some file ->
       let compil = get_ast_from_list_of_files [file] in
-      let raw_inits =
-        LKappa.init_of_ast
-          ~new_syntax:cli_args.Run_cli_args.newSyntax
-          (Model.signatures env) contact (Model.tokens_finder env)
-          (Model.algs_finder env) compil.Ast.init in
       let conf', _, _, _, _ =
         Configuration.parse compil.Ast.configurations in
+      let raw_inits =
+        LKappa.init_of_ast
+          ~syntax_version:conf'.Configuration.syntaxVersion
+          (Model.signatures env) contact (Model.tokens_finder env)
+          (Model.algs_finder env) compil.Ast.init in
       let inits = Eval.compile_inits ?rescale:kasim_args.Kasim_args.rescale
           ~compileModeOn:false contact env raw_inits in
       (conf,progress,env,contact,updated,compr,cflow,cflowfile,inits),
@@ -126,8 +126,6 @@ let get_pack_from_marshalizedfile
       Format.std_formatter
       "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
     exit 1
-
-
 
 let get_compilation_from_pack
     ?(unit=Kasim_args.Time)

@@ -10,7 +10,7 @@ type t = {
   dumpIfDeadlocked : bool;
   initial : float option;
   maxConsecutiveClash : int;
-  newSyntax : bool;
+  syntaxVersion : Ast.syntax_version;
   outputFileName : string option;
   plotPeriod : Counter.period option;
   seed : int option;
