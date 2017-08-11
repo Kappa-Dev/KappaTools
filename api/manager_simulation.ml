@@ -269,7 +269,6 @@ class manager_simulation
           Result_util.map
             ~ok:
               (fun (facade : Kappa_facade.t) ->
-                 let facade = Kappa_facade.clone_t facade in
                  (Kappa_facade.start
                     ~system_process
                     ~parameter:simulation_parameter

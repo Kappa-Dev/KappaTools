@@ -14,8 +14,6 @@ class type system_process =
 *)
 type t
 
-val clone_t : t -> t
-
 (** Trivial implementation *)
 class null_process : system_process
 
