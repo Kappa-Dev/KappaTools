@@ -19,6 +19,7 @@ val wildcard:string
 type accuracy_level = Low | Medium | High | Full
 val accuracy_levels : accuracy_level list
 val contact_map_accuracy_levels : accuracy_level list
+val influence_map_accuracy_levels : accuracy_level list
 
 val accuracy_to_string : accuracy_level -> string
 val accuracy_of_string : string -> accuracy_level option
@@ -69,7 +70,7 @@ type influence_node =
   | Var of var
 
 val influence_node_of_json: Yojson.Basic.json -> influence_node
-val influence_node_to_json: influence_node -> Yojson.Basic.json 
+val influence_node_to_json: influence_node -> Yojson.Basic.json
 
 type dead_rules = rule list
 

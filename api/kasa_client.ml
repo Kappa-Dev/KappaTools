@@ -73,6 +73,25 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
       Lwt_result.bind_result
         (self#message post request)
         (fun x -> Result.Ok x)
+    method get_local_influence_map accuracy ?fwd ?bwd ~total ~origin =
+          let request =
+            `List ( `String "INFLUENCE_MAP" :: (
+                (fun accuracy l ->
+                 match accuracy with
+                 | None -> l
+                 | Some a -> (Public_data.accuracy_to_json a)::l)
+                  accuracy
+                  [JsonUtil.of_option JsonUtil.of_int fwd;
+                   JsonUtil.of_option JsonUtil.of_int bwd;
+                   JsonUtil.of_int total;
+                   origin]
+
+              ))
+                 in
+          Lwt_result.bind_result
+            (self#message post request)
+            (fun x -> Result.Ok x)
+
     method get_dead_rules =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result

@@ -80,16 +80,19 @@ functor (A:Analyzer.Analyzer) ->
         ?bwd  ?fwd  ~total
         ~origin
         state =
-      let origin =
-        Public_data.influence_node_of_json origin
-      in
       let rule_id =
-        match origin with
-        | Public_data.Rule a ->
-          Ckappa_sig.rule_id_of_int (a.Public_data.rule_id)
-        | Public_data.Var a ->
-          Ckappa_sig.rule_id_of_int (a.Public_data.var_id)
-      in
+        try
+          let origin = Public_data.influence_node_of_json origin in
+          begin
+            match origin with
+            | Public_data.Rule a ->
+              Ckappa_sig.rule_id_of_int (a.Public_data.rule_id)
+            | Public_data.Var a ->
+              Ckappa_sig.rule_id_of_int (a.Public_data.var_id)
+          end
+        with
+        | _ -> Ckappa_sig.rule_id_of_int 0
+      in     
       let state, influence_map =
         get_local_influence_map ~accuracy_level ?fwd ?bwd ~total
           rule_id state

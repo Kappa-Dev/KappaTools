@@ -58,6 +58,28 @@ let on_message post text =
     let state, cm = get_contact_map ~accuracy_level !gState in
     let () = gState := state in
     send_response post cm
+  | `List [ `String "INFLUENCE_MAP"; acc ; fwd; bwd; total; origin] ->
+    let accuracy_level = Public_data.accuracy_of_json acc in
+    let error_msg = "bad int" in
+    let fwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) fwd in
+    let bwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) bwd in
+    let total = JsonUtil.to_int ~error_msg total in
+    let state, im =
+      get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
+    in
+    let () = gState := state in
+    send_response post im
+    | `List [ `String "INFLUENCE_MAP"; fwd; bwd; total; origin] ->
+      let accuracy_level = Public_data.Low in
+      let error_msg = "bad int" in
+      let fwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) fwd in
+      let bwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) bwd in
+      let total = JsonUtil.to_int ~error_msg total in
+      let state, im =
+        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
+      in
+      let () = gState := state in
+      send_response post im
   | `List [ `String "INFLUENCE_MAP"; acc ] ->
     let accuracy_level = Public_data.accuracy_of_json acc in
     let state, im = get_influence_map ~accuracy_level !gState in

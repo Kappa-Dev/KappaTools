@@ -18,8 +18,6 @@ let map = "map"
 let interface="interface"
 let site="site name"
 let stateslist="states list"
-let prop="property states"
-let bind="binding states"
 let sitename = "site_name"
 let sitelinks = "site_links"
 let sitestates = "site_states"
@@ -44,7 +42,7 @@ let rule = "rule"
 type accuracy_level = Low | Medium | High | Full
 let accuracy_levels = [ Low; Medium; High; Full ]
 let contact_map_accuracy_levels = [ Low; High ]
-
+let influence_map_accuracy_levels = [ Low; Medium; High]
 let accuracy_to_string = function
   | Low -> "low"
   | Medium -> "medium"

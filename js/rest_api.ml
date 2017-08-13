@@ -450,6 +450,33 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
+  method get_local_influence_map accuracy ?fwd ?bwd ~total ~origin =
+    send
+      ?timeout
+      (let s  =
+         match accuracy with
+         | Some accuracy ->
+         (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))^"_"
+         | None -> ""
+       in
+       Format.sprintf
+         "%s/v2/projects/%s/analyses/influence_map/%s%s_%s_%s_%s"
+         url
+         project_id
+         s
+         (Yojson.Basic.to_string (JsonUtil.of_option JsonUtil.of_int fwd))
+         (Yojson.Basic.to_string (JsonUtil.of_option JsonUtil.of_int bwd))
+         (Yojson.Basic.to_string (JsonUtil.of_int total))
+         (Yojson.Basic.to_string origin)
+      )
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
   method get_dead_rules =
     send
       ?timeout

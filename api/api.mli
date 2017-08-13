@@ -110,6 +110,11 @@ class type virtual manager_static_analysis = object
     Public_data.accuracy_level option -> (Yojson.Basic.json,string) Lwt_result.t
   method get_influence_map :
     Public_data.accuracy_level option -> (Yojson.Basic.json,string) Lwt_result.t
+  method get_local_influence_map :
+    Public_data.accuracy_level option ->
+    ?fwd:int -> ?bwd:int -> total:int ->
+    origin:Yojson.Basic.json ->
+    (Yojson.Basic.json,string) Lwt_result.t
   method get_dead_rules : (Yojson.Basic.json,string) Lwt_result.t
   method get_constraints_list : (Yojson.Basic.json,string) Lwt_result.t
 end
