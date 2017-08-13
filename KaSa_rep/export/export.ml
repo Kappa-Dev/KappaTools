@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 11 2017>
+  * Last modification: Time-stamp: <Aug 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -511,12 +511,11 @@ let convert_label a =
   if a<0 then Remanent_state.Side_effect (-(a+1))
   else Remanent_state.Direct a
 
-let convert_id x nrules =
-  if x<nrules
-  then
-    Remanent_state.Rule x
-  else
-    Remanent_state.Var (x-nrules)
+let convert_id parameters error handler compiled id =
+  Handler.convert_id parameters error handler compiled id
+
+
+
 
 (******************************************************************)
 (*quark map *)
@@ -702,13 +701,19 @@ let get_raw_internal_influence_map =
     (Remanent_state.get_internal_influence_map Public_data.Low)
     compute_raw_internal_influence_map
 
-let convert_half_influence_map influence nrules  =
+let convert_half_influence_map parameters error handler compiled influence =
   Ckappa_sig.PairRule_setmap.Map.fold
-    (fun (x,y) list map ->
-       let x = convert_id (int_of_string (Ckappa_sig.string_of_rule_id x))
-           nrules in
-       let y = convert_id (int_of_string (Ckappa_sig.string_of_rule_id y))
-           nrules in
+    (fun (x,y) list (error,map) ->
+       let error,x =
+         Handler.convert_id parameters error handler compiled
+           (Ckappa_sig.rule_id_of_int
+              (int_of_string (Ckappa_sig.string_of_rule_id x)))
+       in
+       let error,y =
+         Handler.convert_id parameters error handler compiled
+           (Ckappa_sig.rule_id_of_int
+              (int_of_string (Ckappa_sig.string_of_rule_id y)))
+      in
        let old =
          match
            Remanent_state.InfluenceNodeMap.find_option x map
@@ -724,25 +729,27 @@ let convert_half_influence_map influence nrules  =
            (fun (a,b) -> convert_label a,convert_label b)
            (List.rev list)
        in
+       error,
        Remanent_state.InfluenceNodeMap.add x
          (Remanent_state.InfluenceNodeMap.add y list old)
          map
     )
     influence
-    Remanent_state.InfluenceNodeMap.empty
+    (error, Remanent_state.InfluenceNodeMap.empty)
 
 let convert_influence_map show_title state (wake_up_map, inhibition_map) =
   let parameters = Remanent_state.get_parameters state in
   let state, handler = get_handler state in
+  let state, compiled = get_c_compilation state in
   let error = Remanent_state.get_errors state in
   let () = show_title state in
-  let nrules = Handler.nrules parameters error handler in
+  let error, pos = convert_half_influence_map parameters error handler  compiled wake_up_map in
+  let error, neg = convert_half_influence_map parameters error handler  compiled inhibition_map in
   let state = Remanent_state.set_errors error state in
   let output =
     {
-      Remanent_state.positive = convert_half_influence_map wake_up_map nrules ;
-      Remanent_state.negative =
-        convert_half_influence_map inhibition_map nrules ;
+      Remanent_state.positive = pos ;
+      Remanent_state.negative = neg
     }
   in
   state, output
@@ -769,17 +776,18 @@ let compute_intermediary_internal_influence_map show_title state =
       (wake_up_map,inhibition_map)
       state
   in
+  let error, pos =
+    convert_half_influence_map parameters error handler  compil wake_up_map
+  in
+  let error, neg =
+    convert_half_influence_map parameters error handler compil inhibition_map
+  in
   let state = Remanent_state.set_errors error state in
-  let state, handler = get_handler state in
-  let error = Remanent_state.get_errors state in
-  let nrules = Handler.nrules parameters error handler in
   let state =
     Remanent_state.set_influence_map Public_data.Medium
       {
-        Remanent_state.positive =
-          convert_half_influence_map wake_up_map nrules;
-        Remanent_state.negative =
-          convert_half_influence_map inhibition_map nrules ;
+        Remanent_state.positive = pos ;
+        Remanent_state.negative = neg;
       }
       state
   in
@@ -828,8 +836,8 @@ let get_intermediary_internal_influence_map =
 
 let string_of_influence_node x =
   match x with
-  | Remanent_state.Rule i -> "Rule "^(string_of_int i)
-  | Remanent_state.Var i -> "Var "^(string_of_int i)
+  | Public_data.Rule i -> "Rule "^(string_of_int i.Public_data.rule_id)
+  | Public_data.Var i -> "Var "^(string_of_int i.Public_data.var_id)
 
 let print_influence_map parameters influence_map =
   let log = (Remanent_parameters.get_logger parameters) in
@@ -867,14 +875,14 @@ let print_influence_map parameters influence_map =
 let query_inhibition_map influence_map r1 r2 =
   match
     Remanent_state.InfluenceNodeMap.find_option
-      (Remanent_state.Rule r1) influence_map.Remanent_state.negative
+      (Public_data.Rule r1) influence_map.Remanent_state.negative
   with
   | None -> []
   | Some map ->
     begin
       match
         Remanent_state.InfluenceNodeMap.find_option
-          (Remanent_state.Rule r2)
+          (Public_data.Rule r2)
           map
       with
       | None -> []
@@ -920,17 +928,20 @@ let compute_high_res_internal_influence_map show_title state =
       (wake_up_map,inhibition_map)
       state
   in
-  let state = Remanent_state.set_errors error state in
   let state, handler = get_handler state in
-  let error = Remanent_state.get_errors state in
-  let nrules = Handler.nrules parameters error handler in
+  let error, pos =
+    convert_half_influence_map parameters error handler  compil wake_up_map
+  in
+  let error, neg =
+    convert_half_influence_map parameters error handler compil inhibition_map
+  in
+  let state = Remanent_state.set_errors error state in
+
   let state =
     Remanent_state.set_influence_map Public_data.High
       {
-        Remanent_state.positive =
-          convert_half_influence_map wake_up_map nrules;
-        Remanent_state.negative =
-          convert_half_influence_map inhibition_map nrules ;
+        Remanent_state.positive = pos ;
+        Remanent_state.negative = neg ;
       }
       state
   in
@@ -1035,14 +1046,23 @@ let get_influence_map
     (Remanent_state.get_influence_map accuracy_level)
     (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
 
-let convert_to_birectional_influence_map
-    show_title state influence_map =
+let nrules state =
   let parameters = Remanent_state.get_parameters state in
   let state, handler = get_handler state in
-  let error = Remanent_state.get_errors state in
+  let error = get_errors state in
+  state, Handler.nrules parameters error handler
+
+let nvars state =
+  let parameters = Remanent_state.get_parameters state in
+  let state, handler = get_handler state in
+  let error = get_errors state in
+  state, Handler.nvars parameters error handler
+
+let convert_to_birectional_influence_map
+    show_title state influence_map =
   let () = show_title state in
-  let nrules = Handler.nrules parameters error handler in
-  let nvars = Handler.nvars parameters error handler in
+  let state, nrules = nrules state in
+  let state, nvars = nvars state in
   let output =
     Bidirectional_influence_map.convert ~nrules ~nvars influence_map
   in
@@ -1071,6 +1091,55 @@ let get_bidirectional_influence_map
     (Remanent_state.get_bidirectional_influence_map accuracy_level)
     (compute_bidirectional_influence_map ~accuracy_level ~do_we_show_title ~log_title)
 
+let compute_influence_map_blackboard show_title  state =
+  let () = show_title state in
+  let state, nrules = nrules state in
+  let state, nvars = nvars state in
+  let blackboard = Local_influence_map.init_blackboard nrules nvars in
+  state, blackboard
+
+let get_influence_map_blackboard
+  =
+  get_gen
+    ~log_title:"Preparing data-structures for local influence map"
+    (Remanent_state.get_local_influence_map_blackboard)
+    compute_influence_map_blackboard
+
+let get_local_internal_influence_map
+    ?accuracy_level:(accuracy_level=Public_data.Low)
+    ?fwd ?bwd ~total
+    origin
+    state =
+  let parameters = get_parameters state in
+  let error = get_errors state in
+  let state,bidirectional_influence_map =
+    get_bidirectional_influence_map ~accuracy_level state
+  in
+  let state, blackboard =
+    get_influence_map_blackboard state
+  in
+  let error, local_influence_map, _blackboard =
+    Local_influence_map.explore_influence_map
+      parameters error
+      ?fwd ?bwd ~total
+      blackboard origin bidirectional_influence_map
+  in
+  let state = set_errors error state in
+  state, local_influence_map
+
+let get_local_influence_map
+      ?accuracy_level:(accuracy_level=Public_data.Low)
+      ?fwd ?bwd ~total
+      origin
+      state =
+  let state, internal_influence_map =
+    get_local_internal_influence_map
+      ~accuracy_level ?fwd ?bwd ~total
+      origin
+      state
+  in
+  convert_influence_map (fun _ -> ()) state internal_influence_map
+
 let query_inhibition_map ?accuracy_level state r1 r2 =
   let state,inf_map = get_influence_map ?accuracy_level state in
   let output = query_inhibition_map inf_map r1 r2 in
@@ -1092,6 +1161,20 @@ let output_internal_influence_map ?logger
       influence_map
   in
   set_errors error state
+
+let output_local_internal_influence_map ?logger
+    ?accuracy_level:(accuracy_level=Public_data.Low)
+    ?fwd ?bwd ~total origin state =
+    let parameters = get_parameters state in
+    let state, influence_map = get_local_internal_influence_map ~accuracy_level ?fwd ?bwd ~total origin state in
+    let state, c_compil = get_c_compilation state in
+    let state, handler = get_handler state in
+    let error = get_errors state in
+    let error =
+      Print_quarks.dot_of_influence_map ?logger parameters error handler c_compil
+        influence_map
+    in
+    set_errors error state
 
 let output_best_internal_influence_map state =
   let map = Remanent_state.get_internal_influence_map_map state in

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 11 2017>
+  * Last modification: Time-stamp: <Aug 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -42,17 +42,28 @@ val separating_transitions_to_json:
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
-type influence_node =
-  | Rule of rule_id
-  | Var of var_id
 
-module InfluenceNodeMap: SetMap.Map with type elt = influence_node
+module InfluenceNodeMap: SetMap.Map with type elt = Public_data.influence_node
 
 type location =
   | Direct of int
   | Side_effect of int
 
 type 'a pair = 'a * 'a
+
+type distance =
+  {
+    fwd: int ;
+    bwd: int ;
+    total: int
+  }
+
+type local_influence_map_blackboard =
+  {
+    blackboard_distance: distance option array;
+    blackboard_is_done: bool array;
+    blackboard_to_be_explored: bool array
+  }
 
 type influence_map =
   {
@@ -238,6 +249,13 @@ val set_bidirectional_influence_map:
 val get_bidirectional_influence_map:
   Public_data.accuracy_level -> ('static, 'compile) state ->
   bidirectional_influence_map option
+
+val set_local_influence_map_blackboard:
+  local_influence_map_blackboard ->
+  ('static, 'compile) state -> ('static, 'compile) state
+
+val get_local_influence_map_blackboard:
+  ('static, 'compile) state -> local_influence_map_blackboard option
 
 val set_ode_flow: Ode_fragmentation_type.ode_frag -> ('static, 'compile) state -> ('static, 'compile) state
 

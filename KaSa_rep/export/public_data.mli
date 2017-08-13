@@ -56,6 +56,21 @@ type rule =
     rule_position: Locality.t
   }
 
+type var =
+  {
+    var_id: int;
+    var_label: string ;
+    var_ast: string;
+    var_position: Locality.t
+  }
+
+type influence_node =
+  | Rule of rule
+  | Var of var
+
+val influence_node_of_json: Yojson.Basic.json -> influence_node
+val influence_node_to_json: influence_node -> Yojson.Basic.json 
+
 type dead_rules = rule list
 
 val dead_rules_of_json : Yojson.Basic.json -> dead_rules

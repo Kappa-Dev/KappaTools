@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 11 2017>
+  * Last modification: Time-stamp: <Aug 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -56,8 +56,6 @@ let contactmaps="contact maps"
 let influencemap="influence map"
 let influencemaps="influence maps"
 let separating_transitions = "separating transitions"
-let variable = "variable"
-let rule = "rule"
 let direct = "direct"
 let side_effect = "side effect"
 let errors = "errors"
@@ -92,7 +90,7 @@ let separating_transitions_to_json =
 (*****************)
 
 (* Influence Node *)
-type influence_node =
+(*type influence_node =
   | Rule of rule_id
   | Var of var_id
 
@@ -112,6 +110,7 @@ let influence_node_of_json
   | `Assoc [s,json] when s = rule ->
     Rule (JsonUtil.to_int json)
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+*)
 
 (* Location labels *)
 
@@ -136,11 +135,11 @@ let location_of_json
 module InfluenceNodeSetMap =
   SetMap.Make
     (struct
-      type t = influence_node
+      type t = Public_data.influence_node
       let compare = compare
       let print f = function
-        | Rule r -> Format.fprintf f "Rule %i" r
-        | Var r -> Format.fprintf f "Var %i" r
+        | Public_data.Rule r -> Format.fprintf f "Rule %i" r.Public_data.rule_id
+        | Public_data.Var r -> Format.fprintf f "Var %i" r.Public_data.var_id
     end)
 
 module InfluenceNodeMap = InfluenceNodeSetMap.Map
@@ -155,10 +154,10 @@ type half_influence_map =
 let half_influence_map_to_json =
   InfluenceNodeMap.to_json
     ~lab_key:source ~lab_value:target_map
-    influence_node_to_json
+    Public_data.influence_node_to_json
     (InfluenceNodeMap.to_json
        ~lab_key:target ~lab_value:location_pair_list
-       influence_node_to_json
+       Public_data.influence_node_to_json
        (JsonUtil.of_list
           (JsonUtil.of_pair
              ~lab1:rhs ~lab2:lhs
@@ -172,11 +171,11 @@ let half_influence_map_of_json =
   InfluenceNodeMap.of_json
     ~error_msg:(JsonUtil.build_msg "activation or inhibition map")
     ~lab_key:source ~lab_value:target_map
-    (influence_node_of_json ~error_msg:(JsonUtil.build_msg "influence node"))
+    Public_data.influence_node_of_json
     (InfluenceNodeMap.of_json
        ~lab_key:target ~lab_value:location_pair_list
        ~error_msg:"map of lists of pairs of locations"
-       (influence_node_of_json ~error_msg:(JsonUtil.build_msg "influence node"))
+       Public_data.influence_node_of_json
        (JsonUtil.to_list ~error_msg:"list of pair of locations"
           (JsonUtil.to_pair
              ~error_msg:""
@@ -409,6 +408,20 @@ type bidirectional_influence_map =
       (Ckappa_sig.c_rule_id * influence_edge) list array;
   }
 
+type distance =
+  {
+    fwd: int ;
+    bwd: int ;
+    total: int
+  }
+
+type local_influence_map_blackboard =
+  {
+    blackboard_distance: distance option array;
+    blackboard_is_done: bool array;
+    blackboard_to_be_explored: bool array
+  }
+
 type ('static,'dynamic) state =
   {
     parameters    : Remanent_parameters_sig.parameters ;
@@ -427,6 +440,8 @@ type ('static,'dynamic) state =
     influence_map : influence_map Public_data.AccuracyMap.t ;
     bidirectional_influence_map :
       bidirectional_influence_map Public_data.AccuracyMap.t ;
+    local_influence_map_blackboard :
+      local_influence_map_blackboard option ;
     internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
     contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
@@ -490,6 +505,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     internal_influence_map = Public_data.AccuracyMap.empty ;
     influence_map = Public_data.AccuracyMap.empty ;
     bidirectional_influence_map = Public_data.AccuracyMap.empty ;
+    local_influence_map_blackboard = None ;
     internal_contact_map = Public_data.AccuracyMap.empty ;
     contact_map = Public_data.AccuracyMap.empty ;
     signature = None ;
@@ -763,6 +779,13 @@ let set_bidirectional_influence_map accuracy map state =
 
 let get_bidirectional_influence_map accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.bidirectional_influence_map
+
+
+let set_local_influence_map_blackboard blackboard state =
+  {state with local_influence_map_blackboard = Some blackboard}
+
+let get_local_influence_map_blackboard state =
+  state.local_influence_map_blackboard
 
 let set_internal_influence_map accuracy map state =
   {state

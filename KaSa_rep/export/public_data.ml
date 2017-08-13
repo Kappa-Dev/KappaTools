@@ -35,7 +35,8 @@ let label = "label"
 let ast = "ast"
 let position = "location"
 let edit = "edit_rule"
-
+let variable = "variable"
+let rule = "rule"
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -232,34 +233,7 @@ let contact_map_of_json =
              site_node_of_json
           )
           json
-
-
-(*
-             Mods.StringSetMap.Map.of_json
-             ~lab_key:agent ~lab_value:interface
-             (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "agent name"))
-             (Mods.StringSetMap.Map.of_json
-                ~error_msg:(JsonUtil.build_msg "interface")
-                ~lab_key:site ~lab_value:stateslist
-                (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "site name"))
-                  (JsonUtil.to_pair
-                     ~error_msg:(JsonUtil.build_msg "pair of lists of sites")
-                     ~lab1:props ~lab2:binds
-                     (JsonUtil.to_list
-                        ~error_msg:(JsonUtil.build_msg "list of internal states")
-                        (JsonUtil.to_string
-                           ~error_msg:(JsonUtil.build_msg "internal state")))
-                     (JsonUtil.to_list
-                        ~error_msg:(JsonUtil.build_msg "list of binding states")
-                        (JsonUtil.to_pair
-                           ~error_msg:(JsonUtil.build_msg "binding type")
-                           ~lab1:agent ~lab2:site
-                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
-                                                             "agent name"))
-                           (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg
-                                                             "site")))))))
-          json*)
-      with
+  with
       | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
@@ -277,9 +251,6 @@ type rule =
     rule_ast: string;
     rule_position: Locality.t
   }
-
-
-type dead_rules = rule list
 
 let rule_to_json rule =
   `Assoc
@@ -310,9 +281,76 @@ let json_to_rule =
   | x ->
     raise (Yojson.Basic.Util.Type_error ("rule",x))
 
+type var =
+  {
+    var_id: int;
+    var_label: string ;
+    var_ast: string;
+    var_position: Locality.t
+  }
+
+let var_to_json var =
+  `Assoc
+    [
+      rule_id,JsonUtil.of_int var.var_id;
+      label, JsonUtil.of_string var.var_label;
+      ast, JsonUtil.of_string var.var_ast;
+      position,Locality.annot_to_json
+        JsonUtil.of_unit ((),var.var_position)
+    ]
+
+let json_to_var =
+  function
+  | `Assoc l as x when List.length l = 4 ->
+    begin
+      try
+        {
+          var_id = JsonUtil.to_int (List.assoc rule_id l) ;
+          var_label =  JsonUtil.to_string (List.assoc label l) ;
+          var_ast =  JsonUtil.to_string (List.assoc ast l) ;
+          var_position =
+            snd (Locality.annot_of_json
+                   (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
+                   (List.assoc position l))}
+      with Not_found ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " var",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("var",x))
+
+type influence_node =
+  | Rule of rule
+  | Var of var
+
+let influence_node_to_json a =
+  match a with
+  | Var i ->
+    `Assoc [variable,var_to_json i]
+  | Rule i  ->
+    `Assoc [rule,rule_to_json i]
+
+let influence_node_of_json
+  =
+  function
+  | `Assoc [s,json] when s = variable ->
+    Var (json_to_var json)
+  | `Assoc [s,json] when s = rule ->
+    Rule (json_to_rule json)
+  | x ->
+    let error_msg = "Not a correct influence node" in
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+type dead_rules = rule list
+
 let dead_rules_to_json json =
   `Assoc
     [dead_rules, JsonUtil.of_list rule_to_json json]
+
+
+
+(***************)
+(* dead rules *)
+(***************)
 
 let dead_rules_of_json =
   function
@@ -325,6 +363,8 @@ let dead_rules_of_json =
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
+
+
 
 (***************)
 (* dead agents *)

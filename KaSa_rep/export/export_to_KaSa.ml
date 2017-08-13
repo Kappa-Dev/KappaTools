@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 11 2017>
+  * Last modification: Time-stamp: <Aug 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -67,9 +67,10 @@ sig
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_influence_map
 
-  val get_bidirectional_influence_map:
+  val get_local_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
-    state -> state * bidirectional_influence_map
+    ?fwd:int -> ?bwd:int -> total:int -> Ckappa_sig.c_rule_id ->  
+    state -> state * internal_influence_map
 
   val get_reachability_analysis: state -> state * reachability_analysis
 
@@ -88,6 +89,11 @@ sig
   val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
   val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
+
+  val output_local_influence_map: ?logger:Loggers.t ->
+    ?accuracy_level:Public_data.accuracy_level ->
+    ?fwd:int -> ?bwd:int -> total:int -> Ckappa_sig.c_rule_id ->
+    state -> state
 
   val output_constraints_list: ?logger:Loggers.t ->
     state -> state
@@ -112,14 +118,12 @@ module Export =
 
       let get_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map
-      let get_bidirectional_influence_map
-      ?accuracy_level:(accuracy_level=Public_data.Low)
-      (state:state) =
-        ((get_bidirectional_influence_map ~accuracy_level state): state * bidirectional_influence_map)
+      let get_local_influence_map = get_local_internal_influence_map
 
       let get_constraints_list = get_internal_constraints_list
       let output_contact_map = output_internal_contact_map
       let output_influence_map = output_internal_influence_map
+      let output_local_influence_map = output_local_internal_influence_map
       let output_constraints_list = output_internal_constraints_list
       let empty_constraints_list = []
     end

@@ -28,18 +28,11 @@ let get parameters error ~pos i array =
 let clean array =
   List.iter (fun i -> array.array.(i)<-array.default) array.list
 
-type distance =
-  {
-    fwd: int ;
-    bwd: int ;
-    total: int
-  }
-
 let origin =
   {
-    fwd=0;
-    bwd=0;
-    total=0;
+    Remanent_state.fwd=0;
+    Remanent_state.bwd=0;
+    Remanent_state.total=0;
   }
 
 let combine_distance a b =
@@ -48,31 +41,24 @@ let combine_distance a b =
   | Some a ->
     Some
       {
-        fwd = min a.fwd b.fwd ;
-        bwd = min a.fwd b.fwd ;
-        total = min a.total b.total
+        Remanent_state.fwd = min a.Remanent_state.fwd b.Remanent_state.fwd ;
+        Remanent_state.bwd = min a.Remanent_state.fwd b.Remanent_state.fwd ;
+        Remanent_state.total = min a.Remanent_state.total b.Remanent_state.total
       }
-
-type blackboard =
-  {
-    blackboard_distance: distance option array;
-    blackboard_is_done: bool array;
-    blackboard_to_be_explored: bool array
-  }
 
 let init_blackboard nrules nvars =
   let n = nrules + nvars in
   {
-    blackboard_distance       = Array.make n None;
-    blackboard_is_done        = Array.make n false;
-    blackboard_to_be_explored = Array.make n false
+    Remanent_state.blackboard_distance       = Array.make n None;
+    Remanent_state.blackboard_is_done        = Array.make n false;
+    Remanent_state.blackboard_to_be_explored = Array.make n false
   }
 
 type remanent_state =
   {
     waiting_list: int  list ;
     next_round: int list ;
-    distance: distance option cleanable_array ;
+    distance: Remanent_state.distance option cleanable_array ;
     is_done: bool cleanable_array ;
     to_be_explored: bool array ;
     influence_map: Remanent_state.internal_influence_map
@@ -104,9 +90,13 @@ let clean_remanent_state remanent_state =
   ()
 
 let go_fwd distance =
-  {distance with fwd = succ distance.fwd ; total = succ distance.total}
+  {distance with
+   Remanent_state.fwd = succ distance.Remanent_state.fwd ;
+   Remanent_state.total = succ distance.Remanent_state.total}
 let go_bwd distance =
-  {distance with bwd = succ distance.bwd ; total = succ distance.total}
+  {distance with
+   Remanent_state.bwd = succ distance.Remanent_state.bwd ;
+   Remanent_state.total = succ distance.Remanent_state.total}
 
 let leq int int_ref_opt =
   match int_ref_opt with
@@ -118,18 +108,21 @@ let has_improved ~new_distance ~old_distance_opt =
   with
   | None -> true
   | Some old_distance ->
-    new_distance.fwd < old_distance.fwd
-    || new_distance.bwd < old_distance.bwd
-    || new_distance.total < old_distance.total
+    new_distance.Remanent_state.fwd < old_distance.Remanent_state.fwd
+    || new_distance.Remanent_state.bwd < old_distance.Remanent_state.bwd
+    || new_distance.Remanent_state.total < old_distance.Remanent_state.total
 
 let best_distance new_distance old_distance_opt =
   match old_distance_opt with
   | None -> new_distance
   | Some old_distance ->
     {
-      fwd = min new_distance.fwd old_distance.fwd;
-      bwd = min new_distance.bwd old_distance.bwd;
-      total = min new_distance.total old_distance.total
+      Remanent_state.fwd =
+        min new_distance.Remanent_state.fwd old_distance.Remanent_state.fwd;
+      Remanent_state.bwd =
+        min new_distance.Remanent_state.bwd old_distance.Remanent_state.bwd;
+      total =
+        min new_distance.Remanent_state.total old_distance.Remanent_state.total
     }
 
 let add_influence source target label influence_map =
@@ -257,13 +250,18 @@ let visit parameters error
 let explore_influence_map
     ?fwd ?bwd ~total
     parameters error blackboard initial_node bidirectional_influence_map =
+  let initial_node = Ckappa_sig.int_of_rule_id initial_node in
   let good_distance d =
-    leq d.fwd fwd
-    || leq d.bwd bwd
-    || leq d.total (Some total)
+    leq d.Remanent_state.fwd fwd
+    && leq d.Remanent_state.bwd bwd
+    && leq d.Remanent_state.total (Some total)
   in
-  let distance = {array=blackboard.blackboard_distance;list=[];default=None} in
-  let is_done = {array=blackboard.blackboard_is_done;list=[];default=false} in
+  let distance =
+    {array=blackboard.Remanent_state.blackboard_distance;list=[];default=None}
+  in
+  let is_done =
+    {array=blackboard.Remanent_state.blackboard_is_done;list=[];default=false}
+  in
   let error, distance =
     set parameters error ~pos:__POS__ initial_node (Some origin) distance
   in
@@ -278,7 +276,7 @@ let explore_influence_map
       distance=distance;
       is_done=is_done;
       next_round=next_round ;
-      to_be_explored=blackboard.blackboard_to_be_explored;
+      to_be_explored=blackboard.Remanent_state.blackboard_to_be_explored;
       waiting_list=waiting_list;
       influence_map=influence_map
     }
@@ -309,6 +307,6 @@ let explore_influence_map
   let error, remanent_state = aux parameters error remanent_state in
   let () = clean_remanent_state remanent_state in
   error,remanent_state.influence_map,
-  {blackboard_distance = remanent_state.distance.array ;
-   blackboard_is_done = remanent_state.is_done.array ;
-   blackboard_to_be_explored = remanent_state.to_be_explored}
+  {Remanent_state.blackboard_distance = remanent_state.distance.array ;
+   Remanent_state.blackboard_is_done = remanent_state.is_done.array ;
+   Remanent_state.blackboard_to_be_explored = remanent_state.to_be_explored}

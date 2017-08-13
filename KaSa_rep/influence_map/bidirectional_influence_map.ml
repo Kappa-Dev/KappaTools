@@ -1,14 +1,16 @@
 let convert ~nrules ~nvars influence_map =
+  let _ = Format.fprintf Format.std_formatter "RULES: %i VARS: %i\n" nrules nvars in
+  let n = nrules + nvars in
   let bidirectional_map =
     {
       Remanent_state.positive_influence_fwd =
-        Array.make nrules [];
+        Array.make n [];
       Remanent_state.positive_influence_bwd =
-        Array.make nrules [];
+        Array.make n [];
       Remanent_state.negative_influence_fwd =
-        Array.make nvars [];
+        Array.make n [];
       Remanent_state.negative_influence_bwd =
-        Array.make nvars [];
+        Array.make n [];
     }
   in
   let f store_direct store_reverse map birectional_map =
@@ -25,19 +27,20 @@ let convert ~nrules ~nvars influence_map =
   let bidirectional_map =
     f
       (fun i j edge bidirectional_map ->
-           add
-             (fun i bidirectional_map ->
-                bidirectional_map.Remanent_state.positive_influence_fwd.(i))
-             (fun i im bidirectional_map ->
-                let () =
-                  bidirectional_map.Remanent_state.positive_influence_fwd.(i)<-im in
-                bidirectional_map
-             )
-             (Ckappa_sig.int_of_rule_id i)
-             (j,edge)
-             bidirectional_map)
+         add
+           (fun i bidirectional_map ->
+              bidirectional_map.Remanent_state.positive_influence_fwd.(i))
+           (fun i im bidirectional_map ->
+              let () =
+                bidirectional_map.Remanent_state.positive_influence_fwd.(i)<-im
+              in
+              bidirectional_map
+           )
+           (Ckappa_sig.int_of_rule_id i)
+           (j,edge)
+           bidirectional_map)
       (fun i j edge bidirectional_map ->
-           add
+         add
              (fun i bidirectional_map ->
                 bidirectional_map.Remanent_state.positive_influence_bwd.(i))
              (fun i im bidirectional_map ->
@@ -79,7 +82,7 @@ let convert ~nrules ~nvars influence_map =
                    i)<-im in
                bidirectional_map
              )
-             ((Ckappa_sig.int_of_rule_id i)-nrules)
+             (Ckappa_sig.int_of_rule_id i)
              (j,edge)
              bidirectional_map)
     (snd influence_map)

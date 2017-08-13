@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 11 2017>
+ * Last modification: Time-stamp: <Aug 13 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -163,7 +163,7 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
-  let state, stochastic_flow_opt =
+  let state, _stochastic_flow_opt =
     if Remanent_parameters.get_do_stochastic_flow_of_information parameters
     then
       let state, output = Export_to_KaSa.get_ctmc_flow state in
@@ -171,7 +171,7 @@ let main () =
     else
       state, None
   in
-  let state, ode_flow_opt =
+  let state, _ode_flow_opt =
     if Remanent_parameters.get_do_ODE_flow_of_information parameters
     then
       let state, output = Export_to_KaSa.get_ode_flow state in

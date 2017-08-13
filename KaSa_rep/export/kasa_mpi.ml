@@ -15,11 +15,11 @@ module A =
         Remanent_parameters_sig.dynamic_contact_map = true;
       } ())
 
-include Export.Export(A)
+include Export_to_json.Export(A)
 
 let gState =
   let compil = Ast.empty_compil in
-  ref (init ~compil ~called_from:Remanent_parameters_sig.Server ())
+  ref (init ~compil ())
 
 let send_exception post e =
   let reply =
@@ -45,39 +45,35 @@ let on_message post text =
     (try
        let compil = Ast.compil_of_json compil in
        let () = gState :=
-           init ~compil ~called_from:Remanent_parameters_sig.Server () in
+           init ~compil () in
        send_response post `Null
      with e -> send_exception post e)
   | `List [ `String "CONTACT_MAP"; acc ] ->
     let accuracy_level = Public_data.accuracy_of_json acc in
     let state, cm = get_contact_map ~accuracy_level !gState in
     let () = gState := state in
-    send_response
-      post (Public_data.contact_map_to_json (accuracy_level,cm))
+    send_response post cm
   | `List [ `String "CONTACT_MAP" ] | `String "CONTACT_MAP" ->
     let accuracy_level = Public_data.Low in
     let state, cm = get_contact_map ~accuracy_level !gState in
     let () = gState := state in
-    send_response
-      post (Public_data.contact_map_to_json (accuracy_level,cm))
+    send_response post cm
   | `List [ `String "INFLUENCE_MAP"; acc ] ->
     let accuracy_level = Public_data.accuracy_of_json acc in
     let state, im = get_influence_map ~accuracy_level !gState in
     let () = gState := state in
-    send_response
-      post (Remanent_state.influence_map_to_json (accuracy_level,im))
+    send_response post im
   | `List [ `String "INFLUENCE_MAP" ] | `String "INFLUENCE_MAP" ->
     let accuracy_level = Public_data.Low in
     let state, im = get_influence_map ~accuracy_level !gState in
     let () = gState := state in
-    send_response
-      post (Remanent_state.influence_map_to_json (accuracy_level,im))
+    send_response post im
   | `List [ `String "DEAD_RULES" ] | `String "DEAD_RULES" ->
     let state, rules = get_dead_rules !gState in
     let () = gState := state in
-    send_response post (Public_data.dead_rules_to_json rules)
+    send_response post rules
   | `List [ `String "CONSTRAINTS" ] | `String "CONSTRAINTS" ->
-    let state, out = get_constraints_list_to_json !gState in
+    let state, out = get_constraints_list !gState in
     let () = gState := state in
     send_response post out
   | x ->

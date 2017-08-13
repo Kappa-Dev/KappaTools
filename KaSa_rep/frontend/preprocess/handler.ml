@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Jul 31 2017>
+   * Last modification: Time-stamp: <Aug 13 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -309,6 +309,28 @@ let string_of_var ?with_rule:(with_rule=true)
     ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
 
 
+let convert_id parameters error handler compiled id =
+  let int = Ckappa_sig.int_of_rule_id id in
+  let nrules = nrules parameters error handler in
+  if int < nrules then
+    let error,(a,b,c,d) = info_of_rule parameters error compiled id in
+    error,Public_data.Rule
+      {
+        Public_data.rule_id=Ckappa_sig.int_of_rule_id d ;
+        Public_data.rule_position=b;
+        Public_data.rule_label=a;
+        Public_data.rule_ast=c
+      }
+  else
+    let error, (a,b,c,d) = info_of_var parameters error handler compiled id in
+    error,Public_data.Var
+      {
+        Public_data.var_id=Ckappa_sig.int_of_rule_id d ;
+        Public_data.var_position=b;
+        Public_data.var_label=a;
+        Public_data.var_ast=c
+      }
+
 let string_of_rule_or_var
     ?with_rule:(with_rule=true)
     ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
@@ -369,8 +391,8 @@ let string_of_site_aux
         site_int
         sites_dic
     with
-    | error, None -> Exception.warn parameter error' __POS__ Exit (Ckappa_sig.Internal "")
-    | error, Some (value, _, _) -> error', value
+    | error, None -> Exception.warn parameter error __POS__ Exit (Ckappa_sig.Internal "")
+    | error, Some (value, _, _) -> error, value
   in
   check_pos parameter ka_pos ml_pos message error error',
   site_type
