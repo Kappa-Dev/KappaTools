@@ -15,6 +15,7 @@ body {
     flex: 1;
     flex-direction: column;
     width: 100%;
+    min-width:50%;
     /* for Firefox */
     min-height: 0;
 }
