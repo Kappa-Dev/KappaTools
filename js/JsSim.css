@@ -165,7 +165,7 @@ rect { stroke-width: 2; }
     border: 1px solid #eee;
     min-height: 40px;
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     min-height: 0;
 }
 
