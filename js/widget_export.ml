@@ -116,7 +116,7 @@ let onload (configuration :  configuration) =
       Dom_html.handler
         (fun _ ->
            let () = export_button_toggle () in
-           Js._true)
+           Js._false)
   in
   let () =
     export_button##.onclick :=
