@@ -20,6 +20,19 @@ let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 let fwd, set_fwd = React.S.create None
 let bwd, set_bwd = React.S.create None
 let total, set_total = React.S.create 1
+
+let total_input_id = "total_input"
+
+
+
+
+let total_input =
+  Html.input ~a:[ Html.a_id total_input_id ;
+                  Html.a_input_type `Number;
+                  Html.a_value "1";
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
+
 let origin, set_origin = React.S.create `Null
 
 let accuracy_chooser_id = "influence-accuracy"
@@ -43,7 +56,11 @@ let content () =
       [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
               [Html.pcdata "Accuracy"];
-            Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ]
+            Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ];
+        Html.div ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for total_input_id ]
+              [Html.pcdata "radius"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [total_input] ]
       ] in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
@@ -70,14 +87,7 @@ let content () =
                                               [Html.pcdata
                                                  (Yojson.Basic.to_string influences_json) ] in
                                           ())
-                                       (
-
-                                         (* old version *)   (*manager#get_influence_map acc*)
-
-                                         (* new version*)
-                                           manager#get_local_influence_map  ?fwd ?bwd ~total ~origin acc
-
-                                           (* when I use the new version instead of the old version, well KaSa_client dies *))) >>=
+                                       (manager#get_local_influence_map  ?fwd ?bwd ~total ~origin acc)) >>=
                    fun out -> Lwt.return (Api_common.result_lift out)
                                  ))
                             origin)
@@ -102,6 +112,12 @@ let onload () =
            let va = Js.to_string va##.value in
            let () = set_accuracy (Public_data.accuracy_of_string va) in
            Js._true) in
+  let () = (Tyxml_js.To_dom.of_input total_input )##.onchange :=
+               Dom_html.full_handler
+                 (fun va _ ->
+                    let va = Js.to_string va##.value in
+                    let () = set_total (int_of_string va) in
+                    Js._true) in
   let () = Common.jquery_on
       "#navinfluences" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
