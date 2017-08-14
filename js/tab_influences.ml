@@ -36,13 +36,13 @@ let total_input =
                   Html.a_size 1;] ()
 
 let fwd_input =
-  Html.input ~a:[ Html.a_id total_input_id ;
+  Html.input ~a:[ Html.a_id fwd_input_id ;
                   Html.a_input_type `Number;
                   Html.a_class ["form-control"];
                   Html.a_size 1;] ()
 
 let bwd_input =
-  Html.input ~a:[ Html.a_id total_input_id ;
+  Html.input ~a:[ Html.a_id bwd_input_id ;
                   Html.a_input_type `Number;
                   Html.a_class ["form-control"];
                   Html.a_size 1;] ()
@@ -86,14 +86,14 @@ let content () =
                    Html.a_label_for total_input_id ]
               [Html.pcdata "radius"];
             Html.div
-              ~a:[Html.a_class ["col-md-1"] ]
+              ~a:[Html.a_class ["col-md-2"] ]
               [total_input] ];
         Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label
               ~a:[ Html.a_class ["col-md-3"];
                    Html.a_label_for fwd_input_id ]
-              [Html.pcdata "max_fordward"];
+              [Html.pcdata "max_forward"];
             Html.div
               ~a:[Html.a_class ["col-md-2"] ]
               [fwd_input]];
@@ -172,14 +172,14 @@ let onload () =
                       Js._true
                     with _ -> Js._false)
   in
-  let () = (Tyxml_js.To_dom.of_input fwd_input )##.onchange :=
+  let () = (Tyxml_js.To_dom.of_input fwd_input)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->
            let va = Js.to_string va##.value in
            try
              let va_opt =
                if va = "" then None
-               else  Some (int_of_string va)
+               else Some (int_of_string va)
              in
              let () = set_fwd va_opt in
              Js._true
