@@ -91,32 +91,32 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
           Lwt_result.bind_result
             (self#message post request)
             (fun x -> Result.Ok x)
-    method get_initial_node () =
+    (*method get_initial_node () =
       let request =
         `List [`String "INFLUENCE_MAP_ORIGINAL_NODE"]
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
-    method get_next_node json =
+        (fun x -> Result.Ok x)*)
+        (*  method get_next_node json =
       let request =
         `List [`String "INFLUENCE_MAP_NEXT_NODE";json]
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
-    method get_previous_node json =
+            (fun x -> Result.Ok x)*)
+        (*  method get_previous_node json =
       let request =
         `List [`String "INFLUENCE_MAP_NEXT_NODE";json]
       in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+            (fun x -> Result.Ok x)*)
     method get_dead_rules =
       let request = `List [ `String "DEAD_RULES" ] in
       Lwt_result.bind_result
         (self#message post request)
-        (fun x -> Result.Ok x)
+            (fun x -> Result.Ok x)
     method get_constraints_list =
       let request = `List [ `String "CONSTRAINTS" ] in
       Lwt_result.bind_result

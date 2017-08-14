@@ -104,13 +104,13 @@ let content () =
                    Html.a_label_for bwd_input_id ]
               [Html.pcdata "max_backward"];
             Html.div ~a:[Html.a_class ["col-md-2"] ] [bwd_input];
-            Html.div
+            (*  Html.div
               ~a:[ Html.a_class [ "form-group" ] ]
               [ Html.label
                   ~a:[ Html.a_class ["col-md-2"];
                        Html.a_label_for next_node_id ]
                   [Html.pcdata "max_backward"];
-                        Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node];           ]
+                        Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node];  *)         ]
       ] in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
