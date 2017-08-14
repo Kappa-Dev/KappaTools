@@ -1,5 +1,4 @@
 let convert ~nrules ~nvars influence_map =
-  let _ = Format.fprintf Format.std_formatter "RULES: %i VARS: %i\n" nrules nvars in
   let n = nrules + nvars in
   let bidirectional_map =
     {

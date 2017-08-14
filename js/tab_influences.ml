@@ -72,12 +72,10 @@ let content () =
                                           ())
                                        (
 
-                                         (* old version *)   manager#get_influence_map acc
+                                         (* old version *)   (*manager#get_influence_map acc*)
 
                                          (* new version*)
-                                         (*let fwd = None in
-                                         let bwd = None in
-                                           manager#get_local_influence_map  ?fwd ?bwd ~total ~origin acc*)
+                                           manager#get_local_influence_map  ?fwd ?bwd ~total ~origin acc
 
                                            (* when I use the new version instead of the old version, well KaSa_client dies *))) >>=
                    fun out -> Lwt.return (Api_common.result_lift out)
