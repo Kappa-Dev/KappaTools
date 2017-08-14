@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 13 2017>
+  * Last modification: Time-stamp: <Aug 14 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -76,6 +76,12 @@ val influence_map_to_json:
 
 val influence_map_of_json:
   Yojson.Basic.json -> Public_data.accuracy_level * influence_map
+
+val local_influence_map_to_json:
+  Public_data.accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
+
+val local_influence_map_of_json:
+  Yojson.Basic.json -> Public_data.accuracy_level * int * int option * int option * influence_map
 
 type internal_influence_map =
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t

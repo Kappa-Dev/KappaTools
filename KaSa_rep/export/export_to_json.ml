@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 13 2017>
+  * Last modification: Time-stamp: <Aug 14 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -92,12 +92,12 @@ functor (A:Analyzer.Analyzer) ->
           end
         with
         | _ -> Ckappa_sig.rule_id_of_int 0
-      in     
+      in
       let state, influence_map =
         get_local_influence_map ~accuracy_level ?fwd ?bwd ~total
           rule_id state
       in
-      state, Remanent_state.influence_map_to_json (accuracy_level,influence_map)
+      state, Remanent_state.local_influence_map_to_json (accuracy_level,total,bwd,fwd,influence_map)
 
     let origin_of_influence_map state =
       let state, nrules = nrules state in

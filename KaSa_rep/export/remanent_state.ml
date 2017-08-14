@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 13 2017>
+  * Last modification: Time-stamp: <Aug 14 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -59,7 +59,9 @@ let separating_transitions = "separating transitions"
 let direct = "direct"
 let side_effect = "side effect"
 let errors = "errors"
-
+let total_string = "total"
+let fwd_string = "fwd"
+let bwd_string = "bwd"
 
 type dead_rules = Public_data.dead_rules
 
@@ -204,6 +206,24 @@ let influence_map_to_json influence_map =
             inhibition,half_influence_map_to_json
               influence_map.negative;]) influence_map]
 
+let local_influence_map_to_json influence_map =
+  let accuracy, total, bwd, fwd, influence_map = influence_map in
+  `Assoc
+    [influencemap,
+     `Assoc [accuracy_string,Public_data.accuracy_to_json accuracy;
+             total_string,JsonUtil.of_int total;
+             fwd_string,JsonUtil.of_option JsonUtil.of_int fwd;
+             bwd_string,JsonUtil.of_option JsonUtil.of_int bwd;
+             map,
+             (fun influence_map ->
+                `Assoc
+                  [
+                    wakeup,half_influence_map_to_json influence_map.positive;
+                    inhibition,half_influence_map_to_json
+                      influence_map.negative;]) influence_map
+            ]
+    ]
+
 let influence_map_of_json =
   function
   | `Assoc l as x ->
@@ -239,6 +259,66 @@ let influence_map_of_json =
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+
+let local_influence_map_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc influencemap l in
+        match json with
+        | `Assoc l'  ->
+          let accuracy =
+            Public_data.accuracy_of_json (List.assoc accuracy_string l')
+          in
+          let total =
+            JsonUtil.to_int (List.assoc total_string l')
+          in
+          let error_msg = JsonUtil.build_msg "fwd radius" in
+          let fwd =
+            JsonUtil.to_option
+              (JsonUtil.to_int ~error_msg) (List.assoc fwd_string l')
+          in
+          let error_msg = JsonUtil.build_msg "bwd radius" in
+          let bwd =
+            JsonUtil.to_option
+              (JsonUtil.to_int ~error_msg) (List.assoc bwd_string l')
+          in
+          let influence_map =
+            (function
+              | `Assoc l as x when List.length l = 2 ->
+                begin
+                  try
+                    {
+                      positive =
+                        half_influence_map_of_json (List.assoc wakeup l);
+                      negative =
+                        half_influence_map_of_json (List.assoc inhibition l)
+                    }
+                  with Not_found ->
+                    raise
+                      (Yojson.Basic.Util.Type_error
+                         (JsonUtil.build_msg "local influence map",x))
+                end
+              | x ->
+                raise
+                  (Yojson.Basic.Util.Type_error
+                     (JsonUtil.build_msg "local influence map",x)))
+              (List.assoc map l')
+          in
+          (accuracy, total, fwd, bwd, influence_map)
+        | _ ->
+          raise
+            (Yojson.Basic.Util.Type_error
+               (JsonUtil.build_msg "influence map",x))
+      with _ ->
+        raise
+          (Yojson.Basic.Util.Type_error
+             (JsonUtil.build_msg "influence map",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+
 
 (******************************************************************************)
 (******************************************************************************)

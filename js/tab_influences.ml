@@ -22,9 +22,11 @@ let bwd, set_bwd = React.S.create None
 let total, set_total = React.S.create 1
 
 let total_input_id = "total_input"
-
-
-
+let fwd_input_id = "fwd_input"
+let bwd_input_id = "bwd_input"
+let recenter_id = "reset"
+let next_node_id = "next"
+let prev_node_id = "previous"
 
 let total_input =
   Html.input ~a:[ Html.a_id total_input_id ;
@@ -32,6 +34,21 @@ let total_input =
                   Html.a_value "1";
                   Html.a_class ["form-control"];
                   Html.a_size 1;] ()
+
+let fwd_input =
+  Html.input ~a:[ Html.a_id total_input_id ;
+                  Html.a_input_type `Number;
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
+
+let bwd_input =
+  Html.input ~a:[ Html.a_id total_input_id ;
+                  Html.a_input_type `Number;
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
+
+let next_node =
+  Html.button ~a:[ Html.a_id recenter_id]
 
 let origin, set_origin = React.S.create `Null
 
@@ -53,14 +70,47 @@ let accuracy_chooser =
 let content () =
   let accuracy_form =
     Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
-      [ Html.div ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for accuracy_chooser_id ]
+      [ Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-2"];
+                   Html.a_label_for accuracy_chooser_id ]
               [Html.pcdata "Accuracy"];
-            Html.div ~a:[Html.a_class ["col-md-10"] ] [accuracy_chooser] ];
-        Html.div ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label ~a:[ Html.a_class ["col-md-2"]; Html.a_label_for total_input_id ]
+            Html.div
+              ~a:[Html.a_class ["col-md-2"] ]
+              [accuracy_chooser] ];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-2"];
+                   Html.a_label_for total_input_id ]
               [Html.pcdata "radius"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [total_input] ]
+            Html.div
+              ~a:[Html.a_class ["col-md-1"] ]
+              [total_input] ];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-3"];
+                   Html.a_label_for fwd_input_id ]
+              [Html.pcdata "max_fordward"];
+            Html.div
+              ~a:[Html.a_class ["col-md-2"] ]
+              [fwd_input]];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-3"];
+                   Html.a_label_for bwd_input_id ]
+              [Html.pcdata "max_backward"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [bwd_input];
+            Html.div
+              ~a:[ Html.a_class [ "form-group" ] ]
+              [ Html.label
+                  ~a:[ Html.a_class ["col-md-2"];
+                       Html.a_label_for next_node_id ]
+                  [Html.pcdata "max_backward"];
+                        Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node];           ]
       ] in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
@@ -87,7 +137,8 @@ let content () =
                                               [Html.pcdata
                                                  (Yojson.Basic.to_string influences_json) ] in
                                           ())
-                                       (manager#get_local_influence_map  ?fwd ?bwd ~total ~origin acc)) >>=
+                                       (manager#get_local_influence_map
+                                          ?fwd ?bwd ~total ~origin acc)) >>=
                    fun out -> Lwt.return (Api_common.result_lift out)
                                  ))
                             origin)
@@ -112,12 +163,40 @@ let onload () =
            let va = Js.to_string va##.value in
            let () = set_accuracy (Public_data.accuracy_of_string va) in
            Js._true) in
-  let () = (Tyxml_js.To_dom.of_input total_input )##.onchange :=
+  let () = (Tyxml_js.To_dom.of_input total_input)##.onchange :=
                Dom_html.full_handler
                  (fun va _ ->
                     let va = Js.to_string va##.value in
-                    let () = set_total (int_of_string va) in
-                    Js._true) in
+                    try
+                      let () = set_total (int_of_string va) in
+                      Js._true
+                    with _ -> Js._false)
+  in
+  let () = (Tyxml_js.To_dom.of_input fwd_input )##.onchange :=
+      Dom_html.full_handler
+        (fun va _ ->
+           let va = Js.to_string va##.value in
+           try
+             let va_opt =
+               if va = "" then None
+               else  Some (int_of_string va)
+             in
+             let () = set_fwd va_opt in
+             Js._true
+           with _ -> Js._false)
+  in
+  let () = (Tyxml_js.To_dom.of_input bwd_input )##.onchange :=
+               Dom_html.full_handler
+                 (fun va _ ->
+                    let va = Js.to_string va##.value in
+                    try
+                      let va_opt =
+                        if va = "" then None
+                        else  Some (int_of_string va)
+                      in
+                      let () = set_bwd va_opt in
+                      Js._true
+                 with _ -> Js._false) in
   let () = Common.jquery_on
       "#navinfluences" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
