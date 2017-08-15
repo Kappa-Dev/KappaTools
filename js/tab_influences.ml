@@ -114,40 +114,26 @@ let content () =
       ] in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
-    React.S.l1
-      (fun _ ->
-         React.S.l1
-           (fun acc ->
-              React.S.l1
-                (fun fwd ->
-                   React.S.l1
-                   (fun bwd ->
-                     React.S.l1
-                       (fun total ->
-                          React.S.l1
-                            (fun origin ->
-                               State_project.with_project
-                                 ~label:__LOC__
-                                 (fun (manager : Api.concrete_manager) ->
-                                    (Lwt_result.map
-                                       (fun influences_json ->
-                                          let () =
-                                            ReactiveData.RList.set
-                                              set_influences
-                                              [Html.pcdata
-                                                 (Yojson.Basic.to_string influences_json) ] in
-                                          ())
-                                       (manager#get_local_influence_map
-                                          ?fwd ?bwd ~total ~origin acc)) >>=
-                   fun out -> Lwt.return (Api_common.result_lift out)
-                                 ))
-                            origin)
-                       total)
-                   bwd)
-                fwd)
-           accuracy)
+    React.S.l6
+      (fun _ acc fwd bwd total origin ->
+         State_project.with_project
+           ~label:__LOC__
+           (fun (manager : Api.concrete_manager) ->
+              (Lwt_result.map
+                 (fun influences_json ->
+                    let () =
+                      ReactiveData.RList.set
+                        set_influences
+                        [Html.pcdata
+                           (Yojson.Basic.to_string influences_json) ] in
+                    ())
+                 (manager#get_local_influence_map
+                    ?fwd ?bwd ~total ~origin acc)) >>=
+              fun out -> Lwt.return (Api_common.result_lift out)
+           ))
       (React.S.on tab_is_active
-         State_project.dummy_model State_project.model) in
+         State_project.dummy_model State_project.model)
+      accuracy fwd bwd total origin in
   [ Html.div
       ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
       [ accuracy_form; Tyxml_js.R.Html5.p influences ]
