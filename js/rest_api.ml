@@ -477,6 +477,68 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
+  method get_initial_node () =
+    send
+      ?timeout
+      (
+       Format.sprintf
+         "%s/v2/projects/%s/analyses/influence_map/initial_node"
+         url
+         project_id
+      )
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_next_node json =
+    send
+      ?timeout
+      (
+        Format.sprintf
+          "%s/v2/projects/%s/analyses/influence_map/next_node%s"
+          url
+          project_id
+          (try
+             match Public_data.influence_node_of_json json with
+             | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
+             | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
+          with _ -> "")
+      )
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+  method get_previous_node json =
+    send
+      ?timeout
+      (
+        Format.sprintf
+          "%s/v2/projects/%s/analyses/influence_map/previous_node%s"
+          url
+          project_id
+          (try
+             match Public_data.influence_node_of_json json with
+             | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
+             | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
+           with _ -> "")
+      )
+      `GET
+      (fun x -> Yojson.Basic.from_string x)
+    >>= Api_common.result_map
+      ~ok:(fun _ x -> Lwt.return_ok x)
+      ~error:(fun _ -> function
+          | e :: _ -> Lwt.return_error e.Api_types_t.message_text
+          | [] -> Lwt.return_error "Rest_api empty error")
+
+
   method get_dead_rules =
     send
       ?timeout

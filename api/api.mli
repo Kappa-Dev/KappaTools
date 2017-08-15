@@ -115,6 +115,12 @@ class type virtual manager_static_analysis = object
     ?fwd:int -> ?bwd:int -> total:int ->
     origin:Yojson.Basic.json ->
     (Yojson.Basic.json,string) Lwt_result.t
+  method get_initial_node :
+    unit -> (Yojson.Basic.json,string) Lwt_result.t
+  method get_next_node :
+    Yojson.Basic.json -> (Yojson.Basic.json,string) Lwt_result.t
+  method get_previous_node :
+    Yojson.Basic.json -> (Yojson.Basic.json,string) Lwt_result.t
   method get_dead_rules : (Yojson.Basic.json,string) Lwt_result.t
   method get_constraints_list : (Yojson.Basic.json,string) Lwt_result.t
 end

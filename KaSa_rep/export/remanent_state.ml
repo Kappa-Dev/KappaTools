@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 14 2017>
+  * Last modification: Time-stamp: <Aug 15 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -85,34 +85,6 @@ let separating_transitions_to_json =
        JsonUtil.of_string
        Ckappa_sig.rule_id_to_json
        JsonUtil.of_string)
-
-
-(*****************)
-(* Influence map *)
-(*****************)
-
-(* Influence Node *)
-(*type influence_node =
-  | Rule of rule_id
-  | Var of var_id
-
-let influence_node_to_json a =
-  match a with
-  | Var i ->
-    `Assoc [variable,JsonUtil.of_int i]
-  | Rule i  ->
-    `Assoc [rule,JsonUtil.of_int i]
-
-let influence_node_of_json
-    ?error_msg:(error_msg="Not a correct influence node")
-  =
-  function
-  | `Assoc [s,json] when s = variable ->
-    Var (JsonUtil.to_int json)
-  | `Assoc [s,json] when s = rule ->
-    Rule (JsonUtil.to_int json)
-  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
-*)
 
 (* Location labels *)
 
