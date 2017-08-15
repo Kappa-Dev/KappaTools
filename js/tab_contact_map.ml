@@ -70,25 +70,22 @@ let extract_contact_map = function
   | `Assoc [ "contact map", `Assoc [ "map", contact; "accuracy", acc ] ] -> acc,contact
   | _ -> failwith "Wrong ugly contact_map extractor"
 
-let _ = React.S.l1
-    (fun _ ->
-       React.S.l1
-         (fun acc ->
-            State_project.with_project
-              ~label:__LOC__
-              (fun (manager : Api.concrete_manager) ->
-                 (Lwt_result.map
-                    (fun contact_json ->
-                       let _,map_json = extract_contact_map contact_json in
-                       set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
-                    (manager#get_contact_map acc)) >>=
-                 fun out -> Lwt.return (Api_common.result_lift out)
-              )
+let _ = React.S.l2
+    (fun _ acc ->
+       State_project.with_project
+         ~label:__LOC__
+         (fun (manager : Api.concrete_manager) ->
+            (Lwt_result.map
+               (fun contact_json ->
+                  let _,map_json = extract_contact_map contact_json in
+                  set_contact_map_text (Some (Yojson.Basic.to_string map_json)))
+               (manager#get_contact_map acc)) >>=
+            fun out -> Lwt.return (Api_common.result_lift out)
          )
-         accuracy
     )
     (React.S.on tab_is_active
        State_project.dummy_model State_project.model)
+    accuracy
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
