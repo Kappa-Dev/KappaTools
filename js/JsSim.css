@@ -302,11 +302,12 @@ form {
     flex-direction: row;
 }
 .snapshot-container {
-    flex: 4
+    flex: 4;
 }
 
 .snapshot-legend {
-    flex: 1
+    flex: 1;
+    overflow:auto;
 }
 
 .treeSpecies {

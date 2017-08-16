@@ -90,13 +90,22 @@ class SnapUIManager {
             return tempObj;
         } );
         
-
+        let legendHeight = d3.select(".snapshot-legend").node().getBoundingClientRect().height;
         let legendSVG = d3.select(".snapshot-legend")
+            .style("height", legendHeight + "px")
             .append("svg")
             .attr("class", "legend-container")   
             .attr("height", (legendRectSize + legendSpacing) * dataArray.length + 2 * padding )
             .attr("width", "15vw" )
             .attr("preserveAspectRatio", "xMinYMin meet");        	
+        
+        window.addEventListener("resize", resizeLegend);
+        
+        function resizeLegend() {
+            let legendHeight = d3.select("#snapshot-map-display").node().getBoundingClientRect().height;
+            let legendSVG = d3.select(".snapshot-legend")
+                .style("height", legendHeight +"px");
+        }
 
         let legend = legendSVG.selectAll(".legend-elements")           
         .data(dataArray)      
