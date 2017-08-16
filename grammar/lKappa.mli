@@ -73,7 +73,7 @@ val rule_of_json : Yojson.Basic.json -> rule_agent rule
 
 val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> ?max_allowed_var: int ->
+  int Mods.StringMap.t -> ?max_allowed_var: int -> ?c:bool ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (rule_agent list, int) Alg_expr.bool Locality.annot
 
@@ -83,7 +83,7 @@ val modif_expr_of_ast :
   -> int list -> (rule_agent list, int) Ast.modif_expr * int list
 
 val init_of_ast :
-  syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->
+  syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t -> ?c:bool ->
   int Mods.StringMap.t -> int Mods.StringMap.t ->
   (Ast.mixture,string) Ast.init_statment list ->
   (rule_agent list, int) Ast.init_statment list
