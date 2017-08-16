@@ -1475,10 +1475,8 @@ let remove_counter_created_agent sigs raw ag lnk_nb =
    - adds increment agents to the raw mixture
    - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
      to the increments *)
-let remove_counter_rule sigs ?contact_map with_counters mix created =
+let remove_counter_rule sigs with_counters mix created =
   if (with_counters) then
-    let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
-    let () = add_link_contact_map ?contact_map incr_id incr_a incr_id incr_b in
     let lnk_nb =
       List.fold_left
         (fun max ag ->
@@ -1505,24 +1503,23 @@ let remove_counter_rule sigs ?contact_map with_counters mix created =
         (fun (acc,lnk) ag ->
           let (a,lnk') =
             remove_counter_created_agent sigs created ag lnk in
-          (a::acc,lnk'))
+          (a@acc,lnk'))
         ([],lnk_nb') mix_created in
-    (ra_mix@incrs,created@incrs_created@(List.flatten incrs_created'))
+    (ra_mix@incrs,created@incrs_created@incrs_created')
   else List.map (fun ag -> ag.ra) mix,created
 
-let remove_counters sigs ?contact_map with_counters rules  =
+let remove_counters sigs with_counters rules  =
   List.map
     (fun (s,(r,a)) ->
       let (r_mix,r_created) =
-        remove_counter_rule sigs ?contact_map with_counters
-                            r.r_mix r.r_created in
+        remove_counter_rule sigs with_counters r.r_mix r.r_created in
       let r' = {r with r_mix;r_created} in
       (s,(r',a))) rules
 
 let mixture_of_ast ~syntax_version sigs ?contact_map ~with_counters pos mix =
   match annotate_edit_mixture
           ~syntax_version ~is_rule:false sigs ?contact_map mix with
-  | r, [] -> fst (remove_counter_rule sigs ?contact_map with_counters r [])
+  | r, [] -> fst (remove_counter_rule sigs with_counters r [])
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
@@ -1908,6 +1905,9 @@ let compil_of_ast ~syntax_version overwrite c =
   let tk_nd = NamedDecls.create
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
+  let () = if with_counters then
+      let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
+      add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
   let perts',updated_vars =
     List_util.fold_right_map
       (perturbation_of_ast
@@ -1938,7 +1938,7 @@ let compil_of_ast ~syntax_version overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
-  let rules = remove_counters sigs ~contact_map with_counters rules in
+  let rules = remove_counters sigs with_counters rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.variables =
