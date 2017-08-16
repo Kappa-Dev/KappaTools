@@ -312,12 +312,12 @@ let xml () =
              ) ]
       [%html {|
         <form  class="form-inline" id="snap-form">
-        <label><input type="radio" name="mode" value="sumByMass" checked> Mass</label>
+        <label><input type="radio" name="mode" value="sumByMass" > Mass</label>
         <label><input type="radio" name="mode" value="sumByCount" > Count</label>
-        <label><input type="radio" name="mode" value="sumBySize"> Size</label>
+        <label><input type="radio" name="mode" value="sumBySize" checked> Size</label>
         <button id="resetButton" class="stateButton" type="button"> Reset Zoom </button>
         </form>
-        <div class="flex-content" id="|}display_id{|">&nbsp;</div>|}]
+        <div class="flex-content" id="|}display_id{|"></div>|}]
   in
   let format_chooser =
     [%html

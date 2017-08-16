@@ -6,21 +6,21 @@ class SnapUIManager {
         this.buttonClicked = 0;
         let UI = this;
 
-        this.tip = renderer.root.select(".render-container").append("div")	
-            .attr("class", "snap-tooltip")	
+        this.tip = d3.select(".render-container").append("div")	
+            .attr("class", "tooltip")	
             .style("font-size", "2em")			
             .style("padding", "0.5em");
            /* add button functionality */
         
         let timeout = d3.timeout(function() {
-            d3.select("input[value=\"sumByMass\"]")
+            d3.select("input[value=\"sumBySize\"]")
                 .property("checked", true)
                 .dispatch("change");
-        }, 2000);
+        }, 10);
         
         
-        d3.select("#snap-form").selectAll("input")
-            .data([sumByMass, sumByCount, sumBySize], function(d) { return d ? d.name : this.value; })
+        d3.selectAll("input")
+            .data([sumBySize, sumByCount, sumByMass], function(d) { return d ? d.name : this.value; })
             .on("change", changed);
 
         function changed(sum) {
@@ -29,7 +29,7 @@ class SnapUIManager {
             let height = renderer.layout.dimension.height;
             let treemap = d3.treemap()
                 .tile(d3.treemapResquarify)
-                .size([width, height])
+                .size([width, height - 20])
                 .round(true)
                 .paddingInner(4);
 
@@ -54,7 +54,7 @@ class SnapUIManager {
             .transition()
                 .duration(750)
                 .attr("transform", d => { let x = d.x0 + (renderer.layout.margin.left + renderer.layout.margin.right)/2;
-                                            let y = d.y0 + (renderer.layout.margin.top + renderer.layout.margin.bottom)/2;
+                                            let y = d.y0 + 30;
                                             return "translate(" + x + "," + y + ")"; })
                 
                 .select("rect")
@@ -63,7 +63,6 @@ class SnapUIManager {
 
             renderer.removeNodes();
             renderer.renderNodes();
-            
             
         }
 
@@ -81,7 +80,6 @@ class SnapUIManager {
     }
     
     renderLegend() {
-        //console.log("hi");
         let legendRectSize = 25;
         let legendSpacing = 10;
         let padding = 10;
@@ -93,11 +91,11 @@ class SnapUIManager {
         } );
         
 
-        let legendSVG = renderer.root.select(".render-container")
+        let legendSVG = d3.select(".snapshot-legend")
             .append("svg")
             .attr("class", "legend-container")   
             .attr("height", (legendRectSize + legendSpacing) * dataArray.length + 2 * padding )
-            .attr("width", "20vw" )
+            .attr("width", "15vw" )
             .attr("preserveAspectRatio", "xMinYMin meet");        	
 
         let legend = legendSVG.selectAll(".legend-elements")           
@@ -128,7 +126,7 @@ class SnapUIManager {
     showSpecies(d) { 
         let renderer = this.renderer;
         this.tip
-            .style("text-opacity", 1)
+            .style("opacity", 1)
             .style("background", d => {
                 let color = d3.rgb("white");
                 color.opacity = 0.8;
@@ -140,10 +138,10 @@ class SnapUIManager {
             .style('color', "black");
     }     
 
-    hideSpecies(d) {
+    hideSpecies() {
         let renderer = this.renderer;
         this.tip
-            .style("text-opacity", 0)
+            .style("opacity", 0)
             .style("background", d => {
                 let color = d3.rgb("white");
                 color.opacity = 0;
@@ -152,6 +150,4 @@ class SnapUIManager {
         this.tip
             .text("");
     }
-    
-
 }

@@ -169,6 +169,7 @@ class Node extends D3Object {
             site.setId(i); 
             return site;
         });
+
         /* make fake empty site if no site is present on agent */
         if (nodeData.site_node_sites.length === 0) {
                 this.sites = [];
@@ -210,7 +211,10 @@ class Node extends D3Object {
     }
 
     listSites() {
+        
+       
         return this.sites;
+
     }
 
     getSite(siteId) {
@@ -406,8 +410,57 @@ class DataStorage {
         return d3.hierarchy(map[""]);
     }
 
-    sortSites() {
-        this.listNodes().map(function(node) {node.sortSites();});
+    generateForceDirectedNodes() {
+        let nodes = this.data;
+        let nodeList = [];
+        for (let node in nodes) {
+            let nodeObj = {};
+            nodeObj.id = nodes[node].id;
+            nodeObj.sites = nodes[node].sites;
+            nodeObj.label = nodes[node].label;
+            nodeList.push(nodeObj);
+        }
+        //console.log(nodeList);
+        return nodeList;
+    }
+
+    addForceDirectedSites(node) {
+
+    }
+
+    removeForceDirectedSites(node) {
+        
+    }
+
+    generateForceDirectedLinks() {
+        let nodes = this.data;
+        let linkList = [];
+        for (let node in nodes) {
+            let currentNode = nodes[node];
+            for (let site in currentNode.sites) {
+                let currentSite = currentNode.sites[site];
+                for (let link in currentSite.links) {
+                    let currentLink = currentSite.links[link];
+                    let linkObj = {};
+                    linkObj.source = currentNode.id;
+                    linkObj.sourceSite = currentSite.id;
+                    linkObj.target = currentLink.nodeId;
+                    linkObj.targetSite = currentLink.siteId;
+                    linkObj.value = 0.5;
+                    linkList.push(linkObj);
+                }
+            }
+        }
+        //console.log(linkList);
+        return linkList;
+    }
+
+    addForceDirectedLinks(node) {
+        
+     }
+        
+    removeForceDirectedLinks(node) {
+        
     }
 
     packageLinks(nodes) {
@@ -417,7 +470,7 @@ class DataStorage {
 
         // Compute a map from name to node.
         nodes.forEach(function(d) {
-            //console.log(d);
+            console.log(d);
             map[d.data.name] = d;
         });
 
@@ -430,6 +483,10 @@ class DataStorage {
 
         //console.log(links);
         return links;
+    }
+
+    sortSites() {
+        this.listNodes().map(function(node) {node.sortSites();});
     }
 }
 

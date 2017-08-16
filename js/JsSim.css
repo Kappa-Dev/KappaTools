@@ -195,7 +195,7 @@ rect { stroke-width: 2; }
 
 .tooltip {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
   white-space: pre;
   text-align: right;
@@ -255,16 +255,6 @@ rect { stroke-width: 2; }
     overflow: hidden;
 }
 
-.legend-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    text-align: right;
-    background-color:  rgba(255, 255, 255, 0.8);
-    display: inline-block;
-    pointer-events: none;	
-}
-
 #resetButton {
     margin-left: 30px;
 }
@@ -305,4 +295,29 @@ form {
 
 #snap-form {
     margin-bottom: 0.5em;
+}
+
+.render-container {
+    display: flex;
+    flex-direction: row;
+}
+.snapshot-container {
+    flex: 4
+}
+
+.snapshot-legend {
+    flex: 1
+}
+
+.treeSpecies {
+    fill-opacity: 1;
+}
+
+.treeSpecies-hidden {
+    fill-opacity: 0;
+}
+
+.snapshot-links line {
+    stroke:white;
+    stroke-opacity: 0.6;
 }
