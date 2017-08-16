@@ -30,7 +30,8 @@ let next_node_id = "next"
 let prev_node_id = "previous"
 
 let total_input =
-  Html.input ~a:[ Html.a_id total_input_id ;
+  Html.input ~a:[
+                  Html.a_id total_input_id ;
                   Html.a_input_type `Number;
                   Html.a_value "1";
                   Html.a_class ["form-control"];
@@ -51,6 +52,7 @@ let bwd_input =
 let next_node =
   Html.input ~a:[ Html.a_id next_node_id ;
                   Html.a_input_type `Button;
+                  Html.a_value "Next";
                   Html.a_title "Next";
                   Html.a_class ["form-control"];
                   Html.a_size 1;] ()
@@ -58,16 +60,21 @@ let next_node =
 let prev_node =
   Html.input ~a:[ Html.a_id prev_node_id ;
                   Html.a_title "Previous";
+                  Html.a_value "Previous";
                   Html.a_input_type `Button;
                   Html.a_class ["form-control"];
                   Html.a_size 1;] ()
 
 let recenter =
-  Html.input ~a:[ Html.a_id recenter_id ;
+  Html.input ~a:[
+    Html.a_id recenter_id ;
                   Html.a_title "Reset";
+                  Html.a_value "Reset";
                   Html.a_input_type `Button;
                   Html.a_class ["form-control"];
-                  Html.a_size 1;] ()
+                  Html.a_size 1;]
+    ()
+
 
 
 let accuracy_chooser_id = "influence-accuracy"
@@ -99,52 +106,25 @@ let content () =
               [accuracy_chooser] ];
         Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-              ~a:[ Html.a_class ["col-md-2"];
-                   Html.a_label_for total_input_id ]
-              [Html.pcdata "Radius"];
-            Html.div
-              ~a:[Html.a_class ["col-md-2"] ]
-              [total_input] ];
+          [
+            Html.label ~a:[Html.a_class ["col-md-3"]]
+              [Html.pcdata "Size         Radius"];
+            Html.span  ~a:[Html.a_class ["col-md-2"]] [total_input];
+            Html.label ~a:[Html.a_class ["col-md-1"]] [Html.pcdata "fwd"];
+            Html.span ~a:[Html.a_class ["col-md-2"]] [fwd_input];
+            Html.label ~a:[Html.a_class ["col-md-2"]] [Html.pcdata "bwd"];
+            Html.span ~a:[Html.a_class ["col-md-2"]] [bwd_input];
+          ];
         Html.div
           ~a:[ Html.a_class [ "form-group" ] ]
           [ Html.label
-              ~a:[ Html.a_class ["col-md-3"];
-                   Html.a_label_for fwd_input_id ]
-              [Html.pcdata "Max_forward"];
-            Html.div
-              ~a:[Html.a_class ["col-md-2"] ]
-              [fwd_input]];
-        Html.div
-          ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-              ~a:[ Html.a_class ["col-md-3"];
-                   Html.a_label_for bwd_input_id ]
-              [Html.pcdata "Max_backward"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [bwd_input]];
-        Html.div
-          ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-              ~a:[ Html.a_class ["col-md-3"];
-                   Html.a_label_for next_node_id]
-              [Html.pcdata "Next"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node]];
-        Html.div
-          ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-              ~a:[ Html.a_class ["col-md-3"];
-                   Html.a_label_for prev_node_id ]
-              [Html.pcdata "Previous"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [prev_node]];
-        Html.div
-          ~a:[ Html.a_class [ "form-group" ] ]
-          [ Html.label
-              ~a:[ Html.a_class ["col-md-3"];
-                   Html.a_label_for recenter_id ]
-              [Html.pcdata "Reset"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [recenter]];
-      ]
- in
+             ~a:[Html.a_class ["col-md-3"];
+                 Html.a_label_for total_input_id]
+             [Html.pcdata "Navigate"];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [prev_node];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
+            Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]]
+  in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
     React.S.l6
