@@ -89,7 +89,7 @@ class SnapRender {
 
     
         function zoomout () {
-            d3.select("form").selectAll("input")
+            d3.select("#snap-form").selectAll("input")
             .attr('disabled', null);
             d3.select("#force-container").remove();
             renderer.rerender();
@@ -179,7 +179,7 @@ class SnapRender {
             
         function zoomInSpecies (d) 
         {
-            d3.select("form").selectAll("input")
+            d3.select("#snap-form").selectAll("input")
                 .attr('disabled', true);
             if (!renderer.dblclicked) {
                 d3.selectAll(".treeNodes").transition().duration(200).remove();
