@@ -90,6 +90,19 @@ let on_message post text =
     let state, im = get_influence_map ~accuracy_level !gState in
     let () = gState := state in
     send_response post im
+  | `List [ `String "INFLUENCE_MAP_ORIGINAL_NODE" ]
+  | `String "INFLUENCE_MAP_ORIGINAL_NODE" ->
+    let state, im = origin_of_influence_map !gState in
+    let () = gState := state in
+    send_response post im
+  | `List [ `String "INFLUENCE_MAP_NEXT_NODE";json]  ->
+    let state, im = next_node_in_influence_map !gState json in
+    let () = gState := state in
+    send_response post im
+  | `List [ `String "INFLUENCE_MAP_PREVIOUS_NODE";json ] ->
+    let state, im = previous_node_in_influence_map !gState json in
+    let () = gState := state in
+    send_response post im
   | `List [ `String "DEAD_RULES" ] | `String "DEAD_RULES" ->
     let state, rules = get_dead_rules !gState in
     let () = gState := state in

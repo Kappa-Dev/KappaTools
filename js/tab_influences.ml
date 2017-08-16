@@ -20,6 +20,7 @@ let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 let fwd, set_fwd = React.S.create None
 let bwd, set_bwd = React.S.create None
 let total, set_total = React.S.create 1
+let origin, set_origin = React.S.create `Null
 
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
@@ -48,9 +49,26 @@ let bwd_input =
                   Html.a_size 1;] ()
 
 let next_node =
-  Html.button ~a:[ Html.a_id recenter_id]
+  Html.input ~a:[ Html.a_id next_node_id ;
+                  Html.a_input_type `Button;
+                  Html.a_title "Next";
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
 
-let origin, set_origin = React.S.create `Null
+let prev_node =
+  Html.input ~a:[ Html.a_id prev_node_id ;
+                  Html.a_title "Previous";
+                  Html.a_input_type `Button;
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
+
+let recenter =
+  Html.input ~a:[ Html.a_id recenter_id ;
+                  Html.a_title "Reset";
+                  Html.a_input_type `Button;
+                  Html.a_class ["form-control"];
+                  Html.a_size 1;] ()
+
 
 let accuracy_chooser_id = "influence-accuracy"
 
@@ -84,7 +102,7 @@ let content () =
           [ Html.label
               ~a:[ Html.a_class ["col-md-2"];
                    Html.a_label_for total_input_id ]
-              [Html.pcdata "radius"];
+              [Html.pcdata "Radius"];
             Html.div
               ~a:[Html.a_class ["col-md-2"] ]
               [total_input] ];
@@ -93,7 +111,7 @@ let content () =
           [ Html.label
               ~a:[ Html.a_class ["col-md-3"];
                    Html.a_label_for fwd_input_id ]
-              [Html.pcdata "max_forward"];
+              [Html.pcdata "Max_forward"];
             Html.div
               ~a:[Html.a_class ["col-md-2"] ]
               [fwd_input]];
@@ -102,16 +120,31 @@ let content () =
           [ Html.label
               ~a:[ Html.a_class ["col-md-3"];
                    Html.a_label_for bwd_input_id ]
-              [Html.pcdata "max_backward"];
-            Html.div ~a:[Html.a_class ["col-md-2"] ] [bwd_input];
-            (*  Html.div
-              ~a:[ Html.a_class [ "form-group" ] ]
-              [ Html.label
-                  ~a:[ Html.a_class ["col-md-2"];
-                       Html.a_label_for next_node_id ]
-                  [Html.pcdata "max_backward"];
-                        Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node];  *)         ]
-      ] in
+              [Html.pcdata "Max_backward"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [bwd_input]];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-3"];
+                   Html.a_label_for next_node_id]
+              [Html.pcdata "Next"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [next_node]];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-3"];
+                   Html.a_label_for prev_node_id ]
+              [Html.pcdata "Previous"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [prev_node]];
+        Html.div
+          ~a:[ Html.a_class [ "form-group" ] ]
+          [ Html.label
+              ~a:[ Html.a_class ["col-md-3"];
+                   Html.a_label_for recenter_id ]
+              [Html.pcdata "Reset"];
+            Html.div ~a:[Html.a_class ["col-md-2"] ] [recenter]];
+      ]
+ in
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
     React.S.l6
@@ -125,6 +158,8 @@ let content () =
                       ReactiveData.RList.set
                         set_influences
                         [Html.pcdata
+                           (Yojson.Basic.to_string origin);
+                          Html.pcdata
                            (Yojson.Basic.to_string influences_json) ] in
                     ())
                  (manager#get_local_influence_map
@@ -182,7 +217,78 @@ let onload () =
                       in
                       let () = set_bwd va_opt in
                       Js._true
-                 with _ -> Js._false) in
+                    with _ -> Js._false) in
+  let () =
+    (Tyxml_js.To_dom.of_input recenter )##.onclick :=
+      Dom_html.full_handler
+        (fun _ _ ->
+           let _ =
+             React.S.l1
+               (fun _  ->
+                  State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin ->
+                           let () = set_origin origin in
+                           ())
+                        (manager#get_initial_node ()) >>=
+                      fun out ->
+                      Lwt.return (Api_common.result_lift out)
+                     )))
+              (React.S.on tab_is_active
+                         State_project.dummy_model State_project.model)
+          in Js._true
+        )
+  in
+  let () =
+    (Tyxml_js.To_dom.of_input next_node )##.onclick :=
+      Dom_html.full_handler
+        (fun _ _ ->
+          let _ =
+            React.S.l2
+              (fun _  (origin:Yojson.Basic.json) ->
+                State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin' ->
+                           let () = set_origin origin' in
+                           ())
+                        (manager#get_next_node origin) >>=
+                      fun out -> Lwt.return (Api_common.result_lift out)
+                        ))
+                  )
+              (React.S.on tab_is_active
+                 State_project.dummy_model State_project.model)
+              origin
+          in Js._true
+        )
+  in
+  let () =
+    (Tyxml_js.To_dom.of_input prev_node )##.onclick :=
+      Dom_html.full_handler
+        (fun _ _ ->
+          let _ =
+            React.S.l2
+              (fun _  (origin:Yojson.Basic.json) ->
+                State_project.with_project
+                  ~label:__LOC__
+                  (fun (manager : Api.concrete_manager) ->
+                     (Lwt_result.map
+                        (fun origin' ->
+                           let () = set_origin origin' in
+                           ())
+                        (manager#get_previous_node origin) >>=
+                      fun out -> Lwt.return (Api_common.result_lift out)
+                        ))
+                  )
+              (React.S.on tab_is_active
+                 State_project.dummy_model State_project.model)
+              origin
+          in Js._true
+        )
+  in
   let () = Common.jquery_on
       "#navinfluences" "hide.bs.tab"
       (fun _ -> let () = tab_was_active := false in set_tab_is_active false) in
