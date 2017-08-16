@@ -107,7 +107,7 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
             (fun x -> Result.Ok x)
     method get_previous_node json =
       let request =
-        `List [`String "INFLUENCE_MAP_NEXT_NODE";json]
+        `List [`String "INFLUENCE_MAP_PREVIOUS_NODE";json]
       in
       Lwt_result.bind_result
         (self#message post request)
