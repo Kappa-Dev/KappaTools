@@ -357,9 +357,9 @@
 #%obs: 'FRET data' 'Gpa1_free' / 'bound G protein'
 
 
-%mod: [T]=0 do $ADD 10000 Pheromone(ste2)
-%mod: [T]=360 do $SNAPSHOT "peak_ensemble"
-%mod: [T]=[Tmax] do $SNAPSHOT "end_ensemble"; \
-  $FLUX "flux_ensemble2_t1000_p3000.dot" [false]
-#%mod: repeat [T]= do $SNAPSHOT "autodrift_ensemble" until [false]
+%mod: [true] do $ADD 10000 Pheromone(ste2)
+%mod: alarm 360 do $SNAPSHOT "peak_ensemble"
+%mod: alarm 1000 do $FLUX "flux_ensemble2_t1000_p3000.dot" [false]; \
+    $STOP "end_ensemble"
+%mod: alarm 50 do $SNAPSHOT "autodrift_ensemble" repeat [true]
 %mod: [true] do $FLUX "flux_ensemble2_t1000_p3000.dot" [true]
