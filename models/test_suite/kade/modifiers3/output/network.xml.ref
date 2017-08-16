@@ -49,20 +49,36 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <parameter metaid="CMD7" id="k1" value="1"/>
 </listOfParameters>
 <listOfReactions>
-<!-- rule    : bind -->
-<!-- reaction: U(x, y~p) + T(x) -> U(x!1, y~p), T(x!1)  -->
-<reaction id="re1" name="bind" reversible="false" fast="false">
+<!-- rule    : essai -->
+<!-- reaction: U(x, y~p) -> T(x)  -->
+<reaction id="re1" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD13" species="s2"/>
-<speciesReference metaid="CMD14" species="s3"/>
+<speciesReference metaid="CMD13" species="s3"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD15" species="s5"/>
+<speciesReference metaid="CMD14" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s3 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : bind -->
+<!-- reaction: U(x, y~p) + T(x) -> U(x!1, y~p), T(x!1)  -->
+<reaction id="re2" name="bind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD15" species="s2"/>
+<speciesReference metaid="CMD16" species="s3"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD17" species="s5"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD16" species="s1"/>
-<modifierSpeciesReference metaid="CMD17" species="s4"/>
-<modifierSpeciesReference metaid="CMD18" species="s5"/>
+<modifierSpeciesReference metaid="CMD18" species="s1"/>
+<modifierSpeciesReference metaid="CMD19" species="s4"/>
+<modifierSpeciesReference metaid="CMD20" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -74,50 +90,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: U(x, y~p) -> T(x)  -->
-<reaction id="re2" name="essai" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD19" species="s3"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD20" species="s2"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k1 </ci><ci> s3 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : unbind -->
-<!-- reaction: U(x!1, y~p), T(x!1) -> U(x, y~p) + T(x)  -->
-<reaction id="re3" name="unbind" reversible="false" fast="false">
+<!-- reaction: U(x!1, y~p), T(x!1) -> T(x) + T(x)  -->
+<reaction id="re3" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD21" species="s5"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD22" species="s2"/>
-<speciesReference metaid="CMD23" species="s3"/>
-</listOfProducts>
-<listOfModifiers>
-<modifierSpeciesReference metaid="CMD24" species="s2"/>
-<modifierSpeciesReference metaid="CMD25" species="s4"/>
-</listOfModifiers>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><ci> s5 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : essai -->
-<!-- reaction: U(x!1, y~p), T(x!1) -> T(x) + T(x)  -->
-<reaction id="re4" name="essai" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD26" species="s5"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD27" species="s2" stoichiometry="2"/>
+<speciesReference metaid="CMD22" species="s2" stoichiometry="2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -127,18 +106,55 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : unbind -->
-<!-- reaction: U(x!1, y~u), T(x!1) -> U(x, y~u) + T(x)  -->
-<reaction id="re5" name="unbind" reversible="false" fast="false">
+<!-- reaction: U(x!1, y~p), T(x!1) -> U(x, y~p) + T(x)  -->
+<reaction id="re4" name="unbind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD23" species="s5"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD24" species="s2"/>
+<speciesReference metaid="CMD25" species="s3"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD26" species="s2"/>
+<modifierSpeciesReference metaid="CMD27" species="s4"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply><times/><cn type="integer"> 1 </cn><apply><plus/><apply><plus/><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s2</ci></apply><cn type="integer"> 1 </cn></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s4</ci></apply><cn type="integer"> 1 </cn></apply></apply><apply><divide/><apply><times/><cn type="integer"> 1 </cn><ci>s5</ci></apply><cn type="integer"> 1 </cn></apply></apply></apply><ci> s5 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : essai -->
+<!-- reaction: U(x!1, y~u), T(x!1) -> T(x) + T(x)  -->
+<reaction id="re5" name="essai" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD28" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD29" species="s1"/>
-<speciesReference metaid="CMD30" species="s2"/>
+<speciesReference metaid="CMD29" species="s2" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : unbind -->
+<!-- reaction: U(x!1, y~u), T(x!1) -> U(x, y~u) + T(x)  -->
+<reaction id="re6" name="unbind" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD30" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD31" species="s1"/>
+<speciesReference metaid="CMD32" species="s2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD31" species="s2"/>
-<modifierSpeciesReference metaid="CMD32" species="s5"/>
+<modifierSpeciesReference metaid="CMD33" species="s2"/>
+<modifierSpeciesReference metaid="CMD34" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -149,12 +165,12 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- rule    : essai2 -->
 <!-- reaction: U(x!1, y~u), T(x!1) -> U(x!1, y~p), T(x!1)  -->
-<reaction id="re6" name="essai2" reversible="false" fast="false">
+<reaction id="re7" name="essai2" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD33" species="s4"/>
+<speciesReference metaid="CMD35" species="s4"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD34" species="s5"/>
+<speciesReference metaid="CMD36" species="s5"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -164,35 +180,35 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : essai -->
-<!-- reaction: U(x!1, y~u), T(x!1) -> T(x) + T(x)  -->
-<reaction id="re7" name="essai" reversible="false" fast="false">
+<!-- reaction: U(x, y~u) -> T(x)  -->
+<reaction id="re8" name="essai" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD35" species="s4"/>
+<speciesReference metaid="CMD37" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD36" species="s2" stoichiometry="2"/>
+<speciesReference metaid="CMD38" species="s2"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
-<times/><ci> k1 </ci><ci> s4 </ci></apply>
+<times/><ci> k1 </ci><ci> s1 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
 <!-- reaction: U(x, y~u) + T(x) -> U(x!1, y~u), T(x!1)  -->
-<reaction id="re8" name="bind" reversible="false" fast="false">
+<reaction id="re9" name="bind" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD37" species="s1"/>
-<speciesReference metaid="CMD38" species="s2"/>
+<speciesReference metaid="CMD39" species="s1"/>
+<speciesReference metaid="CMD40" species="s2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD39" species="s4"/>
+<speciesReference metaid="CMD41" species="s4"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD40" species="s3"/>
-<modifierSpeciesReference metaid="CMD41" species="s4"/>
-<modifierSpeciesReference metaid="CMD42" species="s5"/>
+<modifierSpeciesReference metaid="CMD42" species="s3"/>
+<modifierSpeciesReference metaid="CMD43" species="s4"/>
+<modifierSpeciesReference metaid="CMD44" species="s5"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -205,33 +221,17 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </reaction>
 <!-- rule    : essai2 -->
 <!-- reaction: U(x, y~u) -> U(x, y~p)  -->
-<reaction id="re9" name="essai2" reversible="false" fast="false">
+<reaction id="re10" name="essai2" reversible="false" fast="false">
 <listOfReactants>
-<speciesReference metaid="CMD43" species="s1"/>
+<speciesReference metaid="CMD45" species="s1"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD44" species="s3"/>
+<speciesReference metaid="CMD46" species="s3"/>
 </listOfProducts>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><ci> nT </ci><ci> s1 </ci></apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : essai -->
-<!-- reaction: U(x, y~u) -> T(x)  -->
-<reaction id="re10" name="essai" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD45" species="s1"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD46" species="s2"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k1 </ci><ci> s1 </ci></apply>
 </math>
 </kineticLaw>
 </reaction>

@@ -259,19 +259,19 @@ dydt(5)=dydt(5)-2*k(5)*y(5)/2;
 dydt(6)=dydt(6)+k(5)*y(5)/2;
 dydt(6)=dydt(6)+k(5)*y(5)/2;
 
-% rule    : R(r!_) -> R(r)
-% reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1) 
-
-dydt(5)=dydt(5)-2*k(5)*y(5)/2;
-dydt(6)=dydt(6)+k(5)*y(5)/2;
-dydt(6)=dydt(6)+k(5)*y(5)/2;
-
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r) 
 
 dydt(5)=dydt(5)-2*k(4)*y(5)/2;
 dydt(4)=dydt(4)+k(4)*y(5)/2;
 dydt(6)=dydt(6)+k(4)*y(5)/2;
+
+% rule    : R(r!_) -> R(r)
+% reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1) 
+
+dydt(5)=dydt(5)-2*k(5)*y(5)/2;
+dydt(6)=dydt(6)+k(5)*y(5)/2;
+dydt(6)=dydt(6)+k(5)*y(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r) 
@@ -370,13 +370,6 @@ jac(5,5)=jac(5,5)-2*k(5)/2;
 jac(6,5)=jac(6,5)+k(5)/2;
 jac(6,5)=jac(6,5)+k(5)/2;
 
-% rule    : R(r!_) -> R(r)
-% reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1) 
-
-jac(5,5)=jac(5,5)-2*k(5)/2;
-jac(6,5)=jac(6,5)+k(5)/2;
-jac(6,5)=jac(6,5)+k(5)/2;
-
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r) 
 
@@ -386,6 +379,13 @@ jac(4,8)=jac(4,8)+jack(4,8)*y(5)/2;
 jac(4,5)=jac(4,5)+k(4)/2;
 jac(6,8)=jac(6,8)+jack(4,8)*y(5)/2;
 jac(6,5)=jac(6,5)+k(4)/2;
+
+% rule    : R(r!_) -> R(r)
+% reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1) 
+
+jac(5,5)=jac(5,5)-2*k(5)/2;
+jac(6,5)=jac(6,5)+k(5)/2;
+jac(6,5)=jac(6,5)+k(5)/2;
 
 % rule    : R(r!_) -> 
 % reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r) 

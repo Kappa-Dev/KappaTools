@@ -177,41 +177,41 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </math>
 </kineticLaw>
 </reaction>
-<!-- rule    : R(r!_) -> R(r) -->
-<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1)  -->
-<reaction id="re7" name="R(r!_) -> R(r)" reversible="false" fast="false">
+<!-- rule    : R(r!_) ->  -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r)  -->
+<reaction id="re7" name="R(r!_) -> " reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD41" species="s5" stoichiometry="2"/>
 </listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD42" species="s6" stoichiometry="2"/>
-</listOfProducts>
-<kineticLaw>
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-<apply>
-<times/><ci> k5 </ci><apply>
-<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
-</apply>
-</math>
-</kineticLaw>
-</reaction>
-<!-- rule    : R(r!_) ->  -->
-<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + E(r)  -->
-<reaction id="re8" name="R(r!_) -> " reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD43" species="s5" stoichiometry="2"/>
-</listOfReactants>
-<listOfProducts>
-<speciesReference metaid="CMD44" species="s4"/>
-<speciesReference metaid="CMD45" species="s6"/>
+<speciesReference metaid="CMD42" species="s4"/>
+<speciesReference metaid="CMD43" species="s6"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD46" species="time"/>
+<modifierSpeciesReference metaid="CMD44" species="time"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">
 <apply>
 <times/><apply><times/><ci>time</ci><ci>t_scale_factor</ci></apply><apply>
+<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r!_) -> R(r) -->
+<!-- reaction: R(e!1, r!2), R(e!3, r!2), E(r!1), E(r!3) -> R(e!1, r), E(r!1) + R(e!1, r), E(r!1)  -->
+<reaction id="re8" name="R(r!_) -> R(r)" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD45" species="s5" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD46" species="s6" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><apply>
 <divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
 </apply>
 </math>

@@ -261,11 +261,11 @@ dydt(1)=dydt(1)-k(4)*y(1);
 dydt(11)=dydt(11)+k(4)*y(1);
 dydt(12)=dydt(12)+k(4)*y(1)*stoc(4,1);
 
-% rule    : A(y~u) -> A(y~p)
+% rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
 
-dydt(3)=dydt(3)-k(3)*y(3);
-dydt(5)=dydt(5)+k(3)*y(3);
+dydt(3)=dydt(3)-k(2)*y(3);
+dydt(5)=dydt(5)+k(2)*y(3);
 
 % rule    : A(y~u) -> A(y~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
@@ -279,17 +279,11 @@ dydt(5)=dydt(5)+k(3)*y(3);
 dydt(3)=dydt(3)-k(2)*y(3);
 dydt(5)=dydt(5)+k(2)*y(3);
 
-% rule    : A(x~u) -> A(x~p)
+% rule    : A(y~u) -> A(y~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
 
-dydt(3)=dydt(3)-k(2)*y(3);
-dydt(5)=dydt(5)+k(2)*y(3);
-
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) 
-
-dydt(5)=dydt(5)-k(3)*y(5);
-dydt(6)=dydt(6)+k(3)*y(5);
+dydt(3)=dydt(3)-k(3)*y(3);
+dydt(5)=dydt(5)+k(3)*y(3);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~u, z!1), A(x~p, y~p, z!1) 
@@ -302,6 +296,12 @@ dydt(9)=dydt(9)+k(2)*y(5);
 
 dydt(5)=dydt(5)-k(2)*y(5);
 dydt(6)=dydt(6)+k(2)*y(5);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) 
+
+dydt(5)=dydt(5)-k(3)*y(5);
+dydt(6)=dydt(6)+k(3)*y(5);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~p, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
@@ -321,17 +321,17 @@ dydt(8)=dydt(8)+k(2)*y(6);
 dydt(8)=dydt(8)-k(2)*y(8);
 dydt(10)=dydt(10)+k(2)*y(8);
 
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
-
-dydt(9)=dydt(9)-k(3)*y(9);
-dydt(8)=dydt(8)+k(3)*y(9);
-
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
 
 dydt(9)=dydt(9)-k(2)*y(9);
 dydt(8)=dydt(8)+k(2)*y(9);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
+
+dydt(9)=dydt(9)-k(3)*y(9);
+dydt(8)=dydt(8)+k(3)*y(9);
 
 % rule    : A(z), A(z) -> A(z!1), A(z!1)
 % reaction: A(x~p, y~p, z) + A(x~p, y~p, z) -> A(x~p, y~p, z!1), A(x~p, y~p, z!1) 
@@ -395,17 +395,17 @@ dydt(4)=dydt(4)-1/2*k(1)*y(4)*y(2);
 dydt(2)=dydt(2)-1/2*k(1)*y(4)*y(2);
 dydt(5)=dydt(5)+1/2*k(1)*y(4)*y(2);
 
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
-
-dydt(2)=dydt(2)-k(3)*y(2);
-dydt(4)=dydt(4)+k(3)*y(2);
-
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
 
 dydt(2)=dydt(2)-k(2)*y(2);
 dydt(4)=dydt(4)+k(2)*y(2);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
+
+dydt(2)=dydt(2)-k(3)*y(2);
+dydt(4)=dydt(4)+k(3)*y(2);
 
 % rule    : A(z), A(z) -> A(z!1), A(z!1)
 % reaction: A(x~u, y~u, z) + A(x~u, y~u, z) -> A(x~u, y~u, z!1), A(x~u, y~u, z!1) 
@@ -512,11 +512,11 @@ jac(12,9)=jac(12,9)+k(4)*y(1)*jacstoc(4,1,9);
 jac(12,10)=jac(12,10)+k(4)*y(1)*jacstoc(4,1,10);
 jac(12,1)=jac(12,1)+k(4)*y(1)*stoc(4,1);
 
-% rule    : A(y~u) -> A(y~p)
+% rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
 
-jac(3,3)=jac(3,3)-k(3);
-jac(5,3)=jac(5,3)+k(3);
+jac(3,3)=jac(3,3)-k(2);
+jac(5,3)=jac(5,3)+k(2);
 
 % rule    : A(y~u) -> A(y~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
@@ -530,17 +530,11 @@ jac(5,3)=jac(5,3)+k(3);
 jac(3,3)=jac(3,3)-k(2);
 jac(5,3)=jac(5,3)+k(2);
 
-% rule    : A(x~u) -> A(x~p)
+% rule    : A(y~u) -> A(y~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~u, z!1) -> A(x~u, y~u, z!1), A(x~u, y~p, z!1) 
 
-jac(3,3)=jac(3,3)-k(2);
-jac(5,3)=jac(5,3)+k(2);
-
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) 
-
-jac(5,5)=jac(5,5)-k(3);
-jac(6,5)=jac(6,5)+k(3);
+jac(3,3)=jac(3,3)-k(3);
+jac(5,3)=jac(5,3)+k(3);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~u, z!1), A(x~p, y~p, z!1) 
@@ -553,6 +547,12 @@ jac(9,5)=jac(9,5)+k(2);
 
 jac(5,5)=jac(5,5)-k(2);
 jac(6,5)=jac(6,5)+k(2);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~u, y~p, z!1) 
+
+jac(5,5)=jac(5,5)-k(3);
+jac(6,5)=jac(6,5)+k(3);
 
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~p, z!1), A(x~u, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
@@ -572,17 +572,17 @@ jac(8,6)=jac(8,6)+k(2);
 jac(8,8)=jac(8,8)-k(2);
 jac(10,8)=jac(10,8)+k(2);
 
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
-
-jac(9,9)=jac(9,9)-k(3);
-jac(8,9)=jac(8,9)+k(3);
-
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
 
 jac(9,9)=jac(9,9)-k(2);
 jac(8,9)=jac(8,9)+k(2);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z!1), A(x~p, y~p, z!1) -> A(x~u, y~p, z!1), A(x~p, y~p, z!1) 
+
+jac(9,9)=jac(9,9)-k(3);
+jac(8,9)=jac(8,9)+k(3);
 
 % rule    : A(z), A(z) -> A(z!1), A(z!1)
 % reaction: A(x~p, y~p, z) + A(x~p, y~p, z) -> A(x~p, y~p, z!1), A(x~p, y~p, z!1) 
@@ -670,17 +670,17 @@ jac(2,2)=jac(2,2)-1/2*k(1)*y(4);
 jac(5,4)=jac(5,4)+1/2*k(1)*y(2);
 jac(5,2)=jac(5,2)+1/2*k(1)*y(4);
 
-% rule    : A(y~u) -> A(y~p)
-% reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
-
-jac(2,2)=jac(2,2)-k(3);
-jac(4,2)=jac(4,2)+k(3);
-
 % rule    : A(x~u) -> A(x~p)
 % reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
 
 jac(2,2)=jac(2,2)-k(2);
 jac(4,2)=jac(4,2)+k(2);
+
+% rule    : A(y~u) -> A(y~p)
+% reaction: A(x~u, y~u, z) -> A(x~u, y~p, z) 
+
+jac(2,2)=jac(2,2)-k(3);
+jac(4,2)=jac(4,2)+k(3);
 
 % rule    : A(z), A(z) -> A(z!1), A(z!1)
 % reaction: A(x~u, y~u, z) + A(x~u, y~u, z) -> A(x~u, y~u, z!1), A(x~u, y~u, z!1) 
