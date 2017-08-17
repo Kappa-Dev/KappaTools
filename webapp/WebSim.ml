@@ -96,4 +96,6 @@ let server =
        )
        ()
     )
-let () = ignore (Lwt_main.run server)
+let () =
+  let () = Lwt.async_exception_hook := ignore in (* see https://github.com/mirage/ocaml-cohttp/issues/511 *)
+  ignore (Lwt_main.run server)
