@@ -65,12 +65,21 @@ type var =
     var_position: Locality.t
   }
 
-type influence_node =
-  | Rule of rule
-  | Var of var
+type ('rule, 'var) influence_node =
+  | Rule of 'rule
+  | Var of 'var
 
-val influence_node_of_json: Yojson.Basic.json -> influence_node
-val influence_node_to_json: influence_node -> Yojson.Basic.json
+val short_influence_node_of_json:
+  Yojson.Basic.json -> (int, int) influence_node
+
+val short_influence_node_to_json:
+  (int, int) influence_node -> Yojson.Basic.json
+
+val refined_influence_node_of_json:
+    Yojson.Basic.json -> (rule, var) influence_node
+
+val refined_influence_node_to_json:
+  (rule, var) influence_node -> Yojson.Basic.json
 
 type dead_rules = rule list
 

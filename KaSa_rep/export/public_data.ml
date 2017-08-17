@@ -316,18 +316,18 @@ let json_to_var =
   | x ->
     raise (Yojson.Basic.Util.Type_error ("var",x))
 
-type influence_node =
-  | Rule of rule
-  | Var of var
+type ('rule,'var) influence_node =
+  | Rule of 'rule
+  | Var of 'var
 
-let influence_node_to_json a =
+let influence_node_to_json rule_to_json var_to_json a =
   match a with
   | Var i ->
     `Assoc [variable,var_to_json i]
   | Rule i  ->
     `Assoc [rule,rule_to_json i]
 
-let influence_node_of_json
+let influence_node_of_json json_to_rule json_to_var
   =
   function
   | `Assoc [s,json] when s = variable ->
@@ -337,6 +337,21 @@ let influence_node_of_json
   | x ->
     let error_msg = "Not a correct influence node" in
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let short_influence_node_to_json =
+  influence_node_to_json JsonUtil.of_int JsonUtil.of_int
+
+let short_influence_node_of_json =
+  influence_node_of_json
+    (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "rule id"))
+    (JsonUtil.to_int ~error_msg:(JsonUtil.build_msg "var id"))
+
+let refined_influence_node_to_json =
+  influence_node_to_json rule_to_json var_to_json
+
+let refined_influence_node_of_json =
+  influence_node_of_json json_to_rule json_to_var
+
 
 type dead_rules = rule list
 

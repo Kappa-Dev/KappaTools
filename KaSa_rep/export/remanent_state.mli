@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 14 2017>
+  * Last modification: Time-stamp: <Aug 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -43,7 +43,10 @@ type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
 
-module InfluenceNodeMap: SetMap.Map with type elt = Public_data.influence_node
+module InfluenceNodeMap: SetMap.Map
+  with type elt =
+         (int,int) Public_data.influence_node
+
 
 type location =
   | Direct of int
@@ -67,6 +70,7 @@ type local_influence_map_blackboard =
 
 type influence_map =
   {
+    nodes: (Public_data.rule, Public_data.var) Public_data.influence_node list ;
     positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
     negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
   }
@@ -84,8 +88,9 @@ val local_influence_map_of_json:
   Yojson.Basic.json -> Public_data.accuracy_level * int * int option * int option * influence_map
 
 type internal_influence_map =
+  Ckappa_sig.c_rule_id list *
+  Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
-  * Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
 
 type ('static,'dynamic) reachability_result = 'static * 'dynamic
 

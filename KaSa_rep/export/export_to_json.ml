@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 16 2017>
+  * Last modification: Time-stamp: <Aug 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -126,27 +126,32 @@ functor (A:Analyzer.Analyzer) ->
         | _ -> state, json in
       let node = Public_data.influence_node_of_json json in
       let parameters = get_parameters state in
-      let error = get_errors state in
       let state, handler = get_handler state in
       let state, nrules = nrules state in
       let state, nvars = nvars state in
-      let state, compil = get_c_compilation state in
-      let id_int =
-        match node with
-        | Public_data.Rule a -> a.Public_data.rule_id
-        | Public_data.Var a -> a.Public_data.var_id
-      in
-      let error, node =
-        if id_int = 0 then
-          convert_id parameters error handler compil
-            (Ckappa_sig.rule_id_of_int (nrules+nvars))
-        else
-          convert_id parameters error handler compil
-            (Ckappa_sig.rule_id_of_int (id_int-1))
-      in
-      let state = set_errors error state in
-      let json = Public_data.influence_node_to_json node in
-      state, json
+      let n = nrules + nvars - 1 in
+      if n = -1
+      then
+        state,`Null
+      else
+        let state, compil = get_c_compilation state in
+        let id_int =
+          match node with
+          | Public_data.Rule a -> a.Public_data.rule_id
+          | Public_data.Var a -> a.Public_data.var_id
+        in
+        let error = get_errors state in
+        let error, node =
+          if id_int = 0 then
+            convert_id parameters error handler compil
+              (Ckappa_sig.rule_id_of_int n)
+          else
+            convert_id parameters error handler compil
+              (Ckappa_sig.rule_id_of_int (id_int-1))
+        in
+        let state = set_errors error state in
+        let json = Public_data.influence_node_to_json node in
+        state, json
 
     let next_node_in_influence_map state json =
       let state, json =
@@ -155,27 +160,29 @@ functor (A:Analyzer.Analyzer) ->
         | _ -> state, json in
       let node = Public_data.influence_node_of_json json in
       let parameters = get_parameters state in
-      let error = get_errors state in
       let state, handler = get_handler state in
       let state, nrules = nrules state in
       let state, nvars = nvars state in
       let n = nrules+nvars-1 in
-      let state, compil = get_c_compilation state in
-      let id_int =
-        match node with
-        | Public_data.Rule a -> a.Public_data.rule_id
-        | Public_data.Var a -> a.Public_data.var_id
-      in
-      if id_int = n then
-        let state = set_errors error state in
-        origin_of_influence_map state
+      if n = - 1
+      then state, `Null
       else
-        let error, node =
-          convert_id parameters error handler compil
-            (Ckappa_sig.rule_id_of_int (id_int+1))
+        let state, compil = get_c_compilation state in
+        let id_int =
+          match node with
+          | Public_data.Rule a -> a.Public_data.rule_id
+          | Public_data.Var a -> a.Public_data.var_id
         in
-        let json = Public_data.influence_node_to_json node in
-        set_errors error state, json
+        if id_int = n then
+          origin_of_influence_map state
+        else
+          let error = get_errors state in
+          let error, node =
+            convert_id parameters error handler compil
+              (Ckappa_sig.rule_id_of_int (id_int+1))
+          in
+          let json = Public_data.influence_node_to_json node in
+          set_errors error state, json
 
 
     let get_dead_rules state =

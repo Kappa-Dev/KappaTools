@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 13 2017>
+  * Last modification: Time-stamp: <Aug 17 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -18,9 +18,7 @@ sig
   type errors = Exception.method_handler
   type internal_contact_map
 
-  type internal_influence_map =
-    Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
-    Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t
+  type internal_influence_map = Remanent_state.internal_influence_map
 
   type bidirectional_influence_map
 
@@ -69,7 +67,7 @@ sig
 
   val get_local_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
-    ?fwd:int -> ?bwd:int -> total:int -> Ckappa_sig.c_rule_id ->  
+    ?fwd:int -> ?bwd:int -> total:int -> Ckappa_sig.c_rule_id ->
     state -> state * internal_influence_map
 
   val get_reachability_analysis: state -> state * reachability_analysis

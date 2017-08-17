@@ -1,5 +1,6 @@
 let convert ~nrules ~nvars influence_map =
   let n = nrules + nvars in
+  let (_,pos,neg) = influence_map in
   let bidirectional_map =
     {
       Remanent_state.positive_influence_fwd =
@@ -50,8 +51,8 @@ let convert ~nrules ~nvars influence_map =
              (Ckappa_sig.int_of_rule_id i)
              (j,edge)
              bidirectional_map
-         )
-      (fst influence_map)
+      )
+      pos
       bidirectional_map
   in
   let bidirectional_map =
@@ -84,7 +85,7 @@ let convert ~nrules ~nvars influence_map =
              (Ckappa_sig.int_of_rule_id i)
              (j,edge)
              bidirectional_map)
-    (snd influence_map)
+    neg
     bidirectional_map
   in bidirectional_map
 

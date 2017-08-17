@@ -125,6 +125,14 @@ let best_distance new_distance old_distance_opt =
         min new_distance.Remanent_state.total old_distance.Remanent_state.total
     }
 
+
+let add_node source remanent_state =
+  let nodes, pos, neg = remanent_state.influence_map in
+  let nodes = source::nodes in
+  let influence_map = nodes, pos, neg in
+  {remanent_state with influence_map}
+
+
 let add_influence source target label influence_map =
   Ckappa_sig.PairRule_setmap.Map.add
     (Ckappa_sig.rule_id_of_int source,
@@ -133,15 +141,15 @@ let add_influence source target label influence_map =
     influence_map
 
 let add_positive_influence source target label remanent_state =
-  let pos,neg = remanent_state.influence_map in
+  let nodes,pos,neg = remanent_state.influence_map in
   let pos = add_influence source target label pos in
-  let influence_map = pos,neg in
+  let influence_map = nodes,pos,neg in
   {remanent_state with influence_map}
 
 let add_negative_influence source target label remanent_state =
-  let pos,neg = remanent_state.influence_map in
+  let nodes,pos,neg = remanent_state.influence_map in
   let neg = add_influence source target label neg in
-  let influence_map = pos,neg in
+  let influence_map = nodes,pos,neg in
   {remanent_state with influence_map}
 
 let add_rev f source target label remanent_state =
@@ -253,6 +261,7 @@ let explore_influence_map
   let initial_node = Ckappa_sig.int_of_rule_id initial_node in
   let n = Array.length blackboard.Remanent_state.blackboard_is_done in
   let influence_map =
+    [],
     Ckappa_sig.PairRule_setmap.Map.empty,
     Ckappa_sig.PairRule_setmap.Map.empty
   in
@@ -318,4 +327,3 @@ let explore_influence_map
     }
   else
     error, influence_map, blackboard
-  

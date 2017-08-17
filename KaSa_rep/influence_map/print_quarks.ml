@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 8th 2011.
- * Last modification: Time-stamp: <Aug 11 2017>
+ * Last modification: Time-stamp: <Aug 17 2017>
  * *
  * Pretty printing of influence map
  *
@@ -267,7 +267,7 @@ let print_inhibition_map parameters error handler compilation print_rule print_v
   let parameters = Remanent_parameters.update_prefix parameters "Inhibition_map:" in
   print_maps parameters (Remanent_parameters.get_logger parameters) error handler compilation print_rule print_var print_label_rule print_label_var print_labels (Remanent_parameters.get_prefix parameters) suffix map
 
-let dot_of_influence_map ?logger parameters error handler compilation (wake_up_map,inhibition_map) =
+let dot_of_influence_map ?logger parameters error handler compilation (nodes,wake_up_map,inhibition_map) =
   let loggers = logger in
   let parameters_dot =
     match loggers
@@ -283,14 +283,35 @@ let dot_of_influence_map ?logger parameters error handler compilation (wake_up_m
       "Influence_map"
   in
   let nrules = Handler.nrules parameters error handler in
-  let nvars = Handler.nvars parameters error handler in
   let error =
-    if nrules > 0
-    then
-      let rec aux k error =
-        if Ckappa_sig.compare_rule_id k (Ckappa_sig.rule_id_of_int nrules) >= 0
-        then error
-        else
+    List.fold_left
+      (fun error k ->
+         if (Ckappa_sig.int_of_rule_id k) < nrules then
+           let error, bool, s =
+             string_of_rule_var parameters error handler compilation
+               Handler.print_rule_dot
+               Handler.print_var_dot
+               Handler.get_label_of_rule_dot
+               Handler.get_label_of_var_dot
+               k
+           in
+           let _ =
+             if bool
+             then
+               let _ =
+                 Graph_loggers.print_node logger
+                   s
+                   ~directives:
+                     [
+                       Graph_loggers_sig.Shape
+                        (Remanent_parameters.get_rule_shape parameters_dot);
+                       Graph_loggers_sig.FillColor (Remanent_parameters.get_rule_color parameters_dot)
+                   ]
+               in
+               ()
+           in
+               error
+         else
           let error, bool, s =
             string_of_rule_var parameters error handler compilation
               Handler.print_rule_dot
@@ -299,42 +320,10 @@ let dot_of_influence_map ?logger parameters error handler compilation (wake_up_m
               Handler.get_label_of_var_dot
               k
           in
-          let _ =
-            if bool
+          let () =
+            if Ckappa_sig.int_of_rule_id k = nrules
             then
-              let _ =
-                Graph_loggers.print_node logger
-                  s
-                  ~directives:
-                    [
-                      Graph_loggers_sig.Shape (Remanent_parameters.get_rule_shape parameters_dot);
-                      Graph_loggers_sig.FillColor (Remanent_parameters.get_rule_color parameters_dot)
-                    ]
-              in
-              ()
-          in
-          aux
-            (Ckappa_sig.next_rule_id k)
-            error
-      in aux Ckappa_sig.dummy_rule_id error
-    else
-      error
-  in
-  let error  =
-    if nvars > 0
-    then
-      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
-      let ntot = nrules + nvars in
-      let rec aux k error =
-        if k >= ntot then error
-        else
-          let error, bool, s =
-            string_of_rule_var parameters error handler compilation
-              Handler.print_rule_dot
-              Handler.print_var_dot
-              Handler.get_label_of_rule_dot
-              Handler.get_label_of_var_dot
-              (Ckappa_sig.rule_id_of_int k)
+              Loggers.print_newline logger
           in
           let () =
             if bool then
@@ -348,10 +337,8 @@ let dot_of_influence_map ?logger parameters error handler compilation (wake_up_m
                     ]
               in
               ()
-          in aux (k+1) error
-      in aux nrules error
-    else
-      error
+          in error
+      ) error nodes
   in
   let error =
     if

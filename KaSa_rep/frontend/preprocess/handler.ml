@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Aug 13 2017>
+   * Last modification: Time-stamp: <Aug 17 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -309,27 +309,39 @@ let string_of_var ?with_rule:(with_rule=true)
     ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
 
 
-let convert_id parameters error handler compiled id =
+let convert_id rule var  parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
   if int < nrules then
     let error,(a,b,c,d) = info_of_rule parameters error compiled id in
-    error,Public_data.Rule
-      {
-        Public_data.rule_id=Ckappa_sig.int_of_rule_id d ;
-        Public_data.rule_position=b;
-        Public_data.rule_label=a;
-        Public_data.rule_ast=c
-      }
+    error,Public_data.Rule (rule d b a c)
+
   else
     let error, (a,b,c,d) = info_of_var parameters error handler compiled id in
-    error,Public_data.Var
-      {
-        Public_data.var_id=Ckappa_sig.int_of_rule_id d ;
-        Public_data.var_position=b;
-        Public_data.var_label=a;
-        Public_data.var_ast=c
-      }
+    error,Public_data.Var (var d b a c)
+
+let convert_id_short =
+  convert_id
+    (fun a _ _ _ -> Ckappa_sig.int_of_rule_id a)
+    (fun a _ _ _ -> Ckappa_sig.int_of_rule_id a)
+
+let convert_id_refined =
+  convert_id
+    (fun a b c d ->
+       {
+         Public_data.rule_id=Ckappa_sig.int_of_rule_id a ;
+         Public_data.rule_position=b;
+         Public_data.rule_label=c;
+         Public_data.rule_ast=d
+       })
+    (fun a b c d ->
+       {
+         Public_data.var_id=Ckappa_sig.int_of_rule_id a ;
+         Public_data.var_position=b;
+         Public_data.var_label=c;
+         Public_data.var_ast=d
+       })
+
 
 let string_of_rule_or_var
     ?with_rule:(with_rule=true)
