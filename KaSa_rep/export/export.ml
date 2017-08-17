@@ -778,7 +778,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  (*let () = show_title state in*)
+  let () = show_title state in
   let error,wake_up_map =
     Algebraic_construction.filter_influence
       parameters error handler compil wake_up_map true
