@@ -503,7 +503,7 @@ class manager
           url
           project_id
           (try
-             match Public_data.influence_node_of_json json with
+             match Public_data.refined_influence_node_of_json json with
              | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
              | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
           with _ -> "")
@@ -525,7 +525,7 @@ class manager
           url
           project_id
           (try
-             match Public_data.influence_node_of_json json with
+             match Public_data.refined_influence_node_of_json json with
              | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
              | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
            with _ -> "")

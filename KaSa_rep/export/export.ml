@@ -508,8 +508,12 @@ let convert_label a =
   if a<0 then Remanent_state.Side_effect (-(a+1))
   else Remanent_state.Direct a
 
-let convert_id parameters error handler compiled id =
-  Handler.convert_id parameters error handler compiled id
+let convert_id_short parameters error handler compiled id =
+  Handler.convert_id_short  parameters error handler compiled id
+
+
+let convert_id_refined parameters error handler compiled id =
+  Handler.convert_id_refined  parameters error handler compiled id
 
 
 
@@ -774,7 +778,7 @@ let compute_intermediary_internal_influence_map show_title state =
   in
   let parameters = Remanent_state.get_parameters state in
   let error = Remanent_state.get_errors state in
-  let () = show_title state in
+  (*let () = show_title state in*)
   let error,wake_up_map =
     Algebraic_construction.filter_influence
       parameters error handler compil wake_up_map true

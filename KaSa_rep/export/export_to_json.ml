@@ -82,7 +82,7 @@ functor (A:Analyzer.Analyzer) ->
         state =
       let rule_id =
         try
-          let origin = Public_data.influence_node_of_json origin in
+          let origin = Public_data.refined_influence_node_of_json origin in
           begin
             match origin with
             | Public_data.Rule a ->
@@ -111,10 +111,11 @@ functor (A:Analyzer.Analyzer) ->
           Exception.warn parameters error __POS__ Exit  `Null
         else
           let error, id =
-            convert_id
-              parameters error handler compil (Ckappa_sig.rule_id_of_int 0)
+            convert_id_refined
+              parameters
+              error handler compil (Ckappa_sig.rule_id_of_int 0)
           in
-          error, Public_data.influence_node_to_json id
+          error, Public_data.refined_influence_node_to_json id
       in
       let state = set_errors error state in
       state, id_json
@@ -124,7 +125,7 @@ functor (A:Analyzer.Analyzer) ->
         match json with
         | `Null -> origin_of_influence_map state
         | _ -> state, json in
-      let node = Public_data.influence_node_of_json json in
+      let node = Public_data.refined_influence_node_of_json json in
       let parameters = get_parameters state in
       let state, handler = get_handler state in
       let state, nrules = nrules state in
@@ -143,14 +144,14 @@ functor (A:Analyzer.Analyzer) ->
         let error = get_errors state in
         let error, node =
           if id_int = 0 then
-            convert_id parameters error handler compil
+            convert_id_refined parameters error handler compil
               (Ckappa_sig.rule_id_of_int n)
           else
-            convert_id parameters error handler compil
+            convert_id_refined parameters error handler compil
               (Ckappa_sig.rule_id_of_int (id_int-1))
         in
         let state = set_errors error state in
-        let json = Public_data.influence_node_to_json node in
+        let json = Public_data.refined_influence_node_to_json node in
         state, json
 
     let next_node_in_influence_map state json =
@@ -158,7 +159,7 @@ functor (A:Analyzer.Analyzer) ->
         match json with
         | `Null -> origin_of_influence_map state
         | _ -> state, json in
-      let node = Public_data.influence_node_of_json json in
+      let node = Public_data.refined_influence_node_of_json json in
       let parameters = get_parameters state in
       let state, handler = get_handler state in
       let state, nrules = nrules state in
@@ -178,10 +179,10 @@ functor (A:Analyzer.Analyzer) ->
         else
           let error = get_errors state in
           let error, node =
-            convert_id parameters error handler compil
+            convert_id_refined parameters error handler compil
               (Ckappa_sig.rule_id_of_int (id_int+1))
           in
-          let json = Public_data.influence_node_to_json node in
+          let json = Public_data.refined_influence_node_to_json node in
           set_errors error state, json
 
 

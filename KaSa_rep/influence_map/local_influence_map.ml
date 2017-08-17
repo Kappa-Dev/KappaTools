@@ -128,7 +128,7 @@ let best_distance new_distance old_distance_opt =
 
 let add_node source remanent_state =
   let nodes, pos, neg = remanent_state.influence_map in
-  let nodes = source::nodes in
+  let nodes = (Ckappa_sig.rule_id_of_int source)::nodes in
   let influence_map = nodes, pos, neg in
   {remanent_state with influence_map}
 
@@ -221,6 +221,11 @@ let visit parameters error
   in
   let distance_next = go_fwd distance in
   let distance_prev = go_bwd distance in
+  let remanent_state =
+    if is_done then remanent_state
+    else
+      add_node node remanent_state
+  in
   let error, remanent_state =
     explore_one_map
       good_distance add_positive_influence

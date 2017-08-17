@@ -200,6 +200,7 @@ let local_influence_map_to_json influence_map =
              (fun influence_map ->
                 `Assoc
                   [
+                    nodes, nodes_list_to_json influence_map.nodes;
                     wakeup,half_influence_map_to_json influence_map.positive;
                     inhibition,half_influence_map_to_json
                       influence_map.negative;]) influence_map
