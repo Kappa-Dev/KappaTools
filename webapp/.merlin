@@ -1,7 +1,4 @@
 S ../api
-B ../_build/api
-
-B ../_build/webapp
 
 PKG cohttp.lwt atdgen
 REC

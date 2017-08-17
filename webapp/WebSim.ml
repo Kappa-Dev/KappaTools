@@ -47,9 +47,9 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
          response.Cohttp.Response.status
      in
      (Lwt_log_core.info_f
-        "%s\t[%02d/%02d/%04d:%02d:%02d:%02d]\t\"%s %s\"\t%s"
+        "%s\t[%02d/%02d/%04d %02d:%02d:%02d]\t\"%s %s\"\t%s"
         ip
-        t.Unix.tm_mday t.Unix.tm_mon t.Unix.tm_year
+        t.Unix.tm_mday t.Unix.tm_mon (1900 + t.Unix.tm_year)
         t.Unix.tm_hour t.Unix.tm_min t.Unix.tm_sec
         request_method
         request_path

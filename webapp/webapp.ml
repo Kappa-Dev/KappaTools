@@ -16,9 +16,7 @@ let route_handler
     (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
   =
   let intermediate =
-    (Webapp_common.route_handler
-       ((Route_root.route ~shutdown_key)
-        (*@ Route_sessions.route *))) in
+    Webapp_common.route_handler (Route_root.route ~shutdown_key) in
   fun (conn : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
     (body : Cohttp_lwt_body.t)

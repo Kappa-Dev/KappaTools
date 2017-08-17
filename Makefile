@@ -169,7 +169,7 @@ WebSim.native WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<agents/*> : package(lwt.unix),package(atdgen)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re.perl)" \
+	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re)" \
 	$@
 
 %Agent.native %Agent.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
