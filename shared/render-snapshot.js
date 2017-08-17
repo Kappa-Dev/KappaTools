@@ -38,7 +38,6 @@ class Snapshot {
         d3.select(this.id).selectAll("svg").remove();
         d3.select(this.id).selectAll("div").remove();
         d3.selectAll(".snap-tooltip").remove();
-        d3.selectAll(".legend").remove();
 
     }
 

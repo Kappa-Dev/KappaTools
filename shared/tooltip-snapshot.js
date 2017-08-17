@@ -7,7 +7,7 @@ class SnapUIManager {
         let UI = this;
 
         this.tip = d3.select(".render-container").append("div")	
-            .attr("class", "tooltip")	
+            .attr("class", "snap-tooltip")	
             .style("font-size", "2em")			
             .style("padding", "0.5em");
            /* add button functionality */

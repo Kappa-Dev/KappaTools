@@ -193,14 +193,6 @@ rect { stroke-width: 2; }
   stroke-dashoffset: 100%;
 }
 
-.tooltip {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  white-space: pre;
-  text-align: right;
-  background-color: white;
-}
 .toolbox {
   position: absolute;
   bottom: 0;
@@ -271,8 +263,18 @@ form {
     position: absolute;			
     text-align: right;		
     white-space: pre;
+    bottom: 0;
+    right: 0;
+    pointer-events: none;	
+}
+
+.tooltip {
+    position: absolute;
     top: 0;
     right: 0;
+    white-space: pre;
+    text-align: right;
+    background-color: white;
     pointer-events: none;	
 }
 
