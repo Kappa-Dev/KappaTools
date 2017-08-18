@@ -123,7 +123,7 @@ let route
                 Api_types_j.environment_projects =
                   Mods.StringMap.size !projects;
                 Api_types_j.environment_build = Version.version_string; } in
-            Webapp_common.result_response
+            Webapp_common.api_result_response
               ~string_of_success:(Api_types_j.string_of_environment_info
                                     ?len:None)
               (Api_common.result_ok info)
@@ -162,7 +162,7 @@ let route
                              Api_types_j.message_range = None ; }] ;
                       Api_types_j.result_code = `Bad_request })
             >>= fun (msg) ->
-            Webapp_common.result_response
+            Webapp_common.api_result_response
               ~string_of_success:(fun x -> x) msg
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -187,14 +187,14 @@ let route
               ~ok:(fun project_list ->
                   Lwt.return
                     (Api_common.result_ok { Api_types_j.project_list })) >>=
-            Webapp_common.result_response
+            Webapp_common.api_result_response
               ~string_of_success:(Mpi_message_j.string_of_project_catalog
                                     ?len:None)
           | `POST ->
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.project_parameter_of_string >>=
             (fun param -> add_projects param projects) >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -207,13 +207,13 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `DELETE ->
             (delete_projects project_id projects) >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `GET ->
             bind_projects
               (fun manager -> manager#project_get project_id)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_project ?len:None)
             )
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -240,7 +240,7 @@ let route
             bind_projects
               (fun manager -> manager#project_parse overwrites)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_project_parse
                                      ?len:None)
             )
@@ -258,7 +258,7 @@ let route
             Mpi_message_j.file_of_string >>= fun file ->
             bind_projects
               (fun manager -> manager#file_create file) project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata
                                      ?len:None)
             )
@@ -266,7 +266,7 @@ let route
             bind_projects
               (fun manager -> manager#file_catalog)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file_catalog
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -282,13 +282,13 @@ let route
             bind_projects
               (fun manager -> manager#file_delete file_id)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `GET ->
             bind_projects
               (fun manager -> manager#file_get file_id)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file ?len:None))
           | `PUT ->
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
@@ -296,7 +296,7 @@ let route
             bind_projects
               (fun manager -> manager#file_update file_id modif)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file_metadata
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -312,14 +312,14 @@ let route
             bind_projects
               (fun manager -> manager#simulation_delete)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null")
             )
           | `GET ->
             bind_projects
               (fun manager -> manager#simulation_info)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_info
                                      ?len:None))
           | `POST ->
@@ -328,7 +328,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_start params)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -344,7 +344,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_raw_trace)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun out -> out))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -360,7 +360,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_parameter)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_simulation_parameter
                     ?len:None))
@@ -379,7 +379,7 @@ let route
               (fun manager -> manager#simulation_detail_file_line
                   (Some filelines_id))
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_file_line_detail
                     ?len:None))
@@ -397,7 +397,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_detail_flux_map fluxmaps_id)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -414,7 +414,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_detail_log_message)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_log_message
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -456,7 +456,7 @@ let route
                      (fun manager -> manager#simulation_detail_plot
                          plot_parameter)
                      project_id projects)) >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_plot_detail
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -473,7 +473,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_detail_snapshot snapshot_id)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_detail
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -490,7 +490,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_efficiency)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Counter.Efficiency.string_of_t
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -507,7 +507,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_catalog_file_line)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file_line_catalog
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -524,7 +524,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_catalog_flux_map)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -541,7 +541,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_catalog_snapshot)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog
                                      ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
@@ -561,7 +561,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_continue params)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -577,7 +577,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_pause)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -595,7 +595,7 @@ let route
             bind_projects
               (fun manager -> manager#simulation_perturbation pert)
               project_id projects >>=
-            (Webapp_common.result_response
+            (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
@@ -607,17 +607,13 @@ let route
         fun ~context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `PUT ->
-            (let project_id = project_ref context in
-             Cohttp_lwt_body.to_string context.Webapp_common.body >>=
-             fun compil -> tmp_bind_projects
-               (fun manager -> manager#init_static_analyser_raw compil)
-               project_id projects >>= function
-             | Result.Ok () ->
-               let body = "null" in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            let project_id = project_ref context in
+            Cohttp_lwt_body.to_string context.Webapp_common.body >>=
+            fun compil -> tmp_bind_projects
+              (fun manager -> manager#init_static_analyser_raw compil)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun () -> "null")
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -634,15 +630,11 @@ let route
             let query = Uri.get_query_param  uri in
             let accuracy = Option_util.bind
                 Public_data.accuracy_of_string (query "accuracy") in
-            (tmp_bind_projects
-               (fun manager -> manager#get_contact_map accuracy)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_contact_map accuracy)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -666,20 +658,16 @@ let route
               Option_util.map
                 (fun x -> Yojson.Basic.from_string x)
                 (query "origin") in
-            (tmp_bind_projects
-               (fun manager ->
-                  match total, origin with
-                  | Some total, Some origin ->
-                    manager#get_local_influence_map
-                      accuracy ?fwd ?bwd ~total ~origin
-                  | _, _ -> manager#get_influence_map accuracy)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager ->
+                 match total, origin with
+                 | Some total, Some origin ->
+                   manager#get_local_influence_map
+                     accuracy ?fwd ?bwd ~total ~origin
+                 | _, _ -> manager#get_influence_map accuracy)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -691,15 +679,11 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
             let project_id = project_ref context in
-            (tmp_bind_projects
-               (fun manager -> manager#get_initial_node)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_initial_node)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -726,15 +710,11 @@ let route
                 Public_data.Var
                   (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
             let node_json = Public_data.short_influence_node_to_json node in
-            (tmp_bind_projects
-               (fun manager -> manager#get_next_node node_json)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_next_node node_json)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -761,15 +741,11 @@ let route
                 Public_data.Var
                   (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
             let node_json = Public_data.short_influence_node_to_json node in
-            (tmp_bind_projects
-               (fun manager -> manager#get_previous_node node_json)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_previous_node node_json)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -781,15 +757,11 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
             let project_id = project_ref context in
-            (tmp_bind_projects
-               (fun manager -> manager#get_dead_rules)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_dead_rules)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
@@ -801,15 +773,11 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
             let project_id = project_ref context in
-            (tmp_bind_projects
-               (fun manager -> manager#get_constraints_list)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+            tmp_bind_projects
+              (fun manager -> manager#get_constraints_list)
+              project_id projects >>=
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> Yojson.Basic.to_string x)
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

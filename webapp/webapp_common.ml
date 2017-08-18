@@ -21,37 +21,12 @@ let headers =
   let h = Cohttp.Header.add h "content-type" "application/json" in
   h
 
-(* Given a result and a way to serialize a success result, return
-   to client the the http response.
-*)
-let result_response
-    ~(string_of_success: 'ok -> string)
-  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
-  Api_common.result_map
-    ~ok:(fun (code : Api.manager_code)
-          (ok : 'a) ->
-          let body : string = string_of_success ok in
-          let status :> Cohttp.Code.status_code = code in
-          Server.respond_string ~headers ~status ~body ())
-    ~error:(fun
-             (code : Api.manager_code)
-             (errors : Api_types_j.errors) ->
-             let error_msg : string = Api_types_j.string_of_errors errors in
-             let status :> Cohttp.Code.status_code = code in
-             (Lwt_log_core.log ~level:Lwt_log_core.Error error_msg)
-             >>= (fun _ ->
-                 Server.respond_string
-                   ?headers:(Some headers)
-                   ~status:status
-                   ~body:error_msg
-                   ()))
-
 let string_response ?(headers=headers) = Server.respond_string ~headers
 
 let error_response
     ?(headers = headers)
     ?(status = `Internal_server_error)
-    ~(errors : Api_types_j.errors)
+    (errors : Api_types_j.errors)
   : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   let error_msg : string = Api_types_j.string_of_errors errors in
   let () =
@@ -66,6 +41,32 @@ let error_response
     ~status
     ~body:error_msg
     ()
+
+
+
+(* Given a result and a way to serialize a success result, return
+   to client the the http response.
+*)
+let api_result_response
+    ~(string_of_success: 'ok -> string)
+  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+  Api_common.result_map
+    ~ok:(fun (code : Api.manager_code)
+          (ok : 'a) ->
+          let body : string = string_of_success ok in
+          let status :> Cohttp.Code.status_code = code in
+          Server.respond_string ~headers ~status ~body ())
+    ~error:(fun (code : Api.manager_code) (errors : Api_types_j.errors) ->
+        let error_msg : string = Api_types_j.string_of_errors errors in
+        let status :> Cohttp.Code.status_code = code in
+        Lwt_log_core.log ~level:Lwt_log_core.Error error_msg >>= fun () ->
+        Server.respond_string ~headers ~status ~body:error_msg ())
+
+let result_response ~string_of_success = function
+  | Result.Ok r ->
+    Server.respond_string ~headers ~status:`OK ~body:(string_of_success r) ()
+  | Result.Error e ->
+    error_response [Api_common.error_msg e]
 
 let method_not_allowed_respond meths =
   let headers =
@@ -176,7 +177,7 @@ let request_handler context = function
          route.operation ~context
       )
       (fun exn ->
-         result_response
+         api_result_response
            ~string_of_success:(fun x -> x)
            (match exn with
             | Yojson.Json_error e -> (Api_common.result_error_msg e)
@@ -188,7 +189,7 @@ let request_handler context = function
     error_response
       ?headers:None
       ?status:None
-      ~errors:(Api_data.api_message_errors "multiple routes match url")
+      (Api_data.api_message_errors "multiple routes match url")
 
 
 let route_handler
