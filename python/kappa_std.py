@@ -131,7 +131,7 @@ class KappaStd(object):
         return(self.dispatch("SimulationPause"))
 
     def simulation_perturbation(self,perturbation_code):
-        return(self.dispatch("SimulationPause",
+        return(self.dispatch("SimulationPerturbation",
                               { "perturbation_code" : perturbation_code }))
 
     def simulation_start(self,simulation_parameter):

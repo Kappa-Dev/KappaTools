@@ -181,12 +181,12 @@ class KappaRest(object):
 
     def simulation_pause(self):
         message = { "action" : "pause" }
-        url = "{0}/projects/{1}/simulation".format(self.url,
+        url = "{0}/projects/{1}/simulation/pause".format(self.url,
                                                    self.project_id)
         return(self.dispatch("PUT",url,message ))
 
     def simulation_perturbation(self,perturbation_code):
-        url = "{0}/projects/{1}/simulation".format(self.url,
+        url = "{0}/projects/{1}/simulation/perturbation".format(self.url,
                                                    self.project_id)
         message = { "perturbation_code" : perturbation_code }
         return(self.dispatch("PUT",url,message ))
