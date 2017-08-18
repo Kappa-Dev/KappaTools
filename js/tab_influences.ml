@@ -266,7 +266,7 @@ let content () =
                     let fmt = Format.formatter_of_buffer buf in
                     let logger =
                       Loggers.open_logger_from_formatter
-                        ~mode:Loggers.Js_Graph fmt
+                        ~mode:Loggers.HTML_Graph fmt
                     in
                     let () = json_to_graph logger influences_json in
                     let () = Loggers.flush_logger logger in
@@ -276,8 +276,8 @@ let content () =
                       ReactiveData.RList.set
                         set_influences
                         [
-                          Html.pcdata
-                            s ] in
+                          Html.Unsafe.data
+                        s] (* ] *) in
                     ())
                  (manager#get_local_influence_map
                     ?fwd ?bwd ~total ~origin acc)) >>=
