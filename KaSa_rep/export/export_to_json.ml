@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 17 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -51,7 +51,7 @@ sig
     Yojson.Basic.json ->
     Exception_without_parameter.method_handler *
     Public_data.contact_map Public_data.AccuracyMap.t *
-    Remanent_state.influence_map Public_data.AccuracyMap.t *
+    Public_data.influence_map Public_data.AccuracyMap.t *
     Public_data.dead_rules option * Remanent_state.constraints_list option *
     Public_data.separating_transitions option
 end
@@ -73,7 +73,7 @@ functor (A:Analyzer.Analyzer) ->
     let get_influence_map
         ?accuracy_level:(accuracy_level=Public_data.Low) state =
       let state, influence_map = get_influence_map ~accuracy_level state in
-      state, Remanent_state.influence_map_to_json (accuracy_level,influence_map)
+      state, Public_data.influence_map_to_json (accuracy_level,influence_map)
 
     let get_local_influence_map
         ?accuracy_level:(accuracy_level=Public_data.Low)
@@ -97,7 +97,7 @@ functor (A:Analyzer.Analyzer) ->
         get_local_influence_map ~accuracy_level ?fwd ?bwd ~total
           rule_id state
       in
-      state, Remanent_state.local_influence_map_to_json (accuracy_level,total,bwd,fwd,influence_map)
+      state, Public_data.local_influence_map_to_json (accuracy_level,total,bwd,fwd,influence_map)
 
     let origin_of_influence_map state =
       let state, nrules = nrules state in

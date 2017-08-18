@@ -96,10 +96,10 @@ let accuracy_chooser =
 let json_to_graph logger influences_json =
   let () = Graph_loggers.print_graph_preamble logger "" in
   let _,_,_,_,influence_map =
-    Remanent_state.local_influence_map_of_json
+    Public_data.local_influence_map_of_json
       influences_json
   in
-  let nodes = influence_map.Remanent_state.nodes in
+  let nodes = influence_map.Public_data.nodes in
   let directives_of_node node =
     let _json = (* TODO: add a directive to call set_origin
                      on _json to when there is a click on the
@@ -176,12 +176,12 @@ let json_to_graph logger influences_json =
       nodes
   in
   let print_maps ?directives:(directives=[]) logger map =
-    Remanent_state.InfluenceNodeMap.iter
+    Public_data.InfluenceNodeMap.iter
       (fun source map ->
          let source_id =
            string_of_int (get_id_of_node_id source)
          in
-         Remanent_state.InfluenceNodeMap.iter
+         Public_data.InfluenceNodeMap.iter
            (fun target _label ->
               let target_id =
                 string_of_int (get_id_of_node_id target)
@@ -205,7 +205,7 @@ let json_to_graph logger influences_json =
     print_maps
       ~directives
       logger
-      influence_map.Remanent_state.positive
+      influence_map.Public_data.positive
   in
   let directives =
     [Graph_loggers_sig.Color !Config.inhibition_color;
@@ -215,7 +215,7 @@ let json_to_graph logger influences_json =
     print_maps
       ~directives
       logger
-      influence_map.Remanent_state.negative
+      influence_map.Public_data.negative
   in
   let () = Graph_loggers.print_graph_foot logger in
   ()
