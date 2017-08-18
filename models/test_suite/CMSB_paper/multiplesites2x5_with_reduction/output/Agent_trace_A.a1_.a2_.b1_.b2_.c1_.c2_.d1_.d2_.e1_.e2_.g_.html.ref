@@ -97,5 +97,5 @@
   svg.attr('height', g.graph().height * initialScale + 40);
   </script>
   </div>
-</body>
+  </body>
 </html>

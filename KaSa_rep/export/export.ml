@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Aug 17 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -238,7 +238,7 @@ let compute_env_init
          Remanent_state.state)
   =
   match Remanent_state.get_init state with
-  | Remanent_state.Compil compil -> state, None, None, None
+  | Remanent_state.Compil _compil -> state, None, None, None
   | Remanent_state.Files files ->
     let () = show_title state in
     let cli = Run_cli_args.default in
@@ -505,8 +505,8 @@ let reindex parameters error handler list =
 (******************************************************************)
 
 let convert_label a =
-  if a<0 then Remanent_state.Side_effect (-(a+1))
-  else Remanent_state.Direct a
+  if a<0 then Public_data.Side_effect (-(a+1))
+  else Public_data.Direct a
 
 let convert_id_short parameters error handler compiled id =
   Handler.convert_id_short  parameters error handler compiled id
@@ -722,9 +722,9 @@ let convert_half_influence_map parameters error handler compiled influence =
       in
        let old =
          match
-           Remanent_state.InfluenceNodeMap.find_option x map
+          Public_data.InfluenceNodeMap.find_option x map
          with
-         | None -> Remanent_state.InfluenceNodeMap.empty
+         | None -> Public_data.InfluenceNodeMap.empty
          | Some x -> x
        in
        let list =
@@ -736,12 +736,12 @@ let convert_half_influence_map parameters error handler compiled influence =
            (List.rev list)
        in
        error,
-       Remanent_state.InfluenceNodeMap.add x
-         (Remanent_state.InfluenceNodeMap.add y list old)
+       Public_data.InfluenceNodeMap.add x
+         (Public_data.InfluenceNodeMap.add y list old)
          map
     )
     influence
-    (error, Remanent_state.InfluenceNodeMap.empty)
+    (error, Public_data.InfluenceNodeMap.empty)
 
 let convert_influence_map
     state (nodes, wake_up_map, inhibition_map)
@@ -763,9 +763,9 @@ let convert_influence_map
   let state = Remanent_state.set_errors error state in
   let output =
     {
-      Remanent_state.nodes = nodes ;
-      Remanent_state.positive = pos ;
-      Remanent_state.negative = neg
+      Public_data.nodes = nodes ;
+      Public_data.positive = pos ;
+      Public_data.negative = neg
     }
   in
   state, output
@@ -864,9 +864,9 @@ let print_influence_map parameters influence_map =
   let log = (Remanent_parameters.get_logger parameters) in
   Loggers.fprintf log "Influence map:" ;
   Loggers.print_newline log;
-  Remanent_state.InfluenceNodeMap.iter
+  Public_data.InfluenceNodeMap.iter
     (fun x y ->
-       Remanent_state.InfluenceNodeMap.iter
+       Public_data.InfluenceNodeMap.iter
          (fun y _labellist ->
             let () =
               Loggers.fprintf log
@@ -878,10 +878,10 @@ let print_influence_map parameters influence_map =
               Loggers.print_newline log in
             ())
          y)
-    influence_map.Remanent_state.positive;
-  Remanent_state.InfluenceNodeMap.iter
+    influence_map.Public_data.positive;
+  Public_data.InfluenceNodeMap.iter
     (fun x y ->
-       Remanent_state.InfluenceNodeMap.iter
+       Public_data.InfluenceNodeMap.iter
          (fun y _labellist ->
             let () =
               Loggers.fprintf log
@@ -891,19 +891,19 @@ let print_influence_map parameters influence_map =
             let () = Loggers.print_newline log in
             ())
          y)
-    influence_map.Remanent_state.negative;
+    influence_map.Public_data.negative;
   Loggers.print_newline log
 
 let query_inhibition_map influence_map r1 r2 =
   match
-    Remanent_state.InfluenceNodeMap.find_option
-      (Public_data.Rule r1) influence_map.Remanent_state.negative
+    Public_data.InfluenceNodeMap.find_option
+      (Public_data.Rule r1) influence_map.Public_data.negative
   with
   | None -> []
   | Some map ->
     begin
       match
-        Remanent_state.InfluenceNodeMap.find_option
+        Public_data.InfluenceNodeMap.find_option
           (Public_data.Rule r2)
           map
       with

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 17 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -42,18 +42,6 @@ val separating_transitions_to_json:
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
-
-module InfluenceNodeMap: SetMap.Map
-  with type elt =
-         (int,int) Public_data.influence_node
-
-
-type location =
-  | Direct of int
-  | Side_effect of int
-
-type 'a pair = 'a * 'a
-
 type distance =
   {
     fwd: int ;
@@ -68,24 +56,6 @@ type local_influence_map_blackboard =
     blackboard_to_be_explored: bool array
   }
 
-type influence_map =
-  {
-    nodes: (Public_data.rule, Public_data.var) Public_data.influence_node list ;
-    positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
-    negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
-  }
-
-val influence_map_to_json:
-  Public_data.accuracy_level * influence_map -> Yojson.Basic.json
-
-val influence_map_of_json:
-  Yojson.Basic.json -> Public_data.accuracy_level * influence_map
-
-val local_influence_map_to_json:
-  Public_data.accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
-
-val local_influence_map_of_json:
-  Yojson.Basic.json -> Public_data.accuracy_level * int * int option * int option * influence_map
 
 type internal_influence_map =
   Ckappa_sig.c_rule_id list *
@@ -150,7 +120,7 @@ val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
 val of_json: Yojson.Basic.json ->
   Exception_without_parameter.method_handler *
   Public_data.contact_map Public_data.AccuracyMap.t *
-  influence_map Public_data.AccuracyMap.t *
+  Public_data.influence_map Public_data.AccuracyMap.t *
   Public_data.dead_rules option *
   constraints_list option *
   Public_data.separating_transitions option
@@ -246,12 +216,12 @@ val get_internal_influence_map:
   internal_influence_map option
 
 val set_influence_map:
-  Public_data.accuracy_level -> influence_map ->
+  Public_data.accuracy_level -> Public_data.influence_map ->
   ('static, 'compile) state -> ('static, 'compile) state
 
 val get_influence_map:
   Public_data.accuracy_level -> ('static, 'compile) state ->
-  influence_map option
+  Public_data.influence_map option
 
 val set_bidirectional_influence_map:
   Public_data.accuracy_level -> bidirectional_influence_map ->
@@ -299,7 +269,8 @@ val set_dead_agents:
   dead_agents -> ('static, 'compile) state -> ('static, 'compile) state
 
 val get_influence_map_map:
-  ('static, 'compile) state -> influence_map Public_data.AccuracyMap.t
+  ('static, 'compile) state ->
+  Public_data.influence_map Public_data.AccuracyMap.t
 
 val set_separating_transitions:
   separating_transitions -> ('static, 'compile) state ->

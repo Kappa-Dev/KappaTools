@@ -35,6 +35,22 @@ let position = "location"
 let edit = "edit_rule"
 let variable = "variable"
 let rule = "rule"
+let direct = "direct"
+let side_effect = "side effect"
+let source = "source"
+let target_map = "target map"
+let target = "target"
+let location_pair_list = "location pair list"
+let rhs = "RHS"
+let lhs = "LHS"
+let influencemap="influence map"
+let wakeup = "wake-up map"
+let inhibition = "inhibition map"
+let nodes = "nodes"
+let total_string = "total"
+let fwd_string = "fwd"
+let bwd_string = "bwd"
+
 (*******************)
 (* Accuracy levels *)
 (*******************)
@@ -351,6 +367,227 @@ let refined_influence_node_to_json =
 
 let refined_influence_node_of_json =
   influence_node_of_json json_to_rule json_to_var
+
+module InfluenceNodeSetMap =
+  SetMap.Make
+    (struct
+      type t = (int, int) influence_node
+      let compare = compare
+      let print f = function
+        | Rule r -> Format.fprintf f "Rule %i" r
+        | Var r -> Format.fprintf f "Var %i" r
+    end)
+
+module InfluenceNodeMap = InfluenceNodeSetMap.Map
+
+(* Relations *)
+
+type 'a pair = 'a * 'a
+
+type location =
+  | Direct of int
+  | Side_effect of int
+
+type half_influence_map =
+  location pair list InfluenceNodeMap.t InfluenceNodeMap.t
+
+type influence_map =
+  {
+    nodes: (rule, var) influence_node list ;
+    positive: half_influence_map ;
+    negative: half_influence_map ;
+
+  }
+
+(* Location labels *)
+let location_to_json a =
+  match a with
+  | Direct i -> `Assoc [direct,JsonUtil.of_int i]
+  | Side_effect i  -> `Assoc [side_effect,JsonUtil.of_int i]
+
+let location_of_json
+    ?error_msg:(error_msg="Not a correct location")
+  =
+  function
+  | `Assoc [s,json] when s=direct -> Direct (JsonUtil.to_int json)
+  | `Assoc [s,json] when s=side_effect -> Side_effect (JsonUtil.to_int json)
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let half_influence_map_to_json =
+  InfluenceNodeMap.to_json
+    ~lab_key:source ~lab_value:target_map
+    short_influence_node_to_json
+    (InfluenceNodeMap.to_json
+       ~lab_key:target ~lab_value:location_pair_list
+       short_influence_node_to_json
+       (JsonUtil.of_list
+          (JsonUtil.of_pair
+             ~lab1:rhs ~lab2:lhs
+             location_to_json
+             location_to_json
+          )
+       )
+    )
+
+let half_influence_map_of_json =
+  InfluenceNodeMap.of_json
+    ~error_msg:(JsonUtil.build_msg "activation or inhibition map")
+    ~lab_key:source ~lab_value:target_map
+    short_influence_node_of_json
+    (InfluenceNodeMap.of_json
+       ~lab_key:target ~lab_value:location_pair_list
+       ~error_msg:"map of lists of pairs of locations"
+       short_influence_node_of_json
+       (JsonUtil.to_list ~error_msg:"list of pair of locations"
+          (JsonUtil.to_pair
+             ~error_msg:""
+             ~lab1:rhs ~lab2:lhs
+             (location_of_json ~error_msg:(JsonUtil.build_msg "location"))
+             (location_of_json ~error_msg:(JsonUtil.build_msg "location")))))
+
+(* Influence map *)
+
+let nodes_list_to_json =
+  JsonUtil.of_list
+    refined_influence_node_to_json
+
+let nodes_list_of_json =
+  JsonUtil.to_list
+    refined_influence_node_of_json
+
+
+let influence_map_to_json influence_map =
+  `Assoc
+    [influencemap,
+     JsonUtil.of_pair
+       ~lab1:accuracy_string ~lab2:map
+       accuracy_to_json
+       (fun influence_map ->
+          `Assoc
+            [ nodes, nodes_list_to_json influence_map.nodes;
+              wakeup,half_influence_map_to_json influence_map.positive;
+              inhibition,half_influence_map_to_json
+                influence_map.negative;]) influence_map]
+
+let local_influence_map_to_json influence_map =
+  let accuracy, total, bwd, fwd, influence_map = influence_map in
+  `Assoc
+    [influencemap,
+     `Assoc [accuracy_string,accuracy_to_json accuracy;
+             total_string,JsonUtil.of_int total;
+             fwd_string,JsonUtil.of_option JsonUtil.of_int fwd;
+             bwd_string,JsonUtil.of_option JsonUtil.of_int bwd;
+             map,
+             (fun influence_map ->
+                `Assoc
+                  [
+                    nodes, nodes_list_to_json influence_map.nodes;
+                    wakeup,half_influence_map_to_json influence_map.positive;
+                    inhibition,half_influence_map_to_json
+                      influence_map.negative;]) influence_map
+            ]
+    ]
+
+let influence_map_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc influencemap l in
+        JsonUtil.to_pair
+          ~lab1:accuracy_string ~lab2:map
+          ~error_msg:(JsonUtil.build_msg "influence map1")
+          accuracy_of_json
+          (function
+            | `Assoc l as x when List.length l = 3 ->
+              begin
+                try
+                  {nodes =
+                     nodes_list_of_json (List.assoc nodes l);
+                   positive =
+                     half_influence_map_of_json (List.assoc wakeup l);
+                   negative =
+                     half_influence_map_of_json (List.assoc inhibition l)}
+                with Not_found ->
+                  raise
+                    (Yojson.Basic.Util.Type_error
+                       (JsonUtil.build_msg "influence map",x))
+              end
+            | x ->
+              raise
+                (Yojson.Basic.Util.Type_error
+                   (JsonUtil.build_msg "influence map",x)))
+          json
+      with
+      | _ ->
+        raise
+          (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+
+let local_influence_map_of_json =
+  function
+  | `Assoc l as x ->
+    begin
+      try
+        let json = List.assoc influencemap l in
+        match json with
+        | `Assoc l'  ->
+          let accuracy =
+            accuracy_of_json (List.assoc accuracy_string l')
+          in
+          let total =
+            JsonUtil.to_int (List.assoc total_string l')
+          in
+          let error_msg = JsonUtil.build_msg "fwd radius" in
+          let fwd =
+            JsonUtil.to_option
+              (JsonUtil.to_int ~error_msg) (List.assoc fwd_string l')
+          in
+          let error_msg = JsonUtil.build_msg "bwd radius" in
+          let bwd =
+            JsonUtil.to_option
+              (JsonUtil.to_int ~error_msg) (List.assoc bwd_string l')
+          in
+          let influence_map =
+            (function
+              | `Assoc l as x when List.length l = 3 ->
+                begin
+                  try
+                    {
+                      nodes =
+                        nodes_list_of_json (List.assoc nodes l);
+                      positive =
+                        half_influence_map_of_json (List.assoc wakeup l);
+                      negative =
+                        half_influence_map_of_json (List.assoc inhibition l)
+                    }
+                  with Not_found ->
+                    raise
+                      (Yojson.Basic.Util.Type_error
+                         (JsonUtil.build_msg "local influence map",x))
+                end
+              | x ->
+                raise
+                  (Yojson.Basic.Util.Type_error
+                     (JsonUtil.build_msg "local influence map",x)))
+              (List.assoc map l')
+          in
+          (accuracy, total, fwd, bwd, influence_map)
+        | _ ->
+          raise
+            (Yojson.Basic.Util.Type_error
+               (JsonUtil.build_msg "influence map",x))
+      with _ ->
+        raise
+          (Yojson.Basic.Util.Type_error
+             (JsonUtil.build_msg "influence map",x))
+    end
+  | x ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
+
 
 
 type dead_rules = rule list

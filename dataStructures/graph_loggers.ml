@@ -414,7 +414,7 @@ let print_foot_shared_html_js logger =
     let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
     let () = Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);" in
     let () = Format.fprintf f "@,</script>" in
-    let () = Format.fprintf f "@,</div>@," in
+    let () = Format.fprintf f "@,</div>" in
     ()
 
 let print_graph_foot logger =
@@ -498,16 +498,16 @@ let print_graph_foot logger =
       print_foot_shared_html_js logger
     end
   | Loggers.HTML_Graph ->
-      begin
+    begin
+      let f_opt = Loggers.formatter_of_logger logger in
+      match
+        f_opt
+      with
+      | None -> ()
+      | Some f ->
         let () = print_foot_shared_html_js logger in
-        let f_opt = Loggers.formatter_of_logger logger in
-        match
-          f_opt
-        with
-        | None -> ()
-        | Some f ->
-          let () = Format.fprintf f "</body>@]@,</html>@]@." in
-          ()
+        let () = Format.fprintf f "@,</body>@]@,</html>@]@." in
+        ()
     end
   | Loggers.Json
   | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab | Loggers.Octave

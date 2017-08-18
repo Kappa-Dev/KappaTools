@@ -15,6 +15,7 @@ val refinement_lemmas:string
 val free:string
 val bound:string
 val wildcard:string
+val influencemap: string
 
 type accuracy_level = Low | Medium | High | Full
 val accuracy_levels : accuracy_level list
@@ -80,6 +81,36 @@ val refined_influence_node_of_json:
 
 val refined_influence_node_to_json:
   (rule, var) influence_node -> Yojson.Basic.json
+
+module InfluenceNodeMap: SetMap.Map
+    with type elt =
+           (int,int) influence_node
+
+type location =
+    | Direct of int
+    | Side_effect of int
+
+type 'a pair = 'a * 'a
+
+type influence_map =
+  {
+    nodes: (rule, var) influence_node list ;
+    positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
+    negative: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
+  }
+
+
+val influence_map_to_json:
+    accuracy_level * influence_map -> Yojson.Basic.json
+
+  val influence_map_of_json:
+    Yojson.Basic.json -> accuracy_level * influence_map
+
+  val local_influence_map_to_json:
+    accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
+
+  val local_influence_map_of_json:
+    Yojson.Basic.json -> accuracy_level * int * int option * int option * influence_map
 
 type dead_rules = rule list
 
