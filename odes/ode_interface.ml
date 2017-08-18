@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 25 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -221,13 +221,14 @@ let species_to_positive_transformations cc =
          let emb' = Mods.IntMap.add pos a emb in
          ((emb',g'),a))
       (fun ~pos ~site a (l,i) (emb',acc) ->
+         let _ = pos in
          let acc' =
            if i <> -1 then
              Primitives.Transformation.PositiveInternalized (a,site,i)::acc
            else acc in
          (emb',
           match l with
-          | Pattern.UnSpec 
+          | Pattern.UnSpec
           | Pattern.Free ->
             Primitives.Transformation.Freed (a,site)::acc'
           | Pattern.Link (x',s') ->
@@ -265,6 +266,7 @@ let add_fully_specified_to_graph sigs graph cc =
          let emb' = Mods.IntMap.add pos ag emb in
          ((emb',g'),ag))
       (fun ~pos ~site (a,_ as ag) (l,i) (emb',acc) ->
+         let _ = pos in
          let acc' =
            if i <> -1 then Edges.add_internal a site i acc else acc in
          (emb',
@@ -342,7 +344,12 @@ let is_zero expr =
   match expr with
   | Alg_expr.CONST a,_ ->
     Nbr.is_zero a
-  | _ -> false
+  | ((Alg_expr.BIN_ALG_OP (_, _, _) |Alg_expr.UN_ALG_OP (_, _)
+     | Alg_expr.IF (_, _, _) | Alg_expr.DIFF_TOKEN _
+     | Alg_expr.DIFF_KAPPA_INSTANCE _ | Alg_expr.STATE_ALG_OP _
+     | Alg_expr.ALG_VAR _| Alg_expr.KAPPA_INSTANCE _
+     | Alg_expr.TOKEN_ID _), _) -> false
+
 
 let add_not_none_not_zero x y list  =
   match y with
@@ -434,7 +441,8 @@ let string_of_var_id ?compil ?init_mode logger r =
     | Loggers.TXT | Loggers.TXT_Tabular
     | Loggers.XLS | Loggers.SBML | Loggers.DOTNET
     | Loggers.DOT
-    | Loggers.HTML | Loggers.HTML_Graph | Loggers.HTML_Tabular
+    | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
+    | Loggers.HTML_Tabular
     | Loggers.Json | Loggers.Matrix -> ""
   in
   let env = environment_opt compil in

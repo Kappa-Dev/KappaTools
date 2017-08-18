@@ -7,7 +7,7 @@ let print_comment logger_fmt logger_buf (s:string) : unit =
   | Loggers.SBML ->
     let () = Loggers.fprintf logger_buf "<!-- %s -->" s in
     let () = Loggers.print_newline logger_buf in ()
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json ->
@@ -46,7 +46,7 @@ with
 | Loggers.SBML ->
   f logger logger_err
 | Loggers.DOTNET
-| Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+| Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
 | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
 | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
 | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
@@ -57,7 +57,7 @@ let do_dotnet logger logger_err f =
   with
   | Loggers.DOTNET -> f logger logger_err
   | Loggers.SBML
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> ()
@@ -68,7 +68,7 @@ let is_dotnet logger =
   with
   | Loggers.DOTNET -> true
   | Loggers.SBML
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
@@ -79,7 +79,7 @@ let is_sbml logger =
     with
     | Loggers.SBML -> true
     | Loggers.DOTNET
-    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
     | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
     | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
     | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
@@ -90,7 +90,7 @@ let is_dotnet_or_sbml  logger =
   with
   | Loggers.DOTNET
   | Loggers.SBML -> true
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json -> false
@@ -1285,7 +1285,7 @@ let maybe_time_dependent logger network var_rule =
       Loggers.get_expr logger var_rule in
     let expr = unsome expr_opt in
     maybe_time_dependent_alg_expr_in_sbml logger expr network
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular
   | Loggers.XLS | Loggers.Octave | Loggers.Mathematica
   | Loggers.Matlab | Loggers.Maple | Loggers.Json | Loggers.DOTNET -> false
@@ -1301,7 +1301,7 @@ let promote nbr =
 
 let dump_kinetic_law
     ~propagate_constants
-    print_alg_expr string_of_var_id logger logger_err network reactants products var_rule correct nocc =
+    string_of_var_id logger logger_err network reactants var_rule correct nocc =
   let () =
     do_dotnet logger logger_err
       (fun logger logger_err ->
@@ -1867,13 +1867,11 @@ let dump_sbml_reaction
                   (fun logger logger_err ->
                      dump_kinetic_law
                        ~propagate_constants
-                       print_expr
                        string_of_var_id
                        logger
                        logger_err
                        network
                        reactants
-                       products
                        var_rule
                        correct
                        nocc

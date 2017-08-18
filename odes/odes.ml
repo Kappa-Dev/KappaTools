@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Jul 25 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
 *)
 
 let local_trace = false
@@ -377,7 +377,7 @@ struct
 
   let enrich_rule cache compil rule rule_id_with_mode =
     let lhs = I.lhs compil rule_id_with_mode rule in
-    let succ_last_cc_id,lhs_cc =
+    let _succ_last_cc_id,lhs_cc =
       List.fold_left
         (fun (counter,list) cc ->
            (next_cc_id counter,
@@ -1078,7 +1078,7 @@ struct
         let reactions =
           List.rev_map
             (fun (reaction,nocc) ->
-               let (reactants,products,_,_) = reaction in
+               let (reactants,_products,_,_) = reaction in
                let correct =
                  Tools.get_product_image_occ 1
                    (fun i j -> i*j) (fun i -> Tools.fact i)
@@ -1401,7 +1401,7 @@ struct
     | Rule_modes.Unary | Rule_modes.Usual -> (id,mode,direct)
     | Rule_modes.Unary_refinement -> (id,Rule_modes.Unary,direct)
 
-  let flatten_coef (id,mode,direct) = id,Rule_modes.Usual, direct
+  let flatten_coef (id,_mode,direct) = id,Rule_modes.Usual, direct
 
   let split_rules parameters compil network sort_rules_and_decls =
     let rate_set = Rule_modes.RuleModeIdSet.empty in
@@ -1820,7 +1820,7 @@ struct
       | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
       | Loggers.Matrix | Loggers.DOT | Loggers.HTML
-      | Loggers.HTML_Graph | Loggers.HTML_Tabular
+      | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML_Tabular
       | Loggers.Json -> ()
     in
     ()
@@ -1844,7 +1844,9 @@ struct
     with
     | Loggers.Mathematica | Loggers.Maple -> step = 2
     | Loggers.Matlab | Loggers.Octave
-    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS
+    | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph
+    | Loggers.HTML | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT
+    | Loggers.TXT_Tabular | Loggers.XLS
     | Loggers.SBML | Loggers.DOTNET
     | Loggers.Json -> step=1
 
@@ -2120,7 +2122,8 @@ struct
                     logger logger_buffer logger_err
                     Ode_loggers_sig.Time_scale_factor Nbr.one;
                   Sbml_backend.line_dotnet logger logger_err
-                | Loggers.Matrix | Loggers.HTML_Graph| Loggers.HTML
+                | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph
+                | Loggers.HTML
                 | Loggers.HTML_Tabular| Loggers.DOT| Loggers.TXT
                 | Loggers.TXT_Tabular
                 | Loggers.XLS| Loggers.Maple| Loggers.Mathematica| Loggers.Json
@@ -2492,7 +2495,7 @@ struct
                Ode_loggers.print_comment ~breakline logger s
                | Loggers.Matrix | Loggers.TXT
                | Loggers.TXT_Tabular | Loggers.XLS
-               | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+               | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
                | Loggers.HTML_Tabular | Loggers.Json -> ()
 
            in
@@ -2621,7 +2624,7 @@ struct
     | Loggers.Matrix | Loggers.TXT
     | Loggers.Maple | Loggers.Mathematica
     | Loggers.TXT_Tabular | Loggers.XLS
-    | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+    | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph | Loggers.Js_Graph
     | Loggers.HTML_Tabular | Loggers.Json
     | Loggers.SBML | Loggers.DOTNET -> ()
     | Loggers.Matlab | Loggers.Octave  ->
@@ -2980,6 +2983,7 @@ struct
                            I.print_token ~compil log id) id,
                       (Some "substance")
                     | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
+                    | Loggers.Js_Graph
                     | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
                     | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
                     | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
@@ -3008,7 +3012,8 @@ struct
                         (fst (Mods.DynArray.get network.species_tab k))
                       ) k, Some ""
                   | Loggers.DOT | Loggers.HTML | Loggers.HTML_Graph
-                  | Loggers.HTML_Tabular | Loggers.Json | Loggers.Maple
+                  | Loggers.HTML_Tabular | Loggers.Json | Loggers.Js_Graph
+                  | Loggers.Maple
                   | Loggers.Mathematica | Loggers.Matlab | Loggers.Matrix
                   | Loggers.Octave | Loggers.TXT | Loggers.TXT_Tabular
                   | Loggers.XLS
@@ -3077,7 +3082,7 @@ struct
           (affect_var ~propagate_constants is_zero logger logger logger_err ~init_mode:false compil
              network) split.var_decl
       | Loggers.Mathematica | Loggers.Maple
-      |  Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML
+      |  Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph  | Loggers.HTML
       | Loggers.HTML_Tabular | Loggers.DOT | Loggers.TXT
       | Loggers.TXT_Tabular | Loggers.XLS
       | Loggers.SBML
@@ -3087,7 +3092,7 @@ struct
     let () =
       if Sbml_backend.is_dotnet logger &&
         List.for_all
-          (fun (id,expr) -> Ode_loggers.is_time expr)
+          (fun (_id,expr) -> Ode_loggers.is_time expr)
           network.obs
       then (* No observable in the model *)
         ()

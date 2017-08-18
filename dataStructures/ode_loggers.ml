@@ -173,6 +173,7 @@ let string_of_variable ~side loggers variable =
     string_of_variable_maple variable
   | Loggers.Matrix
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.DOT
@@ -511,7 +512,7 @@ let print_ode_preamble
     | Loggers.Json
     | Loggers.DOT
     | Loggers.Matrix
-    | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
+    | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT
     | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let declare_global logger string =
@@ -531,7 +532,7 @@ let declare_global logger string =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix
-  | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let affect_symbol logger =
@@ -543,7 +544,7 @@ let affect_symbol logger =
   | Loggers.Maple -> ":="
   | Loggers.Json
   | Loggers.SBML | Loggers.DOTNET
-  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ""
 
@@ -572,7 +573,7 @@ let of_t ~side logger s =
   | Loggers.Mathematica -> Format.sprintf "[%s%s]" s ext
   | Loggers.Matlab  | Loggers.Octave
   | Loggers.SBML | Loggers.DOTNET
-  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS
   | Loggers.Json -> ""
@@ -586,7 +587,7 @@ let instruction_sep logger =
   | Loggers.Mathematica -> ";"
   | Loggers.Matlab  | Loggers.Octave -> ";"
   | Loggers.SBML | Loggers.DOTNET
-  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS | Loggers.Json -> ""
 
@@ -788,7 +789,7 @@ let initialize ~nodevar logger variable =
       ()
     end
   | Loggers.SBML | Loggers.DOTNET -> ()
-  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.Matrix  | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
   | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -801,7 +802,7 @@ let print_newline logger =
     -> Loggers.print_newline logger
   | Loggers.Json
   | Loggers.SBML | Loggers.DOTNET -> ()
-  | Loggers.DOT | Loggers.HTML_Graph | Loggers.HTML
+  | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML
   | Loggers.Matrix | Loggers.HTML_Tabular | Loggers.TXT
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -821,6 +822,7 @@ let string_of_bin_op logger op =
       | Loggers.Matlab -> "^"
       | Loggers.Maple | Loggers.Mathematica | Loggers.Octave -> "**"
       | Loggers.Matrix | Loggers.HTML | Loggers.HTML_Graph
+      | Loggers.Js_Graph
       | Loggers.HTML_Tabular
       | Loggers.DOT
       | Loggers.TXT | Loggers.TXT_Tabular
@@ -930,6 +932,7 @@ let octave_matlab format =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
 
@@ -941,6 +944,7 @@ let dotnet_format format =
   | Loggers.SBML | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
 
@@ -952,6 +956,7 @@ let mathematica_maple format =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> false
 
@@ -965,6 +970,7 @@ let show_time_advance logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -985,6 +991,7 @@ let associate_nonnegative logger bool =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -1242,7 +1249,7 @@ let rec print_alg_expr ?init_mode ?parenthesis_mode string_of_var_id logger logg
     ()
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger logger_err expr
@@ -1299,7 +1306,7 @@ and print_bool_expr ?parenthesis_mode ?init_mode string_of_var_id logger logger_
    | Loggers.DOTNET (*TODO*)
    | Loggers.Json
    | Loggers.DOT
-   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+   | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
    | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_alg_expr_few_parenthesis ?init_mode string_of_var_id logger logger_err alg_expr network_handler =
@@ -1466,6 +1473,7 @@ let print_comment
       | Loggers.Json
       | Loggers.DOT
       | Loggers.Matrix | Loggers.HTML_Graph
+      | Loggers.Js_Graph
       | Loggers.HTML
       | Loggers.HTML_Tabular
       | Loggers.TXT
@@ -1844,7 +1852,7 @@ let associate ~propagate_constants ?init_mode:(init_mode=false) ?comment:(commen
     end
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let associate_nrows logger =
   match
@@ -1863,6 +1871,7 @@ let associate_nrows logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -1878,6 +1887,7 @@ let associate_t logger n =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -1893,6 +1903,7 @@ let init_time logger n =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -1905,7 +1916,7 @@ let inc_symbol logger string varrhs =
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ""
 
 let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_id logger logger_err variable alg_expr network =
   match
@@ -1932,7 +1943,7 @@ let increment ?init_mode:(init_mode=false) ?comment:(comment="") string_of_var_i
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let apply_correct string_of_var correct var  =
   let var_string = string_of_var var in
@@ -2029,7 +2040,7 @@ let gen string logger var_species ~nauto_in_species ~nauto_in_lhs ~nocc var_rate
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
 let consume = gen "-"
@@ -2164,7 +2175,7 @@ let gen_deriv
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular
   | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
@@ -2212,7 +2223,7 @@ let update_token logger var_token ~nauto_in_lhs ~nocc var_rate stoc_coef var_lis
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
 let update_token_jac
@@ -2394,7 +2405,7 @@ let update_token_jac
   | Loggers.SBML | Loggers.DOTNET
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.Matrix | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 
 let print_options ~compute_jacobian ~pos ~nodevar logger =
@@ -2480,6 +2491,7 @@ let print_options ~compute_jacobian ~pos ~nodevar logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2500,6 +2512,7 @@ let start_time logger float =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2523,6 +2536,7 @@ let declare_init ?comment:(comment="") logger i =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2561,6 +2575,7 @@ let print_license_check logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2769,6 +2784,7 @@ let print_integrate ~nobs ~nodevar logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2811,6 +2827,7 @@ let print_interpolate logger =
     | Loggers.Json
     | Loggers.DOT
     | Loggers.HTML_Graph
+    | Loggers.Js_Graph
     | Loggers.Matrix | Loggers.HTML
     | Loggers.HTML_Tabular
     | Loggers.TXT
@@ -2947,6 +2964,7 @@ let print_dump_plots ~nobs ~data_file ~command_line ~titles logger  =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2978,6 +2996,7 @@ let open_procedure logger name name' arg =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -2999,6 +3018,7 @@ let close_procedure logger =
   | Loggers.Json
   | Loggers.DOT
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.Matrix | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -3024,7 +3044,8 @@ let launch_main logger =
   | Loggers.Maple
   | Loggers.Json
   | Loggers.DOT
-  | Loggers.Matrix | Loggers.HTML_Graph
+  | Loggers.Matrix | Loggers.HTML_Graph  | Loggers.Js_Graph 
+
   | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT
@@ -3043,6 +3064,7 @@ let smash_reactions mode _parameters =
   | Loggers.DOT
   | Loggers.Matrix
   | Loggers.HTML_Graph
+  | Loggers.Js_Graph
   | Loggers.HTML
   | Loggers.HTML_Tabular
   | Loggers.TXT

@@ -92,6 +92,134 @@ let accuracy_chooser =
     ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
     (List.map option_gen Public_data.influence_map_accuracy_levels)
 
+
+let json_to_graph logger influences_json =
+  let () = Graph_loggers.print_graph_preamble logger "" in
+  let _,_,_,_,influence_map =
+    Remanent_state.local_influence_map_of_json
+      influences_json
+  in
+  let nodes = influence_map.Remanent_state.nodes in
+  let directives_of_node node =
+    let _json = (* TODO: add a directive to call set_origin
+                     on _json to when there is a click on the
+                  node *)
+      Public_data.refined_influence_node_to_json node
+    in
+    match node
+    with
+    | Public_data.Rule r ->
+      let label,_ast =
+        if r.Public_data.rule_label = ""
+        then r.Public_data.rule_ast,""
+        else r.Public_data.rule_label,r.Public_data.rule_ast
+      in
+      let _pos = (* TODO: add a directive to show _pos and
+                  _ast when the mouse is on the node *)
+        Locality.to_string r.Public_data.rule_position
+      in
+      [
+          Graph_loggers_sig.Label label;
+          Graph_loggers_sig.Shape !Config.rule_shape;
+          Graph_loggers_sig.Color !Config.rule_color;
+        ]
+    | Public_data.Var r ->
+      let label,_ast =
+        if r.Public_data.var_label = ""
+        then r.Public_data.var_ast,""
+        else r.Public_data.var_label,r.Public_data.var_ast
+      in
+      let _pos = (* TODO: add a directive to show _pos and
+                  _ast when the mouse is on the node *)
+        Locality.to_string r.Public_data.var_position
+      in
+      [
+        Graph_loggers_sig.Label label;
+        Graph_loggers_sig.Shape !Config.variable_shape;
+        Graph_loggers_sig.Color !Config.variable_color;]
+  in
+  let max_rule_id =
+    List.fold_left
+      (fun biggest_id n ->
+         match n with
+         | Public_data.Rule r ->
+           max biggest_id (1+(r.Public_data.rule_id))
+         | Public_data.Var _ -> biggest_id)
+      (-1) nodes
+  in
+  let get_id_of_node_id node_id =
+    match node_id with
+    | Public_data.Rule id -> id
+    | Public_data.Var id -> id + max_rule_id
+  in
+  let get_id_of_node node =
+    get_id_of_node_id
+      (
+        match node with
+        | Public_data.Rule rule ->
+          Public_data.Rule rule.Public_data.rule_id
+        | Public_data.Var var ->
+          Public_data.Var var.Public_data.var_id
+      )
+  in
+  let () =
+    List.iter
+      (fun node ->
+         let directives =
+           directives_of_node node
+         in
+         Graph_loggers.print_node
+           logger
+           ~directives
+           (string_of_int (get_id_of_node node))
+      )
+      nodes
+  in
+  let print_maps ?directives:(directives=[]) logger map =
+    Remanent_state.InfluenceNodeMap.iter
+      (fun source map ->
+         let source_id =
+           string_of_int (get_id_of_node_id source)
+         in
+         Remanent_state.InfluenceNodeMap.iter
+           (fun target _label ->
+              let target_id =
+                string_of_int (get_id_of_node_id target)
+              in
+              let label_string = "todo"
+              in
+              let directives = (Graph_loggers_sig.Label
+                                  label_string)::directives in
+              let () =
+                Graph_loggers.print_edge logger ~directives
+                  source_id target_id in
+              ())
+           map)
+      map
+  in
+  let directives =
+    [Graph_loggers_sig.Color !Config.wake_up_color;
+     Graph_loggers_sig.ArrowHead !Config.wake_up_arrow]
+  in
+  let () =
+    print_maps
+      ~directives
+      logger
+      influence_map.Remanent_state.positive
+  in
+  let directives =
+    [Graph_loggers_sig.Color !Config.inhibition_color;
+     Graph_loggers_sig.ArrowHead !Config.inhibition_arrow]
+  in
+  let () =
+    print_maps
+      ~directives
+      logger
+      influence_map.Remanent_state.negative
+  in
+  let () = Graph_loggers.print_graph_foot logger in
+  ()
+
 let content () =
   let accuracy_form =
     Html.form ~a:[ Html.a_class [ "form-horizontal" ] ]
@@ -134,13 +262,22 @@ let content () =
            (fun (manager : Api.concrete_manager) ->
               (Lwt_result.map
                  (fun influences_json ->
+                    let buf = Buffer.create 1000 in
+                    let fmt = Format.formatter_of_buffer buf in
+                    let logger =
+                      Loggers.open_logger_from_formatter
+                        ~mode:Loggers.Js_Graph fmt
+                    in
+                    let () = json_to_graph logger influences_json in
+                    let () = Loggers.flush_logger logger in
+                    let s = Buffer.contents buf in
+                    let () = Loggers.close_logger logger in
                     let () =
                       ReactiveData.RList.set
                         set_influences
-                        [Html.pcdata
-                           (Yojson.Basic.to_string origin);
+                        [
                           Html.pcdata
-                           (Yojson.Basic.to_string influences_json) ] in
+                            s ] in
                     ())
                  (manager#get_local_influence_map
                     ?fwd ?bwd ~total ~origin acc)) >>=

@@ -117,6 +117,19 @@ let shall_I_do_it format filter_in filter_out =
   in
   b1 && (not (List.mem format filter_out))
 
+let print_preamble_shared_html_js f title =
+  let () = Format.fprintf f "<div class=\"container\">@," in
+  let () = Format.fprintf
+      f "<h1>@[%s@]</h1>@," title
+  in
+  let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
+  let () = Format.fprintf f "<script>@," in
+  let () = Format.fprintf f "// Create a new directed graph@," in
+  let () =
+    Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
+
+  ()
+
 let print_graph_preamble
     logger
     ?filter_in:(filter_in=None) ?filter_out:(filter_out=[]) ?header:(header=[])
@@ -140,7 +153,17 @@ let print_graph_preamble
       let () = Loggers.fprintf logger "digraph G{" in
       let () = Loggers.print_newline logger in
       ()
-    | Loggers.HTML_Graph ->
+    | Loggers.Js_Graph -> (* IN PROGESS *)
+      begin
+        let f_opt = Loggers.formatter_of_logger logger in
+        match
+          f_opt
+        with
+        | None -> ()
+        | Some f ->
+          print_preamble_shared_html_js f title
+      end
+    | Loggers.HTML_Graph  ->
       begin
         let f_opt = Loggers.formatter_of_logger logger in
         match
@@ -178,15 +201,8 @@ let print_graph_preamble
                      f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
                  Format.fprintf f "@]@,</style>")
           in
-          let () = Format.fprintf f "@[<v 2><body>@,<div class=\"container\">@," in
-          let () = Format.fprintf
-              f "<h1>@[%s@]</h1>@," title
-          in
-          let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
-          let () = Format.fprintf f "<script>@," in
-          let () = Format.fprintf f "// Create a new directed graph@," in
-          let () =
-            Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
+          let () = Format.fprintf f "@[<v 2><body>@," in
+          let () = print_preamble_shared_html_js f title in
           ()
       end
 
@@ -253,6 +269,153 @@ let matrix_string_of_options l =
                 -> i
            )) 1 l in
   string_of_int i
+
+let print_foot_shared_html_js logger =
+  let () =
+    Mods.String2Map.iter
+      (fun (id1,id2) list ->
+         let list = List.rev list in
+         let id1_int = Loggers.int_of_string_id logger id1 in
+         let id2_int = Loggers.int_of_string_id logger id2 in
+         let attributes = dummy_edge in
+         let attributes =
+           List.fold_left
+             (fun attributes option_list ->
+                List.fold_left
+                  (fun attributes option ->
+                     match
+                       option
+                     with
+                     | Graph_loggers_sig.Label s ->
+                       begin
+                         match attributes.edge_label
+                         with
+                         | None ->
+                           {attributes with
+                            edge_label = Some [s] }
+                         | Some s' ->
+                           {attributes with
+                            edge_label = Some (s::","::s') }
+                       end
+                     | Graph_loggers_sig.Color s ->
+                       begin
+                         match attributes.edge_color with
+                         | None ->
+                           {attributes with edge_color = Some s }
+                         | Some s' when s=s' -> attributes
+                         | Some _ ->
+                           {attributes with edge_color = Some Graph_loggers_sig.Brown}
+                       end
+                     | Graph_loggers_sig.LineStyle s -> {attributes with
+                                                         edge_style = s}
+                     | Graph_loggers_sig.Direction s -> {attributes with
+                                                         edge_direction = s}
+                     | Graph_loggers_sig.ArrowTail s -> {attributes with
+                                                         edge_arrowtail = merge s attributes.edge_arrowtail }
+                     | Graph_loggers_sig.ArrowHead s -> {attributes with
+                                                         edge_arrowhead = merge s
+                                                             attributes.edge_arrowhead}
+                     | Graph_loggers_sig.Shape _
+                     | Graph_loggers_sig.Width _
+                     | Graph_loggers_sig.Height _
+                     | Graph_loggers_sig.FillColor _ -> attributes
+                  )
+                  attributes option_list)
+             attributes
+             list
+         in
+         let () =
+           Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int
+             id2_int in
+         let attributes =
+           match attributes.edge_direction
+           with
+           | Graph_loggers_sig.Undirected ->
+             {attributes with
+              edge_arrowhead=Graph_loggers_sig.No_head ;
+              edge_arrowtail=Graph_loggers_sig.No_head}
+           | Graph_loggers_sig.Direct ->
+             {attributes with
+              edge_arrowtail=Graph_loggers_sig.No_head}
+           | Graph_loggers_sig.Reverse ->
+             {attributes with edge_arrowhead=Graph_loggers_sig.No_head}
+           | Graph_loggers_sig.Both -> attributes
+         in
+         let bool = false in
+         let bool, s_opt=
+           match attributes.edge_label
+           with
+           | None -> bool,None
+           | Some string_list ->
+             let () = Loggers.fprintf logger "label: \"" in
+             let s =
+               Format.asprintf
+                 "%a" (fun fmt -> List.iter (Format.fprintf fmt "%s")) (List.rev string_list)
+             in
+             let s_opt,s' =
+               if
+                 String.length s > 100
+               then
+                 Some s, (String.sub s 0 100)^"..."
+               else
+                 None, s
+             in
+             let () = Loggers.fprintf logger "%s" s' in
+             let () = Loggers.fprintf logger "\"" in
+             true, s_opt
+         in
+         let bool =
+           match attributes.edge_color
+           with
+           | None -> bool
+           | Some s ->
+             let () = between_attributes_in_html logger bool in
+             let color = svg_color_encoding s in
+             let () =
+               Loggers.fprintf logger
+                 "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
+                 color color color
+             in
+             true
+         in
+         let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
+         let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
+         let () = if bool then () else () in
+         let () = Loggers.fprintf logger " });@," in
+         let () =
+           match s_opt
+           with None -> ()
+              | Some s ->
+                Loggers.fprintf logger "<!--%s-->\n" s
+         in
+         ())
+      (Loggers.get_edge_map logger)
+  in
+  let f_opt = Loggers.formatter_of_logger logger in
+  match
+    f_opt
+  with
+  | None -> ()
+  | Some f ->
+    let () = Format.fprintf
+        f "var svg = d3.select(\"svg\"),inner = svg.select(\"g\");@,"
+    in
+    let () = Format.fprintf f "// Set up zoom support@," in
+    let () = Format.fprintf f "var zoom = d3.behavior.zoom().on(\"zoom\", function() {@," in
+    let () = Format.fprintf f "inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +@," in
+    let () = Format.fprintf f "\"scale(\" + d3.event.scale + \")\");@,});@,svg.call(zoom);" in
+    let () = Format.fprintf f "// Create the renderer@, var render = new dagreD3.render();@," in
+    let () = Format.fprintf f "// Run the renderer. This is what draws the final graph.@," in
+    let () = Format.fprintf f "render(inner, g);@," in
+    let () = Format.fprintf f "// Center the graph@,var initialScale = 0.75;@," in
+    let () = Format.fprintf f "zoom@," in
+    let () = Format.fprintf
+        f ".translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])@," in
+    let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
+    let () = Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);" in
+    let () = Format.fprintf f "@,</script>" in
+    let () = Format.fprintf f "@,</div>@," in
+    ()
 
 let print_graph_foot logger =
   match
@@ -330,153 +493,21 @@ let print_graph_foot logger =
     let () = Loggers.close_row logger in
     let () = Loggers.print_newline logger in
     ()
-  | Loggers.HTML_Graph ->
+  | Loggers.Js_Graph ->
     begin
-      let () =
-        Mods.String2Map.iter
-          (fun (id1,id2) list ->
-             let list = List.rev list in
-             let id1_int = Loggers.int_of_string_id logger id1 in
-             let id2_int = Loggers.int_of_string_id logger id2 in
-             let attributes = dummy_edge in
-             let attributes =
-                 List.fold_left
-                   (fun attributes option_list ->
-                      List.fold_left
-                        (fun attributes option ->
-                           match
-                             option
-                           with
-                           | Graph_loggers_sig.Label s ->
-                             begin
-                               match attributes.edge_label
-                               with
-                               | None ->
-                                 {attributes with
-                                  edge_label = Some [s] }
-                               | Some s' ->
-                                 {attributes with
-                                  edge_label = Some (s::","::s') }
-                             end
-                           | Graph_loggers_sig.Color s ->
-                             begin
-                               match attributes.edge_color with
-                               | None ->
-                                 {attributes with edge_color = Some s }
-                               | Some s' when s=s' -> attributes
-                               | Some _ ->
-                                 {attributes with edge_color = Some Graph_loggers_sig.Brown}
-                             end
-                           | Graph_loggers_sig.LineStyle s -> {attributes with
-                                                               edge_style = s}
-                           | Graph_loggers_sig.Direction s -> {attributes with
-                                                               edge_direction = s}
-                           | Graph_loggers_sig.ArrowTail s -> {attributes with
-                                                               edge_arrowtail = merge s attributes.edge_arrowtail }
-                           | Graph_loggers_sig.ArrowHead s -> {attributes with
-                                                               edge_arrowhead = merge s
-                                                              attributes.edge_arrowhead}
-                           | Graph_loggers_sig.Shape _
-                           | Graph_loggers_sig.Width _
-                           | Graph_loggers_sig.Height _
-                           | Graph_loggers_sig.FillColor _ -> attributes
-                        )
-                        attributes option_list)
-                   attributes
-                   list
-             in
-             let () =
-               Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int
-                id2_int in
-             let attributes =
-               match attributes.edge_direction
-               with
-               | Graph_loggers_sig.Undirected ->
-                 {attributes with
-                  edge_arrowhead=Graph_loggers_sig.No_head ;
-                  edge_arrowtail=Graph_loggers_sig.No_head}
-               | Graph_loggers_sig.Direct ->
-                 {attributes with
-                  edge_arrowtail=Graph_loggers_sig.No_head}
-               | Graph_loggers_sig.Reverse ->
-                 {attributes with edge_arrowhead=Graph_loggers_sig.No_head}
-               | Graph_loggers_sig.Both -> attributes
-             in
-             let bool = false in
-             let bool, s_opt=
-               match attributes.edge_label
-               with
-               | None -> bool,None
-               | Some string_list ->
-                 let () = Loggers.fprintf logger "label: \"" in
-                 let s =
-                   Format.asprintf
-                     "%a" (fun fmt -> List.iter (Format.fprintf fmt "%s")) (List.rev string_list)
-                 in
-                 let s_opt,s' =
-                   if
-                     String.length s > 100
-                   then
-                     Some s, (String.sub s 0 100)^"..."
-                   else
-                     None, s
-                 in
-                 let () = Loggers.fprintf logger "%s" s' in
-                 let () = Loggers.fprintf logger "\"" in
-                 true, s_opt
-             in
-             let bool =
-               match attributes.edge_color
-               with
-               | None -> bool
-               | Some s ->
-                 let () = between_attributes_in_html logger bool in
-                 let color = svg_color_encoding s in
-                 let () =
-                   Loggers.fprintf logger
-                     "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
-                color color color
-                 in
-            true
-        in
-        let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
-        let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
-        let () = if bool then () else () in
-        let () = Loggers.fprintf logger " });@," in
-        let () =
-          match s_opt
-          with None -> ()
-             | Some s ->
-               Loggers.fprintf logger "<!--%s-->\n" s
-        in
-        ())
-          (Loggers.get_edge_map logger)
-      in
-      let f_opt = Loggers.formatter_of_logger logger in
-      match
-        f_opt
-      with
-      | None -> ()
-      | Some f ->
-        let () = Format.fprintf
-            f "var svg = d3.select(\"svg\"),inner = svg.select(\"g\");@,"
-        in
-        let () = Format.fprintf f "// Set up zoom support@," in
-        let () = Format.fprintf f "var zoom = d3.behavior.zoom().on(\"zoom\", function() {@," in
-        let () = Format.fprintf f "inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +@," in
-        let () = Format.fprintf f "\"scale(\" + d3.event.scale + \")\");@,});@,svg.call(zoom);" in
-        let () = Format.fprintf f "// Create the renderer@, var render = new dagreD3.render();@," in
-        let () = Format.fprintf f "// Run the renderer. This is what draws the final graph.@," in
-        let () = Format.fprintf f "render(inner, g);@," in
-        let () = Format.fprintf f "// Center the graph@,var initialScale = 0.75;@," in
-        let () = Format.fprintf f "zoom@," in
-        let () = Format.fprintf
-            f ".translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])@," in
-        let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
-        let () = Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);" in
-        let () = Format.fprintf f "@,</script>" in
-        let () = Format.fprintf f "@,</div>@]@,</body>@,</html>@]@." in
-        ()
+      print_foot_shared_html_js logger
+    end
+  | Loggers.HTML_Graph ->
+      begin
+        let () = print_foot_shared_html_js logger in
+        let f_opt = Loggers.formatter_of_logger logger in
+        match
+          f_opt
+        with
+        | None -> ()
+        | Some f ->
+          let () = Format.fprintf f "</body>@]@,</html>@]@." in
+          ()
     end
   | Loggers.Json
   | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab | Loggers.Octave
@@ -495,7 +526,7 @@ let print_comment
       format
     with
     | Loggers.DOT -> Loggers.fprintf logger "#%s" string
-    | Loggers.HTML_Graph -> Loggers.fprintf logger "%s" string
+    | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "%s" string
     | Loggers.Json
     | Loggers.Matrix
     | Loggers.SBML | Loggers.Maple | Loggers.Matlab | Loggers.Mathematica
@@ -505,7 +536,7 @@ let print_comment
 
 let open_asso logger =
   match Loggers.get_encoding_format logger with
-  | Loggers.HTML_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
+  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t<p><dl>\n"
   | Loggers.Json
   | Loggers.Mathematica
   |  Loggers.SBML | Loggers.Maple | Loggers.Matlab
@@ -514,7 +545,7 @@ let open_asso logger =
   | Loggers.TXT_Tabular | Loggers.XLS -> ()
 let close_asso logger =
   match Loggers.get_encoding_format logger with
-  | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
+  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t\t</dl></p>\n"
   | Loggers.Json
   | Loggers.DOTNET | Loggers.Mathematica | Loggers.Maple
   | Loggers.Matlab | Loggers.Octave | Loggers.SBML
@@ -524,7 +555,7 @@ let close_asso logger =
 let print_asso logger string1 string2 =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT -> Loggers.fprintf logger "/*%s %s*/" string1 string2
-  | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
+  | Loggers.HTML_Graph | Loggers.Js_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.Json
   | Loggers.DOTNET | Loggers.Matrix | Loggers.SBML
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.Mathematica
@@ -577,7 +608,7 @@ let print_node logger ?directives:(directives=[]) id =
   let attributes = dummy_node in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT ->
+    | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.TXT ->
       List.fold_left
         (fun attributes option ->
            match
@@ -689,7 +720,7 @@ let print_node logger ?directives:(directives=[]) id =
           end
       in ()
     end
-  | Loggers.HTML_Graph ->
+  | Loggers.HTML_Graph | Loggers.Js_Graph ->
     let id_int = Loggers.int_of_string_id logger id in
     let () = Loggers.fprintf logger "g.setNode(%i, { " id_int in
     let () =
@@ -774,10 +805,10 @@ let print_node logger ?directives:(directives=[]) id =
               in
               ()
           in
-          let () = Loggers.fprintf logger " });@," in
           ()
         end
     in
+    let () = Loggers.fprintf logger " });@," in
     ()
   | Loggers.TXT ->
     begin
@@ -801,7 +832,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
+    | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.TXT | Loggers.HTML ->
       List.fold_left
         (fun attributes option ->
            match
@@ -957,7 +988,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let () = List.iter (Loggers.fprintf logger "%s") (List.rev label) in
     let () = Loggers.print_newline logger in
    ()
-| Loggers.Matrix | Loggers.Json | Loggers.HTML_Graph ->
+| Loggers.Matrix | Loggers.Json | Loggers.HTML_Graph | Loggers.Js_Graph ->
   Loggers.add_edge logger id1 id2 directives
 | Loggers.DOTNET | Loggers.Mathematica
 | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
@@ -973,7 +1004,7 @@ let print_one_to_n_relation
     match
       Loggers.get_encoding_format logger
     with
-    | Loggers.HTML_Graph ->
+    | Loggers.HTML_Graph | Loggers.Js_Graph ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))
     | Loggers.Json
     | Loggers.Matrix

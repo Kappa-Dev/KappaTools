@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Aug 17 2017>
+   * Last modification: Time-stamp: <Aug 18 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -246,8 +246,10 @@ let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id
   with
   | None  -> Exception.warn parameters error __POS__ Exit
                (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,"",var_id)
-  | Some _ ->
-    error,("ALG",Locality.dummy,"",var_id)
+  | Some var  ->
+    error,(fst var.Cckappa_sig.e_id_dot,snd var.Cckappa_sig.e_id_dot,
+           "" (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *) ,
+           var_id)
 
 let string_of_info ?with_rule:(with_rule=true)
     ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) ?kind:(kind="rule ") (label,pos,ast,id) =
@@ -512,8 +514,10 @@ let get_label_of_rule_txt _parameters error rule = error, rule.Cckappa_sig.e_rul
 let get_label_of_rule_dot _parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
 
 
-let get_label_of_var_txt _parameters error rule = error,rule.Cckappa_sig.e_id
-let get_label_of_var_dot _parameters error rule = error,rule.Cckappa_sig.e_id_dot
+let get_label_of_var_txt _parameters error rule =
+  error,fst rule.Cckappa_sig.e_id
+let get_label_of_var_dot _parameters error rule =
+  error,fst rule.Cckappa_sig.e_id_dot
 
 let print_rule_txt parameters error rule_id m1 _m2 rule =
   let m = "'"^ m1 ^"' " in

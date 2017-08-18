@@ -26,7 +26,7 @@ module VarMap = Map.Make(VarOrd)
 module VarSet = Set.Make(VarOrd)
 
 type encoding =
-  | Matrix | HTML_Graph | HTML | HTML_Tabular
+  | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
   | Octave | Matlab | Maple | Mathematica | SBML | DOTNET
   | Json
@@ -57,7 +57,7 @@ let breakable x =
   match
     x
   with
-  | HTML_Tabular | HTML | HTML_Graph | TXT -> true
+  | HTML_Tabular | HTML | HTML_Graph | Js_Graph | TXT -> true
   | Matrix | Json | Mathematica | Matlab | Octave | Maple | SBML | DOTNET
   | DOT | TXT_Tabular | XLS -> false
 
@@ -210,7 +210,7 @@ let end_of_line_symbol logger =
   match
     logger.encoding
   with
-  | HTML | HTML_Graph -> "<Br>"
+  | HTML | HTML_Graph | Js_Graph -> "<Br>"
   | Matrix | Matlab | Mathematica | Octave | Maple | SBML | DOTNET
   | Json | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
@@ -278,8 +278,8 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | Matrix | Json | Mathematica | Matlab | Octave | Maple | SBML | DOTNET |
-      HTML_Graph | HTML | DOT | TXT | XLS -> "",""
+    | Matrix | Json | Mathematica | Matlab | Octave | Maple | SBML | DOTNET
+    | HTML_Graph | Js_Graph | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -303,8 +303,8 @@ let close_logger logger =
       fprintf logger "</TABLE>\n</div>\n</body>"
     | Matrix ->
       fprintf logger "}\n"
-    | Json | Matlab | Mathematica | Octave | Maple  | SBML | DOTNET |
-      HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+    | Json | Matlab | Mathematica | Octave | Maple  | SBML | DOTNET
+    | HTML_Graph | Js_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () = flush_logger logger in
   ()
@@ -326,7 +326,7 @@ let print_preamble logger =
     let () = print_newline logger in
     ()
   | Json | Matlab | Mathematica | Octave | Maple | SBML | DOTNET
-  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
+  | HTML_Graph | Js_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
@@ -432,7 +432,7 @@ let open_row logger =
   | HTML_Tabular -> fprintf logger "<tr>"
   | Matrix -> fprintf logger "["
   | Json | Matlab | Octave | Mathematica | Maple | SBML | DOTNET
-  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
+  | HTML_Graph | Js_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
@@ -441,7 +441,7 @@ let close_row logger =
   | HTML_Tabular -> fprintf logger "<tr>@."
   | Matrix -> fprintf logger "]\n"
   | Json | Matlab | Octave | Maple | Mathematica | SBML | DOTNET
-  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+  | HTML_Graph | Js_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
   match
@@ -538,7 +538,7 @@ let has_forbidden_char t string =
   (match get_encoding_format t
    with
      DOTNET -> true
-   | Matrix | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
    | Octave | Matlab | Maple | Mathematica | Json | SBML -> false)
   &&
   let rec aux k n =

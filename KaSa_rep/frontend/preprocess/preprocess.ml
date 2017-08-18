@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Jul 31 2017>
+   * Last modification: Time-stamp: <Aug 18 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -1756,8 +1756,8 @@ let translate_var parameters error handler (a,b) =
   let error,a_dot = Tools_kasa.make_id_compatible_with_dot_format parameters error (fst a) in
   error,
   {
-    Cckappa_sig.e_id = fst a;
-    Cckappa_sig.e_id_dot = a_dot;
+    Cckappa_sig.e_id = a;
+    Cckappa_sig.e_id_dot = a_dot,snd a;
     Cckappa_sig.c_variable = fst b ;
     Cckappa_sig.e_variable = (a,b')}
 

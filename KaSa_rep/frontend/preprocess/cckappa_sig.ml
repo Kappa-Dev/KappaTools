@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Jul 05 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -555,8 +555,8 @@ let join_mixture parameters error f g mixture1 mixture2 =
 
 type enriched_variable =
     {
-      e_id       : string;
-      e_id_dot   : string;
+      e_id       : string * Ckappa_sig.position ;
+      e_id_dot   : string * Ckappa_sig.position ;
       c_variable : (Ckappa_sig.mixture,string) Alg_expr.e;
       e_variable : (mixture,string) Ast.variable_def
     }

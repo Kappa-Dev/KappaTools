@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2010, the 12th of August
-   * Last modification: Time-stamp: <Mar 11 2017>
+   * Last modification: Time-stamp: <Aug 18 2017>
    * *
    * Pretty printing of token library
    *
@@ -321,10 +321,10 @@ let rec print_short_alg parameters error handler alg =
     error *)
 
 let print_var parameters error handler var =
-  let s = var.Cckappa_sig.e_id in
+  let s = fst var.Cckappa_sig.e_id in
   let _ =
     if s <> ""
-    then Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s: " var.Cckappa_sig.e_id
+    then Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s: " s
   in
   print_short_alg
     parameters error handler (Locality.dummy_annot var.Cckappa_sig.c_variable)
