@@ -349,7 +349,7 @@ let onload () =
                         (fun origin ->
                            let () = set_origin origin in
                            ())
-                        (manager#get_initial_node ()) >>=
+                        manager#get_initial_node >>=
                       fun out ->
                       Lwt.return (Api_common.result_lift out)
                      )))

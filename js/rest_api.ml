@@ -398,7 +398,7 @@ class manager
     send
       ?timeout
       (Format.sprintf "%s/v2/projects/%s/analyses" url project_id)
-      `POST ~data
+      `PUT ~data
       (fun x ->
          match Yojson.Basic.from_string x with
          | `Null -> ()
@@ -420,9 +420,8 @@ class manager
       ?timeout
       (match accuracy with
        | Some accuracy ->
-         Format.sprintf "%s/v2/projects/%s/analyses/contact_map/%s" url
-           project_id
-           (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
+         Format.sprintf "%s/v2/projects/%s/analyses/contact_map?accuracy=%s"
+           url project_id (Public_data.accuracy_to_string accuracy)
        | None ->
          Format.sprintf "%s/v2/projects/%s/analyses/contact_map" url project_id)
       `GET
@@ -438,9 +437,8 @@ class manager
       ?timeout
       (match accuracy with
        | Some accuracy ->
-         Format.sprintf "%s/v2/projects/%s/analyses/influence_map/%s" url
-           project_id
-           (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))
+         Format.sprintf "%s/v2/projects/%s/analyses/influence_map?accuracy=%s"
+           url project_id (Public_data.accuracy_to_string accuracy)
        | None -> Format.sprintf "%s/v2/analyses/influence_map" url)
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -456,18 +454,14 @@ class manager
       (let s  =
          match accuracy with
          | Some accuracy ->
-         (Yojson.Basic.to_string (Public_data.accuracy_to_json accuracy))^"_"
+           "&accuracy="^(Public_data.accuracy_to_string accuracy)
          | None -> ""
        in
        Format.sprintf
-         "%s/v2/projects/%s/analyses/influence_map/%s%s_%s_%s_%s"
-         url
-         project_id
-         s
-         (Yojson.Basic.to_string (JsonUtil.of_option JsonUtil.of_int fwd))
-         (Yojson.Basic.to_string (JsonUtil.of_option JsonUtil.of_int bwd))
-         (Yojson.Basic.to_string (JsonUtil.of_int total))
-         (Yojson.Basic.to_string origin)
+         "%s/v2/projects/%s/analyses/influence_map?origin=%s&total=%i%s%s%s"
+         url project_id (Yojson.Basic.to_string origin) total s
+         (match fwd with None -> "" | Some i -> "&fwd="^string_of_int i)
+         (match bwd with None -> "" | Some i -> "&bwd="^string_of_int i)
       )
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -477,7 +471,7 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_initial_node () =
+  method get_initial_node =
     send
       ?timeout
       (

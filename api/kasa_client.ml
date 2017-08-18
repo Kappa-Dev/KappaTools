@@ -91,7 +91,7 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
           Lwt_result.bind_result
             (self#message post request)
             (fun x -> Result.Ok x)
-    method get_initial_node () =
+    method get_initial_node =
       let request =
         `List [`String "INFLUENCE_MAP_ORIGINAL_NODE"]
       in

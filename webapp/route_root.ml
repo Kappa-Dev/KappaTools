@@ -603,10 +603,10 @@ let route
     (** Static analyses *)
     { Webapp_common.path = "/v2/projects/{projectid}/analyses" ;
       Webapp_common.operation =
-        let methods = [ `OPTIONS ; `POST ; ] in
+        let methods = [ `OPTIONS ; `PUT ; ] in
         fun ~context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
-          | `POST ->
+          | `PUT ->
             (let project_id = project_ref context in
              Cohttp_lwt_body.to_string context.Webapp_common.body >>=
              fun compil -> tmp_bind_projects
@@ -622,29 +622,6 @@ let route
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
     { Webapp_common.path =
-        "/v2/projects/{projectid}/analyses/contact_map/{accuracy}" ;
-      Webapp_common.operation =
-        let methods = [ `OPTIONS ; `GET ; ] in
-        fun ~context:context ->
-          match context.Webapp_common.request.Cohttp.Request.meth with
-          | `GET ->
-            let project_id,raw_accuracy = field_ref context "accuracy" in
-            let accuracy = Some
-                (Public_data.accuracy_of_json
-                   (Yojson.Basic.from_string raw_accuracy)) in
-            (tmp_bind_projects
-               (fun manager -> manager#get_contact_map accuracy)
-               project_id projects >>= function
-             | Result.Ok r ->
-               let body = Yojson.Basic.to_string r in
-               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
-          | `OPTIONS -> Webapp_common.options_respond methods
-          | _ -> Webapp_common.method_not_allowed_respond methods
-    };
-    { Webapp_common.path =
         "/v2/projects/{projectid}/analyses/contact_map" ;
       Webapp_common.operation =
         let methods = [ `OPTIONS ; `GET ; ] in
@@ -652,31 +629,13 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
             let project_id = project_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let query = Uri.get_query_param  uri in
+            let accuracy = Option_util.bind
+                Public_data.accuracy_of_string (query "accuracy") in
             (tmp_bind_projects
-               (fun manager -> manager#get_contact_map None)
-               project_id projects >>= function
-             | Result.Ok r ->
-                let body = Yojson.Basic.to_string r in
-                Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-             | Result.Error e ->
-               Webapp_common.error_response
-                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
-          | `OPTIONS -> Webapp_common.options_respond methods
-          | _ -> Webapp_common.method_not_allowed_respond methods
-    };
-    { Webapp_common.path =
-        "/v2/projects/{projectid}/analyses/influence_map/{accuracy}" ;
-      Webapp_common.operation =
-        let methods = [ `OPTIONS ; `GET ; ] in
-        fun ~context:context ->
-          match context.Webapp_common.request.Cohttp.Request.meth with
-          | `GET ->
-            let project_id,raw_accuracy = field_ref context "accuracy" in
-            let accuracy = Some
-                (Public_data.accuracy_of_json
-                   (Yojson.Basic.from_string raw_accuracy)) in
-            (tmp_bind_projects
-               (fun manager -> manager#get_influence_map accuracy)
+               (fun manager -> manager#get_contact_map accuracy)
                project_id projects >>= function
              | Result.Ok r ->
                let body = Yojson.Basic.to_string r in
@@ -695,8 +654,115 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
             let project_id = project_ref context in
+            let request = context.Webapp_common.request in
+            let uri = Cohttp.Request.uri request in
+            let query = Uri.get_query_param  uri in
+            let accuracy = Option_util.bind
+                Public_data.accuracy_of_string (query "accuracy") in
+            let fwd = Option_util.map int_of_string (query "fwd") in
+            let bwd = Option_util.map int_of_string (query "bdw") in
+            let total = Option_util.map int_of_string (query "total") in
+            let origin =
+              Option_util.map
+                (fun x -> Yojson.Basic.from_string x)
+                (query "origin") in
             (tmp_bind_projects
-               (fun manager -> manager#get_influence_map None)
+               (fun manager ->
+                  match total, origin with
+                  | Some total, Some origin ->
+                    manager#get_local_influence_map
+                      accuracy ?fwd ?bwd ~total ~origin
+                  | _, _ -> manager#get_influence_map accuracy)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map/initial_node" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let project_id = project_ref context in
+            (tmp_bind_projects
+               (fun manager -> manager#get_initial_node)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map/next_node{nodeid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,node_id) = field_ref context "nodeid" in
+            let node =
+              let rule_re =
+                Re.compile
+                  (Re.whole_string
+                     (Re.seq [Re.str "_rule_"; Re.group (Re.rep1 Re.digit)])) in
+              let var_re =
+                Re.compile
+                  (Re.whole_string
+                     (Re.seq [Re.str "_var_"; Re.group (Re.rep1 Re.digit)])) in
+              match Re.exec_opt rule_re node_id with
+              | Some g -> Public_data.Rule (Re.Group.get g 1 |> int_of_string)
+              | None ->
+                Public_data.Var
+                  (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
+            let node_json = Public_data.short_influence_node_to_json node in
+            (tmp_bind_projects
+               (fun manager -> manager#get_next_node node_json)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map/previous_node{nodeid}";
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,node_id) = field_ref context "nodeid" in
+            let node =
+              let rule_re =
+                Re.compile
+                  (Re.whole_string
+                     (Re.seq [Re.str "_rule_"; Re.group (Re.rep1 Re.digit)])) in
+              let var_re =
+                Re.compile
+                  (Re.whole_string
+                     (Re.seq [Re.str "_var_"; Re.group (Re.rep1 Re.digit)])) in
+              match Re.exec_opt rule_re node_id with
+              | Some g -> Public_data.Rule (Re.Group.get g 1 |> int_of_string)
+              | None ->
+                Public_data.Var
+                  (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
+            let node_json = Public_data.short_influence_node_to_json node in
+            (tmp_bind_projects
+               (fun manager -> manager#get_previous_node node_json)
                project_id projects >>= function
              | Result.Ok r ->
                let body = Yojson.Basic.to_string r in
