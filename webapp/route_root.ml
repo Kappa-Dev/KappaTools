@@ -104,67 +104,75 @@ let route
     ~(shutdown_key: string option)
   : Webapp_common.route_handler list =
   let projects = ref Mods.StringMap.empty in
-  [  { Webapp_common.path = "/v2" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            let () = ignore(context) in
+  [
+    { Webapp_common.path = "/v2" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let simulations =
               (*Mods.StringMap.fold
-                (fun _ manager acc ->
+                  (fun _ manager acc ->
                    match m#get_simulation () with
                    | None -> acc
                    | Some _ -> succ acc)
-                !projects*) 0 in
+                  !projects*) 0 in
             let info =
               { Api_types_j.environment_simulations = simulations;
-                Api_types_j.environment_projects = Mods.StringMap.size !projects;
+                Api_types_j.environment_projects =
+                  Mods.StringMap.size !projects;
                 Api_types_j.environment_build = Version.version_string; } in
             Webapp_common.result_response
-              ~string_of_success:(Api_types_j.string_of_environment_info ?len:None)
+              ~string_of_success:(Api_types_j.string_of_environment_info
+                                    ?len:None)
               (Api_common.result_ok info)
-         )
-     };
-     { Webapp_common.path = "/v2/shutdown" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         fun ~context ->
-           (Cohttp_lwt_body.to_string context.Webapp_common.body)
-           >>= (fun body ->
-               match shutdown_key with
-               | Some shutdown_key when shutdown_key = body ->
-                 let () =
-                   Lwt.async
-                     (fun () ->
-                        let () =
-                          Mods.StringMap.iter
-                            (fun _ p -> p#terminate)
-                            !projects in
-                        Lwt_unix.sleep 1.0 >>=
-                        fun () -> exit 0)
-                 in
-                 Lwt.return
-                   { Api_types_j.result_data = Result.Ok "shutting down" ;
-                     Api_types_j.result_code = `OK }
-               | _ ->
-                 Lwt.return
-                   { Api_types_j.result_data =
-                       Result.Error [{ Api_types_j.message_severity = `Error ;
-                                       Api_types_j.message_text = "invalid key";
-                                       Api_types_j.message_range = None ; }] ;
-                     Api_types_j.result_code = `Bad_request })
-           >>= (fun (msg) ->
-               Webapp_common.result_response
-                 ~string_of_success:(fun x -> x)
-                 msg
-             )
-     };
-     { Webapp_common.path =
-         "/v2/projects" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            let () = ignore(context) in
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/shutdown" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body)
+            >>= (fun body ->
+                match shutdown_key with
+                | Some shutdown_key when shutdown_key = body ->
+                  let () =
+                    Lwt.async
+                      (fun () ->
+                         let () =
+                           Mods.StringMap.iter
+                             (fun _ p -> p#terminate)
+                             !projects in
+                         Lwt_unix.sleep 1.0 >>=
+                         fun () -> exit 0)
+                  in
+                  Lwt.return
+                    { Api_types_j.result_data = Result.Ok "shutting down" ;
+                      Api_types_j.result_code = `OK }
+                | _ ->
+                  Lwt.return
+                    { Api_types_j.result_data =
+                        Result.Error
+                          [{ Api_types_j.message_severity = `Error ;
+                             Api_types_j.message_text = "invalid key";
+                             Api_types_j.message_range = None ; }] ;
+                      Api_types_j.result_code = `Bad_request })
+            >>= fun (msg) ->
+            Webapp_common.result_response
+              ~string_of_success:(fun x -> x) msg
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; `POST ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             Mods.StringMap.fold
               (fun project_id manager acc ->
                  acc >>= Api_common.result_bind_lwt
@@ -180,55 +188,43 @@ let route
                   Lwt.return
                     (Api_common.result_ok { Api_types_j.project_list })) >>=
             Webapp_common.result_response
-              ~string_of_success:(Mpi_message_j.string_of_project_catalog ?len:None)
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Mpi_message_j.project_parameter_of_string
-            >>=
+              ~string_of_success:(Mpi_message_j.string_of_project_catalog
+                                    ?len:None)
+          | `POST ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Mpi_message_j.project_parameter_of_string >>=
             (fun param -> add_projects param projects) >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            let project_id = project_ref context in
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `DELETE ; `GET ] in
+        fun ~context ->
+          let project_id = project_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `DELETE ->
             (delete_projects project_id projects) >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
+               ~string_of_success:(fun () -> "null"))
+          | `GET ->
             bind_projects
               (fun manager -> manager#project_get project_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_project ?len:None)
             )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/parse" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/parse" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
             let project_id = project_ref context in
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
             (fun s ->
@@ -245,120 +241,121 @@ let route
               (fun manager -> manager#project_parse overwrites)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_project_parse ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_project_parse
+                                     ?len:None)
             )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/files" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Mpi_message_j.file_of_string
-            >>= fun file ->
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/files" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; `GET ] in
+        fun ~context:context ->
+          let project_id = project_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Mpi_message_j.file_of_string >>= fun file ->
             bind_projects
-              (fun manager -> manager#file_create file)
-              project_id projects >>=
+              (fun manager -> manager#file_create file) project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
+               ~string_of_success:(Mpi_message_j.string_of_file_metadata
+                                     ?len:None)
             )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/files" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
+          | `GET ->
             bind_projects
               (fun manager -> manager#file_catalog)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_catalog ?len:None))
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/files/{fileid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,file_id) = file_ref context in
+               ~string_of_success:(Mpi_message_j.string_of_file_catalog
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/files/{fileid}" ;
+      Webapp_common.operation =
+        fun ~context:context ->
+          let methods = [ `OPTIONS ; `DELETE ; `GET ; `PUT ] in
+          let (project_id,file_id) = file_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `DELETE ->
             bind_projects
               (fun manager -> manager#file_delete file_id)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/files/{fileid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,file_id) = file_ref context in
+               ~string_of_success:(fun () -> "null"))
+          | `GET ->
             bind_projects
               (fun manager -> manager#file_get file_id)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/files/{fileid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,file_id) = file_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Mpi_message_j.file_modification_of_string
-            >>= fun modif ->
+               ~string_of_success:(Mpi_message_j.string_of_file ?len:None))
+          | `PUT ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Mpi_message_j.file_modification_of_string >>= fun modif ->
             bind_projects
               (fun manager -> manager#file_update file_id modif)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_file_metadata ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation" ;
-       Webapp_common.methods = [ `OPTIONS ; `DELETE ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            let project_id = project_ref context in
+               ~string_of_success:(Mpi_message_j.string_of_file_metadata
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/simulation" ;
+      Webapp_common.operation =
+        fun ~context ->
+          let methods = [ `OPTIONS ; `DELETE ; `GET ; `POST ] in
+          let project_id = project_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `DELETE ->
             bind_projects
               (fun manager -> manager#simulation_delete)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(fun () -> "null")
             )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/trace" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
+          | `GET ->
+            bind_projects
+              (fun manager -> manager#simulation_info)
+              project_id projects >>=
+            (Webapp_common.result_response
+               ~string_of_success:(Mpi_message_j.string_of_simulation_info
+                                     ?len:None))
+          | `POST ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Mpi_message_j.simulation_parameter_of_string >>= fun params ->
+            bind_projects
+              (fun manager -> manager#simulation_start params)
+              project_id projects >>=
+            (Webapp_common.result_response
+               ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/simulation/trace" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_raw_trace)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun out -> out)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/parameter" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
+               ~string_of_success:(fun out -> out))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/parameter" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_parameter)
@@ -366,19 +363,18 @@ let route
             (Webapp_common.result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_simulation_parameter
-                    ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/filelines/{filelinesid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,filelines_id) =
-              field_ref
-                context
-                "filelinesid" in
+                    ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/filelines/{filelinesid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,filelines_id) = field_ref context "filelinesid" in
             bind_projects
               (fun manager -> manager#simulation_detail_file_line
                   (Some filelines_id))
@@ -386,48 +382,51 @@ let route
             (Webapp_common.result_response
                ~string_of_success:
                  (Mpi_message_j.string_of_file_line_detail
-                    ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/fluxmaps/{fluxmapsid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,fluxmaps_id) =
-              field_ref
-                context
-                "fluxmapsid" in
+                    ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/fluxmaps/{fluxmapsid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,fluxmaps_id) = field_ref context "fluxmapsid" in
             bind_projects
               (fun manager -> manager#simulation_detail_flux_map fluxmaps_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/logmessages" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/logmessages" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          let project_id = project_ref context in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             bind_projects
               (fun manager -> manager#simulation_detail_log_message)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_log_message ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/plot" ;
-       (* get args *)
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+               ~string_of_success:(Mpi_message_j.string_of_log_message
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path = "/v2/projects/{projectid}/simulation/plot" ;
+      (* get args *)
+      Webapp_common.operation =
+        fun ~context:context ->
+          let methods = [ `OPTIONS ; `GET ; ] in
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             (* "max_points" "limit_method" *)
             let request = context.Webapp_common.request in
             let uri = Cohttp.Request.uri request in
@@ -458,297 +457,294 @@ let route
                          plot_parameter)
                      project_id projects)) >>=
             (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_plot_detail ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/snapshots/{snapshotid}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let (project_id,snapshot_id) =
-              field_ref
-                context
-                "snapshotid" in
+               ~string_of_success:(Mpi_message_j.string_of_plot_detail
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/snapshots/{snapshotid}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
+            let (project_id,snapshot_id) = field_ref context "snapshotid" in
             bind_projects
               (fun manager -> manager#simulation_detail_snapshot snapshot_id)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_detail
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
-            bind_projects
-              (fun manager -> manager#simulation_info)
-              project_id projects >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_simulation_info
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/efficiency" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/efficiency" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_efficiency)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Counter.Efficiency.string_of_t
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/filelines" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/filelines" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_catalog_file_line)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_file_line_catalog
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/fluxmaps" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/fluxmaps" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_catalog_flux_map)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_flux_map_catalog
-                                     ?len:None)
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/snapshots" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/snapshots" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_catalog_snapshot)
               project_id projects >>=
             (Webapp_common.result_response
                ~string_of_success:(Mpi_message_j.string_of_snapshot_catalog
-                                     ?len:None)
-            )
-         )
-     };
-     (* use the controller pattern *)
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/continue" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+                                     ?len:None))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    (* use the controller pattern *)
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/continue" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `PUT ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `PUT ->
             let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Api_types_j.simulation_parameter_of_string
-            >>= fun params ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Api_types_j.simulation_parameter_of_string >>= fun params ->
             bind_projects
               (fun manager -> manager#simulation_continue params)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/pause" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/pause" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `PUT ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `PUT ->
             let project_id = project_ref context in
             bind_projects
               (fun manager -> manager#simulation_pause)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/simulation/perturbation" ;
-       Webapp_common.methods = [ `OPTIONS ; `PUT ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/simulation/perturbation" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `PUT ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `PUT ->
             let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Api_types_j.simulation_perturbation_of_string
-            >>= fun pert ->
+            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            Api_types_j.simulation_perturbation_of_string >>= fun pert ->
             bind_projects
               (fun manager -> manager#simulation_perturbation pert)
               project_id projects >>=
             (Webapp_common.result_response
-               ~string_of_success:(fun () -> "null")
-            )
-         )
-     };
-     { Webapp_common.path = "/v2/projects/{projectid}/simulation" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
-            let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
-            >|=
-            Mpi_message_j.simulation_parameter_of_string
-            >>= fun params ->
-            bind_projects
-              (fun manager -> manager#simulation_start params)
-              project_id projects >>=
-            (Webapp_common.result_response
-               ~string_of_success:(Mpi_message_j.string_of_simulation_artifact
-                                     ?len:None)
-            )
-         )
-     };
-     (** Static analyses *)
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses" ;
-       Webapp_common.methods = [ `OPTIONS ; `POST ; ] ;
-       Webapp_common.operation =
-         (fun ~context ->
-            let project_id = project_ref context in
-            Cohttp_lwt_body.to_string context.Webapp_common.body >>=
-            fun compil -> tmp_bind_projects
-              (fun manager -> manager#init_static_analyser_raw compil)
-              project_id projects >>= function
-            | Result.Ok () ->
-              let body = "null" in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/contact_map/{accuracy}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+               ~string_of_success:(fun () -> "null"))
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    (** Static analyses *)
+    { Webapp_common.path = "/v2/projects/{projectid}/analyses" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `POST ; ] in
+        fun ~context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `POST ->
+            (let project_id = project_ref context in
+             Cohttp_lwt_body.to_string context.Webapp_common.body >>=
+             fun compil -> tmp_bind_projects
+               (fun manager -> manager#init_static_analyser_raw compil)
+               project_id projects >>= function
+             | Result.Ok () ->
+               let body = "null" in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/contact_map/{accuracy}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id,raw_accuracy = field_ref context "accuracy" in
             let accuracy = Some
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
-            tmp_bind_projects
-              (fun manager -> manager#get_contact_map accuracy)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/contact_map" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+            (tmp_bind_projects
+               (fun manager -> manager#get_contact_map accuracy)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/contact_map" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
-            tmp_bind_projects
-              (fun manager -> manager#get_contact_map None)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/influence_map/{accuracy}" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+            (tmp_bind_projects
+               (fun manager -> manager#get_contact_map None)
+               project_id projects >>= function
+             | Result.Ok r ->
+                let body = Yojson.Basic.to_string r in
+                Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map/{accuracy}" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id,raw_accuracy = field_ref context "accuracy" in
             let accuracy = Some
                 (Public_data.accuracy_of_json
                    (Yojson.Basic.from_string raw_accuracy)) in
-            tmp_bind_projects
-              (fun manager -> manager#get_influence_map accuracy)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/influence_map" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+            (tmp_bind_projects
+               (fun manager -> manager#get_influence_map accuracy)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/influence_map" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
-            tmp_bind_projects
-              (fun manager -> manager#get_influence_map None)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-     };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/dead_rules" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+            (tmp_bind_projects
+               (fun manager -> manager#get_influence_map None)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/dead_rules" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
-            tmp_bind_projects
-              (fun manager -> manager#get_dead_rules)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-       };
-     { Webapp_common.path =
-         "/v2/projects/{projectid}/analyses/constraints" ;
-       Webapp_common.methods = [ `OPTIONS ; `GET ; ] ;
-       Webapp_common.operation =
-         (fun ~context:context ->
+            (tmp_bind_projects
+               (fun manager -> manager#get_dead_rules)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
+    { Webapp_common.path =
+        "/v2/projects/{projectid}/analyses/constraints" ;
+      Webapp_common.operation =
+        let methods = [ `OPTIONS ; `GET ; ] in
+        fun ~context:context ->
+          match context.Webapp_common.request.Cohttp.Request.meth with
+          | `GET ->
             let project_id = project_ref context in
-            tmp_bind_projects
-              (fun manager -> manager#get_constraints_list)
-              project_id projects >>= function
-            | Result.Ok r ->
-              let body = Yojson.Basic.to_string r in
-              Webapp_common.string_response ?headers:None ~status:`OK ~body ()
-            | Result.Error e ->
-              Webapp_common.error_response
-                ?headers:None ?status:None ~errors:[Api_common.error_msg e]
-         )
-       };
+            (tmp_bind_projects
+               (fun manager -> manager#get_constraints_list)
+               project_id projects >>= function
+             | Result.Ok r ->
+               let body = Yojson.Basic.to_string r in
+               Webapp_common.string_response ?headers:None ~status:`OK ~body ()
+             | Result.Error e ->
+               Webapp_common.error_response
+                 ?headers:None ?status:None ~errors:[Api_common.error_msg e])
+          | `OPTIONS -> Webapp_common.options_respond methods
+          | _ -> Webapp_common.method_not_allowed_respond methods
+    };
   ]
