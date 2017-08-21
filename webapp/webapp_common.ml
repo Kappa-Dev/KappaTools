@@ -75,7 +75,7 @@ let method_not_allowed_respond meths =
       "Allow"
       (List.map Cohttp.Code.string_of_method meths) in
   Server.respond
-    ~headers ~status:`Method_not_allowed ~body:Cohttp_lwt.Body.empty ()
+    ~headers ~status:`Method_not_allowed ~body:Cohttp_lwt_body.empty ()
 
 let options_respond methods =
   let meths_str = List.map Cohttp.Code.string_of_method methods in
@@ -88,7 +88,7 @@ let options_respond methods =
   let headers =
     Cohttp.Header.add
       headers "Access-Control-Request-Headers" "X-Custom-Header" in
-  Server.respond ~headers ~status:`OK ~body:Cohttp_lwt.Body.empty ()
+  Server.respond ~headers ~status:`OK ~body:Cohttp_lwt_body.empty ()
 
 
 
