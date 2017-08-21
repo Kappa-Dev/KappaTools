@@ -243,13 +243,14 @@ Please document the variable \texttt{LABLTKLIBREP} in the Makefile.
 \section{General structure}
 A model is represented in Kappa by a set of \emph{Kappa Files}. We use
 KF\index{Kappa file} to denote the union of the files that are given
-as input (to either \KaSim~or \KaSa).
+as input (to either \KaSim, \KaDE~or \KaSa).
 
 Each line of the KF\index{Kappa file} is interpreted as a
 \emph{declaration}\index{declaration}, except if the line ends by
 the~{\textquotesingle} \ttt{$\bs$}{\textquotesingle}
 character. Therefore, in order to write a
-declaration\index{declaration} on several lines, put a \ttt{$\bs$} at the end of each line but the last.
+declaration\index{declaration} on several lines, put a \ttt{$\bs$} at
+the end of each line but the last.
 
 Declarations can be: agent and token \emph{signatures}
 (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}),
@@ -274,19 +275,18 @@ write comments in the middle of a declaration\index{declaration}.
 %
 In Kappa there are two entities that can be used for representing
 biological elements: \imp{agents} and \imp{tokens}.  Agents are used
-to represent complex molecules that may bind to other molecules on
-specific sites. Tokens are typically used to represent small particles
-such as ions, ATP, etc. Tokens cannot bind to each other, they can
-only appear or disappear. In a given model, agents always have a
-discrete number of instances while tokens may have a continuous
-concentration.
+to represent complex entity that may bind to other agents on specific
+sites. Tokens are typically used to represent small particles such as
+ions, ATP, etc. Tokens cannot bind anything, they can only appear or
+disappear. In a given model, agents always have a discrete number of
+instances while tokens may have a continuous concentration.
 
 In order to use agents or tokens in a model, one needs to declare them
 first. \emph{Agent signatures}\index{agent signature} constitute a
 form of typing information about the agents that are used in the
-model. They contain information about the name and number of
-interaction sites the agent has, and about their possible internal
-states. A signature\index{agent signature} is declared in the
+model. They contain information about the name of interaction sites
+the agent has, optionaly site binding capabilities, and about possible
+internal states of sites. A signature\index{agent signature} is declared in the
 KF\index{Kappa file} by the following line: \ITE{
 \item[] \ttt{\%agent: } \textit{signature\_expression} } according to
 the grammar given in Table~\ref{tab:sig} where terminal symbols are
@@ -337,10 +337,15 @@ of the form:
 \section{Sited-graph pattern: Kappa expression}
 
 The state of the system is represented in Kappa as a sited graph: a
-graph where edges use sites in nodes. You must think
-sites as resources. At most one edge of the graph can use a site of
-a node (representing an agent in our case). %We call this concept the
-%\emph{rigidity of Kappa}. %% JF: I disagree: rigidity = an embedding between two ccs is defined by the image of one node. It relies not only on the fact that there is at most one edge on a node, but also on the fact that sites have pairwisely distinct names.
+graph where edges use sites in nodes. You must think sites as
+resources. At most one edge of the graph can use a site of a node
+(representing an agent in our case). Moreover, all the sites of an
+agent must have different names.
+
+This leads to the property that an embedding between 2 sited graphs is
+completely defined by the image of one node. This is absolutly
+critical for the efficiency and We call this concept the
+\emph{rigidity of Kappa}.
 
 \subsection{Graphs}
 The ASCII syntax we use to represent sited graphs follows the
@@ -348,9 +353,10 @@ skeletons (describe formally in Table \ref{tab:patterns}):
 \begin{itemize}
 \item We write the type of the agent and then its interface (the comma
   separeted list of the state of its sites) between parenthesis.
-\item When the site is \emph{free} ({\ie}it is not a member of an edge) you
-  just write its name to represent its state. If it has an internal
-  state, you write it after the symbol  '\intstate'. For example, the following graph:
+\item When the site is \emph{free} ({\ie}it is not a member of an
+  edge) you just write its name to represent its state. If it has an
+  internal state, you write it after the symbol '\intstate'. For
+  example, the following graph:
   \begin{center}
     \includegraphics[bb=0 0 61 57]{gkappa_img/syntax_agent.pdf}
   \end{center}
@@ -365,25 +371,25 @@ skeletons (describe formally in Table \ref{tab:patterns}):
   \ttt{A(x!4,y\intstate{}u!95,z\intstate{}1)},
   \ttt{A(x!95,y\intstate{}u!23,z\intstate{}1)}.
 
-  \Remark{Each link identifier appears exactly twice. %this is a consequence of the regidity of Kappa.
-  }
+  \Remark{Each link identifier appears exactly twice.}
 \end{itemize}
 
 \subsection{Patterns}
 Kappa strength is to describe transformations by only mentionning (and
 storing) the relevant part of the subgraph required for that
-transformation to be possible. This is the \emph{don't
-  care, don't write} (DCDW)\index{don't care don't write} principle which  plays a key role in resisting combinatorial explosion when writing models. If a
-transformation occurs independently from the state of a site of an
+transformation to be possible. This is the \emph{don't care, don't
+  write} (DCDW)\index{don't care don't write} principle which plays a
+key role in resisting combinatorial explosion when writing models. If
+a transformation occurs independently from the state of a site of an
 agent, don't mention it in the \emph{pattern} to match. The pattern
 A(x,z) represents an agent of type A whose sites x and z are free but
 the sites y and z can be in any internal state and the site y can be
 linked or not to anything.
 
 If the link state of a site does not matter but the internal state
-does, the symbol '?' has to be added after the site name (and internal state).
-An agent A whose sites x and z are free, y is in state u and z in
-state 2 is written as A(x,y\intstate{}u?,z\intstate{}2).
+does, the symbol '?' has to be added after the site name (and internal
+state).  An agent A whose sites x and z are free, y is in state u and
+z in state 2 is written as A(x,y\intstate{}u?,z\intstate{}2).
 
 \begin{table}[ht!]
   \centering
@@ -403,19 +409,18 @@ state 2 is written as A(x,y\intstate{}u?,z\intstate{}2).
 In standard Kappa, in order to require a site to be bound for an
 interaction to occur, one may use the
 \emph{semi-link}\index{semi-link} construct \ttt{!\_} which does not
-specify who the partner of the bond is. For instance in the following instruction:
-\lstinline[language=kappa]*%var: 'ab' |A(x!_),B(y!_)|*,
-the variable \var{ab} will count the number of \ttt{A}s and \ttt{B}s connected to some agents,
-including the limit case \ttt{A(x!1),B(y!1)}. It is sometimes
-convenient to specify the \emph{type}\index{link type} of the
-semi-link, in order to restrict the choice of the binding partner. For
-instance, in the following instruction:
-\lstinline[language=kappa]*%var: 'ab' |A(x!y.B),B(y!x.A)|!*,
-the variable \var{ab}
-will count the number of \ttt{A}s whose
-site \ttt{x} is connected to a site \ttt{y} of \ttt{B}, plus the
-number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x}
-of \ttt{A}. Note that this still includes the case
+specify who the partner of the bond is. For instance in the following
+instruction: \lstinline[language=kappa]*%var: 'ab' |A(x!_),B(y!_)|*,
+the variable \var{ab} will count the number of \ttt{A}s and \ttt{B}s
+connected to some agents, including the limit case
+\ttt{A(x!1),B(y!1)}. It is sometimes convenient to specify the
+\emph{type}\index{link type} of the semi-link, in order to restrict
+the choice of the binding partner. For instance, in the following
+instruction: \lstinline[language=kappa]*%var: 'ab'
+|A(x!y.B),B(y!x.A)|!*, the variable \var{ab} will count the number of
+\ttt{A}s whose site \ttt{x} is connected to a site \ttt{y} of \ttt{B},
+plus the number of \ttt{B}s whose site \ttt{y} is connected to a site
+\ttt{x} of \ttt{A}. Note that this still includes the case
 \ttt{A(x!1),B(y!1)}.
 
 \Remark{Transformations on semi-links and links type induce side
@@ -423,6 +428,102 @@ of \ttt{A}. Note that this still includes the case
   can even don't make sense at all. What would mean to remove the link
   to A but not the link to B in the example above? Be careful when
   you use them.}
+
+\section{Algebraic expressions, variables and observables}\label{sec:var}
+
+Several components of a KF\index{Kappa file} will implies algebraic
+expressions. Their syntax are defined in Table~\ref{tab:alg}
+(available symbols for variable, constants and operators are given in
+Table~\ref{tab:operators}).
+
+%%
+\begin{table}[htbp]
+  \centering
+  \caption{Algebraic expressions.}
+  \begin{tabular}{@{} lcl @{}}
+    \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
+     &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
+     &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\
+     &  & $\mid$ \textit{boolean\_expression}  \ttt{[?]} \textit{algebraic\_expression} \\
+     & & \hspace*{2cm} \ttt{[:]} \textit{algebraic\_expression}\\
+  \end{tabular}
+  \label{tab:alg}
+  \end{table}
+The last item of the list is an
+  if-expression. \textit{boolean\_expression} are described in
+  Table~\ref{tab:pert}. Think very carefully whether it is the correct
+  thing to do before using it. Mechanistic conditions have to be expressed in rule bodies not in rule rates!
+
+%%
+
+\begin{table}[htbp]
+\centering
+\caption{Symbols usable in algebraic expressions.%\index{algebraic expression}
+}
+\begin{tabular}{@{} l|l @{} }
+\toprule
+\ttt{\tcb{variable}} & Interpretation \\
+\midrule
+\ttt{[E]} & the total number of (productive) simulation events\index{event}\\
+& since the beginning of the simulation \\
+\ttt{[E-]} & the total number of null events\index{null event}\\
+%\ttt{[Emax]} & the max (productive) event limit as set by \ttt{-l} (in \ttt{-u event} mode) \\ &(note that if unset \ttt{Emax}$=\infty$)\\
+\ttt{[T]} & the bio-time of the simulation \\
+\ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
+%\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l} \\ &(note that if unset \ttt{Tmax}$=\infty$)\\
+\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p} \\
+
+\ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
+\ttt{|t|} & the concentration of token \ttt{t}\\
+\ttt{|\textit{Kappa\_expression}|} & number of occurences of the pattern \textit{Kappa\_expression}\\
+\ttt{inf} & symbol for $\infty$ \\\\
+\toprule
+\ttt{\tcb{unary/binary\_op}} & Interpretation \\
+\midrule
+\ttt{[}$f$\texttt{]} & usual mathematical functions and constants \\ &with $f\in\set{\hbox{\ttt{log,exp,sin,cos,tan,sqrt,pi}}}$ \\
+\ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Z$ \\
+\ttt{+,-,*,/,\textasciicircum} & basic mathematical operators (infix notation)\\
+\ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
+\ttt{[max]} & the \emph{maximum} of two values \\
+\ttt{[min]} & the \emph{minimum} of two values \\
+%\ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
+\bottomrule
+\end{tabular}
+\label{tab:operators}
+\end{table}
+%%
+
+First, it is possible to declare
+\emph{variables}\index{variable} for later use with the declaration: \ITE{
+\item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression})
+} where \ttt{var\_name} can be any string.  For instance the
+declaration\index{declaration}s
+\begin{lstlisting}[language=kappa]
+%var: 'homodimer' |A(x!1),A(x!1)|
+%var: 'aa' 'homodimer'/2
+\end{lstlisting}
+define two variables, the first one tracking the number of embeddings
+of \ttt{A(x!1),A(x!1)} in the graph over time, while the second
+divides this value by 2: the number of automorphisms in
+\ttt{A(x!1),A(x!1)}. Note that variables that are used in the
+expression of another variable must be declared beforehand.
+
+More importantly, \KaSim~may output values of an algebraic expression
+in the data file\index{data file} (see option \ttt{-p} in
+Chapter~\ref{chap:cl}) by using the primitive
+\begin{lstlisting}[language=kappa]
+%plot: 'var_name'
+\end{lstlisting}
+
+One may use the shortcut:
+\ITE{
+\item[] \ttt{\%obs: {\textquotesingle}var\_name{\textquotesingle} }
+  \textit{algebraic\_expression}} to declare a variable and at the
+same time require it to be outputted in the data file\index{data
+  file}.
+
+Algebraic expressions\index{algebraic expression} original purpose being to define kinetic rates\index{kinetic
+  rate} for rules.
 
 \section{Rules}\label{sec:rules}
 
@@ -435,7 +536,8 @@ There are two ways of specifying rules:
     \emph{left hand side}\index{left hand side} (LHS), represents what
     you need to apply the rule. The second, the \emph{right hand
       side}\index{right hand side} (RHS), describes what you obtain
-    once the rule is applied. In Kappa, they are separated by an arrow $\rar$ following the chemical intuition this notation comes from.
+    once the rule is applied. In Kappa, they are separated by an arrow
+    $\rar$ following the chemical intuition this notation comes from.
   \item by giving one {\it Kappa\_expression} with edition. The Kappa
     expression still represents the necessary context for the rule to
     apply. But modifications are specified locally inside the expression.
@@ -444,11 +546,11 @@ There are two ways of specifying rules:
 Both are allowed in Kappa and are described in both next subsections.
 
 In any case, rule specification is optionaly prefixed by a rule name
-(written between two symbols \textquotesingle) and always followed by a rule rate.
-Rate expressions (which include algebraic expressions\index{algebraic
-  expression}) are given by the grammars Table~\ref{tab:rates} and
-Table~\ref{tab:alg} (respectively) but can be thought for now as
-positive real numbers.
+(written between two symbols \textquotesingle) and always followed by
+a rule rate.  Rate expressions (which include algebraic
+expressions\index{algebraic expression}) are given by the grammars
+Table~\ref{tab:rates} and Table~\ref{tab:alg} (respectively) but can
+be thought for now as positive real numbers.
 
 A complete rule in the first representation looks like:
 
@@ -464,8 +566,8 @@ declare a \imp{bi-directional rule} using the convention:
 \item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it Kappa\_expression} $\lrar$ {\it Kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}
 }
 
-The above declaration\index{declaration} is equivalent to
-write, in addition to the rule named \ttt{\var{bi-rule}} and another rule named
+The above declaration\index{declaration} is equivalent to write, in
+addition to the rule named \ttt{\var{bi-rule}} and another rule named
 \ttt{\var{bi-rule\_op}} which swaps left and right hand sides, and has
 rate \textit{rate$^-$}.
 
@@ -493,8 +595,9 @@ Table~\ref{tab:tokens}.
 
 \subsection{Chemical notation rules}\index{chemical notation}
 
-This is the most intuitive representation. Nevertheless, as explained in the
-second paragraph, it is error prone. It also induces duplication of the unmodified context between LHS and RHS which can
+This is the most intuitive representation. Nevertheless, as explained
+in the second paragraph, it is error prone. It also induces
+duplication of the unmodified context between LHS and RHS which can
 lead to even more errors when edition a posteriori on the left are not
 correctly reported on the right.
 
@@ -603,10 +706,12 @@ Both rules will cause \KaSim~to raise a warning at rule compilation time.
 \subsection{Edit notation rules}\index{edit rules}
 
 Near any modified element, modification is specified. Created agents
-are prefixed by a $+$. Degraded agents are prefixed by a $-$. Site modifications are described by writing the new (linking or internal)
-state after the symbol $/$. Therefore, the symbol $/$ alone means that the site becomes
-free, $/!9$ means that the site becomes part of link $9$ and $/\intstate{}zzz$
-means that the new internal state of the site is $zzz$.
+are prefixed by a $+$. Degraded agents are prefixed by a $-$. Site
+modifications are described by writing the new (linking or internal)
+state after the symbol $/$. Therefore, the symbol $/$ alone means that
+the site becomes free, $/!9$ means that the site becomes part of link
+$9$ and $/\intstate{}zzz$ means that the new internal state of the
+site is $zzz$.
 
 Here are all the rules mentioned above (+1 extra) translated in this
 unambiguous notation:
@@ -671,9 +776,18 @@ does not check that the consumed amount of token is available. It
 consumes tokens even if the quantity becomes then negative!
 
 \subsection{Rates}\label{sec:kinetics}
-Kappa rules are equipped with one (or two) \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
+Kappa rules are equipped with one (or two) \emph{kinetic
+  rate(s)}\index{kinetic rate}. A rate is an algebraic
+expression\index{algebraic expression} (often simply a real
+number) evaluated as such, called the \emph{individual-based or
+  stochastic rate constant}\index{kinetic rate!stochastic rate
+  constant}, it is the rate at which the corresponding rule is applied
+per instance of the rule. Its dimension is the inverse of a time
+$[T^{-1}]$.
 
-The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
+The stochastic rate is related to the \emph{concentration-based rate
+  constant}\index{kinetic rate!deterministic rate constant} $k$ of the
+rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered.
 %
 %%We often want to express $\ga$ in {\textquotesingle}{\textquotesingle}per molecule{\textquotesingle}{\textquotesingle} rather than {\textquotesingle}{\textquotesingle}per mole{\textquotesingle}{\textquotesingle}.
@@ -688,31 +802,39 @@ $V$ is the volume where the model is considered,
 ${\cal A}= 6.022\cdot 10^{23}$ is Avogadro' s number, %number of $H$ atoms needed to make up for a gram of $H$,
 $a\geq0$ is the arity of the rule ({\ie}$2$ for a bimolecular rule).
 
-In a modelling context, the constant $k$ is typically expressed using \emph{molars} $M:=\mit{moles}\,l^{-1}$ (or variants thereof such
-as $\mu M$, $nM$), and seconds or minutes. If we choose molars and seconds, $k$' s unit is $\mathit{M}^{1-a}\mathit{s}^{-1}$, as
-follows from the relation \ref{stochrate}.
+In a modelling context, the constant $k$ is typically expressed using
+\emph{molars} $M:=\mit{moles}\,l^{-1}$ (or variants thereof such as
+$\mu M$, $nM$), and seconds or minutes. If we choose molars and
+seconds, $k$' s unit is $\mathit{M}^{1-a}\mathit{s}^{-1}$, as follows
+from the relation \ref{stochrate}.
 
-Concentration-based rates are usually favoured for measurements and/or deterministic models, so it is useful to know how to convert them into
+Concentration-based rates are usually favoured for measurements and/or
+deterministic models, so it is useful to know how to convert them into
 individual-based ones used by KaSim.
 %We refer the reader to \url{http://www.KappaLanguage.org} for a tutorial on kinetic rates.
 Here are typical volumes used in modelling:
 \begin{itemize}
 \item Mammalian cell: $V=2.25\; 10^{-12}l$  ($1l=10^{-3}m^3$), and ${\cal A}V=1.35\; 10^{12}$.
 
-A concentration of $1M$ in a mammalian cell volume corresponds to $1.35\; 10^{12}$ molecules; $1nM\approx 1350$ molecules per cell.
+A concentration of $1M$ in a mammalian cell volume corresponds to
+$1.35\; 10^{12}$ molecules; $1nM\approx 1350$ molecules per cell.
 
 \item
 Yeast cell (haploid): $V=4\; 10^{-14}l$, and ${\cal A}V=2.4\; 10^{10}$.
 
-A concentration of $1M$ in a yeast cell volume corresponds to $2.4\; 10^{10}$ molecules; $1nM\approx 24$ molecules per cell. The volume is doubled in a diploid cell.
+A concentration of $1M$ in a yeast cell volume corresponds to $2.4\;
+10^{10}$ molecules; $1nM\approx 24$ molecules per cell. The volume is
+doubled in a diploid cell.
 \item
 E.\@ Coli cell: $V=10^{-15}l$, and ${\cal A}V=10^{8}$.
 
-A concentration of $1M$ in a yeast cell volume corresponds to $10^{8}$ molecules; $10nM\approx 1$ molecule per cell.
+A concentration of $1M$ in a yeast cell volume corresponds to $10^{8}$
+molecules; $10nM\approx 1$ molecule per cell.
 \end{itemize}
 
-The table \ref{tab:kin_rates} lists typical ranges for deterministic rate constants and
-their stochastic counterparts assuming a mammalian cell volume.
+The table \ref{tab:kin_rates} lists typical ranges for deterministic
+rate constants and their stochastic counterparts assuming a mammalian
+cell volume.
 
 \begin{table}[htbp]
 \centering
@@ -741,28 +863,43 @@ receptor dissociation & $1.6\; 10^{-1}$ & $1.6\; 10^{-1}$ %& $s^{-1}$
 
 \subsection{Ambiguous molecularity}\label{sec:ambiguous}
 
-Using a Kappa rule of the form \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} is not a good practice, where this rule could be applied in a context where \ttt{A} and \ttt{B} are sometimes already connected and sometimes disconnected. This would lead to an inconsistency in the definition of the kinetic rate $\ga$ which should have a volume dependency in the former case and no volume dependency in the latter case ({\eg}see Section~\ref{sec:kinetics}).
+Using a Kappa rule of the form \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} is
+not a good practice, where this rule could be applied in a context
+where \ttt{A} and \ttt{B} are sometimes already connected and
+sometimes disconnected. This would lead to an inconsistency in the
+definition of the kinetic rate $\ga$ which should have a volume
+dependency in the former case and be volume independent in the latter
+case ({\eg}see Section~\ref{sec:kinetics}).
 
-This sort of ambiguity should be resolved, if possible, by refining the ambiguous rule into cases that are either exclusively unary or binary. Each refinement having a kinetic rate that is consistent with its molecularity. Note that in practice, for models having a large number of agents, it is sufficient to assume that the rule \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} will have only binary instances. In this case it suffices to consider the approximate model:
+This sort of ambiguity should be resolved, if possible, by refining
+the ambiguous rule into cases that are either exclusively unary or
+binary. Each refinement having a kinetic rate that is consistent with
+its molecularity. Note that in practice, for models having a large
+number of agents, it is sufficient to assume that the rule
+\ttt{A(x),B(y)$\rar \dots$ @ $\ga$} will have only binary
+instances. In this case it suffices to consider the approximate model:
 \begin{lstlisting}[language=kappa]
 'assumed binary AB' A(x),B(y) -> ... @ 'ga_2'
 'unary AB' A(x,c!1),C(a!1,b!2),B(y,c!2) -> ... @ 'k_1'
 \end{lstlisting}
 
-There exist systems where enumerating unary cases becomes
-impossible or where the approximation on binary instances is wrong. As an alternative, one should use the Kappa notation for ambiguous rules:
+There exist systems where enumerating unary cases becomes impossible
+or where the approximation on binary instances is wrong. As an
+alternative, one should use the Kappa notation for ambiguous rules:
 \ITE{
-\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it Kappa\_expression} $\rar$ {\it Kappa\_expression} \ttt{@} $\ga_2 \{k_1\}$
-}
-which will tell \KaSim~to apply the rule named  \ttt{{\textquotesingle}my rule{\textquotesingle}} with a rate $\ga_2$ for
-binary instances and a rate $k_1$ for unary instances. The obtained
-model will behave exactly as a model in which the ambiguous rule has
-been replaced by unambiguous refinements. However the usage of such
-rule \emph{slowdowns simulation in a significant manner}
-depending on various parameters (such as the presence of large
-polymers in the model). We give below an example of a model utilizing
-binary/unary rates for rules\footnote{This model is available in the
-  source repository \ttt{models/poly.ka}.}.
+\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it
+  Kappa\_expression} $\rar$ {\it Kappa\_expression} \ttt{@} $\ga_2
+  \{k_1\}$ } which will tell \KaSim~to apply the rule named
+\ttt{{\textquotesingle}my rule{\textquotesingle}} with a rate $\ga_2$
+for binary instances and a rate $k_1$ for unary instances.
+
+The obtained model will behave exactly as a model in which the
+ambiguous rule has been replaced by unambiguous refinements. However
+the usage of such rule \emph{slowdowns simulation in a significant
+  manner} depending on various parameters (such as the presence of
+large polymers in the model). We give below an example of a model
+utilizing binary/unary rates for rules\footnote{This model is
+  available in the source repository \ttt{models/poly.ka}.}.
 
 \lstinputlisting[language=kappa]{../models/poly.ka}
 
@@ -779,8 +916,9 @@ that we give in Figure~\ref{fig:species}.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=15cm,bb=0 0 2380 677]{generated_img/poly.png}
-\caption{Final mixture %\index{mixture}
-   obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
+\caption{Final mixture %\index{mixture} obtained after 10,000 events
+  of simulation of the \ttt{poly.ka} model. The infinite rate for
+  cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
 \end{center}
 \end{figure}
@@ -791,9 +929,9 @@ For example in the following rule:
 'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2'{'k1':5}
 \end{lstlisting}
 the unary rate is applied only when the agents $A$ and $B$ are at a
-horizon $5$ (or closer), of each other. Horizon is an algebraic expression. It is always truncated to a positive integer
-during simulation.
-This feature \emph{can change in the future}.
+horizon $5$ (or closer), of each other. Horizon is an algebraic
+expression. It is always truncated to a positive integer during
+simulation.  This feature \emph{can change in the future}.
 
 \begin{table}[ht!]
   \centering
@@ -805,98 +943,10 @@ This feature \emph{can change in the future}.
   \label{tab:rates}
 \end{table}
 
-\section{Variables}\label{sec:var}
-
-In the KF\index{Kappa file} it is also possible to declare \emph{variables}\index{variable} with the declaration:
-\ITE{
-\item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression})
-}
-where \ttt{var\_name} can be any string. Algebraic expressions are defined in Table~\ref{tab:alg} (available symbols for variable, constants and operators are given in  Table~\ref{tab:operators}).
-
-%%
-\begin{table}[htbp]
-  \centering
-  \caption{Algebraic expressions.}
-  \begin{tabular}{@{} lcl @{}}
-    \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
-     &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
-     &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\
-     &  & $\mid$ \textit{boolean\_expression}  \ttt{[?]} \textit{algebraic\_expression} \\
-     & & \hspace*{2cm} \ttt{[:]} \textit{algebraic\_expression}\\
-  \end{tabular}
-  \label{tab:alg}
-  \end{table}
-The last item of the list is an
-  if-expression. \textit{boolean\_expression} are described in
-  Table~\ref{tab:pert}. Think very carefully whether it is the correct
-  thing to do before using it. Mechanistic conditions have to be expressed in rule bodies not in rule rates!
-
-%%
-
-
-\begin{table}[htbp]
-\centering
-\caption{Symbols usable in algebraic expressions.%\index{algebraic expression}
-}
-\begin{tabular}{@{} l|l @{} }
-\toprule
-\ttt{\tcb{variable}} & Interpretation \\
-\midrule
-\ttt{[E]} & the total number of (productive) simulation events\index{event}\\
-& since the beginning of the simulation \\
-\ttt{[E-]} & the total number of null events\index{null event}\\
-\ttt{[Emax]} & the max (productive) event limit as set by \ttt{-l} (in \ttt{-u event} mode) \\ &(note that if unset \ttt{Emax}$=\infty$)\\
-\ttt{[T]} & the bio-time of the simulation \\
-\ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
-\ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-l} \\ &(note that if unset \ttt{Tmax}$=\infty$)\\
-\ttt{[pp]} & the number of requested plotting interval set by the option \ttt{-p} \\
-
-\ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
-\ttt{|t|} & the concentration of token \ttt{t}\\
-\ttt{|\textit{Kappa\_expression}|} & number of occurences of the pattern \textit{Kappa\_expression}\\
-\ttt{inf} & symbol for $\infty$ \\\\
-\toprule
-\ttt{\tcb{unary/binary\_op}} & Interpretation \\
-\midrule
-\ttt{[}$f$\texttt{]} & usual mathematical functions and constants \\ &with $f\in\set{\hbox{\ttt{log,exp,sin,cos,tan,sqrt,pi}}}$ \\
-\ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Z$ \\
-\ttt{+,-,*,/,\textasciicircum} & basic mathematical operators (infix notation)\\
-\ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
-\ttt{[max]} & the \emph{maximum} of two values \\
-\ttt{[min]} & the \emph{minimum} of two values \\
-%\ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
-\bottomrule
-\end{tabular}
-\label{tab:operators}
-\end{table}
-%%
-
-\noi For instance the declaration\index{declaration}s
-\begin{lstlisting}[language=kappa]
-%var: 'homodimer' |A(x!1),A(x!1)|
-%var: 'aa' 'homodimer'/2
-\end{lstlisting}
-define two variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. Note that variables that are used in the expression of another variable must be declared beforehand.
-\vskip 0.25cm
-\noi It is also possible to use algebraic expressions\index{algebraic expression} as kinetic rates\index{kinetic rate} as in
-\begin{lstlisting}[language=kappa]
-%var: 'k_on' 1.0E-6 # per molecule per second
-'ab' A(x),A(x) -> A(x!1),A(x!1) @ 'k_on'/2
-\end{lstlisting}
-%%
-\KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-p} in Chapter~\ref{chap:cl}) by using plot. Do:
-\begin{lstlisting}[language=kappa]
-%plot: 'var_name'
-\end{lstlisting}
-One may use the shortcut:
-\ITE{
-\item[] \ttt{\%obs: {\textquotesingle}var\_name{\textquotesingle} } \textit{algebraic\_expression}}
-to declare a variable and at the same time require it to be outputted in the data file\index{data file}.
-
 \section{Initial conditions}\label{sec:init}\index{initial condition}
 
-The initial mixture\index{mixture} to which rules in the KF\index{Kappa file} will be applied are declared as follows:
-\ITE{
+The initial mixture\index{mixture} to which rules in the
+KF\index{Kappa file} will be applied are declared as follows: \ITE{
 \item[] \ttt{\%init: } \textit{algebraic\_expression} \textit{Kappa\_expression}
 }
 %% or:
@@ -909,14 +959,26 @@ or:
 }
 
 %%
-where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and Kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model multiple copies of the graph described by the Kappa expression. The DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
+where \textit{algebraic\_expression} is evaluated before
+initialization of the simulation (hence all token and Kappa expression
+values in the expression are evaluated to 0). This will add to the
+initial state of the model multiple copies of the graph described by
+the Kappa expression. The DCDW convention\index{don't care don't
+  write} allows us not to write the complete interface of added agents
+(the remaining sites will be completed according to the agent's
+signature\index{agent signature}). For instance:
 \begin{lstlisting}[language=kappa]
 %var: 'n' 1000
 %init: 'n' A(),A(y~p)
 %init: 0.39 ca2+ #mM
 \end{lstlisting}
-will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation by using the expression \ttt{|ca2+|}.
-As any other declaration\index{declaration}, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
+will add 1000 instances of \ttt{A} in its default state
+\ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in
+state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39
+mM of calcium ions. Recall that the concentration of calcium can be
+observed during simulation by using the expression \ttt{|ca2+|}.  As
+any other declaration\index{declaration}, \ttt{\%init} can be used
+multiple times, and agents will add up to the initial state.
 
 
 \chapter{The command line}\label{chap:cl}
