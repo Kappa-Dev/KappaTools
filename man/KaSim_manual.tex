@@ -980,6 +980,212 @@ observed during simulation by using the expression \ttt{|ca2+|}.  As
 any other declaration\index{declaration}, \ttt{\%init} can be used
 multiple times, and agents will add up to the initial state.
 
+\section{Perturbation language}\label{sec:mod}
+Intervening on a simulation is allowed in KaSim throught the
+\emph{perturbation} language.
+
+Each perturbation is splitted in 4 parts:
+\begin{description}
+\item[clock] When trying to intervene should be tried
+\item[condition] what is the condition under which the intervention is triggered
+\item[intervention] what are the intervention
+\item[repeatition] if the perturpation is triggered, under what
+  condition should it be still tried afterward
+\end{description}
+
+\subsection{syntax}
+The general syntax is
+\ITE{
+\item[] \ttt{\%mod:} \textit{alarm} \textit{boolean\_expression} \ttt{do} \textit{effect\_list} \ttt{repeat} \textit{boolean\_expression}
+}
+for
+\ITE{
+\item[] \ttt{\%mod:} \textit{clock} \textit{condition} \ttt{do} \textit{intervention} \ttt{repeat} \textit{repeatition}
+}
+
+and syntaxtic sugar detailled below is provided.
+
+\textit{Boolean\_expression} and \textit{effect\_list}\index{effect} are defined by the grammar given  Table~\ref{tab:pert} (the operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions\index{algebraic expression} are defined Table~\ref{tab:alg}).
+
+\begin{table}[htbp]
+  \centering
+  \caption{Perturbation expressions.}
+  \begin{tabular}{@{} lcl @{}}
+    \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
+    && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
+    && | (\textit{boolean\_expression} \tcb{\&\&} \textit{boolean\_expression}) \\
+    && | \tcb{[not]} \textit{boolean\_expression} \\
+    && | \tcb{[true]} | \tcb{[false]} \\\\
+    \textit{effect\_list} &::=& \textit{effect} \tcb{\ttt {;}} \textit{effect\_list} | \textit{effect} \\\\
+\textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
+    && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
+    && | \textit{token\_name} \tcb{<-} \textit{algebraic\_expression} \\
+    && | \tcb{\$SNAPSHOT} \textit{string\_expression}\\
+    && | \tcb{\$STOP} \textit{string\_expression}\\
+	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
+    && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
+    && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
+    && | \tcb{\$PLOTENTRY} \\
+    && | \tcb{\$PRINT} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
+    && | \tcb{\$SPECIES\_OFF} \textit{string\_expression} \textit{Kappa\_expression} \textit{boolean} \\
+    \\
+    \textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
+    && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
+	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
+  \end{tabular}
+  \label{tab:pert}
+\end{table}
+
+There are 2 kind of clocks, an event based one and simulation time ones.
+
+The event based one has the empty string for syntax: if nothing is
+written for clock, it uses the event based clock. It fires at the
+beginning of the simulation and every time a rule has just fired.
+
+The time based one syntax is \ttt{alarm} \textit{float}, it fires
+every amount of time unit given by the float (including at [T]=0).
+
+For example
+\lstinline[language=kappa]@%mod: alarm 2.3 [true] do $PLOTNOW repeat [true]@
+will print a line in the data file every 2.3 time unit of
+simulation whereas
+\lstinline[language=kappa]@%mod: |A()| > 1000 do $PLOTNOW repeat |B(x!_)| < |B(x)|@
+will do it every event where there is more than
+1000 A up to the first event where (there is more than 1000 A and)
+the number of \lstinline[language=kappa]@|B(x!_)|@ becomes bigger than the number of
+\lstinline[language=kappa]@|B(x)|@.
+
+When the conditions of several perturbations that are tested at the
+same moment are satisfied simultanously, perturbations are triggered
+in the order in which they have been declared in the KF\index{Kappa
+  file}. A perturbation can only be fired once per event loop.
+
+\subsection{shortcuts}
+If the repeat keyword and the repeat condition are ommited, it is assumed that it is
+\lstlisting[language=kappa]!repeat [false]! aka a one-shot perturbation.
+
+If the (pre)condition is ommited it is considerated to be
+\lstlisting[language=kappa]![true]! unless both conditions are ommited
+and a clock is provided. In this case the implicit condition is
+\lstlisting[language=kappa]![T] > 0! so that
+\lstlisting[language=kappa]!%mod: alarm 5.8 do effects!
+is somehow a 'at' operator. It means ``do \texttt{effects} at [T] = 5.8''.
+
+\subsection{Model modification}
+\subsubsection{Adding or deleting agents during a simulation}
+
+Continuing with the ABC model, the perturbation effect\index{effect}:
+\lstinline[language=kappa]*$ADD n C(x1~p)*
+will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
+\lstinline[language=kappa]*$DEL |B(x!_)| B(x!_)*
+will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
+
+There are various ways one can use perturbations to study more deeply a given Kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
+\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
+
+The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
+Running again a simulation (a bit longer) by entering in the command line:
+\ttt{
+\ITE{
+\item[\$] KaSim ABC-pert.ka -l 300 -p 0.3 -o abc2.out
+}}
+one obtains the curve given in Fig.~\ref{fig:abc2}.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=10cm]{generated_img/plot-abc2.png}
+\caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
+\label{fig:abc2}
+\end{center}
+\end{figure}
+
+\subsubsection{Changing the value of a token}
+The concentration of any token can be reset on the fly using a perturbation. For instance the declaration\index{declaration}:
+\lstinline[language=kappa]!%mod: repeat (|a|<100 do a <- |a|*2) until [false]!
+will double the concentration of token \ttt{a} each time it gets below 100.
+
+
+\subsubsection{Updating kinetic rates on the fly}
+
+Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0!
+
+This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
+\noi will cause the on rate of all rules to decrease a hunderd fold. Note that it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
+\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
+\noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity.
+
+\subsubsection{Interrupt simulation}
+The perturbation \ttt{\$STOP} will interrupt the simulation. It
+returns the hand to the user if you run in interactive mode or
+terminates the run in batch mode.
+
+The perturbation \ttt{\$STOP "final\_state.ka"} will in addition
+produce a snapshot of the last mixture\index{mixture}.
+
+\subsection{Model examination}
+Advanced and/or experimental examinations are listed in chapter \ref{chap:advanced}.
+
+\subsubsection{Get a snapshot of the mixture}
+
+A snapshot is an instant photography of the current state of the
+mixture (a dump of the state at a given moment in the simulation).
+
+A snapshot is suatable as an initial condition for a model.
+In the previous example, we let the system evolve for some time
+without its main reactant \ttt{C} in order to let other reactants go
+to a less arbitrary initial state. One may object that this way of
+proceeding is CPU-time consuming if one has to do this at each
+simulation.
+
+An alternative is to use the \ttt{\$SNAPSHOT} primitive
+that allows a user to export a snapshot of the mixture\index{mixture}
+at a given time point as a new (piece of) Kappa file.  For instance,
+the declaration\index{declaration}: \lstinline[language=kappa]*%mod:
+[E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"* will ask \KaSim~to export
+the mixture\index{mixture} the first time the percentage of null
+events reaches 90\%. The exported file will be named
+\ttt{prefix\_$n$.ka} where $n$ is the event number at which the
+snapshot was taken. One may also use a \textit{string\_expression} to
+construct any prefix using local variables.
+
+One may omit to define a prefix and simply type:
+\lstinline[language=kappa]!%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT!
+in which case the default prefix \ttt{snap.ka} will be used for naming snapshots.
+
+If the name already exists a counter will be appended at the end of
+the file to prevent overwriting. Snapshots can be performed multiple
+times, for instance every 1,000 events, using the
+declaration\index{declaration}:
+\begin{lstlisting}[language=kappa]
+%mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" until [false]
+\end{lstlisting}
+which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
+
+Note that instead of producing Kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
+
+\subsubsection{Printing values during a simulation}
+The effect \ttt{\$PRINT \textit{string\_expression}
+  <\textit{string\_expression}>} enables one to output values during a
+computation to:
+\begin{itemize}
+\item standard output if the first \textit{string\_expression} is empty,
+\item to the file specified by the first \textit{string\_expression} otherwise.
+\end{itemize}
+For instance:
+{\begin{lstlisting}[language=kappa]
+%mod: repeat \
+ |A|<0 do $PRINT "token_".[E].".dat" <"Token A is: " . |A| . " at time=". [T]>\
+until [false]
+\end{lstlisting}} will ask \KaSim~to output the value of token \ttt{A} in a file
+"token\_$n$.dat" which changes at each new productive event, each time
+its value gets below 0.
+
+\subsubsection{Add an entry in the output data}
+The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
+\lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY until [false]!
+will store the value of observables every 10 productive events.
 
 \chapter{The command line}\label{chap:cl}
 
@@ -1163,161 +1369,7 @@ We will use this model as a running example for the next chapter, in order to il
 
 \chapter{Advanced concepts}\label{chap:advanced}
 
-\section{Perturbation language}\label{sec:mod}
-
-It is possible to trigger a \emph{perturbation}\index{perturbation} of
-the simulation when a \textit{precondition}\index{precondition} (depending on the
-variables\index{variable} of the model) is satisfied.
-
-By default, a perturbation is applied as soon as its precondition is
-satisfied and then discarded. Such perturbation is called \emph{"one
-  shot"}\index{perturbation!one shot}. It is however possible to
-re-apply the same perturbation each time its precondition is
-satisfied and until a certain condition is met, using the \ttt{repeat
-  ... until} constructors.
-
-When the preconditions of several perturbations are satisfied at the
-same time, perturbations are triggered in the order in which they have
-been declared in the KF\index{Kappa file}. A perturbation can only be
-fired once per event loop.
-
-Basic perturbations are obtained using the declaration \index{declaration}:
-\ITE{
-\item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect\_list}
-}
-and may be applied repeatedly using:
-\ITE{
-\item[] \ttt{\%mod:} \ttt{repeat} \textit{boolean\_expression} \ttt{do} \textit{effect\_list} \ttt{until} \textit{boolean\_expression}
-}
-where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are defined by the grammar given  Table~\ref{tab:pert} (the operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions\index{algebraic expression} are defined Table~\ref{tab:alg}).
-
-\begin{table}[htbp]
-  \centering
-  \caption{Perturbation expressions.}
-  \begin{tabular}{@{} lcl @{}}
-  	\textit{perturbation\_expression} &::=& \tcb{\ttt{\%mod:}} \textit{perturbation} \\
-	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\
-        && | \tcb{\ttt{\%mod:}} \tcb{\ttt{every}} \tcb{$x\in\Real$} \textit{boolean\_expression} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\
-
-    \textit{perturbation} &::=& \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect\_list} \\\\
-    \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
-    && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
-    && | (\textit{boolean\_expression} \tcb{\&\&} \textit{boolean\_expression}) \\
-    && | \tcb{[not]} \textit{boolean\_expression} \\
-    && | \tcb{[true]} | \tcb{[false]} \\\\
-    \textit{effect\_list} &::=& \textit{effect} \tcb{\ttt {;}} \textit{effect\_list} | \textit{effect} \\\\
-\textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
-    && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
-    && | \textit{token\_name} \tcb{<-} \textit{algebraic\_expression} \\
-    && | \tcb{\$SNAPSHOT} \textit{string\_expression}\\
-    && | \tcb{\$STOP} \textit{string\_expression}\\
-	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
-    && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
-    && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
-    && | \tcb{\$PLOTENTRY} \\
-    && | \tcb{\$PRINT} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
-    && | \tcb{\$SPECIES\_OFF} \textit{string\_expression} \textit{Kappa\_expression} \textit{boolean} \\
-    \\
-    \textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
-    && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
-	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
-  \end{tabular}
-  \label{tab:pert}
-\end{table}
-
-A example of boolean expression used as a precondition is
-\begin{lstlisting}[language=kappa]
-%mod: ([T]>10) && ('v1' / 'v2') > 1 do ...
-\end{lstlisting}
-
-It indicates the wish to trigger a perturbation whenever the simulation
-time has passed 10 time units and the ratio of variables \ttt{v1} over
-\ttt{v2} is above 1. Recall that the perturbations are "one shot"
-interventions on the simulation. Possible interventions are described
-in the following sections using examples.
-
-\textbf{Note on time dependent preconditions.}
-\\Consider a perturbation of the form:
-\ITE{
-\item[] \ttt{\%mod: {\it f}(t)={\it x} do $\dots$}
-}
-where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general with a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve.
-
-There are only two types of time dependent precondition allowed in \KaSim~:
-\ITE{
- \item[-] an equality test of the form $\mathtt{[T]=}n$ with $n\in\Nat$. For instance:
-   \lstinline[language=kappa]*\%mod: [T]=10 do $STOP*
-   will interrupt the simulation after exactly 10 time units.
- \item[-] a periodic perturbation declared with the keyword \tcb{\ttt{every}}. The following perturbation
-   \lstinline[language=kappa]*\%mod: every 1.5 do $SNAPSHOT ``file.ka'' until ([T] < 14.0)*
-   is applied at the beginning of the simulation and every 1.5 time units, for 14 time units. The user can therefore interrupt the simulation periodically to test the time. A perturbation of the form
-   \ITE{
-   \item[] \ttt{\%mod: every {\it x} {\it f}(t)={\it y} do $\dots$ until $\dots$}}
-   allows the user to apply a function of time every x time units.
-}
-
-
-\subsection{Adding or deleting agents during a simulation}
-
-Continuing with the ABC model, the perturbation effect\index{effect}:
-\lstinline[language=kappa]*$ADD n C(x1~p)*
-will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
-\lstinline[language=kappa]*$DEL |B(x!_)| B(x!_)*
-will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}.
-
-There are various ways one can use perturbations to study more deeply a given Kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the Kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
-\lstinline[language=kappa]*%mod:  [T]=25 do $ADD 10000 C()*.
-
-The modified Kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}).
-Running again a simulation (a bit longer) by entering in the command line:
-\ttt{
-\ITE{
-\item[\$] KaSim ABC-pert.ka -l 300 -p 0.3 -o abc2.out
-}}
-one obtains the curve given in Fig.~\ref{fig:abc2}.
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=10cm]{generated_img/plot-abc2.png}
-\caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
-\label{fig:abc2}
-\end{center}
-\end{figure}
-
-\subsection{Get a snapshot of the mixture (to define a new initial state)}
-
-A snapshot is an instant photography of the current state of the mixture (a dump of the state at a given moment in the simulation).
-
-In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) Kappa file.
-For instance, the declaration\index{declaration}:
-\lstinline[language=kappa]*%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
-will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables.
-
-One may omit to define a prefix and simply type:
-\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT!
-in which case the default prefix \ttt{snap.ka} will be used for naming snapshots.
-
-If the name already exists a counter will be appended at the end of
-the file to prevent overwriting. Snapshots can be performed multiple
-times, for instance every 1,000 events, using the
-declaration\index{declaration}:
-\begin{lstlisting}[language=kappa]
-%mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" until [false]
-\end{lstlisting}
-which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
-
-Note that instead of producing Kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
-
-\subsection{Interrupt simulation}
-The perturbation \ttt{\$STOP "final\_state.ka"} will terminate the
-simulation whenever its precondition is satisfied and produce a
-snapshot of the last mixture\index{mixture}.
-
-\subsection{Changing the value of a token}
-The concentration of any token can be reset on the fly using a perturbation. For instance the declaration\index{declaration}:
-\lstinline[language=kappa]!%mod: repeat (|a|<100 do a <- |a|*2) until [false]!
-will double the concentration of token \ttt{a} each time it gets below 100.
-
+\section{Experimental examination}
 \subsection{Causality analysis}\label{sec:cflows}
 
 In our ABC example, adding the instruction:
@@ -1345,35 +1397,7 @@ The type of compression can be set using the \texttt{\%def} instruction (see Sec
 \lstinline[language=kappa]!%def: "displayCompression" "none" "weak" "strong"!
 will ask \KaSim~to output 3 versions of each computed causal flow, with all possible degrees of compressions. Each causal flow is outputted into a file \texttt{[filename][Type]\_$n$.dot} where \texttt{filename} is the default name for causal flows which can be redefined using the parameter \texttt{cflowFileName}, \texttt{Type} is the type of compression (either nothing or \texttt{Strongly}, or \texttt{Weakly}) and $n$ is the identifier of the causal flow. For each compression type a summary file, named \texttt{[filename][Type]Summary.dat}, is also produced. It allows to map each compressed causal flow to the identifier of its uncompressed version (row \texttt{\#id}), together with the production time $T$ and event number $E$ at which the observable was produced. It also contains information about the size of the causal flow.
 
-\subsection{Flux maps}
-
-\begin{figure}[p] %  figure placement: here, top, bottom, or page
-   \centering
-\includegraphics[width=15cm,bb=0 0 921 793]{generated_img/flux.png}
-   \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
-   \label{fig:flux}
-\end{figure}
-%%
-The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) at every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
-\begin{lstlisting}[language=kappa]
-%mod: [true] do $FLUX "flux.dot" [true]
-%mod: [T]>20 do $FLUX "flux.dot" [false]
-\end{lstlisting}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
-
-
-\subsection{Updating kinetic rates on the fly}
-
-Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 0.0!
-
-This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'k_on' 'k_on'/100!
-\noi will cause the on rate of all rules to decrease a hunderd fold. Note that it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
-\lstinline[language=kappa]!%mod: 'Cpp' > 500 do $UPDATE 'a.b' inf!
-\noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity.
-
-\subsection{Combining several effects in a single perturbation}
+\subsubsection{Limit the number of flows}
 As an example, consider the computation of causal flows between $t=10$ and $t=20$ using the declarations:
 \begin{lstlisting}[language=kappa]
 %mod: [T]>10 do $TRACK 'Cpp' [true]
@@ -1389,29 +1413,22 @@ The above declaration will ask \KaSim~to analyze each new occurrence of \var{Cpp
 The first line is a declaration of an $x$ variable that is initially set to 0. Note that the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$).
 
-\subsection{Printing values during a simulation}
-The effect \ttt{\$PRINT \textit{string\_expression}
-  <\textit{string\_expression}>} enables one to output values during a
-computation to:
-\begin{itemize}
-\item standard output if the first \textit{string\_expression} is empty,
-\item to the file specified by the first \textit{string\_expression} otherwise.
-\end{itemize}
-For instance:
-{\begin{lstlisting}[language=kappa]
-%mod: repeat \
- |A|<0 do $PRINT "token_".[E].".dat" <"Token A is: " . |A| . " at time=". [T]>\
-until [false]
-\end{lstlisting}} will ask \KaSim~to output the value of token \ttt{A} in a file
-"token\_$n$.dat" which changes at each new productive event, each time
-its value gets below 0.
 
-\ignore$
+\subsection{Flux maps}
 
-\subsection{Add an entry in the output data}
-The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
-\lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY until [false]!
-will store the value of observables every 10 productive events.
+\begin{figure}[p] %  figure placement: here, top, bottom, or page
+   \centering
+\includegraphics[width=15cm,bb=0 0 921 793]{generated_img/flux.png}
+   \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
+   \label{fig:flux}
+\end{figure}
+%%
+The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) at every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
+\begin{lstlisting}[language=kappa]
+%mod: [true] do $FLUX "flux.dot" [true]
+%mod: [T]>20 do $FLUX "flux.dot" [false]
+\end{lstlisting}
+The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produces a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
 
 \subsection{Print species of an observable}
 The effect \ttt{\$SPECIES\_OFF} tracks the occurrence of an observable. Each time a new instance of the observable appears, the \emph{species} in which it occured is printed in a file. For example
