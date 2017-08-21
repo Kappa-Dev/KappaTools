@@ -416,8 +416,8 @@ connected to some agents, including the limit case
 \ttt{A(x!1),B(y!1)}. It is sometimes convenient to specify the
 \emph{type}\index{link type} of the semi-link, in order to restrict
 the choice of the binding partner. For instance, in the following
-instruction: \lstinline[language=kappa]*%var: 'ab'
-|A(x!y.B),B(y!x.A)|!*, the variable \var{ab} will count the number of
+instruction: \lstinline[language=kappa]*%var: 'ab' |A(x!y.B),B(y!x.A)|!*,
+the variable \var{ab} will count the number of
 \ttt{A}s whose site \ttt{x} is connected to a site \ttt{y} of \ttt{B},
 plus the number of \ttt{B}s whose site \ttt{y} is connected to a site
 \ttt{x} of \ttt{A}. Note that this still includes the case
@@ -1142,8 +1142,9 @@ simulation.
 An alternative is to use the \ttt{\$SNAPSHOT} primitive
 that allows a user to export a snapshot of the mixture\index{mixture}
 at a given time point as a new (piece of) Kappa file.  For instance,
-the declaration\index{declaration}: \lstinline[language=kappa]*%mod:
-[E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"* will ask \KaSim~to export
+the declaration\index{declaration}:
+\lstinline[language=kappa]*%mod: [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
+will ask \KaSim~to export
 the mixture\index{mixture} the first time the percentage of null
 events reaches 90\%. The exported file will be named
 \ttt{prefix\_$n$.ka} where $n$ is the event number at which the
@@ -1163,7 +1164,11 @@ declaration\index{declaration}:
 \end{lstlisting}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends.
 
-Note that instead of producing Kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
+Note that instead of producing Kappa files, one may use snapshot
+perturbations to produce an image of the mixture\index{mixture} in the
+dot/html format using the parameter by specifying the extention in the
+name skeleton
+(\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "snap.dot"!).
 
 \subsubsection{Printing values during a simulation}
 The effect \ttt{\$PRINT \textit{string\_expression}
