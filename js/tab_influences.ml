@@ -292,7 +292,7 @@ let content () =
                         s] (* ] *) in
                     ())
                  (manager#get_local_influence_map
-                    ?fwd ?bwd ~total ~origin acc)) >>=
+                    ?fwd ?bwd ?origin ~total acc)) >>=
               fun out -> Lwt.return (Api_common.result_lift out)
            ))
       (React.S.on tab_is_active

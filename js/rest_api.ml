@@ -448,7 +448,7 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_local_influence_map accuracy ?fwd ?bwd ~total ~origin =
+  method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
     send
       ?timeout
       (let s  =
