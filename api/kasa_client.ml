@@ -73,7 +73,7 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
       Lwt_result.bind_result
         (self#message post request)
         (fun x -> Result.Ok x)
-    method get_local_influence_map accuracy ?fwd ?bwd ~total ~origin =
+    method get_local_influence_map accuracy ?fwd ?bwd ?origin ~total =
           let request =
             `List ( `String "INFLUENCE_MAP" :: (
                 (fun accuracy l ->

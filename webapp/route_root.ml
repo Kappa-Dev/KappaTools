@@ -100,6 +100,21 @@ let delete_projects (project_id : Api_types_j.project_id) projects :
     let () = m#terminate in
     Lwt.return (Api_common.result_ok ())
 
+let influence_node_of_string =
+  let rule_re =
+    Re.compile
+      (Re.whole_string
+         (Re.seq [Re.str "_rule_"; Re.group (Re.rep1 Re.digit)])) in
+  let var_re =
+    Re.compile
+      (Re.whole_string
+         (Re.seq [Re.str "_var_"; Re.group (Re.rep1 Re.digit)])) in
+  fun node_id -> match Re.exec_opt rule_re node_id with
+    | Some g -> Public_data.Rule (Re.Group.get g 1 |> int_of_string)
+    | None ->
+      Public_data.Var
+        (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string)
+
 let route
     ~(shutdown_key: string option)
   : Webapp_common.route_handler list =
@@ -655,16 +670,14 @@ let route
             let bwd = Option_util.map int_of_string (query "bdw") in
             let total = Option_util.map int_of_string (query "total") in
             let origin =
-              Option_util.map
-                (fun x -> Yojson.Basic.from_string x)
-                (query "origin") in
+              Option_util.map influence_node_of_string (query "origin") in
             tmp_bind_projects
               (fun manager ->
-                 match total, origin with
-                 | Some total, Some origin ->
+                 match total with
+                 | Some total ->
                    manager#get_local_influence_map
-                     accuracy ?fwd ?bwd ~total ~origin
-                 | _, _ -> manager#get_influence_map accuracy)
+                     accuracy ?fwd ?bwd ?origin ~total
+                 | _ -> manager#get_influence_map accuracy)
               project_id projects >>=
             Webapp_common.result_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
@@ -696,22 +709,10 @@ let route
           | `GET ->
             let (project_id,node_id) = field_ref context "nodeid" in
             let node =
-              let rule_re =
-                Re.compile
-                  (Re.whole_string
-                     (Re.seq [Re.str "_rule_"; Re.group (Re.rep1 Re.digit)])) in
-              let var_re =
-                Re.compile
-                  (Re.whole_string
-                     (Re.seq [Re.str "_var_"; Re.group (Re.rep1 Re.digit)])) in
-              match Re.exec_opt rule_re node_id with
-              | Some g -> Public_data.Rule (Re.Group.get g 1 |> int_of_string)
-              | None ->
-                Public_data.Var
-                  (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
-            let node_json = Public_data.short_influence_node_to_json node in
+              if node_id = "" then None
+              else Some (influence_node_of_string node_id) in
             tmp_bind_projects
-              (fun manager -> manager#get_next_node node_json)
+              (fun manager -> manager#get_next_node node)
               project_id projects >>=
             Webapp_common.result_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)
@@ -727,22 +728,10 @@ let route
           | `GET ->
             let (project_id,node_id) = field_ref context "nodeid" in
             let node =
-              let rule_re =
-                Re.compile
-                  (Re.whole_string
-                     (Re.seq [Re.str "_rule_"; Re.group (Re.rep1 Re.digit)])) in
-              let var_re =
-                Re.compile
-                  (Re.whole_string
-                     (Re.seq [Re.str "_var_"; Re.group (Re.rep1 Re.digit)])) in
-              match Re.exec_opt rule_re node_id with
-              | Some g -> Public_data.Rule (Re.Group.get g 1 |> int_of_string)
-              | None ->
-                Public_data.Var
-                  (Re.Group.get (Re.exec var_re node_id) 1 |> int_of_string) in
-            let node_json = Public_data.short_influence_node_to_json node in
+              if node_id = "" then None
+              else Some (influence_node_of_string node_id) in
             tmp_bind_projects
-              (fun manager -> manager#get_previous_node node_json)
+              (fun manager -> manager#get_previous_node node)
               project_id projects >>=
             Webapp_common.result_response
               ~string_of_success:(fun x -> Yojson.Basic.to_string x)

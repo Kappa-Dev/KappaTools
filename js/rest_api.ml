@@ -458,14 +458,14 @@ class manager
          | None -> ""
        in
        Format.sprintf
-         "%s/v2/projects/%s/analyses/influence_map?origin=%s&total=%i%s%s%s"
-         url project_id
+         "%s/v2/projects/%s/analyses/influence_map?total=%i%s%s%s%s"
+         url project_id total
          (
            match origin with
-           | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
-           | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
-           | None -> "_undefined"
-         ) total s
+           | Some (Public_data.Rule i) -> "&origin=_rule_"^(string_of_int i)
+           | Some (Public_data.Var i) -> "&origin=_var_"^(string_of_int i)
+           | None -> ""
+         ) s
          (match fwd with None -> "" | Some i -> "&fwd="^string_of_int i)
          (match bwd with None -> "" | Some i -> "&bwd="^string_of_int i)
       )
@@ -506,7 +506,7 @@ class manager
             match short_id_opt with
             | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
             | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
-            | None -> "_undefined"
+            | None -> ""
           )
       )
       `GET
@@ -529,7 +529,7 @@ class manager
             match short_id_opt with
              | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
              | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
-             | None -> "_undefined")
+             | None -> "")
            )
       `GET
       (fun x -> Yojson.Basic.from_string x)

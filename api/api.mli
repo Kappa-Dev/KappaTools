@@ -111,9 +111,8 @@ class type virtual manager_static_analysis = object
   method get_influence_map :
     Public_data.accuracy_level option -> (Yojson.Basic.json,string) Lwt_result.t
   method get_local_influence_map :
-    Public_data.accuracy_level option ->
-    ?fwd:int -> ?bwd:int -> total:int ->
-    origin:(int,int) Public_data.influence_node option ->
+    Public_data.accuracy_level option -> ?fwd:int -> ?bwd:int ->
+    ?origin:(int,int) Public_data.influence_node -> total:int ->
     (Yojson.Basic.json,string) Lwt_result.t
   method get_initial_node : (Yojson.Basic.json,string) Lwt_result.t
   method get_next_node :
