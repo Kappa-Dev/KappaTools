@@ -64,6 +64,9 @@ let on_message post text =
     let fwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) fwd in
     let bwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) bwd in
     let total = JsonUtil.to_int ~error_msg total in
+    let origin =
+      JsonUtil.to_option Public_data.short_influence_node_of_json origin
+    in
     let state, im =
       get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
     in
@@ -75,6 +78,9 @@ let on_message post text =
       let fwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) fwd in
       let bwd = JsonUtil.to_option (JsonUtil.to_int ~error_msg) bwd in
       let total = JsonUtil.to_int ~error_msg total in
+      let origin =
+        JsonUtil.to_option Public_data.short_influence_node_of_json origin
+      in
       let state, im =
         get_local_influence_map ~accuracy_level ?fwd ?bwd ~total ~origin !gState
       in
@@ -95,12 +101,18 @@ let on_message post text =
     let state, im = origin_of_influence_map !gState in
     let () = gState := state in
     send_response post im
-  | `List [ `String "INFLUENCE_MAP_NEXT_NODE";json]  ->
-    let state, im = next_node_in_influence_map !gState json in
+  | `List [ `String "INFLUENCE_MAP_NEXT_NODE";origin]  ->
+    let origin =
+      JsonUtil.to_option Public_data.short_influence_node_of_json origin
+    in
+    let state, im = next_node_in_influence_map !gState origin in
     let () = gState := state in
     send_response post im
-  | `List [ `String "INFLUENCE_MAP_PREVIOUS_NODE";json ] ->
-    let state, im = previous_node_in_influence_map !gState json in
+  | `List [ `String "INFLUENCE_MAP_PREVIOUS_NODE";origin ] ->
+    let origin =
+      JsonUtil.to_option Public_data.short_influence_node_of_json origin
+    in
+    let state, im = previous_node_in_influence_map !gState origin in
     let () = gState := state in
     send_response post im
   | `List [ `String "DEAD_RULES" ] | `String "DEAD_RULES" ->

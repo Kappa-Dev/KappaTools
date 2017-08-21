@@ -20,7 +20,7 @@ let accuracy, set_accuracy = React.S.create (Some Public_data.Low)
 let fwd, set_fwd = React.S.create None
 let bwd, set_bwd = React.S.create None
 let total, set_total = React.S.create 1
-let origin, set_origin = React.S.create `Null
+let origin, set_origin = React.S.create None
 
 let total_input_id = "total_input"
 let fwd_input_id = "fwd_input"
@@ -257,6 +257,9 @@ let content () =
   let _ =
     React.S.l6
       (fun _ acc fwd bwd total origin ->
+         let origin =
+           Public_data.get_short_node_opt_of_refined_node_opt origin
+         in
          State_project.with_project
            ~label:__LOC__
            (fun (manager : Api.concrete_manager) ->
@@ -267,6 +270,15 @@ let content () =
                     let logger =
                       Loggers.open_logger_from_formatter
                         ~mode:Loggers.HTML_Graph fmt
+                    in
+                    let () = Loggers.fprintf logger "%s\n"
+                        (match origin with
+                           Some (Public_data.Rule r) ->
+                           "rule_"^(string_of_int r)
+
+                         | Some (Public_data.Var v) ->
+                           "var_"^(string_of_int v)
+                         | None -> "undefined")
                     in
                     let () = json_to_graph logger influences_json in
                     let () = Loggers.flush_logger logger in
@@ -347,6 +359,11 @@ let onload () =
                   (fun (manager : Api.concrete_manager) ->
                      (Lwt_result.map
                         (fun origin ->
+                           let origin =
+                             JsonUtil.to_option
+                               Public_data.refined_influence_node_of_json
+                               origin
+                           in
                            let () = set_origin origin in
                            ())
                         manager#get_initial_node >>=
@@ -364,18 +381,26 @@ let onload () =
         (fun _ _ ->
           let _ =
             React.S.l2
-              (fun _  (origin:Yojson.Basic.json) ->
-                State_project.with_project
-                  ~label:__LOC__
-                  (fun (manager : Api.concrete_manager) ->
-                     (Lwt_result.map
-                        (fun origin' ->
-                           let () = set_origin origin' in
-                           ())
-                        (manager#get_next_node origin) >>=
-                      fun out -> Lwt.return (Api_common.result_lift out)
-                        ))
-                  )
+              (fun _  origin ->
+                 let origin =
+                     Public_data.get_short_node_opt_of_refined_node_opt origin
+                 in
+                 State_project.with_project
+                   ~label:__LOC__
+                   (fun (manager : Api.concrete_manager) ->
+                      (Lwt_result.map
+                         (fun origin' ->
+                            let origin' =
+                              JsonUtil.to_option
+                                Public_data.refined_influence_node_of_json
+                                origin'
+                            in
+                            let () = set_origin origin' in
+                            ())
+                         (manager#get_next_node origin) >>=
+                       fun out -> Lwt.return (Api_common.result_lift out)
+                      ))
+              )
               (React.S.on tab_is_active
                  State_project.dummy_model State_project.model)
               origin
@@ -388,12 +413,20 @@ let onload () =
         (fun _ _ ->
           let _ =
             React.S.l2
-              (fun _  (origin:Yojson.Basic.json) ->
+              (fun _  origin ->
+                let origin =
+                    Public_data.get_short_node_opt_of_refined_node_opt origin
+                in
                 State_project.with_project
                   ~label:__LOC__
                   (fun (manager : Api.concrete_manager) ->
                      (Lwt_result.map
                         (fun origin' ->
+                           let origin' =
+                             JsonUtil.to_option
+                               Public_data.refined_influence_node_of_json
+                               origin'
+                           in
                            let () = set_origin origin' in
                            ())
                         (manager#get_previous_node origin) >>=

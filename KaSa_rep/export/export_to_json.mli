@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Aug 21 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -28,14 +28,14 @@ module type Type =
     val get_local_influence_map:
       ?accuracy_level:Public_data.accuracy_level ->
       ?bwd:int -> ?fwd:int -> total:int ->
-      origin:Yojson.Basic.json ->
+      origin:(int,int) Public_data.influence_node option ->
       state -> state * Yojson.Basic.json
 
     val origin_of_influence_map: state -> state * Yojson.Basic.json
     val next_node_in_influence_map:
-      state -> Yojson.Basic.json -> state * Yojson.Basic.json
+      state -> (int,int) Public_data.influence_node option -> state * Yojson.Basic.json
     val previous_node_in_influence_map:
-      state -> Yojson.Basic.json -> state * Yojson.Basic.json
+      state -> (int,int) Public_data.influence_node option -> state * Yojson.Basic.json
 
     val get_dead_rules: state -> state * Yojson.Basic.json
 

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Aug 21 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -28,14 +28,14 @@ sig
   val get_local_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
     ?bwd:int -> ?fwd:int -> total:int ->
-    origin:Yojson.Basic.json ->
+    origin:(int,int) Public_data.influence_node option ->
     state -> state * Yojson.Basic.json
 
   val origin_of_influence_map: state -> state * Yojson.Basic.json
   val next_node_in_influence_map:
-    state -> Yojson.Basic.json -> state * Yojson.Basic.json
+    state -> (int,int) Public_data.influence_node option  -> state * Yojson.Basic.json
   val previous_node_in_influence_map:
-    state -> Yojson.Basic.json -> state * Yojson.Basic.json
+    state -> (int,int) Public_data.influence_node option -> state * Yojson.Basic.json
 
 
   val get_dead_rules: state -> state * Yojson.Basic.json
@@ -80,21 +80,20 @@ functor (A:Analyzer.Analyzer) ->
         ?bwd  ?fwd  ~total
         ~origin
         state =
-      let rule_id =
-        try
-          let origin = Public_data.refined_influence_node_of_json origin in
-          begin
-            match origin with
-            | Public_data.Rule a ->
-              Ckappa_sig.rule_id_of_int (a.Public_data.rule_id)
-            | Public_data.Var a ->
-              Ckappa_sig.rule_id_of_int (a.Public_data.var_id)
-          end
+      let state, rule_id =
+        match origin
         with
-        | _ -> Ckappa_sig.rule_id_of_int 0
+        | Some (Public_data.Rule a)  ->
+          state, a
+        | Some (Public_data.Var a) ->
+          let state, n = nrules state in
+          state, a+n
+        | None -> state, 0
       in
+      let rule_id = Ckappa_sig.rule_id_of_int rule_id in
       let state, influence_map =
-        get_local_influence_map ~accuracy_level ?fwd ?bwd ~total
+        get_local_influence_map
+          ~accuracy_level ?fwd ?bwd ~total
           rule_id state
       in
       state, Public_data.local_influence_map_to_json (accuracy_level,total,bwd,fwd,influence_map)
@@ -106,85 +105,110 @@ functor (A:Analyzer.Analyzer) ->
       let state, handler = get_handler state in
       let state, compil = get_c_compilation state in
       let error = get_errors state in
-      let error, id_json =
+      let error, id_opt =
         if nrules = 0 && nvars = 0 then
-          Exception.warn parameters error __POS__ Exit  `Null
+          Exception.warn parameters error __POS__ Exit  None
         else
           let error, id =
             convert_id_refined
               parameters
               error handler compil (Ckappa_sig.rule_id_of_int 0)
           in
-          error, Public_data.refined_influence_node_to_json id
+          error, Some id
       in
       let state = set_errors error state in
-      state, id_json
+      state, id_opt
 
-    let previous_node_in_influence_map state json =
-      let state, json =
-        match json with
-        | `Null -> origin_of_influence_map state
-        | _ -> state, json in
-      let node = Public_data.refined_influence_node_of_json json in
-      let parameters = get_parameters state in
-      let state, handler = get_handler state in
+    let short_origin_of_influence_map state =
+      let state, origin_opt = origin_of_influence_map state in
+      state, Public_data.get_short_node_opt_of_refined_node_opt origin_opt
+
+    let previous_node_in_influence_map state short_id_opt =
       let state, nrules = nrules state in
       let state, nvars = nvars state in
       let n = nrules + nvars - 1 in
-      if n = -1
-      then
-        state,`Null
-      else
-        let state, compil = get_c_compilation state in
-        let id_int =
-          match node with
-          | Public_data.Rule a -> a.Public_data.rule_id
-          | Public_data.Var a -> a.Public_data.var_id
-        in
-        let error = get_errors state in
-        let error, node =
-          if id_int = 0 then
-            convert_id_refined parameters error handler compil
-              (Ckappa_sig.rule_id_of_int n)
-          else
-            convert_id_refined parameters error handler compil
-              (Ckappa_sig.rule_id_of_int (id_int-1))
-        in
-        let state = set_errors error state in
-        let json = Public_data.refined_influence_node_to_json node in
-        state, json
+      let state, next_opt =
+        if n = -1
+        then
+          state, None
+        else
+          let state, short_id_opt =
+            match short_id_opt with
+            | None -> short_origin_of_influence_map state
+            | Some _ -> state, short_id_opt in
+          let parameters = get_parameters state in
+          let state, handler = get_handler state in
+          let state, compil = get_c_compilation state in
+          let error = get_errors state in
+          let error, id_int =
+            match short_id_opt with
+            | Some (Public_data.Rule a) -> error, a
+            | Some (Public_data.Var a) -> error, a+nrules
+            | None ->
+              Exception.warn parameters error __POS__ Exit 0
+          in
+          let error, node =
+            if id_int = 0 then
+              convert_id_refined parameters error handler compil
+                (Ckappa_sig.rule_id_of_int (max 0 n))
+            else
+              convert_id_refined parameters error handler compil
+                (Ckappa_sig.rule_id_of_int (id_int-1))
+          in
+          let state = set_errors error state in
+          state, Some node
+      in
+      let json =
+        JsonUtil.of_option Public_data.refined_influence_node_to_json
+          next_opt
+      in
+      state, json
 
-    let next_node_in_influence_map state json =
-      let state, json =
-        match json with
-        | `Null -> origin_of_influence_map state
-        | _ -> state, json in
-      let node = Public_data.refined_influence_node_of_json json in
-      let parameters = get_parameters state in
-      let state, handler = get_handler state in
+    let next_node_in_influence_map state short_id_opt  =
       let state, nrules = nrules state in
       let state, nvars = nvars state in
-      let n = nrules+nvars-1 in
-      if n = - 1
-      then state, `Null
-      else
-        let state, compil = get_c_compilation state in
-        let id_int =
-          match node with
-          | Public_data.Rule a -> a.Public_data.rule_id
-          | Public_data.Var a -> a.Public_data.var_id
-        in
-        if id_int = n then
-          origin_of_influence_map state
+      let n = nrules + nvars - 1 in
+      let state, node_opt =
+        if n = -1
+        then
+          state, None
         else
-          let error = get_errors state in
-          let error, node =
-            convert_id_refined parameters error handler compil
-              (Ckappa_sig.rule_id_of_int (id_int+1))
+          let state, short_id_opt =
+            match short_id_opt with
+            | None -> short_origin_of_influence_map state
+            | Some _ -> state, short_id_opt
           in
-          let json = Public_data.refined_influence_node_to_json node in
-          set_errors error state, json
+          let parameters = get_parameters state in
+          let state, handler = get_handler state in
+          let state, compil = get_c_compilation state in
+          let error = get_errors state in
+          let error, id_int =
+            match short_id_opt with
+            | Some (Public_data.Rule a) -> error, a
+            | Some (Public_data.Var a) -> error, a+nrules
+            | None ->
+              Exception.warn parameters error __POS__ Exit 0
+          in
+          let state = set_errors error state in
+          if id_int = n
+          then
+            origin_of_influence_map state
+          else
+            let error = get_errors state in
+            let error, node =
+              convert_id_refined parameters error handler compil
+                (Ckappa_sig.rule_id_of_int (id_int+1))
+            in
+            set_errors error state, Some node
+      in
+      let json =
+        JsonUtil.of_option Public_data.refined_influence_node_to_json node_opt
+      in
+        state, json
 
+    let origin_of_influence_map state =
+      let state, node = origin_of_influence_map state in
+      state, JsonUtil.of_option Public_data.refined_influence_node_to_json node
 
     let get_dead_rules state =
       let state, rules = get_dead_rules state in

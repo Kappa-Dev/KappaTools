@@ -459,7 +459,13 @@ class manager
        in
        Format.sprintf
          "%s/v2/projects/%s/analyses/influence_map?origin=%s&total=%i%s%s%s"
-         url project_id (Yojson.Basic.to_string origin) total s
+         url project_id
+         (
+           match origin with
+           | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
+           | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
+           | None -> "_undefined"
+         ) total s
          (match fwd with None -> "" | Some i -> "&fwd="^string_of_int i)
          (match bwd with None -> "" | Some i -> "&bwd="^string_of_int i)
       )
@@ -488,7 +494,7 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_next_node json =
+  method get_next_node short_id_opt =
     send
       ?timeout
       (
@@ -496,11 +502,12 @@ class manager
           "%s/v2/projects/%s/analyses/influence_map/next_node%s"
           url
           project_id
-          (try
-             match Public_data.refined_influence_node_of_json json with
-             | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
-             | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
-          with _ -> "")
+          (
+            match short_id_opt with
+            | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
+            | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
+            | None -> "_undefined"
+          )
       )
       `GET
       (fun x -> Yojson.Basic.from_string x)
@@ -510,7 +517,7 @@ class manager
           | e :: _ -> Lwt.return_error e.Api_types_t.message_text
           | [] -> Lwt.return_error "Rest_api empty error")
 
-  method get_previous_node json =
+  method get_previous_node short_id_opt =
     send
       ?timeout
       (
@@ -518,12 +525,12 @@ class manager
           "%s/v2/projects/%s/analyses/influence_map/previous_node%s"
           url
           project_id
-          (try
-             match Public_data.refined_influence_node_of_json json with
-             | Public_data.Rule i -> "_rule_"^(string_of_int (i.Public_data.rule_id))
-             | Public_data.Var i -> "_var_"^(string_of_int (i.Public_data.var_id))
-           with _ -> "")
-      )
+          (
+            match short_id_opt with
+             | Some (Public_data.Rule i) -> "_rule_"^(string_of_int i)
+             | Some (Public_data.Var i) -> "_var_"^(string_of_int i)
+             | None -> "_undefined")
+           )
       `GET
       (fun x -> Yojson.Basic.from_string x)
     >>= Api_common.result_map

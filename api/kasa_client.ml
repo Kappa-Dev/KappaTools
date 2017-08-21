@@ -84,8 +84,7 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
                   [JsonUtil.of_option JsonUtil.of_int fwd;
                    JsonUtil.of_option JsonUtil.of_int bwd;
                    JsonUtil.of_int total;
-                   origin]
-
+                   JsonUtil.of_option Public_data.short_influence_node_to_json origin]
               ))
                  in
           Lwt_result.bind_result
@@ -100,14 +99,16 @@ class virtual new_client ~post mailbox : Api.manager_static_analysis =
         (fun x -> Result.Ok x)
     method get_next_node json =
       let request =
-        `List [`String "INFLUENCE_MAP_NEXT_NODE";json]
+        `List [`String "INFLUENCE_MAP_NEXT_NODE";
+               JsonUtil.of_option Public_data.short_influence_node_to_json json]
       in
       Lwt_result.bind_result
         (self#message post request)
             (fun x -> Result.Ok x)
     method get_previous_node json =
       let request =
-        `List [`String "INFLUENCE_MAP_PREVIOUS_NODE";json]
+        `List [`String "INFLUENCE_MAP_PREVIOUS_NODE";
+               JsonUtil.of_option Public_data.short_influence_node_to_json json]
       in
       Lwt_result.bind_result
         (self#message post request)

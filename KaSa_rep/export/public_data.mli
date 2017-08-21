@@ -70,6 +70,9 @@ type ('rule, 'var) influence_node =
   | Rule of 'rule
   | Var of 'var
 
+val get_short_node_opt_of_refined_node_opt:
+  (rule, var) influence_node option -> (int, int) influence_node option
+
 val short_influence_node_of_json:
   Yojson.Basic.json -> (int, int) influence_node
 
