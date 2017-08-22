@@ -1062,13 +1062,13 @@ in the order in which they have been declared in the KF\index{Kappa
 
 \subsection{shortcuts}
 If the repeat keyword and the repeat condition are ommited, it is assumed that it is
-\lstlisting[language=kappa]!repeat [false]! aka a one-shot perturbation.
+\lstinline[language=kappa]!repeat [false]! aka a one-shot perturbation.
 
 If the (pre)condition is ommited it is considerated to be
-\lstlisting[language=kappa]![true]! unless both conditions are ommited
+\lstinline[language=kappa]![true]! unless both conditions are ommited
 and a clock is provided. In this case the implicit condition is
-\lstlisting[language=kappa]![T] > 0! so that
-\lstlisting[language=kappa]!%mod: alarm 5.8 do effects!
+\lstinline[language=kappa]![T] > 0! so that
+\lstinline[language=kappa]!%mod: alarm 5.8 do effects!
 is somehow a 'at' operator. It means ``do \texttt{effects} at [T] = 5.8''.
 
 \subsection{Model modification}
