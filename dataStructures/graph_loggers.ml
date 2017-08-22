@@ -50,6 +50,9 @@ type node_attribute =
     node_width: int option ;
     node_height: int option ;
     node_shape: Graph_loggers_sig.shape option ;
+    node_positions: Locality.t list ;
+    node_contextual_help: string option;
+    node_on_click: Yojson.Basic.json option;
   }
 
 type edge_attribute =
@@ -59,7 +62,10 @@ type edge_attribute =
     edge_style: Graph_loggers_sig.linestyle ;
     edge_direction: Graph_loggers_sig.direction ;
     edge_arrowhead: Graph_loggers_sig.headkind ;
-    edge_arrowtail: Graph_loggers_sig.headkind
+    edge_arrowtail: Graph_loggers_sig.headkind ;
+    edge_positions: Locality.t list ;
+    edge_contextual_help: string option;
+    edge_on_click: Yojson.Basic.json option;
   }
 
 let dummy_node =
@@ -70,6 +76,9 @@ let dummy_node =
     node_width = None ;
     node_height = None ;
     node_shape = None ;
+    node_positions = [] ;
+    node_on_click = None ;
+    node_contextual_help = None ;
   }
 
 let dummy_edge =
@@ -80,6 +89,9 @@ let dummy_edge =
     edge_direction = Graph_loggers_sig.Direct ;
     edge_arrowhead = Graph_loggers_sig.Normal ;
     edge_arrowtail = Graph_loggers_sig.Normal ;
+    edge_positions = [] ;
+    edge_on_click = None ;
+    edge_contextual_help = None ;
   }
 
 let is_no_node_attributes node_attribute = node_attribute = dummy_node
@@ -257,6 +269,9 @@ let matrix_string_of_options l =
                   | Graph_loggers_sig.LightSkyBlue -> i*11
                   | Graph_loggers_sig.PaleGreen -> i*13
                 end
+              | Graph_loggers_sig.Position _
+              | Graph_loggers_sig.Contextual_help _
+              | Graph_loggers_sig.OnClick _
               | Graph_loggers_sig.ArrowHead _
               | Graph_loggers_sig.ArrowTail _
               | Graph_loggers_sig.FillColor _
@@ -315,6 +330,20 @@ let print_foot_shared_html_js logger =
                      | Graph_loggers_sig.ArrowHead s -> {attributes with
                                                          edge_arrowhead = merge s
                                                              attributes.edge_arrowhead}
+                     | Graph_loggers_sig.Position p ->
+                       {attributes with
+                        edge_positions =
+                          p@attributes.edge_positions
+                       }
+                     | Graph_loggers_sig.Contextual_help s ->
+                       {attributes with
+                        edge_contextual_help =
+                          match attributes.edge_contextual_help with
+                          | None -> Some s
+                          | Some s' -> Some (s'^s)}
+                     | Graph_loggers_sig.OnClick json ->
+                       {attributes with
+                          edge_on_click = Some json}
                      | Graph_loggers_sig.Shape _
                      | Graph_loggers_sig.Width _
                      | Graph_loggers_sig.Height _
@@ -620,6 +649,16 @@ let print_node logger ?directives:(directives=[]) id =
            | Graph_loggers_sig.Width i -> {attributes with node_width = Some i}
            | Graph_loggers_sig.Height i -> {attributes with node_height = Some i}
            | Graph_loggers_sig.Shape s -> {attributes with node_shape = Some s}
+           | Graph_loggers_sig.Position p ->
+             {attributes with node_positions = p@attributes.node_positions}
+           | Graph_loggers_sig.OnClick json ->
+             {attributes with node_on_click = Some json}
+           | Graph_loggers_sig.Contextual_help s ->
+             {attributes with node_contextual_help =
+                                match attributes.node_contextual_help with
+                                | None -> Some s
+                                | Some s' -> Some (s'^s)
+             }
            | Graph_loggers_sig.LineStyle _
            | Graph_loggers_sig.Direction _
            | Graph_loggers_sig.ArrowTail _
@@ -720,7 +759,7 @@ let print_node logger ?directives:(directives=[]) id =
           end
       in ()
     end
-  | Loggers.HTML_Graph | Loggers.Js_Graph ->
+  | Loggers.HTML_Graph  ->
     let id_int = Loggers.int_of_string_id logger id in
     let () = Loggers.fprintf logger "g.setNode(%i, { " id_int in
     let () =
@@ -823,7 +862,9 @@ let print_node logger ?directives:(directives=[]) id =
         let () = Loggers.print_newline logger in
         ()
     end
-  | Loggers.Matrix | Loggers.Json -> Loggers.add_node logger id directives
+  | Loggers.Matrix
+  | Loggers.Js_Graph
+  | Loggers.Json -> Loggers.add_node logger id directives
   | Loggers.DOTNET | Loggers.Mathematica
   | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
@@ -832,7 +873,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph | Loggers.TXT | Loggers.HTML ->
+    | Loggers.Matrix | Loggers.DOT | Loggers.HTML_Graph | Loggers.Js_Graph
+    | Loggers.Json | Loggers.TXT | Loggers.HTML ->
       List.fold_left
         (fun attributes option ->
            match
@@ -844,6 +886,15 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
            | Graph_loggers_sig.Direction s -> {attributes with edge_direction = s}
            | Graph_loggers_sig.ArrowTail s -> {attributes with edge_arrowtail = s}
            | Graph_loggers_sig.ArrowHead s -> {attributes with edge_arrowhead = s}
+           | Graph_loggers_sig.Position p ->
+             {attributes with edge_positions = p@attributes.edge_positions}
+           | Graph_loggers_sig.Contextual_help s ->
+             {attributes with edge_contextual_help =
+                                match attributes.edge_contextual_help with
+                                | None -> Some s
+                                | Some s' -> Some (s'^s)}
+           | Graph_loggers_sig.OnClick json ->
+             {attributes with edge_on_click = Some json}
            | Graph_loggers_sig.Shape _
            | Graph_loggers_sig.Width _
            | Graph_loggers_sig.Height _
@@ -851,7 +902,6 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         )
         attributes
         directives
-    | Loggers.Json
     | Loggers.DOTNET | Loggers.Mathematica
     | Loggers.Maple | Loggers.Matlab | Loggers.Octave | Loggers.SBML
     | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular -> attributes
@@ -1004,8 +1054,9 @@ let print_one_to_n_relation
     match
       Loggers.get_encoding_format logger
     with
-    | Loggers.HTML_Graph | Loggers.Js_Graph ->
+    | Loggers.HTML_Graph  ->
       List.rev ((Graph_loggers_sig.Label "")::(Graph_loggers_sig.Shape Graph_loggers_sig.Circle)::(Graph_loggers_sig.Width 0)::(Graph_loggers_sig.Height 0)::(Graph_loggers_sig.FillColor Graph_loggers_sig.Black)::(List.rev directives))
+    | Loggers.Js_Graph
     | Loggers.Json
     | Loggers.Matrix
     | Loggers.Mathematica | Loggers.Maple | Loggers.Matlab

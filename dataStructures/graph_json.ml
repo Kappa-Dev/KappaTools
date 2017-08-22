@@ -54,6 +54,7 @@ let color_to_json color =
   | Graph_loggers_sig.LightSkyBlue -> `String "lightskyblue"
   | Graph_loggers_sig.PaleGreen -> `String "palegreen"
   | Graph_loggers_sig.Brown -> `String "brown"
+
 let directive_to_json option =
   match option
   with
@@ -71,6 +72,17 @@ let directive_to_json option =
     "arrowtail", headkind_to_json headkind
   | Graph_loggers_sig.LineStyle linestyle ->
     "linestyle", linestyle_to_json linestyle
+  | Graph_loggers_sig.Position p ->
+    "position",
+    JsonUtil.of_list
+      (fun json -> Locality.annot_to_json
+          JsonUtil.of_unit ((),json))
+      p
+  | Graph_loggers_sig.Contextual_help s ->
+    "contextual help",
+    JsonUtil.of_string s
+  | Graph_loggers_sig.OnClick json ->
+    "on_click", json
 
 let directives_to_json = JsonUtil.of_assoc directive_to_json
 
@@ -92,8 +104,8 @@ let edges_to_json = JsonUtil.of_list edge_to_json
 
 let to_json graph =
   (`Assoc [
-    "nodes", nodes_to_json (fst graph);
-    "edges", edges_to_json (snd graph)
+      "nodes", nodes_to_json (fst graph);
+      "edges", edges_to_json (snd graph)
     ]: Yojson.Basic.json)
 
 let linestyle_of_json = function
@@ -148,6 +160,18 @@ let directive_of_json =
     Graph_loggers_sig.ArrowTail (headkind_of_json headkind)
   | "linestyle", linestyle ->
     Graph_loggers_sig.LineStyle (linestyle_of_json linestyle)
+  | "position", pos_list ->
+    Graph_loggers_sig.Position
+      (JsonUtil.to_list
+         (fun json -> snd (Locality.annot_of_json
+                             (JsonUtil.to_unit
+                                ?error_msg:(Some (JsonUtil.build_msg "position")))
+                             json))
+         pos_list)
+  | "contextual help", contextual_help ->
+    Graph_loggers_sig.Contextual_help (JsonUtil.to_string contextual_help)
+  | "on_click",json ->
+    Graph_loggers_sig.OnClick json
   | (_,x) -> raise (Yojson.Basic.Util.Type_error ("Not a correct directive",x))
 
 let directives_of_json directives =

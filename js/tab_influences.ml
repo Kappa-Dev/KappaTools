@@ -92,8 +92,24 @@ let accuracy_chooser =
     ~a:[Html.a_class [ "form-control" ]; Html.a_id accuracy_chooser_id ]
     (List.map option_gen Public_data.influence_map_accuracy_levels)
 
+let is_center origin_short_opt node =
+  match origin_short_opt with
+  | None ->
+    begin
+      match node with
+      | Public_data.Rule r -> r.Public_data.rule_id = 0
+      | Public_data.Var _ -> false
+    end
+  | Some origin  ->
+    match origin, node with
+    | Public_data.Rule id, Public_data.Rule a ->
+      a.Public_data.rule_id = id
+    | Public_data.Var id, Public_data.Var a ->
+      a.Public_data.var_id = id
+    | Public_data.Var _, Public_data.Rule _
+    | Public_data.Rule _, Public_data.Var _ -> false
 
-let json_to_graph logger influences_json =
+let json_to_graph logger origin_short_opt influences_json =
   let () = Graph_loggers.print_graph_preamble logger "" in
   let _,_,_,_,influence_map =
     Public_data.local_influence_map_of_json
@@ -101,9 +117,7 @@ let json_to_graph logger influences_json =
   in
   let nodes = influence_map.Public_data.nodes in
   let directives_of_node node =
-    let _json = (* TODO: add a directive to call set_origin
-                     on _json to when there is a click on the
-                  node *)
+    let json =
       Public_data.refined_influence_node_to_json node
     in
     match node
@@ -114,14 +128,22 @@ let json_to_graph logger influences_json =
         then r.Public_data.rule_ast,""
         else r.Public_data.rule_label,r.Public_data.rule_ast
       in
-      let _pos = (* TODO: add a directive to show _pos and
-                  _ast when the mouse is on the node *)
-        Locality.to_string r.Public_data.rule_position
+      let pos = r.Public_data.rule_position in
+      let contextual_help =
+        (Locality.to_string pos)^" "^(r.Public_data.rule_ast)
       in
       [
           Graph_loggers_sig.Label label;
           Graph_loggers_sig.Shape !Config.rule_shape;
-          Graph_loggers_sig.Color !Config.rule_color;
+          Graph_loggers_sig.FillColor !Config.rule_color;
+          Graph_loggers_sig.Color
+            (if is_center origin_short_opt node then
+               !Config.center_color
+             else
+               !Config.rule_color);
+          Graph_loggers_sig.Position [pos] ;
+          Graph_loggers_sig.OnClick json ;
+          Graph_loggers_sig.Contextual_help contextual_help
         ]
     | Public_data.Var r ->
       let label,_ast =
@@ -129,14 +151,23 @@ let json_to_graph logger influences_json =
         then r.Public_data.var_ast,""
         else r.Public_data.var_label,r.Public_data.var_ast
       in
-      let _pos = (* TODO: add a directive to show _pos and
-                  _ast when the mouse is on the node *)
-        Locality.to_string r.Public_data.var_position
+      let pos = r.Public_data.var_position in
+      let contextual_help =
+        (Locality.to_string pos)^(r.Public_data.var_ast)
       in
+
       [
         Graph_loggers_sig.Label label;
         Graph_loggers_sig.Shape !Config.variable_shape;
-        Graph_loggers_sig.Color !Config.variable_color;]
+        Graph_loggers_sig.FillColor !Config.variable_color;
+        Graph_loggers_sig.Color
+          (if is_center origin_short_opt node then
+             !Config.center_color
+           else
+             !Config.variable_color);
+        Graph_loggers_sig.Position [pos] ;
+        Graph_loggers_sig.OnClick json ;
+        Graph_loggers_sig.Contextual_help contextual_help]
   in
   let max_rule_id =
     List.fold_left
@@ -256,9 +287,13 @@ let content () =
   let influences,set_influences = ReactiveData.RList.create [] in
   let _ =
     React.S.l6
-      (fun _ acc fwd bwd total origin ->
+      (fun _ acc fwd bwd total origin_refined ->
+         (*let origin_json =
+             JsonUtil.of_option
+               Public_data.refined_influence_node_to_json origin_refined
+           in*)
          let origin =
-           Public_data.get_short_node_opt_of_refined_node_opt origin
+           Public_data.get_short_node_opt_of_refined_node_opt origin_refined
          in
          State_project.with_project
            ~label:__LOC__
@@ -269,27 +304,21 @@ let content () =
                     let fmt = Format.formatter_of_buffer buf in
                     let logger =
                       Loggers.open_logger_from_formatter
-                        ~mode:Loggers.HTML_Graph fmt
+                        ~mode:Loggers.Js_Graph fmt
                     in
-                    let () = Loggers.fprintf logger "%s\n"
-                        (match origin with
-                           Some (Public_data.Rule r) ->
-                           "rule_"^(string_of_int r)
-
-                         | Some (Public_data.Var v) ->
-                           "var_"^(string_of_int v)
-                         | None -> "undefined")
-                    in
-                    let () = json_to_graph logger influences_json in
+                    let () =
+                      json_to_graph logger origin influences_json in
+                    let graph = Loggers.graph_of_logger logger in
+                    let graph_json = Graph_json.to_json graph in
                     let () = Loggers.flush_logger logger in
-                    let s = Buffer.contents buf in
                     let () = Loggers.close_logger logger in
                     let () =
                       ReactiveData.RList.set
                         set_influences
                         [
-                          Html.Unsafe.data
-                        s] (* ] *) in
+                          (*Html.pcdata (Yojson.Basic.to_string origin_json) ;*)
+                          Html.pcdata (Yojson.Basic.to_string graph_json)
+                        ]  in
                     ())
                  (manager#get_local_influence_map
                     ?fwd ?bwd ?origin ~total acc)) >>=

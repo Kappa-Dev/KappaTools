@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Aug 01 2017>
+  * Last modification: Time-stamp: <Aug 22 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -41,6 +41,7 @@ let rule_shape = ref Graph_loggers_sig.Rect
 let rule_color = ref Graph_loggers_sig.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
 let variable_shape = ref Graph_loggers_sig.Ellipse
 let variable_color = ref Graph_loggers_sig.PaleGreen (* "#98fb98" (*Pale green*)*)
+let center_color = ref Graph_loggers_sig.Red 
 let wake_up_color = ref Graph_loggers_sig.Green (*"#00ff00" (*Green *)*)
 let inhibition_color = ref Graph_loggers_sig.Red (*"#ff0000" (*red*)*)
 let wake_up_arrow = ref Graph_loggers_sig.Normal

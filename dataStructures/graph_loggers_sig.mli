@@ -34,6 +34,9 @@ type options =
     | ArrowHead of headkind
     | ArrowTail of headkind
     | LineStyle of linestyle
+    | OnClick of Yojson.Basic.json
+    | Contextual_help of string
+    | Position of Locality.t list 
 
 type graph =
     (string * options list) list
