@@ -10,13 +10,13 @@ module ApiTypes = Api_types_j
 
 class type plot_configuration =
   object
-    val plotDivId : Js.js_string Js.t Js.prop
-    val plotDivAxisSelectId : Js.js_string Js.t Js.prop
-    val plotLabelDivId:Js.js_string Js.t Js.prop
-    val plotStyleId : Js.js_string Js.t Js.prop
-    val plotShowLegendCheckboxId : Js.js_string Js.t Js.prop
-    val plotXAxisLogCheckboxId : Js.js_string Js.t Js.prop
-    val plotYAxisLogCheckboxId : Js.js_string Js.t Js.prop
+    method plotDivId : Js.js_string Js.t Js.prop
+    method plotDivAxisSelectId : Js.js_string Js.t Js.prop
+    method plotLabelDivId:Js.js_string Js.t Js.prop
+    method plotStyleId : Js.js_string Js.t Js.prop
+    method plotShowLegendCheckboxId : Js.js_string Js.t Js.prop
+    method plotXAxisLogCheckboxId : Js.js_string Js.t Js.prop
+    method plotYAxisLogCheckboxId : Js.js_string Js.t Js.prop
   end
 let constructor_configuration : plot_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
@@ -32,27 +32,16 @@ let create_configuration
   let configuration : plot_configuration Js.t =
     new%js constructor_configuration in
   let () =
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotDivId := Js.string plot_div_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotDivAxisSelectId := Js.string plot_div_select_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotLabelDivId := Js.string plot_label_div_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotStyleId := Js.string plot_style_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotShowLegendCheckboxId := Js.string plot_show_legend_checkbox_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotXAxisLogCheckboxId := Js.string plot_x_axis_log_checkbox_id;
-    (Js.Unsafe.coerce configuration)
-    ##.
-      plotYAxisLogCheckboxId := Js.string plot_y_axis_log_checkbox_id;
+    configuration##.plotDivId := Js.string plot_div_id;
+    configuration##.plotDivAxisSelectId := Js.string plot_div_select_id;
+    configuration##.plotLabelDivId := Js.string plot_label_div_id;
+    configuration##.plotStyleId := Js.string plot_style_id;
+    configuration##.plotShowLegendCheckboxId :=
+      Js.string plot_show_legend_checkbox_id;
+    configuration##.plotXAxisLogCheckboxId :=
+      Js.string plot_x_axis_log_checkbox_id;
+    configuration##.plotYAxisLogCheckboxId :=
+      Js.string plot_y_axis_log_checkbox_id;
     ()
   in configuration
 
