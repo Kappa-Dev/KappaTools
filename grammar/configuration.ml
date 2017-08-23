@@ -62,7 +62,7 @@ let parse result =
           | [] -> (conf,progress,(a,b,c),formatCflow,cflowFile)
           | (error,pos)::_ ->
             raise (ExceptionDefn.Malformed_Decl
-                     ("Unkown value "^error^" for compression mode", pos))
+                     ("Unknown value "^error^" for compression mode", pos))
         in
         parse story_compression value_list
       | "cflowFileName" ->
@@ -187,7 +187,7 @@ let parse result =
            (story_compression, Dot) else
            (story_compression, Html)*)
       | _ as error ->
-        raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
+        raise (ExceptionDefn.Malformed_Decl ("Unknown parameter "^error, pos_p))
     ) (empty, Counter.default_progress, (false,false,false), "dot", None) result
 
 let print f conf =
