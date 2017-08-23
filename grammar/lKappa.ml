@@ -1316,13 +1316,13 @@ let make_counter_agent sigs
   let before_switch = if first&&created then Linked (i,pos) else Maintained in
   let before =
     if first then Ast.LNK_VALUE (i,dst), pos
-    else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
+    else Ast.LNK_VALUE (i,(incr_a,ra_type)), pos in
   let () = ra_ports.(incr_b) <- before,before_switch in
   let after =
     if (last&&equal) then Ast.LNK_FREE, pos
     else
       if last then Ast.LNK_ANY, pos
-      else Ast.LNK_VALUE (j,(ra_type,incr_b)), pos in
+      else Ast.LNK_VALUE (j,(incr_b,ra_type)), pos in
   let () = ra_ports.(incr_a) <- (after,Maintained) in
   let ra_ints = Array.make arity I_ANY in
   {ra_type; ra_erased = false; ra_ports; ra_ints;
@@ -1717,7 +1717,7 @@ let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let c_na = c.Ast.count_nme in
   let c_id = Signature.num_of_site ~agent_name c_na sign in
   let (max_val,pos) = c.Ast.count_delta in
-  let incrs = link_incr sigs 0 (max_val+1) (ag_id,c_id) false 1 pos (-1) in
+  let incrs = link_incr sigs 0 (max_val+1) (c_id,ag_id) false 1 pos (-1) in
   let p = Ast.LNK_VALUE (1,(incr_b,incr_type)),pos in
   let () = ports.(c_id) <- p,Maintained in
   let ra =
