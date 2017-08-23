@@ -254,9 +254,9 @@ let rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
 let effects_of_modif
     ast_algs ast_rules origin ?bwd_bisim ~compileModeOn
     contact_map (domain,rev_effects) = function
-  | INTRO (alg_expr, (ast_mix,mix_pos)) ->
+  | INTRO (alg_expr, (raw_mix,mix_pos)) ->
     rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
-      ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,[])
+      ([],raw_mix,[])
       mix_pos rev_effects
   | DELETE (alg_expr, (ast_mix, mix_pos)) ->
     rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
@@ -416,13 +416,13 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
            | None -> alg
            | Some r -> Alg_expr.mult alg (Alg_expr.float r) in
          match init_t with
-         | INIT_MIX ast,mix_pos ->
+         | INIT_MIX raw_mix,mix_pos ->
            let sigs = Model.signatures env in
            let (preenv',alg') =
              compile_alg ?bwd_bisim ~compileModeOn contact_map preenv alg in
            let fake_rule = {
              LKappa.r_mix = [];
-             LKappa.r_created = LKappa.to_raw_mixture sigs ast;
+             LKappa.r_created = raw_mix;
              LKappa.r_delta_tokens = [];
              LKappa.r_rate = Alg_expr.const Nbr.zero;
              LKappa.r_un_rate = None;
@@ -439,7 +439,9 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
                            "initial mixture %a is partially defined"
-                           (LKappa.print_rule_mixture sigs ~ltypes:false) ast,
+                           (Raw_mixture.print
+                              ~explicit_free:true
+                              ~compact:true ~created:true ~sigs) raw_mix,
                          mix_pos)) in
            preenv'',state'
          | INIT_TOK tk_id,pos_tk ->

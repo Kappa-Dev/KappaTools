@@ -40,7 +40,7 @@ val separating_transitions_to_json:
   separating_transitions -> Yojson.Basic.json
 
 type refined_compilation =
-  (Ckappa_sig.agent, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
+  (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string, Ckappa_sig.direction * Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
 
 type distance =
   {

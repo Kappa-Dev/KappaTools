@@ -99,7 +99,7 @@
 \begin{center}\includegraphics[width=9cm,bb=0 0 375 200]{\KaSimLogo}\end{center}
 
 \section{Preamble}
-This manual describes the usage of \KaSim~and \KaSa, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules.
+This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules.
 Although this manual provides a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modelling.
 %%Therefore, in the following of this manual some familiarity with Kappa is assumed and
 %
@@ -132,7 +132,7 @@ Note that \KaSim~can only render curves in the svg format. However, data outputs
 
 \section{The \KaSa~static analyser}
 
-\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute the contact map and the influence map. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.
+\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute \imp{the contact map} and \imp{the influence map}. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaSa. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
@@ -146,7 +146,6 @@ dimension of the ODEs (or the number of different bio-molecular species in react
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaDE. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
-
 \section{Support}
 \ITE{
 \item[-] Kappa language tutorials and downloads: \url{http://kappalanguage.org}
@@ -155,88 +154,65 @@ A graphical interface is proposed to navigate through the various options and ut
 \item[-] Want to contribute to the project? \ttt{jean.krivine@irif.fr}
 }
 
-\chapter{Installation}\label{chap:install}
+\section{A first model}
+\label{chap:abc}
+We describe below the content of a simple Kappa model and give examples of some typical run\footnote{The corresponding Kappa file is included in the distribution of \KaSim, in the directory \ttt{models/}}.
 
-\section{Using precompiled binaries}
-\label{sec:bin}
-The easiest way to use \KaSim~and \KaSa~is to use pre-compiled versions available in the release section on the github repository (\url{https://github.com/Kappa-Dev/KaSim/releases}). Download the version that corresponds to your operating system (Windows, Linux or Mac OSX) and rename the downloaded file into \KaSim~and \KaSa. Note that on Mac OSX or Linux, it might be necessary to give executable permissions to \KaSim~and \KaSa. This can be done using the shell commands:
-\ttt{chmod u+x KaSim} and \ttt{chmod u+x KaSa}
+%\subsection{ABC.ka}
+\begin{lstlisting}[language=kappa]
+#### Signatures
+%agent: A(x,c)           # Declaration of agent A
+%agent: B(x)             # Declaration of B
+%agent: C(x1~u~p,x2~u~p) # Declaration of C with 2 modifiable sites
+#### Rules
+'a.b' A(x),B(x) -> A(x!1),B(x!1) @ 'on_rate'                        #A binds B
+'a..b' A(x!1),B(x!1) -> A(x),B(x) @ 'off_rate'                      #AB dissociation
+'ab.c' A(x!_,c),C(x1~u) -> A(x!_,c!2),C(x1~u!2)  @ 'on_rate'        #AB binds C
+'mod x1' C(x1~u!1),A(c!1) -> C(x1~p),A(c)  @ 'mod_rate'             #ABC modifies x1
+'a.c' A(x,c),C(x1~p,x2~u) -> A(x,c!1),C(x1~p,x2~u!1) @ 'on_rate'    #A binds C on x2
+'mod x2' A(x,c!1),C(x1~p,x2~u!1) -> A(x,c),C(x1~p,x2~p) @ mod_rate  #A modifies x2
+#### Variables
+%var: 'on_rate'  1.0E-4 # per molecule per second
+%var: 'off_rate' 0.1    # per second
+%var: 'mod_rate' 1      # per second
+%obs: 'AB'  |A(x!x.B)|
+%obs: 'Cuu' |C(x1~u,x2~u)|
+%obs: 'Cpu' |C(x1~p,x2~u)|
+%obs: 'Cpp' |C(x1~p,x2~p)|
+#### Initial conditions
+%init: 1000  A(),B()
+%init: 10000 C()
+\end{lstlisting}
 
-To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise you may need to compile \KaSim~from the sources (see Section \ref{sec:sources}).
+Lines 1-4 of this kappa file\index{Kappa file} contain signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have two sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u} (unphosphorylated) or \ttt{p} (phosphorylated). %Recall that the default state of these sites is \ttt{u} (the first one).
+Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} %(link type \ttt{!\_})
+to a \ttt{C}. %Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by
+%\begin{lstlisting}[language=kappa]
+%'alt_ab.c' A(x!1,c),B(x!1),C(x1~u) -> ...
+%\end{lstlisting}
+There are two main points to notice about this model: \ttt{A} can modify both sites of \ttt{C} once it is bound to them. However, only an \ttt{A} bound to a \ttt{B} can connect on \ttt{x1} and only a free \ttt{A} can connect on \ttt{x2}. Note also that \ttt{x2} is available for connection only when \ttt{x1} is already modified.
 
-\section{Obtaining the sources}\label{sec:sources}
-To obtain \KaSim/\KaSa~you can either use pre-compiled binaries (see
-Section \ref{sec:bin}) or compile the sources for your
-architecture by yourself.
+%\subsection{Some runs}
+We try first a coarse simulation of $100,000$ events (10 times the number of agents in the initial system).
+\ttt{
+\ITE{
+\item[\$] KaSim ABC.ka -u event -l 100000 -p 1000 -o abc.csv
+}}
+Plotting the content of the \ttt{abc.csv} file one notices that nothing  significantly  interesting happens to the observables after 250s. So we can now specify a meaningful time limit by running:
+\ttt{
+\ITE{
+\item[\$] KaSim ABC.ka -l 250 -p 0.25 -o abc.out
+}}
+which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=12cm]{generated_img/plot-abc.png}
+\caption{Simulation of the ABC model: population of unmodified \ttt{C}s (observable \ttt{Cuu} in red) drops rapidly and is replaced, in a first step by simply modified \ttt{C}s (observable \ttt{Cpu} in blue) which are in turn replaced by doubly modified \ttt{C}s (observable \ttt{Cpp} in red). Note that the population of \ttt{AB} complexes (observable \ttt{AB} in black) stabilizes slightly below 400 individuals after about 20s.}
+\label{fig:abc}
+\end{center}
+\end{figure}
+%We will use this model as a running example for the next chapter, in order to illustrate various advanced concepts.
 
-To do so, download the source code from
-\url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent
-OCaml compiler (\KaSim/\KaSa~currently requires Ocaml 4.02.3 to
-compile) as well as \ttt{ocamlbuild}, \ttt{findlib} and the
-\ttt{yojson} library installed.
-
-You can check if it is the case from a terminal window by typing
-\ttt{ocamlfind ocamlopt -v}. If it fails or prints an outdated version number, then you need to install OCaml Native compiler that can be
-downloaded from \url{http://caml.inria.fr/download.en.html} and/or
-findlib available at
-\url{http://projects.camlcity.org/projects/findlib.html}.
-
-Then, type \ttt{ocamlfind query yojson}. The answer should be a
-path. If it is not, install yojson using a package manager.
-
-OCamlbuild is hosted on \url{https://github.com/ocaml/ocamlbuild}.
-
-\section{Compilation}
-Once OCaml is safely installed, decompress \KaSim~archive and compile it following these
-few steps: \ITE{
-\item[\$]\ttt{tar xzvf kasim.tar.gz -d Kappa}
-\item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{make bin/KaSim}
-\item[\$]\ttt{make bin/KaSa}}
-
-At the end of these steps, there should be an executable file named
-KaSim  in the \ttt{bin} directory of the \ttt{Kappa} directory.  In order to check the compilation went fine, simply type
-\ttt{bin/KaSim -\,-version}.
-
-If the tool \ttt{ocamlbuild} is not in your path, you may
-set the variable \ttt{OCAMLBINPATH} to point to the location of the
-compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
-
-\section{Compilation of the graphical interface of KaSa~and KaDE}
-
-The graphical interface of \KaSa~and \KaDE~requires
-\href{http://www.tcl.tk/}{tk-dev} and
-\href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By
-default, the graphical interface is not compiled. The compilation of
-this interface can be toggled on by using the following command:
-\ttt{make USE\_TK=1 bin/KaSa} (or \ttt{make USE\_TK=1 bin/KaDE}).
-
-Common compilation errors are the following:
-\begin{enumerate}
-\item The following error:
-
-\begin{verbatim}
-/usr/bin/ld: cannot find -ltk
-collect2: error: ld returned 1 exit status
-File "caml_startup", line 1:
-Error: Error during linking
-Command exited with code 2.
-\end{verbatim}
-
-occurs when the module  \href{http://www.tcl.tk/}{tk-dev} is not installed.
-\item The following error:
-
-\begin{verbatim}
-File "_none_", line 1:
-Error: Cannot find file jpflib.cmxa
-Command exited with code 2.
-\end{verbatim}
-
-occurs when OCaml cannot link the labltk library.
-
-Please document the variable \texttt{LABLTKLIBREP} in the Makefile.
-
-\end{enumerate}
 
 \chapter{The Kappa language}\label{chap:kappa}
 
@@ -281,11 +257,9 @@ ions, ATP, etc. Tokens cannot bind anything, they can only appear or
 disappear. In a given model, agents always have a discrete number of
 instances while tokens may have a continuous concentration.
 
-In order to use agents or tokens in a model, one needs to declare them
-first. \emph{Agent signatures}\index{agent signature} constitute a
-form of typing information about the agents that are used in the
-model. They contain information about the name of interaction sites
-the agent has, optionaly site binding capabilities, and about possible
+\emph{Agent signatures}\index{agent signature}
+contain information about (i) the name of interaction sites
+the agent has, with optionally site binding capabilities, and (ii) about possible
 internal states of sites. A signature\index{agent signature} is declared in the
 KF\index{Kappa file} by the following line: \ITE{
 \item[] \ttt{\%agent: } \textit{signature\_expression} } according to
@@ -1314,63 +1288,6 @@ the toplevel in order to allow a new interactive session.
 The option \ttt{-mode interactive} interrupts automatically the
 simulation (and launches the toplevel) just after the initialization
 of the simulation.
-
-\chapter{A simple model}\label{chap:abc}
-
-We describe below the content of a simple Kappa model and give examples of some typical run\footnote{The corresponding Kappa file is included in the distribution of \KaSim, in the directory \ttt{models/}}.
-
-\section{ABC.ka}
-\begin{lstlisting}[language=kappa]
-#### Signatures
-%agent: A(x,c) # Declaration of agent A
-%agent: B(x) # Declaration of B
-%agent: C(x1~u~p,x2~u~p) # Declaration of C with 2 modifiable sites
-#### Rules
-'a.b' A(x),B(x) -> A(x!1),B(x!1) @ 'on_rate' #A binds B
-'a..b' A(x!1),B(x!1) -> A(x),B(x) @ 'off_rate' #AB dissociation
-'ab.c' A(x!_,c),C(x1~u) -> A(x!_,c!2),C(x1~u!2)  @ 'on_rate' #AB binds C
-'mod x1' C(x1~u!1),A(c!1) -> C(x1~p),A(c)  @ 'mod_rate' #ABC modifies x1
-'a.c' A(x,c),C(x1~p,x2~u) -> A(x,c!1),C(x1~p,x2~u!1) @ 'on_rate' #A binds C on x2
-'mod x2' A(x,c!1),C(x1~p,x2~u!1) -> A(x,c),C(x1~p,x2~p) @ mod_rate #A modifies x2
-#### Variables
-%var: 'on_rate' 1.0E-4 # per molecule per second
-%var: 'off_rate' 0.1 # per second
-%var: 'mod_rate' 1 # per second
-%obs: 'AB' |A(x!x.B)|
-%obs: 'Cuu' |C(x1~u,x2~u)|
-%obs: 'Cpu' |C(x1~p,x2~u)|
-%obs: 'Cpp' |C(x1~p,x2~p)|
-#### Initial conditions
-%init: 1000 A(),B()
-%init: 10000 C()
-\end{lstlisting}
-
-Lines 1-4 of this KF\index{Kappa file} contain signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have two sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u} (unphosphorylated) or \ttt{p} (phosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by
-\begin{lstlisting}[language=kappa]
-'alt_ab.c' A(x!1,c),B(x!1),C(x1~u) -> ...
-\end{lstlisting}
-There are two main points to notice about this model: \ttt{A} can modify both sites of \ttt{C} once it is bound to them. However, only an \ttt{A} bound to a \ttt{B} can connect on \ttt{x1} and only a free \ttt{A} can connect on \ttt{x2}. Note also that \ttt{x2} is available for connection only when \ttt{x1} is already modified.
-
-\section{Some runs}
-We try first a coarse simulation of $100,000$ events (10 times the number of agents in the initial system).
-\ttt{
-\ITE{
-\item[\$] KaSim ABC.ka -u event -l 100000 -p 1000 -o abc.csv
-}}
-Plotting the content of the \ttt{abc.csv} file one notices that nothing  significantly  interesting happens to the observables after 250s. So we can now specify a meaningful time limit by running:
-\ttt{
-\ITE{
-\item[\$] KaSim ABC.ka -l 250 -p 0.25 -o abc.out
-}}
-which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=12cm]{generated_img/plot-abc.png}
-\caption{Simulation of the ABC model: population of unmodified \ttt{C}s (observable \ttt{Cuu} in red) drops rapidly and is replaced, in a first step by simply modified \ttt{C}s (observable \ttt{Cpu} in blue) which are in turn replaced by doubly modified \ttt{C}s (observable \ttt{Cpp} in red). Note that the population of \ttt{AB} complexes (observable \ttt{AB} in black) stabilizes slightly below 400 individuals after about 20s.}
-\label{fig:abc}
-\end{center}
-\end{figure}
-We will use this model as a running example for the next chapter, in order to illustrate various advanced concepts.
 
 \chapter{Advanced concepts}\label{chap:advanced}
 

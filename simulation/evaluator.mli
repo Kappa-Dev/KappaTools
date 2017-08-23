@@ -10,7 +10,7 @@ val do_interactive_directives :
   outputs:(Data.t -> unit) -> max_sharing:bool ->
   syntax_version:Ast.syntax_version ->
   Contact_map.t -> Model.t -> Counter.t -> Rule_interpreter.t ->
-  State_interpreter.t -> (Ast.mixture, string) Ast.modif_expr list ->
+  State_interpreter.t -> (Ast.mixture, Ast.mixture, string) Ast.modif_expr list ->
   Primitives.modification list *
   (Model.t * (bool * Rule_interpreter.t * State_interpreter.t))
 

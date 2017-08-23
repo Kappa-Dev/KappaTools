@@ -1622,8 +1622,9 @@ let modif_expr_of_ast
   | Ast.INTRO (how,(who,pos)) ->
     Ast.INTRO
       (alg_expr_of_ast ~syntax_version sigs tok algs how ~with_counters,
-       (mixture_of_ast
-          ~syntax_version sigs ~contact_map pos who ~with_counters,pos)),
+       (to_raw_mixture sigs
+         (mixture_of_ast
+          ~syntax_version sigs ~contact_map pos who ~with_counters),pos)),
     acc
   | Ast.DELETE (how,(who,pos)) ->
     Ast.DELETE
@@ -1754,7 +1755,7 @@ let counters_perturbations sigs ast_sigs =
 
 let init_of_ast ~syntax_version sigs tok contact_map ~with_counters = function
   | Ast.INIT_MIX who,pos ->
-    Ast.INIT_MIX (mixture_of_ast ~syntax_version sigs ~contact_map pos who ~with_counters),pos
+    Ast.INIT_MIX (to_raw_mixture sigs (mixture_of_ast ~syntax_version sigs ~contact_map pos who ~with_counters)),pos
   | Ast.INIT_TOK lab,pos ->
     match Mods.StringMap.find_option lab tok with
     | Some x -> Ast.INIT_TOK x,pos

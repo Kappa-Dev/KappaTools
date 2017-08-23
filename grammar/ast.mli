@@ -79,74 +79,74 @@ type rule = {
 
 val flip_label : string -> string
 
-type ('mixture,'id) modif_expr =
+type ('pattern,'mixture,'id) modif_expr =
   | INTRO of
-      (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
+      (('pattern,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
   | DELETE of
-      (('mixture,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
+      (('pattern,'id) Alg_expr.e Locality.annot * 'pattern Locality.annot)
   | UPDATE of
-      ('id Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot)
+      ('id Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
   | UPDATE_TOK of
-      ('id Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot)
+      ('id Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
-  | STOP of ('mixture,'id) Alg_expr.e Primitives.print_expr list
-  | SNAPSHOT of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+  | STOP of ('pattern,'id) Alg_expr.e Primitives.print_expr list
+  | SNAPSHOT of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   (*maybe later of mixture too*)
   | PRINT of
-      (('mixture,'id) Alg_expr.e Primitives.print_expr list) *
-       (('mixture,'id) Alg_expr.e Primitives.print_expr list)
+      (('pattern,'id) Alg_expr.e Primitives.print_expr list) *
+       (('pattern,'id) Alg_expr.e Primitives.print_expr list)
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Locality.annot)
-  | CFLOWMIX of (bool * 'mixture Locality.annot)
+  | CFLOWMIX of (bool * 'pattern Locality.annot)
   | FLUX of
-      Primitives.flux_kind * ('mixture,'id) Alg_expr.e Primitives.print_expr list
-  | FLUXOFF of ('mixture,'id) Alg_expr.e Primitives.print_expr list
+      Primitives.flux_kind * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+  | FLUXOFF of ('pattern,'id) Alg_expr.e Primitives.print_expr list
   | SPECIES_OF of
-      (bool * ('mixture,'id) Alg_expr.e Primitives.print_expr list
-       * 'mixture Locality.annot)
+      (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
+       * 'pattern Locality.annot)
 
-type ('mixture,'id) perturbation =
+type ('pattern,'mixture,'id) perturbation =
   (Nbr.t option *
-   ('mixture,'id) Alg_expr.bool Locality.annot option *
-   (('mixture,'id) modif_expr list) *
-   ('mixture,'id) Alg_expr.bool Locality.annot option)
+   ('pattern,'id) Alg_expr.bool Locality.annot option *
+   (('pattern,'mixture,'id) modif_expr list) *
+   ('pattern,'id) Alg_expr.bool Locality.annot option)
     Locality.annot
 
 type configuration = string Locality.annot * (string Locality.annot list)
 
-type ('mixture,'id) variable_def =
-  string Locality.annot * ('mixture,'id) Alg_expr.e Locality.annot
+type ('pattern,'id) variable_def =
+  string Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot
 
 type ('mixture,'id) init_t =
   | INIT_MIX of 'mixture
   | INIT_TOK of 'id
 
-type ('mixture,'id) init_statment =
+type ('pattern,'mixture,'id) init_statment =
   string Locality.annot option *
-  ('mixture,'id) Alg_expr.e Locality.annot *
+  ('pattern,'id) Alg_expr.e Locality.annot *
   ('mixture,'id) init_t Locality.annot
 
-type ('mixture,'id) instruction =
+type ('pattern,'mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
-  | INIT     of ('mixture,'id) init_statment
-  | DECLARE  of ('mixture,'id) variable_def
-  | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
-  | PLOT     of ('mixture,'id) Alg_expr.e Locality.annot
-  | PERT     of ('mixture,'id) perturbation
+  | INIT     of ('pattern,'mixture,'id) init_statment
+  | DECLARE  of ('pattern,'id) variable_def
+  | OBS      of ('pattern,'id) variable_def (*for backward compatibility*)
+  | PLOT     of ('pattern,'id) Alg_expr.e Locality.annot
+  | PERT     of ('pattern,'mixture,'id) perturbation
   | CONFIG   of configuration
 
-type ('mixture,'id) command =
-  | RUN of ('mixture,'id) Alg_expr.bool Locality.annot
-  | MODIFY of ('mixture,'id) modif_expr list
+type ('pattern,'mixture,'id) command =
+  | RUN of ('pattern,'id) Alg_expr.bool Locality.annot
+  | MODIFY of ('pattern,'mixture,'id) modif_expr list
   | QUIT
 
-type ('agent,'mixture,'id,'rule,'edit_rule) compil =
+type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
   {
     variables :
-      ('mixture,'id) variable_def list;
+      ('pattern,'id) variable_def list;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures :
       'agent list; (**agent signature declaration*)
@@ -156,12 +156,12 @@ type ('agent,'mixture,'id,'rule,'edit_rule) compil =
     edit_rules : (string Locality.annot option * 'edit_rule) list;
     (** rules with explicit modifications*)
     observables :
-      ('mixture,'id) Alg_expr.e Locality.annot list;
+      ('pattern,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
-    init : ('mixture,'id) init_statment list;
+    init : ('pattern,'mixture,'id) init_statment list;
     (*initial graph declaration*)
     perturbations :
-      ('mixture,'id) perturbation list;
+      ('pattern,'mixture,'id) perturbation list;
     configurations :
       configuration list;
     tokens :
@@ -170,7 +170,7 @@ type ('agent,'mixture,'id,'rule,'edit_rule) compil =
       (string * float * string) list
   }
 
-type parsing_compil = (agent,mixture,string,rule,edit_rule) compil
+type parsing_compil = (agent,mixture,mixture,string,rule,edit_rule) compil
 
 val empty_compil : parsing_compil
 

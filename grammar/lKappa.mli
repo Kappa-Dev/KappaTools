@@ -80,21 +80,23 @@ val bool_expr_of_ast :
 val modif_expr_of_ast :
   syntax_version:Ast.syntax_version -> Signature.s -> int Mods.StringMap.t ->
   int Mods.StringMap.t -> Contact_map.t -> with_counters:bool ->
-  (Ast.mixture, string) Ast.modif_expr -> int list ->
-  (rule_agent list, int) Ast.modif_expr * int list
+  (Ast.mixture, Ast.mixture, string) Ast.modif_expr -> int list ->
+  (rule_agent list, Raw_mixture.t, int) Ast.modif_expr * int list
 
 val init_of_ast :
   syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->
   with_counters:bool ->
   int Mods.StringMap.t -> int Mods.StringMap.t ->
-  (Ast.mixture,string) Ast.init_statment list ->
-  (rule_agent list, int) Ast.init_statment list
+  (Ast.mixture, Ast.mixture, string) Ast.init_statment list ->
+  (rule_agent list,  Raw_mixture.t, int) Ast.init_statment list
 
 val compil_of_ast :
   syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
   Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
-  int list * (Ast.agent, rule_agent list, int, rule_agent rule, unit) Ast.compil
+  int list *
+  (Ast.agent, rule_agent list, Raw_mixture.t, int, rule_agent rule, unit)
+    Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
     @return the signature of agent, the contact map, the signature of

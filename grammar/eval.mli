@@ -26,14 +26,14 @@ val compile_bool:
 val compile_modifications_no_track:
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Ast.modif_expr list ->
+  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile_inits:
   ?rescale:float ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Model.t ->
-  (LKappa.rule_mixture, int) Ast.init_statment list ->
+  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
   (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
 
 val compile :
@@ -43,10 +43,10 @@ val compile :
   max_sharing:bool ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool ->
-  ?overwrite_init:(LKappa.rule_mixture, int) Ast.init_statment list ->
+  ?overwrite_init:(LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Contact_map.t ->
-  ('c, LKappa.rule_mixture, int, LKappa.rule_agent LKappa.rule, unit) Ast.compil -> 'b
+  ('c, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule_agent LKappa.rule, unit) Ast.compil -> 'b
 
 val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->

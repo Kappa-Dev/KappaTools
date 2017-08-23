@@ -739,29 +739,29 @@ let rec join_mixture parameters error mixture1 mixture2 =
 let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX
 (*TO DO*)
 
-type 'mixture rule =
+type 'pattern rule =
   {
     position: Locality.t ;
     prefix: int;
     delta: int;
-    lhs   : 'mixture;
+    lhs   : 'pattern;
     bidirectional : bool;
-    rhs   : 'mixture;
-    k_def : ('mixture,string) Alg_expr.e Locality.annot;
-    k_un  : ('mixture,string) Alg_expr.e Locality.annot option;
+    rhs   : 'pattern;
+    k_def : ('pattern,string) Alg_expr.e Locality.annot;
+    k_un  : ('pattern,string) Alg_expr.e Locality.annot option;
     ast : string
   }
 
-type 'mixture perturbation = ('mixture,string) Ast.perturbation
+type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
 
-type 'mixture modif_expr   = ('mixture,string) Ast.modif_expr
+type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
 
-type 'mixture variable     = ('mixture,string) Ast.variable_def
+type 'pattern variable     = ('pattern,string) Ast.variable_def
 
 type direction = Direct | Reverse
 
-type ('agent,'mixture,'rule) compil =
-  ('agent, 'mixture, string, 'rule, unit) Ast.compil
+type ('agent,'pattern,'mixture,'rule) compil =
+  ('agent, 'pattern, 'mixture, string, 'rule, unit) Ast.compil
 
 type ('a, 'b) site_type =
   | Internal of 'a

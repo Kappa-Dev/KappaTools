@@ -41,10 +41,10 @@
 %type <Ast.parsing_compil -> Ast.parsing_compil> start_rule
 
 %start interactive_command
-%type <(Ast.mixture,string) Ast.command> interactive_command
+%type <(Ast.mixture,Ast.mixture,string) Ast.command> interactive_command
 
 %start standalone_effect_list
-%type <(Ast.mixture,string) Ast.modif_expr list> standalone_effect_list
+%type <(Ast.mixture,Ast.mixture,string) Ast.modif_expr list> standalone_effect_list
 
 %start standalone_bool_expr
 %type <(Ast.mixture,string) Alg_expr.bool Locality.annot> standalone_bool_expr
