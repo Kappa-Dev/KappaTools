@@ -19,13 +19,17 @@ val num_of_internal_state : int -> string Locality.annot -> t -> int
 
 val internal_state_of_num : int -> int -> t -> string
 
+val counter_of_site : int -> t -> (int * int) option
+val has_counter : t -> bool
+
 type s (** Store of all the agents *)
 
 val create :
   bool ->
   (string Locality.annot *
    (unit NamedDecls.t *
-    (string Locality.annot * string Locality.annot) list) NamedDecls.t) array ->
+    (string Locality.annot * string Locality.annot) list *
+      (int * int) option) NamedDecls.t) array ->
   s
 
 val size : s -> int

@@ -1599,7 +1599,7 @@ let compute_signature show_title state =
                 state,
                 (Locality.dummy_annot x,
                  (states',
-                  binding'))::acc)
+                  binding',None))::acc)
              (state,[]) interface
          in
          state,
