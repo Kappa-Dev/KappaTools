@@ -359,7 +359,14 @@ let pert_of_result
   let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
       (fun (domain, alg_deps, p_id, lpert, tracking_enabled)
-        ((alarm, pre_expr, modif_expr_list, opt_post),_) ->
+        ((alarm, pre_expr, modif_expr_list, opt_post),pos) ->
+        let () =
+          match alarm with
+          | Some n ->
+             if ((Nbr.compare n Nbr.zero) = 0) then
+               raise (ExceptionDefn.Malformed_Decl
+                        ("alarm 0.0 is not allowed", pos)) else ()
+          | None -> () in
         let origin = Operator.PERT p_id in
         let pre_expr' = pert_not_init (alarm,pre_expr,opt_post) in
         let (domain',pre) =
