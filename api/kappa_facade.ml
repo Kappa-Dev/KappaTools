@@ -173,6 +173,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
        (result :
           (Ast.agent,
            LKappa.rule_agent list,
+           Raw_mixture.t,
            int,
            LKappa.rule_agent LKappa.rule, unit) Ast.compil)) ->
       (yield ()) >>=
