@@ -588,6 +588,213 @@ let incr_agent sigs =
   let before = Signature.num_of_site ("b",Locality.dummy) incr in
   (id,arity,before,after)
 
+let make_counter_agent sigs
+      (first,dst) (last,equal) i j pos created =
+  let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
+  let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), Maintained) in
+  let before_switch = if first&&created then Linked (i,pos) else Maintained in
+  let before =
+    if first then Ast.LNK_VALUE (i,dst), pos
+    else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
+  let () = ra_ports.(incr_b) <- before,before_switch in
+  let after =
+    if (last&&equal) then Ast.LNK_FREE, pos
+    else
+      if last then Ast.LNK_ANY, pos
+      else Ast.LNK_VALUE (j,(ra_type,incr_b)), pos in
+  let () = ra_ports.(incr_a) <- (after,Maintained) in
+  let ra_ints = Array.make arity I_ANY in
+  {ra_type; ra_erased = false; ra_ports; ra_ints;
+   ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
+
+let raw_counter_agent
+      (first,first_lnk) (last,last_lnk) i j sigs equal =
+  let (incr_type,arity,incr_b,incr_a) = incr_agent sigs in
+  let ports = Array.make arity (Raw_mixture.FREE) in
+  let internals =
+    Array.init arity
+               (fun i ->
+                 Signature.default_internal_state incr_type i sigs) in
+  let before = if first then Raw_mixture.VAL first_lnk
+               else Raw_mixture.VAL i in
+  let () = ports.(incr_b) <- before in
+  let after =
+    if (last&&equal) then Raw_mixture.FREE
+    else
+      if last then Raw_mixture.VAL last_lnk
+      else Raw_mixture.VAL j in
+  let () = ports.(incr_a) <- after in
+  { Raw_mixture.a_type = incr_type;
+    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+
+let rec add_incr i first_lnk last_lnk delta equal sigs =
+  if (i=delta) then []
+  else
+    let first = (i=0) in
+    let last = (i=(delta-1)) in
+    let raw_incr =
+      raw_counter_agent
+        (first,first_lnk) (last,last_lnk)
+        (first_lnk+i) (first_lnk+i+1) sigs equal in
+    raw_incr::(add_incr (i+1) first_lnk last_lnk delta equal sigs)
+
+let rec link_incr sigs i nb ag_info equal lnk pos delta =
+  if (i=nb) then []
+  else
+    let first = (i=0) in
+    let last = (i=(nb-1)) in
+    let ra_agent =
+      make_counter_agent sigs (first,ag_info) (last,equal)
+                         (lnk+i) (lnk+i+1) pos (delta>0) in
+    ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
+
+let rec erase_incr sigs i incrs delta lnk =
+  let (_,_,incr_b,_) = incr_agent sigs in
+  match incrs with
+  | hd::tl ->
+     if (i = abs(delta)) then
+       let (before,_) = hd.ra_ports.(incr_b) in
+       let () = hd.ra_ports.(incr_b) <- before, Linked lnk in
+       hd::tl
+     else
+       let () =
+         Array.iteri
+           (fun i (a,_) -> hd.ra_ports.(i) <- a,Erased) hd.ra_ports in
+       let ag = {hd with ra_erased = true} in
+       ag::(erase_incr sigs (i+1) tl delta lnk)
+  | [] -> []
+
+let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
+  let (incr_type,_,incr_b,_) = incr_agent sigs in
+  let start_lnk_for_created = start_lnk_nb + test +1 in
+  let lnk_for_erased = start_lnk_nb + abs(delta) in
+  let ag_info = p_id,ra.ra_type in
+
+  let test_incr =
+    link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
+  let adjust_delta =
+    if (delta<0)
+    then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
+    else test_incr in
+  let created =
+    if (delta>0)
+    then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
+    else [] in
+
+  let () = if (test + delta < 0) then
+      raise (ExceptionDefn.Internal_Error
+               ("Counter test should be greater then abs(delta)",pos')) in
+  let switch =
+    if (delta = 0) then Maintained
+    else if (delta > 0) then Linked (start_lnk_for_created,pos')
+    else Linked (lnk_for_erased,pos') in
+  let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
+  let () = ra.ra_ports.(p_id) <- p in
+  (adjust_delta,created)
+
+(* ag - agent with counters in a rule
+   lnk_nb - the max link number used in the rule;
+   incr_info - info on the incr agent from the signature
+   returns: agent with explicit counters; created incr agents;
+            the next link number to use *)
+let remove_counter_agent sigs ag lnk_nb =
+  let (incrs,lnk_nb') =
+    Tools.array_fold_lefti
+    (fun id (acc_incrs,lnk_nb) (counter,_) ->
+      let (s,pos) = counter.Ast.count_nme in
+      if (s = "") then (acc_incrs,lnk_nb)
+      else
+        match (counter.Ast.count_test,counter.Ast.count_delta) with
+        | (None,_) ->
+           raise (ExceptionDefn.Internal_Error
+                    ("Counter "^s^" should have a test by now",pos))
+        | (Some (test,pos')), delta ->
+           match test with
+           | Ast.CEQ j ->
+              (counter_becomes_port
+                 sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
+              lnk_nb+1+j+(fst delta)
+           | Ast.CGTE j ->
+              (counter_becomes_port
+                 sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
+              lnk_nb+1+j+(fst delta)
+           | Ast.CVAR _ ->
+              raise (ExceptionDefn.Internal_Error
+                       ("Counter "^s^" should not have a var by now",pos')))
+    ([],lnk_nb) ag.ra_counters in
+  let (als,bls) =
+    List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
+  (als,bls,lnk_nb')
+
+let remove_counter_created_agent sigs raw ag lnk_nb =
+  let raw_agent =
+    List.find (fun rag -> rag.Raw_mixture.a_type = ag.ra.ra_type) raw in
+  let ports = raw_agent.Raw_mixture.a_ports in
+  let () = Signature.print_agent sigs (Format.str_formatter) ag.ra.ra_type in
+  let agent_name = Format.flush_str_formatter () in
+  Tools.array_fold_lefti
+    (fun p_id (acc,lnk) (c,_) ->
+      let (s,_) = c.Ast.count_nme in
+      if (s = "") then (acc,lnk)
+      else
+      match c.Ast.count_test with
+      | None -> not_enough_specified agent_name c.Ast.count_nme
+      | Some (test,_) ->
+         match test with
+         | Ast.CEQ j ->
+            let p = Raw_mixture.VAL lnk in
+            let () = ports.(p_id) <- p in
+            let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
+            (acc@incrs,(lnk+j+1))
+         | Ast.CGTE _ | Ast.CVAR _ ->
+            not_enough_specified agent_name c.Ast.count_nme)
+    ([],lnk_nb) ag.ra_counters
+
+(* - adds increment agents to the contact map
+   - adds increment agents to the raw mixture
+   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
+     to the increments *)
+let remove_counter_rule sigs with_counters mix created =
+  if (with_counters) then
+    let lnk_nb =
+      List.fold_left
+        (fun max ag ->
+          Array.fold_left
+            (fun max ((lnk,_),switch) ->
+              let max' =
+                match lnk with
+                  Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
+                | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
+                  | Ast.LNK_TYPE _ -> max in
+              match switch with
+              | Linked (i,_) ->  if (max'<i) then i else max'
+              | Freed | Maintained | Erased -> max')
+            max ag.ra.ra_ports) 0 mix in
+    let mix_created,mix' = List.partition (fun ag -> ag.ra_created) mix in
+    let (incrs,incrs_created,ra_mix,lnk_nb') =
+      List.fold_left
+        (fun (a,b,c,lnk) ag ->
+            let (a',b',lnk') = remove_counter_agent sigs ag lnk in
+            a'@a,b'@b,ag.ra::c,lnk')
+        ([],[],[],lnk_nb+1) mix' in
+    let incrs_created',_ =
+      List.fold_left
+        (fun (acc,lnk) ag ->
+          let (a,lnk') =
+            remove_counter_created_agent sigs created ag lnk in
+          (a@acc,lnk'))
+        ([],lnk_nb') mix_created in
+    (ra_mix@incrs,created@incrs_created@incrs_created')
+  else List.map (fun ag -> ag.ra) mix,created
+
+let remove_counters sigs with_counters rules  =
+  List.map
+    (fun (s,(r,a)) ->
+      let (r_mix,r_created) =
+        remove_counter_rule sigs with_counters r.r_mix r.r_created in
+      let r' = {r with r_mix;r_created} in
+      (s,(r',a))) rules
+
 let annotate_dropped_agent
     ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -1216,7 +1423,10 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
                ~syntax_version sigs ?contact_map (snd lannot) ty intf in
-           ((fst lannot,rannot'),acc,x'::news)
+           let acc' =
+             annotate_created_counters
+               sigs ?contact_map ty counts acc in
+           ((fst lannot,rannot'),acc',x'::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
                ~syntax_version sigs (fst lannot) ty intf counts in
@@ -1317,219 +1527,20 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
     k_def,k_un,r_pos)
    ::rules')
 
-let make_counter_agent sigs
-      (first,dst) (last,equal) i j pos created =
-  let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
-  let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), Maintained) in
-  let before_switch = if first&&created then Linked (i,pos) else Maintained in
-  let before =
-    if first then Ast.LNK_VALUE (i,dst), pos
-    else Ast.LNK_VALUE (i,(incr_a,ra_type)), pos in
-  let () = ra_ports.(incr_b) <- before,before_switch in
-  let after =
-    if (last&&equal) then Ast.LNK_FREE, pos
-    else
-      if last then Ast.LNK_ANY, pos
-      else Ast.LNK_VALUE (j,(incr_b,ra_type)), pos in
-  let () = ra_ports.(incr_a) <- (after,Maintained) in
-  let ra_ints = Array.make arity I_ANY in
-  {ra_type; ra_erased = false; ra_ports; ra_ints;
-   ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
-
-let raw_counter_agent
-      (first,first_lnk) (last,last_lnk) i j sigs equal =
-  let (incr_type,arity,incr_b,incr_a) = incr_agent sigs in
-  let ports = Array.make arity (Raw_mixture.FREE) in
-  let internals =
-    Array.init arity
-               (fun i ->
-                 Signature.default_internal_state incr_type i sigs) in
-  let before = if first then Raw_mixture.VAL first_lnk
-               else Raw_mixture.VAL i in
-  let () = ports.(incr_b) <- before in
-  let after =
-    if (last&&equal) then Raw_mixture.FREE
-    else
-      if last then Raw_mixture.VAL last_lnk
-      else Raw_mixture.VAL j in
-  let () = ports.(incr_a) <- after in
-  { Raw_mixture.a_type = incr_type;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
-
-let rec add_incr i first_lnk last_lnk delta equal sigs =
-  if (i=delta) then []
-  else
-    let first = (i=0) in
-    let last = (i=(delta-1)) in
-    let raw_incr =
-      raw_counter_agent
-        (first,first_lnk) (last,last_lnk)
-        (first_lnk+i) (first_lnk+i+1) sigs equal in
-    raw_incr::(add_incr (i+1) first_lnk last_lnk delta equal sigs)
-
-let rec link_incr sigs i nb ag_info equal lnk pos delta =
-  if (i=nb) then []
-  else
-    let first = (i=0) in
-    let last = (i=(nb-1)) in
-    let ra_agent =
-      make_counter_agent sigs (first,ag_info) (last,equal)
-                         (lnk+i) (lnk+i+1) pos (delta>0) in
-    ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
-
-let rec erase_incr sigs i incrs delta lnk =
-  let (_,_,incr_b,_) = incr_agent sigs in
-  match incrs with
-  | hd::tl ->
-     if (i = abs(delta)) then
-       let (before,_) = hd.ra_ports.(incr_b) in
-       let () = hd.ra_ports.(incr_b) <- before, Linked lnk in
-       hd::tl
-     else
-       let () =
-         Array.iteri
-           (fun i (a,_) -> hd.ra_ports.(i) <- a,Erased) hd.ra_ports in
-       let ag = {hd with ra_erased = true} in
-       ag::(erase_incr sigs (i+1) tl delta lnk)
-  | [] -> []
-
-let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
-  let (incr_type,_,incr_b,_) = incr_agent sigs in
-  let start_lnk_for_created = start_lnk_nb + test +1 in
-  let lnk_for_erased = start_lnk_nb + abs(delta) in
-  let ag_info = p_id,ra.ra_type in
-
-  let test_incr =
-    link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
-  let adjust_delta =
-    if (delta<0)
-    then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
-    else test_incr in
-  let created =
-    if (delta>0)
-    then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
-    else [] in
-
-  let () = if (test + delta < 0) then
-      raise (ExceptionDefn.Internal_Error
-               ("Counter test should be greater then abs(delta)",pos')) in
-  let switch =
-    if (delta = 0) then Maintained
-    else if (delta > 0) then Linked (start_lnk_for_created,pos')
-    else Linked (lnk_for_erased,pos') in
-  let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
-  let () = ra.ra_ports.(p_id) <- p in
-  (adjust_delta,created)
-
-(* ag - agent with counters in a rule
-   lnk_nb - the max link number used in the rule;
-   incr_info - info on the incr agent from the signature
-   returns: agent with explicit counters; created incr agents;
-            the next link number to use *)
-let remove_counter_agent sigs ag lnk_nb =
-  let (incrs,lnk_nb') =
-    Tools.array_fold_lefti
-    (fun id (acc_incrs,lnk_nb) (counter,_) ->
-      let (s,pos) = counter.Ast.count_nme in
-      if (s = "") then (acc_incrs,lnk_nb)
-      else
-        match (counter.Ast.count_test,counter.Ast.count_delta) with
-        | (None,_) ->
-           raise (ExceptionDefn.Internal_Error
-                    ("Counter "^s^" should have a test by now",pos))
-        | (Some (test,pos')), delta ->
-           match test with
-           | Ast.CEQ j ->
-              (counter_becomes_port
-                 sigs ag.ra id delta pos true j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-           | Ast.CGTE j ->
-              (counter_becomes_port
-                 sigs ag.ra id delta pos false j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-           | Ast.CVAR _ ->
-              raise (ExceptionDefn.Internal_Error
-                       ("Counter "^s^" should not have a var by now",pos')))
-    ([],lnk_nb) ag.ra_counters in
-  let (als,bls) =
-    List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
-  (als,bls,lnk_nb')
-
-let remove_counter_created_agent sigs raw ag lnk_nb =
-  let raw_agent =
-    List.find (fun rag -> rag.Raw_mixture.a_type = ag.ra.ra_type) raw in
-  let ports = raw_agent.Raw_mixture.a_ports in
-  let () = Signature.print_agent sigs (Format.str_formatter) ag.ra.ra_type in
-  let agent_name = Format.flush_str_formatter () in
-  Tools.array_fold_lefti
-    (fun p_id (acc,lnk) (c,_) ->
-      let (s,_) = c.Ast.count_nme in
-      if (s = "") then (acc,lnk)
-      else
-      match c.Ast.count_test with
-      | None -> not_enough_specified agent_name c.Ast.count_nme
-      | Some (test,_) ->
-         match test with
-         | Ast.CEQ j ->
-            let p = Raw_mixture.VAL lnk in
-            let () = ports.(p_id) <- p in
-            let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
-            (acc@incrs,(lnk+j))
-         | Ast.CGTE _ | Ast.CVAR _ ->
-            not_enough_specified agent_name c.Ast.count_nme)
-    ([],lnk_nb) ag.ra_counters
-
-(* - adds increment agents to the contact map
-   - adds increment agents to the raw mixture
-   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
-     to the increments *)
-let remove_counter_rule sigs with_counters mix created =
-  if (with_counters) then
-    let lnk_nb =
-      List.fold_left
-        (fun max ag ->
-          Array.fold_left
-            (fun max ((lnk,_),switch) ->
-              let max' =
-                match lnk with
-                  Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
-                | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
-                  | Ast.LNK_TYPE _ -> max in
-              match switch with
-              | Linked (i,_) ->  if (max'<i) then i else max'
-              | Freed | Maintained | Erased -> max')
-            max ag.ra.ra_ports) 0 mix in
-    let mix_created,mix' = List.partition (fun ag -> ag.ra_created) mix in
-    let (incrs,incrs_created,ra_mix,lnk_nb') =
-      List.fold_left
-        (fun (a,b,c,lnk) ag ->
-            let (a',b',lnk') = remove_counter_agent sigs ag lnk in
-            a'@a,b'@b,ag.ra::c,lnk')
-        ([],[],[],lnk_nb+1) mix' in
-    let incrs_created',_ =
-      List.fold_left
-        (fun (acc,lnk) ag ->
-          let (a,lnk') =
-            remove_counter_created_agent sigs created ag lnk in
-          (a@acc,lnk'))
-        ([],lnk_nb') mix_created in
-    (ra_mix@incrs,created@incrs_created@incrs_created')
-  else List.map (fun ag -> ag.ra) mix,created
-
-let remove_counters sigs with_counters rules  =
-  List.map
-    (fun (s,(r,a)) ->
-      let (r_mix,r_created) =
-        remove_counter_rule sigs with_counters r.r_mix r.r_created in
-      let r' = {r with r_mix;r_created} in
-      (s,(r',a))) rules
-
 let mixture_of_ast ~syntax_version sigs ?contact_map ~with_counters pos mix =
   match annotate_edit_mixture
           ~syntax_version ~is_rule:false sigs ?contact_map mix with
   | r, [] -> fst (remove_counter_rule sigs with_counters r [])
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
+
+let raw_mixture_of_ast ~syntax_version sigs ?contact_map ~with_counters mix =
+  let created =
+    List.map (fun (ty,sites,_) -> (ty,sites, Some Ast.Create)) mix in
+  let (a,b) =
+    annotate_edit_mixture
+      ~syntax_version ~is_rule:false sigs ?contact_map created in
+  snd (remove_counter_rule sigs with_counters a b)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1630,9 +1641,8 @@ let modif_expr_of_ast
   | Ast.INTRO (how,(who,pos)) ->
     Ast.INTRO
       (alg_expr_of_ast ~syntax_version sigs tok algs how ~with_counters,
-       (to_raw_mixture sigs
-         (mixture_of_ast
-          ~syntax_version sigs ~contact_map pos who ~with_counters),pos)),
+       (raw_mixture_of_ast
+          ~syntax_version sigs ~contact_map who ~with_counters,pos)),
     acc
   | Ast.DELETE (how,(who,pos)) ->
     Ast.DELETE
@@ -1763,7 +1773,9 @@ let counters_perturbations sigs ast_sigs =
 
 let init_of_ast ~syntax_version sigs tok contact_map ~with_counters = function
   | Ast.INIT_MIX who,pos ->
-    Ast.INIT_MIX (to_raw_mixture sigs (mixture_of_ast ~syntax_version sigs ~contact_map pos who ~with_counters)),pos
+    Ast.INIT_MIX
+      (raw_mixture_of_ast
+         ~syntax_version sigs ~contact_map who ~with_counters),pos
   | Ast.INIT_TOK lab,pos ->
     match Mods.StringMap.find_option lab tok with
     | Some x -> Ast.INIT_TOK x,pos
