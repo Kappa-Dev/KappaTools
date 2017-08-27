@@ -11,7 +11,7 @@ module Html = Tyxml_js.Html5
 
 let display_id = "flux-map-display"
 let export_id = "flux-export"
-let svg_id = "fluxmap-svg"
+let svg_id = "fluxmap-container"
 let select_id = "fluxmap-select"
 
 let rules_checkboxes_id = "fluxmap-rules-checkboxes"
@@ -235,9 +235,9 @@ let onload () =
 
   let div : Dom_html.element Js.t = Ui_common.id_dom display_id in
   let () = div##.innerHTML := Js.string
-        ("<svg id=\""^
+        ("<div id=\""^
          svg_id^
-         "\" width=\"300\" height=\"300\"><g/></svg>") in
+         "\" width=\"300\" height=\"300\"></div>") in
   let () = Common.jquery_on "#navflux"
       "shown.bs.tab"
       (fun _ -> let () = set_tab_is_active true in select_fluxmap flux)

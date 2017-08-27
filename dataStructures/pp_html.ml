@@ -20,5 +20,5 @@ let graph_page title ?subtitle deps header core f =
 	     (fun f -> match subtitle with
 		       | None -> ()
 		       | Some t -> Format.fprintf f "@,<small>%t</small>" t) in
-  let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
+  let () = Format.fprintf f "<div id=\"flux_container\"></div>@," in
   Format.fprintf f "%t@,</div>@]@,</body>@,</html>@]@." core

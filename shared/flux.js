@@ -71,7 +71,7 @@ function fluxMap(configuration) {
             height = configuration.height?configuration.height:700,
             innerRadius = Math.min(width, height) * .37,
 	    outerRadius = innerRadius + 8;
-        var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("svg");
+        var svg = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("#flux_container").append("svg");
         svg.attr("width", width)
            .attr("height", height)
 	   .select("g")
