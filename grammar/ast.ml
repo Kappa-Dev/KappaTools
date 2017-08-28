@@ -1079,9 +1079,9 @@ let enumerate_counter_tests x a ((delta,_) as count_delta) c' =
       | Some (CEQ min,_) -> min in
 
   let rec enum v =
-    if (v=max) then []
+    if (v>max) then []
     else
-      if (v+delta < max)&&(v+delta >= 0)
+      if (v+delta <= max)&&(v+delta >= 0)
       then (Counter
               {count_nme=c'.count_nme;count_test = Some(CEQ v,a);count_delta},
             [x,v])::(enum (v+1))
