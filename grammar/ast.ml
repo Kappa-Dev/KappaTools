@@ -1018,19 +1018,19 @@ let update_rate counters (k,a) =
   ((update_expr k),a)
 
 let prepare_agent rsites lsites =
-  let rec prepare_site c = function
+  let rec prepare_site sites c =
+    match sites with
     | [] -> [Counter c]
     | hd::tl ->
        match hd with
          Counter c' when (name_match c.count_nme c'.count_nme) ->
          (Counter {c' with count_delta = c.count_delta})::tl
-       | Counter _ | Port _ -> hd::(prepare_site c tl) in
+       | Counter _ | Port _ -> hd::(prepare_site tl c) in
   let counters =
     List.fold_left
-      (fun acc' rsite ->
-        match rsite with Port _ -> acc' | Counter c -> c::acc')
+      (fun acc' rsite -> match rsite with Port _ -> acc' | Counter c -> c::acc')
       [] rsites in
-  List.fold_left (fun acc' c -> prepare_site c acc') lsites counters
+  List.fold_left prepare_site lsites counters
 
 (* - add in the lhs : (i) counters only mentioned in the rhs and (ii) the deltas
    - syntactic checks of no test in rhs; no modif in lhs *)
@@ -1053,7 +1053,7 @@ let prepare_counters rules =
        if ((String.compare (fst rna) (fst lna)) = 0) then
          let lsites' = prepare_agent rsites lsites in
          (lna,lsites',b)::(fold r l)
-       else lagent::(fold r l)
+       else lagent::(fold r l) (*what does this subcase mean?*)
     | [], _ | _, [] -> [] in
 
   let aux r = {r with lhs = (fold r.rhs r.lhs)} in
@@ -1114,7 +1114,6 @@ let enumerate_edit rules f =
                | Some _, None -> s,r'
                | Some (s1,a1), Some s2 -> Some (s1^"__"^s2,a1),r') (f r) in
          enumerate_r@acc) [] rules)
-
 
 let remove_variable_in_counters rules edit_rules signatures =
   let counter_gte_delta c delta =

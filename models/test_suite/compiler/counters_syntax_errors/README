@@ -4,3 +4,4 @@
 "${KAPPABIN}"KaSim -seed 92067277 -d output negative_delta_too_big.ka --compile || true
 "${KAPPABIN}"KaSim -seed 92067277 -d output test_rhs.ka --compile || true
 "${KAPPABIN}"KaSim -seed 92067277 -d output var_not_spec.ka --compile || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_declared.ka --compile || true

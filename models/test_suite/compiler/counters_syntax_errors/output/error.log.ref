@@ -10,3 +10,5 @@ File "test_rhs.ka", line 5, characters 27-28:
 Counter c has a test in the rhs
 File "var_not_spec.ka", line 7, characters 59-60:
 z is not a declared variable
+File "counter_not_declared.ka", line 4, characters 20-21:
+"c" is not a declared site name for agent A.

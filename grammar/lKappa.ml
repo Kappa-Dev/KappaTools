@@ -1302,7 +1302,10 @@ although it is left unpecified in the left hand side"
           | _ :: _ -> several_occurence_of_site agent_name c_na in
         let () = ra_counters.(c_id) <- c'' in
         (rc',cset')) (rc,Mods.IntSet.empty) lc in
-  let _ =
+  let _ = (* test if counter of rhs is in the signature *)
+    List.map
+      (fun c -> Signature.num_of_site ~agent_name (c.Ast.count_nme) sign) rc_r in
+  let () =
     if not(rc =[]) && not(rc_r =[]) then
       raise (ExceptionDefn.Internal_Error
                ("Counters in "^agent_name^" should have tests by now",pos)) in
