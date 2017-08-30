@@ -277,10 +277,12 @@ let add_fully_specified_to_graph sigs graph cc =
             | None -> acc'
             | Some ag' -> fst @@ Edges.add_link ag site ag' s' acc'))
       cc (Mods.IntMap.empty,graph) in
-  let r =
+  let r = Renaming.empty () in
+  let out =
     Mods.IntMap.fold
-      (fun i (a,_) r -> Option_util.unsome (Renaming.empty ()) (Renaming.add i a r))
-      e (Renaming.empty ())  in
+      (fun i (a,_) acc -> acc && Renaming.imperative_add i a r)
+      e true in
+  let () = assert out in
   (g,r)
 
 let find_embeddings compil =

@@ -43,4 +43,7 @@ val check_edge : Edges.t -> abstract step -> bool
 val injection_for_one_more_edge :
   ?root:Agent.t -> Renaming.t -> Edges.t -> abstract step -> Renaming.t option
 
+val imperative_edge_is_valid :
+  ?root:Agent.t -> Renaming.t -> Edges.t -> abstract step -> bool
+
 val concretize : Agent.t -> Edges.t -> abstract t -> int t option

@@ -290,15 +290,17 @@ let rec sub_minimize_renaming r = function
     | None -> sub_minimize_renaming r (l,q')
 
 let minimize_renaming dst_nbt ref_nbt =
-  let re = Tools.array_fold_lefti
+  let re = Renaming.empty () in
+  let () = Array.iteri
       (fun ty ->
-         List.fold_left (fun r id ->
+         List.iter (fun id ->
              let ids' =
                List_util.smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
-             if ids' == dst_nbt.(ty) then r
-             else let () = dst_nbt.(ty) <- ids' in
-               Option_util.unsome (Renaming.empty ()) (Renaming.add id id r)))
-      (Renaming.empty ()) ref_nbt in
+             if ids' != dst_nbt.(ty) then
+               let () = dst_nbt.(ty) <- ids' in
+               let b = Renaming.imperative_add id id re in
+               assert b))
+      ref_nbt in
   Tools.array_fold_lefti
     (fun ty r ids -> sub_minimize_renaming r (ids,ref_nbt.(ty))) re dst_nbt
 

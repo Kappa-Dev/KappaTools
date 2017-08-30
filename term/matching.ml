@@ -36,39 +36,35 @@ let reconstruct_renaming domain graph cc_id root =
   | None -> failwith "Matching.reconstruct cc error"
   (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
   | Some (rids,rty) ->
-    let full_rename =
+    let inj = Renaming.empty () in
+    let _,injective =
       match Pattern.reconstruction_navigation (Pattern.Env.content point) with
       | _::_ as nav ->
         List.fold_left
-          (fun (root,inj_op) nav ->
-             match inj_op with
-             | None -> None,None
-             | Some inj ->
-               None,Navigation.injection_for_one_more_edge ?root inj graph nav)
-          (Some (root,rty),Some (Renaming.empty ())) nav
+          (fun (root,injective) nav ->
+             None,injective &&
+                  Navigation.imperative_edge_is_valid ?root inj graph nav)
+          (Some (root,rty),true) nav
       (*- rm - find_root: cc -> (type, node) option *)
-      | [] -> None, match rids with
-        | [rid] -> Renaming.add rid root (Renaming.empty ())
-        | _ -> None in
-  match full_rename with
-  | _, None ->
-    failwith ("Matching.reconstruct renaming error at root "^string_of_int root)
-  | _, Some rename -> rename
+      | [] -> None,match rids with
+        | [rid] -> Renaming.imperative_add rid root inj
+        | _ -> false in
+    if injective then inj else
+      failwith ("Matching.reconstruct renaming error at root "^string_of_int root)
 
 (* reconstruct: Pattern.Env.t -> Edges.t -> t -> int -> Pattern.id ->
    int -> t option*)
 let reconstruct domain graph inj id cc_id root =
-let rename = reconstruct_renaming domain graph cc_id root in
-    match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
-    | None -> None
-    | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
+  let rename = reconstruct_renaming domain graph cc_id root in
+  match Mods.IntSet.disjoint_union (Renaming.image rename) (snd inj) with
+  | None -> None
+  | Some co -> Some (Mods.IntMap.add id rename (fst inj),co)
 
 let rec aux_is_root_of graph root inj = function
   | [] -> true
   | h :: t ->
-    match Navigation.injection_for_one_more_edge ?root inj graph h with
-    | None -> false
-    | Some inj' -> aux_is_root_of graph None inj' t
+    Navigation.imperative_edge_is_valid ?root inj graph h &&
+    aux_is_root_of graph None inj t
 let is_root_of domain graph (_,rty as root) cc_id =
   let point = Pattern.Env.get domain cc_id in
   match Pattern.reconstruction_navigation (Pattern.Env.content point) with
@@ -83,7 +79,7 @@ let roots_of domain graph cc =
 
 (* get : (ContentAgent.t * int) -> t -> int *)
 let get ((node,_),id) (t,_) =
-  Renaming.apply (Mods.IntMap.find_default (Renaming.empty ()) id t) node
+  Renaming.apply (Mods.IntMap.find_default Renaming.dummy id t) node
 
 let elements_with_types domain ccs (t,_) =
   let out = Array.make (Mods.IntMap.size t) [] in

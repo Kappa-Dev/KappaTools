@@ -24,6 +24,9 @@ let empty () = {
   is_identity=true;
   dsts = Mods.IntSet.empty
 }
+
+let dummy = empty ()
+
 let identity l =
   let max = List.fold_left max 0 l in
   let immediate = Array.make (succ max) special_val in
@@ -93,7 +96,7 @@ let unsafe_imperative_add x y i =
 let imperative_add x y i =
   let not_ok =
     !Parameter.debugModeOn &&
-    (x >= Array.length i.immediate || i.immediate.(x) <> special_val) in
+    x < Array.length i.immediate && i.immediate.(x) <> special_val in
   if not_ok then raise Clashing else
     let origin = i.dsts in
     let () = unsafe_imperative_add x y i in

@@ -14,6 +14,7 @@ exception Clashing
 
 type t
 
+val dummy : t
 val empty : unit -> t
 val is_identity : t -> bool
 val identity : int list -> t
@@ -22,6 +23,10 @@ val image : t -> Mods.IntSet.t
 
 val cyclic_permutation_from_list : stop_at:int -> int list -> t
 (** very specific use case for Connected_component.remove_ag_cc *)
+
+val imperative_add : int -> int -> t -> bool
+(** @raise Clashing in debug mode
+@return if the addition preserves injectivity *)
 
 val add : int -> int -> t -> t option
 (** @raise Clashing in debug mode

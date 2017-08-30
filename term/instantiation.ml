@@ -195,26 +195,22 @@ let matching_abstract_concrete ae ce =
        (get_ids (map_test (Agent.id)) [] ce_tests)
        ce.actions) in
   let available_ids used =
-    match used with
-    | None -> concrete_ids
-    | Some r ->
-       List.filter
-         (fun i -> not(Mods.IntSet.mem i (Renaming.image r))) concrete_ids in
-  let acc_option f acc = match acc with
-    | Some a -> f a
-    | None -> None in
+    List.filter
+      (fun i -> not(Mods.IntSet.mem i (Renaming.image used))) concrete_ids in
   let partition fmap i =
     List.partition (fun q -> fmap (fun a -> (Matching.Agent.get_id a) = i) q) in
-  let matching =
+  let matching = Renaming.empty () in
+  let injective =
     List.fold_left
       (fun acc i ->
-        let (tests,_) = partition map_test i ae_tests in
-        let (actions,_) = partition map_action i ae.actions in
-        let j =
-          find_match tests actions ce_tests ce.actions (available_ids acc) in
-        (acc_option (Renaming.add i j) acc))
-      (Some (Renaming.empty ())) abstract_ids in
-  matching
+         acc &&
+         let (tests,_) = partition map_test i ae_tests in
+         let (actions,_) = partition map_action i ae.actions in
+         let j =
+           find_match tests actions ce_tests ce.actions (available_ids matching) in
+         Renaming.imperative_add i j matching)
+      true abstract_ids in
+  if injective then Some matching else None
 
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)

@@ -238,6 +238,26 @@ let injection_for_one_more_edge ?root inj graph = function
        | Some inj' -> dst_is_okay inj' graph root site dst)
     | _ -> None
 
+let imperative_dst_is_okay inj' graph root site = function
+  | ToNothing -> Edges.is_free root site graph
+  | ToInternal i -> Edges.is_internal i root site graph
+  | ToNode (Existing id',site') ->
+    Edges.link_exists root site (Renaming.apply inj' id') site' graph
+  | ToNode (Fresh (id',ty),site') ->
+    match Edges.exists_fresh root site ty site' graph with
+    | None -> false
+    | Some node -> Renaming.imperative_add id' node inj'
+
+let imperative_edge_is_valid ?root inj graph = function
+  | ((Existing id,site),dst) ->
+    imperative_dst_is_okay inj graph (Renaming.apply inj id) site dst
+  | ((Fresh (id,rty),site),dst) ->
+    match root with
+    | Some (root,rty') when rty=rty' ->
+      Renaming.imperative_add id root inj &&
+      imperative_dst_is_okay inj graph root site dst
+    | _ -> false
+
 let concretize_port inj = function
   | (Existing id,site) -> (Renaming.apply inj id,site)
   | (Fresh (id,_),site) -> (Renaming.apply inj id,site)
@@ -247,16 +267,16 @@ let concretize_arrow inj = function
   | ToNode x -> ToNode (concretize_port inj x)
 
 let concretize root graph nav =
+  let inj = Renaming.empty () in
   let out =
     List.fold_left
       (fun out (p,dst as step) ->
          match out with
          | None -> out
-         | Some (root,acc,inj) ->
-           match injection_for_one_more_edge ?root inj graph step with
-           | None -> None
-           | Some inj' ->
-             let st = (concretize_port inj' p, concretize_arrow inj' dst) in
-             Some (None,st::acc,inj'))
-      (Some (Some root,[],Renaming.empty ())) nav in
-  Option_util.map (fun (_,l,_) -> List.rev l) out
+         | Some (root,acc) ->
+           if imperative_edge_is_valid ?root inj graph step then
+             let st = (concretize_port inj p, concretize_arrow inj dst) in
+             Some (None,st::acc)
+           else None)
+      (Some (Some root,[])) nav in
+  Option_util.map (fun (_,l) -> List.rev l) out
