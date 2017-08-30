@@ -258,5 +258,5 @@ let concretize root graph nav =
            | Some inj' ->
              let st = (concretize_port inj' p, concretize_arrow inj' dst) in
              Some (None,st::acc,inj'))
-      (Some (Some root,[],Renaming.empty)) nav in
+      (Some (Some root,[],Renaming.empty ())) nav in
   Option_util.map (fun (_,l,_) -> List.rev l) out

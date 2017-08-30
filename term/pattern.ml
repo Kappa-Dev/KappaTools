@@ -172,7 +172,7 @@ let are_compatible ?possibilities ~strict root1 cc1 root2 cc2 =
               (Mods.IntMap.find_default [||] p cc2.nodes) with
       | (None,conflict) -> (None,conflict)
       | (Some (one_edges',todos',ren'),_) -> aux one_edges' ren' todos' in
-  match Renaming.add root1 root2 Renaming.empty with
+  match Renaming.add root1 root2 (Renaming.empty ()) with
   | None -> assert false
   | Some r ->
     let a_single_agent =
@@ -188,7 +188,7 @@ let equal a b =
           (Array.map (fun x -> List.length x,x) a.nodes_by_type)
           (Array.map (fun x -> List.length x,x) b.nodes_by_type) with
   | None -> None
-  | Some ([],ags) -> if ags = [] then Some Renaming.empty else None
+  | Some ([],ags) -> if ags = [] then Some (Renaming.empty ()) else None
   | Some (h1::_,ags) ->
     List.fold_left
       (fun bool ag ->
@@ -204,7 +204,7 @@ let automorphisms a =
       (fun acc x -> Tools.min_pos_int_not_zero acc (List.length x,x))
       (0,[]) a.nodes_by_type
   with
-  | _, [] -> [Renaming.empty]
+  | _, [] -> [Renaming.empty ()]
   | _, (h :: _ as l) ->
     List.fold_left (fun acc ag ->
         match are_compatible ~strict:true h a ag a with
@@ -297,8 +297,8 @@ let minimize_renaming dst_nbt ref_nbt =
                List_util.smart_filter (fun id' -> id <> id') dst_nbt.(ty) in
              if ids' == dst_nbt.(ty) then r
              else let () = dst_nbt.(ty) <- ids' in
-               Option_util.unsome Renaming.empty (Renaming.add id id r)))
-      Renaming.empty ref_nbt in
+               Option_util.unsome (Renaming.empty ()) (Renaming.add id id r)))
+      (Renaming.empty ()) ref_nbt in
   Tools.array_fold_lefti
     (fun ty r ids -> sub_minimize_renaming r (ids,ref_nbt.(ty))) re dst_nbt
 
@@ -362,7 +362,7 @@ let infs cc1 cc2 =
     match Mods.Int2Set.choose !possibilities with
     | None -> acc
     | Some (root1,root2) ->
-      match Renaming.add root1 root2 Renaming.empty with
+      match Renaming.add root1 root2 (Renaming.empty ()) with
       | None -> assert false
       | Some r ->
         let nodes = aux r Mods.IntMap.empty [root1,root2] in
@@ -954,7 +954,7 @@ end = struct
       let rec find_good_edge = function (*one should use a hash here*)
         | [] -> None
         | (st,cc_id) :: tail ->
-          match Navigation.compatible_point Renaming.empty st edge with
+          match Navigation.compatible_point (Renaming.empty ()) st edge with
           | None ->  find_good_edge tail
           | Some inj' ->
             let dst = get domain cc_id in
@@ -974,7 +974,7 @@ let print ~new_syntax ?domain ~with_id f id =
 let embeddings_to_fully_specified domain a_id b =
   let a = domain.Env.domain.(a_id).Env.content in
   match find_root a with
-  | None -> [Renaming.empty]
+  | None -> [Renaming.empty ()]
   | Some (h,ty) ->
     List.fold_left (fun acc ag ->
       match are_compatible ~strict:false h a ag b with

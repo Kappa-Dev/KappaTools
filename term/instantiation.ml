@@ -213,7 +213,7 @@ let matching_abstract_concrete ae ce =
         let j =
           find_match tests actions ce_tests ce.actions (available_ids acc) in
         (acc_option (Renaming.add i j) acc))
-      (Some Renaming.empty) abstract_ids in
+      (Some (Renaming.empty ())) abstract_ids in
   matching
 
 let subst_map_concrete_agent f (id,na as agent) =

@@ -279,8 +279,8 @@ let add_fully_specified_to_graph sigs graph cc =
       cc (Mods.IntMap.empty,graph) in
   let r =
     Mods.IntMap.fold
-      (fun i (a,_) r -> Option_util.unsome Renaming.empty (Renaming.add i a r))
-      e Renaming.empty  in
+      (fun i (a,_) r -> Option_util.unsome (Renaming.empty ()) (Renaming.add i a r))
+      e (Renaming.empty ())  in
   (g,r)
 
 let find_embeddings compil =

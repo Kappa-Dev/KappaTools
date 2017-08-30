@@ -14,7 +14,7 @@ exception Clashing
 
 type t
 
-val empty : t
+val empty : unit -> t
 val is_identity : t -> bool
 val identity : int list -> t
 

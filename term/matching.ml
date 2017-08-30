@@ -45,10 +45,10 @@ let reconstruct_renaming domain graph cc_id root =
              | None -> None,None
              | Some inj ->
                None,Navigation.injection_for_one_more_edge ?root inj graph nav)
-          (Some (root,rty),Some Renaming.empty) nav
+          (Some (root,rty),Some (Renaming.empty ())) nav
       (*- rm - find_root: cc -> (type, node) option *)
       | [] -> None, match rids with
-        | [rid] -> Renaming.add rid root Renaming.empty
+        | [rid] -> Renaming.add rid root (Renaming.empty ())
         | _ -> None in
   match full_rename with
   | _, None ->
@@ -76,14 +76,14 @@ let is_root_of domain graph (_,rty as root) cc_id =
     (match Pattern.Env.roots point with
      | Some (_,rty') -> rty = rty'
      | None -> false)
-  | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
+  | nav -> aux_is_root_of graph (Some root) (Renaming.empty ()) nav
 
 let roots_of domain graph cc =
   Edges.all_agents_where (fun x -> is_root_of domain graph x cc) graph
 
 (* get : (ContentAgent.t * int) -> t -> int *)
 let get ((node,_),id) (t,_) =
-  Renaming.apply (Mods.IntMap.find_default Renaming.empty id t) node
+  Renaming.apply (Mods.IntMap.find_default (Renaming.empty ()) id t) node
 
 let elements_with_types domain ccs (t,_) =
   let out = Array.make (Mods.IntMap.size t) [] in

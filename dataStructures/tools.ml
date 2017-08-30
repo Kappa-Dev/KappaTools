@@ -183,6 +183,15 @@ let array_min_equal_not_null l1 l2 =
           aux (succ j) nb1 (ag1,ag2) in
     f 0
 
+let array_compare compare a b =
+  let l = Array.length a in let l' = Array.length b in
+  let d = Pervasives.compare l l' in
+  let rec aux_array_compare k =
+    if k >= l then 0 else
+      let o = compare a.(k) b.(k) in
+      if o <> 0 then o else aux_array_compare (succ k) in
+  if d <> 0 then d else aux_array_compare 0
+
 let iteri f i =
   let rec aux j = if j < i then let () = f j in aux (succ j) in
   aux 0
