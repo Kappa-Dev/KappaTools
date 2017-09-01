@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Sep 01 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -301,7 +301,8 @@ let find_embeddings_unary_binary compil p x =
            (fun m ->
               List_util.map_option
                 (fun r ->
-                   Matching.add_cc m i (Renaming.compose false r ren)) em)
+                   Matching.add_cc m i
+                     (Renaming.compose true r ren)) em)
            acc)
       [Matching.empty]
       p in

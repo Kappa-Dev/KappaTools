@@ -135,7 +135,13 @@ let compose extensible i i' =
     immediate = Array.make (Array.length i.immediate) special_val;
     delayed = Some (i,i');
     is_identity = i.is_identity && i'.is_identity;
-    dsts = i'.dsts;
+    dsts =
+      Mods.IntSet.fold
+        (fun v' set ->
+           let v'' = compute v' i' in
+           Mods.IntSet.add v'' set)
+        i.dsts
+        Mods.IntSet.empty
   }
 (*    let sigma,is_id =
       Mods.IntMap.fold (fun x y (out,is_id) ->
