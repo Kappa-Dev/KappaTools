@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Jul 25 2017>
+  * Last modification: Time-stamp: <Sep 02 2017>
 *)
 
 module type Interface =
@@ -79,8 +79,11 @@ sig
   val find_all_embeddings:
     compil -> chemical_species -> (connected_component * embedding) list
 
-  val find_embeddings_unary_binary:
-    compil -> pattern -> chemical_species -> embedding_forest list * mixture
+  (*val find_embeddings_unary_binary:
+    compil -> pattern -> chemical_species -> embedding_forest list * mixture*)
+
+  val compose_embeddings_unary_binary:
+    compil -> pattern -> embedding list list -> chemical_species -> embedding_forest list * mixture
 
   module type ObsMap =
   sig
@@ -88,6 +91,8 @@ sig
     val empty: 'a  -> 'a t
     val add: connected_component -> 'a -> 'a list t -> 'a list t
     val get: connected_component -> 'a list t -> 'a list
+    val reset: connected_component -> 'a list t -> 'a list t
+
   end
 
   module ObsMap : ObsMap

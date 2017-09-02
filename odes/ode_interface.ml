@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 22/07/2016
-  * Last modification: Time-stamp: <Sep 01 2017>
+  * Last modification: Time-stamp: <Sep 02 2017>
 *)
 
 type rule = Primitives.elementary_rule
@@ -288,7 +288,16 @@ let add_fully_specified_to_graph sigs graph cc =
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
-let find_embeddings_unary_binary compil p x =
+let f ren acc (i,cc) em =
+  List_util.map_flatten
+    (fun m ->
+       List_util.map_option
+         (fun r ->
+            Matching.add_cc m i
+              (Renaming.compose true r ren)) em)
+    acc
+
+(*let find_embeddings_unary_binary compil p x =
   let mix,ren =
     add_fully_specified_to_graph
       (Model.signatures compil.environment)
@@ -297,15 +306,26 @@ let find_embeddings_unary_binary compil p x =
     Tools.array_fold_lefti
       (fun i acc cc ->
          let em = find_embeddings compil cc x in
-         List_util.map_flatten
-           (fun m ->
-              List_util.map_option
-                (fun r ->
-                   Matching.add_cc m i
-                     (Renaming.compose true r ren)) em)
-           acc)
+         f ren acc (i,cc) em)
       [Matching.empty]
       p in
+  (matc,mix)*)
+
+let compose_embeddings_unary_binary compil p emb_list x =
+  let mix,ren =
+    add_fully_specified_to_graph
+      (Model.signatures compil.environment)
+      (Edges.empty ~with_connected_components:false) x in
+  let cc_list =
+    Tools.array_fold_lefti
+      (fun i acc cc -> (i,cc)::acc)
+      [] p
+  in
+  let matc =
+    List.fold_left2
+      (f ren)
+      [Matching.empty]
+      cc_list emb_list in
   (matc,mix)
 
 let disjoint_union_sigs  sigs l =
@@ -698,6 +718,8 @@ sig
   val empty: 'a  -> 'a t
   val add: connected_component -> 'a -> 'a list t -> 'a list t
   val get: connected_component -> 'a list t -> 'a list
+  val reset: connected_component -> 'a list t -> 'a list t
+
 end
 
 module ObsMap  =
@@ -712,6 +734,10 @@ module ObsMap  =
   let add cc data map =
     let old = get cc map in
     let () = Pattern.ObsMap.set map cc (data::old) in
+    map
+
+  let reset cc map  =
+    let () = Pattern.ObsMap.set map cc [] in
     map
 
 end: ObsMap)

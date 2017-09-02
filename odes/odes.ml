@@ -1,6 +1,6 @@
 (** Network/ODE generation
   * Creation: 15/07/2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Sep 02 2017>
 *)
 
 let local_trace = false
@@ -142,6 +142,9 @@ struct
     {
       rules : enriched_rule list ;
       cc_to_rules : (enriched_rule * int) list I.ObsMap.t ;
+      cc_to_embedding_to_current_species : I.embedding list I.ObsMap.t ;
+      updated_cc_to_embedding_to_current_species : I.connected_component list ;
+
       ode_variables : VarSet.t ;
       reactions:
         ((id list * id list * (id Locality.annot) list * enriched_rule) * int)
@@ -271,10 +274,47 @@ struct
       (*sym_reduction = Symmetries.Ground ;*)
     }
 
+  let add_embed_to_current_species cc embed network =
+    let old,network =
+      match I.ObsMap.get cc network.cc_to_embedding_to_current_species
+      with
+      | [] -> [],
+              {network with
+               updated_cc_to_embedding_to_current_species = cc::network.updated_cc_to_embedding_to_current_species}
+      | _::_ as old -> old,network
+    in
+    let cc_to_embedding_to_current_species =
+      I.ObsMap.add cc embed network.cc_to_embedding_to_current_species
+    in
+    {network
+     with
+      cc_to_embedding_to_current_species}
+
+  let get_embed_to_current_species cc network =
+    I.ObsMap.get cc network.cc_to_embedding_to_current_species
+
+  let clean_embed_to_current_species network =
+    let l = network.updated_cc_to_embedding_to_current_species in
+    let updated_cc_to_embedding_to_current_species = [] in
+    let cc_to_embedding_to_current_species =
+      List.fold_left
+        (fun cc_to_embedding_to_current_species k ->
+           I.ObsMap.reset k cc_to_embedding_to_current_species)
+        network.cc_to_embedding_to_current_species
+        l
+    in
+    {
+      network with
+      updated_cc_to_embedding_to_current_species;
+      cc_to_embedding_to_current_species;
+    }
+
   let init compil =
     {
       rules = [] ;
       cc_to_rules = I.ObsMap.empty [];
+      cc_to_embedding_to_current_species = I.ObsMap.empty [];
+      updated_cc_to_embedding_to_current_species = [];
       reactions = [] ;
       ode_variables = VarSet.empty ;
       ode_vars_tab = Mods.DynArray.create 0 Dummy ;
@@ -844,6 +884,7 @@ struct
       match to_be_visited with
       | [] -> network
       | new_species::to_be_visited ->
+        let network = clean_embed_to_current_species network in
         let () = debug "@[<v 2>@[test for the new species:@ %a@]"
             (fun x -> I.print_chemical_species ~compil x) new_species
         in
@@ -1002,19 +1043,50 @@ struct
                 begin
                   (* unary application of binary rules *)
                   let () = debug "unary case" in
-                  let to_be_visited, network =
-                    let lembed,mix =
-                      I.find_embeddings_unary_binary compil
-                        enriched_rule.lhs new_species in
-                    fold_left_swap
-                      (fun embed ->
-                        let () =
-                          debug "add new reaction (unary)"
+                  let network =
+                    add_embed_to_current_species
+                      cc embed network
+                  in
+                  let emb_list_list_opt =
+                    let rec aux list output =
+                      match list with
+                      | [] -> Some output
+                      | (cc_id,cc)::tail ->
+                        let emb_list =
+                          if cc_id = pos then [embed]
+                          else
+                            get_embed_to_current_species cc network
                         in
-                         add_reaction ?max_size
-                           parameters compil enriched_rule embed mix)
-                      lembed
-                      (to_be_visited, network)
+                        begin
+                          match emb_list with
+                          | [] -> None
+                          | _::_ -> aux tail (emb_list::output)
+                        end
+                    in
+                    aux enriched_rule.lhs_cc []
+                  in
+                  let (to_be_visited,network) =
+                    match emb_list_list_opt with
+                    | Some l  ->
+                      let lembed,mix =
+                        I.compose_embeddings_unary_binary compil
+                          enriched_rule.lhs l new_species in
+                      fold_left_swap
+                        (fun embed remanent ->
+                           let () =
+                             debug "add new reaction (unary)"
+                           in
+                           let embed =
+                             add_reaction ?max_size
+                               parameters compil enriched_rule embed mix remanent in
+                           let () =
+                                 debug "end new reaction (unary)"
+                           in
+                           embed
+                        )
+                        lembed
+                        (to_be_visited, network)
+                    | None -> (to_be_visited, network)
                   in
                   let () = debug "@]" in
                   store_old_embeddings, to_be_visited, network
