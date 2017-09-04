@@ -126,7 +126,7 @@ let survive_nav inj graph =
 
 (*edges: list of concrete edges,
     returns the roots of observables that are above in the domain*)
-let from_edge domain graph (out,cache as acc) edge =
+let from_edge domain graph (out,cache as acc) node site arrow =
   let rec aux_from_edges cache (obs,rev_deps as acc) = function
     | [] -> acc,cache
     | (pid,point,inj_point2graph) :: remains ->
@@ -156,7 +156,7 @@ let from_edge domain graph (out,cache as acc) edge =
                  (next::re,ca'))
           (remains,cache) (Pattern.Env.sons point) in
       aux_from_edges cache' acc' remains' in
-  match Pattern.Env.get_elementary domain edge with
+  match Pattern.Env.get_elementary domain node site arrow with
   | None -> acc
   | Some x ->
     aux_from_edges
@@ -173,15 +173,12 @@ let observables_from_agent
   else acc
 
 let observables_from_free domain graph acc node site =
-  from_edge domain graph acc
-    ((Navigation.Fresh node,site),Navigation.ToNothing)
+  from_edge domain graph acc node site Navigation.ToNothing
 let observables_from_internal domain graph acc node site id =
-  from_edge domain graph acc
-    ((Navigation.Fresh node,site),Navigation.ToInternal id)
+  from_edge domain graph acc node site (Navigation.ToInternal id)
 let observables_from_link domain graph acc n site  n' site' =
-  from_edge domain graph acc
-    ((Navigation.Fresh n,site),
-     Navigation.ToNode (Navigation.Fresh n',site'))
+  from_edge domain
+    graph acc n site (Navigation.ToNode (Navigation.Fresh n',site'))
 
 module Agent = struct
   type t =

@@ -30,8 +30,8 @@ val of_yojson : Yojson.Basic.json -> abstract t
 
 val rename : Renaming.t -> abstract t -> Renaming.t * abstract t
 
-val compatible_point :
-  Renaming.t -> abstract step -> abstract step -> Renaming.t option
+val compatible_fresh_point :
+  abstract step -> Agent.t -> int -> abstract arrow -> Renaming.t option
 (** Retuns the extension of the given injections so that the second edge
     is the image of the first *)
 

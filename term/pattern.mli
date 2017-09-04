@@ -58,7 +58,8 @@ module Env : sig
 
   val get_single_agent : int -> t -> (id * Operator.DepSet.t) option
 
-  val get_elementary : t -> Navigation.abstract Navigation.step ->
+  val get_elementary :
+    t -> Agent.t -> int -> Navigation.abstract Navigation.arrow ->
     (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s

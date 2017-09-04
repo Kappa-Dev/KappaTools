@@ -92,6 +92,42 @@ let rec print sigs find_ty f = function
       (print_id_internal_state sigs find_ty source site) (Some i)
       (print sigs (extend find_ty source)) t
 
+let compatible_fresh_point e (sid,sty) ssite arrow =
+  match e,arrow with
+  | ((Fresh (id,ty),site),x), ToNothing ->
+    if ty = sty && site = ssite && x = ToNothing
+    then let inj = Renaming.empty () in
+      if Renaming.imperative_add id sid inj then Some inj else None
+    else None
+  | ((Fresh (id,ty),site),x), ToInternal i ->
+    if ty = sty && site = ssite && x = ToInternal i
+    then let inj = Renaming.empty () in
+      if Renaming.imperative_add id sid inj then Some inj else None
+    else None
+  | ((Fresh (id,ty),site), ToNode (Fresh (id',ty'),site')),
+    ToNode (Fresh (sid',sty'),ssite') ->
+    if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+    then let inj = Renaming.empty () in
+      if Renaming.imperative_add id sid inj then
+        if Renaming.imperative_add id' sid' inj then Some inj else None
+      else None
+    else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
+    then let inj = Renaming.empty () in
+      if Renaming.imperative_add id sid' inj then
+        if Renaming.imperative_add id' sid inj then Some inj else None
+      else None
+    else None
+  | (((Existing id,site), ToNode (Fresh(id',ty'),site'))
+    | ((Fresh(id',ty'),site), ToNode (Existing id,site'))),
+    ToNode (Existing sid',ssite') ->
+    if  ((ssite = site && ssite' = site') || (ssite' = site && ssite = site'))
+        && ty' = sty && id = id' && sid = sid'
+    then let inj = Renaming.empty () in
+      if Renaming.imperative_add id sid' inj then Some inj else None
+    else None
+  | ((Existing _,_),_), _ -> None
+  | ((Fresh _,_),_), ToNode _ -> None
+
 let compatible_point inj e e' =
   match e,e' with
   | ((Existing id,site), ToNothing), e ->
@@ -122,13 +158,14 @@ let compatible_point inj e e' =
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))
     | ((Fresh (id',ty),site),ToNode (Existing id,site')),
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))) ->
-    if  ssite = site && ty' = ty && ssite' = site'
-        && not (Renaming.mem id' inj) then
+    if ty' = ty && not (Renaming.mem id' inj) &&
+       ((ssite = site && ssite' = site') ||
+        (id = id' && ssite = site' && ssite' = site)) then
       match Renaming.add id' sid' inj with
       | Some inj' when Renaming.mem id inj' && sid = Renaming.apply inj' id  ->
         Some inj'
       | _ -> None
-   else None
+    else None
   | ((Existing _,_), ToNode (Fresh _,_)),
     (((Fresh _ | Existing _), _), _) -> None
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->

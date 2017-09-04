@@ -754,7 +754,8 @@ module Env : sig
   val to_navigation : t -> id -> Navigation.abstract Navigation.t
 
   val get_elementary :
-    t -> Navigation.abstract Navigation.step -> (id * point * Renaming.t) option
+    t -> Agent.t -> int -> Navigation.abstract Navigation.arrow ->
+    (id * point * Renaming.t) option
 
   val signatures : t -> Signature.s
   val new_obs_map : t -> (id -> 'a) -> 'a ObsMap.t
@@ -937,8 +938,8 @@ end = struct
                            | _ -> raise Not_found) l
                        | _ -> raise Not_found) l
                 | _ -> raise Not_found);
-            max_obs = (match List.assoc "max_obs" l with 
-                        | `Int i -> i 
+            max_obs = (match List.assoc "max_obs" l with
+                        | `Int i -> i
                         | _ -> raise Not_found)
           }
         with Not_found ->
@@ -949,19 +950,17 @@ end = struct
 
   let new_obs_map env f = Mods.DynArray.init env.max_obs f
 
-  let get_elementary domain = function
-    | (Navigation.Existing _,_),_ -> assert false
-    | (Navigation.Fresh (_,ty),s),_ as edge ->
-      let sa = domain.elementaries.(ty) in
-      let rec find_good_edge = function (*one should use a hash here*)
-        | [] -> None
-        | (st,cc_id) :: tail ->
-          match Navigation.compatible_point (Renaming.empty ()) st edge with
-          | None ->  find_good_edge tail
-          | Some inj' ->
-            let dst = get domain cc_id in
-            Some (cc_id,dst,inj') in
-      find_good_edge sa.(s)
+  let get_elementary domain (_,ty as node) s arrow =
+    let sa = domain.elementaries.(ty) in
+    let rec find_good_edge = function (*one should use a hash here*)
+      | [] -> None
+      | (st,cc_id) :: tail ->
+        match Navigation.compatible_fresh_point st node s arrow with
+        | None ->  find_good_edge tail
+        | Some inj' ->
+          let dst = get domain cc_id in
+          Some (cc_id,dst,inj') in
+    find_good_edge sa.(s)
 
 end
 
