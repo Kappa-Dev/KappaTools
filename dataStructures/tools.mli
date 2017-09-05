@@ -19,6 +19,8 @@ val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_rev_of_list : 'a list -> 'a array
 val array_fold_lefti :
   (int -> 'a -> 'b -> 'a) -> 'a -> 'b array -> 'a
+val array_fold_righti :
+  (int -> 'a -> 'b -> 'b) -> 'a array -> 'b -> 'b
 val array_filter : (int -> 'a -> bool) -> 'a array -> int list
 val array_fold_left_mapi :
   (int -> 'a -> 'b -> 'a * 'c) -> 'a -> 'b array -> 'a * 'c array

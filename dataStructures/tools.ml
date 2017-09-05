@@ -153,6 +153,12 @@ let array_fold_lefti f x a =
   let () = Array.iteri (fun i e -> y := f i !y e) a in
   !y
 
+let rec aux_fold_righti i f a x =
+  if i < 0 then x else
+    aux_fold_righti (pred i) f a (f i a.(i) x)
+let array_fold_righti f a x =
+  aux_fold_righti (Array.length a - 1) f a x
+
 let array_fold_left2i  f x a1 a2 =
   let l = Array.length a1 in
   if l <> Array.length a2 then raise (Invalid_argument "array_fold_left2i")
