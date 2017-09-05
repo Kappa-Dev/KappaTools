@@ -80,8 +80,9 @@ val are_connected :
   ?max_distance : int -> t -> Agent.t list -> Agent.t list -> path option
 (** [are_connected ?max_distance graph nodes_x nodes_y] *)
 
-val species : Signature.s -> int -> t -> Raw_mixture.t
+val species : Signature.s -> int -> t -> User_graph.connected_component
 
-val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list
+val build_snapshot :
+  Signature.s -> t -> (int * User_graph.connected_component) list
 
 val debug_print : Format.formatter -> t -> unit

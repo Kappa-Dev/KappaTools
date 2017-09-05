@@ -16,6 +16,7 @@ val recti : ('a -> int -> 'a) -> 'a -> int -> 'a
 
 val array_compare : ('a -> 'a -> int) -> 'a array -> 'a array -> int
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
+val array_rev_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_rev_of_list : 'a list -> 'a array
 val array_fold_lefti :
   (int -> 'a -> 'b -> 'a) -> 'a -> 'b array -> 'a

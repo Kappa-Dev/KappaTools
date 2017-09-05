@@ -12,6 +12,8 @@ val read_between_spaces :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a)
 
+val write_comma: Bi_outbuf.t -> unit
+
 (** Jsonify simple types *)
 
 val build_msg: string -> string
@@ -35,10 +37,14 @@ val of_list: ('a -> Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
 val to_list:
   ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a list
 
+val write_list: (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a list -> unit
+
 val of_array: ('a -> Yojson.Basic.json) -> 'a array -> Yojson.Basic.json
 
 val to_array:
   ?error_msg:string -> (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a array
+
+val write_array: (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a array -> unit
 
 val smart_assoc: (string * Yojson.Basic.json) list -> Yojson.Basic.json
 (** Do not put fields whose value is 'null', '[]' or '{}' *)
@@ -50,6 +56,9 @@ val to_assoc:
   ?error_msg:string -> (string * Yojson.Basic.json -> 'a) ->
   Yojson.Basic.json -> 'a list
 
+val write_field:
+  string -> (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a -> unit
+
 val of_pair:
   ?lab1:string -> ?lab2:string ->
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
@@ -59,6 +68,15 @@ val to_pair:
   ?lab1:string -> ?lab2:string -> ?error_msg:string ->
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> 'a * 'b
+
+val write_compact_pair:
+  (Bi_outbuf.t -> 'a -> unit) -> (Bi_outbuf.t -> 'b -> unit) ->
+  Bi_outbuf.t -> 'a * 'b -> unit
+
+val read_compact_pair:
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'b) ->
+  Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a * 'b
 
 val of_triple:
     ?lab1:string -> ?lab2:string -> ?lab3:string ->

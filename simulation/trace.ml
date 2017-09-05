@@ -345,14 +345,12 @@ let side_effects_of_step = function
   | Rule ((_,e,_)) | Pert ((_,e,_)) -> e.Instantiation.side_effects_dst
   | Subs _ | Obs _ | Dummy _ | Init _ -> []
 
-let init_trace_file ~uuid env fname =
-  let desc = Kappa_files.open_out fname in
+let init_trace_file ~uuid env desc =
   let () = output_string desc "{\n\"uuid\" : \"" in
   let () = output_string desc (string_of_int uuid) in
   let () = output_string desc "\",\n\"model\":" in
   let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
-  let () = output_string desc ",\n\"trace\":[" in
-  desc
+  output_string desc ",\n\"trace\":["
 
 let fold_trace_file f init fname =
   let desc = open_in fname in

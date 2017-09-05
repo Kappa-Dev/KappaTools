@@ -332,8 +332,7 @@ module Make (Instances:Instances_sig.S) = struct
       f "@[<v>%a@,%a@]"
       (Pp.list Pp.space (fun f (i,mix) ->
            Format.fprintf f "%%init: %i @[<h>%a@]" i
-             (Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
-                ~sigs) mix))
+             (User_graph.print_cc ~explicit_free:false ~compact:false) mix))
       (Edges.build_snapshot sigs state.edges)
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf
@@ -689,9 +688,10 @@ module Make (Instances:Instances_sig.S) = struct
     let () = state.outdated <- true in
     let former_deps,mod_connectivity = state.outdated_elements in
     (*Negative update*)
+    let lnk_dst ((a,_),s) = Edges.link_destination a s state.edges in
     let concrete_removed =
       Primitives.Transformation.negative_transformations_of_actions
-        sigs state.edges actions in
+        sigs lnk_dst actions in
     let ((del_obs,del_deps),_) =
       List.fold_left
         (obs_from_transformation domain state.edges)

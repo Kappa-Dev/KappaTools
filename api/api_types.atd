@@ -50,18 +50,7 @@ type project_catalog = project list
 type project_parameter = { project_parameter_project_id <json name="project_id"> : project_id ; }
 
 
-type site = {
-     site_name: string;
-     site_links: (int * int) list;
-     site_states: string list;
-}
-
-type site_node = {
-     site_node_name: string;
-     site_node_sites: site list <ocaml repr="array">;
-}
-
-type site_graph = site_node list <ocaml repr="array">
+type site_graph <ocaml module="User_graph" t="connected_component"> = abstract
 
 type nbr <ocaml module="Nbr" t="t"> = abstract
 type overwritten_var =
@@ -133,7 +122,7 @@ type ('agent,'token) generic_snapshot <ocaml predef module="Data"> = {
     snapshot_agents : 'agent list;
     snapshot_tokens : 'token list <ocaml repr="array">; }
 
-type snapshot = ((int * site_graph),(float * string)) generic_snapshot
+type snapshot = ((int * site_graph),(string * nbr)) generic_snapshot
 type snapshot_detail = snapshot
 type snapshot_catalog = { snapshot_ids : snapshot_id list }
 

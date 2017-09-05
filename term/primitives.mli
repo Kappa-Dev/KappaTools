@@ -36,7 +36,10 @@ sig
     Instantiation.abstract t list
 
   val negative_transformations_of_actions :
-    Signature.s -> Edges.t -> Instantiation.concrete Instantiation.action list ->
+    Signature.s ->
+    (Instantiation.concrete Instantiation.site ->
+     Instantiation.concrete Instantiation.site option) ->
+    Instantiation.concrete Instantiation.action list ->
     Instantiation.concrete t list
   val positive_transformations_of_actions :
     Signature.s -> Instantiation.concrete Instantiation.site list ->

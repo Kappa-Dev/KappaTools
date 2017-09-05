@@ -160,18 +160,18 @@ class Site extends D3Object {
 
 class Node extends D3Object {
     constructor (nodeData) {
-        super(nodeData.site_node_name);
+        super(nodeData.node_type);
         let node = this;
         this.clicked = 0; // for detect cycle
         this.side = 0; // for detect cycle
-        this.sites = nodeData.site_node_sites.map(function(siteData, i) {
+        this.sites = nodeData.node_sites.map(function(siteData, i) {
             let site = new Site(siteData, node);
             site.setId(i); 
             return site;
         });
 
         /* make fake empty site if no site is present on agent */
-        if (nodeData.site_node_sites.length === 0) {
+        if (nodeData.node_sites.length === 0) {
                 this.sites = [];
                 let siteData = {};
                 siteData.site_name = null;

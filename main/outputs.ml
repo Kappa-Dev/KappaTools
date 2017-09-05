@@ -233,7 +233,10 @@ let initialize activities_file trace_file plotPack env =
   let () =
     match trace_file with
     | None -> ()
-    | Some s -> traceDescr := Some (Trace.init_trace_file ~uuid env s) in
+    | Some s ->
+      let desc = Kappa_files.open_out s in
+      let () = Trace.init_trace_file ~uuid env desc in
+      traceDescr := Some desc in
   let () = init_activities env activities_file in
   match plotPack with
   | None -> ()
@@ -266,59 +269,23 @@ let rec plot_now l =
   | Some (Raw fd) -> print_values_raw fd.is_tsv fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
-let print_snapshot sigs f s =
-  Format.fprintf
-    f "@[<v># \"uuid\" : \"%i\"@,%%def: \"T0\" \"%g\"@,@,%a@,%a@]"
-    uuid
-    s.Data.snapshot_time
-    (Pp.list Pp.space (fun f (i,mix) ->
-         Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
-           (List.length mix)
-           (Raw_mixture.print
-              ~explicit_free:false ~compact:false ~created:false ~sigs)
-           mix))
-    s.Data.snapshot_agents
-    (Pp.array Pp.space (fun _ f (na,el) ->
-         Format.fprintf
-           f "%%init: %a %s" Nbr.print el na))
-    s.Data.snapshot_tokens
-
-let print_dot_snapshot sigs f s =
-  Format.fprintf
-    f "@[<v>// \"uuid\" : \"%i\"@,digraph G{@,%a@,%a}@]"
-    uuid
-    (Pp.listi
-       Pp.cut
-       (fun i f (nb,mix) ->
-          Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
-          Format.fprintf
-            f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
-            i nb (Raw_mixture.print_dot sigs i) mix))
-    s.Data.snapshot_agents
-    (Pp.array Pp.cut (fun i f (na,el) ->
-         Format.fprintf
-           f "token_%d [label = \"%s (%a)\" , shape=none]"
-           i na Nbr.print el))
-    s.Data.snapshot_tokens
-
-let snapshot env s =
+let snapshot s =
   if Filename.check_suffix s.Data.snapshot_file ".dot" then
     Kappa_files.with_snapshot
       s.Data.snapshot_file s.Data.snapshot_event "dot"
-      (fun f -> Format.fprintf f "%a@." (print_dot_snapshot env) s)
+      (fun f -> Format.fprintf f "%a@." (Data.print_dot_snapshot ~uuid) s)
   else
     Kappa_files.with_snapshot
       s.Data.snapshot_file s.Data.snapshot_event "ka"
-      (fun f -> Format.fprintf f "%a@." (print_snapshot env) s)
+      (fun f -> Format.fprintf f "%a@." (Data.print_snapshot ~uuid) s)
 
-let print_species sigs f time mixture =
+let print_species time f mixture =
   Format.fprintf
     f "%g: @[<h>%a@]@." time
-    (Raw_mixture.print
-       ~explicit_free:false ~compact:false ~created:false ~sigs) mixture
+    (User_graph.print_cc ~explicit_free:false ~compact:false) mixture
 
-let go env = function
-  | Data.Snapshot s -> snapshot env s
+let go = function
+  | Data.Snapshot s -> snapshot s
   | Data.Flux f -> output_flux f
   | Data.DeltaActivities (r,flux) -> output_activities r flux
   | Data.Plot x -> plot_now x
@@ -340,7 +307,7 @@ let go env = function
     end
   | Data.Species (file,time,mixture) ->
      let desc = get_desc file species_desc in
-     print_species env desc time mixture
+     print_species time desc mixture
 
 let inputsDesc = ref None
 

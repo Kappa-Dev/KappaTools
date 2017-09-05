@@ -570,29 +570,56 @@ let to_raw_mixture sigs x =
                                         internals; })
     x
 
-let of_raw_mixture x =
-  List.map
-    (fun r ->
-       let internals =
-         Array.map
-           (function
-             | Some i -> I_VAL_CHANGED (i,i)
-             | None -> I_ANY)
-           r.Raw_mixture.a_ints in
-       let ports =
-         Array.map
-           (function
-             | Raw_mixture.VAL i ->
-               (Locality.dummy_annot (Ast.LNK_VALUE (i,(-1,-1))),
-                Maintained)
-             | Raw_mixture.FREE ->
-               (Locality.dummy_annot Ast.LNK_FREE, Maintained)
-           )
-           r.Raw_mixture.a_ports in
-       { ra_type = r.Raw_mixture.a_type; ra_erased = false;
-         ra_ports = ports; ra_ints = internals;
-         ra_syntax = Some (Array.copy ports, Array.copy internals); })
-    x
+let of_user_graph sigs g =
+  let out,_ =
+    Tools.array_fold_lefti
+      (fun node (acc,pack) ag ->
+         let ra_type = Signature.num_of_agent
+             (Locality.dummy_annot ag.User_graph.node_type) sigs in
+         let ar = Array.length ag.User_graph.node_sites in
+         let ra_ports =
+           Array.make
+             ar (Locality.dummy_annot Ast.LNK_FREE, Maintained) in
+       let ra_ints = Array.make ar I_ANY in
+         let pack' =
+           Tools.array_fold_lefti
+             (fun id (dandling, free_id as pack) si ->
+                let () = match si.User_graph.site_states with
+                  | [] -> ()
+                  | [ s ] ->
+                    let i = Signature.num_of_internal_state
+                        id (Locality.dummy_annot s)
+                        (Signature.get sigs ra_type) in
+                    ra_ints.(id) <- I_VAL_CHANGED (i,i)
+                  | _ :: _ :: _ ->
+                    failwith "LKappa.of_user_graph: several internals" in
+                match si.User_graph.site_links with
+                | [] -> pack
+                | _ :: _ :: _ ->
+                  failwith "LKappa.of_user_graph: several links"
+                | [ s ] ->
+                  match Mods.Int2Map.pop s dandling with
+                  | Some va,dandling' ->
+                    let () =
+                      ra_ports.(id) <-
+                        (Locality.dummy_annot (Ast.LNK_VALUE(va,(-1,-1))),
+                         Maintained) in
+                    dandling',free_id
+                  | None, dandling' ->
+                    let () =
+                      ra_ports.(id) <-
+                        (Locality.dummy_annot (Ast.LNK_VALUE(free_id,(-1,-1))),
+                         Maintained) in
+                    Mods.Int2Map.add (node,id) free_id dandling',succ free_id
+
+             )
+             pack
+             ag.User_graph.node_sites in
+         ({ ra_type; ra_erased = false; ra_ports; ra_ints;
+            ra_syntax = Some (Array.copy ra_ports, Array.copy ra_ints); }::acc),
+         pack')
+      ([],(Mods.Int2Map.empty,1)) g in
+  out
 
 let incr_agent sigs =
   let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in

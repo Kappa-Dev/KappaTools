@@ -6,15 +6,24 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type internal = int option
-type link = FREE | VAL of int
-type agent =
-    { a_type: int; a_ports: link array; a_ints: internal array; }
-type t = agent list
+type cc_site = {
+  site_link: (int * int) option; (** (node_id, site_id) *)
+  site_state: int option;
+}
+type cc_node = {
+  node_type: int;
+  node_sites: cc_site array;
+}
+type connected_component = cc_node array
 
-val print :
-  explicit_free:bool -> compact:bool -> created:bool ->
-  ?sigs:Signature.s -> Format.formatter -> t -> unit
+type t
 
-val to_json : t -> Yojson.Basic.json
-val of_json : Yojson.Basic.json -> t
+val cc_to_user_cc :
+  Signature.s -> connected_component -> User_graph.connected_component
+
+val empty : t
+
+val increment_in_snapshot : Signature.s -> connected_component -> t -> t
+
+val export :
+  Signature.s -> t -> (int * User_graph.connected_component) list

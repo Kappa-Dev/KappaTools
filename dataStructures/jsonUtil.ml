@@ -55,6 +55,26 @@ let to_list ?error_msg:(error_msg=build_msg "list") of_json = function
   | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let rec iter2_aux f_elt f_sep x = function
+    [] -> ()
+  | y :: l ->
+      f_sep x;
+      f_elt x y;
+      iter2_aux f_elt f_sep x l
+
+let iter2 f_elt f_sep x = function
+    [] -> ()
+  | y :: l ->
+      f_elt x y;
+      iter2_aux f_elt f_sep x l
+
+let write_comma ob = Bi_outbuf.add_char ob ','
+
+let write_list f ob l =
+  let () = Bi_outbuf.add_char ob '[' in
+  let () = iter2 f write_comma ob l in
+  Bi_outbuf.add_char ob ']'
+
 let of_array to_json a =
   `List (Array.fold_right (fun x acc -> to_json x::acc) a [])
 
@@ -62,6 +82,14 @@ let to_array ?error_msg:(error_msg=build_msg "array") of_json = function
   | `List l -> Tools.array_map_of_list of_json l
   | `Null -> [||]
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
+let write_array f ob l =
+  let () = Bi_outbuf.add_char ob '[' in
+  let () = if Array.length l > 0 then f ob l.(0) in
+  let () = Tools.iteri
+      (fun i -> let () = write_comma ob in f ob l.(succ i))
+      (pred (Array.length l)) in
+  Bi_outbuf.add_char ob ']'
 
 let smart_assoc l =
   `Assoc (List.rev (List.fold_left (fun acc -> function
@@ -86,6 +114,10 @@ let to_assoc
   | `Null -> []
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let write_field na f ob x =
+  let () = Yojson.Basic.write_string ob na in
+  let () = Bi_outbuf.add_char ob ':' in
+  f ob x
 
 let of_pair ?(lab1="first") ?(lab2="second") to_json1 to_json2 (a,b) =
   `Assoc [ lab1, to_json1 a; lab2, to_json2 b ]
@@ -125,6 +157,20 @@ let to_pair ?lab1:(lab1="first") ?lab2:(lab2="second")
   | x ->
     raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let write_compact_pair f g ob (x,y) =
+  let () = Bi_outbuf.add_char ob '[' in
+  let () = f ob x in
+  let () = write_comma ob in
+  let () = g ob y in
+  Bi_outbuf.add_char ob ']'
+
+let read_compact_pair f g st b =
+  let () = Yojson.Basic.read_lbr st b in
+  let x = read_between_spaces f st b in
+  let () = Yojson.Basic.read_comma st b in
+  let y = read_between_spaces g st b in
+  let () = Yojson.Basic.read_rbr st b in
+  (x,y)
 
 let of_map
     ?lab_key:(lab_key="key")

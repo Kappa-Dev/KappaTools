@@ -686,7 +686,7 @@ let patterns_of_mixture contact_map sigs pre_env e =
       (fun (cc_cache,acc) (i,m) ->
          match connected_components_sum_of_ambiguous_mixture
                  ~compileModeOn:false contact_map
-                 cc_cache (LKappa.of_raw_mixture m) with
+                 cc_cache (LKappa.of_user_graph sigs m) with
          | cc_cache',[[|_,x|],_] ->
            cc_cache',Tools.recti (fun a _ -> x::a) acc i
          | _ -> assert false)

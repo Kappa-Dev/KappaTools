@@ -438,42 +438,45 @@ let get_connected_component ag graph =
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
-  let rec build acc free_id dangling =
+  let rec build id acc known =
     function
-    | [] -> acc,free_id
-    | (ty,node) :: todos ->
+    | [] -> Tools.array_rev_map_of_list
+              (fun (node_type,sites) -> {
+                   Snapshot.node_type;
+                   Snapshot.node_sites =
+                     Tools.array_map_of_list
+                       (fun (link,site_state) -> {
+                            Snapshot.site_link =
+                              Option_util.map
+                                (fun ((n,_),s) ->
+                                   Mods.IntMap.find_default (-1) n known,s)
+                                link;
+                            Snapshot.site_state;
+                          })
+                       sites;
+                 }) acc
+    | (node,ty) :: todos ->
       if Cache.test graph.cache node
-      then build acc free_id dangling todos
+      then build id acc known todos
       else match Mods.DynArray.get graph.sort node with
         | None -> failwith "Edges.one_connected_component"
         | Some _ ->
           let () = Cache.mark graph.cache node in
+          let known' = Mods.IntMap.add node id known in
           let arity = Signature.arity sigs ty in
-          let ports = Array.make arity Raw_mixture.FREE in
-          let (free_id',dangling',todos'),ports =
-            Tools.array_fold_left_mapi
-              (fun i (free_id,dangling,todos) _ ->
-                 match (Mods.DynArray.get graph.connect node).(i) with
-                 | None ->
-                   (free_id,dangling,todos),Raw_mixture.FREE
-                 | Some ((n',ty'),s') ->
-                   match Mods.Int2Map.pop (n',s') dangling with
-                   | None, dangling ->
-                     (succ free_id,
-                      Mods.Int2Map.add (node,i) free_id dangling,
-                      if n' = node || List.mem (ty',n') todos
-                      then todos
-                      else (ty',n')::todos),
-                     Raw_mixture.VAL free_id
-                   | Some id, dangling' ->
-                     (free_id,dangling',todos), Raw_mixture.VAL id)
-              (free_id,dangling,todos) ports in
-          let skel =
-            { Raw_mixture.a_type = ty;
-              Raw_mixture.a_ports = ports;
-              Raw_mixture.a_ints = Mods.DynArray.get graph.state node; } in
-          build (skel::acc) free_id' dangling' todos'
-  in build [] 1 Mods.Int2Map.empty [ty,node]
+          let todos',ports =
+            Tools.recti
+              (fun (todos,acc) i ->
+                 let link = (Mods.DynArray.get graph.connect node).(i) in
+                 (match link with
+                  | None -> todos
+                  | Some ((n',_ as p),_) ->
+                    if Mods.IntMap.mem n' known' then todos else (p::todos)),
+                 ((link,
+                   (Mods.DynArray.get graph.state node).(i)))::acc)
+              (todos,[]) arity in
+          build (succ id) ((ty,ports)::acc) known' todos' in
+  build 0 [] Mods.IntMap.empty [node,ty]
 
 let species sigs root graph =
   let specie = match Mods.DynArray.get graph.sort root with
@@ -482,7 +485,9 @@ let species sigs root graph =
          (ExceptionDefn.Internal_Error
             (Locality.dummy_annot
                ("Sort of node unavailable "^string_of_int root)))
-    | Some ty -> fst (one_connected_component sigs ty root graph) in
+    | Some ty ->
+      Snapshot.cc_to_user_cc
+        sigs (one_connected_component sigs ty root graph) in
   let () = Cache.reset graph.cache in
   specie
 
@@ -490,17 +495,17 @@ let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in
   let rec aux ccs node =
     if node = Mods.DynArray.length graph.sort
-    then let () = Cache.reset graph.cache in Raw_mixture.output_snapshot ccs
+    then let () = Cache.reset graph.cache in Snapshot.export sigs ccs
     else
     if Cache.test graph.cache node
     then aux ccs (succ node)
     else match Mods.DynArray.get graph.sort node with
       | None -> aux ccs (succ node)
       | Some ty ->
-        let (out,_) =
+        let out =
           one_connected_component sigs ty node graph in
-        aux (Raw_mixture.increment_in_snapshot sigs out ccs) (succ node) in
-  aux Raw_mixture.empty_snapshot 0
+        aux (Snapshot.increment_in_snapshot sigs out ccs) (succ node) in
+  aux Snapshot.empty 0
 
 let debug_print f graph =
   let print_sites ag =

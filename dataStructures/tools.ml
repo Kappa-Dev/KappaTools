@@ -121,32 +121,47 @@ let array_fold_left_mapi f x a =
         out) in
   (!y,o)
 
-let array_map_of_list f l =
-  let len = List.length l in
-  let rec fill i v = function
+let array_map_of_list =
+  let rec fill f i v = function
     | [] -> ()
     | x :: l ->
       Array.unsafe_set v i (f x);
-      fill (succ i) v l in
-  match l with
-  | [] -> [||]
-  | x :: l ->
-    let ans = Array.make len (f x) in
-    let () = fill 1 ans l in
-    ans
+      fill f (succ i) v l in
+  fun f -> function
+    | [] -> [||]
+    | x :: l ->
+      let len = succ (List.length l) in
+      let ans = Array.make len (f x) in
+      let () = fill f 1 ans l in
+      ans
 
-let array_rev_of_list = function
+let array_rev_of_list =
+  let rec fill out i = function
+    | [] -> assert (i= -1)
+    | h' :: t' ->
+      let () = Array.unsafe_set out i h' in
+      fill out (pred i) t' in
+  function
   | [] -> [||]
   | h :: t ->
     let l = succ (List.length t) in
     let out = Array.make l h in
-    let rec fill i = function
-      | [] -> assert (i= -1)
-      | h' :: t' ->
-        let () = Array.unsafe_set out i h' in
-        fill (pred i) t' in
-    let () = fill (l - 2) t in
+    let () = fill out (l - 2) t in
     out
+
+let array_rev_map_of_list =
+  let rec fill f out i = function
+    | [] -> assert (i= -1)
+    | h' :: t' ->
+      let () = Array.unsafe_set out i (f h') in
+      fill f out (pred i) t' in
+  fun f -> function
+    | [] -> [||]
+    | h :: t ->
+      let l = succ (List.length t) in
+      let out = Array.make l (f h) in
+      let () = fill f out (l - 2) t in
+      out
 
 let array_fold_lefti f x a =
   let y = ref x in

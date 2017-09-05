@@ -62,7 +62,7 @@ type t =
     mutable plot : Api_types_j.plot ;
     mutable snapshots : Api_types_j.snapshot list ;
     mutable flux_maps : Api_types_j.flux_map list ;
-    mutable species : (float*Raw_mixture.t) list Mods.StringMap.t;
+    mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_j.errors ;
     mutable trace : Trace.t ;
@@ -270,10 +270,7 @@ let outputs (simulation : t) =
             na (file_line.Data.file_line_text::lines) simulation.files
     end
   | Data.Snapshot snapshot ->
-    simulation.snapshots <-
-      (Api_data.label_snapshot
-         (Model.signatures simulation.env)
-         snapshot)::simulation.snapshots
+    simulation.snapshots <- snapshot::simulation.snapshots
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.TraceStep st -> simulation.trace <- st :: simulation.trace
 

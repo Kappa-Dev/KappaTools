@@ -68,12 +68,9 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
   in
   let n,w,s = story_compression in
   let () =  Format.printf "+ Compiling...@." in
-  let outputs =
-    Outputs.go (Signature.create false [||])
-  in
   let (env, has_tracking,init_l) =
     Eval.compile
-      ~outputs
+      ~outputs:Outputs.go
       ~pause:(fun f -> f ()) ~return:(fun x -> x) ~max_sharing
       ?rescale_init:kasim_args.Kasim_args.rescale
       ?overwrite_init ?bwd_bisim ~compileModeOn

@@ -19,5 +19,5 @@ val initial_inputs :
 
 val input_modifications : Model.t -> int -> Primitives.modification list -> unit
 
-val go : Signature.s -> Data.t -> unit
+val go : Data.t -> unit
 val close : ?event:int -> unit -> unit

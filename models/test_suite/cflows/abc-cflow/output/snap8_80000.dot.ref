@@ -7,11 +7,11 @@ subgraph cluster0{
   }
 subgraph cluster1{
   counter1 [label = "744 instance(s)", shape=none];
-  node1_0 [label = "B(x)", color = "#6fd754", style=filled];
+  node1_0 [label = "A(x,c)", color = "#1f2bc2", style=filled];
   node1_0 -> counter1 [style=invis];
-  node1_1 [label = "A(x,c)", color = "#1f2bc2", style=filled];
+  node1_1 [label = "B(x)", color = "#6fd754", style=filled];
   node1_1 -> counter1 [style=invis];
-  node1_1 -> node1_0 [taillabel="x", headlabel="x", dir=none];
+  node1_0 -> node1_1 [taillabel="x", headlabel="x", dir=none];
   }
 subgraph cluster2{
   counter2 [label = "256 instance(s)", shape=none];

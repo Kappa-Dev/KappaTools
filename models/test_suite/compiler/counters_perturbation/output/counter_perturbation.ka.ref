@@ -1,6 +1,6 @@
 # Snapshot [Event: 4]
 %def: "T0" "0.0860731"
 
-%init: 1 /*6 agents*/ __incr(a, b!5), __incr(a!5, b!4), __incr(a!4, b!3), __incr(a!3, b!2), __incr(a!2, b!1), A(x~u, c!1)
-%init: 39 /*2 agents*/ __incr(a, b!1), A(x~u, c!1)
+%init: 1 /*6 agents*/ A(x~u, c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(a!5, b!4), __incr(a, b!5)
+%init: 39 /*2 agents*/ A(x~u, c!1), __incr(a, b!1)
 

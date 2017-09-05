@@ -220,7 +220,7 @@ let () =
     if not kasim_args.Kasim_args.compileMode then
       Outputs.initialize deltaActivitiesFileName trace_file plotPack env;
 
-    let outputs = Outputs.go (Model.signatures env) in
+    let outputs = Outputs.go in
     let () =
       Kappa_files.with_marshalized
         (fun d -> Marshal.to_channel d init_result []) in
@@ -262,7 +262,7 @@ let () =
     let () = match plotPack with
       | Some _ ->
         if Counter.positive_plot_period counter then
-          Outputs.go (Model.signatures env)
+          Outputs.go
             (Data.Plot
                (State_interpreter.observables_values env graph counter))
       | _ -> ()
