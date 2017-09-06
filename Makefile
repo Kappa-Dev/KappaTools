@@ -276,6 +276,12 @@ KappaBin.zip:
 	mkdir KappaBin
 	mkdir KappaBin/bin
 	mv site KappaBin/package.nw
+	FILE=$$(mktemp -t nwjsXXXX); \
+	curl -LsS -o $$FILE https://dl.nwjs.io/v$(NWJS_VERSION)/nwjs-v$(NWJS_VERSION)-win-x64.zip && \
+	unzip $$FILE && rm -f $$FILE
+	mv nwjs-v$(NWJS_VERSION)-win-x64/* KappaBin/
+	rmdir nwjs-v$(NWJS_VERSION)-win-x64
+	mv KappaBin/nw.exe KappaBin/Kappapp.exe
 	mv _build/main/KaSim.native KappaBin/bin/KaSim.exe
 	mv _build/KaSa_rep/main/KaSa.native KappaBin/bin/KaSa.exe
 	mv _build/cflow/KaStor.native KappaBin/bin/KaStor.exe
