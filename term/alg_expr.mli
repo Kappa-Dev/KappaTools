@@ -34,10 +34,12 @@ and ('mix,'id) bool =
 type t = (Pattern.id array list, int) e
 
 val e_to_yojson :
+  filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a,'b) e -> Yojson.Basic.json
 
 val e_of_yojson :
+  filenames : string array ->
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) e
 
@@ -46,10 +48,12 @@ val print :
   (Format.formatter -> 'b -> unit) -> Format.formatter -> ('a, 'b) e -> unit
 
 val bool_to_yojson :
+  filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a,'b) bool -> Yojson.Basic.json
 
 val bool_of_yojson :
+  filenames : string array ->
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) bool
 

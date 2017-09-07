@@ -77,6 +77,17 @@ let to_yojson loc =
       "to_pos", position_to_yojson loc.to_position;
     ]
 
+let to_compact_yojson decls loc =
+  `Assoc
+    [
+      ("file",
+       match Mods.StringMap.find_option loc.file decls with
+       | Some i -> `Int i
+       | None -> `String loc.file);
+      "from_pos", position_to_yojson loc.from_position;
+      "to_pos", position_to_yojson loc.to_position;
+    ]
+
 let position_of_json = function
   | `Assoc [ "line", `Int line; "chr", `Int  chr ] |
     `Assoc [ "chr", `Int chr; "line", `Int line ] ->
@@ -89,15 +100,42 @@ let of_yojson = function
     `Assoc [ "from_pos", fr; "to_pos", t; "file", `String file ] |
     `Assoc [ "to_pos", t; "from_pos", fr; "file", `String file ] |
     `Assoc [ "from_pos", fr; "file", `String file; "to_pos", t ] |
-    `Assoc [ "to_pos", t; "file", `String file; "from_pos", fr ] ->
-    { file; from_position = position_of_json fr; to_position = position_of_json t }
+    `Assoc [ "to_pos", t; "file", `String file; "from_pos", fr ] -> {
+      file;
+      from_position = position_of_json fr;
+      to_position = position_of_json t
+    }
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
-let annot_to_json f (x,l) =
-  `Assoc [ "val", f x; "loc", to_yojson l]
-let annot_of_json f = function
+let of_compact_yojson decls = function
+  | `Assoc [ "file", file; "from_pos", fr; "to_pos", t ] |
+    `Assoc [ "file", file; "to_pos", t; "from_pos", fr ] |
+    `Assoc [ "from_pos", fr; "to_pos", t; "file", file ] |
+    `Assoc [ "to_pos", t; "from_pos", fr; "file", file ] |
+    `Assoc [ "from_pos", fr; "file", file; "to_pos", t ] |
+    `Assoc [ "to_pos", t; "file", file; "from_pos", fr ] ->
+    let file = match file with
+      | `String x -> x
+      | `Int i -> decls.(i)
+      | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x)) in {
+      file;
+      from_position = position_of_json fr;
+      to_position = position_of_json t
+    }
+  | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
+
+let annot_to_yojson ?filenames f (x,l) =
+  `Assoc [ "val", f x;
+           "loc",
+           match filenames with
+           | None -> to_yojson l
+           | Some decls -> to_compact_yojson decls l]
+let annot_of_yojson ?filenames f = function
   | `Assoc [ "val", x; "loc", l ] | `Assoc [ "loc", l; "val", x ] ->
-    (f x, of_yojson l)
+    (f x,
+     match filenames with
+     | None -> of_yojson l
+     | Some decls -> of_compact_yojson decls l)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid location",x))
 
 let write_range ob f = Yojson.Basic.to_outbuf ob (to_yojson f)
@@ -112,4 +150,3 @@ let read_range p lb =
 
 let range_of_string s =
   read_range (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-

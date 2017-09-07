@@ -900,7 +900,7 @@ struct
           aux_print left Ord.print key aux_print right
 
     let print f = function
-      | Private.Empty -> Pp.empty_set f
+      | Private.Empty -> Format.pp_print_string f "\xE2\x88\x85"
       | Private.Node _ as m -> Format.fprintf f "@[{%a}@]" aux_print m
 
     let rec min_elt = function
@@ -1729,7 +1729,7 @@ struct
           (aux_print pr) left Ord.print key pr data (aux_print pr) right
 
     let print pr f = function
-      | Private.Empty -> Pp.empty_set f
+      | Private.Empty -> Format.pp_print_string f "\xE2\x88\x85"
       | Private.Node _ as m -> Format.fprintf f "@[{%a}@]" (aux_print pr) m
 
     let rec diff_with_logs warn parameters error map1 map2 =

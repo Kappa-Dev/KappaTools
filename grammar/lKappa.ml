@@ -93,18 +93,18 @@ let print_switching ~show_erased f = function
   | Maintained -> ()
   | Erased -> if show_erased then Format.pp_print_string f "--"
 
-let switching_to_json = function
+let switching_to_json filenames = function
   | Freed -> `String "Freed"
   | Maintained -> `String "Maintained"
   | Erased -> `String "Erased"
-  | Linked i -> Locality.annot_to_json JsonUtil.of_int i
+  | Linked i -> Locality.annot_to_yojson ~filenames JsonUtil.of_int i
 
-let switching_of_json = function
+let switching_of_json filenames = function
   | `String "Freed" -> Freed
   | `String "Maintained" -> Maintained
   | `String "Erased"-> Erased
-  | x -> Linked (Locality.annot_of_json
-                   (JsonUtil.to_int~error_msg:"Invalid Switching") x)
+  | x -> Linked (Locality.annot_of_yojson
+                   ~filenames (JsonUtil.to_int~error_msg:"Invalid Switching") x)
 
 let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
   Format.fprintf
@@ -298,24 +298,25 @@ let print_rule ~full sigs pr_tok pr_var f r =
     r.r_delta_tokens
     (fun f -> if full then print_rates sigs pr_tok pr_var f r)
 
-let rule_agent_to_json a =
+let rule_agent_to_json filenames a =
   `Assoc [
     "type", `Int a.ra_type;
     "bindings",
     `List (Array.fold_right
              (fun (e,s) c ->
                 (`List [
-                    Locality.annot_to_json
+                    Locality.annot_to_yojson
+                      ~filenames
                       (Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
                          (fun (s,a) -> [`Int s;`Int a])) e;
-                       switching_to_json s])::c)
+                       (switching_to_json filenames) s])::c)
              a.ra_ports []);
     "states",
     `List (Array.fold_right
              (fun x c -> rule_internal_to_json x :: c) a.ra_ints []);
     "erased", `Bool a.ra_erased;
   ]
-let rule_agent_of_json = function
+let rule_agent_of_json filenames = function
   | `Assoc l as x when List.length l = 4 ->
     begin
       try
@@ -325,14 +326,15 @@ let rule_agent_of_json = function
             Tools.array_map_of_list
               (function
                 | `List [e;s] ->
-                  (Locality.annot_of_json
+                  (Locality.annot_of_yojson
+                     ~filenames
                      (Ast.link_of_json
                         (fun _ -> Yojson.Basic.Util.to_int)
                         Yojson.Basic.Util.to_int
                         (function
                           | [`Int s; `Int a] -> (s,a)
                           | _ -> raise Not_found)) e,
-                  switching_of_json s)
+                  (switching_of_json filenames) s)
                 | _ -> raise Not_found) s
           | _ -> raise Not_found in
         let ints =
@@ -352,56 +354,68 @@ let rule_agent_of_json = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid rule_agent",x))
 
-let rule_mixture_to_json = JsonUtil.of_list rule_agent_to_json
-let rule_mixture_of_json = JsonUtil.to_list rule_agent_of_json
+let rule_mixture_to_json filenames =
+  JsonUtil.of_list (rule_agent_to_json filenames)
+let rule_mixture_of_json filenames =
+  JsonUtil.to_list (rule_agent_of_json filenames)
 
-let lalg_expr_to_json =
-  Alg_expr.e_to_yojson rule_mixture_to_json JsonUtil.of_int
-let lalg_expr_of_json =
-  Alg_expr.e_of_yojson rule_mixture_of_json (JsonUtil.to_int ?error_msg:None)
+let lalg_expr_to_json filenames =
+  Alg_expr.e_to_yojson
+    ~filenames (rule_mixture_to_json filenames) JsonUtil.of_int
+let lalg_expr_of_json filenames =
+  Alg_expr.e_of_yojson
+    ~filenames (rule_mixture_of_json filenames)
+    (JsonUtil.to_int ?error_msg:None)
 
-let rule_to_json r =
+let rule_to_json ~filenames r =
   `Assoc
     [
-      "mixture", rule_mixture_to_json r.r_mix;
+      "mixture", rule_mixture_to_json filenames r.r_mix;
       "created", Raw_mixture.to_json r.r_created;
       "delta_tokens",
       JsonUtil.of_list
         (JsonUtil.of_pair ~lab1:"val" ~lab2:"tok"
-           (Locality.annot_to_json lalg_expr_to_json)
+           (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
            JsonUtil.of_int)
         r.r_delta_tokens;
-      "rate", Locality.annot_to_json lalg_expr_to_json r.r_rate;
+      "rate", Locality.annot_to_yojson
+        ~filenames (lalg_expr_to_json filenames) r.r_rate;
       "unary_rate",
       JsonUtil.of_option
         (JsonUtil.of_pair
-           (Locality.annot_to_json lalg_expr_to_json)
-           (JsonUtil.of_option (Locality.annot_to_json lalg_expr_to_json)))
+           (Locality.annot_to_yojson ~filenames (lalg_expr_to_json filenames))
+           (JsonUtil.of_option
+              (Locality.annot_to_yojson
+                 ~filenames (lalg_expr_to_json filenames))))
         r.r_un_rate;
       "editStyle", `Bool r.r_editStyle;
     ]
-let rule_of_json = function
+let rule_of_json ~filenames = function
   | `Assoc l as x when List.length l < 7 ->
     begin
       try
         {
-          r_mix = rule_mixture_of_json (List.assoc "mixture" l);
+          r_mix = rule_mixture_of_json filenames (List.assoc "mixture" l);
           r_created = Raw_mixture.of_json (List.assoc "created" l);
           r_delta_tokens =
             JsonUtil.to_list
               (JsonUtil.to_pair ~lab1:"val" ~lab2:"tok"
-                 (Locality.annot_of_json lalg_expr_of_json)
+                 (Locality.annot_of_yojson
+                    ~filenames (lalg_expr_of_json filenames))
                  (JsonUtil.to_int ?error_msg:None))
               (List.assoc "delta_tokens" l);
           r_rate =
-            Locality.annot_of_json lalg_expr_of_json (List.assoc "rate" l);
+            Locality.annot_of_yojson ~filenames (lalg_expr_of_json filenames)
+              (List.assoc "rate" l);
           r_un_rate =
             (try
                JsonUtil.to_option
                  (JsonUtil.to_pair
-                    (Locality.annot_of_json lalg_expr_of_json)
-                    (JsonUtil.to_option (Locality.annot_of_json
-                                           lalg_expr_of_json)))
+                    (Locality.annot_of_yojson
+                       ~filenames (lalg_expr_of_json filenames))
+                    (JsonUtil.to_option
+                       (Locality.annot_of_yojson
+                          (lalg_expr_of_json filenames))))
                  (List.assoc "unary_rate" l)
              with Not_found -> None);
            r_editStyle = Yojson.Basic.Util.to_bool (List.assoc "editStyle" l);

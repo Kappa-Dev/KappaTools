@@ -7,7 +7,7 @@
 (******************************************************************************)
 
 type t = {
-  filenames : unit NamedDecls.t;
+  filenames : string list;
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Locality.annot) NamedDecls.t;
@@ -26,9 +26,6 @@ type t = {
 
 let init ~filenames domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     (ast_rules,rules) observables perturbations contact_map =
-  let filenames = NamedDecls.create
-      (Tools.array_map_of_list
-         (fun x -> Locality.dummy_annot x,()) filenames) in
   { filenames; domain; tokens; ast_rules; rules; algs; observables;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
@@ -251,30 +248,39 @@ let kappa_instance_to_yojson =
   JsonUtil.of_list (JsonUtil.of_array Pattern.id_to_yojson)
 
 let to_yojson env =
+  let files =
+    Array.of_list (Lexing.dummy_pos.Lexing.pos_fname::env.filenames) in
+  let filenames =
+    Tools.array_fold_lefti
+      (fun i map x -> Mods.StringMap.add x i map)
+      Mods.StringMap.empty files in
   `Assoc [
-    "filenames",
-    JsonUtil.of_array (fun (x,()) -> `String x) env.filenames.NamedDecls.decls;
+    "filenames", JsonUtil.of_array JsonUtil.of_string files;
     "update", Pattern.Env.to_yojson (domain env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
       (fun (x,_) ->
-         Alg_expr.e_to_yojson kappa_instance_to_yojson JsonUtil.of_int x)
+         Alg_expr.e_to_yojson
+           ~filenames kappa_instance_to_yojson JsonUtil.of_int x)
       env.algs;
     "observables",
     `List
       (Array.fold_right
          (fun (x,_) l ->
-            Alg_expr.e_to_yojson kappa_instance_to_yojson JsonUtil.of_int x :: l)
+            Alg_expr.e_to_yojson
+              ~filenames kappa_instance_to_yojson JsonUtil.of_int x :: l)
          env.observables []);
     "ast_rules",
     `List
       (Array.fold_right (fun (n,(r,_)) l ->
            `List [(match n with None -> `Null | Some (n,_) -> `String n);
-              LKappa.rule_to_json r]::l) env.ast_rules []);
-    "elementary_rules", JsonUtil.of_array Primitives.rule_to_yojson env.rules;
+              LKappa.rule_to_json ~filenames r]::l) env.ast_rules []);
+    "elementary_rules",
+    JsonUtil.of_array (Primitives.rule_to_yojson ~filenames) env.rules;
     "contact_map", Contact_map.to_yojson (env.contact_map);
     "perturbations",
-    JsonUtil.of_array Primitives.perturbation_to_yojson env.perturbations;
+    JsonUtil.of_array
+      (Primitives.perturbation_to_yojson ~filenames) env.perturbations;
     "dependencies_in_time", Operator.depset_to_yojson env.dependencies_in_time;
     "dependencies_in_event", Operator.depset_to_yojson env.dependencies_in_event;
     "algs_reverse_dependencies",
@@ -289,72 +295,76 @@ let kappa_instance_of_yojson =
 let of_yojson = function
   | `Assoc l as x when List.length l = 13 ->
     begin
-      try {
-        filenames = NamedDecls.create
-            (JsonUtil.to_array (function
-                   `String x -> (Locality.dummy_annot x,())
-                 | _ -> raise Not_found )
-               (List.assoc "filenames" l));
-        domain = Pattern.Env.of_yojson (List.assoc "update" l);
-        tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
-        algs = NamedDecls.of_json
-            (fun x -> Locality.dummy_annot
-                (Alg_expr.e_of_yojson kappa_instance_of_yojson
-                   (JsonUtil.to_int ?error_msg:None) x))
-            (List.assoc "algs" l);
-        observables = (match List.assoc "observables" l with
-            | `List o ->
-              Tools.array_map_of_list
-                (fun x -> Locality.dummy_annot
-                    (Alg_expr.e_of_yojson kappa_instance_of_yojson
-                       (JsonUtil.to_int ?error_msg:None) x)) o
-            | `Null -> [||]
-            | _ -> raise Not_found);
-        ast_rules = (match List.assoc "ast_rules" l with
+      try
+        let filenames =
+          JsonUtil.to_array (JsonUtil.to_string ?error_msg:None)
+            (List.assoc "filenames" l) in {
+          filenames = List.tl (Array.to_list filenames);
+          domain = Pattern.Env.of_yojson (List.assoc "update" l);
+          tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
+          algs = NamedDecls.of_json
+              (fun x -> Locality.dummy_annot
+                  (Alg_expr.e_of_yojson
+                     ~filenames kappa_instance_of_yojson
+                     (JsonUtil.to_int ?error_msg:None) x))
+              (List.assoc "algs" l);
+          observables = (match List.assoc "observables" l with
+              | `List o ->
+                Tools.array_map_of_list
+                  (fun x -> Locality.dummy_annot
+                      (Alg_expr.e_of_yojson
+                         ~filenames kappa_instance_of_yojson
+                         (JsonUtil.to_int ?error_msg:None) x)) o
+              | `Null -> [||]
+              | _ -> raise Not_found);
+          ast_rules = (match List.assoc "ast_rules" l with
             | `List o ->
               Tools.array_map_of_list
                 (function
                   | `List [`Null;r]->
-                    (None, Locality.dummy_annot (LKappa.rule_of_json r))
+                    (None, Locality.dummy_annot
+                       (LKappa.rule_of_json ~filenames r))
                   | `List [`String n;r]->
                     (Some (Locality.dummy_annot n),
-                     Locality.dummy_annot (LKappa.rule_of_json r))
+                     Locality.dummy_annot (LKappa.rule_of_json ~filenames r))
                   | _ -> raise Not_found) o
             | `Null -> [||]
             | _ -> raise Not_found);
-        rules = (match (List.assoc "elementary_rules" l) with
-            | `List o ->
-              Tools.array_map_of_list Primitives.rule_of_yojson o
-            | _ -> raise Not_found);
-        perturbations =
-          JsonUtil.to_array Primitives.perturbation_of_yojson
-            (Yojson.Basic.Util.member "perturbations" x);
-        dependencies_in_time =
-          Operator.depset_of_yojson
-            (Yojson.Basic.Util.member "dependencies_in_time" x);
-        dependencies_in_event =
-          Operator.depset_of_yojson
-            (Yojson.Basic.Util.member "dependencies_in_event" x);
-        algs_reverse_dependencies =
-          JsonUtil.to_array Operator.depset_of_yojson
-            (Yojson.Basic.Util.member "algs_reverse_dependencies" x);
-        tokens_reverse_dependencies =
-          JsonUtil.to_array Operator.depset_of_yojson
-            (Yojson.Basic.Util.member "tokens_reverse_dependencies" x);
-        contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
-      }
+          rules = (match (List.assoc "elementary_rules" l) with
+              | `List o ->
+                Tools.array_map_of_list
+                  (Primitives.rule_of_yojson ~filenames) o
+              | _ -> raise Not_found);
+          perturbations =
+            JsonUtil.to_array
+              (Primitives.perturbation_of_yojson ~filenames)
+              (Yojson.Basic.Util.member "perturbations" x);
+          dependencies_in_time =
+            Operator.depset_of_yojson
+              (Yojson.Basic.Util.member "dependencies_in_time" x);
+          dependencies_in_event =
+            Operator.depset_of_yojson
+              (Yojson.Basic.Util.member "dependencies_in_event" x);
+          algs_reverse_dependencies =
+            JsonUtil.to_array Operator.depset_of_yojson
+              (Yojson.Basic.Util.member "algs_reverse_dependencies" x);
+          tokens_reverse_dependencies =
+            JsonUtil.to_array Operator.depset_of_yojson
+              (Yojson.Basic.Util.member "tokens_reverse_dependencies" x);
+          contact_map = Contact_map.of_yojson (List.assoc "contact_map" l);
+        }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Not a correct environment",x))
 
-let unary_patterns env = 
+let unary_patterns env =
   fold_rules
     (fun _ acc r ->
-        match r.Primitives.unary_rate with
-        | None -> acc
-        | Some _ ->
-          Pattern.Set.add
-            r.Primitives.connected_components.(0)
-            (Pattern.Set.add r.Primitives.connected_components.(1) acc)
+       match r.Primitives.unary_rate with
+       | None -> acc
+       | Some _ ->
+         Pattern.Set.add
+           r.Primitives.connected_components.(0)
+           (Pattern.Set.add r.Primitives.connected_components.(1) acc)
     ) Pattern.Set.empty env

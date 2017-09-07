@@ -33,14 +33,17 @@ and ('mix,'id) bool =
 
 type t = (Pattern.id array list, int) e
 
-let rec e_to_yojson f_mix f_id = function
+let rec e_to_yojson ~filenames f_mix f_id = function
   | BIN_ALG_OP (op,a,b) ->
     `List [Operator.bin_alg_op_to_json op;
-           Locality.annot_to_json (e_to_yojson f_mix f_id) a;
-           Locality.annot_to_json (e_to_yojson f_mix f_id) b]
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) a;
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) b]
   | UN_ALG_OP (op,a) ->
     `List [Operator.un_alg_op_to_json op;
-           Locality.annot_to_json (e_to_yojson f_mix f_id) a]
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) a]
   | STATE_ALG_OP op -> Operator.state_alg_op_to_json op
   | ALG_VAR i -> `List [`String "VAR"; f_id i]
   | KAPPA_INSTANCE cc -> `List [`String "MIX"; f_mix cc]
@@ -48,77 +51,100 @@ let rec e_to_yojson f_mix f_id = function
   | CONST n -> Nbr.to_yojson n
   | IF (cond,yes,no) ->
     `List [`String "IF";
-           Locality.annot_to_json (bool_to_yojson f_mix f_id) cond;
-           Locality.annot_to_json (e_to_yojson f_mix f_id) yes;
-           Locality.annot_to_json (e_to_yojson f_mix f_id) no]
+           Locality.annot_to_yojson ~filenames
+             (bool_to_yojson ~filenames f_mix f_id) cond;
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) yes;
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) no]
   | DIFF_TOKEN (expr,token) ->
     `List [`String "DIFF_TOKEN";
-           Locality.annot_to_json (e_to_yojson f_mix f_id) expr;
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) expr;
            f_id token]
   | DIFF_KAPPA_INSTANCE (expr,mixture) ->
     `List [`String "DIFF_MIXTURE";
-           Locality.annot_to_json (e_to_yojson f_mix f_id) expr;
+           Locality.annot_to_yojson ~filenames
+             (e_to_yojson ~filenames f_mix f_id) expr;
            f_mix mixture]
 
-and bool_to_yojson f_mix f_id = function
+and bool_to_yojson ~filenames f_mix f_id = function
   | TRUE -> `Bool true
   | FALSE -> `Bool false
   | UN_BOOL_OP (op,a) ->
     `List [ Operator.un_bool_op_to_json op;
-            Locality.annot_to_json (bool_to_yojson f_mix f_id) a ]
+            Locality.annot_to_yojson ~filenames
+              (bool_to_yojson ~filenames f_mix f_id) a ]
   | BIN_BOOL_OP (op,a,b) ->
     `List [ Operator.bin_bool_op_to_json op;
-            Locality.annot_to_json (bool_to_yojson f_mix f_id) a;
-            Locality.annot_to_json (bool_to_yojson f_mix f_id) b ]
+            Locality.annot_to_yojson ~filenames
+              (bool_to_yojson ~filenames f_mix f_id) a;
+            Locality.annot_to_yojson ~filenames
+              (bool_to_yojson ~filenames f_mix f_id) b ]
   | COMPARE_OP (op,a,b) ->
     `List [ Operator.compare_op_to_json op;
-            Locality.annot_to_json (e_to_yojson f_mix f_id) a;
-            Locality.annot_to_json (e_to_yojson f_mix f_id) b ]
+            Locality.annot_to_yojson ~filenames
+              (e_to_yojson ~filenames f_mix f_id) a;
+            Locality.annot_to_yojson ~filenames
+              (e_to_yojson ~filenames f_mix f_id) b ]
 
-let rec e_of_yojson f_mix f_id = function
+let rec e_of_yojson ~filenames f_mix f_id = function
   | `List [`String "DIFF_MIXTURE"; expr ; mixture] ->
     DIFF_KAPPA_INSTANCE
-      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+      (Locality.annot_of_yojson ~filenames
+         (e_of_yojson ~filenames f_mix f_id) expr,
        f_mix mixture)
   | `List [`String "DIFF_TOKEN"; expr ; tok] ->
     DIFF_TOKEN
-      (Locality.annot_of_json (e_of_yojson f_mix f_id) expr,
+      (Locality.annot_of_yojson ~filenames
+         (e_of_yojson ~filenames f_mix f_id) expr,
        f_id tok)
   | `List [op;a;b] ->
     BIN_ALG_OP
       (Operator.bin_alg_op_of_json op,
-       Locality.annot_of_json (e_of_yojson f_mix f_id) a,
-       Locality.annot_of_json (e_of_yojson f_mix f_id) b)
+       Locality.annot_of_yojson ~filenames
+         (e_of_yojson ~filenames f_mix f_id) a,
+       Locality.annot_of_yojson ~filenames
+         (e_of_yojson ~filenames f_mix f_id) b)
   | `List [`String "VAR"; i] -> ALG_VAR (f_id i)
   | `List [`String "TOKEN"; i] -> TOKEN_ID (f_id i)
   | `List [`String "MIX"; cc] -> KAPPA_INSTANCE (f_mix cc)
   | `List [op;a] ->
     UN_ALG_OP (Operator.un_alg_op_of_json op,
-               Locality.annot_of_json (e_of_yojson f_mix f_id) a)
+               Locality.annot_of_yojson ~filenames
+                 (e_of_yojson ~filenames f_mix f_id) a)
   | `List [`String "IF"; cond; yes; no] ->
-    IF (Locality.annot_of_json (bool_of_yojson f_mix f_id) cond,
-        Locality.annot_of_json (e_of_yojson f_mix f_id) yes,
-        Locality.annot_of_json (e_of_yojson f_mix f_id) no)
+    IF (Locality.annot_of_yojson ~filenames
+          (bool_of_yojson ~filenames f_mix f_id) cond,
+        Locality.annot_of_yojson ~filenames
+          (e_of_yojson ~filenames f_mix f_id) yes,
+        Locality.annot_of_yojson ~filenames
+          (e_of_yojson ~filenames f_mix f_id) no)
   | x ->
     try STATE_ALG_OP (Operator.state_alg_op_of_json x)
     with Yojson.Basic.Util.Type_error _ ->
     try  CONST (Nbr.of_yojson x)
     with Yojson.Basic.Util.Type_error _ ->
       raise (Yojson.Basic.Util.Type_error ("Invalid Alg_expr",x))
-and bool_of_yojson f_mix f_id = function
+and bool_of_yojson ~filenames f_mix f_id = function
   | `Bool b -> if b then TRUE else FALSE
   | `List [op; a] ->
     UN_BOOL_OP (Operator.un_bool_op_of_json op,
-                Locality.annot_of_json (bool_of_yojson f_mix f_id) a)
+                Locality.annot_of_yojson ~filenames
+                  (bool_of_yojson ~filenames f_mix f_id) a)
   | `List [op; a; b] as x ->
     begin
       try BIN_BOOL_OP (Operator.bin_bool_op_of_json op,
-                   Locality.annot_of_json (bool_of_yojson f_mix f_id) a,
-                   Locality.annot_of_json (bool_of_yojson f_mix f_id) b)
+                       Locality.annot_of_yojson ~filenames
+                         (bool_of_yojson ~filenames f_mix f_id) a,
+                       Locality.annot_of_yojson ~filenames
+                         (bool_of_yojson ~filenames f_mix f_id) b)
       with Yojson.Basic.Util.Type_error _ ->
       try COMPARE_OP (Operator.compare_op_of_json op,
-                      Locality.annot_of_json (e_of_yojson f_mix f_id) a,
-                      Locality.annot_of_json (e_of_yojson f_mix f_id) b)
+                      Locality.annot_of_yojson ~filenames
+                        (e_of_yojson ~filenames f_mix f_id) a,
+                      Locality.annot_of_yojson ~filenames
+                        (e_of_yojson ~filenames f_mix f_id) b)
       with Yojson.Basic.Util.Type_error _ ->
         raise (Yojson.Basic.Util.Type_error ("Incorrect bool expr",x))
     end

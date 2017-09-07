@@ -28,8 +28,12 @@ val print : Format.formatter -> t -> unit
 val print_annot :
   (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a annot -> unit
 
-val annot_of_json : (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a annot
-val annot_to_json : ('a -> Yojson.Basic.json) -> 'a annot -> Yojson.Basic.json
+val annot_of_yojson :
+  ?filenames : string array ->
+  (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a annot
+val annot_to_yojson :
+  ?filenames : int Mods.StringMap.t ->
+  ('a -> Yojson.Basic.json) -> 'a annot -> Yojson.Basic.json
 
 val write_range : Bi_outbuf.t -> t -> unit
   (** Output a JSON value of type {!t}. *)

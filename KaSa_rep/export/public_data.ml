@@ -272,7 +272,7 @@ let rule_to_json rule =
       rule_id,JsonUtil.of_int rule.rule_id;
       label, JsonUtil.of_string rule.rule_label;
       ast, JsonUtil.of_string rule.rule_ast;
-      position,Locality.annot_to_json
+      position,Locality.annot_to_yojson
         JsonUtil.of_unit ((),rule.rule_position)
     ]
 
@@ -286,7 +286,7 @@ let json_to_rule =
           rule_label =  JsonUtil.to_string (List.assoc label l) ;
           rule_ast =  JsonUtil.to_string (List.assoc ast l) ;
           rule_position =
-            snd (Locality.annot_of_json
+            snd (Locality.annot_of_yojson
                (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
                (List.assoc position l))}
       with Not_found ->
@@ -309,7 +309,7 @@ let var_to_json var =
       rule_id,JsonUtil.of_int var.var_id;
       label, JsonUtil.of_string var.var_label;
       ast, JsonUtil.of_string var.var_ast;
-      position,Locality.annot_to_json
+      position,Locality.annot_to_yojson
         JsonUtil.of_unit ((),var.var_position)
     ]
 
@@ -323,7 +323,7 @@ let json_to_var =
           var_label =  JsonUtil.to_string (List.assoc label l) ;
           var_ast =  JsonUtil.to_string (List.assoc ast l) ;
           var_position =
-            snd (Locality.annot_of_json
+            snd (Locality.annot_of_yojson
                    (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
                    (List.assoc position l))}
       with Not_found ->

@@ -68,8 +68,10 @@ val print_rule :
   full:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
   (Format.formatter -> int -> unit) -> Format.formatter -> rule_agent rule -> unit
 
-val rule_to_json : rule_agent rule -> Yojson.Basic.json
-val rule_of_json : Yojson.Basic.json -> rule_agent rule
+val rule_to_json :
+  filenames : int Mods.StringMap.t -> rule_agent rule -> Yojson.Basic.json
+val rule_of_json :
+  filenames : string array -> Yojson.Basic.json -> rule_agent rule
 
 val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->

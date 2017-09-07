@@ -64,18 +64,23 @@ type elementary_rule = {
 val extract_cc_ids : elementary_rule -> Pattern.id array
 val extract_abstract_event :
   elementary_rule -> Instantiation.abstract Instantiation.event
-val rule_to_yojson : elementary_rule -> Yojson.Basic.json
 
-val rule_of_yojson : Yojson.Basic.json -> elementary_rule
+val rule_to_yojson :
+  filenames : int Mods.StringMap.t -> elementary_rule -> Yojson.Basic.json
+
+val rule_of_yojson :
+  filenames : string array -> Yojson.Basic.json -> elementary_rule
 
 type 'alg_expr print_expr =
     Str_pexpr of string Locality.annot
   | Alg_pexpr of 'alg_expr Locality.annot
 
 val print_expr_to_yojson :
+  filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->
   ('a,'b) Alg_expr.e print_expr -> Yojson.Basic.json
 val print_expr_of_yojson :
+  filenames : string array ->
   (Yojson.Basic.json -> 'a) -> (Yojson.Basic.json -> 'b) ->
   Yojson.Basic.json -> ('a,'b) Alg_expr.e print_expr
 
@@ -128,8 +133,10 @@ type perturbation =
     repeat : (Pattern.id array list,int) Alg_expr.bool Locality.annot;
   }
 
-val perturbation_to_yojson : perturbation -> Yojson.Basic.json
-val perturbation_of_yojson : Yojson.Basic.json -> perturbation
+val perturbation_to_yojson :
+  filenames : int Mods.StringMap.t -> perturbation -> Yojson.Basic.json
+val perturbation_of_yojson :
+  filenames : string array -> Yojson.Basic.json -> perturbation
 
 val exists_modification : (modification -> bool) -> perturbation array -> bool
 
