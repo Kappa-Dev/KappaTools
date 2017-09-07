@@ -305,8 +305,10 @@ let counter_test_of_json = function
 
 let port_to_json filenames p =
   let mod_l = JsonUtil.of_option
-      (JsonUtil.of_option
-         (Locality.annot_to_yojson ~filenames JsonUtil.of_int)) in
+      (function
+        | None -> `String "FREE"
+        | Some x ->
+          Locality.annot_to_yojson ~filenames JsonUtil.of_int x) in
   let mod_i =JsonUtil.of_option
       (Locality.annot_to_yojson ~filenames JsonUtil.of_string) in
   `Assoc [
@@ -345,9 +347,12 @@ let site_of_json filenames = function
     `Assoc [ "port_int", i; "port_lnk", l; "port_nme", n ] |
     `Assoc [ "port_lnk", l; "port_int", i; "port_nme", n ] ->
     let mod_l = JsonUtil.to_option
-        (JsonUtil.to_option
-           (Locality.annot_of_yojson
-              ~filenames (JsonUtil.to_int ?error_msg:None))) in
+        (function
+          | `String "FREE" -> None
+          | x ->
+            Some
+              (Locality.annot_of_yojson
+                 ~filenames (JsonUtil.to_int ?error_msg:None) x)) in
     let mod_i = JsonUtil.to_option
         (Locality.annot_of_yojson
            ~filenames (JsonUtil.to_string ?error_msg:None)) in
