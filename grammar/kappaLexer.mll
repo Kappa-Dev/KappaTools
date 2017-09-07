@@ -195,7 +195,8 @@ and inline_comment = parse
   let compile logger compil fic =
     let d = open_in fic in
     let lexbuf = Lexing.from_channel d in
-    lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
+    let () = lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} in
+    let compil = { compil with Ast.filenames = fic :: compil.Ast.filenames } in
     try
       let () = Format.fprintf logger "Parsing %s...@." fic in
       let out = KappaParser.start_rule token lexbuf compil in

@@ -568,7 +568,7 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
                      " navigation steps"));
 
   let env =
-    Model.init domain tk_nd alg_nd alg_deps''
+    Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
       (Array.of_list result.rules,rule_nd)
       (Array.of_list (List.rev obs)) (Array.of_list pert) contact_map in
 

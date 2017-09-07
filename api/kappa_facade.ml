@@ -128,12 +128,16 @@ type file = { file_id : string ; file_content : string }
 
 let rec compile_file
     (yield : unit -> unit Lwt.t)
-    (compile : Ast.parsing_compil) : file list -> (Ast.parsing_compil, Api_types_j.errors) Result.result Lwt.t =
+    (compile : Ast.parsing_compil)
+  : file list -> (Ast.parsing_compil, Api_types_j.errors) Result.result Lwt.t =
   function
   | [] -> Lwt.return (Result_util.ok compile)
   | file::files ->
     let lexbuf = Lexing.from_string file.file_content in
-    let () = lexbuf.Lexing.lex_curr_p <- { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = file.file_id }  in
+    let () = lexbuf.Lexing.lex_curr_p <-
+        { lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = file.file_id }  in
+    let compile =
+      { compile with Ast.filenames = file.file_id :: compile.Ast.filenames } in
     Lwt.catch
       (fun () ->
          (Lwt.wrap3 KappaParser.start_rule KappaLexer.token lexbuf compile) >>=

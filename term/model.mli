@@ -11,7 +11,7 @@
 type t
 
 val init :
-  Pattern.Env.t -> unit NamedDecls.t ->
+  filenames : string list -> Pattern.Env.t -> unit NamedDecls.t ->
   Alg_expr.t Locality.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->

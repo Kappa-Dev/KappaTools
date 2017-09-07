@@ -150,6 +150,7 @@ type ('pattern,'mixture,'id) command =
 
 type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
   {
+    filenames : string list;
     variables :
       ('pattern,'id) variable_def list;
     (*pattern declaration for reusing as variable in perturbations
@@ -200,6 +201,7 @@ let no_more_site_on_right error left right =
 
 let empty_compil =
   {
+    filenames      = [];
     variables      = [];
     signatures     = [];
     rules          = [];
@@ -841,6 +843,7 @@ let compil_to_json c =
   let var_to_json = JsonUtil.of_string in
   `Assoc
     [
+      "filenames", JsonUtil.of_list JsonUtil.of_string c.filenames;
       "signatures",
       JsonUtil.of_list agent_to_json c.signatures;
       "tokens", JsonUtil.of_list string_annot_to_json c.tokens;
@@ -893,13 +896,17 @@ let compil_to_json c =
     ]
 
 let compil_of_json = function
-  | `Assoc l as x when List.length l = 9 ->
+  | `Assoc l as x when List.length l = 10 ->
     let mix_of_json =
       JsonUtil.to_list agent_of_json in
     let var_of_json = JsonUtil.to_string ?error_msg:None in
     begin
       try
         {
+          filenames =
+            JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST filenames")
+              (JsonUtil.to_string ~error_msg:(JsonUtil.build_msg "ASTfilename"))
+              (List.assoc "filenamess" l);
           signatures =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST signature")
               agent_of_json

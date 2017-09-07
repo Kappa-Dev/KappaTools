@@ -928,6 +928,7 @@ let translate_compil parameters error compil =
       compil.Ast.perturbations
   in
   error,{
+    Ast.filenames = compil.Ast.filenames;
     Ast.variables = List.rev var_rev;
     Ast.signatures = List.rev signatures_rev;
     Ast.rules = List.rev rules_rev ;

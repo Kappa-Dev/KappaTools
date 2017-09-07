@@ -145,6 +145,7 @@ type ('pattern,'mixture,'id) command =
 
 type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
   {
+    filenames : string list;
     variables :
       ('pattern,'id) variable_def list;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)

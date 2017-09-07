@@ -7,6 +7,7 @@
 (******************************************************************************)
 
 type t = {
+  filenames : unit NamedDecls.t;
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Locality.annot) NamedDecls.t;
@@ -23,12 +24,15 @@ type t = {
   contact_map : Contact_map.t;
 }
 
-let init domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
+let init ~filenames domain tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     (ast_rules,rules) observables perturbations contact_map =
-  { domain; tokens; ast_rules; rules; algs; observables; perturbations;
+  let filenames = NamedDecls.create
+      (Tools.array_map_of_list
+         (fun x -> Locality.dummy_annot x,()) filenames) in
+  { filenames; domain; tokens; ast_rules; rules; algs; observables;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
-    contact_map;
+    perturbations; contact_map;
   }
 
 let domain env = env.domain
@@ -214,6 +218,7 @@ let propagate_constant ?max_time ?max_events updated_vars alg_overwrite x =
               ?max_time ?max_events updated_vars algs' v))
       algs' in
   {
+    filenames = x.filenames;
     domain = x.domain;
     tokens = x.tokens;
     algs = NamedDecls.create algs';
@@ -247,6 +252,8 @@ let kappa_instance_to_yojson =
 
 let to_yojson env =
   `Assoc [
+    "filenames",
+    JsonUtil.of_array (fun (x,()) -> `String x) env.filenames.NamedDecls.decls;
     "update", Pattern.Env.to_yojson (domain env);
     "tokens", NamedDecls.to_json (fun () -> `Null) env.tokens;
     "algs", NamedDecls.to_json
@@ -280,9 +287,14 @@ let kappa_instance_of_yojson =
   JsonUtil.to_list (JsonUtil.to_array Pattern.id_of_yojson)
 
 let of_yojson = function
-  | `Assoc l as x when List.length l = 12 ->
+  | `Assoc l as x when List.length l = 13 ->
     begin
       try {
+        filenames = NamedDecls.create
+            (JsonUtil.to_array (function
+                   `String x -> (Locality.dummy_annot x,())
+                 | _ -> raise Not_found )
+               (List.assoc "filenames" l));
         domain = Pattern.Env.of_yojson (List.assoc "update" l);
         tokens = NamedDecls.of_json (fun _ -> ()) (List.assoc "tokens" l);
         algs = NamedDecls.of_json

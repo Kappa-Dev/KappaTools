@@ -1981,6 +1981,7 @@ let compil_of_ast ~syntax_version overwrite c =
   let rules = remove_counters sigs with_counters rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
+    Ast.filenames = c.Ast.filenames;
     Ast.variables =
       List_util.mapi
         (fun i (lab,expr) ->
