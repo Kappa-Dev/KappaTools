@@ -7,21 +7,31 @@ info:
   license:
     name: LGPL
     url: 'http://www.gnu.org/licenses/lgpl-3.0.en.html'
-  version: 1.0.0
+  version: 4.0.0
 host: api.executableknowledge.org
 schemes:
   - https
 basePath: /kappa/v2
 produces:
   - application/json
+tags:
+  - name: model
+  - name: simulation
+  - name: analyses
+  - name: causality
+  - name: ODE
 paths:
   /projects:
     get:
+      tags:
+        - model
       summary: List of projets
       responses:
         '200':
           description: list of project id
     post:
+      tags:
+        - model
       parameters:
         - in: body
           name: project
@@ -36,6 +46,8 @@ paths:
           description: Project already exists
   '/projects/{project_id}':
     get:
+      tags:
+        - model
       parameters:
         - in: path
           name: project_id
@@ -48,19 +60,45 @@ paths:
         '404':
           description: Project does not exist
     delete:
+      tags:
+        - model
       parameters:
         - in: path
           name: project_id
           type: string
           required: true
-      summary: Create project
+      summary: Delete project
       responses:
         '200':
           description: OK
         '404':
           description: Project does not exist
+  '/projects/{project_id}/parse':
+    post:
+      tags:
+        - model
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: overwritten_vars
+          schema:
+            type: array
+            items:
+              type: number
+          required: true
+      summary: Compile the model
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
   '/projects/{project_id}/files':
     post:
+      tags:
+        - model
       parameters:
         - in: path
           name: project_id
@@ -75,6 +113,130 @@ paths:
       responses:
         '200':
           description: OK
+        default:
+          description: Something went wrong
+    get:
+      tags:
+        - model
+      summary: Get file catalog
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+  '/projects/{project_id}/files/{file_id}':
+    put:
+      tags:
+        - model
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: file_id
+          type: string
+          required: true
+        - in: body
+          name: file
+          schema:
+            $ref: '#/definitions/File_modification'
+      summary: Modify a file
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+    get:
+      tags:
+        - model
+      summary: Get a file
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: file_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+    delete:
+      tags:
+        - model
+      summary: Remove a file from the project
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: file_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+  '/projects/{project_id}/simulation':
+    post:
+      tags:
+        - simulation
+      summary: Launch a simulation
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: parameters
+          schema:
+            $ref: '#/definitions/Simulation_parameter'
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+    get:
+      tags:
+        - simulation
+      summary: Get simulation status
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
+    delete:
+      tags:
+        - simulation
+      summary: Delete the current simulation
+      description: All outputs are lost
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Something went wrong
 definitions:
   Project_parameter:
     type: object
@@ -106,9 +268,7 @@ definitions:
       position:
         type: integer
       version:
-        type: array
-        items:
-          $ref: '#/definitions/File_version'
+        $ref: '#/definitions/File_version'
   File:
     type: object
     required:
@@ -119,3 +279,49 @@ definitions:
         $ref: '#/definitions/File_metadata'
       content:
         type: string
+  File_patch:
+    type: object
+    required:
+      - file_patch_content
+    properties:
+      file_patch_start:
+        type: integer
+      file_patch_stop:
+        type: integer
+      file_patch_content:
+        type: string
+  File_modification:
+    type: object
+    required:
+      - file_modification_version
+    properties:
+      file_modification_version:
+        $ref: '#/definitions/File_version'
+      compile:
+        type: boolean
+      id:
+        type: string
+      position:
+        type: integer
+      content:
+        $ref: '#/definitions/File_patch'
+      hash:
+        type: string
+  Simulation_parameter:
+    type: object
+    required:
+      - plot_period
+      - pause_condition
+      - simulation_id
+      - store_trace
+    properties:
+      plot_period:
+        type: number
+      pause_condition:
+        type: string
+      simulation_id:
+        type: string
+      seed:
+        type: integer
+      store_trace:
+        type: boolean
