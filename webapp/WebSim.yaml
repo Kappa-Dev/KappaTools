@@ -467,6 +467,105 @@ paths:
           description: OK
         default:
           $ref: '#/responses/Default'
+  '/projects/{project_id}/analyses':
+    put:
+      tags:
+        - analyses
+      summary: Initialize the static analyser
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: model
+          schema:
+            type: object
+            description: JSON of the model AST
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/analyses/contact_map':
+    get:
+      tags:
+        - analyses
+      summary: Get contact map JSON
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: query
+          name: accuracy
+          type: string
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/analyses/influence_map':
+    get:
+      tags:
+        - analyses
+      summary: Get influence map
+      description: only the neighbours of a node when origin is given
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: query
+          name: accuracy
+          type: string
+        - in: query
+          name: fwd
+          type: integer
+        - in: query
+          name: bwd
+          type: integer
+        - in: query
+          name: total
+          type: integer
+        - in: query
+          name: origin
+          type: string
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/analyses/dead_rules':
+    get:
+      tags:
+        - analyses
+      summary: Return dead rules
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/analyses/constraints':
+    get:
+      tags:
+        - analyses
+      summary: Get model invariants
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
 responses:
   Default:
     description: Something went wrong
