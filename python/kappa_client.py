@@ -14,7 +14,7 @@ def project_catalog_project_id (project_catalog):
     return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
 
 def file_catalog_file_id (file_catalog):
-    return(map((lambda entry: entry["file_metadata_id"]),file_catalog["file_metadata_list"]))
+    return(map((lambda entry: entry["id"]),file_catalog["file_metadata_list"]))
 
 def scratch():
     file_id = str(uuid.uuid1())
