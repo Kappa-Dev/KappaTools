@@ -12,6 +12,8 @@ host: api.executableknowledge.org
 schemes:
   - https
 basePath: /kappa/v2
+consumes:
+  - application/json
 produces:
   - application/json
 tags:
@@ -36,7 +38,12 @@ paths:
         - in: body
           name: project
           schema:
-            $ref: '#/definitions/Project_parameter'
+            type: object
+            required:
+              - project_id
+            properties:
+              project_id:
+                type: string
           required: true
       summary: Create project
       responses:
@@ -44,44 +51,46 @@ paths:
           description: OK
         '500':
           description: Project already exists
+          schema:
+            $ref: '#/definitions/Error'
   '/projects/{project_id}':
+    parameters:
+      - in: path
+        name: project_id
+        type: string
+        required: true
     get:
       tags:
         - model
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
       summary: Get project info
       responses:
         '200':
           description: Information
         '404':
           description: Project does not exist
+          schema:
+            $ref: '#/definitions/Error'
     delete:
       tags:
         - model
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
       summary: Delete project
       responses:
         '200':
           description: OK
         '404':
           description: Project does not exist
+          schema:
+            $ref: '#/definitions/Error'
   '/projects/{project_id}/parse':
+    parameters:
+      - in: path
+        name: project_id
+        type: string
+        required: true
     post:
       tags:
         - model
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
         - in: body
           name: overwritten_vars
           schema:
@@ -94,16 +103,17 @@ paths:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
   '/projects/{project_id}/files':
+    parameters:
+      - in: path
+        name: project_id
+        type: string
+        required: true
     post:
       tags:
         - model
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
         - in: body
           name: file
           schema:
@@ -114,34 +124,30 @@ paths:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
     get:
       tags:
         - model
       summary: Get file catalog
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
       responses:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
   '/projects/{project_id}/files/{file_id}':
+    parameters:
+      - in: path
+        name: project_id
+        type: string
+        required: true
+      - in: path
+        name: file_id
+        type: string
+        required: true
     put:
       tags:
         - model
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: path
-          name: file_id
-          type: string
-          required: true
         - in: body
           name: file
           schema:
@@ -151,53 +157,36 @@ paths:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
     get:
       tags:
         - model
       summary: Get a file
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: path
-          name: file_id
-          type: string
-          required: true
       responses:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
     delete:
       tags:
         - model
       summary: Remove a file from the project
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: path
-          name: file_id
-          type: string
-          required: true
       responses:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
   '/projects/{project_id}/simulation':
+    parameters:
+      - in: path
+        name: project_id
+        type: string
+        required: true
     post:
       tags:
         - simulation
       summary: Launch a simulation
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
         - in: body
           name: parameters
           schema:
@@ -207,26 +196,31 @@ paths:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
     get:
       tags:
         - simulation
       summary: Get simulation status
-      parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
       responses:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
     delete:
       tags:
         - simulation
       summary: Delete the current simulation
       description: All outputs are lost
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/pause':
+    put:
+      tags:
+        - simulation
+      summary: Pause the simulation
       parameters:
         - in: path
           name: project_id
@@ -236,15 +230,249 @@ paths:
         '200':
           description: OK
         default:
-          description: Something went wrong
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/continue':
+    put:
+      tags:
+        - simulation
+      summary: Restart the simulation
+      description: with new parameters
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: parameters
+          schema:
+            $ref: '#/definitions/Simulation_parameter'
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/perturbation':
+    put:
+      tags:
+        - simulation
+      summary: Execute a perturbation
+      description: the siulation must be paused
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: body
+          name: perturbation
+          schema:
+            type: object
+            required:
+              - perturbation_code
+            properties:
+              perturbation_code:
+                type: string
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/parameter':
+    get:
+      tags:
+        - simulation
+      summary: Parameters used to launch the simulation
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/logmessages':
+    get:
+      tags:
+        - simulation
+      summary: Get simulation log
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/efficiency':
+    get:
+      tags:
+        - simulation
+      summary: Get simulation efficiency
+      description: Number of null events and their reason
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/plot':
+    get:
+      tags:
+        - simulation
+      summary: Get observable values
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: query
+          name: plot_limit_points
+          type: integer
+        - in: query
+          name: plot_limit_offset
+          type: integer
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: project not found
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/trace':
+    get:
+      tags:
+        - simulation
+      summary: Get the trace of the simulation
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/filelines':
+    get:
+      tags:
+        - simulation
+      summary: List files generated by $PRINT
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/filelines/{fileline_id}':
+    get:
+      tags:
+        - simulation
+      summary: Get a file generated by $PRINT
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: fileline_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/fluxmaps':
+    get:
+      tags:
+        - simulation
+      summary: List the dynamic influence map
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/fluxmaps/{DIN_id}':
+    get:
+      tags:
+        - simulation
+      summary: Get a DIN
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: DIN_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/snapshots':
+    get:
+      tags:
+        - simulation
+      summary: List snapshots
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+  '/projects/{project_id}/simulation/snapshots/{snap_id}':
+    get:
+      tags:
+        - simulation
+      summary: Get a snapshot
+      description: >-
+        This does not fire the computation of a snapshot. It sends an already
+        available one.
+      parameters:
+        - in: path
+          name: project_id
+          type: string
+          required: true
+        - in: path
+          name: snap_id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          $ref: '#/responses/Default'
+responses:
+  Default:
+    description: Something went wrong
+    schema:
+      $ref: '#/definitions/Error'
 definitions:
-  Project_parameter:
-    type: object
-    required:
-      - project_id
-    properties:
-      project_id:
-        type: string
   File_version:
     type: object
     properties:
@@ -325,3 +553,12 @@ definitions:
         type: integer
       store_trace:
         type: boolean
+  Error:
+    type: object
+    properties:
+      message_severity:
+        type: string
+      message_text:
+        type: string
+      message_range:
+        type: object
