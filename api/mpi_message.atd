@@ -31,7 +31,6 @@ type simulation_parameter <ocaml from="Api_types"> = abstract
 type simulation_perturbation  <ocaml from="Api_types"> = abstract
 type simulation_info <ocaml from="Api_types"> = abstract
 type simulation_efficiency <ocaml module="Counter.Efficiency" t="t"> = abstract
-type file_line_id <ocaml from="Api_types"> = abstract
 type file_line  <ocaml from="Api_types"> = abstract
 type file_id  <ocaml from="Api_types"> = abstract
 type file_line_detail <ocaml from="Api_types"> = abstract
@@ -64,7 +63,7 @@ type request = [
 	       | ProjectGet of project_id
                | SimulationContinue of simulation_parameter
                | SimulationDelete
-               | SimulationDetailFileLine of file_line_id
+               | SimulationDetailFileLine of string option
                | SimulationDetailFluxMap of flux_map_id
                | SimulationDetailLogMessage
                | SimulationDetailPlot of plot_parameter

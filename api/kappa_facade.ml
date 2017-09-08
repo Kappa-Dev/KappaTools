@@ -82,7 +82,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~syntax_version
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
   syntax_version;
   plot = { Api_types_j.plot_legend = [] ;
-           Api_types_j.plot_time_series = [] ; } ;
+           Api_types_j.plot_series = [] ; } ;
   snapshots = [];
   flux_maps = [];
   species = Mods.StringMap.empty;
@@ -101,7 +101,7 @@ let reinitialize random_state t =
   t.run_finalize <- false;
   t.pause_condition <- Alg_expr.FALSE;
   t.plot <- { Api_types_j.plot_legend = [] ;
-              Api_types_j.plot_time_series = [] ; } ;
+              Api_types_j.plot_series = [] ; } ;
   t.snapshots <- [];
   t.flux_maps <- [];
   t.files <- [];
@@ -254,8 +254,8 @@ let outputs (simulation : t) =
     let new_values = prepare_plot_value new_observables in
     simulation.plot <-
       {simulation.plot with
-       Api_types_j.plot_time_series =
-         new_values :: simulation.plot.Api_types_j.plot_time_series }
+       Api_types_j.plot_series =
+         new_values :: simulation.plot.Api_types_j.plot_series }
   | Data.Species(file,time,mix) ->
     let p = Mods.StringMap.find_default [] file simulation.species in
     simulation.species <-
@@ -424,7 +424,7 @@ let start
                   let () =
                     t.plot <-
                       { Api_types_j.plot_legend = Array.to_list legend;
-                        Api_types_j.plot_time_series = [ first_values ]} in
+                        Api_types_j.plot_series = [ first_values ]} in
                   run_simulation ~system_process:system_process ~t:t stop)
              with e ->
                catch_error

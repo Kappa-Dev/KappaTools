@@ -127,7 +127,7 @@ class KappaClientTest(object):
             # test that no limit returns all entries
             last_status = runtime.simulation_detail_plot()
             test_count = 101
-            self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
+            self.assertEqual(test_count, len(last_status['plot_detail_plot']['series']))
 
             print(simulation_info)
             plot_limit_offset = 100
@@ -135,8 +135,8 @@ class KappaClientTest(object):
             test_count = 1
             limit = kappa_common.PlotLimit(plot_limit_offset)
             last_status = runtime.simulation_detail_plot(limit)
-            self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
-            self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
+            self.assertEqual(test_count, len(last_status['plot_detail_plot']['series']))
+            self.assertEqual(test_time, last_status['plot_detail_plot']['series'][0][0])
 
             plot_limit_offset = 10
             plot_limit_points = 1
@@ -144,8 +144,8 @@ class KappaClientTest(object):
             test_count = 1
             limit = kappa_common.PlotLimit(plot_limit_offset,plot_limit_points)
             last_status = runtime.simulation_detail_plot(limit)
-            self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
-            self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
+            self.assertEqual(test_count, len(last_status['plot_detail_plot']['series']))
+            self.assertEqual(test_time, last_status['plot_detail_plot']['series'][0][0])
 
             print(simulation_info)
             plot_limit_offset = 50
@@ -153,8 +153,8 @@ class KappaClientTest(object):
             test_count = 51
             limit = kappa_common.PlotLimit(plot_limit_offset)
             last_status = runtime.simulation_detail_plot(limit)
-            self.assertEqual(test_count, len(last_status['plot_detail_plot']['plot_time_series']))
-            self.assertEqual(test_time, last_status['plot_detail_plot']['plot_time_series'][0][0])
+            self.assertEqual(test_count, len(last_status['plot_detail_plot']['series']))
+            self.assertEqual(test_time, last_status['plot_detail_plot']['series'][0][0])
 
 
 class RestClientTest(KappaClientTest,unittest.TestCase):

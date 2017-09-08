@@ -17,11 +17,11 @@ class FileMetadata(object):
         self.file_metadata_hash = file_metadata_hash
         self.file_version = file_version
     def toJSON(self):
-        return({ "file_metadata_compile" : self.file_metadata_compile ,
-                 "file_metadata_hash" : self.file_metadata_hash ,
-                 "file_metadata_id" : self.file_metadata_id ,
-                 "file_metadata_position" : self.file_metadata_position ,
-                 "file_metadata_version" : self.file_version })
+        return({ "compile" : self.file_metadata_compile ,
+                 "hash" : self.file_metadata_hash ,
+                 "id" : self.file_metadata_id ,
+                 "position" : self.file_metadata_position ,
+                 "version" : self.file_version })
 
     def get_file_id(self):
         return(self.file_metadata_id)
@@ -38,8 +38,8 @@ class File(object):
         self.file_content = file_content
 
     def toJSON(self):
-        return({ "file_metadata" : self.file_metadata.toJSON() ,
-                 "file_content" : self.file_content })
+        return({ "metadata" : self.file_metadata.toJSON() ,
+                 "content" : self.file_content })
 
     def get_file_id(self):
         return(self.file_metadata.get_file_id())
@@ -47,8 +47,8 @@ class File(object):
         return(self.file_content)
 
 def hydrate_file (info):
-    return(File(info["file_metadata"],
-                info["file_content"]))
+    return(File(info["metadata"],
+                info["content"]))
 
 class SimulationParameter(object):
 
@@ -65,11 +65,11 @@ class SimulationParameter(object):
         self.simulation_store_trace = simulation_store_trace
 
     def toJSON(self):
-        return({ "simulation_plot_period" : self.simulation_plot_period,
+        return({ "plot_period" : self.simulation_plot_period,
                  "simulation_id" : self.simulation_id,
-                 "simulation_pause_condition": self.simulation_pause_condition ,
-                 "simulation_store_trace": self.simulation_store_trace ,
-                 "simulation_seed" : self.simulation_seed })
+                 "pause_condition": self.simulation_pause_condition ,
+                 "store_trace": self.simulation_store_trace ,
+                 "seed" : self.simulation_seed })
 
 class PlotLimit(object):
 
@@ -96,8 +96,8 @@ class PlotLimit(object):
         return url_plot_limit
 
     def toJSON(self):
-        return({ "plot_limit_offset" : self.plot_limit_offset ,
-                 "plot_limit_points" : self.plot_limit_points })
+        return({ "start_time" : self.plot_limit_offset ,
+                 "max_points" : self.plot_limit_points })
 
 def PlotParameter(plot_limit_offset = None,
                   plot_limit_points = None) :

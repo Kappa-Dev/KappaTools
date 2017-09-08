@@ -16,9 +16,9 @@ type severity =
    non parsing errors.
 *)
 type message =
-     { message_severity : severity <json name="severity"> ;
-       message_text     : string <json name="text">;
-       message_range    : range nullable  <json name="range"> }
+     { severity : severity ;
+       text     : string ;
+       range    : range nullable } <ocaml field_prefix="message_">
 type errors = message list
 
 (* Code here is the just the http code the int used here
@@ -32,9 +32,9 @@ type ('ok,'code)  result =
 (* Give a summary of the service.  The intention is to give the
    users an overview of the state of the kappa service.
 *)
-type environment_info = { environment_simulations : int <json name="simulations"> ;
-                          environment_projects :  int  <json name="projects"> ;
-                          environment_build : string <json name="build"> ; }
+type environment_info = { simulations : int ;
+                          projects :  int ;
+                          build : string ; } <ocaml field_prefix="environment_">
 
 type workspace_id = string
 type workspace_catalog = workspace_id list
@@ -47,7 +47,7 @@ type project_version = int
 type project = { project_id : project_id ;
                  project_version : project_version ; }
 type project_catalog = { project_list : project list }
-type project_parameter = { project_parameter_project_id : project_id <json name="project_id"> ; }
+type project_parameter = { project_parameter_project_id <json name="project_id"> : project_id ; }
 
 
 type site = {
@@ -63,8 +63,8 @@ type site_node = {
 
 type site_graph = site_node list <ocaml repr="array">
 type project_parse = {
-  project_parse_project_version : project_version <json name="project_version">;
-  project_parse_raw_ast : string <json name="boxed_ast">;
+  project_parse_project_version  <json name="project_version">: project_version ;
+  project_parse_raw_ast <json name="boxed_ast">: string ;
 }
 type kappa_code = string
 type simulation_seed = int
@@ -77,24 +77,24 @@ type simulation_artifact = {
 }
 
 type simulation_parameter = {
-  simulation_plot_period : float <json name="plot_period"> ;
-  simulation_pause_condition : string <json name="pause_condition"> ;
-  simulation_id : simulation_id <json name="simulation_id"> ;
-  simulation_seed : simulation_seed nullable <json name="seed"> ;
-  simulation_store_trace : bool <json name="store_trace"> ;
-}
+  plot_period : float ;
+  pause_condition : string ;
+  id  <json name="simulation_id"> : simulation_id;
+  seed : simulation_seed nullable ;
+  store_trace : bool ;
+} <ocaml field_prefix="simulation_">
 
 type simulation_perturbation = { perturbation_code : string }
 
 type observable = float nullable list
 
-type plot_limit = { plot_limit_offset : int nullable <json name="start_time"> ;
-                    plot_limit_points : int nullable <json name="max_points"> ; }
+type plot_limit = { plot_limit_offset <json name="start_time"> : int nullable ;
+                    plot_limit_points <json name="max_points"> : int nullable ; }
 
 type plot_parameter = plot_limit
 
-type plot = { plot_legend : string list <json name="legend"> ;
-      	      plot_time_series : observable list <json name="time_series"> ; }
+type plot = { legend : string list ;
+      	      series : observable list ; } <ocaml field_prefix="plot_">
 
 type plot_range  = { plot_range_begin : int ;
      		     plot_range_end : int ; }
@@ -122,11 +122,10 @@ type flux_map <ocaml predef module="Data"> =
 type flux_map_catalog = { flux_map_ids : flux_map_id list }
 
 (* file line *)
-type file_line_id = string nullable <json name="name">
 type file_line <ocaml predef module="Data"> =
-     { file_line_name : file_line_id;
-       file_line_text : string <json name="text"> }
-type file_line_catalog = { file_line_ids : file_line_id list }
+     { name : string nullable;
+       text : string <json name="text"> } <ocaml field_prefix="file_line_">
+type file_line_catalog = { file_line_ids : string nullable list }
 type file_line_detail = file_line list
 
 (* snapshot *)
@@ -192,20 +191,21 @@ type simulation_detail = { simulation_detail_progress : simulation_progress ;
 
 (* file *)
 type client_id     = string
-type local_version = { local_version_client_id : client_id <json name="client_id"> ;
+type local_version = { local_version_client_id <json name="client_id"> : client_id;
                        local_version_file_version : int ;
                      }
 type file_version = local_version list
 type file_id = string
-type file_metadata = { file_metadata_compile <ocaml mutable>  : bool <json name="compile"> ;
-                       file_metadata_hash <ocaml mutable>     : string nullable <json name="hash"> ;
-                       file_metadata_id <ocaml mutable>       : file_id <json name="id"> ;
-                       file_metadata_position <ocaml mutable> : int <json name="position"> ;
-		       file_metadata_version <ocaml mutable>  : file_version <json name="version"> ; }
+type file_metadata = { compile <ocaml mutable>  : bool ;
+                       hash <ocaml mutable>     : string nullable ;
+                       id <ocaml mutable>       : file_id ;
+                       position <ocaml mutable> : int ;
+		       version <ocaml mutable>  : file_version ;
+		       } <ocaml  field_prefix="file_metadata_">
 
 type file_catalog = { file_metadata_list : file_metadata list }
-type file = { file_metadata <ocaml mutable> : file_metadata <json name="metadata"> ;
-              file_content <ocaml mutable>  : string <json name="content"> ; }
+type file = { file_metadata <ocaml mutable> <json name="metadata"> : file_metadata ;
+              file_content <ocaml mutable> <json name="content"> : string ; }
 type file_patch = {
      file_patch_start   : int nullable ; (* if not provided assume begining *)
      file_patch_end     : int nullable ; (* if not provided assume end of file *)
@@ -213,10 +213,11 @@ type file_patch = {
      (* Replacing a file can be encoded by giving the content with out
         specifying a start or end. *)
 }
-type file_modification = { file_modification_version              : file_version ; (* version for update *)
-                           file_modification_compile              : bool nullable  <json name="compile"> ;
-                           file_modification_id                   : string nullable <json name="id"> ;
-                           file_modification_position             : int nullable <json name="position"> ;
-                           file_modification_patch                : file_patch nullable <json name="content"> ;
-                           file_modification_hash <ocaml mutable> : string nullable <json name="hash"> ;
+type file_modification = {
+     file_modification_version              : file_version ; (* version for update *)
+     file_modification_compile  <json name="compile"> : bool nullable  ;
+     file_modification_id       <json name="id"> : string nullable ;
+     file_modification_position <json name="position"> : int nullable ;
+     file_modification_patch    <json name="content"> : file_patch nullable ;
+     file_modification_hash     <ocaml mutable> <json name="hash"> : string nullable ;
 }

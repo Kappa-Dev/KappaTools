@@ -82,6 +82,8 @@ let options_respond methods =
   let headers =
     Cohttp.Header.init_with "Access-Control-Allow-Origin" "*" in
   let headers =
+    Cohttp.Header.add headers "Access-Control-Allow-Headers" "Content-Type" in
+  let headers =
     Cohttp.Header.add_multi headers "Allow" meths_str in
   let headers =
     Cohttp.Header.add_multi headers "Access-Control-Allow-Methods" meths_str in

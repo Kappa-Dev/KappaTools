@@ -79,7 +79,7 @@ class KappaRest(object):
     def project_create(self,project_id):
         method = "POST"
         url = "{0}/projects".format(self.url)
-        body = { "project_parameter_project_id" : project_id }
+        body = { "project_id" : project_id }
         return(self.dispatch(method,url,body))
 
     def project_info(self):

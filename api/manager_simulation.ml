@@ -40,9 +40,9 @@ class manager_file_line
 
     method private info_file_line (detail : Api_types_j.simulation_detail) :
       Api_types_j.file_line_catalog Api.result =
-      let file_lines : Api_types_j.file_line list =
+      let file_lines : Api_types_t.file_line list =
         detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_file_lines in
-      let file_line_ids : Api_types_j.file_line_id list =
+      let file_line_ids : string option list =
         List.fold_left
           (fun acc l ->
              if List.mem l.Api_types_j.file_line_name acc then
@@ -58,7 +58,7 @@ class manager_file_line
       Api_common.result_ok file_line_catalog
 
     method private get_file_line
-        (file_line_id : Api_types_j.file_line_id)
+        ?file_line_id
         (status : Api_types_j.simulation_detail) :
       (Api_types_j.file_line list) Api.result =
       let file_line_list : Api_types_j.file_line list =
@@ -78,10 +78,10 @@ class manager_file_line
       detail_projection ~project ~system_process ~projection:self#info_file_line
 
     method simulation_detail_file_line
-        (file_line_id : Api_types_j.file_line_id) :
+        (file_line_id : string option) :
       (Api_types_j.file_line list) Api.result Lwt.t =
       detail_projection
-        ~project ~system_process ~projection:(self#get_file_line file_line_id)
+        ~project ~system_process ~projection:(self#get_file_line ?file_line_id)
 
   end;;
 
@@ -146,7 +146,7 @@ class manager_log_message
 let select_observables
     (plot_limit : Api_types_j.plot_limit)
     (plot : Api_types_j.plot) : Api_types_j.plot_detail =
-  let plot_time_series = Tools.array_rev_of_list plot.Api_types_j.plot_time_series in
+  let plot_time_series = Tools.array_rev_of_list plot.Api_types_j.plot_series in
   let plot_detail_size = Array.length plot_time_series in
   let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
   let plot_limit_points = plot_limit.Api_types_j.plot_limit_points in
@@ -158,7 +158,7 @@ let select_observables
     | Some offset, Some nb -> offset, min nb (max 0 (plot_detail_size - offset))
   in
   let new_plot_time_series = (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
-  let plot_detail_plot = { plot with Api_types_j.plot_time_series = new_plot_time_series }  in
+  let plot_detail_plot = { plot with Api_types_j.plot_series = new_plot_time_series }  in
   let plot_detail_range : Api_types_j.plot_range option =
     if len > 0 then
       Some { Api_types_j.plot_range_begin = start ;

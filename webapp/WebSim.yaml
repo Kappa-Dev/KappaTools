@@ -655,9 +655,9 @@ definitions:
   Error:
     type: object
     properties:
-      message_severity:
+      severity:
         type: string
-      message_text:
+      text:
         type: string
-      message_range:
+      range:
         type: object

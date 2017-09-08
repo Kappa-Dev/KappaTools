@@ -81,7 +81,7 @@ let create_data ~(plot : ApiTypes.plot)
            (List.tl plot.ApiTypes.plot_legend));
     configuration##.timeSeries := Js.array
         (Tools.array_map_of_list (fun o -> create_observable ~observable:o)
-           plot.ApiTypes.plot_time_series);
+           plot.ApiTypes.plot_series);
     ()
   in configuration
 

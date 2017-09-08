@@ -42,7 +42,7 @@ let file_count state =
    The idea is to always give a valid file identifier.
  *)
 let get_file_line_id
-    (file : Api_types_j.file_line_detail) : Api_types_j.file_line_id =
+    (file : Api_types_j.file_line_detail) : string option =
   match file with
   | h::_ -> h.Api_types_j.file_line_name
   | [] -> None
@@ -52,10 +52,10 @@ let navli () =
 
 let xml () =
   let select file_line_info =
-    let file_ids : Api_types_j.file_line_id list =
+    let file_ids : string option list =
       file_line_info.Api_types_j.file_line_ids in
     let file : Api_types_j.file_line_detail option = React.S.value current_file in
-    let current_file_id : Api_types_j.file_line_id =
+    let current_file_id : string option =
       (match (file_ids,file) with
        | (f::_,None) -> f
        | (_::_,Some file) -> get_file_line_id file

@@ -13,81 +13,81 @@ type project_id = Api_types_t.project_id
 
 class type manager_environment = object
   method environment_info:
-    unit -> Api_types_j.environment_info result Lwt.t
+    unit -> Api_types_t.environment_info result Lwt.t
 end
 
 class type manager_project = object
   method project_get :
-    project_id -> Api_types_j.project result Lwt.t
+    project_id -> Api_types_t.project result Lwt.t
   method project_parse :
-    (string * Nbr.t) list -> Api_types_j.project_parse result Lwt.t
+    (string * Nbr.t) list -> Api_types_t.project_parse result Lwt.t
 end
 
 class type manager_file = object
-  method file_catalog : Api_types_j.file_catalog result Lwt.t
+  method file_catalog : Api_types_t.file_catalog result Lwt.t
 
   method file_create :
-    Api_types_j.file -> Api_types_j.file_metadata result Lwt.t
+    Api_types_t.file -> Api_types_t.file_metadata result Lwt.t
 
-  method file_get : Api_types_j.file_id -> Api_types_j.file result Lwt.t
+  method file_get : Api_types_t.file_id -> Api_types_t.file result Lwt.t
 
   method file_update :
-    Api_types_j.file_id ->
-    Api_types_j.file_modification ->
-    Api_types_j.file_metadata result Lwt.t
+    Api_types_t.file_id ->
+    Api_types_t.file_modification ->
+    Api_types_t.file_metadata result Lwt.t
 
-  method file_delete : Api_types_j.file_id -> unit result Lwt.t
+  method file_delete : Api_types_t.file_id -> unit result Lwt.t
 end
 
 class type manager_file_line = object
   method simulation_catalog_file_line :
-    Api_types_j.file_line_catalog result Lwt.t
+    Api_types_t.file_line_catalog result Lwt.t
   method simulation_detail_file_line :
-    Api_types_j.file_line_id -> Api_types_j.file_line list result Lwt.t
+    string option -> Api_types_t.file_line list result Lwt.t
 end
 
 class type manager_flux_map = object
-  method simulation_catalog_flux_map : Api_types_j.flux_map_catalog result Lwt.t
+  method simulation_catalog_flux_map : Api_types_t.flux_map_catalog result Lwt.t
   method simulation_detail_flux_map :
-    Api_types_j.flux_map_id -> Api_types_j.flux_map result Lwt.t
+    Api_types_t.flux_map_id -> Api_types_t.flux_map result Lwt.t
 end
 
 class type manager_log_message = object
   method simulation_detail_log_message :
-    Api_types_j.log_message result Lwt.t
+    Api_types_t.log_message result Lwt.t
 end
 
 class type manager_plot = object
   method simulation_detail_plot :
-    Api_types_j.plot_parameter -> Api_types_j.plot_detail result Lwt.t
+    Api_types_t.plot_parameter -> Api_types_t.plot_detail result Lwt.t
 end
 
 class type manager_snapshot = object
-  method simulation_catalog_snapshot : Api_types_j.snapshot_catalog result Lwt.t
+  method simulation_catalog_snapshot : Api_types_t.snapshot_catalog result Lwt.t
   method simulation_detail_snapshot :
-    Api_types_j.snapshot_id -> Api_types_j.snapshot result Lwt.t
+    Api_types_t.snapshot_id -> Api_types_t.snapshot result Lwt.t
 end
 
 class type manager_simulation = object
   method simulation_delete : unit result Lwt.t
 
   method simulation_start :
-    Api_types_j.simulation_parameter ->
-    Api_types_j.simulation_artifact result Lwt.t
+    Api_types_t.simulation_parameter ->
+    Api_types_t.simulation_artifact result Lwt.t
 
   method simulation_pause : unit result Lwt.t
 
   method simulation_perturbation :
-    Api_types_j.simulation_perturbation -> unit result Lwt.t
+    Api_types_t.simulation_perturbation -> unit result Lwt.t
 
   method simulation_continue :
-    Api_types_j.simulation_parameter -> unit result Lwt.t
+    Api_types_t.simulation_parameter -> unit result Lwt.t
 
-  method simulation_info : Api_types_j.simulation_info result Lwt.t
+  method simulation_info : Api_types_t.simulation_info result Lwt.t
 
   method simulation_efficiency : Counter.Efficiency.t result Lwt.t
 
-  method simulation_parameter : Api_types_j.simulation_parameter result Lwt.t
+  method simulation_parameter : Api_types_t.simulation_parameter result Lwt.t
 
   method simulation_raw_trace : string result Lwt.t
 
@@ -141,8 +141,8 @@ end
 class type rest_manager = object
   inherit manager_environment
   inherit concrete_manager
-  method project_catalog : Api_types_j.project_catalog result Lwt.t
+  method project_catalog : Api_types_t.project_catalog result Lwt.t
   method project_create :
-    Api_types_j.project_parameter -> unit result Lwt.t
+    Api_types_t.project_parameter -> unit result Lwt.t
   method project_delete : project_id -> unit result Lwt.t
 end
