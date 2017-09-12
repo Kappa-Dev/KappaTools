@@ -97,8 +97,10 @@ class manager
         (Format.sprintf "%s/v2/projects/%s/parse" url project_id)
         `POST
         ~data:(Yojson.Safe.to_string
-                 (`List (List.map (fun (v,n) ->
-                      `Tuple [`String v;(Nbr.to_yojson n :> Yojson.Safe.json)])
+                 (`List (List.map (fun x ->
+                      `Assoc ["var",`String x.Api_types_j.overwrite_var;
+                              "val",(Nbr.to_yojson x.Api_types_j.overwrite_val
+                                     :> Yojson.Safe.json)])
                            overwrite)))
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
@@ -188,7 +190,7 @@ class manager
         `GET
         ~data:args
         (fun result ->
-             (`SimulationDetailPlot (Mpi_message_j.plot_detail_of_string result)))
+             (`SimulationDetailPlot (Mpi_message_j.plot_of_string result)))
     | `SimulationDetailSnapshot snapshot_id ->
       send
         ?timeout

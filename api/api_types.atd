@@ -62,6 +62,11 @@ type site_node = {
 }
 
 type site_graph = site_node list <ocaml repr="array">
+
+type nbr <ocaml module="Nbr" t="t"> = abstract
+type overwritten_var =
+{ var : string; val : nbr } <ocaml field_prefix="overwrite_">
+
 type project_parse = {
   project_parse_project_version  <json name="project_version">: project_version ;
   project_parse_raw_ast <json name="boxed_ast">: string ;
@@ -88,20 +93,13 @@ type simulation_perturbation = { perturbation_code : string }
 
 type observable = float nullable list
 
-type plot_limit = { plot_limit_offset <json name="start_time"> : int nullable ;
-                    plot_limit_points <json name="max_points"> : int nullable ; }
+type plot_limit = { plot_limit_offset <json name="offset"> : int nullable ;
+                    plot_limit_points <json name="nb_points"> : int nullable ; }
 
 type plot_parameter = plot_limit
 
 type plot = { legend : string list ;
       	      series : observable list ; } <ocaml field_prefix="plot_">
-
-type plot_range  = { plot_range_begin : int ;
-     		     plot_range_end : int ; }
-
-type plot_detail = { plot_detail_plot : plot;
-     		     plot_detail_range : plot_range nullable;
-	             plot_detail_size : int ; }
 
 (* flux *)
 type flux_kind <ocaml from module="Primitives">= abstract

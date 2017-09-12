@@ -267,7 +267,7 @@ class virtual  manager_base () : manager_base_type =
 
     method simulation_detail_plot
         (plot_parameter : Api_types_j.plot_parameter):
-      Api_types_j.plot_detail Api.result Lwt.t =
+      Api_types_j.plot Api.result Lwt.t =
       self#message (`SimulationDetailPlot plot_parameter) >>=
       Api_common.result_bind_lwt
         ~ok:(function

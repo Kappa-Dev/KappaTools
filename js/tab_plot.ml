@@ -44,8 +44,7 @@ let export_json filename =
           { Api_types_j.plot_limit_offset = None ;
             Api_types_j.plot_limit_points = None }) >>=
        (Api_common.result_bind_lwt
-          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
-              let plot = plot_detail.Api_types_j.plot_detail_plot in
+          ~ok:(fun (plot : Api_types_t.plot)  ->
               let data = Api_types_j.string_of_plot plot in
               let () =
                 Common.saveFile ~data ~mime:"application/json" ~filename in
@@ -59,8 +58,7 @@ let export_csv filename =
           { Api_types_j.plot_limit_offset = None ;
             Api_types_j.plot_limit_points = None }) >>=
        (Api_common.result_bind_lwt
-          ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
-              let plot = plot_detail.Api_types_j.plot_detail_plot in
+          ~ok:(fun (plot : Api_types_t.plot)  ->
               let data = Api_data.plot_values plot in
               let () = Common.saveFile ~data ~mime:"text/csv" ~filename in
               Lwt.return (Api_common.result_ok ()))))
@@ -224,8 +222,7 @@ let update_plot (js_plot : Js_plot.observable_plot Js.t) : unit =
       let () = update_offset true in
       (manager#simulation_detail_plot (plot_parameter ())) >>=
       (Api_common.result_bind_lwt
-         ~ok:(fun (plot_detail : Api_types_t.plot_detail)  ->
-             let plot = plot_detail.Api_types_j.plot_detail_plot in
+         ~ok:(fun (plot : Api_types_t.plot)  ->
              let data : Js_plot.plot_data Js.t = Js_plot.create_data ~plot in
              let () = js_plot##setPlot(data) in
              Lwt.return (Api_common.result_ok ())

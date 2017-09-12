@@ -1,21 +1,16 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
   title: Kasim API
-  description: Kasim API
+  description: Calls to a server running Kappa tools suite
   contact:
     email: admin@executableknowledge.org
   license:
     name: LGPL
     url: 'http://www.gnu.org/licenses/lgpl-3.0.en.html'
   version: 4.0.0
-host: api.executableknowledge.org
-schemes:
-  - https
-basePath: /kappa/v2
-consumes:
-  - application/json
-produces:
-  - application/json
+servers:
+  - url: 'https://api.executableknowledge.org/kappa/v2'
+    description: Example dev server
 tags:
   - name: model
   - name: simulation
@@ -34,31 +29,27 @@ paths:
     post:
       tags:
         - model
-      parameters:
-        - in: body
-          name: project
-          schema:
-            type: object
-            required:
-              - project_id
-            properties:
-              project_id:
-                type: string
-          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - project_id
+              properties:
+                project_id:
+                  type: string
+        required: true
       summary: Create project
       responses:
         '200':
           description: OK
         '500':
           description: Project already exists
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}':
     parameters:
-      - in: path
-        name: project_id
-        type: string
-        required: true
+      - $ref: '#/components/parameters/ProjectId'
     get:
       tags:
         - model
@@ -68,8 +59,7 @@ paths:
           description: Information
         '404':
           description: Project does not exist
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/components/responses/Default'
     delete:
       tags:
         - model
@@ -79,52 +69,51 @@ paths:
           description: OK
         '404':
           description: Project does not exist
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/parse':
     parameters:
-      - in: path
-        name: project_id
-        type: string
-        required: true
+      - $ref: '#/components/parameters/ProjectId'
     post:
       tags:
         - model
-      parameters:
-        - in: body
-          name: overwritten_vars
-          schema:
-            type: array
-            items:
-              type: number
-          required: true
+      requestBody:
+        description: Overwrittten variables
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  var:
+                    type: string
+                  val:
+                    type: number
+        required: true
       summary: Compile the model
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/files':
     parameters:
-      - in: path
-        name: project_id
-        type: string
-        required: true
+      - $ref: '#/components/parameters/ProjectId'
     post:
       tags:
         - model
-      parameters:
-        - in: body
-          name: file
-          schema:
-            $ref: '#/definitions/File'
-          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File'
+        required: true
       summary: Add a file to the project
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
     get:
       tags:
         - model
@@ -133,31 +122,30 @@ paths:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/files/{file_id}':
     parameters:
-      - in: path
-        name: project_id
-        type: string
-        required: true
+      - $ref: '#/components/parameters/ProjectId'
       - in: path
         name: file_id
-        type: string
+        schema:
+          type: string
         required: true
     put:
       tags:
         - model
-      parameters:
-        - in: body
-          name: file
-          schema:
-            $ref: '#/definitions/File_modification'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/File_modification'
+        required: true
       summary: Modify a file
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
     get:
       tags:
         - model
@@ -166,7 +154,7 @@ paths:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
     delete:
       tags:
         - model
@@ -175,28 +163,25 @@ paths:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation':
     parameters:
-      - in: path
-        name: project_id
-        type: string
-        required: true
+      - $ref: '#/components/parameters/ProjectId'
     post:
       tags:
         - simulation
       summary: Launch a simulation
-      parameters:
-        - in: body
-          name: parameters
-          schema:
-            $ref: '#/definitions/Simulation_parameter'
-          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Simulation_parameter'
+        required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
     get:
       tags:
         - simulation
@@ -205,7 +190,7 @@ paths:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
     delete:
       tags:
         - simulation
@@ -215,22 +200,19 @@ paths:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/pause':
     put:
       tags:
         - simulation
       summary: Pause the simulation
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/continue':
     put:
       tags:
@@ -238,19 +220,18 @@ paths:
       summary: Restart the simulation
       description: with new parameters
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: body
-          name: parameters
-          schema:
-            $ref: '#/definitions/Simulation_parameter'
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Simulation_parameter'
+        required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/perturbation':
     put:
       tags:
@@ -258,54 +239,46 @@ paths:
       summary: Execute a perturbation
       description: the siulation must be paused
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: body
-          name: perturbation
-          schema:
-            type: object
-            required:
-              - perturbation_code
-            properties:
-              perturbation_code:
-                type: string
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - perturbation_code
+              properties:
+                perturbation_code:
+                  type: string
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/parameter':
     get:
       tags:
         - simulation
       summary: Parameters used to launch the simulation
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/logmessages':
     get:
       tags:
         - simulation
       summary: Get simulation log
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/efficiency':
     get:
       tags:
@@ -313,138 +286,121 @@ paths:
       summary: Get simulation efficiency
       description: Number of null events and their reason
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/plot':
     get:
       tags:
         - simulation
       summary: Get observable values
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
         - in: query
           name: plot_limit_points
-          type: integer
+          description: maximal number of lines returned
+          schema:
+            type: integer
         - in: query
           name: plot_limit_offset
-          type: integer
+          description: >-
+            number of lines to skip at the beginning Returns the last lines if
+            not set.
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
         '404':
           description: project not found
-          schema:
-            $ref: '#/definitions/Error'
+          $ref: '#/components/responses/Default'
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/trace':
     get:
       tags:
         - simulation
       summary: Get the trace of the simulation
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/filelines':
     get:
       tags:
         - simulation
       summary: List files generated by $PRINT
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/filelines/{fileline_id}':
     get:
       tags:
         - simulation
       summary: Get a file generated by $PRINT
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
         - in: path
           name: fileline_id
-          type: string
+          schema:
+            type: string
           required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/fluxmaps':
     get:
       tags:
         - simulation
       summary: List the dynamic influence map
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/fluxmaps/{DIN_id}':
     get:
       tags:
         - simulation
       summary: Get a DIN
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
         - in: path
           name: DIN_id
-          type: string
+          schema:
+            type: string
           required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/snapshots':
     get:
       tags:
         - simulation
       summary: List snapshots
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation/snapshots/{snap_id}':
     get:
       tags:
@@ -454,57 +410,49 @@ paths:
         This does not fire the computation of a snapshot. It sends an already
         available one.
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
         - in: path
           name: snap_id
-          type: string
+          schema:
+            type: string
           required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses':
     put:
       tags:
         - analyses
       summary: Initialize the static analyser
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: body
-          name: model
-          schema:
-            type: object
-            description: JSON of the model AST
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: JSON of the model AST
+        required: true
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses/contact_map':
     get:
       tags:
         - analyses
       summary: Get contact map JSON
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: query
-          name: accuracy
-          type: string
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Accuracy'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses/influence_map':
     get:
       tags:
@@ -512,152 +460,163 @@ paths:
       summary: Get influence map
       description: only the neighbours of a node when origin is given
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
-        - in: query
-          name: accuracy
-          type: string
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Accuracy'
         - in: query
           name: fwd
-          type: integer
+          schema:
+            type: integer
         - in: query
           name: bwd
-          type: integer
+          schema:
+            type: integer
         - in: query
           name: total
-          type: integer
+          schema:
+            type: integer
         - in: query
           name: origin
-          type: string
+          schema:
+            type: string
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses/dead_rules':
     get:
       tags:
         - analyses
       summary: Return dead rules
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
+          $ref: '#/components/responses/Default'
   '/projects/{project_id}/analyses/constraints':
     get:
       tags:
         - analyses
       summary: Get model invariants
       parameters:
-        - in: path
-          name: project_id
-          type: string
-          required: true
+        - $ref: '#/components/parameters/ProjectId'
       responses:
         '200':
           description: OK
         default:
-          $ref: '#/responses/Default'
-responses:
-  Default:
-    description: Something went wrong
-    schema:
-      $ref: '#/definitions/Error'
-definitions:
-  File_version:
-    type: object
-    properties:
-      client_id:
-        type: string
-      local_version_file_version:
-        type: integer
-  File_metadata:
-    type: object
-    required:
-      - compile
-      - id
-      - position
-    properties:
-      compile:
-        type: boolean
-      hash:
-        type: string
-      id:
-        type: string
-      position:
-        type: integer
-      version:
-        $ref: '#/definitions/File_version'
-  File:
-    type: object
-    required:
-      - metadata
-      - content
-    properties:
-      metadata:
-        $ref: '#/definitions/File_metadata'
+          $ref: '#/components/responses/Default'
+components:
+  schemas:
+    File_version:
+      type: object
+      properties:
+        client_id:
+          type: string
+        local_version_file_version:
+          type: integer
+    File_metadata:
+      type: object
+      required:
+        - compile
+        - id
+        - position
+      properties:
+        compile:
+          type: boolean
+        hash:
+          type: string
+        id:
+          type: string
+        position:
+          type: integer
+        version:
+          type: array
+          items:
+            $ref: '#/components/schemas/File_version'
+    File:
+      type: object
+      required:
+        - metadata
+        - content
+      properties:
+        metadata:
+          $ref: '#/components/schemas/File_metadata'
+        content:
+          type: string
+    File_patch:
+      type: object
+      required:
+        - file_patch_content
+      properties:
+        file_patch_start:
+          type: integer
+        file_patch_stop:
+          type: integer
+        file_patch_content:
+          type: string
+    File_modification:
+      type: object
+      required:
+        - file_modification_version
+      properties:
+        file_modification_version:
+          $ref: '#/components/schemas/File_version'
+        compile:
+          type: boolean
+        id:
+          type: string
+        position:
+          type: integer
+        content:
+          $ref: '#/components/schemas/File_patch'
+        hash:
+          type: string
+    Simulation_parameter:
+      type: object
+      required:
+        - plot_period
+        - pause_condition
+        - simulation_id
+        - store_trace
+      properties:
+        plot_period:
+          type: number
+        pause_condition:
+          type: string
+        simulation_id:
+          type: string
+        seed:
+          type: integer
+        store_trace:
+          type: boolean
+  responses:
+    Default:
+      description: Something went wrong
       content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              severity:
+                type: string
+              text:
+                type: string
+              range:
+                type: object
+  parameters:
+    ProjectId:
+      in: path
+      name: project_id
+      schema:
         type: string
-  File_patch:
-    type: object
-    required:
-      - file_patch_content
-    properties:
-      file_patch_start:
-        type: integer
-      file_patch_stop:
-        type: integer
-      file_patch_content:
+      required: true
+    Accuracy:
+      in: query
+      name: accuracy
+      schema:
         type: string
-  File_modification:
-    type: object
-    required:
-      - file_modification_version
-    properties:
-      file_modification_version:
-        $ref: '#/definitions/File_version'
-      compile:
-        type: boolean
-      id:
-        type: string
-      position:
-        type: integer
-      content:
-        $ref: '#/definitions/File_patch'
-      hash:
-        type: string
-  Simulation_parameter:
-    type: object
-    required:
-      - plot_period
-      - pause_condition
-      - simulation_id
-      - store_trace
-    properties:
-      plot_period:
-        type: number
-      pause_condition:
-        type: string
-      simulation_id:
-        type: string
-      seed:
-        type: integer
-      store_trace:
-        type: boolean
-  Error:
-    type: object
-    properties:
-      severity:
-        type: string
-      text:
-        type: string
-      range:
-        type: object
+        enum:
+          - Low
+          - High

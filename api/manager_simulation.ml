@@ -145,7 +145,7 @@ class manager_log_message
 
 let select_observables
     (plot_limit : Api_types_j.plot_limit)
-    (plot : Api_types_j.plot) : Api_types_j.plot_detail =
+    (plot : Api_types_j.plot) : Api_types_j.plot =
   let plot_time_series = Tools.array_rev_of_list plot.Api_types_j.plot_series in
   let plot_detail_size = Array.length plot_time_series in
   let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
@@ -158,17 +158,7 @@ let select_observables
     | Some offset, Some nb -> offset, min nb (max 0 (plot_detail_size - offset))
   in
   let new_plot_time_series = (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
-  let plot_detail_plot = { plot with Api_types_j.plot_series = new_plot_time_series }  in
-  let plot_detail_range : Api_types_j.plot_range option =
-    if len > 0 then
-      Some { Api_types_j.plot_range_begin = start ;
-             Api_types_j.plot_range_end = start + len ; }
-    else
-      None
-  in
-  { Api_types_j.plot_detail_plot = plot_detail_plot ;
-    Api_types_j.plot_detail_range = plot_detail_range ;
-    Api_types_j.plot_detail_size = plot_detail_size ; }
+  { plot with Api_types_j.plot_series = new_plot_time_series }
 
 class manager_plot
     (project : Api_environment.project)
@@ -178,7 +168,7 @@ class manager_plot
     method private get_plot
         (plot_limit : Api_types_j.plot_parameter)
         (detail : Api_types_j.simulation_detail) :
-      Api_types_j.plot_detail Api.result =
+      Api_types_j.plot Api.result =
       match detail.Api_types_j.simulation_detail_output.Api_types_j.simulation_output_plot with
       | Some plot ->
         Api_common.result_ok
@@ -188,7 +178,7 @@ class manager_plot
 
     method simulation_detail_plot
         (plot_parameter : Api_types_j.plot_parameter) :
-      Api_types_j.plot_detail Api.result Lwt.t =
+      Api_types_j.plot Api.result Lwt.t =
       detail_projection
         ~project ~system_process ~projection:(self#get_plot plot_parameter)
   end

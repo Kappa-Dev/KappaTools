@@ -42,8 +42,9 @@ class KappaRest(object):
             return details
 
     def shutdown(self, key):
-        """ Shut down kappa instance.  Given a key to a
-            kappa service shutdown a running kappa instance.
+        """
+        Shut down kappa instance.  Given a key to a
+        kappa service shutdown a running kappa instance.
         """
         method = "POST"
         handler = urllib.request.HTTPHandler()
@@ -125,7 +126,7 @@ class KappaRest(object):
         body = None
         info = self.dispatch(method,url,body)
         #return(list(map(hydrate_filemetada,info)))
-        return(info)
+        return(map(kappa_common.hydrate_file_metadata,info))
 
     def simulation_delete(self):
         method = "DELETE"
@@ -133,19 +134,19 @@ class KappaRest(object):
         body = None
         return(self.dispatch(method,url,body))
 
-    def simulation_detail_file_line(self,file_line_id):
+    def simulation_file_line(self,file_line_id):
         url = "{0}/projects/{1}/simulation/file_lines/{2}".format(self.url,self.project_id,file_line_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_flux_map(self,flux_map_id):
+    def simulation_DIN(self,flux_map_id):
         url = "{0}/projects/{1}/simulation/fluxmaps/{2}".format(self.url,self.project_id,flux_map_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_log_message(self):
+    def simulation_log_messages(self):
         url = "{0}/projects/{1}/simulation/logmessages".format(self.url,self.project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_plot(self, limit = None) :
+    def simulation_plot(self, limit = None) :
         if limit is not None:
             parameter = limit.toURL()
         else:
@@ -153,7 +154,7 @@ class KappaRest(object):
         url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
         return(self.dispatch("GET",url,None))
 
-    def simulation_detail_snapshot(self,snapshot_id):
+    def simulation_snapshot(self,snapshot_id):
         url = "{0}/projects/{1}/simulation/snapshots/{2}".format(self.url,self.project_id,snapshot_id)
         return(self.dispatch("GET",url,None))
 
@@ -165,11 +166,11 @@ class KappaRest(object):
         url = "{0}/projects/{1}/simulation/file_lines".format(self.url,self.project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info_flux_map(self):
+    def simulation_DINs(self):
         url = "{0}/projects/{1}/simulation/fluxmaps".format(self.url,self.project_id)
         return(self.dispatch("GET",url,None))
 
-    def simulation_info_snapshot(self):
+    def simulation_snapshots(self):
         url = "{0}/projects/{1}/simulation/snapshots".format(self.url,
                                                              self.project_id)
         return(self.dispatch("GET",url,None))
@@ -195,3 +196,8 @@ class KappaRest(object):
         url = "{0}/projects/{1}/simulation".format(self.url,self.project_id)
         message = simulation_parameter.toJSON()
         return(self.dispatch("POST",url,message ))
+
+    def simulation_continue(self,simulation_parameter):
+        url = "{0}/projects/{1}/simulation/continue".format(self.url,self.project_id)
+        message = simulation_parameter.toJSON()
+        return(self.dispatch("PUT",url,message))

@@ -1,4 +1,5 @@
-""" Web api client for the kappa programming language
+"""
+Client for the kappa programming language
 """
 
 import sys
@@ -106,7 +107,7 @@ def main():
                 print("")
                 print("info")
                 print(simulation_info)
-                plot_detail = runtime.simulation_detail_plot()
+                plot_detail = runtime.simulation_plot()
                 print("plot")
                 print(plot_detail)
     except kappa_common.KappaError as exception:

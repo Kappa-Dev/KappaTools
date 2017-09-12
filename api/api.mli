@@ -20,7 +20,7 @@ class type manager_project = object
   method project_get :
     project_id -> Api_types_t.project result Lwt.t
   method project_parse :
-    (string * Nbr.t) list -> Api_types_t.project_parse result Lwt.t
+    Api_types_t.overwritten_var list -> Api_types_t.project_parse result Lwt.t
 end
 
 class type manager_file = object
@@ -59,7 +59,7 @@ end
 
 class type manager_plot = object
   method simulation_detail_plot :
-    Api_types_t.plot_parameter -> Api_types_t.plot_detail result Lwt.t
+    Api_types_t.plot_parameter -> Api_types_t.plot result Lwt.t
 end
 
 class type manager_snapshot = object

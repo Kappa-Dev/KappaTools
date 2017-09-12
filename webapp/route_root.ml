@@ -244,12 +244,7 @@ let route
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
             (fun s ->
                Yojson.Safe.read_list
-                 (Yojson.Safe.read_tuple
-                    (fun k (a,b) x y ->
-                       if k = 0 then (Yojson.Safe.read_string x y,b)
-                       else if k = 1 then (a,Nbr.read_t x y)
-                       else failwith "Wrong parse overwrites")
-                    ("",Nbr.zero))
+                 (Api_types_j.read_overwritten_var)
                  (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
             >>= fun overwrites ->
             bind_projects
@@ -472,8 +467,7 @@ let route
                          plot_parameter)
                      project_id projects)) >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_plot_detail
-                                     ?len:None))
+               ~string_of_success:(Mpi_message_j.string_of_plot ?len:None))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

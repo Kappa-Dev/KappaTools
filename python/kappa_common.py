@@ -26,6 +26,16 @@ class FileMetadata(object):
     def get_file_id(self):
         return(self.file_metadata_id)
 
+def hydrate_file_metadata (info):
+    return(
+        FileMetadata(
+            info["id"],
+            info["position"],
+            info["compile"] ,
+            info["hash"] ,
+            [] #hydrate_file_version(info["version"])
+        ))
+
 def stringAsFile(content,position=1):
     return(File(FileMetadata("inlined_input",position),content))
 
@@ -47,7 +57,7 @@ class File(object):
         return(self.file_content)
 
 def hydrate_file (info):
-    return(File(info["metadata"],
+    return(File(hydrate_file_metadata(info["metadata"]),
                 info["content"]))
 
 class SimulationParameter(object):

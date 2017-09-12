@@ -32,7 +32,7 @@ let options (t :t)  : (string * Arg.spec * string) list = [
  else
    let _ =
      Lwt_log.file
-       ?mode:(Some `Append)
+       ~mode:`Append
        ~file_name:file_name ()
    in
    ()

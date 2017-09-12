@@ -22,6 +22,7 @@ type file <ocaml from="Api_types"> = abstract
 type file_modification <ocaml from="Api_types"> = abstract
 type file_catalog <ocaml from="Api_types"> = abstract
 
+type overwritten_var <ocaml from="Api_types"> = abstract
 type project_parse <ocaml from="Api_types"> = abstract
 
 type project_parameter <ocaml from="Api_types"> = abstract
@@ -42,7 +43,7 @@ type flux_map_catalog <ocaml from="Api_types"> = abstract
 
 type log_message <ocaml from="Api_types"> = abstract
 
-type plot_detail <ocaml from="Api_types"> = abstract
+type plot <ocaml from="Api_types"> = abstract
 type plot_parameter <ocaml from="Api_types"> = abstract
 
 type snapshot_id <ocaml from="Api_types"> = abstract
@@ -51,15 +52,13 @@ type snapshot_catalog <ocaml from="Api_types"> = abstract
 
 type simulation_artifact <ocaml from="Api_types"> = abstract
 
-type nbr <ocaml module="Nbr" t="t"> = abstract
-
 type request = [
                | FileCreate of file
                | FileDelete of file_id
                | FileGet of file_id
                | FileCatalog
                | FileUpdate of (file_id * file_modification)
-	       | ProjectParse of (string * nbr) list
+	       | ProjectParse of overwritten_var list
 	       | ProjectGet of project_id
                | SimulationContinue of simulation_parameter
                | SimulationDelete
@@ -99,7 +98,7 @@ type response_content = [
    | SimulationDetailFileLine of file_line_detail
    | SimulationDetailFluxMap of flux_map
    | SimulationDetailLogMessage of log_message
-   | SimulationDetailPlot of plot_detail
+   | SimulationDetailPlot of plot
    | SimulationDetailSnapshot of snapshot_detail
    | SimulationInfo of simulation_info
    | SimulationEfficiency of simulation_efficiency

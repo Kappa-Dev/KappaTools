@@ -30,6 +30,10 @@ object
     (project#get_state () >>= function
       | Some x -> Lwt.return x
       | None ->
+        let overwrites =
+          List.rev_map
+            (fun x -> (x.Api_types_t.overwrite_var,x.Api_types_t.overwrite_val))
+            overwrites in
         let harakiri,_ = Lwt.task () in
         let cand =
           Lwt.pick [

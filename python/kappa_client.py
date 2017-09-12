@@ -14,41 +14,7 @@ def project_catalog_project_id (project_catalog):
     return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
 
 def file_catalog_file_id (file_catalog):
-    return(map((lambda entry: entry["id"]),file_catalog["file_metadata_list"]))
-
-def scratch():
-    file_id = str(uuid.uuid1())
-    project_id_1 = "1"
-    project_id_2 = "2"
-    project_id_3 = "3"
-    kappaStd = kappa_std.KappaStd("../bin/KaSimAgent")
-    print(kappaStd.info())
-    print(kappaStd.project_create(project_id_1))
-    # print(kappaStd.project_create(project_id_2))
-    # print(kappaStd.info())
-    print(kappaStd.project_info())
-    # file = File(FileMetadata(file_id,0),
-    #             "%agent: A(x,c) # Declaration of agent A ")
-    # print(kappaStd.file_create(project_id_1,file))
-    # print(kappaStd.file_info(project_id_1))
-    # print(kappaStd.file_get(project_id_1,file_id))
-    # print(kappaStd.file_delete(project_id_1,file_id))
-    # print(kappaStd.file_info(project_id_1))
-
-    # file_id = str(uuid.uuid1())
-    # project_id_1 = str(uuid.uuid1())
-    # print(kappaStd.project_create(project_id_1))
-    # inputfile = "/home/mwm1/Work/KaSim/models/abc.ka"
-    # with open(inputfile) as f:
-    #     code = f.read()
-    #     file = File(FileMetadata(file_id,0),code)
-    #     print(kappaStd.file_create(project_id_1,file))
-    #     simulation_parameter =
-    #       SimulationParameter(1,project_id_1,simulation_pause_condition = "[E] = 10")
-    #     print(kappaStd.simulation_start(project_id_1,simulation_parameter))
-    #     print(kappaStd.simulation_info(project_id_1,project_id_1))
-    # kappaStd.shutdown()
-
+    return(map((lambda entry: entry.id),file_catalog["file_metadata_list"]))
 
 def main():
     # command line
@@ -57,7 +23,7 @@ def main():
 
     # default arguments
     inputfile = None  # if missing input file just get version
-    url = "http://localhost:8080"
+    url = "../bin/KaSimAgent"
     pause_condition = "[false]"
     plot_period = 0.1
     seed = None
@@ -152,7 +118,7 @@ def main():
                 print("")
                 print("info")
                 print(simulation_info)
-                plot_detail = runtime.simulation_detail_plot()
+                plot_detail = runtime.simulation_plot()
                 print("plot")
                 print(plot_detail)
         else:
