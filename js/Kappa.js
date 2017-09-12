@@ -6,13 +6,13 @@ CodeMirror.defineSimpleMode("Kappa", {
   // The start state contains the rules that are intially used
   start: [
       {regex: /\#(.*)/, token: "comment"},
-      {regex: /(\%agent:|\%def:|\%var:|\%plot:|\%obs:|\%init:|\%mod:|\%token:|do|repeat|until)\s/,
+      {regex: /(\%agent:|\%def:|\%var:|\%plot:|\%obs:|\%init:|\%mod:|\%token:|do|repeat|alarm)\s/,
        token: "keyword"},
       {regex: /(\$ADD|\$DEL|\$SNAPSHOT|\$STOP|\$FLUX|\$TRACK|\$UPDATE|\$PRINT)\s/,
        token: "variable-2"},
-      {regex: /(\[not\]|\[log\]|\[sin\]|\[cos\]|\[tan\]|\[sqrt\]|\[mod\]|\[exp\]|\[int\])/,
+      {regex: /(\[not\]|\[log\]|\[sin\]|\[cos\]|\[tan\]|\[sqrt\]|\[mod\]|\[exp\]|\[int\]|INF)/,
        token: "atom"},
-      {regex: /(\[E\]|\[E\+\]|\[E\-\]|\[Emax\]|\[T\]|\[Tsim\]|\[Tmax\]|\[inf\]|\[pi\]|\[true\]|\[false\])/,
+      {regex: /(\[E\]|\[E\+\]|\[E\-\]|\[Emax\]|\[T\]|\[Tsim\]|\[Tmax\]|\[pi\]|\[true\]|\[false\])/,
        token: "atom"},
       {regex: /'([^'\s]+)'/, token: "atom"},
       {regex: /\/\*/, token: "comment", next: "comment"},
