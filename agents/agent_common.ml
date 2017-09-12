@@ -24,4 +24,3 @@ let serve chan delimiter process_command : unit Lwt.t =
         aux_serve ()
     | None -> Lwt.return_unit in
   aux_serve ()
-

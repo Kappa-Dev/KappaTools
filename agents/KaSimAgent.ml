@@ -6,6 +6,8 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+open Lwt.Infix
+
 (* system process for v2 *)
 class system_process () : Kappa_facade.system_process =
   object
@@ -17,14 +19,17 @@ class system_process () : Kappa_facade.system_process =
 
 (* set up handlers for v2 *)
 let process_comand_v2
-    (message_delimter : char) :
+    (message_delimiter : char) :
     string -> unit Lwt.t =
   let sytem_process : Kappa_facade.system_process = new system_process () in
   let manager : Api.manager = new Api_runtime.manager sytem_process in
   Mpi_api.on_message
     manager
     (fun message ->
-       Lwt_io.write Lwt_io.stdout (message^(String.make 1 message_delimter)))
+       Lwt_io.atomic (fun f ->
+           Lwt_io.write f message >>= fun () ->
+           Lwt_io.write_char f message_delimiter)
+         Lwt_io.stdout)
 
 (* start server *)
 let () =
