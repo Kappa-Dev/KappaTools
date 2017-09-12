@@ -136,14 +136,14 @@ class manager
            "%s/v2/projects/%s/simulation/filelines/%s"
            url
            project_id
-           (match file_line_id with
-              None -> ""
-            |Some file_line_id -> file_line_id
-           ))
+           file_line_id)
         `GET
         (fun result ->
-           (`SimulationDetailFileLine
-                        (Mpi_message_j.file_line_detail_of_string result)))
+           let lines =
+             Yojson.Safe.read_list
+               Yojson.Safe.read_string
+               (Yojson.Safe.init_lexer ()) (Lexing.from_string result) in
+           (`SimulationDetailFileLine lines))
     | `SimulationDetailFluxMap flux_map_id ->
       send
         ?timeout

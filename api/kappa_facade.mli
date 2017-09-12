@@ -47,11 +47,13 @@ val continue :
   system_process:system_process -> t:t -> pause_condition:string ->
   (unit, Api_types_j.errors) Result.result Lwt.t
 
-val info :
-  system_process:system_process ->
-  t:t ->
-  (Api_types_j.simulation_detail, Api_types_j.errors)
-    Result.result Lwt.t
+val progress :
+  system_process:system_process -> t:t ->
+  (Api_types_t.simulation_progress, Api_types_j.errors) Result.result Lwt.t
+
+val outputs :
+  system_process:system_process -> t:t ->
+  (Api_data.simulation_detail_output, Api_types_j.errors) Result.result Lwt.t
 
 val efficiency : t -> Counter.Efficiency.t
 

@@ -121,7 +121,7 @@ type flux_map_catalog = { flux_map_ids : flux_map_id list }
 type file_line <ocaml predef module="Data"> =
      { name : string nullable;
        text : string <json name="text"> } <ocaml field_prefix="file_line_">
-type file_line_catalog = { file_line_ids : string nullable list }
+type file_line_catalog = { file_line_ids : string list }
 type file_line_detail = file_line list
 
 (* snapshot *)
@@ -172,18 +172,6 @@ type simulation_info = { simulation_info_progress : simulation_progress  ;
 			 simulation_info_output : simulation_info_output; }
 
 type simulation = { simulation_info : simulation_info nullable }
-
-type simulation_detail_output =
-     (plot nullable,
-      flux_map list,
-      file_line list,
-      snapshot list,
-      log_message)
-     simulation_output
-
-type simulation_detail = { simulation_detail_progress : simulation_progress ;
-                           simulation_detail_output : simulation_detail_output ; }
-
 
 (* file *)
 type client_id     = string

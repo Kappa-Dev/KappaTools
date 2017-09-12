@@ -62,7 +62,7 @@ type request = [
 	       | ProjectGet of project_id
                | SimulationContinue of string
                | SimulationDelete
-               | SimulationDetailFileLine of string option
+               | SimulationDetailFileLine of string
                | SimulationDetailFluxMap of flux_map_id
                | SimulationDetailLogMessage
                | SimulationDetailPlot of plot_parameter
@@ -95,7 +95,7 @@ type response_content = [
    | FileUpdate of file_metadata
    | ProjectParse of project_parse
    | ProjectGet of project
-   | SimulationDetailFileLine of file_line_detail
+   | SimulationDetailFileLine of string list
    | SimulationDetailFluxMap of flux_map
    | SimulationDetailLogMessage of log_message
    | SimulationDetailPlot of plot

@@ -63,7 +63,7 @@ type t =
     mutable snapshots : Api_types_j.snapshot list ;
     mutable flux_maps : Api_types_j.flux_map list ;
     mutable species : (float*Raw_mixture.t) list Mods.StringMap.t;
-    mutable files : Api_types_j.file_line list ;
+    mutable files : string list Mods.StringMap.t ;
     mutable error_messages : Api_types_j.errors ;
     mutable trace : Trace.t ;
     ast : Ast.parsing_compil;
@@ -86,7 +86,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~syntax_version
   snapshots = [];
   flux_maps = [];
   species = Mods.StringMap.empty;
-  files = [];
+  files = Mods.StringMap.empty;
   error_messages = [];
   trace = [];
   ast; contact_map; env; graph; state; init_l;
@@ -104,7 +104,7 @@ let reinitialize random_state t =
               Api_types_j.plot_series = [] ; } ;
   t.snapshots <- [];
   t.flux_maps <- [];
-  t.files <- [];
+  t.files <- Mods.StringMap.empty;
   t.error_messages <- [];
   t.graph <- Rule_interpreter.empty
       ~with_trace:false
@@ -261,7 +261,16 @@ let outputs (simulation : t) =
     simulation.species <-
       Mods.StringMap.add file ((time,mix)::p) simulation.species
   | Data.Print file_line ->
-    simulation.files <- file_line::simulation.files
+    begin
+      match file_line.Data.file_line_name with
+      | None ->
+        Format.fprintf simulation.log_form "%s@." file_line.Data.file_line_text
+      | Some na ->
+        let lines = Mods.StringMap.find_default [] na simulation.files in
+        simulation.files <-
+          Mods.StringMap.add
+            na (file_line.Data.file_line_text::lines) simulation.files
+    end
   | Data.Snapshot snapshot ->
     simulation.snapshots <-
       (Api_data.label_snapshot
@@ -535,49 +544,55 @@ let continue
     (catch_error
        (fun e -> Lwt.return (Result_util.error e)))
 
-let create_info ~(t : t) : Api_types_j.simulation_detail =
-  let progress :  Api_types_j.simulation_progress =
-    { Api_types_j.simulation_progress_time =
-        Counter.current_time t.counter ;
-      Api_types_j.simulation_progress_time_percentage =
-        Counter.time_percentage t.counter ;
-      Api_types_j.simulation_progress_event =
-        Counter.current_event t.counter ;
-      Api_types_j.simulation_progress_event_percentage =
-        Counter.event_percentage t.counter ;
-      Api_types_j.simulation_progress_tracked_events =
-        Counter.tracked_events t.counter ;
-      Api_types_j.simulation_progress_is_running =
-        t.is_running ;
-    } in
-  let output : Api_types_j.simulation_detail_output =
-    { Api_types_j.simulation_output_plot =
-        Some t.plot ;
-      Api_types_j.simulation_output_flux_maps =
-        t.flux_maps ;
-      Api_types_j.simulation_output_file_lines =
-        t.files ;
-      Api_types_j.simulation_output_snapshots =
-        t.snapshots ;
-      Api_types_j.simulation_output_log_messages =
-        Buffer.contents t.log_buffer ; }
-  in
-  { Api_types_j.simulation_detail_progress =
-      progress ;
-    Api_types_j.simulation_detail_output =
-      output ; }
-
-let info
+let progress
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_j.simulation_detail,Api_types_j.errors) Result.result Lwt.t =
+  (Api_types_t.simulation_progress,Api_types_j.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   match t.error_messages with
   | [] ->
     Lwt.catch
       (fun () ->
-         Lwt.return (Result_util.ok (create_info ~t:t)))
+         Lwt.return (Result_util.ok {
+             Api_types_j.simulation_progress_time =
+               Counter.current_time t.counter ;
+             Api_types_j.simulation_progress_time_percentage =
+               Counter.time_percentage t.counter ;
+             Api_types_j.simulation_progress_event =
+               Counter.current_event t.counter ;
+             Api_types_j.simulation_progress_event_percentage =
+               Counter.event_percentage t.counter ;
+             Api_types_j.simulation_progress_tracked_events =
+               Counter.tracked_events t.counter ;
+             Api_types_j.simulation_progress_is_running =
+               t.is_running ;
+           }))
+      (catch_error (fun e -> Lwt.return (Result_util.error e)))
+  | _ -> Lwt.return (Result_util.error t.error_messages)
+
+let outputs
+    ~(system_process : system_process)
+    ~(t : t) :
+  (Api_data.simulation_detail_output,Api_types_j.errors) Result.result Lwt.t =
+  let () = ignore(system_process) in
+  let () = ignore(t) in
+  match t.error_messages with
+  | [] ->
+    Lwt.catch
+      (fun () ->
+         Lwt.return (Result_util.ok {
+             Api_types_j.simulation_output_plot =
+               Some t.plot ;
+             Api_types_j.simulation_output_flux_maps =
+               t.flux_maps ;
+             Api_types_j.simulation_output_file_lines =
+               t.files ;
+             Api_types_j.simulation_output_snapshots =
+               t.snapshots ;
+             Api_types_j.simulation_output_log_messages =
+               Buffer.contents t.log_buffer ;
+           }))
       (catch_error (fun e -> Lwt.return (Result_util.error e)))
   | _ -> Lwt.return (Result_util.error t.error_messages)
 

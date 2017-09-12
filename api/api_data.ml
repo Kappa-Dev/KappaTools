@@ -1,3 +1,11 @@
+type simulation_detail_output =
+  (Api_types_t.plot option,
+   Api_types_t.flux_map list,
+   string list Mods.StringMap.t,
+   Api_types_t.snapshot list,
+   string)
+    Api_types_t.simulation_output
+
 let api_message_errors
     ?(severity:Api_types_t.severity = `Error)
     ?(region:Api_types_t.range option)
@@ -227,12 +235,9 @@ let api_contact_map
     cm
 
 let api_simulation_status
-    (detail : Api_types_t.simulation_detail) :
+    (progress : Api_types_t.simulation_progress)
+    (detail : simulation_detail_output) :
   Api_types_t.simulation_info =
-  let progress : Api_types_t.simulation_progress =
-    detail.Api_types_t.simulation_detail_progress in
-  let detail : Api_types_t.simulation_detail_output =
-    detail.Api_types_t.simulation_detail_output in
   let output : Api_types_t.simulation_info_output =
     { Api_types_t.simulation_output_plot =
         (match detail.Api_types_t.simulation_output_plot with
@@ -241,7 +246,7 @@ let api_simulation_status
       Api_types_t.simulation_output_flux_maps =
         List.length detail.Api_types_t.simulation_output_flux_maps ;
       Api_types_t.simulation_output_file_lines =
-        List.length detail.Api_types_t.simulation_output_file_lines ;
+        Mods.StringMap.size detail.Api_types_t.simulation_output_file_lines ;
       Api_types_t.simulation_output_snapshots =
         List.length detail.Api_types_t.simulation_output_snapshots ;
       Api_types_t.simulation_output_log_messages =

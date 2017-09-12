@@ -42,8 +42,7 @@ end
 class type manager_file_line = object
   method simulation_catalog_file_line :
     Api_types_t.file_line_catalog result Lwt.t
-  method simulation_detail_file_line :
-    string option -> Api_types_t.file_line list result Lwt.t
+  method simulation_detail_file_line : string -> string list result Lwt.t
 end
 
 class type manager_flux_map = object

@@ -16,19 +16,17 @@ let export_id = "output-export"
 let tab_is_active, set_tab_is_active = React.S.create false
 
 let current_file, set_current_file =
-  React.S.create (None : Api_types_j.file_line_detail option)
+  React.S.create None
 
 let update_outputs key : unit =
-  let file_line_info_id = if key = "/dev/stdout" then None else Some key in
   State_simulation.when_ready
     ~label:__LOC__
     (fun manager ->
-      (manager#simulation_detail_file_line file_line_info_id) >>=
+      (manager#simulation_detail_file_line key) >>=
       (Api_common.result_bind_lwt
-         ~ok:(fun (file_line_detail : Api_types_j.file_line_detail) ->
-             let () = set_current_file (Some file_line_detail) in
-             Lwt.return (Api_common.result_ok ()
-                        )
+         ~ok:(fun lines ->
+             let () = set_current_file (Some (key,lines)) in
+             Lwt.return (Api_common.result_ok ())
            )
       )
     )
@@ -52,25 +50,23 @@ let navli () =
 
 let xml () =
   let select file_line_info =
-    let file_ids : string option list =
+    let file_ids : string list =
       file_line_info.Api_types_j.file_line_ids in
-    let file : Api_types_j.file_line_detail option = React.S.value current_file in
-    let current_file_id : string option =
-      (match (file_ids,file) with
-       | (f::_,None) -> f
-       | (_::_,Some file) -> get_file_line_id file
-       | _ -> None) in
+    let lines = React.S.value current_file in
+    let current_file_id : string =
+      match (file_ids,lines) with
+      | [], _ -> assert false
+      | (file::_,None) | (_::_,Some (file,_)) -> file in
     let file_options =
       List.map
         (fun key ->
            Html.option
-             ~a:([ Html.a_value (Option_util.unsome "/dev/stdout" key)]@
-                 (if (key = current_file_id) then
-                    [Html.a_selected ()]
+             ~a:([ Html.a_value key]@
+                 (if key = current_file_id then [Html.a_selected ()]
                   else  []))
-             (Html.pcdata (Ui_common.option_label (Option_util.unsome "" key))))
+             (Html.pcdata (Ui_common.option_label key)))
         file_ids in
-    let () = update_outputs (Option_util.unsome "/dev/stdout" current_file_id) in
+    let () = update_outputs current_file_id in
     Tyxml_js.Html.select
       ~a:[ Html.a_class ["form-control"] ; Html.a_id select_id ]
       file_options in
@@ -91,13 +87,10 @@ let xml () =
                               (match file_line_info.Api_types_j.file_line_ids with
                                | [] -> []
                                | key::[] ->
-                                 let () = update_outputs
-                                     (Option_util.unsome "/dev/stdout" key) in
+                                 let () = update_outputs key in
                                  [Html.h4
                                     [ Html.pcdata
-                                        (Ui_common.option_label
-                                           (Option_util.unsome "" key)
-                                        )]]
+                                        (Ui_common.option_label key)]]
                                | _ :: _ :: _ -> [select file_line_info])
                           in
                           Lwt.return (Api_common.result_ok ())
@@ -116,12 +109,10 @@ let xml () =
        ~a:[Html.a_class ["panel-scroll";"flex-content"]]
        (ReactiveData.RList.from_signal
           (React.S.map
-             (fun (file : Api_types_j.file_line_detail option) ->
-                match file with
-                | None -> []
-                | Some lines ->
-                  List.rev_map (fun line ->
-                      Html.p [ Html.pcdata line.Api_types_j.file_line_text ]) lines)
+             (function
+               | None -> []
+               | Some (_,lines) ->
+                 List.map (fun line -> Html.p [ Html.pcdata line ]) lines)
              current_file))] in
   [ [%html {|<div class="navcontent-view">
              <div class="row">

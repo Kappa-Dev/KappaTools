@@ -226,8 +226,8 @@ class virtual  manager_base () : manager_base_type =
                    (BadResponse response)))
 
     method simulation_detail_file_line
-      (file_line_id : string option) :
-      Api_types_j.file_line list Api.result Lwt.t =
+      (file_line_id : string) :
+      string list Api.result Lwt.t =
       self#message (`SimulationDetailFileLine file_line_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function

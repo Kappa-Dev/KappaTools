@@ -387,12 +387,12 @@ let route
             let (project_id,filelines_id) = field_ref context "filelinesid" in
             bind_projects
               (fun manager -> manager#simulation_detail_file_line
-                  (Some filelines_id))
+                  filelines_id)
               project_id projects >>=
             (Webapp_common.api_result_response
                ~string_of_success:
-                 (Mpi_message_j.string_of_file_line_detail
-                    ?len:None))
+                 (fun l -> Yojson.Safe.to_string
+                     (`List (List.map (fun x -> `String x) l))))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };
