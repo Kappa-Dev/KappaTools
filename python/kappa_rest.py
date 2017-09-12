@@ -197,7 +197,6 @@ class KappaRest(object):
         message = simulation_parameter.toJSON()
         return(self.dispatch("POST",url,message ))
 
-    def simulation_continue(self,simulation_parameter):
+    def simulation_continue(self,pause_condition):
         url = "{0}/projects/{1}/simulation/continue".format(self.url,self.project_id)
-        message = simulation_parameter.toJSON()
-        return(self.dispatch("PUT",url,message))
+        return(self.dispatch("PUT",url,pause_condition))

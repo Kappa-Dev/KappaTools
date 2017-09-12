@@ -498,10 +498,10 @@ let perturbation
 let continue
     ~(system_process : system_process)
     ~(t : t)
-    ~(parameter : Api_types_j.simulation_parameter)
+    ~(pause_condition : string)
   : (unit,Api_types_j.errors) Result.result Lwt.t =
   let lexbuf =
-    Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
+    Lexing.from_string pause_condition in
   Lwt.catch
     (fun () ->
        if t.is_running then

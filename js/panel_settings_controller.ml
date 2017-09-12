@@ -20,12 +20,12 @@ let create_simulation_parameter param :
 let continue_simulation () =
   Common.async
     (fun () ->
-       let simulation_parameter =
-         create_simulation_parameter
-           (React.S.value State_project.model).State_project.model_parameters in
+       let pause_condition =
+         let open State_project in
+         (React.S.value model).model_parameters.pause_condition in
        State_error.wrap
          __LOC__
-         (State_simulation.continue_simulation simulation_parameter)
+         (State_simulation.continue_simulation pause_condition)
        >>= (fun _ -> Lwt.return_unit)
     )
 

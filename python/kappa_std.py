@@ -211,9 +211,8 @@ class KappaStd(object):
         return(self.dispatch("SimulationStart",
                              simulation_parameter.toJSON()))
 
-    def simulation_continue(self,simulation_parameter):
+    def simulation_continue(self,pause_condition):
         """
         Restarts a paused simulation
         """
-        return(self.dispatch("SimulationContinue",
-                             simulation_parameter.toJSON()))
+        return(self.dispatch("SimulationContinue",pause_condition))

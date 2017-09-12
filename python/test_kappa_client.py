@@ -147,7 +147,6 @@ class KappaClientTest(object):
             self.assertEqual(test_count, len(last_status['series']))
             self.assertEqual(test_time, last_status['series'][0][0])
 
-            print(simulation_info)
             plot_limit_offset = 50
             test_time = 10.0
             test_count = 51
@@ -155,6 +154,18 @@ class KappaClientTest(object):
             last_status = runtime.simulation_plot(limit)
             self.assertEqual(test_count, len(last_status['series']))
             self.assertEqual(test_time, last_status['series'][0][0])
+
+            runtime.simulation_continue("[T] > 35")
+
+            simulation_info = runtime.simulation_info()
+
+            while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
+                time.sleep(1)
+                simulation_info = runtime.simulation_info()
+
+            # test that no limit returns all entries
+            last_status = runtime.simulation_plot()
+            self.assertEqual(351, len(last_status['series']))
 
 
 class RestClientTest(KappaClientTest,unittest.TestCase):

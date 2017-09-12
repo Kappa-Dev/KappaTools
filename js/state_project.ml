@@ -189,7 +189,7 @@ let remove_files manager =
            (fun m ->
               manager#file_delete m.Api_types_j.file_metadata_id>>=
               (fun _ -> Lwt.return_unit))
-           catalog.Api_types_t.file_metadata_list >>=
+           catalog >>=
          (fun () -> Lwt.return (Api_common.result_ok ()))))
 
 let remove_project project_id =

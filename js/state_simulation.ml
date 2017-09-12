@@ -149,7 +149,7 @@ let refresh () =
 
 let init () : unit Lwt.t = Lwt.return_unit
 
-let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter) : unit Api.result Lwt.t =
+let continue_simulation (pause_condition : string) : unit Api.result Lwt.t =
   with_simulation_info
     ~label:"continue_simulation"
     ~stopped:
@@ -166,7 +166,7 @@ let continue_simulation (simulation_parameter : Api_types_j.simulation_parameter
         Lwt.return (Api_common.result_error_msg error_msg))
     ~ready:
       (fun manager _ ->
-          manager#simulation_continue simulation_parameter >>=
+          manager#simulation_continue pause_condition >>=
         (Api_common.result_bind_lwt ~ok:sync))
     ()
 

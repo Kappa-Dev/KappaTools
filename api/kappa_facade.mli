@@ -44,9 +44,7 @@ val perturbation :
   (unit, Api_types_j.errors) Result.result Lwt.t
 
 val continue :
-  system_process:system_process ->
-  t:t ->
-  parameter:Api_types_j.simulation_parameter ->
+  system_process:system_process -> t:t -> pause_condition:string ->
   (unit, Api_types_j.errors) Result.result Lwt.t
 
 val info :

@@ -106,8 +106,8 @@ class PlotLimit(object):
         return url_plot_limit
 
     def toJSON(self):
-        return({ "start_time" : self.plot_limit_offset ,
-                 "max_points" : self.plot_limit_points })
+        return({ "offset" : self.plot_limit_offset ,
+                 "nb_points" : self.plot_limit_points })
 
 def PlotParameter(plot_limit_offset = None,
                   plot_limit_points = None) :

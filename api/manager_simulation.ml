@@ -342,8 +342,7 @@ class manager_simulation
            )
         )
 
-    method simulation_continue
-        (simulation_parameter : Api_types_j.simulation_parameter) :
+    method simulation_continue (pause_condition : string) :
       unit Api.result Lwt.t =
       Model_storage.bind_simulation
         project
@@ -351,8 +350,7 @@ class manager_simulation
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.continue
               ~system_process:system_process
-              ~t:t
-              ~parameter:simulation_parameter) >>=
+              ~t:t ~pause_condition) >>=
            (Result_util.map
                 ~ok:((fun () -> Lwt.return (Api_common.result_ok ())))
                 ~error:((fun (errors : Api_types_j.errors) ->

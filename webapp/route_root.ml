@@ -566,7 +566,10 @@ let route
           | `PUT ->
             let project_id = project_ref context in
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
-            Api_types_j.simulation_parameter_of_string >>= fun params ->
+            (fun s ->
+               Yojson.Safe.read_string
+                 (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
+            >>= fun params ->
             bind_projects
               (fun manager -> manager#simulation_continue params)
               project_id projects >>=

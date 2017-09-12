@@ -114,7 +114,7 @@ let update_directory
          let () =
            set_directory_state
              { directory with
-               state_directory = catalog.Api_types_j.file_metadata_list }
+               state_directory = catalog }
          in
          Lwt.return (Api_common.result_ok ()))
   )
@@ -176,19 +176,18 @@ let create_file
                  List.filter
                    (fun file_metadata ->
                       filename = file_metadata.Api_types_j.file_metadata_id)
-                   catalog.Api_types_j.file_metadata_list in
+                   catalog in
                (match matching_file with
                 | [] ->
                   manager#file_create
                     (new_file
-                       ~position:(List.length
-                                    catalog.Api_types_j.file_metadata_list)
+                       ~position:(List.length catalog)
                        filename content)
                 | metadata::_ ->
                   let file_modification : Api_types_t.file_modification =
                     file_patch
                       metadata
-                      ?content:(Some content)
+                      ~content
                       ?compile:None
                       ?position:None
                       ()
@@ -228,7 +227,7 @@ let select_file (filename : string) (line : int option) : unit Api.result Lwt.t 
        manager#file_catalog >>=
        (Api_common.result_bind_lwt
           ~ok:(fun (catalog : Api_types_j.file_catalog) ->
-              let current = choose_file filename catalog.Api_types_j.file_metadata_list in
+              let current = choose_file filename catalog in
               let () =
                 set_directory_state
                   { state_current =
@@ -237,7 +236,7 @@ let select_file (filename : string) (line : int option) : unit Api.result Lwt.t 
                          None
                        | Some current ->
                          Some current.Api_types_j.file_metadata_id) ;
-                    state_directory = catalog.Api_types_j.file_metadata_list ; }
+                    state_directory = catalog ; }
               in
               match current with
               | None ->
@@ -275,10 +274,7 @@ let modify_file
             ~ok:(fun (catalog : Api_types_j.file_catalog) ->
                 (* lets fetch the latest metadata to get the verison *)
                 let current =
-                  choose_file
-                    filename
-                    catalog.Api_types_j.file_metadata_list
-                in
+                  choose_file filename catalog in
                 match current with
                 | None ->
                   let error_msg : string =
@@ -401,11 +397,9 @@ let sync ?(reset=false) () : unit Api.result Lwt.t =
        (* get current directory *)
        manager#file_catalog >>=
        (Api_common.result_bind_lwt
-          ~ok:(fun (catalog : Api_types_j.file_catalog) ->
+          ~ok:(fun (current_directory : Api_types_j.file_catalog) ->
               (* Save the new state of the directory.*)
               let (new_state,refresh_ui) =
-                let current_directory =
-                  catalog.Api_types_j.file_metadata_list in
                 (* Use the current file's metadata if it is still in the directory. *)
                 let current_metadata : Api_types_j.file_metadata option =
                   match old_state.state_current with

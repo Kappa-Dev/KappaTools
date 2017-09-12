@@ -60,7 +60,7 @@ type request = [
                | FileUpdate of (file_id * file_modification)
 	       | ProjectParse of overwritten_var list
 	       | ProjectGet of project_id
-               | SimulationContinue of simulation_parameter
+               | SimulationContinue of string
                | SimulationDelete
                | SimulationDetailFileLine of string option
                | SimulationDetailFluxMap of flux_map_id

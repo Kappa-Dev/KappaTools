@@ -201,7 +201,7 @@ type file_metadata = { compile <ocaml mutable>  : bool ;
 		       version <ocaml mutable>  : file_version ;
 		       } <ocaml  field_prefix="file_metadata_">
 
-type file_catalog = { file_metadata_list : file_metadata list }
+type file_catalog = file_metadata list
 type file = { file_metadata <ocaml mutable> <json name="metadata"> : file_metadata ;
               file_content <ocaml mutable> <json name="content"> : string ; }
 type file_patch = {

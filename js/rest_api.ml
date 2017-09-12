@@ -111,15 +111,14 @@ class manager
         `GET
         (fun result ->
              (`ProjectGet (Mpi_message_j.project_of_string result)))
-    | `SimulationContinue simulation_parameter ->
+    | `SimulationContinue pause_condition ->
       send
         ?timeout
         (Format.sprintf
            "%s/v2/projects/%s/simulation/continue"
            url project_id)
         `PUT
-        ~data:(Api_types_j.string_of_simulation_parameter
-                 simulation_parameter)
+        ~data:(Yojson.Safe.to_string (`String pause_condition))
         (fun _ -> (`SimulationContinue))
     | `SimulationDelete ->
       send

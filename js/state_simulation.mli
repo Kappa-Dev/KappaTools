@@ -40,7 +40,7 @@ val when_ready :
   ?handler:(unit Api.result -> unit Lwt.t) ->
   (Api.concrete_manager -> unit Api.result Lwt.t) -> unit
 
-val continue_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t
+val continue_simulation : string -> unit Api.result Lwt.t
 val pause_simulation : unit -> unit Api.result Lwt.t
 val stop_simulation : unit -> unit Api.result Lwt.t
 val start_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t

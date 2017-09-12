@@ -131,9 +131,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
       Api_types_j.file_catalog Api.result Lwt.t =
       let files : Api_types_j.file list = (project#get_files ()) in
       let file_catalog : Api_types_j.file_catalog =
-        { Api_types_j.file_metadata_list =
-            List.map (fun file -> file.Api_types_j.file_metadata) files }
-      in
+        List.map (fun file -> file.Api_types_j.file_metadata) files in
       Lwt.return (Api_common.result_ok file_catalog)
 
     method file_create

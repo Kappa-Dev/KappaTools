@@ -201,10 +201,9 @@ class virtual  manager_base () : manager_base_type =
                 (Api_common.result_error_exception
                    (BadResponse response)))
 
-    method simulation_continue
-      (simulation_parameter :Api_types_j.simulation_parameter) :
+    method simulation_continue (pause_condition : string) :
       unit Api.result Lwt.t =
-      self#message (`SimulationContinue simulation_parameter) >>=
+      self#message (`SimulationContinue pause_condition) >>=
       Api_common.result_bind_lwt
         ~ok:(function
             | `SimulationContinue ->
