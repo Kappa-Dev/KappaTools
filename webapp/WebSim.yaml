@@ -578,14 +578,11 @@ components:
       required:
         - plot_period
         - pause_condition
-        - simulation_id
         - store_trace
       properties:
         plot_period:
           type: number
         pause_condition:
-          type: string
-        simulation_id:
           type: string
         seed:
           type: integer

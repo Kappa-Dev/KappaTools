@@ -13,7 +13,6 @@ let create_simulation_parameter param :
   Api_types_j.simulation_plot_period = param.State_project.plot_period ;
   Api_types_j.simulation_pause_condition = param.State_project.pause_condition ;
   Api_types_j.simulation_seed = param.State_project.seed;
-  Api_types_j.simulation_id = "default" ;
   Api_types_j.simulation_store_trace = param.State_project.store_trace ;
 }
 

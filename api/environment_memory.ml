@@ -7,7 +7,6 @@ class simulation
   object
     val mutable _runtime_state = runtime_state
     val mutable _simulation_parameter = simulation_parameter
-    method get_simulation_id () = _simulation_parameter.Api_types_j.simulation_id
     method get_runtime_state () = _runtime_state
     method set_runtime_state (runtime_state : Kappa_facade.t) =
       _runtime_state <- runtime_state

@@ -242,14 +242,11 @@ class manager_simulation
       Api_types_j.simulation_artifact Api.result Lwt.t =
       let (simulation_parameter,simulation_seed) =
         patch_parameter simulation_parameter in
-      let simulation_id = simulation_parameter.Api_types_j.simulation_id in
       match project#get_simulation () with
       | Some _ ->
-        let message : string =
-          Format.sprintf
-            "simulation id %s exists" simulation_id in
         Lwt.return
-          (Api_common.result_error_msg ~result_code:`Conflict message)
+          (Api_common.result_error_msg
+             ~result_code:`Conflict "A simulation already exists")
       | None ->
         project#get_state () >>= function
         | None ->
@@ -270,10 +267,9 @@ class manager_simulation
                          let () =
                            project#set_simulation simulation_parameter facade in
                          Lwt.return
-                           (Api_common.result_ok
-                              { Api_types_j.simulation_artifact_simulation_id = simulation_id ;
-                                Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
-                              }))
+                           (Api_common.result_ok {
+                               Api_types_j.simulation_artifact_simulation_seed = simulation_seed ;
+                             }))
                     ~error:
                       (fun (errors : Api_types_j.errors) ->
                          Lwt.return (Api_common.result_messages errors)))

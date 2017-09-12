@@ -75,13 +75,10 @@ def main():
                 file_object = kappa_common.File(file_metadata,file_content)
                 runtime.file_create(file_object)
                 runtime.project_parse()
-                simulation_id = str(uuid.uuid1())
-                print("simulation_id : {0}".format(simulation_id))
 
 
                 end_time = 10.0
                 simulation_parameter = kappa_common.SimulationParameter(plot_period,
-                                                                        simulation_id,
                                                                         pause_condition,
                                                                         seed)
                 runtime.simulation_start(simulation_parameter)

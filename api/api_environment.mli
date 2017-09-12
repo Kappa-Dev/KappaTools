@@ -3,7 +3,6 @@
 type parse_state = (Kappa_facade.t,Api_types_j.errors) Result.result
 
 class type simulation = object
-  method get_simulation_id : unit -> Api_types_j.simulation_id
   method get_runtime_state : unit -> Kappa_facade.t
   method set_runtime_state : Kappa_facade.t -> unit
   method get_simulation_parameter : unit -> Api_types_j.simulation_parameter

@@ -64,19 +64,16 @@ class SimulationParameter(object):
 
     def __init__(self,
                  simulation_plot_period,
-                 simulation_id,
                  simulation_pause_condition,
                  simulation_seed = None,
                  simulation_store_trace = False) :
         self.simulation_plot_period = simulation_plot_period
-        self.simulation_id = simulation_id
         self.simulation_pause_condition = simulation_pause_condition
         self.simulation_seed = simulation_seed
         self.simulation_store_trace = simulation_store_trace
 
     def toJSON(self):
         return({ "plot_period" : self.simulation_plot_period,
-                 "simulation_id" : self.simulation_id,
                  "pause_condition": self.simulation_pause_condition ,
                  "store_trace": self.simulation_store_trace ,
                  "seed" : self.simulation_seed })

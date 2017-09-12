@@ -115,7 +115,7 @@ class KappaClientTest(object):
             runtime.file_create(file_object)
             runtime.project_parse()
             pause_condition = "[T] > 10.0"
-            simulation_parameter = kappa_common.SimulationParameter(0.1,"default",pause_condition)
+            simulation_parameter = kappa_common.SimulationParameter(0.1,pause_condition)
             runtime.simulation_start(simulation_parameter)
 
             simulation_info = runtime.simulation_info()

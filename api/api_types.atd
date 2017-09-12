@@ -77,14 +77,12 @@ type simulation_seed = int
 type simulation_id = string
 
 type simulation_artifact = {
-     simulation_artifact_simulation_id : simulation_id ;
      simulation_artifact_simulation_seed : simulation_seed ;
 }
 
 type simulation_parameter = {
   plot_period : float ;
   pause_condition : string ;
-  id  <json name="simulation_id"> : simulation_id;
   seed : simulation_seed nullable ;
   store_trace : bool ;
 } <ocaml field_prefix="simulation_">
