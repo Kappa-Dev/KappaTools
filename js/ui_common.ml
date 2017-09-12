@@ -178,32 +178,61 @@ let save_plot_ui
   in
   ()
 
-let badge
-    (counter : Api_types_j.simulation_info option -> int)
-  =
-  let badge_list, badge_handle = ReactiveData.RList.create [] in
-  [ Tyxml_js.R.Html.span
-      (let _ = React.S.map
-           (fun model ->
-              let simulation_info =
-                State_simulation.t_simulation_info model in
-              let count = counter simulation_info in
-              if count > 0  then
-                ReactiveData.RList.set
-                  badge_handle
-                  [ Html.pcdata " " ;
-                    Html.span
-                      ~a:[ Html.a_class ["badge"] ; ]
-                      [ Html.pcdata (string_of_int count) ; ] ;
-                  ]
-              else
-                ReactiveData.RList.set badge_handle []
-           )
-           State_simulation.model
-       in
-       badge_list
+let label_news tab_is_active counter =
+  let count =
+    React.S.map
+      (fun model ->
+         let simulation_info =
+           State_simulation.t_simulation_info model in
+         counter simulation_info)
+      State_simulation.model in
+  let bip = ref React.E.never in
+  let labels, set_labels = ReactiveData.RList.create [] in
+  let _ =
+    React.S.map
+      (fun tab_active ->
+         let () = React.E.stop !bip in
+         if tab_active then
+           ReactiveData.RList.set set_labels []
+         else
+           bip :=
+             React.E.map
+               (fun v ->
+                  ReactiveData.RList.set
+                    set_labels
+                    (if v > 0 then
+                       [ Html.pcdata " " ;
+                         Html.span
+                           ~a:[ Html.a_class ["label";"label-default"] ]
+                           [ Html.pcdata "New" ; ] ]
+                     else [])
+               )
+               (React.S.changes count)
       )
-  ]
+      tab_is_active in
+  labels
+
+let badge
+    (counter : Api_types_j.simulation_info option -> int) =
+  let badge, badge_handle = ReactiveData.RList.create [] in
+  let _ = React.S.map
+      (fun model ->
+         let simulation_info =
+           State_simulation.t_simulation_info model in
+         let count = counter simulation_info in
+         if count > 0  then
+           ReactiveData.RList.set
+             badge_handle
+             [ Html.pcdata " " ;
+               Html.span
+                 ~a:[ Html.a_class ["badge"] ; ]
+                 [ Html.pcdata (string_of_int count) ; ] ;
+             ]
+         else
+           ReactiveData.RList.set badge_handle []
+      )
+      State_simulation.model in
+  badge
 
 let arguments (key : string) : string list =
   List.map
@@ -234,12 +263,15 @@ let navli label active decorations =
     else
       default_attributes
   in
+  let text =
+    ReactiveData.RList.concat
+      (ReactiveData.RList.singleton (Html.cdata label)) decorations in
   Html.li ~a:attributes
-    [ Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
-                ; Html.Unsafe.string_attrib "role" "tab"
-                ; Html.Unsafe.string_attrib "aria-controls" label
-                ; Html.a_href ("#"^label) ]
-        (List.append [ Html.cdata label ]  decorations)
+    [ Tyxml_js.R.Html.a ~a:[ Html.Unsafe.string_attrib "data-toggle" "tab"
+                           ; Html.Unsafe.string_attrib "role" "tab"
+                           ; Html.Unsafe.string_attrib "aria-controls" label
+                           ; Html.a_href ("#"^label) ]
+        text
     ]
 
 let navtabs nav_tab_id = function
@@ -336,7 +368,9 @@ module type Div = sig
 end;;
 
 module type Tab = sig
-  val navli : unit -> Html_types.flow5_without_interactive Tyxml_js.Html5.elt list
+  val navli :
+    unit ->
+    Html_types.flow5_without_interactive Tyxml_js.Html5.elt ReactiveData.RList.t
   val content : unit -> Html_types.div_content_fun Tyxml_js.Html5.elt list
   val onload : unit -> unit
   val onresize : unit -> unit

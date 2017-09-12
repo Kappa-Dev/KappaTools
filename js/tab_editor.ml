@@ -8,7 +8,7 @@
 
 module Html = Tyxml_js.Html5
 
-let navli () = []
+let navli () = ReactiveData.RList.empty
 let rightsubpanel_id : string = "rightsubpanel"
 let rightsubpanel () =
   Html.div
@@ -29,7 +29,6 @@ let rightsubpanel () =
        ; "influences", (Tab_influences.navli ())
        ; "dead_rules", (Tab_dead_rules.navli ())
        ; "constraints", (Tab_constraints.navli ())
-       ; "log",        (Tab_log.navli ())
        ];
      Ui_common.navcontent
        ~id:rightsubpanel_id
@@ -38,7 +37,6 @@ let rightsubpanel () =
        ; "influences",  [], (Tab_influences.content ())
        ; "dead_rules",  [], (Tab_dead_rules.content ())
        ; "constraints", [], (Tab_constraints.content ())
-       ; "log",         [], (Tab_log.content ())
        ]]
 
 let content () =
@@ -62,18 +60,15 @@ let childs_hide b =
     let () = Tab_contact_map.parent_hide () in
     let () = Tab_influences.parent_hide () in
     let () = Tab_dead_rules.parent_hide () in
-    let () = Tab_constraints.parent_hide () in
-    Tab_log.parent_hide ()
+    Tab_constraints.parent_hide ()
   else
     let () = Tab_contact_map.parent_shown () in
     let () = Tab_influences.parent_shown () in
     let () = Tab_dead_rules.parent_shown () in
-    let () = Tab_constraints.parent_shown () in
-    Tab_log.parent_shown ()
+    Tab_constraints.parent_shown ()
 
 let onload () =
   let () = Subpanel_editor.onload () in
-  let () = Tab_log.onload () in
   let () = Tab_contact_map.onload () in
   let () = Tab_influences.onload () in
   let () = Tab_dead_rules.onload () in
@@ -86,7 +81,6 @@ let onload () =
   ()
 
 let onresize () : unit =
-  let () = Tab_log.onresize () in
   let () = Tab_contact_map.onresize () in
   let () = Tab_influences.onresize () in
   let () = Tab_dead_rules.onresize () in

@@ -12,6 +12,7 @@ let navtabs () =
   Tyxml_js.To_dom.of_ul @@
   Ui_common.navtabs nav_tab_id
     ([ "editor",    (Tab_editor.navli ())
+     ; "log",       (Tab_log.navli ())
      ; "plot",      (Tab_plot.navli ())
      ; "flux",      (Tab_flux.navli ())
      ; "snapshot",  (Tab_snapshot.navli ())
@@ -28,6 +29,7 @@ let navcontents () =
     ~id:navcontents_id
     []
     ([ "editor",   ["row"], (Tab_editor.content ())
+     ; "log",      [],      (Tab_log.content ())
      ; "plot",     [],      (Tab_plot.content ())
      ; "flux",     [],      (Tab_flux.content ())
      ; "snapshot", [],      (Tab_snapshot.content ())
@@ -37,6 +39,7 @@ let navcontents () =
 
 let onload () =
   let () = Tab_editor.onload () in
+  let () = Tab_log.onload () in
   let () = Tab_plot.onload () in
   let () = Tab_flux.onload () in
   let () = Tab_snapshot.onload () in
@@ -46,6 +49,7 @@ let onload () =
 
 let onresize () =
   let () = Tab_editor.onresize () in
+  let () = Tab_log.onresize () in
   let () = Tab_plot.onresize () in
   let () = Tab_flux.onresize () in
   let () = Tab_snapshot.onresize () in

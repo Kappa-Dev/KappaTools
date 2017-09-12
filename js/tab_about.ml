@@ -8,7 +8,7 @@
 
 module Html = Tyxml_js.Html5
 
-let navli () = []
+let navli () = ReactiveData.RList.empty
 
 let content () = [%html {|
 <h2>The Kappa Language</h2>

@@ -9,7 +9,7 @@
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
-let navli () = []
+let navli () = ReactiveData.RList.empty
 
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false

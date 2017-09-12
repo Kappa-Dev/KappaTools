@@ -9,10 +9,18 @@
 module Html = Tyxml_js.Html5
 open Lwt.Infix
 
-let navli () = []
-
 let tab_is_active, set_tab_is_active = React.S.create false
 let tab_was_active = ref false
+
+let line_count state =
+  match state with
+  | None -> 0
+  | Some state ->
+    let open Api_types_t in
+    state.simulation_info_output.simulation_output_log_messages
+
+let navli () =
+  Ui_common.label_news tab_is_active (fun state -> (line_count state))
 
 let content () =
   let state_log , set_state_log = React.S.create ("" : string) in

@@ -13,7 +13,7 @@ open Lwt.Infix
 let display_id = "contact-map-display"
 let export_id = "contact-export"
 
-let navli () = []
+let navli () = ReactiveData.RList.empty
 
 let tab_is_active, set_tab_is_active = React.S.create true
 let tab_was_active = ref true
