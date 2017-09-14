@@ -411,6 +411,15 @@ birate:
 
 rate:
     | alg_expr OP_CUR alg_with_radius CL_CUR {($1,Some $3)}
+    | alg_expr OP_PAR alg_with_radius CL_PAR {
+      ExceptionDefn.deprecated
+         ~pos:(Locality.of_pos (Parsing.rhs_start_pos 2)
+			       (Parsing.rhs_end_pos 4))
+	      "unimolecular rate"
+	      (fun f -> Format.pp_print_string
+			  f "use {} instead of ()");
+			  ($1,Some $3)
+    }
     | alg_expr {($1,None)}
     | OP_CUR alg_with_radius CL_CUR
       {(Locality.dummy_annot (Alg_expr.CONST Nbr.zero),Some $2)}
