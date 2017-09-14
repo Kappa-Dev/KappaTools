@@ -40,17 +40,6 @@ let update_file
            file_metadata_compile
        | Some file_content -> file_content)
   in
-  let () = file.Api_types_j.file_metadata.Api_types_j.file_metadata_hash <-
-      (match file_modification.Api_types_j.
-               file_modification_hash
-       with
-       | None ->
-         file.Api_types_j.
-           file_metadata.Api_types_j.
-           file_metadata_hash
-       | Some file_metadata_hash ->
-         Some file_metadata_hash)
-  in
   let () = file.Api_types_j.file_metadata.Api_types_j.file_metadata_id <-
       (match file_modification.
                Api_types_j.

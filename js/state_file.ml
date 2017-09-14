@@ -129,21 +129,20 @@ let file_patch
     Api_types_j.file_modification_id = None ;
     Api_types_j.file_modification_position = position ;
     Api_types_j.file_modification_patch = modification_patch ;
-    Api_types_j.file_modification_hash = None ; }
+  }
 
 
 
 
 let new_file ~position filename content : Api_types_t.file =
   let client_id = State_settings.get_client_id () in
-  let file_metadata = { Api_types_j.file_metadata_compile = true ;
-                        Api_types_j.file_metadata_hash = None ;
-                        Api_types_j.file_metadata_id = filename ;
-                        Api_types_j.file_metadata_position = position ;
-                        Api_types_j.file_metadata_version =
-                          File_version.create client_id ;
-                    }
-  in
+  let file_metadata = {
+    Api_types_j.file_metadata_compile = true ;
+    Api_types_j.file_metadata_id = filename ;
+    Api_types_j.file_metadata_position = position ;
+    Api_types_j.file_metadata_version =
+      File_version.create client_id ;
+  } in
   { Api_types_j.file_metadata = file_metadata ;
     Api_types_j.file_content = content ; }
 

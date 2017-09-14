@@ -9,16 +9,13 @@ class FileMetadata(object):
                  file_metadata_id,
                  file_metadata_position,
                  file_metadata_compile = True ,
-                 file_metadata_hash = None ,
                  file_version = []):
         self.file_metadata_id = file_metadata_id
         self.file_metadata_position = file_metadata_position
         self.file_metadata_compile = file_metadata_compile
-        self.file_metadata_hash = file_metadata_hash
         self.file_version = file_version
     def toJSON(self):
         return({ "compile" : self.file_metadata_compile ,
-                 "hash" : self.file_metadata_hash ,
                  "id" : self.file_metadata_id ,
                  "position" : self.file_metadata_position ,
                  "version" : self.file_version })
@@ -32,7 +29,6 @@ def hydrate_file_metadata (info):
             info["id"],
             info["position"],
             info["compile"] ,
-            info["hash"] ,
             [] #hydrate_file_version(info["version"])
         ))
 

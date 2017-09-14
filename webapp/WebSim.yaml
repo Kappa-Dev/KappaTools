@@ -525,8 +525,6 @@ components:
       properties:
         compile:
           type: boolean
-        hash:
-          type: string
         id:
           type: string
         position:
@@ -571,8 +569,6 @@ components:
           type: integer
         content:
           $ref: '#/components/schemas/File_patch'
-        hash:
-          type: string
     Simulation_parameter:
       type: object
       required:

@@ -181,7 +181,6 @@ type local_version = { local_version_client_id <json name="client_id"> : client_
 type file_version = local_version list
 type file_id = string
 type file_metadata = { compile <ocaml mutable>  : bool ;
-                       hash <ocaml mutable>     : string nullable ;
                        id <ocaml mutable>       : file_id ;
                        position <ocaml mutable> : int ;
 		       version <ocaml mutable>  : file_version ;
@@ -203,5 +202,4 @@ type file_modification = {
      file_modification_id       <json name="id"> : string nullable ;
      file_modification_position <json name="position"> : int nullable ;
      file_modification_patch    <json name="content"> : file_patch nullable ;
-     file_modification_hash     <ocaml mutable> <json name="hash"> : string nullable ;
 }
