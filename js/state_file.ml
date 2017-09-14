@@ -38,20 +38,6 @@ let directory_metadata directory_state : Api_types_j.file_metadata option =
       find_metadata file_id directory_state.state_directory
 
   with Not_found -> None
-let directory_gt
-    (l : state)
-    (r : state) : bool =
-  match directory_metadata  l with
-  | None -> false
-  | Some l_metadata ->
-    (match directory_metadata  r with
-     | None -> false
-     | Some r_metadata ->
-       let l_version = l_metadata.Api_types_j.file_metadata_version in
-       let r_version = r_metadata.Api_types_j.file_metadata_version in
-       let client_id = State_settings.get_client_id () in
-       File_version.gt ~client_id l_version r_version
-    )
 let blank_state = { state_current = None ; state_directory = [] }
 let directory_state , set_directory_state = React.S.create blank_state
 type refresh = { filename : string ; content : string ; line : int option ; }
