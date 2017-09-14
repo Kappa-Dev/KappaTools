@@ -295,7 +295,10 @@ class manager
         `PUT
         ~data:(Api_types_j.string_of_simulation_perturbation
                  simulation_perturbation)
-        (fun _ -> `SimulationPerturbation)
+        (fun result ->
+           `SimulationPerturbation
+             (Yojson.Safe.read_string
+                (Yojson.Safe.init_lexer ()) (Lexing.from_string result)))
     | `SimulationStart simulation_parameter ->
       send
         ?timeout

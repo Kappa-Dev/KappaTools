@@ -608,7 +608,7 @@ let route
               (fun manager -> manager#simulation_perturbation pert)
               project_id projects >>=
             (Webapp_common.api_result_response
-               ~string_of_success:(fun () -> "null"))
+               ~string_of_success:(fun s -> Yojson.Safe.to_string (`String s)))
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

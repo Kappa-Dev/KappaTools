@@ -20,7 +20,7 @@ let has_errors () =
   | [] -> false
   | _::_ -> true
 
-let set_errors ~append (location : string) (errors : Api_types_j.errors) =
+let add_error (location : string) (errors : Api_types_j.errors) =
   (* log location and errors if debugging is enabled *)
   let debug =
     Format.sprintf
@@ -32,32 +32,26 @@ let set_errors ~append (location : string) (errors : Api_types_j.errors) =
   let current_state_error : t list = React.S.value state_error in
   let new_state_error : t list =
     { state_error_errors = errors;
-      state_error_location =  location; }::
-    (if append then current_state_error else [])
-  in
+      state_error_location =  location; }::current_state_error in
   set_state_error new_state_error
 
-let errors : Api_types_j.errors option React.signal =
+let errors : Api_types_j.errors React.signal =
   React.S.map
     (fun (state_error : t list) ->
-       let errors =
-         List.fold_left
-           (fun acc value -> value.state_error_errors@acc)
-           []
-           state_error in
-       match errors with
-       | [] -> None
-       | errors -> Some errors)
+       List.fold_left
+         (fun acc value -> value.state_error_errors@acc)
+         []
+         state_error)
     state_error
 
 let wrap : 'a . ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t =
-  fun ?(append = false) loc r ->
+  fun ?(append=false) loc r ->
     r >>=
-    (Api_common.result_map
+    (let () = if not append then clear_errors () in
+     Api_common.result_map
        ~ok:(fun _ r ->
-           let () = if not append then clear_errors () in
            Lwt.return (Api_common.result_ok r))
        ~error:(fun _ (errors : Api_types_j.errors) ->
-           let () = set_errors ~append loc errors in
+           let () = add_error loc errors in
            Lwt.return (Api_common.result_messages errors)
          ))

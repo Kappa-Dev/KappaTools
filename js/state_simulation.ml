@@ -72,14 +72,14 @@ let fail_lwt error_msg = Lwt.return (Api_common.result_error_msg error_msg)
 let with_simulation_info
   ~(label : string)
   ?(stopped : Api.concrete_manager ->
-    unit Api.result Lwt.t =
+    'a Api.result Lwt.t =
     fun _ -> fail_lwt "Simulation stopped")
   ?(initializing : Api.concrete_manager ->
-    unit Api.result Lwt.t =
+    'a Api.result Lwt.t =
     fun _ -> fail_lwt "Simulation initalizing")
   ?(ready : Api.concrete_manager ->
     Api_types_j.simulation_info ->
-    unit Api.result Lwt.t =
+    'a Api.result Lwt.t =
     fun _ _ -> fail_lwt "Simulation ready")
   () =
   with_simulation
@@ -273,7 +273,7 @@ let start_simulation (simulation_parameter : Api_types_j.simulation_parameter) :
          Lwt.return (Api_common.result_error_msg error_msg))
     ()
 
-let perturb_simulation (code : string) : unit Api.result Lwt.t =
+let perturb_simulation (code : string) : string Api.result Lwt.t =
   with_simulation_info
     ~label:"perturb_simulation"
     ~stopped:
@@ -290,5 +290,9 @@ let perturb_simulation (code : string) : unit Api.result Lwt.t =
       (fun manager _ ->
         manager#simulation_perturbation
           { Api_types_j.perturbation_code = code } >>=
-        (Api_common.result_bind_lwt ~ok:sync))
+        (Api_common.result_bind_lwt
+           ~ok:(fun out -> sync () >>=
+                 Api_common.result_bind_lwt
+                   ~ok:(fun () ->
+                       Lwt.return (Api_common.result_ok out)))))
     ()

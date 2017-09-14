@@ -29,11 +29,11 @@ val with_simulation :
 
 val with_simulation_info :
   label:string ->
-  ?stopped:(Api.concrete_manager -> unit Api.result Lwt.t) ->
-  ?initializing:(Api.concrete_manager -> unit Api.result Lwt.t) ->
+  ?stopped:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
+  ?initializing:(Api.concrete_manager -> 'a Api.result Lwt.t) ->
   ?ready:(Api.concrete_manager ->
-          Api_types_j.simulation_info -> unit Api.result Lwt.t) ->
-  unit -> unit Api.result Lwt.t
+          Api_types_j.simulation_info -> 'a Api.result Lwt.t) ->
+  unit -> 'a Api.result Lwt.t
 
 val when_ready :
   label:string ->
@@ -44,4 +44,4 @@ val continue_simulation : string -> unit Api.result Lwt.t
 val pause_simulation : unit -> unit Api.result Lwt.t
 val stop_simulation : unit -> unit Api.result Lwt.t
 val start_simulation : Api_types_j.simulation_parameter -> unit Api.result Lwt.t
-val perturb_simulation : string -> unit Api.result Lwt.t
+val perturb_simulation : string -> string Api.result Lwt.t

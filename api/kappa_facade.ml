@@ -279,6 +279,13 @@ let outputs (simulation : t) =
   | Data.Log s -> Format.fprintf simulation.log_form "%s@." s
   | Data.TraceStep st -> simulation.trace <- st :: simulation.trace
 
+let interactive_outputs formatter t = function
+  | Data.Log s -> Format.fprintf formatter "%s@." s
+  | Data.Print file_line when file_line.Data.file_line_name = None ->
+    Format.fprintf formatter "%s@." file_line.Data.file_line_text
+  | Data.Flux _ | Data.DeltaActivities _ | Data.Plot _ | Data.Species _ |
+    Data.Print _ | Data.Snapshot _ | Data.TraceStep _ as v -> outputs t v
+
 let parse
     ~(system_process : system_process)
     ~(kappa_files : Api_types_t.file list)
@@ -479,7 +486,7 @@ let perturbation
     ~(system_process : system_process)
     ~(t : t)
     ~(perturbation:Api_types_j.simulation_perturbation)
-  : (unit, Api_types_j.errors) Result.result Lwt.t =
+  : (string, Api_types_j.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
     Lexing.from_string perturbation.Api_types_j.perturbation_code
@@ -493,15 +500,18 @@ let perturbation
          Lwt.wrap2
            KappaParser.standalone_effect_list KappaLexer.token lexbuf >>=
          fun e ->
+         let log_buffer = Buffer.create 512 in
+         let log_form = Format.formatter_of_buffer log_buffer in
          Lwt.wrap6
            (Evaluator.do_interactive_directives
-              ~outputs:(outputs t) ~max_sharing:false ~syntax_version:t.syntax_version)
+              ~outputs:(interactive_outputs log_form t)
+              ~max_sharing:false ~syntax_version:t.syntax_version)
            t.contact_map t.env t.counter t.graph t.state e >>=
          fun (_,(env',(_,graph'',state'))) ->
          let () = t.env <- env' in
          let () = t.graph <- graph'' in
          let () = t.state <- state' in
-         Lwt.return (Result_util.ok ()))
+         Lwt.return (Result_util.ok (Buffer.contents log_buffer)))
     (catch_error (fun e -> Lwt.return (Result_util.error e)))
 
 let continue

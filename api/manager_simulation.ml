@@ -309,7 +309,7 @@ class manager_simulation
 
     method simulation_perturbation
         (simulation_perturbation : Api_types_j.simulation_perturbation) :
-      unit Api.result Lwt.t =
+      string Api.result Lwt.t =
       Model_storage.bind_simulation
         project
         (fun simulation ->
@@ -319,10 +319,9 @@ class manager_simulation
               ~t:t
               ~perturbation:simulation_perturbation) >>=
            (Result_util.map
-                ~ok:((fun () -> Lwt.return (Api_common.result_ok ())))
-                ~error:((fun (errors : Api_types_j.errors) ->
-                          Lwt.return (Api_common.result_messages errors)) :
-                          Api_types_j.errors -> unit Api.result Lwt.t)
+                ~ok:((fun s -> Lwt.return (Api_common.result_ok s)))
+                ~error:(fun (errors : Api_types_j.errors) ->
+                    Lwt.return (Api_common.result_messages errors))
            )
         )
 

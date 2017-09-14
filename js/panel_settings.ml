@@ -7,7 +7,6 @@
 (******************************************************************************)
 
 module Html = Tyxml_js.Html5
-module R = Tyxml_js.R
 
 open Lwt.Infix
 open List_util.Infix
@@ -159,25 +158,21 @@ module DivErrorMessage : Ui_common.Div = struct
   let _ =
     React.S.l1
       (function
-        | None -> ()
-        | Some [] -> ()
-        | Some (_::_) ->
-          (match (React.S.value error_index) with
-           | None -> set_error_index (Some 0)
-           | Some _ -> ())
-      )
+        | [] -> ()
+        | _::_ ->
+          match (React.S.value error_index) with
+          | None -> set_error_index (Some 0)
+          | Some _ -> ())
       State_error.errors
 
 
   (* if there are less or no errors the index needs to be updated *)
-  let sanitize_index (index : int option) (errors : Api_types_j.errors option) : int option =
+  let sanitize_index (index : int option) (errors : Api_types_j.errors) : int option =
     match (index,errors) with
-    | None, None -> None
-    | None,Some [] -> None
-    | None,Some (_::_) -> Some 0
-    | Some _,None -> None
-    | Some _,Some [] -> None
-    | Some index,Some error ->
+    | None, [] -> None
+    | None, _::_ -> Some 0
+    | Some _, [] -> None
+    | Some index, error ->
       let length = List.length error in
       if index > length then
         let () = set_error_index (Some 0) in
@@ -190,22 +185,19 @@ module DivErrorMessage : Ui_common.Div = struct
          else
            Some index)
 
-  let get_message (index : int option) (errors : Api_types_j.errors option) : Api_types_t.message option =
+  let get_message (index : int option) (errors : Api_types_j.errors) : Api_types_t.message option =
     Option_util.bind
-      (fun n ->
-         Option_util.bind (fun errors -> Some (List.nth errors n))
-           errors
-      )
+      (fun n -> Some (List.nth errors n))
       (sanitize_index index errors)
 
   let mesage_nav_text =
     React.S.l2
       (fun index error  ->
        match (index,error) with
-       | (None,  None) -> ""
-       | (Some _,None) -> ""
-       | (None, Some _) -> ""
-       | (Some index,Some errors) ->
+       | (None,  []) -> ""
+       | (Some _,[]) -> ""
+       | (None, _::_) -> ""
+       | (Some index,(_ :: _ as errors)) ->
          Format.sprintf
            "%d/%d"
            (index+1)
@@ -220,10 +212,8 @@ module DivErrorMessage : Ui_common.Div = struct
            (fun error ->
               React.S.const
                 (match error with
-                 | None -> [ "hide" ; ]
-                 | Some [] -> [ "hide" ; ]
-                 | Some (_::[]) -> [ "hide" ; ]
-                 | Some (_::_) -> [ "error-span"; "clickable"]
+                 | [] | [ _ ] -> [ "hide" ; ]
+                 | _::_::_ -> [ "error-span"; "clickable"]
                 )
            )
         )
@@ -288,8 +278,8 @@ module DivErrorMessage : Ui_common.Div = struct
                (fun error ->
                   React.S.const
                   (match error with
-                    | None -> [ "alert-sm" ; "alert" ; ]
-                    | Some _ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
+                    | [] -> [ "alert-sm" ; "alert" ; ]
+                    | _ :: _ -> [ "alert-sm" ; "alert" ; "alert-danger" ; ]
                   )
                )
             );
@@ -299,7 +289,8 @@ module DivErrorMessage : Ui_common.Div = struct
         error_message ;
       ])
 
-  let content () : [> Html_types.div ] Tyxml_js.Html.elt list = [ alert_messages ]
+  let content () : [> Html_types.div ] Tyxml_js.Html.elt list =
+    [ alert_messages ]
 
   let file_click_handler () =
     let dom = Tyxml_js.To_dom.of_span file_label in

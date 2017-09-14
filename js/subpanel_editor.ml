@@ -124,9 +124,7 @@ let error_lint errors : Codemirror.lint Js.t Js.js_array Js.t =
 
 
 let setup_lint _ _ _ =
-  match React.S.value State_error.errors with
-  | None -> Js.array [||]
-  | Some (e : Api_types_j.errors) -> error_lint e
+  error_lint (React.S.value State_error.errors)
 
 (* http://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w *)
 let jump_to_line (codemirror : codemirror Js.t) (line : int) : unit =

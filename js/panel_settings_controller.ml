@@ -60,9 +60,16 @@ let perturb_simulation () =
       let model_perturbation =
         React.S.value State_perturbation.model_perturbation in
       State_error.wrap
-        __LOC__ (State_simulation.perturb_simulation model_perturbation)
-      >>= (fun _ -> Lwt.return_unit)
-    )
+        __LOC__ (State_simulation.perturb_simulation model_perturbation) >>=
+      Api_common.result_map
+        ~ok:(fun _ message_text ->
+            let () = State_error.add_error __LOC__ [{
+                Api_types_t.message_severity = `Info;
+                Api_types_t.message_range = None;
+                Api_types_t.message_text;
+              }] in
+            Lwt.return_unit)
+        ~error:(fun _ _ -> Lwt.return_unit))
 
 let focus_range (range : Locality.t) : unit =
   let file_id = range.Locality.file in

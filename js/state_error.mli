@@ -26,8 +26,10 @@ val set_errors : append:bool -> string -> Api_types_j.errors -> unit
 val has_errors : unit -> bool
 (** Return true if errors are present. *)
 
-val errors : Api_types_j.errors option React.signal
+val errors : Api_types_j.errors React.signal
 (** Signal containing the error. *)
+
+val add_error : string -> Api_types_j.errors -> unit
 
 val wrap : ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t
 (** This displays the error *)

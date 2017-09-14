@@ -110,7 +110,7 @@ type response_content = [
    | SimulationContinue
    | SimulationDelete
    | SimulationPause
-   | SimulationPerturbation
+   | SimulationPerturbation of string
    | SimulationStart of simulation_artifact
 ]
 
