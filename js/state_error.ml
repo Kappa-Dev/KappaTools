@@ -13,7 +13,10 @@ type t =
     state_error_location : string }
 let state_error, set_state_error = React.S.create ([] : t list)
 
-let clear_errors () = set_state_error []
+let clear_errors location =
+  let () = Common.debug
+      (Js.string (Format.sprintf "Clear_errors %s " location)) in
+  set_state_error []
 
 let has_errors () =
   match React.S.value state_error with
@@ -47,7 +50,7 @@ let errors : Api_types_j.errors React.signal =
 let wrap : 'a . ?append:bool -> string -> 'a Api.result Lwt.t -> 'a Api.result Lwt.t =
   fun ?(append=false) loc r ->
     r >>=
-    (let () = if not append then clear_errors () in
+    (let () = if not append then clear_errors loc in
      Api_common.result_map
        ~ok:(fun _ r ->
            Lwt.return (Api_common.result_ok r))
