@@ -345,6 +345,15 @@ let side_effects_of_step = function
   | Rule ((_,e,_)) | Pert ((_,e,_)) -> e.Instantiation.side_effects_dst
   | Subs _ | Obs _ | Dummy _ | Init _ -> []
 
+let init_trace_file ~uuid env fname =
+  let desc = Kappa_files.open_out fname in
+  let () = output_string desc "{\n\"uuid\" : \"" in
+  let () = output_string desc (string_of_int uuid) in
+  let () = output_string desc "\",\n\"model\":" in
+  let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
+  let () = output_string desc ",\n\"trace\":[" in
+  desc
+
 let fold_trace_file f init fname =
   let desc = open_in fname in
   let lex_buf = Lexing.from_channel desc in
@@ -361,7 +370,7 @@ let fold_trace_file f init fname =
         JsonUtil.read_between_spaces Yojson.Basic.read_comma lex_st lex_buf in
       Yojson.Basic.read_ident lex_st lex_buf
     else ident in
-  let () = assert (ident' = "env") in
+  let () = assert (ident' = "model") in
   let () =
     JsonUtil.read_between_spaces Yojson.Basic.read_colon lex_st lex_buf in
   let env = Model.of_yojson

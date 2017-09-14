@@ -113,5 +113,7 @@ val step_of_string : string -> step
 val to_yojson : t -> Yojson.Basic.json
 val of_yojson : Yojson.Basic.json -> t
 
+val init_trace_file : uuid:int -> Model.t -> string -> out_channel
+
 val fold_trace_file :
   (Model.t -> 'a -> step -> 'a) -> (Model.t -> 'a) -> string -> (Model.t * 'a)

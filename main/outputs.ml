@@ -233,13 +233,7 @@ let initialize activities_file trace_file plotPack env =
   let () =
     match trace_file with
     | None -> ()
-    | Some s ->
-      let desc = Kappa_files.open_out s in
-      let () = output_string
-          desc ("{\n\"uuid\" : \""^string_of_int uuid^"\",\n\"env\":") in
-      let () = Yojson.Basic.to_channel desc (Model.to_yojson env) in
-      let () = output_string desc ",\n\"trace\":[" in
-      traceDescr := Some desc in
+    | Some s -> traceDescr := Some (Trace.init_trace_file ~uuid env s) in
   let () = init_activities env activities_file in
   match plotPack with
   | None -> ()

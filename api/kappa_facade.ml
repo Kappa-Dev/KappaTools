@@ -611,7 +611,7 @@ let efficiency t = Counter.get_efficiency t.counter
 let get_raw_trace t =
   Yojson.Basic.to_string
     (`Assoc [
-        "env", Model.to_yojson t.env;
+        "model", Model.to_yojson t.env;
         "trace", `List (List.rev_map Trace.step_to_yojson t.trace);
       ])
 
