@@ -17,6 +17,7 @@ let refresh =
 
 let create_project (project_id : string) : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
@@ -25,6 +26,7 @@ let create_project (project_id : string) : unit =
 
 let set_project (project_id : string) : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
@@ -33,6 +35,7 @@ let set_project (project_id : string) : unit =
 
 let close_project project_id : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
@@ -41,6 +44,7 @@ let close_project project_id : unit =
 
 let set_manager (runtime_id : string) : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__

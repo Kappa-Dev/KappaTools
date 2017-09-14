@@ -18,6 +18,7 @@ let create_simulation_parameter param :
 
 let continue_simulation () =
   Common.async
+    __LOC__
     (fun () ->
        let pause_condition =
          let open State_project in
@@ -30,6 +31,7 @@ let continue_simulation () =
 
 let pause_simulation () =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap __LOC__ (State_simulation.pause_simulation ())
        >>= (fun _ -> Lwt.return_unit)
@@ -37,6 +39,7 @@ let pause_simulation () =
 
 let stop_simulation () =
   Common.async
+    __LOC__
     (fun () ->
        let () = Common.debug (Js.string "subpanel_editor_controller.stop") in
        State_error.wrap __LOC__ (State_simulation.stop_simulation ())
@@ -45,6 +48,7 @@ let stop_simulation () =
 
 let start_simulation () =
   Common.async
+    __LOC__
     (fun () ->
        let simulation_parameter =
          create_simulation_parameter
@@ -55,7 +59,8 @@ let start_simulation () =
     )
 
 let perturb_simulation () =
-    Common.async
+  Common.async
+    __LOC__
     (fun () ->
       let model_perturbation =
         React.S.value State_perturbation.model_perturbation in
@@ -75,6 +80,7 @@ let focus_range (range : Locality.t) : unit =
   let file_id = range.Locality.file in
   let line = range.Locality.from_position.Locality.line in
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          ~append:true

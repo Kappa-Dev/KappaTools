@@ -163,7 +163,7 @@ let onload () =
       "click"
       (Dom_html.handler
          (fun _ ->
-            let () = Common.async State_ui.sync in
+            let () = Common.async __LOC__ State_ui.sync in
             Js._false))
   in
   let () =

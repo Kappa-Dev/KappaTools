@@ -276,6 +276,7 @@ let onload () =
       (Dom_html.handler
          (fun _ ->
             let () = Common.async
+                __LOC__
                 (fun _ ->
                    State_error.wrap
                      __LOC__

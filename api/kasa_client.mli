@@ -8,7 +8,6 @@
 
 type mailbox
 
-val reply_of_string : string -> (Yojson.Basic.json,string) Result.result
 val receive : mailbox -> string -> unit
 
 val new_mailbox : unit -> mailbox

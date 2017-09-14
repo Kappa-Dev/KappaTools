@@ -6,8 +6,6 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-module Html5 = Tyxml_js.Html5
-
 let onload _ =
   let () = State_ui.onload () in
   let main = Ui_common.id_dom "main" in

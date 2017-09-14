@@ -10,6 +10,7 @@ open Lwt.Infix
 
 let with_file (handler : Api_types_j.file Api.result -> unit Api.result Lwt.t) =
     Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__

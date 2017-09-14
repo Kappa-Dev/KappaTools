@@ -39,4 +39,5 @@ let loop_sync () : unit Lwt.t =
   else Lwt.return_unit
 
 let onload () : unit =
-  Common.async (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 20.0)
+  Common.async
+    __LOC__ (fun () -> Lwt.return_unit >>= init >>= loop loop_sync 20.0)

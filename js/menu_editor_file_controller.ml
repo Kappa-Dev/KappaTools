@@ -12,6 +12,7 @@ let create_file
     ?(text = Lwt.return (Js.string ""))
     (file_id : string) : unit =
   Common.async
+    __LOC__
     (fun () ->
        (State_error.wrap
           __LOC__
@@ -30,6 +31,7 @@ let create_file
 let set_file (file_id : string) : unit =
   let () = Common.debug (Js.string (Format.sprintf "set_file:%s" file_id)) in
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          ~append:true
@@ -42,6 +44,7 @@ let set_file (file_id : string) : unit =
 
 let close_file () : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
@@ -53,6 +56,7 @@ let close_file () : unit =
 
 let set_file_compile (file_id: string) (compile : bool) : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__
@@ -68,6 +72,7 @@ let set_file_compile (file_id: string) (compile : bool) : unit =
 
 let order_files (filenames : string list) : unit =
   Common.async
+    __LOC__
     (fun () ->
        State_error.wrap
          __LOC__

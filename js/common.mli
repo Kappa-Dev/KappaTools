@@ -17,7 +17,7 @@ val ajax_request :
   ?timeout:float ->
   url:string ->
   meth:meth -> ?data:string -> handler:(int -> string -> unit) -> 'a
-val async : (unit -> unit Lwt.t) -> unit
+val async : string -> (unit -> unit Lwt.t) -> unit
 val guid : unit -> string
 val modal : id:string -> action:string -> unit
 val element_data :

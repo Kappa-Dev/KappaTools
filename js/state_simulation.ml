@@ -95,6 +95,7 @@ let when_ready
     ?(handler : unit Api.result -> unit Lwt.t = fun _ -> Lwt.return_unit)
     (operation : Api.concrete_manager -> unit Api.result Lwt.t) : unit =
     Common.async
+      __LOC__
       (fun () ->
          with_simulation_info
            ~label

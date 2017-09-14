@@ -148,13 +148,14 @@ let ajax_request
    so there should be no other async calls in the
    code.
 *)
-let async (task : unit -> 'a Lwt.t) : unit =
+let async loc (task : unit -> 'a Lwt.t) : unit =
   Lwt_js_events.async
     (fun () ->
        Lwt.catch
          task
          (fun exn ->
-            let () = debug exn in
+            let () = info (Js.string (loc^Printexc.to_string exn)) in
+            let () = debug (Js.string (Printexc.get_backtrace ())) in
             Lwt.return_unit
          )
     )
