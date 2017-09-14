@@ -328,7 +328,7 @@ sum_token:
 edit_rule_expression:
 	mixture token_expr AT rate
 	{ let (act,un_act) = $4 in
-	{Ast.mix = $1; Ast.delta_token = $2; Ast.act; Ast.un_act} };
+	add_pos {Ast.mix = $1; Ast.delta_token = $2; Ast.act; Ast.un_act} };
 
 rule_expression:
     | lhs_rhs arrow lhs_rhs birate

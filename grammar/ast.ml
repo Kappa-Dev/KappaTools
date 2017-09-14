@@ -161,7 +161,7 @@ type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
       (string Locality.annot option * 'rule Locality.annot) list;
     (*rules (possibly named)*)
     edit_rules :
-      (string Locality.annot option * 'edit_rule) list;
+      (string Locality.annot option * 'edit_rule Locality.annot) list;
     observables :
       ('pattern,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
@@ -826,7 +826,7 @@ let sig_from_inits =
 
 let sig_from_edit_rules =
   List.fold_left
-    (fun (ags,toks) (_,r) ->
+    (fun (ags,toks) (_,(r,_)) ->
        (merge_agents ags r.mix, merge_tokens toks r.delta_token))
 
 let sig_from_rules =
@@ -922,7 +922,8 @@ let compil_to_json c =
       "edit_rules", JsonUtil.of_list
         (JsonUtil.of_pair
            (JsonUtil.of_option (string_annot_to_json filenames))
-           (edit_rule_to_yojson filenames))
+           (Locality.annot_to_yojson ~filenames
+              (edit_rule_to_yojson filenames)))
         c.edit_rules;
       "observables",
       JsonUtil.of_list
@@ -998,7 +999,8 @@ let compil_of_json = function
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST rules")
               (JsonUtil.to_pair
                  (JsonUtil.to_option (string_annot_of_json filenames))
-                 (edit_rule_of_yojson filenames))
+                 (Locality.annot_of_yojson ~filenames
+                    (edit_rule_of_yojson filenames)))
               (List.assoc "edit_rules" l);
           observables =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST observables")
@@ -1268,12 +1270,12 @@ let remove_variable_in_counters rules edit_rules signatures =
                         (fun acc (_,i) -> (string_of_int i)^acc) "" counters) in
             (append,({r with lhs; k_def; k_un; k_op; k_op_un},a))) r in
   let remove_var_edit_rule r =
-    merge (fun r -> r.mix)
-          (fun mix counters r ->
+    merge (fun (r,_) -> r.mix)
+          (fun mix counters (r,pos) ->
             let act = update_rate counters r.act in
             let un_act = update_pair_rate counters r.un_act in
             let append = None in
-            (append,{r with mix; act; un_act})) r in
+            (append,({r with mix; act; un_act},pos))) r in
   let rules = prepare_counters rules in
 
   ((enumerate_edit edit_rules remove_var_edit_rule),
@@ -1299,7 +1301,7 @@ let compile_counters c =
                   Format.printf "@.%s = %a" label print_ast_rule r)
                 rules;
       Format.printf "@.ast edit_rules@.";
-      List.iter (fun (s,r) ->
+      List.iter (fun (s,(r,_)) ->
                   let label = match s with None -> "" | Some (l,_) -> l in
                   Format.printf "@.%s = %a" label print_ast_edit_rule r)
                 edit_rules) in

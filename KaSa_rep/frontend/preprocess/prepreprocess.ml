@@ -815,7 +815,7 @@ let translate_compil parameters error compil =
   in
   let error,_id_set,rules_rev =
     List.fold_left
-      (fun (error,id_set,list) (id,rule) ->
+      (fun (error,id_set,list) (id,(rule,position)) ->
          let error,id_set =
            match id with
            | None -> error,id_set
@@ -843,7 +843,7 @@ let translate_compil parameters error compil =
          let error,direct =
            error,
            {
-             Ckappa_sig.position = Locality.dummy ;
+             Ckappa_sig.position ;
              Ckappa_sig.prefix = prefix ;
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;

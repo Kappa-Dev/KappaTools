@@ -1491,7 +1491,7 @@ let add_un_variable k_un acc rate_var =
       else (acc,k) in
     (acc_un,Some (k',dist))
 
-let name_and_purify_edit_rule (label_opt,r) (pack,acc,rules) =
+let name_and_purify_edit_rule (label_opt,(r,_)) (pack,acc,rules) =
   let pack',label =
     give_rule_label false pack Ast.print_ast_edit_rule r label_opt in
   let acc',act =

@@ -154,7 +154,8 @@ type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
     rules :
       (string Locality.annot option * 'rule Locality.annot) list;
     (**rules (possibly named)*)
-    edit_rules : (string Locality.annot option * 'edit_rule) list;
+    edit_rules :
+      (string Locality.annot option * 'edit_rule Locality.annot) list;
     (** rules with explicit modifications*)
     observables :
       ('pattern,'id) Alg_expr.e Locality.annot list;
