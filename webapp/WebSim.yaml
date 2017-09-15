@@ -26,6 +26,14 @@ paths:
       responses:
         '200':
           description: list of project id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - default
     post:
       tags:
         - model
@@ -43,7 +51,7 @@ paths:
       summary: Create project
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/Unit'
         '500':
           description: Project already exists
           $ref: '#/components/responses/Default'
@@ -57,6 +65,16 @@ paths:
       responses:
         '200':
           description: Information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project_id:
+                    type: string
+                    example: default
+                  project_version:
+                    type: integer
         '404':
           description: Project does not exist
           $ref: '#/components/responses/Default'
@@ -66,7 +84,7 @@ paths:
       summary: Delete project
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/Unit'
         '404':
           description: Project does not exist
           $ref: '#/components/responses/Default'
@@ -93,7 +111,16 @@ paths:
       summary: Compile the model
       responses:
         '200':
-          description: OK
+          description: The AST of the model
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project_version:
+                    type: string
+                  boxed_ast:
+                    description: data
         default:
           $ref: '#/components/responses/Default'
   '/projects/{project_id}/files':
@@ -112,6 +139,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File_metadata'
         default:
           $ref: '#/components/responses/Default'
     get:
@@ -121,6 +152,12 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File_metadata'
         default:
           $ref: '#/components/responses/Default'
   '/projects/{project_id}/files/{file_id}':
@@ -144,6 +181,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File_metadata'
         default:
           $ref: '#/components/responses/Default'
     get:
@@ -153,6 +194,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
         default:
           $ref: '#/components/responses/Default'
     delete:
@@ -161,7 +206,7 @@ paths:
       summary: Remove a file from the project
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/Unit'
         default:
           $ref: '#/components/responses/Default'
   '/projects/{project_id}/simulation':
@@ -225,7 +270,7 @@ paths:
         content:
           application/json:
             schema:
-              -type: string
+              type: string
         required: true
       responses:
         '200':
@@ -550,7 +595,7 @@ components:
       properties:
         file_patch_start:
           type: integer
-        file_patch_stop:
+        file_patch_end:
           type: integer
         file_patch_content:
           type: string
@@ -560,7 +605,9 @@ components:
         - file_modification_version
       properties:
         file_modification_version:
-          $ref: '#/components/schemas/File_version'
+          type: array
+          items:
+            $ref: '#/components/schemas/File_version'
         compile:
           type: boolean
         id:
@@ -585,6 +632,13 @@ components:
         store_trace:
           type: boolean
   responses:
+    Unit:
+      description: Done
+      content:
+        application/json:
+          schema:
+            nullable: true
+            example: null
     Default:
       description: Something went wrong
       content:

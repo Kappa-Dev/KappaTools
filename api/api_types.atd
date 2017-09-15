@@ -46,7 +46,7 @@ type project_version = int
 
 type project = { project_id : project_id ;
                  project_version : project_version ; }
-type project_catalog = { project_list : project list }
+type project_catalog = project list
 type project_parameter = { project_parameter_project_id <json name="project_id"> : project_id ; }
 
 

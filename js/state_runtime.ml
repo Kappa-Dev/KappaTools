@@ -245,7 +245,7 @@ let init () =
            ?timeout:None ~url ~project_id:"" in
          manager#project_catalog >>=
          Api_common.result_map
-           ~ok:(fun _ projects -> Lwt.return projects.Api_types_t.project_list)
+           ~ok:(fun _ projects -> Lwt.return projects)
            ~error:(fun _ _ -> Lwt.return_nil)
        else Lwt.return_nil)
 

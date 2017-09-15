@@ -198,10 +198,6 @@ let route
                              Lwt.return (Api_common.result_ok (x::acc)))
                      ))
               !projects (Lwt.return (Api_common.result_ok [])) >>=
-            Api_common.result_bind_lwt
-              ~ok:(fun project_list ->
-                  Lwt.return
-                    (Api_common.result_ok { Api_types_j.project_list })) >>=
             Webapp_common.api_result_response
               ~string_of_success:(Mpi_message_j.string_of_project_catalog
                                     ?len:None)
