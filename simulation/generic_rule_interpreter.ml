@@ -167,15 +167,13 @@ module Make (Instances:Instances_sig.S) = struct
     }
 
   let instance_to_matching domain edges instance patterns =
-    let rec aux i matching roots =
-      match matching, roots with
-      | None, _ -> None
-      | Some matching, [] -> Some matching
-      | Some matching, root::next_roots ->
-        let new_acc =
-          Matching.reconstruct domain edges matching i patterns.(i) root in
-        aux (i+1) new_acc next_roots in
-    aux 0 (Some Matching.empty) instance
+    Tools.array_fold_lefti
+      (fun i matching root ->
+      match matching with
+      | None -> None
+      | Some matching ->
+        Matching.reconstruct domain edges matching i patterns.(i) root)
+      (Some Matching.empty) instance
 
   let all_injections ?excp ?unary_rate state_insts domain edges patterna =
     let out =
@@ -184,10 +182,9 @@ module Make (Instances:Instances_sig.S) = struct
            match instance_to_matching domain edges instance patterna with
            | None -> acc
            | Some matching ->
-             let rev_roots = instance |> List.rev in
+             let rev_roots = Array.fold_left (fun t h -> h::t) [] instance in
              (matching, rev_roots) :: acc
-        )
-      |> List.rev in
+        ) in
     match unary_rate with
     | None -> out
     | Some (_,None) ->

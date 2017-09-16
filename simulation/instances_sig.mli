@@ -41,7 +41,7 @@ val update_roots :
 val number_of_instances : t -> Pattern.id array -> int
 (** [number_of_instances state patterns] *)
 
-val number_of_unary_instances_in_cc : 
+val number_of_unary_instances_in_cc :
   t -> Pattern.id * Pattern.id -> int -> int
 (** [number_of_unary_instances_in_cc state (pat1, pat2) cc] *)
 
@@ -51,8 +51,8 @@ val number_of_unary_instances_in_cc :
 val pick_unary_instance_in_cc :
   t -> Random.State.t -> Pattern.id * Pattern.id -> int -> int * int
 (** [pick_unary_instance_in_cc state random_state (pat1, pat2) cc]
-    Returns a pair of roots corresponding to [pat1] and [pat2] respectively. 
-    Optimized for currying before the [cc] argument. 
+    Returns a pair of roots corresponding to [pat1] and [pat2] respectively.
+    Optimized for currying before the [cc] argument.
     In case of failure, one of the resulting roots is set to [(-1)]. *)
 
 val fold_picked_instance :
@@ -70,7 +70,7 @@ val fold_picked_instance :
 
 val fold_instances :
   ?excp:(Pattern.id * int) ->
-  t -> Pattern.id array -> init:'a -> (int list -> 'a -> 'a) -> 'a
+  t -> Pattern.id array -> init:'a -> (int array -> 'a -> 'a) -> 'a
 (** [fold_enumerated_instances state patterns ~init f]
     with [f roots acc].
     Folds through every rectangular instance of an array of patterns. *)

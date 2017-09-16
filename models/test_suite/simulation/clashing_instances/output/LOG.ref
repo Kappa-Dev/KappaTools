@@ -887,7 +887,7 @@ Rule rule has now 30 instances.
 Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
-On roots: 73 14
+On roots: 14 90
 Rule rule has now 25 instances.
 Obtained
 %init: 5 A(x)
@@ -895,7 +895,7 @@ Obtained
 Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
-On roots: 90 73
+On roots: 51 73
 Rule rule has now 16 instances.
 Obtained
 %init: 4 A(x)
@@ -903,7 +903,7 @@ Obtained
 #Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
-On roots: 51 90
+On roots: 14 51
 Rule rule has now 9 instances.
 Obtained
 %init: 3 A(x)
@@ -914,7 +914,7 @@ Applied 0:
 Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
-On roots: 51 80
+On roots: 14 80
 Rule rule has now 4 instances.
 Obtained
 %init: 2 A(x)
@@ -922,7 +922,7 @@ Obtained
 #Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
-On roots: 64 51
+On roots: 64 14
 Rule rule has now 1 instances.
 Obtained
 %init: 1 A(x)

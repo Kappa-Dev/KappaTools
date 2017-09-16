@@ -112,7 +112,7 @@ Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc1*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ A/*1*//*1*/.x = A/*1*//*0*/.x
 @1
-On roots: 1 7
+On roots: 7 1
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 0 instances.
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 4 instances.
 Obtained
@@ -172,7 +172,7 @@ Obtained
 (ast: 2) 0: /*cc2*/ A/*1*/(x!1, y!.), A/*2*/(x!1, y!.)
 -- A/*2*//*0*/.y = ⊥, A/*1*//*0*/.y = ⊥ ++ A/*2*//*0*/.y = A/*1*//*0*/.y
 @1
-On roots: 7
+On roots: 1
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 0 instances.
 Rule A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1) has now 4 instances.
 Obtained
@@ -188,7 +188,7 @@ Applied 2:
 (ast: 3) 0: /*cc3*/ A/*1*/(x!1, y!2), A/*2*/(x!1, y!2)
 -- A/*2*//*0*/.y = A/*1*//*0*/.y, A/*2*//*0*/.x = A/*1*//*0*/.x
 ++ A/*2*//*0*/.y = A/*1*//*0*/.x, A/*2*//*0*/.x = A/*1*//*0*/.y @1
-On roots: 7
+On roots: 1
 Rule A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1) has now 2 instances.
 Rule GOAL has now 4 instances.
 Obtained
@@ -248,12 +248,12 @@ Obtained
 ##Applied 3:
 (ast: 4) 0: /*cc4*/ A/*1*/(x!1), A/*2*/(y!1) -- A/*2*//*0*/.y = A/*1*//*0*/.x
 ++ A/*2*//*0*/.y = ⊥, A/*1*//*0*/.x = ⊥ @1
-On roots: 7
+On roots: 1
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 9 instances.
 Rule GOAL has now 3 instances.
 Obtained
 %init: 1 A(x!1, y), A(x!1, y)
-%init: 1 A(x, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x, y!1)
 %init: 1 A(x!2, y!1), A(x!1, y!2)
 %init: 2 A(x, y)
 
@@ -261,10 +261,10 @@ Obtained
 (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc1*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ A/*1*//*1*/.x = A/*1*//*0*/.x
 @1
-On roots: 5 7
+On roots: 5 1
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 1 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!1, y), A(x!1, y)
 %init: 1 A(x!2, y!1), A(x!1, y!2)
 %init: 1 A(x, y)
@@ -276,7 +276,7 @@ On roots: 0
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 4 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!1, y), A(x!1, y)
 %init: 1 A(x!1, y), A(x, y!1)
 %init: 1 A(x, y)
@@ -299,7 +299,7 @@ Rule A(x), A(x) -> A(x!1), A(x!1) has now 1 instances.
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 4 instances.
 Rule GOAL has now 1 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 2 A(x!1, y), A(x!1, y)
 %init: 1 A(x, y)
 
@@ -315,7 +315,7 @@ On roots: 2
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 2 instances.
 Rule A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1) has now 2 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!1, y!2), A(x!1, y!2)
 %init: 1 A(x!1, y), A(x!1, y)
 %init: 1 A(x, y)
@@ -328,7 +328,7 @@ On roots: 3
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 0 instances.
 Rule A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1) has now 4 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 2 A(x!1, y!2), A(x!1, y!2)
 %init: 1 A(x, y)
 
@@ -340,7 +340,7 @@ On roots: 4
 Rule A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1) has now 2 instances.
 Rule GOAL has now 3 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!2, y!1), A(x!1, y!2)
 %init: 1 A(x!1, y!2), A(x!1, y!2)
 %init: 1 A(x, y)
@@ -352,7 +352,7 @@ On roots: 4
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 4 instances.
 Rule GOAL has now 2 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x, y!1), A(x!1, y)
 %init: 1 A(x!1, y!2), A(x!1, y!2)
 %init: 1 A(x, y)
@@ -373,7 +373,7 @@ On roots: 2
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 9 instances.
 Rule GOAL has now 1 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!1, y!2), A(x!1, y!2)
 %init: 3 A(x, y)
 
@@ -389,7 +389,7 @@ On roots: 6 4
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 1 instances.
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 2 instances.
 Obtained
-%init: 1 A(x!2, y), A(x!2, y!1), A(x!1, y)
+%init: 1 A(x!1, y), A(x!2, y), A(x!1, y!2)
 %init: 1 A(x!1, y), A(x!1, y)
 %init: 1 A(x!1, y!2), A(x!1, y!2)
 %init: 1 A(x, y)
@@ -397,7 +397,7 @@ Obtained
 ##Applied 3:
 (ast: 4) 0: /*cc4*/ A/*1*/(x!1), A/*2*/(y!1) -- A/*2*//*0*/.y = A/*1*//*0*/.x
 ++ A/*2*//*0*/.y = ⊥, A/*1*//*0*/.x = ⊥ @1
-On roots: 1
+On roots: 7
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 4 instances.
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 4 instances.
 Rule GOAL has now 0 instances.
@@ -410,7 +410,7 @@ Obtained
 (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc1*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ A/*1*//*1*/.x = A/*1*//*0*/.x
 @1
-On roots: 2 1
+On roots: 2 7
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 0 instances.
 Rule A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1) has now 6 instances.
 Obtained

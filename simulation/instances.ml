@@ -91,29 +91,25 @@ let fold_picked_instance st random_state pats ~init f =
 
 (** {6 Enumerate instances} *)
 
-let process_excp pats = function
-  | None -> (fun _ -> false), (-1)
+let process_excp =
+  let no_no_no _ = false in
+  fun pats -> function
+  | None -> no_no_no, (-1)
   | Some (pat, root) ->
-    let fixed_is = 
-        pats
-        |> Array.to_list
-        |> List.mapi (fun i x -> (i, x))
-        |> List.filter (fun (_, pat') -> Pattern.is_equal_canonicals pat pat')
-        |> List.map fst in
-    let sent_to_fixed_root j = List.mem j fixed_is in
+    let sent_to_fixed_root j = Pattern.is_equal_canonicals pat pats.(j) in
     sent_to_fixed_root, root
 
 
 (* This is the legitimate and efficient version. *)
-let fold_instances' ?excp st pats ~init f =
+let fold_instances ?excp st pats ~init f =
 
   let sent_to_excp_root, excp_root = process_excp pats excp in
-        
+
   let n = Array.length pats in
   let tab = Array.make n (-1) in
   let rec aux i acc =
     if i >= n then
-      f (Array.to_list tab) acc
+      f tab acc
     else
       if sent_to_excp_root i then begin tab.(i) <- excp_root ; aux (i+1) acc end else
       let ith_roots = Roots.of_pattern pats.(i) st.roots  in
@@ -122,37 +118,6 @@ let fold_instances' ?excp st pats ~init f =
         aux (i + 1) acc
       ) ith_roots acc
   in aux 0 init
-
-
-  (* This is an inefficient and weird version that is 
-     backward-compatibility. *)
-  let fold_instances ?excp st pats ~init f =
-
-    let sent_to_excp_root, excp_root = process_excp pats excp in
-
-    let instances = 
-      pats |> Tools.array_fold_lefti (fun i instances pat ->
-        let candidates = 
-          if sent_to_excp_root i then
-            let c = IntCollection.create 1 in
-            let () = IntCollection.add excp_root c in
-            c
-          else 
-            Roots.of_pattern pat st.roots in
-
-        IntCollection.fold (fun root new_instances ->
-          instances |> List.fold_left (fun new_instances instance ->
-            (root :: instance) :: new_instances
-          ) new_instances
-        ) candidates []
-      ) [[]] in
-    (* Injections have been generated in the reverse order *)
-    let instances = List.map List.rev instances in
-
-    instances |> List.fold_left (fun acc instance ->
-      f instance acc
-    ) init
-
 
 let map_fold2 map1 map2 ~init f =
   Mods.IntMap.monadic_fold2_sparse () ()
