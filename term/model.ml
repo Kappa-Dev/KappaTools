@@ -10,8 +10,8 @@ type t = {
   filenames : string list;
   domain : Pattern.Env.t;
   tokens : unit NamedDecls.t;
-  algs : (Alg_expr.t Locality.annot) NamedDecls.t;
-  observables : Alg_expr.t Locality.annot array;
+  algs : (Primitives.alg_expr Locality.annot) NamedDecls.t;
+  observables : Primitives.alg_expr Locality.annot array;
   ast_rules :
     (string Locality.annot option * (LKappa.rule_agent) LKappa.rule Locality.annot)
       array;

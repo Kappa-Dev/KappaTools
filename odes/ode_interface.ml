@@ -14,7 +14,7 @@ type compil =
   {
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
-    init: (Alg_expr.t * rule * Locality.t) list;
+    init: (Primitives.alg_expr * rule * Locality.t) list;
     rule_rate_convention: Remanent_parameters_sig.rate_convention ;
     reaction_rate_convention: Remanent_parameters_sig.rate_convention option;
     show_reactions: bool ;
@@ -105,7 +105,7 @@ let get_sym_cache cache = cache.representative_cache
 let set_sym_cache sym_cache cache =
   {cache with representative_cache = sym_cache}
 
-type init = (Alg_expr.t * rule * Locality.t) list
+type init = (Primitives.alg_expr * rule * Locality.t) list
 
 let get_init compil= compil.init
 

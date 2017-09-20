@@ -31,8 +31,6 @@ and ('mix,'id) bool =
   | COMPARE_OP of Operator.compare_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 
-type t = (Pattern.id array list, int) e
-
 val e_to_yojson :
   filenames : int Mods.StringMap.t ->
   ('a -> Yojson.Basic.json) -> ('b -> Yojson.Basic.json) ->

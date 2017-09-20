@@ -45,13 +45,15 @@ sig
   (** [positive_transformations_of_actions signature side_effect_dsts actions] *)
 end
 
+type alg_expr = (Pattern.id array list, int) Alg_expr.e
+
 type elementary_rule = {
-  rate : Alg_expr.t Locality.annot;
-  unary_rate : (Alg_expr.t Locality.annot * Alg_expr.t option) option;
+  rate : alg_expr Locality.annot;
+  unary_rate : (alg_expr Locality.annot * alg_expr option) option;
   connected_components : Pattern.id array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  delta_tokens : (Alg_expr.t Locality.annot * int) list;
+  delta_tokens : (alg_expr Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
@@ -110,21 +112,21 @@ val flux_kind_of_string :
   (** Deserialize JSON data of type {!flux_kind}. *)
 
 type modification =
-  | ITER_RULE of Alg_expr.t Locality.annot * elementary_rule
-  | UPDATE of int * Alg_expr.t Locality.annot
-  | SNAPSHOT of Alg_expr.t print_expr list
-  | STOP of Alg_expr.t print_expr list
+  | ITER_RULE of alg_expr Locality.annot * elementary_rule
+  | UPDATE of int * alg_expr Locality.annot
+  | SNAPSHOT of alg_expr print_expr list
+  | STOP of alg_expr print_expr list
   | CFLOW of string option * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
   (** First string is the named used by the user *)
-  | FLUX of flux_kind * Alg_expr.t print_expr list
-  | FLUXOFF of Alg_expr.t print_expr list
+  | FLUX of flux_kind * alg_expr print_expr list
+  | FLUXOFF of alg_expr print_expr list
   | CFLOWOFF of string option * Pattern.id array
   | PLOTENTRY
-  | PRINT of Alg_expr.t print_expr list * Alg_expr.t print_expr list
-  | SPECIES of Alg_expr.t print_expr list * Pattern.id array *
+  | PRINT of alg_expr print_expr list * alg_expr print_expr list
+  | SPECIES of alg_expr print_expr list * Pattern.id array *
              Instantiation.abstract Instantiation.test list list
-  | SPECIES_OFF of Alg_expr.t print_expr list
+  | SPECIES_OFF of alg_expr print_expr list
 
 type perturbation =
   { alarm: Nbr.t option;
@@ -146,11 +148,11 @@ val extract_connected_components_modifications :
 val extract_connected_components_bool :
   (Pattern.id array list,int) Alg_expr.bool Locality.annot -> Pattern.id list
 
-val map_expr_rule : (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
+val map_expr_rule : (alg_expr Locality.annot -> alg_expr Locality.annot) ->
   elementary_rule -> elementary_rule
 
 val map_expr_perturbation :
-  (Alg_expr.t Locality.annot -> Alg_expr.t Locality.annot) ->
+  (alg_expr Locality.annot -> alg_expr Locality.annot) ->
   ((Pattern.id array list,int) Alg_expr.bool Locality.annot ->
    (Pattern.id array list,int) Alg_expr.bool Locality.annot) ->
   perturbation -> perturbation

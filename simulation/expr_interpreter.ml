@@ -23,11 +23,14 @@ let value_state_alg_op counter ?(time=Counter.current_time counter) = function
 type (_,_) stack =
   | RETURN : ('a,'a) stack
   | TO_EXEC_ALG :
-      Operator.bin_alg_op * Alg_expr.t * (Nbr.t,'a) stack -> (Nbr.t,'a) stack
+      Operator.bin_alg_op * Primitives.alg_expr * (Nbr.t,'a) stack ->
+    (Nbr.t,'a) stack
   | TO_EXEC_COMP :
-      Operator.compare_op * Alg_expr.t * (bool,'a) stack -> (Nbr.t,'a) stack
+      Operator.compare_op * Primitives.alg_expr * (bool,'a) stack ->
+    (Nbr.t,'a) stack
   | TO_EXEC_IF :
-      Alg_expr.t * Alg_expr.t * (Nbr.t,'a) stack -> (bool,'a) stack
+      Primitives.alg_expr * Primitives.alg_expr * (Nbr.t,'a) stack ->
+    (bool,'a) stack
   | TO_EXEC_BOOL :
       Operator.bin_bool_op * (Pattern.id array list,int) Alg_expr.bool *
       (bool,'a) stack -> (bool,'a) stack
@@ -39,7 +42,7 @@ type (_,_) stack =
   | TO_COMPUTE_BOOL : Operator.un_bool_op * (bool,'a) stack -> (bool,'a) stack
 
 let rec exec_alg :
-  type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
+  type a. Counter.t -> ?time:float -> get_alg:(int -> Primitives.alg_expr) ->
   get_mix:(Pattern.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) -> (Pattern.id array list,int) Alg_expr.e ->
   (Nbr.t,a) stack -> a =
@@ -68,7 +71,7 @@ let rec exec_alg :
   | Alg_expr.DIFF_TOKEN _ | Alg_expr.DIFF_KAPPA_INSTANCE _ ->
     raise (ExceptionDefn.Internal_Error ("Cannot evalutate derivatives in expression",Locality.dummy))
 and exec_bool :
-  type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
+  type a. Counter.t -> ?time:float -> get_alg:(int -> Primitives.alg_expr) ->
   get_mix:(Pattern.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) -> (Pattern.id array list,int) Alg_expr.bool ->
   (bool,a) stack -> a =
@@ -85,7 +88,7 @@ and exec_bool :
   | Alg_expr.COMPARE_OP (op,(a,_),(b,_)) ->
     exec_alg counter ?time ~get_alg ~get_mix ~get_tok a (TO_EXEC_COMP (op,b,sk))
 and with_value :
-  type a b. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
+  type a b. Counter.t -> ?time:float -> get_alg:(int -> Primitives.alg_expr) ->
   get_mix:(Pattern.id array list -> Nbr.t) ->
   get_tok:(int -> Nbr.t) -> a -> (a,b) stack -> b =
   fun counter ?time ~get_alg ~get_mix ~get_tok n -> function

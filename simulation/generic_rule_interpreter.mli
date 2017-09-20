@@ -24,7 +24,7 @@ module Make (Instances:Instances_sig.S) : sig
   (** [get_alg] is by default [Model.get_alg] but it is not hard
       wired because perturbations can redefined alg_expr.*)
 
-  val value_alg : Counter.t -> t -> Alg_expr.t -> Nbr.t
+  val value_alg : Counter.t -> t -> Primitives.alg_expr -> Nbr.t
 
   val value_bool :
     Counter.t -> t -> (Pattern.id array list,int) Alg_expr.bool -> bool
@@ -61,7 +61,7 @@ module Make (Instances:Instances_sig.S) : sig
 
   val incorporate_extra_pattern : Pattern.Env.t -> t -> Pattern.id -> t
 
-  val overwrite_var : int -> Counter.t -> t -> Alg_expr.t -> t
+  val overwrite_var : int -> Counter.t -> t -> Primitives.alg_expr -> t
   val update_outdated_activities :
     (int -> float -> float -> unit) ->
     Model.t -> Counter.t -> t -> (t * int list)

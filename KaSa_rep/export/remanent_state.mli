@@ -17,7 +17,8 @@ type init =
     Compil of compilation
   | Files of string list
 
-type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
+type initial_state =
+  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list
 
 type internal_contact_map =
   (Ckappa_sig.c_state list *

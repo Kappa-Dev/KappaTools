@@ -21,7 +21,8 @@ type init =
   | Compil of compilation
   | Files of string list
 
-type initial_state = (Alg_expr.t * Primitives.elementary_rule * Locality.t) list
+type initial_state =
+  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string,

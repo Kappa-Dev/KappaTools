@@ -71,7 +71,8 @@ type t =
     mutable env : Model.t ;
     mutable graph : Rule_interpreter.t ;
     mutable state : State_interpreter.t ;
-    init_l : (Alg_expr.t * Primitives.elementary_rule * Locality.t) list ;
+    init_l :
+      (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list ;
     mutable lastyield : float ;
   }
 

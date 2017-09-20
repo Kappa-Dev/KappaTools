@@ -34,7 +34,7 @@ module Make (Instances:Instances_sig.S) = struct
       nb_rectangular_instances_by_cc: ValMap.t Mods.IntMap.t;
 
       variables_cache: Nbr.t array;
-      variables_overwrite: Alg_expr.t option array;
+      variables_overwrite: Primitives.alg_expr option array;
 
       edges: Edges.t;
       tokens: Nbr.t array;

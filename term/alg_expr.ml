@@ -31,8 +31,6 @@ and ('mix,'id) bool =
   | COMPARE_OP of Operator.compare_op *
                   ('mix,'id) e Locality.annot * ('mix,'id) e Locality.annot
 
-type t = (Pattern.id array list, int) e
-
 let rec e_to_yojson ~filenames f_mix f_id = function
   | BIN_ALG_OP (op,a,b) ->
     `List [Operator.bin_alg_op_to_json op;
