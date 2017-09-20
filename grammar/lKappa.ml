@@ -470,10 +470,30 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
                     (Signature.print_agent sigs) dst_ty,
                   pos))
 
+let forbid_modification pos = function
+  | None -> ()
+  | Some _ ->
+    raise (ExceptionDefn.Malformed_Decl
+             ("A modification is forbidden here.",pos))
+
+let several_internal_states pos =
+  raise (ExceptionDefn.Malformed_Decl
+           ("In a pattern, a site cannot have several internal states.",pos))
+
 let not_enough_specified agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
            ("The link status of agent '"^agent_name^"', site '"^na
             ^"' on the right hand side is underspecified",pos))
+
+let several_occurence_of_site agent_name (na,pos) =
+  raise (ExceptionDefn.Malformed_Decl
+           ("Site '"^na^
+            "' occurs more than once in this agent '"^agent_name^"'",pos))
+
+let link_only_one_occurence i pos =
+  raise (ExceptionDefn.Malformed_Decl
+           ("The link '"^string_of_int i^
+            "' occurs only one time in the mixture.", pos))
 
 let copy_rule_agent a =
   let p = Array.copy a.ra_ports in

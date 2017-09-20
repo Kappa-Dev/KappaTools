@@ -51,250 +51,9 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
                     (Signature.print_agent sigs) dst_ty,
                   pos))
 
-let forbid_modification pos = function
-  | None -> ()
-  | Some _ ->
-    raise (ExceptionDefn.Malformed_Decl
-             ("A modification is forbidden here.",pos))
-
-let several_internal_states pos =
-  raise (ExceptionDefn.Malformed_Decl
-           ("In a pattern, a site cannot have several internal states.",pos))
-
-let not_enough_specified agent_name (na,pos) =
-  raise (ExceptionDefn.Malformed_Decl
-           ("The link status of agent '"^agent_name^"', site '"^na
-            ^"' on the right hand side is underspecified",pos))
-
-let several_occurence_of_site agent_name (na,pos) =
-  raise (ExceptionDefn.Malformed_Decl
-           ("Site '"^na^
-            "' occurs more than once in this agent '"^agent_name^"'",pos))
-
-let link_only_one_occurence i pos =
-  raise (ExceptionDefn.Malformed_Decl
-           ("The link '"^string_of_int i^
-            "' occurs only one time in the mixture.", pos))
-
-let incr_agent sigs =
-  let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in
-  let incr = Signature.get sigs id in
-  let arity = Signature.arity sigs id in
-  let after = Signature.num_of_site ("a",Locality.dummy) incr in
-  let before = Signature.num_of_site ("b",Locality.dummy) incr in
-  (id,arity,before,after)
-
-let make_counter_agent sigs
-      (first,dst) (last,equal) i j pos created =
-  let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
-  let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), LKappa.Maintained) in
-  let before_switch =
-    if first&&created then LKappa.Linked (i,pos) else LKappa.Maintained in
-  let before =
-    if first then Ast.LNK_VALUE (i,dst), pos
-    else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
-  let () = ra_ports.(incr_b) <- before,before_switch in
-  let after =
-    if (last&&equal) then Ast.LNK_FREE, pos
-    else
-      if last then Ast.LNK_ANY, pos
-      else Ast.LNK_VALUE (j,(ra_type,incr_b)), pos in
-  let () = ra_ports.(incr_a) <- (after,LKappa.Maintained) in
-  let ra_ints = Array.make arity LKappa.I_ANY in
-  {LKappa.ra_type; ra_erased = false; ra_ports; ra_ints;
-   ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
-
-let raw_counter_agent
-      (first,first_lnk) (last,last_lnk) i j sigs equal =
-  let (incr_type,arity,incr_b,incr_a) = incr_agent sigs in
-  let ports = Array.make arity (Raw_mixture.FREE) in
-  let internals =
-    Array.init arity
-               (fun i ->
-                 Signature.default_internal_state incr_type i sigs) in
-  let before = if first then Raw_mixture.VAL first_lnk
-               else Raw_mixture.VAL i in
-  let () = ports.(incr_b) <- before in
-  let after =
-    if (last&&equal) then Raw_mixture.FREE
-    else
-      if last then Raw_mixture.VAL last_lnk
-      else Raw_mixture.VAL j in
-  let () = ports.(incr_a) <- after in
-  { Raw_mixture.a_type = incr_type;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
-
-let rec add_incr i first_lnk last_lnk delta equal sigs =
-  if (i=delta) then []
-  else
-    let first = (i=0) in
-    let last = (i=(delta-1)) in
-    let raw_incr =
-      raw_counter_agent
-        (first,first_lnk) (last,last_lnk)
-        (first_lnk+i) (first_lnk+i+1) sigs equal in
-    raw_incr::(add_incr (i+1) first_lnk last_lnk delta equal sigs)
-
-let rec link_incr sigs i nb ag_info equal lnk pos delta =
-  if (i=nb) then []
-  else
-    let first = (i=0) in
-    let last = (i=(nb-1)) in
-    let ra_agent =
-      make_counter_agent sigs (first,ag_info) (last,equal)
-                         (lnk+i) (lnk+i+1) pos (delta>0) in
-    ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
-
-let rec erase_incr sigs i incrs delta lnk =
-  let (_,_,incr_b,_) = incr_agent sigs in
-  match incrs with
-  | hd::tl ->
-     if (i = abs(delta)) then
-       let (before,_) = hd.LKappa.ra_ports.(incr_b) in
-       let () = hd.LKappa.ra_ports.(incr_b) <- before, LKappa.Linked lnk in
-       hd::tl
-     else
-       let () =
-         Array.iteri
-           (fun i (a,_) -> hd.LKappa.ra_ports.(i) <- a,LKappa.Erased) hd.LKappa.ra_ports in
-       let ag = {hd with LKappa.ra_erased = true} in
-       ag::(erase_incr sigs (i+1) tl delta lnk)
-  | [] -> []
-
-let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
-  let (incr_type,_,incr_b,_) = incr_agent sigs in
-  let start_lnk_for_created = start_lnk_nb + test +1 in
-  let lnk_for_erased = start_lnk_nb + abs(delta) in
-  let ag_info = p_id,ra.LKappa.ra_type in
-
-  let test_incr =
-    link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
-  let adjust_delta =
-    if (delta<0)
-    then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
-    else test_incr in
-  let created =
-    if (delta>0)
-    then add_incr 0 start_lnk_for_created start_lnk_nb delta false sigs
-    else [] in
-
-  let () = if (test + delta < 0) then
-      raise (ExceptionDefn.Internal_Error
-               ("Counter test should be greater then abs(delta)",pos')) in
-  let switch =
-    if (delta = 0) then LKappa.Maintained
-    else if (delta > 0) then LKappa.Linked (start_lnk_for_created,pos')
-    else LKappa.Linked (lnk_for_erased,pos') in
-  let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
-  let () = ra.LKappa.ra_ports.(p_id) <- p in
-  (adjust_delta,created)
-
-(* ag - agent with counters in a rule
-   lnk_nb - the max link number used in the rule;
-   incr_info - info on the incr agent from the signature
-   returns: agent with explicit counters; created incr agents;
-            the next link number to use *)
-let remove_counter_agent sigs ag lnk_nb =
-  let (incrs,lnk_nb') =
-    Tools.array_fold_lefti
-    (fun id (acc_incrs,lnk_nb) (counter,_) ->
-      let (s,pos) = counter.Ast.count_nme in
-      if (s = "") then (acc_incrs,lnk_nb)
-      else
-        match (counter.Ast.count_test,counter.Ast.count_delta) with
-        | (None,_) ->
-           raise (ExceptionDefn.Internal_Error
-                    ("Counter "^s^" should have a test by now",pos))
-        | (Some (test,pos')), delta ->
-           match test with
-           | Ast.CEQ j ->
-              (counter_becomes_port
-                 sigs ag.LKappa.ra id delta pos true j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-           | Ast.CGTE j ->
-              (counter_becomes_port
-                 sigs ag.LKappa.ra id delta pos false j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-           | Ast.CVAR _ ->
-              raise (ExceptionDefn.Internal_Error
-                       ("Counter "^s^" should not have a var by now",pos')))
-    ([],lnk_nb) ag.LKappa.ra_counters in
-  let (als,bls) =
-    List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
-  (als,bls,lnk_nb')
-
-let remove_counter_created_agent sigs raw ag lnk_nb =
-  let raw_agent =
-    List.find
-      (fun rag -> rag.Raw_mixture.a_type = ag.LKappa.ra.LKappa.ra_type) raw in
-  let ports = raw_agent.Raw_mixture.a_ports in
-  let () =
-    Signature.print_agent sigs (Format.str_formatter) ag.LKappa.ra.LKappa.ra_type in
-  let agent_name = Format.flush_str_formatter () in
-  Tools.array_fold_lefti
-    (fun p_id (acc,lnk) (c,_) ->
-      let (s,_) = c.Ast.count_nme in
-      if (s = "") then (acc,lnk)
-      else
-      match c.Ast.count_test with
-      | None -> not_enough_specified agent_name c.Ast.count_nme
-      | Some (test,_) ->
-         match test with
-         | Ast.CEQ j ->
-            let p = Raw_mixture.VAL lnk in
-            let () = ports.(p_id) <- p in
-            let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
-            (acc@incrs,(lnk+j+1))
-         | Ast.CGTE _ | Ast.CVAR _ ->
-            not_enough_specified agent_name c.Ast.count_nme)
-    ([],lnk_nb) ag.LKappa.ra_counters
-
-(* - adds increment agents to the contact map
-   - adds increment agents to the raw mixture
-   - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
-     to the increments *)
-let remove_counter_rule sigs with_counters mix created =
-  if (with_counters) then
-    let lnk_nb =
-      List.fold_left
-        (fun max ag ->
-          Array.fold_left
-            (fun max ((lnk,_),switch) ->
-              let max' =
-                match lnk with
-                  Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
-                | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
-                  | Ast.LNK_TYPE _ -> max in
-              match switch with
-              | LKappa.Linked (i,_) ->  if (max'<i) then i else max'
-              | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
-            max ag.LKappa.ra.LKappa.ra_ports) 0 mix in
-    let mix_created,mix' = List.partition (fun ag -> ag.LKappa.ra_created) mix in
-    let (incrs,incrs_created,ra_mix,lnk_nb') =
-      List.fold_left
-        (fun (a,b,c,lnk) ag ->
-            let (a',b',lnk') = remove_counter_agent sigs ag lnk in
-            a'@a,b'@b,ag.LKappa.ra::c,lnk')
-        ([],[],[],lnk_nb+1) mix' in
-    let incrs_created',_ =
-      List.fold_left
-        (fun (acc,lnk) ag ->
-          let (a,lnk') =
-            remove_counter_created_agent sigs created ag lnk in
-          (a@acc,lnk'))
-        ([],lnk_nb') mix_created in
-    (ra_mix@incrs,created@incrs_created@incrs_created')
-  else List.map (fun ag -> ag.LKappa.ra) mix,created
-
-let remove_counters sigs with_counters rules  =
-  List.map
-    (fun (s,(r,a)) ->
-      let (r_mix,r_created) =
-        remove_counter_rule sigs with_counters r.LKappa.r_mix r.LKappa.r_created in
-      let r' = {r with LKappa.r_mix;r_created} in
-      (s,(r',a))) rules
-
-
+let empty_counter =
+  {Ast.count_nme = ("",Locality.dummy);
+   count_test = None; count_delta =(0,Locality.dummy)}
 
 let annotate_dropped_agent
     ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
@@ -314,16 +73,16 @@ let annotate_dropped_agent
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
-             several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = forbid_modification p_pos p.Ast.port_int_mod in
+             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
 
          let () = match p.Ast.port_int with
            | [] -> ()
            | [ va ] ->
              internals.(p_id) <-
                LKappa.I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
-           | _ :: (_, pos) :: _ -> several_internal_states pos in
+           | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
          match p.Ast.port_lnk with
          | [Ast.LNK_ANY, pos] ->
            let () =
@@ -368,7 +127,7 @@ let annotate_dropped_agent
            raise (ExceptionDefn.Malformed_Decl
                     ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
-  let ra_counters = Array.make arity (Counters_compiler.empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
   let _ =
     List.fold_left
       (fun pset c ->
@@ -376,7 +135,7 @@ let annotate_dropped_agent
         let p_id = Signature.num_of_site ~agent_name p_na sign in
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
-             several_occurence_of_site agent_name c.Ast.count_nme in
+             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
         let () = ra_counters.(p_id) <-(c,LKappa.Erased) in pset')
       Mods.IntSet.empty counts in
   let ra =
@@ -384,20 +143,15 @@ let annotate_dropped_agent
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
   {LKappa.ra; ra_counters; ra_created = false},lannot
 
-let agent_with_counters ag_ty sigs =
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  Signature.has_counter sign
-
 let annotate_created_counters
       sigs ?contact_map (agent_name,_ as ag_ty) counts acc =
 
-  if not(agent_with_counters ag_ty sigs) then acc
+  if not(Counters_compiler.agent_with_counters ag_ty sigs) then acc
   else
     let ag_id = Signature.num_of_agent ag_ty sigs in
     let sign = Signature.get sigs ag_id in
     let arity = Signature.arity sigs ag_id in
-    let ra_counters = Array.make arity (Counters_compiler.empty_counter, LKappa.Maintained) in
+    let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
 
     (* register all counters (specified or not) with min value *)
     let () =
@@ -425,7 +179,7 @@ let annotate_created_counters
           | None -> ()) ra_counters in
 
     let register_counter_modif c_id =
-      let (incr_id,_,incr_b,_) = incr_agent sigs in
+      let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
       add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
     let _ =
       List.fold_left
@@ -434,7 +188,7 @@ let annotate_created_counters
           let p_id = Signature.num_of_site ~agent_name p_na sign in
           let pset' = Mods.IntSet.add p_id pset in
           let () = if pset == pset' then
-                     several_occurence_of_site agent_name c.Ast.count_nme in
+                     LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
           let () = register_counter_modif p_id in
           let () = ra_counters.(p_id) <- c,LKappa.Maintained in
           pset') Mods.IntSet.empty counts in
@@ -460,21 +214,21 @@ let annotate_created_agent
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
-             several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = forbid_modification p_pos p.Ast.port_int_mod in
+             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
          let () = match p.Ast.port_int with
            | [] -> ()
            | [ va ] ->
              internals.(p_id) <-
                Some (Signature.num_of_internal_state p_id va sign)
-           | _ :: (_, pos) :: _ -> several_internal_states pos in
+           | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
          match p.Ast.port_lnk with
          | ([Ast.LNK_ANY, _] | [Ast.LNK_SOME, _] |
             [Ast.LNK_TYPE _, _] | _::_::_) ->
-           not_enough_specified agent_name p_na
+           LKappa.not_enough_specified agent_name p_na
          | [Ast.ANY_FREE, _] when syntax_version = Ast.V4 ->
-           not_enough_specified agent_name p_na
+           LKappa.not_enough_specified agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
            let _,rannot' =
@@ -520,7 +274,7 @@ let annotate_edit_agent
     let p_id = Signature.num_of_site ~agent_name p.Ast.port_nme sign in
     let pset' = Mods.IntSet.add p_id pset in
     let () = if pset == pset' then
-        several_occurence_of_site agent_name p.Ast.port_nme in
+        LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
     let links_annot' =
       match p.Ast.port_lnk with
       | [Ast.LNK_SOME, pos as x] ->
@@ -588,14 +342,14 @@ let annotate_edit_agent
       | [ va ], None ->
         let i_id = Signature.num_of_internal_state p_id va sign in
         internals.(p_id) <- LKappa.I_VAL_CHANGED (i_id,i_id)
-      | _ :: (_,pos) :: _, _ -> several_internal_states pos in
+      | _ :: (_,pos) :: _, _ -> LKappa.several_internal_states pos in
     (links_annot',pset') in
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
 
-  let ra_counters = Array.make arity (Counters_compiler.empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
   let register_counter_modif c_id =
-    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
     add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
   let _ =
     List.fold_left
@@ -604,7 +358,7 @@ let annotate_edit_agent
         let p_id = Signature.num_of_site ~agent_name p_na sign in
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
-             several_occurence_of_site agent_name c.Ast.count_nme in
+             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
         let () = register_counter_modif p_id in
         let () = ra_counters.(p_id) <- c,LKappa.Maintained in pset')
       Mods.IntSet.empty counts in
@@ -621,7 +375,7 @@ let annotate_agent_with_diff
   let ports = Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
   let internals = Array.make arity LKappa.I_ANY in
   let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
-    let () = forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_lnk_mod in
+    let () = LKappa.forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_lnk_mod in
     match lnk1,p'.Ast.port_lnk with
     | [Ast.LNK_ANY,pos], [Ast.LNK_ANY,_] ->
       let () = ports.(p_id) <- ((Ast.ANY_FREE,pos), LKappa.Maintained) in
@@ -635,7 +389,7 @@ let annotate_agent_with_diff
       let () = ports.(p_id) <- build_l_type sigs pos dst_ty dst_p LKappa.Maintained in
       links_annot
     | _, ([Ast.LNK_ANY,_] | [Ast.LNK_SOME,_] | [Ast.LNK_TYPE _,_]) ->
-      not_enough_specified agent_name p'.Ast.port_nme
+      LKappa.not_enough_specified agent_name p'.Ast.port_nme
     | [Ast.LNK_ANY,pos], ([(Ast.LNK_FREE|Ast.ANY_FREE),_] | []) ->
       let () = ports.(p_id) <- ((Ast.LNK_ANY,pos), LKappa.Freed) in
       links_annot
@@ -722,7 +476,7 @@ let annotate_agent_with_diff
       raise (ExceptionDefn.Malformed_Decl
                ("Several link state for a single site",pos)) in
   let register_internal_modif p_id int1 p' =
-    let () = forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_int_mod in
+    let () = LKappa.forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_int_mod in
     match int1,p'.Ast.port_int with
     | [], [] -> ()
     | [ va ], [ va' ] ->
@@ -748,14 +502,14 @@ although it is left unpecified in the left hand side"
                ("The internal state of port '"^na^
                 "' is underspecified on the right hand side", pos))
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
-      several_internal_states pos in
+      LKappa.several_internal_states pos in
   let find_in_r (na,pos) rp =
     let (p',r) =
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
-    | [] -> not_enough_specified agent_name (na,pos)
-    | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
+    | [] -> LKappa.not_enough_specified agent_name (na,pos)
+    | _ :: _ -> LKappa.several_occurence_of_site agent_name (na,pos) in
   let rp_r,annot,_ =
     List.fold_left
       (fun (rp,annot,pset) p ->
@@ -763,9 +517,9 @@ although it is left unpecified in the left hand side"
          let p_id = Signature.num_of_site ~agent_name p_na sign in
          let pset' = Mods.IntSet.add p_id pset in
          let () = if pset == pset' then
-             several_occurence_of_site agent_name p.Ast.port_nme in
-         let () = forbid_modification p_pos p.Ast.port_lnk_mod in
-         let () = forbid_modification p_pos p.Ast.port_int_mod in
+             LKappa.several_occurence_of_site agent_name p.Ast.port_nme in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
+         let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
 
          let p',rp' = find_in_r p_na rp in
          let annot' = register_port_modif
@@ -782,10 +536,10 @@ although it is left unpecified in the left hand side"
       annot rp_r in
 
   let register_counter_modif c c_id =
-    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
     let () = add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
     (c, LKappa.Maintained) in
-  let ra_counters = Array.make arity (Counters_compiler.empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
   let rc_r,_ =
     List.fold_left
       (fun (rc,cset) c ->
@@ -793,14 +547,14 @@ although it is left unpecified in the left hand side"
         let c_id = Signature.num_of_site ~agent_name c_na sign in
         let cset' = Mods.IntSet.add c_id cset in
         let () = if cset == cset' then
-                   several_occurence_of_site agent_name c_na in
+                   LKappa.several_occurence_of_site agent_name c_na in
         let c',rc' =
           List.partition
             (fun p -> String.compare (fst p.Ast.count_nme) na = 0) rc in
         let c'' =
           match c' with
           | _::[] | [] -> register_counter_modif c c_id
-          | _ :: _ -> several_occurence_of_site agent_name c_na in
+          | _ :: _ -> LKappa.several_occurence_of_site agent_name c_na in
         let () = ra_counters.(c_id) <- c'' in
         (rc',cset')) (rc,Mods.IntSet.empty) lc in
   let _ = (* test if counter of rhs is in the signature *)
@@ -856,8 +610,8 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
     | ((lag_na,lpos as ag_ty),lag_s,lmod)::lt, ((rag_na,rpos),rag_s,rmod)::rt
       when String.compare lag_na rag_na = 0 &&
            Ast.no_more_site_on_right true lag_s rag_s ->
-      let () = forbid_modification lpos lmod in
-      let () = forbid_modification rpos rmod in
+      let () = LKappa.forbid_modification lpos lmod in
+      let () = LKappa.forbid_modification rpos rmod in
       let (lag_p,lag_c) = separate_sites lag_s in
       let (rag_p,rag_c) = separate_sites rag_s in
       let ra,links_annot' =
@@ -882,7 +636,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
           (fun (acc,lannot) ((_,pos as na),sites,modif) ->
-             let () = forbid_modification pos modif in
+             let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let ra,lannot' = annotate_dropped_agent
                  ~syntax_version sigs lannot na intf counts in
@@ -891,12 +645,12 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let () =
         match Mods.IntMap.root lhs_links_one with
         | None -> ()
-        | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+        | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
       let () = refer_links_annot lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
       let mix,cmix,(rhs_links_one,_) =
         List.fold_left
           (fun (acc',acc,rannot) ((_,pos as na),sites,modif) ->
-             let () = forbid_modification pos modif in
+             let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
                  ~syntax_version sigs ?contact_map rannot na intf in
@@ -907,7 +661,7 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let () =
         match Mods.IntMap.root rhs_links_one with
         | None -> ()
-        | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+        | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
       List.rev mix, List.rev cmix in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
@@ -941,12 +695,12 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
-    | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+    | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   let () = refer_links_annot lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
   let () =
     match Mods.IntMap.root rhs_links_one with
     | None -> ()
-    | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+    | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   (List.rev mix, List.rev cmix)
 
 let give_rule_label bidirectional (id,set) printer r = function
@@ -1034,7 +788,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
 let mixture_of_ast ~syntax_version sigs ?contact_map ~with_counters pos mix =
   match annotate_edit_mixture
           ~syntax_version ~is_rule:false sigs ?contact_map mix with
-  | r, [] -> fst (remove_counter_rule sigs with_counters r [])
+  | r, [] -> fst (Counters_compiler.remove_counter_rule sigs with_counters r [])
   | _, _ -> raise (ExceptionDefn.Internal_Error
                      ("A mixture cannot create agents",pos))
 
@@ -1044,7 +798,7 @@ let raw_mixture_of_ast ~syntax_version sigs ?contact_map ~with_counters mix =
   let (a,b) =
     annotate_edit_mixture
       ~syntax_version ~is_rule:false sigs ?contact_map created in
-  snd (remove_counter_rule sigs with_counters a b)
+  snd (Counters_compiler.remove_counter_rule sigs with_counters a b)
 
 let convert_alg_var ?max_allowed_var algs lab pos =
   let i =
@@ -1229,53 +983,6 @@ let perturbation_of_ast
       post),pos),
   up_vars'
 
-let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
-  let (incr_type,_,incr_b,_) = incr_agent sigs in
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  let arity = Signature.arity sigs ag_id in
-  let ports =
-    Array.make arity (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
-  let internals = Array.make arity LKappa.I_ANY in
-  let c_na = c.Ast.count_nme in
-  let c_id = Signature.num_of_site ~agent_name c_na sign in
-  let (max_val,pos) = c.Ast.count_delta in
-  let max_val' = max_val+1 in
-  let incrs = link_incr sigs 0 (max_val'+1) (c_id,ag_id) false 1 pos (-1) in
-  let p = Ast.LNK_VALUE (1,(incr_b,incr_type)),pos in
-  let () = ports.(c_id) <- p,LKappa.Maintained in
-  let ra =
-    { LKappa.ra_type = ag_id;ra_ports = ports;ra_ints = internals;ra_erased = false;
-      ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  ra::incrs
-
-let counter_perturbation sigs c ag_ty =
-  let filename =
-    [Primitives.Str_pexpr ("counter_perturbation", snd c.Ast.count_nme) ] in
-  let stop_message =
-    "\nCounter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum\n" in
-  let stop_message' =
-    [Primitives.Str_pexpr (stop_message, snd c.Ast.count_nme) ] in
-  let mods = [Ast.PRINT ([],stop_message'); Ast.STOP filename] in
-  let val_of_counter =
-    Alg_expr.KAPPA_INSTANCE (agent_with_max_counter sigs c ag_ty) in
-  let pre =
-    Alg_expr.COMPARE_OP
-      (Operator.EQUAL,(val_of_counter,snd c.Ast.count_nme),
-       (Alg_expr.CONST (Nbr.I 1),snd c.Ast.count_nme)) in
-  (None,Some (pre,snd ag_ty),mods,Some (Locality.dummy_annot Alg_expr.FALSE))
-
-let counters_perturbations sigs ast_sigs =
-  List.fold_left
-    (fun acc (ag_ty,sites,_)->
-      List.fold_left
-        (fun acc' site ->
-          match site with
-            Ast.Port _ -> acc'
-          | Ast.Counter c ->
-             ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc') acc sites)
-    [] ast_sigs
-
 let init_of_ast ~syntax_version sigs tok contact_map ~with_counters = function
   | Ast.INIT_MIX who,pos ->
     Ast.INIT_MIX
@@ -1446,7 +1153,7 @@ let compil_of_ast ~syntax_version overwrite c with_counters =
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
   let () = if with_counters then
-      let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
+      let (incr_id,_,incr_b,incr_a) = Counters_compiler.incr_agent sigs in
       add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
   let perts',updated_vars =
     List_util.fold_right_map
@@ -1454,7 +1161,8 @@ let compil_of_ast ~syntax_version overwrite c with_counters =
          ~syntax_version sigs tok algs contact_map ~with_counters)
       c.Ast.perturbations [] in
   let perts'' =
-    if (with_counters) then (counters_perturbations sigs c.Ast.signatures)@perts'
+    if (with_counters) then
+      (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
     else perts' in
   let old_style_rules =
     List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
@@ -1478,7 +1186,7 @@ let compil_of_ast ~syntax_version overwrite c with_counters =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
-  let rules = remove_counters sigs with_counters rules in
+  let rules = Counters_compiler.counters_rules sigs with_counters rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.filenames = c.Ast.filenames;

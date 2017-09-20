@@ -39,6 +39,12 @@ Array.copy ra_ints)]. *)
 
 type rule_mixture = rule_agent list
 
+val forbid_modification : Locality.t -> 'a option -> unit
+val several_internal_states : Locality.t -> 'a
+val not_enough_specified : string -> string * Locality.t -> 'a
+val several_occurence_of_site : string -> string * Locality.t -> 'a
+val link_only_one_occurence : int -> Locality.t -> 'a
+
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
