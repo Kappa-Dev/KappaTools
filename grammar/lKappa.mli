@@ -94,7 +94,7 @@ val init_of_ast :
 
 val compil_of_ast :
   syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
-  Ast.parsing_compil ->
+  Ast.parsing_compil -> bool ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
   int list *
   (Ast.agent, rule_agent list, Raw_mixture.t, int, unit, rule)

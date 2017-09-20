@@ -23,10 +23,11 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
   let syntax_version =
     Ast.merge_version
       cli_args.Run_cli_args.syntaxVersion conf.Configuration.syntaxVersion in
+  let (ast',with_counters) = Counters_compiler.compile ast in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa.compil_of_ast
       ~syntax_version
-      kasim_args.Kasim_args.alg_var_overwrite ast in
+      kasim_args.Kasim_args.alg_var_overwrite ast' with_counters in
   let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
     | None -> None,None
     | Some file ->

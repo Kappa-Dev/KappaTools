@@ -900,7 +900,7 @@ let annotate_dropped_agent
            raise (ExceptionDefn.Malformed_Decl
                     ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
-  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let ra_counters = Array.make arity (Counters_compiler.empty_counter, Maintained) in
   let _ =
     List.fold_left
       (fun pset c ->
@@ -929,7 +929,7 @@ let annotate_created_counters
     let ag_id = Signature.num_of_agent ag_ty sigs in
     let sign = Signature.get sigs ag_id in
     let arity = Signature.arity sigs ag_id in
-    let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+    let ra_counters = Array.make arity (Counters_compiler.empty_counter, Maintained) in
 
     (* register all counters (specified or not) with min value *)
     let () =
@@ -1125,7 +1125,7 @@ let annotate_edit_agent
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
 
-  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let ra_counters = Array.make arity (Counters_compiler.empty_counter, Maintained) in
   let register_counter_modif c_id =
     let (incr_id,_,incr_b,_) = incr_agent sigs in
     add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
@@ -1317,7 +1317,7 @@ although it is left unpecified in the left hand side"
     let (incr_id,_,incr_b,_) = incr_agent sigs in
     let () = add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
     (c, Maintained) in
-  let ra_counters = Array.make arity (Ast.empty_counter, Maintained) in
+  let ra_counters = Array.make arity (Counters_compiler.empty_counter, Maintained) in
   let rc_r,_ =
     List.fold_left
       (fun (rc,cset) c ->
@@ -1939,8 +1939,7 @@ let create_sig l =
   let t = Array.of_list sigs' in
   Signature.create with_contact_map t
 
-let compil_of_ast ~syntax_version overwrite c =
-  let (c,with_counters) = Ast.compile_counters c in
+let compil_of_ast ~syntax_version overwrite c with_counters =
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then
