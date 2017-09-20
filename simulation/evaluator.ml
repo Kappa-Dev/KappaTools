@@ -13,7 +13,7 @@ let do_interactive_directives
   let contact_map' = Array.map Array.copy contact_map in
   let e',_ =
     List_util.fold_right_map
-      (LKappa.modif_expr_of_ast
+      (LKappa_compiler.modif_expr_of_ast
          ~syntax_version (Model.signatures env) (Model.tokens_finder env)
          (Model.algs_finder env) contact_map' ~with_counters:true) e [] in
   let () =
@@ -42,7 +42,7 @@ let get_pause_criteria ~max_sharing ~syntax_version contact_map env graph b =
   let cc_preenv =
     Pattern.PreEnv.of_env (Model.domain env) in
   let b' =
-    LKappa.bool_expr_of_ast ~syntax_version
+    LKappa_compiler.bool_expr_of_ast ~syntax_version
       (Model.signatures env) (Model.tokens_finder env)
       (Model.algs_finder env) ~with_counters:true b in
   let cc_preenv',(b'',pos_b'' as bpos'') =

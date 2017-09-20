@@ -48,6 +48,13 @@ val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
 
+type rule_agent_counters =
+  {
+    ra : rule_agent;
+    ra_counters : (Ast.counter * switching) array;
+    ra_created : bool;
+  }
+
 type rule =
   {
     r_mix: rule_mixture;
@@ -72,55 +79,3 @@ val print_rule :
 val rule_to_json :
   filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.json
 val rule_of_json : filenames : string array -> Yojson.Basic.json -> rule
-
-val bool_expr_of_ast :
-  syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> ?max_allowed_var: int -> with_counters:bool ->
-  (Ast.mixture, string) Alg_expr.bool Locality.annot ->
-  (rule_agent list, int) Alg_expr.bool Locality.annot
-
-val modif_expr_of_ast :
-  syntax_version:Ast.syntax_version -> Signature.s -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> Contact_map.t -> with_counters:bool ->
-  (Ast.mixture, Ast.mixture, string) Ast.modif_expr -> int list ->
-  (rule_agent list, Raw_mixture.t, int) Ast.modif_expr * int list
-
-val init_of_ast :
-  syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->
-  with_counters:bool ->
-  int Mods.StringMap.t -> int Mods.StringMap.t ->
-  (Ast.mixture, Ast.mixture, string) Ast.init_statment list ->
-  (rule_agent list,  Raw_mixture.t, int) Ast.init_statment list
-
-val compil_of_ast :
-  syntax_version:Ast.syntax_version -> (string * Nbr.t) list ->
-  Ast.parsing_compil -> bool ->
-  Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
-  int list *
-  (Ast.agent, rule_agent list, Raw_mixture.t, int, unit, rule)
-    Ast.compil
-(** [compil_of_ast variable_overwrite ast]
-
-    @return the signature of agent, the contact map, the signature of
-    tokens, an algebraic variable finder, algebraic variable on which
-    constant propagation is forbidden, and an Ast.compil where identifiers
-    are integers and not string, syntactic sugar on rules are expansed
-    (syntactic sugar on mixture are not)
-
-    This function sorts out longest prefix convention as well as ensure a
-    lot of sanity on mixtures:
-    - agent exists
-    - sites exist
-    - unique site occurence / agent
-    - internal_states exist
-    - unique internal_state / site
-    - links appear exactly twice
-
-    The sanity checks on rates consists in ensuring that
-    - either absolute or unary rates are provided;
-    - if the algebraic expression of the rate contains a mixture then
-    a new variable is declared called rulelabel_un_rate; it is
-    necessary in the update phase.
-
-    After this step, [Ast.ANY_FREE] is a synonym of "an [Ast.LNK_ANY]
-    explicitely given by the user". *)

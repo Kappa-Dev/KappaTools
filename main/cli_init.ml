@@ -25,7 +25,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
       cli_args.Run_cli_args.syntaxVersion conf.Configuration.syntaxVersion in
   let (ast',with_counters) = Counters_compiler.compile ast in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
-    LKappa.compil_of_ast
+    LKappa_compiler.compil_of_ast
       ~syntax_version
       kasim_args.Kasim_args.alg_var_overwrite ast' with_counters in
   let overwrite_init,overwrite_t0 = match kasim_args.Kasim_args.initialMix with
@@ -36,7 +36,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
       let conf, _, _, _, _ =
         Configuration.parse compil.Ast.configurations in
       Some
-        (LKappa.init_of_ast
+        (LKappa_compiler.init_of_ast
            ~syntax_version sigs_nd contact_map ~with_counters:true
            tk_nd.NamedDecls.finder alg_finder compil.Ast.init),
       conf.Configuration.initial in
@@ -113,7 +113,7 @@ let get_pack_from_marshalizedfile
       let conf', _, _, _, _ =
         Configuration.parse compil.Ast.configurations in
       let raw_inits =
-        LKappa.init_of_ast
+        LKappa_compiler.init_of_ast
           ~syntax_version:conf'.Configuration.syntaxVersion
           (Model.signatures env) contact ~with_counters:true
           (Model.tokens_finder env) (Model.algs_finder env) compil.Ast.init in
