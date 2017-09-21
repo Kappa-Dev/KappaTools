@@ -419,11 +419,6 @@ let remove_counter_agent sigs ag lnk_nb =
     List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
   (als,bls,lnk_nb')
 
-let not_enough_specified agent_name (na,pos) =
-  raise (ExceptionDefn.Malformed_Decl
-           ("The link status of agent '"^agent_name^"', site '"^na
-            ^"' on the right hand side is underspecified",pos))
-
 let remove_counter_created_agent sigs raw ag lnk_nb =
   let raw_agent =
     List.find
@@ -438,7 +433,7 @@ let remove_counter_created_agent sigs raw ag lnk_nb =
       if (s = "") then (acc,lnk)
       else
       match c.Ast.count_test with
-      | None -> not_enough_specified agent_name c.Ast.count_nme
+      | None -> LKappa.not_enough_specified agent_name c.Ast.count_nme
       | Some (test,_) ->
          match test with
          | Ast.CEQ j ->
@@ -447,7 +442,7 @@ let remove_counter_created_agent sigs raw ag lnk_nb =
             let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
             (acc@incrs,(lnk+j+1))
          | Ast.CGTE _ | Ast.CVAR _ ->
-            not_enough_specified agent_name c.Ast.count_nme)
+            LKappa.not_enough_specified agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.LKappa.ra_counters
 
 (* - adds increment agents to the contact map
@@ -657,7 +652,7 @@ let annotate_created_counters
 
     let register_counter_modif c_id =
       let (incr_id,_,incr_b,_) = incr_agent sigs in
-      add_link_contact_map  ag_id c_id incr_id incr_b in
+      add_link_contact_map ag_id c_id incr_id incr_b in
     let _ =
       List.fold_left
         (fun pset c ->
