@@ -51,10 +51,6 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
                     (Signature.print_agent sigs) dst_ty,
                   pos))
 
-let empty_counter =
-  {Ast.count_nme = ("",Locality.dummy);
-   count_test = None; count_delta =(0,Locality.dummy)}
-
 let annotate_dropped_agent
     ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -127,75 +123,11 @@ let annotate_dropped_agent
            raise (ExceptionDefn.Malformed_Decl
                     ("Several link state for a single site",pos)))
       (links_annot,Mods.IntSet.empty) intf in
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
-  let _ =
-    List.fold_left
-      (fun pset c ->
-        let p_na = c.Ast.count_nme in
-        let p_id = Signature.num_of_site ~agent_name p_na sign in
-        let pset' = Mods.IntSet.add p_id pset in
-        let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = ra_counters.(p_id) <-(c,LKappa.Erased) in pset')
-      Mods.IntSet.empty counts in
   let ra =
     { LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {LKappa.ra; ra_counters; ra_created = false},lannot
-
-let annotate_created_counters
-      sigs ?contact_map (agent_name,_ as ag_ty) counts acc =
-
-  if not(Counters_compiler.agent_with_counters ag_ty sigs) then acc
-  else
-    let ag_id = Signature.num_of_agent ag_ty sigs in
-    let sign = Signature.get sigs ag_id in
-    let arity = Signature.arity sigs ag_id in
-    let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
-
-    (* register all counters (specified or not) with min value *)
-    let () =
-      Array.iteri
-        (fun p_id _ ->
-          match Signature.counter_of_site p_id sign with
-          | Some (min,_) ->
-             begin
-               let c_name = Signature.site_of_num p_id sign in
-               try
-                 let c =
-                   List.find
-                     (fun c' ->
-                       (String.compare (fst c'.Ast.count_nme) c_name) = 0) counts in
-                 ra_counters.(p_id) <-
-                   {Ast.count_nme = c.Ast.count_nme;
-                    Ast.count_test = c.Ast.count_test;
-                    Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained
-               with Not_found ->
-                    ra_counters.(p_id) <-
-                      {Ast.count_nme = (c_name,Locality.dummy);
-                       Ast.count_test = Some (Ast.CEQ min,Locality.dummy);
-                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained
-             end
-          | None -> ()) ra_counters in
-
-    let register_counter_modif c_id =
-      let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
-      add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
-    let _ =
-      List.fold_left
-        (fun pset c ->
-          let p_na = c.Ast.count_nme in
-          let p_id = Signature.num_of_site ~agent_name p_na sign in
-          let pset' = Mods.IntSet.add p_id pset in
-          let () = if pset == pset' then
-                     LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-          let () = register_counter_modif p_id in
-          let () = ra_counters.(p_id) <- c,LKappa.Maintained in
-          pset') Mods.IntSet.empty counts in
-    let ra =
-      {LKappa.ra_type = ag_id;ra_ports =[||];ra_ints =[||];ra_erased = false;
-       ra_syntax = Some ([||],[||]);} in
-    {LKappa.ra; ra_counters;ra_created = true}::acc
+  Counters_compiler.annotate_dropped_counters
+    sign counts ra arity agent_name None,lannot
 
 let annotate_created_agent
     ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
@@ -346,29 +278,14 @@ let annotate_edit_agent
     (links_annot',pset') in
   let annot',_ =
     List.fold_left scan_port (links_annot,Mods.IntSet.empty) intf in
-
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
-  let register_counter_modif c_id =
-    let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
-    add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
-  let _ =
-    List.fold_left
-      (fun pset c ->
-        let p_na = c.Ast.count_nme in
-        let p_id = Signature.num_of_site ~agent_name p_na sign in
-        let pset' = Mods.IntSet.add p_id pset in
-        let () = if pset == pset' then
-             LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
-        let () = register_counter_modif p_id in
-        let () = ra_counters.(p_id) <- c,LKappa.Maintained in pset')
-      Mods.IntSet.empty counts in
   let ra =
     { LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {LKappa.ra; ra_counters; ra_created=false},annot'
+  Counters_compiler.annotate_edit_counters
+    sigs ag_ty counts ra (add_link_contact_map ?contact_map),annot'
 
 let annotate_agent_with_diff
-    sigs ?contact_map (agent_name, pos as ag_ty) links_annot lp rp lc rc =
+    sigs ?contact_map (agent_name,_ as ag_ty) links_annot lp rp lc rc =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -535,39 +452,11 @@ although it is left unpecified in the left hand side"
          register_port_modif p_id [Locality.dummy_annot Ast.LNK_ANY] p annot)
       annot rp_r in
 
-  let register_counter_modif c c_id =
-    let (incr_id,_,incr_b,_) = Counters_compiler.incr_agent sigs in
-    let () = add_link_contact_map ?contact_map ag_id c_id incr_id incr_b in
-    (c, LKappa.Maintained) in
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
-  let rc_r,_ =
-    List.fold_left
-      (fun (rc,cset) c ->
-        let (na,_) as c_na = c.Ast.count_nme in
-        let c_id = Signature.num_of_site ~agent_name c_na sign in
-        let cset' = Mods.IntSet.add c_id cset in
-        let () = if cset == cset' then
-                   LKappa.several_occurence_of_site agent_name c_na in
-        let c',rc' =
-          List.partition
-            (fun p -> String.compare (fst p.Ast.count_nme) na = 0) rc in
-        let c'' =
-          match c' with
-          | _::[] | [] -> register_counter_modif c c_id
-          | _ :: _ -> LKappa.several_occurence_of_site agent_name c_na in
-        let () = ra_counters.(c_id) <- c'' in
-        (rc',cset')) (rc,Mods.IntSet.empty) lc in
-  let _ = (* test if counter of rhs is in the signature *)
-    List.map
-      (fun c -> Signature.num_of_site ~agent_name (c.Ast.count_nme) sign) rc_r in
-  let () =
-    if not(rc =[]) && not(rc_r =[]) then
-      raise (ExceptionDefn.Internal_Error
-               ("Counters in "^agent_name^" should have tests by now",pos)) in
   let ra =
     { LKappa.ra_type = ag_id; ra_ports = ports; ra_ints = internals;ra_erased = false;
       ra_syntax = Some (Array.copy ports, Array.copy internals);} in
-  {LKappa.ra; ra_counters; ra_created = false},annot'
+  Counters_compiler.annotate_counters_with_diff
+    sigs ag_ty lc rc ra (add_link_contact_map ?contact_map),annot'
 
 let refer_links_annot links_annot mix =
   List.iter
@@ -654,8 +543,9 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
                  ~syntax_version sigs ?contact_map rannot na intf in
-             let acc'' = annotate_created_counters
-                 sigs ?contact_map na counts acc' in
+             let acc'' =
+               Counters_compiler.annotate_created_counters
+                 sigs na counts acc' (add_link_contact_map ?contact_map) in
              acc'',x'::acc,rannot')
           (mix,[],snd links_annot) added in
       let () =
@@ -682,8 +572,8 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
            let rannot',x' = annotate_created_agent
                ~syntax_version sigs ?contact_map (snd lannot) ty intf in
            let acc' =
-             annotate_created_counters
-               sigs ?contact_map ty counts acc in
+              Counters_compiler.annotate_created_counters
+               sigs ty counts acc (add_link_contact_map ?contact_map) in
            ((fst lannot,rannot'),acc',x'::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
@@ -1067,21 +957,6 @@ let create_t sites incr_info =
     sites ([],[]) in
   NamedDecls.create (Array.of_list aux),counters
 
-let add_incr counters =
-  let annot = Locality.dummy in
-  let a_port = ("a",annot) in
-  let b_port = ("b",annot) in
-  let incr = ("__incr",Locality.dummy) in
-  let after = (a_port,(NamedDecls.create [||],[(b_port,incr)],None)) in
-  let before_lnks =
-    List.fold_right
-      (fun (ag,counts) acc ->
-        (List.map (fun c -> (c,ag)) counts)@acc) counters [(a_port,incr)] in
-  let before = (b_port,(NamedDecls.create [||],before_lnks,None)) in
-  let lnks = NamedDecls.create [|after;before|] in
-  let counter_agent = (incr,lnks) in
-  counter_agent
-
 let create_sig l =
   let (with_counters,with_contact_map) =
     List.fold_left
@@ -1110,7 +985,7 @@ let create_sig l =
           create_t sites (("b",annot),("__incr",annot)) in
         ((name,lnks)::acc,(name,counters')::counters))
        l ([],[]) in
-  let sigs' = if with_counters then (add_incr counters)::sigs else sigs in
+  let sigs' = if with_counters then (Counters_compiler.add_incr counters)::sigs else sigs in
   let t = Array.of_list sigs' in
   Signature.create with_contact_map t
 
@@ -1153,15 +1028,15 @@ let compil_of_ast ~syntax_version overwrite c with_counters =
       (Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
   let () = if with_counters then
-      let (incr_id,_,incr_b,incr_a) = Counters_compiler.incr_agent sigs in
-      add_link_contact_map ~contact_map incr_id incr_a incr_id incr_b in
+             Counters_compiler.add_counter_to_contact_map
+               sigs (add_link_contact_map ~contact_map) in
   let perts',updated_vars =
     List_util.fold_right_map
       (perturbation_of_ast
          ~syntax_version sigs tok algs contact_map ~with_counters)
       c.Ast.perturbations [] in
   let perts'' =
-    if (with_counters) then
+    if with_counters then
       (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
     else perts' in
   let old_style_rules =
