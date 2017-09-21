@@ -47,9 +47,9 @@ val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
 
-type 'agent rule =
+type rule =
   {
-    r_mix: 'agent list;
+    r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
@@ -62,16 +62,15 @@ type 'agent rule =
   }
 
 val print_rates : Signature.s -> (Format.formatter -> int -> unit)
-  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule_agent rule -> unit
+  -> (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
 val print_rule :
   full:bool -> Signature.s -> (Format.formatter -> int -> unit) ->
-  (Format.formatter -> int -> unit) -> Format.formatter -> rule_agent rule -> unit
+  (Format.formatter -> int -> unit) -> Format.formatter -> rule -> unit
 
 val rule_to_json :
-  filenames : int Mods.StringMap.t -> rule_agent rule -> Yojson.Basic.json
-val rule_of_json :
-  filenames : string array -> Yojson.Basic.json -> rule_agent rule
+  filenames : int Mods.StringMap.t -> rule -> Yojson.Basic.json
+val rule_of_json : filenames : string array -> Yojson.Basic.json -> rule
 
 val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
@@ -97,7 +96,7 @@ val compil_of_ast :
   Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
   int list *
-  (Ast.agent, rule_agent list, Raw_mixture.t, int, rule_agent rule, unit)
+  (Ast.agent, rule_agent list, Raw_mixture.t, int, unit, rule)
     Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 

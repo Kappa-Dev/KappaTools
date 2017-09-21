@@ -19,12 +19,11 @@ module RuleCache : Hashed_list.Hash
 val init_cache: unit -> cache
 
 val mixture_to_species_map : Remanent_parameters_sig.rate_convention -> cache ->
-  LKappa.rule_agent LKappa.rule -> cache * (int * int) CannonicMap.t
+  LKappa.rule -> cache * (int * int) CannonicMap.t
 
 val nauto: Remanent_parameters_sig.rate_convention -> cache ->
-  LKappa.rule_agent LKappa.rule -> cache * int
+  LKappa.rule -> cache * int
 
-val n_cc: cache -> LKappa.rule_agent LKappa.rule -> cache * int
+val n_cc: cache -> LKappa.rule -> cache * int
 
-val cannonic_form: cache -> LKappa.rule_agent LKappa.rule ->
-  cache * RuleCache.hashed_list
+val cannonic_form: cache -> LKappa.rule -> cache * RuleCache.hashed_list

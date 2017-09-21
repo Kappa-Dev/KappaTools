@@ -176,11 +176,8 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
        tk_nd,_algs_nd,
        _updated_vars,
        (result :
-          (Ast.agent,
-           LKappa.rule_agent list,
-           Raw_mixture.t,
-           int,
-           LKappa.rule_agent LKappa.rule, unit) Ast.compil)) ->
+          (Ast.agent, LKappa.rule_agent list, Raw_mixture.t,
+           int, unit, LKappa.rule) Ast.compil)) ->
       (yield ()) >>=
       (fun () ->
          (* The last yield is updated after the last yield.

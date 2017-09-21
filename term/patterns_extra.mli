@@ -35,27 +35,27 @@ val pattern_id_to_cc:
   Pattern.id ->
   Pattern.cc option
 
-val raw_mixture_to_lkappa_rule: Raw_mixture.t -> LKappa.rule_agent LKappa.rule
+val raw_mixture_to_lkappa_rule: Raw_mixture.t -> LKappa.rule
 
 val species_to_lkappa_rule:
   ?parameters:Remanent_parameters_sig.parameters -> sigs:Signature.s ->
-  Pattern.t -> LKappa.rule_agent LKappa.rule
+  Pattern.t -> LKappa.rule
 
 val species_to_lkappa_rule_and_unspec:
   ?parameters:Remanent_parameters_sig.parameters -> sigs:Signature.s ->
-  Pattern.t -> LKappa.rule_agent LKappa.rule * (int * int) list
+  Pattern.t -> LKappa.rule * (int * int) list
 
 val pattern_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters -> sigs:Signature.s ->
-  Pattern.cc -> LKappa.rule_agent LKappa.rule
+  Pattern.cc -> LKappa.rule
 
 val pattern_id_to_lkappa_rule :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t -> Pattern.id -> LKappa.rule_agent LKappa.rule
+  Model.t -> Pattern.id -> LKappa.rule
 
 val pattern_id_to_lkappa_rule_and_unspec :
   ?parameters:Remanent_parameters_sig.parameters ->
-  Model.t -> Pattern.id -> LKappa.rule_agent LKappa.rule * (int * int) list
+  Model.t -> Pattern.id -> LKappa.rule * (int * int) list
 
 val copy_agent_in_raw_mixture: Raw_mixture.agent -> Raw_mixture.agent
 val copy_agent_in_lkappa: LKappa.rule_agent -> LKappa.rule_agent

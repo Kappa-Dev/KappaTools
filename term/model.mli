@@ -15,8 +15,7 @@ val init :
   Primitives.alg_expr Locality.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ((string Locality.annot option *
-    (LKappa.rule_agent) LKappa.rule Locality.annot) array *
+  ((string Locality.annot option * LKappa.rule Locality.annot) array *
    Primitives.elementary_rule array) ->
   Primitives.alg_expr Locality.annot array -> Primitives.perturbation array ->
   Contact_map.t -> t
@@ -43,14 +42,13 @@ val get_alg : t -> int -> Primitives.alg_expr
 val get_algs : t -> (string * Primitives.alg_expr Locality.annot) array
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
-val get_ast_rule: t -> int -> (LKappa.rule_agent) LKappa.rule
+val get_ast_rule: t -> int -> LKappa.rule
 val get_ast_rule_rate_pos: unary:bool -> t -> int -> Locality.t
 val map_observables : (Primitives.alg_expr -> 'a) -> t -> 'a array
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
 
-val fold_ast_rules :
-   (int -> 'a -> (LKappa.rule_agent) LKappa.rule -> 'a) -> 'a -> t -> 'a
+val fold_ast_rules : (int -> 'a -> LKappa.rule -> 'a) -> 'a -> t -> 'a
 
 val fold_perturbations :
   (int -> 'a -> Primitives.perturbation -> 'a) -> 'a -> t -> 'a

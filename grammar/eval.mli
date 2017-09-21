@@ -46,7 +46,7 @@ val compile :
   ?overwrite_init:(LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
   Contact_map.t ->
-  ('c, LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule_agent LKappa.rule, unit) Ast.compil -> 'b
+  ('c, LKappa.rule_mixture, Raw_mixture.t, int, unit, LKappa.rule) Ast.compil -> 'b
 
 val build_initial_state :
   bind:('a -> (bool * Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->

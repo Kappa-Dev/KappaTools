@@ -37,9 +37,9 @@ type rule_agent_counters =
     ra_created : bool;
   }
 
-type 'agent rule =
+type rule =
   {
-    r_mix: 'agent list;
+    r_mix: rule_mixture;
     r_created: Raw_mixture.t;
     r_delta_tokens :
       ((rule_mixture,int) Alg_expr.e Locality.annot * int) list;
@@ -801,14 +801,6 @@ let remove_counter_rule sigs with_counters mix created =
     (ra_mix@incrs,created@incrs_created@incrs_created')
   else List.map (fun ag -> ag.ra) mix,created
 
-let remove_counters sigs with_counters rules  =
-  List.map
-    (fun (s,(r,a)) ->
-      let (r_mix,r_created) =
-        remove_counter_rule sigs with_counters r.r_mix r.r_created in
-      let r' = {r with r_mix;r_created} in
-      (s,(r',a))) rules
-
 let annotate_dropped_agent
     ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -1491,7 +1483,7 @@ let add_un_variable k_un acc rate_var =
       else (acc,k) in
     (acc_un,Some (k',dist))
 
-let name_and_purify_edit_rule (label_opt,(r,_)) (pack,acc,rules) =
+let name_and_purify_edit_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
   let pack',label =
     give_rule_label false pack Ast.print_ast_edit_rule r label_opt in
   let acc',act =
@@ -1504,7 +1496,7 @@ let name_and_purify_edit_rule (label_opt,(r,_)) (pack,acc,rules) =
   (pack',acc'',
    (label_opt,
     {Ast.mix = r.Ast.mix; Ast.delta_token = r.Ast.delta_token;
-     Ast.act; Ast.un_act})::rules)
+     Ast.act; Ast.un_act},r_pos)::rules)
 
 let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
   let pack',label = give_rule_label
@@ -1651,6 +1643,38 @@ let print_expr_of_ast ~syntax_version ~with_counters sigs tok algs = function
   | Primitives.Alg_pexpr x ->
     Primitives.Alg_pexpr
       (alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters x)
+
+let assemble_rule ~syntax_version ~r_editStyle ~with_counters
+    sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
+  let tok = tk_nd.NamedDecls.finder in
+  let tks =
+    List.rev_map (fun (al,tk) ->
+        (alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters
+           (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
+         NamedDecls.elt_id ~kind:"token" tk_nd tk))
+      rm_tk in
+  let tks' =
+    List_util.rev_map_append (fun (al,tk) ->
+          (alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters al,
+           NamedDecls.elt_id ~kind:"token" tk_nd tk))
+      add_tk tks in
+  { r_mix; r_created; r_editStyle;
+    r_delta_tokens = List.rev tks';
+    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters rate;
+    r_un_rate =
+      let r_dist d =
+        alg_expr_of_ast
+          ~syntax_version sigs tok algs ?max_allowed_var:None ~with_counters d in
+      Option_util.map
+        (fun (un_rate',dist) ->
+           let un_rate'' =
+             alg_expr_of_ast ~syntax_version sigs tok algs
+               ?max_allowed_var:None ~with_counters un_rate' in
+           match dist with
+           | Some d -> (un_rate'', Some (r_dist d))
+           | None -> (un_rate'', None))
+        un_rate;
+  }
 
 let modif_expr_of_ast
     ~syntax_version sigs tok algs contact_map ~with_counters modif acc =
@@ -1801,38 +1825,6 @@ let init_of_ast ~syntax_version sigs tok contact_map ~with_counters = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
-let assemble_rule ~syntax_version ~r_editStyle ~with_counters
-    sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
-  let tok = tk_nd.NamedDecls.finder in
-  let tks =
-    List.rev_map (fun (al,tk) ->
-        (alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters
-           (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
-         NamedDecls.elt_id ~kind:"token" tk_nd tk))
-      rm_tk in
-  let tks' =
-    List_util.rev_map_append (fun (al,tk) ->
-          (alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters al,
-           NamedDecls.elt_id ~kind:"token" tk_nd tk))
-      add_tk tks in
-  { r_mix; r_created; r_editStyle;
-    r_delta_tokens = List.rev tks';
-    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters rate;
-    r_un_rate =
-      let r_dist d =
-        alg_expr_of_ast
-          ~syntax_version sigs tok algs ?max_allowed_var:None ~with_counters d in
-      Option_util.map
-        (fun (un_rate',dist) ->
-           let un_rate'' =
-             alg_expr_of_ast ~syntax_version sigs tok algs
-               ?max_allowed_var:None ~with_counters un_rate' in
-           match dist with
-           | Some d -> (un_rate'', Some (r_dist d))
-           | None -> (un_rate'', None))
-        un_rate;
-  }
-
 let create_t sites incr_info =
   let (aux,counters) =
     List.fold_right
@@ -1972,8 +1964,8 @@ let compil_of_ast ~syntax_version overwrite c =
     else perts' in
   let old_style_rules =
     List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
-        let mix,created =
-          annotate_lhs_with_diff sigs ~contact_map lhs rhs in
+        let mix,created = annotate_lhs_with_diff sigs ~contact_map lhs rhs in
+        let mix,created = remove_counter_rule sigs with_counters mix created in
         label,
         (assemble_rule
            ~syntax_version ~r_editStyle:false ~with_counters
@@ -1981,18 +1973,17 @@ let compil_of_ast ~syntax_version overwrite c =
          r_pos))
       cleaned_rules in
   let edit_rules =
-    List.rev_map (fun (label,r) ->
+    List.rev_map (fun (label,r,r_pos) ->
         let mix,cmix = annotate_edit_mixture
             ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map r.Ast.mix in
+        let mix,cmix = remove_counter_rule sigs with_counters mix cmix in
         (label,
-         Locality.dummy_annot
            (assemble_rule
               ~syntax_version:Ast.V4 ~r_editStyle:true ~with_counters
               sigs tk_nd algs mix cmix [] r.Ast.delta_token
-              r.Ast.act r.Ast.un_act)))
+              r.Ast.act r.Ast.un_act,r_pos)))
       cleaned_edit_rules in
-  let rules = List.rev_append edit_rules old_style_rules in
-  let rules = remove_counters sigs with_counters rules in
+  let edit_rules = List.rev_append edit_rules old_style_rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.filenames = c.Ast.filenames;
@@ -2003,8 +1994,8 @@ let compil_of_ast ~syntax_version overwrite c =
               ~syntax_version ~max_allowed_var:(pred i) ~with_counters
               sigs tok algs expr))
         alg_vars_over;
-    Ast.rules ;
-    Ast.edit_rules = [];
+    Ast.rules = [];
+    Ast.edit_rules;
     Ast.observables =
       List.map (fun expr ->
           alg_expr_of_ast ~syntax_version sigs tok algs ~with_counters expr)
