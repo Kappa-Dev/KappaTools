@@ -419,13 +419,11 @@ let remove_counter_agent sigs ag lnk_nb =
     List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
   (als,bls,lnk_nb')
 
-let remove_counter_created_agent sigs raw ag lnk_nb =
-  let raw_agent =
-    List.find
-      (fun rag -> rag.Raw_mixture.a_type = ag.LKappa.ra.LKappa.ra_type) raw in
-  let ports = raw_agent.Raw_mixture.a_ports in
+let remove_counter_created_agent sigs ag lnk_nb =
+  let raw_ag = ag.LKappa.ra in
+  let ports = raw_ag.Raw_mixture.a_ports in
   let () =
-    Signature.print_agent sigs (Format.str_formatter) ag.LKappa.ra.LKappa.ra_type in
+    Signature.print_agent sigs (Format.str_formatter) raw_ag.Raw_mixture.a_type in
   let agent_name = Format.flush_str_formatter () in
   Tools.array_fold_lefti
     (fun p_id (acc,lnk) (c,_) ->
@@ -445,7 +443,7 @@ let remove_counter_created_agent sigs raw ag lnk_nb =
             LKappa.not_enough_specified agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.LKappa.ra_counters
 
-(* - adds increment agents to the contact map
+(* - adds increment agents to the rule_agent mixture
    - adds increment agents to the raw mixture
    - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
      to the increments *)
@@ -465,22 +463,25 @@ let remove_counter_rule sigs with_counters mix created =
               | LKappa.Linked (i,_) ->  if (max'<i) then i else max'
               | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
             max ag.LKappa.ra.LKappa.ra_ports) 0 mix in
-    let mix_created,mix' = List.partition (fun ag -> ag.LKappa.ra_created) mix in
-    let (incrs,incrs_created,ra_mix,lnk_nb') =
+    let incrs,incrs_created,lnk_nb' =
       List.fold_left
-        (fun (a,b,c,lnk) ag ->
+        (fun (a,b,lnk) ag ->
             let (a',b',lnk') = remove_counter_agent sigs ag lnk in
-            a'@a,b'@b,ag.LKappa.ra::c,lnk')
-        ([],[],[],lnk_nb+1) mix' in
+            a'@a,b'@b,lnk')
+        ([],[],lnk_nb+1) mix in
     let incrs_created',_ =
       List.fold_left
         (fun (acc,lnk) ag ->
           let (a,lnk') =
-            remove_counter_created_agent sigs created ag lnk in
+            remove_counter_created_agent sigs ag lnk in
           (a@acc,lnk'))
-        ([],lnk_nb') mix_created in
-    (ra_mix@incrs,created@incrs_created@incrs_created')
-  else List.map (fun ag -> ag.LKappa.ra) mix,created
+        ([],lnk_nb') created in
+
+    let rule_agent_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) mix) in
+    let raw_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) created) in
+    (rule_agent_mix@incrs,raw_mix@incrs_created@incrs_created')
+  else (List.map (fun ag -> ag.LKappa.ra) mix),
+       (List.map (fun ag -> ag.LKappa.ra) created)
 
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let (incr_type,_,incr_b,_) = incr_agent sigs in
@@ -555,7 +556,7 @@ let annotate_dropped_counters sign counts ra arity agent_name aux =
         let () = match aux with | Some f -> f p_id | None -> () in
         let () = ra_counters.(p_id) <- c,LKappa.Erased in pset')
       Mods.IntSet.empty counts in
-  {LKappa.ra; ra_counters; ra_created = false}
+  {LKappa.ra; ra_counters;}
 
 let annotate_edit_counters
       sigs (agent_name, _ as ag_ty) counts ra add_link_contact_map =
@@ -577,7 +578,7 @@ let annotate_edit_counters
         let () = register_counter_modif p_id in
         let () = ra_counters.(p_id) <- c,LKappa.Maintained in pset')
       Mods.IntSet.empty counts in
-  {LKappa.ra; ra_counters; ra_created = false}
+  {LKappa.ra; ra_counters;}
 
 let annotate_counters_with_diff
       sigs (agent_name, pos as ag_ty) lc rc ra add_link_contact_map =
@@ -613,17 +614,15 @@ let annotate_counters_with_diff
     if not(rc =[]) && not(rc_r =[]) then
       raise (ExceptionDefn.Internal_Error
                ("Counters in "^agent_name^" should have tests by now",pos)) in
-  {LKappa.ra; ra_counters; ra_created = false}
+  {LKappa.ra; ra_counters;}
 
 let annotate_created_counters
-      sigs (agent_name,_ as ag_ty) counts acc add_link_contact_map =
+      sigs (agent_name,_ as ag_ty) counts add_link_contact_map ra =
 
-  if not(agent_with_counters ag_ty sigs) then acc
-  else
-    let ag_id = Signature.num_of_agent ag_ty sigs in
-    let sign = Signature.get sigs ag_id in
-    let arity = Signature.arity sigs ag_id in
-    let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
+  let ag_id = Signature.num_of_agent ag_ty sigs in
+  let sign = Signature.get sigs ag_id in
+  let arity = Signature.arity sigs ag_id in
+  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
 
     (* register all counters (specified or not) with min value *)
     let () =
@@ -664,10 +663,7 @@ let annotate_created_counters
           let () = register_counter_modif p_id in
           let () = ra_counters.(p_id) <- c,LKappa.Maintained in
           pset') Mods.IntSet.empty counts in
-    let ra =
-      {LKappa.ra_type = ag_id;ra_ports =[||];ra_ints =[||];ra_erased = false;
-       ra_syntax = Some ([||],[||]);} in
-    {LKappa.ra; ra_counters;ra_created = true}::acc
+    {LKappa.ra;ra_counters;}
 
 let add_incr counters =
   let annot = Locality.dummy in

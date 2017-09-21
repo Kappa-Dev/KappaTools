@@ -536,18 +536,18 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
         | None -> ()
         | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
       let () = refer_links_annot lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
-      let mix,cmix,(rhs_links_one,_) =
+      let cmix,(rhs_links_one,_) =
         List.fold_left
-          (fun (acc',acc,rannot) ((_,pos as na),sites,modif) ->
+          (fun (acc,rannot) ((_,pos as na),sites,modif) ->
              let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
                  ~syntax_version sigs ?contact_map rannot na intf in
-             let acc'' =
+             let x'' =
                Counters_compiler.annotate_created_counters
-                 sigs na counts acc' (add_link_contact_map ?contact_map) in
-             acc'',x'::acc,rannot')
-          (mix,[],snd links_annot) added in
+                 sigs na counts (add_link_contact_map ?contact_map) x' in
+             x''::acc,rannot')
+          ([],snd links_annot) added in
       let () =
         match Mods.IntMap.root rhs_links_one with
         | None -> ()
@@ -571,10 +571,10 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
                ~syntax_version sigs ?contact_map (snd lannot) ty intf in
-           let acc' =
+           let x'' =
               Counters_compiler.annotate_created_counters
-               sigs ty counts acc (add_link_contact_map ?contact_map) in
-           ((fst lannot,rannot'),acc',x'::news)
+               sigs ty counts (add_link_contact_map ?contact_map) x' in
+           ((fst lannot,rannot'),acc,x''::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
                ~syntax_version sigs (fst lannot) ty intf counts in

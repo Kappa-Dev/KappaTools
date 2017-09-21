@@ -15,5 +15,8 @@ done
 Done
 + Command line to rerun is: 'KaSim' '-l' '1' '-seed' '442310228' '-d' 'output' 'counters.ka'
 ____________________________________________________________
-############################################################
+#######
+Counter c of agent A reached maximum
+
+#####################################################
 Simulation ended

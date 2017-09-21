@@ -54,11 +54,10 @@ val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
 
-type rule_agent_counters =
+type 'a rule_agent_counters =
   {
-    ra : rule_agent;
+    ra : 'a;
     ra_counters : (Ast.counter * switching) array;
-    ra_created : bool;
   }
 
 type rule =

@@ -30,11 +30,10 @@ type rule_agent =
 
 type rule_mixture = rule_agent list
 
-type rule_agent_counters =
+type 'a rule_agent_counters =
   {
-    ra : rule_agent;
+    ra : 'a;
     ra_counters : (Ast.counter * switching) array;
-    ra_created : bool;
   }
 
 type rule =
