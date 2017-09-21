@@ -470,10 +470,7 @@ module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
              MC.add parameter error
                key_c
                (merge parameter error find_default
-                (*(MC.find_default_without_logs parameter error
-                  identity_elt
-                  key_c
-                  submap)*) data_a)
+                  data_a)
                submap
            in
            MB.add_or_overwrite parameter error key_b submap map_b

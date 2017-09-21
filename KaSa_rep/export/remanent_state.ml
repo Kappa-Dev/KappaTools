@@ -292,7 +292,7 @@ type ('static,'dynamic) state =
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
-    graph_scc : Graphs.node list option
+    graph_scc : Graphs.node Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
 
 let get_graph_scc state =

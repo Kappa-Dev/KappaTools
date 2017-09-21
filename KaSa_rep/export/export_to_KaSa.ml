@@ -18,6 +18,8 @@ sig
   type errors = Exception.method_handler
   type internal_contact_map
 
+  type contact_map = Public_data.contact_map
+
   type internal_influence_map = Remanent_state.internal_influence_map
 
   type bidirectional_influence_map
@@ -56,8 +58,26 @@ sig
   (*WORK IN PROCESS*)
   (*add new function: get contact_map_int*)
   (*val get_graph_scc : state -> state * Graphs.node list*)
+  (*val get_string_contact_map :
+  ?accuracy_level:Public_data.accuracy_level ->
+  state -> state * contact_map*)
 
-  val get_contact_map:
+  val get_contact_map :
+  ?accuracy_level:Public_data.accuracy_level ->
+  state -> state * contact_map
+
+  val dump_contact_map :
+  Public_data.accuracy_level ->
+  state -> unit
+
+  val output_contact_map_graph:
+    ?accuracy_level:Public_data.accuracy_level ->
+    state ->
+    Exception.method_handler *
+    Graphs.node
+      Ckappa_sig.AgentSite_map_and_set.Map.t
+
+  val get_internal_contact_map:
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_contact_map
 
@@ -84,7 +104,7 @@ sig
 
   val dump_c_compil: state -> c_compilation -> state
 
-  val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
+  val output_internal_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
   val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
@@ -114,12 +134,16 @@ module Export =
       let init () =
         init ~called_from:Remanent_parameters_sig.KaSa ()
 
-      let get_contact_map = get_internal_contact_map
+      let get_contact_map = get_contact_map
+      let dump_contact_map = dump_contact_map
+      let output_contact_map_graph = output_contact_map_graph
+
+      let get_internal_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map
       let get_local_influence_map = get_local_internal_influence_map
 
       let get_constraints_list = get_internal_constraints_list
-      let output_contact_map = output_internal_contact_map
+      let output_internal_contact_map = output_internal_contact_map
       let output_influence_map = output_internal_influence_map
       let output_local_influence_map = output_local_internal_influence_map
       let output_constraints_list = output_internal_constraints_list

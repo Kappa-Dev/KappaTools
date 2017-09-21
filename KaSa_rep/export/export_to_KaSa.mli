@@ -18,6 +18,8 @@ sig
   type errors = Exception.method_handler
   type internal_contact_map
 
+  type contact_map = Public_data.contact_map
+
   type internal_influence_map =
     Remanent_state.internal_influence_map
 
@@ -56,8 +58,26 @@ sig
 
   (*WORK IN PROGRESS*)
   (*val get_graph_scc : state -> state * Graphs.node list*)
+  (*val get_string_contact_map:
+  ?accuracy_level:Public_data.accuracy_level ->
+  state -> state * Public_data.contact_map*)
 
-  val get_contact_map:
+  val get_contact_map :
+  ?accuracy_level:Public_data.accuracy_level ->
+  state -> state * contact_map
+
+  val dump_contact_map :
+  Public_data.accuracy_level ->
+  state -> unit
+
+  val output_contact_map_graph:
+    ?accuracy_level:Public_data.accuracy_level ->
+    state ->
+    Exception.method_handler *
+    Graphs.node
+      Ckappa_sig.AgentSite_map_and_set.Map.t
+
+  val get_internal_contact_map:
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * internal_contact_map
 
@@ -84,7 +104,7 @@ sig
 
   val dump_c_compil: state -> c_compilation -> state
 
-  val output_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
+  val output_internal_contact_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
   val output_influence_map: ?logger:Loggers.t -> ?accuracy_level:Public_data.accuracy_level -> state -> state
 
@@ -92,7 +112,6 @@ sig
     ?accuracy_level:Public_data.accuracy_level ->
     ?fwd:int -> ?bwd:int -> total:int -> Ckappa_sig.c_rule_id ->
     state -> state
-
 
   val output_constraints_list: ?logger:Loggers.t ->
     state -> state

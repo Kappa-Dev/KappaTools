@@ -11,22 +11,6 @@
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-(*module B =
-  (val Domain_selection.select_domain
-      ~reachability_parameters:{
-        Remanent_parameters_sig.views = true;
-        Remanent_parameters_sig.site_across_bonds = true;
-        Remanent_parameters_sig.parallel_bonds = true;
-        Remanent_parameters_sig.dynamic_contact_map = true;
-      } ())
-
-include Export.Export(B)
-
-let gState =
-  let compil = Ast.empty_compil in
-  ref (init ~compil ~called_from:Remanent_parameters_sig.Server ())*)
-
-
 let main () =
   let start_time = Sys.time () in
   let errors = Exception.empty_error_handler in
@@ -61,7 +45,7 @@ let main () =
         | Remanent_parameters_sig.None
         | Remanent_parameters_sig.Low ->
           true,
-          Export_to_KaSa.output_contact_map
+          Export_to_KaSa.output_internal_contact_map
             ~accuracy_level:Public_data.Low state
         | Remanent_parameters_sig.Medium
         | Remanent_parameters_sig.High
@@ -84,15 +68,21 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*WORK IN PROCESS:*)
-  (*let gstate, string_contact_map = get_contact_map !gState in
+  (*let errors, cm_graph =
+    Export_to_KaSa.output_contact_map_graph ~accuracy_level:Public_data.Low state
+  in
+  let () = Export_to_KaSa.dump_contact_map Public_data.Low state
+  in
   let () =
-    Contact_map_scc.convert_contact_map_to_graph parameters errors
-      string_contact_map
-  in*)
-
-  (*let _ =
-    let state, output = Export_to_KaSa.get_graph_scc state in
-    state, Some output
+      Ckappa_sig.AgentSite_map_and_set.Map.iter
+      (fun (x,y) node ->
+         Loggers.fprintf
+           (Remanent_parameters.get_logger parameters)
+           "node:%i:(Agent:%i,site:%i)\n"
+           (Graphs.int_of_node node)
+           (Ckappa_sig.int_of_agent_name x)
+           (Ckappa_sig.int_of_site_name y)
+      ) cm_graph
   in*)
   (*-----------------------------------------------------------------------*)
   (**)
@@ -135,7 +125,7 @@ let main () =
       | Remanent_parameters_sig.Medium
       | Remanent_parameters_sig.High
       | Remanent_parameters_sig.Full ->
-        Export_to_KaSa.output_contact_map
+        Export_to_KaSa.output_internal_contact_map
           ~accuracy_level:Public_data.Medium
           state
       | Remanent_parameters_sig.None

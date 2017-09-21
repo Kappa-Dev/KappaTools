@@ -16,14 +16,6 @@ module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 (***************************************************************************)
 
-module Dictionary_of_agent_site: Dictionary.Dictionary
-  with type key = int
-   and type value = int * int
-
-type agent_site_dic = (unit,unit) Dictionary_of_agent_site.dictionary
-
-(***************************************************************************)
-
 type position       = Locality.t
 type agent_name     = string
 type site_name      = string
@@ -36,6 +28,16 @@ type c_site_name
 type c_state
 type c_rule_id
 type c_agent_id
+
+(***************************************************************************)
+(*Contact map graph *)
+
+module Dictionary_of_agent_site: Dictionary.Dictionary
+  with type key = int
+   and type value = c_agent_name * c_site_name
+
+type agent_site_dic = (unit,unit) Dictionary_of_agent_site.dictionary
+
 
 (****************************************************************************)
 

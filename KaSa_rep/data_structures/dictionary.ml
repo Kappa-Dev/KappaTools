@@ -142,15 +142,6 @@ module Dictionary =
            is_stabilized = true
          }
 
-       (*(*insert *)
-       let insert parameters error k v =
-         {
-           is_stabilized = true;
-           stabilized = Array.add Some (v, )
-
-         }*)
-
-
          let member parameters error value dictionary =
          premember parameters error value dictionary.in_construction
 

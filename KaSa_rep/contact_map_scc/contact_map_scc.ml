@@ -23,8 +23,24 @@ sigma-graph)
 Take a new graph directed G defined as :
    + Nodes are binding sites in the contact map
    + There is an edge from (A,x) to (B,y) if and only if
-     There exists z such that there is a bond between (A,z) and
+     There exists y such that there is a bond between (A,y) and
      (B,y) in the contact map.
+
+Example:
+%agent:A(x,y,z)
+%agent:B(x,y)
+%agent:C(x,y)
+
+%init: 100 A()
+%init: 100 B()
+%init: 100 C()
+
+'r1' A(y), C(x) -> A(y!1), C(x!1)
+'r2' B(x), C(y) -> B(x!1), C(y!1)
+'r3' A(z), B(y) -> A(z!1), B(y!1)
+'r4' A(x), B(y) -> A(x!1), B(y!1)
+
+-> A(x!1), B(y!1), because z belongs to A, and A(z!1), B(y!1)
 
 Thm: if there is an unbounded number of species, there is a
 (directed) cycle in G
@@ -42,24 +58,6 @@ compute the relation that establish that a pair of sites in the
 signature may be in the same cc in a readable species.
 *)
 
-module Node_id =
-struct
-  type t = int * int
-  let compare = compare
-  let print _ _ = ()
-end
-
-module Dictionary_of_agent_site =
-  (
-    Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
-    with type key = int
-     and type value = int * int (*agent * site*)
-  )
-
-type agent_site_dic =
-  (unit, unit) Dictionary_of_agent_site.dictionary
-
-
 (*
 For each one, you have an agent and a site, and you have to
 allocate this pair in the dictionary.
@@ -69,60 +67,102 @@ Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
 
-(*type t = ((int list) * (int*int) list) array array*)
-
-let convert_contact_map_to_graph parameters error string_contact_map =
-  Mods.StringSetMap.Map.iter (fun ag map ->
-      Mods.StringSetMap.Map.iter (fun site (state_list, pair_list) ->
-          List.iter (fun (ag2, site2) ->
-              Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                "agent:%s:site:%s - agent:%s:site:%s\n"
-                ag site
-                ag2 site2
-            ) pair_list
-        ) map
-    ) string_contact_map
-
-
-let convert_int_to_nodes parameters error handler contact_map  =
+let convert_contact_map_to_graph parameters errors handler contact_map store_result =
   let agents_sites_dic = handler.Cckappa_sig.agents_sites_dic in
-  let error, store_node_list, _ =
-  Array.fold_left
-      (fun (error, store_node_list, edges_list) pair_array ->
-         Array.fold_left (fun (error, store_node_list, edges_list)
-             (state_list, pair_list)  ->
-             List.fold_left
-               (fun (error, store_node_list, edges_list) (agent, site) ->
-                  let error, (bool, output) =
-                    Ckappa_sig.Dictionary_of_agent_site.allocate_bool
+  List.fold_left (fun (errors, store_result) node ->
+      let x = node.Public_data.site_node_name in
+      let interface = node.Public_data.site_node_sites in
+      List.fold_left (fun (errors, store_result) site ->
+          let y  = site.Public_data.site_name in
+          (*let l1 = site.Public_data.site_states in*)
+          (*let l2 = site.Public_data.site_links in*)
+          let errors, (agent_name, site_name) =
+            let errors, (bool, output) =
+              Ckappa_sig.Dictionary_of_agents.allocate_bool
+                parameters
+                errors
+                Ckappa_sig.compare_unit_agent_name
+                x
+                ()
+                Misc_sa.const_unit
+                handler.Cckappa_sig.agents_dic
+            in
+            match bool, output with
+            | _, None ->
+              Exception.warn parameters errors __POS__ Exit
+                (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name)
+            | _, Some (agent_name, _, _, _) ->
+              begin
+                let errors, site_dic =
+                  match
+                    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
                       parameters
-                      error
-                      Ckappa_sig.compare_unit_agent_site
-                      (agent, site)
-                      ()
-                      Misc_sa.const_unit
-                      agents_sites_dic
-                  in
-                  let error, id =
-                    match bool, output with
-                    | _, None | true, _ ->
-                      Exception.warn parameters error __POS__ Exit 0
-                    | _, Some (k, _, _, _) -> error, k
-                  in
-                  let node_id = Graphs.node_of_int id in
-                  let node_list = node_id :: store_node_list in
-                  let _ =
-                    Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                      "agent:%i:site:%i:node_id:%i\n" agent site
-                      (Graphs.int_of_node node_id)
-                  in
-                  error, node_list, edges_list)
-               (error, store_node_list, edges_list) pair_list)
-           (error, store_node_list, edges_list) pair_array)
-      (error, [], []) contact_map
-  in
-  error, store_node_list
-
+                      errors
+                      agent_name
+                      handler.Cckappa_sig.sites
+                  with
+                  | errors, None ->
+                    Exception.warn parameters errors __POS__ Exit
+                      (Ckappa_sig.Dictionary_of_sites.init ())
+                  | errors, Some i -> errors, i
+                in
+                let errors, (bool, output) =
+                  Ckappa_sig.Dictionary_of_sites.allocate_bool
+                    parameters
+                    errors
+                    Ckappa_sig.compare_unit_site_name
+                    (Ckappa_sig.Binding y)
+                    ()
+                    Misc_sa.const_unit
+                    site_dic
+                in
+                let errors, site_name =
+                  match bool, output with
+                  | _, None | true, _ ->
+                    Exception.warn parameters
+                      errors __POS__ Exit Ckappa_sig.dummy_site_name
+                  | _, Some (site_name, _, _, _) -> errors, site_name
+                in
+                errors, (agent_name, site_name)
+              end
+          in
+          let errors, (bool, output) =
+            Ckappa_sig.Dictionary_of_agent_site.allocate_bool
+              parameters
+              errors
+              Ckappa_sig.compare_unit_agent_site
+              (agent_name, site_name)
+              ()
+              Misc_sa.const_unit
+              agents_sites_dic
+            in
+          let errors, id =
+            match bool, output with
+            | _, None ->
+              let _ = Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "None\n"
+              in
+              Exception.warn parameters errors __POS__ Exit 0
+            | _, Some (k, _, _, _) ->
+              let _ = Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "Some k:%i\n" k
+              in
+              errors, k
+          in
+          let node_id = Graphs.node_of_int id in
+          let errors, store_result =
+            Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
+              parameters
+              errors
+              (agent_name,site_name)
+              node_id
+              store_result
+          in
+          errors, store_result
+        ) (errors, store_result) interface
+    ) (errors, store_result) contact_map
 
 (*let compute_graph_scc parameters error contact_map =
   let init_graph = Graphs.create parameters error

@@ -109,9 +109,11 @@ type ('static, 'dynamic) state
 (*******************************************************************)
 (*work in process*)
 
-val get_graph_scc : ('static, 'dynamic)  state -> Graphs.node list option
+val get_graph_scc : ('static, 'dynamic)  state ->
+  Graphs.node Ckappa_sig.AgentSite_map_and_set.Map.t option
 
-val set_graph_scc : Graphs.node list -> ('static, 'dynamic)  state ->
+val set_graph_scc : Graphs.node Ckappa_sig.AgentSite_map_and_set.Map.t ->
+  ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 
 (*******************************************************************)

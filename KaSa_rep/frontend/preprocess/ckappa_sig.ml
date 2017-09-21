@@ -17,26 +17,6 @@ module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 let local_trace = true
 
 (****************************************************************************)
-(*work in process*)
-
-module Node_id =
-struct
-  type t = int * int
-  let compare = compare
-  let print _ _ = ()
-end
-
-module Dictionary_of_agent_site =
-  (
-    Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
-    with type key = int
-     and type value = int * int (*agent * site*)
-  )
-
-  type agent_site_dic =
-    (unit, unit) Dictionary_of_agent_site.dictionary
-
-(****************************************************************************)
 
 type position       = Locality.t
 type agent_name     = string
@@ -48,6 +28,26 @@ type c_agent_id   = int
 type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
+
+(****************************************************************************)
+(*work in process*)
+
+module Node_id =
+struct
+  type t = c_agent_name * c_site_name
+  let compare = compare
+  let print _ _ = ()
+end
+
+module Dictionary_of_agent_site =
+  (
+    Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
+    with type key = int
+     and type value = c_agent_name * c_site_name (*agent * site*)
+  )
+
+  type agent_site_dic =
+    (unit, unit) Dictionary_of_agent_site.dictionary
 
 (****************************************************************************)
 

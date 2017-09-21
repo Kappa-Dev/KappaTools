@@ -199,7 +199,6 @@ let get_pair_cv_map_with_missing_association_creation
 
 let collect_bdu_creation_restriction_map parameters handler error
     rule_id rule
-    (*store_new_index_pair_map*)
     store_remanent_triple
     store_result =
   let error, handler, bdu_false =
@@ -273,7 +272,6 @@ let collect_bdu_creation_restriction_map parameters handler error
 
 let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
     rule_id rule
-    (*store_new_index_pair_map*)
     store_remanent_triple
     store_result =
   let store_init_bdu_creation_restriction_map =
@@ -287,7 +285,6 @@ let collect_proj_bdu_creation_restriction_map parameters handler_bdu error
       error
       rule_id
       rule
-      (*store_new_index_pair_map*)
       store_remanent_triple
       store_init_bdu_creation_restriction_map
   in

@@ -516,8 +516,6 @@ let convert_id_refined parameters error handler compiled id =
   Handler.convert_id_refined  parameters error handler compiled id
 
 
-
-
 (******************************************************************)
 (*quark map *)
 (******************************************************************)
@@ -1419,6 +1417,26 @@ let dump_contact_map accuracy state =
   | None -> ()
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
+
+(*Work in process*)
+let output_contact_map_graph ?accuracy_level:(accuracy_level=Public_data.Low)
+    state =
+  let parameters = Remanent_state.get_parameters state in
+  let state, contact_map = get_contact_map ~accuracy_level state in
+  let state, handler = get_handler state in
+  let errors = get_errors state in
+  let errors, graph_scc =
+    match Remanent_state.get_graph_scc state with
+    | None -> Exception.warn parameters errors __POS__ Exit
+                Ckappa_sig.AgentSite_map_and_set.Map.empty
+    | Some g -> errors, g
+  in
+  let errors, cm_graph =
+    Contact_map_scc.convert_contact_map_to_graph
+      parameters errors handler contact_map graph_scc
+  in
+  errors, cm_graph
+
 
 (*internal contact map*)
 
