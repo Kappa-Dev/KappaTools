@@ -989,7 +989,8 @@ let create_sig l =
   let t = Array.of_list sigs' in
   Signature.create with_contact_map t
 
-let compil_of_ast ~syntax_version overwrite c with_counters =
+let compil_of_ast ~syntax_version overwrite c =
+  let (c,with_counters) = Counters_compiler.compile c in
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
     then
