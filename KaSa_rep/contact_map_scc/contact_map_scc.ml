@@ -68,7 +68,7 @@ and conversely, the pair from the id.
 *)
 
 let convert_contact_map_to_graph parameters errors handler contact_map store_result =
-  let agents_sites_dic = handler.Cckappa_sig.agents_sites_dic in
+  (*let agents_sites_dic = handler.Cckappa_sig.agents_sites_dic in*)
   List.fold_left (fun (errors, store_result) node ->
       let x = node.Public_data.site_node_name in
       let interface = node.Public_data.site_node_sites in
@@ -126,7 +126,47 @@ let convert_contact_map_to_graph parameters errors handler contact_map store_res
                 errors, (agent_name, site_name)
               end
           in
+          let state = Ckappa_sig.C_Lnk_type (agent_name,site_name) in
+          let errors, state_dic =
+            Misc_sa.unsome
+              (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                 parameters
+                 errors
+                 (agent_name, site_name)
+                 handler.Cckappa_sig.states_dic)
+              (fun error ->
+                 Exception.warn parameters error __POS__ Exit
+                  (Ckappa_sig.Dictionary_of_States.init ()))
+          in
           let errors, (bool, output) =
+            Ckappa_sig.Dictionary_of_States.allocate_bool
+              parameters
+              errors
+              Ckappa_sig.compare_unit_state_index
+              (Ckappa_sig.Binding state)
+              ()
+              Misc_sa.const_unit
+              state_dic
+          in
+          let errors, state_id =
+            match bool, output with
+            | _, None ->
+              let _ = Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "None\n"
+              in
+              Exception.warn parameters errors __POS__ Exit
+                Ckappa_sig.dummy_state_index
+            | _, Some (k, _, _, _) ->
+              let _ = Loggers.fprintf
+                  (Remanent_parameters.get_logger parameters)
+                  "Some k:%i\n" (Ckappa_sig.int_of_state_index k)
+              in
+              errors, k
+          in
+          let node_id = Graphs.node_of_int
+              (Ckappa_sig.int_of_state_index state_id) in
+          (*let errors, (bool, output) =
             Ckappa_sig.Dictionary_of_agent_site.allocate_bool
               parameters
               errors
@@ -151,7 +191,7 @@ let convert_contact_map_to_graph parameters errors handler contact_map store_res
               in
               errors, k
           in
-          let node_id = Graphs.node_of_int id in
+          let node_id = Graphs.node_of_int id in*)
           let errors, store_result =
             Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
               parameters
