@@ -487,16 +487,6 @@ let remove_counter_rule sigs with_counters mix created =
     (ra_mix@incrs,created@incrs_created@incrs_created')
   else List.map (fun ag -> ag.LKappa.ra) mix,created
 
-let counters_rules sigs with_counters rules =
-  List.map
-    (fun (s,(r,a)) ->
-      let (r_mix,r_created) =
-        remove_counter_rule sigs with_counters r.LKappa.r_mix r.LKappa.r_created in
-      let r' = {r with LKappa.r_mix;r_created} in
-      (s,(r',a))) rules
-
-
-
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let (incr_type,_,incr_b,_) = incr_agent sigs in
   let ag_id = Signature.num_of_agent ag_ty sigs in

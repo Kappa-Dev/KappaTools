@@ -20,13 +20,6 @@ val counters_perturbations :
   Signature.s -> Ast.agent list ->
   (LKappa.rule_agent list, Raw_mixture.agent list, int) Ast.perturbation list
 
-val counters_rules :
-  Signature.s -> bool ->
-  (string Locality.annot option *
-     LKappa.rule_agent_counters LKappa.rule Locality.annot) list ->
-  (string Locality.annot option *
-     LKappa.rule_agent LKappa.rule Locality.annot) list
-
 val annotate_dropped_counters :
   Signature.t -> Ast.counter list ->  LKappa.rule_agent -> int -> string ->
   (int -> unit) option -> LKappa.rule_agent_counters

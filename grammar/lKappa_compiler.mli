@@ -30,8 +30,7 @@ val compil_of_ast :
   Ast.parsing_compil ->
   Signature.s * Contact_map.t * unit NamedDecls.t * int Mods.StringMap.t *
   int list *
-  (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int,
-   LKappa.rule_agent LKappa.rule, unit)
+  (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int, unit, LKappa.rule)
     Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 
