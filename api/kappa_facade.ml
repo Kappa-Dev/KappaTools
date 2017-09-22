@@ -169,7 +169,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
     let syntax_version = conf.Configuration.syntaxVersion in
-    (Lwt.wrap2 (LKappa.compil_of_ast ~syntax_version) overwrite ast) >>=
+    (Lwt.wrap2 (LKappa_compiler.compil_of_ast ~syntax_version) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,

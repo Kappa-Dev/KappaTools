@@ -444,8 +444,9 @@ let remove_counter_created_agent sigs ag lnk_nb =
     ([],lnk_nb) ag.LKappa.ra_counters
 
 let raw_agent_with_counters ag =
-  Array.exists
-    (fun (c,_) -> not(fst(c.Ast.count_nme) = "")) ag.LKappa.ra_counters
+  Array.fold_left
+    (fun ok (c,_) -> not(fst(c.Ast.count_nme) = "")||ok)
+    false ag.LKappa.ra_counters
 
 let agent_with_counters ag sigs =
   let sign = Signature.get sigs ag.LKappa.ra_type in
