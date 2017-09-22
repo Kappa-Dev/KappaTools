@@ -25,129 +25,14 @@ let close_desc () =
   Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc;
   Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) species_desc
 
-let dot_of_flux flux =
-  let printer desc =
-    let () = Format.fprintf desc "@[<v>// \"uuid\" : \"%i\",@," uuid in
-    let () = Format.fprintf
-        desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
-    let () = Format.fprintf
-        desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
-    let () =
-      Pp.array
-        (fun _ -> ())
-        (fun s ->
-           Pp.array
-             Pp.empty
-             (fun d f v ->
-                if v=0. then ()
-                else
-                  let color,arrowhead =
-                    if v<0. then ("red3","tee") else ("green3","normal") in
-                  Format.fprintf
-                    f
-                    "@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-                    flux.Data.flux_rules.(s)
-                    flux.Data.flux_rules.(d)
-                    (abs (int_of_float v)) v color arrowhead))
-        desc flux.Data.flux_data.Data.flux_fluxs in
-    Format.fprintf desc "}@]@."
-  in
-  Kappa_files.with_flux flux.Data.flux_data.Data.flux_name printer
-
-let print_json_of_flux f flux =
-  let () = Format.fprintf
-      f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
-      flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
-  let () = Format.fprintf
-      f "@[<v>\"normalized\" : %b,@ \"uuid\" : \"%i\",@,"
-      (flux.Data.flux_data.Data.flux_kind <> Primitives.ABSOLUTE) uuid in
-  let () =
-    Format.fprintf
-      f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
-      (Pp.array Pp.comma (fun _ f x -> Format.fprintf f "\"%s\"" x))
-      flux.Data.flux_rules
-      (Pp.array Pp.comma (fun _ -> Format.pp_print_int))
-      flux.Data.flux_data.Data.flux_hits in
-  Format.fprintf
-    f "@[\"fluxs\" :@ @[[%a]@]@]@ }@]"
-    (Pp.array
-       Pp.comma
-       (fun _ f x ->
-          Format.fprintf
-            f "@[[%a]@]"
-            (Pp.array Pp.comma (fun _ f y -> Format.fprintf f "%e" y)) x))
-    flux.Data.flux_data.Data.flux_fluxs
-
-let json_of_flux flux =
-  Kappa_files.with_flux
-    flux.Data.flux_data.Data.flux_name (fun f -> print_json_of_flux f flux)
-
-let html_of_flux flux =
+let output_flux flux =
   Kappa_files.with_flux
     flux.Data.flux_data.Data.flux_name
-    (Pp_html.graph_page
-       (fun f -> Format.pp_print_string f "Dynamic influence map")
-       ~subtitle:(fun f -> Format.pp_print_string
-                     f "between t = <span id=\"begin_time\"></span>s and t = <span id=\"end_time\"></span>s (<span id=\"nb_events\"></span> events)")
-       ["http://d3js.org/d3.v3.min.js"]
-       (fun f ->
-          let () =
-            Format.fprintf
-              f "@[<v 2><style>@,.chord path {@ fill-opacity: .67;@ " in
-          Format.fprintf
-            f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
-       (fun f ->
-          let () = Format.fprintf f "@[<hv 2><form>@," in
-          let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
-          let () =
-            Format.fprintf f "<label for=\"correction\">Correction</label>@," in
-          let () =
-            Format.fprintf
-              f
-              "<select id=\"select_correction\" class=\"form-control\" id=\"correction\">@," in
-          let () =
-            Format.fprintf f "<option value=\"none\">None</option>@," in
-          let () = Format.fprintf
-              f "<option value=\"hits\">Rule occurences</option>@," in
-          let () = Format.fprintf
-              f "<option value=\"time\">Time</option>@]@,</select>@,</div>@," in
-          let () = Format.fprintf
-              f "<input id=\"toggle_selected_rules\" type=\"button\" value=\"Toggle selected rules\">@," in
-          let () = Format.fprintf f "@[<v 2><label class=\"checkbox-inline\">@," in
-          let () =
-            Format.fprintf
-              f
-              "<input id=\"checkbox_self_influence\" type=\"checkbox\">@," in
-          let () =
-            Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
-          let () = Format.fprintf f "<form id=\"menu\"></form>@," in
-          let () = Format.fprintf
-              f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.common_js in
-          let () = Format.fprintf
-              f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.flux_js in
-
-          let () = Format.fprintf
-              f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
-              print_json_of_flux flux in
-          let () = Format.fprintf f "var ids = {@[@," in
-          let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\",@ " in
-          let () = Format.fprintf f "\"endTimeId\" : \"end_time\",@ " in
-          let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\",@ " in
-          let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\",@ " in
-          let () = Format.fprintf f "\"rulesCheckboxesId\" : \"menu\",@ " in
-          let () = Format.fprintf f "\"toggleRulesId\" : \"toggle_selected_rules\",@ " in
-          let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"};@]@ " in
-          let () = Format.fprintf f "window.onload = function(){ @[@," in
-          let () = Format.fprintf f "var flux_map = new fluxMap(ids);@ " in
-          let () = Format.fprintf f "flux_map.setFlux(flux); }; @]@," in
-          Format.fprintf f "@]@,</script>"))
-
-let output_flux out =
-  if Filename.check_suffix out.Data.flux_data.Data.flux_name ".html"
-  then html_of_flux out
-  else if Filename.check_suffix out.Data.flux_data.Data.flux_name ".json"
-  then json_of_flux out
-  else dot_of_flux out
+    (if Filename.check_suffix flux.Data.flux_data.Data.flux_name ".html"
+     then Kappa_files.wrap_formatter (fun f -> Data.print_html_flux_map f flux)
+      else if Filename.check_suffix flux.Data.flux_data.Data.flux_name ".json"
+      then fun d -> JsonUtil.write_to_channel Data.write_flux_map d flux
+      else Kappa_files.wrap_formatter (fun f -> Data.print_dot_flux_map ~uuid f flux))
 
 let actsDescr = ref None
 let emptyActs = ref true
@@ -270,18 +155,13 @@ let rec plot_now l =
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
 let snapshot s =
-  if Filename.check_suffix s.Data.snapshot_file ".dot" then
-    Kappa_files.with_snapshot
-      s.Data.snapshot_file s.Data.snapshot_event "dot"
-      (fun f -> Format.fprintf f "%a@." (Data.print_dot_snapshot ~uuid) s)
-  else if Filename.check_suffix s.Data.snapshot_file ".json" then
-    Kappa_files.with_channel_fresh
-      s.Data.snapshot_file (string_of_int s.Data.snapshot_event) "json"
-      (fun d -> (JsonUtil.write_to_channel Data.write_snapshot) d s)
-  else
-    Kappa_files.with_snapshot
-      s.Data.snapshot_file s.Data.snapshot_event "ka"
-      (fun f -> Format.fprintf f "%a@." (Data.print_snapshot ~uuid) s)
+  Kappa_files.with_snapshot
+    s.Data.snapshot_file s.Data.snapshot_event
+    (if Filename.check_suffix s.Data.snapshot_file ".dot" then
+       Kappa_files.wrap_formatter (fun f -> Data.print_dot_snapshot ~uuid f s)
+     else if Filename.check_suffix s.Data.snapshot_file ".json" then
+       fun d -> JsonUtil.write_to_channel Data.write_snapshot d s
+     else Kappa_files.wrap_formatter (fun f -> Data.print_snapshot ~uuid f s))
 
 let print_species time f mixture =
   Format.fprintf
@@ -335,7 +215,7 @@ let close ?event () =
   close_desc ()
 
 let initial_inputs conf env contact_map init ~filename =
-  let inputs = Kappa_files.open_out_fresh filename "" "ka" in
+  let inputs = Kappa_files.open_out_fresh filename "" ".ka" in
   let inputs_form = Format.formatter_of_out_channel inputs in
   let () = Format.fprintf inputs_form "# \"uuid\" : \"%i\"@." uuid in
   let () = Format.fprintf inputs_form

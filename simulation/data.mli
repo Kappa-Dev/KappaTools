@@ -66,6 +66,10 @@ val snapshot_of_string :
   string -> snapshot
   (** Deserialize JSON data of type {!snapshot}. *)
 
+val print_dot_flux_map : ?uuid: int -> Format.formatter -> flux_map -> unit
+
+val print_html_flux_map : Format.formatter -> flux_map -> unit
+
 val write_flux_map :
   Bi_outbuf.t -> flux_map -> unit
   (** Output a JSON value of type {!flux_map}. *)

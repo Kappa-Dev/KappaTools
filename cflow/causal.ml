@@ -832,7 +832,7 @@ let pretty_print
                if (dotFormat = Json) then
                  (let (_,grid_story,_) = List.nth grid_list cpt in
                   Kappa_files.with_cflow_file
-                    [compression_type;(string_of_int cpt)] "json"
+                    [compression_type;(string_of_int cpt)] ".json"
                     (fun f -> Format.fprintf f "%s@."
                       (Yojson.Basic.to_string
                          (json_of_grid enriched_config grid_story steps)))) in
@@ -850,7 +850,7 @@ let pretty_print
                              Format.pp_print_int) ids
                 in
                 Kappa_files.with_cflow_file
-                  [compression_type;string_of_int cpt] "dot"
+                  [compression_type;string_of_int cpt] ".dot"
                   (dot_of_grid profiling env enriched_config)
              | Html ->
                 let profiling desc =
@@ -867,7 +867,7 @@ let pretty_print
                              Format.pp_print_int) ids;
                 in
                 Kappa_files.with_cflow_file
-                  [compression_type;string_of_int cpt] "html"
+                  [compression_type;string_of_int cpt] ".html"
                   (html_of_grid
                      profiling compression_type cpt env enriched_config) in
            cpt+1
@@ -875,13 +875,13 @@ let pretty_print
     in
     let () = match dotFormat with
       | Json ->
-        Kappa_files.with_cflow_file [compression_type;"env"] "json"
+        Kappa_files.with_cflow_file [compression_type;"env"] ".json"
           (fun f -> Format.fprintf f "%s@."
               (Yojson.Basic.to_string (Model.to_yojson env)))
       | Dot | Html -> () in
     let _ =
       Kappa_files.with_cflow_file
-        [compression_type;"Summary"] "dat"
+        [compression_type;"Summary"] ".dat"
         (fun form ->
            let () = Format.fprintf form "@[<v>#id\tE\tT\t\tdepth\tsize\t@," in
            let () =

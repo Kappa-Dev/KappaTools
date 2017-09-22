@@ -521,7 +521,7 @@ let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
 
 let counter_perturbation sigs c ag_ty =
   let filename =
-    [Primitives.Str_pexpr ("counter_perturbation", snd c.Ast.count_nme) ] in
+    [Primitives.Str_pexpr ("counter_perturbation.ka", snd c.Ast.count_nme) ] in
   let stop_message =
     "\nCounter "^(fst c.Ast.count_nme)^" of agent "^(fst ag_ty)^" reached maximum\n" in
   let stop_message' =

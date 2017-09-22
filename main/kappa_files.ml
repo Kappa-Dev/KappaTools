@@ -57,16 +57,16 @@ let path f =
 let find_available_name name facultative ext =
   let base = try Filename.chop_extension name
       with Invalid_argument _ -> name in
-  if Sys.file_exists (path (base^"."^ext)) then
+  if Sys.file_exists (path (base^ext)) then
     let base' = if facultative <> "" then base^"_"^facultative else base in
-    if Sys.file_exists (path (base'^"."^ext)) then
+    if Sys.file_exists (path (base'^ext)) then
       let v = ref 0 in
       let () =
-        while Sys.file_exists (path (base'^"~"^(string_of_int !v)^"."^ext))
+        while Sys.file_exists (path (base'^"~"^(string_of_int !v)^ext))
         do incr v; done
-      in base'^"~"^(string_of_int !v)^"."^ext
-    else base'^"."^ext
-  else base^"."^ext
+      in base'^"~"^(string_of_int !v)^ext
+    else base'^ext
+  else base^ext
 
 let get_fresh_filename base_name concat_list facultative ext =
   let tmp_name = try Filename.chop_extension base_name
@@ -84,7 +84,7 @@ let open_out_fresh base_name facultative ext =
     if !overwrite_permission then
       let base = try Filename.chop_extension base_name
         with Invalid_argument _ -> base_name in
-      base^"."^ext
+      base^ext
     else get_fresh_filename base_name [] facultative ext in
   let () = mk_dir_r (Filename.dirname x) in
   open_out x
@@ -140,18 +140,13 @@ let with_channel str f =
     let () = f desc in
     close_out desc
 
-let with_channel_fresh base_name facultative ext f =
-  let desc = open_out_fresh base_name facultative ext in
-  let () = f desc in
-  close_out desc
+let wrap_formatter f desc =
+  let fr = Format.formatter_of_out_channel desc in
+  let () = f fr in
+  Format.pp_print_flush fr ()
 
 let with_formatter str f =
-  with_channel
-    str
-    (fun desc ->
-     let fr = Format.formatter_of_out_channel desc in
-     let () = f fr in
-     Format.pp_print_flush fr ())
+  with_channel str (wrap_formatter f)
 
 let set_dir s =
   let () = try
@@ -182,11 +177,6 @@ let set_cflow s = cflowFileName := s
 let get_cflow l e = get_fresh_filename !cflowFileName l "" e
 let with_cflow_file l e f =
   with_formatter (get_fresh_filename !cflowFileName l "" e) f
-let with_json_cflow l e json =
-  let oc = open_out (get_cflow l e) in
-  let () = Yojson.Basic.to_channel oc json in
-  let () = output_string oc "\n" in
-  close_out oc
 
 let open_tasks_profiling () = open_out !tasks_profilingName
 let open_branch_and_cut_engine_profiling () = open_out !branch_and_cut_engine_profilingName
@@ -199,12 +189,11 @@ let set_flux nme event =
   set fluxFileName (Some "dot")
 
 let with_flux str f =
-  with_formatter (match str with "" -> !fluxFileName | _ -> str) f
+  with_channel (match str with "" -> !fluxFileName | _ -> str) f
 
-let with_snapshot str event ext f =
+let with_snapshot str event f =
+  let ext = Filename.extension str in
   let str = if str="" then !snapshotFileName else str in
   let desc = open_out_fresh str (string_of_int event) ext in
-  let fr = Format.formatter_of_out_channel desc in
-  let () =
-    Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
+  let () = f desc in
   close_out desc

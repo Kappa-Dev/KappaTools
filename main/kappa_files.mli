@@ -29,20 +29,16 @@ val set_cflow : string -> unit
 val get_cflow : string list -> string -> string
 val with_cflow_file :
   string list -> string -> (Format.formatter -> unit) -> unit
-val with_json_cflow :
-  string list -> string -> Yojson.Basic.json -> unit
 
 val open_tasks_profiling : unit -> out_channel
 val open_branch_and_cut_engine_profiling: unit -> out_channel
 
 val set_flux : string -> int -> unit
-val with_flux : string -> (Format.formatter -> unit) -> unit
+val with_flux : string -> (out_channel -> unit) -> unit
 
-val with_snapshot :
-  string -> int -> string -> (Format.formatter -> unit) -> unit
+val with_snapshot : string -> int -> (out_channel -> unit) -> unit
 
 val with_channel : string -> (out_channel -> unit) -> unit
 (** [with_channel path f] *)
 
-val with_channel_fresh :
-  string -> string -> string -> (out_channel -> unit) -> unit
+val wrap_formatter : (Format.formatter -> unit) -> out_channel -> unit
