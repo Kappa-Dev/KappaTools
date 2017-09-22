@@ -43,7 +43,7 @@ module Dictionary_of_agent_site =
   (
     Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
     with type key = int
-     and type value = c_agent_name * c_site_name (*agent * site*)
+     and type value = c_agent_name * c_site_name
   )
 
   type agent_site_dic =

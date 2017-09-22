@@ -68,7 +68,10 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*WORK IN PROCESS:*)
-  (*let errors, cm_graph =
+  (*let state, cm =
+    Export_to_KaSa.get_contact_map ~accuracy_level:Public_data.Low state
+  in
+  let errors, cm_graph =
     Export_to_KaSa.output_contact_map_graph ~accuracy_level:Public_data.Low state
   in
   let () = Export_to_KaSa.dump_contact_map Public_data.Low state
