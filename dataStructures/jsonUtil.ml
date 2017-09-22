@@ -6,6 +6,11 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+let write_to_channel f d x =
+  let b = Bi_outbuf.create_channel_writer d in
+  let () = f b x in
+  Bi_outbuf.flush_channel_writer b
+
 let read_between_spaces f lex_st lex_buf =
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let x = f lex_st lex_buf in

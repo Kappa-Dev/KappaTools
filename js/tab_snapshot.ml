@@ -186,7 +186,7 @@ let select (snapshots : Api_types_j.snapshot_id list) =
              @
              if (match (React.S.value current_snapshot) with
                  | None -> false
-                 | Some s -> s.Api_types_j.snapshot_file = snapshot_id)
+                 | Some s -> s.Data.snapshot_file = snapshot_id)
              then [Html.a_selected ()]
              else [])
          (Html.pcdata
@@ -245,7 +245,7 @@ let xml () =
                 match snapshot with
                 | None -> ""
                 | Some snapshot ->
-                  (Ui_common.option_label snapshot.Api_types_j.snapshot_file))
+                  (Ui_common.option_label snapshot.Data.snapshot_file))
              current_snapshot)
       ]
   in

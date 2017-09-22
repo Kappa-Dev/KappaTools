@@ -274,6 +274,10 @@ let snapshot s =
     Kappa_files.with_snapshot
       s.Data.snapshot_file s.Data.snapshot_event "dot"
       (fun f -> Format.fprintf f "%a@." (Data.print_dot_snapshot ~uuid) s)
+  else if Filename.check_suffix s.Data.snapshot_file ".json" then
+    Kappa_files.with_channel_fresh
+      s.Data.snapshot_file (string_of_int s.Data.snapshot_event) "json"
+      (fun d -> (JsonUtil.write_to_channel Data.write_snapshot) d s)
   else
     Kappa_files.with_snapshot
       s.Data.snapshot_file s.Data.snapshot_event "ka"

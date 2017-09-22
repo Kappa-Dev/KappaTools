@@ -6,15 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('agent,'token) generic_snapshot = {
+type snapshot = {
   snapshot_file : string;
   snapshot_event : int;
   snapshot_time : float;
-  snapshot_agents : 'agent list;
-  snapshot_tokens : 'token array;
+  snapshot_agents : (int * User_graph.connected_component) list;
+  snapshot_tokens : (string * Nbr.t) array;
 }
-type snapshot =
-  ((int * User_graph.connected_component),(string * Nbr.t)) generic_snapshot
 
 type flux_data = {
   flux_name : string;
@@ -76,3 +74,58 @@ let print_dot_snapshot ?uuid f s =
            f "token_%d [label = \"%s (%a)\" , shape=none]"
            i na Nbr.print el))
     s.snapshot_tokens
+
+let write_snapshot ob s =
+  let () = Bi_outbuf.add_char ob '{' in
+  let () = JsonUtil.write_field
+      "snapshot_file" Yojson.Basic.write_string ob s.snapshot_file in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field
+      "snapshot_event" Yojson.Basic.write_int ob s.snapshot_event in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field
+      "snapshot_time" Yojson.Basic.write_float ob s.snapshot_time in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field
+      "snapshot_agents"
+      (JsonUtil.write_list
+         (JsonUtil.write_compact_pair
+            Yojson.Basic.write_int User_graph.write_connected_component))
+      ob s.snapshot_agents in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field
+      "snapshot_tokens"
+      (JsonUtil.write_array
+         (JsonUtil.write_compact_pair Yojson.Basic.write_string Nbr.write_t))
+      ob s.snapshot_tokens in
+  Bi_outbuf.add_char ob '}'
+
+let read_snapshot p lb =
+  let
+    snapshot_file,snapshot_event,snapshot_time,snapshot_agents,snapshot_tokens =
+    Yojson.Basic.read_fields
+      (fun (f,e,ti,a,t) key p lb ->
+         if key = "snapshot_file" then (Yojson.Basic.read_string p lb,e,ti,a,t)
+         else if key = "snapshot_event" then
+           (f,Yojson.Basic.read_int p lb,ti,a,t)
+         else if key = "snapshot_time" then
+           (f,e,Yojson.Basic.read_number p lb,a,t)
+         else if key = "snapshot_agents" then
+           (f,e,ti,Yojson.Basic.read_list
+              (JsonUtil.read_compact_pair
+                 Yojson.Basic.read_int User_graph.read_connected_component) p lb,t)
+         else let () = assert (key = "snapshot_tokens") in
+           (f,e,ti,a,Yojson.Basic.read_array
+              (JsonUtil.read_compact_pair Yojson.Basic.read_string Nbr.read_t)
+              p lb)
+      )
+      ("",-1,nan,[],[||]) p lb in
+  {snapshot_file;snapshot_event;snapshot_time;snapshot_agents;snapshot_tokens}
+
+let string_of_snapshot ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  let () = write_snapshot ob x in
+  Bi_outbuf.contents ob
+
+let snapshot_of_string s =
+  read_snapshot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)

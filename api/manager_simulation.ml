@@ -182,7 +182,7 @@ class manager_snapshot
         detail.Api_types_j.simulation_output_snapshots in
       let snapshot_catalog =
         { Api_types_j.snapshot_ids =
-            List.map (fun s -> s.Api_types_j.snapshot_file) snapshots } in
+            List.map (fun s -> s.Data.snapshot_file) snapshots } in
       Api_common.result_ok snapshot_catalog
     method private get_snapshot
         (snapshot_id : Api_types_j.snapshot_id)
@@ -192,7 +192,7 @@ class manager_snapshot
         detail.Api_types_j.simulation_output_snapshots
       in
       let snapshot_eq : Api_types_j.snapshot -> bool =
-        fun snapshot -> snapshot_id = snapshot.Api_types_j.snapshot_file
+        fun snapshot -> snapshot_id = snapshot.Data.snapshot_file
       in
       try Api_common.result_ok (List.find snapshot_eq snapshot_list)
       with Not_found ->

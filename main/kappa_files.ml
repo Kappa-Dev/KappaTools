@@ -140,6 +140,11 @@ let with_channel str f =
     let () = f desc in
     close_out desc
 
+let with_channel_fresh base_name facultative ext f =
+  let desc = open_out_fresh base_name facultative ext in
+  let () = f desc in
+  close_out desc
+
 let with_formatter str f =
   with_channel
     str

@@ -43,3 +43,6 @@ val with_snapshot :
 
 val with_channel : string -> (out_channel -> unit) -> unit
 (** [with_channel path f] *)
+
+val with_channel_fresh :
+  string -> string -> string -> (out_channel -> unit) -> unit

@@ -102,7 +102,7 @@ site: $(RESOURCES_HTML)
 	mkdir -p $@
 	cp $^ $@
 
-site/external: site
+site/external:
 	mkdir -p $@
 
 site/external/bootstrap-$(BOOTSTRAP_VERSION)-dist: externals.mk

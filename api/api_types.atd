@@ -113,16 +113,8 @@ type file_line <ocaml predef module="Data"> =
 type file_line_catalog = { file_line_ids : string list }
 type file_line_detail = file_line list
 
-(* snapshot *)
 type snapshot_id = string
-type ('agent,'token) generic_snapshot <ocaml predef module="Data"> = {
-    snapshot_file : snapshot_id;
-    snapshot_event : int;
-    snapshot_time : float;
-    snapshot_agents : 'agent list;
-    snapshot_tokens : 'token list <ocaml repr="array">; }
-
-type snapshot = ((int * site_graph),(string * nbr)) generic_snapshot
+type snapshot <ocaml module="Data"> = abstract
 type snapshot_detail = snapshot
 type snapshot_catalog = { snapshot_ids : snapshot_id list }
 

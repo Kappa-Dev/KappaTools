@@ -6,15 +6,13 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type ('agent,'token) generic_snapshot   = {
+type snapshot = {
   snapshot_file : string;
   snapshot_event : int;
   snapshot_time : float;
-  snapshot_agents : 'agent list;
-  snapshot_tokens : 'token array;
+  snapshot_agents : (int * User_graph.connected_component) list;
+  snapshot_tokens : (string * Nbr.t) array;
 }
-type snapshot =
-  ((int * User_graph.connected_component),(string * Nbr.t)) generic_snapshot
 
 type flux_data = {
   flux_name : string;
@@ -47,3 +45,23 @@ type t =
 val print_snapshot : ?uuid: int -> Format.formatter -> snapshot -> unit
 
 val print_dot_snapshot : ?uuid: int -> Format.formatter -> snapshot -> unit
+
+val write_snapshot :
+  Bi_outbuf.t -> snapshot -> unit
+  (** Output a JSON value of type {!snapshot}. *)
+
+val string_of_snapshot :
+  ?len:int -> snapshot -> string
+  (** Serialize a value of type {!snapshot}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_snapshot :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> snapshot
+  (** Input JSON data of type {!snapshot}. *)
+
+val snapshot_of_string :
+  string -> snapshot
+  (** Deserialize JSON data of type {!snapshot}. *)
