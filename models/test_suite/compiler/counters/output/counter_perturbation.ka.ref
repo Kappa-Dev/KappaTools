@@ -1,0 +1,10 @@
+# Snapshot [Event: 12]
+%def: "T0" "0.162662"
+
+%init: 1 /*7 agents*/ B(x!1, c!2), A(x~u!1, c!3, d!4), __incr(a, b!3), __incr(a!5, b!4), __incr(a!6, b!5), __incr(a, b!6), __incr(a, b!2)
+%init: 6 /*6 agents*/ A(x~u!1, c!2, d!3), B(x!1, c!4), __incr(a, b!4), __incr(a, b!2), __incr(a!5, b!3), __incr(a, b!5)
+%init: 3 /*2 agents*/ B(x, c!1), __incr(a, b!1)
+%init: 1 /*8 agents*/ A(x~p, c!1, d!2), __incr(a!3, b!1), __incr(a!4, b!3), __incr(a!5, b!4), __incr(a!6, b!5), __incr(a, b!6), __incr(a!7, b!2), __incr(a, b!7)
+%init: 1 /*6 agents*/ A(x~p, c!1, d!2), __incr(a!3, b!1), __incr(a!4, b!3), __incr(a, b!4), __incr(a!5, b!2), __incr(a, b!5)
+%init: 2 /*4 agents*/ A(x~u, c!1, d!2), __incr(a, b!1), __incr(a!3, b!2), __incr(a, b!3)
+
