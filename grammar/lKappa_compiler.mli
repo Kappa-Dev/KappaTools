@@ -8,19 +8,18 @@
 
 val bool_expr_of_ast :
   syntax_version:Ast.syntax_version ->  Signature.s -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> ?max_allowed_var: int -> with_counters:bool ->
+  int Mods.StringMap.t -> ?max_allowed_var: int ->
   (Ast.mixture, string) Alg_expr.bool Locality.annot ->
   (LKappa.rule_agent list, int) Alg_expr.bool Locality.annot
 
 val modif_expr_of_ast :
   syntax_version:Ast.syntax_version -> Signature.s -> int Mods.StringMap.t ->
-  int Mods.StringMap.t -> Contact_map.t -> with_counters:bool ->
+  int Mods.StringMap.t -> Contact_map.t ->
   (Ast.mixture, Ast.mixture, string) Ast.modif_expr -> int list ->
   (LKappa.rule_agent list, Raw_mixture.t, int) Ast.modif_expr * int list
 
 val init_of_ast :
   syntax_version:Ast.syntax_version -> Signature.s -> Contact_map.t ->
-  with_counters:bool ->
   int Mods.StringMap.t -> int Mods.StringMap.t ->
   (Ast.mixture, Ast.mixture, string) Ast.init_statment list ->
   (LKappa.rule_agent list,  Raw_mixture.t, int) Ast.init_statment list

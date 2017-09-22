@@ -443,26 +443,41 @@ let remove_counter_created_agent sigs ag lnk_nb =
             LKappa.not_enough_specified agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.LKappa.ra_counters
 
+let raw_agent_with_counters ag =
+  Array.exists
+    (fun (c,_) -> not(fst(c.Ast.count_nme) = "")) ag.LKappa.ra_counters
+
+let agent_with_counters ag sigs =
+  let sign = Signature.get sigs ag.LKappa.ra_type in
+  Signature.has_counter sign
+
 (* - adds increment agents to the rule_agent mixture
    - adds increment agents to the raw mixture
    - links the agents in the mixture(lhs,rhs,mix) or in the raw mixture(created)
      to the increments *)
-let remove_counter_rule sigs with_counters mix created =
-  if (with_counters) then
+let remove_counter_rule sigs mix created =
+  let with_counters =
+    List.fold_left
+      (fun ok ag -> (agent_with_counters ag.LKappa.ra sigs)||ok) false mix in
+  let with_counters =
+    List.fold_left
+      (fun ok ag -> (raw_agent_with_counters ag)||ok) with_counters created in
+  if with_counters then
     let lnk_nb =
       List.fold_left
         (fun max ag ->
           Array.fold_left
-            (fun max ((lnk,_),switch) ->
-              let max' =
-                match lnk with
-                  Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
-                | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
-                  | Ast.LNK_TYPE _ -> max in
-              match switch with
+          (fun max ((lnk,_),switch) ->
+            let max' =
+              match lnk with
+                Ast.LNK_VALUE (i,_) -> if (max<i) then i else max
+              | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
+                | Ast.LNK_TYPE _ -> max in
+            match switch with
               | LKappa.Linked (i,_) ->  if (max'<i) then i else max'
               | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
             max ag.LKappa.ra.LKappa.ra_ports) 0 mix in
+
     let incrs,incrs_created,lnk_nb' =
       List.fold_left
         (fun (a,b,lnk) ag ->
@@ -529,11 +544,6 @@ let counters_perturbations sigs ast_sigs =
           | Ast.Counter c ->
              ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc') acc sites)
     [] ast_sigs
-
-let agent_with_counters ag_ty sigs =
-  let ag_id = Signature.num_of_agent ag_ty sigs in
-  let sign = Signature.get sigs ag_id in
-  Signature.has_counter sign
 
 let empty_counter =
   {Ast.count_nme = ("",Locality.dummy);

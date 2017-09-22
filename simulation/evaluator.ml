@@ -15,7 +15,7 @@ let do_interactive_directives
     List_util.fold_right_map
       (LKappa_compiler.modif_expr_of_ast
          ~syntax_version (Model.signatures env) (Model.tokens_finder env)
-         (Model.algs_finder env) contact_map' ~with_counters:true) e [] in
+         (Model.algs_finder env) contact_map') e [] in
   let () =
     if Tools.array_fold_lefti
         (fun n -> Tools.array_fold_lefti
@@ -44,7 +44,7 @@ let get_pause_criteria ~max_sharing ~syntax_version contact_map env graph b =
   let b' =
     LKappa_compiler.bool_expr_of_ast ~syntax_version
       (Model.signatures env) (Model.tokens_finder env)
-      (Model.algs_finder env) ~with_counters:true b in
+      (Model.algs_finder env) b in
   let cc_preenv',(b'',pos_b'' as bpos'') =
     Eval.compile_bool ~compileModeOn:false  contact_map cc_preenv b' in
   let env',graph' =

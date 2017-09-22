@@ -9,10 +9,9 @@
 val compile : Ast.parsing_compil -> Ast.parsing_compil * bool
 
 val incr_agent : Signature.s -> int * int * int * int
-val agent_with_counters : string * Locality.t -> Signature.s -> bool
 
 val remove_counter_rule :
-  Signature.s -> bool -> LKappa.rule_agent LKappa.rule_agent_counters list ->
+  Signature.s -> LKappa.rule_agent LKappa.rule_agent_counters list ->
   Raw_mixture.agent LKappa.rule_agent_counters list ->
   LKappa.rule_agent list *  Raw_mixture.agent list
 
