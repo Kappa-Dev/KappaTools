@@ -65,3 +65,23 @@ val read_snapshot :
 val snapshot_of_string :
   string -> snapshot
   (** Deserialize JSON data of type {!snapshot}. *)
+
+val write_flux_map :
+  Bi_outbuf.t -> flux_map -> unit
+  (** Output a JSON value of type {!flux_map}. *)
+
+val string_of_flux_map :
+  ?len:int -> flux_map -> string
+  (** Serialize a value of type {!flux_map}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_flux_map :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_map
+  (** Input JSON data of type {!flux_map}. *)
+
+val flux_map_of_string :
+  string -> flux_map
+  (** Deserialize JSON data of type {!flux_map}. *)

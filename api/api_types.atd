@@ -89,21 +89,9 @@ type plot = { legend : string list ;
       	      series : observable list ; } <ocaml field_prefix="plot_">
 
 (* flux *)
-type flux_kind <ocaml from module="Primitives">= abstract
 type flux_map_id = string
-type flux_flux = float list <ocaml repr="array">
-type flux_data <ocaml predef module="Data"> = {
-     flux_name : flux_map_id;
-     flux_kind : flux_kind;
-     flux_start : float;
-     flux_hits : int list <ocaml repr="array">;
-     flux_fluxs : flux_flux list <ocaml repr="array">
-}
-type flux_map <ocaml predef module="Data"> =
-     { flux_rules : string list <ocaml repr="array">;
-       flux_data : flux_data;
-       flux_end : float;
-     }
+type flux_map <ocaml module="Data"> = abstract
+
 type flux_map_catalog = { flux_map_ids : flux_map_id list }
 
 (* file line *)

@@ -29,7 +29,7 @@ let flux =
     ~thead flux_table
 
 let fill_table flux_map =
-  let open Api_types_j in
+  let open Data in
   let all = flux_map.flux_data.flux_kind = Primitives.PROBABILITY in
   let header =
     Html.tr

@@ -81,7 +81,7 @@ class manager_flux_map
         detail.Api_types_j.simulation_output_flux_maps in
       let flux_map_catalog =
         { Api_types_j.flux_map_ids =
-            List.map (fun f -> f.Api_types_j.flux_data.Api_types_j.flux_name)
+            List.map (fun f -> f.Data.flux_data.Data.flux_name)
               flux_maps } in
       Api_common.result_ok flux_map_catalog
 
@@ -94,7 +94,7 @@ class manager_flux_map
       in
       let flux_maps_eq : Api_types_j.flux_map -> bool =
         fun flux_map ->
-          flux_map_id = flux_map.Api_types_j.flux_data.Api_types_j.flux_name
+          flux_map_id = flux_map.Data.flux_data.Data.flux_name
       in
       try Api_common.result_ok (List.find flux_maps_eq flux_maps_list)
       with Not_found ->
