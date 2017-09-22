@@ -1,6 +1,0 @@
-File "counter.ka", line 6, characters 16-17:
-Warning: rule induces a link permutation on site 'b' of agent '__incr'
-File "counter.ka", line 6, characters 16-17:
-Warning: rule induces a link permutation on site 'b' of agent '__incr'
-File "counter.ka", line 6, characters 20-21:
-Warning: rule induces a link permutation on site 'c' of agent 'A'

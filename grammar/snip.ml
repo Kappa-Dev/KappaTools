@@ -193,6 +193,28 @@ let is_linked_on_port me i id = function
 let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.LKappa.ra_ports <> []
 
+let rule_induces_link_permutation ~pos ?sort_src sigs sort site =
+  let warning_for_counters =
+    let () = Signature.print_agent sigs (Format.str_formatter) sort in
+    let sort_nme = Format.flush_str_formatter () in
+    if (String.compare sort_nme "__incr") == 0 then true
+    else
+    match sort_src with
+    | None -> false
+    | Some s ->
+       let () = Signature.print_agent sigs (Format.str_formatter) s in
+       let sort_src_nme = Format.flush_str_formatter () in
+       (String.compare sort_src_nme "__incr") == 0 in
+
+  if not(warning_for_counters) then
+  ExceptionDefn.warning
+    ~pos
+    (fun f ->
+      Format.fprintf
+        f "rule induces a link permutation on site '%a' of agent '%a'"
+        (Signature.print_site sigs sort) site
+        (Signature.print_agent sigs) sort)
+
 let define_full_transformation
     sigs (removed,added as transf) links_transf place site (cand,cand_pos) switch =
   match switch with
@@ -211,13 +233,7 @@ let define_full_transformation
         | None -> ()
         | Some pos ->
           let sort = Matching.Agent.get_type place in
-          ExceptionDefn.warning
-            ~pos
-            (fun f ->
-               Format.fprintf
-                 f "rule induces a link permutation on site '%a' of agent '%a'"
-                 (Signature.print_site sigs sort) site
-                 (Signature.print_agent sigs) sort) in
+          rule_induces_link_permutation ~pos sigs sort site in
       let links_transf' =
         Mods.IntMap.add
           i ((place,site),Option_util.map (fun _ -> pos) cand_pos)
@@ -230,24 +246,14 @@ let define_full_transformation
         | None -> ()
         | Some pos' ->
           let sort = Matching.Agent.get_type place in
+          let sort_src = Matching.Agent.get_type place' in
           let () =
-            ExceptionDefn.warning
-              ~pos:pos'
-              (fun f ->
-                 Format.fprintf
-                   f "rule induces a link permutation on site '%a' of agent '%a'"
-                   (Signature.print_site sigs sort) site
-                   (Signature.print_agent sigs) sort) in
+            rule_induces_link_permutation ~pos:pos' ~sort_src sigs sort site in
           match risk with
           | Some _ ->
             let sort = Matching.Agent.get_type place' in
-            ExceptionDefn.warning
-              ~pos
-              (fun f ->
-                 Format.fprintf
-                   f "rule induces a link permutation on site '%a' of agent '%a'"
-                   (Signature.print_site sigs sort) site'
-                   (Signature.print_agent sigs) sort)
+            let sort_src = Matching.Agent.get_type place in
+            rule_induces_link_permutation ~pos ~sort_src sigs sort site'
           | None -> () in
       ((cand::removed,
         Primitives.Transformation.Linked((place,site),dst')::added),
@@ -270,14 +276,8 @@ let define_positive_transformation
     | Some (dst',_) ->
       let links_transf' = Mods.IntMap.remove i links_transf in
       let sort = Matching.Agent.get_type place in
-      let () =
-        ExceptionDefn.warning
-          ~pos
-          (fun f ->
-             Format.fprintf
-               f "rule induces a link permutation on site '%a' of agent '%a'"
-               (Signature.print_site sigs sort) site
-               (Signature.print_agent sigs) sort) in
+      let sort_src = Matching.Agent.get_type (fst dst') in
+      let () = rule_induces_link_permutation ~pos ~sort_src sigs sort site in
       ((removed,
         Primitives.Transformation.Linked((place,site),dst')::added),
        links_transf')
@@ -558,13 +558,8 @@ let rec complete_with_creation
                 match risk with
                 | Some pos ->
                   let sort = Matching.Agent.get_type place' in
-                  ExceptionDefn.warning
-                    ~pos
-                    (fun f ->
-                       Format.fprintf
-                         f "rule induces a link permutation on site '%a' of agent '%a'"
-                         (Signature.print_site sigs sort) site'
-                         (Signature.print_agent sigs) sort)
+                  let sort_src = Matching.Agent.get_type place in
+                  rule_induces_link_permutation ~pos sigs ~sort_src sort site'
                 | None -> () in
               Primitives.Transformation.Linked((place,site_id),dst)::added',
               (Instantiation.Bind_to((place,site_id),dst)
