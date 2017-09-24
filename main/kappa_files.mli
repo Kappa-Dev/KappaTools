@@ -36,7 +36,7 @@ val open_branch_and_cut_engine_profiling: unit -> out_channel
 val set_flux : string -> int -> unit
 val with_flux : string -> (out_channel -> unit) -> unit
 
-val with_snapshot : string -> int -> (out_channel -> unit) -> unit
+val with_snapshot : string -> string -> int -> (out_channel -> unit) -> unit
 
 val with_channel : string -> (out_channel -> unit) -> unit
 (** [with_channel path f] *)

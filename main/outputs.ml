@@ -155,13 +155,18 @@ let rec plot_now l =
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
 let snapshot s =
-  Kappa_files.with_snapshot
-    s.Data.snapshot_file s.Data.snapshot_event
-    (if Filename.check_suffix s.Data.snapshot_file ".dot" then
-       Kappa_files.wrap_formatter (fun f -> Data.print_dot_snapshot ~uuid f s)
-     else if Filename.check_suffix s.Data.snapshot_file ".json" then
-       fun d -> JsonUtil.write_to_channel Data.write_snapshot d s
-     else Kappa_files.wrap_formatter (fun f -> Data.print_snapshot ~uuid f s))
+  if Filename.check_suffix s.Data.snapshot_file ".dot" then
+    Kappa_files.with_snapshot
+      s.Data.snapshot_file ".dot" s.Data.snapshot_event
+      (Kappa_files.wrap_formatter (fun f -> Data.print_dot_snapshot ~uuid f s))
+  else if Filename.check_suffix s.Data.snapshot_file ".json" then
+    Kappa_files.with_snapshot
+      s.Data.snapshot_file ".json" s.Data.snapshot_event
+      (fun d -> JsonUtil.write_to_channel Data.write_snapshot d s)
+  else
+    Kappa_files.with_snapshot
+      s.Data.snapshot_file ".ka" s.Data.snapshot_event
+      (Kappa_files.wrap_formatter (fun f -> Data.print_snapshot ~uuid f s))
 
 let print_species time f mixture =
   Format.fprintf

@@ -191,8 +191,7 @@ let set_flux nme event =
 let with_flux str f =
   with_channel (match str with "" -> !fluxFileName | _ -> str) f
 
-let with_snapshot str event f =
-  let ext = Filename.extension str in
+let with_snapshot str ext event f =
   let str = if str="" then !snapshotFileName else str in
   let desc = open_out_fresh str (string_of_int event) ext in
   let () = f desc in
