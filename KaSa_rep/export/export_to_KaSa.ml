@@ -62,6 +62,9 @@ sig
   ?accuracy_level:Public_data.accuracy_level ->
   state -> state * contact_map*)
 
+(**************************************************)
+(*work in process*)
+
   val get_contact_map :
   ?accuracy_level:Public_data.accuracy_level ->
   state -> state * contact_map
@@ -70,12 +73,25 @@ sig
   Public_data.accuracy_level ->
   state -> unit
 
-  val output_contact_map_graph:
+  (*val output_contact_map_converted:
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
-    Graphs.node
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+    (Graphs.node list * (int * int) list)
+      Ckappa_sig.AgentSite_map_and_set.Map.t*)
+
+  val output_graph_scc :
+    ?accuracy_level:Public_data.accuracy_level ->
+    state ->
+    Exception.method_handler *
+    (
+      ((Graphs.node list * (int * int) list)
+         Ckappa_sig.AgentSite_map_and_set.Map.t)
+      *
+      (unit, unit) Graphs.graph
+        Ckappa_sig.AgentSite_map_and_set.Map.t)
+
+(**************************************************)
 
   val get_internal_contact_map:
     ?accuracy_level:Public_data.accuracy_level ->
@@ -136,7 +152,7 @@ module Export =
 
       let get_contact_map = get_contact_map
       let dump_contact_map = dump_contact_map
-      let output_contact_map_graph = output_contact_map_graph
+      let output_graph_scc = output_graph_scc
 
       let get_internal_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map

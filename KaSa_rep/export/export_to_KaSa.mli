@@ -70,12 +70,28 @@ sig
   Public_data.accuracy_level ->
   state -> unit
 
-  val output_contact_map_graph:
+(**************************************************)
+(*work in process *)
+
+  (*val output_contact_map_converted:
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
-    Graphs.node
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+    (Graphs.node list * (int * int) list)
+      Ckappa_sig.AgentSite_map_and_set.Map.t*)
+
+  val output_graph_scc :
+    ?accuracy_level:Public_data.accuracy_level ->
+    state ->
+    Exception.method_handler *
+    (
+      ((Graphs.node list * (int * int) list)
+       Ckappa_sig.AgentSite_map_and_set.Map.t)
+      *
+      (unit, unit) Graphs.graph
+        Ckappa_sig.AgentSite_map_and_set.Map.t)
+
+(**************************************************)
 
   val get_internal_contact_map:
     ?accuracy_level:Public_data.accuracy_level ->

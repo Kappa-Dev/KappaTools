@@ -293,8 +293,17 @@ type ('static,'dynamic) state =
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
-    graph_scc : Graphs.node Ckappa_sig.AgentSite_map_and_set.Map.t option
+    contact_map_converted : (*TODO: remove later*)
+      (Graphs.node list* (int * int) list)
+        Ckappa_sig.AgentSite_map_and_set.Map.t option;
+    graph_scc : (unit, unit) Graphs.graph Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
+
+let get_contact_map_converted state =
+  state.contact_map_converted
+
+let set_contact_map_converted cm state =
+  {state with contact_map_converted = Some cm }
 
 let get_graph_scc state =
   state.graph_scc
@@ -357,6 +366,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
+    contact_map_converted = None; (*REMOVE later*)
     graph_scc = None
   }
 

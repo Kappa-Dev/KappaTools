@@ -71,20 +71,23 @@ let main () =
   (*let state, cm =
     Export_to_KaSa.get_contact_map ~accuracy_level:Public_data.Low state
   in
-  let errors, cm_graph =
-    Export_to_KaSa.output_contact_map_graph ~accuracy_level:Public_data.Low state
+  let errors, (cm_graph, graph_scc) =
+    Export_to_KaSa.output_graph_scc
+      ~accuracy_level:Public_data.Low state
   in
   let () = Export_to_KaSa.dump_contact_map Public_data.Low state
   in
   let () =
       Ckappa_sig.AgentSite_map_and_set.Map.iter
-      (fun (x,y) node ->
-         Loggers.fprintf
-           (Remanent_parameters.get_logger parameters)
-           "node:%i:(Agent:%i,site:%i)\n"
-           (Graphs.int_of_node node)
-           (Ckappa_sig.int_of_agent_name x)
-           (Ckappa_sig.int_of_site_name y)
+        (fun (x,y) (nodes, _) ->
+           List.iter (fun node ->
+               Loggers.fprintf
+                 (Remanent_parameters.get_logger parameters)
+                 "node:%i:(Agent:%i,site:%i)\n"
+                 (Graphs.int_of_node node)
+                 (Ckappa_sig.int_of_agent_name x)
+                 (Ckappa_sig.int_of_site_name y)
+             ) nodes
       ) cm_graph
   in*)
   (*-----------------------------------------------------------------------*)
