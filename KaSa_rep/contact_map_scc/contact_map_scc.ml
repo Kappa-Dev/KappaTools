@@ -196,23 +196,41 @@ let compute_graph_scc parameters errors contact_map_converted store_result =
   Ckappa_sig.AgentSite_map_and_set.Map.fold
     (fun (agent_name, site_name) (nodes, l2) (errors, store_result) ->
        (*create a new graph *)
-       let errors, nodes' =
-         List.fold_left (fun (errors, store_list) (ag,site) ->
-             errors, (Graphs.node_of_int site) :: store_list
-           ) (errors, []) l2
+       let errors, store_result' =
+         List.fold_left (fun (errors, store_result') (ag,site) ->
+             let errors, store_result' =
+               Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
+                 parameters
+                 errors
+                 ((Ckappa_sig.agent_name_of_int ag), (Ckappa_sig.site_name_of_int site))
+                 ((Graphs.node_of_int site) :: [])
+                 store_result'
+             in
+             errors, store_result'
+             (*todo: store a pair (ag, site) node map?*)
+           ) (errors, Ckappa_sig.AgentSite_map_and_set.Map.empty) l2
        in
        (*todo: check the condition of edges*)
        let errors, edges_list =
          List.fold_left (fun (erros, store_list) n1 ->
-             List.fold_left (fun (errors, store_list) n2 ->
-                 let s = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                     "\nnode:%n-node:%i\n"
-                     (Graphs.int_of_node n1)
-                     (Graphs.int_of_node n2)
-                 in
-                 errors, (n1, s, n2) :: store_list
-               ) (erros, store_list) nodes
-           ) (errors, []) nodes'
+             Ckappa_sig.AgentSite_map_and_set.Map.fold
+               (fun (ag2, site2) nodes' (errors, store_list) ->
+                  List.fold_left (fun (errors, store_list) n2 ->
+                      let s =
+                        Loggers.fprintf
+                          (Remanent_parameters.get_logger parameters)
+                          "\nagent:%i:site:%i:node:%n-agent:%i:site:%i:node:%i\n"
+                          (Ckappa_sig.int_of_agent_name agent_name)
+                          (Ckappa_sig.int_of_site_name site_name)
+                          (Graphs.int_of_node n1)
+                          (Ckappa_sig.int_of_agent_name ag2)
+                          (Ckappa_sig.int_of_site_name site2)
+                          (Graphs.int_of_node n2)
+                      in
+                      errors, (n1, s, n2) :: store_list
+                    ) (errors, store_list) nodes'
+               ) store_result' (errors, store_list)
+           ) (errors, []) nodes
        in
        let graph_scc =
          Graphs.create parameters errors
