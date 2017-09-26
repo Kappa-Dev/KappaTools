@@ -48,8 +48,6 @@ val link_only_one_occurence : int -> Locality.t -> 'a
 val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
-val of_user_graph :
-  Signature.s -> User_graph.connected_component -> rule_mixture
 val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
   Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit

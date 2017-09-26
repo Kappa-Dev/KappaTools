@@ -9,6 +9,8 @@
 val compile : Ast.parsing_compil -> Ast.parsing_compil * bool
 
 val incr_agent : Signature.s -> int * int * int * int
+val empty_counter : Ast.counter
+val make_counter : int -> string -> Ast.counter
 
 val remove_counter_rule :
   Signature.s -> LKappa.rule_agent LKappa.rule_agent_counters list ->

@@ -6,12 +6,17 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
+type cc_port = {
+  port_links: (int * int) list;
+  port_states: string list;
+}
+type site =
+  | Port of cc_port
+  | Counter of int
 type cc_site = {
   site_name: string;
-  site_links: (int * int) list;
-  site_states: string list;
-}
-type cc_node = {
+  site_type: site
+}type cc_node = {
   node_type: string;
   node_sites: cc_site array;
 }

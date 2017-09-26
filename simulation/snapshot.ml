@@ -89,7 +89,26 @@ let increment_in_snapshot sigs x s =
     else h::aux_increment t in
   Mods.IntMap.add hs (aux_increment l) s
 
+let is_counter n_id sigs =
+  let ag_name = Signature.agent_of_num n_id sigs in
+  (String.compare ag_name "__incr") = 0
+
+let rec counter_value cc (nid,sid) count =
+  let ag = cc.(nid) in
+  Tools.array_fold_lefti
+    (fun id acc si ->
+      if (id = sid) then acc
+      else
+        match si.site_link with
+        | None -> acc
+        | Some x -> counter_value cc x (acc+1)) count ag.node_sites
+
 let cc_to_user_cc sigs cc =
+  let cc_without_counters =
+    Array.of_list
+      (Array.fold_right
+         (fun ag acc ->
+           if not(is_counter ag.node_type sigs) then ag::acc else acc) cc []) in
   Array.map
     (fun ag -> {
          User_graph.node_type =
@@ -99,19 +118,28 @@ let cc_to_user_cc sigs cc =
                  User_graph.site_name =
                    Format.asprintf
                      "%a" (Signature.print_site sigs ag.node_type) id;
-                 User_graph.site_links = (match si.site_link with
-                     | None -> []
-                     | Some x -> [x]);
-                 User_graph.site_states = (match si.site_state with
-                     | None -> []
-                     | Some s ->
-                       [Format.asprintf
-                          "%a" (Signature.print_internal_state
-                                  sigs ag.node_type id)
-                          s]);
-               }) ag.node_sites;
-       })
-    cc
+                 User_graph.site_type =
+                   let port_states =
+                     (match si.site_state with
+                      | None -> []
+                      | Some s ->
+                         [Format.asprintf
+                            "%a" (Signature.print_internal_state
+                                    sigs ag.node_type id)
+                            s]) in
+                   match si.site_link with
+                   | None ->
+                      User_graph.Port
+                        {User_graph.port_links = []; User_graph.port_states}
+                   | Some ((dn_id,_) as x) ->
+                      if not(is_counter (cc.(dn_id)).node_type sigs) then
+                        User_graph.Port
+                          {User_graph.port_links = [x]; User_graph.port_states}
+                      else User_graph.Counter (counter_value cc x 0)
+                      })
+                      ag.node_sites;
+    })
+    cc_without_counters
 
 let export sigs s =
   Mods.IntMap.fold (fun _ l acc ->

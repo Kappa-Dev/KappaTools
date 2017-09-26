@@ -550,6 +550,10 @@ let empty_counter =
   {Ast.count_nme = ("",Locality.dummy);
    count_test = None; count_delta =(0,Locality.dummy)}
 
+let make_counter i name =
+  {Ast.count_nme = (name,Locality.dummy);
+   count_test = Some (Ast.CEQ i,Locality.dummy); count_delta =(0,Locality.dummy)}
+
 let add_counter_to_contact_map sigs add_link_contact_map =
   let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
   add_link_contact_map incr_id incr_a incr_id incr_b
