@@ -112,9 +112,42 @@ let _ = React.S.map
     (React.S.on
        tab_is_active State_simulation.dummy_model State_simulation.model)
 
+let export_current_flux_map to_string mime filename =
+  let fluxmap_id =
+    Js.to_string ((Tyxml_js.To_dom.of_select flux_select)##.value) in
+  State_simulation.when_ready
+    ~label:__LOC__
+    (fun manager -> manager#simulation_detail_flux_map fluxmap_id >>=
+      Api_common.result_bind_lwt
+        ~ok:(fun flux -> let data = to_string flux in
+              let () = Common.saveFile ~data ~mime ~filename in
+              Lwt.return (Api_common.result_ok  ())))
+
+let export_configuration = {
+  Widget_export.id = "flux-export";
+  Widget_export.show = React.S.const true;
+  Widget_export.handlers = [
+    { Widget_export.suffix = "json";
+      Widget_export.label = "json";
+      Widget_export.export = export_current_flux_map
+          (Data.string_of_flux_map ?len:None)
+          "application/json";};
+    { Widget_export.suffix = "dot";
+      Widget_export.label = "dot";
+      Widget_export.export = export_current_flux_map
+          (Format.asprintf "@[%a@]" (Data.print_dot_flux_map ?uuid:None))
+          "text/vnd.graphviz";};
+    { Widget_export.suffix = "html";
+      Widget_export.label = "html";
+      Widget_export.export = export_current_flux_map
+          (Format.asprintf "@[%a@]" (Data.print_html_flux_map))
+          "text/html";};
+  ];
+}
+
 let content () = [
   Html.div ~a:[Html.a_class ["flex_content"; "table-responsive"]]
-    [Html.form [flux_select]; flux ]
+    [Html.form [flux_select]; flux; Widget_export.content export_configuration]
 ]
 
 let navli () =
@@ -129,6 +162,7 @@ let onload () =
   let () =
     (Tyxml_js.To_dom.of_select flux_select)##.onchange :=
       Dom.handler (fun _ -> let () = select_fluxmap () in Js._false) in
+  let () = Widget_export.onload export_configuration in
   let () = Common.jquery_on "#navflux"
       "shown.bs.tab" (fun _ -> set_tab_is_active true) in
   Common.jquery_on "#navflux"
