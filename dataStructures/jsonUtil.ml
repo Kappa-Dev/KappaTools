@@ -47,6 +47,13 @@ let of_option to_json = function
 
 let to_option = Yojson.Basic.Util.to_option
 
+let write_option f ob = function
+  | None -> Yojson.Basic.write_null ob ()
+  | Some x -> f ob x
+
+let read_option f p lb =
+  if Yojson.Basic.read_null_if_possible p lb then None else Some (f p lb)
+
 let of_list to_json l =
   `List (List.rev_map to_json (List.rev l))
 

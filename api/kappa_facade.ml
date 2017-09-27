@@ -36,13 +36,13 @@ class null_process : system_process =
   end;;
 
 type file_index =
-  { file_index_file_id : Api_types_j.file_id ;
+  { file_index_file_id : Api_types_t.file_id ;
     file_index_line_offset : int ;
     file_index_char_offset : int ;
     file_line_count : int ; }
 
 type kappa_file =
-  { kappa_file_id : Api_types_j.file_id ;
+  { kappa_file_id : Api_types_t.file_id ;
     kappa_file_code : string ;
   }
 
@@ -59,12 +59,12 @@ type t =
     counter : Counter.t ;
     log_buffer : Buffer.t ;
     log_form : Format.formatter ;
-    mutable plot : Api_types_j.plot ;
-    mutable snapshots : Api_types_j.snapshot list ;
-    mutable flux_maps : Api_types_j.flux_map list ;
+    mutable plot : Data.plot ;
+    mutable snapshots : Data.snapshot list ;
+    mutable flux_maps : Data.flux_map list ;
     mutable species : (float*User_graph.connected_component) list Mods.StringMap.t;
     mutable files : string list Mods.StringMap.t ;
-    mutable error_messages : Api_types_j.errors ;
+    mutable error_messages : Api_types_t.errors ;
     mutable trace : Trace.t ;
     ast : Ast.parsing_compil;
     contact_map : Contact_map.t ;
@@ -82,8 +82,7 @@ let create_t ~log_form ~log_buffer ~contact_map ~syntax_version
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
   syntax_version;
-  plot = { Api_types_j.plot_legend = [] ;
-           Api_types_j.plot_series = [] ; } ;
+  plot = Data.init_plot env;
   snapshots = [];
   flux_maps = [];
   species = Mods.StringMap.empty;
@@ -101,8 +100,7 @@ let reinitialize random_state t =
   t.is_running <- false;
   t.run_finalize <- false;
   t.pause_condition <- Alg_expr.FALSE;
-  t.plot <- { Api_types_j.plot_legend = [] ;
-              Api_types_j.plot_series = [] ; } ;
+  t.plot <- Data.init_plot t.env ;
   t.snapshots <- [];
   t.flux_maps <- [];
   t.files <- Mods.StringMap.empty;
@@ -112,7 +110,7 @@ let reinitialize random_state t =
       random_state t.env t.counter;
   t.state <- State_interpreter.empty ~with_delta_activities:false t.env []
 
-let catch_error : 'a . (Api_types_j.errors -> 'a) -> exn -> 'a =
+let catch_error : 'a . (Api_types_t.errors -> 'a) -> exn -> 'a =
   fun handler ->
     (function
       |  ExceptionDefn.Syntax_Error ((message,region) : string Locality.annot) ->
@@ -130,7 +128,7 @@ type file = { file_id : string ; file_content : string }
 let rec compile_file
     (yield : unit -> unit Lwt.t)
     (compile : Ast.parsing_compil)
-  : file list -> (Ast.parsing_compil, Api_types_j.errors) Result.result Lwt.t =
+  : file list -> (Ast.parsing_compil, Api_types_t.errors) Result.result Lwt.t =
   function
   | [] -> Lwt.return (Result_util.ok compile)
   | file::files ->
@@ -240,20 +238,13 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
     )
     (catch_error (fun e -> Lwt.return (Result_util.error e)))
 
-let prepare_plot_value x =
-  Array.fold_right (fun nbr acc -> Nbr.to_float nbr :: acc) x []
-
 let outputs (simulation : t) =
   function
   | Data.Flux flux_map ->
     simulation.flux_maps <- flux_map::simulation.flux_maps
   | Data.DeltaActivities _ -> assert false
   | Data.Plot new_observables ->
-    let new_values = prepare_plot_value new_observables in
-    simulation.plot <-
-      {simulation.plot with
-       Api_types_j.plot_series =
-         new_values :: simulation.plot.Api_types_j.plot_series }
+    simulation.plot <- Data.add_plot_line new_observables simulation.plot
   | Data.Species(file,time,mix) ->
     let p = Mods.StringMap.find_default [] file simulation.species in
     simulation.species <-
@@ -285,7 +276,7 @@ let parse
     ~(system_process : system_process)
     ~(kappa_files : Api_types_t.file list)
     ~overwrites
-  : (t,Api_types_j.errors) Result.result Lwt.t
+  : (t,Api_types_t.errors) Result.result Lwt.t
   =
 
   let kappa_files =
@@ -368,11 +359,11 @@ let run_simulation
 
 let start
     ~(system_process : system_process)
-    ~(parameter : Api_types_j.simulation_parameter)
+    ~(parameter : Api_types_t.simulation_parameter)
     ~(t : t)
-  : (unit,Api_types_j.errors) Result.result Lwt.t =
+  : (unit,Api_types_t.errors) Result.result Lwt.t =
   let lexbuf =
-    Lexing.from_string parameter.Api_types_j.simulation_pause_condition in
+    Lexing.from_string parameter.Api_types_t.simulation_pause_condition in
   Lwt.catch (fun () ->
       (*let () =
           Counter.set_max_time
@@ -385,7 +376,7 @@ let start
                  parameter.Api_types_j.simulation_max_events
                in*)
       let random_state =
-        match parameter.Api_types_j.simulation_seed with
+        match parameter.Api_types_t.simulation_seed with
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
       let () = reinitialize random_state t in
@@ -401,7 +392,7 @@ let start
       let () =
         Counter.set_plot_period
           t.counter
-          (Counter.DT parameter.Api_types_j.simulation_plot_period) in
+          (Counter.DT parameter.Api_types_t.simulation_plot_period) in
       let () =
         Lwt.async
           (fun () ->
@@ -421,21 +412,11 @@ let start
                (fun (stop,graph,state) ->
                   let () = t.graph <- graph; t.state <- state in
                   let () = ExceptionDefn.flush_warning t.log_form in
-                  let legend =
-                    Model.map_observables
-                      (fun o -> Format.asprintf
-                          "%a"
-                          (Kappa_printer.alg_expr
-                             ~env:t.env) o)
-                      t.env in
                   let first_obs =
                     State_interpreter.observables_values
                       t.env graph t.counter in
-                  let first_values = prepare_plot_value first_obs in
                   let () =
-                    t.plot <-
-                      { Api_types_j.plot_legend = Array.to_list legend;
-                        Api_types_j.plot_series = [ first_values ]} in
+                    t.plot <- Data.add_plot_line first_obs t.plot in
                   run_simulation ~system_process:system_process ~t:t stop)
              with e ->
                catch_error
@@ -451,7 +432,7 @@ let start
 
 let pause
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_j.errors) Result.result Lwt.t =
+    ~(t : t) : (unit,Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   let () = if t.is_running then
@@ -463,7 +444,7 @@ let pause
 
 let stop
     ~(system_process : system_process)
-    ~(t : t) : (unit,Api_types_j.errors) Result.result Lwt.t =
+    ~(t : t) : (unit,Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   Lwt.catch
@@ -480,11 +461,11 @@ let stop
 let perturbation
     ~(system_process : system_process)
     ~(t : t)
-    ~(perturbation:Api_types_j.simulation_perturbation)
-  : (string, Api_types_j.errors) Result.result Lwt.t =
+    ~(perturbation:Api_types_t.simulation_perturbation)
+  : (string, Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let lexbuf =
-    Lexing.from_string perturbation.Api_types_j.perturbation_code
+    Lexing.from_string perturbation.Api_types_t.perturbation_code
   in
   Lwt.catch
     (fun () ->
@@ -513,7 +494,7 @@ let continue
     ~(system_process : system_process)
     ~(t : t)
     ~(pause_condition : string)
-  : (unit,Api_types_j.errors) Result.result Lwt.t =
+  : (unit,Api_types_t.errors) Result.result Lwt.t =
   let lexbuf =
     Lexing.from_string pause_condition in
   Lwt.catch
@@ -533,12 +514,12 @@ let continue
          (*let () =
            Counter.set_max_time
              t.counter
-             parameter.Api_types_j.simulation_max_time
+             parameter.Api_types_t.simulation_max_time
          in
          let () =
            Counter.set_max_events
              t.counter
-             parameter.Api_types_j.simulation_max_events
+             parameter.Api_types_t.simulation_max_events
            in*)
          let () =
            Lwt.async
@@ -552,7 +533,7 @@ let continue
 let progress
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_types_t.simulation_progress,Api_types_j.errors) Result.result Lwt.t =
+  (Api_types_t.simulation_progress,Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   match t.error_messages with
@@ -560,17 +541,17 @@ let progress
     Lwt.catch
       (fun () ->
          Lwt.return (Result_util.ok {
-             Api_types_j.simulation_progress_time =
+             Api_types_t.simulation_progress_time =
                Counter.current_time t.counter ;
-             Api_types_j.simulation_progress_time_percentage =
+             Api_types_t.simulation_progress_time_percentage =
                Counter.time_percentage t.counter ;
-             Api_types_j.simulation_progress_event =
+             Api_types_t.simulation_progress_event =
                Counter.current_event t.counter ;
-             Api_types_j.simulation_progress_event_percentage =
+             Api_types_t.simulation_progress_event_percentage =
                Counter.event_percentage t.counter ;
-             Api_types_j.simulation_progress_tracked_events =
+             Api_types_t.simulation_progress_tracked_events =
                Counter.tracked_events t.counter ;
-             Api_types_j.simulation_progress_is_running =
+             Api_types_t.simulation_progress_is_running =
                t.is_running ;
            }))
       (catch_error (fun e -> Lwt.return (Result_util.error e)))
@@ -579,7 +560,7 @@ let progress
 let outputs
     ~(system_process : system_process)
     ~(t : t) :
-  (Api_data.simulation_detail_output,Api_types_j.errors) Result.result Lwt.t =
+  (Api_data.simulation_detail_output,Api_types_t.errors) Result.result Lwt.t =
   let () = ignore(system_process) in
   let () = ignore(t) in
   match t.error_messages with
@@ -587,15 +568,15 @@ let outputs
     Lwt.catch
       (fun () ->
          Lwt.return (Result_util.ok {
-             Api_types_j.simulation_output_plot =
+             Api_types_t.simulation_output_plot =
                Some t.plot ;
-             Api_types_j.simulation_output_flux_maps =
+             Api_types_t.simulation_output_flux_maps =
                t.flux_maps ;
-             Api_types_j.simulation_output_file_lines =
+             Api_types_t.simulation_output_file_lines =
                t.files ;
-             Api_types_j.simulation_output_snapshots =
+             Api_types_t.simulation_output_snapshots =
                t.snapshots ;
-             Api_types_j.simulation_output_log_messages =
+             Api_types_t.simulation_output_log_messages =
                Buffer.contents t.log_buffer ;
            }))
       (catch_error (fun e -> Lwt.return (Result_util.error e)))

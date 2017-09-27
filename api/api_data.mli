@@ -15,5 +15,4 @@ val api_snapshot_kappa : Api_types_t.snapshot -> string
 val api_simulation_status :
   Api_types_t.simulation_progress -> simulation_detail_output ->
   Api_types_t.simulation_info
-val plot_values : ?separator:string -> Api_types_t.plot -> string
 val agent_count : Api_types_t.site_graph -> int

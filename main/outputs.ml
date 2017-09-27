@@ -89,20 +89,6 @@ let close_plot () =
   | Some (Raw plot) -> close_out plot.desc
   | Some (Svg s) -> Pp_svg.to_file s
 
-let print_header_raw is_tsv f a =
-  let print_sep =
-    if is_tsv then fun f -> Format.pp_print_string f "\t"
-    else Pp.comma in
-  Format.fprintf f "@[<h>%a@]@."
-    (Pp.array print_sep (fun _ f x -> Format.fprintf f "\"%s\"" x)) a
-
-let print_values_raw is_tsv f l =
-  let print_sep =
-    if is_tsv then fun f -> Format.pp_print_string f "\t"
-    else Pp.comma in
-  Format.fprintf f "@[<h>%a@]@."
-    (Pp.array print_sep (fun _ -> Nbr.print_option)) l
-
 let traceDescr = ref None
 let traceNotEmpty = ref false
 
@@ -143,7 +129,7 @@ let launch_plot (filename,title,head) =
       let () = if not is_tsv then Format.fprintf d "# %s@." title in
       let () = if not is_tsv
         then Format.fprintf d "# \"uuid\" : \"%i\"@." uuid in
-      let () = print_header_raw is_tsv d head in
+      let () = Data.print_plot_legend ~is_tsv d head in
       Raw {desc=d_chan; form=d; is_tsv} in
     plotDescr := Some format
 
@@ -151,7 +137,8 @@ let rec plot_now l =
   match !plotDescr with
   | None -> assert false
   | Some (StandBy p) -> let () = launch_plot p in plot_now l
-  | Some (Raw fd) -> print_values_raw fd.is_tsv fd.form l
+  | Some (Raw fd) ->
+    Data.print_plot_line ~is_tsv:fd.is_tsv Nbr.print_option fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
 let snapshot s =

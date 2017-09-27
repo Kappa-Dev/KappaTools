@@ -70,22 +70,51 @@ val print_dot_flux_map : ?uuid: int -> Format.formatter -> flux_map -> unit
 
 val print_html_flux_map : Format.formatter -> flux_map -> unit
 
-val write_flux_map :
-  Bi_outbuf.t -> flux_map -> unit
+val write_flux_map : Bi_outbuf.t -> flux_map -> unit
   (** Output a JSON value of type {!flux_map}. *)
 
-val string_of_flux_map :
-  ?len:int -> flux_map -> string
+val string_of_flux_map : ?len:int -> flux_map -> string
   (** Serialize a value of type {!flux_map}
       into a JSON string.
       @param len specifies the initial length
                  of the buffer used internally.
                  Default: 1024. *)
 
-val read_flux_map :
-  Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_map
+val read_flux_map : Yojson.Safe.lexer_state -> Lexing.lexbuf -> flux_map
   (** Input JSON data of type {!flux_map}. *)
 
-val flux_map_of_string :
-  string -> flux_map
+val flux_map_of_string : string -> flux_map
   (** Deserialize JSON data of type {!flux_map}. *)
+
+type plot = {
+  plot_legend : string array;
+  plot_series : float option array list;
+}
+
+val add_plot_line : Nbr.t array -> plot -> plot
+
+val init_plot : Model.t -> plot
+
+val write_plot : Bi_outbuf.t -> plot -> unit
+  (** Output a JSON value of type {!plot}. *)
+
+val string_of_plot : ?len:int -> plot -> string
+  (** Serialize a value of type {!plot}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_plot : Yojson.Safe.lexer_state -> Lexing.lexbuf -> plot
+  (** Input JSON data of type {!plot}. *)
+
+val plot_of_string : string -> plot
+(** Deserialize JSON data of type {!plot}. *)
+
+val print_plot_legend : is_tsv:bool -> Format.formatter -> string array -> unit
+
+val print_plot_line :
+  is_tsv:bool -> (Format.formatter -> 'a -> unit) -> Format.formatter ->
+  'a array -> unit
+
+val export_plot : is_tsv: bool -> plot -> string

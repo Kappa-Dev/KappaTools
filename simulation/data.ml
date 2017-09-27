@@ -263,6 +263,76 @@ let print_html_flux_map desc flux =
        Format.fprintf f "@]@,</script>")
     desc
 
+type plot = {
+  plot_legend : string array;
+  plot_series : float option array list;
+}
+
+let add_plot_line new_observables plot =
+  let new_values = Array.map (fun nbr -> Nbr.to_float nbr) new_observables in
+  {
+    plot_legend = plot.plot_legend;
+    plot_series = new_values :: plot.plot_series;
+  }
+
+let init_plot env =
+  let plot_legend =
+    Model.map_observables
+      (fun o -> Format.asprintf "@[%a@]" (Kappa_printer.alg_expr ~env) o) env in
+  { plot_legend; plot_series = []; }
+
+let write_plot ob f =
+  let () = Bi_outbuf.add_char ob '{' in
+  let () = JsonUtil.write_field "legend"
+      (JsonUtil.write_array Yojson.Basic.write_string) ob f.plot_legend in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field "series"
+      (JsonUtil.write_list (JsonUtil.write_array
+                              (JsonUtil.write_option Yojson.Basic.write_float)))
+      ob f.plot_series in
+  Bi_outbuf.add_char ob '}'
+
+let read_plot p lb =
+  let (plot_legend,plot_series) =
+    Yojson.Basic.read_fields
+      (fun (l,s) key p lb ->
+         if key = "plot_series" then
+           (l,Yojson.Basic.read_list
+              (Yojson.Basic.read_array
+                 (JsonUtil.read_option Yojson.Basic.read_number)) p lb)
+         else let () = assert (key = "plot_legend") in
+           (Yojson.Basic.read_array Yojson.Basic.read_string p lb,s))
+      ([||],[]) p lb in
+  { plot_legend; plot_series; }
+
+let string_of_plot ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  let () = write_plot ob x in
+  Bi_outbuf.contents ob
+
+let plot_of_string s =
+  read_plot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
+let print_plot_sep is_tsv =
+  if is_tsv then fun f -> Format.pp_print_string f "\t"
+  else Pp.comma
+
+let print_plot_legend ~is_tsv f a =
+  Format.fprintf f "@[<h>%a@]@."
+    (Pp.array (print_plot_sep is_tsv) (fun _ f x -> Format.fprintf f "\"%s\"" x))
+    a
+
+let print_plot_line ~is_tsv pp f l =
+  Format.fprintf f "@[<h>%a@]@."
+    (Pp.array (print_plot_sep is_tsv) (fun _ -> pp)) l
+
+let export_plot ~is_tsv plot =
+  Format.asprintf "%a%a"
+    (print_plot_legend ~is_tsv) plot.plot_legend
+    (Pp.list Pp.empty (print_plot_line ~is_tsv
+                         (Pp.option (fun f -> Format.fprintf f "%e"))))
+    (List.rev plot.plot_series)
+
 type file_line = {
   file_line_name : string option;
   file_line_text : string;

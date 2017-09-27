@@ -34,7 +34,7 @@ let api_simulation_status
     { Api_types_t.simulation_output_plot =
         (match detail.Api_types_t.simulation_output_plot with
         | None -> 0
-        | Some plot -> List.length plot.Api_types_t.plot_series);
+        | Some plot -> List.length plot.Data.plot_series);
       Api_types_t.simulation_output_flux_maps =
         List.length detail.Api_types_t.simulation_output_flux_maps ;
       Api_types_t.simulation_output_file_lines =
@@ -47,20 +47,6 @@ let api_simulation_status
   in
   { Api_types_t.simulation_info_progress = progress ;
     Api_types_t.simulation_info_output = output ; }
-
-let plot_values
-    ?(separator : string = ",")
-    (plot : Api_types_t.plot) : string =
-  Format.asprintf "@[<v>%a@,%a@]"
-    (fun f -> Format.fprintf f "@[<h>%a@]"
-        (Pp.list (fun f -> Format.pp_print_string f separator)
-           (fun f -> Format.fprintf f "\"%s\"")))
-    plot.Api_types_t.plot_legend
-    (Pp.list Pp.space
-       (fun f -> Format.fprintf f "@[<h>%a@]"
-           (Pp.list (fun f -> Format.pp_print_string f separator)
-              (Pp.option ~with_space:false (fun f -> Format.fprintf f "%e")))))
-    (List.rev plot.Api_types_t.plot_series)
 
 (* return the agent count *)
 let agent_count (species : Api_types_t.site_graph) : int = Array.length species

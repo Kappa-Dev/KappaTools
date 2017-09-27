@@ -133,7 +133,7 @@ class manager_log_message
 let select_observables
     (plot_limit : Api_types_j.plot_limit)
     (plot : Api_types_j.plot) : Api_types_j.plot =
-  let plot_time_series = Tools.array_rev_of_list plot.Api_types_j.plot_series in
+  let plot_time_series = Tools.array_rev_of_list plot.Data.plot_series in
   let plot_detail_size = Array.length plot_time_series in
   let plot_limit_offset = plot_limit.Api_types_j.plot_limit_offset in
   let plot_limit_points = plot_limit.Api_types_j.plot_limit_points in
@@ -145,7 +145,7 @@ let select_observables
     | Some offset, Some nb -> offset, min nb (max 0 (plot_detail_size - offset))
   in
   let new_plot_time_series = (List.rev (Array.to_list (Array.sub plot_time_series start len))) in
-  { plot with Api_types_j.plot_series = new_plot_time_series }
+  { plot with Data.plot_series = new_plot_time_series }
 
 class manager_plot
     (project : Api_environment.project)

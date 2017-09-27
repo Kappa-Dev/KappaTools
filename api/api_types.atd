@@ -78,15 +78,12 @@ type simulation_parameter = {
 
 type simulation_perturbation = { perturbation_code : string }
 
-type observable = float nullable list
-
 type plot_limit = { plot_limit_offset <json name="offset"> : int nullable ;
                     plot_limit_points <json name="nb_points"> : int nullable ; }
 
 type plot_parameter = plot_limit
 
-type plot = { legend : string list ;
-      	      series : observable list ; } <ocaml field_prefix="plot_">
+type plot <ocaml module="Data"> = abstract
 
 (* flux *)
 type flux_map_id = string

@@ -52,16 +52,17 @@ class type plot_observable =
   end
 let constructor_observable : plot_observable Js.t Js.constr =
   (Js.Unsafe.variable "Object")
-let create_observable ~(observable : ApiTypes.observable)
-  : plot_observable Js.t  =
+let create_observable ~observable : plot_observable Js.t  =
   let configuration : plot_observable Js.t = new%js constructor_observable in
   let () =
-    match observable with
-    | Some time :: l ->
-      configuration##.time := time;
-      configuration##.values :=
-        Js.array (Tools.array_map_of_list  Js.Opt.option l)
-    | _ -> failwith "problematic output line"
+    configuration##.time := Option_util.unsome nan observable.(0);
+    configuration##.values :=
+      Js.array
+        (Array.map  Js.Opt.option
+           (Array.sub observable
+              1 (Array.length observable - 1)));
+
+
   in configuration
 
 
@@ -76,12 +77,13 @@ let create_data ~(plot : ApiTypes.plot)
   let configuration : plot_data Js.t = new%js constructor_data in
   let () =
     configuration##.legend := Js.array
-        (Tools.array_map_of_list
+        (Array.map
            Js.string
-           (List.tl plot.ApiTypes.plot_legend));
+           (Array.sub plot.Data.plot_legend
+              1 (Array.length plot.Data.plot_legend - 1)));
     configuration##.timeSeries := Js.array
         (Tools.array_map_of_list (fun o -> create_observable ~observable:o)
-           plot.ApiTypes.plot_series);
+           plot.Data.plot_series);
     ()
   in configuration
 

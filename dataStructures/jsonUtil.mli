@@ -34,6 +34,13 @@ val of_option: ('a -> Yojson.Basic.json) -> 'a option -> Yojson.Basic.json
 val to_option: (Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a option
 (** Beware: `Null is reserved for None *)
 
+val write_option:
+  (Bi_outbuf.t -> 'a -> unit) -> Bi_outbuf.t -> 'a option -> unit
+
+val read_option:
+  (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->
+  Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a option
+
 val of_list: ('a -> Yojson.Basic.json) -> 'a list -> Yojson.Basic.json
 
 val to_list:
