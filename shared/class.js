@@ -3,7 +3,7 @@
 var opacity = {
     node_normal: 1,
     node_hidden: 0.25,
-    line_highlight: 0.9, 
+    line_highlight: 0.9,
     line_normal: 0.4,
     line_side: 0.15,
     line_hidden: 0.1
@@ -37,7 +37,7 @@ class Dimension {
         this.width = dimension.width;
     }
 
-    
+
 }
 
 class D3Object {
@@ -45,7 +45,7 @@ class D3Object {
         this.label = label;
         this.dimension = new Dimension(0, 0);
     }
-    
+
     setDimension(dimension) {
         this.dimension = dimension;
     }
@@ -59,14 +59,34 @@ class Site extends D3Object {
     constructor (siteData, agent) {
         super(siteData.site_name);
         let site = this;
-        this.links = siteData.site_links.map(function(link)
-            { 
-                return new SiteLink(link[0],link[1]); 
-            });
+        let type = siteData.site_type;
+	var links = [];
+	var states = [];
+	var counter = -1;
+	Object.keys(type).forEach(function (d) {
+	    if (d == "port") {
+		let port = type[d];
+
+		links = port.port_links.map(function(link) {
+                    return new SiteLink(link[0],link[1]);
+		});
+		states = port.port_states.map(function(state) {
+                    return new State(state, site);
+		});
+	    };
+	    if (d == "counter") {
+		counter = type[d];
+		console.log(counter);
+	    };
+	});
+
+	if (counter !== -1) {
+	    this.counter = counter;
+	}
+
+	this.links = links;
+	this.states = states;
         this.agent = agent;
-        this.states = siteData.site_states.map(function(state) {
-                return new State(state, site);
-            });
         this.currentState = null;
         this.startAngle = 0;
         this.endAngle = 0;
@@ -112,7 +132,7 @@ class Site extends D3Object {
             let pathPointMid = {};
             pathPointMid.x = this.cartX(3 * innerRadius / 4);
             pathPointMid.y = this.cartY(3 * innerRadius / 4);
-            
+
             let pathPointSide2 = {};
 
             pathPointSide2.x = 7 * innerRadius/8 * Math.cos(this.endAngle + 3 * Math.PI/2);
@@ -166,7 +186,7 @@ class Node extends D3Object {
         this.side = 0; // for detect cycle
         this.sites = nodeData.node_sites.map(function(siteData, i) {
             let site = new Site(siteData, node);
-            site.setId(i); 
+            site.setId(i);
             return site;
         });
 
@@ -181,9 +201,9 @@ class Node extends D3Object {
                 site.setId(-1);
                 this.sites.push(site);
         }
-        
+
     }
-    
+
     setId(id) {
         this.id = id;
     }
@@ -194,7 +214,7 @@ class Node extends D3Object {
         let node = this;
         this.sites.forEach(function(site) {
                 //console.log(node.idHashMap);
-                node.idHashMap[site.id] = site;           
+                node.idHashMap[site.id] = site;
         });
     }
 
@@ -205,14 +225,14 @@ class Node extends D3Object {
                 return 1;
             else if (a.label < b.label)
                 return -1;
-            else 
+            else
                 return 0;
         });
     }
 
     listSites() {
-        
-       
+
+
         return this.sites;
 
     }
@@ -221,7 +241,7 @@ class Node extends D3Object {
         if (this.idHashMap !== undefined)
             {return this.idHashMap[siteId];}
         return this.sites[siteId];
-        
+
     }
 
 }
@@ -261,7 +281,7 @@ class DataWareHouse {
             sitegraph.mapData = new DataStorage(data.snapshot_agents[map][1], true);
             this.snapshot.push(sitegraph);
         }
-        
+
         //console.log(this.snapshot);
     }
 
@@ -295,10 +315,10 @@ class DataWareHouse {
             children.name = "mixture" + this.snapshot[child].id;
             children.data = this.snapshot[child].mapData;
             //console.log(this.snapshot[child]);
-            
+
             children.count = this.snapshot[child].count;
             children.size = this.snapshot[child].mapData.data.length;
-            
+
             this.treeData.children.push(children);
         }
     }
@@ -318,7 +338,7 @@ class DataStorage {
             tempData.push(node);
         });
         this.data = tempData;
-        
+
     }
 
     getNode(id) {
@@ -340,7 +360,7 @@ class DataStorage {
         /* generate id hashmap */
         let nodes = this;
         this.data.forEach(function(node) {
-                nodes.idHashMap[node.id] = node;           
+                nodes.idHashMap[node.id] = node;
         });
     }
 
@@ -351,16 +371,16 @@ class DataStorage {
                 return 1;
             else if (a.label < b.label)
                 return -1;
-            else 
+            else
                 return 0;
         });
     }
-    
+
     constructHierarchy() {
         let siteList = [];
         let data = this.data;
        // console.log(data);
-        for (let key in data) { 
+        for (let key in data) {
             let sites = data[key].listSites();
             for (let key in sites) {
                 siteList.push(sites[key]);
@@ -377,7 +397,7 @@ class DataStorage {
             let links = siteList[sites].listLinks();
             let linkArray = [];
 
-            for (let link in links) {               
+            for (let link in links) {
                 //console.log(data);
                 let site = this.getSite(links[link].nodeId, links[link].siteId);
                 linkArray.push('root.' + site.getAgent().label + '.' + site.label);
@@ -429,7 +449,7 @@ class DataStorage {
     }
 
     removeForceDirectedSites(node) {
-        
+
     }
 
     generateForceDirectedLinks() {
@@ -456,15 +476,15 @@ class DataStorage {
     }
 
     addForceDirectedLinks(node) {
-        
+
      }
-        
+
     removeForceDirectedLinks(node) {
-        
+
     }
 
     packageLinks(nodes) {
-     
+
         let map = {},
             links = [];
 
@@ -489,4 +509,3 @@ class DataStorage {
         this.listNodes().map(function(node) {node.sortSites();});
     }
 }
-

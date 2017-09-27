@@ -121,45 +121,60 @@ type cc_node = {
 type connected_component = cc_node array
  *)
 
+let write_cc_port ob p =
+  let () = Bi_outbuf.add_char ob '{' in
+  let () = JsonUtil.write_field
+             "port_links" (JsonUtil.write_list
+                             (JsonUtil.write_compact_pair
+                                Yojson.Basic.write_int Yojson.Basic.write_int))
+             ob p.port_links in
+  let () = JsonUtil.write_comma ob in
+  let () = JsonUtil.write_field
+             "port_states" (JsonUtil.write_list Yojson.Basic.write_string)
+             ob p.port_states in
+  Bi_outbuf.add_char ob '}'
+
+let write_site ob f =
+  let () = Bi_outbuf.add_char ob '{' in
+  let () = match f.site_type with
+    | Counter i -> JsonUtil.write_field "counter" (Yojson.Basic.write_int) ob i
+    | Port p -> JsonUtil.write_field "port" write_cc_port ob p in
+  Bi_outbuf.add_char ob '}'
+
 let write_cc_site ob f =
   let () = Bi_outbuf.add_char ob '{' in
   let () = JsonUtil.write_field
       "site_name" Yojson.Basic.write_string ob f.site_name in
   let () = JsonUtil.write_comma ob in
-  match f.site_type with
-  | Counter i -> JsonUtil.write_field "counter" (Yojson.Basic.write_int) ob i
-  | Port p ->
-     let () = JsonUtil.write_field
-      "site_links" (JsonUtil.write_list
-                      (JsonUtil.write_compact_pair
-                         Yojson.Basic.write_int Yojson.Basic.write_int))
-      ob p.port_links in
-     let () = JsonUtil.write_comma ob in
-     let () = JsonUtil.write_field
-      "site_states" (JsonUtil.write_list Yojson.Basic.write_string)
-      ob p.port_states in
+  let () = JsonUtil.write_field "site_type" write_site ob f in
   Bi_outbuf.add_char ob '}'
 
 let read_cc_port p lb =
   let (port_links, port_states) =
   Yojson.Basic.read_fields
     (fun (s,i) key p lb ->
-     if key = "site_links" then
+     if key = "port_links" then
        (Yojson.Basic.read_list
             (JsonUtil.read_compact_pair
                Yojson.Basic.read_int Yojson.Basic.read_int) p lb,i)
-     else let () = assert (key = "site_states") in
+     else let () = assert (key = "port_states") in
           (s,Yojson.Basic.read_list Yojson.Basic.read_string p lb))
     ([],[]) p lb in
   {port_links; port_states}
+
+let read_site p lb =
+  Yojson.Basic.read_fields
+    (fun _ key p lb ->
+      if key = "counter" then (Counter (Yojson.Basic.read_int p lb))
+      else let () = assert (key = "port") in Port (read_cc_port p lb))
+    (Counter (-1)) p lb
 
 let read_cc_site p lb =
   let (site_name,site_type) =
     Yojson.Basic.read_fields
       (fun (n,s) key p lb ->
          if key = "site_name" then (Yojson.Basic.read_string p lb,s)
-         else if key = "counter" then (n,Counter (Yojson.Basic.read_int p lb))
-         else (n,Port (read_cc_port p lb)))
+         else let () = assert (key = "site_type") in (n,read_site p lb))
       ("",Counter (-1)) p lb in
   { site_name; site_type }
 
