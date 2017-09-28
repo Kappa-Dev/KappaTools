@@ -87,7 +87,7 @@ let update_text project new_files handler =
           x.Api_types_t.file_metadata.Api_types_t.file_metadata_position
           y.Api_types_t.file_metadata.Api_types_t.file_metadata_position)
       new_files in
-  let version : Api_types_j.project_version = project#set_files sorted_files in
+  let version = project#set_files sorted_files in
    handler version
 
 let excavate file_id file_list =
@@ -151,7 +151,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
           project
           (file::file_list)
           (fun
-            (_project_version : Api_types_j.project_version) ->
+            (_project_version) ->
             Lwt.return
               (Api_common.result_ok
                  file.Api_types_j.file_metadata)
@@ -181,7 +181,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
             project
             file_list
             (fun
-              (_project_version : Api_types_j.project_version) ->
+              (_project_version) ->
               Lwt.return
                 (Api_common.result_ok file.Api_types_j.file_metadata
                 )
@@ -200,7 +200,7 @@ class manager_file (project : Api_environment.project) : Api.manager_file =
              project
              updated_directory
              (fun
-               (_project_version : Api_types_j.project_version) ->
+               (_project_version) ->
                Lwt.return (Api_common.result_ok ())
              )
         )

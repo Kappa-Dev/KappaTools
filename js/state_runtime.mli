@@ -34,13 +34,13 @@ val create_spec : load:bool -> string -> unit Api.result
 (** Create a runtime to be used by the system *)
 
 val create_manager :
-  is_new:bool -> Api_types_t.project_id -> Api.concrete_manager Api.result Lwt.t
+  is_new:bool -> string -> Api.concrete_manager Api.result Lwt.t
 (** Get the current manager.  It is assumed that
     when the system is initalized this is set to a
     default, which is currently default web worker
     as it is provides the fastest simulation. *)
 
-val init : unit -> Api_types_t.project list Lwt.t
+val init : unit -> string list Lwt.t
 (* run on application init *)
 
 val sync : unit -> unit Lwt.t

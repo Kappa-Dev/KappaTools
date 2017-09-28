@@ -9,7 +9,7 @@ type manager_code =
 type result_code = manager_code
 type 'ok result = ('ok,manager_code) Api_types_t.result
 
-type project_id = Api_types_t.project_id
+type project_id = string
 
 class type manager_environment = object
   method environment_info:
@@ -17,8 +17,6 @@ class type manager_environment = object
 end
 
 class type manager_project = object
-  method project_get :
-    project_id -> Api_types_t.project result Lwt.t
   method project_parse :
     Api_types_t.overwritten_var list -> Api_types_t.project_parse result Lwt.t
 end
@@ -139,7 +137,7 @@ end
 class type rest_manager = object
   inherit manager_environment
   inherit concrete_manager
-  method project_catalog : Api_types_t.project_catalog result Lwt.t
+  method project_catalog : string list result Lwt.t
   method project_create :
     Api_types_t.project_parameter -> unit result Lwt.t
   method project_delete : project_id -> unit result Lwt.t

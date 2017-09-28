@@ -11,6 +11,11 @@ let write_to_channel f d x =
   let () = f b x in
   Bi_outbuf.flush_channel_writer b
 
+let string_of_write f ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  let () = f ob x in
+  Bi_outbuf.contents ob
+
 let read_between_spaces f lex_st lex_buf =
   let () = Yojson.Basic.read_space lex_st lex_buf in
   let x = f lex_st lex_buf in

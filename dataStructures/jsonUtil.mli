@@ -9,6 +9,7 @@
 (** Parsing utils *)
 
 val write_to_channel: (Bi_outbuf.t -> 'a -> unit) -> out_channel -> 'a -> unit
+val string_of_write: (Bi_outbuf.t -> 'a -> unit) -> ?len:int -> 'a -> string
 
 val read_between_spaces :
   (Yojson.Basic.lexer_state -> Lexing.lexbuf -> 'a) ->

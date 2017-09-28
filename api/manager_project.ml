@@ -12,19 +12,10 @@ let stop_simulation (system_process:Kappa_facade.system_process) :
        ~error:(fun errors ->
            Lwt.return (Api_common.result_messages errors)))
 
-let to_project project_id (project : Api_environment.project) =
-  { Api_types_j.project_id ;
-    Api_types_j.project_version = project#get_version () ; }
-
 class manager_project
     (project : Api_environment.project)
     (system_process : Kappa_facade.system_process) : Api.manager_project =
 object
-  method project_get
-      (project_id : Api_types_j.project_id) :
-    Api_types_j.project Api.result Lwt.t =
-    Lwt.return (Api_common.result_ok (to_project project_id project))
-
   method project_parse overwrites :
     Api_types_j.project_parse Api.result Lwt.t =
     (project#get_state () >>= function

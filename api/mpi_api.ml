@@ -40,9 +40,6 @@ let on_message
   | `FileUpdate (file_id,file_modification) ->
     (manager#file_update file_id file_modification) >>=
     (handler (fun result -> `FileUpdate result))
-  |  `ProjectGet project_id ->
-    (manager#project_get project_id) >>=
-    (handler (fun result -> `ProjectGet result))
   |  `ProjectParse overwrites ->
     manager#project_parse overwrites >>=
     (handler (fun result -> `ProjectParse result))
@@ -173,17 +170,6 @@ class virtual  manager_base () : manager_base_type =
       Api_common.result_bind_lwt
         ~ok:(function
             | `FileUpdate result ->
-              Lwt.return (Api_common.result_ok result)
-            | response ->
-              Lwt.return
-                (Api_common.result_error_exception
-                   (BadResponse response)))
-
-    method project_get (project_id : Api_types_j.project_id) : Api_types_j.project Api.result Lwt.t =
-      self#message (`ProjectGet project_id) >>=
-      Api_common.result_bind_lwt
-        ~ok:(function
-            | `ProjectGet result ->
               Lwt.return (Api_common.result_ok result)
             | response ->
               Lwt.return

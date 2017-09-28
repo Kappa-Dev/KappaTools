@@ -16,7 +16,7 @@ type parameters = {
 }
 
 type a_project = {
-  project_id : Api_types_j.project_id;
+  project_id : string;
   project_manager : Api.concrete_manager;
 }
 
@@ -29,8 +29,8 @@ type state = {
 }
 
 type model = {
-  model_project_id : Api_types_j.project_id option ;
-  model_project_ids : Api_types_j.project_id list ;
+  model_project_id : string option ;
+  model_project_ids : string list ;
   model_project_version : int ;
   model_parameters : parameters ;
 }
@@ -111,7 +111,7 @@ let update_state me project_catalog default_parameters project_parameters =
            Lwt.return (Api_common.result_messages errors))
     )
 
-let add_project is_new (project_id : Api_types_j.project_id) : unit Api.result Lwt.t =
+let add_project is_new project_id : unit Api.result Lwt.t =
   let catalog = (React.S.value state).project_catalog in
   (try
      Lwt.return (Api_common.result_ok
@@ -260,8 +260,6 @@ let init existing_projects : unit Lwt.t =
   let () = init_pause_condition arg_pause_condition in
   let () = init_model_seed arg_model_seed in
 
-  let existing_projects =
-    List.map (fun x -> x.Api_types_t.project_id) existing_projects in
   let projects = Common_state.url_args ~default:["default"] "project" in
   let rec add_projects projects : unit Lwt.t =
     match projects with

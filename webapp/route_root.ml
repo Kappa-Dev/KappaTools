@@ -89,7 +89,7 @@ let add_projects parameter projects =
     let () = projects := Mods.StringMap.add project_id manager !projects in
     Lwt.return (Api_common.result_ok ())
 
-let delete_projects (project_id : Api_types_j.project_id) projects :
+let delete_projects project_id projects :
   unit Api.result Lwt.t =
   match Mods.StringMap.pop project_id !projects with
   | None,_ ->
@@ -126,18 +126,11 @@ let route
         fun ~context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
-            let simulations =
-              (*Mods.StringMap.fold
-                  (fun _ manager acc ->
-                   match m#get_simulation () with
-                   | None -> acc
-                   | Some _ -> succ acc)
-                  !projects*) 0 in
-            let info =
-              { Api_types_j.environment_simulations = simulations;
-                Api_types_j.environment_projects =
-                  Mods.StringMap.size !projects;
-                Api_types_j.environment_build = Version.version_string; } in
+            let info = {
+              Api_types_j.environment_projects =
+                Mods.StringMap.size !projects;
+              Api_types_j.environment_build = Version.version_string;
+            } in
             Webapp_common.api_result_response
               ~string_of_success:(Api_types_j.string_of_environment_info
                                     ?len:None)
@@ -188,19 +181,12 @@ let route
         fun ~context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `GET ->
-            Mods.StringMap.fold
-              (fun project_id manager acc ->
-                 acc >>= Api_common.result_bind_lwt
-                   ~ok:(fun acc ->
-                       manager#project_get project_id >>=
-                       Api_common.result_bind_lwt
-                         ~ok:(fun x ->
-                             Lwt.return (Api_common.result_ok (x::acc)))
-                     ))
-              !projects (Lwt.return (Api_common.result_ok [])) >>=
+            let names = List.map fst (Mods.StringMap.bindings !projects) in
             Webapp_common.api_result_response
-              ~string_of_success:(Mpi_message_j.string_of_project_catalog
-                                    ?len:None)
+              ~string_of_success:
+                (JsonUtil.string_of_write
+                   (JsonUtil.write_list Yojson.Basic.write_string) ?len:None)
+              (Api_common.result_ok names)
           | `POST ->
             (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.project_parameter_of_string >>=
@@ -212,7 +198,7 @@ let route
     };
     { Webapp_common.path = "/v2/projects/{projectid}" ;
       Webapp_common.operation =
-        let methods = [ `OPTIONS ; `DELETE ; `GET ] in
+        let methods = [ `OPTIONS ; `DELETE ] in
         fun ~context ->
           let project_id = project_ref context in
           match context.Webapp_common.request.Cohttp.Request.meth with
@@ -220,13 +206,6 @@ let route
             (delete_projects project_id projects) >>=
             (Webapp_common.api_result_response
                ~string_of_success:(fun () -> "null"))
-          | `GET ->
-            bind_projects
-              (fun manager -> manager#project_get project_id)
-              project_id projects >>=
-            (Webapp_common.api_result_response
-               ~string_of_success:(Mpi_message_j.string_of_project ?len:None)
-            )
           | `OPTIONS -> Webapp_common.options_respond methods
           | _ -> Webapp_common.method_not_allowed_respond methods
     };

@@ -14,9 +14,6 @@ type 'ok result = ('ok,manager_code) api_result
 
 type environment_info <ocaml from="Api_types"> = abstract
 
-type project_id <ocaml from="Api_types"> = abstract
-type project <ocaml from="Api_types"> = abstract
-
 type file_metadata <ocaml from="Api_types"> = abstract
 type file <ocaml from="Api_types"> = abstract
 type file_modification <ocaml from="Api_types"> = abstract
@@ -26,7 +23,6 @@ type overwritten_var <ocaml from="Api_types"> = abstract
 type project_parse <ocaml from="Api_types"> = abstract
 
 type project_parameter <ocaml from="Api_types"> = abstract
-type project_catalog <ocaml from="Api_types"> = abstract
 
 type simulation_parameter <ocaml from="Api_types"> = abstract
 type simulation_perturbation  <ocaml from="Api_types"> = abstract
@@ -59,7 +55,6 @@ type request = [
                | FileCatalog
                | FileUpdate of (file_id * file_modification)
 	       | ProjectParse of overwritten_var list
-	       | ProjectGet of project_id
                | SimulationContinue of string
                | SimulationDelete
                | SimulationDetailFileLine of string
@@ -84,7 +79,7 @@ type rest_request = [
      | EnvironmentInfo
      | ProjectCatalog
      | ProjectCreate of project_parameter
-     | ProjectDelete of project_id
+     | ProjectDelete of string
      ]
 
 type response_content = [
@@ -94,7 +89,6 @@ type response_content = [
    | FileCatalog of file_catalog
    | FileUpdate of file_metadata
    | ProjectParse of project_parse
-   | ProjectGet of project
    | SimulationDetailFileLine of string list
    | SimulationDetailFluxMap of flux_map
    | SimulationDetailLogMessage of log_message
@@ -119,7 +113,7 @@ type rest_response_content = [
      | EnvironmentInfo of environment_info
      | ProjectCreate
      | ProjectDelete
-     | ProjectCatalog of project_catalog
+     | ProjectCatalog of string list
 ]
 
 type response = response_content result

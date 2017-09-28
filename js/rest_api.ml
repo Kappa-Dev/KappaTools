@@ -104,13 +104,6 @@ class manager
                            overwrite)))
         (fun result ->
              (`ProjectParse (Mpi_message_j.project_parse_of_string result)))
-    | `ProjectGet project_id ->
-      send
-        ?timeout
-        (Format.sprintf "%s/v2/projects/%s" url project_id)
-        `GET
-        (fun result ->
-             (`ProjectGet (Mpi_message_j.project_of_string result)))
     | `SimulationContinue pause_condition ->
       send
         ?timeout
@@ -328,7 +321,11 @@ class manager
         (Format.sprintf "%s/v2/projects" url)
         `GET
         (fun result ->
-             (`ProjectCatalog (Mpi_message_j.project_catalog_of_string result)))
+           let projects =
+             Yojson.Safe.read_list
+               Yojson.Safe.read_string
+               (Yojson.Safe.init_lexer ()) (Lexing.from_string result) in
+           `ProjectCatalog projects)
     | `ProjectCreate project_parameter ->
       send
         ?timeout
@@ -356,9 +353,7 @@ class manager
               (Api_common.result_error_exception
                  (BadResponse response)))
 
-    method project_delete
-        (project_id : Api_types_j.project_id) :
-      unit Api.result Lwt.t =
+    method project_delete project_id: unit Api.result Lwt.t =
       self#rest_message (`ProjectDelete project_id) >>=
       Api_common.result_bind_lwt
         ~ok:(function
@@ -371,7 +366,7 @@ class manager
 
           )
 
-    method project_catalog : Api_types_j.project_catalog Api.result Lwt.t =
+    method project_catalog : string list Api.result Lwt.t =
       self#rest_message `ProjectCatalog >>=
       Api_common.result_bind_lwt
         ~ok:(function

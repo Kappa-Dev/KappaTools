@@ -98,10 +98,7 @@ let read_snapshot p lb =
       ("",-1,nan,[],[||]) p lb in
   {snapshot_file;snapshot_event;snapshot_time;snapshot_agents;snapshot_tokens}
 
-let string_of_snapshot ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  let () = write_snapshot ob x in
-  Bi_outbuf.contents ob
+let string_of_snapshot = JsonUtil.string_of_write write_snapshot
 
 let snapshot_of_string s =
   read_snapshot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
@@ -167,10 +164,7 @@ let read_flux_map p lb =
   { flux_rules;flux_end;
     flux_data={ flux_name;flux_kind;flux_start;flux_hits;flux_fluxs } }
 
-let string_of_flux_map ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  let () = write_flux_map ob x in
-  Bi_outbuf.contents ob
+let string_of_flux_map = JsonUtil.string_of_write write_flux_map
 
 let flux_map_of_string s =
   read_flux_map (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
@@ -305,10 +299,7 @@ let read_plot p lb =
       ([||],[]) p lb in
   { plot_legend; plot_series; }
 
-let string_of_plot ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  let () = write_plot ob x in
-  Bi_outbuf.contents ob
+let string_of_plot = JsonUtil.string_of_write write_plot
 
 let plot_of_string s =
   read_plot (Yojson.Safe.init_lexer ()) (Lexing.from_string s)

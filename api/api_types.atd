@@ -2,8 +2,6 @@
    this should be replaced by.  It is expected than non error
    message will decide how best to relay its messages.
 *)
-type unit_t = unit
-
 type ('ok,'error) result_data <ocaml from module="Result_util" t="t"> = abstract
 
 type range <ocaml from module="Locality"> = abstract
@@ -32,22 +30,13 @@ type ('ok,'code)  result =
 (* Give a summary of the service.  The intention is to give the
    users an overview of the state of the kappa service.
 *)
-type environment_info = { simulations : int ;
-                          projects :  int ;
-                          build : string ; } <ocaml field_prefix="environment_">
+type environment_info = {
+  projects :  int ;
+  build : string ;
+} <ocaml field_prefix="environment_">
 
-type workspace_id = string
-type workspace_catalog = workspace_id list
-type workspace_parameter = { workspace_id : workspace_id }
-type workspace_info = unit
-
-type project_id = string
-type project_version = int
-
-type project = { project_id : project_id ;
-                 project_version : project_version ; }
-type project_catalog = project list
-type project_parameter = { project_parameter_project_id <json name="project_id"> : project_id ; }
+type project_parameter = {
+project_parameter_project_id <json name="project_id"> : string ; }
 
 
 type site_graph <ocaml module="User_graph" t="connected_component"> = abstract
@@ -57,7 +46,7 @@ type overwritten_var =
 { var : string; val : nbr } <ocaml field_prefix="overwrite_">
 
 type project_parse = {
-  project_parse_project_version  <json name="project_version">: project_version ;
+  project_parse_project_version  <json name="project_version">: int ;
   project_parse_raw_ast <json name="boxed_ast">: string ;
 }
 type kappa_code = string
@@ -136,8 +125,6 @@ type simulation_progress = { simulation_progress_time : float;
 
 type simulation_info = { simulation_info_progress : simulation_progress  ;
 			 simulation_info_output : simulation_info_output; }
-
-type simulation = { simulation_info : simulation_info nullable }
 
 (* file *)
 type client_id     = string
