@@ -296,11 +296,11 @@ let read_plot p lb =
   let (plot_legend,plot_series) =
     Yojson.Basic.read_fields
       (fun (l,s) key p lb ->
-         if key = "plot_series" then
+         if key = "series" then
            (l,Yojson.Basic.read_list
               (Yojson.Basic.read_array
                  (JsonUtil.read_option Yojson.Basic.read_number)) p lb)
-         else let () = assert (key = "plot_legend") in
+         else let () = assert (key = "legend") in
            (Yojson.Basic.read_array Yojson.Basic.read_string p lb,s))
       ([||],[]) p lb in
   { plot_legend; plot_series; }
