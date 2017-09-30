@@ -104,11 +104,25 @@ let rec counter_value cc (nid,sid) count =
         | Some x -> counter_value cc x (acc+1)) count ag.node_sites
 
 let cc_to_user_cc sigs cc =
-  let cc_without_counters =
-    Array.of_list
-      (Array.fold_right
-         (fun ag acc ->
-           if not(is_counter ag.node_type sigs) then ag::acc else acc) cc []) in
+  let r = Renaming.empty () in
+  let (cc_list,indexes,_) =
+    Tools.array_fold_lefti
+         (fun i (acc,indexes,pos) ag ->
+           if not(is_counter ag.node_type sigs)
+           then
+             let indexes' =
+               if i = pos then indexes else
+                 match Renaming.add i pos indexes with
+                 | None ->
+                    raise
+                      (ExceptionDefn.Internal_Error
+                         (Locality.dummy_annot
+                            "Injectivity of renaming in snapshot"))
+                 | Some r -> r in
+             (ag::acc,indexes',pos+1)
+           else (acc,indexes,pos))
+         ([],r,0) cc in
+  let cc_without_counters = Array.of_list (List.rev cc_list) in
   Array.map
     (fun ag -> {
          User_graph.node_type =
@@ -131,11 +145,14 @@ let cc_to_user_cc sigs cc =
                    | None ->
                       User_graph.Port
                         {User_graph.port_links = []; User_graph.port_states}
-                   | Some ((dn_id,_) as x) ->
+                   | Some (dn_id,s) ->
+                      let dn_id' =
+                        try Renaming.apply indexes dn_id with
+                          Renaming.Undefined | Invalid_argument _ -> dn_id in
                       if not(is_counter (cc.(dn_id)).node_type sigs) then
                         User_graph.Port
-                          {User_graph.port_links = [x]; User_graph.port_states}
-                      else User_graph.Counter (counter_value cc x 0)
+                          {User_graph.port_links = [(dn_id',s)]; User_graph.port_states}
+                      else User_graph.Counter (counter_value cc (dn_id,s) 0)
                       })
                       ag.node_sites;
     })
