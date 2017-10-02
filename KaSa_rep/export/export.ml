@@ -464,14 +464,14 @@ let rename_links parameter handler error map l =
 
 let reindex parameters error handler list =
   let map,_ =
-    List.fold_left
+    Array.fold_left
       (fun (map,counter_ag) site_node ->
-         let ag = site_node.Public_data.site_node_name in
-         let interface = site_node.Public_data.site_node_sites in
+         let ag = site_node.User_graph.node_type in
+         let interface = site_node.User_graph.node_sites in
          let map,_ =
-           List.fold_left
+           Array.fold_left
              (fun (map,counter_site) site ->
-                let site_name = site.Public_data.site_name in
+                let site_name = site.User_graph.site_name in
                 Mods.String2Map.add (ag,site_name) (counter_ag,counter_site)
                 map,
               counter_site+1)
@@ -482,24 +482,30 @@ let reindex parameters error handler list =
     (Mods.String2Map.empty, 0)
     list
   in
-  List.fold_left
-    (fun (error,agent_list) site_node ->
+  Array.fold_right
+    (fun site_node (error,agent_list) ->
        let error, interface =
-         List.fold_left
-           (fun (error,interface) site ->
-              let error, new_links =
-                  rename_links
-                    parameters handler error map
-                    site.Public_data.site_links
-              in
-              let site = {site with Public_data.site_links = new_links} in
+         Array.fold_right
+           (fun site (error,interface) ->
+              let error,site =
+                match site.User_graph.site_type with
+                | User_graph.Counter _ -> error,site
+                | User_graph.Port p ->
+                  let error, new_links =
+                    rename_links
+                      parameters handler error map
+                      p.User_graph.port_links
+                  in
+                  error,{site with User_graph.site_type =
+                                     User_graph.Port {p with User_graph.port_links =
+                                                               new_links}} in
               error, (site::interface))
-           (error,[]) (List.rev site_node.Public_data.site_node_sites)
+           site_node.User_graph.node_sites (error,[])
        in
-       let agent = {site_node with Public_data.site_node_sites = interface}
+       let agent = {site_node with User_graph.node_sites = Array.of_list interface}
        in
        error, agent::agent_list)
-    (error,[]) (List.rev list)
+    list (error,[])
 
 
 (******************************************************************)
@@ -1279,18 +1285,20 @@ let get_internal_contact_map
   | Public_data.Full -> get_intermediary_internal_contact_map state
 
 let convert_contact_map_map_to_list sol =
-  List.rev
+  Tools.array_rev_of_list
     (Mods.StringSetMap.Map.fold
        (fun a data l ->
-          { Public_data.site_node_name= a;
-            Public_data.site_node_sites=
-              List.rev
+          { User_graph.node_type = a;
+            User_graph.node_sites=
+              Tools.array_rev_of_list
                 (Mods.StringSetMap.Map.fold
                    (fun a (props,links) l ->
                       {
-                        Public_data.site_name=a;
-                        Public_data.site_links=links;
-                        Public_data.site_states=props
+                        User_graph.site_name=a;
+                        User_graph.site_type = User_graph.Port {
+                            User_graph.port_links=links;
+                            User_graph.port_states=props;
+                          }
                       }::l) data [])}::l)
        sol [])
 
@@ -1346,10 +1354,10 @@ let convert_contact_map show_title state contact_map =
     reindex parameters error handler contact_map
   in
   Remanent_state.set_errors error state,
-  contact_map
+  Array.of_list contact_map
 
 let compute_contact_map
-    ?accuracy_level:(accuracy_level=Public_data.Low) _show_title =
+    ?(accuracy_level=Public_data.Low) _show_title =
   compute_map_gen
     get_internal_contact_map
     Remanent_state.set_contact_map
@@ -1376,15 +1384,19 @@ let print_contact_map parameters contact_map =
   let log = (Remanent_parameters.get_logger parameters) in
   Loggers.fprintf log  "Contact map: ";
   Loggers.print_newline log;
-  List.iter
+  Array.iter
     (fun node ->
-       let x = node.Public_data.site_node_name in
-       let interface = node.Public_data.site_node_sites in
-       List.iter
+       let x = node.User_graph.node_type in
+       let interface = node.User_graph.node_sites in
+       Array.iter
          (fun site ->
-            let y = site.Public_data.site_name in
-            let l1 = site.Public_data.site_states in
-            let l2 = site.Public_data.site_links in
+            let y = site.User_graph.site_name in
+            let l1,l2 =
+              match site.User_graph.site_type with
+              | User_graph.Counter _ ->
+                failwith "KaSa does not deal yet with counters"
+              | User_graph.Port p ->
+                p.User_graph.port_states, p.User_graph.port_links in
             if l1<>[]
             then
               begin
@@ -1589,6 +1601,7 @@ let compute_raw_contact_map show_title state =
   let error, sol =
     reindex parameters error handler sol
   in
+  let sol = Array.of_list sol in
   Remanent_state.set_errors error
     (Remanent_state.set_contact_map Public_data.Low sol state),
   sol
@@ -1608,16 +1621,20 @@ let compute_signature show_title state =
   let state,l = get_contact_map state in
   let () = show_title state in
   let state, l =
-    List.fold_left
+    Array.fold_left
       (fun (state,list) site_node ->
-         let a = site_node.Public_data.site_node_name in
-         let interface = site_node.Public_data.site_node_sites in
+         let a = site_node.User_graph.node_type in
+         let interface = site_node.User_graph.node_sites in
          let state,acc =
-           List.fold_left
+           Array.fold_left
              (fun (state,acc) site ->
-                let x = site.Public_data.site_name in
-                let states = site.Public_data.site_states in
-                let binding = site.Public_data.site_links in
+                let x = site.User_graph.site_name in
+                let states,binding =
+                  match site.User_graph.site_type with
+                  | User_graph.Counter _ ->
+                    failwith "KaSa does not deal with counters yet"
+                  | User_graph.Port p ->
+                    p.User_graph.port_states, p.User_graph.port_links in
                 let state, binding' =
                   List.fold_left
                     (fun (state,list) (x,y) ->

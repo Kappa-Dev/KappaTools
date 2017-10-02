@@ -30,19 +30,7 @@ val accuracy_of_json : Yojson.Basic.json -> accuracy_level
 
 module AccuracyMap: SetMap.Map with type elt = accuracy_level
 
-type site = {
-     site_name: string;
-     site_links: (int * int) list;
-     site_states: string list;
-}
-
-type site_node = {
-     site_node_name: string;
-     site_node_sites: site list (*ocaml repr="array">*)
-}
-
-type site_graph = site_node list (*ocaml repr="array"*)
-type contact_map = site_graph
+type contact_map = User_graph.connected_component
 
 val contact_map_to_json:
   accuracy_level * contact_map -> Yojson.Basic.json

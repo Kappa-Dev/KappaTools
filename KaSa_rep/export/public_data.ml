@@ -19,8 +19,9 @@ let interface="interface"
 let site="site name"
 let stateslist="states list"
 let sitename = "site_name"
-let sitelinks = "site_links"
-let sitestates = "site_states"
+let sitetype = "site_type"
+let sitelinks = "port_links"
+let sitestates = "port_states"
 let sitenodename = "node_type"
 let sitenodesites = "node_sites"
 let hyp = "site graph"
@@ -115,32 +116,56 @@ module AccuracyMap = AccuracySetMap.Map
 (* Contact map *)
 (***************)
 
-type site = {
-     site_name: string;
-     site_links: (int * int) list;
-     site_states: string list;
-}
+type contact_map = User_graph.connected_component
 
-type site_node = {
-     site_node_name: string;
-     site_node_sites: site list (*ocaml repr="array">*);
-}
+let site_type_to_json = function
+  | User_graph.Counter i -> `List [ `String "counter"; `Int i ]
+  | User_graph.Port p ->
+    `List [
+      `String "port";
+      `Assoc [
+        sitelinks,
+        JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y])
+          p.User_graph.port_links;
 
-type site_graph = site_node list (*ocaml repr="array"*)
-type contact_map = site_graph
+        sitestates,
+        JsonUtil.of_list JsonUtil.of_string p.User_graph.port_states
+      ]
+    ]
 
 let site_to_json site =
   `Assoc
     [
-      sitename,
-      JsonUtil.of_string site.site_name;
-
-      sitelinks,
-      JsonUtil.of_list (fun (x,y) -> `List [`Int x; `Int y]) site.site_links;
-
-      sitestates,
-      JsonUtil.of_list JsonUtil.of_string site.site_states
+      sitename, JsonUtil.of_string site.User_graph.site_name;
+      sitetype, site_type_to_json site.User_graph.site_type
     ]
+
+let site_type_of_json = function
+  | `List [ `String "counter"; `Int i ] -> User_graph.Counter i
+  | `List [ `String "port"; `Assoc l ] as x ->
+    begin
+      try
+        let port_links =
+          let json = List.assoc sitelinks l in
+          JsonUtil.to_list ~error_msg:"link list"
+            (function
+              | `List [ `Int ag; `Int si ] -> (ag,si)
+              | x -> raise (Yojson.Basic.Util.Type_error
+                              (JsonUtil.build_msg "sites_links",x)))
+            json
+        in
+        let port_states =
+          let json = List.assoc sitestates l in
+          JsonUtil.to_list ~error_msg:"state list"
+            (JsonUtil.to_string ~error_msg:"state")
+            json
+        in
+        User_graph.Port { User_graph.port_links; User_graph.port_states }
+      with
+      | _ ->
+        raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node type",x))
+    end
+  | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node type",x))
 
 let site_of_json =
   function
@@ -151,25 +176,13 @@ let site_of_json =
             let json = List.assoc sitename l in
             JsonUtil.to_string json
           in
-          let site_links =
-            let json = List.assoc sitelinks l in
-            JsonUtil.to_list ~error_msg:"link list"
-              (function
-                | `List [ `Int ag; `Int si ] -> (ag,si)
-                | x -> raise (Yojson.Basic.Util.Type_error
-                                (JsonUtil.build_msg "sites_links",x)))
-              json
-          in
-          let site_states =
-            let json = List.assoc sitestates l in
-            JsonUtil.to_list ~error_msg:"state list"
-              (JsonUtil.to_string ~error_msg:"state")
-              json
+          let site_type =
+            let json = List.assoc sitetype l in
+            site_type_of_json json
           in
           {
-            site_name;
-            site_links;
-            site_states;
+            User_graph.site_name;
+            User_graph.site_type;
           }
         with
         | _ ->
@@ -179,10 +192,10 @@ let site_of_json =
 
 
 let site_node_sites_to_json list =
-  JsonUtil.of_list site_to_json list
+  JsonUtil.of_array site_to_json list
 
 let site_node_sites_of_json =
-  JsonUtil.to_list
+  JsonUtil.to_array
     ~error_msg:"site node sites"
     site_of_json
 
@@ -191,10 +204,10 @@ let site_node_sites_of_json =
 let site_node_to_json node =
   `Assoc
     [ sitenodename,
-      JsonUtil.of_string node.site_node_name;
+      JsonUtil.of_string node.User_graph.node_type;
 
       sitenodesites,
-      site_node_sites_to_json node.site_node_sites]
+      site_node_sites_to_json node.User_graph.node_sites]
 
 
 let site_node_of_json =
@@ -202,17 +215,17 @@ function
 | `Assoc l as x ->
   begin
     try
-      let site_node_name =
+      let node_type =
         let json = List.assoc sitenodename l in
         JsonUtil.to_string json
       in
-      let site_node_sites =
+      let node_sites =
         let json = List.assoc sitenodesites l in
         site_node_sites_of_json json
       in
       {
-        site_node_name;
-        site_node_sites
+        User_graph.node_type;
+        User_graph.node_sites
       }
     with
     | _ ->
@@ -226,7 +239,7 @@ let contact_map_to_json contact_map=
      JsonUtil.of_pair
        ~lab1:accuracy_string ~lab2:map
        accuracy_to_json
-       (JsonUtil.of_list
+       (JsonUtil.of_array
           site_node_to_json)
        contact_map
     ]
@@ -242,7 +255,7 @@ let contact_map_of_json =
           ~lab1:accuracy_string ~lab2:map
           ~error_msg:(JsonUtil.build_msg "contact map")
           accuracy_of_json
-          (JsonUtil.to_list
+          (JsonUtil.to_array
              ~error_msg:(JsonUtil.build_msg "site nodes list")
              site_node_of_json
           )

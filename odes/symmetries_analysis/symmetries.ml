@@ -61,12 +61,15 @@ let partition_gen
     empty add find_option fold sort empty_range cache hash int_of_hash f list =
   let map =
     fst
-      (List.fold_left
+      (Array.fold_left
          (fun (inverse,cache) site ->
-            let key = site.Public_data.site_name in
+            let key = site.User_graph.site_name in
             let data =
-              site.Public_data.site_states,
-              site.Public_data.site_links
+              match site.User_graph.site_type with
+              | User_graph.Counter _ ->
+                failwith "KaSa does not deal with counters yet"
+              | User_graph.Port p ->
+              p.User_graph.port_states, p.User_graph.port_links
             in
             let range = f data in
             if range = empty_range
@@ -128,10 +131,10 @@ end
 module BindingTypeList = Hashed_list.Make (BindingType)
 
 let collect_partitioned_contact_map contact_map =
-  List.fold_left
+  Array.fold_left
     (fun map site_node ->
-       let ag = site_node.Public_data.site_node_name in
-       let site_list = site_node.Public_data.site_node_sites in
+       let ag = site_node.User_graph.node_type in
+       let site_list = site_node.User_graph.node_sites in
        let cache1 = StateList.init () in
        let cache2 = BindingTypeList.init () in
        let (internal_state_partition: string list list) =
@@ -205,34 +208,39 @@ let print_partitioned_contact_map_in_lkappa logger env partitioned_contact_map =
 
 let print_contact_map parameters contact_map =
   let log = Remanent_parameters.get_logger parameters in
-  List.iter
+  Array.iter
     (fun site_node ->
-       let agent = site_node.Public_data.site_node_name in
-       let interface = site_node.Public_data.site_node_sites in
+       let agent = site_node.User_graph.node_type in
+       let interface = site_node.User_graph.node_sites in
        let () = Loggers.fprintf log "agent:%s\n" agent in
-       List.iter
+       Array.iter
          (fun site ->
-            let site_name = site.Public_data.site_name in
-            let l1 = site.Public_data.site_states in
-            let l2 = site.Public_data.site_links in
+            let site_name = site.User_graph.site_name in
             let () = Loggers.fprintf log "  site:%s\n" site_name in
-            let () =
-              if l1 <> []
-              then
-                let () = Loggers.fprintf log "internal_states:" in
-                let () = List.iter (Loggers.fprintf log "%s;") l1 in
-                let () = Loggers.print_newline log in ()
-            in
-            let () =
-              if l2 <> []
-              then
-                let () = Loggers.fprintf log "binding_states:" in
-                let () =
-                  List.iter (fun (s1,s2) ->
-                      Loggers.fprintf log "%i.%i;" s1 s2) l2
-                in
-                let () = Loggers.print_newline log in ()
-            in ()) interface) contact_map
+            match site.User_graph.site_type with
+            | User_graph.Counter i ->
+              let () = Loggers.fprintf log "counter: %i" i in
+              let () = Loggers.print_newline log in ()
+            | User_graph.Port p ->
+              let l1 = p.User_graph.port_states in
+              let l2 = p.User_graph.port_links in
+              let () =
+                if l1 <> []
+                then
+                  let () = Loggers.fprintf log "internal_states:" in
+                  let () = List.iter (Loggers.fprintf log "%s;") l1 in
+                  let () = Loggers.print_newline log in ()
+              in
+              let () =
+                if l2 <> []
+                then
+                  let () = Loggers.fprintf log "binding_states:" in
+                  let () =
+                    List.iter (fun (s1,s2) ->
+                        Loggers.fprintf log "%i.%i;" s1 s2) l2
+                  in
+                  let () = Loggers.print_newline log in ()
+              in ()) interface) contact_map
 
 (****************************************************************)
 

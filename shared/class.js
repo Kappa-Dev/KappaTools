@@ -59,34 +59,22 @@ class Site extends D3Object {
     constructor (siteData, agent) {
         super(siteData.site_name);
         let site = this;
-        let type = siteData.site_type;
-	var links = [];
-	var states = [];
-	var counter = -1;
-	Object.keys(type).forEach(function (d) {
-	    if (d == "port") {
-		let port = type[d];
-
-		links = port.port_links.map(function(link) {
-                    return new SiteLink(link[0],link[1]);
-		});
-		states = port.port_states.map(function(state) {
-                    return new State(state, site);
-		});
-	    };
-	    if (d == "counter") {
-		counter = type[d];
-		console.log(counter);
-	    };
-	});
-
-	if (counter !== -1) {
-	    this.counter = counter;
-	}
-
-	this.links = links;
-	this.states = states;
         this.agent = agent;
+        let type = siteData.site_type;
+        if (type[0] == "port") {
+            let port = type[1];
+
+	    this.links = port.port_links.map(function(link) {
+                return new SiteLink(link[0],link[1]);
+	    });
+	    this.states = port.port_states.map(function(state) {
+                return new State(state, site);
+	    });
+	};
+	if (type[0] == "counter") {
+	    this.counter = type[1];
+	};
+
         this.currentState = null;
         this.startAngle = 0;
         this.endAngle = 0;

@@ -118,15 +118,18 @@ let contact_map_converted parameters errors handler contact_map store_result =
       handler.Cckappa_sig.sites
   in
   (*convert each node in contact map to node in graph*)
-  List.fold_left (fun (errors, store_result) node ->
-      let x = node.Public_data.site_node_name in
-      let interface = node.Public_data.site_node_sites in
-      List.fold_left (fun (errors, store_result) site ->
-          let y  = site.Public_data.site_name in
+  Array.fold_left (fun (errors, store_result) node ->
+      let x = node.User_graph.node_type in
+      let interface = node.User_graph.node_sites in
+      Array.fold_left (fun (errors, store_result) site ->
+          let y  = site.User_graph.site_name in
           (*l2 can be edges; site_name can be id*)
           (*let l1 = site.Public_data.site_states in*)
           (*list of n2*)
-          let l2 = site.Public_data.site_links in
+          let l2 = match site.User_graph.site_type with
+            | User_graph.Counter _ ->
+              failwith "Kasa does not deal with counters yet"
+            | User_graph.Port p -> p.User_graph.port_links in
           let errors, (agent_name, site_name) =
             let errors, (bool, output) =
               Ckappa_sig.Dictionary_of_agents.allocate_bool
@@ -212,7 +215,7 @@ let compute_graph_scc parameters errors contact_map_converted store_result =
        in
        (*todo: check the condition of edges*)
        let errors, edges_list =
-         List.fold_left (fun (erros, store_list) n1 ->
+         List.fold_left (fun (errors, store_list) n1 ->
              Ckappa_sig.AgentSite_map_and_set.Map.fold
                (fun (ag2, site2) nodes' (errors, store_list) ->
                   List.fold_left (fun (errors, store_list) n2 ->

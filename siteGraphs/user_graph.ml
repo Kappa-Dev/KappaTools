@@ -135,11 +135,17 @@ let write_cc_port ob p =
   Bi_outbuf.add_char ob '}'
 
 let write_site ob f =
-  let () = Bi_outbuf.add_char ob '{' in
+  let () = Bi_outbuf.add_char ob '[' in
   let () = match f.site_type with
-    | Counter i -> JsonUtil.write_field "counter" (Yojson.Basic.write_int) ob i
-    | Port p -> JsonUtil.write_field "port" write_cc_port ob p in
-  Bi_outbuf.add_char ob '}'
+    | Counter i ->
+      let () = Yojson.Basic.write_string ob "counter" in
+      let () = Bi_outbuf.add_char ob ',' in
+      Yojson.Basic.write_int ob i
+    | Port p ->
+      let () = Yojson.Basic.write_string ob "port" in
+      let () = Bi_outbuf.add_char ob ',' in
+      write_cc_port ob p in
+  Bi_outbuf.add_char ob ']'
 
 let write_cc_site ob f =
   let () = Bi_outbuf.add_char ob '{' in
@@ -163,11 +169,17 @@ let read_cc_port p lb =
   {port_links; port_states}
 
 let read_site p lb =
-  Yojson.Basic.read_fields
-    (fun _ key p lb ->
-      if key = "counter" then (Counter (Yojson.Basic.read_int p lb))
-      else let () = assert (key = "port") in Port (read_cc_port p lb))
-    (Counter (-1)) p lb
+  let () = Yojson.Basic.read_lbr p lb in
+  let key = JsonUtil.read_between_spaces Yojson.Basic.read_string p lb in
+  let () = Yojson.Basic.read_comma p lb in
+  let out =
+    JsonUtil.read_between_spaces
+      (fun p lb ->
+         if key = "counter" then Counter (Yojson.Basic.read_int p lb)
+         else let () = assert (key = "port") in Port (read_cc_port p lb))
+      p lb in
+  let () = Yojson.Basic.read_rbr p lb in
+  out
 
 let read_cc_site p lb =
   let (site_name,site_type) =
