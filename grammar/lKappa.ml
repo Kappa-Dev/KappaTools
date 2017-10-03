@@ -424,51 +424,6 @@ let rule_of_json ~filenames = function
     end
   | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect rule",x))
 
-let build_l_type sigs pos dst_ty dst_p switch =
-  let ty_id = Signature.num_of_agent dst_ty sigs in
-  let p_id = Signature.id_of_site dst_ty dst_p sigs in
-  ((Ast.LNK_TYPE (p_id,ty_id),pos),switch)
-
-let add_link_contact_map ?contact_map sty sp dty dp =
-  match contact_map with
-  | None -> ()
-  | Some contact_map ->
-    let si, sl = contact_map.(sty).(sp) in
-    let di,dl = contact_map.(dty).(dp) in
-    let () = contact_map.(sty).(sp) <-
-        si, List_util.merge_uniq Mods.int_pair_compare sl [dty,dp] in
-    contact_map.(dty).(dp) <-
-      di, List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
-
-let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
-  if Mods.IntMap.mem i links_two then
-    raise (ExceptionDefn.Malformed_Decl
-             ("This is the third occurence of link '"^string_of_int i
-              ^"' in the same mixture.",pos))
-  else match Mods.IntMap.pop i links_one with
-    | None,one' ->
-      let new_link = match switch with
-        | Linked (j,_) -> Some j
-        | Freed | Erased | Maintained -> None in
-      ((Ast.LNK_VALUE (i,(-1,-1)),pos),switch),
-      (Mods.IntMap.add i (ag_ty,p_id,new_link,pos) one',links_two)
-    | Some (dst_ty,dst_p,dst_id,_),one' ->
-      if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
-        let () = add_link_contact_map ?contact_map ag_ty p_id dst_ty dst_p in
-        let maintained = match switch with
-          | Linked (j,_) -> Some j = dst_id
-          | Freed | Erased | Maintained -> false in
-        ((Ast.LNK_VALUE (i,(dst_p,dst_ty)),pos),
-         if maintained then Maintained else switch),
-        (one',Mods.IntMap.add i (ag_ty,p_id,maintained) links_two)
-      else
-        raise (ExceptionDefn.Malformed_Decl
-                 (Format.asprintf
-                    "Forbidden link to a %a.%a from signature declaration"
-                    (Signature.print_site sigs dst_ty) dst_p
-                    (Signature.print_agent sigs) dst_ty,
-                  pos))
-
 let forbid_modification pos = function
   | None -> ()
   | Some _ ->
