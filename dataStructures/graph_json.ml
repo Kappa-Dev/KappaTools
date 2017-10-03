@@ -93,8 +93,8 @@ let node_to_json (id, directives) =
   ]
 let edge_to_json (id1, id2, directives) =
   `Assoc [
-    "from", `String id1 ;
-    "to", `String id2;
+    "source", `String id1 ;
+    "target", `String id2;
     "directives", directives_to_json directives
   ]
 
@@ -197,8 +197,8 @@ let edge_of_json = function
   | `Assoc l as x when List.length l = 2 ->
     begin
       try
-        id_of_json (List.assoc "from" l),
-        id_of_json (List.assoc "to" l),
+        id_of_json (List.assoc "source" l),
+        id_of_json (List.assoc "target" l),
         directives_of_json (List.assoc "directives" l)
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error ("Not a correct edge",x))
