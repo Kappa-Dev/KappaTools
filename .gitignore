@@ -70,6 +70,8 @@ META
 
 # python
 *.pyc
+python/dist/
+python/*.egg-info
 .idea
 
 \#*#

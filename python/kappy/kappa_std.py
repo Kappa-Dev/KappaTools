@@ -6,7 +6,7 @@ import subprocess
 import threading
 import json
 import abc
-import kappa_common
+import kappy.kappa_common
 
 class KappaStd(object):
     def __init__(self, path, delimiter='\x1e', args=None):

@@ -5,7 +5,7 @@ import urllib.error
 import urllib.request
 import urllib.parse
 import json
-import kappa_common
+import kappy.kappa_common
 
 class KappaRest(object):
     def __init__(self, endpoint, project_id):

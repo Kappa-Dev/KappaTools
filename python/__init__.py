@@ -1,4 +1,0 @@
-kappa_common
-kappa_std
-kappa_rest
-kappa_client
