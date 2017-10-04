@@ -29,6 +29,11 @@ let recenter_id = "reset"
 let next_node_id = "next"
 let prev_node_id = "previous"
 
+let display_id = "influence_map_display"
+let influence_map_text,set_influence_map_text =
+  React.S.create ~eq:(Option_util.equal String.equal) None
+let influencemap = Js_graphlogger.create_graph_logger display_id
+
 let total_input =
   Html.input ~a:[
                   Html.a_id total_input_id ;
@@ -284,58 +289,60 @@ let content () =
             Html.span ~a:[Html.a_class ["col-md-2"] ] [next_node];
             Html.span ~a:[Html.a_class ["col-md-2"] ] [recenter]]]
   in
-  let influences,set_influences = ReactiveData.RList.create [] in
-  let _ =
-    React.S.l6
-      (fun _ acc fwd bwd total origin_refined ->
-         (*let origin_json =
+  [ accuracy_form;
+    Html.div ~a:[Html.a_id display_id; Html.a_class ["flex-content"] ] [] ]
+
+let _ =
+  React.S.l6
+    (fun _ acc fwd bwd total origin_refined ->
+       (*let origin_json =
              JsonUtil.of_option
                Public_data.refined_influence_node_to_json origin_refined
            in*)
-         let origin =
-           Public_data.get_short_node_opt_of_refined_node_opt origin_refined
-         in
-         State_project.with_project
-           ~label:__LOC__
-           (fun (manager : Api.concrete_manager) ->
-              (Lwt_result.map
-                 (fun influences_json ->
-                    let buf = Buffer.create 1000 in
-                    let fmt = Format.formatter_of_buffer buf in
-                    let logger =
-                      Loggers.open_logger_from_formatter
-                        ~mode:Loggers.Js_Graph fmt
-                    in
-                    let () =
-                      json_to_graph logger origin influences_json in
-                    let graph = Loggers.graph_of_logger logger in
-                    let graph_json = Graph_json.to_json graph in
-                    let () = Loggers.flush_logger logger in
-                    let () = Loggers.close_logger logger in
-                    let () =
-                      ReactiveData.RList.set
-                        set_influences
-                        [
-                          (*Html.pcdata (Yojson.Basic.to_string origin_json) ;*)
-                          Html.pcdata (Yojson.Basic.to_string graph_json)
-                        ]  in
-                    ())
-                 (manager#get_local_influence_map
-                    ?fwd ?bwd ?origin ~total acc)) >>=
-              fun out -> Lwt.return (Api_common.result_lift out)
-           ))
-      (React.S.on tab_is_active
-         State_project.dummy_model State_project.model)
-      accuracy fwd bwd total origin in
-  [ Html.div
-      ~a:[Html.a_class ["panel-pre" ; "panel-scroll"]]
-      [ accuracy_form; Tyxml_js.R.Html5.p influences ]
-  ]
+       let origin =
+         Public_data.get_short_node_opt_of_refined_node_opt origin_refined
+       in
+       State_project.with_project
+         ~label:__LOC__
+         (fun (manager : Api.concrete_manager) ->
+            ((manager#get_local_influence_map
+                ?fwd ?bwd ?origin ~total acc) >>= function
+             | Result.Ok influences_json ->
+               let buf = Buffer.create 1000 in
+               let fmt = Format.formatter_of_buffer buf in
+               let logger =
+                 Loggers.open_logger_from_formatter
+                   ~mode:Loggers.Js_Graph fmt
+               in
+               let () =
+                 json_to_graph logger origin influences_json in
+               let graph = Loggers.graph_of_logger logger in
+               let graph_json = Graph_json.to_json graph in
+               let () = Loggers.flush_logger logger in
+               let () = Loggers.close_logger logger in
+               let () =
+                 set_influence_map_text
+                   (Some (Yojson.Basic.to_string graph_json)) in
+               Lwt_result.return ()
+             | Result.Error e ->
+               let () = set_influence_map_text None in
+               Lwt_result.fail e) >>=
+            fun out -> Lwt.return (Api_common.result_lift out)
+         ))
+    (React.S.on tab_is_active
+       State_project.dummy_model State_project.model)
+    accuracy fwd bwd total origin
 
 let parent_hide () = set_tab_is_active false
 let parent_shown () = set_tab_is_active !tab_was_active
 
 let onload () =
+  let _ =
+    React.S.map
+      (function
+        | None -> influencemap##clearData
+        | Some data -> influencemap##setData (Js.string data))
+      (React.S.on tab_is_active None influence_map_text) in
   let () = (Tyxml_js.To_dom.of_select accuracy_chooser)##.onchange :=
       Dom_html.full_handler
         (fun va _ ->
