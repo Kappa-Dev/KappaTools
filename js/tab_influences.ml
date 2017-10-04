@@ -30,8 +30,7 @@ let next_node_id = "next"
 let prev_node_id = "previous"
 
 let display_id = "influence_map_display"
-let influence_map_text,set_influence_map_text =
-  React.S.create ~eq:(Option_util.equal String.equal) None
+let influence_map_text,set_influence_map_text = React.S.create None
 let influencemap = Js_graphlogger.create_graph_logger display_id
 
 let total_input =
