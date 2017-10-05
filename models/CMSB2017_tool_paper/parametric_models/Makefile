@@ -1,7 +1,7 @@
 SUMMARY?=summary.txt
 TIMEOUT?=10m
 FROM?=1
-TO?=10
+TO?=3
 
 KAPPABIN?=$(HOME)/KaSim/bin/
 BNGBIN?=$(HOME)/BioNetGen/
