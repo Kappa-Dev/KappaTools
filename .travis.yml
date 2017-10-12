@@ -1,9 +1,7 @@
-language: python
+language: OCaml
 
 dist: trusty
 sudo: required
-
-python: 3.5
 
 env:
   global:
@@ -12,6 +10,8 @@ env:
 matrix:
   include:
   - env: CHECKED=webserver
+    language: python
+    python: 3.5
     addons:
       apt:
         sources:
