@@ -1,8 +1,9 @@
 from setuptools import setup
 
 import distutils.cmd
+import distutils.core
 import subprocess
-import setuptools.command.build_py
+import setuptools.command.build_ext
 
 class BuildAgentsCommand(distutils.cmd.Command):
     """Instruction to compile Kappa agents"""
@@ -23,12 +24,12 @@ class BuildAgentsCommand(distutils.cmd.Command):
         distutils.dir_util.mkpath("python/kappy/bin")
         distutils.file_util.copy_file("bin/KaSimAgent", "python/kappy/bin/")
 
-class MyBuildPyCommand(setuptools.command.build_py.build_py):
+class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
     def run(self):
         self.run_command('build_agents')
-        setuptools.command.build_py.build_py.run(self)
+        setuptools.command.build_ext.build_ext.run(self)
 
 
 def readme():
@@ -37,7 +38,7 @@ def readme():
 
 setup(name='kappy',
       license='LGPLv3',
-      version='4.0.0.dev3',
+      version='4.0.0.dev4',
       description='Wrapper to interact with the Kappa tool suite',
       long_description=readme(),
       url='https://github.com/Kappa-Dev/KaSim.git',
@@ -49,7 +50,7 @@ setup(name='kappy',
       ],
       cmdclass={
           'build_agents': BuildAgentsCommand,
-          'build_py': MyBuildPyCommand,
+          'build_ext': MyBuildExtCommand,
       },
       extras_require={
           'REST': ['urllib3'],
@@ -58,7 +59,12 @@ setup(name='kappy',
       include_package_data=True,
       package_data={
           '': ['README.rst'],
-          'kappy':['bin/KaSimAgent'],
+          'kappy':['bin/*Agent'],
       },
       packages=['kappy'],
-      zip_safe=False)
+      zip_safe=False,
+      # This distribution contains binaries not built with
+      # distutils. So we must create a dummy Extension object so when
+      # we create a binary file it knows to make it platform-specific.
+      ext_modules=[distutils.core.Extension('kappy.dummy', sources = ['python/dummy.c'])],
+)
