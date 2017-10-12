@@ -11,12 +11,12 @@ import string
 import time
 from kappy import kappa_rest
 import kappy
-import kappa_client
 import uuid
 
+def file_catalog_file_id (file_catalog):
+    return(map((lambda entry: entry.file_metadata_id),file_catalog))
+
 class KappaClientTest(object):
-
-
     def check_integration_test(self, integration_test):
         """ run an integration test by requesting a url with
             a given method and checking the response code.
@@ -32,17 +32,6 @@ class KappaClientTest(object):
         connection = opener.open(request)
         self.assertEqual(connection.code, integration_test['code'])
 
-
-    # def test_info(self):
-    #     """ the the ability of the server to return
-    #         information about the service.
-    #     """
-    #     runtime = self.getRuntime()
-    #     info = runtime.info()
-    #     self.assertIsNotNone('environment_simulations' in info)
-    #     self.assertEqual(info['environment_simulations'], 0)
-    #     self.assertIsNotNone('environment_projects' in info)
-    #     self.assertIsNotNone('environment_build' in info)
 
     # def test_project_crud(self):
     #     runtime = self.getRuntime()
@@ -68,7 +57,7 @@ class KappaClientTest(object):
         file_metadata = kappy.FileMetadata(file_id,0)
         file_object = kappy.File(file_metadata,file_content)
         runtime.file_create(file_object)
-        file_names = kappa_client.file_catalog_file_id(runtime.file_info())
+        file_names = file_catalog_file_id(runtime.file_info())
         self.assertIn(file_id,file_names)
         self.assertEqual(runtime.file_get(file_id).get_content(),
                          file_content)
@@ -98,7 +87,7 @@ class KappaClientTest(object):
                 runtime.project_parse()
                 with self.assertRaises(kappy.KappaError):
                     runtime.file_create(file_2_object)
-                file_names = list(kappa_client.file_catalog_file_id(runtime.file_info()))
+                file_names = list(file_catalog_file_id(runtime.file_info()))
                 self.assertIn(file_1_id,file_names)
                 self.assertIn(file_2_id,file_names)
 
@@ -194,6 +183,16 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
                        SystemRandom().
                        choice(string.ascii_uppercase + string.digits)
                        for _ in range(100))
+
+    def test_info(self):
+        """ the the ability of the server to return
+            information about the service.
+        """
+        project_id = str(uuid.uuid1())
+        runtime = self.getRuntime(project_id)
+        info = runtime.info()
+        self.assertIsNotNone('environment_projects' in info)
+        self.assertIsNotNone('environment_build' in info)
 
     def __init__(self, *args, **kwargs):
         """ initalize test by launching kappa server """

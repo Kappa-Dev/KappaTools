@@ -5,14 +5,8 @@ import sys
 import getopt
 import time
 import uuid
-from kappy import kappa_common, kappa_std, kappa_rest
-
-def project_catalog_project_id (project_catalog):
-    print(project_catalog)
-    return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
-
-def file_catalog_file_id (file_catalog):
-    return(map((lambda entry: entry.file_metadata_id),file_catalog))
+from kappy import kappa_rest
+import kappy
 
 def main():
     # command line

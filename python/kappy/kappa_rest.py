@@ -11,7 +11,8 @@ class KappaRest(object):
     def __init__(self, endpoint, project_id):
         self.url = "{0}/v2".format(endpoint)
         self.project_id = project_id
-        self.project_create(project_id)
+        if not project_id in self.project_info():
+            self.project_create(project_id)
 
     def __del__(self):
         self.project_delete()

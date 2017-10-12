@@ -74,7 +74,7 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python/tests && python3 test_kappa_client.py && python2 python2_kappa_client.py -k ../models/abc.ka -t 100 ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python/tests && python3 test_kappa_client.py && python2 python2_kappa_client.py -k ../../models/abc.ka -t 100 ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
 
 after_success:
