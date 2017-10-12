@@ -4,6 +4,7 @@ import distutils.cmd
 import distutils.core
 import subprocess
 import setuptools.command.build_ext
+import os.path
 
 class BuildAgentsCommand(distutils.cmd.Command):
     """Instruction to compile Kappa agents"""
@@ -21,14 +22,15 @@ class BuildAgentsCommand(distutils.cmd.Command):
 
     def run(self):
         subprocess.check_call(["make","agents"])
-        distutils.dir_util.mkpath("python/kappy/bin")
-        distutils.file_util.copy_file("bin/KaSimAgent", "python/kappy/bin/")
 
 class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
     def run(self):
         self.run_command('build_agents')
+        bin_dir = os.path.join(self.build_lib, 'bin')
+        distutils.dir_util.mkpath(bin_dir)
+        distutils.file_util.copy_file("bin/KaSimAgent", bin_dir)
         setuptools.command.build_ext.build_ext.run(self)
 
 
@@ -59,7 +61,6 @@ setup(name='kappy',
       include_package_data=True,
       package_data={
           '': ['README.rst'],
-          'kappy':['bin/*Agent'],
       },
       packages=['kappy'],
       zip_safe=False,

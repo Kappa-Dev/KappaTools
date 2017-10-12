@@ -58,26 +58,6 @@ paths:
   '/projects/{project_id}':
     parameters:
       - $ref: '#/components/parameters/ProjectId'
-    get:
-      tags:
-        - model
-      summary: Get project info
-      responses:
-        '200':
-          description: Information
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  project_id:
-                    type: string
-                    example: default
-                  project_version:
-                    type: integer
-        '404':
-          description: Project does not exist
-          $ref: '#/components/responses/Default'
     delete:
       tags:
         - model
