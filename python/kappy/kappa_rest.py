@@ -31,13 +31,13 @@ class KappaRest(object):
         except urllib.request.HTTPError as exception:
             message = exception.read()
             error = json.loads(message.decode("utf-8"))
-            raise kappa_common.KappaError(error)
+            raise kappy.kappa_common.KappaError(error)
         except urllib.request.URLError as exception:
-            raise kappa_common.KappaError(exception.reason)
+            raise kappy.kappa_common.KappaError(exception.reason)
         text = connection.read()
         details = json.loads(text.decode("utf-8"))
         if 400 <= connection.code < 500:
-            raise kappa_common.KappaError(details)
+            raise kappy.kappa_common.KappaError(details)
         else:
             return details
 
@@ -57,17 +57,17 @@ class KappaRest(object):
         except urllib.error.HTTPError as exception:
             connection = exception
         except urllib.error.URLError as exception:
-            raise kappa_common.KappaError(exception.reason)
+            raise kappy.kappa_common.KappaError(exception.reason)
         if connection.code == 200:
             text = connection.read()
             return text
         elif connection.code == 400:
             text = connection.read()
             print(text)
-            raise kappa_common.KappaError(text)
+            raise kappy.kappa_common.KappaError(text)
         elif connection.code == 401:
             text = connection.read()
-            raise kappa_common.KappaError(text)
+            raise kappy.kappa_common.KappaError(text)
         else:
             raise exception
 
@@ -118,7 +118,7 @@ class KappaRest(object):
         url = "{0}/projects/{1}/files/{2}".format(self.url,self.project_id,file_id)
         body = None
         file = self.dispatch(method,url,body)
-        return(kappa_common.hydrate_file(file))
+        return(kappy.kappa_common.hydrate_file(file))
 
     def file_info(self):
         method = "GET"
@@ -126,7 +126,7 @@ class KappaRest(object):
         body = None
         info = self.dispatch(method,url,body)
         #return(list(map(hydrate_filemetada,info)))
-        return(map(kappa_common.hydrate_file_metadata,info))
+        return(map(kappy.kappa_common.hydrate_file_metadata,info))
 
     def simulation_delete(self):
         method = "DELETE"
@@ -150,7 +150,7 @@ class KappaRest(object):
         if limit is not None:
             parameter = limit.toURL()
         else:
-            parameter = kappa_common.PlotLimit().toURL()
+            parameter = kappy.kappa_common.PlotLimit().toURL()
         url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
         return(self.dispatch("GET",url,None))
 

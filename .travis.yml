@@ -62,16 +62,17 @@ install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
   - opam install -y ocamlbuild yojson
+  - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
-  - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then pip install --user . && pip3 install --user .[REST] ; fi"
 
 script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python && python3 test_kappa_client.py && python2 python2_kappa_client.py -k ../models/abc.ka -t 100 ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python/tests && python3 test_kappa_client.py && python2 python2_kappa_client.py -k ../models/abc.ka -t 100 ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
 
 after_success:

@@ -9,9 +9,8 @@ import subprocess
 import random
 import string
 import time
-import kappa_common
-import kappa_std
-import kappa_rest
+from kappy import kappa_rest
+import kappy
 import kappa_client
 import uuid
 
@@ -58,7 +57,7 @@ class KappaClientTest(object):
     #     try:
     #         runtime.project_delete(project_id)
     #         self.fail()
-    #     except kappa_common.KappaError as exception:
+    #     except kappy.KappaError as exception:
     #         None
 
     def test_file_crud(self):
@@ -66,8 +65,8 @@ class KappaClientTest(object):
         runtime = self.getRuntime(project_id)
         file_id = str(uuid.uuid1())
         file_content = str("")
-        file_metadata = kappa_common.FileMetadata(file_id,0)
-        file_object = kappa_common.File(file_metadata,file_content)
+        file_metadata = kappy.FileMetadata(file_id,0)
+        file_object = kappy.File(file_metadata,file_content)
         runtime.file_create(file_object)
         file_names = kappa_client.file_catalog_file_id(runtime.file_info())
         self.assertIn(file_id,file_names)
@@ -85,19 +84,19 @@ class KappaClientTest(object):
         runtime = self.getRuntime(project_id)
         file_1_id = str(uuid.uuid1())
         file_2_id = str(uuid.uuid1())
-        test_dir = "../models/test_suite/compiler/file_order/"
+        test_dir = "../../models/test_suite/compiler/file_order/"
         with open(test_dir+"file2.ka") as file_2:
             with open(test_dir+"file1.ka") as file_1:
                 data_1 = file_1.read()
-                file_1_metadata = kappa_common.FileMetadata(file_1_id,0)
-                file_1_object = kappa_common.File(file_1_metadata,data_1)
+                file_1_metadata = kappy.FileMetadata(file_1_id,0)
+                file_1_object = kappy.File(file_1_metadata,data_1)
                 runtime.file_create(file_1_object)
 
                 data_2 = file_2.read()
-                file_2_metadata = kappa_common.FileMetadata(file_2_id,0)
-                file_2_object = kappa_common.File(file_2_metadata,data_2)
+                file_2_metadata = kappy.FileMetadata(file_2_id,0)
+                file_2_object = kappy.File(file_2_metadata,data_2)
                 runtime.project_parse()
-                with self.assertRaises(kappa_common.KappaError):
+                with self.assertRaises(kappy.KappaError):
                     runtime.file_create(file_2_object)
                 file_names = list(kappa_client.file_catalog_file_id(runtime.file_info()))
                 self.assertIn(file_1_id,file_names)
@@ -107,15 +106,15 @@ class KappaClientTest(object):
         project_id = str(uuid.uuid1())
         runtime = self.getRuntime(project_id)
         file_id = str(uuid.uuid1())
-        with open("../models/abc-pert.ka") as kappa_file:
+        with open("../../models/abc-pert.ka") as kappa_file:
             data = kappa_file.read()
             file_content = str(data)
-            file_metadata = kappa_common.FileMetadata(file_id,0)
-            file_object = kappa_common.File(file_metadata,file_content)
+            file_metadata = kappy.FileMetadata(file_id,0)
+            file_object = kappy.File(file_metadata,file_content)
             runtime.file_create(file_object)
             runtime.project_parse()
             pause_condition = "[T] > 10.0"
-            simulation_parameter = kappa_common.SimulationParameter(0.1,pause_condition)
+            simulation_parameter = kappy.SimulationParameter(0.1,pause_condition)
             runtime.simulation_start(simulation_parameter)
 
             simulation_info = runtime.simulation_info()
@@ -133,7 +132,7 @@ class KappaClientTest(object):
             plot_limit_offset = 100
             test_time = 10.0
             test_count = 1
-            limit = kappa_common.PlotLimit(plot_limit_offset)
+            limit = kappy.PlotLimit(plot_limit_offset)
             last_status = runtime.simulation_plot(limit)
             self.assertEqual(test_count, len(last_status['series']))
             self.assertEqual(test_time, last_status['series'][0][0])
@@ -142,7 +141,7 @@ class KappaClientTest(object):
             plot_limit_points = 1
             test_time = 1.0
             test_count = 1
-            limit = kappa_common.PlotLimit(plot_limit_offset,plot_limit_points)
+            limit = kappy.PlotLimit(plot_limit_offset,plot_limit_points)
             last_status = runtime.simulation_plot(limit)
             self.assertEqual(test_count, len(last_status['series']))
             self.assertEqual(test_time, last_status['series'][0][0])
@@ -150,7 +149,7 @@ class KappaClientTest(object):
             plot_limit_offset = 50
             test_time = 10.0
             test_count = 51
-            limit = kappa_common.PlotLimit(plot_limit_offset)
+            limit = kappy.PlotLimit(plot_limit_offset)
             last_status = runtime.simulation_plot(limit)
             self.assertEqual(test_count, len(last_status['series']))
             self.assertEqual(test_time, last_status['series'][0][0])
@@ -173,7 +172,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """ set up unit test by launching client"""
-        self.websim = "../bin/WebSim"
+        self.websim = "../../bin/WebSim"
         self.key = self.generate_key()
         self.port = 6666
         command_format = "{0} --shutdown-key {1} --port {2} --level debug"
@@ -198,7 +197,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         """ initalize test by launching kappa server """
-        self.websim = "../WebSim.native"
+        self.websim = "../../WebSim.native"
         self.key = self.generate_key()
         self.port = 6666
         super(KappaClientTest, self).__init__(*args, **kwargs)
@@ -208,10 +207,9 @@ class StdClientTest(KappaClientTest,unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """ set up unit test by launching client"""
-        self.stdsim = "../bin/KaSimAgent"
 
     def getRuntime(self,project_id):
-        return(kappa_std.KappaStd(self.stdsim))
+        return(kappy.KappaStd())
     @classmethod
     def tearDownClass(self):
         """ tear down test by shutting down"""

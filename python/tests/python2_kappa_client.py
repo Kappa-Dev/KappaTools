@@ -1,20 +1,12 @@
-""" Web api client for the kappa programming language
+"""
+Client for the kappa programming language
 """
 
 import sys
 import getopt
 import time
 import uuid
-import kappa_common
-import kappa_std
-import kappa_rest
-
-def project_catalog_project_id (project_catalog):
-    print(project_catalog)
-    return(map((lambda entry: entry["project_id"]),project_catalog["project_list"]))
-
-def file_catalog_file_id (file_catalog):
-    return(map((lambda entry: entry.file_metadata_id),file_catalog))
+from kappy import kappa_common, kappa_std
 
 def main():
     # command line
@@ -28,13 +20,14 @@ def main():
     plot_period = 0.1
     seed = None
 
-    help_line = (cmd +
-                 ' -k <kappafile> ' +
-                 ' -u <url or path to stdsim> ' +
-                 ' -t <max_time> ' +
-                 ' -e <max_events> ' +
-                 ' -pp <plot_period> ' +
-                 ' -s <random_seed> ')
+    help_line= (cmd
+                + ' -k <kappafile> '
+                + ' -u <url or path to stdsim> '
+                + ' -t <max_time> '
+                + ' -e <max_events> '
+                + ' -pp <plot_period> '
+                + ' -s <random_seed> ')
+
     try:
         opts, args = getopt.getopt(argv,
                                    "h:k:u:t:e:pp:s",
@@ -43,14 +36,13 @@ def main():
                                     "max_time=",
                                     "max_event=",
                                     "plot_period=",
-                                    "seed="])
+                                    "seed=", ])
     except:
         print(help_line)
-
         sys.exit(2)
 
     for opt, arg in opts:
-        if opt == '-h':
+        if opt in ('-h',"--help"):
             print(help_line)
             sys.exit()
         elif opt in ("-k", "--kappafile"):
@@ -73,12 +65,7 @@ def main():
     print('Random seed : {0} '.format(seed))
 
     try:
-        project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
-        if url.startswith('http'):
-            runtime = kappa_rest.KappaRest(url,project_id)
-        else:
-            runtime = kappa_std.KappaStd(url)
-        print("project_id : {0}".format(project_id))
+        runtime = kappa_std.KappaStd(url)
         if inputfile:
             with open(inputfile) as f:
                 code = f.read()
@@ -87,6 +74,7 @@ def main():
                 file_object = kappa_common.File(file_metadata,file_content)
                 runtime.file_create(file_object)
                 runtime.project_parse()
+
 
                 end_time = 10.0
                 simulation_parameter = kappa_common.SimulationParameter(plot_period,
@@ -118,8 +106,6 @@ def main():
                 plot_detail = runtime.simulation_plot()
                 print("plot")
                 print(plot_detail)
-        else:
-            print(runtime.info())
     except kappa_common.KappaError as exception:
         print(exception.errors)
     return None
