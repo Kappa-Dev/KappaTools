@@ -3,6 +3,8 @@ language: python
 dist: trusty
 sudo: required
 
+python: 3.5
+
 env:
   global:
     secure: "XBCnCpNZ9WfkvDLkwMeW/D/TphPpqDJQdSsC9UOK9HFR3rgBmCof36DlirrZeefF6YKTr3Exkbl/7jDUK7hAGoa1c5NbXqYFp4ne3pSo77G3jHbC0zEP5k2F15NKSo8P9x0QsKzi7Mg1liratz7u65jRqURaZG4kFMw4f0NfVGU="
@@ -65,7 +67,7 @@ install:
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then pip install . && pip3 install .[REST] ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then pip2 install --user . && pip install .[REST] ; fi"
 
 script:
   - make all
