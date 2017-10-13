@@ -27,12 +27,18 @@ class MyBuildExtCommand(setuptools.command.build_ext.build_ext):
     """Compile Kappa agent in addition of standard build"""
 
     def run(self):
+        self.my_outputs = []
         self.run_command('build_agents')
-        bin_dir = os.path.join(self.build_lib, 'bin')
+        bin_dir = os.path.join(self.build_lib, 'kappy/bin')
         distutils.dir_util.mkpath(bin_dir)
         distutils.file_util.copy_file("bin/KaSimAgent", bin_dir)
+        self.my_outputs.append(os.path.join(bin_dir, "KaSimAgent"))
         setuptools.command.build_ext.build_ext.run(self)
 
+    def get_outputs(self):
+        outputs = setuptools.command.build_ext.build_ext.get_outputs(self)
+        outputs.extend(self.my_outputs)
+        return outputs
 
 def readme():
     with open('python/README.rst') as f:
