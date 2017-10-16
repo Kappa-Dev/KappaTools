@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Oct 16 2017>
+   * Last modification: Time-stamp: <Aug 18 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -208,7 +208,7 @@ let info_of_rule
   | None ->
     Exception.warn
       parameters error __POS__ Exit
-      ("",Locality.dummy,Public_data.Dummy_rule_direction,"",Ckappa_sig.dummy_rule_id)
+      ("",Locality.dummy,"",Ckappa_sig.dummy_rule_id)
   | Some rule ->
     let label_opt = rule.Cckappa_sig.e_rule_label in
     let error, (label, _) =
@@ -226,17 +226,10 @@ let info_of_rule
     let position =
         rule.Cckappa_sig.e_rule_rule.Ckappa_sig.position
     in
-    let direction =
-      match
-        rule.Cckappa_sig.e_rule_initial_direction
-      with
-      | Ckappa_sig.Direct -> Public_data.Direct_rule
-      | Ckappa_sig.Reverse -> Public_data.Reverse_rule
-    in
     let ast =
       rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
     in
-    error, (label, position, direction, ast, rule_id)
+    error, (label, position, ast, rule_id)
 
 let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let vars = compiled.Cckappa_sig.variables in
@@ -252,15 +245,14 @@ let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id
   match var
   with
   | None  -> Exception.warn parameters error __POS__ Exit
-               (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,Public_data.Variable,"",var_id)
+               (("VAR " ^ (Ckappa_sig.string_of_rule_id var_id)),Locality.dummy,"",var_id)
   | Some var  ->
     error,(fst var.Cckappa_sig.e_id_dot,snd var.Cckappa_sig.e_id_dot,
-           Public_data.Variable,
            "" (* TO DO: string for the ast representation (from var.Cckappa_sig.c_variable?) *) ,
            var_id)
 
 let string_of_info ?with_rule:(with_rule=true)
-    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) ?kind:(kind="rule ") (label,pos,_direction,ast,id) =
+    ?with_rule_name:(with_rule_name=true) ?with_rule_id:(with_rule_id=true) ?with_loc:(with_loc=true) ?with_ast:(with_ast=true) ?kind:(kind="rule ") (label,pos,ast,id) =
   let label =
     if with_rule_name then label else ""
   in
@@ -323,34 +315,33 @@ let convert_id rule var  parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
   if int < nrules then
-    let error,(a,b,c,d,e) = info_of_rule parameters error compiled id in
-    error,Public_data.Rule (rule e b a d c)
+    let error,(a,b,c,d) = info_of_rule parameters error compiled id in
+    error,Public_data.Rule (rule d b a c)
 
   else
-    let error, (a,b,c,d,e) = info_of_var parameters error handler compiled id in
-    error,Public_data.Var (var e b a d c)
+    let error, (a,b,c,d) = info_of_var parameters error handler compiled id in
+    error,Public_data.Var (var d b a c)
 
 let convert_id_short =
   convert_id
-    (fun a _ _ _ _ -> Ckappa_sig.int_of_rule_id a)
-    (fun a _ _ _ _ -> Ckappa_sig.int_of_rule_id a)
+    (fun a _ _ _ -> Ckappa_sig.int_of_rule_id a)
+    (fun a _ _ _ -> Ckappa_sig.int_of_rule_id a)
 
 let convert_id_refined =
   convert_id
-    (fun a b d e c ->
+    (fun a b c d ->
        {
          Public_data.rule_id=Ckappa_sig.int_of_rule_id a ;
          Public_data.rule_position=b;
-         Public_data.rule_direction=c;
-         Public_data.rule_label=d;
-         Public_data.rule_ast=e
+         Public_data.rule_label=c;
+         Public_data.rule_ast=d
        })
-    (fun a b d e _ ->
+    (fun a b c d ->
        {
          Public_data.var_id=Ckappa_sig.int_of_rule_id a ;
          Public_data.var_position=b;
-         Public_data.var_label=d;
-         Public_data.var_ast=e
+         Public_data.var_label=c;
+         Public_data.var_ast=d
        })
 
 

@@ -259,11 +259,11 @@ let compile c =
     in
     let () =
       if (!Parameter.debugModeOn) then
-        (Format.printf "@.ast rules@.";
-         List.iter (fun (s,(r,_)) ->
-             let label = match s with None -> "" | Some (l,_) -> l in
-             Format.printf "@.%s = %a" label (Ast.print_ast_rule ?direction:None) r)
-           rules;
+      (Format.printf "@.ast rules@.";
+      List.iter (fun (s,(r,_)) ->
+                  let label = match s with None -> "" | Some (l,_) -> l in
+                  Format.printf "@.%s = %a" label Ast.print_ast_rule r)
+                rules;
       Format.printf "@.ast edit_rules@.";
       List.iter (fun (s,(r,_)) ->
                   let label = match s with None -> "" | Some (l,_) -> l in

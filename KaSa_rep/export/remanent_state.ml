@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 16 2017>
+  * Last modification: Time-stamp: <Aug 18 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -54,13 +54,12 @@ let errors = "errors"
 
 type dead_rules = Public_data.dead_rules
 
-let info_to_rule (s1,loc,direction,s2,id) =
+let info_to_rule (s1,loc,s2,id) =
   {
     Public_data.rule_id = Ckappa_sig.int_of_rule_id id ;
     Public_data.rule_position = loc;
     Public_data.rule_label = s1 ;
-    Public_data.rule_ast=s2;
-    Public_data.rule_direction=direction;
+    Public_data.rule_ast=s2
   }
 
 type dead_agents = Ckappa_sig.c_agent_name list

@@ -38,21 +38,12 @@ val contact_map_to_json:
 val contact_map_of_json:
   Yojson.Basic.json -> accuracy_level * contact_map
 
-
-type rule_direction =
-    | Direct_rule
-    | Reverse_rule
-    | Both_directions
-    | Dummy_rule_direction
-    | Variable
-
 type rule =
   {
     rule_id: int;
     rule_label: string ;
     rule_ast: string;
-    rule_position: Locality.t;
-    rule_direction: rule_direction ;
+    rule_position: Locality.t
   }
 
 type var =
@@ -85,7 +76,6 @@ val refined_influence_node_to_json:
 module InfluenceNodeMap: SetMap.Map
     with type elt =
            (int,int) influence_node
-
 
 type location =
     | Direct of int
