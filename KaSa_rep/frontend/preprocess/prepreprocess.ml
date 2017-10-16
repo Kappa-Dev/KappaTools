@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 31 2017>
+ * Last modification: Time-stamp: <Oct 16 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -780,10 +780,11 @@ let translate_compil parameters error compil =
          let buf = Buffer.create 0 in
          let fmt = Format.formatter_of_buffer buf in
          let () =
-            Ast.print_ast_rule fmt rule
+            Ast.print_ast_rule fmt ~direction:Public_data.Direct_rule rule
          in
          let () = Format.pp_print_flush fmt () in
          let ast = Buffer.contents buf in
+         let direct_ast = ast in
          let error,direct =
            error,
            {
@@ -795,15 +796,24 @@ let translate_compil parameters error compil =
              Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
-             Ckappa_sig.ast = ast ;
+             Ckappa_sig.ast = direct_ast ;
            }
          in
          if rule.Ast.bidirectional then
            let error,reverse =
+             let buf = Buffer.create 0 in
+             let fmt = Format.formatter_of_buffer buf in
+             let () =
+               Ast.print_ast_rule fmt ~direction:Public_data.Reverse_rule rule
+             in
+             let () = Format.pp_print_flush fmt () in
+             let ast = Buffer.contents buf in
+             let reverse_ast = ast in
              error,{direct
                     with Ckappa_sig.lhs = rhs;
                          Ckappa_sig.rhs = lhs;
-                         Ckappa_sig.bidirectional = false ;
+                         Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
+                         Ckappa_sig.ast = reverse_ast
                    }
            in
            error,id_set,

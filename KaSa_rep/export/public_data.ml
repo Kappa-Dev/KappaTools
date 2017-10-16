@@ -51,6 +51,7 @@ let nodes = "nodes"
 let total_string = "total"
 let fwd_string = "fwd"
 let bwd_string = "bwd"
+let direction = "direction"
 
 (*******************)
 (* Accuracy levels *)
@@ -271,13 +272,42 @@ let contact_map_of_json =
 (* dead rules *)
 (**************)
 
+type rule_direction =
+  | Direct_rule
+  | Reverse_rule
+  | Both_directions
+  | Dummy_rule_direction
+  | Variable
+
+
 type rule =
   {
     rule_id: int;
     rule_label: string ;
     rule_ast: string;
-    rule_position: Locality.t
+    rule_position: Locality.t;
+    rule_direction: rule_direction;
   }
+
+let direction_to_json d =
+  match d with
+  | Direct_rule -> `String "direct"
+  | Reverse_rule -> `String "reverse"
+  | Both_directions -> `String "both"
+  | Dummy_rule_direction -> `String "dummy"
+  | Variable -> `String "variable"
+
+
+let json_to_direction s =
+  match s with
+  | `String "direct" -> Direct_rule
+  | `String "reverse" -> Reverse_rule
+  | `String "both" -> Both_directions
+  | `String "dummy" -> Dummy_rule_direction
+  | `String "variable" -> Variable
+  | x ->
+    raise (Yojson.Basic.Util.Type_error ("rule direction",x))
+
 
 let rule_to_json rule =
   `Assoc
@@ -286,7 +316,8 @@ let rule_to_json rule =
       label, JsonUtil.of_string rule.rule_label;
       ast, JsonUtil.of_string rule.rule_ast;
       position,Locality.annot_to_yojson
-        JsonUtil.of_unit ((),rule.rule_position)
+        JsonUtil.of_unit ((),rule.rule_position);
+      direction, direction_to_json rule.rule_direction
     ]
 
 let json_to_rule =
@@ -301,7 +332,10 @@ let json_to_rule =
           rule_position =
             snd (Locality.annot_of_yojson
                (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
-               (List.assoc position l))}
+               (List.assoc position l));
+          rule_direction =
+            json_to_direction (List.assoc direction l)
+        }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " rule",x))
     end

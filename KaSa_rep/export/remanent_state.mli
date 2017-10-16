@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Oct 16 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -32,7 +32,9 @@ type var_id =  int
 
 type dead_agents = Ckappa_sig.c_agent_name list
 
-val info_to_rule: (string*Locality.t*string*Ckappa_sig.c_rule_id) -> Public_data.rule
+val info_to_rule:
+  (string*Locality.t*Public_data.rule_direction*string*Ckappa_sig.c_rule_id)
+  -> Public_data.rule
 
 type separating_transitions =
   (string * Ckappa_sig.c_rule_id * string) list
