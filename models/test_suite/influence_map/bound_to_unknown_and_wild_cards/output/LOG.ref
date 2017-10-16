@@ -277,13 +277,13 @@ Influence_map:Wake_up_map:rule(2):'' A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2) -
 Influence_map:Inhibition_map:rule(0):'' A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!2) -> rule(2):'' A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)[0->0]
 Reachability analysis...
 
-	Applying rule A(x!1,y?), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) @ 1 (File "influence.ka", line 1, characters 0-52:):
+	Applying rule A(x!1,y?), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) (File "influence.ka", line 1, characters 0-52:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x!1,y!_), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) @ 1 (File "influence.ka", line 2, characters 0-53:):
+	Applying rule A(x!1,y!_), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) (File "influence.ka", line 2, characters 0-53:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x!1,y), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) @ 1 (File "influence.ka", line 3, characters 0-51:):
+	Applying rule A(x!1,y), B(x!1) -> A(x!1,y!2), B(x!1), C(y!2) (File "influence.ka", line 3, characters 0-51:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------

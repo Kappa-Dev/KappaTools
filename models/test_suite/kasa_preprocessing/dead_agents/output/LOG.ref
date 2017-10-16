@@ -464,19 +464,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule D(x) -> A(x~u) @ 1 (File "dead_agents.ka", line 17, characters 0-18:):
+	Applying rule D(x) -> A(x~u) (File "dead_agents.ka", line 17, characters 0-18:):
 		the precondition is not satisfied yet
 
-	Applying rule E(x!_) -> A(x~u) @ 1 (File "dead_agents.ka", line 18, characters 0-20:):
+	Applying rule E(x!_) -> A(x~u) (File "dead_agents.ka", line 18, characters 0-20:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~q), B(x~u) -> A(x~u), B(x~p) @ 1 (File "dead_agents.ka", line 10, characters 0-33:):
+	Applying rule A(x~q), B(x~u) -> A(x~u), B(x~p) (File "dead_agents.ka", line 10, characters 0-33:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 12, characters 0-25:):
 		the precondition is satisfied
 
-		rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
+		rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
@@ -508,24 +508,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,x!free)
 
 
-	Applying rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x~p?) -> A(x~u?) (File "dead_agents.ka", line 12, characters 0-25:):
 		the precondition is satisfied
 
-		rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
+		rule A(x~p?) -> A(x~u?) (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule A(x~u?) -> A(x~p?) @ 1 (File "dead_agents.ka", line 13, characters 0-22:):
+	Applying rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 13, characters 0-22:):
 		the precondition is satisfied
 
-		rule A(x~u?) -> A(x~p?) @ 1 (File "dead_agents.ka", line 13, characters 0-22:) is applied for the first time
+		rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 13, characters 0-22:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule B(x~u) <-> B(x~p) @ 1, 2 (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x~u) -> B(x~p) (File "dead_agents.ka", line 11, characters 0-23:):
 		the precondition is satisfied
 
-		rule B(x~u) <-> B(x~p) @ 1, 2 (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
+		rule B(x~u) -> B(x~p) (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
 
 		Updating the views for B(x~)
 
@@ -547,44 +547,44 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p)
 
 
-	Applying rule B(x~u) <-> B(x~p) @ 1, 2 (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x~p) -> B(x~u) (File "dead_agents.ka", line 11, characters 0-23:):
 		the precondition is satisfied
 
-		rule B(x~u) <-> B(x~p) @ 1, 2 (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
+		rule B(x~p) -> B(x~u) (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
 
 		Updating the views for B(x~)
 
-	Applying rule A(x~u!_) -> A(x~p) @ 1 (File "dead_agents.ka", line 14, characters 0-22:):
+	Applying rule A(x~u!_) -> A(x~p) (File "dead_agents.ka", line 14, characters 0-22:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~u!_) -> A(x~p) @ 1 (File "dead_agents.ka", line 15, characters 0-22:):
+	Applying rule A(x~u!_) -> A(x~p) (File "dead_agents.ka", line 15, characters 0-22:):
 		the precondition is not satisfied yet
 
-	Applying rule E(x!_) -> A(x~u) @ 1 (File "dead_agents.ka", line 18, characters 0-20:):
+	Applying rule E(x!_) -> A(x~u) (File "dead_agents.ka", line 18, characters 0-20:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~q), B(x~u) -> A(x~u), B(x~p) @ 1 (File "dead_agents.ka", line 10, characters 0-33:):
+	Applying rule A(x~q), B(x~u) -> A(x~u), B(x~p) (File "dead_agents.ka", line 10, characters 0-33:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 12, characters 0-25:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule D(x) -> A(x~u) @ 1 (File "dead_agents.ka", line 17, characters 0-18:):
+	Applying rule D(x) -> A(x~u) (File "dead_agents.ka", line 17, characters 0-18:):
 		the precondition is not satisfied yet
 
-	Applying rule B(x~u) <-> B(x~p) @ 1, 2 (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x~u) -> B(x~p) (File "dead_agents.ka", line 11, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for B(x~)
 
-	Applying rule A(x~u?) <-> A(x~p?) @ 1, 2 (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x~p?) -> A(x~u?) (File "dead_agents.ka", line 12, characters 0-25:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule A(x~u?) -> A(x~p?) @ 1 (File "dead_agents.ka", line 13, characters 0-22:):
+	Applying rule A(x~u?) -> A(x~p?) (File "dead_agents.ka", line 13, characters 0-22:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)

@@ -178,25 +178,25 @@ Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
 Reachability analysis...
 
-	Applying rule  -> A() @ 1 (File "empty_agents.ka", line 1, characters 0-13:):
+	Applying rule  -> A() (File "empty_agents.ka", line 1, characters 0-13:):
 		the precondition is satisfied
 
-		rule  -> A() @ 1 (File "empty_agents.ka", line 1, characters 0-13:) is applied for the first time
+		rule  -> A() (File "empty_agents.ka", line 1, characters 0-13:) is applied for the first time
 
-	Applying rule A() -> B() @ 1 (File "empty_agents.ka", line 2, characters 0-13:):
+	Applying rule A() -> B() (File "empty_agents.ka", line 2, characters 0-13:):
 		the precondition is satisfied
 
-		rule A() -> B() @ 1 (File "empty_agents.ka", line 2, characters 0-13:) is applied for the first time
+		rule A() -> B() (File "empty_agents.ka", line 2, characters 0-13:) is applied for the first time
 
-	Applying rule B() -> C() @ 1 (File "empty_agents.ka", line 3, characters 0-13:):
+	Applying rule B() -> C() (File "empty_agents.ka", line 3, characters 0-13:):
 		the precondition is satisfied
 
-		rule B() -> C() @ 1 (File "empty_agents.ka", line 3, characters 0-13:) is applied for the first time
+		rule B() -> C() (File "empty_agents.ka", line 3, characters 0-13:) is applied for the first time
 
-	Applying rule C() -> D(x~u) @ 1 (File "empty_agents.ka", line 4, characters 0-16:):
+	Applying rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
-		rule C() -> D(x~u) @ 1 (File "empty_agents.ka", line 4, characters 0-16:) is applied for the first time
+		rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -217,10 +217,10 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule E() -> F(x~u) @ 1 (File "empty_agents.ka", line 5, characters 0-16:):
+	Applying rule E() -> F(x~u) (File "empty_agents.ka", line 5, characters 0-16:):
 		the precondition is not satisfied yet
 
-	Applying rule C() -> D(x~u) @ 1 (File "empty_agents.ka", line 4, characters 0-16:):
+	Applying rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
 ------------------------------------------------------------
