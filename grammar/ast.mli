@@ -193,8 +193,7 @@ val print_link :
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ('a, 'b) link -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
-val print_ast_rule :
-  Format.formatter -> ?direction:Public_data.rule_direction -> rule -> unit
+val print_ast_rule : Format.formatter -> rule -> unit
 val print_ast_edit_rule : Format.formatter -> edit_rule -> unit
 val print_ast_rule_no_rate :
   reverse:bool -> Format.formatter -> rule -> unit

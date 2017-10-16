@@ -456,15 +456,6 @@ let print_one_size tk f mix =
 let print_arrow f bidir =
   Format.pp_print_string f (if bidir then "<->" else "->")
 
-let print_direct_arrow f =
-  Format.pp_print_string f "->"
-
-let print_reverse_arrow f =
-  Format.pp_print_string f "<-"
-
-let print_both_arrows f =
-  Format.pp_print_string f "<->"
-
 let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
   Format.fprintf
     f "%a%t" (Alg_expr.print pr_mix pr_tok pr_var) def
@@ -473,31 +464,6 @@ let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
          None -> ()
        | Some (d,_) ->
          Format.fprintf f ", %a" (Alg_expr.print pr_mix pr_tok pr_var) d)
-let print_rates un op f def =
-  Format.fprintf
-    f "%a%t"
-    (print_raw_rate
-       (fun f m -> Format.fprintf f "|%a|" print_ast_mix m)
-       Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x) op)
-    def
-    (fun f ->
-       match un with
-         None -> ()
-       | Some ((d,_),max_dist) ->
-         Format.fprintf
-           f " {%a:%a}"
-           (Alg_expr.print
-              (fun f m ->
-                 Format.fprintf f "|%a|" print_ast_mix m)
-              Format.pp_print_string (fun f x -> Format.fprintf f "'%s'" x)) d
-           (Pp.option (fun f (md,_) ->
-                        Format.fprintf f ":%a"
-                        (Alg_expr.print
-                           (fun f m ->
-                              Format.fprintf f "|%a|" print_ast_mix m)
-                           Format.pp_print_string
-                           (fun f x -> Format.fprintf f "'%s'" x)) md))
-           max_dist)
 
 let print_rates_one_dir un f def =
   Format.fprintf
@@ -532,30 +498,13 @@ let print_rates_one_dir un f def =
 
 let print_ast_edit_rule f r =
   Format.fprintf f "@[<h>%a @@@ %a@]"
-    print_ast_mix r.mix (print_rates r.un_act None) r.act
+    print_ast_mix r.mix (print_rates_one_dir r.un_act) r.act
 
-(*let print_ast_rule f r =
+let print_ast_rule f r =
   Format.fprintf
-    f "@[<h>%a %a@ %a @@ %a@]"
+    f "@[<h>%a %a@ %a @@ %a%t@]"
     (print_one_size r.rm_token) r.lhs
     print_arrow r.bidirectional
-    (print_one_size r.add_token) r.rhs
-    (print_rates r.k_un r.k_op) r.k_def*)
-
-let print_ast_rule f ?direction r =
-  Format.fprintf
-    f "@[<h>%a %a@ %a %a%t]"
-    (print_one_size r.rm_token) r.lhs
-    (fun f r ->
-       match direction with
-       | None -> print_arrow f r
-       | Some Public_data.Direct_rule -> print_direct_arrow f
-       | Some Public_data.Reverse_rule -> print_reverse_arrow f
-       | Some Public_data.Both_directions -> print_both_arrows f
-       | Some Public_data.Variable | Some Public_data.Dummy_rule_direction ->
-         ()
-    )
-    r.bidirectional
     (print_one_size r.add_token) r.rhs
     (print_rates_one_dir r.k_un) r.k_def
     (fun f ->

@@ -780,7 +780,7 @@ let translate_compil parameters error compil =
          let buf = Buffer.create 0 in
          let fmt = Format.formatter_of_buffer buf in
          let () =
-            Ast.print_ast_rule fmt ~direction:Public_data.Direct_rule rule
+            Ast.print_ast_rule_no_rate ~reverse:false fmt rule
          in
          let () = Format.pp_print_flush fmt () in
          let ast = Buffer.contents buf in
@@ -803,7 +803,7 @@ let translate_compil parameters error compil =
              let buf = Buffer.create 0 in
              let fmt = Format.formatter_of_buffer buf in
              let () =
-               Ast.print_ast_rule fmt ~direction:Public_data.Reverse_rule rule
+               Ast.print_ast_rule_no_rate ~reverse:true fmt rule
              in
              let () = Format.pp_print_flush fmt () in
              let ast = Buffer.contents buf in
