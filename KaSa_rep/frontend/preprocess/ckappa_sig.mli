@@ -341,7 +341,6 @@ type 'pattern rule =
     prefix: int;
     delta: int;
     lhs   : 'pattern;
-    bidirectional : bool;
     rhs   : 'pattern;
     k_def : ('pattern,string) Alg_expr.e Locality.annot;
     k_un  : ('pattern,string) Alg_expr.e Locality.annot option;

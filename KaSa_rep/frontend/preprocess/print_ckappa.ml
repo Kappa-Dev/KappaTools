@@ -278,9 +278,6 @@ and print_bool parameter (error:Exception.method_handler) = function
 let print_rule parameter error rule =
   let error = print_mixture parameter error rule.Ckappa_sig.lhs in
   let arrow =
-    if rule.Ckappa_sig.bidirectional then
-      Remanent_parameters.get_bi_arrow_symbol parameter
-    else
       Remanent_parameters.get_uni_arrow_symbol parameter in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" arrow in
   let error = print_mixture parameter error rule.Ckappa_sig.rhs in

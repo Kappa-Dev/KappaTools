@@ -793,7 +793,6 @@ let translate_compil parameters error compil =
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;
              Ckappa_sig.rhs =  rhs ;
-             Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
              Ckappa_sig.ast = direct_ast ;
@@ -809,16 +808,27 @@ let translate_compil parameters error compil =
              let () = Format.pp_print_flush fmt () in
              let ast = Buffer.contents buf in
              let reverse_ast = ast in
-             error,{direct
-                    with Ckappa_sig.lhs = rhs;
-                         Ckappa_sig.rhs = lhs;
-                         Ckappa_sig.bidirectional = rule.Ast.bidirectional ;
-                         Ckappa_sig.ast = reverse_ast
-                   }
+             let error,k_op =
+               alg_with_pos_map (refine_mixture parameters) error
+                 (Option_util.unsome (Alg_expr.const Nbr.zero) rule.Ast.k_op) in
+             let error,k_op_un =
+               alg_with_pos_with_option_map (refine_mixture parameters) error
+                 (Tools_kasa.fst_option rule.Ast.k_op_un) in
+             error,
+             {
+               Ckappa_sig.position = p ;
+               Ckappa_sig.prefix = prefix ;
+               Ckappa_sig.delta = tail_rhs ;
+               Ckappa_sig.lhs = rhs ;
+               Ckappa_sig.rhs =  lhs ;
+               Ckappa_sig.k_def = k_op ;
+               Ckappa_sig.k_un = k_op_un ;
+               Ckappa_sig.ast = reverse_ast ;
+             }
            in
            error,id_set,
            (id,((Ckappa_sig.Reverse,reverse),p))::
-           (id,((Ckappa_sig.Direct,({direct with Ckappa_sig.bidirectional = false })),p))::list
+           (id,((Ckappa_sig.Direct,(direct)),p))::list
          else error,id_set,(id,((Ckappa_sig.Direct,direct),p))::list)
       (error,id_set,[])
       compil.Ast.rules
@@ -858,7 +868,6 @@ let translate_compil parameters error compil =
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;
              Ckappa_sig.rhs =  rhs ;
-             Ckappa_sig.bidirectional = false;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
              Ckappa_sig.ast = ast
