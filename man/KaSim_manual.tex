@@ -33,7 +33,7 @@
 \usepackage{fancyhdr} %to insert logo on the left head of each page
 \pagestyle{fancy}
 \begin{titlepage}
-\rhead{\includegraphics[width=35mm,bb=0 0 375 200]{\KaSimLogo}}
+\rhead{\includegraphics[width=35mm]{\KaSimLogo}}
 \end{titlepage}
 
 \def\KaSim{\textsf{KaSim}}
@@ -94,7 +94,7 @@
 \listoftables
 
 \chapter{Introduction}
-\begin{center}\includegraphics[width=9cm,natwidth=375,natheight=200]{\KaSimLogo}\end{center}
+\begin{center}\includegraphics[width=9cm]{\KaSimLogo}\end{center}
 
 \section{Preamble}
 This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules.
@@ -887,7 +887,7 @@ that we give in Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=15cm,bb=0 0 2380 677]{generated_img/poly.png}
+\includegraphics[width=15cm]{generated_img/poly.png}
 \caption{Final mixture %\index{mixture} obtained after 10,000 events
   of simulation of the \ttt{poly.ka} model. The infinite rate for
   cycle closure allows one to obtain a large number of triangles.}
@@ -1338,7 +1338,7 @@ The last line stops causality analysis whenever time is greater than 20 or when 
 
 \begin{figure}[p] %  figure placement: here, top, bottom, or page
    \centering
-\includegraphics[width=15cm,bb=0 0 921 793]{generated_img/flux.png}
+\includegraphics[width=15cm]{generated_img/flux.png}
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
    \label{fig:flux}
 \end{figure}
@@ -1485,7 +1485,7 @@ without any option.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_0.png}
+\includegraphics[width=12cm]{img/kasa_0.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Actions}.}
 \label{fig:kasa:0}
 \end{figure}
@@ -1532,7 +1532,7 @@ The following options are available:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_1.png}
+\includegraphics[width=12cm]{img/kasa_1.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{output}.}
 \label{fig:kasa:1}
 \end{figure}
@@ -1560,7 +1560,7 @@ When a file already exists, it is overwritten without any warning.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_2.png}
+\includegraphics[width=12cm]{img/kasa_2.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Reachability\_analysis}.}
 \label{fig:kasa:2}
 \end{figure}
@@ -1741,7 +1741,7 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_3.png}
+\includegraphics[width=12cm]{img/kasa_3.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Trace analysis}.}
 \label{fig:kasa:3}
 \end{figure}
@@ -1779,7 +1779,7 @@ The transition system that describes the local traces for the agents of kind $P$
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=10cm,bb=0 0 1939 1027]{generated_img/trace_raw.png}
+\includegraphics[width=10cm]{generated_img/trace_raw.png}
 \caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}.}
 \label{fig:trace-raw}
 \end{figure}
@@ -1808,7 +1808,7 @@ moreover a transition between two microstates $v$ and $v'$ can be described by a
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=10cm,bb=0 0 1155 453]{generated_img/trace_macro.png}
+\includegraphics[width=10cm]{generated_img/trace_macro.png}
 \caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}.}
 \label{fig:trace-macro}
 \end{figure}
@@ -1826,7 +1826,7 @@ Although the semantics of a coarse-grainged transition system is fully defined  
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_4.png}
+\includegraphics[width=12cm]{img/kasa_4.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Contact map}.}
 \label{fig:kasa:4}
 \end{figure}
@@ -1854,7 +1854,7 @@ Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=8cm,bb=0 0 452 247]{generated_img/abc_contact.png}
+\includegraphics[width=8cm]{generated_img/abc_contact.png}
 \caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}.}
 \label{fig:abc-contact}
 \end{figure}
@@ -1875,7 +1875,7 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kasa_5.png}
+\includegraphics[width=12cm]{img/kasa_5.png}
 \caption{\KaSa~ graphical interface - sub-tab \texttt{Influence map}.}
 \label{fig:kasa:4}
 \end{figure}
@@ -1901,7 +1901,7 @@ In Fig.~\ref{fig:imbis}, we illustrate the construction of positive influences d
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-\includegraphics[width=8cm,bb=0 0 1462 756]{img/im.png}
+\includegraphics[width=8cm]{img/im.png}
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rule embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:imbis}
 \end{figure}
@@ -2012,7 +2012,7 @@ without any option.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_0.png}
+\includegraphics[width=12cm]{img/kade_0.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{Data set}.}
 \label{fig:kade:0}
 \end{figure}
@@ -2066,7 +2066,7 @@ The following options are available:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_1.png}
+\includegraphics[width=12cm]{img/kade_1.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{Output}.}
 \label{fig:kade:1}
 \end{figure}
@@ -2087,7 +2087,7 @@ The following options are available:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_3.png}
+\includegraphics[width=12cm]{img/kade_3.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{Integration settings}.}
 \label{fig:kade:3}
 \end{figure}
@@ -2126,7 +2126,7 @@ In expert mode, the last sub-tab provides options to tune the amount of debuggin
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\includegraphics[width=12cm]{img/kade_5.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{6\_debug\_mode}.}
 \label{fig:kade:6}
 \end{figure}
@@ -2169,7 +2169,7 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 \label{fig:sec1:phos}
 \end{figure}
 \begin{figure}[t]
-\centering\hspace*{5mm}\includegraphics[width=1.3\linewidth,bb=0 0 789 132]{gkappa_img/ref.pdf}
+\centering\hspace*{5mm}\includegraphics[width=1.3\linewidth]{gkappa_img/ref.pdf}
   \caption{From rules to reactions. The rule in Fig.~\ref{fig:sec1:bind} is refined into two reactions according to whether the site \texttt{r} of the protein \texttt{S} is phosphorylated or not.}
   \label{fig:refinement}
 \end{figure}
@@ -2211,7 +2211,7 @@ the one in the sequence $R_1,\ldots,R_m$.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_2.png}
+\includegraphics[width=12cm]{img/kade_2.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{2\_semantics}.}
 \label{fig:kade:2}
 \end{figure}
@@ -2375,7 +2375,7 @@ The sub-tab \texttt{Model reduction} gives access to more information about
 potential model reduction.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_4.png}
+\includegraphics[width=12cm]{img/kade_4.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{Model reduction}.}
 \label{fig:kade:4}
 \end{figure}
@@ -2390,7 +2390,7 @@ The following options are available:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=12cm,bb=0 0 1904 1208]{img/kade_5.png}
+\includegraphics[width=12cm]{img/kade_5.png}
 \caption{\KaDE~ graphical interface - sub-tab \texttt{Static analysis}.}
 \label{fig:kade:5}
 \end{figure}
