@@ -322,7 +322,7 @@ let rule_to_json rule =
 
 let json_to_rule =
   function
-  | `Assoc l as x when List.length l = 4 ->
+  | `Assoc l as x when List.length l = 5 ->
     begin
       try
         {
