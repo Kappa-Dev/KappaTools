@@ -639,7 +639,7 @@ let name_and_purify_edit_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
 
 let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
   let pack',label = give_rule_label
-      r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
+      r.Ast.bidirectional pack (Ast.print_ast_rule ?direction:None) r label_opt in
   let acc',k_def =
     if Alg_expr.has_mix (fst r.Ast.k_def) then
       let rate_var = label^"_rate" in
