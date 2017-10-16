@@ -5,8 +5,6 @@
 \usepackage[parfill]{parskip}
 \usepackage{graphicx}
 \usepackage{amssymb}
-\usepackage{epstopdf}
-\DeclareGraphicsRule{.tif}{png}{.png}{ 'convert #1 ' dirname #1' /' basename #1 .tif' .png}
 
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
@@ -96,7 +94,7 @@
 \listoftables
 
 \chapter{Introduction}
-\begin{center}\includegraphics[width=9cm,bb=0 0 375 200]{\KaSimLogo}\end{center}
+\begin{center}\includegraphics[width=9cm,natwidth=375,natheight=200]{\KaSimLogo}\end{center}
 
 \section{Preamble}
 This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules.
@@ -332,14 +330,14 @@ skeletons (describe formally in Table \ref{tab:patterns}):
   internal state, you write it after the symbol '\intstate'. For
   example, the following graph:
   \begin{center}
-    \includegraphics[bb=0 0 61 57]{gkappa_img/syntax_agent.pdf}
+    \includegraphics{gkappa_img/syntax_agent.pdf}
   \end{center}
   is written as \ttt{A(x,y\intstate{}p,z\intstate{}0)}.
 \item When a site is a part of an edge, you assign an arbitrary positive
   integer identifier $n$ to this edge and you specify the appartenance
   of the site to this edge by writing \ttt{site\_name$!n$}. The following graph:
   \begin{center}
-    \includegraphics[bb=0 0 171 129]{gkappa_img/syntax_ring.pdf}
+    \includegraphics{gkappa_img/syntax_ring.pdf}
   \end{center}
   can be reprensented as \ttt{A(x!23,y\intstate{}u!4,z\intstate{}1)},
   \ttt{A(x!4,y\intstate{}u!95,z\intstate{}1)},
@@ -2158,7 +2156,7 @@ In Kappa, rules may be more and less refined \cite{DanosFFHK08,DBLP:journals/tcs
 \begin{figure}[t]
 \begin{minipage}{\linewidth}
     \centering\scalebox{0.7}%
-    {\includegraphics[bb=0 0 198 28]{gkappa_img/sect1-bind.pdf}}
+    {\includegraphics{gkappa_img/sect1-bind.pdf}}
   \end{minipage}
   \caption{Proteins \texttt{K} and \texttt{S} may bind.}
   \label{fig:sec1:bind}
@@ -2241,7 +2239,7 @@ A(u,r~u),A(u,r~u),A(u,r~u),A(u,r~u) -> A(u!1,r~u),A(u!1,r~u),A(u,r~u),A(u,r~p) @
     \end{lstlisting}
 which is depicted as follows:
 \begin{center}
-  \scalebox{0.8}{\includegraphics[bb=0 0 381 32]{gkappa_img/auto.pdf}}
+  \scalebox{0.8}{\includegraphics{gkappa_img/auto.pdf}}
 \end{center}
 
   with the first convention (that is the one of the simulator), rates of rules are not corrected, hence the effective rate of this rule is $k$;
@@ -2256,7 +2254,7 @@ To account for this, {\KaDE} never applies a binary rule in a
 
 \begin{figure}[t]
   \hfill\begin{minipage}{0.9\linewidth}
-  \scalebox{0.7}{\includegraphics[bb=0 0 714 167]{gkappa_img/amb_noamb.pdf}}
+  \scalebox{0.7}{\includegraphics{gkappa_img/amb_noamb.pdf}}
 \end{minipage}\hfill\mbox{}
 \caption{The rule \texttt{A(x),A(x) -> A(x!1),A(x!1)} may bind two agents that are already in the same connected component, only if a second rate constant is given explictly.}
 \end{figure}
@@ -2345,13 +2343,13 @@ A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @2
 
 \begin{figure}[t]
   \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtt.pdf}}
+    \centering\scalebox{0.7}{\includegraphics{gkappa_img/symtt.pdf}}
   \end{minipage}\hspace*{5mm}
   \begin{minipage}{0.3\linewidth}
-    \scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symff.pdf}}
+    \scalebox{0.7}{\includegraphics{gkappa_img/symff.pdf}}
   \end{minipage}\hspace*{5mm}
 \begin{minipage}{0.3\linewidth}
-    \centering\scalebox{0.7}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtf.pdf}}
+    \centering\scalebox{0.7}{\includegraphics{gkappa_img/symtf.pdf}}
   \end{minipage}
   \caption{Sites are equivalent, if the corrected rates of the third rule is twice the corrected rate of each other rule.}
   \label{fig:symmetric:rules}
@@ -2418,17 +2416,17 @@ The rules of this models are depicted as follows:
 
 \begin{center}
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtt.pdf}}
+    \centering\scalebox{0.85}{\includegraphics{gkappa_img/symtt.pdf}}
   \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-  \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symff.pdf}}
+  \centering\scalebox{0.85}{\includegraphics{gkappa_img/symff.pdf}}
 \end{minipage}
 
 
 \begin{minipage}{0.49\linewidth}
-    \centering\scalebox{0.85}{\includegraphics[bb=0 0 183 31]{gkappa_img/symtf.pdf}}
+    \centering\scalebox{0.85}{\includegraphics{gkappa_img/symtf.pdf}}
   \end{minipage}
 
 \end{center}
@@ -2581,21 +2579,21 @@ Then we can integrate our three differential systems and plot their respective  
 We obtain the following plots:
 \begin{figure}[htp]
 \centering  \begin{minipage}{0.35\linewidth}
-   \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot.png}}
+   \scalebox{0.35}{\includegraphics{img/plot.png}}
 \end{minipage}
 \caption{Initial model (without reduction).}
 \end{figure}
 
 \begin{figure}[htp]
 \centering\begin{minipage}{0.35\linewidth}
-  \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot_fwd.png}}
+  \scalebox{0.35}{\includegraphics{img/plot_fwd.png}}
 \end{minipage}
 \caption{Reduced model (fwd bisimulation).}
 \end{figure}
 
 \begin{figure}[htp]
 \centering\begin{minipage}{0.35\linewidth}
-  \scalebox{0.35}{\includegraphics[bb=0 0 480 360]{img/plot_bwd.png}}
+  \scalebox{0.35}{\includegraphics{img/plot_bwd.png}}
 \end{minipage}\caption{Reduced model (bwd bisimulation).}
 \end{figure}
 
