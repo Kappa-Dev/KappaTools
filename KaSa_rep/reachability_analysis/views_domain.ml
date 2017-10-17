@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Aug 01 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    *
    * Compute the relations between sites in the BDU data structures
    *
@@ -111,7 +111,6 @@ struct
 
   let get_agent_name static = lift Analyzer_headers.get_agent_name static
 
-  (*TODO*)
   let get_agent_name_from_pattern static =
     lift Analyzer_headers.get_agent_name_from_pattern static
 
@@ -245,15 +244,6 @@ struct
     let result = get_domain_dynamic_information dynamic in
     error, result
 
-  (*let get_store_remanent_triple static error =
-    let error, result_static =
-      get_bdu_analysis_static static error
-    in
-    let store_remanent_triple =
-      result_static.Bdu_static_views.store_remanent_triple
-    in
-    error, store_remanent_triple*)
-
   let get_store_proj_bdu_test_restriction static error =
     let error, result_static =
       get_bdu_analysis_static static error
@@ -370,8 +360,6 @@ struct
     (*-----------------------------------------------------------------------*)
     (*pattern*)
     (*-----------------------------------------------------------------------*)
-    (*let error, store_remanent_triple = get_store_remanent_triple static error
-    in*)
     let error, result =
       Bdu_static_views.scan_rule_set_pattern
         parameters
@@ -595,7 +583,7 @@ struct
     error, site_correspondence
 
 
-  let dump_cv_label static dynamic error bool (agent_type, cv_id) =
+  let dump_cv_label static error bool (agent_type, cv_id) =
     (*TODO: put title*)
     let parameters = get_parameter static in
     let handler_kappa = get_kappa_handler static in
@@ -749,7 +737,7 @@ struct
       (*------------------------------------------------------------------*)
       (*build a pair of coresspondence map:
         - map1: global -> local; map2: local -> global*)
-      let error, (_map1, map2) = (*CHECK*)
+      let error, (_map1, map2) =
         Common_map.new_index_pair_map parameters error
           site_correspondence
       in
@@ -888,7 +876,7 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
-    let error, dynamic, _title, is_new_views, updates_list =
+    let error, dynamic, _title, is_new_views, _updates_list =
       if Ckappa_sig.Views_bdu.equal bdu_old bdu_union
       then
         error, dynamic, title, false, updates_list
@@ -936,13 +924,11 @@ struct
     then
       (*print*)
       let error, event_list =
-        List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
-            updates_list2event_list
-              static
-              dynamic
-              error
-              event_list
-          ) (error, event_list) updates_list
+        updates_list2event_list
+          static
+          dynamic
+          error
+          event_list
       in
       error, dynamic, event_list
     else
@@ -970,9 +956,6 @@ struct
   let build_init_restriction static dynamic error init_state =
     let parameters = get_parameter static in
     let store_remanent_triple = get_remanent_triple static in
-    (*let error, store_remanent_triple =
-      get_store_remanent_triple static error
-    in*)
     let error, (dynamic, event_list) =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameters error
@@ -1171,7 +1154,7 @@ struct
 
   (*****************************************************************)
 
-  let step_list_empty kappa_handler dynamic parameters error agent_id
+  let step_list_empty _kappa_handler dynamic parameters error agent_id
       agent_type site_name cv_list fixpoint_result
       proj_bdu_test_restriction
       bdu_false bdu_true
@@ -2758,73 +2741,77 @@ struct
               | Cckappa_sig.Dead_agent (_, _, _, _) -> error, dynamic
               | Cckappa_sig.Agent agent ->
                 let agent_type = agent.Cckappa_sig.agent_name in
-                let error, site_correspondence =
-                  match
-                    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                let interface = agent.Cckappa_sig.agent_interface in
+                if Ckappa_sig.Site_map_and_set.Map.is_empty interface then
+                  error, dynamic
+                else
+                  let error, site_correspondence =
+                    match
+                      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                        parameters error
+                        agent_type
+                        site_correspondence
+                    with
+                    | error, None ->
+                      Exception.warn parameters error __POS__ Exit []
+                    | error, Some l -> error, l
+                  in
+                  let error, get_pair_list =
+                    Bdu_static_views.get_pair_cv_map_with_restriction_views
                       parameters error
-                      agent_type
+                      agent
                       site_correspondence
-                  with
-                  | error, None ->
-                    Exception.warn parameters error __POS__ Exit []
-                  | error, Some l -> error, l
-                in
-                let error, get_pair_list =
-                  Bdu_static_views.get_pair_cv_map_with_restriction_views
-                    parameters error
-                    agent
-                    site_correspondence
-                in
-                (*build bdu_test*)
-                let error, dynamic =
-                  List.fold_left (fun (error, dynamic) (cv_id, map_res) ->
-                      if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
-                      then error, dynamic
-                      else
-                        let error, pair_list =
-                          Ckappa_sig.Site_map_and_set.Map.fold
-                            (fun site' state (error, current_list) ->
-                               let pair_list =
-                                 (site',
-                                  (state.Cckappa_sig.min, state.Cckappa_sig.max)
+                  in
+                  (*build bdu_test*)
+                  let error, dynamic =
+                    List.fold_left (fun (error, dynamic) (cv_id, map_res) ->
+                        if Ckappa_sig.Site_map_and_set.Map.is_empty map_res
+                        then error, dynamic
+                        else
+                          let error, pair_list =
+                            Ckappa_sig.Site_map_and_set.Map.fold
+                              (fun site' state (error, current_list) ->
+                                 let pair_list =
+                                   (site',
+                                    (state.Cckappa_sig.min, state.Cckappa_sig.max)
                                   ) :: current_list in
-                               error, pair_list
-                            ) map_res (error, [])
-                        in
-                        let handler = get_mvbdu_handler dynamic in
-                        let error, handler, bdu_test =
-                          Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list parameters handler error
+                                 error, pair_list
+                              ) map_res (error, [])
+                          in
+                          let handler = get_mvbdu_handler dynamic in
+                          let error, handler, bdu_test =
+                            Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_range_list parameters handler error
                             pair_list
-                        in
-                        let dynamic = set_mvbdu_handler handler dynamic in
-                        (*check bdu_test with bdu in result*)
-                        let error, bdu_X =
-                          match
-                            Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                          in
+                          let dynamic = set_mvbdu_handler handler dynamic in
+                          (*check bdu_test with bdu in result*)
+                          let error, bdu_X =
+                            match
+                              Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                               parameters error
                               (agent_type, cv_id)
                               fixpoint_result
-                          with
-                          | error, None -> error, bdu_false
-                          | error, Some bdu -> error, bdu
-                        in
-                        let handler = get_mvbdu_handler dynamic in
-                        (*if it does not overlap then answer false, otherwise
+                            with
+                            | error, None -> error, bdu_false
+                            | error, Some bdu -> error, bdu
+                          in
+                          let handler = get_mvbdu_handler dynamic in
+                          (*if it does not overlap then answer false, otherwise
                           continue*)
-                        let error, handler, bdu_inter =
-                          Ckappa_sig.Views_bdu.mvbdu_and
-                            parameters handler error bdu_test bdu_X
-                        in
-                        let dynamic = set_mvbdu_handler handler dynamic in
-                        (*check if it is overlap or not?*)
-                        if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false
-                        then raise (False (error, dynamic))
-                        else
-                          (*continue to iterate*)
-                          error, dynamic
-                    ) (error, dynamic) get_pair_list
-                in
-                error, dynamic
+                          let error, handler, bdu_inter =
+                            Ckappa_sig.Views_bdu.mvbdu_and
+                              parameters handler error bdu_test bdu_X
+                          in
+                          let dynamic = set_mvbdu_handler handler dynamic in
+                          (*check if it is overlap or not?*)
+                          if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false
+                          then raise (False (error, dynamic))
+                          else
+                            (*continue to iterate*)
+                            error, dynamic
+                      ) (error, dynamic) get_pair_list
+                  in
+                  error, dynamic
            ) pattern.Cckappa_sig.views dynamic
       in
       let precondition =
@@ -3082,7 +3069,6 @@ struct
            let error =
              dump_cv_label
                static
-               dynamic
                error
                (Remanent_parameters.get_dump_reachability_analysis_diff
                   parameters)

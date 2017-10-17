@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 31 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    *
    * Abstract domain to record live rules
    *
@@ -469,13 +469,49 @@ struct
         (error, dynamic, Some precondition) l
 
   (***********************************************************)
-  (*TODO*)
 
   (* ignore the flag *)
   (* Please check that each agent type occuring in the pattern is reachable *)
+  exception False of Exception.method_handler * dynamic_information
 
-  let maybe_reachable _static dynamic error _flag _pattern precondition =
-    error, dynamic, Some precondition
+
+  let maybe_reachable static dynamic error _flag pattern precondition =
+    let parameters = get_parameter static in
+    try
+      let error, dynamic =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+          parameters error
+          (fun parameters error _agent_id agent dynamic ->
+             match agent with
+             | Cckappa_sig.Unknown_agent _
+             | Cckappa_sig.Ghost
+             | Cckappa_sig.Dead_agent (_, _, _, _) -> error, dynamic
+             | Cckappa_sig.Agent agent ->
+               let local = get_seen_agent dynamic in
+               let agent_type = agent.Cckappa_sig.agent_name in
+               let error, bool =
+                 Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+                  parameters error agent_type local in
+               match
+                 bool
+               with
+               | Some true ->
+                 error, dynamic
+               | Some false ->
+                 raise (False (error,dynamic))
+               | None ->
+                 let error, () =
+                   Exception.warn
+                     parameters error __POS__ Exit ()
+                 in
+                 error, dynamic
+          ) pattern.Cckappa_sig.views dynamic
+      in
+      error, dynamic, Some precondition
+    with
+      False (error, dynamic)
+      ->
+      error, dynamic, None
 
   (*********************************************************************)
   (** fold a list of creation each time update the array when agent is
