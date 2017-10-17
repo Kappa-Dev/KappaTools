@@ -76,8 +76,8 @@ let main () =
       ~accuracy_level:Public_data.Low state
   in
   let () = Export_to_KaSa.dump_contact_map Public_data.Low state
-  in
-  let () =
+  in*)
+  (*let () =
       Ckappa_sig.AgentSite_map_and_set.Map.iter
         (fun (x,y) (nodes, _) ->
            List.iter (fun node ->

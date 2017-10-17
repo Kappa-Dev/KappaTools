@@ -113,12 +113,13 @@ type ('static, 'dynamic) state
 (*work in process*)
 
 val get_contact_map_converted : ('static, 'dynamic)  state ->
-  (Graphs.node list * (int * int) list)
-    Ckappa_sig.AgentSite_map_and_set.Map.t option
+(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
+   Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
+  option
 
 val set_contact_map_converted :
-  (Graphs.node list * (int * int) list)
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
+(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
+   Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t) ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 

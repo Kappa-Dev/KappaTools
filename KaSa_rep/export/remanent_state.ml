@@ -295,8 +295,9 @@ type ('static,'dynamic) state =
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
     contact_map_converted : (*TODO: remove later*)
-      (Graphs.node list* (int * int) list)
-        Ckappa_sig.AgentSite_map_and_set.Map.t option;
+      (Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
+         Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
+         option;
     graph_scc : (unit, unit) Graphs.graph Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
 
