@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Mar 11 2017>
+   * Last modification: Time-stamp: <Oct 17 2017>
    * *
    * algebraic check for the influence map.
    *
@@ -262,6 +262,23 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
 
 exception Pass of Exception.method_handler
 
+let is_shift_required bool rule =
+  match rule.Cckappa_sig.e_rule_initial_direction with
+  | Ckappa_sig.Direct -> bool
+  | Ckappa_sig.Reverse -> not bool
+
+let shift_agent_id bool rule id =
+  if is_shift_required bool rule &&
+    Ckappa_sig.compare_agent_id id
+      (Ckappa_sig.agent_id_of_int rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.prefix)
+    >= 0
+  then
+    Ckappa_sig.add_agent_id
+      id
+      rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.delta
+  else id
+
+
 let filter_influence parameters error handler compilation map bool =
   let nrules = Handler.nrules parameters error handler in
   let get_var v =
@@ -289,19 +306,12 @@ let filter_influence parameters error handler compilation map bool =
   in
   let get_bool = if bool then get_rhs else get_lhs in
 
-  let check_influence_rule_mixt error rule1 mixt  pos =
+  let check_influence_rule_mixt error rule1 mixt rule2_opt pos =
     let updt_pos ((x:Ckappa_sig.c_agent_id), (y:Ckappa_sig.c_agent_id)) =
-      (if bool &&
-          Ckappa_sig.compare_agent_id x
-            (Ckappa_sig.agent_id_of_int rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.prefix)
-          >= 0
-       then
-         Ckappa_sig.add_agent_id
-           x
-           rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.delta
-       else x
-      ),
-      y
+      (shift_agent_id bool rule1 x,
+       match rule2_opt with
+       | None -> y
+       | Some rule2 -> shift_agent_id  false rule2 y)
     in
     check
       parameters
@@ -334,7 +344,7 @@ let filter_influence parameters error handler compilation map bool =
                in raise (Pass error)
              | Some r -> error,r
            in
-           let error,mixt =
+           let error,mixt,rule2_opt =
              if
                Ckappa_sig.compare_rule_id b (Ckappa_sig.rule_id_of_int nrules) < 0
              then
@@ -354,7 +364,8 @@ let filter_influence parameters error handler compilation map bool =
                        ~message:("Missing rule"^ (Ckappa_sig.string_of_rule_id b))
                        Exit ()
                    in raise (Pass error)
-                 | Some r -> error, get_lhs r
+                 | Some r -> error, get_lhs r,
+                             Some r
                end
              else
                begin
@@ -373,7 +384,8 @@ let filter_influence parameters error handler compilation map bool =
                        ~message:("Missing var" ^(Ckappa_sig.string_of_rule_id b))
                        Exit ()
                    in raise (Pass error)
-                 | Some v -> get_var v
+                 | Some v -> let error, mixt =  get_var v in
+                   error, mixt, None
                end
            in
            let error,couple' =
@@ -386,10 +398,11 @@ let filter_influence parameters error handler compilation map bool =
                    (fun error a b  ->
                       match
                         check_influence_rule_mixt error
-                        r1
-                        mixt
-                        (Ckappa_sig.agent_id_of_int a,
-                         Ckappa_sig.agent_id_of_int b)
+                          r1
+                          mixt
+                          rule2_opt
+                          (Ckappa_sig.agent_id_of_int a,
+                           Ckappa_sig.agent_id_of_int b)
                       with
                       | error, Some _ -> error, true
                       | error, None -> error, false
@@ -444,19 +457,12 @@ let filter_influence_high maybe_reachable
   in
   let get_bool = if bool then get_rhs else get_lhs in
 
-  let check_influence_rule_mixt error rule1 mixt  pos =
+  let check_influence_rule_mixt error rule1 mixt rule2_opt  pos =
     let updt_pos ((x:Ckappa_sig.c_agent_id), (y:Ckappa_sig.c_agent_id)) =
-      (if bool &&
-          Ckappa_sig.compare_agent_id x
-            (Ckappa_sig.agent_id_of_int rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.prefix)
-          >= 0
-       then
-         Ckappa_sig.add_agent_id
-           x
-           rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.delta
-       else x
-      ),
-      y
+      (shift_agent_id bool rule1 x,
+       match rule2_opt with
+       | None -> y
+       | Some rule2 -> shift_agent_id false rule2 y)
     in
     check
       parameters
@@ -489,7 +495,7 @@ let filter_influence_high maybe_reachable
                in raise (Pass error)
              | Some r -> error,r
            in
-           let error,mixt =
+           let error,mixt,rule2_opt =
              if
                Ckappa_sig.compare_rule_id b (Ckappa_sig.rule_id_of_int nrules) < 0
              then
@@ -509,7 +515,7 @@ let filter_influence_high maybe_reachable
                        ~message:("Missing rule"^ (Ckappa_sig.string_of_rule_id b))
                        Exit ()
                    in raise (Pass error)
-                 | Some r -> error, get_lhs r
+                 | Some r -> error, get_lhs r, Some r
                end
              else
                begin
@@ -528,7 +534,9 @@ let filter_influence_high maybe_reachable
                        ~message:("Missing var" ^(Ckappa_sig.string_of_rule_id b))
                        Exit ()
                    in raise (Pass error)
-                 | Some v -> get_var v
+                 | Some v ->
+                   let error, var = get_var v in
+                   error, var, None
                end
            in
            let (error,dynamic),couple' =
@@ -543,6 +551,7 @@ let filter_influence_high maybe_reachable
                         check_influence_rule_mixt error
                         r1
                         mixt
+                        rule2_opt
                         (Ckappa_sig.agent_id_of_int a,
                          Ckappa_sig.agent_id_of_int b)
                       with

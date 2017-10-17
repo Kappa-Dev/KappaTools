@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 16 2017>
+ * Last modification: Time-stamp: <Oct 17 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -818,7 +818,7 @@ let translate_compil parameters error compil =
              {
                Ckappa_sig.position = p ;
                Ckappa_sig.prefix = prefix ;
-               Ckappa_sig.delta = tail_rhs ;
+               Ckappa_sig.delta = tail_lhs ;
                Ckappa_sig.lhs = rhs ;
                Ckappa_sig.rhs =  lhs ;
                Ckappa_sig.k_def = k_op ;
