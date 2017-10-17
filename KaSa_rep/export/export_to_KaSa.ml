@@ -84,12 +84,8 @@ sig
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
-    (
-      (Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
-       Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
-      *
-      (unit, unit) Graphs.graph
-        Ckappa_sig.AgentSite_map_and_set.Map.t)
+    Graphs.Nodearray.key list list
+      Ckappa_sig.AgentSite_map_and_set.Map.t
 
 (**************************************************)
 

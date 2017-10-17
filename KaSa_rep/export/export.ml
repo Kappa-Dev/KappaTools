@@ -1462,7 +1462,7 @@ let dump_contact_map accuracy state =
                    Ckappa_sig.AgentSite_map_and_set.Map.empty)
       | Some (m1,m2) -> errors, (m1,m2)
     in
-    let errors, graph_scc =
+    let errors, graph =
       match Remanent_state.get_graph_scc state with
       | None -> Exception.warn parameters errors __POS__ Exit
                   Ckappa_sig.AgentSite_map_and_set.Map.empty
@@ -1474,9 +1474,9 @@ let dump_contact_map accuracy state =
     in
     let errors, graph_scc =
       Contact_map_scc.compute_graph_scc
-        parameters errors cm_graph graph_scc
+        parameters errors cm_graph graph
     in
-    errors, (cm_graph, graph_scc)
+    errors, graph_scc
 
 (*internal contact map*)
 

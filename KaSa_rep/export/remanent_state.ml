@@ -298,7 +298,7 @@ type ('static,'dynamic) state =
       (Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
          Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
          option;
-    graph_scc : (unit, unit) Graphs.graph Ckappa_sig.AgentSite_map_and_set.Map.t option
+    graph_scc :  Graphs.Nodearray.key list list Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
 
 let get_contact_map_converted state =

@@ -124,11 +124,11 @@ val set_contact_map_converted :
   ('static, 'dynamic)  state
 
 val get_graph_scc : ('static, 'dynamic)  state ->
-  (unit, unit) Graphs.graph
+  Graphs.Nodearray.key list list
     Ckappa_sig.AgentSite_map_and_set.Map.t option
 
 val set_graph_scc :
-  (unit, unit) Graphs.graph
+  Graphs.Nodearray.key list list
     Ckappa_sig.AgentSite_map_and_set.Map.t ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
