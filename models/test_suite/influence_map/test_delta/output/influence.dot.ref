@@ -1,0 +1,53 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa test_delta.ka --influence-map-accuracy-level Realisable --debugging-mode --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(),C()->A(),B(),B()" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(),B(),B()->A(),C()" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A()->B()" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A()->C()" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:B()->A()" [shape="box" fillcolor="#87ceeb" style=filled];
+"5:C()->A()" [shape="box" fillcolor="#87ceeb" style=filled];
+
+"qb" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"qc" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"0:A(),C()->A(),B(),B()" -> "1:A(),B(),B()->A(),C()" [label="[1->1];[1->2];[2->1];[2->2]" color="green"];
+"0:A(),C()->A(),B(),B()" -> "4:B()->A()" [label="[1->0];[2->0]" color="green"];
+"0:A(),C()->A(),B(),B()" -> "qb" [label="[1->0];[2->0]" color="green"];
+"1:A(),B(),B()->A(),C()" -> "0:A(),C()->A(),B(),B()" [label="[1->1]" color="green"];
+"1:A(),B(),B()->A(),C()" -> "5:C()->A()" [label="[1->0]" color="green"];
+"1:A(),B(),B()->A(),C()" -> "qc" [label="[1->0]" color="green"];
+"2:A()->B()" -> "1:A(),B(),B()->A(),C()" [label="[0->1];[0->2]" color="green"];
+"2:A()->B()" -> "4:B()->A()" [label="[0->0]" color="green"];
+"2:A()->B()" -> "qb" [label="[0->0]" color="green"];
+"3:A()->C()" -> "0:A(),C()->A(),B(),B()" [label="[0->1]" color="green"];
+"3:A()->C()" -> "5:C()->A()" [label="[0->0]" color="green"];
+"3:A()->C()" -> "qc" [label="[0->0]" color="green"];
+"4:B()->A()" -> "0:A(),C()->A(),B(),B()" [label="[0->0]" color="green"];
+"4:B()->A()" -> "1:A(),B(),B()->A(),C()" [label="[0->0]" color="green"];
+"4:B()->A()" -> "2:A()->B()" [label="[0->0]" color="green"];
+"4:B()->A()" -> "3:A()->C()" [label="[0->0]" color="green"];
+"5:C()->A()" -> "0:A(),C()->A(),B(),B()" [label="[0->0]" color="green"];
+"5:C()->A()" -> "1:A(),B(),B()->A(),C()" [label="[0->0]" color="green"];
+"5:C()->A()" -> "2:A()->B()" [label="[0->0]" color="green"];
+"5:C()->A()" -> "3:A()->C()" [label="[0->0]" color="green"];
+"0:A(),C()->A(),B(),B()" -> "5:C()->A()" [label="[1->0]" color="red" arrowhead="tee"];
+"0:A(),C()->A(),B(),B()" -> "qc" [label="[1->0]" color="red" arrowhead="tee"];
+"1:A(),B(),B()->A(),C()" -> "1:A(),B(),B()->A(),C()" [label="[1->2];[2->1]" color="red" arrowhead="tee"];
+"1:A(),B(),B()->A(),C()" -> "4:B()->A()" [label="[1->0];[2->0]" color="red" arrowhead="tee"];
+"1:A(),B(),B()->A(),C()" -> "qb" [label="[1->0];[2->0]" color="red" arrowhead="tee"];
+"2:A()->B()" -> "0:A(),C()->A(),B(),B()" [label="[0->0]" color="red" arrowhead="tee"];
+"2:A()->B()" -> "1:A(),B(),B()->A(),C()" [label="[0->0]" color="red" arrowhead="tee"];
+"2:A()->B()" -> "3:A()->C()" [label="[0->0]" color="red" arrowhead="tee"];
+"3:A()->C()" -> "0:A(),C()->A(),B(),B()" [label="[0->0]" color="red" arrowhead="tee"];
+"3:A()->C()" -> "1:A(),B(),B()->A(),C()" [label="[0->0]" color="red" arrowhead="tee"];
+"3:A()->C()" -> "2:A()->B()" [label="[0->0]" color="red" arrowhead="tee"];
+"4:B()->A()" -> "1:A(),B(),B()->A(),C()" [label="[0->1];[0->2]" color="red" arrowhead="tee"];
+"4:B()->A()" -> "qb" [label="[0->0]" color="red" arrowhead="tee"];
+"5:C()->A()" -> "0:A(),C()->A(),B(),B()" [label="[0->1]" color="red" arrowhead="tee"];
+"5:C()->A()" -> "qc" [label="[0->0]" color="red" arrowhead="tee"];
+}
