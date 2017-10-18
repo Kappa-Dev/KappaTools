@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Oct 16 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -194,7 +194,7 @@ let complementary_interface
   error, Misc_sa.list_minus l interface
 
 let info_of_rule
-    parameters error compiled (rule_id: Ckappa_sig.c_rule_id) =
+    parameters ?(with_rates=false) ?(original=false) error compiled (rule_id: Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
   let error,rule =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
@@ -234,7 +234,13 @@ let info_of_rule
       | Ckappa_sig.Reverse -> Public_data.Reverse_rule
     in
     let ast =
-      rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
+      match original, with_rates with
+      | true, true ->
+        rule.Cckappa_sig.e_rule_rule.Ckappa_sig.original_ast
+      | true, false ->
+        rule.Cckappa_sig.e_rule_rule.Ckappa_sig.original_ast_no_rate
+      | false, true -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast
+      | false, false -> rule.Cckappa_sig.e_rule_rule.Ckappa_sig.ast_no_rate
     in
     error, (label, position, direction, ast, rule_id)
 

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Aug 18 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -74,12 +74,16 @@ let empty_e_rule handler error =
         Ckappa_sig.position = Locality.dummy ;
         Ckappa_sig.prefix = 0;
         Ckappa_sig.delta  = 0;
+        Ckappa_sig.interprete_delta = Ckappa_sig.Direct ;
         Ckappa_sig.lhs = Ckappa_sig.EMPTY_MIX ;
         Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX;
         Ckappa_sig.k_def = Alg_expr.const Nbr.zero;
-        (*Ckappa_sig.k_un_radius = None ; *)
         Ckappa_sig.k_un = None ;
         Ckappa_sig.ast = "";
+        Ckappa_sig.ast_no_rate = "";
+        Ckappa_sig.original_ast = "";
+        Ckappa_sig.original_ast_no_rate = "";
+        Ckappa_sig.from_a_biderectional_rule = false ;
       };
     Cckappa_sig.e_rule_c_rule = rule }
 
@@ -1317,7 +1321,8 @@ let check_freeness parameters lhs source (error, half_release_set) =
 
 
 let translate_rule parameters error handler rule =
-  let label,((direction,rule),position) = rule in
+  let label,(rule,position) = rule in
+  let direction = rule.Ckappa_sig.interprete_delta in 
   let error,c_rule_lhs,question_marks_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
   let error,c_rule_rhs,question_marks_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
   let error,c_rule_lhs = clean_question_marks parameters error question_marks_r c_rule_lhs in (* remove ? in the lhs when they occur in the rhs (according to the BNF, they have to occur in the lhs as well *)
@@ -1712,7 +1717,7 @@ let lift_allowing_question_marks parameters handler =
      clean_question_marks parameters a c b)
 
 
-let translate_pert_init error a (alg,_) (c_alg,_) mixture c_mixture  pos' =
+let translate_pert_init error a (alg,_) (c_alg,_) mixture c_mixture  _pos' =
     error,
     {Cckappa_sig.e_init_factor = alg ;
      Cckappa_sig.e_init_c_factor = c_alg ;

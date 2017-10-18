@@ -195,8 +195,11 @@ val print_link :
 val print_ast_mix : Format.formatter -> mixture -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
 val print_ast_edit_rule : Format.formatter -> edit_rule -> unit
+val print_ast_edit_rule_no_rate : Format.formatter -> edit_rule -> unit
 val print_ast_rule_no_rate :
   reverse:bool -> Format.formatter -> rule -> unit
+val print_ast_rule_no_rate_kasa :
+  Format.formatter -> rule -> unit
 
 val link_to_json :
   ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->

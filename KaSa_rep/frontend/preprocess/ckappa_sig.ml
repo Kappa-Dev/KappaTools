@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Jul 31 2017>
+ * Last modification: Time-stamp: <Oct 18 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -739,16 +739,28 @@ let rec join_mixture parameters error mixture1 mixture2 =
 let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX
 (*TO DO*)
 
+type direction = Direct | Reverse
+
 type 'pattern rule =
   {
-    position: Locality.t ;
+    position: Locality.t;
     prefix: int;
+    interprete_delta: direction ;
     delta: int;
+    (* to go from Ckappa id to KaSim id: *)
+    (* in direct mode:
+        substract delta to agents with id >= prefix in the rhs *)
+    (* in reverse mode:
+        substract delta to agents with id >= prefix in the lhs *)
     lhs   : 'pattern;
     rhs   : 'pattern;
     k_def : ('pattern,string) Alg_expr.e Locality.annot;
     k_un  : ('pattern,string) Alg_expr.e Locality.annot option;
-    ast : string
+    ast: string ;
+    ast_no_rate: string ;
+    original_ast: string ;
+    original_ast_no_rate: string ;
+    from_a_biderectional_rule: bool;
   }
 
 type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
@@ -756,8 +768,6 @@ type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
 type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
 
 type 'pattern variable     = ('pattern,string) Ast.variable_def
-
-type direction = Direct | Reverse
 
 type ('agent,'pattern,'mixture,'rule) compil =
   ('agent, 'pattern, 'mixture, string, 'rule, unit) Ast.compil

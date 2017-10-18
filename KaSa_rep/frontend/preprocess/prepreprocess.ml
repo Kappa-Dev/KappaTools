@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 17 2017>
+ * Last modification: Time-stamp: <Oct 18 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -730,6 +730,45 @@ let refine_var parameters error id_set var =
     let error,alg' = alg_map (refine_mixture parameters) error alg
     in error,id_set,((string,pos),(alg',pos'))
 
+
+let dump_rule rule =
+  let buf = Buffer.create 0 in
+  let fmt = Format.formatter_of_buffer buf in
+  let () =
+   Ast.print_ast_rule fmt rule
+  in
+  let () = Format.pp_print_flush fmt () in
+  Buffer.contents buf
+
+let dump_rule_no_rate rule =
+    let buf = Buffer.create 0 in
+    let fmt = Format.formatter_of_buffer buf in
+    let () =
+     Ast.print_ast_rule_no_rate_kasa fmt rule
+    in
+    let () = Format.pp_print_flush fmt () in
+    Buffer.contents buf
+
+let dump_edit_rule rule =
+  let buf = Buffer.create 0 in
+  let fmt = Format.formatter_of_buffer buf in
+  let () =
+    Ast.print_ast_edit_rule fmt rule
+  in
+  let () = Format.pp_print_flush fmt () in
+  Buffer.contents buf
+
+let dump_edit_rule_no_rate rule =
+  let buf = Buffer.create 0 in
+  let fmt = Format.formatter_of_buffer buf in
+  let () =
+    Ast.print_ast_edit_rule_no_rate fmt rule
+  in
+  let () = Format.pp_print_flush fmt () in
+  Buffer.contents buf
+
+
+
 let translate_compil parameters error compil =
   let id_set = Mods.StringSet.empty in
   let agent_set = Mods.StringSet.empty in
@@ -777,37 +816,49 @@ let translate_compil parameters error compil =
            alg_with_pos_map (refine_mixture parameters) error rule.Ast.k_def in
          let error,k_un =
            alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.k_un) in
-         let buf = Buffer.create 0 in
-         let fmt = Format.formatter_of_buffer buf in
-         let () =
-            Ast.print_ast_rule_no_rate ~reverse:false fmt rule
-         in
-         let () = Format.pp_print_flush fmt () in
-         let ast = Buffer.contents buf in
-         let direct_ast = ast in
+         let original_ast = dump_rule rule in
+         let original_ast_no_rate = dump_rule_no_rate rule in
+         let rule_direct = {rule with Ast.bidirectional = false} in
+
+         let direct_ast = dump_rule rule_direct in
+         let direct_ast_no_rate = dump_rule_no_rate rule_direct in
          let error,direct =
            error,
            {
              Ckappa_sig.position = p ;
              Ckappa_sig.prefix = prefix ;
+             Ckappa_sig.interprete_delta = Ckappa_sig.Direct ;
              Ckappa_sig.delta = tail_lhs ;
              Ckappa_sig.lhs = lhs ;
              Ckappa_sig.rhs =  rhs ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
              Ckappa_sig.ast = direct_ast ;
+             Ckappa_sig.ast_no_rate = direct_ast_no_rate ;
+             Ckappa_sig.original_ast = original_ast ;
+             Ckappa_sig.original_ast_no_rate = original_ast_no_rate ;
+             Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional;
            }
          in
          if rule.Ast.bidirectional then
+           let reverse_rule =
+             {rule_direct with
+              Ast.lhs = rule.Ast.rhs;
+              Ast.rhs = rule.Ast.lhs;
+              Ast.rm_token = rule.Ast.add_token;
+              Ast.add_token = rule.Ast.rm_token;
+              Ast.k_def =
+                (match rule.Ast.k_op with
+                | None -> Alg_expr.const Nbr.zero
+                | Some k -> k);
+              Ast.k_un = rule.Ast.k_op_un ;
+              Ast.k_op_un = None ;
+              Ast.k_op = None;
+             }
+           in
+           let reverse_ast = dump_rule reverse_rule in
+           let reverse_ast_no_rate = dump_rule_no_rate reverse_rule in
            let error,reverse =
-             let buf = Buffer.create 0 in
-             let fmt = Format.formatter_of_buffer buf in
-             let () =
-               Ast.print_ast_rule_no_rate ~reverse:true fmt rule
-             in
-             let () = Format.pp_print_flush fmt () in
-             let ast = Buffer.contents buf in
-             let reverse_ast = ast in
              let error,k_op =
                alg_with_pos_map (refine_mixture parameters) error
                  (Option_util.unsome (Alg_expr.const Nbr.zero) rule.Ast.k_op) in
@@ -819,17 +870,22 @@ let translate_compil parameters error compil =
                Ckappa_sig.position = p ;
                Ckappa_sig.prefix = prefix ;
                Ckappa_sig.delta = tail_lhs ;
+               Ckappa_sig.interprete_delta = Ckappa_sig.Reverse ;
                Ckappa_sig.lhs = rhs ;
                Ckappa_sig.rhs =  lhs ;
                Ckappa_sig.k_def = k_op ;
                Ckappa_sig.k_un = k_op_un ;
                Ckappa_sig.ast = reverse_ast ;
+               Ckappa_sig.ast_no_rate = reverse_ast_no_rate ;
+               Ckappa_sig.original_ast = original_ast ;
+               Ckappa_sig.original_ast_no_rate = original_ast_no_rate ;
+               Ckappa_sig.from_a_biderectional_rule = rule.Ast.bidirectional ;
              }
            in
            error,id_set,
-           (id,((Ckappa_sig.Reverse,reverse),p))::
-           (id,((Ckappa_sig.Direct,(direct)),p))::list
-         else error,id_set,(id,((Ckappa_sig.Direct,direct),p))::list)
+           (id,(reverse,p))::
+           (id,(direct,p))::list
+         else error,id_set,(id,(direct,p))::list)
       (error,id_set,[])
       compil.Ast.rules
   in
@@ -853,13 +909,8 @@ let translate_compil parameters error compil =
            alg_with_pos_map (refine_mixture parameters) error rule.Ast.act in
          let error,k_un =
            alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.un_act) in
-         let buf = Buffer.create 0 in
-         let fmt = Format.formatter_of_buffer buf in
-         let () =
-           Ast.print_ast_edit_rule fmt rule
-         in
-         let () = Format.pp_print_flush fmt () in
-         let ast = Buffer.contents buf in
+         let ast = dump_edit_rule rule in
+         let ast_no_rate = dump_edit_rule_no_rate rule in
          let error,direct =
            error,
            {
@@ -870,10 +921,15 @@ let translate_compil parameters error compil =
              Ckappa_sig.rhs =  rhs ;
              Ckappa_sig.k_def = k_def ;
              Ckappa_sig.k_un = k_un ;
-             Ckappa_sig.ast = ast
+             Ckappa_sig.ast = ast ;
+             Ckappa_sig.original_ast = ast ;
+             Ckappa_sig.ast_no_rate = ast_no_rate ;
+             Ckappa_sig.original_ast_no_rate = ast_no_rate ;
+             Ckappa_sig.from_a_biderectional_rule = false ;
+             Ckappa_sig.interprete_delta = Ckappa_sig.Direct ;
            }
          in
-         error,id_set,(id,(Locality.dummy_annot (Ckappa_sig.Direct,direct)))::list)
+         error,id_set,(id,(Locality.dummy_annot direct))::list)
       (error,id_set',chem_rules_rev)
       compil.Ast.edit_rules
   in
@@ -941,7 +997,7 @@ let translate_compil parameters error compil =
              (error,[])
              m
          in
-         error,((alarm,b',List.rev m'(*,p*),o'),p)::list
+         error,((alarm,b',List.rev m',o'),p)::list
       )
       (error,[])
       compil.Ast.perturbations

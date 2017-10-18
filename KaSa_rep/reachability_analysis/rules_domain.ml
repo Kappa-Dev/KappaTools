@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
    *
    * Creation: 2016, the 30th of January
-   * Last modification: Time-stamp: <Jul 31 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    *
    * Abstract domain to record live rules
    *
@@ -257,7 +257,8 @@ struct
         (fun _parameters error i bool list ->
            if bool then error, list
            else
-             let error, info = Handler.info_of_rule parameters error compil i in
+             let error, info =
+               Handler.info_of_rule ~original:true ~with_rates:false parameters error compil i in
              let rule = Remanent_state.info_to_rule info in
              error, rule::list
         )

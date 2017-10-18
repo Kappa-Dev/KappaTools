@@ -500,6 +500,17 @@ let print_ast_edit_rule f r =
   Format.fprintf f "@[<h>%a @@@ %a@]"
     print_ast_mix r.mix (print_rates_one_dir r.un_act) r.act
 
+let print_ast_edit_rule_no_rate f r =
+      Format.fprintf f "@[<h>%a @]"
+        print_ast_mix r.mix
+
+let print_ast_rule_no_rate_kasa f r =
+  Format.fprintf
+    f "@[<h>%a %a@ %a@]"
+    (print_one_size r.rm_token) r.lhs
+    print_arrow r.bidirectional
+    (print_one_size r.add_token) r.rhs
+
 let print_ast_rule f r =
   Format.fprintf
     f "@[<h>%a %a@ %a @@ %a%t@]"
@@ -521,8 +532,12 @@ let print_ast_rule f r =
 let print_ast_rule_no_rate ~reverse f r =
   Format.fprintf
     f "@[<h>%a -> %a@]"
-    (print_one_size r.rm_token) (if reverse then r.rhs else r.lhs)
-    (print_one_size r.add_token) (if reverse then r.lhs else r.rhs)
+    (print_one_size
+       (if reverse then r.add_token else r.rm_token))
+    (if reverse then r.rhs else r.lhs)
+    (print_one_size
+       (if reverse then r.rm_token else r.add_token))
+    (if reverse then r.lhs else r.rhs)
 
 let rule_to_json filenames f_mix f_var r =
   `Assoc [

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 17th of January
-   * Last modification: Time-stamp: <Jul 05 2017>
+   * Last modification: Time-stamp: <Oct 18 2017>
    * *
    * Number agents, sites, states in ckappa represenations
    *
@@ -465,7 +465,7 @@ let scan_rules scan_mixt parameters a b =
       ()
   in
   List.fold_left
-    (fun remanent (_,((_,rule),_)) ->
+    (fun remanent (_,(rule,_)) ->
        scan_mixture
          parameters
          (scan_mixt parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
