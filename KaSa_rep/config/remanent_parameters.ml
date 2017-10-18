@@ -222,6 +222,8 @@ let add_debugging_parameters_to_reachability_map reachability =
     {
       reachability
       with
+        Remanent_parameters_sig.hide_reverse_rule_without_label_from_dead_rules =
+        !Config.hide_reverse_rule_without_label_from_dead_rules ;
         Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
         = !Config.hide_one_d_relations_from_cartesian_decomposition;
         Remanent_parameters_sig.smash_relations = !Config.smash_relations;
@@ -261,9 +263,7 @@ let add_debugging_parameters_to_reachability_map reachability =
   if trace then
     { reachability
       with
-        Remanent_parameters_sig.hide_reverse_rule_without_label_from_dead_rules =
-      !Config.hide_reverse_rule_without_label_from_dead_rules ;
-        Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
+          Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
           !Config.dump_reachability_analysis_covering_classes;
         Remanent_parameters_sig.dump_reachability_analysis_static =
           !Config.dump_reachability_analysis_static;
@@ -501,7 +501,7 @@ let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reach
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
 let get_hide_reverse_rule_without_label_from_dead_rules_1 r =
-  r.Remanent_parameters_sig. hide_reverse_rule_without_label_from_dead_rules
+  r.Remanent_parameters_sig.hide_reverse_rule_without_label_from_dead_rules
 
 let get_post_processing_1 r =
   match r.Remanent_parameters_sig.use_natural_language with

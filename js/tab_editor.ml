@@ -92,6 +92,7 @@ let init_dead_rules () =
                                Some rule.Public_data.rule_position;
                              Api_types_t.message_text;
                            } :: acc) [] list in
+                  let warnings = List.rev warnings in 
                   State_error.add_error __LOC__ warnings)
                manager#get_dead_rules) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
