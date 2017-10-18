@@ -10,7 +10,7 @@ type preprocessed_ast =
   Configuration.t * Counter.progressBar * (bool * bool * bool) * string *
   string option * Signature.s * Contact_map.t * unit NamedDecls.t *
   int Mods.StringMap.t * int list *
-  (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int, unit, LKappa.rule) Ast.compil *
+  (Ast.agent, LKappa.rule_agent list, Raw_mixture.t, int, LKappa.rule) Ast.compil *
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list option *
   float option
 

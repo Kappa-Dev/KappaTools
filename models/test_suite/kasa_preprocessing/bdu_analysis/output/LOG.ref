@@ -446,10 +446,10 @@ Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'r
 Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x)->A(x!1),B(x!1) -> rule(7):'r7' A(x,y),C(x)->A(x,y!1),C(x!1)[0->0]
 Reachability analysis...
 
-	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 4-22:):
+	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 5-22:):
 		the precondition is satisfied
 
-		rule r0 (File "bdu_analysis.ka", line 9, characters 4-22:) is applied for the first time
+		rule r0 (File "bdu_analysis.ka", line 9, characters 5-22:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -518,10 +518,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u)
 
 
-	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 4-25:):
+	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-25:):
 		the precondition is satisfied
 
-		rule r1 (File "bdu_analysis.ka", line 10, characters 4-25:) is applied for the first time
+		rule r1 (File "bdu_analysis.ka", line 10, characters 5-25:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -571,10 +571,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x!A@x)
 
 
-	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 4-27:):
+	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 5-27:):
 		the precondition is satisfied
 
-		rule r2 (File "bdu_analysis.ka", line 11, characters 4-27:) is applied for the first time
+		rule r2 (File "bdu_analysis.ka", line 11, characters 5-27:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -727,13 +727,13 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x!)
 
-	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 4-22:):
+	Applying rule r0 (File "bdu_analysis.ka", line 9, characters 5-22:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 4-25:):
+	Applying rule r1 (File "bdu_analysis.ka", line 10, characters 5-25:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 4-27:):
+	Applying rule r2 (File "bdu_analysis.ka", line 11, characters 5-27:):
 		the precondition is satisfied
 
 	Applying rule r3 (File "bdu_analysis.ka", line 12, characters 4-14:):

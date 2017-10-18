@@ -744,30 +744,11 @@ let dump_rule_no_rate rule =
     let buf = Buffer.create 0 in
     let fmt = Format.formatter_of_buffer buf in
     let () =
-     Ast.print_ast_rule_no_rate_kasa fmt rule
+      Ast.print_rule_content
+        ~bidirectional:rule.Ast.bidirectional fmt rule.Ast.rewrite
     in
     let () = Format.pp_print_flush fmt () in
     Buffer.contents buf
-
-let dump_edit_rule rule =
-  let buf = Buffer.create 0 in
-  let fmt = Format.formatter_of_buffer buf in
-  let () =
-    Ast.print_ast_edit_rule fmt rule
-  in
-  let () = Format.pp_print_flush fmt () in
-  Buffer.contents buf
-
-let dump_edit_rule_no_rate rule =
-  let buf = Buffer.create 0 in
-  let fmt = Format.formatter_of_buffer buf in
-  let () =
-    Ast.print_ast_edit_rule_no_rate fmt rule
-  in
-  let () = Format.pp_print_flush fmt () in
-  Buffer.contents buf
-
-
 
 let translate_compil parameters error compil =
   let id_set = Mods.StringSet.empty in
@@ -798,7 +779,7 @@ let translate_compil parameters error compil =
       (error,[])
       compil.Ast.observables
   in
-  let error,id_set',chem_rules_rev =
+  let error,_id_set,rules_rev =
     List.fold_left
       (fun (error,id_set,list) (id,(rule,p)) ->
          let error,id_set =
@@ -806,8 +787,15 @@ let translate_compil parameters error compil =
            | None -> error,id_set
            | Some id -> check_freshness parameters error "Label" (fst id) id_set
          in
-         let ast_lhs,ast_rhs = rule.Ast.lhs,rule.Ast.rhs in
-         let prefix,tail_lhs,tail_rhs = longuest_prefix ast_lhs ast_rhs in
+         let (ast_lhs,ast_rhs),(prefix,tail_lhs,tail_rhs) =
+           match rule.Ast.rewrite with
+           | Ast.Edit e ->
+             let raw_lhs,raw_rhs,add,del = Ast.split_mixture e.Ast.mix in
+             (raw_lhs@del,raw_rhs@add),
+             (List.length raw_lhs, List.length del, List.length add)
+           | Ast.Arrow a ->
+             (a.Ast.lhs,a.Ast.rhs),
+             longuest_prefix a.Ast.lhs a.Ast.rhs in
          let error,lhs =
            refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
          let error,rhs =
@@ -841,19 +829,26 @@ let translate_compil parameters error compil =
            }
          in
          if rule.Ast.bidirectional then
+           let rewrite = match rule.Ast.rewrite with
+             | Ast.Edit _ -> failwith "bidirectional edit rules are impossible"
+             | Ast.Arrow a ->
+               Ast.Arrow {
+                 Ast.lhs = a.Ast.rhs;
+                 Ast.rhs = a.Ast.lhs;
+                 Ast.rm_token = a.Ast.add_token;
+                 Ast.add_token = a.Ast.rm_token;
+               } in
            let reverse_rule =
-             {rule_direct with
-              Ast.lhs = rule.Ast.rhs;
-              Ast.rhs = rule.Ast.lhs;
-              Ast.rm_token = rule.Ast.add_token;
-              Ast.add_token = rule.Ast.rm_token;
-              Ast.k_def =
-                (match rule.Ast.k_op with
-                | None -> Alg_expr.const Nbr.zero
-                | Some k -> k);
-              Ast.k_un = rule.Ast.k_op_un ;
-              Ast.k_op_un = None ;
-              Ast.k_op = None;
+             {
+               Ast.rewrite;
+               Ast.bidirectional = false;
+               Ast.k_def =
+                 (match rule.Ast.k_op with
+                  | None -> Alg_expr.const Nbr.zero
+                  | Some k -> k);
+               Ast.k_un = rule.Ast.k_op_un ;
+               Ast.k_op_un = None ;
+               Ast.k_op = None;
              }
            in
            let reverse_ast = dump_rule reverse_rule in
@@ -888,50 +883,6 @@ let translate_compil parameters error compil =
          else error,id_set,(id,(direct,p))::list)
       (error,id_set,[])
       compil.Ast.rules
-  in
-  let error,_id_set,rules_rev =
-    List.fold_left
-      (fun (error,id_set,list) (id,(rule,position)) ->
-         let error,id_set =
-           match id with
-           | None -> error,id_set
-           | Some id -> check_freshness parameters error "Label" (fst id) id_set
-         in
-         let raw_lhs,raw_rhs,add,del = Ast.split_mixture rule.Ast.mix in
-         let ast_lhs,ast_rhs = raw_lhs@del,raw_rhs@add in
-         let prefix,tail_lhs,tail_rhs =
-           (List.length raw_lhs, List.length del, List.length add) in
-         let error,lhs =
-           refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
-         let error,rhs =
-           refine_mixture_in_rule parameters error prefix tail_lhs 0 ast_rhs in
-         let error,k_def =
-           alg_with_pos_map (refine_mixture parameters) error rule.Ast.act in
-         let error,k_un =
-           alg_with_pos_with_option_map (refine_mixture parameters) error (Tools_kasa.fst_option rule.Ast.un_act) in
-         let ast = dump_edit_rule rule in
-         let ast_no_rate = dump_edit_rule_no_rate rule in
-         let error,direct =
-           error,
-           {
-             Ckappa_sig.position ;
-             Ckappa_sig.prefix = prefix ;
-             Ckappa_sig.delta = tail_lhs ;
-             Ckappa_sig.lhs = lhs ;
-             Ckappa_sig.rhs =  rhs ;
-             Ckappa_sig.k_def = k_def ;
-             Ckappa_sig.k_un = k_un ;
-             Ckappa_sig.ast = ast ;
-             Ckappa_sig.original_ast = ast ;
-             Ckappa_sig.ast_no_rate = ast_no_rate ;
-             Ckappa_sig.original_ast_no_rate = ast_no_rate ;
-             Ckappa_sig.from_a_biderectional_rule = false ;
-             Ckappa_sig.interprete_delta = Ckappa_sig.Direct ;
-           }
-         in
-         error,id_set,(id,(Locality.dummy_annot direct))::list)
-      (error,id_set',chem_rules_rev)
-      compil.Ast.edit_rules
   in
   let error,init_rev =
     List.fold_left
@@ -1007,7 +958,6 @@ let translate_compil parameters error compil =
     Ast.variables = List.rev var_rev;
     Ast.signatures = List.rev signatures_rev;
     Ast.rules = List.rev rules_rev ;
-    Ast.edit_rules = [] ;
     Ast.observables  = List.rev observables_rev;
     Ast.init = List.rev init_rev ;
     Ast.perturbations = List.rev perturbations_rev ;

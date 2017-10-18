@@ -545,14 +545,14 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
   outputs (Data.Log "\t -rules");
   let (preenv',alg_deps',compiled_rules) =
     compile_rules
-      alg_deps ?bwd_bisim ~compileModeOn contact_map preenv' result.Ast.edit_rules in
+      alg_deps ?bwd_bisim ~compileModeOn contact_map preenv' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
   pause @@ fun () ->
   outputs (Data.Log "\t -perturbations");
   let (preenv,alg_deps'',pert,has_tracking) =
     pert_of_result
-      result.variables result.edit_rules alg_deps' ?bwd_bisim ~compileModeOn
+      result.variables result.rules alg_deps' ?bwd_bisim ~compileModeOn
       contact_map preenv' result in
 
   pause @@ fun () ->
@@ -569,7 +569,7 @@ let compile ~outputs ~pause ~return ~max_sharing ?bwd_bisim ~compileModeOn ?over
 
   let env =
     Model.init ~filenames:result.filenames domain tk_nd alg_nd alg_deps''
-      (Array.of_list result.edit_rules,rule_nd)
+      (Array.of_list result.rules,rule_nd)
       (Array.of_list (List.rev obs)) (Array.of_list pert) contact_map in
 
   outputs (Data.Log "\t -initial conditions");

@@ -612,69 +612,6 @@ let give_rule_label bidirectional (id,set) printer r = function
       else (id,set''),lab
     else (id,set'),lab
 
-let add_un_variable k_un acc rate_var =
-  match k_un with
-  | None -> (acc,None)
-  | Some (k,dist) ->
-    let acc_un,k' = if Alg_expr.has_mix (fst k) then
-        ((Locality.dummy_annot rate_var,k)::acc,
-         Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
-      else (acc,k) in
-    (acc_un,Some (k',dist))
-
-let name_and_purify_edit_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
-  let pack',label =
-    give_rule_label false pack Ast.print_ast_edit_rule r label_opt in
-  let acc',act =
-    if Alg_expr.has_mix (fst r.Ast.act) then
-      let rate_var = label^"_rate" in
-      ((Locality.dummy_annot rate_var,r.Ast.act)::acc,
-       Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
-    else (acc,r.Ast.act) in
-  let acc'',un_act = add_un_variable r.Ast.un_act acc' (label^"_un_rate") in
-  (pack',acc'',
-   (label_opt,
-    {Ast.mix = r.Ast.mix; Ast.delta_token = r.Ast.delta_token;
-     Ast.act; Ast.un_act},r_pos)::rules)
-
-let name_and_purify_rule (label_opt,(r,r_pos)) (pack,acc,rules) =
-  let pack',label = give_rule_label
-      r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
-  let acc',k_def =
-    if Alg_expr.has_mix (fst r.Ast.k_def) then
-      let rate_var = label^"_rate" in
-      ((Locality.dummy_annot rate_var,r.Ast.k_def)::acc,
-       Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
-    else (acc,r.Ast.k_def) in
-  let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
-  let acc''',rules' =
-    match r.Ast.bidirectional,r.Ast.k_op with
-    | true, Some k when Alg_expr.has_mix (fst k) ->
-      let rate_var = (Ast.flip_label label)^"_rate" in
-      let rate_var_un = (Ast.flip_label label)^"_un_rate" in
-      let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
-      ((Locality.dummy_annot rate_var,k)::acc_un,
-       (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
-        r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-        Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
-    | true, Some rate ->
-      let rate_var_un = (Ast.flip_label label)^"_un_rate" in
-      let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
-      (acc_un,
-       (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
-        r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-        rate,k_op_un,r_pos)::rules)
-    | false, None -> (acc'',rules)
-    | (false, Some _ | true, None) ->
-       raise
-         (ExceptionDefn.Malformed_Decl
-            ("Incompatible arrow and kinectic rate for inverse definition",
-             r_pos)) in
-  (pack',acc''',
-   (label_opt,r.Ast.lhs,r.Ast.rhs,r.Ast.rm_token,r.Ast.add_token,
-    k_def,k_un,r_pos)
-   ::rules')
-
 let mixture_of_ast ~syntax_version sigs ?contact_map pos mix =
   match annotate_edit_mixture
           ~syntax_version ~is_rule:false sigs ?contact_map mix with
@@ -880,6 +817,72 @@ let init_of_ast ~syntax_version sigs tok contact_map = function
       raise (ExceptionDefn.Malformed_Decl
                (lab ^" is not a declared token",pos))
 
+let add_un_variable k_un acc rate_var =
+  match k_un with
+  | None -> (acc,None)
+  | Some (k,dist) ->
+    let acc_un,k' = if Alg_expr.has_mix (fst k) then
+        ((Locality.dummy_annot rate_var,k)::acc,
+         Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
+      else (acc,k) in
+    (acc_un,Some (k',dist))
+
+let name_and_purify_rule
+    sigs ~contact_map (label_opt,(r,r_pos)) (pack,acc,rules) =
+  let pack',label = give_rule_label
+      r.Ast.bidirectional pack Ast.print_ast_rule r label_opt in
+  let acc',k_def =
+    if Alg_expr.has_mix (fst r.Ast.k_def) then
+      let rate_var = label^"_rate" in
+      ((Locality.dummy_annot rate_var,r.Ast.k_def)::acc,
+       Locality.dummy_annot (Alg_expr.ALG_VAR rate_var))
+    else (acc,r.Ast.k_def) in
+  let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
+  match r.Ast.rewrite with
+  | Ast.Edit e ->
+    let () =
+      if r.Ast.bidirectional || r.Ast.k_op <> None || r.Ast.k_op_un <> None then
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("Rules in edit notation cannot be bidirectional",r_pos)) in
+    let mix,created = annotate_edit_mixture
+        ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map e.Ast.mix in
+    (pack',acc'',
+     (label_opt,true,mix,created,[],e.Ast.delta_token,k_def,k_un,r_pos)::rules)
+  | Ast.Arrow a ->
+    let acc''',rules' =
+      match r.Ast.bidirectional,r.Ast.k_op with
+      | true, Some k when Alg_expr.has_mix (fst k) ->
+        let rate_var = (Ast.flip_label label)^"_rate" in
+        let rate_var_un = (Ast.flip_label label)^"_un_rate" in
+        let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
+        let mix,created =
+          annotate_lhs_with_diff sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+        ((Locality.dummy_annot rate_var,k)::acc_un,
+         (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+          false,mix,created,a.Ast.add_token,a.Ast.rm_token,
+          Locality.dummy_annot (Alg_expr.ALG_VAR rate_var),k_op_un,r_pos)::rules)
+      | true, Some rate ->
+        let rate_var_un = (Ast.flip_label label)^"_un_rate" in
+        let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
+        let mix,created =
+          annotate_lhs_with_diff sigs ~contact_map a.Ast.rhs a.Ast.lhs in
+        (acc_un,
+         (Option_util.map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+          false,mix,created,a.Ast.add_token,a.Ast.rm_token,
+          rate,k_op_un,r_pos)::rules)
+      | false, None -> (acc'',rules)
+      | (false, Some _ | true, None) ->
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("Incompatible arrow and kinectic rate for inverse definition",
+              r_pos)) in
+    let mix,created =
+      annotate_lhs_with_diff sigs ~contact_map a.Ast.lhs a.Ast.rhs in
+    (pack',acc''',
+     (label_opt,false,mix,created,a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
+   ::rules')
+
 let assemble_rule ~syntax_version ~r_editStyle
     sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
   let tok = tk_nd.NamedDecls.finder in
@@ -1003,12 +1006,10 @@ let compil_of_ast ~syntax_version overwrite c =
           (fun s -> (Tools.recti
                        (fun a k -> k::a) []
                        (Signature.internal_states_number i s sigs),[]))) in
-  let (name_pack,var_pack,cleaned_rules) =
+  let ((_,rule_names),extra_vars,cleaned_rules) =
     List.fold_right
-      name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
-  let ((_,rule_names),extra_vars,cleaned_edit_rules) =
-    List.fold_right
-      name_and_purify_edit_rule c.Ast.edit_rules (name_pack,var_pack,[]) in
+      (name_and_purify_rule sigs ~contact_map)
+      c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
   let alg_vars_over =
     List_util.rev_map_append
       (fun (x,v) -> (Locality.dummy_annot x,
@@ -1034,30 +1035,17 @@ let compil_of_ast ~syntax_version overwrite c =
     if with_counters then
       (Counters_compiler.counters_perturbations sigs c.Ast.signatures)@perts'
     else perts' in
-  let old_style_rules =
-    List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
-        let mix,created = annotate_lhs_with_diff sigs ~contact_map lhs rhs in
+  let rules =
+    List.map
+      (fun (label,r_editStyle,mix,created,rm_tk,add_tk,rate,un_rate,r_pos) ->
         let mix,created =
           Counters_compiler.remove_counter_rule sigs mix created in
         label,
         (assemble_rule
-           ~syntax_version ~r_editStyle:false
+           ~syntax_version ~r_editStyle
            sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
          r_pos))
       cleaned_rules in
-  let edit_rules =
-    List.rev_map (fun (label,r,r_pos) ->
-        let mix,cmix = annotate_edit_mixture
-            ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map r.Ast.mix in
-        let mix,cmix =
-          Counters_compiler.remove_counter_rule sigs mix cmix in
-        (label,
-           (assemble_rule
-              ~syntax_version:Ast.V4 ~r_editStyle:true
-              sigs tk_nd algs mix cmix [] r.Ast.delta_token
-              r.Ast.act r.Ast.un_act,r_pos)))
-      cleaned_edit_rules in
-  let edit_rules = List.rev_append edit_rules old_style_rules in
   sigs,contact_map,tk_nd,algs,updated_vars,
   {
     Ast.filenames = c.Ast.filenames;
@@ -1068,8 +1056,7 @@ let compil_of_ast ~syntax_version overwrite c =
               ~syntax_version ~max_allowed_var:(pred i)
               sigs tok algs expr))
         alg_vars_over;
-    Ast.rules = [];
-    Ast.edit_rules;
+    Ast.rules;
     Ast.observables =
       List.map (fun expr ->
           alg_expr_of_ast ~syntax_version sigs tok algs expr)

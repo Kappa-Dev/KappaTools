@@ -60,15 +60,8 @@ start_rule:
     | LABEL rule_expression newline
         {let out = (Some ($1, rhs_pos 1),$2) in
 	fun c -> let r = $3 c in {r with Ast.rules = out::r.Ast.rules}}
-    | LABEL edit_rule_expression newline
-        {let out = (Some ($1, rhs_pos 1),$2) in
-	fun c -> let r = $3 c in
-	{r with Ast.edit_rules = out::r.Ast.edit_rules}}
     | rule_expression newline
         {fun c -> let r = $2 c in {r with Ast.rules = (None,$1)::r.Ast.rules}}
-    | edit_rule_expression newline
-        {fun c -> let r = $2 c in
-	{r with Ast.edit_rules = (None,$1)::r.Ast.edit_rules}}
     | LABEL EQUAL alg_expr newline
         {let out = (($1,rhs_pos 1),$3) in
 	fun c -> let r = $4 c in {r with Ast.variables = out::r.Ast.variables}}
@@ -307,9 +300,6 @@ bool_expr:
 
 standalone_bool_expr: bool_expr EOF {$1}
 
-lhs_rhs:
-  mixture token_expr {($1,$2)};
-
 token_expr:
   /*empty*/ {[]}
     | PIPE sum_token {$2}
@@ -325,23 +315,21 @@ sum_token:
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
-edit_rule_expression:
-	mixture token_expr AT rate
-	{ let (act,un_act) = $4 in
-	add_pos {Ast.mix = $1; Ast.delta_token = $2; Ast.act; Ast.un_act} };
-
 rule_expression:
-    | lhs_rhs arrow lhs_rhs birate
-		 { let pos =
-		     Locality.of_pos (Parsing.rhs_start_pos 1)
-				     (Parsing.symbol_end_pos ()) in
-		   let (k2,k1,kback,kback1) = $4 in
-		   let lhs,token_l = $1 and rhs,token_r = $3 in
-		   ({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.bidirectional=$2;
-			 Ast.rhs=rhs; Ast.add_token = token_r;
-			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback; Ast.k_op_un=kback1},pos)
-		 }
-    ;
+  | mixture token_expr arrow mixture token_expr birate
+    { let (k_def,k_un,k_op,k_op_un) = $6 in
+      add_pos {
+        Ast.rewrite = Ast.Arrow
+	  {Ast.lhs=$1; Ast.rm_token = $2;Ast.rhs=$4; Ast.add_token = $5};
+	Ast.bidirectional=$3;Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
+      } }
+  | mixture token_expr AT rate
+    { let (k_def,k_un) = $4 in
+      add_pos {
+        Ast.rewrite = Ast.Edit {Ast.mix = $1; Ast.delta_token = $2};
+	Ast.bidirectional=false;
+        Ast.k_def; Ast.k_un; Ast.k_op=None; Ast.k_op_un=None;
+      } };
 
 arrow:
     | KAPPA_RAR {false}

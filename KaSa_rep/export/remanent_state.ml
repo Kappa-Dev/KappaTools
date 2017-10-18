@@ -26,7 +26,7 @@ type initial_state =
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string,
-   Ckappa_sig.mixture Ckappa_sig.rule,unit) Ast.compil
+   Ckappa_sig.mixture Ckappa_sig.rule) Ast.compil
 
 type quark_map = Quark_type.quarks
 

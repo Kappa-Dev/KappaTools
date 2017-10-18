@@ -407,10 +407,10 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Reachability analysis...
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 6-26:):
 		the precondition is satisfied
 
-		rule r1 (File "stochastic_create.ka", line 8, characters 4-26:) is applied for the first time
+		rule r1 (File "stochastic_create.ka", line 8, characters 6-26:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -450,10 +450,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-21:):
 		the precondition is satisfied
 
-		rule r3 (File "stochastic_create.ka", line 10, characters 4-21:) is applied for the first time
+		rule r3 (File "stochastic_create.ka", line 10, characters 5-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -508,7 +508,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r2 (File "stochastic_create.ka", line 9, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 6-26:):
 		the precondition is satisfied
 
 	Applying rule r8 (File "stochastic_create.ka", line 15, characters 4-38:):
@@ -517,7 +517,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r0 (File "stochastic_create.ka", line 7, characters 4-41:):
 		the precondition is not satisfied yet
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-21:):
 		the precondition is satisfied
 
 ------------------------------------------------------------

@@ -489,10 +489,10 @@ Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(6):'r6
 Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->1];[0->2];[1->0];[2->0]
 Reachability analysis...
 
-	Applying rule r0 (File "double_agents.ka", line 5, characters 4-24:):
+	Applying rule r0 (File "double_agents.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-		rule r0 (File "double_agents.ka", line 5, characters 4-24:) is applied for the first time
+		rule r0 (File "double_agents.ka", line 5, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -553,10 +553,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u)
 
 
-	Applying rule r1 (File "double_agents.ka", line 6, characters 4-24:):
+	Applying rule r1 (File "double_agents.ka", line 6, characters 5-24:):
 		the precondition is satisfied
 
-		rule r1 (File "double_agents.ka", line 6, characters 4-24:) is applied for the first time
+		rule r1 (File "double_agents.ka", line 6, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -628,10 +628,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p,y~p,x!free)
 
 
-	Applying rule r5 (File "double_agents.ka", line 10, characters 4-15:):
+	Applying rule r5 (File "double_agents.ka", line 10, characters 5-15:):
 		the precondition is satisfied
 
-		rule r5 (File "double_agents.ka", line 10, characters 4-15:) is applied for the first time
+		rule r5 (File "double_agents.ka", line 10, characters 5-15:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -905,13 +905,13 @@ EXTENSIONAL DESCRIPTION:
 		B(x~q,y~q,x!free)
 
 
-	Applying rule r0 (File "double_agents.ka", line 5, characters 4-24:):
+	Applying rule r0 (File "double_agents.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "double_agents.ka", line 6, characters 4-24:):
+	Applying rule r1 (File "double_agents.ka", line 6, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r5 (File "double_agents.ka", line 10, characters 4-15:):
+	Applying rule r5 (File "double_agents.ka", line 10, characters 5-15:):
 		the precondition is satisfied
 
 	Applying rule r3 (File "double_agents.ka", line 8, characters 4-34:):
@@ -1021,10 +1021,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,y~,x!)
 
-	Applying rule r5 (File "double_agents.ka", line 10, characters 4-15:):
+	Applying rule r5 (File "double_agents.ka", line 10, characters 5-15:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "double_agents.ka", line 6, characters 4-24:):
+	Applying rule r1 (File "double_agents.ka", line 6, characters 5-24:):
 		the precondition is satisfied
 
 	Applying rule r3 (File "double_agents.ka", line 8, characters 4-34:):
@@ -1034,7 +1034,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,y~,x!)
 
-	Applying rule r0 (File "double_agents.ka", line 5, characters 4-24:):
+	Applying rule r0 (File "double_agents.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
 	Applying rule r6 (File "double_agents.ka", line 11, characters 4-34:):

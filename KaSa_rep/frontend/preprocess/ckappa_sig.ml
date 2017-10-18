@@ -770,7 +770,7 @@ type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
 type 'pattern variable     = ('pattern,string) Ast.variable_def
 
 type ('agent,'pattern,'mixture,'rule) compil =
-  ('agent, 'pattern, 'mixture, string, 'rule, unit) Ast.compil
+  ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
 
 type ('a, 'b) site_type =
   | Internal of 'a

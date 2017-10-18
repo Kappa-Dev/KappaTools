@@ -47,24 +47,26 @@ type agent = (string Locality.annot * site list * agent_mod option)
 
 type mixture = agent list
 
-type edit_rule = {
+type edit_notation = {
   mix: mixture;
-  delta_token: ((mixture,string) Alg_expr.e Locality.annot *
-                string Locality.annot) list;
-  act: (mixture,string) Alg_expr.e Locality.annot;
-  un_act:
-    ((mixture,string) Alg_expr.e Locality.annot *
-     (mixture,string) Alg_expr.e Locality.annot option) option;
+  delta_token: ((mixture,string) Alg_expr.e Locality.annot
+                * string Locality.annot) list;
 }
 
-type rule = {
+type arrow_notation = {
   lhs: mixture ;
-  rm_token: ((mixture,string) Alg_expr.e Locality.annot *
-             string Locality.annot) list;
-  bidirectional:bool ;
+  rm_token: ((mixture,string) Alg_expr.e Locality.annot
+             * string Locality.annot) list ;
   rhs: mixture ;
-  add_token: ((mixture,string) Alg_expr.e Locality.annot *
-              string Locality.annot) list;
+  add_token: ((mixture,string) Alg_expr.e Locality.annot
+              * string Locality.annot) list;
+}
+
+type rule_content = Edit of edit_notation | Arrow of arrow_notation
+
+type rule = {
+  rewrite: rule_content;
+  bidirectional:bool ;
   k_def: (mixture,string) Alg_expr.e Locality.annot ;
   k_un:
     ((mixture,string) Alg_expr.e Locality.annot *
@@ -143,7 +145,7 @@ type ('pattern,'mixture,'id) command =
   | MODIFY of ('pattern,'mixture,'id) modif_expr list
   | QUIT
 
-type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
+type ('agent,'pattern,'mixture,'id,'rule) compil =
   {
     filenames : string list;
     variables :
@@ -154,9 +156,6 @@ type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
     rules :
       (string Locality.annot option * 'rule Locality.annot) list;
     (**rules (possibly named)*)
-    edit_rules :
-      (string Locality.annot option * 'edit_rule Locality.annot) list;
-    (** rules with explicit modifications*)
     observables :
       ('pattern,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
@@ -172,7 +171,7 @@ type ('agent,'pattern,'mixture,'id,'rule,'edit_rule) compil =
       (string * float * string) list
   }
 
-type parsing_compil = (agent,mixture,mixture,string,rule,edit_rule) compil
+type parsing_compil = (agent,mixture,mixture,string,rule) compil
 
 val empty_compil : parsing_compil
 
@@ -194,12 +193,8 @@ val print_link :
   Format.formatter -> ('a, 'b) link -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
-val print_ast_edit_rule : Format.formatter -> edit_rule -> unit
-val print_ast_edit_rule_no_rate : Format.formatter -> edit_rule -> unit
-val print_ast_rule_no_rate :
-  reverse:bool -> Format.formatter -> rule -> unit
-val print_ast_rule_no_rate_kasa :
-  Format.formatter -> rule -> unit
+val print_rule_content :
+  bidirectional:bool -> Format.formatter -> rule_content -> unit
 
 val link_to_json :
   ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->
