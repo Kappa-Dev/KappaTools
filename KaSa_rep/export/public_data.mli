@@ -53,6 +53,7 @@ type rule =
     rule_ast: string;
     rule_position: Locality.t;
     rule_direction: rule_direction ;
+    rule_hidden : bool ; 
   }
 
 type var =

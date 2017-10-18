@@ -121,7 +121,7 @@ val get_parallel_bonds_analysis_1: Remanent_parameters_sig.reachability_paramete
 val get_dynamic_contact_map_1: Remanent_parameters_sig.reachability_parameters -> bool
 val get_reachability_parameters: unit -> Remanent_parameters_sig.reachability_parameters
 
-val get_hide_reverse_rule_from_dead_rules: Remanent_parameters_sig.parameters -> bool
+val get_hide_reverse_rule_without_label_from_dead_rules: Remanent_parameters_sig.parameters -> bool
 
 (** local traces *)
 val get_local_trace_format: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.graph_format

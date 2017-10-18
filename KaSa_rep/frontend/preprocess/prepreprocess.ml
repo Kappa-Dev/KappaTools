@@ -883,8 +883,8 @@ let translate_compil parameters error compil =
              }
            in
            error,id_set,
-           (id,(reverse,p))::
-           (id,(direct,p))::list
+           (id,(direct,p))::
+           (id,(reverse,p))::list
          else error,id_set,(id,(direct,p))::list)
       (error,id_set,[])
       compil.Ast.rules

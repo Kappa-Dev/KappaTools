@@ -111,7 +111,7 @@ type reachability_map_output =
     trace_prefix: string;
     trace_directory: string;
     compute_separating_transitions : bool;
-    hide_reverse_rule_from_dead_rules : bool ; 
+    hide_reverse_rule_without_label_from_dead_rules : bool ; 
   }
 
 type reachability_parameters =

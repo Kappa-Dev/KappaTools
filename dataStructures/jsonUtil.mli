@@ -27,6 +27,9 @@ val to_string: ?error_msg:string -> Yojson.Basic.json  -> string
 val of_int: int -> Yojson.Basic.json
 val to_int: ?error_msg:string -> Yojson.Basic.json  -> int
 
+val of_bool: bool -> Yojson.Basic.json
+val to_bool: ?error_msg:string -> Yojson.Basic.json  -> bool
+
 val of_unit: unit -> Yojson.Basic.json
 val to_unit: ?error_msg:string -> Yojson.Basic.json  -> unit
 

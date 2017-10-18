@@ -52,6 +52,7 @@ let total_string = "total"
 let fwd_string = "fwd"
 let bwd_string = "bwd"
 let direction = "direction"
+let rule_hidden = "hidden"
 
 (*******************)
 (* Accuracy levels *)
@@ -283,6 +284,7 @@ type rule =
     rule_ast: string;
     rule_position: Locality.t;
     rule_direction: rule_direction;
+    rule_hidden: bool;
   }
 
 let direction_to_json d =
@@ -313,12 +315,13 @@ let rule_to_json rule =
       ast, JsonUtil.of_string rule.rule_ast;
       position,Locality.annot_to_yojson
         JsonUtil.of_unit ((),rule.rule_position);
-      direction, direction_to_json rule.rule_direction
+      direction, direction_to_json rule.rule_direction;
+      rule_hidden, JsonUtil.of_bool rule.rule_hidden
     ]
 
 let json_to_rule =
   function
-  | `Assoc l as x when List.length l = 5 ->
+  | `Assoc l as x when List.length l = 6 ->
     begin
       try
         {
@@ -330,7 +333,8 @@ let json_to_rule =
                (JsonUtil.to_unit ~error_msg:(JsonUtil.build_msg "locality"))
                (List.assoc position l));
           rule_direction =
-            json_to_direction (List.assoc direction l)
+            json_to_direction (List.assoc direction l);
+          rule_hidden = JsonUtil.to_bool (List.assoc rule_hidden l)
         }
       with Not_found ->
         raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg " rule",x))

@@ -95,7 +95,7 @@ let dump_reachability_analysis_dynamic = ref false
 let dump_reachability_analysis_diff = ref false
 let dump_reachability_analysis_wl = ref false
 
-let hide_reverse_rule_from_dead_rules = ref true
+let hide_reverse_rule_without_label_from_dead_rules = ref true
 
 let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref true

@@ -249,7 +249,7 @@ struct
   let export static dynamic error kasa_state =
     let parameters = get_parameter static in
     let hide_reverse_rule =
-      Remanent_parameters.get_hide_reverse_rule_from_dead_rules
+      Remanent_parameters.get_hide_reverse_rule_without_label_from_dead_rules
         parameters
     in
     let original = hide_reverse_rule in
@@ -265,9 +265,14 @@ struct
              let error, info =
                Handler.info_of_rule ~original ~with_rates:false parameters error compil i
              in
-             let error, b = Handler.is_reverse parameters error compil i in
-             let info = if b && hide_reverse_rule then Handler.remove_ast info else info in
+             let error, b1 = Handler.is_reverse parameters error compil i in
+             let error, b2 = Handler.has_no_label parameters error compil i in
              let rule = Remanent_state.info_to_rule info in
+             let rule =
+               if b1 && b2 && hide_reverse_rule
+               then Handler.hide rule
+               else rule
+             in
              error, rule::list
         )
         array []

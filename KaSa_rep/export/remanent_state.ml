@@ -61,6 +61,7 @@ let info_to_rule (s1,loc,direction,s2,id) =
     Public_data.rule_label = s1 ;
     Public_data.rule_ast=s2;
     Public_data.rule_direction=direction;
+    Public_data.rule_hidden=false;
   }
 
 type dead_agents = Ckappa_sig.c_agent_name list

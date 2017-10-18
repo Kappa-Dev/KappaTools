@@ -184,7 +184,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.add_singular_macrostates = false;
     Remanent_parameters_sig.add_singular_microstates = false;
     Remanent_parameters_sig.smash_relations = false;
-    Remanent_parameters_sig.hide_reverse_rule_from_dead_rules = true ;
+    Remanent_parameters_sig.hide_reverse_rule_without_label_from_dead_rules = true ;
     Remanent_parameters_sig.use_natural_language =
       Remanent_parameters_sig.Kappa;
     Remanent_parameters_sig.format_for_local_traces =
@@ -261,8 +261,8 @@ let add_debugging_parameters_to_reachability_map reachability =
   if trace then
     { reachability
       with
-        Remanent_parameters_sig.hide_reverse_rule_from_dead_rules =
-      !Config.hide_reverse_rule_from_dead_rules ;
+        Remanent_parameters_sig.hide_reverse_rule_without_label_from_dead_rules =
+      !Config.hide_reverse_rule_without_label_from_dead_rules ;
         Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
           !Config.dump_reachability_analysis_covering_classes;
         Remanent_parameters_sig.dump_reachability_analysis_static =
@@ -500,8 +500,8 @@ let get_dump_reachability_analysis_diff_1 r = r.Remanent_parameters_sig.dump_rea
 let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_wl
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
-let get_hide_reverse_rule_from_dead_rules_1 r =
-  r.Remanent_parameters_sig. hide_reverse_rule_from_dead_rules
+let get_hide_reverse_rule_without_label_from_dead_rules_1 r =
+  r.Remanent_parameters_sig. hide_reverse_rule_without_label_from_dead_rules
 
 let get_post_processing_1 r =
   match r.Remanent_parameters_sig.use_natural_language with
@@ -695,8 +695,8 @@ let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_
 let get_post_processing = upgrade_from_reachability_map_field get_post_processing_1
 let get_backend_mode = upgrade_from_reachability_map_field get_backend_mode_1
 let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
-let get_hide_reverse_rule_from_dead_rules =
-  upgrade_from_reachability_map_field get_hide_reverse_rule_from_dead_rules_1
+let get_hide_reverse_rule_without_label_from_dead_rules =
+  upgrade_from_reachability_map_field get_hide_reverse_rule_without_label_from_dead_rules_1
 
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
 let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1

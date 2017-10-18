@@ -37,6 +37,14 @@ let to_int ?error_msg:(error_msg=build_msg "int") =
   | `Int (s:int) -> s
   | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
 
+let of_bool (s:bool) = `String (if s then "true" else "false")
+
+let to_bool ?error_msg:(error_msg=build_msg "boolean") =
+  function
+  | `String "true" -> true
+  | `String "false" -> false
+  | x -> raise (Yojson.Basic.Util.Type_error (error_msg,x))
+
 let of_unit () = `Null
 
 let to_unit ?error_msg:(error_msg=build_msg "unit") =

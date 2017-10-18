@@ -211,6 +211,26 @@ let is_reverse parameters error compiled rule_id =
   | Some rule ->
     error, rule.Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Reverse
 
+let has_no_label parameters error compiled rule_id =
+  let rules = compiled.Cckappa_sig.rules in
+  let error,rule =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+      parameters
+      error
+      rule_id
+      rules
+  in
+  match rule
+  with
+  | None ->
+    Exception.warn
+      parameters error __POS__ Exit
+      true
+  | Some rule ->
+    error,
+    match rule.Cckappa_sig.e_rule_label
+    with None -> true
+       | Some _ -> false
 
 let info_of_rule
     parameters ?(with_rates=false) ?(original=false) error compiled (rule_id: Ckappa_sig.c_rule_id) =
@@ -263,7 +283,8 @@ let info_of_rule
     in
     error, (label, position, direction, ast, rule_id)
 
-let remove_ast (label,position, direction, _ ,rule_id) = (label, position, direction, "", rule_id)
+let hide rule = {rule with Public_data.rule_hidden = true}
+
 let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
@@ -369,7 +390,8 @@ let convert_id_refined =
          Public_data.rule_position=b;
          Public_data.rule_direction=c;
          Public_data.rule_label=d;
-         Public_data.rule_ast=e
+         Public_data.rule_ast=e;
+         Public_data.rule_hidden=false
        })
     (fun a b d e _ ->
        {

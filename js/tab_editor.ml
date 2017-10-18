@@ -76,19 +76,22 @@ let init_dead_rules () =
                   let warnings =
                     List.fold_left
                       (fun acc rule ->
-                         let message_text =
-                           "Dead rule "^
-                           if rule.Public_data.rule_label <> ""
-                           then (" '"^rule.Public_data.rule_label^"'")
-                           else if rule.Public_data.rule_ast <> ""
-                           then rule.Public_data.rule_ast
-                           else string_of_int rule.Public_data.rule_id in
-                         {
-                           Api_types_t.message_severity = `Warning;
-                           Api_types_t.message_range =
-                             Some rule.Public_data.rule_position;
-                           Api_types_t.message_text;
-                         } :: acc) [] list in
+                         if rule.Public_data.rule_hidden
+                         then acc
+                         else
+                           let message_text =
+                             "Dead rule "^
+                             if rule.Public_data.rule_label <> ""
+                             then (" '"^rule.Public_data.rule_label^"'")
+                             else if rule.Public_data.rule_ast <> ""
+                             then rule.Public_data.rule_ast
+                             else string_of_int rule.Public_data.rule_id in
+                           {
+                             Api_types_t.message_severity = `Warning;
+                             Api_types_t.message_range =
+                               Some rule.Public_data.rule_position;
+                             Api_types_t.message_text;
+                           } :: acc) [] list in
                   State_error.add_error __LOC__ warnings)
                manager#get_dead_rules) >>=
             fun out -> Lwt.return (Api_common.result_lift out)
