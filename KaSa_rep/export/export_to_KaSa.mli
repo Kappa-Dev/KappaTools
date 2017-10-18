@@ -39,8 +39,7 @@ sig
 
   type ctmc_flow
 
-  val init:
-    unit -> state
+  val init: unit -> state
 
   val set_errors: errors -> state -> state
 
@@ -55,12 +54,6 @@ sig
   val get_env: state -> state * Model.t option
 
   val get_c_compilation: state -> state * c_compilation
-
-  (*WORK IN PROGRESS*)
-  (*val get_graph_scc : state -> state * Graphs.node list*)
-  (*val get_string_contact_map:
-  ?accuracy_level:Public_data.accuracy_level ->
-  state -> state * Public_data.contact_map*)
 
   val get_contact_map :
   ?accuracy_level:Public_data.accuracy_level ->

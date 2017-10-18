@@ -200,8 +200,6 @@ let site_node_sites_of_json =
     ~error_msg:"site node sites"
     site_of_json
 
-
-
 let site_node_to_json node =
   `Assoc
     [ sitenodename,
@@ -209,7 +207,6 @@ let site_node_to_json node =
 
       sitenodesites,
       site_node_sites_to_json node.User_graph.node_sites]
-
 
 let site_node_of_json =
 function
@@ -244,7 +241,6 @@ let contact_map_to_json contact_map=
           site_node_to_json)
        contact_map
     ]
-
 
 let contact_map_of_json =
   function
