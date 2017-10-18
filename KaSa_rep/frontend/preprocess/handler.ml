@@ -193,6 +193,25 @@ let complementary_interface
   in
   error, Misc_sa.list_minus l interface
 
+let is_reverse parameters error compiled rule_id =
+  let rules = compiled.Cckappa_sig.rules in
+  let error,rule =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+      parameters
+      error
+      rule_id
+      rules
+  in
+  match rule
+  with
+  | None ->
+    Exception.warn
+      parameters error __POS__ Exit
+      false
+  | Some rule ->
+    error, rule.Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Reverse
+
+
 let info_of_rule
     parameters ?(with_rates=false) ?(original=false) error compiled (rule_id: Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
@@ -244,6 +263,7 @@ let info_of_rule
     in
     error, (label, position, direction, ast, rule_id)
 
+let remove_ast (label,position, direction, _ ,rule_id) = (label, position, direction, "", rule_id)
 let info_of_var parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in

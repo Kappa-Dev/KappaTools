@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Aug 22 2017>
+  * Last modification: Time-stamp: <Oct 18 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -41,7 +41,7 @@ let rule_shape = ref Graph_loggers_sig.Rect
 let rule_color = ref Graph_loggers_sig.LightSkyBlue (*"#87ceeb" (* light sky blue *)*)
 let variable_shape = ref Graph_loggers_sig.Ellipse
 let variable_color = ref Graph_loggers_sig.PaleGreen (* "#98fb98" (*Pale green*)*)
-let center_color = ref Graph_loggers_sig.Red 
+let center_color = ref Graph_loggers_sig.Red
 let wake_up_color = ref Graph_loggers_sig.Green (*"#00ff00" (*Green *)*)
 let inhibition_color = ref Graph_loggers_sig.Red (*"#ff0000" (*red*)*)
 let wake_up_arrow = ref Graph_loggers_sig.Normal
@@ -94,6 +94,8 @@ let dump_reachability_analysis_static = ref false
 let dump_reachability_analysis_dynamic = ref false
 let dump_reachability_analysis_diff = ref false
 let dump_reachability_analysis_wl = ref false
+
+let hide_reverse_rule_from_dead_rules = ref true
 
 let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref true
