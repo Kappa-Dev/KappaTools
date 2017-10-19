@@ -17,7 +17,7 @@ val get_compilation :
   Counter.t
 
 val get_ast_from_list_of_files:
-  string list -> Ast.parsing_compil
+  Ast.syntax_version -> string list -> Ast.parsing_compil
 
 val get_ast_from_cli_args:
   Run_cli_args.t -> Ast.parsing_compil

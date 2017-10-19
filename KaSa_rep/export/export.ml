@@ -284,7 +284,7 @@ let compute_compilation show_title state =
     | Remanent_state.Compil compil -> compil
     | Remanent_state.Files files ->
       let () = show_title state in
-      Cli_init.get_ast_from_list_of_files files
+      Cli_init.get_ast_from_list_of_files Ast.V3 files
   in
   let state = Remanent_state.set_compilation compil state in
   state, compil

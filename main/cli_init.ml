@@ -29,7 +29,11 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
     | None -> None,None
     | Some file ->
       let compil =
-        KappaLexer.compile Format.std_formatter Ast.empty_compil file in
+        match syntax_version with
+        | Ast.V4 ->
+          Klexer4.compile Format.std_formatter Ast.empty_compil file
+        | Ast.V3 ->
+          KappaLexer.compile Format.std_formatter Ast.empty_compil file in
       let conf, _, _, _, _ =
         Configuration.parse compil.Ast.configurations in
       Some
@@ -41,18 +45,24 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
   story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,alg_finder,
   updated_vars,result',overwrite_init,overwrite_t0
 
-let get_ast_from_list_of_files list =
-  List.fold_left
-    (KappaLexer.compile Format.std_formatter)
-    Ast.empty_compil list
+let get_ast_from_list_of_files syntax_version list =
+  let f =
+    match syntax_version with
+    | Ast.V4 -> Klexer4.compile Format.std_formatter
+    | Ast.V3 -> KappaLexer.compile Format.std_formatter in
+  List.fold_left f Ast.empty_compil list
 
 let get_ast_from_cli_args cli_args =
-  get_ast_from_list_of_files cli_args.Run_cli_args.inputKappaFileNames
+  get_ast_from_list_of_files
+    cli_args.Run_cli_args.syntaxVersion
+    cli_args.Run_cli_args.inputKappaFileNames
 
 let get_preprocessed_ast_from_cli_args
     ?(kasim_args=Kasim_args.default) cli_args =
   let ast =
-    get_ast_from_list_of_files cli_args.Run_cli_args.inputKappaFileNames
+    get_ast_from_list_of_files
+      cli_args.Run_cli_args.syntaxVersion
+      cli_args.Run_cli_args.inputKappaFileNames
   in
   preprocess cli_args ~kasim_args ast
 
@@ -60,8 +70,8 @@ let get_pack_from_preprocessed_ast ?(kasim_args=Kasim_args.default)
     ~max_sharing ?bwd_bisim ~compileModeOn preprocessed_ast
   =
   let conf, progressConf,
-  story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,_alg_finder,
-      updated_vars,result',overwrite_init,overwrite_t0
+      story_compression, formatCflow, cflowFile,sigs_nd,contact_map,tk_nd,
+      _alg_finder, updated_vars,result',overwrite_init,overwrite_t0
     = preprocessed_ast
   in
   let n,w,s = story_compression in
@@ -106,7 +116,8 @@ let get_pack_from_marshalizedfile
     match kasim_args.Kasim_args.initialMix with
     | None -> pack,alg_overwrite,None
     | Some file ->
-      let compil = get_ast_from_list_of_files [file] in
+      let compil =
+        get_ast_from_list_of_files cli_args.Run_cli_args.syntaxVersion [file] in
       let conf', _, _, _, _ =
         Configuration.parse compil.Ast.configurations in
       let raw_inits =
