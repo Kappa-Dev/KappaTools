@@ -1785,7 +1785,12 @@ let translate_perturb parameters error handler ((alarm,bool1,modif,bool2),pos2) 
   let error,modif' =
     List.fold_left
       (fun (error,l) elt ->
-         let error,elt' = Prepreprocess.modif_map (lift_forbidding_question_marks parameters handler) (lift_allowing_question_marks parameters handler) error elt in
+         let error,elt' =
+           Prepreprocess.modif_map
+             (fun error (_,pos as x) ->
+                let err,r = translate_rule parameters error handler (None,x) in
+                err,(r.Cckappa_sig.e_rule_c_rule,pos))
+             (lift_allowing_question_marks parameters handler) error elt in
          error,elt'::l)
       (error,[]) (List.rev modif)
   in

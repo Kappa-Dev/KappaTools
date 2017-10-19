@@ -92,9 +92,11 @@ type 'pattern rule =
     from_a_biderectional_rule: bool;
   }
 
-type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
+type ('pattern,'rule) perturbation =
+  ('pattern,'pattern,string,'rule) Ast.perturbation
 
-type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
+type ('pattern,'rule) modif_expr   =
+  ('pattern,'pattern,string,'rule) Ast.modif_expr
 
 type 'pattern variable     = ('pattern,string) Ast.variable_def
 
@@ -915,7 +917,8 @@ type c_compil =
     c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)
     c_perturbations :
-      c_mixture Locality.annot perturbation Int_storage.Nearly_inf_Imperatif.t
+      (c_mixture Locality.annot,enriched_rule) perturbation
+        Int_storage.Nearly_inf_Imperatif.t
   }
 
 let lift to_int from_int p =
@@ -957,35 +960,6 @@ let array_of_list_rule_id create set parameters error list =
           (set parameters (fst a) k t (snd a))
       end
   in aux list dummy_rule_id a
-
-let mixture_of_modif =
-  function
-  | Ast.INTRO x -> Some x
-  | Ast.DELETE _
-  | Ast.UPDATE _
-  | Ast.UPDATE_TOK _
-  | Ast.STOP _
-  | Ast.SNAPSHOT _
-    (*maybe later of mixture too*)
-  | Ast.PRINT _
-  | Ast.PLOTENTRY
-  | Ast.CFLOWLABEL _
-  | Ast.CFLOWMIX _
-  | Ast.SPECIES_OF _
-  | Ast.FLUX _
-  | Ast.FLUXOFF _ -> None
-
-let introduceable_species_in_pertubation parameter error f ((_,_,list,_),_) =
-  List.fold_left
-    (fun (error,list) a ->
-       match mixture_of_modif a
-       with
-       | Some (a,b) ->
-         let error, elt = f parameter error a b in
-         error, elt::list
-       | None -> error,list)
-    (error,[])
-    list
 
 (***************************************************************************)
 (*MODULE*)

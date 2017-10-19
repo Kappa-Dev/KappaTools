@@ -596,24 +596,17 @@ let map_with_pos map =
 
 let alg_with_pos_map = map_with_pos alg_map
 
-let modif_map f_forbidding_question_marks f_allowing_question_marks error alg =
+let modif_map f_rule f_allowing_question_marks error alg =
   match
     alg
   with
-  | Ast.INTRO (alg,(mixture,pos)) ->
+  | Ast.APPLY (alg,mixture) ->
     let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
-    let error,mixture' = f_forbidding_question_marks error mixture in
-    error,Ast.INTRO(alg',(mixture',pos))
-  | Ast.DELETE (alg,(mixture,pos)) ->
-    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
-    let error,mixture' = f_allowing_question_marks error mixture in
-    error,Ast.DELETE(alg',(mixture',pos))
+    let error,mixture' = f_rule error mixture in
+    error,Ast.APPLY(alg',mixture')
   | Ast.UPDATE (pos,alg) ->
     let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
     error,Ast.UPDATE (pos,alg')
-  | Ast.UPDATE_TOK (pos,alg) ->
-    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
-    error,Ast.UPDATE_TOK (pos,alg')
   | Ast.STOP list ->
     let error,list' =
       List.fold_left
@@ -945,14 +938,11 @@ let translate_compil parameters error compil =
            List.fold_left
              (fun (error,list) m ->
                 match m with
-                | Ast.INTRO (a,(m,p)) ->
+                | Ast.APPLY (a,(_,p as r)) ->
                   let error,a' = alg_with_pos_map (refine_mixture parameters) error a in
-                  let error,m' = refine_mixture parameters error (rev_ast m) in
-                  error,Ast.INTRO(a',(m',p))::list
-                | Ast.DELETE (a,(m,p)) ->
-                  let error,a' = alg_with_pos_map (refine_mixture parameters) error a in
-                  let error,m' = refine_mixture parameters error (rev_ast m) in
-                  error,Ast.DELETE(a',(m',p))::list
+                  (match translate_rule error r with
+                   | error, None -> error,list
+                   | error, Some m' -> error,Ast.APPLY(a',(m',p))::list)
                 | Ast.UPDATE (x,y) ->
                   let error,y' = alg_with_pos_map (refine_mixture parameters) error y in
                   error,(Ast.UPDATE (x,y'))::list
@@ -976,9 +966,8 @@ let translate_compil parameters error compil =
                       (error,[]) (List.rev l)
                   in
                   error,(Ast.SNAPSHOT l')::list
-                | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.FLUX _
-                | Ast.FLUXOFF _ | Ast.CFLOWMIX _ | Ast.PLOTENTRY
-                | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
+                | Ast.PRINT _ | Ast.FLUX _ | Ast.FLUXOFF _ | Ast.CFLOWMIX _
+                | Ast.PLOTENTRY | Ast.CFLOWLABEL _ | Ast.SPECIES_OF _ ->
                   error,list (*to do*))
              (error,[])
              m

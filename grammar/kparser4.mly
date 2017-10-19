@@ -25,7 +25,7 @@
 %token PLUS MINUS MULT DIV MOD MAX MIN SINUS COSINUS TAN POW ABS SQRT EXPONENT
 %token OR AND NOT THEN ELSE DIFF EQUAL SMALLER GREATER TRUE FALSE INFINITY
 %token SHARP UNDERSCORE PIPE RAR LRAR EMAX TMAX CPUTIME TIME EVENT NULL_EVENT
-%token COLON NEWLINE SIGNATURE TOKEN INIT LET OBS PLOT PERT CONFIG RUN
+%token COLON NEWLINE SIGNATURE TOKEN INIT LET OBS PLOT PERT CONFIG RUN APPLY
 %token DELETE INTRO SNAPSHOT STOP FLUX TRACK ASSIGN PRINTF PLOTENTRY SPECIES_OF
 %token DO REPEAT ALARM
 %token <int> INT
@@ -37,11 +37,11 @@
 %type <Ast.parsing_instruction list> model
 
 %start interactive_command
-%type <(Ast.mixture,Ast.mixture,string) Ast.command> interactive_command
+%type <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.command> interactive_command
 
 %start standalone_effect_list
 %type
-  <(Ast.mixture,Ast.mixture,string) Ast.modif_expr list> standalone_effect_list
+  <(Ast.mixture,Ast.mixture,string,Ast.rule) Ast.modif_expr list> standalone_effect_list
 
 %start standalone_bool_expr
 %type <(Ast.mixture,string) Alg_expr.bool Locality.annot> standalone_bool_expr
@@ -379,15 +379,17 @@ arrow:
   ;
 
 sum_token:
-  | small_alg_expr annot ID annot { [($1,($3,rhs_pos 3))] }
+  | small_alg_expr annot ID annot { [($1,($3,rhs_pos 3))],end_pos 3,$4 }
   | small_alg_expr annot ID annot COMMA annot sum_token
-    { ($1,($3,rhs_pos 3)) :: $7 }
+    { let (l,pend,an) = $7 in ($1,($3,rhs_pos 3)) :: l,pend,an }
   ;
 
 rule_side:
-  | pattern { let (p,_,_) = $1 in (p,[]) }
-  | pattern PIPE annot sum_token { let (p,_,_) = $1 in (p, $4) }
-  | PIPE annot sum_token { ([], $3) }
+  | pattern { let (p,pend,an) = $1 in (p,[],pend,an) }
+  | pattern PIPE annot sum_token
+    { let (p,_,_) = $1 in
+      let (t,pend,an) = $4 in (p, t, pend, an) }
+  | PIPE annot sum_token { let (t,pend,an) = $3 in ([], t, pend, an) }
   | pattern PIPE annot error
     { raise (ExceptionDefn.Syntax_Error
 	(add_pos 4 "Malformed token expression, I was expecting a_0 t_0, ... \
@@ -400,18 +402,18 @@ rule_side:
 
 rule_content:
   | rule_side arrow annot rule_side
-    { let (lhs,rm_token) = $1 in
-      let (rhs,add_token) = $4 in
-      (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs; Ast.add_token},$2) }
-  | rule_side arrow
-    { let (lhs,rm_token) = $1 in
-      (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs=[]; Ast.add_token=[]},$2) }
+    { let (lhs,rm_token,_,_) = $1 in
+      let (rhs,add_token,pend,an) = $4 in
+      (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs; Ast.add_token},$2,pend,an) }
+  | rule_side arrow annot
+    { let (lhs,rm_token,_,_) = $1 in
+      (Ast.Arrow {Ast.lhs; Ast.rm_token; Ast.rhs=[]; Ast.add_token=[]},$2,end_pos 2,$3) }
   | arrow annot rule_side
-    { let (rhs,add_token) = $3 in
-      (Ast.Arrow {Ast.lhs=[]; Ast.rm_token=[]; Ast.rhs; Ast.add_token},$1) }
+    { let (rhs,add_token,pend,an) = $3 in
+      (Ast.Arrow {Ast.lhs=[]; Ast.rm_token=[]; Ast.rhs; Ast.add_token},$1,pend,an) }
   | rule_side
-    { let (mix,delta_token) = $1 in
-      (Ast.Edit {Ast.mix; Ast.delta_token},false) }
+    { let (mix,delta_token,pend,an) = $1 in
+      (Ast.Edit {Ast.mix; Ast.delta_token},false,pend,an) }
   ;
 
 alg_with_radius:
@@ -439,7 +441,7 @@ birate:
 rule:
   | rule_content birate
     { let (k_def,k_un,k_op,k_op_un,pos_end,_annot) = $2 in
-      let (rewrite,bidirectional) = $1 in
+      let (rewrite,bidirectional,_,_) = $1 in
       ({
         Ast.rewrite;Ast.bidirectional;
         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
@@ -535,10 +537,27 @@ effect:
         (Ast.FLUX (Primitives.RELATIVE,p),end_pos 6,$7)
       else raise (ExceptionDefn.Syntax_Error
                     ("Incorrect FLUX expression",rhs_pos 4)) }
+  | APPLY annot alg_expr rule_content AT
+  { let (rewrite,_,pend,an) = $4 in
+    let (v,_,_) = $3 in
+    Ast.APPLY(v,
+	({ Ast.rewrite; Ast.bidirectional = false;
+	   Ast.k_def=Alg_expr.const Nbr.zero;Ast.k_un=None;
+	   Ast.k_op=None; Ast.k_op_un=None},Locality.of_pos (start_pos 3) pend)),
+    pend,an
+    }
   | INTRO annot alg_expr pattern
     { let (m,pend,p) = $4 in
       let (v,_,_) = $3 in
-      (Ast.INTRO (v,(m, Locality.of_pos (start_pos 4) pend)),pend,p) }
+      (Ast.APPLY(v,
+                 ({Ast.rewrite =
+		   Ast.Edit {Ast.mix=Ast.to_created_mixture m;
+                     Ast.delta_token=[];};
+		   Ast.bidirectional=false;
+                   Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
+                   Ast.k_op=None; Ast.k_op_un=None},
+                  Locality.of_pos (start_pos 4) pend)),
+       pend,p) }
   | INTRO annot error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 3 "Malformed perturbation instruction, I was expecting \
@@ -546,7 +565,15 @@ effect:
   | DELETE annot alg_expr pattern
     { let (m,pend,p) = $4 in
       let (v,_,_) = $3 in
-      (Ast.DELETE (v,(m, Locality.of_pos (start_pos 4) pend)),pend,p) }
+      (Ast.APPLY(v,
+               ({Ast.rewrite =
+		 Ast.Edit {Ast.mix=Ast.to_erased_mixture m;
+                   Ast.delta_token=[];};
+		 Ast.bidirectional=false;
+                 Ast.k_def=Alg_expr.const Nbr.zero; Ast.k_un=None;
+                 Ast.k_op=None; Ast.k_op_un=None},
+                Locality.of_pos (start_pos 4) pend)),
+       pend,p) }
   | DELETE annot error
            { raise (ExceptionDefn.Syntax_Error
                       (add_pos 3 "Malformed perturbation instruction, I was \

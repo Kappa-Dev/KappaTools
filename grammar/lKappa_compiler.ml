@@ -939,18 +939,58 @@ let print_expr_of_ast ~syntax_version sigs tok algs = function
     Primitives.Alg_pexpr
       (alg_expr_of_ast ~syntax_version sigs tok algs x)
 
+let assemble_rule ~syntax_version ~r_editStyle
+    sigs tok algs r_mix r_created rm_tk add_tk rate un_rate =
+  let tks =
+    List.rev_map (fun (al,(tk,pos)) ->
+        (alg_expr_of_ast ~syntax_version sigs tok algs
+           (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
+         convert_token_name tk tok pos))
+      rm_tk in
+  let tks' =
+    List_util.rev_map_append (fun (al,(tk,pos)) ->
+          (alg_expr_of_ast ~syntax_version sigs tok algs al,
+           convert_token_name tk tok pos))
+      add_tk tks in
+  { LKappa.r_mix; r_created; r_editStyle;
+    r_delta_tokens = List.rev tks';
+    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs rate;
+    r_un_rate =
+      let r_dist d =
+        alg_expr_of_ast
+          ~syntax_version sigs tok algs ?max_allowed_var:None d in
+      Option_util.map
+        (fun (un_rate',dist) ->
+           let un_rate'' =
+             alg_expr_of_ast ~syntax_version sigs tok algs
+               ?max_allowed_var:None un_rate' in
+           match dist with
+           | Some d -> (un_rate'', Some (r_dist d))
+           | None -> (un_rate'', None))
+        un_rate;
+  }
+
 let modif_expr_of_ast
     ~syntax_version sigs tok algs contact_map modif acc =
   match modif with
-  | Ast.INTRO (how,(who,pos)) ->
-    Ast.INTRO
-      (alg_expr_of_ast ~syntax_version sigs tok algs how,
-       (raw_mixture_of_ast ~syntax_version sigs ~contact_map who,pos)),
-    acc
-  | Ast.DELETE (how,(who,pos)) ->
-    Ast.DELETE
-      (alg_expr_of_ast ~syntax_version sigs tok algs how,
-       (mixture_of_ast ~syntax_version sigs pos who,pos)),
+  | Ast.APPLY(nb,(r,pos)) ->
+    let (mix,cmix),rm_tok,add_tok,r_editStyle =
+      match r.Ast.rewrite with
+      | Ast.Edit e ->
+        annotate_edit_mixture
+          ~syntax_version:Ast.V4 ~is_rule:true sigs ~contact_map e.Ast.mix,
+        [],e.Ast.delta_token,true
+      | Ast.Arrow a ->
+        annotate_lhs_with_diff
+          ~syntax_version sigs ~contact_map a.Ast.lhs a.Ast.rhs,
+        a.Ast.rm_token,a.Ast.add_token,false in
+    let mix,cmix = Counters_compiler.remove_counter_rule sigs mix cmix in
+    Ast.APPLY
+      (alg_expr_of_ast ~syntax_version sigs tok algs nb,
+       (assemble_rule
+          ~syntax_version:Ast.V4 ~r_editStyle
+          sigs tok algs mix cmix rm_tok add_tok
+          r.Ast.k_def r.Ast.k_un,pos)),
     acc
   | Ast.UPDATE ((lab,pos),how) ->
     let i =
@@ -963,17 +1003,6 @@ let modif_expr_of_ast
       ((i,pos),
        alg_expr_of_ast ~syntax_version sigs tok algs how),
     i::acc
-  | Ast.UPDATE_TOK ((lab,pos),how) ->
-    let i =
-      match Mods.StringMap.find_option lab tok with
-      | Some x -> x
-      | None ->
-        raise (ExceptionDefn.Malformed_Decl
-                 (lab ^" is not a declared token",pos)) in
-    Ast.UPDATE_TOK
-      ((i,pos),
-       alg_expr_of_ast ~syntax_version sigs tok algs how),
-    acc
   | Ast.STOP p ->
     Ast.STOP
       (List.map
@@ -1107,38 +1136,6 @@ let name_and_purify_rule
     (pack',acc''',
      (label_opt,false,mix,created,a.Ast.rm_token,a.Ast.add_token,k_def,k_un,r_pos)
    ::rules')
-
-let assemble_rule ~syntax_version ~r_editStyle
-    sigs tk_nd algs r_mix r_created rm_tk add_tk rate un_rate =
-  let tok = tk_nd.NamedDecls.finder in
-  let tks =
-    List.rev_map (fun (al,tk) ->
-        (alg_expr_of_ast ~syntax_version sigs tok algs
-           (Locality.dummy_annot (Alg_expr.UN_ALG_OP (Operator.UMINUS,al))),
-         NamedDecls.elt_id ~kind:"token" tk_nd tk))
-      rm_tk in
-  let tks' =
-    List_util.rev_map_append (fun (al,tk) ->
-          (alg_expr_of_ast ~syntax_version sigs tok algs al,
-           NamedDecls.elt_id ~kind:"token" tk_nd tk))
-      add_tk tks in
-  { LKappa.r_mix; r_created; r_editStyle;
-    r_delta_tokens = List.rev tks';
-    r_rate = alg_expr_of_ast ~syntax_version sigs tok algs rate;
-    r_un_rate =
-      let r_dist d =
-        alg_expr_of_ast
-          ~syntax_version sigs tok algs ?max_allowed_var:None d in
-      Option_util.map
-        (fun (un_rate',dist) ->
-           let un_rate'' =
-             alg_expr_of_ast ~syntax_version sigs tok algs
-               ?max_allowed_var:None un_rate' in
-           match dist with
-           | Some d -> (un_rate'', Some (r_dist d))
-           | None -> (un_rate'', None))
-        un_rate;
-  }
 
 let create_t sites incr_info =
   let (aux,counters) =
@@ -1292,7 +1289,7 @@ let compil_of_ast ~syntax_version overwrite c =
         label,
         (assemble_rule
            ~syntax_version ~r_editStyle
-           sigs tk_nd algs mix created rm_tk add_tk rate un_rate,
+           sigs tok algs mix created rm_tk add_tk rate un_rate,
          r_pos))
       cleaned_rules in
   sigs,contact_map,tk_nd,algs,updated_vars,

@@ -407,7 +407,6 @@ let set_new_index_pair_map m static =
 
 let compute_initial_state error static =
   let parameters = get_parameter static in
-  let kappa_handler  = get_kappa_handler static in
   let compil = get_cc_code static in
   let error, init =
     Int_storage.Nearly_inf_Imperatif.fold
@@ -416,32 +415,6 @@ let compute_initial_state error static =
        (fun _parameters error _ i l -> error, i :: l)
        compil.Cckappa_sig.init
        []
-  in
-  let error, init =
-    Int_storage.Nearly_inf_Imperatif.fold
-       parameters
-       error
-       (fun parameters error _ perturbation l ->
-          let error, list =
-            Ckappa_sig.introduceable_species_in_pertubation
-              parameters
-              error
-              (fun p e (alg,pos) (mixture,pos')->
-                 let mixture' = mixture.Cckappa_sig.c_mixture in
-                 let e,alg' =
-                   Prepreprocess.alg_map
-                     (fun e m -> e,m.Cckappa_sig.c_mixture) e alg in
-                 Preprocess.translate_pert
-                   p e kappa_handler
-                   (alg',pos)
-                   (mixture',pos') )
-                perturbation
-          in
-          error, List.fold_left
-            (fun l elt -> elt::l)
-            l list)
-       compil.Cckappa_sig.perturbations
-       init
   in
   error, List.rev init
 

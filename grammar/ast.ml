@@ -86,15 +86,10 @@ type rule = {
 
 let flip_label str = str^"_op"
 
-type ('pattern,'mixture,'id) modif_expr =
-  | INTRO of
-      (('pattern,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
-  | DELETE of
-      (('pattern,'id) Alg_expr.e Locality.annot * 'pattern Locality.annot)
+type ('pattern,'mixture,'id,'rule) modif_expr =
+  | APPLY of
+      (('pattern,'id) Alg_expr.e Locality.annot * 'rule Locality.annot)
   | UPDATE of
-      ('id Locality.annot *
-       ('pattern,'id) Alg_expr.e Locality.annot)
-  | UPDATE_TOK of
       ('id Locality.annot *
        ('pattern,'id) Alg_expr.e Locality.annot)
   | STOP of ('pattern,'id) Alg_expr.e Primitives.print_expr list
@@ -112,10 +107,10 @@ type ('pattern,'mixture,'id) modif_expr =
       (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
        * 'pattern Locality.annot)
 
-type ('pattern,'mixture,'id) perturbation =
+type ('pattern,'mixture,'id,'rule) perturbation =
   (Nbr.t option *
    ('pattern,'id) Alg_expr.bool Locality.annot option *
-   (('pattern,'mixture,'id) modif_expr list) *
+   (('pattern,'mixture,'id,'rule) modif_expr list) *
    ('pattern,'id) Alg_expr.bool Locality.annot option) Locality.annot
 
 type configuration = string Locality.annot * (string Locality.annot list)
@@ -140,13 +135,13 @@ type ('agent,'pattern,'mixture,'id,'rule) instruction =
   | DECLARE  of ('pattern,'id) variable_def
   | OBS      of ('pattern,'id) variable_def (*for backward compatibility*)
   | PLOT     of ('pattern,'id) Alg_expr.e Locality.annot
-  | PERT     of ('pattern,'mixture,'id) perturbation
+  | PERT     of ('pattern,'mixture,'id,'rule) perturbation
   | CONFIG   of configuration
   | RULE     of (string Locality.annot option * 'rule Locality.annot)
 
-type ('pattern,'mixture,'id) command =
+type ('pattern,'mixture,'id,'rule) command =
   | RUN of ('pattern,'id) Alg_expr.bool Locality.annot
-  | MODIFY of ('pattern,'mixture,'id) modif_expr list
+  | MODIFY of ('pattern,'mixture,'id,'rule) modif_expr list
   | QUIT
 
 type ('agent,'pattern,'mixture,'id,'rule) compil =
@@ -167,7 +162,7 @@ type ('agent,'pattern,'mixture,'id,'rule) compil =
     init : ('pattern,'mixture,'id) init_statment list;
     (*initial graph declaration*)
     perturbations :
-      ('pattern,'mixture,'id) perturbation list;
+      ('pattern,'mixture,'id,'rule) perturbation list;
     configurations :
       configuration list;
     tokens :
@@ -464,6 +459,16 @@ let agent_of_json filenames = function
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
+let to_erased_mixture =
+  List.map (function
+      | Absent pos -> Absent pos
+      | Present (n,s,_) -> Present (n,s,Some Erase))
+
+let to_created_mixture =
+  List.map (function
+      | Absent pos -> Absent pos
+      | Present (n,s,_) -> Present (n,s,Some Create))
+
 let init_to_json ~filenames f_mix f_var = function
   | INIT_MIX m ->
     `List [`String "mixture"; Locality.annot_to_yojson ~filenames f_mix m ]
@@ -724,23 +729,14 @@ let rule_of_json filenames f_mix f_var = function
 
 
 let modif_to_json filenames f_mix f_var = function
-  | INTRO (alg,mix) ->
-    `List [ `String "INTRO";
+  | APPLY (alg,r) ->
+    `List [ `String "APPLY";
             Locality.annot_to_yojson
               ~filenames (Alg_expr.e_to_yojson ~filenames f_mix f_var) alg;
-            Locality.annot_to_yojson ~filenames f_mix mix ]
-  | DELETE (alg,mix) ->
-    `List [ `String "DELETE";
             Locality.annot_to_yojson
-              ~filenames (Alg_expr.e_to_yojson ~filenames f_mix f_var) alg;
-            Locality.annot_to_yojson ~filenames f_mix mix ]
+              ~filenames (rule_to_json filenames f_mix f_var) r ]
   | UPDATE (id,alg) ->
     `List [ `String "UPDATE";
-            Locality.annot_to_yojson ~filenames f_var id;
-            Locality.annot_to_yojson
-              ~filenames (Alg_expr.e_to_yojson ~filenames f_mix f_var) alg ]
-  | UPDATE_TOK (id,alg) ->
-    `List [ `String "UPDATE_TOK";
             Locality.annot_to_yojson ~filenames f_var id;
             Locality.annot_to_yojson
               ~filenames (Alg_expr.e_to_yojson ~filenames f_mix f_var) alg ]
@@ -778,26 +774,17 @@ let modif_to_json filenames f_mix f_var = function
              Locality.annot_to_yojson ~filenames f_mix m ]
 
 let modif_of_json filenames f_mix f_var = function
-  | `List [ `String "INTRO"; alg; mix ] ->
-     INTRO
+  | `List [ `String "APPLY"; alg; mix ] ->
+     APPLY
        (Locality.annot_of_yojson
           ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) alg,
-        Locality.annot_of_yojson ~filenames f_mix mix)
-  | `List [ `String "DELETE"; alg; mix ] ->
-    DELETE
-      (Locality.annot_of_yojson
-         ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) alg,
-       Locality.annot_of_yojson ~filenames f_mix mix)
+        Locality.annot_of_yojson
+          ~filenames (rule_of_json filenames f_mix f_var) mix)
   | `List [ `String "UPDATE"; id; alg ] ->
     UPDATE
       (Locality.annot_of_yojson ~filenames f_var id,
        Locality.annot_of_yojson
          ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) alg)
-  | `List [ `String "UPDATE_TOK"; id; alg ] ->
-     UPDATE_TOK
-       (Locality.annot_of_yojson ~filenames f_var id,
-        Locality.annot_of_yojson
-          ~filenames (Alg_expr.e_of_yojson ~filenames f_mix f_var) alg)
   | `List (`String "STOP" :: l) ->
     STOP (List.map (Primitives.print_expr_of_yojson ~filenames f_mix f_var) l)
   | `List (`String "SNAPSHOT" :: l) ->
@@ -887,30 +874,28 @@ let sig_from_inits =
        | na,INIT_TOK l ->
          (ags,merge_tokens toks (List.map (fun x -> (na,x)) l)))
 
+let sig_from_rule (ags,toks) r =
+  match r.rewrite with
+  | Edit e -> (merge_agents ags e.mix, merge_tokens toks e.delta_token)
+  | Arrow a ->
+    let (ags',toks') =
+      if r.bidirectional then
+        (merge_agents ags a.rhs, merge_tokens toks a.add_token)
+      else (ags,toks) in
+    (merge_agents ags' a.lhs, merge_tokens toks' a.rm_token)
+
 let sig_from_rules =
-  List.fold_left
-    (fun (ags,toks) (_,(r,_)) ->
-       match r.rewrite with
-       | Edit e -> (merge_agents ags e.mix, merge_tokens toks e.delta_token)
-       | Arrow a ->
-         let (ags',toks') =
-           if r.bidirectional then
-             (merge_agents ags a.rhs, merge_tokens toks a.add_token)
-           else (ags,toks) in
-         (merge_agents ags' a.lhs, merge_tokens toks' a.rm_token))
+  List.fold_left (fun p (_,(r,_)) -> sig_from_rule p r)
 
 let sig_from_perts =
   List.fold_left
     (fun acc ((_,_,p,_),_) ->
        List.fold_left
-         (fun (ags,toks) -> function
-            | INTRO (_,(m,_)) ->
-              (merge_agents ags m,toks)
-            | UPDATE_TOK (t,na) ->
-              (ags,merge_tokens toks [na,t])
-            | (DELETE _ | UPDATE _ | STOP _ | SNAPSHOT _ | PRINT _ | PLOTENTRY |
+         (fun p -> function
+            | APPLY (_,(r,_)) -> sig_from_rule p r
+            | (UPDATE _ | STOP _ | SNAPSHOT _ | PRINT _ | PLOTENTRY |
                CFLOWLABEL _ | CFLOWMIX _ | FLUX _ | FLUXOFF _ | SPECIES_OF _) ->
-               (ags,toks))
+               p)
          acc p)
 
 let implicit_signature r =

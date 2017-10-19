@@ -83,15 +83,10 @@ type rule = {
 
 val flip_label : string -> string
 
-type ('pattern,'mixture,'id) modif_expr =
-  | INTRO of
-      (('pattern,'id) Alg_expr.e Locality.annot * 'mixture Locality.annot)
-  | DELETE of
-      (('pattern,'id) Alg_expr.e Locality.annot * 'pattern Locality.annot)
+type ('pattern,'mixture,'id,'rule) modif_expr =
+  | APPLY of
+      (('pattern,'id) Alg_expr.e Locality.annot * 'rule Locality.annot)
   | UPDATE of
-      ('id Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot)
-  (*TODO: pause*)
-  | UPDATE_TOK of
       ('id Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot)
   (*TODO: pause*)
   | STOP of ('pattern,'id) Alg_expr.e Primitives.print_expr list
@@ -110,10 +105,10 @@ type ('pattern,'mixture,'id) modif_expr =
       (bool * ('pattern,'id) Alg_expr.e Primitives.print_expr list
        * 'pattern Locality.annot)
 
-type ('pattern,'mixture,'id) perturbation =
+type ('pattern,'mixture,'id,'rule) perturbation =
   (Nbr.t option *
    ('pattern,'id) Alg_expr.bool Locality.annot option *
-   (('pattern,'mixture,'id) modif_expr list) *
+   (('pattern,'mixture,'id,'rule) modif_expr list) *
    ('pattern,'id) Alg_expr.bool Locality.annot option)
     Locality.annot
 
@@ -137,13 +132,13 @@ type ('agent,'pattern,'mixture,'id,'rule) instruction =
   | DECLARE  of ('pattern,'id) variable_def
   | OBS      of ('pattern,'id) variable_def (*for backward compatibility*)
   | PLOT     of ('pattern,'id) Alg_expr.e Locality.annot
-  | PERT     of ('pattern,'mixture,'id) perturbation
+  | PERT     of ('pattern,'mixture,'id,'rule) perturbation
   | CONFIG   of configuration
   | RULE     of (string Locality.annot option * 'rule Locality.annot)
 
-type ('pattern,'mixture,'id) command =
+type ('pattern,'mixture,'id,'rule) command =
   | RUN of ('pattern,'id) Alg_expr.bool Locality.annot
-  | MODIFY of ('pattern,'mixture,'id) modif_expr list
+  | MODIFY of ('pattern,'mixture,'id,'rule) modif_expr list
   | QUIT
 
 type ('agent,'pattern,'mixture,'id,'rule) compil =
@@ -161,7 +156,7 @@ type ('agent,'pattern,'mixture,'id,'rule) compil =
     (*list of patterns to plot*)
     init : ('pattern,'mixture,'id) init_statment list;
     (*initial graph declaration*)
-    perturbations : ('pattern,'mixture,'id) perturbation list;
+    perturbations : ('pattern,'mixture,'id,'rule) perturbation list;
     configurations : configuration list;
     tokens : string Locality.annot list;
     volumes : (string * float * string) list
@@ -192,6 +187,9 @@ val print_ast_mix : Format.formatter -> mixture -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
 val print_rule_content :
   bidirectional:bool -> Format.formatter -> rule_content -> unit
+
+val to_erased_mixture : mixture -> mixture
+val to_created_mixture : mixture -> mixture
 
 val link_to_json :
   ('a -> 'a -> Yojson.Basic.json) -> ('a -> Yojson.Basic.json) ->

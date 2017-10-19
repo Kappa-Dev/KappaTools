@@ -230,51 +230,27 @@ let cflows_of_label
   (domain',
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
-let rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
-    (mix,created,tks) mix_pos rev_effects =
-  let ast_rule =
-    { LKappa.r_mix = mix; LKappa.r_created = created;
-      LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
-      LKappa.r_rate = Alg_expr.const Nbr.zero; LKappa.r_editStyle = true;
-    } in
-  let (domain',alg_pos) =
-    compile_alg ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
-  let domain'',_,elem_rules =
-    rules_of_ast ?bwd_bisim
-      ~compileModeOn contact_map domain' ~syntax_ref:0 (ast_rule,mix_pos) in
-  let elem_rule = match elem_rules with
-    | [ r ] -> r
-    | _ ->
-      raise
-        (ExceptionDefn.Malformed_Decl
-           ("Ambiguous rule in perturbation is impossible",mix_pos)) in
-  (domain'',
-   (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects)
-
 let effects_of_modif
     ast_algs ast_rules origin ?bwd_bisim ~compileModeOn
     contact_map (domain,rev_effects) = function
-  | INTRO (alg_expr, (raw_mix,mix_pos)) ->
-    rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
-      ([],raw_mix,[])
-      mix_pos rev_effects
-  | DELETE (alg_expr, (ast_mix, mix_pos)) ->
-    rule_effect ?bwd_bisim ~compileModeOn contact_map domain alg_expr
-      (LKappa.to_erased (Pattern.PreEnv.sigs domain) ast_mix,[],[])
-      mix_pos rev_effects
+  | APPLY (alg_expr, (_,pos as pack)) ->
+    let (domain',alg_pos) =
+      compile_alg ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
+    let domain'',_,elem_rules =
+      rules_of_ast ?bwd_bisim
+        ~compileModeOn contact_map domain' ~syntax_ref:0 pack in
+    let elem_rule = match elem_rules with
+      | [ r ] -> r
+      | _ ->
+        raise
+          (ExceptionDefn.Malformed_Decl
+             ("Ambiguous rule in perturbation is impossible",pos)) in
+    (domain'',
+     (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects)
   | UPDATE ((i, _), alg_expr) ->
     let (domain', alg_pos) =
       compile_alg ?bwd_bisim ~compileModeOn contact_map domain alg_expr in
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
-  | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
-    rule_effect ?bwd_bisim ~compileModeOn contact_map domain
-      (Alg_expr.const Nbr.one)
-      ([],[],
-       [Locality.dummy_annot
-          (Alg_expr.BIN_ALG_OP
-             (Operator.MINUS,alg_expr,
-              Locality.dummy_annot (Alg_expr.TOKEN_ID tk_id))), tk_id])
-      tk_pos rev_effects
   | SNAPSHOT pexpr ->
     let (domain',pexpr') =
       compile_print_expr ?bwd_bisim ~compileModeOn contact_map domain pexpr in

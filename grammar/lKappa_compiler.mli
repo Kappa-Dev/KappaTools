@@ -15,8 +15,9 @@ val bool_expr_of_ast :
 val modif_expr_of_ast :
   syntax_version:Ast.syntax_version -> Signature.s -> int Mods.StringMap.t ->
   int Mods.StringMap.t -> Contact_map.t ->
-  (Ast.mixture, Ast.mixture, string) Ast.modif_expr -> int list ->
-  (LKappa.rule_agent list, Raw_mixture.t, int) Ast.modif_expr * int list
+  (Ast.mixture, Ast.mixture, string,Ast.rule) Ast.modif_expr -> int list ->
+  (LKappa.rule_agent list, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr *
+  int list
 val of_user_graph :
   Signature.s -> User_graph.connected_component -> LKappa.rule_mixture
 val init_of_ast :

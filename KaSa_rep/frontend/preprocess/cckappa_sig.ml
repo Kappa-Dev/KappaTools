@@ -189,7 +189,7 @@ type compil =
     init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)
     perturbations :
-      mixture Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t
+      (mixture,rule) Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t
   }
 
 (*******************************************************)

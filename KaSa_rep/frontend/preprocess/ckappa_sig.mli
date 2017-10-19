@@ -165,9 +165,11 @@ type 'pattern rule =
     from_a_biderectional_rule: bool;
   }
 
-type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
+type ('pattern,'rule) perturbation =
+  ('pattern,'pattern,string,'rule) Ast.perturbation
 
-type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
+type ('pattern,'rule) modif_expr   =
+  ('pattern,'pattern,string,'rule) Ast.modif_expr
 
 type 'pattern variable     = ('pattern,string) Ast.variable_def
 
@@ -392,7 +394,7 @@ type c_compil =
     c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)
     c_perturbations :
-      c_mixture Locality.annot perturbation Int_storage.Nearly_inf_Imperatif.t
+      (c_mixture Locality.annot,enriched_rule) perturbation Int_storage.Nearly_inf_Imperatif.t
   }
 
 (*******************************************************)
@@ -413,15 +415,6 @@ val array_of_list_rule_id:
   Exception.method_handler ->
   'a list ->
   Exception.method_handler * 'a Rule_nearly_Inf_Int_storage_Imperatif.t
-
-val introduceable_species_in_pertubation:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   ('a, string) Alg_expr.e Locality.annot ->
-   'a Locality.annot -> Exception.method_handler * 'b) -> 'a perturbation ->
-  Exception.method_handler * 'b list
 
 (***************************************************************************)
 

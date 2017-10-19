@@ -123,6 +123,7 @@ rule token = parse
     }
   | '$' (id as s) {
     match s with
+    | "APPLY" -> APPLY
     | "DEL" -> DELETE
     | "ADD" -> INTRO
     | "SNAPSHOT" -> SNAPSHOT

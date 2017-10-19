@@ -57,6 +57,7 @@ rule token = parse
 	 | pert as s {match s with
 		      | "$DEL" -> DELETE
 		      | "$ADD" -> INTRO
+		      | "$APPLY" -> APPLY
 		      | "$SNAPSHOT" -> SNAPSHOT
 		      | "$STOP" -> STOP
 		      | "$FLUX" -> FLUX

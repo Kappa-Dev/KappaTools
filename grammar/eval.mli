@@ -26,7 +26,7 @@ val compile_bool:
 val compile_modifications_no_track:
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, Raw_mixture.t, int) Ast.modif_expr list ->
+  (LKappa.rule_mixture, Raw_mixture.t, int, LKappa.rule) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile_inits:
