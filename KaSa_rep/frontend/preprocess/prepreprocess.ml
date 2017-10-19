@@ -298,7 +298,11 @@ let translate_port is_signature parameters int_set port remanent =
       translate_lnk_state parameters port.Ast.port_lnk (error',map) in
   {
     Ckappa_sig.port_nme = fst (port.Ast.port_nme) ;
-    Ckappa_sig.port_int = List.rev_map fst (List.rev port.Ast.port_int) ;
+    Ckappa_sig.port_int =
+      List.fold_left (fun acc -> function
+          | Some x, _ -> x::acc
+          | None, _ -> acc)
+        [] (List.rev port.Ast.port_int) ;
     Ckappa_sig.port_lnk = lnk ;
     (*       port_pos = pos ; *)
     Ckappa_sig.port_free = is_free },

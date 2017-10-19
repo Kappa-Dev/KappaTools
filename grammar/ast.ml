@@ -22,7 +22,7 @@ type ('a,'annot) link =
   | LNK_TYPE of 'a (* port *)
     * 'a (*agent_type*)
 
-type internal = string Locality.annot list
+type internal = string option Locality.annot list
 
 type port = {
   port_nme:string Locality.annot;
@@ -258,7 +258,9 @@ let print_ast_link =
     (fun f (x,_) -> Format.pp_print_string f x)
     (fun _ () -> ())
 let print_ast_internal =
-  Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x)
+  Pp.list Pp.empty (fun f -> function
+      | Some x,_ -> Format.fprintf f "~%s" x
+      | None, _ -> ())
 
 let print_ast_port f p =
   let f_mod_i = Pp.option ~with_space:false
@@ -290,6 +292,13 @@ let string_annot_of_json filenames =
   Locality.annot_of_yojson
     ~filenames (JsonUtil.to_string ?error_msg:None)
 
+let string_option_annot_to_json filenames =
+  Locality.annot_to_yojson
+    ~filenames (JsonUtil.of_option JsonUtil.of_string)
+let string_option_annot_of_json filenames =
+  Locality.annot_of_yojson
+    ~filenames (JsonUtil.to_option (JsonUtil.to_string ?error_msg:None))
+
 let counter_test_to_json = function
   | CEQ x -> `Assoc [ "test", `String "eq"; "val", `Int x ]
   | CGTE x -> `Assoc [ "test", `String "gte"; "val", `Int x ]
@@ -315,7 +324,8 @@ let port_to_json filenames p =
   `Assoc [
     "port_nme", string_annot_to_json filenames p.port_nme;
     "port_int", `Assoc [
-      "state", JsonUtil.of_list (string_annot_to_json filenames) p.port_int;
+      "state", JsonUtil.of_list
+        (string_option_annot_to_json filenames) p.port_int;
       "mod", mod_i p.port_int_mod];
     "port_lnk", `Assoc [
       "state", JsonUtil.of_list
@@ -361,7 +371,7 @@ let site_of_json filenames = function
       match i with
       | `Assoc [ "state", i; "mod", m ]
       | `Assoc [ "mod", m; "state", i ] ->
-        (JsonUtil.to_list (string_annot_of_json filenames) i, mod_i m)
+        (JsonUtil.to_list (string_option_annot_of_json filenames) i, mod_i m)
       | _-> raise (Yojson.Basic.Util.Type_error ("Not internal states",i)) in
     let port_lnk,port_lnk_mod =
       match l with
@@ -801,7 +811,9 @@ let modif_of_json filenames f_mix f_var = function
 let merge_internals =
   List.fold_left
     (fun acc (x,_ as y) ->
-       if List.exists (fun (x',_) -> String.compare x x' = 0) acc
+       if List.exists
+           (fun (x',_) ->
+              Option_util.equal (fun x x' -> String.compare x x' = 0) x x') acc
        then acc else y::acc)
 
 let rec merge_sites_counter c = function
@@ -908,7 +920,7 @@ let split_mixture m =
                              port_int =
                                (match p.port_int_mod with
                                 | None -> p.port_int
-                                | Some x -> [x]);
+                                | Some (x,pos) -> [Some x,pos]);
                              port_int_mod = None;
                              port_lnk =
                                (match p.port_lnk_mod with

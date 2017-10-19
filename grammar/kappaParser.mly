@@ -510,7 +510,7 @@ port_expression:
 
 internal_state:
   /*empty*/ {[]}
-    | KAPPA_MRK internal_state {($1,rhs_pos 1)::$2}
+    | KAPPA_MRK internal_state {(Some $1,rhs_pos 1)::$2}
     | error
        {raise (ExceptionDefn.Syntax_Error
        (add_pos "Issue after internal state"))}

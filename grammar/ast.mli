@@ -19,7 +19,7 @@ type ('a,'annot) link =
   | LNK_SOME
   | LNK_TYPE of 'a * 'a (** port * agent_type *)
 
-type internal = string Locality.annot list
+type internal = string option Locality.annot list
 
 type port = {
   port_nme:string Locality.annot;

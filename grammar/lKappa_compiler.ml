@@ -74,10 +74,11 @@ let annotate_dropped_agent
          let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
 
          let () = match p.Ast.port_int with
-           | [] -> ()
-           | [ va ] ->
+           | [] | [ None , _ ] -> ()
+           | [ Some va,pos ] ->
              internals.(p_id) <-
-               LKappa.I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
+               LKappa.I_VAL_ERASED
+                 (Signature.num_of_internal_state p_id (va,pos) sign)
            | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
          match p.Ast.port_lnk with
          | [Ast.LNK_ANY, pos] ->
@@ -150,10 +151,10 @@ let annotate_created_agent
          let () = LKappa.forbid_modification p_pos p.Ast.port_lnk_mod in
          let () = LKappa.forbid_modification p_pos p.Ast.port_int_mod in
          let () = match p.Ast.port_int with
-           | [] -> ()
-           | [ va ] ->
+           | [] | [ None, _ ] -> ()
+           | [ Some va, pos ] ->
              internals.(p_id) <-
-               Some (Signature.num_of_internal_state p_id va sign)
+               Some (Signature.num_of_internal_state p_id (va,pos) sign)
            | _ :: (_, pos) :: _ -> LKappa.several_internal_states pos in
          match p.Ast.port_lnk with
          | ([Ast.LNK_ANY, _] | [Ast.LNK_SOME, _] |
@@ -254,25 +255,33 @@ let annotate_edit_agent
                  ("Several link state for a single site",pos)) in
     let () =
       match p.Ast.port_int,p.Ast.port_int_mod with
-      | [], None -> ()
-      | [ va ], Some va' ->
+      | ([None,_] | []), None -> ()
+      | [ Some va, pos ], Some va' ->
         internals.(p_id) <-
-          LKappa.I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
-                         Signature.num_of_internal_state p_id va' sign)
+          LKappa.I_VAL_CHANGED
+            (Signature.num_of_internal_state p_id (va,pos) sign,
+             Signature.num_of_internal_state p_id va' sign)
       | [], Some (_,pos as va) ->
         let () =
-          ExceptionDefn.warning
-            ~pos
-            (fun f ->
+          if syntax_version = Ast.V3 then
+            ExceptionDefn.warning
+              ~pos
+              (fun f ->
                Format.fprintf
                  f
                  "internal state of site '%s' of agent '%s' is modified \
                   although it is left unpecified in the left hand side"
-                 p_na agent_name) in
+                 p_na agent_name)
+          else
+            raise (ExceptionDefn.Malformed_Decl
+                     ("Modified internal state must appear on the left",pos)) in
         internals.(p_id) <-
           LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
-      | [ va ], None ->
-        let i_id = Signature.num_of_internal_state p_id va sign in
+      | [None,_], Some va ->
+        internals.(p_id) <-
+          LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
+      | [ Some va, pos ], None ->
+        let i_id = Signature.num_of_internal_state p_id (va,pos) sign in
         internals.(p_id) <- LKappa.I_VAL_CHANGED (i_id,i_id)
       | _ :: (_,pos) :: _, _ -> LKappa.several_internal_states pos in
     (links_annot',pset') in
@@ -356,7 +365,8 @@ let annotate_agent_with_diff
              Format.fprintf
                f "breaking a semi-link on site '%s' will induce a side effect"
                na) in
-      let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), LKappa.Linked (i,pos')) in
+      let () = ports.(p_id) <-
+          ((Ast.LNK_SOME,pos_lnk), LKappa.Linked (i,pos')) in
       let _,rhs_links' =
         build_link sigs ?contact_map pos' i ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
@@ -375,8 +385,8 @@ let annotate_agent_with_diff
         build_link sigs ?contact_map pos' i ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | ([(Ast.LNK_FREE|Ast.ANY_FREE),_] | []), [Ast.LNK_VALUE (i,()),pos] ->
-      let () =
-        ports.(p_id) <- (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked (i,pos)) in
+      let () = ports.(p_id) <-
+          (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked (i,pos)) in
       let _,rhs_links' =
         build_link sigs ?contact_map pos i ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
@@ -393,14 +403,16 @@ let annotate_agent_with_diff
       raise (ExceptionDefn.Malformed_Decl
                ("Several link state for a single site",pos)) in
   let register_internal_modif p_id int1 p' =
-    let () = LKappa.forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_int_mod in
+    let () =
+      LKappa.forbid_modification (snd p'.Ast.port_nme) p'.Ast.port_int_mod in
     match int1,p'.Ast.port_int with
-    | [], [] -> ()
-    | [ va ], [ va' ] ->
+    | ([None,_] | []), ([None,_] | []) -> ()
+    | [ Some va, pos ], [ Some va', pos' ] ->
       internals.(p_id) <-
-        LKappa.I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
-                       Signature.num_of_internal_state p_id va' sign)
-    | [], [ va ] ->
+        LKappa.I_VAL_CHANGED
+          (Signature.num_of_internal_state p_id (va,pos) sign,
+           Signature.num_of_internal_state p_id (va',pos') sign)
+    | [], [ Some va, vapos ] ->
       let (na,pos) = p'.Ast.port_nme in
       let () =
         ExceptionDefn.warning
@@ -412,8 +424,13 @@ let annotate_agent_with_diff
 although it is left unpecified in the left hand side"
                na agent_name) in
       internals.(p_id) <-
-        LKappa.I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
-    | [ _ ], [] ->
+        LKappa.I_ANY_CHANGED
+          (Signature.num_of_internal_state p_id (va,vapos) sign)
+    | [None,_], [ Some va, vapos ] ->
+      internals.(p_id) <-
+        LKappa.I_ANY_CHANGED
+          (Signature.num_of_internal_state p_id (va,vapos) sign)
+    | [ _ ], ([None,_] | []) ->
       let (na,pos) = p'.Ast.port_nme in
       raise (ExceptionDefn.Malformed_Decl
                ("The internal state of port '"^na^
@@ -946,41 +963,48 @@ let assemble_rule ~syntax_version ~r_editStyle
 let create_t sites incr_info =
   let (aux,counters) =
     List.fold_right
-    (fun site (acc,counts) ->
-      match site with
-      | Ast.Port p ->
-         (p.Ast.port_nme,
-          (NamedDecls.create
-             (Tools.array_map_of_list (fun x -> (x,())) p.Ast.port_int),
-           List.fold_left
-             (fun acc' -> function
-               | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc'
-               | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
-                  raise
-                    (ExceptionDefn.Malformed_Decl
-                       ("Forbidden link status inside a definition of signature",
-                        pos))
-               | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc')
-             [] p.Ast.port_lnk,
-           None))::acc,counts
-      | Ast.Counter c ->
-         match c.Ast.count_test with
-         | None ->
-            let (n,pos) = c.Ast.count_nme in
-            raise (ExceptionDefn.Internal_Error
-                     ("Counter "^n^" should have a test by now",pos))
-         | Some (test,pos) ->
-            match test with
-            | Ast.CGTE _ | Ast.CVAR _ ->
+      (fun site (acc,counts) ->
+         match site with
+         | Ast.Port p ->
+           (p.Ast.port_nme,
+            (NamedDecls.create
+               (Tools.array_map_of_list
+                  (function
+                    | Some x,pos -> ((x,pos),())
+                    | None, pos ->
+                      raise
+                        (ExceptionDefn.Malformed_Decl
+                           ("Forbidden internal state inside signature definition",pos))
+                  ) p.Ast.port_int),
+             List.fold_left
+               (fun acc' -> function
+                  | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc'
+                  | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
+                    raise
+                      (ExceptionDefn.Malformed_Decl
+                         ("Forbidden link status inside signature definition",
+                          pos))
+                  | Ast.LNK_TYPE (a,b), _ -> (a,b) :: acc')
+               [] p.Ast.port_lnk,
+             None))::acc,counts
+         | Ast.Counter c ->
+           match c.Ast.count_test with
+           | None ->
+             let (n,pos) = c.Ast.count_nme in
+             raise (ExceptionDefn.Internal_Error
+                      ("Counter "^n^" should have a test by now",pos))
+           | Some (test,pos) ->
+             match test with
+             | Ast.CGTE _ | Ast.CVAR _ ->
                raise (ExceptionDefn.Internal_Error
                         ("Counter should not have a var by now",pos))
-            | Ast.CEQ j ->
+             | Ast.CEQ j ->
                (c.Ast.count_nme,
                 (NamedDecls.create [||],
                  [incr_info],
                  Some (j,(fst c.Ast.count_delta))))::acc,
-          c.Ast.count_nme::counts)
-    sites ([],[]) in
+               c.Ast.count_nme::counts)
+      sites ([],[]) in
   NamedDecls.create (Array.of_list aux),counters
 
 let create_sig l =
