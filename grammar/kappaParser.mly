@@ -121,15 +121,10 @@ instruction:
     ;
 
 init_declaration:
-    | alg_expr ID OP_PAR interface_expression CL_PAR
-    { (None,$1,(Ast.INIT_MIX [($2,rhs_pos 2), $4, None],
-        Locality.of_pos (Parsing.rhs_start_pos 2) (Parsing.rhs_end_pos 5))) }
-    | alg_expr ID OP_PAR interface_expression CL_PAR COMMA mixture
-    { (None,$1,(Ast.INIT_MIX ((($2,rhs_pos 2), $4, None) :: $7),
-          Locality.of_pos (Parsing.rhs_start_pos 2) (Parsing.rhs_end_pos 7))) }
-    | alg_expr OP_PAR ID OP_PAR interface_expression CL_PAR COMMA mixture CL_PAR
-    { (None,$1,(Ast.INIT_MIX ((($3,rhs_pos 3), $5, None) :: $8),
-          Locality.of_pos (Parsing.rhs_start_pos 3) (Parsing.rhs_end_pos 8))) }
+    | alg_expr non_empty_mixture
+    { (None,$1,(Ast.INIT_MIX $2,rhs_pos 2)) }
+    | alg_expr OP_PAR non_empty_mixture CL_PAR
+    { (None,$1,(Ast.INIT_MIX $3, rhs_pos 3)) }
     | ID LAR alg_expr {(None,$3,(Ast.INIT_TOK $1,rhs_pos 1))}
     | alg_expr ID {(None,$1,(Ast.INIT_TOK $2,rhs_pos 2))}
     | ID OP_CUR init_declaration CL_CUR
@@ -215,7 +210,7 @@ effect:
 						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
     | TRACK LABEL boolean
 	    {Ast.CFLOWLABEL ($3,($2,rhs_pos 2))}
-    | TRACK non_empty_mixture boolean
+    | TRACK pattern boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX nonempty_print_expr boolean
 	   {if $3 then Ast.FLUX (Primitives.RELATIVE,$2) else Ast.FLUXOFF $2}
@@ -315,21 +310,32 @@ sum_token:
     | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
-rule_expression:
-  | mixture token_expr arrow mixture token_expr birate
-    { let (k_def,k_un,k_op,k_op_un) = $6 in
-      add_pos {
-        Ast.rewrite = Ast.Arrow
-	  {Ast.lhs=$1; Ast.rm_token = $2;Ast.rhs=$4; Ast.add_token = $5};
-	Ast.bidirectional=$3;Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
-      } }
-  | mixture token_expr AT rate
-    { let (k_def,k_un) = $4 in
-      add_pos {
-        Ast.rewrite = Ast.Edit {Ast.mix = $1; Ast.delta_token = $2};
-	Ast.bidirectional=false;
-        Ast.k_def; Ast.k_un; Ast.k_op=None; Ast.k_op_un=None;
-      } };
+rule_content:
+  | pattern token_expr arrow pattern token_expr
+    {Ast.Arrow {Ast.lhs=$1; Ast.rm_token = $2; Ast.rhs=$4; Ast.add_token = $5},
+     $3}
+  | pattern token_expr arrow token_expr
+    {Ast.Arrow {Ast.lhs=$1; Ast.rm_token = $2; Ast.rhs=[]; Ast.add_token = $4},
+     $3}
+  | token_expr arrow pattern token_expr
+    {Ast.Arrow {Ast.lhs=[]; Ast.rm_token = $1; Ast.rhs=$3; Ast.add_token = $4},
+     $2}
+  | token_expr arrow token_expr
+    {Ast.Arrow {Ast.lhs=[]; Ast.rm_token = $1; Ast.rhs=[]; Ast.add_token = $3},
+     $2}
+  | pattern token_expr
+    { Ast.Edit {Ast.mix = $1; Ast.delta_token = $2},false };
+  | PIPE sum_token
+    { Ast.Edit {Ast.mix = []; Ast.delta_token = $2},false };
+
+ rule_expression:
+  | rule_content birate
+    { let (k_def,k_un,k_op,k_op_un) = $2 in
+      let rewrite,bidirectional = $1 in
+       add_pos {
+         Ast.rewrite;Ast.bidirectional;
+         Ast.k_def; Ast.k_un; Ast.k_op; Ast.k_op_un;
+       } };
 
 arrow:
     | KAPPA_RAR {false}
@@ -394,7 +400,7 @@ birate:
     | AT rate COMMA rate {let (k2,k1) = $2 in
 			  let (kback,kback1) = $4 in
 			  (k2,k1,Some kback,kback1)}
-    | {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
+    | error {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
     ;
 
 rate:
@@ -421,17 +427,16 @@ alg_with_radius:
     | alg_expr TYPE alg_expr {($1, Some $3)}
     ;
 
-mixture:
-      /*empty*/ {[]}
-    | OP_PAR mixture CL_PAR {$2}
-    | agent_expression COMMA mixture {$1 :: $3}
+pattern:
+    | OP_PAR pattern CL_PAR {$2}
+    | agent_expression COMMA pattern {$1 :: $3}
     | agent_expression {[$1]}
 ;
 
 non_empty_mixture:
     | ID OP_PAR interface_expression CL_PAR
     { [($1,rhs_pos 1), $3, None] }
-    | ID OP_PAR interface_expression CL_PAR COMMA mixture
+    | ID OP_PAR interface_expression CL_PAR COMMA pattern
     { (($1,rhs_pos 1), $3, None) :: $6}
     ;
 
