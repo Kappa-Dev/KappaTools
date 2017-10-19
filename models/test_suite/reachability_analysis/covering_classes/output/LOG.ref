@@ -863,10 +863,10 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(7):'r7' C(x!_)->[0-
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
 Reachability analysis...
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-21:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 4-21:):
 		the precondition is satisfied
 
-		rule r0 (File "covering_classes.ka", line 1, characters 5-21:) is applied for the first time
+		rule r0 (File "covering_classes.ka", line 1, characters 4-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -926,10 +926,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,x!free)
 
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-21:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 4-21:):
 		the precondition is satisfied
 
-		rule r1 (File "covering_classes.ka", line 2, characters 5-21:) is applied for the first time
+		rule r1 (File "covering_classes.ka", line 2, characters 4-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -989,10 +989,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u,x!free)
 
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-21:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 4-21:):
 		the precondition is satisfied
 
-		rule r2 (File "covering_classes.ka", line 3, characters 5-21:) is applied for the first time
+		rule r2 (File "covering_classes.ka", line 3, characters 4-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -1206,13 +1206,13 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule r12 (File "covering_classes.ka", line 13, characters 5-18:):
 		the precondition is not satisfied yet
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-21:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 4-21:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-21:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 4-21:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-21:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r3 (File "covering_classes.ka", line 4, characters 4-19:):
@@ -1434,7 +1434,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(y~,y!)
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-21:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r7 (File "covering_classes.ka", line 8, characters 4-17:):
@@ -1647,10 +1647,10 @@ EXTENSIONAL DESCRIPTION:
 		C(y~p,y!free)
 
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-21:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 4-21:):
 		the precondition is satisfied
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-21:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r5 (File "covering_classes.ka", line 6, characters 4-52:):
@@ -1709,7 +1709,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(y~,y!)
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-21:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r7 (File "covering_classes.ka", line 8, characters 4-17:):
@@ -1787,7 +1787,7 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for C(x~,x!)
 
-	Applying rule r0 (File "covering_classes.ka", line 1, characters 5-21:):
+	Applying rule r0 (File "covering_classes.ka", line 1, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r4 (File "covering_classes.ka", line 5, characters 4-38:):
@@ -1797,10 +1797,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x~,x!)
 
-	Applying rule r1 (File "covering_classes.ka", line 2, characters 5-21:):
+	Applying rule r1 (File "covering_classes.ka", line 2, characters 4-21:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "covering_classes.ka", line 3, characters 5-21:):
+	Applying rule r2 (File "covering_classes.ka", line 3, characters 4-21:):
 		the precondition is satisfied
 
 	Applying rule r6 (File "covering_classes.ka", line 7, characters 4-46:):

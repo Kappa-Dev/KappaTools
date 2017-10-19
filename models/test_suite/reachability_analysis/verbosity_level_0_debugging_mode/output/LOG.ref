@@ -309,10 +309,10 @@ Influence_map:Inhibition_map:rule(4):'' A(x~u)->A(x~q) -> rule(1):'' A(x~u)->A(x
 Influence_map:Inhibition_map:rule(7):'KO' A(x~0,y~q)->A(x~1,y~0) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
 Reachability analysis...
 
-	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:):
+	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
-		rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:) is applied for the first time
+		rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -626,7 +626,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule KO (File "../verbosity.ka", line 8, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:):
+	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
 	Applying rule A(x~u) -> A(x~p) (File "../verbosity.ka", line 2, characters 0-17:):

@@ -5,12 +5,12 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-			(rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:)) should be investigated
+			(rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:)) should be investigated
 
-	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:):
+	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
-		rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:) is applied for the first time
+		rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:) is applied for the first time
 				(rule KO (File "../verbosity.ka", line 8, characters 4-32:)) should be investigated 
 				(rule A(y~q,z~u) -> A(y~q,z~q) (File "../verbosity.ka", line 7, characters 0-27:)) should be investigated 
 				(rule A(x~q,y~u) -> A(x~q,y~q) (File "../verbosity.ka", line 6, characters 0-25:)) should be investigated 
@@ -30,7 +30,7 @@ Reachability analysis...
 			(rule A(x~q,y~u) -> A(x~q,y~q) (File "../verbosity.ka", line 6, characters 0-25:)) should be investigated
 			(rule A(y~q,z~u) -> A(y~q,z~q) (File "../verbosity.ka", line 7, characters 0-27:)) should be investigated
 			(rule KO (File "../verbosity.ka", line 8, characters 4-32:)) should be investigated
-			(rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:)) should be investigated
+			(rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:)) should be investigated
 
 	Applying rule A(x~u) -> A(x~p) (File "../verbosity.ka", line 2, characters 0-17:):
 		the precondition is satisfied
@@ -101,7 +101,7 @@ Reachability analysis...
 	Applying rule KO (File "../verbosity.ka", line 8, characters 4-32:):
 		the precondition is not satisfied yet
 
-	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 1-21:):
+	Applying rule  -> A(x~u,y~u,z~u) (File "../verbosity.ka", line 1, characters 0-21:):
 		the precondition is satisfied
 
 	Applying rule A(x~u) -> A(x~p) (File "../verbosity.ka", line 2, characters 0-17:):

@@ -178,10 +178,10 @@ Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
 Reachability analysis...
 
-	Applying rule  -> A() (File "empty_agents.ka", line 1, characters 4-13:):
+	Applying rule  -> A() (File "empty_agents.ka", line 1, characters 0-13:):
 		the precondition is satisfied
 
-		rule  -> A() (File "empty_agents.ka", line 1, characters 4-13:) is applied for the first time
+		rule  -> A() (File "empty_agents.ka", line 1, characters 0-13:) is applied for the first time
 
 	Applying rule A() -> B() (File "empty_agents.ka", line 2, characters 0-13:):
 		the precondition is satisfied
