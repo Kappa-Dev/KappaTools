@@ -5,9 +5,9 @@
 %def: "plotPeriod" "1" "t.u."
 %def: "outputFileName" "data.csv"
 
-%agent: __incr(a!b.__incr, b!a.__incr!c.A!d.A!c.B)
-%agent: A(x~u~p!x.B, c!b.__incr, d!b.__incr)
-%agent: B(x!x.A, c!b.__incr)
+
+%agent: A(x~u~p!x.B, c:0 += 3, d:1 += 2)
+%agent: B(x!x.A, c:0 += 3)
 
 %var:/*0*/ 'A1' |A(x~u!., c:1)|
 %plot: [T]

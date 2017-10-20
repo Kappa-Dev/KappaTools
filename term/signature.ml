@@ -191,6 +191,10 @@ let print_site_internal_state sigs ag_ty site f = function
   | Some id ->
     Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
+let print_counter sigs ag_ty f id =
+  match (counter_of_site id (get sigs ag_ty)) with
+    None -> ()
+  | Some (c1,c2) -> Format.fprintf f ":%d += %d" c1 c2
 
 let print_one ?sigs i f sign =
   let pp_int =
@@ -235,3 +239,8 @@ let is_counter n_id sigs = match sigs with
   | Some s ->
      let ag_name = agent_of_num n_id s in
      (String.compare ag_name "__incr") = 0
+
+let site_is_counter sigs ag_ty id =
+  match (counter_of_site id (get sigs ag_ty)) with
+    None -> false
+  | Some _ -> true
