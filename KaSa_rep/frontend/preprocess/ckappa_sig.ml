@@ -375,17 +375,6 @@ module AgentSite_map_and_set =
          let print = Pp.pair Format.pp_print_int Format.pp_print_int
        end))
 
-(*working in process*)
-module AgentSite2_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = ((c_agent_name * c_site_name) * (int * int))
-         let compare = compare
-         let print f ((a,b),(c,d)) =
-           Format.fprintf f "%i, %i, %i, %i" a b c d
-       end))
-
 module Agents_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
