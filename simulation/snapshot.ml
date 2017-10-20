@@ -89,10 +89,6 @@ let increment_in_snapshot sigs x s =
     else h::aux_increment t in
   Mods.IntMap.add hs (aux_increment l) s
 
-let is_counter n_id sigs =
-  let ag_name = Signature.agent_of_num n_id sigs in
-  (String.compare ag_name "__incr") = 0
-
 let rec counter_value cc (nid,sid) count =
   let ag = cc.(nid) in
   Tools.array_fold_lefti
@@ -108,7 +104,7 @@ let cc_to_user_cc sigs cc =
   let (cc_list,indexes,_) =
     Tools.array_fold_lefti
          (fun i (acc,indexes,pos) ag ->
-           if not(is_counter ag.node_type sigs)
+           if not(Signature.is_counter ag.node_type (Some sigs))
            then
              let indexes' =
                if i = pos then indexes else
@@ -149,7 +145,7 @@ let cc_to_user_cc sigs cc =
                       let dn_id' =
                         try Renaming.apply indexes dn_id with
                           Renaming.Undefined | Invalid_argument _ -> dn_id in
-                      if not(is_counter (cc.(dn_id)).node_type sigs) then
+                      if not(Signature.is_counter (cc.(dn_id)).node_type (Some sigs)) then
                         User_graph.Port
                           {User_graph.port_links = [(dn_id',s)]; User_graph.port_states}
                       else User_graph.Counter (counter_value cc (dn_id,s) 0)

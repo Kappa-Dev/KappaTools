@@ -18,7 +18,7 @@ A(s1~p/~u!., c!1/!2), -__incr(a!2, b!1), __incr(a!3, b!2/!2), __incr(a!., b!3) @
 A(s2~p/~u!., c!1/!2), -__incr(a!2, b!1), __incr(a!., b!2/!2) @ (2 * (5 ^ 1))
 A(s2~p/~u!., c!1/!2), -__incr(a!2, b!1), __incr(a!3, b!2/!2), __incr(a!., b!3) @ (2 * (5 ^ 2))
 
-/*0*/%mod: (|A(c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(b!4)| = 1) do $PRINTF  <"
+/*0*/%mod: (|A(c:3)| = 1) do $PRINTF  <"
 Counter c of agent A reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
 

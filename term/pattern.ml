@@ -400,6 +400,18 @@ let intersection renaming cc1 cc2 =
   { nodes_by_type; nodes;
     recogn_nav = raw_to_navigation false nodes_by_type nodes; }
 
+let rec counter_value nodes (nid,sid) count =
+  match Mods.IntMap.find_option nid nodes with
+  | None -> count
+  | Some ag ->
+     Tools.array_fold_lefti
+       (fun id acc (el,_) ->
+         if (id = sid) then acc
+         else
+           match el with
+           | UnSpec | Free -> acc
+           | Link (dn,di) -> counter_value nodes (dn,di) (acc+1)) count ag
+
 let dotcomma dotnet =
   if dotnet
   then (fun fmt -> Format.fprintf fmt ",")
@@ -435,6 +447,12 @@ let print_cc
               let () = if new_syntax then Format.fprintf f "!." in
               (true,out)
             | Link (dst_a,dst_p) ->
+              let dst_ty = find_ty cc dst_a in
+              if (Signature.is_counter dst_ty sigs) then
+                let counter = counter_value cc.nodes (dst_a,dst_p) 0 in
+                let () = Format.fprintf f ":%d" counter in
+                true,out
+              else
               let i,out' =
                 match
                   Mods.Int2Map.find_option (dst_a,dst_p) link_ids
@@ -455,6 +473,7 @@ let print_cc
     Mods.IntMap.fold
       (fun x el (not_empty,link_ids) ->
          let ag_x = (x,find_ty cc x) in
+         if not(Signature.is_counter (snd ag_x) sigs) then
          let () =
            Format.fprintf
              f "%t@[<h>%a("
@@ -469,7 +488,8 @@ let print_cc
              (Agent.print ?sigs ~with_id) ag_x in
          let out = print_intf ag_x link_ids el in
          let () = Format.fprintf f ")@]" in
-         true, out)
+         true, out
+         else not_empty,link_ids)
       cc.nodes (false, (1, Mods.Int2Map.empty))
   in
   ()

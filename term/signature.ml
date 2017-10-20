@@ -229,3 +229,9 @@ let print f sigs =
 
 let to_json = NamedDecls.to_json one_to_json
 let of_json = NamedDecls.of_json one_of_json
+
+let is_counter n_id sigs = match sigs with
+  | None -> false
+  | Some s ->
+     let ag_name = agent_of_num n_id s in
+     (String.compare ag_name "__incr") = 0
