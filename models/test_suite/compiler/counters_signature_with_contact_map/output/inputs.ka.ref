@@ -13,13 +13,13 @@
 'r1' B(x!./!1), A(x!./!1) @ 1
 'r2' B(x!1/!., c!4/!5), A(x!1/!., c!2/!3), __incr(b!4/!4), __incr(b!2/!2), +__incr(a!4, b!5), +__incr(a!2, b!3) @ 1
 
-/*0*/%mod: (|B(c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(a!5, b!4), __incr(b!5)| = 1) do $PRINTF  <"
+/*0*/%mod: (|B(c:4)| = 1) do $PRINTF  <"
 Counter c of agent B reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
-/*1*/%mod: (|A(d!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(b!4)| = 1) do $PRINTF  <"
+/*1*/%mod: (|A(d:3)| = 1) do $PRINTF  <"
 Counter d of agent A reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
-/*2*/%mod: (|A(c!1), __incr(a!2, b!1), __incr(a!3, b!2), __incr(a!4, b!3), __incr(a!5, b!4), __incr(b!5)| = 1) do $PRINTF  <"
+/*2*/%mod: (|A(c:4)| = 1) do $PRINTF  <"
 Counter c of agent A reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
 

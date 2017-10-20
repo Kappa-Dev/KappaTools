@@ -73,3 +73,5 @@ prints both the site and its internal state if it is not [None]. *)
 val print : Format.formatter -> s -> unit
 val to_json : s -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> s
+
+val is_counter : int -> s option -> bool
