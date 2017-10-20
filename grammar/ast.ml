@@ -46,7 +46,9 @@ type site =
 
 type agent_mod = Erase | Create
 
-type agent = (string Locality.annot * site list * agent_mod option)
+type agent =
+  | Present of string Locality.annot * site list * agent_mod option
+  | Absent of Locality.t
 
 type mixture = agent list
 
@@ -396,11 +398,13 @@ let print_agent_mod f = function
   | Create -> Format.pp_print_string f "+"
   | Erase -> Format.pp_print_string f "-"
 
-let print_ast_agent f ((ag_na,_),l,m) =
-  Format.fprintf f "%a%s(%a)"
-    (Pp.option ~with_space:false print_agent_mod) m ag_na
-    (Pp.list (fun f -> Format.fprintf f ",")
-       print_ast_site) l
+let print_ast_agent f = function
+  | Absent _ -> Format.pp_print_string f "."
+  | Present ((ag_na,_),l,m) ->
+    Format.fprintf f "%a%s(%a)"
+      (Pp.option ~with_space:false print_agent_mod) m ag_na
+      (Pp.list (fun f -> Format.fprintf f ",")
+         print_ast_site) l
 
 let agent_mod_to_yojson = function
   | Create -> `String "created"
@@ -412,21 +416,25 @@ let agent_mod_of_yojson = function
   | x ->
     raise (Yojson.Basic.Util.Type_error ("Incorrect agent modification",x))
 
-let agent_to_json filenames (na,l,m) =
-  `Assoc [ "name", Locality.annot_to_yojson ~filenames JsonUtil.of_string na;
-           "sig", JsonUtil.of_list (site_to_json filenames) l;
-           "mod", (JsonUtil.of_option agent_mod_to_yojson) m]
+let agent_to_json filenames = function
+  | Absent _ -> `Null
+  | Present (na,l,m) ->
+    `Assoc [ "name", Locality.annot_to_yojson ~filenames JsonUtil.of_string na;
+             "sig", JsonUtil.of_list (site_to_json filenames) l;
+             "mod", (JsonUtil.of_option agent_mod_to_yojson) m]
 
 let agent_of_json filenames = function
+  | `Null -> Absent Locality.dummy
   | `Assoc [ "name", n; "sig", s; "mod", m ]
   | `Assoc [ "sig", s; "name", n; "mod", m ]
   | `Assoc [ "name", n; "mod", m; "sig", s ]
   | `Assoc [ "sig", s; "mod", m; "name", n ]
   | `Assoc [ "mod", m; "name", n; "sig", s ]
   | `Assoc [ "mod", m; "sig", s; "name", n ] ->
-    (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
-     JsonUtil.to_list (site_of_json filenames) s,
-     (JsonUtil.to_option agent_mod_of_yojson) m)
+    Present
+      (Locality.annot_of_yojson ~filenames (JsonUtil.to_string ?error_msg:None) n,
+       JsonUtil.to_list (site_of_json filenames) s,
+       (JsonUtil.to_option agent_mod_of_yojson) m)
   | x -> raise (Yojson.Basic.Util.Type_error ("Not an AST agent",x))
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
@@ -814,16 +822,19 @@ let merge_sites =
 
 let merge_agents =
   List.fold_left
-    (fun acc ((na,_ as x),s,_) ->
-       let rec aux = function
-         | [] -> [x,List.map
-                    (function
-                      | Port p -> Port {p with port_lnk = []}
-                      | Counter _ as x -> x) s,None]
-         | ((na',_),s',_) :: t when String.compare na na' = 0 ->
-           (x,merge_sites s' s,None)::t
-         | h :: t -> h :: aux t in
-       aux acc)
+    (fun acc -> function
+       | Absent _ -> acc
+       | Present ((na,_ as x),s,_) ->
+         let rec aux = function
+           | [] -> [Present
+                      (x,List.map
+                         (function
+                           | Port p -> Port {p with port_lnk = []}
+                           | Counter _ as x -> x) s,None)]
+           | Present ((na',_),s',_) :: t when String.compare na na' = 0 ->
+             Present (x,merge_sites s' s,None)::t
+           | (Present _ | Absent _ as h) :: t -> h :: aux t in
+         aux acc)
 
 let merge_tokens =
   List.fold_left
@@ -876,35 +887,38 @@ let implicit_signature r =
 
 let split_mixture m =
     List.fold_right
-      (fun  (na,intf,modif) (lhs,rhs,add,del) ->
-         match modif with
-         | Some Erase -> (lhs,rhs,add,(na,intf,None)::del)
-         | Some Create -> (lhs,rhs,(na,intf,None)::add,del)
-         | None ->
-           let (intfl,intfr) =
-             List.fold_left
-               (fun (l,r) -> function
-                  | Port p ->
-                    (Port {port_nme = p.port_nme;
-                           port_int = p.port_int;
-                           port_int_mod = None;
-                           port_lnk = p.port_lnk;
-                           port_lnk_mod=None}::l,
-                     Port {port_nme = p.port_nme;
-                           port_int =
-                             (match p.port_int_mod with
-                              | None -> p.port_int
-                              | Some x -> [x]);
-                           port_int_mod = None;
-                           port_lnk =
-                             (match p.port_lnk_mod with
-                              | None -> p.port_lnk
-                              | Some None -> [Locality.dummy_annot LNK_FREE]
-                              | Some (Some (i,pos)) -> [LNK_VALUE (i,()),pos]);
-                           port_lnk_mod=None}::r)
-                  | Counter _ -> (l,r)
-               ) ([],[]) intf in
-           ((na,intfl,None)::lhs,(na,intfr,None)::rhs,add,del)
+      (fun ag (lhs,rhs,add,del as pack) ->
+         match ag with
+         | Absent _ -> pack
+         | Present (na,intf,modif) ->
+           match modif with
+           | Some Erase -> (lhs,rhs,add,Present (na,intf,None)::del)
+           | Some Create -> (lhs,rhs,Present (na,intf,None)::add,del)
+           | None ->
+             let (intfl,intfr) =
+               List.fold_left
+                 (fun (l,r) -> function
+                    | Port p ->
+                      (Port {port_nme = p.port_nme;
+                             port_int = p.port_int;
+                             port_int_mod = None;
+                             port_lnk = p.port_lnk;
+                             port_lnk_mod=None}::l,
+                       Port {port_nme = p.port_nme;
+                             port_int =
+                               (match p.port_int_mod with
+                                | None -> p.port_int
+                                | Some x -> [x]);
+                             port_int_mod = None;
+                             port_lnk =
+                               (match p.port_lnk_mod with
+                                | None -> p.port_lnk
+                                | Some None -> [Locality.dummy_annot LNK_FREE]
+                                | Some (Some (i,pos))-> [LNK_VALUE (i,()),pos]);
+                             port_lnk_mod=None}::r)
+                    | Counter _ -> (l,r)
+                 ) ([],[]) intf in
+             (Present (na,intfl,None)::lhs,Present (na,intfr,None)::rhs,add,del)
       ) m ([],[],[],[])
 
 let compil_to_json c =

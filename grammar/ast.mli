@@ -43,7 +43,9 @@ type site =
 
 type agent_mod = Erase | Create
 
-type agent = (string Locality.annot * site list * agent_mod option)
+type agent =
+  | Present of string Locality.annot * site list * agent_mod option
+  | Absent of Locality.t
 
 type mixture = agent list
 

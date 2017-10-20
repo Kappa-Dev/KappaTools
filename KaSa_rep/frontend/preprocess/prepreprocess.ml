@@ -174,8 +174,11 @@ let rec scan_interface parameters k agent interface ((error,a),set as remanent)=
           | [] | ((Ast.LNK_ANY | Ast.LNK_FREE | Ast.LNK_TYPE _ | Ast.LNK_SOME
                   | Ast.ANY_FREE | Ast.LNK_VALUE (_,())),_) :: _ -> remanent),set)
 
-let scan_agent parameters k ((name,_),intf,_modif) remanent =
-  fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
+let scan_agent parameters k ag remanent =
+  match ag with
+  | Ast.Absent _ -> remanent
+  | Ast.Present ((name,_),intf,_modif) ->
+    fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
 
 let rec collect_binding_label
     parameters mixture f (k:Ckappa_sig.c_agent_id) remanent =
@@ -316,16 +319,25 @@ let rec translate_interface parameters is_signature int_set interface remanent =
 let translate_interface parameters is_signature =
   translate_interface parameters is_signature Mods.StringSet.empty
 
-let translate_agent parameters is_signature
-    ((ag_nme,ag_nme_pos),intf,_modif) remanent =
-  let interface,remanent =
-    translate_interface parameters is_signature intf remanent in
-  {Ckappa_sig.ag_nme;
-   Ckappa_sig.ag_intf = interface ;
-   Ckappa_sig.ag_nme_pos;
-   (*     Ckappa_sig.ag_pos = position ;*)
-  },
-  remanent
+let translate_agent parameters is_signature ag (error, x as remanent) =
+  match ag with
+  | Ast.Absent pos ->
+    {Ckappa_sig.ag_nme= "__dummy";
+     Ckappa_sig.ag_intf = Ckappa_sig.EMPTY_INTF ;
+     Ckappa_sig.ag_nme_pos = pos;
+    },
+    Exception.warn parameters error __POS__
+      ~message:"An \"absent\" agent occurs in a mixture" ~pos
+      Exit x
+  | Ast.Present ((ag_nme,ag_nme_pos),intf,_modif) ->
+    let interface,remanent =
+      translate_interface parameters is_signature intf remanent in
+    {Ckappa_sig.ag_nme;
+     Ckappa_sig.ag_intf = interface ;
+     Ckappa_sig.ag_nme_pos;
+     (*     Ckappa_sig.ag_pos = position ;*)
+    },
+    remanent
 
 let rec build_skip k mixture =
   if k = 0
@@ -410,18 +422,20 @@ let rec translate_mixture parameters mixture remanent  =
         let mixture,remanent = translate_mixture parameters mixture remanent in
         Ckappa_sig.PLUS(i,agent,mixture),remanent*)
 
-let support_agent ((name,_),intfs,_) =
-  let list =
-    let rec scan intf list =
-      match intf with
-      | [] -> List.sort compare list
-      | Ast.Port port::intf ->
-        scan intf ((fst port.Ast.port_nme)::list)
-      | Ast.Counter _::intf -> scan intf list
+let support_agent = function
+  | Ast.Absent _ -> None
+  | Ast.Present ((name,_),intfs,_) ->
+    let list =
+      let rec scan intf list =
+        match intf with
+        | [] -> List.sort compare list
+        | Ast.Port port::intf ->
+          scan intf ((fst port.Ast.port_nme)::list)
+        | Ast.Counter _::intf -> scan intf list
+      in
+      scan intfs []
     in
-    scan intfs []
-  in
-  name,list
+    Some (name,list)
 
 let compatible_agent ag1 ag2 =
   support_agent ag1 = support_agent ag2
@@ -701,9 +715,12 @@ let refine_init_t parameters error = function
     let error,(token,_) = refine_token parameters error (token,pos) in
     error,(Ast.INIT_TOK token,pos)
 
-let refine_agent parameters error agent_set ((name,_),_,_ as agent) =
+let refine_agent parameters error agent_set agent =
   let error,agent_set =
-    check_freshness parameters error "Agent" name agent_set in
+    match agent with
+    | Ast.Absent _ -> error,agent_set
+    | Ast.Present ((name,_),_,_) ->
+      check_freshness parameters error "Agent" name agent_set in
   let error, map =
     scan_agent
       parameters

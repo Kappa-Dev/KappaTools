@@ -496,7 +496,13 @@ Is responsible for the check that:
 let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
-    | ((lag_na,lpos as ag_ty),lag_s,lmod)::lt, ((rag_na,rpos),rag_s,rmod)::rt
+    | Ast.Absent pos::_, _
+    | (Ast.Present _ :: _ | []), Ast.Absent pos::_ ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Absent agent are KaSim > 3 syntax",pos))
+    | Ast.Present ((lag_na,lpos as ag_ty),lag_s,lmod)::lt,
+      Ast.Present ((rag_na,rpos),rag_s,rmod)::rt
       when String.compare lag_na rag_na = 0 &&
            Ast.no_more_site_on_right true lag_s rag_s ->
       let () = LKappa.forbid_modification lpos lmod in
@@ -507,29 +513,38 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
         annotate_agent_with_diff
           sigs ?contact_map ag_ty links_annot lag_p rag_p lag_c rag_c in
       aux links_annot' (ra::acc) lt rt
-    | erased, added ->
+    | (Ast.Present _ :: _ | [] as erased), added ->
       let () =
         if added <> [] then
-          List.iter (fun ((lag,pos),lag_p,_) ->
-              if List.exists
-                  (fun ((rag,_),rag_p,_) ->
-                     String.compare lag rag = 0 &&
-                     Ast.no_more_site_on_right false lag_p rag_p) added then
-                ExceptionDefn.warning ~pos
-                  (fun f ->
-                     Format.fprintf
-                       f "Rule induced deletion AND creation of the agent %s"
-                       lag))
+          List.iter (function
+              | Ast.Absent _ -> ()
+              | Ast.Present ((lag,pos),lag_p,_) ->
+                if List.exists
+                    (function
+                      | Ast.Absent _ -> false
+                      | Ast.Present ((rag,_),rag_p,_) ->
+                        String.compare lag rag = 0 &&
+                        Ast.no_more_site_on_right false lag_p rag_p) added then
+                  ExceptionDefn.warning ~pos
+                    (fun f ->
+                       Format.fprintf
+                         f "Rule induced deletion AND creation of the agent %s"
+                         lag))
             erased in
       let syntax_version=Ast.V3 in
       let mix,(lhs_links_one,lhs_links_two) =
         List.fold_left
-          (fun (acc,lannot) ((_,pos as na),sites,modif) ->
-             let () = LKappa.forbid_modification pos modif in
-             let intf,counts = separate_sites sites in
-             let ra,lannot' = annotate_dropped_agent
-                 ~syntax_version sigs lannot na intf counts in
-             (ra::acc,lannot'))
+          (fun (acc,lannot) -> function
+             | Ast.Absent pos ->
+               raise
+                 (ExceptionDefn.Malformed_Decl
+                    ("Absent agent are KaSim > 3 syntax",pos))
+             | Ast.Present ((_,pos as na),sites,modif) ->
+               let () = LKappa.forbid_modification pos modif in
+               let intf,counts = separate_sites sites in
+               let ra,lannot' = annotate_dropped_agent
+                   ~syntax_version sigs lannot na intf counts in
+               (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let () =
         match Mods.IntMap.root lhs_links_one with
@@ -538,7 +553,12 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
       let () = refer_links_annot lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
       let cmix,(rhs_links_one,_) =
         List.fold_left
-          (fun (acc,rannot) ((_,pos as na),sites,modif) ->
+          (fun (acc,rannot) -> function
+             | Ast.Absent pos ->
+               raise
+                 (ExceptionDefn.Malformed_Decl
+                    ("Absent agent are KaSim > 3 syntax",pos))
+             | Ast.Present ((_,pos as na),sites,modif) ->
              let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
@@ -560,7 +580,12 @@ let annotate_lhs_with_diff sigs ?contact_map lhs rhs =
 let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
   let ((lhs_links_one,lhs_links_two),(rhs_links_one,_)),mix,cmix =
     List.fold_left
-      (fun (lannot,acc,news) (ty,sites,modif) ->
+      (fun (lannot,acc,news) -> function
+         | Ast.Absent pos ->
+           raise
+             (ExceptionDefn.Malformed_Decl
+                ("Absent agent cannot occurs in rule in edit notation",pos))
+         | Ast.Present (ty,sites,modif) ->
          let (intf,counts) = separate_sites sites in
          match modif with
          | None ->
@@ -621,7 +646,10 @@ let mixture_of_ast ~syntax_version sigs ?contact_map pos mix =
 
 let raw_mixture_of_ast ~syntax_version sigs ?contact_map mix =
   let created =
-    List.map (fun (ty,sites,_) -> (ty,sites, Some Ast.Create)) mix in
+    List.map (function
+        | Ast.Absent l -> Ast.Absent l
+        | Ast.Present (ty,sites,_) -> Ast.Present (ty,sites,Some Ast.Create))
+      mix in
   let (a,b) =
     annotate_edit_mixture
       ~syntax_version ~is_rule:false sigs ?contact_map created in
@@ -958,7 +986,12 @@ let create_t sites incr_info =
 let create_sig l =
   let (with_counters,with_contact_map) =
     List.fold_left
-      (fun (count,contact) (_,sites,_) ->
+      (fun (count,contact) -> function
+         | Ast.Absent pos ->
+           raise
+             (ExceptionDefn.Malformed_Decl
+                ("Absent agent are forbidden in signature",pos))
+         | Ast.Present (_,sites,_) ->
         List.fold_left
           (fun (count',contact') site ->
             match site with
@@ -978,11 +1011,14 @@ let create_sig l =
   let annot = Locality.dummy in
   let (sigs,counters) =
     List.fold_right
-      (fun (name,sites,_) (acc,counters) ->
-        let (lnks,counters') =
-          create_t sites (("b",annot),("__incr",annot)) in
-        ((name,lnks)::acc,(name,counters')::counters))
-       l ([],[]) in
+      (fun ag (acc,counters) ->
+         match ag with
+         | Ast.Absent _ -> (acc,counters)
+         | Ast.Present (name,sites,_) ->
+           let (lnks,counters') =
+             create_t sites (("b",annot),("__incr",annot)) in
+           ((name,lnks)::acc,(name,counters')::counters))
+      l ([],[]) in
   let sigs' = if with_counters then (Counters_compiler.add_incr counters)::sigs else sigs in
   let t = Array.of_list sigs' in
   Signature.create with_contact_map t

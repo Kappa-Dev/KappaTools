@@ -435,9 +435,9 @@ pattern:
 
 non_empty_mixture:
     | ID OP_PAR interface_expression CL_PAR
-    { [($1,rhs_pos 1), $3, None] }
+    { [Ast.Present (($1,rhs_pos 1), $3, None)] }
     | ID OP_PAR interface_expression CL_PAR COMMA pattern
-    { (($1,rhs_pos 1), $3, None) :: $6}
+    { Ast.Present (($1,rhs_pos 1), $3, None) :: $6}
     ;
 
 mod_agent:
@@ -447,7 +447,7 @@ mod_agent:
 
 agent_expression:
     | mod_agent ID OP_PAR interface_expression CL_PAR
-	 {(($2,rhs_pos 2), $4, $1)}
+	 {Ast.Present (($2,rhs_pos 2), $4, $1)}
     | mod_agent ID error
 	 { raise (ExceptionDefn.Syntax_Error
 		    (add_pos ("Malformed agent '"^$2^"'")))}

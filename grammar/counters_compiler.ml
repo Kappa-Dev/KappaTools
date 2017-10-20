@@ -79,16 +79,18 @@ let prepare_counters rules =
                             ("Counter "^(fst c.Ast.count_nme)^error,
                              (snd c.Ast.count_nme)))) sites in
 
-  let rec fold rhs lhs = match (rhs,lhs) with
-    | ((rna,rsites,_)::r, ((lna,lsites,b) as lagent)::l) ->
-       let () = syntax lsites (fun c -> not((fst c.Ast.count_delta)=0))
-                       " has a modif in the lhs";
-                syntax rsites (fun c -> not(c.Ast.count_test=None))
-                       " has a test in the rhs" in
-       if ((String.compare (fst rna) (fst lna)) = 0) then
-         let lsites' = prepare_agent rsites lsites in
-         (lna,lsites',b)::(fold r l)
-       else lagent::(fold r l) (*what does this subcase mean?*)
+  let rec fold rhs lhs = match rhs,lhs with
+    | Ast.Present (rna,rsites,_)::r, (Ast.Present (lna,lsites,b) as lagent)::l->
+      let () = syntax lsites (fun c -> not((fst c.Ast.count_delta)=0))
+          " has a modif in the lhs";
+        syntax rsites (fun c -> not(c.Ast.count_test=None))
+          " has a test in the rhs" in
+      if ((String.compare (fst rna) (fst lna)) = 0) then
+        let lsites' = prepare_agent rsites lsites in
+        Ast.Present (lna,lsites',b)::(fold r l)
+      else lagent::(fold r l) (*what does this subcase mean?*)
+    | _::r, Ast.Absent _::l -> (*delete agent*) fold r l
+    | Ast.Absent _::r, _::l -> (*created agent*) fold r l
     | [], _ | _, [] -> [] in
 
   let aux r = match r.Ast.rewrite with
@@ -99,11 +101,15 @@ let prepare_counters rules =
   List.map (fun (s,(r,a)) -> (s,(aux r,a))) rules
 
 let counters_signature s agents =
-  let (_,sites',_) = List.find (fun (s',_,_) -> name_match s s') agents in
-  List.fold_left
-    (fun acc s -> match s with
-                    Ast.Counter c -> c::acc
-                  | Ast.Port _ -> acc) [] sites'
+  match List.find (function
+      | Ast.Absent _ -> false
+      | Ast.Present (s',_,_) -> name_match s s') agents with
+  | Ast.Absent _ -> assert false
+  | Ast.Present (_,sites',_) ->
+    List.fold_left
+      (fun acc s -> match s with
+           Ast.Counter c -> c::acc
+         | Ast.Port _ -> acc) [] sites'
 
 (* c': counter declaration, returns counter in rule*)
 let enumerate_counter_tests x a ((delta,_) as count_delta) c' =
@@ -190,10 +196,13 @@ let remove_variable_in_counters rules signatures =
     | s::t ->
        combinations
          (remove_var_sites counters t) (remove_var_site counters s) in
-  let remove_var_agent (s,sites,m) =
-    let counters = counters_signature s signatures in
-    let enumerate_sites = remove_var_sites counters sites in
-    List.map (fun (sites',c) -> ((s,sites',m),c)) enumerate_sites in
+  let remove_var_agent = function
+    | Ast.Absent l -> [Ast.Absent l,[]]
+    | Ast.Present (s,sites,m) ->
+      let counters = counters_signature s signatures in
+      let enumerate_sites = remove_var_sites counters sites in
+      List.map
+        (fun (sites',c) -> (Ast.Present (s,sites',m),c)) enumerate_sites in
   let rec remove_var_mixture = function
     | [] -> []
     | ag::t -> combinations (remove_var_mixture t) (remove_var_agent ag) in
@@ -236,7 +245,9 @@ let remove_variable_in_counters rules signatures =
 let with_counters c =
   let with_counters_mix mix =
     List.exists
-      (fun (_,ls,_) ->
+      (function
+        | Ast.Absent _ -> false
+        | Ast.Present (_,ls,_) ->
         List.exists (function Ast.Counter _ -> true | Ast.Port _ -> false) ls)
       mix in
   with_counters_mix c.Ast.signatures
@@ -519,13 +530,16 @@ let counter_perturbation sigs c ag_ty =
 
 let counters_perturbations sigs ast_sigs =
   List.fold_left
-    (fun acc (ag_ty,sites,_)->
-      List.fold_left
-        (fun acc' site ->
-          match site with
-            Ast.Port _ -> acc'
-          | Ast.Counter c ->
-             ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc') acc sites)
+    (fun acc -> function
+       | Ast.Absent _ -> acc
+       | Ast.Present (ag_ty,sites,_) ->
+         List.fold_left
+           (fun acc' site ->
+              match site with
+                Ast.Port _ -> acc'
+              | Ast.Counter c ->
+                ((counter_perturbation sigs c ag_ty),(snd ag_ty))::acc')
+           acc sites)
     [] ast_sigs
 
 let empty_counter =
