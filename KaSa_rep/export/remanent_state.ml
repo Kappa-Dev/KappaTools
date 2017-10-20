@@ -296,10 +296,12 @@ type ('static,'dynamic) state =
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
     contact_map_converted : (*TODO: remove later*)
-      (Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
-         Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
-         option;
-    graph_scc :  Graphs.Nodearray.key list list Ckappa_sig.AgentSite_map_and_set.Map.t option
+      (*(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
+        Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)*)
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
+          Ckappa_sig.AgentSite_map_and_set.Map.t option;
+    graph_scc :
+      Graphs.Nodearray.key list list Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
 
 let get_contact_map_converted state =

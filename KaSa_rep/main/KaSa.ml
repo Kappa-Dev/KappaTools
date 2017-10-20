@@ -77,23 +77,27 @@ let main () =
   in
   let () = Export_to_KaSa.dump_contact_map Public_data.Low state in
   let () =
-      Ckappa_sig.AgentSite_map_and_set.Map.iter
-        (fun (x,y) scc ->
-           Loggers.fprintf
-             (Remanent_parameters.get_logger parameters)
-             "(%i,%i) "
-             (Ckappa_sig.int_of_agent_name x)
-             (Ckappa_sig.int_of_site_name y);
-             List.iter (fun l ->
-                 List.iter (fun k ->
-                     Loggers.fprintf
-                       (Remanent_parameters.get_logger parameters)
-                       " %i "
-                       (Graphs.int_of_node k)
-                 ) l
-             ) scc; print_newline()
+    Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "Graph of strongly connected components:\n";
+    Ckappa_sig.AgentSite_map_and_set.Map.iter
+      (fun (x,y) scc ->
+         Loggers.fprintf
+           (Remanent_parameters.get_logger parameters)
+           "(%i,%i) "
+           (Ckappa_sig.int_of_agent_name x)
+           (Ckappa_sig.int_of_site_name y);
+         List.iter (fun l ->
+             List.iter (fun k ->
+                 Loggers.fprintf
+                   (Remanent_parameters.get_logger parameters)
+                   " %i \n"
+                   (Graphs.int_of_node k)
+               ) l
+           ) scc
       ) graph_scc
-  in*)
+  in
+  let () = print_newline() in*)
   (*-----------------------------------------------------------------------*)
   (**)
   let state =

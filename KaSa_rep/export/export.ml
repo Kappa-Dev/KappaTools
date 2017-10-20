@@ -1430,25 +1430,6 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
-(*Work in process*)
-(*let output_contact_map_converted ?accuracy_level:(accuracy_level=Public_data.Low)
-    state =
-  let parameters = Remanent_state.get_parameters state in
-  let state, contact_map = get_contact_map ~accuracy_level state in
-  let state, handler = get_handler state in
-  let errors = get_errors state in
-  let errors, graph_scc =
-    match Remanent_state.get_graph_scc state with
-    | None -> Exception.warn parameters errors __POS__ Exit
-                Ckappa_sig.AgentSite_map_and_set.Map.empty
-    | Some g -> errors, g
-  in
-  let errors, cm_graph =
-    Contact_map_scc.contact_map_converted
-      parameters errors handler contact_map graph_scc
-  in
-  errors, cm_graph*)
-
   let output_graph_scc ?accuracy_level:(accuracy_level=Public_data.Low)
       state =
     let parameters = Remanent_state.get_parameters state in
@@ -1458,9 +1439,8 @@ let dump_contact_map accuracy state =
     let errors, converted_map =
       match Remanent_state.get_contact_map_converted state with
       | None -> Exception.warn parameters errors __POS__ Exit
-                  (Ckappa_sig.AgentSite_map_and_set.Map.empty,
-                   Ckappa_sig.AgentSite_map_and_set.Map.empty)
-      | Some (m1,m2) -> errors, (m1,m2)
+                  Ckappa_sig.AgentSite_map_and_set.Map.empty
+      | Some m -> errors, m
     in
     let errors, graph =
       match Remanent_state.get_graph_scc state with

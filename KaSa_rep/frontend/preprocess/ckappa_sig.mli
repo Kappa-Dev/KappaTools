@@ -38,7 +38,6 @@ module Dictionary_of_agent_site: Dictionary.Dictionary
 
 type agent_site_dic = (unit,unit) Dictionary_of_agent_site.dictionary
 
-
 (****************************************************************************)
 
 val rule_id_to_json : c_rule_id -> Yojson.Basic.json
@@ -105,7 +104,6 @@ val compare_unit_agent_name: unit -> unit -> c_agent_name
 val compare_unit_site_name: unit -> unit -> c_site_name
 val compare_unit_state_index: unit -> unit -> c_state
 val compare_unit_agent_site : unit -> unit -> int
-
 
 (***************************************************************************)
 
@@ -221,6 +219,10 @@ module Site_map_and_set: Map_wrapper.S_with_logs
 
 module AgentSite_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_name * c_site_name
+
+(*work in process*)
+module AgentSite2_map_and_set: Map_wrapper.S_with_logs
+  with type elt = (c_agent_name * c_site_name) * (int * int)
 
 module Agents_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id * c_agent_name

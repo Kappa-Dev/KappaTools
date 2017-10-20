@@ -113,13 +113,12 @@ type ('static, 'dynamic) state
 (*work in process*)
 
 val get_contact_map_converted : ('static, 'dynamic)  state ->
-(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
-   Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)
-  option
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
+    Ckappa_sig.AgentSite_map_and_set.Map.t option
 
 val set_contact_map_converted :
-(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
-   Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t) ->
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
+    Ckappa_sig.AgentSite_map_and_set.Map.t ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 
@@ -133,8 +132,8 @@ val set_graph_scc :
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 
-
 (*******************************************************************)
+
 val to_json: ('static, 'dynamic) state -> Yojson.Basic.json
 
 val of_json: Yojson.Basic.json ->
