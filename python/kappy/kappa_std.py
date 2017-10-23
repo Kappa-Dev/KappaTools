@@ -10,8 +10,8 @@ import json
 import abc
 from pkg_resources import resource_filename
 
-from kappy.kappa_common import KappaError, hydrate_file_data, \
-                               hydrate_file_metadata, PlotLimit
+from kappy.kappa_common import KappaError, hydrate_file, hydrate_file_metadata,\
+                               PlotLimit
 
 
 class KappaStd(object):
@@ -19,7 +19,7 @@ class KappaStd(object):
 
     path -- where to find kappa executables
     delimiter -- What to use to delimit messages (must not appears in
-        message body default '\x1e')
+        message body default '\\x1e')
     args -- arguments to pass to kappa executables
     """
     def __init__(self, path=None, delimiter='\x1e', args=None):

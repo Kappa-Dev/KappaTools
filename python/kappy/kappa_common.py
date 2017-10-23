@@ -8,28 +8,34 @@ import json
 
 
 class FileMetadata(object):
-
-    def __init__(self,
-                 file_metadata_id,
-                 file_metadata_position,
-                 file_metadata_compile = True ,
-                 file_version = []):
-        self.file_metadata_id = file_metadata_id
-        self.file_metadata_position = file_metadata_position
-        self.file_metadata_compile = file_metadata_compile
+     # NOTE: Two of these input names should be changed: `id` to `file_id`, or
+     # `compile` to `do_compile` to avoid conflicting with buildins.
+    def __init__(self, id, position, compile=True, file_version=[]):
+        self.id = id
+        self.position = position
+        self.compile = compile
         self.file_version = file_version
 
     def toJSON(self):
-        return { "compile" : self.file_metadata_compile ,
-                 "id" : self.file_metadata_id ,
-                 "position" : self.file_metadata_position ,
+        return { "id" : self.id ,
+                 "compile" : self.compile ,
+                 "position" : self.position ,
                  "version" : self.file_version }
 
+    # NOTE: This isn't really needed, it's actually longer than just calling 
+    # `<varname>.id`.
     def get_file_id(self):
-        return self.file_metadata_id
+        return self.id
 
 
-def hydrate_file_metadata (info):
+# NOTE: This is not really necessary in python. The equivalent task could be
+# accomplished by simply calling `FileMetadata(**info)` with the appropriate
+# keys defined in FileMetadata. as shown.
+def hydrate_file_metadata(info):
+    """Generate a FileMetadata object using a dict `info`.
+
+    The dict must contain the keys 'id', 'position', and 'compile'.
+    """
     return FileMetadata(
         info["id"],
         info["position"],
@@ -61,9 +67,15 @@ class File(object):
         return self.file_content
 
 
-def hydrate_file (info):
-    return(File(hydrate_file_metadata(info["metadata"]),
-                info["content"]))
+def hydrate_file(info):
+    """Generate a File object given a dict `info`.
+    
+    `info` is a dict with attributes 'metadata' and 'content', which will be
+    processed and used to generate a File object, which is returned. The
+    'metadata' attribute will be passed to `hydrate_file_metadata`, and must
+    therefore have the appropriate items ('id', 'position', and 'compile').
+    """
+    return File(hydrate_file_metadata(info["metadata"]), info["content"])
 
 
 class SimulationParameter(object):
@@ -120,5 +132,5 @@ class KappaError(Exception):
     """ Error returned from the Kappa server
     """
     def __init__(self, errors):
-        Exception.__init__(self)
+        Exception.__init__(self, errors)
         self.errors = errors
