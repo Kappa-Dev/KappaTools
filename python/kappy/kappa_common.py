@@ -1,10 +1,11 @@
 """ Shared functions of api client for the kappa programming language
 """
-__all__ = ['FileMetaData', 'hydrate_file_metadata', 'stringAsFile', 'File',
-           'hydrate_file', 'SimulationParameter', 'PlotParameter', 'PlotLimit',
-           'KappaError'] 
+__all__ = ['FileMetadata', 'hydrate_file_metadata', 'string_as_file', 'File',
+           'hydrate_file', 'SimulationParameter', 'get_plot_parameter',
+           'PlotLimit', 'KappaError'] 
 
 import json
+
 
 class FileMetadata(object):
 
@@ -17,26 +18,29 @@ class FileMetadata(object):
         self.file_metadata_position = file_metadata_position
         self.file_metadata_compile = file_metadata_compile
         self.file_version = file_version
+
     def toJSON(self):
-        return({ "compile" : self.file_metadata_compile ,
+        return { "compile" : self.file_metadata_compile ,
                  "id" : self.file_metadata_id ,
                  "position" : self.file_metadata_position ,
-                 "version" : self.file_version })
+                 "version" : self.file_version }
 
     def get_file_id(self):
-        return(self.file_metadata_id)
+        return self.file_metadata_id
+
 
 def hydrate_file_metadata (info):
-    return(
-        FileMetadata(
-            info["id"],
-            info["position"],
-            info["compile"] ,
-            [] #hydrate_file_version(info["version"])
-        ))
+    return FileMetadata(
+        info["id"],
+        info["position"],
+        info["compile"] ,
+        [] #hydrate_file_version(info["version"])
+        )
 
-def stringAsFile(content,position=1):
-    return(File(FileMetadata("inlined_input",position),content))
+
+def string_as_file(content,position=1):
+    return File(FileMetadata("inlined_input",position),content)
+
 
 class File(object):
 
@@ -47,17 +51,20 @@ class File(object):
         self.file_content = file_content
 
     def toJSON(self):
-        return({ "metadata" : self.file_metadata.toJSON() ,
-                 "content" : self.file_content })
+        return { "metadata" : self.file_metadata.toJSON() ,
+                 "content" : self.file_content }
 
     def get_file_id(self):
-        return(self.file_metadata.get_file_id())
+        return self.file_metadata.get_file_id()
+
     def get_content(self):
-        return(self.file_content)
+        return self.file_content
+
 
 def hydrate_file (info):
     return(File(hydrate_file_metadata(info["metadata"]),
                 info["content"]))
+
 
 class SimulationParameter(object):
 
@@ -72,10 +79,10 @@ class SimulationParameter(object):
         self.simulation_store_trace = simulation_store_trace
 
     def toJSON(self):
-        return({ "plot_period" : self.simulation_plot_period,
+        return { "plot_period" : self.simulation_plot_period,
                  "pause_condition": self.simulation_pause_condition ,
                  "store_trace": self.simulation_store_trace ,
-                 "seed" : self.simulation_seed })
+                 "seed" : self.simulation_seed }
 
 class PlotLimit(object):
 
@@ -86,7 +93,6 @@ class PlotLimit(object):
         self.plot_limit_points = plot_limit_points
 
     def toURL(self):
-
         if self.plot_limit_offset is not None :
             url_plot_limit_offset = "&plot_limit_offset={0}".format(self.plot_limit_offset)
         else :
@@ -102,12 +108,13 @@ class PlotLimit(object):
         return url_plot_limit
 
     def toJSON(self):
-        return({ "offset" : self.plot_limit_offset ,
-                 "nb_points" : self.plot_limit_points })
+        return { "offset" : self.plot_limit_offset ,
+                 "nb_points" : self.plot_limit_points }
 
-def PlotParameter(plot_limit_offset = None,
-                  plot_limit_points = None) :
-    return(PlotLimit(plot_limit_offset,plot_limit_points))
+
+def get_plot_parameter(plot_limit_offset=None, plot_limit_points=None) :
+    return PlotLimit(plot_limit_offset, plot_limit_points)
+
 
 class KappaError(Exception):
     """ Error returned from the Kappa server

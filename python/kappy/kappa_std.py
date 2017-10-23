@@ -8,19 +8,21 @@ import subprocess
 import threading
 import json
 import abc
-import kappy.kappa_common
-
 from pkg_resources import resource_filename
 
-class KappaStd(object):
-    def __init__(self, path=None, delimiter='\x1e', args=None):
-        """
-        Kappa tools driver
+from kappy.kappa_common import KappaError, hydrate_file_data, \
+                               hydrate_file_metadata, PlotLimit
 
-        path -- where to find kappa executables
-        delimiter -- What to use to delimit messages (must not appears in message body default '\x1e')
-        args -- arguments to pass to kappa executables
-        """
+
+class KappaStd(object):
+    """Kappa tools driver run locally.
+
+    path -- where to find kappa executables
+    delimiter -- What to use to delimit messages (must not appears in
+        message body default '\x1e')
+    args -- arguments to pass to kappa executables
+    """
+    def __init__(self, path=None, delimiter='\x1e', args=None):
         self.delimiter = delimiter
         if not path:
             path = resource_filename(__name__,"bin/KaSimAgent")
@@ -65,7 +67,10 @@ class KappaStd(object):
                 c = self.popen.stdout.read(1)
             response = json.loads(buffer.decode('utf-8'))
             if response["id"] != message_id:
-                raise KappaError("expect id {0} got {1}".format(response["id"], message_id))
+                raise KappaError(
+                        "expect id {0} got {1}".format(response["id"],
+                                                       message_id)
+                        )
             else:
                 return self.projection(response)
 
@@ -86,7 +91,7 @@ class KappaStd(object):
         if result_data[0] == "Ok":
             return data[1]
         else:
-            raise kappy.kappa_common.KappaError(data)
+            raise KappaError(data)
 
     def project_parse(self,overwrites=[]):
         """
@@ -117,7 +122,7 @@ class KappaStd(object):
         Returns file file_id stored in the project
         """
         f = self.dispatch("FileGet",file_id)
-        return(kappy.kappa_common.hydrate_file(f))
+        return(hydrate_file(f))
 
     def file_info(self):
         """
@@ -125,7 +130,7 @@ class KappaStd(object):
         """
         info = self.dispatch("FileCatalog")
         #return(list(map(hydrate_filemetadata,info)))
-        return(map(kappy.kappa_common.hydrate_file_metadata, info))
+        return(map(hydrate_file_metadata, info))
 
     def simulation_delete(self):
         """
@@ -162,7 +167,7 @@ class KappaStd(object):
         if limit is not None:
             parameter = limit.toJSON()
         else:
-            parameter = kappy.kappa_common.PlotLimit().toJSON()
+            parameter = PlotLimit().toJSON()
         return(self.dispatch("SimulationDetailPlot",parameter))
 
     def simulation_snapshot(self,snapshot_id):

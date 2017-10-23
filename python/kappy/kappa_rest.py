@@ -3,13 +3,18 @@
 
 __all__ = ['KappaRest']
 
-import urllib.error
-import urllib.request
-import urllib.parse
 import json
-import kappy.kappa_common
+from urllib import error, request, parse
+
+from kappy.kappa_common import KappaError, hydrate_file, hydrate_file_metadata,\
+                               PlotLimit
 
 class KappaRest(object):
+    """Client to a Kappa tools driver run as a server.
+
+    endpoint -- The url to the kappa server.
+    project_id -- An identifier for this particular project.
+    """
     def __init__(self, endpoint, project_id):
         self.url = "{0}/v2".format(endpoint)
         self.project_id = project_id
@@ -20,57 +25,57 @@ class KappaRest(object):
         self.project_delete()
 
     def dispatch(self, method, url, data):
-        handler = urllib.request.HTTPHandler()
-        opener = urllib.request.build_opener(handler)
+        handler = request.HTTPHandler()
+        opener = request.build_opener(handler)
         if data is not None:
             code = json.dumps(data)
-            request = urllib.request.Request(url,
+            request = request.Request(url,
                                              data=code.encode("utf-8"))
         else:
-            request = urllib.request.Request(url)
+            request = request.Request(url)
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib.request.HTTPError as exception:
+        except request.HTTPError as exception:
             message = exception.read()
             error = json.loads(message.decode("utf-8"))
-            raise kappy.kappa_common.KappaError(error)
-        except urllib.request.URLError as exception:
-            raise kappy.kappa_common.KappaError(exception.reason)
+            raise KappaError(error)
+        except request.URLError as exception:
+            raise KappaError(exception.reason)
         text = connection.read()
         details = json.loads(text.decode("utf-8"))
         if 400 <= connection.code < 500:
-            raise kappy.kappa_common.KappaError(details)
+            raise KappaError(details)
         else:
             return details
 
     def shutdown(self, key):
-        """
-        Shut down kappa instance.  Given a key to a
-        kappa service shutdown a running kappa instance.
+        """Shut down kappa instance.
+        
+        Given a key to a kappa service shutdown a running kappa instance.
         """
         method = "POST"
-        handler = urllib.request.HTTPHandler()
-        opener = urllib.request.build_opener(handler)
+        handler = request.HTTPHandler()
+        opener = request.build_opener(handler)
         parse_url = "{0}/shutdown".format(self.url)
-        request = urllib.request.Request(parse_url, data=key.encode('utf-8'))
+        request = request.Request(parse_url, data=key.encode('utf-8'))
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
-        except urllib.error.HTTPError as exception:
+        except error.HTTPError as exception:
             connection = exception
-        except urllib.error.URLError as exception:
-            raise kappy.kappa_common.KappaError(exception.reason)
+        except error.URLError as exception:
+            raise KappaError(exception.reason)
         if connection.code == 200:
             text = connection.read()
             return text
         elif connection.code == 400:
             text = connection.read()
             print(text)
-            raise kappy.kappa_common.KappaError(text)
+            raise KappaError(text)
         elif connection.code == 401:
             text = connection.read()
-            raise kappy.kappa_common.KappaError(text)
+            raise KappaError(text)
         else:
             raise exception
 
@@ -121,7 +126,7 @@ class KappaRest(object):
         url = "{0}/projects/{1}/files/{2}".format(self.url,self.project_id,file_id)
         body = None
         file = self.dispatch(method,url,body)
-        return(kappy.kappa_common.hydrate_file(file))
+        return(hydrate_file(file))
 
     def file_info(self):
         method = "GET"
@@ -129,7 +134,7 @@ class KappaRest(object):
         body = None
         info = self.dispatch(method,url,body)
         #return(list(map(hydrate_filemetada,info)))
-        return(map(kappy.kappa_common.hydrate_file_metadata,info))
+        return(map(hydrate_file_metadata,info))
 
     def simulation_delete(self):
         method = "DELETE"
@@ -153,7 +158,7 @@ class KappaRest(object):
         if limit is not None:
             parameter = limit.toURL()
         else:
-            parameter = kappy.kappa_common.PlotLimit().toURL()
+            parameter = PlotLimit().toURL()
         url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
         return(self.dispatch("GET",url,None))
 
