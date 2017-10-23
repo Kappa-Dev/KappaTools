@@ -2,6 +2,8 @@
 Client for the kappa programming language through standard channel api
 """
 
+__all__ = ['KappaStd']
+
 import subprocess
 import threading
 import json

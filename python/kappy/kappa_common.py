@@ -1,5 +1,8 @@
 """ Shared functions of api client for the kappa programming language
 """
+__all__ = ['FileMetaData', 'hydrate_file_metadata', 'stringAsFile', 'File',
+           'hydrate_file', 'SimulationParameter', 'PlotParameter', 'PlotLimit',
+           'KappaError'] 
 
 import json
 

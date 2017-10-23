@@ -1,6 +1,8 @@
 """ Web api client for the kappa programming language
 """
 
+__all__ = ['KappaRest']
+
 import urllib.error
 import urllib.request
 import urllib.parse
