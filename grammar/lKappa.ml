@@ -149,12 +149,13 @@ let find_counter_with_link mix i counter_type =
           | Freed | Maintained | Erased -> acc)
         false a.ra_ports) mix
 
-let counter_delta mix created j count_value count_type = function
+let counter_delta created j = function
   | Linked (i,_) ->
      begin
      match (Raw_mixture.counters_chain_length created i true) with
        None  -> (j-i) (*decrement counter*)
      | Some c -> c
+     (*incr counter : count nb of chained increments in raw mixture*)
      end
   | Freed ->
      raise (ExceptionDefn.Internal_Error
@@ -187,7 +188,7 @@ let add_counter_agent sigs mix created ag =
              let count_test = Some (Locality.dummy_annot count_value) in
              let count_delta =
                Locality.dummy_annot
-                 (counter_delta mix created i count_value (snd a) s) in
+                 (counter_delta created i s) in
              ra_counters.(id) <-
                ({Ast.count_nme; count_test; count_delta}, s))
       ag.ra_ports in

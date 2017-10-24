@@ -484,7 +484,7 @@ let remove_counter_rule sigs mix created =
           let (a,lnk') =
             remove_counter_created_agent sigs ag lnk in
           (a@acc,lnk'))
-        ([],lnk_nb') created in
+        ([],lnk_nb'+1) created in
 
     let rule_agent_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) mix) in
     let raw_mix = List.rev (List.map (fun ag -> ag.LKappa.ra) created) in
