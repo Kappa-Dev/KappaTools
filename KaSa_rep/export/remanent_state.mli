@@ -123,13 +123,11 @@ val set_contact_map_converted :
   ('static, 'dynamic)  state
 
 val get_graph_scc : ('static, 'dynamic)  state ->
-  (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
-  bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+  Graphs.Nodearray.key list list
     Ckappa_sig.AgentSiteString_map_and_set.Map.t option
 
 val set_graph_scc :
-  (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
-  bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+  Graphs.Nodearray.key list list
     Ckappa_sig.AgentSiteString_map_and_set.Map.t ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state

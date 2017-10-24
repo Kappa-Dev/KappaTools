@@ -301,8 +301,7 @@ type ('static,'dynamic) state =
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
           Ckappa_sig.Pair_AgentSite_map_and_set.Map.t option;
     graph_scc :
-      (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
-      bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+      Graphs.Nodearray.key list list
         Ckappa_sig.AgentSiteString_map_and_set.Map.t option
   }
 

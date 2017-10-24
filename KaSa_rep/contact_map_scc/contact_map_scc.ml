@@ -195,7 +195,7 @@ let compute_graph_scc parameters errors contact_map_converted store_result =
           parameters
           errors
           (agent_name_string, site_name_string)
-          (low, pre, on_stack, scc)
+          scc
           store_result
       in
       errors, store_result

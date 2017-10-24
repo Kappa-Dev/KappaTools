@@ -83,7 +83,7 @@ let main () =
       (Remanent_parameters.get_logger parameters)
       "Strongly connected components:\n";
     Ckappa_sig.AgentSiteString_map_and_set.Map.iter
-      (fun (agent_name_string,site_name_string) (low, pre, on_stack, scc) ->
+      (fun (agent_name_string,site_name_string) scc ->
          let () =
            Loggers.fprintf
              (Remanent_parameters.get_logger parameters)
@@ -91,7 +91,7 @@ let main () =
              agent_name_string
              site_name_string
          in
-         let errors = Graphs.Nodearray.print parameters errors
+         (*let errors = Graphs.Nodearray.print parameters errors
              (fun parameters errors i ->
                 let () =
                   Loggers.fprintf
@@ -112,7 +112,7 @@ let main () =
                 in
                 errors
              ) pre
-         in
+         in*)
          List.iter (fun l ->
              List.iter (fun x ->
                Loggers.fprintf (Remanent_parameters.get_logger parameters)
@@ -121,7 +121,7 @@ let main () =
            ) scc;
          Loggers.print_newline (Remanent_parameters.get_logger parameters)
       ) graph_scc
-  in*)
+    in*)
   (*-----------------------------------------------------------------------*)
   (**)
   let state =

@@ -13,6 +13,7 @@ module NodeSetMap =
          let print = Format.pp_print_int
        end
        ))
+
 module NodeMap = NodeSetMap.Map
 
 module Fixed_size_array =
@@ -317,7 +318,7 @@ let detect_bridges
                 match
                   Fixed_size_array.get parameters error ni graph.node_labels
               with
-              | erro, None ->
+              | error, None ->
                 Exception.warn parameters error __POS__ Exit bridges
               | error, Some nstringi ->
                 begin

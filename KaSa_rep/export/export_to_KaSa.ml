@@ -69,9 +69,7 @@ sig
   val output_graph_scc :
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
-    Exception.method_handler *
-    (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
-    bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+    Exception.method_handler * Graphs.Nodearray.key list list
       Ckappa_sig.AgentSiteString_map_and_set.Map.t
 
 (**************************************************)
