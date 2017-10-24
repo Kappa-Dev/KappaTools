@@ -34,7 +34,7 @@ type c_rule_id    = int
 
 module Node_id =
 struct
-  type t = c_agent_name * c_site_name
+  type t = string * string
   let compare = compare
   let print _ _ = ()
 end
@@ -43,11 +43,31 @@ module Dictionary_of_agent_site =
   (
     Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
     with type key = int
-     and type value = c_agent_name * c_site_name
+     and type value = string * string
   )
 
   type agent_site_dic =
     (unit, unit) Dictionary_of_agent_site.dictionary
+
+module Pair_AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_name * c_site_name) * (string * string)
+         let compare = compare
+         let print f ((a, b), (c,d)) =
+           Format.fprintf f "(%i, %i, %s, %s)" a b c d
+       end))
+
+module AgentSiteString_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = string * string
+         let compare = compare
+         let print f (a, b) = Format.fprintf f "(%s, %s)" a b
+       end))
+
 
 (****************************************************************************)
 
@@ -166,7 +186,6 @@ module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
       (Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif):
          Int_storage.Storage
     with type key = c_agent_name * c_site_name
-
      and type dimension = int * int
   )
 

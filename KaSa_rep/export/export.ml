@@ -1439,13 +1439,13 @@ let dump_contact_map accuracy state =
     let errors, converted_map =
       match Remanent_state.get_contact_map_converted state with
       | None -> Exception.warn parameters errors __POS__ Exit
-                  Ckappa_sig.AgentSite_map_and_set.Map.empty
+                  Ckappa_sig.Pair_AgentSite_map_and_set.Map.empty
       | Some m -> errors, m
     in
     let errors, graph =
       match Remanent_state.get_graph_scc state with
       | None -> Exception.warn parameters errors __POS__ Exit
-                  Ckappa_sig.AgentSite_map_and_set.Map.empty
+                  Ckappa_sig.AgentSiteString_map_and_set.Map.empty
       | Some g -> errors, g
     in
     let errors, cm_graph =

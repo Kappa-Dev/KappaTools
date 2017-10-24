@@ -34,9 +34,16 @@ type c_agent_id
 
 module Dictionary_of_agent_site: Dictionary.Dictionary
   with type key = int
-   and type value = c_agent_name * c_site_name
+   and type value = string * string
 
 type agent_site_dic = (unit,unit) Dictionary_of_agent_site.dictionary
+
+module Pair_AgentSite_map_and_set: Map_wrapper.S_with_logs
+  with type elt = (c_agent_name * c_site_name) * (string * string)
+
+module AgentSiteString_map_and_set: Map_wrapper.S_with_logs
+  with type elt = string * string
+
 
 (****************************************************************************)
 

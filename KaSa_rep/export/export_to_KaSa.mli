@@ -66,19 +66,13 @@ sig
 (**************************************************)
 (*work in process *)
 
-  (*val output_contact_map_converted:
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    (Graphs.node list * (int * int) list)
-      Ckappa_sig.AgentSite_map_and_set.Map.t*)
-
   val output_graph_scc :
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
-    Graphs.Nodearray.key list list
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+    (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
+    bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+      Ckappa_sig.AgentSiteString_map_and_set.Map.t
 
 (**************************************************)
 

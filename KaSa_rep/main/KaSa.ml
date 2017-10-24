@@ -71,30 +71,55 @@ let main () =
   (*let state, cm =
     Export_to_KaSa.get_contact_map ~accuracy_level:Public_data.Low state
   in
+  let () = Export_to_KaSa.dump_contact_map Public_data.Low state in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   let errors, graph_scc =
     Export_to_KaSa.output_graph_scc
       ~accuracy_level:Public_data.Low state
   in
-  let () = Export_to_KaSa.dump_contact_map Public_data.Low state in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   let () =
     Loggers.fprintf
       (Remanent_parameters.get_logger parameters)
-      "Graph of strongly connected components:\n";
-    Ckappa_sig.AgentSite_map_and_set.Map.iter
-      (fun (x,y) scc ->
-         Loggers.fprintf
-           (Remanent_parameters.get_logger parameters)
-           "(%i,%i) "
-           (Ckappa_sig.int_of_agent_name x)
-           (Ckappa_sig.int_of_site_name y);
+      "Strongly connected components:\n";
+    Ckappa_sig.AgentSiteString_map_and_set.Map.iter
+      (fun (agent_name_string,site_name_string) (low, pre, on_stack, scc) ->
+         let () =
+           Loggers.fprintf
+             (Remanent_parameters.get_logger parameters)
+             "%s@%s"
+             agent_name_string
+             site_name_string
+         in
+         let errors = Graphs.Nodearray.print parameters errors
+             (fun parameters errors i ->
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters)
+                    "low:%i\n"
+                    i
+                in
+                errors
+             ) low
+         in
+         let errors = Graphs.Nodearray.print parameters errors
+             (fun parameters errors i ->
+                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameters)
+                    "pre:%i\n"
+                    i
+                in
+                errors
+             ) pre
+         in
          List.iter (fun l ->
-             List.iter (fun k ->
-                 Loggers.fprintf
-                   (Remanent_parameters.get_logger parameters)
-                   " %i \n"
-                   (Graphs.int_of_node k)
+             List.iter (fun x ->
+               Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                  " %i " (Graphs.int_of_node x)
                ) l
-           ) scc
+           ) scc;
+         Loggers.print_newline (Remanent_parameters.get_logger parameters)
       ) graph_scc
   in*)
   (*-----------------------------------------------------------------------*)

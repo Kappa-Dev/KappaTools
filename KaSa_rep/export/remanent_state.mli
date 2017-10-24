@@ -114,21 +114,23 @@ type ('static, 'dynamic) state
 
 val get_contact_map_converted : ('static, 'dynamic)  state ->
   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-    Ckappa_sig.AgentSite_map_and_set.Map.t option
+    Ckappa_sig.Pair_AgentSite_map_and_set.Map.t option
 
 val set_contact_map_converted :
   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
+    Ckappa_sig.Pair_AgentSite_map_and_set.Map.t ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 
 val get_graph_scc : ('static, 'dynamic)  state ->
-  Graphs.Nodearray.key list list
-    Ckappa_sig.AgentSite_map_and_set.Map.t option
+  (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
+  bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+    Ckappa_sig.AgentSiteString_map_and_set.Map.t option
 
 val set_graph_scc :
-  Graphs.Nodearray.key list list
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
+  (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
+  bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+    Ckappa_sig.AgentSiteString_map_and_set.Map.t ->
   ('static, 'dynamic)  state ->
   ('static, 'dynamic)  state
 

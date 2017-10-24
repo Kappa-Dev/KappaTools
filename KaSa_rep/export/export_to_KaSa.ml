@@ -55,13 +55,6 @@ sig
 
   val get_c_compilation: state -> state * c_compilation
 
-  (*WORK IN PROCESS*)
-  (*add new function: get contact_map_int*)
-  (*val get_graph_scc : state -> state * Graphs.node list*)
-  (*val get_string_contact_map :
-  ?accuracy_level:Public_data.accuracy_level ->
-  state -> state * contact_map*)
-
 (**************************************************)
 (*work in process*)
 
@@ -73,19 +66,13 @@ sig
   Public_data.accuracy_level ->
   state -> unit
 
-  (*val output_contact_map_converted:
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    (Graphs.node list * (int * int) list)
-      Ckappa_sig.AgentSite_map_and_set.Map.t*)
-
   val output_graph_scc :
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
-    Graphs.Nodearray.key list list
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+    (int Graphs.Nodearray.t * int Graphs.Nodearray.t *
+    bool Graphs.Nodearray.t * Graphs.Nodearray.key list list)
+      Ckappa_sig.AgentSiteString_map_and_set.Map.t
 
 (**************************************************)
 
