@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim abc-pert.ka -seed 924556145 -u e -l 100000 -p 0 -d output --time-independent -mode batch || exit 0
+"${KAPPABIN}"KaSim abc-pert.ka -seed 924556145 -u e -l 100000 -p 0 -d output --time-independent -mode batch -syntax 3 || exit 0
 
 #This is the classical abc model. 
 #Perturbations are used:

@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (128 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-l' '10' '-seed' '92067277' '-d' 'output' 'counter_max.ka'
++ Command line to rerun is: 'KaSim' '-l' '10' '-seed' '92067277' '-d' 'output' 'counter_max.ka' '-syntax' '3'
 ____________________________________________________________
 
 Counter c of agent A reached maximum

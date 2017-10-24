@@ -13,5 +13,5 @@ done
 	 -initial conditions
 + Building initial state (4 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-l' '1' '-d' 'output' '-seed' '148153191' 'remove_nodes_and_link.ka'
++ Command line to rerun is: 'KaSim' '-l' '1' '-d' 'output' '-seed' '148153191' 'remove_nodes_and_link.ka' '-syntax' '3'
 Simulation ended

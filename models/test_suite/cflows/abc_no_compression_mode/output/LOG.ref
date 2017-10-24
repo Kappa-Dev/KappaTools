@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (16384 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'abc.ka' '-mode' 'batch' '-var' 'on_rate' '1.0E-4' '-u' 'event' '-l' '2000' '-d' 'output' '-p' '20' '--time-independent'
++ Command line to rerun is: 'KaSim' 'abc.ka' '-mode' 'batch' '-var' 'on_rate' '1.0E-4' '-u' 'event' '-l' '2000' '-d' 'output' '-p' '20' '--time-independent' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 Simulation ended

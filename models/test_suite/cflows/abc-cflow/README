@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim abc-cflow.ka -seed 924556145 -u event -l 100000 -d output -p 1000 --time-independent || exit 0
+"${KAPPABIN}"KaSim abc-cflow.ka -seed 924556145 -u event -l 100000 -d output -p 1000 --time-independent -syntax 3 || exit 0
 
 #This is the classical abc model. 
 #Perturbations are used:

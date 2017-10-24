@@ -114,7 +114,7 @@ On roots:
 Rule rule has now 10000 instances.
  (128 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug'
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '120' '-d' 'output' 'clashing_instances.ka' '-seed' '923639563' '--debug' '-syntax' '3'
 Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1

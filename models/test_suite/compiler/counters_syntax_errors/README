@@ -1,7 +1,7 @@
-"${KAPPABIN}"KaSim -seed 92067277 -d output counter_name_twice.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_enough_spec.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output modif_lhs.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output negative_delta_too_big.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output test_rhs.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output var_not_spec.ka --compile || true
-"${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_declared.ka --compile || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output counter_name_twice.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_enough_spec.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output modif_lhs.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output negative_delta_too_big.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output test_rhs.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output var_not_spec.ka --compile -syntax 3 || true
+"${KAPPABIN}"KaSim -seed 92067277 -d output counter_not_declared.ka --compile -syntax 3 || true

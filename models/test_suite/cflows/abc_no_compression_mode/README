@@ -1,6 +1,6 @@
 #Command-line:
 "${KAPPABIN}"KaSim abc.ka -mode batch -var on_rate 1.0E-4 -u event -l 2000 \
--d output -p 20 --time-independent || exit 0
+-d output -p 20 --time-independent -syntax 3 || exit 0
 
 #In this version, we have not fixed the compression mode
 #Thus a warning should be reported.

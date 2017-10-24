@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (512 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka'
++ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 Simulation ended

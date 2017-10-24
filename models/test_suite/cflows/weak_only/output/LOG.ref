@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2048 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-o' 'data.svg' '-p' '1000' '--time-independent'
++ Command line to rerun is: 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-o' 'data.svg' '-p' '1000' '--time-independent' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 + Loading trace

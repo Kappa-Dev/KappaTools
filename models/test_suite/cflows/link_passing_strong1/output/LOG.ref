@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (16 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'link_passing_strong1.ka' '-seed' '611463625' '-u' 'event' '-l' '100' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'link_passing_strong1.ka' '-seed' '611463625' '-u' 'event' '-l' '100' '-d' 'output' '--time-independent' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 + Loading trace
