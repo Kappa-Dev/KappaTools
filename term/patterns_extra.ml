@@ -147,9 +147,9 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           LKappa.print_rule_mixture ~ltypes:true sigs fmt mix)
+           LKappa.print_rule_mixture ~ltypes:true sigs [] fmt mix)
         (fun fmt ->
-           LKappa.print_rule_mixture ~ltypes:true sigs fmt mix)
+           LKappa.print_rule_mixture ~ltypes:true sigs [] fmt mix)
   in
   let unspec =
     List.fold_left
@@ -602,9 +602,9 @@ let pattern_to_mixture ?parameters ~sigs pattern =
         safe_print_str
           __POS__ ?parameters
           (fun fmt ->
-             LKappa.print_rule_mixture sigs ~ltypes:false fmt output)
+             LKappa.print_rule_mixture sigs ~ltypes:false [] fmt output)
           (fun fmt ->
-             LKappa.print_rule_mixture sigs ~ltypes:false fmt output)
+             LKappa.print_rule_mixture sigs ~ltypes:false [] fmt output)
       in
       Some (output, unspec)
     end

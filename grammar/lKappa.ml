@@ -105,16 +105,116 @@ let switching_of_json filenames = function
   | x -> Linked (Locality.annot_of_yojson
                    ~filenames (JsonUtil.to_int~error_msg:"Invalid Switching") x)
 
-let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
-  Format.fprintf
-    f "%a%a"
-    (Ast.print_link
-       ~syntax_version:Ast.V4 (Signature.print_site sigs)
-       (Signature.print_agent sigs) (print_link_annot ~ltypes sigs))
-    e
-    (print_switching ~show_erased) s
+let is_counter sigs (_,ag_ty) = Signature.is_counter ag_ty (Some sigs)
 
-let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints) =
+let match_link e = function
+  | Ast.LNK_VALUE (i,_) ->
+     begin
+       match e with
+         Ast.LNK_VALUE (i',_) -> (i=i')
+       | Ast.ANY_FREE | Ast.LNK_FREE
+         | Ast.LNK_ANY  | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
+     end
+  | Ast.ANY_FREE | Ast.LNK_FREE
+    | Ast.LNK_ANY  | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
+
+let rec counter_value mix e (pid,ag_ty) count =
+  let incr =
+    List.find
+      (fun a ->
+        ag_ty = a.ra_type &&
+          Tools.array_fold_lefti
+            (fun pid' acc ((e',_),_) ->
+                (pid = pid' && (match_link e e')) || acc)
+              false a.ra_ports) mix in
+  let e' =
+    Array.fold_left
+      (fun acc ((e',_),_) ->
+        if (match_link e e') then acc else e')
+      e incr.ra_ports in
+  match e' with
+  | Ast.ANY_FREE | Ast.LNK_FREE -> Ast.CEQ count
+  | Ast.LNK_ANY -> Ast.CGTE count
+  | Ast.LNK_TYPE _ | Ast.LNK_SOME | Ast.LNK_VALUE _ ->
+     counter_value mix e' (pid,ag_ty) (count+1)
+
+let find_counter_with_link mix i counter_type =
+  List.exists
+    (fun a ->
+      (a.ra_type = counter_type)&&
+      Array.fold_left
+        (fun acc ((_,_),s) ->
+          match s with
+          | Linked (i',_) -> (i=i')||acc
+          | Freed | Maintained | Erased -> acc)
+        false a.ra_ports) mix
+
+let counter_delta mix created j count_value count_type = function
+  | Linked (i,_) ->
+     begin
+     match (Raw_mixture.counters_chain_length created i true) with
+       None  -> (j-i) (*decrement counter*)
+     | Some c -> c
+     end
+  | Freed ->
+     raise (ExceptionDefn.Internal_Error
+              (Locality.dummy_annot("Cannot erase all increment agents")))
+  | Maintained -> 0
+  | Erased -> 0
+
+let empty_counter =
+  {Ast.count_nme = ("",Locality.dummy);
+   count_test = None; count_delta =(0,Locality.dummy)}
+
+let add_counter_agent sigs mix created ag =
+  let ra_counters =
+    Array.make
+      (Array.length ag.ra_ports) (empty_counter,Maintained) in
+  let () =
+    Array.iteri
+      (fun id ((e,_),s) ->
+        match e with
+        | Ast.ANY_FREE | Ast.LNK_FREE
+          | Ast.LNK_ANY | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
+        | Ast.LNK_VALUE (i,a) ->
+           if not(is_counter sigs a) then ()
+           else
+             let count_nme =
+               Locality.dummy_annot
+                 (Signature.site_of_num
+                    id (Signature.get sigs ag.ra_type)) in
+             let count_value = counter_value mix e a 0 in
+             let count_test = Some (Locality.dummy_annot count_value) in
+             let count_delta =
+               Locality.dummy_annot
+                 (counter_delta mix created i count_value (snd a) s) in
+             ra_counters.(id) <-
+               ({Ast.count_nme; count_test; count_delta}, s))
+      ag.ra_ports in
+  ra_counters
+
+let print_rule_link sigs ~show_erased ~ltypes (counter,_) f ((e,_),s) =
+  if (fst (counter.Ast.count_nme) = "") then
+    Format.fprintf
+      f "%a%a"
+      (Ast.print_link
+         ~syntax_version:Ast.V4 (Signature.print_site sigs)
+         (Signature.print_agent sigs) (print_link_annot ~ltypes sigs))
+      e
+      (print_switching ~show_erased) s
+  else
+    let () =
+      match counter.Ast.count_test with
+      | None -> ()
+      | Some (test,_) ->
+         match test with
+         | Ast.CEQ c -> Format.fprintf f ":%i" c
+         | Ast.CGTE c -> if c = 0 then () else Format.fprintf f ":>%i" c
+         | Ast.CVAR _ -> () in
+    let (delta,_) = counter.Ast.count_delta in
+    if delta = 0 then () else Format.fprintf f " += %d" delta
+
+let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints,counters) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
@@ -126,20 +226,26 @@ let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints) =
             f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
             (Signature.print_site sigs ag_ty) i
             (print_rule_internal sigs ~show_erased ag_ty i)
-            ints.(i) (print_rule_link sigs ~show_erased ~ltypes) ports.(i) in
+            ints.(i)
+            (print_rule_link sigs ~show_erased ~ltypes counters.(i))
+            ports.(i) in
         aux false (succ i)
       else aux empty (succ i) in
   aux true 0
 
-let print_rule_agent sigs ~ltypes f ag =
+let print_rule_agent sigs ~ltypes mix created f ag =
+  let ra_counters = add_counter_agent sigs mix created ag in
   Format.fprintf f "%t%a(@[<h>%a@])"
     (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
     (Signature.print_agent sigs) ag.ra_type
     (print_rule_intf sigs ~show_erased:false ~ltypes ag.ra_type)
-    (ag.ra_ports,ag.ra_ints)
+    (ag.ra_ports,ag.ra_ints,ra_counters)
 
-let print_rule_mixture sigs ~ltypes f mix =
-  Pp.list Pp.comma (print_rule_agent sigs ~ltypes) f mix
+let print_rule_mixture sigs ~ltypes created f mix =
+  let mix_without_counters =
+    List.filter
+      (fun ag -> not(Signature.is_counter ag.ra_type (Some sigs))) mix in
+  Pp.list Pp.comma (print_rule_agent sigs ~ltypes mix created) f mix_without_counters
 
 let print_internal_lhs sigs ag_ty site f = function
   | (I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED) -> ()
@@ -163,7 +269,8 @@ let print_link_rhs ~ltypes sigs f ((e,_),s) =
   | Linked (i,_) ->
     Ast.print_link
       ~syntax_version:Ast.V3 (Signature.print_site sigs)
-      (Signature.print_agent sigs) (fun _ () -> ()) f (Ast.LNK_VALUE (i,()))
+      (Signature.print_agent sigs) (fun _ () -> ())
+      f (Ast.LNK_VALUE (i,()))
   | Freed -> ()
   | Maintained ->
     Ast.print_link
@@ -247,7 +354,7 @@ let print_rates sigs pr_tok pr_var f r =
   Format.fprintf
     f " @@ %a%t"
     (Alg_expr.print
-       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs ~ltypes) m)
+       (fun f m -> Format.fprintf f "|%a|" (print_rule_mixture sigs ~ltypes []) m)
        pr_tok pr_var) (fst r.r_rate)
     (fun f ->
        match r.r_un_rate with
@@ -257,14 +364,14 @@ let print_rates sigs pr_tok pr_var f r =
            f " {%a%a}"
            (Alg_expr.print
               (fun f m -> Format.fprintf f "|%a|"
-                  (print_rule_mixture sigs ~ltypes) m)
+                  (print_rule_mixture sigs ~ltypes []) m)
               pr_tok pr_var) ra
            (Pp.option
               (fun f (md,_) ->
                 Format.fprintf f ":%a"
                 (Alg_expr.print
                    (fun f m -> Format.fprintf f "|%a|"
-                       (print_rule_mixture sigs ~ltypes) m)
+                       (print_rule_mixture sigs ~ltypes []) m)
                    pr_tok pr_var) md)) max_dist)
 
 let print_rule ~full sigs pr_tok pr_var f r =
@@ -273,7 +380,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
     (fun f ->
        if full || r.r_editStyle then
          Format.fprintf f "%a%t%a"
-           (print_rule_mixture sigs ~ltypes:false) r.r_mix
+           (print_rule_mixture sigs ~ltypes:false r.r_created) r.r_mix
            (fun f -> if r.r_mix <> [] && r.r_created <> [] then Pp.comma f)
            (Raw_mixture.print
               ~explicit_free:true ~compact:false ~created:true ~sigs)
@@ -291,7 +398,7 @@ let print_rule ~full sigs pr_tok pr_var f r =
             f "%a %a"
             (Alg_expr.print
                (fun f m -> Format.fprintf
-                   f "|%a|" (print_rule_mixture sigs ~ltypes:false) m)
+                   f "|%a|" (print_rule_mixture sigs ~ltypes:false []) m)
                pr_tok pr_var) nb
             pr_tok tk))
     r.r_delta_tokens

@@ -18,3 +18,5 @@ val print :
 
 val to_json : t -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> t
+
+val counters_chain_length : t -> int -> bool -> int option

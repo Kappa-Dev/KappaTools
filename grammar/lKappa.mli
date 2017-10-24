@@ -22,7 +22,7 @@ type rule_agent =
   { ra_type: int; (*agent_id*)
     ra_erased: bool;
     ra_ports: ((int,int*int) Ast.link Locality.annot * switching) array;
-    (*(state, _) , switch*)
+    (*((link nb, (dst_site,dst_ag_type)), _) , switch*)
     ra_ints: rule_internal array;
     ra_syntax: (((int,int*int) Ast.link Locality.annot * switching) array *
                 rule_internal array) option;
@@ -50,7 +50,8 @@ val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val copy_rule_agent : rule_agent -> rule_agent
 val print_rule_mixture :
-  Signature.s -> ltypes:bool -> Format.formatter -> rule_agent list -> unit
+  Signature.s -> ltypes:bool -> Raw_mixture.t -> Format.formatter ->
+  rule_agent list -> unit
 
 type 'a rule_agent_counters =
   {
