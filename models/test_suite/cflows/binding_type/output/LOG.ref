@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (256 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'binding_type.ka' '-seed' '924556145' '-l' '10000' '-u' 'event' '-d' 'output' '--time-independent'
++ Command line to rerun is: 'KaSim' 'binding_type.ka' '-seed' '924556145' '-l' '10000' '-u' 'event' '-d' 'output' '--time-independent' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 + Loading trace

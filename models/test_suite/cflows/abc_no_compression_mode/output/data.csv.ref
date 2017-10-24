@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'abc.ka' '-mode' 'batch' '-var' 'on_rate' '1.0E-4' '-u' 'event' '-l' '2000' '-d' 'output' '-p' '20' '--time-independent'
+# Output of 'KaSim' 'abc.ka' '-mode' 'batch' '-var' 'on_rate' '1.0E-4' '-u' 'event' '-l' '2000' '-d' 'output' '-p' '20' '--time-independent' '-syntax' '3'
 "[T]", "AB", "Cuu", "Cpu", "Cpp"
 0., 0, 10000, 0, 0
 0.191170138718, 16, 10000, 0, 0

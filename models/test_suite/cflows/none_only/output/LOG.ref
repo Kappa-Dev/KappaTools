@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (32 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent'
++ Command line to rerun is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 + Loading trace

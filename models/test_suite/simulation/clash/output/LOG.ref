@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output'
++ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 Simulation ended

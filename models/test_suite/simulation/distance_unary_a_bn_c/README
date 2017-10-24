@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -u e -l 200 -seed 656095496 -o data.svg -d output -p 2 a_bn_c.ka || exit 0
+"${KAPPABIN}"KaSim -u e -l 200 -seed 656095496 -o data.svg -d output -p 2 a_bn_c.ka -syntax 3 || exit 0

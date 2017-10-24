@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim create.ka -seed 931056658 -u event -l 500 -d output --time-independent || exit 0
+"${KAPPABIN}"KaSim create.ka -seed 931056658 -u event -l 500 -d output --time-independent -syntax 3 || exit 0
 
 #In this example, each A has two sites.  Site x of a A can connect to
 #site y of another A.  Then it can get phosphorylated while
