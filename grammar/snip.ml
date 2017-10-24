@@ -656,7 +656,7 @@ let connected_components_sum_of_ambiguous_rule
            (fun f x ->
               Format.fprintf
                 f "@[%a%t%a@]"
-                (LKappa.print_rule_mixture sigs ~ltypes:true) x
+                (LKappa.print_rule_mixture sigs ~ltypes:true created) x
                 (if x <> [] && created <> [] then Pp.comma else Pp.empty)
                 (Raw_mixture.print
                    ~explicit_free:true ~compact:false ~created:true ~sigs)

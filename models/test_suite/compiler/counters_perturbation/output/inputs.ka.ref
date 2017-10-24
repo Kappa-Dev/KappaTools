@@ -9,13 +9,13 @@
 %agent: A(x~u~p, c:0 += 3)
 
 %plot: [T]
-'r1' A(x!., c!1/!2), __incr(b!1/!1), +__incr(a!1, b!2) @ 1
-'r2' A(x!., c!1/!3), __incr(a!2, b!1/!1), __incr(b!2), +__incr(a!1, b!3) @ 10
+'r1' A(x!., c += 1),  @ 1
+'r2' A(x!., c:>1 += 1),  @ 10
 
 /*0*/%mod: (|A(c:4)| = 1) do $PRINTF  <"
 Counter c of agent A reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
 
-%init: 40 A(x~u!., c!1), __incr(a!., b!1)
+%init: 40 A(x~u!., c:0)
 
 %mod: [E] = 4 do $STOP

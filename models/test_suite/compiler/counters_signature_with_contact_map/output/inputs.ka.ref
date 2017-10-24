@@ -11,7 +11,7 @@
 
 %plot: [T]
 'r1' B(x!./!1), A(x!./!1) @ 1
-'r2' B(x!1/!., c!4/!5), A(x!1/!., c!2/!3), __incr(b!4/!4), __incr(b!2/!2), +__incr(a!4, b!5), +__incr(a!2, b!3) @ 1
+'r2' B(x!1/!., c += 1), A(x!1/!., c += 1),  @ 1
 
 /*0*/%mod: (|B(c:4)| = 1) do $PRINTF  <"
 Counter c of agent B reached maximum
@@ -23,7 +23,7 @@ Counter d of agent A reached maximum
 Counter c of agent A reached maximum
 ">; $STOP "counter_perturbation.ka" repeat ([false])
 
-%init: 10 A(x!., c!1, d!2), __incr(a!., b!1), __incr(a!3, b!2), __incr(a!., b!3)
-%init: 10 B(x!., c!1), __incr(a!., b!1)
+%init: 10 A(x!., c:0, d:1)
+%init: 10 B(x!., c:0)
 
 %mod: [E] = 39 do $STOP
