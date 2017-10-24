@@ -4,7 +4,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg"
 xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
-<title>Output of 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka'</title>
+<title>Output of 'KaSim' '-u' 'e' '-l' '200' '-seed' '656095496' '-o' 'data.svg' '-d' 'output' '-p' '2' 'a_bn_c.ka' '-syntax' '3'</title>
 
 <style type="text/css" >
 <![CDATA[

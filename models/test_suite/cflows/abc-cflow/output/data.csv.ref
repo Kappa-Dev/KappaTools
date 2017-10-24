@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent'
+# Output of 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent' '-syntax' '3'
 "[T]", "AB", "Cuu", "Cpu", "Cpp", "n_c"
 0., 0, 0, 0, 0, 0
 3.18857310231, 698, 0, 0, 0, 0

@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -l 1 -seed 442310228 -d output counters.ka || true
+"${KAPPABIN}"KaSim -l 1 -seed 442310228 -d output counters.ka -syntax 3 || true

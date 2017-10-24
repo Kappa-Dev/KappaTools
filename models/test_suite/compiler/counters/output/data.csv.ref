@@ -1,3 +1,3 @@
-# Output of 'KaSim' '-l' '1' '-seed' '442310228' '-d' 'output' 'counters.ka'
+# Output of 'KaSim' '-l' '1' '-seed' '442310228' '-d' 'output' 'counters.ka' '-syntax' '3'
 "[T]", "A1"
 0., 0

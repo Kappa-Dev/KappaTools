@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2048 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'abc-pert.ka' '-seed' '924556145' '-u' 'e' '-l' '100000' '-p' '0' '-d' 'output' '--time-independent' '-mode' 'batch'
++ Command line to rerun is: 'KaSim' 'abc-pert.ka' '-seed' '924556145' '-u' 'e' '-l' '100000' '-p' '0' '-d' 'output' '--time-independent' '-mode' 'batch' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 + Loading trace

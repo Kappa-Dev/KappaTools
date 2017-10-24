@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim side-effects.ka -u e -l 25 -seed 253329392 -d output --time-independent || exit 0 
+"${KAPPABIN}"KaSim side-effects.ka -u e -l 25 -seed 253329392 -d output --time-independent -syntax 3 || exit 0 
 
 
 #A and B can for dimmer.

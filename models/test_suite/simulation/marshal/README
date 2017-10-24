@@ -2,7 +2,7 @@
 
 BLOB=/tmp/KaSim-test-blob-$(basename $PWD)
 
-"${KAPPABIN}"KaSim --compile -make-sim ${BLOB} -seed 496408597 -d output model.ka && \
-"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 958076642 -d output && \
-"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 458154606 -d output -var init 300 || exit 0
+"${KAPPABIN}"KaSim --compile -make-sim ${BLOB} -seed 496408597 -d output model.ka -syntax 3 && \
+"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 958076642 -d output -syntax 3 && \
+"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 458154606 -d output -var init 300 -syntax 3 || exit 0
 rm -f ${BLOB}

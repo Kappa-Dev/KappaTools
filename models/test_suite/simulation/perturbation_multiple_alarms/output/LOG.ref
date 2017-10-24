@@ -15,7 +15,7 @@ done
 3rd printing alarm at 0.
  (16384 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-l' '5' '-d' 'output' '-seed' '20543' 'repeat_time.ka'
++ Command line to rerun is: 'KaSim' '-l' '5' '-d' 'output' '-seed' '20543' 'repeat_time.ka' '-syntax' '3'
 ____________________________________________________________
 ########1st printing alarm at 0.7
 2nd printing alarm at 0.7

@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (32768 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-p' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-mode' 'batch' '--max-sharing'
++ Command line to rerun is: 'KaSim' '-p' '0.008' '-d' 'output' 'rafinements.ka' '-o' 'data.tsv' '-mode' 'batch' '--max-sharing' '-syntax' '3'
 ____________________________________________________________
 ############################################################
 Simulation ended
