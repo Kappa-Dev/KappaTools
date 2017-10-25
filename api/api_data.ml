@@ -9,16 +9,16 @@ type simulation_detail_output =
 let api_message_errors
     ?(severity:Api_types_t.severity = `Error)
     ?(region:Api_types_t.range option)
-    (message : string) : Api_types_t.errors =
-  [{ Api_types_t.message_severity = severity;
+    (message : string) : Api_types_t.message =
+  { Api_types_t.message_severity = severity;
      Api_types_t.message_text = message ;
-     Api_types_t.message_range = region }]
+     Api_types_t.message_range = region }
 
 let api_exception_errors
     (e : exn) : Api_types_t.errors =
-  api_message_errors
+  [api_message_errors
     (try  (Printexc.to_string e)
-     with _ -> "unspecified exception thrown")
+     with _ -> "unspecified exception thrown")]
 
 let api_snapshot_dot (snapshot : Api_types_t.snapshot) =
   Format.asprintf "%a@." (Data.print_dot_snapshot ?uuid:None) snapshot

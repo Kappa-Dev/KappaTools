@@ -8,7 +8,7 @@ type simulation_detail_output =
 
 val api_message_errors :
   ?severity:Api_types_t.severity ->
-  ?region:Api_types_t.range -> string -> Api_types_t.errors
+  ?region:Api_types_t.range -> string -> Api_types_t.message
 val api_exception_errors : exn -> Api_types_t.errors
 val api_snapshot_dot : Api_types_t.snapshot -> string
 val api_snapshot_kappa : Api_types_t.snapshot -> string

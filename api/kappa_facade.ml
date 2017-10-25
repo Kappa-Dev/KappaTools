@@ -53,7 +53,6 @@ type t =
   { mutable is_running : bool ;
     mutable run_finalize : bool ;
     mutable pause_condition : (Pattern.id array list,int) Alg_expr.bool ;
-    syntax_version : Ast.syntax_version;
     dumpIfDeadlocked : bool;
     maxConsecutiveClash : int;
     counter : Counter.t ;
@@ -76,12 +75,11 @@ type t =
     mutable lastyield : float ;
   }
 
-let create_t ~log_form ~log_buffer ~contact_map ~syntax_version
+let create_t ~log_form ~log_buffer ~contact_map
     ~dumpIfDeadlocked ~maxConsecutiveClash ~env ~counter ~graph
     ~state ~init_l ~lastyield ~ast : t = {
   is_running = false; run_finalize = false; counter; log_buffer; log_form;
   pause_condition = Alg_expr.FALSE; dumpIfDeadlocked; maxConsecutiveClash;
-  syntax_version;
   plot = Data.init_plot env;
   snapshots = [];
   flux_maps = [];
@@ -113,14 +111,17 @@ let reinitialize random_state t =
 let catch_error : 'a . (Api_types_t.errors -> 'a) -> exn -> 'a =
   fun handler ->
     (function
-      |  ExceptionDefn.Syntax_Error ((message,region) : string Locality.annot) ->
-        handler (Api_data.api_message_errors ~region message)
-      | ExceptionDefn.Malformed_Decl ((message,region) : string Locality.annot) ->
-        handler (Api_data.api_message_errors ~region message)
-      | ExceptionDefn.Internal_Error ((message,region) : string Locality.annot) ->
-        handler (Api_data.api_message_errors ~region message)
+      |  ExceptionDefn.Syntax_Error
+          ((message,region) : string Locality.annot) ->
+        handler [Api_data.api_message_errors ~region message]
+      | ExceptionDefn.Malformed_Decl
+          ((message,region) : string Locality.annot) ->
+        handler [Api_data.api_message_errors ~region message]
+      | ExceptionDefn.Internal_Error
+          ((message,region) : string Locality.annot) ->
+        handler [Api_data.api_message_errors ~region message]
       | Invalid_argument error ->
-        handler (Api_data.api_message_errors ("Runtime error "^ error))
+        handler [Api_data.api_message_errors ("Runtime error "^ error)]
       | exn -> handler (Api_data.api_exception_errors exn))
 
 type file = { file_id : string ; file_content : string }
@@ -130,7 +131,7 @@ let rec compile_file
     (compile : Ast.parsing_compil)
   : file list -> (Ast.parsing_compil, Api_types_t.errors) Result.result Lwt.t =
   function
-  | [] -> Lwt.return (Result_util.ok compile)
+  | [] -> Lwt_result.return compile
   | file::files ->
     let lexbuf = Lexing.from_string file.file_content in
     let () = lexbuf.Lexing.lex_curr_p <-
@@ -139,10 +140,20 @@ let rec compile_file
       { compile with Ast.filenames = file.file_id :: compile.Ast.filenames } in
     Lwt.catch
       (fun () ->
-         (Lwt.wrap3 KappaParser.start_rule KappaLexer.token lexbuf compile) >>=
-         (fun new_compile ->
+         (Lwt.wrap2 Kparser4.model Klexer4.token lexbuf) >>=
+         (fun (insts,err) ->
             (yield ()) >>=
-            (fun () -> compile_file yield new_compile files))
+            (fun () ->
+               let new_compile = Cst.append_to_ast_compil insts compile in
+               compile_file yield new_compile files >>=
+               if err = [] then Lwt.return
+               else
+                 let err = List.map
+                     (fun (m,region) -> Api_data.api_message_errors ~region m)
+                     err in
+                 Result_util.fold
+                   ~ok:(fun _ -> Lwt_result.fail err)
+                   ~error:(fun error -> Lwt_result.fail (err@error))))
       )
       (catch_error
          (fun e ->
@@ -166,8 +177,8 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   let post_parse ast =
     let (conf,_,_,_,_) =
       Configuration.parse ast.Ast.configurations in
-    let syntax_version = conf.Configuration.syntaxVersion in
-    (Lwt.wrap2 (LKappa_compiler.compil_of_ast ~syntax_version) overwrite ast) >>=
+    (Lwt.wrap2
+       (LKappa_compiler.compil_of_ast ~syntax_version:Ast.V4) overwrite ast) >>=
     (fun
       (sig_nd,
        contact_map,
@@ -213,7 +224,6 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
                   ~contact_map ~log_form ~log_buffer ~ast ~env ~counter
                   ~dumpIfDeadlocked:conf.Configuration.dumpIfDeadlocked
                   ~maxConsecutiveClash:conf.Configuration.maxConsecutiveClash
-                  ~syntax_version
                   ~graph:(Rule_interpreter.empty
                             ~with_trace
                             random_state env counter)
@@ -380,55 +390,58 @@ let start
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
       let () = reinitialize random_state t in
-      Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
-      fun pause ->
-      Lwt.wrap4 (Evaluator.get_pause_criteria
-                   ~max_sharing:false ~syntax_version:t.syntax_version)
-        t.contact_map t.env t.graph pause >>=
-      fun (env',graph',b'') ->
-      let () = t.env <- env' in
-      let () = t.graph <- graph' in
-      let () = t.pause_condition <- b'' in
-      let () =
-        Counter.set_plot_period
-          t.counter
-          (Counter.DT parameter.Api_types_t.simulation_plot_period) in
-      let () =
-        Lwt.async
-          (fun () ->
-             try (* exception raised by build_initial_state must have been
-                    raised with Lwt.fail. Something is wrong for now... *)
-               Eval.build_initial_state
-                 ~bind:(fun x f ->
-                     (time_yield ~system_process:system_process ~t:t) >>=
-                     (fun () -> x >>= f))
-                 ~return:Lwt.return ~outputs:(outputs t)
-                 ~with_trace:parameter.Api_types_t.simulation_store_trace
-                 ~with_delta_activities:false
-                 t.counter
-                 t.env
-                 random_state
-                 t.init_l >>=
-               (fun (stop,graph,state) ->
-                  let () = t.graph <- graph; t.state <- state in
-                  let () = ExceptionDefn.flush_warning t.log_form in
-                  let first_obs =
-                    State_interpreter.observables_values
-                      t.env graph t.counter in
-                  let () =
-                    t.plot <- Data.add_plot_line first_obs t.plot in
-                  run_simulation ~system_process:system_process ~t:t stop)
-             with e ->
-               catch_error
-                 (fun e ->
-                    let () = t.error_messages <- e in
-                    Lwt.return_unit) e
-          ) in
-      Lwt.return (Result_util.ok ()))
+      Lwt.wrap2 Kparser4.standalone_bool_expr Klexer4.token lexbuf >>=
+      function
+      | Result.Error (message,region) ->
+        Lwt_result.fail [Api_data.api_message_errors ~region message]
+      | Result.Ok pause ->
+        Lwt.wrap4 (Evaluator.get_pause_criteria
+                     ~max_sharing:false ~syntax_version:Ast.V4)
+          t.contact_map t.env t.graph pause >>=
+        fun (env',graph',b'') ->
+        let () = t.env <- env' in
+        let () = t.graph <- graph' in
+        let () = t.pause_condition <- b'' in
+        let () =
+          Counter.set_plot_period
+            t.counter
+            (Counter.DT parameter.Api_types_t.simulation_plot_period) in
+        let () =
+          Lwt.async
+            (fun () ->
+               try (* exception raised by build_initial_state must have been
+                      raised with Lwt.fail. Something is wrong for now... *)
+                 Eval.build_initial_state
+                   ~bind:(fun x f ->
+                       (time_yield ~system_process:system_process ~t:t) >>=
+                       (fun () -> x >>= f))
+                   ~return:Lwt.return ~outputs:(outputs t)
+                   ~with_trace:parameter.Api_types_t.simulation_store_trace
+                   ~with_delta_activities:false
+                   t.counter
+                   t.env
+                   random_state
+                   t.init_l >>=
+                 (fun (stop,graph,state) ->
+                    let () = t.graph <- graph; t.state <- state in
+                    let () = ExceptionDefn.flush_warning t.log_form in
+                    let first_obs =
+                      State_interpreter.observables_values
+                        t.env graph t.counter in
+                    let () =
+                      t.plot <- Data.add_plot_line first_obs t.plot in
+                    run_simulation ~system_process:system_process ~t:t stop)
+               with e ->
+                 catch_error
+                   (fun e ->
+                      let () = t.error_messages <- e in
+                      Lwt.return_unit) e
+            ) in
+        Lwt_result.return ())
     (catch_error
        (fun e ->
           let () = t.error_messages <- e in
-          Lwt.return (Result_util.error e)))
+          Lwt_result.fail e))
 
 let pause
     ~(system_process : system_process)
@@ -470,25 +483,26 @@ let perturbation
   Lwt.catch
     (fun () ->
        if t.is_running then
-         Lwt.return
-           (Result_util.error (Api_data.api_message_errors msg_process_not_paused))
+         Lwt_result.fail [Api_data.api_message_errors msg_process_not_paused]
        else
-         Lwt.wrap2
-           KappaParser.standalone_effect_list KappaLexer.token lexbuf >>=
-         fun e ->
-         let log_buffer = Buffer.create 512 in
-         let log_form = Format.formatter_of_buffer log_buffer in
-         Lwt.wrap6
-           (Evaluator.do_interactive_directives
-              ~outputs:(interactive_outputs log_form t)
-              ~max_sharing:false ~syntax_version:t.syntax_version)
-           t.contact_map t.env t.counter t.graph t.state e >>=
-         fun (_,(env',(_,graph'',state'))) ->
-         let () = t.env <- env' in
-         let () = t.graph <- graph'' in
-         let () = t.state <- state' in
-         Lwt.return (Result_util.ok (Buffer.contents log_buffer)))
-    (catch_error (fun e -> Lwt.return (Result_util.error e)))
+         Lwt.wrap2 Kparser4.standalone_effect_list Klexer4.token lexbuf >>=
+         function
+         | Result.Error (message,region) ->
+           Lwt_result.fail [Api_data.api_message_errors ~region message]
+         | Result.Ok e ->
+           let log_buffer = Buffer.create 512 in
+           let log_form = Format.formatter_of_buffer log_buffer in
+           Lwt.wrap6
+             (Evaluator.do_interactive_directives
+                ~outputs:(interactive_outputs log_form t)
+                ~max_sharing:false ~syntax_version:Ast.V4)
+             t.contact_map t.env t.counter t.graph t.state e >>=
+           fun (_,(env',(_,graph'',state'))) ->
+           let () = t.env <- env' in
+           let () = t.graph <- graph'' in
+           let () = t.state <- state' in
+           Lwt.return (Result_util.ok (Buffer.contents log_buffer)))
+    (catch_error (fun e -> Lwt_result.fail e))
 
 let continue
     ~(system_process : system_process)
@@ -502,30 +516,33 @@ let continue
        if t.is_running then
          Lwt.return (Result_util.ok ())
        else
-         Lwt.wrap2 KappaParser.standalone_bool_expr KappaLexer.token lexbuf >>=
-         fun pause ->
-         Lwt.wrap4 (Evaluator.get_pause_criteria
-                      ~max_sharing:false ~syntax_version:t.syntax_version)
-           t.contact_map t.env t.graph pause >>=
-         fun (env',graph',b'') ->
-         let () = t.env <- env' in
-         let ()  = t.graph <- graph' in
-         let () = t.pause_condition <- b'' in
-         (*let () =
-           Counter.set_max_time
+         Lwt.wrap2 Kparser4.standalone_bool_expr Klexer4.token lexbuf >>=
+         function
+         | Result.Error (message,region) ->
+           Lwt_result.fail [Api_data.api_message_errors ~region message]
+         | Result.Ok pause ->
+           Lwt.wrap4 (Evaluator.get_pause_criteria
+                        ~max_sharing:false ~syntax_version:Ast.V4)
+             t.contact_map t.env t.graph pause >>=
+           fun (env',graph',b'') ->
+           let () = t.env <- env' in
+           let ()  = t.graph <- graph' in
+           let () = t.pause_condition <- b'' in
+           (*let () =
+             Counter.set_max_time
              t.counter
              parameter.Api_types_t.simulation_max_time
-         in
-         let () =
-           Counter.set_max_events
+             in
+             let () =
+             Counter.set_max_events
              t.counter
              parameter.Api_types_t.simulation_max_events
-           in*)
-         let () =
-           Lwt.async
-             (fun () ->
-                run_simulation ~system_process:system_process ~t:t false) in
-         Lwt.return (Result_util.ok ())
+             in*)
+           let () =
+             Lwt.async
+               (fun () ->
+                  run_simulation ~system_process:system_process ~t:t false) in
+           Lwt.return (Result_util.ok ())
     )
     (catch_error
        (fun e -> Lwt.return (Result_util.error e)))

@@ -191,7 +191,7 @@ let request_handler context = function
     error_response
       ?headers:None
       ?status:None
-      (Api_data.api_message_errors "multiple routes match url")
+      [Api_data.api_message_errors "multiple routes match url"]
 
 
 let route_handler
