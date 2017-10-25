@@ -23,7 +23,7 @@ let detail_projection
        (Kappa_facade.outputs
           ~system_process:system_process
           ~t:t) >>=
-       (Result_util.map
+       (Result_util.fold
           ~ok:(fun (simulation_detail : Api_data.simulation_detail_output) ->
               Lwt.return (projection simulation_detail):
                 (Api_data.simulation_detail_output -> 'a Api.result Lwt.t))
@@ -241,7 +241,7 @@ class manager_simulation
           Lwt.return (Api_common.result_error_msg
                         "Cannot start simulation: Parse not done")
         | Some parse ->
-          Result_util.map
+          Result_util.fold
             ~ok:
               (fun (facade : Kappa_facade.t) ->
                  (Kappa_facade.start
@@ -249,7 +249,7 @@ class manager_simulation
                     ~parameter:simulation_parameter
                     ~t:facade)
                  >>=
-                 (Result_util.map
+                 (Result_util.fold
                     ~ok:
                       (fun () ->
                          let () =
@@ -298,7 +298,7 @@ class manager_simulation
         (fun simulation(* project simulation *) ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            (Kappa_facade.stop ~system_process ~t) >>=
-           (Result_util.map
+           (Result_util.fold
               ~ok:((fun () ->
                   Lwt.return (Api_common.result_ok ())))
               ~error:((fun (errors : Api_types_j.errors) ->
@@ -318,7 +318,7 @@ class manager_simulation
               ~system_process:system_process
               ~t:t
               ~perturbation:simulation_perturbation) >>=
-           (Result_util.map
+           (Result_util.fold
                 ~ok:((fun s -> Lwt.return (Api_common.result_ok s)))
                 ~error:(fun (errors : Api_types_j.errors) ->
                     Lwt.return (Api_common.result_messages errors))
@@ -334,7 +334,7 @@ class manager_simulation
            (Kappa_facade.continue
               ~system_process:system_process
               ~t:t ~pause_condition) >>=
-           (Result_util.map
+           (Result_util.fold
                 ~ok:((fun () -> Lwt.return (Api_common.result_ok ())))
                 ~error:((fun (errors : Api_types_j.errors) ->
                           Lwt.return (Api_common.result_messages errors)) :
@@ -348,10 +348,10 @@ class manager_simulation
         (fun simulation ->
            let t : Kappa_facade.t = simulation#get_runtime_state () in
            Kappa_facade.progress ~system_process ~t >>=
-           (Result_util.map
+           (Result_util.fold
               ~ok:(fun progress ->
                   Kappa_facade.outputs ~system_process ~t >>=
-                  (Result_util.map
+                  (Result_util.fold
                      ~ok:(fun outputs ->
                          Lwt.return
                            (Api_common.result_ok

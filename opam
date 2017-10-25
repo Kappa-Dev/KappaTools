@@ -15,17 +15,18 @@ depends : [
   "ocamlfind"
   "ocamlbuild" {build}
   "yojson"
+  "lwt"
 ]
 
 depopts: [
-  "labltk" "lwt" "cohttp-lwt-unix"
+  "labltk" "cohttp-lwt-unix"
   "atdgen" {build}
 ]
 
 build: [
   [ make "USE_TK=1" {labltk:installed} "all" ]
   [ make "META" "kappalib" ]
-  [ make "agents" ] {atdgen:installed & lwt:installed}
+  [ make "agents" ] {atdgen:installed}
   [ make "bin/WebSim" ] {atdgen:installed & cohttp-lwt-unix:installed}
 ]
 

@@ -58,7 +58,7 @@ let read_t read__ok read__error = fun p lb ->
 let t_of_string read__ok read__error s =
   read_t read__ok read__error (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
-let map
+let fold
     ~(ok:'ok -> 'a)
     ~(error:'error -> 'a) : ('ok,'error) t -> 'a
   =
@@ -66,9 +66,22 @@ let map
   | Result.Ok o -> ok o
   | Result.Error e -> error e
 
-let bind ~(ok:'ok -> 'a) : ('ok,'error) t -> 'a = function
+let bind: type ok a err. (ok -> (a,err) t) -> (ok,err) t -> (a,err) t =
+  fun ok -> function
   | Result.Ok o -> ok o
-  | Result.Error e -> `Error e
+  | Result.Error _ as e -> e
+
+let map: type ok a err. (ok -> a) -> (ok,err) t -> (a,err) t =
+  fun ok -> function
+  | Result.Ok o -> Ok (ok o)
+  | Result.Error _ as e -> e
+
+let map2:
+  type a b ok err. (a -> b -> ok) -> (a,err) t -> (b,err) t -> (ok,err) t =
+  fun f a b -> match a,b with
+  | Result.Ok a, Result.Ok b -> Ok (f a b)
+  | Result.Error _ as e, _ -> e
+  | Result.Ok _, (Result.Error _ as e) -> e
 
 let error (error:'error ) : ('ok,'error) t = Result.Error error
 

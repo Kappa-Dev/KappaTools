@@ -7,7 +7,7 @@ let stop_simulation (system_process:Kappa_facade.system_process) :
   | Some current ->
     let t : Kappa_facade.t = current#get_runtime_state () in
     (Kappa_facade.stop ~system_process:system_process ~t:t) >>=
-    (Result_util.map
+    (Result_util.fold
        ~ok:(fun _ -> Lwt.return (Api_common.result_ok ()))
        ~error:(fun errors ->
            Lwt.return (Api_common.result_messages errors)))
@@ -42,7 +42,7 @@ object
     >>=
     (fun state ->
        Lwt.return
-         (Result_util.map
+         (Result_util.fold
             ~ok:(fun kappa_facade ->
                 Api_common.result_ok {
                   Api_types_t.project_parse_project_version =
