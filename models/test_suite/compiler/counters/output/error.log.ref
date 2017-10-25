@@ -1,4 +1,4 @@
-File "counters.ka", line 38, characters 6-22:
+File "counters.ka", line 39, characters 6-22:
 Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "counters.ka", line 35, characters 20-21:
+File "counters.ka", line 36, characters 20-21:
 Warning: Counter c:>0 always holds
