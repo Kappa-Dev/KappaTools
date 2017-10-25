@@ -69,6 +69,7 @@ val print_site_internal_state :
   s -> int -> int -> Format.formatter -> int option -> unit
 (** [print_site_internal_state sigs agent_type site_id f state_id]
 prints both the site and its internal state if it is not [None]. *)
+
 val print_counter : s -> int -> Format.formatter -> int -> unit
 
 val print : Format.formatter -> s -> unit

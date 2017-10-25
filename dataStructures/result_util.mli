@@ -34,7 +34,10 @@ val t_of_string :
   string -> ('ok, 'error) t
 (** Deserialize JSON data of type {!t}. *)
 
-val map : ok:('ok -> 'a) -> error:('error -> 'a) -> ('ok, 'error) t -> 'a
-val bind : ok:('ok -> ([> `Error of 'error ] as 'a)) -> ('ok, 'error) t -> 'a
+val fold : ok:('ok -> 'a) -> error:('error -> 'a) -> ('ok, 'error) t -> 'a
+val bind : ('ok -> ('a, 'error) t) -> ('ok, 'error) t -> ('a, 'error) t
+val map : ('ok -> 'a) -> ('ok, 'error) t -> ('a, 'error) t
+val map2 :
+  ('a -> 'b -> 'ok) -> ('a, 'error) t -> ('b, 'error) t -> ('ok, 'error) t
 val error : 'error -> ('ok, 'error) t
 val ok : 'ok -> ('ok, 'error) t

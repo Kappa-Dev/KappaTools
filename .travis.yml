@@ -63,10 +63,10 @@ before_install:
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
-  - opam install -y ocamlbuild yojson
+  - opam install -y ocamlbuild yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen cohttp ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then pip2 install --user . && pip install -v .[REST] ; fi"
 
 script:

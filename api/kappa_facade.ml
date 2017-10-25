@@ -150,7 +150,7 @@ let rec compile_file
             (fun () -> compile_file yield compile files) >>=
             (fun result ->
                let r =
-                 Result_util.map
+                 Result_util.fold
                    ~ok:(fun _ -> Result_util.error e)
                    ~error:(fun error -> Result_util.error (e@error))
                    result
@@ -229,7 +229,7 @@ let build_ast (kappa_files : file list) overwrite (yield : unit -> unit Lwt.t) =
   Lwt.catch
     (fun () ->
        (compile_file yield Ast.empty_compil kappa_files) >>=
-       (Result_util.map
+       (Result_util.fold
           ~ok:(fun raw_ast ->
               (yield ()) >>=
               (fun () -> post_parse raw_ast))
@@ -292,7 +292,7 @@ let parse
   Lwt.bind
     (build_ast
        kappa_files overwrites system_process#yield)
-    (Result_util.map
+    (Result_util.fold
        ~ok:(fun simulation -> Lwt.return (Result_util.ok simulation))
        ~error:(fun e -> Lwt.return (Result_util.error e)))
 
