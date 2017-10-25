@@ -476,7 +476,7 @@ let remove_counter_rule sigs mix created =
       List.fold_left
         (fun (a,b,lnk) ag ->
             let (a',b',lnk') = remove_counter_agent sigs ag lnk in
-            a'@a,b'@b,lnk')
+            a'@a,b'@b,lnk'+1)
         ([],[],lnk_nb+1) mix in
     let incrs_created',_ =
       List.fold_left
