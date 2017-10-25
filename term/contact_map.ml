@@ -52,7 +52,7 @@ let print_kappa sigs f c =
   Format.fprintf f "@[<v>%a@]"
     (Pp.array Pp.space
        (fun ag f intf ->
-         if not(Signature.is_counter ag (Some sigs)) then
+         if not(Signature.is_counter ag (Some sigs))||(!Parameter.debugModeOn) then
            begin
            Format.fprintf f "@[<h>%%agent: %a(%a)@]"
            (Signature.print_agent sigs) ag
@@ -64,12 +64,14 @@ let print_kappa sigs f c =
                          (Signature.print_internal_state sigs ag s) i)) is
                   (Pp.list Pp.empty (fun f (ad,sd) ->
                                       if (Signature.site_is_counter sigs ag s)
+                                         &&not(!Parameter.debugModeOn)
                                       then ()
                                       else
                                         Format.fprintf f "!%a.%a"
                                         (Signature.print_site sigs ad) sd
                                         (Signature.print_agent sigs) ad)) ls
-                  (Signature.print_counter sigs ag) s))
+                  (fun f id-> if (!Parameter.debugModeOn) then ()
+                              else Signature.print_counter sigs ag f id) s))
            end
            intf))
     c
