@@ -172,6 +172,7 @@ let add_counter_agent sigs mix created ag =
     Array.make
       (Array.length ag.ra_ports) (empty_counter,Maintained) in
   let () =
+    if not(!Parameter.debugModeOn) then
     Array.iteri
       (fun id ((e,_),s) ->
         match e with
@@ -195,7 +196,7 @@ let add_counter_agent sigs mix created ag =
   ra_counters
 
 let print_rule_link sigs ~show_erased ~ltypes (counter,_) f ((e,_),s) =
-  if (fst (counter.Ast.count_nme) = "") then
+  if (fst (counter.Ast.count_nme) = "")||(!Parameter.debugModeOn) then
     Format.fprintf
       f "%a%a"
       (Ast.print_link
@@ -243,7 +244,7 @@ let print_rule_agent sigs ~ltypes mix created f ag =
     (ag.ra_ports,ag.ra_ints,ra_counters)
 
 let print_rule_mixture sigs ~ltypes created f mix =
-  let mix_without_counters =
+  let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
       (fun ag -> not(Signature.is_counter ag.ra_type (Some sigs))) mix in
   Pp.list Pp.comma (print_rule_agent sigs ~ltypes mix created) f mix_without_counters

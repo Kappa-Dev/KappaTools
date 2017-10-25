@@ -71,7 +71,8 @@ let print_link ~explicit_free mix sigs ag_ty f = function
   | FREE -> if explicit_free then Format.pp_print_string f "!."
   | VAL i ->
      let (dst_ag,dst_port) = find_ag_with_link mix i ag_ty in
-     if not(dst_ag = -1) && (Signature.is_counter dst_ag sigs) then
+     if not(dst_ag = -1) && (Signature.is_counter dst_ag sigs) &&
+          not(!Parameter.debugModeOn) then
        let counter = counter_value mix i (dst_ag,dst_port) 0 in
        Format.fprintf f ":%d" counter
      else Format.fprintf f "!%i" i
@@ -112,7 +113,7 @@ let print_agent ~explicit_free compact created link ?sigs mix f ag =
       (ag.a_ports, ag.a_ints)
 
 let print ~explicit_free ~compact ~created ?sigs f mix =
-  let mix_without_counters =
+  let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
       (fun ag -> not(Signature.is_counter ag.a_type sigs)) mix in
   Pp.list
