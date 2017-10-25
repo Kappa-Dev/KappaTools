@@ -101,7 +101,7 @@ let compute_scc
              let () =
                Loggers.fprintf
                (Remanent_parameters.get_logger parameters)
-               "%i %s;\n"
+               "Node: %i %s;\n"
                i (n_to_string j) in
              error)
           graph.node_labels
@@ -113,7 +113,7 @@ let compute_scc
              let () =
                Loggers.fprintf
                  (Remanent_parameters.get_logger parameters)
-                 "%i:" i
+                 "Edge %i -- " i
               in
              let error =
                List.fold_left
@@ -266,20 +266,18 @@ let compute_scc
       in
       let _ =
         List.iter
-          (fun list  ->
+          (fun list ->
              let () =
                List.iter
                  (Loggers.fprintf
                    (Remanent_parameters.get_logger parameters)
-                   "%i;")
-               list in
-             let () =
-               Loggers.fprintf
-                 (Remanent_parameters.get_logger parameters)
-                 "\n"
+                   " %i; ") list
              in
-             ())
-          scc_list
+             ()
+          ) scc_list;
+          Loggers.fprintf
+            (Remanent_parameters.get_logger parameters)
+            "\n"
       in
       Loggers.print_newline
         (Remanent_parameters.get_logger parameters)

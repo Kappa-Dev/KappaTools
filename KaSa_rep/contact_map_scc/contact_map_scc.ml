@@ -175,11 +175,6 @@ let compute_graph_scc parameters errors contact_map_converted store_result =
       let graph =
         Graphs.create parameters errors
           (fun _n -> ()
-           (*let () =
-                 Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "node_labels:%i\n"
-                  (Graphs.int_of_node n)
-              in*)
           )
           nodes
           edges_list

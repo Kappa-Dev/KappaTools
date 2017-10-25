@@ -91,37 +91,15 @@ let main () =
              agent_name_string
              site_name_string
          in
-         (*let errors = Graphs.Nodearray.print parameters errors
-             (fun parameters errors i ->
-                let () =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameters)
-                    "low:%i\n"
-                    i
-                in
-                errors
-             ) low
-         in
-         let errors = Graphs.Nodearray.print parameters errors
-             (fun parameters errors i ->
-                let () =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameters)
-                    "pre:%i\n"
-                    i
-                in
-                errors
-             ) pre
-         in*)
          List.iter (fun l ->
              List.iter (fun x ->
-               Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  " %i " (Graphs.int_of_node x)
+                 Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                   " %i " (Graphs.int_of_node x)
                ) l
            ) scc;
          Loggers.print_newline (Remanent_parameters.get_logger parameters)
       ) graph_scc
-    in*)
+  in*)
   (*-----------------------------------------------------------------------*)
   (**)
   let state =
