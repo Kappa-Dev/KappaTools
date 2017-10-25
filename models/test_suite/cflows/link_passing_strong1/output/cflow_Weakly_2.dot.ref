@@ -16,7 +16,7 @@ node_5 [label="-B(x!.), +C(x!.)", shape=invhouse, style=filled, fillcolor = ligh
 node_9 [label="A(x!./!1), B(x!./!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_6 [label="-C(x!.), +A(x!.)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
 node_7 [label="-A(x!.), +B(x!.)", shape=invhouse, style=filled, fillcolor = lightblue] ;

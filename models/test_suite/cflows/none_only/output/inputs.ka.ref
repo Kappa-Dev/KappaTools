@@ -30,7 +30,7 @@
 'a..b' A(x!1/!.), B(x!1/!.) @ off_rate
 'ab.c' A(x!_, c!./!2), C(x1~u!./!2) @ on_rate
 'mod x1' C(x1~u/~p!1/!.), A(c!1/!.) @ mod_rate
-'a.c' A(x!., c!./!1), C(x1~p, x2~u!./!1) @ on_rate
+'a.c' A(x!., c!./!1), C(x1~p?, x2~u!./!1) @ on_rate
 'mod x2' A(x!., c!1/!.), C(x1~p!., x2~u/~p!1/!.) @ mod_rate
 
 /*0*/%mod: ([T] > 20) do $ADD 10000 C(x1~u, x2~u); $UPDATE n_c |C()| repeat ([false])
