@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 18 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -217,6 +217,9 @@ type internal_contact_map =
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
+type internal_scc_decomposition =
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list list
+
 type ('static, 'dynamic) reachability_result = 'static * 'dynamic
 
 type subviews_info = unit
@@ -282,6 +285,7 @@ type ('static,'dynamic) state =
       local_influence_map_blackboard option ;
     internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
     contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
+    internal_scc_decomposition: internal_scc_decomposition Public_data.AccuracyMap.t Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
     reachability_state: ('static, 'dynamic) reachability_result option ;
@@ -357,6 +361,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     bidirectional_influence_map = Public_data.AccuracyMap.empty ;
     local_influence_map_blackboard = None ;
     internal_contact_map = Public_data.AccuracyMap.empty ;
+    internal_scc_decomposition = Public_data.AccuracyMap.empty ;
     contact_map = Public_data.AccuracyMap.empty ;
     signature = None ;
     bdu_handler = handler_bdu ;
@@ -654,6 +659,28 @@ let set_internal_contact_map accuracy int_contact_map state =
 
 let get_internal_contact_map accuracy state =
   Public_data.AccuracyMap.find_option accuracy state.internal_contact_map
+
+let set_internal_scc_decomposition accuracy accuracy' dec state =
+  let old =
+    Public_data.AccuracyMap.find_default
+      Public_data.AccuracyMap.empty
+      accuracy state.internal_scc_decomposition
+  in
+  {state with
+   internal_scc_decomposition =
+     Public_data.AccuracyMap.add
+     accuracy
+     (Public_data.AccuracyMap.add accuracy' dec old)
+     state.internal_scc_decomposition
+  }
+
+let get_internal_scc_decomposition accuracy accuracy' state =
+  match
+    Public_data.AccuracyMap.find_option accuracy state.internal_scc_decomposition
+  with
+  | None -> None
+  | Some a ->
+    Public_data.AccuracyMap.find_option accuracy' a
 
 let get_reachability_result state = state.reachability_state
 

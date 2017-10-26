@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 17 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -17,7 +17,7 @@ sig
   type parameters = Remanent_parameters_sig.parameters
   type errors = Exception.method_handler
   type internal_contact_map
-
+  type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
   type contact_map = Public_data.contact_map
 
   type internal_influence_map =
@@ -63,22 +63,16 @@ sig
   Public_data.accuracy_level ->
   state -> unit
 
-(**************************************************)
-(*work in process *)
+  val get_scc_decomposition :
+    ?accuracy_level_cm:Public_data.accuracy_level ->
+    ?accuracy_level_scc:Public_data.accuracy_level ->
+    state -> state *
+             internal_scc_decomposition
 
-  (*val output_contact_map_converted:
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    (Graphs.node list * (int * int) list)
-      Ckappa_sig.AgentSite_map_and_set.Map.t*)
-
-  val output_graph_scc :
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    Graphs.Nodearray.key list list
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+  val dump_scc_decomposition :
+    ?accuracy_level_cm:Public_data.accuracy_level ->
+    ?accuracy_level_scc:Public_data.accuracy_level ->
+    state -> unit
 
 (**************************************************)
 

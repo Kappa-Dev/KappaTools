@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 18 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -34,6 +34,7 @@ val get_short_version: Remanent_parameters_sig.parameters -> string
 val get_full_version: Remanent_parameters_sig.parameters -> string
 val get_launched_when_and_where: Remanent_parameters_sig.parameters -> string
 val get_do_contact_map: Remanent_parameters_sig.parameters -> bool
+val get_do_scc: Remanent_parameters_sig.parameters -> bool
 val get_do_influence_map: Remanent_parameters_sig.parameters -> bool
 val get_do_ODE_flow_of_information: Remanent_parameters_sig.parameters -> bool
 val get_do_reachability_analysis: Remanent_parameters_sig.parameters -> bool

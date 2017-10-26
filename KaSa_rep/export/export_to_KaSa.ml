@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Aug 17 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -17,7 +17,7 @@ sig
   type parameters = Remanent_parameters_sig.parameters
   type errors = Exception.method_handler
   type internal_contact_map
-
+  type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
   type contact_map = Public_data.contact_map
 
   type internal_influence_map = Remanent_state.internal_influence_map
@@ -55,23 +55,32 @@ sig
 
   val get_c_compilation: state -> state * c_compilation
 
-  (*WORK IN PROCESS*)
-  (*add new function: get contact_map_int*)
-  (*val get_graph_scc : state -> state * Graphs.node list*)
-  (*val get_string_contact_map :
-  ?accuracy_level:Public_data.accuracy_level ->
-  state -> state * contact_map*)
 
 (**************************************************)
 (*work in process*)
 
-  val get_contact_map :
-  ?accuracy_level:Public_data.accuracy_level ->
-  state -> state * contact_map
+val get_contact_map :
+?accuracy_level:Public_data.accuracy_level ->
+state -> state * contact_map
 
-  val dump_contact_map :
-  Public_data.accuracy_level ->
-  state -> unit
+val dump_contact_map :
+Public_data.accuracy_level ->
+state -> unit
+
+  (*WORK IN PROCESS*)
+
+  val get_scc_decomposition :
+    ?accuracy_level_cm:Public_data.accuracy_level ->
+    ?accuracy_level_scc:Public_data.accuracy_level ->
+    state -> state *
+             internal_scc_decomposition
+
+  val dump_scc_decomposition :
+    ?accuracy_level_cm:Public_data.accuracy_level ->
+    ?accuracy_level_scc:Public_data.accuracy_level ->
+    state -> unit
+
+
 
   (*val output_contact_map_converted:
     ?accuracy_level:Public_data.accuracy_level ->
@@ -80,12 +89,12 @@ sig
     (Graphs.node list * (int * int) list)
       Ckappa_sig.AgentSite_map_and_set.Map.t*)
 
-  val output_graph_scc :
+  (*val output_graph_scc :
     ?accuracy_level:Public_data.accuracy_level ->
     state ->
     Exception.method_handler *
     Graphs.Nodearray.key list list
-      Ckappa_sig.AgentSite_map_and_set.Map.t
+      Ckappa_sig.AgentSite_map_and_set.Map.t*)
 
 (**************************************************)
 
@@ -148,7 +157,8 @@ module Export =
 
       let get_contact_map = get_contact_map
       let dump_contact_map = dump_contact_map
-      let output_graph_scc = output_graph_scc
+      let get_scc_contact_map = get_scc_decomposition
+
 
       let get_internal_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map

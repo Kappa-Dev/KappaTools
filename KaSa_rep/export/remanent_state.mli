@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 18 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -24,6 +24,9 @@ type internal_contact_map =
   (Ckappa_sig.c_state list *
    (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list)
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
+
+type internal_scc_decomposition =
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list list
 
 type quark_map = Quark_type.quarks
 
@@ -209,6 +212,15 @@ val set_internal_contact_map:
 val get_internal_contact_map:
   Public_data.accuracy_level -> ('static, 'compile) state ->
   internal_contact_map option
+
+val get_internal_scc_decomposition:
+  Public_data.accuracy_level  -> Public_data.accuracy_level ->
+  ('static, 'compile) state -> internal_scc_decomposition option
+
+val set_internal_scc_decomposition:
+  Public_data.accuracy_level  -> Public_data.accuracy_level ->
+  internal_scc_decomposition ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
 val set_contact_map:
   Public_data.accuracy_level -> Public_data.contact_map ->

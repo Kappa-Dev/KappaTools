@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Aug 07 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -53,46 +53,110 @@ Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
 
-let contact_map_converted parameters error handler contact_map store_result =
+let add_edges
+    parameters error
+    (agent_name,site_name) (agent_name',site_name_list') graph =
+  let error,old =
+    Ckappa_sig.AgentSite_map_and_set.Map.find_default_without_logs
+      parameters
+      error
+      []
+      (agent_name, site_name)
+      graph
+  in
+
+  Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
+  parameters
+  error
+  (agent_name, site_name)
+  (List.fold_left
+     (fun old site_name' -> (agent_name',site_name')::old)
+     old site_name_list')
+  graph
+
+
+let contact_map_converted parameters error handler
+    (contact_map:Remanent_state.internal_contact_map) =
+  let graph = Ckappa_sig.AgentSite_map_and_set.Map.empty in
   (*get a list of sites*)
-  let error, pair_list =
+  (*  let error, pair_list =
     Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameters error
       (fun parameters error (x,y) (a,b,c) store_list ->
         error,  (a,b) :: store_list
       ) handler.Cckappa_sig.dual []
-  in
+      in*)
+    Ckappa_sig.Agent_map_and_set.Map.fold
+(*  parameters error*)
+    (fun (*parameters error*) agent_name interface (error,graph) ->
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (* parameters error*)
+           (fun (*parameters error*) site_name (_,partners) (error,graph) ->
+            List.fold_left
+              (fun (error,graph) (agent_name',site_name') ->
+                 let error, pair_opt =
+                   Ckappa_sig.Agent_map_and_set.Map.find_option
+                     parameters error
+                     agent_name'
+                     contact_map
+                 in
+                 match pair_opt with
+                 | None -> Exception.warn parameters error __POS__ Exit graph
+                 | Some interface' ->
+                   let error, others =
+                     Ckappa_sig.Site_map_and_set.Map.fold
+                       (fun site_name (_,partners) (error,others) ->
+                          error, if partners = [] || site_name=site_name'
+                          then
+                            others
+                          else
+                            site_name::others)
+                          interface'
+                          (error,[])
+                   in
+                   add_edges
+                       parameters error
+                       (agent_name,site_name)
+                       (agent_name',others)
+                       graph
+              )
+              (error,graph) partners)
+           interface (error,graph))
+    contact_map (error,graph)
+
+    (*
+
   Array.fold_left (fun (error, store_result) node ->
       let x = node.User_graph.node_type in
       let interface = node.User_graph.node_sites in
       Array.fold_left (fun (error, store_result) site ->
           let y  = site.User_graph.site_name in
           (*list of n2*)
-          let l2 = match site.User_graph.site_type with
-            | User_graph.Counter _ ->
-              failwith "Kasa does not deal with counters yet"
-            | User_graph.Port p -> p.User_graph.port_links
-          in
-          let error, (agent_name, site_name) =
-            let error, (bool, output) =
-              Ckappa_sig.Dictionary_of_agents.allocate_bool
-                parameters
-                error
-                Ckappa_sig.compare_unit_agent_name
-                x
-                ()
-                Misc_sa.const_unit
-                handler.Cckappa_sig.agents_dic
-            in
-            match bool, output with
-            | _, None ->
-              Exception.warn parameters error __POS__ Exit
-                (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name)
-            | _, Some (agent_name, _, _, _) ->
-              begin
-                let error, site_dic =
-                  match
-                    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
+          match site.User_graph.site_type with
+          | User_graph.Counter _ -> error, store_result
+          (* we do care only about binding site *)
+          | User_graph.Port p ->
+            let l2 =  p.User_graph.port_links in
+            let error, (agent_name, site_name) =
+              let error, (bool, output) =
+                Ckappa_sig.Dictionary_of_agents.allocate_bool
+                  parameters
+                  error
+                  Ckappa_sig.compare_unit_agent_name
+                  x
+                  ()
+                  Misc_sa.const_unit
+                  handler.Cckappa_sig.agents_dic
+              in
+              match bool, output with
+              | _, None ->
+                Exception.warn parameters error __POS__ Exit
+                  (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name)
+              | _, Some (agent_name, _, _, _) ->
+                begin
+                  let error, site_dic =
+                    match
+                      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
                       parameters
                       error
                       agent_name
@@ -125,11 +189,11 @@ let contact_map_converted parameters error handler contact_map store_result =
           in
           let error, store_result =
             List.fold_left (fun (error, store_result) (agent_name2, site2) ->
-                let potential_sites =
-                  List.filter (fun (a,x) ->
+                let potential_sites = [] in
+                (*                  List.filter (fun (a,x) ->
                       (Ckappa_sig.int_of_agent_name a) = agent_name2 &&
                       (Ckappa_sig.int_of_site_name x) <> site2) pair_list
-                in
+                                    in*)
                 let error, store_result =
                   Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
                     parameters
@@ -143,56 +207,105 @@ let contact_map_converted parameters error handler contact_map store_result =
           in
           error, store_result
         ) (error, store_result) interface
-    ) (error, store_result) contact_map
+    ) (error, store_result) contact_map*)
 
-let compute_graph_scc parameters errors contact_map_converted store_result =
-  Ckappa_sig.AgentSite_map_and_set.Map.fold
-    (fun (agent_name, site_name) potential_sites (errors, store_result) ->
-       let errors, nodes, edges_list =
-         List.fold_left (fun (errors, store_nodes, store_edges) (agent2, site2) ->
-             let n1 = Graphs.node_of_int (Ckappa_sig.int_of_site_name site_name) in
-             let n2 = Graphs.node_of_int (Ckappa_sig.int_of_site_name site2) in
-             let () =
-               Loggers.fprintf
-                 (Remanent_parameters.get_logger parameters)
-                 "\nagent:%i:site:%i:node:%n-agent:%i:site:%i:node:%i\n"
-                 (Ckappa_sig.int_of_agent_name agent_name)
-                 (Ckappa_sig.int_of_site_name site_name)
-                 (Graphs.int_of_node n1)
-                 (Ckappa_sig.int_of_agent_name agent2)
-                 (Ckappa_sig.int_of_site_name site2)
-                 (Graphs.int_of_node n2)
+
+let compute_graph_scc parameters errors kappa_handler contact_map_converted =
+    let nodes, edges_list =
+        Ckappa_sig.AgentSite_map_and_set.Map.fold
+          (fun (agent_name, site_name) potential_sites (nodes, edges) ->
+             let nodes  =
+               (agent_name,site_name)::nodes
              in
-             errors, (n1 :: store_nodes), (n1, (), n2) :: store_edges
-           ) (errors, [], []) potential_sites
-       in
-       (*build a graph_scc*)
-       let graph =
-         Graphs.create parameters errors
-           (fun n ->
-              let () =
-                Loggers.fprintf (Remanent_parameters.get_logger parameters)
-                  "node_labels:%i\n"
-                  (Graphs.int_of_node n)
-              in
-              ()
-           )
+             let edges =
+               List.fold_left
+                 (fun edges (agent2, site2) ->
+                    ((agent_name,site_name),(agent2,site2))::edges)
+                  edges potential_sites
+             in
+             nodes,edges)
+          contact_map_converted
+          ([], [])
+    in
+    let n_nodes = List.length nodes in
+    let nodes_array =
+      Array.make
+        n_nodes (Ckappa_sig.dummy_agent_name,Ckappa_sig.dummy_site_name)
+    in
+    let nodes_map = Ckappa_sig.AgentSite_map_and_set.Map.empty in
+    let _, nodes, (errors, nodes_map) =
+      List.fold_left
+        (fun (i,nodes_list,(errors,map)) node ->
+           nodes_array.(i)<-node ;
+           i+1,
+           (Graphs.node_of_int i)::nodes_list,
+           Ckappa_sig.AgentSite_map_and_set.Map.add
+             parameters errors
+             node
+             (Graphs.node_of_int i)
+             map
+        )
+        (0,[],(errors,nodes_map))
            nodes
-           edges_list
+    in
+    let errors,edges =
+      List.fold_left
+        (fun (errors, l) (a,b) ->
+           let errors, node_opt =
+            Ckappa_sig.AgentSite_map_and_set.Map.find_option
+              parameters errors
+              a
+              nodes_map
+           in
+           let errors, node_opt' =
+            Ckappa_sig.AgentSite_map_and_set.Map.find_option
+              parameters errors
+              b
+              nodes_map
+           in
+           match node_opt,node_opt' with
+           | None,_ | _,None ->
+             Exception.warn parameters errors __POS__ Exit l
+           | Some a,Some b -> errors,(a,(),b)::l)
+        (errors,[]) edges_list
+    in
+(*build a graph_scc*)
+    let graph =
+      Graphs.create parameters errors
+        (fun n ->
+           let n = nodes_array.(Graphs.int_of_node n) in
+           let errors, ag = Handler.string_of_agent parameters errors kappa_handler (fst n) in
+           let _errors, st = Handler.string_of_site parameters errors kappa_handler (fst n) (snd n) in
+           let () =
+             Loggers.fprintf (Remanent_parameters.get_logger parameters)
+               "node_labels:%s.%s" ag st
+           in
+           let () =
+             Loggers.print_newline (Remanent_parameters.get_logger parameters)
+           in
+           (* to do: deals with errors *)
+           ()
+        )
+        nodes
+        edges
        in
        (*compute scc*)
-       let errors, low, pre, on_stack, scc =
+       let errors, _low, _pre, _on_stack, scc =
          Graphs.compute_scc parameters errors
            (fun () -> "")
            graph
        in
-       let errors, store_result =
-         Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite
-           parameters
-           errors
-           (agent_name, site_name)
-           scc
-           store_result
+       let scc =
+         List.fold_left
+           (fun l a -> if List.length a < 2 then l else a::l)
+           [] (List.rev scc)
        in
-       errors, store_result
-    ) contact_map_converted (errors, store_result)
+       let scc =
+         List.rev_map
+           (fun a ->
+              List.rev_map
+                (fun b -> nodes_array.(Graphs.int_of_node b))
+                (List.rev a))
+           (List.rev scc )
+       in
+       errors, scc

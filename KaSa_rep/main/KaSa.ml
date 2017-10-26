@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Aug 13 2017>
+ * Last modification: Time-stamp: <Oct 26 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -68,36 +68,64 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*WORK IN PROCESS:*)
-  (*let state, cm =
-    Export_to_KaSa.get_contact_map ~accuracy_level:Public_data.Low state
+  let state =
+    if Remanent_parameters.get_do_scc parameters
+    then
+      let accuracy_level_cm =
+        match
+          Remanent_parameters.get_contact_map_accuracy_level parameters
+        with
+        | Remanent_parameters_sig.None -> Public_data.Low
+        | Remanent_parameters_sig.Low -> Public_data.Low
+        | Remanent_parameters_sig.Medium
+        | Remanent_parameters_sig.High
+        | Remanent_parameters_sig.Full -> Public_data.Full
+      in
+      let accuracy_level_scc = Public_data.Low in
+      let state, graph_scc =
+        Export_to_KaSa.get_scc_decomposition
+          ~accuracy_level_cm ~accuracy_level_scc state
+      in
+      let state, handler = Export_to_KaSa.get_handler state in
+      let error = Export_to_KaSa.get_errors state in
+      let error =
+        Loggers.fprintf
+          (Remanent_parameters.get_logger parameters)
+          "Graph of strongly connected components:\n";
+        List.fold_left
+          (fun error list ->
+             let error =
+               List.fold_left
+                 (fun error (x,y) ->
+                    let error, agent_name =
+                      Handler.string_of_agent parameters error handler x
+                    in
+                    let error, site_name =
+                      Handler.string_of_site parameters   error handler x y
+                    in
+                    let () =
+                      Loggers.fprintf
+                        (Remanent_parameters.get_logger parameters)
+                        "(%s,%s); "
+                        agent_name site_name
+                    in error
+                 )
+                 error
+                 list
+             in
+             let () =
+               Loggers.print_newline
+                 (Remanent_parameters.get_logger parameters)
+             in error
+          )
+          error
+          graph_scc
+      in
+      let state = Export_to_KaSa.set_errors error state in
+      state
+    else state
   in
-  let errors, graph_scc =
-    Export_to_KaSa.output_graph_scc
-      ~accuracy_level:Public_data.Low state
-  in
-  let () = Export_to_KaSa.dump_contact_map Public_data.Low state in
-  let () =
-    Loggers.fprintf
-      (Remanent_parameters.get_logger parameters)
-      "Graph of strongly connected components:\n";
-    Ckappa_sig.AgentSite_map_and_set.Map.iter
-      (fun (x,y) scc ->
-         Loggers.fprintf
-           (Remanent_parameters.get_logger parameters)
-           "(%i,%i) "
-           (Ckappa_sig.int_of_agent_name x)
-           (Ckappa_sig.int_of_site_name y);
-         List.iter (fun l ->
-             List.iter (fun k ->
-                 Loggers.fprintf
-                   (Remanent_parameters.get_logger parameters)
-                   " %i \n"
-                   (Graphs.int_of_node k)
-               ) l
-           ) scc
-      ) graph_scc
-  in*)
-  (*-----------------------------------------------------------------------*)
+      (*-----------------------------------------------------------------------*)
   (**)
   let state =
     if Remanent_parameters.get_do_influence_map parameters

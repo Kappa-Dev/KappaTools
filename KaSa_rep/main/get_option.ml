@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <May 28 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   * primitive to parse command-line options
   *
@@ -32,6 +32,7 @@ let options =
           "--compute-contact-map";
           "--compute-influence-map";
           "--compute-ODE-flow-of-information";
+          "--compute-potential-cycles";
           "--compute-stochastic-flow-of-information";
           "--compute-reachability-analysis";
         ],[]),"launch everything",[actions,0],Normal;
@@ -41,6 +42,7 @@ let options =
           "--no-compute-contact-map";
           "--no-compute-influence-map";
           "--no-compute-ODE-flow-of-information";
+          "--no-compute-potential-cycles";
           "--no-compute-stochastic-flow-of-information";
           "--no-compute-reachability-analysis";
         ],[]),"launch nothing",[actions,1],Normal;
@@ -74,16 +76,21 @@ let options =
       [actions,4;flow,6],
       Expert;
 
+      "--compute-potential-cycles",
+      Bool Config.do_scc,
+      "Compute the bonds that may be involved in polymerisation",
+      [actions,5;contact_map,1], Normal;
+
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
-      [actions,5;flow,6],
+      [actions,6;flow,6],
       Expert;
 
       "--compute-reachability-analysis",
       Bool Config.do_reachability_analysis,
       "Compute an approximation of the states of agent sites",
-      [actions,6;reachability,0],
+      [actions,7;reachability,0],
       Normal;
       "--enable-every-domain",
       Multi(
@@ -128,7 +135,7 @@ let options =
       "--compute-symmetries",
       Bool Config.do_symmetries,
       "Look up for pairs of symmetric sites",
-      [actions,7],Normal;
+      [actions,8],Normal;
       "--verbosity-level-for-view-analysis",
       (Choice
          ([
@@ -181,7 +188,7 @@ let options =
       "--compute-local-traces",
       Bool Config.compute_local_traces,
       "Compute the local traces of interesting parts of agent interfaces",
-      [actions,8;traces,0],
+      [actions,9;traces,0],
       Normal;
 
       "--show-rule-names-in-local-traces",
@@ -217,7 +224,7 @@ let options =
       "--compute-separating-transitions",
       Bool Config.compute_separating_transitions,
       "Compute the transitions that separates strongly connected set of configurations",
-      [actions,9;traces,6],
+      [actions,10;traces,6],
       Normal;
 
       "--output-directory",
@@ -235,13 +242,13 @@ let options =
       "--output-contact-map-directory",
       String Config.output_cm_directory,
       "put the contact map file in this directory",
-      [output,0;contact_map,2],
+      [output,0;contact_map,3],
       Normal;
 
       "--output-contact-map",
       String Config.contact_map_file,
       "file name for the contact map output",
-      [output,1;contact_map,2],
+      [output,1;contact_map,4],
       Normal;
 
       "--contact-map-format",
@@ -249,7 +256,7 @@ let options =
                 (*"HTML","HTML format"*)],[],
                Config.contact_map_format)),
       "Tune the output format for the contact map",
-      [output,2;contact_map,3],
+      [output,2;contact_map,5],
       Hidden;
 
       "--contact-map-accuracy-level",
@@ -259,13 +266,13 @@ let options =
           ],[],
           Config.contact_map_accuracy_level)),
       "Tune the accuracy level of the contact map",
-      [contact_map,4],
+      [contact_map,6],
       Expert;
 
       "--pure-contact",
       Bool Config.pure_contact,
       "show in the contact map  only the sites with a binding state",
-      [contact_map,5],
+      [contact_map,7],
       Expert;
 
 

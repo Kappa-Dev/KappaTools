@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa scc.ka --compute-potential-cycles  || exit 0
+
+#Detection of bonds that may be involved in polymers.

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 18 2017>
+  * Last modification: Time-stamp: <Oct 26 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -44,7 +44,7 @@ type parameters = Remanent_parameters_sig.parameters
 type errors = Exception.method_handler
 
 type internal_contact_map = Remanent_state.internal_contact_map
-
+type internal_scc_decomposition = Remanent_state.internal_scc_decomposition
 type internal_influence_map = Remanent_state.internal_influence_map
 type bidirectional_influence_map = Remanent_state.bidirectional_influence_map
 type handler = Cckappa_sig.kappa_handler
@@ -1430,34 +1430,50 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
-  let output_graph_scc ?accuracy_level:(accuracy_level=Public_data.Low)
-      state =
-    let parameters = Remanent_state.get_parameters state in
-    let state, contact_map = get_contact_map ~accuracy_level state in
+let compute_scc_decomposition
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    ?do_we_show_title:(_do_we_show_title=(fun _ -> false))
+    ?log_title:(_log_title="")
+    _show_title state =
+  let parameters = Remanent_state.get_parameters state in
+  let accuracy_level = accuracy_level_cm in
+    let state, contact_map = get_internal_contact_map ~accuracy_level state in
     let state, handler = get_handler state in
     let errors = get_errors state in
-    let errors, converted_map =
-      match Remanent_state.get_contact_map_converted state with
-      | None -> Exception.warn parameters errors __POS__ Exit
-                  Ckappa_sig.AgentSite_map_and_set.Map.empty
-      | Some m -> errors, m
-    in
-    let errors, graph =
-      match Remanent_state.get_graph_scc state with
-      | None -> Exception.warn parameters errors __POS__ Exit
-                  Ckappa_sig.AgentSite_map_and_set.Map.empty
-      | Some g -> errors, g
-    in
     let errors, cm_graph =
       Contact_map_scc.contact_map_converted
-        parameters errors handler contact_map converted_map
+        parameters errors handler contact_map
     in
     let errors, graph_scc =
       Contact_map_scc.compute_graph_scc
-        parameters errors cm_graph graph
+        parameters errors handler cm_graph
     in
-    errors, graph_scc
+    let state = Remanent_state.set_internal_scc_decomposition
+        accuracy_level_cm accuracy_level_scc graph_scc state
+    in
+    let state = Remanent_state.set_errors errors state in
+    state, graph_scc
 
+let get_scc_decomposition
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+  =
+  get_gen
+    (Remanent_state.get_internal_scc_decomposition
+       accuracy_level_cm accuracy_level_scc)
+    (compute_scc_decomposition
+       ~accuracy_level_cm
+       ~accuracy_level_scc
+       ~do_we_show_title:(fun _ -> true)
+       ~log_title:("Decompose the contact map in strongly connected components")
+       )
+
+let dump_scc_decomposition
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    state =
+  ()
 (*internal contact map*)
 
 let output_internal_contact_map ?logger
