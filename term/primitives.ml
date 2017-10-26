@@ -542,6 +542,7 @@ type perturbation =
     precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     repeat : (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+    needs_backtrack : bool;
   }
 
 let bool_expr_to_yojson ~filenames =
@@ -563,10 +564,11 @@ let perturbation_to_yojson ~filenames p =
       (bool_expr_to_yojson ~filenames) p.precondition;
     "effect", JsonUtil.of_list (modification_to_yojson ~filenames) p.effect;
     "repeat", Locality.annot_to_yojson ~filenames
-      (bool_expr_to_yojson ~filenames) p.repeat ]
+      (bool_expr_to_yojson ~filenames) p.repeat;
+    "needs_backtrack", `Bool p.needs_backtrack ]
 
 let perturbation_of_yojson ~filenames = function
-  | `Assoc l as x when List.length l = 4 ->
+  | `Assoc l as x when List.length l = 5 ->
      begin
        try {
            alarm = JsonUtil.to_option Nbr.of_yojson (List.assoc "alarm" l);
@@ -579,6 +581,11 @@ let perturbation_of_yojson ~filenames = function
            repeat =
              Locality.annot_of_yojson ~filenames
                (bool_expr_of_yojson ~filenames) (List.assoc "repeat" l);
+           needs_backtrack =
+             (function
+              | `Bool b -> b
+              | x -> raise (Yojson.Basic.Util.Type_error ("Incorrect bool",x)))
+               (List.assoc "needs_backtrack" l);
          }
        with Not_found ->
          raise (Yojson.Basic.Util.Type_error ("Invalid perturbation",x))
@@ -659,6 +666,7 @@ let map_expr_perturbation f_alg f_bool x =
     precondition = f_bool x.precondition;
     effect = List.map (map_expr_modification f_alg) x.effect;
     repeat = f_bool x.repeat;
+    needs_backtrack = x.needs_backtrack;
   }
 
 let stops_of_perturbation algs_deps x =

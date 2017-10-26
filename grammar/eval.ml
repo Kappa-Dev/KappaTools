@@ -394,6 +394,17 @@ let pert_of_result
                 Primitives.PLOTENTRY | Primitives.STOP _ |
                 Primitives.ITER_RULE _ | Primitives.SPECIES_OFF _ ) -> false)
             effects in
+        let needs_backtrack =
+          List.exists
+            (function
+               Primitives.UPDATE _ |
+               Primitives.STOP _ | Primitives.ITER_RULE _ -> true
+               | Primitives.CFLOW _ | Primitives.SPECIES _ |
+                   Primitives.CFLOWOFF _ | Primitives.PRINT _ |
+                     Primitives.SNAPSHOT _ | Primitives.FLUX _ |
+                       Primitives.FLUXOFF _ | Primitives.PLOTENTRY |
+                         Primitives.SPECIES_OFF _  -> false)
+            effects in
         let repeat = match opt with
             None -> Locality.dummy_annot Alg_expr.FALSE
           | Some p -> p in
@@ -402,6 +413,7 @@ let pert_of_result
             Primitives.precondition = pre;
             Primitives.effect = effects;
             Primitives.repeat = repeat;
+            Primitives.needs_backtrack = needs_backtrack;
           } in
         (domain, alg_deps', succ p_id, pert::lpert,has_tracking)
       )

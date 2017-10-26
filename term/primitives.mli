@@ -136,6 +136,7 @@ type perturbation =
     precondition: (Pattern.id array list,int) Alg_expr.bool Locality.annot;
     effect : modification list;
     repeat : (Pattern.id array list,int) Alg_expr.bool Locality.annot;
+    needs_backtrack : bool;
   }
 
 val perturbation_to_yojson :
