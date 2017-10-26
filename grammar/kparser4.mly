@@ -119,28 +119,47 @@ site_link:
   ;
 
 site_internal:
-  | annot internal_states internal_modif CL_CUR annot
-    { Result_util.map2 (fun x y -> (x,y)) $2 $3 }
-  | annot internal_states internal_modif recovery
-    { Error ("invalid internal state or missing '}'",rhs_pos 4) }
+  | internal_states internal_modif CL_CUR annot
+    { Result_util.map2 (fun x y -> (x,y)) $1 $2 }
+  | internal_states internal_modif recovery
+    { Error ("invalid internal state or missing '}'",rhs_pos 3) }
+  ;
+
+counter_modif:
+  | PLUS annot EQUAL annot INT { ($5, rhs_pos 5) }
+  | PLUS annot EQUAL annot MINUS annot INT { (- $7, rhs_pos 7) }
+  | MINUS annot EQUAL annot INT { (- $5, rhs_pos 5) }
+  ;
+
+counter_test:
+  | EQUAL annot INT { (Ast.CEQ $3,rhs_pos 3) }
+  | GREATER annot EQUAL annot INT { (Ast.CGTE $5,rhs_pos 5) }
+  | EQUAL annot ID { (Ast.CVAR $3,rhs_pos 3) }
+  ;
+
+site_counter:
+  | counter_modif annot CL_CUR annot { (None, $1) }
+  | counter_test annot CL_CUR annot { (Some $1, Locality.dummy_annot 0) }
+  | counter_test annot DIV annot counter_modif annot CL_CUR annot
+    { (Some $1,$5) }
   ;
 
 site:
-  | ID annot OP_BRA site_link OP_CUR site_internal
+  | ID annot OP_BRA site_link OP_CUR annot site_internal
     { match $4 with
       | Error _ as e -> e
       | Ok (port_lnk, port_lnk_mod) ->
-         match $6 with
+         match $7 with
          | Error _ as e -> e
          | Ok (port_int, port_int_mod) ->
             Ok (Ast.Port
                   { Ast.port_nme=($1,rhs_pos 1); Ast.port_int;
                     Ast.port_lnk; Ast.port_int_mod; Ast.port_lnk_mod; }) }
-  | ID annot OP_CUR site_internal OP_BRA site_link
-    { match $4 with
+  | ID annot OP_CUR annot site_internal OP_BRA site_link
+    { match $5 with
       | Error _ as e -> e
       | Ok (port_int, port_int_mod) ->
-         match $6 with
+         match $7 with
          | Error _ as e -> e
          | Ok (port_lnk, port_lnk_mod) ->
             Ok (Ast.Port
@@ -153,13 +172,16 @@ site:
          Ok (Ast.Port
                { Ast.port_nme=($1,rhs_pos 1); Ast.port_int=[];
                  Ast.port_lnk; Ast.port_int_mod=None; Ast.port_lnk_mod; }) }
-  | ID annot OP_CUR site_internal
-    { match $4 with
-      | Error _ as e -> e
-      | Ok (port_int, port_int_mod) ->
-         Ok (Ast.Port
-               { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[];
-                 Ast.port_int; Ast.port_int_mod; Ast.port_lnk_mod=None; }) }
+  | ID annot OP_CUR annot site_internal
+    { Result_util.map
+        (fun (port_int, port_int_mod) ->
+          Ast.Port
+            { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[];
+              Ast.port_int; Ast.port_int_mod; Ast.port_lnk_mod=None; }) $5 }
+  | ID annot OP_CUR annot site_counter
+    { let (count_test,count_delta) = $5 in
+      Ok (Ast.Counter
+            { Ast.count_nme=($1,rhs_pos 1); Ast.count_test; Ast.count_delta }) }
   | ID annot
     { Ok (Ast.Port
             { Ast.port_nme=($1,rhs_pos 1);Ast.port_lnk=[]; Ast.port_int=[];
@@ -183,6 +205,9 @@ agent_no_err:
   | ID annot OP_PAR annot interface CL_PAR agent_modif
     { let modif,an = $7 in
       Result_util.map (fun i -> Ast.Present (($1,rhs_pos 1), i, modif),an) $5 }
+  | ID annot COLON annot ID annot OP_PAR annot interface CL_PAR agent_modif
+    { let modif,an = $11 in
+      Result_util.map (fun i -> Ast.Present (($5,rhs_pos 5), i, modif),an) $9 }
   ;
 
 agent:
@@ -564,8 +589,10 @@ effect:
     { Result_util.map (fun (s,p) -> Ast.SNAPSHOT s,p) $2 }
   | STOP print_expr
     { Result_util.map (fun (s,p) -> Ast.SNAPSHOT s,p) $2 }
-  | PRINTF print_expr SMALLER annot nonempty_print_expr GREATER annot
-    { Result_util.map2 (fun (f,_) (c,_) -> Ast.PRINT (f,c),$7) $2 $5 }
+  | PRINTF print_expr GREATER print_expr
+    { Result_util.map2 (fun (c,_) (f,p) -> Ast.PRINT (f,c),p) $2 $4 }
+  | PRINTF print_expr
+    { Result_util.map (fun (c,p) -> Ast.PRINT ([],c),p) $2 }
   | PLOTENTRY annot { Ok (Ast.PLOTENTRY,$2) }
   | SPECIES_OF print_expr pattern boolean annot
     { Result_util.map2
