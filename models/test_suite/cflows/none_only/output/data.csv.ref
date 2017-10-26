@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent' '-syntax' '3'
+# Output of 'KaSim' 'none_only.ka' '-seed' '627933151' '-u' 'event' '-l' '1000' '-d' 'output' '-p' '20' '--time-independent' '-syntax' '4'
 "[T]", "AB", "Cuu", "Cpu", "Cpp", "n_c"
 0., 0, 0, 0, 0, 0
 34.4380659299, 2, 9994, 6, 0, 10000

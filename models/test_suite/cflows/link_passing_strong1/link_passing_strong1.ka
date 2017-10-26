@@ -1,5 +1,4 @@
 %def: "displayCompression" "weak" "strong"
-%def: "syntaxVersion" "4"
 
 -A(x!.), +B(x!.) @1
 -B(x!.), +C(x!.) @1

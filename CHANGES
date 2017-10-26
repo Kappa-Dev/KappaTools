@@ -17,10 +17,9 @@ x is whatever |      A(x?)    |    A(x)
 Rational: 'A(u~p)' used to mean "u is free and in state p" whereas it
 now only means "u is in state p".
 
-you can specify `%def: "syntaxVersion" "3"` (or '-syntax 3' in the
-command line) to use KaSim4 with a model in KaSim3 syntax. In
-addition, the ouptut log file "inputs.ka" will be a copy of your model
-in KaSim4 syntax.
+you can specify `-syntax 3` in the command line) to use KaSim4 with a
+model in KaSim3 syntax. In addition, the ouptut log file "inputs.ka"
+will be a copy of your model in KaSim4 syntax.
 
 - Rates for unary instances of rule involving ambiguous molecularity
   are in {} instead of ()

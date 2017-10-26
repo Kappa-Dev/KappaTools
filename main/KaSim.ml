@@ -206,7 +206,6 @@ let () =
              Configuration.dumpIfDeadlocked; Configuration.maxConsecutiveClash;
              Configuration.deltaActivitiesFileName;
              Configuration.traceFileName = user_trace_file;
-             Configuration.syntaxVersion = Ast.V4;
              Configuration.initial =
                if Tools.float_is_zero (Counter.init_time counter) then None
                else Some (Counter.init_time counter);

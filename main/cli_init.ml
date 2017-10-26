@@ -20,9 +20,7 @@ let preprocess ?(kasim_args=Kasim_args.default) cli_args ast =
       story_compression, formatCflow, cflowFile =
     Configuration.parse ast.Ast.configurations in
   let () = Format.printf "+ Sanity checks@." in
-  let syntax_version =
-    Ast.merge_version
-      cli_args.Run_cli_args.syntaxVersion conf.Configuration.syntaxVersion in
+  let syntax_version = cli_args.Run_cli_args.syntaxVersion in
   let (sigs_nd,contact_map,tk_nd,alg_finder,updated_vars,result') =
     LKappa_compiler.compil_of_ast
       ~syntax_version
@@ -113,7 +111,7 @@ let get_pack_from_marshalizedfile
         Configuration.parse compil.Ast.configurations in
       let raw_inits =
         LKappa_compiler.init_of_ast
-          ~syntax_version:conf'.Configuration.syntaxVersion
+          ~syntax_version:cli_args.Run_cli_args.syntaxVersion
           (Model.signatures env) contact
           (Model.tokens_finder env) (Model.algs_finder env) compil.Ast.init in
       let inits = Eval.compile_inits ?rescale:kasim_args.Kasim_args.rescale

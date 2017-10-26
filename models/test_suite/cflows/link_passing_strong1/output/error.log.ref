@@ -1,4 +1,4 @@
-File "link_passing_strong1.ka", line 12, characters 11-12:
+File "link_passing_strong1.ka", line 11, characters 11-12:
 Warning: breaking a semi-link on site 'x' will induce a side effect
-File "link_passing_strong1.ka", line 8, characters 14-15:
+File "link_passing_strong1.ka", line 7, characters 14-15:
 Warning: rule induces a link permutation on site 'x' of agent 'B'
