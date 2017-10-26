@@ -131,8 +131,8 @@ type ('pattern,'mixture,'id) init_statment =
   ('pattern,'id) Alg_expr.e Locality.annot *
   ('mixture,'id) init_t Locality.annot
 
-type ('pattern,'mixture,'id) instruction =
-  | SIG      of agent
+type ('agent,'pattern,'mixture,'id,'rule) instruction =
+  | SIG      of 'agent
   | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of ('pattern,'mixture,'id) init_statment
@@ -141,6 +141,7 @@ type ('pattern,'mixture,'id) instruction =
   | PLOT     of ('pattern,'id) Alg_expr.e Locality.annot
   | PERT     of ('pattern,'mixture,'id) perturbation
   | CONFIG   of configuration
+  | RULE     of (string Locality.annot option * 'rule Locality.annot)
 
 type ('pattern,'mixture,'id) command =
   | RUN of ('pattern,'id) Alg_expr.bool Locality.annot
@@ -158,22 +159,18 @@ type ('agent,'pattern,'mixture,'id,'rule) compil =
     rules :
       (string Locality.annot option * 'rule Locality.annot) list;
     (**rules (possibly named)*)
-    observables :
-      ('pattern,'id) Alg_expr.e Locality.annot list;
+    observables : ('pattern,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
     init : ('pattern,'mixture,'id) init_statment list;
     (*initial graph declaration*)
-    perturbations :
-      ('pattern,'mixture,'id) perturbation list;
-    configurations :
-      configuration list;
-    tokens :
-      string Locality.annot list;
-    volumes :
-      (string * float * string) list
+    perturbations : ('pattern,'mixture,'id) perturbation list;
+    configurations : configuration list;
+    tokens : string Locality.annot list;
+    volumes : (string * float * string) list
   }
 
 type parsing_compil = (agent,mixture,mixture,string,rule) compil
+type parsing_instruction = (agent,mixture,mixture,string,rule) instruction
 
 val empty_compil : parsing_compil
 
