@@ -26,7 +26,9 @@ type internal_contact_map =
     Ckappa_sig.Site_map_and_set.Map.t Ckappa_sig.Agent_map_and_set.Map.t
 
 type internal_scc_decomposition =
-  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list list
+  ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) *
+   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name))
+    list list
 
 type quark_map = Quark_type.quarks
 

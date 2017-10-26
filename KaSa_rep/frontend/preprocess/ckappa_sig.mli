@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 18 2017>
+ * Last modification: Time-stamp: <Oct 26 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -213,6 +213,8 @@ module Rule_setmap: SetMap.S with type elt = c_rule_id
 module Agent_id_setmap: SetMap.S with type elt = c_agent_id
 
 module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
+
+module PairAgentSite_map_and_set : Map_wrapper.S_with_logs  with type elt = (c_agent_name * c_site_name) * (c_agent_name * c_site_name)
 
 module Site_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_site_name

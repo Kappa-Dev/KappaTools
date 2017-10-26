@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 18 2017>
+ * Last modification: Time-stamp: <Oct 26 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -416,6 +416,16 @@ module AgentsSitePState_map_and_set =
 
 (***************************************************************************)
 (*bonds in rhs and lhs*)
+
+module PairAgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_name * c_site_name) *
+                  (c_agent_name * c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
 
 module PairAgentsSiteState_map_and_set =
   Map_wrapper.Make

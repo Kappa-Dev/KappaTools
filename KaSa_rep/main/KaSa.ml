@@ -96,18 +96,24 @@ let main () =
           (fun error list ->
              let error =
                List.fold_left
-                 (fun error (x,y) ->
+                 (fun error ((ag,st),(ag',st')) ->
                     let error, agent_name =
-                      Handler.string_of_agent parameters error handler x
+                      Handler.string_of_agent parameters error handler ag
                     in
                     let error, site_name =
-                      Handler.string_of_site parameters   error handler x y
+                      Handler.string_of_site parameters   error handler ag st
+                    in
+                    let error, agent_name' =
+                      Handler.string_of_agent parameters error handler ag'
+                    in
+                    let error, site_name' =
+                      Handler.string_of_site parameters   error handler ag' st'
                     in
                     let () =
                       Loggers.fprintf
                         (Remanent_parameters.get_logger parameters)
-                        "(%s,%s); "
-                        agent_name site_name
+                        "(%s,%s)--(%s,%s); "
+                        agent_name site_name agent_name' site_name'
                     in error
                  )
                  error
