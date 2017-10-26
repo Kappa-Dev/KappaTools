@@ -41,7 +41,8 @@ type rule_mixture = rule_agent list
 
 val forbid_modification : Locality.t -> 'a option -> unit
 val several_internal_states : Locality.t -> 'a
-val not_enough_specified : string -> string * Locality.t -> 'a
+val not_enough_specified :
+  status:string -> side:string -> string -> string * Locality.t -> 'a
 val several_occurence_of_site : string -> string * Locality.t -> 'a
 val link_only_one_occurence : int -> Locality.t -> 'a
 

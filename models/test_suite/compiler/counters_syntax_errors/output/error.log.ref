@@ -1,7 +1,7 @@
 line 0, characters -1--1:
 Counter variable y appears twice in rule
 File "counter_not_enough_spec.ka", line 5, characters 38-39:
-The link status of agent 'A', site 'd' on the right hand side is underspecified
+The counter state of agent 'A', site 'd' on the right hand side is underspecified
 File "modif_lhs.ka", line 5, characters 18-19:
 Counter c has a modif in the lhs
 File "negative_delta_too_big.ka", line 5, characters 31-32:

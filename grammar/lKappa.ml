@@ -543,10 +543,10 @@ let several_internal_states pos =
   raise (ExceptionDefn.Malformed_Decl
            ("In a pattern, a site cannot have several internal states.",pos))
 
-let not_enough_specified agent_name (na,pos) =
+let not_enough_specified ~status ~side agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
-           ("The link status of agent '"^agent_name^"', site '"^na
-            ^"' on the right hand side is underspecified",pos))
+           ("The "^status^" state of agent '"^agent_name^"', site '"^na
+            ^"' on the "^side^" hand side is underspecified",pos))
 
 let several_occurence_of_site agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
@@ -622,7 +622,8 @@ let to_raw_mixture sigs x =
                 let p_na =
                   Format.asprintf
                     "%a" (Signature.print_site sigs r.ra_type) j in
-                not_enough_specified ag_na (p_na,pos)
+                not_enough_specified
+                  ~status:"linking" ~side:"left" ag_na (p_na,pos)
               | (Ast.LNK_VALUE (i,_), _),_ -> Raw_mixture.VAL i
               | (((Ast.LNK_ANY | Ast.ANY_FREE | Ast.LNK_FREE), _)),_ ->
                 Raw_mixture.FREE

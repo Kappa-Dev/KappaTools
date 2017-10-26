@@ -424,7 +424,8 @@ let remove_counter_created_agent sigs ag lnk_nb =
       if (s = "") then (acc,lnk)
       else
       match c.Ast.count_test with
-      | None -> LKappa.not_enough_specified agent_name c.Ast.count_nme
+        | None -> LKappa.not_enough_specified
+                    ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
       | Some (test,_) ->
          match test with
          | Ast.CEQ j ->
@@ -433,7 +434,8 @@ let remove_counter_created_agent sigs ag lnk_nb =
             let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
             (acc@incrs,(lnk+j+1))
          | Ast.CGTE _ | Ast.CVAR _ ->
-            LKappa.not_enough_specified agent_name c.Ast.count_nme)
+           LKappa.not_enough_specified
+             ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.LKappa.ra_counters
 
 let raw_agent_with_counters ag =
