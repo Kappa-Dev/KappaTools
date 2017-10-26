@@ -121,7 +121,7 @@ rule token = parse
     | "SPECIES_OF" -> SPECIES_OF
     | s -> UNKNOWN s
     }
-  | eof { EOF }
+  | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
   | _ as c { UNKNOWN (String.make 1 c) }
 
 and inline_comment acc = parse

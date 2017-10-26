@@ -73,13 +73,13 @@ let bind: type ok a err. (ok -> (a,err) t) -> (ok,err) t -> (a,err) t =
 
 let map: type ok a err. (ok -> a) -> (ok,err) t -> (a,err) t =
   fun ok -> function
-  | Result.Ok o -> Ok (ok o)
+  | Result.Ok o -> Result.Ok (ok o)
   | Result.Error _ as e -> e
 
 let map2:
   type a b ok err. (a -> b -> ok) -> (a,err) t -> (b,err) t -> (ok,err) t =
   fun f a b -> match a,b with
-  | Result.Ok a, Result.Ok b -> Ok (f a b)
+  | Result.Ok a, Result.Ok b -> Result.Ok (f a b)
   | Result.Error _ as e, _ -> e
   | Result.Ok _, (Result.Error _ as e) -> e
 
