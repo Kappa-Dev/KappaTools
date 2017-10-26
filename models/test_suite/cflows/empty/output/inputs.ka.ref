@@ -1,4 +1,5 @@
 %def: "seed" "126704914"
+%def: "syntaxVersion" "4"
 %def: "dumpIfDeadlocked" "true"
 %def: "maxConsecutiveClash" "2"
 %def: "plotPeriod" "0.2" "t.u."
