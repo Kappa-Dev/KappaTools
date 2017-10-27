@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Oct 27 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1442,12 +1442,12 @@ let compute_scc_decomposition
     let state, handler = get_handler state in
     let errors = get_errors state in
     let errors, cm_graph =
-      Contact_map_scc.contact_map_converted
+      Contact_map_scc.convert_contact_map
         parameters errors handler contact_map
     in
     let errors, graph_scc =
       Contact_map_scc.compute_graph_scc
-        parameters errors handler cm_graph
+        parameters errors cm_graph
     in
     let state = Remanent_state.set_internal_scc_decomposition
         accuracy_level_cm accuracy_level_scc graph_scc state

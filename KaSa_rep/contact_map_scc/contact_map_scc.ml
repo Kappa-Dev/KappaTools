@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Oct 27 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -53,9 +53,16 @@ Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
 
+type site = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
+type node = site * site
+type edge = node * node
+type converted_contact_map =
+  node list Ckappa_sig.PairAgentSite_map_and_set.Map.t
+
 let add_edges
     parameters error
-    (agent_name,site_name,agent_name',site_name') (agent_name',site_name_list') graph =
+    (agent_name,site_name,agent_name',site_name')
+    site_name_list graph =
   let error,old =
     Ckappa_sig.PairAgentSite_map_and_set.Map.find_default_without_logs
       parameters
@@ -74,12 +81,11 @@ let add_edges
               ((agent_name',site_name''),(agent_name''',site_name'''))::old)
             old
             partners)
-       old site_name_list')
+       old site_name_list)
     graph
 
 
-let contact_map_converted parameters error handler
-    (contact_map:Remanent_state.internal_contact_map) =
+let convert_contact_map parameters error handler contact_map =
   let graph = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
     Ckappa_sig.Agent_map_and_set.Map.fold
     (fun agent_name interface (error,graph) ->
@@ -110,14 +116,37 @@ let contact_map_converted parameters error handler
                    add_edges
                        parameters error
                        (agent_name,site_name,agent_name',site_name')
-                       (agent_name',others)
+                       others
                        graph
               )
               (error,graph) partners)
            interface (error,graph))
     contact_map (error,graph)
 
-let compute_graph_scc parameters errors kappa_handler contact_map_converted =
+let mixture_of_edge
+    parameters errors (((ag,st),(ag',st')),((ag'',st''),(ag''',st'''))) =
+  let _ = ag,ag''',st,st''' in
+  if ag'<> ag'' || st'=st''
+  then
+    let errors, mixture = Preprocess.empty_mixture parameters errors in
+    Exception.warn parameters errors __POS__ Exit mixture
+  else
+    (* TO DO build the pattern: ag(st!1),ag'(st'!1,st''!2),ag'''(st'''!2)*)
+    let errors, mixture = Preprocess.empty_mixture parameters errors in
+    errors, mixture
+(* *)
+
+let filter_edges_in_converted_contact_map
+    parameters error static dynamic
+    is_reachable
+    converted_contact_map
+  =
+  (* TO DO: remove in converted_contact_map each edge that would encode an unreachable patten *)
+  (* Take care of propagating memoisation table, and error stream *)
+  let _ = parameters, is_reachable in
+  error, dynamic, converted_contact_map
+
+let compute_graph_scc parameters errors contact_map_converted =
     let nodes, edges_list =
         Ckappa_sig.PairAgentSite_map_and_set.Map.fold
           (fun node1 potential_sites (nodes, edges) ->
