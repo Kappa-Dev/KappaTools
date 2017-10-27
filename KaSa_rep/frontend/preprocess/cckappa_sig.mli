@@ -136,16 +136,6 @@ val join_mixture: Remanent_parameters_sig.parameters ->
    mixture -> mixture ->
   Exception.method_handler * mixture
 
-(*TODO*)
-module Mixture_setmap: SetMap.S with type elt = mixture
-
-module Mixture_map_and_set : Map_wrapper.S_with_logs with type
-  elt = mixture
-
-module MixtureAgent_map_and_set  :Map_wrapper.S_with_logs with type
-  elt = (mixture * Ckappa_sig.c_agent_id)
-
-
 type enriched_variable =
   {
     e_id       : string * Ckappa_sig.position ;

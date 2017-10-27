@@ -4,7 +4,7 @@
  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2016, the 2th of March
- * Last modification: Time-stamp: <Dec 01 2016>
+ * Last modification: Time-stamp: <Oct 27 2017>
  *
  * Type definitions for the covering classes relations between the left hand site of a rule and its sites.
  *
@@ -112,12 +112,3 @@ module Project2_modif: Map_wrapper.Projection
    and type elt_b = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
    and type 'a map_a = 'a Ckappa_sig.AgentsSite_map_and_set.Map.t
    and type 'a map_b = 'a Ckappa_sig.AgentSite_map_and_set.Map.t
-
-module Project2_pattern: SetMap.Projection2
-  with type elt_a = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * cv_id
-   and type elt_b = Cckappa_sig.mixture
-   and type 'a map_a = 'a AgentsCV_setmap.Map.t
-   and type 'a map_b = 'a Cckappa_sig.Mixture_setmap.Map.t
-   and type elt_c = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * cv_id
-(* find the appropriate type names *)
-   and type 'a map_c = 'a AgentsCV_setmap.Map.t

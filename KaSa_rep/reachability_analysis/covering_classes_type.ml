@@ -171,9 +171,3 @@ module Project2_bdu_views =
 
 module Project2_modif =
   Map_wrapper.Proj (Ckappa_sig.AgentsSite_map_and_set) (Ckappa_sig.AgentSite_map_and_set)
-
-module Project2_pattern =
-  SetMap.Proj2
-    (AgentsCV_setmap)
-    (Cckappa_sig.Mixture_setmap)
-    (AgentsCV_setmap)

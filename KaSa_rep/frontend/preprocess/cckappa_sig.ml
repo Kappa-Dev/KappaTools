@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Aug 18 2017>
+  * Last modification: Time-stamp: <Oct 27 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -424,32 +424,6 @@ let join_bonds parameters error bond1 bond2 =
     )
     bond1
     bond2
-
-module Mixture_setmap =
-  SetMap.Make
-    (struct
-      type t = mixture
-      let compare = compare
-      let print _ _ = ()
-    end)
-
-module Mixture_map_and_set =
-  Map_wrapper.Make (SetMap.Make
-                      (struct
-                        type t = mixture
-                        let compare = compare
-                        let print _ _ = ()
-                      end
-                      ))
-
-module MixtureAgent_map_and_set =
-  Map_wrapper.Make (SetMap.Make
-                      (struct
-                        type t = (mixture * Ckappa_sig.c_agent_id)
-                        let compare = compare
-                        let print _ _ = ()
-                      end
-                      ))
 
 let rename_bonds parameters error f bonds =
   let error, empty =
