@@ -1,5 +1,5 @@
 (* command line:  *)
-(*      'KaDE' 'expr.ka' '-d' 'output' '-l' '1' '-p' '0.1' '--ode-backend''MATHEMATICA' *)
+(*      'KaDE' 'expr.ka' '-syntax' '3' '-d' 'output' '-l' '1' '-p' '0.1''--ode-backend''MATHEMATICA' *)
 (* THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS: *)
 (* *) 
 (* init - the initial abundances of each species and token *)
@@ -205,7 +205,7 @@ sol =
 
 
 fid = OpenWrite[NotebookDirectory[]<>"data.csv"];
-Write[fid,"# KaDE expr.ka -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
+Write[fid,"# KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA\n"];
 Write[fid,"# "];
 Write[fid,"[T],"];
 Write[fid,"\n"];

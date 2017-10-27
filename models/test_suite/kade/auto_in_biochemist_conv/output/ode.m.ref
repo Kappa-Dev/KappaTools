@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'auto.ka' '-d' 'output' '-l' '1' '-p' '0.01' '--rate-convention''Biochemist'
+%      'KaDE' 'auto.ka' '-d' 'output' '-l' '1' '-p' '0.01' '-syntax' '3''--rate-convention''Biochemist'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -164,7 +164,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE auto.ka -d output -l 1 -p 0.01 --rate-convention Biochemist\n')
+fprintf(fid,'# KaDE auto.ka -d output -l 1 -p 0.01 -syntax 3 --rate-convention Biochemist\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'dimmers,')

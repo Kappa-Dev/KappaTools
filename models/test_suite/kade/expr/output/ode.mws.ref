@@ -1,5 +1,5 @@
 # command line: 
-#      'KaDE' 'expr.ka' '-d' 'output' '-l' '1' '-p' '0.1' '--ode-backend''MAPLE'
+#      'KaDE' 'expr.ka' '-syntax' '3' '-d' 'output' '-l' '1' '-p' '0.1''--ode-backend''MAPLE'
 ## THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 ## 
 ## init - the initial abundances of each species and token
@@ -202,7 +202,7 @@ sol :=
 
 
 fid := fopen ("data.csv",WRITE):
-fprintf(fid,"# KaDE expr.ka -d output -l 1 -p 0.1 --ode-backend MAPLE\n"):
+fprintf(fid,"# KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend MAPLE\n"):
 fprintf(fid,"# "):
 fprintf(fid,"[T],"):
 fprintf(fid,"\n"):
