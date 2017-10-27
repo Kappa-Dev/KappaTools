@@ -26,5 +26,5 @@ ____________________________________________________________
 3rd printing alarm at 2.8
 ###########################
 Simulation ended
-94.62% of event loops were productive. Null event cause:
+99.16% of event loops were productive. Null event cause:
 	Perturbation interrupting time advance: 100.00%

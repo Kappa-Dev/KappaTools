@@ -334,6 +334,47 @@ let one_rule ~outputs ~maxConsecutiveClash env counter graph state =
         Format.printf "@[<v>Obtained@ %a@]@." (Rule_interpreter.print env) graph''' in
     (final_step||stop,graph''',state')
 
+let rec perturbate_until_first_backtrack
+          env counter ~outputs (stop,graph,state,dt) =
+  match state.stopping_times with
+  | [] -> (stop,graph,state,dt,None)
+  | (rt,ti,pe) :: tail ->
+     if (Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt))) then
+       let tail' = match rt with
+         | None -> tail
+         | Some n ->
+            List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail in
+       let () = state.stopping_times <- tail' in
+
+       let pert = Model.get_perturbation env pe in
+       if not(pert.Primitives.needs_backtrack) then
+         let stop',graph',state',dt' =
+           match Nbr.to_float
+                   (Nbr.sub ti (Nbr.F (Counter.current_time counter))) with
+           | None -> false,graph,state,dt
+           | Some dti ->
+              let dt' = dt -. dti in
+              (*set time for perturbate *)
+              let () = Counter.one_time_advance counter dti in
+              let stop',graph',state' =
+                perturbate ~outputs env counter graph state [pe] in
+              stop',graph',state',dt' in
+
+         perturbate_until_first_backtrack
+           env counter ~outputs (stop',graph',state',dt')
+
+       (* if some perturbation needs backtrack, return the perturbation *)
+       else (stop,graph,state,dt,Some (ti,pe))
+     else (stop,graph,state,dt,None)
+
+let perturbate_with_backtrack ~outputs env counter graph state (ti,pe) =
+  let continue = Counter.one_time_correction_event counter ti in
+  let () =
+    Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
+  let stop,graph',state' =
+    perturbate ~outputs env counter graph state [pe] in
+  (not continue||stop,graph',state')
+
 let a_loop
     ~outputs ~dumpIfDeadlocked ~maxConsecutiveClash env counter graph state =
   let activity = Rule_interpreter.activity graph in
@@ -364,29 +405,32 @@ let a_loop
            | Some n ->
               List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail in
         let () = state.stopping_times <- tail' in
-        let continue = Counter.one_time_correction_event counter ti in
-        let () =
-          Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
-        let stop,graph',state' =
-          perturbate ~outputs env counter graph state [pe] in
-        (not continue||stop,graph',state')
+        perturbate_with_backtrack ~outputs env counter graph state (ti,pe)
+
     else
       (*activity is positive*)
       match state.stopping_times with
-      | (rt,ti,pe) :: tail
+      | (_,ti,_) :: _
         when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-         let tail' = match rt with
-           | None -> tail
-           | Some n ->
-              List_util.merge_uniq compare_stops [(rt,(Nbr.add ti n),pe)] tail
-        in
-        let () = state.stopping_times <- tail' in
-        let continue = Counter.one_time_correction_event counter ti in
-        let () =
-          Counter.fill ~outputs counter ~dt:0. (observables_values env graph) in
-        let stop,graph',state' =
-          perturbate ~outputs env counter graph state [pe] in
-        (not continue||stop,graph',state')
+
+         let (stop,graph',state',dt',needs_backtrack) =
+           perturbate_until_first_backtrack
+             env counter ~outputs (false,graph,state,dt) in
+
+         begin
+           match needs_backtrack with
+           | Some p ->
+              perturbate_with_backtrack ~outputs env counter graph' state' p
+           | None ->
+              (*set time for apply rule *)
+              let () =
+                Counter.fill ~outputs counter ~dt (observables_values env graph) in
+              let () = Counter.one_time_advance counter dt' in
+
+              if stop then (stop,graph',state') else
+                one_rule ~outputs ~maxConsecutiveClash env counter graph' state'
+         end
+
       | _ ->
         let () =
           Counter.fill ~outputs counter ~dt (observables_values env graph) in

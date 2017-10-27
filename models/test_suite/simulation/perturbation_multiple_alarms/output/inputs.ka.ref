@@ -18,4 +18,4 @@ A(a~p/~u!.) @ 0.01
 
 %init: 10000 A(a~u!.)
 
-%mod: [E] = 528 do $STOP
+%mod: [E] = 474 do $STOP

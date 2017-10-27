@@ -1,6 +1,0 @@
-# Snapshot [Event: 477]
-%def: "T0" "5"
-
-%init: 459 /*1 agents*/ A(a~p)
-%init: 9541 /*1 agents*/ A(a~u)
-
