@@ -1,4 +1,4 @@
-"${KAPPABIN}"KaSim ../kappa/abc.ka -seed 751761073 -u e -l 100000 -p 1000 -o abc.csv -mode batch && \
+"${KAPPABIN}"KaSim ../kappa/abc.ka -seed 751761073 -u e -l 100000 -p 1000 -o abc.csv -mode batch -syntax 3 && \
 gnuplot abc.gplot && \
 circo -Tpng flux.dot -o ../generated_img/flux.png && \
 "${KAPPABIN}"KaSa ../kappa/abc.ka --no-output-directory  && \
