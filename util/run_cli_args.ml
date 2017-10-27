@@ -37,7 +37,7 @@ let default : t = {
   plotPeriod = None;
   outputDataFile = None;
   outputDirectory = ".";
-  syntaxVersion = Ast.V3;
+  syntaxVersion = Ast.V4;
   batchmode = false;
   interactive = false;
 }
