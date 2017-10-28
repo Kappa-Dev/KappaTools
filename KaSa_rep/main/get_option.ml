@@ -55,7 +55,7 @@ let options =
            ["V3";"V4";"3";"4";"v3";"v4"],
           Config.syntax_version),
       "Version of the lexer/parser",
-      [influence_map,1],
+      [syntax,1;actions,30],
       Normal;
 
       "--compute-contact-map",
