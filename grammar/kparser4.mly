@@ -455,7 +455,7 @@ rule_content:
 
 alg_with_radius:
   | alg_expr { Result_util.map (fun (a,_) -> (a,None)) $1 }
-  | alg_expr SEMICOLON annot alg_expr
+  | alg_expr COLON annot alg_expr
     { Result_util.map2 (fun (a,_) (r,_) -> (a, Some r)) $1 $4 }
   ;
 
@@ -465,11 +465,6 @@ rate:
   | alg_expr OP_CUR annot alg_with_radius CL_CUR annot
     { Result_util.map2 (fun (b,_) u -> (b,Some u,$6)) $1 $4 }
   | alg_expr { Result_util.map (fun (a,an) -> (a,None,an)) $1 }
-  | OP_CUR annot CL_CUR annot alg_expr
-    { Result_util.map
-        (fun (b,an) ->
-          (b, Some (Locality.dummy_annot (Alg_expr.CONST Nbr.zero),None),an))
-        $5 }
   ;
 
 birate:

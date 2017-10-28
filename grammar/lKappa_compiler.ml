@@ -395,10 +395,13 @@ let annotate_agent_with_diff
       let () = ports.(p_id) <-
           (Locality.dummy_annot Ast.LNK_FREE, LKappa.Maintained) in
       links_annot
-    | ([(Ast.LNK_FREE|Ast.ANY_FREE),_], [(Ast.LNK_FREE|Ast.ANY_FREE),_])
-    | ([],[]) ->
+    | ([(Ast.LNK_FREE|Ast.ANY_FREE),_], [(Ast.LNK_FREE|Ast.ANY_FREE),_]) ->
       let () = ports.(p_id) <-
           (Locality.dummy_annot Ast.LNK_FREE, LKappa.Maintained) in
+      links_annot
+    | ([],[]) ->
+      let () = ports.(p_id) <-
+          (Locality.dummy_annot Ast.LNK_ANY, LKappa.Maintained) in
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], [(Ast.LNK_FREE|Ast.ANY_FREE),_] ->
       let va,lhs_links' =
