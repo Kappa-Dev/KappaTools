@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 12/08/2010
-   * Last modification: Time-stamp: <Oct 18 2017>
+   * Last modification: Time-stamp: <Oct 28 2017>
    * *
    * Translation from kASim ast to OpenKappa internal representations, and linkage
    *
@@ -989,6 +989,9 @@ let translate_view parameters error handler (k:Ckappa_sig.c_agent_id)
     end
 
 let translate_mixture parameters error handler mixture =
+  let syntax_version =
+    Remanent_parameters.get_syntax_version parameters
+  in
   let size = length_mixture mixture in
   let rec aux mixture error (k:Ckappa_sig.c_agent_id) (kasim_id:Ckappa_sig.c_agent_id)
       bond_list questionmarks dot_list plus_list array =
@@ -1093,7 +1096,8 @@ let translate_mixture parameters error handler mixture =
       in
       aux mixture error
         (Ckappa_sig.next_agent_id k)
-        kasim_id
+        (if syntax_version = Ast.V3 then kasim_id
+         else Ckappa_sig.next_agent_id kasim_id)
         bond_list questionmarks dot_list plus_list array
   in
   let error,array =
@@ -1322,7 +1326,7 @@ let check_freeness parameters lhs source (error, half_release_set) =
 
 let translate_rule parameters error handler rule =
   let label,(rule,position) = rule in
-  let direction = rule.Ckappa_sig.interprete_delta in 
+  let direction = rule.Ckappa_sig.interprete_delta in
   let error,c_rule_lhs,question_marks_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
   let error,c_rule_rhs,question_marks_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
   let error,c_rule_lhs = clean_question_marks parameters error question_marks_r c_rule_lhs in (* remove ? in the lhs when they occur in the rhs (according to the BNF, they have to occur in the lhs as well *)

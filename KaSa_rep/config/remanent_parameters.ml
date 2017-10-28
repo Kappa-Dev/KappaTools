@@ -340,9 +340,9 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         Remanent_parameters_sig.syntax_version =
           begin
             match !Config.syntax_version with
-            "V4" -> Ast.V4
-          | "V3" -> Ast.V3
-          | _ -> failwith "Syntax version should be either V3 or V4"
+            | "4" | "v4" | "V4" -> Ast.V4
+            | "3" | "v3" | "V3" -> Ast.V3
+            | _ -> failwith "Syntax version should be either V3 or V4"
           end ;
         Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
         Remanent_parameters_sig.do_scc = !Config.do_scc ;

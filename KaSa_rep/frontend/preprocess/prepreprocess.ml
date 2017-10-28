@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 18 2017>
+ * Last modification: Time-stamp: <Oct 28 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -326,17 +326,11 @@ let translate_interface parameters is_signature =
 let translate_agent parameters is_signature ag (error, x as remanent) =
   match ag with
   | Ast.Absent pos ->
-    {Ckappa_sig.ag_nme= "__dummy";
-     Ckappa_sig.ag_intf = Ckappa_sig.EMPTY_INTF ;
-     Ckappa_sig.ag_nme_pos = pos;
-    },
-    Exception.warn parameters error __POS__
-      ~message:"An \"absent\" agent occurs in a mixture" ~pos
-      Exit x
+    None, remanent
   | Ast.Present ((ag_nme,ag_nme_pos),intf,_modif) ->
     let interface,remanent =
       translate_interface parameters is_signature intf remanent in
-    {Ckappa_sig.ag_nme;
+    Some {Ckappa_sig.ag_nme;
      Ckappa_sig.ag_intf = interface ;
      Ckappa_sig.ag_nme_pos;
      (*     Ckappa_sig.ag_pos = position ;*)
@@ -351,23 +345,23 @@ let rec build_skip k mixture =
       (k - 1)
       (Ckappa_sig.SKIP(mixture))
 
+let add_agent agent_opt mixture remanent =
+  match agent_opt with
+  | None -> Ckappa_sig.SKIP(mixture), remanent
+  | Some agent ->
+  Ckappa_sig.COMMA(agent,mixture),remanent
+
+
 let rec translate_mixture_zero_zero  parameters mixture remanent tail_size =
   match mixture with
   | [] -> build_skip tail_size Ckappa_sig.EMPTY_MIX,remanent
   | agent :: mixture ->
-    let agent,remanent =
+    let agent_opt,remanent =
       translate_agent parameters false agent remanent in
     let mixture,remanent =
       translate_mixture_zero_zero parameters mixture remanent tail_size  in
-    Ckappa_sig.COMMA(agent,mixture),remanent
-(*      | Ast.DOT(i,agent,mixture) ->
-          let agent,remanent = translate_agent parameters agent remanent in
-          let mixture,remanent = translate_mixture_zero_zero parameters mixture remanent tail_size  in
-            Ckappa_sig.DOT(i,agent,mixture),remanent
-        | Ast.PLUS(i,agent,mixture) ->
-          let agent,remanent = translate_agent parameters agent remanent in
-          let mixture,remanent = translate_mixture_zero_zero parameters mixture remanent tail_size  in
-            Ckappa_sig.PLUS(i,agent,mixture),remanent*)
+    add_agent agent_opt mixture remanent
+
 
 let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_size tail_size =
   if prefix_size = 0
@@ -386,7 +380,7 @@ let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_
     match mixture with
     | [] -> Ckappa_sig.EMPTY_MIX, remanent
     | agent :: mixture ->
-      let agent, remanent =
+      let agent_opt, remanent =
         translate_agent parameters false agent remanent in
       let mixture, remanent =
         translate_mixture_in_rule
@@ -397,34 +391,15 @@ let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_
           empty_size
           tail_size
       in
-      Ckappa_sig.COMMA(agent,mixture),remanent
-
-(* | Ast.DOT(i,agent,mixture) -> let agent,remanent = translate_agent
-   parameters agent remanent in let mixture,remanent =
-   translate_mixture_in_rule parameters mixture remanent
-   (prefix_size-1) empty_size tail_size in
-   Ckappa_sig.DOT(i,agent,mixture),remanent |
-   Ast.PLUS(i,agent,mixture) -> let agent,remanent = translate_agent
-   parameters agent remanent in let mixture,remanent =
-   translate_mixture_in_rule parameters mixture remanent
-   (prefix_size-1) empty_size tail_size in
-   Ckappa_sig.PLUS(i,agent,mixture),remanent*)
+      add_agent agent_opt mixture remanent
 
 let rec translate_mixture parameters mixture remanent  =
   match mixture with
   | [] -> Ckappa_sig.EMPTY_MIX,remanent
   | agent :: mixture ->
-    let agent,remanent = translate_agent parameters false agent remanent in
+    let agent_opt,remanent = translate_agent parameters false agent remanent in
     let mixture,remanent = translate_mixture parameters mixture remanent in
-    Ckappa_sig.COMMA(agent,mixture),remanent
-(*      | Ast.DOT(i,agent,mixture) ->
-        let agent,remanent = translate_agent parameters agent remanent in
-        let mixture,remanent = translate_mixture parameters mixture remanent in
-        Ckappa_sig.DOT(i,agent,mixture),remanent
-        | Ast.PLUS(i,agent,mixture) ->
-        let agent,remanent = translate_agent parameters agent remanent in
-        let mixture,remanent = translate_mixture parameters mixture remanent in
-        Ckappa_sig.PLUS(i,agent,mixture),remanent*)
+    add_agent agent_opt mixture remanent
 
 let support_agent = function
   | Ast.Absent _ -> None
@@ -442,7 +417,9 @@ let support_agent = function
     Some (name,list)
 
 let compatible_agent ag1 ag2 =
-  support_agent ag1 = support_agent ag2
+  match support_agent ag1,support_agent ag2 with
+  | None, _ | _, None -> true
+  | Some a, Some b -> a=b
 
 let length mixture =
   let rec aux mixture k =
@@ -456,11 +433,11 @@ let longuest_prefix mixture1 mixture2 =
   let rec common_prefix mixture1 mixture2 k =
     match mixture1 with
     | [] -> (k,mixture1,mixture2)
-    | agent :: mixture (*| Ast.DOT(_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
+    | agent :: mixture ->
       begin
         match mixture2 with
         | [] -> (k,mixture1,mixture2)
-        | agent' :: mixture' (*| Ast.DOT(_,agent',mixture') | Ast.PLUS(_,agent',mixture')*) ->
+        | agent' :: mixture' ->
           begin
             if compatible_agent agent agent'
             then
@@ -787,7 +764,13 @@ let translate_compil parameters error compil =
       (fun  (error,agent_set,list) agent->
          let error,agent_set,agent =
            refine_agent parameters error agent_set agent in
-         error,agent_set,(agent::list))
+         match agent with
+         | None ->
+           let error, () =
+             Exception.warn parameters error __POS__ Exit ~message:"There shall be no missing agents in agent declarations" () in
+           error, agent_set, list
+         | Some agent ->
+           error,agent_set,(agent::list))
       (error,agent_set,[])
       compil.Ast.signatures
   in
