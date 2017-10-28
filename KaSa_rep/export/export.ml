@@ -242,7 +242,10 @@ let compute_env_init
   | Remanent_state.Files files ->
     let () = show_title state in
     let cli = Run_cli_args.default in
-    let () = cli.Run_cli_args.syntaxVersion <- Ast.V3 in
+    let syntax_version =
+      Remanent_parameters.get_syntax_version
+        (Remanent_state.get_parameters state) in
+    let () = cli.Run_cli_args.syntaxVersion <- syntax_version in
     let () = cli.Run_cli_args.inputKappaFileNames <- files in
     let (_,_,env, contactmap, _, _, _, _, init), _ =
       Cli_init.get_compilation cli
