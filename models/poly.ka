@@ -1,21 +1,21 @@
 %agent: A(b,c)
 %agent: B(a,c)
 %agent: C(b,a)
-##
+//
 %var: 'V' 1
 %var: 'k1' INF
 %var: 'k2' 1.0E-4/'V'
 %var: 'k_off' 0.1
-##
-'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2'{'k1'}
-'a.c' A(c),C(a) -> A(c!1),C(a!1) @ 'k2'{'k1'}
-'b.c' B(c),C(b) -> B(c!1),C(b!1) @ 'k2'{'k1'}
-##
-'a..b' A(b!a.B) -> A(b) @ 'k_off'
-'a..c' A(c!a.C) -> A(c) @ 'k_off'
-'b..c' B(c!b.C) -> B(c) @ 'k_off'
-##
+//
+'a.b' A(b[.]),B(a[.]) -> A(b[1]),B(a[1]) @ 'k2'{'k1'}
+'a.c' A(c[.]),C(a[.]) -> A(c[1]),C(a[1]) @ 'k2'{'k1'}
+'b.c' B(c[.]),C(b[.]) -> B(c[1]),C(b[1]) @ 'k2'{'k1'}
+//
+'a..b' A(b[a.B]) -> A(b[.]) @ 'k_off'
+'a..c' A(c[a.C]) -> A(c[.]) @ 'k_off'
+'b..c' B(c[b.C]) -> B(c[.]) @ 'k_off'
+//
 %var: 'n'  1000
-##
+//
 %init: 'n'  A(),B(),C()
 %mod: [E] = 10000 do $STOP "snap.dot"
