@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Oct 28 2017>
   * *
   * primitive to parse command-line options
   *
@@ -15,13 +15,14 @@
 open Superarg
 
 let actions = "Actions",0,None
-let output = "Output",1,None
-let reachability = "Reachability analysis",2,None
-let traces = "Trace analysis",3,None
-let contact_map = "Contact map",4,None
-let influence_map = "Influence map",5,None
-let flow = "Flow of information",6,None
-let debug = "Debugging information",7,None
+let syntax = "Syntax",1,None
+let output = "Output",2,None
+let reachability = "Reachability analysis",3,None
+let traces = "Trace analysis",4,None
+let contact_map = "Contact map",5,None
+let influence_map = "Influence map",6,None
+let flow = "Flow of information",7,None
+let debug = "Debugging information",8,None
 
 let options =
   List.rev
@@ -47,6 +48,16 @@ let options =
           "--no-compute-reachability-analysis";
         ],[]),"launch nothing",[actions,1],Normal;
       "--void",Void,"",[actions,2],Normal;
+      "-syntax",
+      Choice
+         (["V3","previous version";
+           "V4","current version"],
+           ["V3";"V4"],
+          Config.syntax_version),
+      "Version of the lexer/parser",
+      [influence_map,1],
+      Normal;
+
       "--compute-contact-map",
       Bool Config.do_contact_map,
       "compute the contact map",

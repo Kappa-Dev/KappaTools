@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Oct 28 2017>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -28,6 +28,7 @@ let output_local_trace_directory = ref "output"
 
 let unsafe = ref true
 let trace = ref false
+let syntax_version = ref "V4"
 let dump_error_as_soon_as_they_occur = ref false
 let log = ref stdout
 let formatter = ref Format.std_formatter
@@ -60,7 +61,7 @@ let make_labels_compatible_with_dot =
 
 (** contact map*)
 let do_contact_map = ref true
-let do_scc = ref false 
+let do_scc = ref false
 let pure_contact = ref false
 let contact_map_file = ref "contact"
 let contact_map_format = ref "DOT"

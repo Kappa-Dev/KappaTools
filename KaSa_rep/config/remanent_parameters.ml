@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Oct 28 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -337,6 +337,13 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
+        Remanent_parameters_sig.syntax_version =
+          begin
+            match !Config.syntax_version with
+            "V4" -> Ast.V4
+          | "V3" -> Ast.V3
+          | _ -> failwith "Syntax version should be either V3 or V4"
+          end ;
         Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
         Remanent_parameters_sig.do_scc = !Config.do_scc ;
         Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
@@ -551,6 +558,8 @@ let get_call_stack_1                       marshalisable = marshalisable.Remanen
 let get_link_mode_1                        marshalisable = marshalisable.Remanent_parameters_sig.link_mode
 let get_kasa_state_1                       marshalisable = marshalisable.Remanent_parameters_sig.kasa_state
 let get_do_contact_map_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_contact_map
+let get_syntax_version_1                   marshalisable =
+  marshalisable.Remanent_parameters_sig.syntax_version
 let get_do_scc_1                           marshalisable = marshalisable.Remanent_parameters_sig.do_scc
 
 let get_do_influence_map_1                 marshalisable = marshalisable.Remanent_parameters_sig.do_influence_map
@@ -601,7 +610,8 @@ let get_full_version = upgrade_from_marshal_field get_full_version_1
 let get_launching_date = upgrade_from_marshal_field get_launching_date_1
 let get_launched_when_and_where parameters = Printf.sprintf "%s on %s" (get_launching_date parameters) (get_launched_where parameters)
 let get_do_contact_map = upgrade_from_marshal_field get_do_contact_map_1
-let get_do_scc = upgrade_from_marshal_field get_do_scc_1 
+let get_syntax_version = upgrade_from_marshal_field get_syntax_version_1
+let get_do_scc = upgrade_from_marshal_field get_do_scc_1
 let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
 let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1
 let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_stochastic_flow_of_information_1

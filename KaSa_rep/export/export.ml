@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 27 2017>
+  * Last modification: Time-stamp: <Oct 28 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -280,12 +280,14 @@ let get_init =
 (*compilation*)
 
 let compute_compilation show_title state =
+  let parameters = get_parameters state in
+  let syntax_version = Remanent_parameters.get_syntax_version parameters in
   let compil =
     match Remanent_state.get_init state with
     | Remanent_state.Compil compil -> compil
     | Remanent_state.Files files ->
       let () = show_title state in
-      Cli_init.get_ast_from_list_of_files Ast.V3 files
+      Cli_init.get_ast_from_list_of_files syntax_version files
   in
   let state = Remanent_state.set_compilation compil state in
   state, compil
