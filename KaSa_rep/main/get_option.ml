@@ -52,7 +52,7 @@ let options =
       Choice
          (["V3","previous version";
            "V4","current version"],
-           ["V3";"V4"],
+           ["V3";"V4";"3";"4";"v3";"v4"],
           Config.syntax_version),
       "Version of the lexer/parser",
       [influence_map,1],
