@@ -1,19 +1,18 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+/* TEMPLATE MODEL AS DESCRIBED IN THE MANUAL */
 %def: "displayCompression" "weak" 
 
-#### Signatures 
+// Signatures 
 %agent: A()
-%agent: B() # Declaration of B 
+%agent: B() // Declaration of B 
 %agent: C()
 
-#### Rules 
-A() -> B() @ 1 
-B() -> C() @ 1
-
+// Rules 
+A(),. -> .,B() @ 1 
+B(),. -> .,C() @ 1
 
 %obs: 'C' |C()|
 
-#### Initial conditions 
+// Initial conditions 
 %init: 10000 A()
 
 %mod: [true] do $TRACK 'C' [true]

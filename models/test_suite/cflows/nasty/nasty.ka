@@ -1,18 +1,19 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+/* TEMPLATE MODEL AS DESCRIBED IN THE MANUAL */
 
-#### Signatures 
-%agent: A(x~u~p,y~u~p,z~u~p) # Declaration of agent A 
+// Signatures 
+%agent: A(x{u,p},y{u,p},z{u,p}) // Declaration of agent A 
 %agent: K()
 %agent: KK()
 
-#### Rules 
-'y' A(x~u,y~u),K() -> A(x~p,y~p) @ 1 
-'z' A(x~u,z~u),K() -> A(x~p,z~p) @ 1 
-'x' A(x~p) -> A(x~u),K() @1
-'y-' A(y~p) -> A(y~u) @1
-'z-' A(z~p) -> A(z~u) @1 
-'goal' A(x~u,z~p,y~p) -> A(x~u,z~p,y~p),KK() @100
-#### Initial conditions 
+// Rules 
+'y' A(x{u}[.],y{u}[.]),K() -> A(x{p}[.],y{p}[.]),. @ 1 
+'z' A(x{u}[.],z{u}[.]),K() -> A(x{p}[.],z{p}[.]),. @ 1 
+'x' A(x{p}[.]),. -> A(x{u}[.]),K() @ 1
+'y-' A(y{p}[.]) -> A(y{u}[.]) @ 1
+'z-' A(z{p}[.]) -> A(z{u}[.]) @ 1 
+'goal' A(x{u}[.],z{p}[.],y{p}[.]),. -> A(x{u}[.],z{p}[.],y{p}[.]),KK() @ 100
+
+// Initial conditions 
 %init: 1 A()
 %init: 1 K() 
 

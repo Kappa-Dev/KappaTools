@@ -1,16 +1,16 @@
 %def: "displayCompression" "weak" "strong" 
 
-A(x,y) -> C(x,y) @1
-C(x,y) -> A(x,y) @1
-A(x),B(x) -> A(x!1),B(x!1) @1
-A(y),B(y) -> A(y!1),B(y!1) @1
-A(x!1,y!2),B(x!1,y!2) -> A(x!1,y!2),B(x!2,y!1) @1
+A(x[.],y[.]),. -> .,C(x[.],y[.]) @ 1
+C(x[.],y[.]),. -> .,A(x[.],y[.]) @ 1
+A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
+A(y[.]),B(y[.]) -> A(y[1]),B(y[1]) @ 1
+A(x[1],y[2]),B(x[1],y[2]) -> A(x[1],y[2]),B(x[2],y[1]) @ 1
 
-'GOAL' A(x!1),B(y!1) -> A(x),B(y) @1 
-A(y!1),B(x!1) -> A(y),B(x) @1 
+'GOAL' A(x[1]),B(y[1]) -> A(x[.]),B(y[.]) @ 1 
+A(y[1]),B(x[1]) -> A(y[.]),B(x[.]) @ 1 
 
-%init: 1 A(x,y)
-%init: 1 B(x,y) 
+%init: 1 A(x[.],y[.])
+%init: 1 B(x[.],y[.]) 
 
 %agent: C(x,y)
 %agent: A(x,y)

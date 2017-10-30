@@ -1,18 +1,18 @@
 %def: "displayCompression" "weak" "strong" 
 %def: "dumpIfDeadlocked" "true"
 
-A(x)->B(x) @1
-B(x)->C(x) @1 
-C(x)->A(x) @1
+A(x[.]),. -> .,B(x[.]) @ 1
+B(x[.]),. -> .,C(x[.]) @ 1 
+C(x[.]),. -> .,A(x[.]) @ 1
 
-A(x),E(x!1),C(x!1) -> A(x!1),E(x!1),C(x) @1
-E(x),C(x) -> E(x!1),C(x!1) @1 
+A(x[.]),E(x[1]),C(x[1]) -> A(x[1]),E(x[1]),C(x[.]) @ 1
+E(x[.]),C(x[.]) -> E(x[1]),C(x[1]) @ 1 
 
 
-'GOAL' A(x!1),E(x!1) -> A(x),E(x) @1
+'GOAL' A(x[1]),E(x[1]) -> A(x[.]),E(x[.]) @ 1
 
-%init: 10 A(x)
-%init: 10 E(x)
+%init: 10 A(x[.])
+%init: 10 E(x[.])
 
 %agent: A(x)
 %agent: B(x)

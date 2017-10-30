@@ -1,6 +1,6 @@
 #Command-line:
 "${KAPPABIN}"KaSim -i link_swapping_strong3.ka -seed 924556145 -u event -l 30 \
-  -d output --debug --time-independent -syntax 3 || exit 0
+  -d output --debug --time-independent -syntax 4 || exit 0
 
 #In this model As can form a dimmer by connecting their two x(s), and
 #their two y(s) concurrently.

@@ -1,26 +1,23 @@
 %agent: C()
 %agent: L(z,s)
 %agent: Z(l,s)
-%agent: S(k, l, z, x~u~p, y~u~p)
-%agent: K(s, x~u~p)
+%agent: S(k, l, z, x{u,p}, y{u,p})
+%agent: K(s, x{u,p})
 
-
-'Signal'   K(x~u) -> K(x~p) @ 1
-'K.S'      K(x~p, s), S(k) <-> K(x~p, s!0), S(k!0) @ 1, 1
-'KpSx'     K(s!0), S(k!0, x~u)  -> K(s!0), S(k!0, x~p) @ 1
-'KpSy'     K(s!0), S(k!0, y~u)  -> K(s!0), S(k!0, y~p) @ 1
-'S.L.Z'    S(x~p, y~p, l, z), L(z!0,s), Z(l!0,s) -> S(x~p, y~p, l!1, z!2), L(z!0, s!1), Z(l!0, s!2) @ 1
-'S..L..Z'  S(l!1, z!2), L(z!0, s!1), Z(l!0, s!2) -> S(l, z), L(z, s), Z(l, s) @ 1
+'Signal'   K(x{u}[.]) -> K(x{p}[.]) @ 1
+'K.S'      K(x{p}[.], s[.]), S(k[.]) <-> K(x{p}[.], s[0]), S(k[0]) @ 1, 1
+'KpSx'     K(s[0]), S(k[0], x{u}[.])  -> K(s[0]), S(k[0], x{p}[.]) @ 1
+'KpSy'     K(s[0]), S(k[0], y{u}[.])  -> K(s[0]), S(k[0], y{p}[.]) @ 1
+'S.L.Z'    S(x{p}[.], y{p}[.], l[.], z[.]), L(z[0],s[.]), Z(l[0],s[.]) -> S(x{p}[.], y{p}[.], l[1], z[2]), L(z[0], s[1]), Z(l[0], s[2]) @ 1
+'S..L..Z'  S(l[1], z[2]), L(z[0], s[1]), Z(l[0], s[2]) -> S(l[.], z[.]), L(z[.], s[.]), Z(l[.], s[.]) @ 1
 
 %init: 10 (K(), S())
-'C' -> L(z!0), Z(l!0) @ 1 
-%obs: 'L' |L(z)|
-
+'C' .,. -> L(z[0]), Z(l[0]) @ 1 
+%obs: 'L' |L(z[.])|
 
 %def: "displayCompression" "none" "weak" "strong"
 %mod: [true] do $TRACK 'L' [true]
 
-
-#%mod: [T]>30 do $TRACK 'Sub3 total' [false]
-# KaSim -i Trial_stories.ka -t 31 -p 31
-# dot cflow_Strongly_0.dot -Tpng -O
+// %mod: [T]>30 do $TRACK 'Sub3 total' [false]
+//  KaSim -i Trial_stories.ka -t 31 -p 31
+//  dot cflow_Strongly_0.dot -Tpng -O

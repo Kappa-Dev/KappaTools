@@ -8,10 +8,10 @@
 
 %plot: [T]
 A(x/~a!.) @ 3
-A(x/~b!.) @ 3
-A(x/~c!.) @ 3
+A(x/~b?) @ 3
+A(x/~c?) @ 3
 A(x/~d!.) @ 1
-'GOAL' A(x~d!.) @ 1
+'GOAL' A(x~d?) @ 1
 
 /*0*/%mod: [true] do $TRACK A(x~d) [true] repeat ([false])
 

@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (16384 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent' '-syntax' '3'
++ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 + Loading trace

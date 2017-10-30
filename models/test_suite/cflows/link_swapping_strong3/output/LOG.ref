@@ -22,7 +22,7 @@ On roots:
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 64 instances.
  (8 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-i' 'link_swapping_strong3.ka' '-seed' '924556145' '-u' 'event' '-l' '30' '-d' 'output' '--debug' '--time-independent' '-syntax' '3'
++ Command line to rerun is: 'KaSim' '-i' 'link_swapping_strong3.ka' '-seed' '924556145' '-u' 'event' '-l' '30' '-d' 'output' '--debug' '--time-independent' '-syntax' '4'
 Applied 0:
 (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc1*/ A/*1*/(x!.)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ A/*1*//*1*/.x = A/*1*//*0*/.x

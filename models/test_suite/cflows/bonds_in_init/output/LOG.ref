@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (64 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'bonds_in_init.ka' '-l' '40' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '3'
++ Command line to rerun is: 'KaSim' 'bonds_in_init.ka' '-l' '40' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 + Loading trace

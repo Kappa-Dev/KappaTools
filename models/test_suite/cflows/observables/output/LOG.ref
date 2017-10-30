@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (2 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-i' 'observables.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '--time-independent' '-syntax' '3'
++ Command line to rerun is: 'KaSim' '-i' 'observables.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '--time-independent' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 + Loading trace

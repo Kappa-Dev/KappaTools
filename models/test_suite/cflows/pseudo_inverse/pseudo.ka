@@ -1,17 +1,17 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+// TEMPLATE MODEL AS DESCRIBED IN THE MANUAL //
 %def: "displayCompression" "none" "weak"
 
-#### Signatures
-%agent: A(x~a~b~c)
+// Signatures
+%agent: A(x{a,b,c})
 
-#### Rules
-'R1' A(x~a) -> A(x~b) @ 1
-'R2' A(x~b) -> A(x~a) @ 100
-'R3' A(x~b) -> A(x~c) @ 2
+// Rules
+'R1' A(x{a}[.]) -> A(x{b}[.]) @ 1
+'R2' A(x{b}[.]) -> A(x{a}[.]) @ 100
+'R3' A(x{b}[.]) -> A(x{c}[.]) @ 2
 
-%obs: 'c' |A(x~c)|
+%obs: 'c' |A(x{c}[.])|
 
-#### Initial conditions
+// Initial conditions
 %init: 'n_a' A()
 
 %mod: [true] do $TRACK 'c' [true]

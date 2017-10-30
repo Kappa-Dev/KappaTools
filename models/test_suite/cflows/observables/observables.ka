@@ -1,14 +1,14 @@
 %def: "displayCompression" "weak" "none"
 
-A(a~u),B(a~u) -> A(a~p),B(a~p) @1
-A(a~p),B(a~p) -> /*could be inlined*/ A(a~u),B(a~u) @1
-'C' A(a~u),B(a~p) -> A(a~u),B(a~p) @1
+A(a{u}[.]),B(a{u}[.]) -> A(a{p}[.]),B(a{p}[.]) @ 1
+A(a{p}[.]),B(a{p}[.]) -> /*could be inlined*/ A(a{u}[.]),B(a{u}[.]) @ 1
+'C' A(a{u}[.]),B(a{p}[.]) -> A(a{u}[.]),B(a{p}[.]) @ 1
 
-%init: 1 A(a~u)
-%init: 1 B(a~u)
+%init: 1 A(a{u})
+%init: 1 B(a{u})
 
 
 %mod: [true] do $TRACK 'C' /*last noop rule*/ [true]
 
-%agent: A(a~u~p)
-%agent: B(a~u~p)
+%agent: A(a{u,p})
+%agent: B(a{u,p})

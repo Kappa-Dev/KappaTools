@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i processive.ka -seed 240056667 -u event -l 30000 -d output --time-independent -syntax 3 || exit 0
+"${KAPPABIN}"KaSim -i processive.ka -seed 240056667 -u event -l 30000 -d output --time-independent -syntax 4 || exit 0
 
 #Processive phosphorilation the sites of a protein A.
 #Even it the kinase breaks its connection, and another kinase finish the job, the strong compression will merge the two Ks and detect that the unbinding was unecessary. 

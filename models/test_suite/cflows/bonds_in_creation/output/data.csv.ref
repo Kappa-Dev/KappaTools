@@ -1,4 +1,4 @@
-# Output of 'KaSim' 'bonds_in_creation.ka' '-u' 'time' '-l' '40' '-p' '0.4' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '3'
+# Output of 'KaSim' 'bonds_in_creation.ka' '-u' 'time' '-l' '40' '-p' '0.4' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '4'
 "[T]", "L"
 0., 0
 0.4, 0
