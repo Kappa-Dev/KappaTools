@@ -408,7 +408,7 @@ arrow:
 sum_token:
   | small_alg_expr annot ID annot
     { Result_util.map (fun x -> [(x,($3,rhs_pos 3))]) $1 }
-  | small_alg_expr annot ID annot PLUS annot sum_token
+  | small_alg_expr annot ID annot COMMA annot sum_token
     { Result_util.map2 (fun x l -> (x,($3,rhs_pos 3))::l) $1 $7 }
   ;
 
