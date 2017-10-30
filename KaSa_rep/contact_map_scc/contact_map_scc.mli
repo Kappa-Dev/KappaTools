@@ -19,7 +19,6 @@ type converted_contact_map
 val convert_contact_map:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
-  Cckappa_sig.kappa_handler ->
   Remanent_state.internal_contact_map ->
   Exception.method_handler * converted_contact_map
 

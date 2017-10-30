@@ -1449,7 +1449,7 @@ let compute_scc_decomposition
     let errors = get_errors state in
     let errors, cm_graph =
       Contact_map_scc.convert_contact_map
-        parameters errors handler contact_map
+        parameters errors contact_map
     in
     let errors, graph_scc =
       Contact_map_scc.compute_graph_scc

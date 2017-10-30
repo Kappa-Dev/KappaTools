@@ -1,0 +1,9 @@
+#### Signatures
+
+%agent: A(x, y,z)
+%agent: B(x, y,z)
+%agent: C(x, y,z)
+
+A(x),B(y) -> A(x!1),B(y!1) @1 
+B(x),C(y) -> B(x!1),C(y!1) @1 
+C(x),A(y) -> C(x!1),A(y!1) @1 

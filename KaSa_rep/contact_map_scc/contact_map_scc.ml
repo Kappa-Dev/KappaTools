@@ -53,46 +53,53 @@ Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
 
+
 type site = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
+
 type node = site * site
+
 type edge = node * node
+
 type converted_contact_map =
   node list Ckappa_sig.PairAgentSite_map_and_set.Map.t
 
 let add_edges
     parameters error
-    (agent_name,site_name,agent_name',site_name')
+    (agent_name, site_name, agent_name', site_name')
     site_name_list graph =
-  let error,old =
+  let edge = ((agent_name, site_name), (agent_name', site_name')) in
+  let error, old =
     Ckappa_sig.PairAgentSite_map_and_set.Map.find_default_without_logs
       parameters
       error
       []
-      ((agent_name, site_name),(agent_name',site_name'))
+      edge
       graph
+  in
+  let internal_scc_decomposition =
+    List.fold_left (fun old (site_name'', partners) ->
+        List.fold_left (fun old (agent_name''', site_name''') ->
+            let edge =
+              ((agent_name', site_name''), (agent_name''', site_name'''))
+            in
+            edge :: old
+          ) old partners
+      ) old site_name_list
   in
   Ckappa_sig.PairAgentSite_map_and_set.Map.add_or_overwrite
     parameters error
-    ((agent_name, site_name),(agent_name',site_name'))
-    (List.fold_left
-       (fun old (site_name'',partners) ->
-          List.fold_left
-            (fun old (agent_name''',site_name''') ->
-              ((agent_name',site_name''),(agent_name''',site_name'''))::old)
-            old
-            partners)
-       old site_name_list)
+    edge
+    internal_scc_decomposition
     graph
 
-
-let convert_contact_map parameters error handler contact_map =
+let convert_contact_map parameters error contact_map =
   let graph = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
     Ckappa_sig.Agent_map_and_set.Map.fold
-    (fun agent_name interface (error,graph) ->
+    (fun agent_name interface (error, graph) ->
          Ckappa_sig.Site_map_and_set.Map.fold
-           (fun  site_name (_,partners) (error,graph) ->
+           (fun site_name (_, partners) (error, graph) ->
             List.fold_left
-              (fun (error,graph) (agent_name',site_name') ->
+              (fun (error, graph) (agent_name', site_name') ->
                  let error, pair_opt =
                    Ckappa_sig.Agent_map_and_set.Map.find_option
                      parameters error
@@ -104,35 +111,128 @@ let convert_contact_map parameters error handler contact_map =
                  | Some interface' ->
                    let error, others =
                      Ckappa_sig.Site_map_and_set.Map.fold
-                       (fun site_name (_,partners) (error,others) ->
-                          error, if partners = [] || site_name=site_name'
+                       (fun site_name (_, partners) (error, others) ->
+                          error,
+                          if partners = [] || site_name = site_name'
                           then
                             others
                           else
-                            (site_name,partners)::others)
-                          interface'
-                          (error,[])
+                            (site_name, partners) :: others
+                       ) interface' (error,[])
                    in
                    add_edges
-                       parameters error
-                       (agent_name,site_name,agent_name',site_name')
-                       others
-                       graph
-              )
-              (error,graph) partners)
-           interface (error,graph))
-    contact_map (error,graph)
+                     parameters error
+                     (agent_name, site_name, agent_name', site_name')
+                     others
+                     graph
+              ) (error, graph) partners
+           ) interface (error, graph)
+    ) contact_map (error,graph)
 
 let mixture_of_edge
-    parameters errors (((ag,st),(ag',st')),((ag'',st''),(ag''',st'''))) =
-  let _ = ag,ag''',st,st''' in
-  if ag'<> ag'' || st'=st''
+    parameters errors
+    (((ag, st), (ag', st')),
+      ((ag'', st''), (ag''', st'''))) =
+  let _ = ag, ag''', st, st''' in
+  if ag'<> ag'' || st' = st''
   then
     let errors, mixture = Preprocess.empty_mixture parameters errors in
     Exception.warn parameters errors __POS__ Exit mixture
   else
-    (* TO DO build the pattern: ag(st!1),ag'(st'!1,st''!2),ag'''(st'''!2)*)
-    let errors, mixture = Preprocess.empty_mixture parameters errors in
+    (* TO DO build the pattern:
+       A(x!1), B(x!1, y!2), C(x!2)
+       ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
+    *)
+    (*get agend_id of ag(st!1)*)
+    let errors, init_views =
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
+        parameters errors
+        0
+    in
+    let fresh_agent_id = Ckappa_sig.dummy_agent_id in
+    let ag_id' = Ckappa_sig.next_agent_id fresh_agent_id in
+    let ag_id'' = Ckappa_sig.next_agent_id ag_id' in
+    let ag_id''' = Ckappa_sig.next_agent_id ag_id'' in
+    (*build bond *)
+    let site_address1 =
+      {
+        Cckappa_sig.agent_index = fresh_agent_id;
+        Cckappa_sig.site = st;
+        Cckappa_sig.agent_type = ag;
+      }
+    in
+    let errors, site_map1 =
+      Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+        parameters errors
+        st
+        site_address1
+        Ckappa_sig.Site_map_and_set.Map.empty
+    in
+    let site_address2 =
+      {
+        Cckappa_sig.agent_index = ag_id';
+        Cckappa_sig.site = st';
+        Cckappa_sig.agent_type = ag';
+      }
+    in
+    let errors, site_map2 =
+    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+      parameters errors
+      st'
+      site_address2
+      site_map1
+    in
+    let site_address3 =
+      {
+        Cckappa_sig.agent_index = ag_id'';
+        Cckappa_sig.site = st'';
+        Cckappa_sig.agent_type = ag'';
+      }
+    in
+    let errors, site_map3 =
+    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+      parameters errors
+      st''
+      site_address3
+      site_map2
+    in
+    let site_address4 =
+      {
+        Cckappa_sig.agent_index = ag_id''';
+        Cckappa_sig.site = st''';
+        Cckappa_sig.agent_type = ag''';
+      }
+    in
+    let errors, site_map4 =
+    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+      parameters errors
+      st'''
+      site_address4
+      site_map3
+    in
+    let errors, init_bonds =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters errors
+      0
+    in
+    let errors, bonds =
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+        parameters errors
+        ag_id'''
+        site_map4
+        init_bonds
+    in
+    let errors, mixture =
+      errors,
+      {
+        Cckappa_sig.views = init_views;
+        Cckappa_sig.bonds = bonds;
+        Cckappa_sig.plus = [];
+        Cckappa_sig.dot = [];
+        Cckappa_sig.c_mixture = Ckappa_sig.EMPTY_MIX
+      }
+    in
+    (*let errors, mixture = Preprocess.empty_mixture parameters errors in*)
     errors, mixture
 (* *)
 
@@ -141,7 +241,8 @@ let filter_edges_in_converted_contact_map
     is_reachable
     converted_contact_map
   =
-  (* TO DO: remove in converted_contact_map each edge that would encode an unreachable patten *)
+  (* TO DO: remove in converted_contact_map each edge that would encode
+     an unreachable patten *)
   (* Take care of propagating memoisation table, and error stream *)
   let _ = parameters, is_reachable in
   error, dynamic, converted_contact_map
@@ -150,41 +251,36 @@ let compute_graph_scc parameters errors contact_map_converted =
     let nodes, edges_list =
         Ckappa_sig.PairAgentSite_map_and_set.Map.fold
           (fun node1 potential_sites (nodes, edges) ->
-             let nodes  =
-               node1::nodes
-             in
+             let nodes = node1::nodes in
              let edges =
-               List.fold_left
-                 (fun edges node2 ->
-                    (node1,node2)::edges)
-                  edges potential_sites
+               List.fold_left (fun edges node2 ->
+                   (node1, node2) :: edges
+                 ) edges potential_sites
              in
-             nodes,edges)
-          contact_map_converted
-          ([], [])
+             nodes,edges
+          ) contact_map_converted ([], [])
     in
     let n_nodes = List.length nodes in
     let nodes_array =
-      Array.make
-        n_nodes ((Ckappa_sig.dummy_agent_name,Ckappa_sig.dummy_site_name),(Ckappa_sig.dummy_agent_name,Ckappa_sig.dummy_site_name))
+      Array.make n_nodes
+        ((Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name),
+         (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name))
     in
     let nodes_map = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
     let _, nodes, (errors, nodes_map) =
       List.fold_left
-        (fun (i,nodes_list,(errors,map)) node ->
-           nodes_array.(i)<-node ;
+        (fun (i, nodes_list, (errors, map)) node ->
+           nodes_array.(i) <- node;
            i+1,
-           (Graphs.node_of_int i)::nodes_list,
+           (Graphs.node_of_int i) :: nodes_list,
            Ckappa_sig.PairAgentSite_map_and_set.Map.add
              parameters errors
              node
              (Graphs.node_of_int i)
              map
-        )
-        (0,[],(errors,nodes_map))
-           nodes
+        ) (0, [], (errors, nodes_map)) nodes
     in
-    let errors,edges =
+    let errors, edges =
       List.fold_left
         (fun (errors, l) (a,b) ->
            let errors, node_opt =
@@ -200,12 +296,12 @@ let compute_graph_scc parameters errors contact_map_converted =
               nodes_map
            in
            match node_opt,node_opt' with
-           | None,_ | _,None ->
+           | None, _ | _, None ->
              Exception.warn parameters errors __POS__ Exit l
-           | Some a,Some b -> errors,(a,(),b)::l)
-        (errors,[]) edges_list
+           | Some a, Some b -> errors, (a, (), b) :: l)
+        (errors, []) edges_list
     in
-(*build a graph_scc*)
+    (*build a graph_scc*)
     let graph =
       Graphs.create parameters errors
         (fun _ -> ())
