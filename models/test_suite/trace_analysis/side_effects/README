@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa side-effects.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces || exit 0
+"${KAPPABIN}"KaSa side-effects.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces -syntax 3 || exit 0

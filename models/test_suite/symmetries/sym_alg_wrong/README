@@ -1,6 +1,6 @@
 #Command-line:
-"${KAPPABIN}"KaDE sym_alg_wrong.ka  -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings || exit 0
-"${KAPPABIN}"KaDE sym_alg_wrong.ka  -d output --with-symmetries true --octave-output sym1_occ.m --count occurrences || exit 0
+"${KAPPABIN}"KaDE sym_alg_wrong.ka -syntax 3 -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings || exit 0
+"${KAPPABIN}"KaDE sym_alg_wrong.ka -syntax 3 -d output --with-symmetries true --octave-output sym1_occ.m --count occurrences || exit 0
 
 #test case for isomorphism and symmetries
 #we have to check to occurrence/embedding numbers are corrected.

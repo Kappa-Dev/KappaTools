@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa ../../cflows/abc/abc.ka  --output-directory output --output-contact-map cm.dot --output-influence-map if.dot || exit 0
+"${KAPPABIN}"KaSa ../../cflows/abc/abc.ka  --output-directory output --output-contact-map cm.dot --output-influence-map if.dot -syntax 3 || exit 0

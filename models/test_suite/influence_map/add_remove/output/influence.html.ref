@@ -1,7 +1,7 @@
 <!--
 Download sources/binaries at https://github.com/Kappa-Dev/KaSim<Br>
 <Br>
-Command line is: KaSa add_remove.ka --influence-map-format HTML --output-directory output<Br>
+Command line is: KaSa add_remove.ka --influence-map-format HTML --output-directory output -syntax 3<Br>
 <Br>
 This file contains the description of the influence map in dot.<Br>
 Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF<Br>

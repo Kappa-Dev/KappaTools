@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa question_marks.ka --output-directory output --debugging-mode  || true
+"${KAPPABIN}"KaSa question_marks.ka --output-directory output --debugging-mode -syntax 3 || true

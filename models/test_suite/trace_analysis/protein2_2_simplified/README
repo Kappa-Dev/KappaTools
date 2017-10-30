@@ -1,3 +1,3 @@
 #Command-line:
-"${KAPPABIN}"KaSa protein2x2.ka --compute-local-traces --output-directory output --ignore-trivial-losanges --use-macrotransitions-in-local-traces || exit 0
-"${KAPPABIN}"KaSa protein2x2.ka --compute-local-traces --output-directory output --ignore-trivial-losanges --use-macrotransitions-in-local-traces --local-traces-format HTML || exit 0
+"${KAPPABIN}"KaSa protein2x2.ka --compute-local-traces --output-directory output --ignore-trivial-losanges --use-macrotransitions-in-local-traces -syntax 3 || exit 0
+"${KAPPABIN}"KaSa protein2x2.ka --compute-local-traces --output-directory output --ignore-trivial-losanges --use-macrotransitions-in-local-traces -syntax 3 --local-traces-format HTML || exit 0

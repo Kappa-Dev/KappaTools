@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'sym_alg_wrong.ka' '-d' 'output' '--with-symmetries' 'true''--octave-output' 'sym1_emb.m' '--count''embeddings'
+%      'KaDE' 'sym_alg_wrong.ka' '-syntax' '3' '-d' 'output' '--with-symmetries''true' '--octave-output' 'sym1_emb.m' '--count''embeddings'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -156,7 +156,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE sym_alg_wrong.ka -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings\n')
+fprintf(fid,'# KaDE sym_alg_wrong.ka -syntax 3 -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')

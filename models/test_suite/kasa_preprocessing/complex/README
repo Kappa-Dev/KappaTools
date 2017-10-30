@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSa complex.ka --debugging-mode --output-directory output || exit 0
+"${KAPPABIN}"KaSa complex.ka --debugging-mode --output-directory output -syntax 3 || exit 0
 
 # The op rule of 'r1' B(x!_,y!_),C(x~u,y~p) <-> B(x!1,y!2),C(x~u!1,y~p!2) @1,2
 # is ill-formed. When a site is modified, its state must be fully specified.

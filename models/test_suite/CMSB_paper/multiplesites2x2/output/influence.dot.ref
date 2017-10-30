@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa ../protein2x2.ka --compute-local-traces --output-directory output
+#Command line is: KaSa ../protein2x2.ka --compute-local-traces --output-directory output -syntax 3
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF

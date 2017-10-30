@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaSa add_remove.ka --output-directory output || exit 0 
-"${KAPPABIN}"KaSa add_remove.ka --influence-map-format HTML --output-directory output || exit 0
+"${KAPPABIN}"KaSa add_remove.ka --output-directory output -syntax 3 || exit 0
+"${KAPPABIN}"KaSa add_remove.ka --influence-map-format HTML --output-directory output -syntax 3 || exit 0
 #Test dot output 
