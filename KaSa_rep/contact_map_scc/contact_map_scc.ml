@@ -130,23 +130,23 @@ let convert_contact_map parameters error contact_map =
     ) contact_map (error,graph)
 
 let mixture_of_edge
-    parameters errors
+    parameters error
     (((ag, st), (ag', st')),
       ((ag'', st''), (ag''', st'''))) =
   let _ = ag, ag''', st, st''' in
   if ag'<> ag'' || st' = st''
   then
-    let errors, mixture = Preprocess.empty_mixture parameters errors in
-    Exception.warn parameters errors __POS__ Exit mixture
+    let error, mixture = Preprocess.empty_mixture parameters error in
+    Exception.warn parameters error __POS__ Exit mixture
   else
     (* TO DO build the pattern:
        A(x!1), B(x!1, y!2), C(x!2)
        ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
     *)
     (*get agend_id of ag(st!1)*)
-    let errors, init_views =
+    let error, init_views =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
-        parameters errors
+        parameters error
         0
     in
     let fresh_agent_id = Ckappa_sig.dummy_agent_id in
@@ -161,9 +161,9 @@ let mixture_of_edge
         Cckappa_sig.agent_type = ag;
       }
     in
-    let errors, site_map1 =
+    let error, site_map1 =
       Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-        parameters errors
+        parameters error
         st
         site_address1
         Ckappa_sig.Site_map_and_set.Map.empty
@@ -175,9 +175,9 @@ let mixture_of_edge
         Cckappa_sig.agent_type = ag';
       }
     in
-    let errors, site_map2 =
+    let error, site_map2 =
     Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters errors
+      parameters error
       st'
       site_address2
       site_map1
@@ -189,9 +189,9 @@ let mixture_of_edge
         Cckappa_sig.agent_type = ag'';
       }
     in
-    let errors, site_map3 =
+    let error, site_map3 =
     Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters errors
+      parameters error
       st''
       site_address3
       site_map2
@@ -203,27 +203,27 @@ let mixture_of_edge
         Cckappa_sig.agent_type = ag''';
       }
     in
-    let errors, site_map4 =
+    let error, site_map4 =
     Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters errors
+      parameters error
       st'''
       site_address4
       site_map3
     in
-    let errors, init_bonds =
+    let error, init_bonds =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters errors
+      parameters error
       0
     in
-    let errors, bonds =
+    let error, bonds =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-        parameters errors
+        parameters error
         ag_id'''
         site_map4
         init_bonds
     in
-    let errors, mixture =
-      errors,
+    let error, mixture =
+      error,
       {
         Cckappa_sig.views = init_views;
         Cckappa_sig.bonds = bonds;
@@ -232,9 +232,11 @@ let mixture_of_edge
         Cckappa_sig.c_mixture = Ckappa_sig.EMPTY_MIX
       }
     in
-    (*let errors, mixture = Preprocess.empty_mixture parameters errors in*)
-    errors, mixture
+    error, mixture
+
 (* *)
+exception Pass of Exception.method_handler
+exception False of Exception.method_handler
 
 let filter_edges_in_converted_contact_map
     parameters error static dynamic
@@ -245,9 +247,74 @@ let filter_edges_in_converted_contact_map
      an unreachable patten *)
   (* Take care of propagating memoisation table, and error stream *)
   let _ = parameters, is_reachable in
+  (*
+  In the converted site-graph, edges are of the form:
+  ((A,s),(A’,s’)),((A’,s’’),(A’’,s’’’)).
+
+  Say that the edge is potential if and only if the pattern:
+  A(s!1),A’(s’!1,s’’!2),A’’(s’’’!2)
+  is reachable.
+
+  Your goal is to filter out the edges in the list that are not potential,
+ before computing the strongest connected components. *)
+  let error, dynamic, converted_contact_map =
+    Ckappa_sig.PairAgentSite_map_and_set.Map.fold
+      (fun node1 potential_sites (error, dynamic, map) ->
+         try
+           begin
+             let error, dynamic, potential_sites' =
+               try
+                 let error, dynamic, potential_sites' =
+                   List.fold_left (fun (error, dynamic, potential_sites') edge ->
+                       (*let error, mixture =
+                         mixture_of_edge
+                           parameters error
+                           pattern
+                       in
+                       let error, dynamic, bool =
+                         is_reachable parameters error
+                           static dynamic
+                           mixture
+                       in
+                       let () =
+                         if bool
+                         then
+                           Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                             "YES!!!\n"
+                         else
+                           Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                             "NO!!!\n"
+                       in*)
+                       (*let error =
+                         Print_cckappa.print_mixture parameters error
+                           handler mixture
+                       in*)
+                       (*TODO: filter edges that are not reachable*)
+                       error, dynamic, potential_sites' (*TODO*)
+                     )  (error, dynamic, []) potential_sites
+                 in
+                 error, dynamic, potential_sites'
+               with False (error) -> error, dynamic, potential_sites
+             in
+             if  potential_sites <> []
+             then
+               let error, map =
+                 Ckappa_sig.PairAgentSite_map_and_set.Map.add
+                   parameters error
+                   node1
+                   potential_sites'
+                   map
+               in
+               error, dynamic, map
+             else error, dynamic, map
+           end
+         with Pass error -> error, dynamic, map
+      ) converted_contact_map
+      (error, dynamic, Ckappa_sig.PairAgentSite_map_and_set.Map.empty)
+  in
   error, dynamic, converted_contact_map
 
-let compute_graph_scc parameters errors contact_map_converted =
+let compute_graph_scc parameters error contact_map_converted =
     let nodes, edges_list =
         Ckappa_sig.PairAgentSite_map_and_set.Map.fold
           (fun node1 potential_sites (nodes, edges) ->
@@ -267,50 +334,50 @@ let compute_graph_scc parameters errors contact_map_converted =
          (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name))
     in
     let nodes_map = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
-    let _, nodes, (errors, nodes_map) =
+    let _, nodes, (error, nodes_map) =
       List.fold_left
-        (fun (i, nodes_list, (errors, map)) node ->
+        (fun (i, nodes_list, (error, map)) node ->
            nodes_array.(i) <- node;
            i+1,
            (Graphs.node_of_int i) :: nodes_list,
            Ckappa_sig.PairAgentSite_map_and_set.Map.add
-             parameters errors
+             parameters error
              node
              (Graphs.node_of_int i)
              map
-        ) (0, [], (errors, nodes_map)) nodes
+        ) (0, [], (error, nodes_map)) nodes
     in
-    let errors, edges =
+    let error, edges =
       List.fold_left
-        (fun (errors, l) (a,b) ->
-           let errors, node_opt =
+        (fun (error, l) (a,b) ->
+           let error, node_opt =
             Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
-              parameters errors
+              parameters error
               a
               nodes_map
            in
-           let errors, node_opt' =
+           let error, node_opt' =
             Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
-              parameters errors
+              parameters error
               b
               nodes_map
            in
            match node_opt,node_opt' with
            | None, _ | _, None ->
-             Exception.warn parameters errors __POS__ Exit l
-           | Some a, Some b -> errors, (a, (), b) :: l)
-        (errors, []) edges_list
+             Exception.warn parameters error __POS__ Exit l
+           | Some a, Some b -> error, (a, (), b) :: l)
+        (error, []) edges_list
     in
     (*build a graph_scc*)
     let graph =
-      Graphs.create parameters errors
+      Graphs.create parameters error
         (fun _ -> ())
         nodes
         edges
        in
        (*compute scc*)
-       let errors, _low, _pre, _on_stack, scc =
-         Graphs.compute_scc parameters errors
+       let error, _low, _pre, _on_stack, scc =
+         Graphs.compute_scc parameters error
            (fun () -> "")
            graph
        in
@@ -327,4 +394,4 @@ let compute_graph_scc parameters errors contact_map_converted =
                 (List.rev a))
            (List.rev scc )
        in
-       errors, scc
+       error, scc

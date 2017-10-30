@@ -135,9 +135,7 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
     else
       error,(bool,(to_do,already_done))
 
-
   and check_interface error ag1 ag2 bonds1 bonds2 to_do already_done =
-
     let error,(bool,(to_do,already_done)) =
       match
         ag1,ag2
@@ -277,7 +275,6 @@ let shift_agent_id bool rule id =
       id
       rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.delta
   else id
-
 
 let filter_influence parameters error handler compilation map bool =
   let nrules = Handler.nrules parameters error handler in
@@ -420,11 +417,7 @@ let filter_influence parameters error handler compilation map bool =
          end
        with Pass error -> (error,map')
     )
-    map
-    (error,
-     Ckappa_sig.PairRule_setmap.Map.empty
-    )
-
+    map (error, Ckappa_sig.PairRule_setmap.Map.empty)
 
 let filter_influence_high maybe_reachable
     parameters handler error compilation
