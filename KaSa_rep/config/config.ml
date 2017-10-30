@@ -28,7 +28,7 @@ let output_local_trace_directory = ref "output"
 
 let unsafe = ref true
 let trace = ref false
-let syntax_version = ref "V3" (*change into V4 when ready*)
+let syntax_version = ref "V4"
 let dump_error_as_soon_as_they_occur = ref false
 let log = ref stdout
 let formatter = ref Format.std_formatter
