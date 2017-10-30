@@ -50,7 +50,7 @@ let default_gui =
     plotPeriod_gui = ref (Some 0.01);
     outputDataFile_gui = ref (Some "data.csv");
     outputDirectory_gui = ref ".";
-    syntaxVersion_gui = ref 3;
+    syntaxVersion_gui = ref 4;
     batchmode_gui = ref "interactive";
   }
 
