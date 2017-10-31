@@ -40,9 +40,9 @@ Intial graph;
   
 File "link_swapping_strong3.ka", line 5, characters 17-18:
 Warning: rule induces a link permutation on site 'x' of agent 'A'
-File "link_swapping_strong3.ka", line 5, characters 46-47:
-Warning: rule induces a link permutation on site 'y' of agent 'A'
 File "link_swapping_strong3.ka", line 5, characters 22-23:
 Warning: rule induces a link permutation on site 'y' of agent 'A'
-File "link_swapping_strong3.ka", line 5, characters 51-52:
+File "link_swapping_strong3.ka", line 5, characters 4-5:
 Warning: rule induces a link permutation on site 'x' of agent 'A'
+File "link_swapping_strong3.ka", line 5, characters 9-10:
+Warning: rule induces a link permutation on site 'y' of agent 'A'

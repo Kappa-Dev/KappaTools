@@ -64,5 +64,3 @@ Domain:
 Intial graph;
   
   
-File "symmetry.ka", line 6, characters 16-17:
-Warning: rule induces a link permutation on site 'y' of agent 'A'

@@ -22,6 +22,28 @@ let add_link_contact_map ?contact_map sty sp dty dp =
     contact_map.(dty).(dp) <-
       di, List_util.merge_uniq Mods.int_pair_compare dl [sty,sp]
 
+let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
+  let warning_for_counters =
+    let () = Signature.print_agent sigs (Format.str_formatter) sort in
+    let sort_nme = Format.flush_str_formatter () in
+    if (String.compare sort_nme "__incr") == 0 then true
+    else
+    match dst_ty with
+    | None -> false
+    | Some s ->
+       let () = Signature.print_agent sigs (Format.str_formatter) s in
+       let sort_src_nme = Format.flush_str_formatter () in
+       (String.compare sort_src_nme "__incr") == 0 in
+
+  if not(warning_for_counters) then
+  ExceptionDefn.warning
+    ~pos
+    (fun f ->
+      Format.fprintf
+        f "rule induces a link permutation on site '%a' of agent '%a'"
+        (Signature.print_site sigs sort) site
+        (Signature.print_agent sigs) sort)
+
 let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
@@ -38,7 +60,12 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
       if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
         let () = add_link_contact_map ?contact_map ag_ty p_id dst_ty dst_p in
         let maintained = match switch with
-          | LKappa.Linked (j,_) -> Some j = dst_id
+          | LKappa.Linked (j,_) ->
+             let link_swap = (Some j <> dst_id) in
+             let () =
+               if link_swap then
+                 rule_induces_link_permutation ~pos ~dst_ty sigs ag_ty p_id in
+             not(link_swap)
           | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> false in
         ((Ast.LNK_VALUE (i,(dst_p,dst_ty)),pos),
          if maintained then LKappa.Maintained else switch),
@@ -552,7 +579,7 @@ although it is left unpecified in the left hand side"
   Counters_compiler.annotate_counters_with_diff
     sigs ag_ty lc rc ra (add_link_contact_map ?contact_map),annot'
 
-let refer_links_annot links_annot mix =
+let refer_links_annot sigs links_annot mix =
   List.iter
     (fun ra ->
        Array.iteri
@@ -562,9 +589,14 @@ let refer_links_annot links_annot mix =
                 match Mods.IntMap.find_option j links_annot with
                 | None -> ()
                 | Some (dst_ty,dst_p,maintained) ->
+                  let mods' = if maintained then LKappa.Maintained else mods in
+                  let () = match mods' with
+                    | LKappa.Linked _ ->
+                       rule_induces_link_permutation
+                         ~pos ~dst_ty sigs ra.LKappa.ra_type i
+                    | LKappa.Erased | LKappa.Freed | LKappa.Maintained -> () in
                   ra.LKappa.ra_ports.(i) <-
-                    ((Ast.LNK_VALUE (j,(dst_p,dst_ty)),pos),
-                     if maintained then LKappa.Maintained else mods)
+                    ((Ast.LNK_VALUE (j,(dst_p,dst_ty)),pos),mods')
               end
             | ((Ast.LNK_VALUE _ | Ast.LNK_ANY | Ast.LNK_SOME
                | Ast.LNK_TYPE _ | Ast.LNK_FREE | Ast.ANY_FREE),_),_ -> ())
@@ -578,13 +610,13 @@ let separate_sites ls =
         | Ast.Counter c -> (ps,c::cs)) ([],[]) ls in
   (List.rev a,b)
 
-let final_rule_sanity ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
+let final_rule_sanity sigs ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
     | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   let () =
-    refer_links_annot lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
+    refer_links_annot sigs lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
   | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
@@ -669,7 +701,7 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
                  sigs na counts (add_link_contact_map ?contact_map) x' in
              x''::acc,rannot')
           ([],snd links_annot) added in
-      let () = final_rule_sanity (llinks,rlinks) mix in
+      let () = final_rule_sanity sigs (llinks,rlinks) mix in
       List.rev mix, List.rev cmix in
   aux
     ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
@@ -680,7 +712,7 @@ let annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs =
   let rec aux links_annot mix cmix lhs rhs =
     match lhs,rhs with
     | [], [] ->
-      let () = final_rule_sanity links_annot mix in
+      let () = final_rule_sanity sigs links_annot mix in
       List.rev mix, List.rev cmix
     | Ast.Absent _::lt, Ast.Absent _:: rt -> aux links_annot mix cmix lt rt
     | Ast.Present ((_,pos as ty),sites,lmod) :: lt, Ast.Absent _ :: rt ->
@@ -760,7 +792,7 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
       (((Mods.IntMap.empty,Mods.IntMap.empty),
         (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
       m in
-  let () = final_rule_sanity links_annot mix in
+  let () = final_rule_sanity sigs links_annot mix in
   (List.rev mix, List.rev cmix)
 
 let give_rule_label bidirectional (id,set) printer r = function
