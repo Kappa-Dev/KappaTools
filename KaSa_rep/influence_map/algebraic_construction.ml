@@ -590,7 +590,6 @@ let filter_influence_high maybe_reachable
                                   (Remanent_parameters.get_logger parameters)
                                   "FST:\n"
                               in
-
                               let error =
                                 Print_cckappa.print_mixture parameters error
                                   handler (get_bool r1)

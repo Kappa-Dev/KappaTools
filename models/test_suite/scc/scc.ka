@@ -1,6 +1,7 @@
-#### Signatures
+// Signatures
 
-%agent: A(x, y,z)
-%agent: B(x, y,z)
-A(x), A(y) -> A(x!1), A(y!1) @1
-B(x), B(y) -> B(x!1), B(y!1) @1
+%agent: A(x, y, z)
+%agent: B(x, y, z)
+
+A(x[.]), A(y[.]) -> A(x[1]), A(y[1]) @ 1
+B(x[.]), B(y[.]) -> B(x[1]), B(y[1]) @ 1

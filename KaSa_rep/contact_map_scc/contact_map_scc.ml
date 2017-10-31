@@ -265,8 +265,14 @@ let filter_edges_in_converted_contact_map
              let error, dynamic, potential_sites' =
                try
                  let error, dynamic, potential_sites' =
-                   List.fold_left (fun (error, dynamic, potential_sites') edge ->
-                       (*let error, mixture =
+                   List.fold_left (fun (error, dynamic, potential_sites') node2 ->
+                       let ((ag,st),(ag',st')) = node1 in
+                       let ((ag'',st''),(ag''',st''')) = node2 in
+                       let pattern =
+                         (((ag,st),(ag',st')),
+                          ((ag'',st''),(ag''',st''')))
+                       in
+                       let error, mixture =
                          mixture_of_edge
                            parameters error
                            pattern
@@ -276,6 +282,13 @@ let filter_edges_in_converted_contact_map
                            static dynamic
                            mixture
                        in
+                       let error, potential_sites' =
+                         if bool
+                         then
+                           error, node1 :: node2 :: potential_sites'
+                         else
+                           error, potential_sites'
+                       in
                        let () =
                          if bool
                          then
@@ -284,19 +297,14 @@ let filter_edges_in_converted_contact_map
                          else
                            Loggers.fprintf (Remanent_parameters.get_logger parameters)
                              "NO!!!\n"
-                       in*)
-                       (*let error =
-                         Print_cckappa.print_mixture parameters error
-                           handler mixture
-                       in*)
-                       (*TODO: filter edges that are not reachable*)
-                       error, dynamic, potential_sites' (*TODO*)
+                       in
+                       error, dynamic, potential_sites'
                      )  (error, dynamic, []) potential_sites
                  in
                  error, dynamic, potential_sites'
                with False (error) -> error, dynamic, potential_sites
              in
-             if  potential_sites <> []
+             if  potential_sites' <> []
              then
                let error, map =
                  Ckappa_sig.PairAgentSite_map_and_set.Map.add
