@@ -57,7 +57,6 @@ let read_c_rule_id p lb =
 let c_rule_id_of_string s =
   read_c_rule_id (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 
-
 let dummy_agent_name = 0
 let dummy_site_name = 0
 let dummy_state_index = 0
@@ -103,350 +102,6 @@ let get_agent_color n_sites parameters =
     (int_of_site_name n_sites)
     (Remanent_parameters.get_agent_color_array parameters)
     (Remanent_parameters.get_agent_color_def parameters)
-
-(***************************************************************************)
-
-module Agent_type_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = c_agent_name
-     and type dimension = int
-  )
-
-module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (Agent_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
-    with type key = c_agent_name
-     and type dimension = int
-  )
-
-module Rule_id_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = c_rule_id
-     and type dimension = int
-  )
-module Rule_id_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (Rule_id_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
-    with type key = c_rule_id
-     and type dimension = int
-  )
-
-module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
-  (
-    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage
-    with type key = c_agent_name * c_site_name
-     and type dimension = int * int
-  )
-
-module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
-  (
-    Int_storage.Quick_key_list
-      (Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif):
-         Int_storage.Storage
-    with type key = c_agent_name * c_site_name
-
-     and type dimension = int * int
-  )
-
-module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
-  (
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
-    with type key = (c_agent_name * (c_site_name * c_state))
-     and type dimension = (int * (int * int))
-  )
-
-(*site*)
-module Site_type_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = c_site_name
-     and type dimension = int
-  )
-
-module Site_type_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
-    with type key = c_site_name
-     and type dimension = int
-  )
-
-(*state*)
-module State_index_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = c_state
-     and type dimension = int
-  )
-
-module State_index_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (State_index_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
-    with type key = c_state
-     and type dimension = int
-  )
-
-(*rule_id*)
-module Rule_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = c_rule_id
-     and type dimension = int
-  )
-
-module Rule_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (Rule_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
-    with type key = c_rule_id
-     and type dimension = int
-  )
-
-module Site_union_find =
-  Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
-
-(****************************************************************************)
-(*Define module fifo take rule_id*)
-
-module Rule =
-struct
-  type t = c_rule_id
-  let compare = compare
-  let print = Format.pp_print_int
-end
-
-module Rule_FIFO = Working_list.WlMake (Rule)
-
-(****************************************************************************)
-
-module Agent_id_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage
-    with type key = c_agent_id
-     and type dimension = int
-  )
-
-module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
-  (
-    Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
-    with type key = c_agent_id
-     and type dimension = int
-  )
-
-(***************************************************************************)
-
-module Agent_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_name
-         let compare = compare
-         let print = Format.pp_print_int
-       end
-       ))
-
-module Agent_id_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_id
-         let compare = compare
-         let print = Format.pp_print_int
-       end
-       ))
-
-module Rule_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_rule_id
-         let compare = compare
-         let print = Format.pp_print_int
-       end))
-
-module State_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_state
-         let compare = compare
-         let print = Format.pp_print_int
-       end))
-
-module AgentRule_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_name * c_rule_id
-         let compare = compare
-         let print = Pp.pair Format.pp_print_int Format.pp_print_int
-       end))
-
-module RuleAgent_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_rule_id * c_agent_id
-         let compare = compare
-         let print = Pp.pair Format.pp_print_int Format.pp_print_int
-       end))
-
-(*use in site_accross_bonds_domain*)
-module SiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_site_name * c_state
-         let compare = compare
-         let print = Pp.pair Format.pp_print_int Format.pp_print_int
-       end))
-
-
-module AgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_name * c_site_name * c_state
-         let compare = compare
-         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
-       end))
-
-module Rule_setmap =
-  SetMap.Make (
-  struct
-    type t = c_rule_id
-    let compare = compare
-    let print = Format.pp_print_int
-  end)
-
-module Agent_id_setmap =
-  SetMap.Make (
-  struct
-    type t = c_agent_id
-    let compare = compare
-    let print = Format.pp_print_int
-  end)
-
-module PairRule_setmap =
-  SetMap.Make
-    (struct
-      type t = c_rule_id * c_rule_id
-      let compare = compare
-      let print = Pp.pair Format.pp_print_int Format.pp_print_int
-    end)
-
-(****************************************************************************)
-
-module Site_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t      = c_site_name
-         let compare = compare
-         let print = Format.pp_print_int
-       end))
-
-module AgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_name * c_site_name
-         let compare = compare
-         let print = Pp.pair Format.pp_print_int Format.pp_print_int
-       end))
-
-module Agents_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_id * c_agent_name
-         let compare = compare
-         let print = Pp.pair Format.pp_print_int Format.pp_print_int
-       end))
-
-module AgentsSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_id * c_agent_name * c_site_name
-         let compare = compare
-         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
-       end))
-
-module AgentsSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_id * c_agent_name * c_site_name * c_state
-         let compare = compare
-         let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
-       end))
-
-type pair_of_states = c_state * c_state
-
-module AgentsSitePState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = c_agent_id * c_agent_name * c_site_name * pair_of_states
-         let compare = compare
-(*let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d*)
-         let print _ _ = ()
-       end))
-
-(***************************************************************************)
-(*bonds in rhs and lhs*)
-
-module PairAgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_name * c_site_name) *
-                  (c_agent_name * c_site_name)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module PairAgentsSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_id * c_agent_name * c_site_name * c_state) *
-                  (c_agent_id * c_agent_name * c_site_name * c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module PairAgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_name * c_site_name * c_state) *
-                  (c_agent_name * c_site_name * c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-module PairAgentSitesState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (c_agent_name * c_site_name * c_site_name * c_state) *
-           (c_agent_name * c_site_name * c_site_name * c_state)
-         let compare = compare
-         let print _ _ = ()
-       end))
-
-(*******************************************************************)
-
-module Views_bdu =
-  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu
-   with type key = c_site_name
-    and type value = c_state
-   with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
-
-module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)
 
 (***************************************************************)
 
@@ -696,7 +351,6 @@ let rename_mixture parameters error f mixture =
   in
   aux parameters error 0 list_m dot plus
 
-
 let rec join_mixture parameters error mixture1 mixture2 =
   match
     mixture1, mixture2
@@ -860,6 +514,15 @@ type c_port =
     c_site_interval : c_state interval
   }
 
+module Site_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t      = c_site_name
+         let compare = compare
+         let print = Format.pp_print_int
+       end))
+
 type c_interface = c_port Site_map_and_set.Map.t
 
 type c_proper_agent =
@@ -1022,3 +685,337 @@ let introduceable_species_in_pertubation parameter error f ((_,_,list,_),_) =
        | None -> error,list)
     (error,[])
     list
+
+(***************************************************************************)
+
+module Agent_type_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_agent_name
+     and type dimension = int
+  )
+
+module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_agent_name
+     and type dimension = int
+  )
+
+module Rule_id_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_rule_id
+     and type dimension = int
+  )
+module Rule_id_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Rule_id_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_rule_id
+     and type dimension = int
+  )
+
+module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+  (
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage
+    with type key = c_agent_name * c_site_name
+     and type dimension = int * int
+  )
+
+module Agent_type_site_quick_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+  (
+    Int_storage.Quick_key_list
+      (Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif):
+      Int_storage.Storage
+    with type key = c_agent_name * c_site_name
+
+     and type dimension = int * int
+  )
+
+module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
+  (
+    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
+    with type key = (c_agent_name * (c_site_name * c_state))
+     and type dimension = (int * (int * int))
+  )
+
+(*site*)
+module Site_type_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_site_name
+     and type dimension = int
+  )
+
+module Site_type_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_site_name
+     and type dimension = int
+  )
+
+(*state*)
+module State_index_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_state
+     and type dimension = int
+  )
+
+module State_index_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (State_index_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_state
+     and type dimension = int
+  )
+
+(*rule_id*)
+module Rule_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+    with type key = c_rule_id
+     and type dimension = int
+  )
+
+module Rule_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Rule_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
+    with type key = c_rule_id
+     and type dimension = int
+  )
+
+module Site_union_find =
+  Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
+
+(****************************************************************************)
+(*Define module fifo take rule_id*)
+
+module Rule =
+struct
+  type t = c_rule_id
+  let compare = compare
+  let print = Format.pp_print_int
+end
+
+module Rule_FIFO = Working_list.WlMake (Rule)
+
+(****************************************************************************)
+
+module Agent_id_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage
+    with type key = c_agent_id
+     and type dimension = int
+  )
+
+module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
+    with type key = c_agent_id
+     and type dimension = int
+  )
+
+(***************************************************************************)
+
+module Agent_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name
+         let compare = compare
+         let print = Format.pp_print_int
+       end
+       ))
+
+module Agent_id_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id
+         let compare = compare
+         let print = Format.pp_print_int
+       end
+       ))
+
+module Rule_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_rule_id
+         let compare = compare
+         let print = Format.pp_print_int
+       end))
+
+module State_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_state
+         let compare = compare
+         let print = Format.pp_print_int
+       end))
+
+module AgentRule_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_rule_id
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
+
+module RuleAgent_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_rule_id * c_agent_id
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
+
+(*use in site_accross_bonds_domain*)
+module SiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_site_name * c_state
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
+
+module AgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_site_name * c_state
+         let compare = compare
+         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
+       end))
+
+module Rule_setmap =
+  SetMap.Make (
+  struct
+    type t = c_rule_id
+    let compare = compare
+    let print = Format.pp_print_int
+  end)
+
+module Agent_id_setmap =
+  SetMap.Make (
+  struct
+    type t = c_agent_id
+    let compare = compare
+    let print = Format.pp_print_int
+  end)
+
+module PairRule_setmap =
+  SetMap.Make
+    (struct
+      type t = c_rule_id * c_rule_id
+      let compare = compare
+      let print = Pp.pair Format.pp_print_int Format.pp_print_int
+    end)
+
+(****************************************************************************)
+
+module AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_site_name
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
+
+module Agents_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))
+
+module AgentsSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name
+         let compare = compare
+         let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
+       end))
+
+module AgentsSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name * c_state
+         let compare = compare
+         let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d
+       end))
+
+type pair_of_states = c_state * c_state
+
+module AgentsSitePState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name * pair_of_states
+         let compare = compare
+         (*let print f (a,b,c,d) = Format.fprintf f "(%i, %i, %i, %i)" a b c d*)
+         let print _ _ = ()
+       end))
+
+(***************************************************************************)
+(*bonds in rhs and lhs*)
+
+module PairAgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_name * c_site_name) *
+                  (c_agent_name * c_site_name)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module PairAgentsSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_id * c_agent_name * c_site_name * c_state) *
+                  (c_agent_id * c_agent_name * c_site_name * c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module PairAgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_name * c_site_name * c_state) *
+                  (c_agent_name * c_site_name * c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+module PairAgentSitesState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t =
+           (c_agent_name * c_site_name * c_site_name * c_state) *
+           (c_agent_name * c_site_name * c_site_name * c_state)
+         let compare = compare
+         let print _ _ = ()
+       end))
+
+(*******************************************************************)
+
+module Views_bdu =
+  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu
+   with type key = c_site_name
+    and type value = c_state
+   with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
+
+module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)

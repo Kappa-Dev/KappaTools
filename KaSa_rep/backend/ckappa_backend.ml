@@ -20,7 +20,6 @@ struct
   let int_of_bond_index (a:bond_index) : int = a
   let bond_index_of_int (a:int) : bond_index = a
 
-
   let binding_state_to_json =
     function
     | Free -> `Assoc [free, `Null]
@@ -34,7 +33,6 @@ struct
                 JsonUtil.of_string
                 JsonUtil.of_string
                 (agent_name, site_name)]
-
 
   let binding_state_of_json =
     function
@@ -249,8 +247,7 @@ struct
             agent_id (agent_type, new_map)
             t.views
         in
-        match range_opt
-        with
+        match range_opt with
         | None -> error, t
         | Some (state_min,state_max) ->
           let error, is_binding_site =
@@ -258,8 +255,7 @@ struct
               agent_type site
           in
           let error,
-              (internal_state_string_opt, binding_state_opt)
-            =
+              (internal_state_string_opt, binding_state_opt) =
             match state_min = state_max, is_binding_site with
             | true, true ->
               if state_min = Ckappa_sig.dummy_state_index

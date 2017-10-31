@@ -12,7 +12,6 @@
   * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-
 type site  =
   (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
@@ -227,7 +226,6 @@ let join_props parameters error map1 map2 =
     map2
     Ckappa_sig.Site_map_and_set.Map.empty
 
-
 let join_bonds' parameters error map1 map2 =
   Ckappa_sig.Site_map_and_set.Map.fold2
     parameters error
@@ -294,7 +292,6 @@ let join_agent parameters error agent1 agent2 =
   | (Agent _ | Dead_agent _ | Unknown_agent _),
     (Agent _ | Dead_agent _ | Unknown_agent _)
     -> Exception.warn parameters error __POS__ Exit agent1
-
 
 type agent_sig = Ckappa_sig.c_state list interface proper_agent
 
@@ -385,6 +382,26 @@ type mixture =
     plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list;
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
+
+let add_agent parameters error kappa_handler agent_type mixture =
+  let agent_id = Ckappa_sig.dummy_agent_id in
+  let error', views =
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+      parameters error
+      agent_id
+      agent_type
+      mixture.views
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+      ~message:"this agent id is already used" Exit
+  in
+  error, agent_id,
+  {
+    mixture with
+    views = views
+  }
+
 
 let join_bonds parameters error bond1 bond2 =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
