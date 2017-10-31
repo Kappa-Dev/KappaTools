@@ -1,7 +1,7 @@
-%agent:	A(x~u~p,c:0 +=3,d:1 +=2)
-%agent:	B(x,c:0 +=3)
+%agent:	A(x{u,p},c{=0 / +=3},d{=1 / +=2})
+%agent:	B(x,c{=0 / +=3})
 
-%init:	10	A(x~u,c:0,d:1)
-%init:	10	B(x,c:0)
+%init:	10	A(x{u}[.],c{=0},d{=1})
+%init:	10	B(x[.],c{=0})
 
-'counter_name_twice' A(x,c:y,d:y),B(x) -> A(x!1), B(x!1) @ 1+y
+'counter_name_twice' A(x[.],c{=y},d{=y}),B(x[.]) -> A(x[1]), B(x[1]) @ 1+y

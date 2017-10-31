@@ -1,15 +1,15 @@
 %def: "displayCompression" "weak" "none" 
 
-'C' B(a!_),C(a~u) -> B(a!_),C(a~p) @ 1 
-A(b) -> @ 1
- C(a!_) -> C(a) @2
- -> A(a!1,b),B(a!1) @10
- -> C(a~p) @10
+'C' B(a[_]),C(a{u}[.]) -> B(a[_]),C(a{p}[.]) @ 1 
+A(b[.]) -> . @ 1
+C(a[_]) -> C(a[.]) @ 2
+.,. -> A(a[1],b[.]),B(a[1]) @ 10
+. -> C(a{p}[.]) @ 10
 
-%init: 2 C(a~u!1),C(a~p!1)
+%init: 2 (C(a{u}[1]),C(a{p}[1]))
 
 %mod: [true] do $TRACK 'C' [true]
 
 %agent: A(a,b)
 %agent: B(a)
-%agent: C(a~p~u)
+%agent: C(a{p,u})

@@ -1,4 +1,4 @@
-%agent:	A(x~u~p)
+%agent:	A(x{u,p})
 %init:	10	A()
 
-'r' A(x~u) -> A(x~p,c +=1) @ 1
+'r' A(x{u}[.]) -> A(x{p}[.],c{+=1}) @ 1

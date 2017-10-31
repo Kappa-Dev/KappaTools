@@ -1,16 +1,15 @@
 %def: "displayCompression" "weak" "strong" 
 
-A(x)->B(x) @1
-B(x)->C(x) @1 
-C(x)->A(x) @1
+A(x[.]),. -> .,B(x[.]) @ 1
+B(x[.]),. -> .,C(x[.]) @ 1 
+C(x[.]),. -> .,A(x[.]) @ 1
 
-B(x!1),A(x!1) -> B(x!1),A(x),D(x!1) @1
-A(x),B(x) -> A(x!1),B(x!1) @1
+B(x[1]),A(x[1]),. -> B(x[1]),A(x[.]),D(x[1]) @ 1
+A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
 
+'GOAL' D(x[_]) -> D(x[.]) @ 1
 
-'GOAL' D(x!_) -> D(x) @1
-
-%init: 10 A(x)
+%init: 10 A(x[.])
 
 %agent: A(x)
 %agent: B(x)

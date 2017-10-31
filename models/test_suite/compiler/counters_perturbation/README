@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -l 10 -seed 92067277 -d output counter_max.ka -syntax 3 || true
+"${KAPPABIN}"KaSim -l 10 -seed 92067277 -d output counter_max.ka -syntax 4 || true

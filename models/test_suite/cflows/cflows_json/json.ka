@@ -1,18 +1,18 @@
-%agent: A(a~u~p)
-%agent: B(a~u~p,b)
+%agent: A(a{u,p})
+%agent: B(a{u,p},b)
 
-'Ap'	A(a~u) -> A(a~p) @ 0.01
-'Bp'	B(a~u) -> B(a~p) @ 0.01
+'Ap'	A(a{u}[.]) -> A(a{p}[.]) @ 0.01
+'Bp'	B(a{u}[.]) -> B(a{p}[.]) @ 0.01
 
-'A.B'	A(a~p), B(a~p) -> A(a~p!1), B(a~p!1) @ 0.01
-'A..B'	A(a~p!1), B(a~p!1) -> A(a~p), B(a~p) @ 0.01
-'A.B.A'	A(a~p), B(a~p,b), A(a~p) -> A(a~p!1), B(a~p!1,b!2), A(a~p!2) @ 0.01
+'A.B'	A(a{p}[.]), B(a{p}[.]) -> A(a{p}[1]), B(a{p}[1]) @ 0.01
+'A..B'	A(a{p}[1]), B(a{p}[1]) -> A(a{p}[.]), B(a{p}[.]) @ 0.01
+'A.B.A'	A(a{p}[.]), B(a{p}[.],b[.]), A(a{p}[.]) -> A(a{p}[1]), B(a{p}[1],b[2]), A(a{p}[2]) @ 0.01
 
-%obs: 'ApBp' |A(a~p), B(a~p)|
-%obs: 'ABA' |A(a~p!1), B(a~p!1,b!2), A(a~p!2)|
+%obs: 'ApBp' |A(a{p}[.]), B(a{p}[.])|
+%obs: 'ABA' |A(a{p}[1]), B(a{p}[1],b[2]), A(a{p}[2])|
 
 %mod: [true] do $TRACK 'ApBp' [true]
 %mod: [true] do $TRACK 'ABA' [true]
 
-%init: 1000 A(a~u)
-%init: 1000 B(a~u,b)
+%init: 1000 A(a{u}[.])
+%init: 1000 B(a{u}[.],b[.])
