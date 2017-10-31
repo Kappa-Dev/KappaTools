@@ -144,7 +144,7 @@ let mixture_of_edge
        ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
     *)
     (*get agend_id of ag(st!1)*)
-    let error, init_views =
+    (*let error, init_views =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
         parameters error
         0
@@ -231,7 +231,8 @@ let mixture_of_edge
         Cckappa_sig.dot = [];
         Cckappa_sig.c_mixture = Ckappa_sig.EMPTY_MIX
       }
-    in
+      in*)
+    let error, mixture = Preprocess.empty_mixture parameters error in
     error, mixture
 
 (* *)
@@ -257,7 +258,7 @@ let filter_edges_in_converted_contact_map
 
   Your goal is to filter out the edges in the list that are not potential,
  before computing the strongest connected components. *)
-  let error, dynamic, converted_contact_map =
+  (*let error, dynamic, converted_contact_map =
     Ckappa_sig.PairAgentSite_map_and_set.Map.fold
       (fun node1 potential_sites (error, dynamic, map) ->
          try
@@ -319,7 +320,7 @@ let filter_edges_in_converted_contact_map
          with Pass error -> error, dynamic, map
       ) converted_contact_map
       (error, dynamic, Ckappa_sig.PairAgentSite_map_and_set.Map.empty)
-  in
+  in*)
   error, dynamic, converted_contact_map
 
 let compute_graph_scc parameters error contact_map_converted =

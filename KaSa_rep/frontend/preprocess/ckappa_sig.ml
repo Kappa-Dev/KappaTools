@@ -30,26 +30,6 @@ type c_state      = int
 type c_rule_id    = int
 
 (****************************************************************************)
-(*work in process*)
-
-module Node_id =
-struct
-  type t = c_agent_name * c_site_name
-  let compare = compare
-  let print _ _ = ()
-end
-
-module Dictionary_of_agent_site =
-  (
-    Dictionary.Dictionary_of_Ord (Node_id) : Dictionary.Dictionary
-    with type key = int
-     and type value = c_agent_name * c_site_name
-  )
-
-  type agent_site_dic =
-    (unit, unit) Dictionary_of_agent_site.dictionary
-
-(****************************************************************************)
 
 let rule_id_to_json x =
       `Assoc ["rule_id", `Int x]
@@ -629,7 +609,6 @@ let join_interface parameters error interface1 interface2 =
   let list = Mods.StringMap.bindings map3 in
   let list = List.rev_map snd list in
   error, rev_interface_of_list list
-
 
 let rename_agent parameters error f agent =
   let error, interface = rename_interface parameters error f agent.ag_intf in

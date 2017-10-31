@@ -35,8 +35,6 @@ type kappa_handler =
     dual                  :
       (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
         Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
-
-    agents_sites_dic : Ckappa_sig.agent_site_dic
   }
 
 type 'a interval = {min:'a; max:'a}

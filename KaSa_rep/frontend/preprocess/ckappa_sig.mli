@@ -29,15 +29,6 @@ type c_state
 type c_rule_id
 type c_agent_id
 
-(***************************************************************************)
-(*Contact map graph *)
-
-module Dictionary_of_agent_site: Dictionary.Dictionary
-  with type key = int
-   and type value = c_agent_name * c_site_name
-
-type agent_site_dic = (unit,unit) Dictionary_of_agent_site.dictionary
-
 (****************************************************************************)
 
 val rule_id_to_json : c_rule_id -> Yojson.Basic.json
