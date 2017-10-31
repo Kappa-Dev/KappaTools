@@ -44,7 +44,9 @@ let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
         (Signature.print_site sigs sort) site
         (Signature.print_agent sigs) sort)
 
-let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
+let build_link
+      sigs ?contact_map ?(r_editStyle:bool = false) pos i ag_ty p_id switch
+      (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
              ("This is the third occurence of link '"^string_of_int i
@@ -63,7 +65,7 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
           | LKappa.Linked (j,_) ->
              let link_swap = (Some j <> dst_id) in
              let () =
-               if link_swap then
+               if link_swap && not(r_editStyle) then
                  rule_induces_link_permutation ~pos ~dst_ty sigs ag_ty p_id in
              not(link_swap)
           | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> false in
@@ -79,7 +81,7 @@ let build_link sigs ?contact_map pos i ag_ty p_id switch (links_one,links_two) =
                   pos))
 
 let annotate_dropped_agent
-    ~syntax_version sigs links_annot (agent_name, _ as ag_ty) intf counts =
+    ~syntax_version ~r_editStyle sigs links_annot (agent_name, _ as ag_ty) intf counts =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -154,7 +156,7 @@ let annotate_dropped_agent
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
            let va,lannot' =
-             build_link sigs pos i ag_id p_id LKappa.Erased lannot in
+             build_link sigs ~r_editStyle pos i ag_id p_id LKappa.Erased lannot in
            let () = ports.(p_id) <- va in (lannot',pset')
          | _::(_,pos)::_ ->
            raise (ExceptionDefn.Malformed_Decl
@@ -168,7 +170,7 @@ let annotate_dropped_agent
     sign counts ra arity agent_name None,lannot
 
 let annotate_created_agent
-    ~syntax_version sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
+    ~syntax_version ~r_editStyle sigs ?contact_map rannot (agent_name, _ as ag_ty) intf =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -206,7 +208,7 @@ let annotate_created_agent
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
            let _,rannot' = build_link
-               sigs ?contact_map pos i ag_id p_id LKappa.Freed rannot in
+               sigs ~r_editStyle ?contact_map pos i ag_id p_id LKappa.Freed rannot in
            pset',rannot'
          | [(Ast.ANY_FREE | Ast.LNK_FREE), _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
@@ -232,7 +234,9 @@ let translate_modification sigs ?contact_map ag_id p_id
     | None ->  LKappa.Freed,links_annot
     | Some (j,pos_j) ->
       let _,rhs_links' =
-        build_link sigs ?contact_map pos_j j ag_id p_id LKappa.Freed rhs_links in
+        build_link
+          sigs ~r_editStyle:true
+          ?contact_map pos_j j ag_id p_id LKappa.Freed rhs_links in
       LKappa.Linked (j,pos_j),(lhs_links,rhs_links')
 
 let annotate_edit_agent
@@ -292,7 +296,7 @@ let annotate_edit_agent
         let va,lhs_links' =
           build_link
             sigs ?contact_map:(if is_rule then None else contact_map)
-            pos i ag_id p_id modif lhs_links in
+            ~r_editStyle:true pos i ag_id p_id modif lhs_links in
         let () = ports.(p_id) <- va in
         (lhs_links',rhs_links)
       | _::(_,pos)::_ ->
@@ -579,7 +583,7 @@ although it is left unpecified in the left hand side"
   Counters_compiler.annotate_counters_with_diff
     sigs ag_ty lc rc ra (add_link_contact_map ?contact_map),annot'
 
-let refer_links_annot sigs links_annot mix =
+let refer_links_annot ?(r_editStyle:bool = false) sigs links_annot mix =
   List.iter
     (fun ra ->
        Array.iteri
@@ -592,8 +596,9 @@ let refer_links_annot sigs links_annot mix =
                   let mods' = if maintained then LKappa.Maintained else mods in
                   let () = match mods' with
                     | LKappa.Linked _ ->
-                       rule_induces_link_permutation
-                         ~pos ~dst_ty sigs ra.LKappa.ra_type i
+                       if not(r_editStyle) then
+                         rule_induces_link_permutation
+                           ~pos ~dst_ty sigs ra.LKappa.ra_type i
                     | LKappa.Erased | LKappa.Freed | LKappa.Maintained -> () in
                   ra.LKappa.ra_ports.(i) <-
                     ((Ast.LNK_VALUE (j,(dst_p,dst_ty)),pos),mods')
@@ -610,13 +615,15 @@ let separate_sites ls =
         | Ast.Counter c -> (ps,c::cs)) ([],[]) ls in
   (List.rev a,b)
 
-let final_rule_sanity sigs ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
+let final_rule_sanity
+      ?(r_editStyle:bool = false) sigs
+      ((lhs_links_one,lhs_links_two),(rhs_links_one,_)) mix =
   let () =
     match Mods.IntMap.root lhs_links_one with
     | None -> ()
     | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos in
   let () =
-    refer_links_annot sigs lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
+    refer_links_annot ~r_editStyle sigs lhs_links_two (List.map (fun r -> r.LKappa.ra) mix) in
   match Mods.IntMap.root rhs_links_one with
   | None -> ()
   | Some (i,(_,_,_,pos)) -> LKappa.link_only_one_occurence i pos
@@ -681,7 +688,7 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
                let () = LKappa.forbid_modification pos modif in
                let intf,counts = separate_sites sites in
                let ra,lannot' = annotate_dropped_agent
-                   ~syntax_version sigs lannot na intf counts in
+                   ~syntax_version ~r_editStyle:false sigs lannot na intf counts in
                (ra::acc,lannot'))
           (acc,fst links_annot) erased in
       let cmix,rlinks =
@@ -695,7 +702,8 @@ let annotate_lhs_with_diff_v3 sigs ?contact_map lhs rhs =
              let () = LKappa.forbid_modification pos modif in
              let intf,counts = separate_sites sites in
              let rannot',x' = annotate_created_agent
-                 ~syntax_version sigs ?contact_map rannot na intf in
+                 ~syntax_version ~r_editStyle:false sigs
+                 ?contact_map rannot na intf in
              let x'' =
                Counters_compiler.annotate_created_counters
                  sigs na counts (add_link_contact_map ?contact_map) x' in
@@ -719,13 +727,14 @@ let annotate_lhs_with_diff_v4 sigs ?contact_map lhs rhs =
       let () = LKappa.forbid_modification pos lmod in
       let (intf,counts) = separate_sites sites in
       let ra,lannot' = annotate_dropped_agent
-          ~syntax_version sigs (fst links_annot) ty intf counts in
+          ~syntax_version ~r_editStyle:false sigs (fst links_annot) ty intf counts in
       aux (lannot',snd links_annot) (ra::mix) cmix lt rt
     | Ast.Absent _ :: lt, Ast.Present ((_,pos as ty),sites,rmod) :: rt ->
       let () = LKappa.forbid_modification pos rmod in
       let (intf,counts) = separate_sites sites in
       let rannot',x' = annotate_created_agent
-          ~syntax_version sigs ?contact_map (snd links_annot) ty intf in
+          ~syntax_version ~r_editStyle:false sigs
+          ?contact_map (snd links_annot) ty intf in
       let x'' =
         Counters_compiler.annotate_created_counters
           sigs ty counts (add_link_contact_map ?contact_map) x' in
@@ -780,19 +789,21 @@ let annotate_edit_mixture ~syntax_version ~is_rule sigs ?contact_map m =
            (lannot',a::acc,news)
          | Some Ast.Create ->
            let rannot',x' = annotate_created_agent
-               ~syntax_version sigs ?contact_map (snd lannot) ty intf in
+               ~syntax_version ~r_editStyle:true sigs
+               ?contact_map (snd lannot) ty intf in
            let x'' =
               Counters_compiler.annotate_created_counters
                sigs ty counts (add_link_contact_map ?contact_map) x' in
            ((fst lannot,rannot'),acc,x''::news)
          | Some Ast.Erase ->
            let ra,lannot' = annotate_dropped_agent
-               ~syntax_version sigs (fst lannot) ty intf counts in
+               ~syntax_version ~r_editStyle:true sigs
+               (fst lannot) ty intf counts in
            ((lannot',snd lannot),ra::acc,news))
       (((Mods.IntMap.empty,Mods.IntMap.empty),
         (Mods.IntMap.empty,Mods.IntMap.empty)),[],[])
       m in
-  let () = final_rule_sanity sigs links_annot mix in
+  let () = final_rule_sanity ~r_editStyle:true sigs links_annot mix in
   (List.rev mix, List.rev cmix)
 
 let give_rule_label bidirectional (id,set) printer r = function
