@@ -1,3 +1,3 @@
 #Command-line:
-"${KAPPABIN}"KaSim lpc1.ka -seed 785872661 -u events -l 2 -d output -syntax 3 || exit 0
+"${KAPPABIN}"KaSim lpc1.ka -seed 785872661 -u events -l 2 -d output -syntax 4 || exit 0
 

@@ -1,9 +1,9 @@
 %agent: A(x,y,z)
 %agent: B(x)
 
-'delete A' A(x!1),A(z!1) -> A(x,z) @ 1
-%obs: 'free A' A(x,y,z)
+'delete A' A(x[1]),A(z[1]) -> A(x[.],z[.]),. @ 1
+%obs: 'free A' |A(x[.],y[.],z[.])|
 
-%init: 1 A(x!1,y!2),A(z!1),B(x!2)
+%init: 1 A(x[1],y[2]),A(z[1]),B(x[2])
 
 %def: "dumpIfDeadlocked" "yes"

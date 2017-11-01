@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (4 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'lpc1.ka' '-seed' '785872661' '-u' 'events' '-l' '2' '-d' 'output' '-syntax' '3'
++ Command line to rerun is: 'KaSim' 'lpc1.ka' '-seed' '785872661' '-u' 'events' '-l' '2' '-d' 'output' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 Simulation ended

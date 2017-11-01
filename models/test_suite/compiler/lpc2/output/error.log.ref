@@ -1,4 +1,2 @@
-File "lpc2.ka", line 5, characters 6-23:
-Warning: Deprecated variable syntax: use |kappa instance| instead.
-File "lpc2.ka", line 4, characters 32-33:
+File "lpc2.ka", line 4, characters 37-38:
 Site 'z' was not mentionned in the left-hand side.

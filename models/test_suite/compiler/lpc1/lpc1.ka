@@ -1,7 +1,7 @@
 %agent: A(x,y,z)
 %agent: B(x)
 
-'delete A' A(x!1),A(z!1) -> A(x) @ 1
-%init: 1 A(x!1,y!2),A(z!1),B(x!2)
+'delete A' A(x[1]),A(z[1]) -> A(x[.]),. @ 1
+%init: 1 A(x[1],y[2]),A(z[1]),B(x[2])
 
 %def: "dumpIfDeadlocked" "yes"
