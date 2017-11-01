@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Oct 27 2017>
+  * Last modification: Time-stamp: <Nov 01 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -385,6 +385,10 @@ type mixture =
 
 let add_agent parameters error kappa_handler agent_type mixture =
   let agent_id = Ckappa_sig.dummy_agent_id in
+  (* you should not use the dummy agent id *)
+  (* put the agent_id as an argument of add_agent instead *)
+  (* this will be up to the caller to ensure that this is fresh *)
+  (* and do not forget to add the agent at the ckappa level as well *)
   let error', views =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
       parameters error
