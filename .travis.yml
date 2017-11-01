@@ -56,6 +56,7 @@ matrix:
           - texlive-pictures
           - tex4ht
   - os: osx
+    env: CHECKED=MacOS
 
 before_install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew install opam ; fi"
@@ -76,6 +77,10 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python/tests && python3 test_kappa_client.py && python2 python2_kappa_client.py -k ../../models/abc.ka -t 100 ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
 
-after_success:
- sh -c "if [ '$TRAVIS_BRANCH' = master ] ; then dev/update-web.sh $CHECKED ; fi"
+deploy:
+  provider: script
+  script: dev/update-web.sh "$CHECKED"
+  on:
+    branch: master

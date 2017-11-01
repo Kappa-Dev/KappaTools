@@ -15,8 +15,7 @@ case $1 in
         cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
         ;;
     js )
-        [ -d ${PLAYGROUND}/try ] || \
-            mkdir ${PLAYGROUND}/try
+        [ -d ${PLAYGROUND}/try ] || mkdir ${PLAYGROUND}/try
         cp site/* ${PLAYGROUND}/try/
 	sed '/<\/head>/i \
 	<!-- Piwik -->\
@@ -38,6 +37,13 @@ case $1 in
         ;;
     webserver )
         ;;
+    '' )
+	;;
+    MacOS )
+        [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
+	codesign -s - Kappapp.app && \
+	    zip -r ${PLAYGROUND}/binaries/Kappapp.app.zip Kappapp.app
+	;;
 esac
 COMMITNAME=$(git show --pretty=oneline -s --no-color)
 cd ${PLAYGROUND}
