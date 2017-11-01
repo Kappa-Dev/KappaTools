@@ -1,16 +1,16 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+// TEMPLATE MODEL AS DESCRIBED IN THE MANUAL //
 %def: "displayCompression" "weak" "none"
 
-#### Signatures 
-%agent: A(x) # Declaration of agent A 
-%agent: B(x) # Declaration of B 
+// Signatures 
+%agent: A(x) // Declaration of agent A 
+%agent: B(x) // Declaration of B 
 
-#### Rules 
-'a.b' A(x),B(x) -> A(x!1),B(x!1) @ 1
-'B-' B(x!_) -> @ 1 
-'B+' -> B(x)  @1 
+// Rules 
+'a.b' A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
+'B-' B(x[_]) -> . @ 1 
+'B+' . -> B(x[.]) @ 1 
 
-#### Initial conditions 
+// Initial conditions 
 %init: 1000 B()
 %init: 1 A()
 

@@ -1,7 +1,7 @@
 %agent: A(x)
 
-'dimmer' A(x),A(x) <-> A(x!12),A(x!12) @ 1e-2, 1
+'dimmer' A(x[.]),A(x[.]) <-> A(x[12]),A(x[12]) @ 1e-2, 1
 
-%init: 7 A(x)
+%init: 7 A(x[.])
 
-%mod: repeat [true] do $PRINT "stream.txt" < "At ".[E]." ".|A(x!_)| > until [false]
+%mod: [true] do $PRINT ("At ".[E]." ".|A(x[_])|) > "stream.txt" repeat [true]

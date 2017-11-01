@@ -583,7 +583,7 @@ effect:
   | SNAPSHOT print_expr
     { Result_util.map (fun (s,p) -> Ast.SNAPSHOT s,p) $2 }
   | STOP print_expr
-    { Result_util.map (fun (s,p) -> Ast.SNAPSHOT s,p) $2 }
+    { Result_util.map (fun (s,p) -> Ast.STOP s,p) $2 }
   | PRINTF print_expr GREATER print_expr
     { Result_util.map2 (fun (c,_) (f,p) -> Ast.PRINT (f,c),p) $2 $4 }
   | PRINTF print_expr

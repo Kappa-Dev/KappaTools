@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i clash.ka -seed 728130018 -u event -l 3 -d output -syntax 3 || exit 0
+"${KAPPABIN}"KaSim -i clash.ka -seed 728130018 -u event -l 3 -d output -syntax 4 || exit 0
 
 #A model where a pair (embedding,rule) do not have a pushout

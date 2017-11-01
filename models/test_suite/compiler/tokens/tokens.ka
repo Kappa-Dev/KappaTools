@@ -1,6 +1,6 @@
 %agent: A(x)
 %token: tt
 
-%init: tt <- 33
+%init: 33 tt
 
 %mod: [E] = 5 do tt <- 22

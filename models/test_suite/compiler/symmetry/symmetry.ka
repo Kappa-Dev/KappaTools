@@ -1,8 +1,8 @@
-%agent: A(x~a~b,y)
+%agent: A(x{a,b},y)
 
-'colle' A(x), A(y) <-> A(x!1),A(y!1) @ 1, 1
-'monte' A(x~a!1),A(y!1) -> A(x~b), A(y) @1
-'detruit' A(x!1,y!2), A(x!2,y!1) -> @1
-'boucle' A(x!1,y?),A(x!2,y!1),A(y!2,x~b) -> A(x!1,y!3),A(x!2,y!1),A(y!2,x~b!3) @1
-%plot: |A(y!1),A(x~a!1)|
-%var: 'tourne' |A(y!3,x~b),A(x!1),A(x!3,y!1)|
+'colle' A(x{#}[.]), A(y[.]) <-> A(x{#}[1]),A(y[1]) @ 1, 1
+'monte' A(x{a}[1]),A(y[1]) -> A(x{b}[.]), A(y[.]) @ 1
+'detruit' A(x{#}[1],y[2]), A(x[2]{#},y[1]) -> .,. @ 1
+'boucle' A(x[1]{#},y[#]),A(x{#}[2],y[1]),A(y[2],x[.]{b}) -> A(x[1]{#},y[3]),A(x{#}[2],y[1]),A(y[2],x{b}[3]) @ 1
+%plot: |A(y[1]),A(x{a}[1])|
+%var: 'tourne' |A(y[3],x{b}[.]),A(x[1]{#}),A(x{#}[3],y[1])|

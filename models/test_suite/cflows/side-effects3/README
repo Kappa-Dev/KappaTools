@@ -1,6 +1,6 @@
 #!/bin/sh
 
-"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -u event -l 199 -d output -trace trace.json -syntax 3 || exit 0
+"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -u event -l 199 -d output -trace trace.json -syntax 4 || exit 0
 "${KAPPABIN}"KaStor -d output --none --weak --time-independent output/trace.json || exit 0
 
 #Test KaStor

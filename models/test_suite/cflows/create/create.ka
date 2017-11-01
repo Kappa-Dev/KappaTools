@@ -1,13 +1,13 @@
 %def: "displayCompression" "weak" "strong" 
 
-A(x),A(y) -> A(x!1),A(y!1) @0.001
-A(x!_) -> A(x) @1 
-'x++' A(x~u!1),A(y!1,x?) -> A(x~p),A(y,x~u),A() @1
-'GOAL' A(x~p) ->  @1 
+A(x[.]),A(y[.]) -> A(x[1]),A(y[1]) @ 0.001
+A(x[_]) -> A(x[.]) @ 1 
+'x++' A(x{u}[1]),A(y[1],x{#}[#]),. -> A(x{p}[.]),A(y[.],x{u}[.]),A() @ 1
+'GOAL' A(x{p}[.]) -> . @ 1 
 
-%init: 1000 A(x~u,y)
+%init: 1000 A(x{u}[.],y[.])
 
-%agent: A(x~u~p,y)
+%agent: A(x{u,p},y)
 
 %mod: [true] do $TRACK 'GOAL' [true]
 

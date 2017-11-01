@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (16 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'side-effects.ka' '-u' 'e' '-l' '25' '-seed' '253329392' '-d' 'output' '--time-independent' '-syntax' '3'
++ Command line to rerun is: 'KaSim' 'side-effects.ka' '-u' 'e' '-l' '25' '-seed' '253329392' '-d' 'output' '--time-independent' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 + Loading trace

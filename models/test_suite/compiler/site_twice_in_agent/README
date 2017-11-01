@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim lhs.ka -seed 924556145 -d output --compile -syntax 3 || true
-"${KAPPABIN}"KaSim rhs.ka -seed 924556145 -d output --compile -syntax 3 || true
-"${KAPPABIN}"KaSim internal.ka -seed 924556145 -d output --compile -syntax 3 || true
-"${KAPPABIN}"KaSim remove.ka -seed 924556145 -d output --compile -syntax 3 || true
+"${KAPPABIN}"KaSim lhs.ka -seed 924556145 -d output --compile -syntax 4 || true
+"${KAPPABIN}"KaSim rhs.ka -seed 924556145 -d output --compile -syntax 4 || true
+"${KAPPABIN}"KaSim internal.ka -seed 924556145 -d output --compile -syntax 4 || true
+"${KAPPABIN}"KaSim remove.ka -seed 924556145 -d output --compile -syntax 4 || true

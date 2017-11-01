@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
-<!--       KaDE   ../../simulation/activity/activity.ka   -d   output   -l   1   -p  0.1   -syntax   3    -ode-backend  SBML  -->
+<!--       KaDE   ../../simulation/activity/activity.ka   -d   output   -l   1   -p  0.1   -syntax   4    -ode-backend  SBML  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
 <!--
@@ -63,16 +63,13 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
-<!-- reaction:  ->  | 2:t + -(1):t  -->
+<!-- reaction:  ->  | 1:t  -->
 <reaction id="re2" name="expo2" reversible="false" fast="false">
-<listOfReactants>
-<speciesReference metaid="CMD12" species="t2"/>
-</listOfReactants>
 <listOfProducts>
-<speciesReference metaid="CMD13" species="t2" stoichiometry="2"/>
+<speciesReference metaid="CMD12" species="t2"/>
 </listOfProducts>
 <listOfModifiers>
-<modifierSpeciesReference metaid="CMD14" species="t2"/>
+<modifierSpeciesReference metaid="CMD13" species="t2"/>
 </listOfModifiers>
 <kineticLaw>
 <math xmlns="http://www.w3.org/1998/Math/MathML">

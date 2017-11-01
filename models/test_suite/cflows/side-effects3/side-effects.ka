@@ -1,14 +1,14 @@
--> C() @1
-A(x!_) -> A(x) @1
-A(x~0),B(x) -> A(x~1!1),B(x!1) @1
-A(x~1),B(x) -> A(x~0!1),B(x!1) @1
-'GOAL' A(x~1!1),B(x~1!1) -> @1 
+. -> C() @ 1
+A(x[_]) -> A(x[.]) @ 1
+A(x{a}[.]),B(x[.]) -> A(x{b}[1]),B(x[1]) @ 1
+A(x{b}[.]),B(x[.]) -> A(x{a}[1]),B(x[1]) @ 1
+'GOAL' A(x{b}[1]),B(x{b}[1]) -> .,. @ 1 
 
-%init: 1 A(x~0!1),B(x~1!1)
-%init: 10 B(x~0) 
+%init: 1 A(x{a}[1]),B(x{b}[1])
+%init: 10 B(x{a}[.]) 
 
 %mod: [true] do $TRACK 'GOAL' [true]
 
-%agent: A(x~0~1)
-%agent: B(x~0~1)
+%agent: A(x{a,b})
+%agent: B(x{a,b})
 %agent: C()

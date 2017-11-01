@@ -13,7 +13,7 @@ done
 	 -initial conditions
 + Building initial state (16384 agents)
 Done
-+ Command line to rerun is: 'KaSim' '-l' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '0.84' 'overlapping_unaries.ka' '-syntax' '3'
++ Command line to rerun is: 'KaSim' '-l' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '0.84' 'overlapping_unaries.ka' '-syntax' '4'
 ____________________________________________________________
 ############################################################
 Simulation ended

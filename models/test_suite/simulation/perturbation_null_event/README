@@ -1,3 +1,3 @@
 #!/bin/sh
 
-"${KAPPABIN}"KaSim -u Event -l 25 -d output -seed 20543 pert_null_event.ka -syntax 3 || exit 0
+"${KAPPABIN}"KaSim -u Event -l 25 -d output -seed 20543 pert_null_event.ka -syntax 4 || exit 0

@@ -2,7 +2,7 @@
 %agent:	B(b,c)
 %agent:	C(b,c)
 
-%init:	0	A(x,b,c), B(b,c), C(b,c)
-%init:  1	A(x!1,b!2,c!3),A(x!1),B(b!2,c!4),C(b!4,c!3)
+%init:	0	A(x[.],b[.],c[.]),B(b[.],c[.]),C(b[.],c[.])
+%init:  1	A(x[1],b[2],c[3]),A(x[1]),B(b[2],c[4]),C(b[4],c[3])
 
-'side_effect'	A(x!1,b!2,c!3),A(x!1),B(b!2),C(c!3) -> 	@ 1
+'side_effect'	A(x[1],b[2],c[3]),A(x[1]),B(b[2]),C(c[3]) -> .,.,.,.	@ 1

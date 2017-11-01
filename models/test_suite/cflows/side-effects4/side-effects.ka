@@ -2,14 +2,15 @@
 
 %var: 'goal' 0
 %var: 'bad' 1
-A(x!_/!.) @ 'bad'
-A(x!_/!.), +C() @ 'goal'
-A(x!./!1),B(x!./!1) @1
-A(x!./!1),B(x!./!1) @1
-'GOAL' A(x!1),B(x~1!1),C() -> @1
+A(x[_/.]) @ 'bad'
+A(x[_/.]), C()+ @ 'goal'
+A(x[./1]),B(x[./1]) @ 1
+A(x[./1]),B(x[./1]) @ 1
 
-%init: 1 A(x!1),B(x~1!1)
-%init: 10 B(x~0!.)
+'GOAL' A(x[1]),B(x{b}[1]),C() -> .,.,. @ 1
+
+%init: 1 (A(x[1]),B(x{b}[1]))
+%init: 10 B(x{a}[.])
 
 %mod: [true] do $TRACK 'GOAL' [true]
-%mod: [T]>10 do ($UPDATE 'bad' 0;$UPDATE 'goal' 1)
+%mod: [T]>10 do ( $UPDATE 'bad' 0 ; $UPDATE 'goal' 1 )

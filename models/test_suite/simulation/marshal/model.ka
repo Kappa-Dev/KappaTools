@@ -1,9 +1,9 @@
 %agent: A(x)
 %agent: B(x)
 
-'dim' A(x), B(x) <-> A(x!1), B(x!1) @ 1, 0.01
+'dim' A(x[.]), B(x[.]) <-> A(x[1]), B(x[1]) @ 1, 0.01
 
 %var: 'init' 100
-%init: 'init' A(x!1), B(x!1)
+%init: 'init' A(x[1]), B(x[1])
 
 %mod: [false] do $STOP

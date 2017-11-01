@@ -1,7 +1,7 @@
-%agent: A(a~u~p)
-%init: 10000 A(a~u)
+%agent: A(a{u,p})
+%init: 10000 A(a{u}[.])
 
-A(a~u) -> A(a~p) @ 0.01
-A(a~p) -> A(a~u) @ 0.01
+A(a{u}[.]) -> A(a{p}[.]) @ 0.01
+A(a{p}[.]) -> A(a{u}[.]) @ 0.01
 
 %mod: alarm 1.0 [true] do $SNAPSHOT "rt.ka" repeat [true]

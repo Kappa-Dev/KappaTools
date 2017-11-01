@@ -1,12 +1,12 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
-#### Signatures 
+// TEMPLATE MODEL AS DESCRIBED IN THE MANUAL //
+// Signatures 
 %agent: A(x) 
 
-#### Rules 
-'a..a' A(x!_),A(x!_) -> A(x),A(x!_) @1
-'rem_a' A(),A(x!_) -> A(),A(x!_) @1
+// Rules 
+'a..a' A(x[_]),A(x[_]) -> A(x[.]),A(x[_]) @ 1
+'rem_a' A(),A(x[_]) -> A(),A(x[_]) @ 1
 
-#### Initial conditions
-%init: 1 A(x!1),A(x!1)
+// Initial conditions
+%init: 1 A(x[1]),A(x[1])
 
 

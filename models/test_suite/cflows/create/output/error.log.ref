@@ -1,4 +1,2 @@
-File "create.ka", line 5, characters 39-40:
-Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
-File "create.ka", line 4, characters 12-13:
+File "create.ka", line 4, characters 13-14:
 Warning: breaking a semi-link on site 'x' will induce a side effect

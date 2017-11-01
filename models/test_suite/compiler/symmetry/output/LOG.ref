@@ -13,4 +13,4 @@ done
 	 -initial conditions
 + Building initial state (1 agents)
 Done
-+ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-l' '0' '-syntax' '3'
++ Command line to rerun is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-l' '0' '-syntax' '4'

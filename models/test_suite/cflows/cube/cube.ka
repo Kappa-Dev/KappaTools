@@ -1,15 +1,15 @@
  %def: "seed" "240056667"
  %def: "displayCompression" "none" "weak"
 
-'x++' A(x{u},z{u}) -> A(x{p},z{u}) @ 10
-'x--' A(x{p},y{p},z{p}) -> A(x{u},y{p},z{p}) @ 10
-'x++_' A(x{u},z{p},y{u}) -> A(x{p},z{p},y{u}) @ 10
-'z++' A(x{p},z{u}) -> A(x{p},z{p}) @ 10
-'y++' A(x{u},y{u},z{u}) -> A(x{u},y{p},z{u}) @ 10
-'y--' A(x{u},y{p},z{p}) -> A(x{u},y{u},z{p}) @ 10
-'GOAL' A(x{p},y{u},z{p}) -> . @ 0
+'x++' A(x{u}[.],z{u}[.]) -> A(x{p}[.],z{u}[.]) @ 10
+'x--' A(x[.]{p},y[.]{p},z[.]{p}) -> A(x[.]{u},y[.]{p},z[.]{p}) @ 10
+'x++_' A(x[.]{u},z[.]{p},y[.]{u}) -> A(x[.]{p},z[.]{p},y[.]{u}) @ 10
+'z++' A(x{p}[.],z{u}[.]) -> A(x{p}[.],z{p}[.]) @ 10
+'y++' A(x{u}[.],y{u}[.],z{u}[.]) -> A(x{u}[.],y{p}[.],z{u}[.]) @ 10
+'y--' A(x{u}[.],y{p}[.],z{p}[.]) -> A(x{u}[.],y{u}[.],z{p}[.]) @ 10
+'GOAL' A(x{p}[.],y{u}[.],z{p}[.]) -> . @ 0
 
-%init: 10000 A(x{u},y{u},z{u})
+%init: 10000 A(x{u}[.],y[.]{u},z[.]{u})
 
 %agent: A(x{u,p},y{u,p},z{u,p})
 

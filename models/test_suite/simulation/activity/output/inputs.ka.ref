@@ -16,7 +16,7 @@
 %plot: T
 
 'expo' T(), +T() @ 1
-'expo2'  | -(1) t + 2 t @ expo2_rate
+'expo2'  | 1 t @ expo2_rate
 
 
 %init: nT T()
