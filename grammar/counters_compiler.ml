@@ -278,7 +278,7 @@ let make_counter_agent sigs
   let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
   let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), LKappa.Maintained) in
   let before_switch =
-    if first&&created then LKappa.Linked (i,pos) else LKappa.Maintained in
+    if first&&created then LKappa.Linked i else LKappa.Maintained in
   let before =
     if first then Ast.LNK_VALUE (i,dst), pos
     else Ast.LNK_VALUE (i,(ra_type,incr_a)), pos in
@@ -360,7 +360,7 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
     link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
   let adjust_delta =
     if (delta<0)
-    then erase_incr sigs 0 test_incr delta (lnk_for_erased,pos)
+    then erase_incr sigs 0 test_incr delta lnk_for_erased
     else test_incr in
   let created =
     if (delta>0)
@@ -372,8 +372,8 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
                ("Counter test should be greater then abs(delta)",pos')) in
   let switch =
     if (delta = 0) then LKappa.Maintained
-    else if (delta > 0) then LKappa.Linked (start_lnk_for_created,pos')
-    else LKappa.Linked (lnk_for_erased,pos') in
+    else if (delta > 0) then LKappa.Linked start_lnk_for_created
+    else LKappa.Linked lnk_for_erased in
   let p = (Ast.LNK_VALUE (start_lnk_nb,(incr_b,incr_type)),pos),switch in
   let () = ra.LKappa.ra_ports.(p_id) <- p in
   (adjust_delta,created)
@@ -470,7 +470,7 @@ let remove_counter_rule sigs mix created =
               | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY | Ast.LNK_SOME
                 | Ast.LNK_TYPE _ -> max in
             match switch with
-              | LKappa.Linked (i,_) ->  if (max'<i) then i else max'
+              | LKappa.Linked i ->  if (max'<i) then i else max'
               | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> max')
             max ag.LKappa.ra.LKappa.ra_ports) 0 mix in
 

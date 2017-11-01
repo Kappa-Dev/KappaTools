@@ -168,12 +168,12 @@ let translate rate_convention cache rule  =
                     (Copy_lhs i) (agent_id, site_id+n_site)
                     (add_map rate_convention (Lhs i) (agent_id, site_id) map),
                   site_id + 1
-                | Ast.LNK_VALUE (i,_), LKappa.Linked (j,_) ->
+                | Ast.LNK_VALUE (i,_), LKappa.Linked j ->
                   add_map rate_convention (Rhs j) (agent_id,site_id+n_site)
                     (add_map rate_convention (Lhs i) (agent_id, site_id) map), site_id + 1
                 | Ast.LNK_VALUE (i,_), _ ->
                   add_map rate_convention (Lhs i) (agent_id, site_id) map, site_id + 1
-                | _, LKappa.Linked (j,_) ->
+                | _, LKappa.Linked j ->
                   add_map rate_convention (Rhs j) (agent_id, site_id+n_site) map, site_id + 1
                 | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_SOME |
                    Ast.LNK_ANY | Ast.LNK_TYPE _),

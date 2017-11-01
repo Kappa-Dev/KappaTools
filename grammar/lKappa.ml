@@ -6,8 +6,7 @@
 (* |_|\_\ * GNU Lesser General Public License Version 3                       *)
 (******************************************************************************)
 
-type switching =
-  | Linked of int Locality.annot | Freed | Maintained | Erased
+type switching = Linked of int | Freed | Maintained | Erased
 
 type rule_internal =
   | I_ANY
@@ -87,23 +86,22 @@ let rule_internal_of_json = function
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect rule_internal",x))
 
 let print_switching ~show_erased f = function
-  | Linked (i,_) -> Format.fprintf f "/!%i" i
+  | Linked i -> Format.fprintf f "/!%i" i
   | Freed -> Format.pp_print_string f "/!."
   | Maintained -> ()
   | Erased -> if show_erased then Format.pp_print_string f "--"
 
-let switching_to_json filenames = function
+let switching_to_json = function
   | Freed -> `String "Freed"
   | Maintained -> `String "Maintained"
   | Erased -> `String "Erased"
-  | Linked i -> Locality.annot_to_yojson ~filenames JsonUtil.of_int i
+  | Linked i -> JsonUtil.of_int i
 
-let switching_of_json filenames = function
+let switching_of_json = function
   | `String "Freed" -> Freed
   | `String "Maintained" -> Maintained
   | `String "Erased"-> Erased
-  | x -> Linked (Locality.annot_of_yojson
-                   ~filenames (JsonUtil.to_int~error_msg:"Invalid Switching") x)
+  | x -> Linked (JsonUtil.to_int ~error_msg:"Invalid Switching" x)
 
 let is_counter sigs (_,ag_ty) = Signature.is_counter ag_ty (Some sigs)
 
@@ -138,19 +136,8 @@ let rec counter_value mix e (pid,ag_ty) count =
   | Ast.LNK_TYPE _ | Ast.LNK_SOME | Ast.LNK_VALUE _ ->
      counter_value mix e' (pid,ag_ty) (count+1)
 
-let find_counter_with_link mix i counter_type =
-  List.exists
-    (fun a ->
-      (a.ra_type = counter_type)&&
-      Array.fold_left
-        (fun acc ((_,_),s) ->
-          match s with
-          | Linked (i',_) -> (i=i')||acc
-          | Freed | Maintained | Erased -> acc)
-        false a.ra_ports) mix
-
 let counter_delta created j = function
-  | Linked (i,_) ->
+  | Linked i ->
      begin
      match (Raw_mixture.counters_chain_length created i true) with
        None  -> (j-i) (*decrement counter*)
@@ -268,7 +255,7 @@ let print_link_lhs ~ltypes sigs f ((e,_),_) =
 
 let print_link_rhs ~ltypes sigs f ((e,_),s) =
   match s with
-  | Linked (i,_) ->
+  | Linked i ->
     Ast.print_link
       ~syntax_version:Ast.V3 (Signature.print_site sigs)
       (Signature.print_agent sigs) (fun _ () -> ())
@@ -417,7 +404,7 @@ let rule_agent_to_json filenames a =
                       ~filenames
                       (Ast.link_to_json (fun _ i -> `Int i) (fun i -> `Int i)
                          (fun (s,a) -> [`Int s;`Int a])) e;
-                       (switching_to_json filenames) s])::c)
+                    switching_to_json s])::c)
              a.ra_ports []);
     "states",
     `List (Array.fold_right
@@ -442,7 +429,7 @@ let rule_agent_of_json filenames = function
                         (function
                           | [`Int s; `Int a] -> (s,a)
                           | _ -> raise Not_found)) e,
-                  (switching_of_json filenames) s)
+                   switching_of_json s)
                 | _ -> raise Not_found) s
           | _ -> raise Not_found in
         let ints =

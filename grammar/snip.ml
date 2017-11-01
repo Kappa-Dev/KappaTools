@@ -17,7 +17,7 @@ let ports_from_contact_map contact_map ty_id p_id =
 
 let find_implicit_infos contact_map ags =
   let max_s m = function
-    | LKappa.Linked (i,_) -> max i m
+    | LKappa.Linked i -> max i m
     | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> m in
   let new_switch = function
     | LKappa.Maintained -> LKappa.Maintained
@@ -194,7 +194,7 @@ let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.LKappa.ra_ports <> []
 
 let define_full_transformation
-    sigs (removed,added as transf) links_transf place site (cand,cand_pos) switch =
+    (removed,added as transf) links_transf place site (cand,_) switch =
   match switch with
   | LKappa.Freed ->
     ((cand::removed, (Primitives.Transformation.Freed(place,site)::added)),
@@ -203,35 +203,33 @@ let define_full_transformation
     (transf,links_transf)
   | LKappa.Erased ->
     ((cand::removed,added),links_transf)
-  | LKappa.Linked (i,pos) ->
+  | LKappa.Linked i ->
     match Mods.IntMap.find_option i links_transf with
     | None ->
       let links_transf' =
-        Mods.IntMap.add
-          i ((place,site),Option_util.map (fun _ -> pos) cand_pos)
-          links_transf in
+        Mods.IntMap.add i (place,site) links_transf in
       ((cand::removed,added),links_transf')
-    | Some ((place',site' as dst'),risk) ->
+    | Some dst' ->
       let links_transf' = Mods.IntMap.remove i links_transf in
       ((cand::removed,
         Primitives.Transformation.Linked((place,site),dst')::added),
        links_transf')
 
 let define_positive_transformation
-    sigs (removed,added as transf) links_transf place site switch =
+    (removed,added as transf) links_transf place site switch =
   match switch with
   | LKappa.Freed ->
     ((removed,
       Primitives.Transformation.Freed (place,site)::added),links_transf)
   | LKappa.Erased -> (transf,links_transf)
   | LKappa.Maintained -> (transf,links_transf)
-  | LKappa.Linked (i,pos) ->
+  | LKappa.Linked i ->
     match Mods.IntMap.find_option i links_transf with
     | None ->
       let links_transf' =
-        Mods.IntMap.add i ((place,site),Some pos) links_transf in
+        Mods.IntMap.add i (place,site) links_transf in
       (transf,links_transf')
-    | Some (dst',_) ->
+    | Some dst' ->
       let links_transf' = Mods.IntMap.remove i links_transf in
       ((removed,
         Primitives.Transformation.Linked((place,site),dst')::added),
@@ -393,7 +391,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
         | ((Ast.LNK_ANY|Ast.ANY_FREE),pos), s ->
           let transf',l_t' =
             define_full_transformation
-              sigs transf l_t place site_id
+              transf l_t place site_id
               (Primitives.Transformation.NegativeWhatEver
                  (place,site_id),Some pos) s in
           handle_ports wk' r_l c_l transf' l_t' re acc (succ site_id)
@@ -401,7 +399,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
           let wk'' = Pattern.new_free wk' (node,site_id) in
           let transf',l_t' =
             define_full_transformation
-              sigs transf l_t place site_id
+              transf l_t place site_id
               (Primitives.Transformation.Freed (place,site_id),None) s in
           handle_ports
             wk'' r_l c_l transf' l_t' re acc (succ site_id)
@@ -420,7 +418,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                 c_l in
             let transf',l_t' =
               define_full_transformation
-                sigs transf l_t place site_id
+                transf l_t place site_id
                 (Primitives.Transformation.Linked
                    ((place,site_id),(dst_place)),Some pos) s in
             handle_ports wk'' (Mods.IntMap.remove i r_l) c_l' transf'
@@ -438,12 +436,12 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
                 else wk' in
               let transf',l_t' =
                 define_full_transformation
-                  sigs transf l_t place site_id
+                  transf l_t place site_id
                   (Primitives.Transformation.Linked
                      ((place,site_id),(place,site_id')),Some pos) s in
               let transf'',l_t'' =
                 define_full_transformation
-                  sigs transf' l_t' place site_id'
+                  transf' l_t' place site_id'
                   (Primitives.Transformation.Linked
                      ((place,site_id'),(place,site_id)),Some pos) s in
               let c_l' =
@@ -458,7 +456,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
               let r_l' = Mods.IntMap.add i (node,site_id) r_l in
               let transf',l_t' =
                 define_positive_transformation
-                  sigs transf l_t place site_id s in
+                  transf l_t place site_id s in
               match List.partition (is_linked_on i) re with
               | [], re' ->
                 if List_util.exists_uniq (is_linked_on i) acc then
@@ -508,13 +506,13 @@ let rec complete_with_creation
             l_t
           | Raw_mixture.VAL i ->
             match Mods.IntMap.pop i l_t with
-            | Some ((place',site' as dst),risk),l_t' ->
+            | Some dst,l_t' ->
               Primitives.Transformation.Linked((place,site_id),dst)::added',
               (Instantiation.Bind_to((place,site_id),dst)
                ::(Instantiation.Bind_to((dst,(place,site_id))))::actions'),
               l_t'
             | None,l_t ->
-              let l_t' = Mods.IntMap.add i ((place,site_id),None) l_t in
+              let l_t' = Mods.IntMap.add i (place,site_id) l_t in
               (added',actions',l_t') in
         handle_ports added'' l_t' actions'' (point::intf) (succ site_id) in
     handle_ports
@@ -578,9 +576,9 @@ let connected_components_of_mixture created mix (env,origin) =
       let event' =
         Instantiation.rename_abstract_event id inj event in
       let l_t' = Mods.IntMap.map
-          (fun (((p,s),b) as x) ->
+          (fun (p,s as x) ->
              let p' = Matching.Agent.rename id inj p in
-             if p == p' then x else ((p',s),b)) l_t in
+             if p == p' then x else (p',s)) l_t in
       aux env' (removed',added') event' l_t' ((cc_id,cc)::acc) (succ id) remains
   in aux env ([],[]) Instantiation.empty_event Mods.IntMap.empty [] 0 mix
 

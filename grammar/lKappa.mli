@@ -8,8 +8,7 @@
 
 (** Intermediate representation of model on wich sanity has been checked *)
 
-type switching =
-  | Linked of int Locality.annot | Freed | Maintained | Erased
+type switching = Linked of int | Freed | Maintained | Erased
 
 type rule_internal = (*state*)
   | I_ANY

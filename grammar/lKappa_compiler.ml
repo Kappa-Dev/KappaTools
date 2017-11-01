@@ -44,8 +44,7 @@ let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
         (Signature.print_site sigs sort) site
         (Signature.print_agent sigs) sort)
 
-let build_link
-      sigs ?contact_map ?(r_editStyle:bool = false) pos i ag_ty p_id switch
+let build_link sigs ?contact_map ~warn_on_swap pos i ag_ty p_id switch
       (links_one,links_two) =
   if Mods.IntMap.mem i links_two then
     raise (ExceptionDefn.Malformed_Decl
@@ -54,7 +53,7 @@ let build_link
   else match Mods.IntMap.pop i links_one with
     | None,one' ->
       let new_link = match switch with
-        | LKappa.Linked (j,_) -> Some j
+        | LKappa.Linked j -> Some j
         | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> None in
       ((Ast.LNK_VALUE (i,(-1,-1)),pos),switch),
       (Mods.IntMap.add i (ag_ty,p_id,new_link,pos) one',links_two)
@@ -62,10 +61,10 @@ let build_link
       if Signature.allowed_link ag_ty p_id dst_ty dst_p sigs then
         let () = add_link_contact_map ?contact_map ag_ty p_id dst_ty dst_p in
         let maintained = match switch with
-          | LKappa.Linked (j,_) ->
+          | LKappa.Linked j ->
              let link_swap = (Some j <> dst_id) in
              let () =
-               if link_swap && not(r_editStyle) then
+               if link_swap && warn_on_swap then
                  rule_induces_link_permutation ~pos ~dst_ty sigs ag_ty p_id in
              not(link_swap)
           | LKappa.Freed | LKappa.Erased | LKappa.Maintained -> false in
@@ -156,7 +155,8 @@ let annotate_dropped_agent
            (lannot,pset')
          | [Ast.LNK_VALUE (i,()), pos] ->
            let va,lannot' =
-             build_link sigs ~r_editStyle pos i ag_id p_id LKappa.Erased lannot in
+             build_link sigs ~warn_on_swap:(not r_editStyle) pos i
+               ag_id p_id LKappa.Erased lannot in
            let () = ports.(p_id) <- va in (lannot',pset')
          | _::(_,pos)::_ ->
            raise (ExceptionDefn.Malformed_Decl
@@ -207,8 +207,8 @@ let annotate_created_agent
              ~status:"linking" ~side:"left" agent_name p_na
          | [Ast.LNK_VALUE (i,()), pos] ->
            let () = ports.(p_id) <- Raw_mixture.VAL i in
-           let _,rannot' = build_link
-               sigs ~r_editStyle ?contact_map pos i ag_id p_id LKappa.Freed rannot in
+           let _,rannot' = build_link sigs ~warn_on_swap:(not r_editStyle)
+               ?contact_map pos i ag_id p_id LKappa.Freed rannot in
            pset',rannot'
          | [(Ast.ANY_FREE | Ast.LNK_FREE), _] | [] -> pset',rannot
       ) (Mods.IntSet.empty,rannot) intf in
@@ -235,9 +235,9 @@ let translate_modification sigs ?contact_map ag_id p_id
     | Some (j,pos_j) ->
       let _,rhs_links' =
         build_link
-          sigs ~r_editStyle:true
+          sigs ~warn_on_swap:false
           ?contact_map pos_j j ag_id p_id LKappa.Freed rhs_links in
-      LKappa.Linked (j,pos_j),(lhs_links,rhs_links')
+      LKappa.Linked j,(lhs_links,rhs_links')
 
 let annotate_edit_agent
     ~syntax_version ~is_rule sigs ?contact_map (agent_name, _ as ag_ty)
@@ -296,7 +296,7 @@ let annotate_edit_agent
         let va,lhs_links' =
           build_link
             sigs ?contact_map:(if is_rule then None else contact_map)
-            ~r_editStyle:true pos i ag_id p_id modif lhs_links in
+            ~warn_on_swap:false pos i ag_id p_id modif lhs_links in
         let () = ports.(p_id) <- va in
         (lhs_links',rhs_links)
       | _::(_,pos)::_ ->
@@ -436,16 +436,19 @@ let annotate_agent_with_diff
       links_annot
     | [Ast.LNK_VALUE (i,()),pos], [(Ast.LNK_FREE|Ast.ANY_FREE),_] ->
       let va,lhs_links' =
-        build_link sigs pos i ag_id p_id LKappa.Freed lhs_links in
+        build_link sigs ~warn_on_swap:true pos i
+          ag_id p_id LKappa.Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_VALUE (i,()),pos], [] when syntax_version = Ast.V3 ->
       let va,lhs_links' =
-        build_link sigs pos i ag_id p_id LKappa.Freed lhs_links in
+        build_link sigs ~warn_on_swap:true pos i
+          ag_id p_id LKappa.Freed lhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | [Ast.LNK_ANY,pos_lnk], [Ast.LNK_VALUE (i,()),pos] ->
-      let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), LKappa.Linked (i,pos)) in
+      let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos i ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos i
+          ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_SOME,pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -457,9 +460,10 @@ let annotate_agent_with_diff
                f "breaking a semi-link on site '%s' will induce a side effect"
                na) in
       let () = ports.(p_id) <-
-          ((Ast.LNK_SOME,pos_lnk), LKappa.Linked (i,pos')) in
+          ((Ast.LNK_SOME,pos_lnk), LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos' i ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos' i
+          ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk], [Ast.LNK_VALUE (i,()),pos'] ->
       let (na,pos) = p'.Ast.port_nme in
@@ -471,27 +475,31 @@ let annotate_agent_with_diff
                f "breaking a semi-link on site '%s' will induce a side effect"
                na) in
       let () = ports.(p_id) <-
-          build_l_type sigs pos_lnk dst_ty dst_p (LKappa.Linked (i,pos')) in
+          build_l_type sigs pos_lnk dst_ty dst_p (LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos' i ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos' i
+          ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [(Ast.LNK_FREE|Ast.ANY_FREE),_], [Ast.LNK_VALUE (i,()),pos] ->
       let () = ports.(p_id) <-
-          (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked (i,pos)) in
+          (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos i ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos i
+          ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [], [Ast.LNK_VALUE (i,()),pos] when syntax_version = Ast.V3 ->
       let () = ports.(p_id) <-
-          (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked (i,pos)) in
+          (Locality.dummy_annot Ast.LNK_FREE, LKappa.Linked i) in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos i ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos i
+          ag_id p_id LKappa.Freed rhs_links in
       lhs_links,rhs_links'
     | [Ast.LNK_VALUE (i,()),pos_i], [Ast.LNK_VALUE (j,()),pos_j] ->
-      let va,lhs_links' = build_link
-          sigs pos_i i ag_id p_id (LKappa.Linked (j,pos_j)) lhs_links in
+      let va,lhs_links' = build_link sigs ~warn_on_swap:true pos_i i
+          ag_id p_id (LKappa.Linked j) lhs_links in
       let _,rhs_links' =
-        build_link sigs ?contact_map pos_j j ag_id p_id LKappa.Freed rhs_links in
+        build_link sigs ~warn_on_swap:true ?contact_map pos_j j
+          ag_id p_id LKappa.Freed rhs_links in
       let () = ports.(p_id) <- va in (lhs_links',rhs_links')
     | [(Ast.LNK_VALUE (_, ()) | Ast.LNK_FREE | Ast.ANY_FREE |
         Ast.LNK_TYPE (_, _) | Ast.LNK_SOME | Ast.LNK_ANY), _], [] ->
