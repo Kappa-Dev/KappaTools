@@ -82,5 +82,6 @@ script:
 deploy:
   provider: script
   script: dev/update-web.sh "$CHECKED"
+  skip_cleanup: true
   on:
     branch: master
