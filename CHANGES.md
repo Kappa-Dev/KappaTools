@@ -9,6 +9,16 @@ You can specify `-syntax 3` in the command line) to use KaSim4 with a
 model in KaSim3 syntax. In addition, the ouptut log file "inputs.ka"
 will be a copy of your model in KaSim4 syntax.
 
+### Comments follow standard of C
+
+* line comments starts by `//`
+* block comments are between `/*` and `*/`
+* the meaning of `#` is completely different
+
+### No more `\` for sentences splitted over several lines
+
+You can go to a new line anytime anywhere but don't put `\`.
+
 ### Site specification
 
 The general picture is now the following:
@@ -22,14 +32,13 @@ The general picture is now the following:
 Here is a table of correspondance:
 
 KaSim < 4 | Syntax V4
----------------------
-    x     |   x[.]
-   x!1    |   x[1]
-   x!_    |   x[_]
-  x!y.B   |  x[y.B]
-    x?    | x[#] or x
----------------------
-   y~p?   |   y{p}
+----------|----------
+`x` | `x[.]`
+`x!1` | `x[1]`
+`x!_` | `x[_]`
+`x!y.B` | `x[y.B]`
+`x?` | `x[#]` or `x`
+`y~p?` | `y{p}`
 
 ### Agent order in rules
 
@@ -56,8 +65,9 @@ Commas remains mandatory in lists of agents.
   are in `{}` instead of `()`
 
 ### Repetitive perturbation syntax is now
-
-`%mod: [precondition] do [modifications] repeat [condition]`
+```
+%mod: [precondition] do [modifications] repeat [condition]
+```
 
 Beware: the second condition is the negation of the old until clause.
 
@@ -78,9 +88,9 @@ parenthesis.
 Example: `%mod: |A(a)| < 100 do $SNAPSHOT ("snap_at_".[T].".ka")`
 
 ### tokens are initialised like species:
-
-`%init: [alg_expr] [token_name]`.
-
+```
+%init: [alg_expr] [token_name]`
+```
 ### There is no special case for "observables"
 
 Number of occurrences of the pattern pat is now written |pat| and it can
@@ -92,13 +102,13 @@ of `%var: 'o' A(x!1),B(x!1)`.
 But you can write directly `%var: 'o' 1 + |A(x!1),B(x!1)| / 2` instead
 of
 ```
-%var: 'tmp_o' A(x!1),B(x!1) %var: 'o' 1 + 'tmp_o' / 2
+%var: 'tmp_o' A(x!1),B(x!1) 
+%var: 'o' 1 + 'tmp_o' / 2
 ```
 
 As a (more or less direct) consequence, you can write
 ```
-%init: "any
-algebraic expression" "mixture"
+%init: "any algebraic expression" "mixture"
 ```
 and `$TRACK "pattern" [true]`
 
