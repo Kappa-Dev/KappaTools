@@ -31,7 +31,7 @@ let real =
 let id = '_'* ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*
 
 rule token = parse
-  | '/' '/' ([^'\r''\n']* as s) eol {Lexing.new_line lexbuf; COMMENT s}
+  | '/' '/' ([^'\r''\n']* as s) (eol | eof) {Lexing.new_line lexbuf; COMMENT s}
   | '/' '*' {COMMENT (inline_comment [] lexbuf)}
   | eol { Lexing.new_line lexbuf; NEWLINE }
   | blank + as x { SPACE x }
@@ -132,6 +132,7 @@ and inline_comment acc = parse
   | ('*' [^'/' '\n' '\"' '\'']) as x { inline_comment (x::acc) lexbuf }
   | ('/' [^'*' '\n' '\"' '\'']) as x { inline_comment (x::acc) lexbuf }
   | '*' '/' { String.concat "" (List.rev acc) }
+  | eof { String.concat "" (List.rev acc) }
   | '*' '\n' { Lexing.new_line lexbuf; inline_comment ("*\n"::acc) lexbuf }
   | ('\'' [^'\n' '\'']+ '\'') as x { inline_comment (x::acc) lexbuf }
   | ('\"' [^'\n' '\"']+ '\"') as x { inline_comment (x::acc) lexbuf }
