@@ -3,15 +3,15 @@
 %mod: [T]>10 do $TRACK 'sos recruited' [true]
 %mod: [T]>11 do $TRACK 'sos recruited' [false]
 
-%var: 'DIM_beat' 2 #s
-%var: 'DIM_length' 5 #clock beats
+%var: 'DIM_beat' 2 //s
+%var: 'DIM_length' 5 //clock beats
 
 %var: 'DIM_tick' 0
 %var: 'DIM_clock' 0
-%mod: repeat [T] > 'DIM_clock' && 'DIM_tick' > 'DIM_length' - 1 do\
- $FLUX "flux_".'DIM_tick' - 'DIM_length'.".json" [false] until [false]
-%mod: repeat [T] > 'DIM_clock' do $FLUX "flux_".'DIM_tick'.".json" [true]\
- until ('DIM_tick' + 'DIM_length' + 1) * 'DIM_beat' > [Tmax]
-%mod: repeat [T] > 'DIM_clock' do\
- $UPDATE 'DIM_clock' 'DIM_clock' + 'DIM_beat';\
- $UPDATE 'DIM_tick' 'DIM_tick' + 1 until [false]
+%mod: [T] > 'DIM_clock' && 'DIM_tick' > 'DIM_length' - 1 do
+ $FLUX "flux_".'DIM_tick' - 'DIM_length'.".json" [false] repeat [true]
+%mod: [T] > 'DIM_clock' do $FLUX "flux_".'DIM_tick'.".json" [true]
+ repeat ('DIM_tick' + 'DIM_length' + 1) * 'DIM_beat' < [Tmax]
+%mod: [T] > 'DIM_clock' do
+  $UPDATE 'DIM_clock' 'DIM_clock' + 'DIM_beat';
+  $UPDATE 'DIM_tick' 'DIM_tick' + 1 repeat [true]
