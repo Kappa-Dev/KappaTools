@@ -1,5 +1,5 @@
-# command line:  
-#       KaDE   conflicts.ka   -d   output   -syntax   3    -ode-backend  DOTNET  
+# command line: 
+#       KaDE   conflicts.ka   -d   output   -syntax   3    -ode-backend  DOTNET 
 # THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 # 
 # init - the initial abundances of each species and token
@@ -33,13 +33,13 @@ end species
 
 
 begin reactions
-# rule    : A(), A() -> A(), . 
-# A() + A() -> A()  
+# rule    : A(), A() -> A(), .
+# A() + A() -> A()
 1 1,1 1 k3
-# rule    : A() -> . 
-# A() ->   
+# rule    : A() -> .
+# A() -> 
 2 1 k1_
-# rule    : . -> A() 
-#  -> A()  
+# rule    : . -> A()
+#  -> A()
 3 2 1,2 k2_
 end reactions

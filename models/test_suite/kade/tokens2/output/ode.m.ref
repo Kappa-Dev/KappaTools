@@ -208,14 +208,14 @@ k(2)=var(4);
 dydt=zeros(nodevar,1);
 
 % rule    : expo
-% reaction: T() -> T() + T() 
+% reaction: T() -> T() + T()
 
 dydt(1)=dydt(1)-k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 
 % rule    : expo2
-% reaction:  ->  | 1:t 
+% reaction:  ->  | 1 t
 
 dydt(2)=dydt(2)+k(2)*stoc(2,1);
 dydt(3)=1;
@@ -255,14 +255,14 @@ jack(2,2)=jacvar(4,2);
 jac=sparse(nodevar,nodevar);
 
 % rule    : expo
-% reaction: T() -> T() + T() 
+% reaction: T() -> T() + T()
 
 jac(1,1)=jac(1,1)-k(1);
 jac(1,1)=jac(1,1)+k(1);
 jac(1,1)=jac(1,1)+k(1);
 
 % rule    : expo2
-% reaction:  ->  | 1:t 
+% reaction:  ->  | 1 t
 
 jac(2,2)=jac(2,2)+jack(2,2)*stoc(2,1);
 end

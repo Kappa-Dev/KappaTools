@@ -47,7 +47,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : expo -->
-<!-- reaction: T() -> T() + T()  -->
+<!-- reaction: T() -> T() + T() -->
 <reaction id="re1" name="expo" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD10" species="s1"/>
@@ -63,7 +63,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : expo2 -->
-<!-- reaction:  ->  | 1:t  -->
+<!-- reaction:  ->  | 1 t -->
 <reaction id="re2" name="expo2" reversible="false" fast="false">
 <listOfProducts>
 <speciesReference metaid="CMD12" species="t2"/>

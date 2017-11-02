@@ -1465,7 +1465,7 @@ let print_comment
         else Loggers.print_breakable_hint logger
       | Loggers.DOTNET ->
         (*print comments *)
-        let () = Loggers.fprintf logger "# %s "
+        let () = Loggers.fprintf logger "# %s"
             (Sbml_backend.string_in_comment string) in
         if breakline then
           Loggers.print_newline logger

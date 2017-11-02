@@ -48,7 +48,7 @@ no correcion is applied on reaction rates
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : B(), B(), B() -> B(), B(), . -->
-<!-- reaction: B() + B() + B() -> B() + B()  -->
+<!-- reaction: B() + B() + B() -> B() + B() -->
 <reaction id="re1" name="B(), B(), B() -> B(), B(), ." reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD11" species="s1" stoichiometry="3"/>
@@ -71,7 +71,7 @@ no correcion is applied on reaction rates
 </kineticLaw>
 </reaction>
 <!-- rule    : A(), A(), A(), B(), B(), ., . -> A(), A(), ., ., ., B(), B() -->
-<!-- reaction: B() + B() + A() + A() + A() -> B() + B() + A() + A()  -->
+<!-- reaction: B() + B() + A() + A() + A() -> B() + B() + A() + A() -->
 <reaction id="re2" name="A(), A(), A(), B(), B(), ., . -> A(), A(), ., ., ., B(), B()" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD13" species="s1" stoichiometry="2"/>
@@ -100,7 +100,7 @@ no correcion is applied on reaction rates
 </kineticLaw>
 </reaction>
 <!-- rule    : A(), A() -> A(), . -->
-<!-- reaction: A() + A() -> A()  -->
+<!-- reaction: A() + A() -> A() -->
 <reaction id="re3" name="A(), A() -> A(), ." reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD17" species="s2" stoichiometry="2"/>

@@ -195,7 +195,7 @@ global stoc
 dydt=zeros(nodevar,1);
 
 % rule    : A(), A(x[.]) -> ., .
-% reaction: A() + A() ->  
+% reaction: A() + A() -> 
 
 dydt(1)=dydt(1)-k(1)*y(1)*y(1);
 dydt(1)=dydt(1)-k(1)*y(1)*y(1);
@@ -228,7 +228,7 @@ global jacstoc
 jac=sparse(nodevar,nodevar);
 
 % rule    : A(), A(x[.]) -> ., .
-% reaction: A() + A() ->  
+% reaction: A() + A() -> 
 
 jac(1,1)=jac(1,1)-k(1)*y(1);
 jac(1,1)=jac(1,1)-k(1)*y(1);

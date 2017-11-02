@@ -2468,9 +2468,9 @@ struct
                  let _ =
                    List.fold_left
                      (fun bool ((alg,_),k) ->
-                      let prefix = if bool then " + " else " | " in
+                      let prefix = if bool then ", " else " | " in
                       let () =
-                        Format.fprintf fmt "%s%a:%a"
+                        Format.fprintf fmt "%s%a %a"
                           prefix
                           (Alg_expr.print
                              (fun fmt mixture ->
@@ -2547,7 +2547,7 @@ struct
                | Loggers.SBML
                | Loggers.Mathematica | Loggers.Maple ->
                  let s = Format.asprintf
-                     "reaction: %a -> %a%a "
+                     "reaction: %a -> %a%a"
                      dump reactants
                      dump products
                      dump_token_list
@@ -2556,7 +2556,7 @@ struct
                  Ode_loggers.print_comment ~breakline logger s
                | Loggers.DOTNET ->
                let s = Format.asprintf
-                   "%a -> %a%a "
+                   "%a -> %a%a"
                    dump
                    reactants
                    dump
@@ -2838,9 +2838,9 @@ struct
                    let _ =
                      List.fold_left
                        (fun bool ((alg,_),k) ->
-                          let prefix = if bool then " + " else " | " in
+                          let prefix = if bool then ", " else " | " in
                           let () =
-                            Format.fprintf fmt "%s%a:%a"
+                            Format.fprintf fmt "%s%a %a"
                               prefix
                               (
                                 Alg_expr.print
@@ -2914,7 +2914,7 @@ struct
                  in
                  let s =
                    Format.asprintf
-                     "reaction: %a -> %a%a "
+                     "reaction: %a -> %a%a"
                      dump
                      reactants
                      dump
