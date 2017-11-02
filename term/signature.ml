@@ -194,28 +194,32 @@ let print_site_internal_state sigs ag_ty site f = function
 let print_counter sigs ag_ty f id =
   match (counter_of_site id (get sigs ag_ty)) with
     None -> ()
-  | Some (c1,c2) -> Format.fprintf f ":%d += %d" c1 c2
+  | Some (c1,c2) -> Format.fprintf f "{=%d/+=%d}" c1 c2
 
 let print_one ?sigs i f sign =
-  let pp_int =
-    NamedDecls.print
-      ~sep:(fun _ -> ())
-      (fun _ na f () -> Format.fprintf f "~%s" na) in
+  let pp_int f x =
+    if NamedDecls.size x > 0 then
+      Format.fprintf f "{%a}"
+        (NamedDecls.print
+           ~sep:Pp.space
+           (fun _ na f () -> Format.fprintf f "%s" na))
+        x in
   let pp_link =
     match sigs with
     | None -> fun _ _ _ -> ()
     | Some sigs -> fun i f -> function
       | None -> ()
       | Some links ->
-        Pp.array Pp.empty
-          (fun ag -> Pp.array Pp.empty
-              (fun si f b -> if b then
-                  Format.fprintf f "!%a.%a"
-                    (print_site sigs (i+ag)) si (print_agent sigs) (i+ag)))
-          f links in
+        Format.fprintf f "[%a]"
+          (Pp.array Pp.space
+             (fun ag -> Pp.array Pp.space
+                 (fun si f b -> if b then
+                     Format.fprintf f "%a.%a"
+                       (print_site sigs (i+ag)) si (print_agent sigs) (i+ag))))
+          links in
   let pp_counts f = function
       None -> ()
-    | Some (c1,c2) -> Format.fprintf f "~:%d,+= %d" c1 c2 in
+    | Some (c1,c2) -> Format.fprintf f "{=%d/+=%d}" c1 c2 in
   (NamedDecls.print
      ~sep:(fun f -> Format.fprintf f ",@,")
      (fun _ name f (ints,links,counts) ->

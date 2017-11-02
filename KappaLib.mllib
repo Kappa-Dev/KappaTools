@@ -44,6 +44,8 @@ Raw_mixture
 Edges
 Navigation
 Matching
+Counters_compiler
+LKappa_compiler
 Snip
 Trace
 Expr_interpreter

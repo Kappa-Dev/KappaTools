@@ -25,7 +25,7 @@ Environment:
   'boucle' A(x[1] y[#/3]), A(x[2] y[1]), A(x{b}[./3] y[2]) @ 1
   
   Signatures:
-    %agent: A(x~a~b,y)
+    %agent: A(x{a b},y)
   Rules:
     0: (ast: 1) 0: /*cc2*/ A/*1*/(x[.]), 1: /*cc3*/ A/*1*/(y[.])
       -- A/*1*//*1*/.y = ⊥, A/*1*//*0*/.x = ⊥

@@ -62,7 +62,7 @@ Environment:
   Signatures:
     %agent: A(x,c)
     %agent: B(x)
-    %agent: C(x1~u~p,x2~u~p)
+    %agent: C(x1{u p},x2{u p})
   Rules:
     0: (ast: 1) 0: /*cc5*/ A/*1*/(x[.]), 1: /*cc6*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
