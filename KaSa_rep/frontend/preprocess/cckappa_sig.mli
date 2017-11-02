@@ -112,6 +112,17 @@ type mixture =
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
 
+val add_agent :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
+  agent ->
+  Ckappa_sig.c_agent_name ->
+  mixture ->
+  Exception.method_handler *
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
+  mixture
+
 val rename_mixture: Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   (Remanent_parameters_sig.parameters ->
@@ -197,7 +208,6 @@ type enriched_init =
   }
 
 val dummy_init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * enriched_init
-
 
 type compil =
   {

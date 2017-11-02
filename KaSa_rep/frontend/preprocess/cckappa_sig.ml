@@ -204,7 +204,11 @@ module Address_map_and_set =
 type agent =
 | Ghost
 | Agent of Ckappa_sig.c_state interval interface proper_agent
-| Dead_agent of Ckappa_sig.c_state interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
+| Dead_agent of
+    Ckappa_sig.c_state interval interface proper_agent *
+    KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type)
+      Ckappa_sig.Site_map_and_set.Map.t  *
+    Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
 (* agent with a site or state that never occur in the rhs or an initial
    state, set of the undefined sites, map of sites with undefined
    internal states, map of sites with undefined binding states*)
@@ -383,17 +387,71 @@ type mixture =
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
 
-let add_agent parameters error kappa_handler agent_type mixture =
-  let agent_id = Ckappa_sig.dummy_agent_id in
+let add_agent_interface parameters error agent =
+  let error', agent_interface =
+    Ckappa_sig.Site_map_and_set.Map.fold
+      (fun key value (error, map) ->
+         Ckappa_sig.Site_map_and_set.Map.add
+           parameters error
+           key value
+           map
+      ) agent.agent_interface
+      (error, Ckappa_sig.Site_map_and_set.Map.empty)
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+      ~message:"this agent interface is already used" Exit
+  in
+  error, agent_interface
+
+let add_agent parameters error agent_id agent agent_type mixture =
   (* you should not use the dummy agent id *)
   (* put the agent_id as an argument of add_agent instead *)
   (* this will be up to the caller to ensure that this is fresh *)
   (* and do not forget to add the agent at the ckappa level as well *)
+  let error', agent =
+    match agent with
+    | Ghost -> error, Ghost
+    | Agent agent ->
+      let error, agent_interface =
+        add_agent_interface parameters error agent
+      in
+      error,
+      Agent
+        {agent with
+         agent_kasim_id = agent_id;
+         agent_name = agent_type;
+         agent_interface = agent_interface
+        }
+    | Dead_agent (agent, inf, props, bonds) ->
+      let error, agent_interface =
+        add_agent_interface parameters error agent in
+      let error, bonds =
+        Ckappa_sig.Site_map_and_set.Map.fold
+          (fun key value (error, map) ->
+             Ckappa_sig.Site_map_and_set.Map.add parameters error
+               key value map
+          ) bonds (error, Ckappa_sig.Site_map_and_set.Map.empty)
+      in
+      error,
+      Dead_agent (
+        {agent with
+         agent_kasim_id = agent_id;
+         agent_name = agent_type;
+         agent_interface = agent_interface
+        }, inf, props, bonds)
+    | Unknown_agent (string, _) ->
+      error, Unknown_agent (string, agent_id)
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+      ~message:"this agent is already used" Exit
+  in
   let error', views =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
       parameters error
       agent_id
-      agent_type
+      agent
       mixture.views
   in
   let error =
@@ -405,6 +463,117 @@ let add_agent parameters error kappa_handler agent_type mixture =
     mixture with
     views = views
   }
+
+let add_site_address parameters error agent_id agent_type site =
+  let error', site_address =
+    error,
+    {
+      agent_index = agent_id;
+      site = site;
+      agent_type = agent_type
+    }
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+      ~message:"this site address is already used" Exit
+  in
+  error, site_address
+
+let add_site_map parameters error site site_address map =
+  (*let error, old_site_map =
+    match
+      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+        parameters error
+        site
+        map
+    with
+    | error, None ->
+      Exception.warn parameters error __POS__ Exit Ckappa_sig.Site_map_and_set.Map.empty
+    | error, Some m -> error, m
+  in*)
+  let error', site_map =
+    Ckappa_sig.Site_map_and_set.Map.add
+      parameters error
+      site
+      site_address
+      map
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+    ~message:"this site map is already used" Exit
+  in
+  error, site_map
+
+let add_bond_to parameters error agent_id agent_type site mixture =
+  let error, site_address =
+    add_site_address parameters error agent_id agent_type site
+  in
+  (*let error, site_map =
+    add_site_map parameters error site site_address
+      Ckappa_sig.Site_map_and_set.Map.empty
+  in*)
+  let error, old_site_map =
+    match
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+        parameters error
+        agent_id
+        mixture.bonds
+    with
+    | error, None ->
+      Exception.warn parameters error __POS__ Exit
+        Ckappa_sig.Site_map_and_set.Map.empty
+    | error, Some m -> error, m
+  in
+  let error, new_site_map =
+    add_site_map parameters error site site_address old_site_map
+  in
+  let error', bonds =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+      parameters error
+      agent_id
+      new_site_map
+      mixture.bonds
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error error' __POS__
+    ~message:"this bonds is already used" Exit
+  in
+  error, agent_id,
+  {
+    mixture with
+    bonds = bonds
+  }
+
+(*let add_state_interv parameters error kappa_handler agent_id site
+    state_min state_max mixture =
+  let error, agent_op =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+      parameters error
+      agent_id
+      mixture.views
+  in
+  match agent with
+  | Ghost ->
+  | Agent agent ->
+    let agent_type = agent.agent_name in
+
+  | Dead_agent (agent, _, _, _ ) ->
+  | Unknown_agent (s, _) ->
+
+
+let add_state parameters error kappa_handler agent_id site state mixture =
+  add_state_interv parameters error kappa_handler agent_id site state
+    state mixture
+
+
+let add_bond_type parameters error kappa_handler
+    agent_id agent_type site agent_type' site' mixture =
+  let error, state_id =
+    Handler.id_of_binding_type parameters error kappa_handler
+      agent_type site agent_type' site'
+  in
+add_state parameters error kappa_handler agent_id site state_id mixture
+*)
 
 
 let join_bonds parameters error bond1 bond2 =
