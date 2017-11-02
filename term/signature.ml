@@ -189,7 +189,7 @@ let print_internal_state sigs ag_ty site f id =
 let print_site_internal_state sigs ag_ty site f = function
   | None -> print_site sigs ag_ty f site
   | Some id ->
-    Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
+    Format.fprintf f "%s{%s}" (site_of_id ag_ty site sigs)
       (internal_state_of_id ag_ty site id sigs)
 let print_counter sigs ag_ty f id =
   match (counter_of_site id (get sigs ag_ty)) with

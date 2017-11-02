@@ -229,13 +229,13 @@ let empty_compil =
         rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link ~syntax_version pr_port pr_type pr_annot f = function
-  | ANY_FREE -> if syntax_version = V3 then Format.fprintf f "?"
-  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" (pr_port a) p pr_type a
-  | LNK_ANY -> Format.fprintf f "?"
-  | LNK_FREE -> if syntax_version = V4 then Format.fprintf f "!."
-  | LNK_SOME -> Format.fprintf f "!_"
-  | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
+let print_link pr_port pr_type pr_annot f = function
+  | ANY_FREE -> Format.pp_print_string f "."
+  | LNK_TYPE (p, a) -> Format.fprintf f "%a.%a" (pr_port a) p pr_type a
+  | LNK_ANY -> Format.pp_print_string f "#"
+  | LNK_FREE -> Format.pp_print_string f "."
+  | LNK_SOME -> Format.pp_print_string f "_"
+  | LNK_VALUE (i,a) -> Format.fprintf f "%i%a" i pr_annot a
 
 let link_to_json port_to_json type_to_json annot_to_json = function
   | ANY_FREE -> `String "ANY_FREE"
@@ -254,39 +254,59 @@ let link_of_json port_of_json type_of_json annot_of_json = function
   | `List (`Int i :: ( [] | _::_::_ as a)) -> LNK_VALUE (i,annot_of_json a)
   | x -> raise (Yojson.Basic.Util.Type_error ("Uncorrect link",x))
 
-let print_ast_link =
-  print_link
-    (fun _ f (x,_) -> Format.pp_print_string f x)
-    (fun f (x,_) -> Format.pp_print_string f x)
-    (fun _ () -> ())
-let print_ast_internal =
-  Pp.list Pp.empty (fun f -> function
-      | Some x,_ -> Format.fprintf f "~%s" x
-      | None, _ -> ())
+let print_ast_link mod_l f l =
+  if l <> [] || mod_l <> None then
+    Format.fprintf f "[%a%a]"
+      (Pp.list Pp.space
+         (fun f (x,_) -> print_link
+             (fun _ f (x,_) -> Format.pp_print_string f x)
+             (fun f (x,_) -> Format.pp_print_string f x)
+             (fun _ () -> ()) f x))
+      l
+      (Pp.option ~with_space:false
+         (fun f x -> Format.fprintf f "/%a"
+             ((fun f -> function
+                 | Some (l,_)-> Format.pp_print_int f l
+                 | None -> Format.pp_print_string f "."))
+             x))
+      mod_l
+
+let print_ast_internal mod_i f l =
+  if l <> [] || mod_i <> None then
+    Format.fprintf f "{%a%a}"
+      (Pp.list Pp.space (fun f -> function
+           | Some x,_ -> Format.pp_print_string f x
+           | None, _ -> Format.pp_print_string f "#"))
+      l
+      (Pp.option ~with_space:false
+         (fun f (i,_) -> Format.fprintf f "/%s" i))
+      mod_i
 
 let print_ast_port f p =
-  let f_mod_i = Pp.option ~with_space:false
-      (fun f (i,_) -> Format.fprintf f "/~%s" i) in
-  let f_mod_l = Pp.option ~with_space:false
-      (fun f x -> Format.fprintf f "/%a"
-          (Pp.option ~with_space:false (fun f (l,_)-> Format.fprintf f "!%i" l))
-          x) in
-  Format.fprintf f "%s%a%a%a%a" (fst p.port_nme)
-    print_ast_internal p.port_int f_mod_i p.port_int_mod
-    (Pp.list Pp.empty (fun f (x,_) -> print_ast_link ~syntax_version:V4 f x))
-    p.port_lnk
-    f_mod_l p.port_lnk_mod
+  Format.fprintf f "%s%a%a" (fst p.port_nme)
+    (print_ast_internal p.port_int_mod) p.port_int
+    (print_ast_link p.port_lnk_mod) p.port_lnk
 
 let print_counter_test f = function
   | CEQ x, _ -> Format.fprintf f "=%i" x
   | CGTE x, _ -> Format.fprintf f ">=%i" x
-  | CVAR x, _ ->  Format.fprintf f ":%s" x
+  | CVAR x, _ ->  Format.fprintf f "=%s" x
+
+let print_counter_delta test f (delta,_) =
+  if delta <> 0 then
+    Format.fprintf f "%a+=%d"
+      (Pp.option ~with_space:false (fun f _ -> Format.pp_print_string f "/"))
+      test
+      delta
+
+let print_counter f c =
+  Format.fprintf f "%s{%a%a}" (fst c.count_nme)
+    (Pp.option ~with_space:false print_counter_test) c.count_test
+    (print_counter_delta c.count_test) c.count_delta
 
 let print_ast_site f = function
   | Port p -> print_ast_port f p
-  | Counter c ->
-    Format.fprintf f "%s%a+=%i" (fst c.count_nme)
-      (Pp.option print_counter_test) c.count_test (fst c.count_delta)
+  | Counter c -> print_counter f c
 
 let string_annot_to_json filenames =
   Locality.annot_to_yojson ~filenames JsonUtil.of_string
@@ -413,10 +433,10 @@ let print_agent_mod f = function
 let print_ast_agent f = function
   | Absent _ -> Format.pp_print_string f "."
   | Present ((ag_na,_),l,m) ->
-    Format.fprintf f "%a%s(%a)"
-      (Pp.option ~with_space:false print_agent_mod) m ag_na
-      (Pp.list (fun f -> Format.fprintf f ",")
-         print_ast_site) l
+    Format.fprintf f "%s(%a)%a"
+      ag_na
+      (Pp.list (fun f -> Format.fprintf f " ") print_ast_site) l
+      (Pp.option ~with_space:false print_agent_mod) m
 
 let agent_mod_to_yojson = function
   | Create -> `String "created"

@@ -230,8 +230,7 @@ let initial_inputs conf env contact_map init ~filename =
               else
                 Format.fprintf f "@[<h>%%init: %a %a@]"
                   (Kappa_printer.alg_expr ~env) n
-                  (Raw_mixture.print
-                     ~explicit_free:true ~compact:false ~created:false ~sigs)
+                  (Raw_mixture.print ~created:false ~sigs)
                   (List.map snd ins_fresh))) init in
   inputsDesc := Some inputs
 

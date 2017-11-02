@@ -386,28 +386,28 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
 let remove_counter_agent sigs ag lnk_nb =
   let (incrs,lnk_nb') =
     Tools.array_fold_lefti
-    (fun id (acc_incrs,lnk_nb) (counter,_) ->
-      let (s,pos) = counter.Ast.count_nme in
-      if (s = "") then (acc_incrs,lnk_nb)
-      else
-        match (counter.Ast.count_test,counter.Ast.count_delta) with
-        | (None,_) ->
-           raise (ExceptionDefn.Internal_Error
-                    ("Counter "^s^" should have a test by now",pos))
-        | (Some (test,pos')), delta ->
-           match test with
-           | Ast.CEQ j ->
+      (fun id (acc_incrs,lnk_nb) -> function
+         | None -> (acc_incrs,lnk_nb)
+         | Some (counter,_) ->
+           let (s,pos) = counter.Ast.count_nme in
+           match (counter.Ast.count_test,counter.Ast.count_delta) with
+           | (None,_) ->
+             raise (ExceptionDefn.Internal_Error
+                      ("Counter "^s^" should have a test by now",pos))
+           | (Some (test,pos')), delta ->
+             match test with
+             | Ast.CEQ j ->
               (counter_becomes_port
                  sigs ag.LKappa.ra id delta pos true j lnk_nb)::acc_incrs,
               lnk_nb+1+j+(fst delta)
-           | Ast.CGTE j ->
-              (counter_becomes_port
-                 sigs ag.LKappa.ra id delta pos false j lnk_nb)::acc_incrs,
-              lnk_nb+1+j+(fst delta)
-           | Ast.CVAR _ ->
-              raise (ExceptionDefn.Internal_Error
-                       ("Counter "^s^" should not have a var by now",pos')))
-    ([],lnk_nb) ag.LKappa.ra_counters in
+             | Ast.CGTE j ->
+               (counter_becomes_port
+                  sigs ag.LKappa.ra id delta pos false j lnk_nb)::acc_incrs,
+               lnk_nb+1+j+(fst delta)
+             | Ast.CVAR _ ->
+               raise (ExceptionDefn.Internal_Error
+                        ("Counter "^s^" should not have a var by now",pos')))
+      ([],lnk_nb) ag.LKappa.ra_counters in
   let (als,bls) =
     List.fold_left (fun (als,bls) (a,b) -> a@als,b@bls) ([],[]) incrs in
   (als,bls,lnk_nb')
@@ -419,28 +419,27 @@ let remove_counter_created_agent sigs ag lnk_nb =
     Signature.print_agent sigs (Format.str_formatter) raw_ag.Raw_mixture.a_type in
   let agent_name = Format.flush_str_formatter () in
   Tools.array_fold_lefti
-    (fun p_id (acc,lnk) (c,_) ->
-      let (s,_) = c.Ast.count_nme in
-      if (s = "") then (acc,lnk)
-      else
-      match c.Ast.count_test with
-        | None -> LKappa.not_enough_specified
-                    ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
-      | Some (test,_) ->
+    (fun p_id (acc,lnk) -> function
+       | None -> (acc,lnk)
+       | Some (c,_) ->
+         match c.Ast.count_test with
+         | None -> LKappa.not_enough_specified
+                     ~status:"counter" ~side:"left" agent_name c.Ast.count_nme
+         | Some (test,_) ->
          match test with
-         | Ast.CEQ j ->
-            let p = Raw_mixture.VAL lnk in
-            let () = ports.(p_id) <- p in
-            let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
-            (acc@incrs,(lnk+j+1))
-         | Ast.CGTE _ | Ast.CVAR _ ->
-           LKappa.not_enough_specified
-             ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
+           | Ast.CEQ j ->
+             let p = Raw_mixture.VAL lnk in
+             let () = ports.(p_id) <- p in
+             let incrs = add_incr 0 lnk (lnk+j) (j+1) true sigs in
+             (acc@incrs,(lnk+j+1))
+           | Ast.CGTE _ | Ast.CVAR _ ->
+             LKappa.not_enough_specified
+               ~status:"counter" ~side:"left" agent_name c.Ast.count_nme)
     ([],lnk_nb) ag.LKappa.ra_counters
 
 let raw_agent_with_counters ag =
   Array.fold_left
-    (fun ok (c,_) -> not(fst(c.Ast.count_nme) = "")||ok)
+    (fun ok x -> x<>None||ok)
     false ag.LKappa.ra_counters
 
 let agent_with_counters ag sigs =
@@ -544,10 +543,6 @@ let counters_perturbations sigs ast_sigs =
            acc sites)
     [] ast_sigs
 
-let empty_counter =
-  {Ast.count_nme = ("",Locality.dummy);
-   count_test = None; count_delta =(0,Locality.dummy)}
-
 let make_counter i name =
   {Ast.count_nme = (name,Locality.dummy);
    count_test = Some (Ast.CEQ i,Locality.dummy); count_delta =(0,Locality.dummy)}
@@ -557,7 +552,7 @@ let add_counter_to_contact_map sigs add_link_contact_map =
   add_link_contact_map incr_id incr_a incr_id incr_b
 
 let annotate_dropped_counters sign counts ra arity agent_name aux =
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity None in
   let _ =
     List.fold_left
       (fun pset c ->
@@ -567,7 +562,7 @@ let annotate_dropped_counters sign counts ra arity agent_name aux =
         let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
         let () = match aux with | Some f -> f p_id | None -> () in
-        let () = ra_counters.(p_id) <- c,LKappa.Erased in pset')
+        let () = ra_counters.(p_id) <- Some (c,LKappa.Erased) in pset')
       Mods.IntSet.empty counts in
   {LKappa.ra; ra_counters;}
 
@@ -576,7 +571,7 @@ let annotate_edit_counters
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity None in
   let register_counter_modif c_id =
     let (incr_id,_,incr_b,_) = incr_agent sigs in
     add_link_contact_map ag_id c_id incr_id incr_b in
@@ -589,7 +584,7 @@ let annotate_edit_counters
         let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
         let () = register_counter_modif p_id in
-        let () = ra_counters.(p_id) <- c,LKappa.Maintained in pset')
+        let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in pset')
       Mods.IntSet.empty counts in
   {LKappa.ra; ra_counters;}
 
@@ -602,7 +597,7 @@ let annotate_counters_with_diff
     let (incr_id,_,incr_b,_) = incr_agent sigs in
     let () = add_link_contact_map ag_id c_id incr_id incr_b in
     (c, LKappa.Maintained) in
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity None in
   let rc_r,_ =
     List.fold_left
       (fun (rc,cset) c ->
@@ -618,7 +613,7 @@ let annotate_counters_with_diff
           match c' with
           | _::[] | [] -> register_counter_modif c c_id
           | _ :: _ -> LKappa.several_occurence_of_site agent_name c_na in
-        let () = ra_counters.(c_id) <- c'' in
+        let () = ra_counters.(c_id) <- Some c'' in
         (rc',cset')) (rc,Mods.IntSet.empty) lc in
   let _ = (* test if counter of rhs is in the signature *)
     List.map
@@ -635,7 +630,7 @@ let annotate_created_counters
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ra_counters = Array.make arity (empty_counter, LKappa.Maintained) in
+  let ra_counters = Array.make arity None in
 
     (* register all counters (specified or not) with min value *)
     let () =
@@ -649,16 +644,18 @@ let annotate_created_counters
                  let c =
                    List.find
                      (fun c' ->
-                       (String.compare (fst c'.Ast.count_nme) c_name) = 0) counts in
+                        (String.compare (fst c'.Ast.count_nme) c_name) = 0) counts in
                  ra_counters.(p_id) <-
-                   {Ast.count_nme = c.Ast.count_nme;
-                    Ast.count_test = c.Ast.count_test;
-                    Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained
+                   Some
+                     ({Ast.count_nme = c.Ast.count_nme;
+                       Ast.count_test = c.Ast.count_test;
+                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained)
                with Not_found ->
-                    ra_counters.(p_id) <-
-                      {Ast.count_nme = (c_name,Locality.dummy);
+                 ra_counters.(p_id) <-
+                   Some
+                     ({Ast.count_nme = (c_name,Locality.dummy);
                        Ast.count_test = Some (Ast.CEQ min,Locality.dummy);
-                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained
+                       Ast.count_delta = (0,Locality.dummy)},LKappa.Maintained)
              end
           | None -> ()) ra_counters in
 
@@ -674,7 +671,7 @@ let annotate_created_counters
           let () = if pset == pset' then
                      LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
           let () = register_counter_modif p_id in
-          let () = ra_counters.(p_id) <- c,LKappa.Maintained in
+          let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in
           pset') Mods.IntSet.empty counts in
     {LKappa.ra;ra_counters;}
 

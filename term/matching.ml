@@ -107,7 +107,7 @@ module Cache = struct
     else c
   let print f (a,a') =
     Format.fprintf f "%a%a"
-      (Pattern.print ~new_syntax:true ?domain:None ~with_id:true) a
+      (Pattern.print ?domain:None ~with_id:true) a
       (Pp.option (Pp.pair Format.pp_print_int Format.pp_print_int)) a'
 end
 module CacheSetMap = SetMap.Make(Cache)

@@ -185,11 +185,11 @@ val implicit_signature : parsing_compil -> parsing_compil
 (** {6 Printers} *)
 
 val print_link :
-  syntax_version:syntax_version ->
   ('a -> Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ('a, 'b) link -> unit
+val print_counter : Format.formatter -> counter -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
 val print_rule_content :

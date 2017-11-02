@@ -17,8 +17,7 @@ let cc_mix ?env =
          (fun f -> Format.fprintf f "*")
          (fun _ f cc ->
             Format.fprintf
-              f "|%a|"
-              (Pattern.print ~new_syntax:true ?domain ~with_id:false) cc) f ccs)
+              f "|%a|" (Pattern.print ?domain ~with_id:false) cc) f ccs)
 
 let alg_expr ?env =
   Alg_expr.print (cc_mix ?env) (Model.print_token ?env) (Model.print_alg ?env)
@@ -29,11 +28,15 @@ let bool_expr ?env =
     (fun f i -> Format.fprintf f "|%a|" (Model.print_token ?env) i)
     (Model.print_alg ?env)
 
-let print_expr ?env f e =
+let print_expr ?env f =
   let aux f = function
     | Primitives.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
     | Primitives.Alg_pexpr (alg,_) -> alg_expr ?env f alg
-  in Pp.list (fun f -> Format.fprintf f ".") aux f e
+  in function
+    | [] -> ()
+    | [ Primitives.Str_pexpr (str,_) ] -> Format.fprintf f "\"%s\"" str
+    | ([ Primitives.Alg_pexpr  _ ] | _::_::_) as e ->
+      Format.fprintf f "(%a)" (Pp.list (fun f -> Format.fprintf f ".") aux) e
 
 let print_expr_val alg_val f e =
   let aux f = function
@@ -57,7 +60,7 @@ let elementary_rule ?env f r =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
-    let () = Pattern.print ~new_syntax:true ?domain ~with_id:true f cc in
+    let () = Pattern.print ?domain ~with_id:true f cc in
     Format.pp_close_box f ()
   in
   let ins_fresh,ins_mixte,ins_existing =
@@ -73,11 +76,11 @@ let elementary_rule ?env f r =
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (if r.Primitives.connected_components <> [||] && ins_fresh <> []
      then Pp.comma else Pp.empty)
-    (Raw_mixture.print ~explicit_free:true ~compact:true ~created:true ?sigs)
+    (Raw_mixture.print ~created:true ?sigs)
     (List.map snd ins_fresh)
     (if r.Primitives.delta_tokens <> []
      then (fun f -> Format.fprintf f "|@ ") else Pp.empty)
-    (Pp.list (fun f -> Format.fprintf f "@ + ") pr_tok)
+    (Pp.list Pp.comma pr_tok)
     r.Primitives.delta_tokens
 
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
@@ -102,8 +105,11 @@ let modification ?env f m =
     | Some e -> Some (Model.domain e) in
   match m with
   | Primitives.PRINT (nme,va) ->
-    Format.fprintf f "$PRINTF %a <%a>"
-      (print_expr ?env) nme (print_expr ?env) va
+    if nme <> [] then
+      Format.fprintf f "$PRINTF %a > %a"
+        (print_expr ?env) va (print_expr ?env) nme
+    else
+      Format.fprintf f "$PRINTF %a" (print_expr ?env) va
   | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
   | Primitives.ITER_RULE ((n,_),rule) ->
     if rule.Primitives.inserted = [] then
@@ -117,7 +123,7 @@ let modification ?env f m =
         | _ -> assert false
       else
         let boxed_cc _ =
-          Pattern.print ~new_syntax:true ?domain ~with_id:false in
+          Pattern.print ?domain ~with_id:false in
         Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
           (Pp.array Pp.comma boxed_cc)
           rule.Primitives.connected_components
@@ -134,8 +140,7 @@ let modification ?env f m =
               sigs rule.Primitives.inserted in
           if ins_existing = [] then
             Format.fprintf f "$ADD %a %a" (alg_expr ~env) n
-              (Raw_mixture.print
-                 ~explicit_free:false ~compact:false ~created:false ~sigs)
+              (Raw_mixture.print ~created:false ~sigs)
               (List.map snd ins_fresh)
           else
             Format.fprintf f "$APPLY %a %a" (alg_expr ~env) n
@@ -162,20 +167,20 @@ let modification ?env f m =
       f "$TRACK @[%a@] [true]"
       (Pp.array
          Pp.comma
-         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
+         (fun _ -> Pattern.print ?domain ~with_id:false)) cc
   | Primitives.CFLOWOFF (_,cc) ->
     Format.fprintf
       f "$TRACK %a [false]"
       (Pp.array
          Pp.comma
-         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
+         (fun _ -> Pattern.print ?domain ~with_id:false)) cc
   | Primitives.SPECIES (fn,cc,_) ->
     Format.fprintf
       f "$SPECIES_OF %a @[%a@] [true]"
       (print_expr ?env) fn
       (Pp.array
          Pp.comma
-         (fun _ -> Pattern.print ~new_syntax:true ?domain ~with_id:false)) cc
+         (fun _ -> Pattern.print ?domain ~with_id:false)) cc
   | Primitives.SPECIES_OFF fn ->
     Format.fprintf
       f "$SPECIES_OFF %a [false]"
@@ -187,15 +192,11 @@ let perturbation ?env f pert =
     | None -> ()
     | Some n -> Format.fprintf f "alarm %a " Nbr.print n
   in
-  let aux f =
-    Format.fprintf
-      f "%t%a do %a"
-      aux_alarm
-      (bool_expr ?env) (fst pert.Primitives.precondition)
-      (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
-  in
-  Format.fprintf f "%%mod: %t repeat (%a)"
-                 aux (bool_expr ?env) (fst pert.Primitives.repeat)
+  Format.fprintf f "%%mod: %t%a do %a repeat %a"
+    aux_alarm
+    (bool_expr ?env) (fst pert.Primitives.precondition)
+    (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
+    (bool_expr ?env) (fst pert.Primitives.repeat)
 
 let env f env =
   Model.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)

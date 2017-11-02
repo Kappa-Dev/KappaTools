@@ -56,7 +56,7 @@ val print_rule_mixture :
 type 'a rule_agent_counters =
   {
     ra : 'a;
-    ra_counters : (Ast.counter * switching) array;
+    ra_counters : (Ast.counter * switching) option array;
   }
 
 type rule =

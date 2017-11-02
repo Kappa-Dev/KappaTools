@@ -415,10 +415,10 @@ let rec counter_value nodes (nid,sid) count =
 let dotcomma dotnet =
   if dotnet
   then (fun fmt -> Format.fprintf fmt ",")
-  else  Pp.comma
+  else  Pp.space
 let print_cc
     ?dotnet:(dotnet=false)
-    ?full_species:(full_species=false) ~new_syntax ?sigs ?cc_id ~with_id f cc =
+    ?full_species:(full_species=false) ?sigs ?cc_id ~with_id f cc =
   let print_intf (ag_i, _ as ag) link_ids neigh =
     snd
       (Tools.array_fold_lefti
@@ -430,8 +430,7 @@ let print_cc
                   (if not_empty then dotcomma dotnet
                    else Pp.empty)
                   (Agent.print_internal ?sigs ag p) st
-              else
-              if  el <> UnSpec then
+              else if  el <> UnSpec then
                 Format.fprintf
                   f "%t%a"
                   (if not_empty then dotcomma dotnet
@@ -440,18 +439,18 @@ let print_cc
             match el with
             | UnSpec ->
               if st >= 0 then
-                let () = if not new_syntax && not full_species then Format.fprintf f "?" in
+                let () = if full_species then Format.pp_print_string f "[.]" in
                 (true,out)
               else (not_empty,out)
             | Free ->
-              let () = if new_syntax then Format.fprintf f "!." in
+              let () = Format.pp_print_string f "[.]" in
               (true,out)
             | Link (dst_a,dst_p) ->
               let dst_ty = find_ty cc dst_a in
               if (Signature.is_counter dst_ty sigs)
                  &&not(!Parameter.debugModeOn) then
                 let counter = counter_value cc.nodes (dst_a,dst_p) 0 in
-                let () = Format.fprintf f ":%d" counter in
+                let () = Format.fprintf f "{=%d}" counter in
                 true,out
               else
               let i,out' =
@@ -463,7 +462,7 @@ let print_cc
                   (free, (succ free,
                           Mods.Int2Map.add (ag_i,p) free link_ids))
               in
-              let () = Format.fprintf f "!%i" i in
+              let () = Format.fprintf f "[%i]" i in
               true, out')
          (false, link_ids) neigh)
   in
@@ -819,7 +818,7 @@ end = struct
     let pp_point p_id f p =
       Format.fprintf
         f "@[<hov 2>@[<h>%a@]@ %t-> @[(%a)@]@]"
-        (fun x -> print_cc  ~new_syntax:true ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
+        (fun x -> print_cc ~sigs:env.sig_decl ~cc_id:p_id ~with_id:true x)
         p.content
         (fun f -> if p.roots <> None then
             Format.fprintf
@@ -986,12 +985,12 @@ end = struct
 
 end
 
-let print ~new_syntax ?domain ~with_id f id =
+let print ?domain ~with_id f id =
   match domain with
   | None -> Format.pp_print_int f id
   | Some env ->
     let cc_id = if with_id then Some id else None in
-    print_cc ~new_syntax ~sigs:(Env.signatures env) ?cc_id ~with_id
+    print_cc ~sigs:(Env.signatures env) ?cc_id ~with_id
       f env.Env.domain.(id).Env.content
 
 let embeddings_to_fully_specified domain a_id b =

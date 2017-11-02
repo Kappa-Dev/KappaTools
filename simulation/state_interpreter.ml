@@ -111,8 +111,7 @@ let do_modification ~outputs env counter graph state extra modification =
         let domain = Model.domain env in
         Format.asprintf
           "@[<h>%a@]"
-          (Pp.array Pp.comma
-             (fun _ -> Pattern.print ~new_syntax:true ~domain ~with_id:false))
+          (Pp.array Pp.comma (fun _ -> Pattern.print ~domain ~with_id:false))
           cc in
     ((false,
       Rule_interpreter.add_tracked cc name tests graph,

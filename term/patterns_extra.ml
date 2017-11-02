@@ -68,11 +68,9 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
         __POS__
         ?parameters
         (fun fmt ->
-           Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
-             ~sigs fmt mix)
+           Raw_mixture.print ~created:false ~sigs fmt mix)
         (fun fmt ->
-           Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
-             fmt mix)
+           Raw_mixture.print ~created:false fmt mix)
   in
   let unspec =
     List.fold_left
@@ -130,9 +128,8 @@ let raw_mixture_to_species ?parameters ?sigs preenv mix unspec =
       let () = trace_print ?parameters "OUTPUT:" in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt ->
-            Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt b )
-          (fun fmt -> Pattern.print_cc ~new_syntax:true ~with_id:false fmt b)
+          (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt b)
+          (fun fmt -> Pattern.print_cc ~with_id:false fmt b)
       in ()
   in (a, b, c)
 
@@ -216,12 +213,12 @@ let mixture_to_pattern ?parameters ?sigs preenv mix unspec =
     | None -> ()
     | Some sigs ->
       let () = trace_print ?parameters "OUTPUT:" in
-      let () = if !Parameter.debugModeOn then let _ = Pattern.id_to_yojson c in () in
+      let () =
+        if !Parameter.debugModeOn then let _ = Pattern.id_to_yojson c in () in
       let () =
         safe_print_str __POS__ ?parameters
-          (fun fmt ->
-             Pattern.print_cc ~new_syntax:true ~sigs ~with_id:true fmt b )
-          (fun fmt -> Pattern.print_cc ~new_syntax:true ~with_id:true fmt b)
+          (fun fmt -> Pattern.print_cc ~sigs ~with_id:true fmt b)
+          (fun fmt -> Pattern.print_cc ~with_id:true fmt b)
       in ()
   in (a, b, c)
 
@@ -345,10 +342,8 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
     let () =
       safe_print_str
         __POS__ ?parameters
-        (fun fmt ->
-          Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
-        (fun fmt ->
-          Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
+        (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt pattern)
+        (fun fmt -> Pattern.print_cc ~with_id:false fmt pattern)
       in ()
   in
   let _agent_list, site_list, agent_type_map, bond_map =
@@ -460,12 +455,8 @@ let species_to_raw_mixture ?parameters ~sigs pattern =
       let () =
         safe_print_str
           __POS__ ?parameters
-          (fun fmt ->
-             Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
-               ~sigs fmt output)
-          (fun fmt ->
-             Raw_mixture.print ~explicit_free:false ~compact:false ~created:false
-               fmt output)
+          (fun fmt -> Raw_mixture.print ~created:false ~sigs fmt output)
+          (fun fmt -> Raw_mixture.print ~created:false fmt output)
       in
       Some (output, unspec)
     end
@@ -476,10 +467,8 @@ let pattern_to_mixture ?parameters ~sigs pattern =
   let () =
     safe_print_str
         __POS__ ?parameters
-        (fun fmt ->
-           Pattern.print_cc ~new_syntax:true ~sigs ~with_id:false fmt pattern)
-        (fun fmt ->
-           Pattern.print_cc ~new_syntax:true ~with_id:false fmt pattern)
+        (fun fmt -> Pattern.print_cc ~sigs ~with_id:false fmt pattern)
+        (fun fmt -> Pattern.print_cc ~with_id:false fmt pattern)
   in
   let _agent_list, site_list, agent_type_map, bond_map =
     parse pattern

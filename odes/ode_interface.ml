@@ -163,7 +163,6 @@ let print_chemical_species ?dotnet ?compil f =
     (Pattern.print_cc
        ?dotnet
        ?full_species:(Some true)
-       ~new_syntax:false
        ?sigs:(Option_util.map Model.signatures (environment_opt compil))
        ?cc_id:None ~with_id:false)
 
@@ -181,7 +180,7 @@ let nbr_automorphisms_in_chemical_species x =
 let compare_connected_component = Pattern.compare_canonicals
 
 let print_connected_component ?compil =
-  Pattern.print ~new_syntax:false ?domain:(domain_opt compil) ~with_id:false
+  Pattern.print ?domain:(domain_opt compil) ~with_id:false
 
 let canonic_form x = x
 
@@ -288,7 +287,7 @@ let add_fully_specified_to_graph sigs graph cc =
 let find_embeddings compil =
   Pattern.embeddings_to_fully_specified (domain compil)
 
-let f ren acc (i,cc) em =
+let f ren acc (i,_cc) em =
   List_util.map_flatten
     (fun m ->
        List_util.map_option

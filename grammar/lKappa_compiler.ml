@@ -1332,7 +1332,7 @@ let of_user_graph sigs g =
            Array.make
              ar (Locality.dummy_annot Ast.LNK_FREE, LKappa.Maintained) in
          let ra_counters =
-           Array.make ar (Counters_compiler.empty_counter, LKappa.Maintained) in
+           Array.make ar None in
          let ra_ints = Array.make ar LKappa.I_ANY in
          let pack' =
            Tools.array_fold_lefti
@@ -1341,8 +1341,9 @@ let of_user_graph sigs g =
                | User_graph.Counter i ->
                   let () =
                     ra_counters.(id) <-
-                      (Counters_compiler.make_counter i (si.User_graph.site_name),
-                       LKappa.Maintained) in
+                      Some
+                        (Counters_compiler.make_counter i (si.User_graph.site_name),
+                         LKappa.Maintained) in
                   pack
                | User_graph.Port p ->
                   let () = match p.User_graph.port_states with

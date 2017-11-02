@@ -28,10 +28,9 @@ struct
   type t = int * ((int, unit) Ast.link)
   let compare = compare
   let print log (a,b) =
-    Format.fprintf log "%i:%a" a
+    Format.fprintf log "%i:[%a]" a
       (fun log  ->
          Ast.print_link
-           ~syntax_version:Ast.V4
            (fun _ f x -> Format.pp_print_int f x)
            (fun f x -> Format.pp_print_int f x)
            (fun _ () -> ()) log)

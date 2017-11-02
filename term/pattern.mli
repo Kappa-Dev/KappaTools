@@ -121,12 +121,11 @@ val is_equal_canonicals : id -> id -> bool
 
 val print_cc :
   ?dotnet:bool -> ?full_species:bool ->
-  new_syntax:bool -> ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
+  ?sigs:Signature.s -> ?cc_id:id -> with_id:bool ->
   Format.formatter -> t -> unit
 
 val print :
-  new_syntax:bool -> ?domain:Env.t -> with_id:bool ->
-  Format.formatter -> id -> unit
+  ?domain:Env.t -> with_id:bool -> Format.formatter -> id -> unit
 (** [print ~domain ?with_id:None form cc] *)
 
 val id_to_yojson : id -> Yojson.Basic.json

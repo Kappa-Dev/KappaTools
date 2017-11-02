@@ -458,9 +458,7 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
                            "initial mixture %a is partially defined"
-                           (Raw_mixture.print
-                              ~explicit_free:true
-                              ~compact:true ~created:true ~sigs) raw_mix,
+                           (Raw_mixture.print ~created:true ~sigs) raw_mix,
                          mix_pos)) in
            preenv'',state'
          | INIT_TOK tk_id,pos_tk ->

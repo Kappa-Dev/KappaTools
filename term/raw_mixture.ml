@@ -67,35 +67,32 @@ let counters_chain_length mix i limit =
   if ag_ty = -1 then None else
     Some (counter_value mix i ~limit (ag_ty,pid) 0)
 
-let print_link ~explicit_free mix sigs ag_ty f = function
-  | FREE -> if explicit_free then Format.pp_print_string f "!."
+let print_link mix sigs ag_ty f = function
+  | FREE -> Format.pp_print_string f "[.]"
   | VAL i ->
      let (dst_ag,dst_port) = find_ag_with_link mix i ag_ty in
      if not(dst_ag = -1) && (Signature.is_counter dst_ag sigs) &&
           not(!Parameter.debugModeOn) then
        let counter = counter_value mix i (dst_ag,dst_port) 0 in
-       Format.fprintf f ":%d" counter
-     else Format.fprintf f "!%i" i
+       Format.fprintf f "{=%d}" counter
+     else Format.fprintf f "[%i]" i
 
 let aux_pp_si sigs a s f i =
   match sigs with
   | Some sigs -> Signature.print_site_internal_state sigs a s f i
   | None ->
     match i with
-    | Some i -> Format.fprintf f "%i~%i" s i
+    | Some i -> Format.fprintf f "%i{%i}" s i
     | None -> Format.pp_print_int f s
 
-let print_intf ~explicit_free compact with_link ?sigs mix ag_ty f (ports,ints) =
+let print_intf with_link ?sigs mix ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
           f "%t%a%a"
-          (if empty then Pp.empty
-           else if compact then Pp.compact_comma else Pp.comma)
-          (aux_pp_si sigs ag_ty i)
-          ints.(i)
-          (if with_link then print_link ~explicit_free mix sigs ag_ty
-           else (fun _ _ -> ()))
+          (if empty then Pp.empty else Pp.space)
+          (aux_pp_si sigs ag_ty i) ints.(i)
+          (if with_link then print_link mix sigs ag_ty else (fun _ _ -> ()))
           ports.(i) in
       aux false (succ i) in
   aux true 0
@@ -105,20 +102,19 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent ~explicit_free compact created link ?sigs mix f ag =
-  Format.fprintf f "%t%a(@[<h>%a@])"
-      (fun f -> if created then Format.pp_print_string f "+")
+let print_agent created link ?sigs mix f ag =
+  Format.fprintf f "%a(@[<h>%a@])%t"
       (aux_pp_ag sigs) ag.a_type
-      (print_intf ~explicit_free compact link ?sigs mix ag.a_type)
-      (ag.a_ports, ag.a_ints)
+      (print_intf link ?sigs mix ag.a_type) (ag.a_ports, ag.a_ints)
+      (fun f -> if created then Format.pp_print_string f "+")
 
-let print ~explicit_free ~compact ~created ?sigs f mix =
+let print ~created ?sigs f mix =
   let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
       (fun ag -> not(Signature.is_counter ag.a_type sigs)) mix in
   Pp.list
     Pp.comma
-    (print_agent ~explicit_free compact created true ?sigs mix)
+    (print_agent created true ?sigs mix)
     f mix_without_counters
 
 let agent_to_json a =

@@ -77,18 +77,18 @@ let extend f = function
 let rec print sigs find_ty f = function
   | [] -> ()
   | ((source,site), ToNothing) :: t ->
-    Format.fprintf f "-%a_%a-%t->%a" (print_id sigs) source
-      (print_id_site sigs find_ty source) site Pp.bottom
+    Format.fprintf f "-%a(%a[.])->%a" (print_id sigs) source
+      (print_id_site sigs find_ty source) site
       (print sigs (extend find_ty source)) t
   | ((source,site), ToNode (id,port)) :: t ->
-    Format.fprintf f "-%a_%a-%a_%a->%a" (print_id sigs) source
+    Format.fprintf f "-%a(%a[%a.%a])->%a" (print_id sigs) source
       (print_id_site sigs find_ty source) site
-      (print_id sigs) id
       (print_id_site ~source sigs find_ty id) port
+      (print_id sigs) id
       (print sigs (extend (extend find_ty id) source)) t
   | ((source,site), ToInternal i) :: t ->
     Format.fprintf
-      f "-%a_%a->%a" (print_id sigs) source
+      f "-%a(%a)->%a" (print_id sigs) source
       (print_id_internal_state sigs find_ty source site) (Some i)
       (print sigs (extend find_ty source)) t
 
