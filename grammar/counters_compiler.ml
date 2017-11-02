@@ -74,24 +74,34 @@ let prepare_counters rules =
     List.iter
       (function Ast.Port _ -> ()
               | Ast.Counter c ->
-                 if (f c) then
-                   raise (ExceptionDefn.Malformed_Decl
-                            ("Counter "^(fst c.Ast.count_nme)^error,
-                             (snd c.Ast.count_nme)))) sites in
+                if (f c) then
+                  raise (ExceptionDefn.Malformed_Decl
+                           ("Counter "^(fst c.Ast.count_nme)^error,
+                            (snd c.Ast.count_nme)))) sites in
 
   let rec fold rhs lhs = match rhs,lhs with
-    | Ast.Present (rna,rsites,_)::r, (Ast.Present (lna,lsites,b) as lagent)::l->
+    | Ast.Present (rna,rsites,_)::r, Ast.Present (lna,lsites,b)::l->
       let () = syntax lsites (fun c -> not((fst c.Ast.count_delta)=0))
           " has a modif in the lhs";
         syntax rsites (fun c -> not(c.Ast.count_test=None))
           " has a test in the rhs" in
-      if ((String.compare (fst rna) (fst lna)) = 0) then
+      if String.compare (fst rna) (fst lna) = 0 then
         let lsites' = prepare_agent rsites lsites in
         Ast.Present (lna,lsites',b)::(fold r l)
-      else lagent::(fold r l) (*what does this subcase mean?*)
-    | _::r, Ast.Absent _::l -> (*delete agent*) fold r l
-    | Ast.Absent _::r, _::l -> (*created agent*) fold r l
-    | [], _ | _, [] -> [] in
+      else lhs (*TODO we stop our job here. LKappa_compiler will detect
+                 later that there is a problem *)
+    | _::r, (Ast.Absent _ as lagent)::l ->
+      (*created agent*)
+      (* TODO Maybe some syntax check on rhs are necessary here *)
+      lagent::fold r l
+    | Ast.Absent _::r, (Ast.Present (_,lsites,_) as lagent)::l ->
+      (*deleted  agent*)
+      let () = syntax lsites (fun c -> not((fst c.Ast.count_delta)=0))
+          " has a modif in the lhs" in
+      lagent::fold r l
+    | [], x -> x (* TODO x must be [] but it is for now LKappa_compiler
+                    duty to complain *)
+    | _x, [] -> (*TODO let () = assert (_x = []) in*) [] in
 
   let aux r = match r.Ast.rewrite with
     | Ast.Edit _ -> r
