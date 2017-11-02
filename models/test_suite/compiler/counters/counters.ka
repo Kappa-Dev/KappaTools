@@ -1,39 +1,40 @@
-%agent:	A(x~u~p,c:0 +=3,d:1 +=2)
-%agent:	B(x,c:0 +=3)
+%agent:	A(x{u,p},c{=0 / +=3},d{=1 / +=2})
+%agent:	B(x,c{=0 / +=3})
 
-%init:	10	A(x~u,c:0,d:1)
-%init:	10	B(x,c:0)
+%init:	10	A(x{u}[.],c{=0},d{=1})
+%init:	10	B(x[.],c{=0})
 
-'r1' A(x), B(x) -> A(x!1), B(x!1) @ 1
 
-#update rates
-'r2' A(x,c:y,d:y1),B(x,c:y2) -> A(x!1), B(x!1) @ (|y2|+|y1|+|y|) * 0.1
+'r1' A(x[.]), B(x[.]) -> A(x[1]), B(x[1]) @ 1
 
-#unfolding of no test in lhs
-'r3' A(x~u) -> A(x~p,c +=2) @ 1
+//update rates
+'r2' A(x[.],c{=y},d{=y1}),B(x[.],c{=y2}) -> A(x[1]), B(x[1]) @ (|y2|+|y1|+|y|) * 0.1
 
-#unfolding negative modif
-'r4' A(x~u) -> A(x~p, c +=-2) @ 0.1
-'r2' A(x!1), B(x!1) -> A(x,c += -1), B(x, c += -1) @ 1
+//unfolding of no test in lhs
+'r3' A(x{u}[.]) -> A(x{p}[.],c{+=2}) @ 1
 
-#unfolding rule with test and modif
-'r5' A(x~u,c:3) -> A(x~p,c +=-1) @ 1
-'r6' A(x!1,c:1), B(x!1) -> A(x,c +=3), B(x) @ 1
-'r7' A(x!1,c:1), B(x!1,c:2) -> A(x,c +=3), B(x,c +=2) @ 1
-'r8' A(x!1,c:1,d:2), B(x!1) -> A(x,c +=3,d +=2), B(x) @ 1
-'r9' A(x~u,c:>1) -> A(x~p,c +=2) @ 1
+//unfolding negative modif
+'r4' A(x{u}[.]) -> A(x{p}[.], c{-= 2}) @ 0.1
+'r2' A(x[1]), B(x[1]) -> A(x[.],c{-= 1}), B(x[.], c{-= 1}) @ 1
 
-#create agents with counters
-'r10' A(x~u) -> A(x~u),A(x~u,c:0,d:2) @ 1
-'r11' -> A(x~u,c:1,d:2) @ 1
-'r12' A(x!1,c:3), B(x!1) -> A(x, c +=-2), B(x), A(x,c:2,d:1) @ 1
-'r12bis' -> A(c:1), A(c:2) @ 1
+//unfolding rule with test and modif
+'r5' A(x{u}[.],c{=3}) -> A(x{p}[.],c{-= 1}) @ 1
+'r6' A(x[1],c{=1}), B(x[1]) -> A(x[.],c{+=3}), B(x[.]) @ 1
+'r7' A(x[1],c{=1}), B(x[1],c{=2}) -> A(x[.],c{+=3}), B(x[.],c{+=2}) @ 1
+'r8' A(x[1],c{=1},d{=2}), B(x[1]) -> A(x[.],c{+=3},d{+=2}), B(x[.]) @ 1
+'r9' A(x{u}[.],c{>=1}) -> A(x{p}[.],c{+=2}) @ 1
 
-#not fully specified agent
-'r13' A(x~u) -> A(x~u),A(x) @ 1
+//create agents with counters
+'r10' A(x{u}[.]), A(x{u}[.],c{=0},d{=2})+ @ 1
+'r11' A(x{u}[.],c{=1},d{=2})+ @ 1
+'r12' A(x[1 / .],c{=3 / -= 2}), B(x[1/.]), A(x[.],c{=2},d{=1})+ @ 1
+'r12bis' A(c{=1})+, A(c{=2})+ @ 1
 
-#generates warning
-'get_zero' A(x~u,c:>0) -> A(x~p,c += 1) @ 1
+//not fully specified agent
+'r13' A(x{u}[.]), A(x[.])+ @ 1
 
-#counter in obs
-%obs: 'A1' A(x~u,c:>1)
+//generates warning
+'get_zero' A(x{u}[.],c{>=0}) -> A(x{p}[.],c{+= 1}) @ 1
+
+//counter in obs
+%obs: 'A1' |A(x{u}[.],c{>=1})|
