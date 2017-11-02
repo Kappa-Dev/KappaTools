@@ -8,13 +8,13 @@
 %agent: B(x!x.A)
 
 %plot: [T]
-A(x!./!1), B(x!./!1) @ 1
--A(x?), +B(x!.) @ 1
--B(x?), +A(x!.) @ 1
-'GOAL' A(x!1/!.), B(x!1/!.) @ 1
+A(x[./1]), B(x[./1]) @ 1
+A(x[#])-, B(x[.])+ @ 1
+B(x[#])-, A(x[.])+ @ 1
+'GOAL' A(x[1/.]), B(x[1/.]) @ 1
 
-/*0*/%mod: [true] do $TRACK A(x!1), B(x!1) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK A(x[1]), B(x[1]) [true] repeat [false]
 
-%init: 1 A(x!.), B(x!.)
+%init: 1 A(x[.]), B(x[.])
 
 %mod: [E] = 25 do $STOP

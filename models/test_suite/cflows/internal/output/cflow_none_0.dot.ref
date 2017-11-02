@@ -192,7 +192,7 @@ digraph G{
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_2 [label="A(x) -> A(x~d)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_2 [label="A(x{#}[.]) -> A(x{d}[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
 node_3 [label="GOAL", style=filled, fillcolor=red] ;

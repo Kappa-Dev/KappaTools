@@ -1,44 +1,44 @@
 _____(1)
-A(x!1(*x.B*)), B(x!1(*x.A*))
+A(x[1/*x.B*/]), B(x[1/*x.A*/])
 _____(1)
-C(x1~u?, x2~u?)
+C(x1{u}[#] x2{u}[#])
 _____(1)
-C(x1~p?, x2~u?)
+C(x1{p}[#] x2{u}[#])
 _____(1)
-C(x1~p?, x2~p?)
+C(x1{p}[#] x2{p}[#])
 _____(1)
-A(x!./!1), B(x!./!1)
+A(x[./1]), B(x[./1])
 _____(1)
-A(x!1(*x.B*)/!.), B(x!1(*x.A*)/!.)
+A(x[1/*x.B*//.]), B(x[1/*x.A*//.])
 _____(1)
-A(x!3(*x.B*), c!./!2), C(x1~u!./!2), B(x!3(*x.A*))
+A(x[3/*x.B*/] c[./2]), C(x1{u}[./2]), B(x[3/*x.A*/])
 _____(1)
-C(x1~u/~p!1(*c.A*)/!.), A(c!1(*x1.C*)/!.)
+C(x1{u/p}[1/*c.A*//.]), A(c[1/*x1.C*//.])
 _____(1)
-A(x!., c!./!1), C(x1~p!., x2~u!./!1)
+A(x[.] c[./1]), C(x1{p}[.] x2{u}[./1])
 _____(1)
-A(x!., c!1(*x2.C*)/!.), C(x1~p!., x2~u/~p!1(*c.A*)/!.)
+A(x[.] c[1/*x2.C*//.]), C(x1{p}[.] x2{u/p}[1/*c.A*//.])
 _____(1)
-C(x1~u?, x2~u?)
+C(x1{u}[#] x2{u}[#])
 _____(1)
-C(x1~p?, x2~u?)
+C(x1{p}[#] x2{u}[#])
 _____(1)
-C(x1~p?, x2~p?)
+C(x1{p}[#] x2{p}[#])
 _____(1)
--C(x1~p?, x2~p?)
+C(x1{p}[#] x2{p}[#])-
 _____(1)
-+C(x1~u!., x2~u!.)
+C(x1{u}[.] x2{u}[.])+
 _____(1)
-+B(x!.), +A(x!., c!.)
+B(x[.])+, A(x[.] c[.])+
 Environment:
   
   %var:/*0*/ 'on_rate' 0.001
   %var:/*1*/ 'off_rate' 0.1
   %var:/*2*/ 'mod_rate' 1
-  %var:/*3*/ 'AB' |A(x!1), B(x!1)|
-  %var:/*4*/ 'Cuu' |C(x1~u, x2~u)|
-  %var:/*5*/ 'Cpu' |C(x1~p, x2~u)|
-  %var:/*6*/ 'Cpp' |C(x1~p, x2~p)|
+  %var:/*3*/ 'AB' |A(x[1]), B(x[1])|
+  %var:/*4*/ 'Cuu' |C(x1{u} x2{u})|
+  %var:/*5*/ 'Cpu' |C(x1{p} x2{u})|
+  %var:/*6*/ 'Cpp' |C(x1{p} x2{p})|
   %var:/*7*/ 'n_ab' 1000
   %var:/*8*/ 'n_c' 10000
   %plot: [T]
@@ -47,74 +47,78 @@ Environment:
   %plot: Cpu
   %plot: Cpp
   
-  'a.b' A(x!./!1), B(x!./!1) @ on_rate
-  'a.b_op' A(x!1/!.), B(x!1/!.) @ off_rate
-  'ab.c' A(x!_, c!./!2), C(x1~u!./!2) @ on_rate
-  'mod x1' C(x1~u/~p!1/!.), A(c!1/!.) @ mod_rate
-  'a.c' A(x!., c!./!1), C(x1~p!., x2~u!./!1) @ on_rate
-  'mod x2' A(x!., c!1/!.), C(x1~p!., x2~u/~p!1/!.) @ mod_rate
+  'a.b' A(x[./1]), B(x[./1]) @ on_rate
+  'a.b_op' A(x[1/.]), B(x[1/.]) @ off_rate
+  'ab.c' A(x[_] c[./2]), C(x1{u}[./2]) @ on_rate
+  'mod x1' C(x1{u/p}[1/.]), A(c[1/.]) @ mod_rate
+  'a.c' A(x[.] c[./1]), C(x1{p}[.] x2{u}[./1]) @ on_rate
+  'mod x2' A(x[.] c[1/.]), C(x1{p}[.] x2{u/p}[1/.]) @ mod_rate
   
-  /*0*/%mod: [true] do $TRACK C(x1~u, x2~u) [true] repeat ([false])
-  /*1*/%mod: [true] do $TRACK C(x1~p, x2~u) [true] repeat ([false])
-  /*2*/%mod: [true] do $TRACK C(x1~p, x2~p) [true] repeat ([false])
-  /*3*/%mod: [true] do $FLUX "flux_map.dot" "absolute" [true] repeat ([false])
-  /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false]; $DEL 10000 C(x1~p, x2~p) repeat ([false])
+  /*0*/%mod: [true] do $TRACK C(x1{u} x2{u}) [true] repeat [false]
+  /*1*/%mod: [true] do $TRACK C(x1{p} x2{u}) [true] repeat [false]
+  /*2*/%mod: [true] do $TRACK C(x1{p} x2{p}) [true] repeat [false]
+  /*3*/%mod: [true] do $FLUX "flux_map.dot" "absolute" [true] repeat [false]
+  /*4*/%mod: ([E] = inf) do $FLUX "flux_map.dot" [false]; $DEL 10000 C(x1{p} x2{p}) repeat [false]
   Signatures:
     %agent: A(x,c)
     %agent: B(x)
     %agent: C(x1~u~p,x2~u~p)
   Rules:
-    0: (ast: 1) 0: /*cc5*/ A/*1*/(x!.), 1: /*cc6*/ B/*2*/(x!.)
+    0: (ast: 1) 0: /*cc5*/ A/*1*/(x[.]), 1: /*cc6*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @0.001
-    1: (ast: 2) 0: /*cc1*/ A/*1*/(x!1), B/*2*/(x!1)
+    1: (ast: 2) 0: /*cc1*/ A/*1*/(x[1]), B/*2*/(x[1])
       -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.1
     2: (ast: 3)
-      0: /*cc7*/ A/*1*/(x!1, c!.), B/*2*/(x!1), 1: /*cc8*/ C/*3*/(x1~u!.)
+      0: /*cc7*/ A/*1*/(x[1] c[.]), B/*2*/(x[1]), 1: /*cc8*/ C/*3*/(x1{u}[.])
       -- C/*3*//*1*/.x1 = ⊥, A/*1*//*0*/.c = ⊥
       ++ C/*3*//*1*/.x1 = A/*1*//*0*/.c @0.001
-    3: (ast: 4) 0: /*cc9*/ A/*1*/(c!1), C/*3*/(x1~u!1)
+    3: (ast: 4) 0: /*cc9*/ A/*1*/(c[1]), C/*3*/(x1{u}[1])
       -- A/*1*//*0*/.c = C/*3*//*0*/.x1, C/*3*//*0*/.x1~ =
-      ++ A/*1*//*0*/.c = ⊥, C/*3*//*0*/.x1 = ⊥, C/*3*//*0*/.x1~p = @1
+      ++ A/*1*//*0*/.c = ⊥, C/*3*//*0*/.x1 = ⊥, C/*3*//*0*/.x1{p} = @1
     4: (ast: 5)
-      0: /*cc10*/ A/*1*/(x!., c!.), 1: /*cc11*/ C/*3*/(x1~p!., x2~u!.)
+      0: /*cc10*/ A/*1*/(x[.] c[.]), 1: /*cc11*/ C/*3*/(x1{p}[.] x2{u}[.])
       -- C/*3*//*1*/.x2 = ⊥, A/*1*//*0*/.c = ⊥
       ++ C/*3*//*1*/.x2 = A/*1*//*0*/.c @0.001
-    5: (ast: 6) 0: /*cc12*/ A/*1*/(x!., c!1), C/*3*/(x1~p!., x2~u!1)
+    5: (ast: 6) 0: /*cc12*/ A/*1*/(x[.] c[1]), C/*3*/(x1{p}[.] x2{u}[1])
       -- C/*3*//*0*/.x2 = A/*1*//*0*/.c, C/*3*//*0*/.x2~ =
-      ++ C/*3*//*0*/.x2 = ⊥, C/*3*//*0*/.x2~p =, A/*1*//*0*/.c = ⊥ @1
+      ++ C/*3*//*0*/.x2 = ⊥, C/*3*//*0*/.x2{p} =, A/*1*//*0*/.c = ⊥ @1
 Polymers:
   
 Domain:
   /*cc0*/  -> ()
-  /*cc1*/ A/*1*/(x!1), B/*2*/(x!1) [algebraic variable [3] rate_of_rule [1]]
-    -> (-1_c-⊥->() 7)
-  /*cc2*/ C/*3*/(x1~u, x2~u) [algebraic variable [4] perturbation [0]] -> ()
-  /*cc3*/ C/*3*/(x1~p, x2~u) [algebraic variable [5] perturbation [1]]
-    -> (-3_x2-!A-1_c->-3_x1-⊥->-1_x-⊥->() 12 -3_x2-⊥->-3_x1-⊥->() 11)
-  /*cc4*/ C/*3*/(x1~p, x2~p) [algebraic variable [6] perturbation [2]] -> ()
-  /*cc5*/ A/*1*/(x!.) [rate_of_rule [0]]
-    -> (-1_c-!C-3_x2->-3_x2~u->-3_x1-⊥->-3_x1~p->() 12 -1_c-⊥->() 10)
-  /*cc6*/ B/*2*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc7*/ A/*1*/(x!1, c!.), B/*2*/(x!1) [rate_of_rule [2]] -> ()
-  /*cc8*/ C/*3*/(x1~u!.) [rate_of_rule [2]] -> ()
-  /*cc9*/ A/*1*/(c!1), C/*3*/(x1~u!1) [rate_of_rule [3]] -> ()
-  /*cc10*/ A/*1*/(x!., c!.) [rate_of_rule [4]] -> ()
-  /*cc11*/ C/*3*/(x1~p!., x2~u!.) [rate_of_rule [4]] -> ()
-  /*cc12*/ A/*1*/(x!., c!1), C/*3*/(x1~p!., x2~u!1) [rate_of_rule [5]] -> ()
-  /*cc13*/ A/*1*/(c!.) -> (-1_x-!B-2_x->() 7 -1_x-⊥->() 10)
-  /*cc14*/ A/*1*/(c!1), C/*3*/(x1!1) -> (-3_x1~u->() 9)
-  /*cc15*/ A/*1*/(c!1), C/*3*/(x2!1)
-    -> (-3_x2~u->-3_x1-⊥->-3_x1~p->-1_x-⊥->() 12)
-  /*cc16*/ C/*3*/(x1!.)
-    -> (-3_x2-!A-1_c->-3_x2~u->-3_x1~p->-1_x-⊥->() 12
-       -3_x2-⊥->-3_x2~u->-3_x1~p->() 11 -3_x1~u->() 8)
-  /*cc17*/ C/*3*/(x1~u) -> (-3_x1-!A-1_c->() 9 -3_x1-⊥->() 8 -3_x2~u->() 2)
-  /*cc18*/ C/*3*/(x1~p) -> (-3_x2~p->() 4 -3_x2~u->() 3)
-  /*cc19*/ C/*3*/(x2!.) -> (-3_x2~u->-3_x1-⊥->-3_x1~p->() 11)
-  /*cc20*/ C/*3*/(x2~u) -> (-3_x1~p->() 3 -3_x1~u->() 2)
-  /*cc21*/ C/*3*/(x2~p) -> (-3_x1~p->() 4)
+  /*cc1*/ A/*1*/(x[1]), B/*2*/(x[1])
+    [algebraic variable [3] rate_of_rule [1]] -> (-1(c[.])->() 7)
+  /*cc2*/ C/*3*/(x1{u} x2{u}) [algebraic variable [4] perturbation [0]] -> ()
+  /*cc3*/ C/*3*/(x1{p} x2{u}) [algebraic variable [5] perturbation [1]]
+    -> (-3(x2[c.!A-1])->-3(x1[.])->-1(x[.])->() 12
+       -3(x2[.])->-3(x1[.])->() 11)
+  /*cc4*/ C/*3*/(x1{p} x2{p}) [algebraic variable [6] perturbation [2]] -> ()
+  /*cc5*/ A/*1*/(x[.]) [rate_of_rule [0]]
+    -> (-1(c[x2.!C-3])->-3(x2{u})->-3(x1[.])->-3(x1{p})->() 12
+       -1(c[.])->() 10)
+  /*cc6*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc7*/ A/*1*/(x[1] c[.]), B/*2*/(x[1]) [rate_of_rule [2]] -> ()
+  /*cc8*/ C/*3*/(x1{u}[.]) [rate_of_rule [2]] -> ()
+  /*cc9*/ A/*1*/(c[1]), C/*3*/(x1{u}[1]) [rate_of_rule [3]] -> ()
+  /*cc10*/ A/*1*/(x[.] c[.]) [rate_of_rule [4]] -> ()
+  /*cc11*/ C/*3*/(x1{p}[.] x2{u}[.]) [rate_of_rule [4]] -> ()
+  /*cc12*/ A/*1*/(x[.] c[1]), C/*3*/(x1{p}[.] x2{u}[1]) [rate_of_rule [5]]
+    -> ()
+  /*cc13*/ A/*1*/(c[.]) -> (-1(x[x.!B-2])->() 7 -1(x[.])->() 10)
+  /*cc14*/ A/*1*/(c[1]), C/*3*/(x1[1]) -> (-3(x1{u})->() 9)
+  /*cc15*/ A/*1*/(c[1]), C/*3*/(x2[1])
+    -> (-3(x2{u})->-3(x1[.])->-3(x1{p})->-1(x[.])->() 12)
+  /*cc16*/ C/*3*/(x1[.])
+    -> (-3(x2[c.!A-1])->-3(x2{u})->-3(x1{p})->-1(x[.])->() 12
+       -3(x2[.])->-3(x2{u})->-3(x1{p})->() 11 -3(x1{u})->() 8)
+  /*cc17*/ C/*3*/(x1{u})
+    -> (-3(x1[c.!A-1])->() 9 -3(x1[.])->() 8 -3(x2{u})->() 2)
+  /*cc18*/ C/*3*/(x1{p}) -> (-3(x2{p})->() 4 -3(x2{u})->() 3)
+  /*cc19*/ C/*3*/(x2[.]) -> (-3(x2{u})->-3(x1[.])->-3(x1{p})->() 11)
+  /*cc20*/ C/*3*/(x2{u}) -> (-3(x1{p})->() 3 -3(x1{u})->() 2)
+  /*cc21*/ C/*3*/(x2{p}) -> (-3(x1{p})->() 4)
 Intial graph;
   %init: 10000 C(x1~u, x2~u)
   %init: 1000 B(x)
@@ -122,4 +126,4 @@ Intial graph;
   
 File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
-Warning: At t=6.624768, $DEL 10000 C(x1~p, x2~p) does not apply (anymore)
+Warning: At t=6.624768, $DEL 10000 C(x1{p} x2{p}) does not apply (anymore)

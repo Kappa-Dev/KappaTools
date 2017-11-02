@@ -9,16 +9,16 @@
 %agent: KK()
 
 %plot: [T]
-'y' A(x~u/~p!., y~u/~p!.), -K() @ 1
-'z' A(x~u/~p!., z~u/~p!.), -K() @ 1
-'x' A(x~p/~u!.), +K() @ 1
-'y-' A(y~p/~u!.) @ 1
-'z-' A(z~p/~u!.) @ 1
-'goal' A(x~u!., y~p!., z~p!.), +KK() @ 100
+'y' A(x{u/p}[.] y{u/p}[.]), K()- @ 1
+'z' A(x{u/p}[.] z{u/p}[.]), K()- @ 1
+'x' A(x{p/u}[.]), K()+ @ 1
+'y-' A(y{p/u}[.]) @ 1
+'z-' A(z{p/u}[.]) @ 1
+'goal' A(x{u}[.] y{p}[.] z{p}[.]), KK()+ @ 100
 
-/*0*/%mod: [true] do $TRACK A(x~u, y~p, z~p) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK A(x{u} y{p} z{p}) [true] repeat [false]
 
-%init: 1 A(x~u!., y~u!., z~u!.)
+%init: 1 A(x{u}[.] y{u}[.] z{u}[.])
 %init: 1 K()
 
 %mod: [E] = 100 do $STOP

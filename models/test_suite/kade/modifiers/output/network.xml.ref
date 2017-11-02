@@ -35,9 +35,9 @@ reaction rates are corrected by the product, for each species, of the factorial 
 <compartment metaid="default" id="default" size="1" units="volume"/>
 </listOfCompartments>
 <listOfSpecies>
-<species metaid="CMD7" id="s1" name="U(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD8" id="s2" name="T(x)" compartment="default" initialAmount="10" substanceUnits="substance"/>
-<species metaid="CMD9" id="s3" name="U(x!1), T(x!1)" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD7" id="s1" name="U(x[.])" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD8" id="s2" name="T(x[.])" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="s3" name="U(x[1]), T(x[1])" compartment="default" initialAmount="0" substanceUnits="substance"/>
 </listOfSpecies>
 <listOfParameters>
 <parameter metaid="CMD3" id="tinit" value="0." units="time"/>
@@ -47,7 +47,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </listOfParameters>
 <listOfReactions>
 <!-- rule    : unbind -->
-<!-- reaction: U(x!1), T(x!1) -> U(x) + T(x)  -->
+<!-- reaction: U(x[1]), T(x[1]) -> U(x[.]) + T(x[.])  -->
 <reaction id="re1" name="unbind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD10" species="s3"/>
@@ -67,7 +67,7 @@ reaction rates are corrected by the product, for each species, of the factorial 
 </kineticLaw>
 </reaction>
 <!-- rule    : bind -->
-<!-- reaction: U(x) + T(x) -> U(x!1), T(x!1)  -->
+<!-- reaction: U(x[.]) + T(x[.]) -> U(x[1]), T(x[1])  -->
 <reaction id="re2" name="bind" reversible="false" fast="false">
 <listOfReactants>
 <speciesReference metaid="CMD14" species="s1"/>

@@ -268,10 +268,10 @@ EXTENSIONAL DESCRIPTION:
 		A(z!A@z)
 
 
-	Applying rule A(z), A(z) -> A(z!1), A(z!1) (File "sym_init2.ka", line 8, characters 0-29:):
+	Applying rule A(z), A(z) -> A(z[1]), A(z[1]) (File "sym_init2.ka", line 8, characters 0-29:):
 		the precondition is satisfied
 
-		rule A(z), A(z) -> A(z!1), A(z!1) (File "sym_init2.ka", line 8, characters 0-29:) is applied for the first time
+		rule A(z), A(z) -> A(z[1]), A(z[1]) (File "sym_init2.ka", line 8, characters 0-29:) is applied for the first time
 
 		Updating the views for A(z!)
 
@@ -571,98 +571,98 @@ A(z!1),A(z!1)=> [
 Compute the contact map...
 Translation from patten to raw_mixture
 INPUT:
-A(x~p, y~u, z!1),
-A(x~u, y~p, z!1)
+A(x{p} y{u} z[1]),
+A(x{u} y{p} z[1])
 OUTPUT:
-A(x~p, y~u, z!0),
-A(x~u, y~p, z!0)
+A(x{p}[.] y{u}[.] z[0]),
+A(x{u}[.] y{p}[.] z[0])
 Translation from patten to raw_mixture
 INPUT:
-A(x~p, y~p, z!1),
-A(x~p, y~p, z!1)
+A(x{p} y{p} z[1]),
+A(x{p} y{p} z[1])
 OUTPUT:
-A(x~p, y~p, z!0),
-A(x~p, y~p, z!0)
+A(x{p}[.] y{p}[.] z[0]),
+A(x{p}[.] y{p}[.] z[0])
 Translation from patten to raw_mixture
 INPUT:
-A(x~u, y~p, z!1),
-A(x~u, y~p, z!1)
+A(x{u} y{p} z[1]),
+A(x{u} y{p} z[1])
 OUTPUT:
-A(x~u, y~p, z!0),
-A(x~u, y~p, z!0)
+A(x{u}[.] y{p}[.] z[0]),
+A(x{u}[.] y{p}[.] z[0])
 Translation from patten to raw_mixture
 INPUT:
-A(x~p, y~u, z!.)
+A(x{p} y{u} z[.])
 OUTPUT:
-A(x~p, y~u, z)
+A(x{p}[.] y{u}[.] z[.])
 Translation from patten to raw_mixture
 INPUT:
-A(x~u, y~p, z!.)
+A(x{u} y{p} z[.])
 OUTPUT:
-A(x~u, y~p, z)
+A(x{u}[.] y{p}[.] z[.])
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   A(z!./!1), A(z!./!1) @ 1
- rule:   A(z!./!1), A(z!./!1) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
+ rule:   A(z[./1]), A(z[./1]) @ 1
 Existing rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   +A(x~p!., y~u!., z!0), +A(x~u!., y~p!., z!0) @ 0
- rule:   +A(x~u!., y~p!., z!0), +A(x~u!., y~p!., z!0) @ 0
+ rule:   A(x{p}[.] y{u}[.] z[0])+, A(x{u}[.] y{p}[.] z[0])+ @ 0
+ rule:   A(x{u}[.] y{p}[.] z[0])+, A(x{u}[.] y{p}[.] z[0])+ @ 0
 Existing rule
- rule:   +A(x~p!., y~u!., z!0), +A(x~p!., y~u!., z!0) @ 0
+ rule:   A(x{p}[.] y{u}[.] z[0])+, A(x{p}[.] y{u}[.] z[0])+ @ 0
 Unknown rule
 Check an orbit
 Permutation of the sites x and y in agent of type  A
- rule:   +A(x~p!., y~u!., z!0), +A(x~u!., y~p!., z!0) @ 0
- rule:   +A(x~u!., y~p!., z!0), +A(x~u!., y~p!., z!0) @ 0
+ rule:   A(x{p}[.] y{u}[.] z[0])+, A(x{u}[.] y{p}[.] z[0])+ @ 0
+ rule:   A(x{u}[.] y{p}[.] z[0])+, A(x{u}[.] y{p}[.] z[0])+ @ 0
 Existing rule
- rule:   +A(x~p!., y~u!., z!0), +A(x~p!., y~u!., z!0) @ 0
+ rule:   A(x{p}[.] y{u}[.] z[0])+, A(x{p}[.] y{u}[.] z[0])+ @ 0
 Unknown rule
 Contact map
 agent:A

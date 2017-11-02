@@ -64,9 +64,9 @@ jackund=zeros(nrules,nodevar);
 t = 0.000000;
 
 init(2)=t;
-init(1)=2; % A(x!1, y!2), A(x!1, y!2)
+init(1)=2; % A(x[1] y[2]), A(x[1] y[2])
 
-k(1)=1; % A(x!_,y!1), A(x!_,y!1) -> A(x,y), A(x!_,y)
+k(1)=1; % A(x[_] y[1]), A(x[_] y[1]) -> A(x[.] y[.]), A(x[_] y[.])
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -174,7 +174,7 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % A(x!1, y!2), A(x!1, y!2)
+Init(1) = init(1); % A(x[1] y[2]), A(x[1] y[2])
 Init(2) = init(2); % t
 end
 

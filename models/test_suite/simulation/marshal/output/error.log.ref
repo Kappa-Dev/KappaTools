@@ -1,34 +1,34 @@
 _____(1)
-A(x!./!1), B(x!./!1)
+A(x[./1]), B(x[./1])
 _____(1)
-A(x!1(*x.B*)/!.), B(x!1(*x.A*)/!.)
+A(x[1/*x.B*//.]), B(x[1/*x.A*//.])
 _____(1)
-+B(x!1), +A(x!1)
+B(x[1])+, A(x[1])+
 Environment:
   
   %var:/*0*/ 'init' 100
   %plot: [T]
-  'dim' A(x!./!1), B(x!./!1) @ 1
-  'dim_op' A(x!1/!.), B(x!1/!.) @ 0.01
+  'dim' A(x[./1]), B(x[./1]) @ 1
+  'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
-  /*0*/%mod: [false] do $STOP  repeat ([false])
+  /*0*/%mod: [false] do $STOP  repeat [false]
   Signatures:
     %agent: A(x)
     %agent: B(x)
   Rules:
-    0: (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc2*/ B/*2*/(x!.)
+    0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
-    1: (ast: 2) 0: /*cc3*/ A/*1*/(x!1), B/*2*/(x!1)
+    1: (ast: 2) 0: /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1])
       -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
 Polymers:
   
 Domain:
   /*cc0*/  -> ()
-  /*cc1*/ A/*1*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc2*/ B/*2*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc3*/ A/*1*/(x!1), B/*2*/(x!1) [rate_of_rule [1]] -> ()
+  /*cc1*/ A/*1*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
   %init: 100 A(x!1), B(x!1)
   
@@ -36,27 +36,27 @@ Environment:
   
   %var:/*0*/ 'init' 100
   %plot: [T]
-  'dim' A(x!./!1), B(x!./!1) @ 1
-  'dim_op' A(x!1/!.), B(x!1/!.) @ 0.01
+  'dim' A(x[./1]), B(x[./1]) @ 1
+  'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
-  /*0*/%mod: [false] do $STOP  repeat ([false])
+  /*0*/%mod: [false] do $STOP  repeat [false]
   Signatures:
     %agent: A(x)
     %agent: B(x)
   Rules:
-    0: (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc2*/ B/*2*/(x!.)
+    0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
-    1: (ast: 2) 0: /*cc3*/ A/*1*/(x!1), B/*2*/(x!1)
+    1: (ast: 2) 0: /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1])
       -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
 Polymers:
   
 Domain:
   /*cc0*/  -> ()
-  /*cc1*/ A/*1*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc2*/ B/*2*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc3*/ A/*1*/(x!1), B/*2*/(x!1) [rate_of_rule [1]] -> ()
+  /*cc1*/ A/*1*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
   %init: 100 A(x!1), B(x!1)
   
@@ -64,27 +64,27 @@ Environment:
   
   %var:/*0*/ 'init' 300
   %plot: [T]
-  'dim' A(x!./!1), B(x!./!1) @ 1
-  'dim_op' A(x!1/!.), B(x!1/!.) @ 0.01
+  'dim' A(x[./1]), B(x[./1]) @ 1
+  'dim_op' A(x[1/.]), B(x[1/.]) @ 0.01
   
-  /*0*/%mod: [false] do $STOP  repeat ([false])
+  /*0*/%mod: [false] do $STOP  repeat [false]
   Signatures:
     %agent: A(x)
     %agent: B(x)
   Rules:
-    0: (ast: 1) 0: /*cc1*/ A/*1*/(x!.), 1: /*cc2*/ B/*2*/(x!.)
+    0: (ast: 1) 0: /*cc1*/ A/*1*/(x[.]), 1: /*cc2*/ B/*2*/(x[.])
       -- B/*2*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥
       ++ B/*2*//*1*/.x = A/*1*//*0*/.x @1
-    1: (ast: 2) 0: /*cc3*/ A/*1*/(x!1), B/*2*/(x!1)
+    1: (ast: 2) 0: /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1])
       -- B/*2*//*0*/.x = A/*1*//*0*/.x
       ++ B/*2*//*0*/.x = ⊥, A/*1*//*0*/.x = ⊥ @0.01
 Polymers:
   
 Domain:
   /*cc0*/  -> ()
-  /*cc1*/ A/*1*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc2*/ B/*2*/(x!.) [rate_of_rule [0]] -> ()
-  /*cc3*/ A/*1*/(x!1), B/*2*/(x!1) [rate_of_rule [1]] -> ()
+  /*cc1*/ A/*1*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
+  /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
   %init: 300 A(x!1), B(x!1)
   

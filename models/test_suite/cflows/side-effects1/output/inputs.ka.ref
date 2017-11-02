@@ -9,14 +9,14 @@
 %agent: C(a~p~u!a.C)
 
 %plot: [T]
-'C' B(a!_), C(a~u/~p!.) @ 1
--A(a?, b!.) @ 1
-C(a!_/!.) @ 2
-+A(a!1, b!.), +B(a!1) @ 10
-+C(a~p!.) @ 10
+'C' B(a[_]), C(a{u/p}[.]) @ 1
+A(a[#] b[.])- @ 1
+C(a[_/.]) @ 2
+A(a[1] b[.])+, B(a[1])+ @ 10
+C(a{p}[.])+ @ 10
 
-/*0*/%mod: [true] do $TRACK B(a!1), A(a!1), C(a~u!.) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK B(a[1]), A(a[1]), C(a{u}[.]) [true] repeat [false]
 
-%init: 2 C(a~u!1), C(a~p!1)
+%init: 2 C(a{u}[1]), C(a{p}[1])
 
 %mod: [E] = 10000 do $STOP

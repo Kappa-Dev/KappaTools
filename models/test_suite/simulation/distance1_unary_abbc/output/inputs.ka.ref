@@ -8,18 +8,18 @@
 %agent: B(a!a.A, b!b.B, c!c.C)
 %agent: C(c!c.B)
 
-%var:/*0*/ 'Ap' |A(a~p)|
+%var:/*0*/ 'Ap' |A(a{p})|
 %plot: [T]
 %plot: Ap
 
-'ab' A(a!./!1), B(a!./!1) @ 0.01
-'bb' B(b!./!1), B(b!./!1) @ 0.01
-'bc' B(c!./!1), C(c!./!1) @ 0.01
-'up' A(a~u/~p?), C() @ 0 {100 :1}
+'ab' A(a[./1]), B(a[./1]) @ 0.01
+'bb' B(b[./1]), B(b[./1]) @ 0.01
+'bc' B(c[./1]), C(c[./1]) @ 0.01
+'up' A(a{u/p}[#]), C() @ 0 {100 :1}
 
 
-%init: 100 A(a~u!.)
-%init: 100 B(a!., b!., c!.)
-%init: 100 C(c!.)
+%init: 100 A(a{u}[.])
+%init: 100 B(a[.] b[.] c[.])
+%init: 100 C(c[.])
 
 %mod: [E] = 200 do $STOP

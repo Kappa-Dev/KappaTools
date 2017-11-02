@@ -9,23 +9,23 @@
 %agent: C(c!c.B, d!d.D)
 %agent: D(a!d.A, d!d.B!d.C)
 
-%var:/*0*/ 'Ap' |A(a~p)|
+%var:/*0*/ 'Ap' |A(a{p})|
 %plot: [T]
 %plot: Ap
 
-'ab' A(a!./!1), B(a!./!1) @ 0.01
-'ad' A(d!./!1), D(a!./!1) @ 0.01
-'bb' B(b!./!1), B(b!./!1) @ 0.01
-'bc' B(c!./!1), C(c!./!1) @ 0.01
-'bd' B(d!./!1), D(d!./!1) @ 0.01
-'cd' C(d!./!1), D(d!./!1) @ 0.01
-'up' A(a~u/~p?, d!1), D(a!1), C(d!2), D(d!2) @ 0 {100 :2}
+'ab' A(a[./1]), B(a[./1]) @ 0.01
+'ad' A(d[./1]), D(a[./1]) @ 0.01
+'bb' B(b[./1]), B(b[./1]) @ 0.01
+'bc' B(c[./1]), C(c[./1]) @ 0.01
+'bd' B(d[./1]), D(d[./1]) @ 0.01
+'cd' C(d[./1]), D(d[./1]) @ 0.01
+'up' A(a{u/p}[#] d[1]), D(a[1]), C(d[2]), D(d[2]) @ 0 {100 :2}
 
-/*0*/%mod: [true] do $TRACK A(a~p) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK A(a{p}) [true] repeat [false]
 
-%init: 100 A(a~u!., d!.)
-%init: 100 B(a!., b!., c!., d!.)
-%init: 100 C(c!., d!.)
-%init: 100 D(a!., d!.)
+%init: 100 A(a{u}[.] d[.])
+%init: 100 B(a[.] b[.] c[.] d[.])
+%init: 100 C(c[.] d[.])
+%init: 100 D(a[.] d[.])
 
 %mod: [E] = 200 do $STOP

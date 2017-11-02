@@ -66,7 +66,7 @@ t = 0.000000;
 init(2)=t;
 init(1)=4.5; % A()
 
-k(1)=1; % A(), A(x?) -> 
+k(1)=1; % A(), A(x[.]) -> ., .
 
 uiIsOctave = false;
 uiIsMatlab = false;
@@ -194,7 +194,7 @@ global stoc
 
 dydt=zeros(nodevar,1);
 
-% rule    : A(), A(x?) -> 
+% rule    : A(), A(x[.]) -> ., .
 % reaction: A() + A() ->  
 
 dydt(1)=dydt(1)-k(1)*y(1)*y(1);
@@ -227,7 +227,7 @@ global jacstoc
 
 jac=sparse(nodevar,nodevar);
 
-% rule    : A(), A(x?) -> 
+% rule    : A(), A(x[.]) -> ., .
 % reaction: A() + A() ->  
 
 jac(1,1)=jac(1,1)-k(1)*y(1);

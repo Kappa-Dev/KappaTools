@@ -441,10 +441,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:C(x~p)
 
 
-	Applying rule A(x~u), B(x~p), B(x~p) -> A(x~u), C(x~u) (File "test_delta.ka", line 1, characters 0-43:):
+	Applying rule A(x{u}), B(x{p}), B(x{p}) -> A(x{u}), C(x{u}) (File "test_delta.ka", line 1, characters 0-43:):
 		the precondition is satisfied
 
-		rule A(x~u), B(x~p), B(x~p) -> A(x~u), C(x~u) (File "test_delta.ka", line 1, characters 0-43:) is applied for the first time
+		rule A(x{u}), B(x{p}), B(x{p}) -> A(x{u}), C(x{u}) (File "test_delta.ka", line 1, characters 0-43:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~)
 
@@ -452,28 +452,28 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for B(x~)
 
-	Applying rule A(x~u), C(x~u) -> A(x~u), B(x~p), B(x~p) (File "test_delta.ka", line 1, characters 0-43:):
+	Applying rule A(x{u}), C(x{u}) -> A(x{u}), B(x{p}), B(x{p}) (File "test_delta.ka", line 1, characters 0-43:):
 		the precondition is satisfied
 
-		rule A(x~u), C(x~u) -> A(x~u), B(x~p), B(x~p) (File "test_delta.ka", line 1, characters 0-43:) is applied for the first time
+		rule A(x{u}), C(x{u}) -> A(x{u}), B(x{p}), B(x{p}) (File "test_delta.ka", line 1, characters 0-43:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~)
 
 		Influence_map:Updating the views for C(x~)
 
-	Applying rule A(x~u), C(x~p) -> A(x~u), B(x~u), B(x~u) (File "test_delta.ka", line 2, characters 0-43:):
+	Applying rule A(x{u}), C(x{p}) -> A(x{u}), B(x{u}), B(x{u}) (File "test_delta.ka", line 2, characters 0-43:):
 		the precondition is satisfied
 
-		rule A(x~u), C(x~p) -> A(x~u), B(x~u), B(x~u) (File "test_delta.ka", line 2, characters 0-43:) is applied for the first time
+		rule A(x{u}), C(x{p}) -> A(x{u}), B(x{u}), B(x{u}) (File "test_delta.ka", line 2, characters 0-43:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~)
 
 		Influence_map:Updating the views for C(x~)
 
-	Applying rule A(x~u), B(x~u), B(x~u) -> A(x~u), C(x~p) (File "test_delta.ka", line 2, characters 0-43:):
+	Applying rule A(x{u}), B(x{u}), B(x{u}) -> A(x{u}), C(x{p}) (File "test_delta.ka", line 2, characters 0-43:):
 		the precondition is satisfied
 
-		rule A(x~u), B(x~u), B(x~u) -> A(x~u), C(x~p) (File "test_delta.ka", line 2, characters 0-43:) is applied for the first time
+		rule A(x{u}), B(x{u}), B(x{u}) -> A(x{u}), C(x{p}) (File "test_delta.ka", line 2, characters 0-43:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~)
 

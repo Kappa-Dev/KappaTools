@@ -9,14 +9,14 @@ node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_3 [label="A(x,y) -> B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="A(x[.] y[.]), . -> ., B(x[.] y[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_5 [label="A(y), B(y) -> A(y!1), B(y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="A(x[.]), B(x[.]) -> A(x[1]), B(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="A(y[.]), B(y[.]) -> A(y[1]), B(y[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_6 [label="A(x!1,y!2), B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="A(x[1] y[2]), B(x[1] y[2]) -> A(x[1] y[2]), B(x[2] y[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
 node_7 [label="GOAL", style=filled, fillcolor=red] ;

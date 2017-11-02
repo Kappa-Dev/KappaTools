@@ -8,8 +8,8 @@
 %agent: B(x!y.A)
 
 %plot: [T]
-'delete A' A(x!1/!.), -A(x?, y?, z!1) @ 1
+'delete A' A(x[1/.]), A(x[#] y[#] z[1])- @ 1
 
-%init: 1 A(x!1, y!2, z!.), A(x!., y!., z!1), B(x!2)
+%init: 1 A(x[1] y[2] z[.]), A(x[.] y[.] z[1]), B(x[2])
 
 %mod: [E] = 1 do $STOP

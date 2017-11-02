@@ -12,15 +12,15 @@
 %plot: [T]
 %plot: goal
 
--A(x?) @ 1
-+A(x!.) @ 1
--B(x?) @ 0
-A(x!./!1), B(x!./!1) @ 1
-A(x!1), B(x!1), +C() @ 1
+A(x[#])- @ 1
+A(x[.])+ @ 1
+B(x[#])- @ 0
+A(x[./1]), B(x[./1]) @ 1
+A(x[1]), B(x[1]), C()+ @ 1
 
-/*0*/%mod: ([T] < 100) do $TRACK C() [true] repeat ([false])
+/*0*/%mod: ([T] < 100) do $TRACK C() [true] repeat [false]
 
-%init: 10 B(x!.)
-%init: 1 A(x!.)
+%init: 10 B(x[.])
+%init: 1 A(x[.])
 
 %mod: [E] = 19 do $STOP

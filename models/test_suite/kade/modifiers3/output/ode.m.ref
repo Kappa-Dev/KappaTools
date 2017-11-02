@@ -65,10 +65,10 @@ t = 0.000000;
 
 init(6)=t;
 var(1)=10; % nT
-init(2)=var(1); % T(x)
+init(2)=var(1); % T(x[.])
 var(5)=init(2)+init(4)+init(5); % unbind_rate
 var(4)=init(2); % T
-init(1)=var(1); % U(x, y~u)
+init(1)=var(1); % U(x[.] y{u}[.])
 var(3)=init(1)+init(3); % t
 var(2)=init(1)+init(3)+init(4)+init(5); % qU
 
@@ -182,11 +182,11 @@ global nodevar
 global init
 Init=zeros(nodevar,1);
 
-Init(1) = init(1); % U(x, y~u)
-Init(2) = init(2); % T(x)
-Init(3) = init(3); % U(x, y~p)
-Init(4) = init(4); % U(x!1, y~u), T(x!1)
-Init(5) = init(5); % U(x!1, y~p), T(x!1)
+Init(1) = init(1); % U(x[.] y{u}[.])
+Init(2) = init(2); % T(x[.])
+Init(3) = init(3); % U(x[.] y{p}[.])
+Init(4) = init(4); % U(x[1] y{u}[.]), T(x[1])
+Init(5) = init(5); % U(x[1] y{p}[.]), T(x[1])
 Init(6) = init(6); % t
 end
 
@@ -214,67 +214,67 @@ k(4)=var(5);
 dydt=zeros(nodevar,1);
 
 % rule    : essai
-% reaction: U(x, y~p) -> T(x) 
+% reaction: U(x[.] y{p}[.]) -> T(x[.]) 
 
 dydt(3)=dydt(3)-k(1)*y(3);
 dydt(2)=dydt(2)+k(1)*y(3);
 
 % rule    : bind
-% reaction: U(x, y~p) + T(x) -> U(x!1, y~p), T(x!1) 
+% reaction: U(x[.] y{p}[.]) + T(x[.]) -> U(x[1] y{p}[.]), T(x[1]) 
 
 dydt(2)=dydt(2)-k(3)*y(2)*y(3);
 dydt(3)=dydt(3)-k(3)*y(2)*y(3);
 dydt(5)=dydt(5)+k(3)*y(2)*y(3);
 
 % rule    : essai
-% reaction: U(x!1, y~p), T(x!1) -> T(x) + T(x) 
+% reaction: U(x[1] y{p}[.]), T(x[1]) -> T(x[.]) + T(x[.]) 
 
 dydt(5)=dydt(5)-k(1)*y(5);
 dydt(2)=dydt(2)+k(1)*y(5);
 dydt(2)=dydt(2)+k(1)*y(5);
 
 % rule    : unbind
-% reaction: U(x!1, y~p), T(x!1) -> U(x, y~p) + T(x) 
+% reaction: U(x[1] y{p}[.]), T(x[1]) -> U(x[.] y{p}[.]) + T(x[.]) 
 
 dydt(5)=dydt(5)-k(4)*y(5);
 dydt(2)=dydt(2)+k(4)*y(5);
 dydt(3)=dydt(3)+k(4)*y(5);
 
 % rule    : essai
-% reaction: U(x!1, y~u), T(x!1) -> T(x) + T(x) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> T(x[.]) + T(x[.]) 
 
 dydt(4)=dydt(4)-k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 dydt(2)=dydt(2)+k(1)*y(4);
 
 % rule    : unbind
-% reaction: U(x!1, y~u), T(x!1) -> U(x, y~u) + T(x) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> U(x[.] y{u}[.]) + T(x[.]) 
 
 dydt(4)=dydt(4)-k(4)*y(4);
 dydt(2)=dydt(2)+k(4)*y(4);
 dydt(1)=dydt(1)+k(4)*y(4);
 
 % rule    : essai2
-% reaction: U(x!1, y~u), T(x!1) -> U(x!1, y~p), T(x!1) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> U(x[1] y{p}[.]), T(x[1]) 
 
 dydt(4)=dydt(4)-k(2)*y(4);
 dydt(5)=dydt(5)+k(2)*y(4);
 
 % rule    : essai
-% reaction: U(x, y~u) -> T(x) 
+% reaction: U(x[.] y{u}[.]) -> T(x[.]) 
 
 dydt(1)=dydt(1)-k(1)*y(1);
 dydt(2)=dydt(2)+k(1)*y(1);
 
 % rule    : bind
-% reaction: U(x, y~u) + T(x) -> U(x!1, y~u), T(x!1) 
+% reaction: U(x[.] y{u}[.]) + T(x[.]) -> U(x[1] y{u}[.]), T(x[1]) 
 
 dydt(2)=dydt(2)-k(3)*y(2)*y(1);
 dydt(1)=dydt(1)-k(3)*y(2)*y(1);
 dydt(4)=dydt(4)+k(3)*y(2)*y(1);
 
 % rule    : essai2
-% reaction: U(x, y~u) -> U(x, y~p) 
+% reaction: U(x[.] y{u}[.]) -> U(x[.] y{p}[.]) 
 
 dydt(1)=dydt(1)-k(2)*y(1);
 dydt(3)=dydt(3)+k(2)*y(1);
@@ -331,13 +331,13 @@ jack(4,5)=jacvar(5,5);
 jac=sparse(nodevar,nodevar);
 
 % rule    : essai
-% reaction: U(x, y~p) -> T(x) 
+% reaction: U(x[.] y{p}[.]) -> T(x[.]) 
 
 jac(3,3)=jac(3,3)-k(1);
 jac(2,3)=jac(2,3)+k(1);
 
 % rule    : bind
-% reaction: U(x, y~p) + T(x) -> U(x!1, y~p), T(x!1) 
+% reaction: U(x[.] y{p}[.]) + T(x[.]) -> U(x[1] y{p}[.]), T(x[1]) 
 
 jac(2,1)=jac(2,1)-jack(3,1)*y(2)*y(3);
 jac(2,3)=jac(2,3)-jack(3,3)*y(2)*y(3);
@@ -359,14 +359,14 @@ jac(5,2)=jac(5,2)+k(3)*y(3);
 jac(5,3)=jac(5,3)+k(3)*y(2);
 
 % rule    : essai
-% reaction: U(x!1, y~p), T(x!1) -> T(x) + T(x) 
+% reaction: U(x[1] y{p}[.]), T(x[1]) -> T(x[.]) + T(x[.]) 
 
 jac(5,5)=jac(5,5)-k(1);
 jac(2,5)=jac(2,5)+k(1);
 jac(2,5)=jac(2,5)+k(1);
 
 % rule    : unbind
-% reaction: U(x!1, y~p), T(x!1) -> U(x, y~p) + T(x) 
+% reaction: U(x[1] y{p}[.]), T(x[1]) -> U(x[.] y{p}[.]) + T(x[.]) 
 
 jac(5,2)=jac(5,2)-jack(4,2)*y(5);
 jac(5,4)=jac(5,4)-jack(4,4)*y(5);
@@ -382,14 +382,14 @@ jac(3,5)=jac(3,5)+jack(4,5)*y(5);
 jac(3,5)=jac(3,5)+k(4);
 
 % rule    : essai
-% reaction: U(x!1, y~u), T(x!1) -> T(x) + T(x) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> T(x[.]) + T(x[.]) 
 
 jac(4,4)=jac(4,4)-k(1);
 jac(2,4)=jac(2,4)+k(1);
 jac(2,4)=jac(2,4)+k(1);
 
 % rule    : unbind
-% reaction: U(x!1, y~u), T(x!1) -> U(x, y~u) + T(x) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> U(x[.] y{u}[.]) + T(x[.]) 
 
 jac(4,2)=jac(4,2)-jack(4,2)*y(4);
 jac(4,4)=jac(4,4)-jack(4,4)*y(4);
@@ -405,19 +405,19 @@ jac(1,5)=jac(1,5)+jack(4,5)*y(4);
 jac(1,4)=jac(1,4)+k(4);
 
 % rule    : essai2
-% reaction: U(x!1, y~u), T(x!1) -> U(x!1, y~p), T(x!1) 
+% reaction: U(x[1] y{u}[.]), T(x[1]) -> U(x[1] y{p}[.]), T(x[1]) 
 
 jac(4,4)=jac(4,4)-k(2);
 jac(5,4)=jac(5,4)+k(2);
 
 % rule    : essai
-% reaction: U(x, y~u) -> T(x) 
+% reaction: U(x[.] y{u}[.]) -> T(x[.]) 
 
 jac(1,1)=jac(1,1)-k(1);
 jac(2,1)=jac(2,1)+k(1);
 
 % rule    : bind
-% reaction: U(x, y~u) + T(x) -> U(x!1, y~u), T(x!1) 
+% reaction: U(x[.] y{u}[.]) + T(x[.]) -> U(x[1] y{u}[.]), T(x[1]) 
 
 jac(2,1)=jac(2,1)-jack(3,1)*y(2)*y(1);
 jac(2,3)=jac(2,3)-jack(3,3)*y(2)*y(1);
@@ -439,7 +439,7 @@ jac(4,2)=jac(4,2)+k(3)*y(1);
 jac(4,1)=jac(4,1)+k(3)*y(2);
 
 % rule    : essai2
-% reaction: U(x, y~u) -> U(x, y~p) 
+% reaction: U(x[.] y{u}[.]) -> U(x[.] y{p}[.]) 
 
 jac(1,1)=jac(1,1)-k(2);
 jac(3,1)=jac(3,1)+k(2);

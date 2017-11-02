@@ -10,16 +10,16 @@
 %agent: D(x!x.B)
 
 %plot: [T]
--A(x!.), +B(x!.) @ 1
--B(x!.), +C(x!.) @ 1
--C(x!.), +A(x!.) @ 1
-D(x!./!1), B(x!1/!1), A(x!1/!.) @ 1
-A(x!./!1), B(x!./!1) @ 1
-'GOAL' D(x!_/!.) @ 1
+A(x[.])-, B(x[.])+ @ 1
+B(x[.])-, C(x[.])+ @ 1
+C(x[.])-, A(x[.])+ @ 1
+D(x[./1]), B(x[1/1]), A(x[1/.]) @ 1
+A(x[./1]), B(x[./1]) @ 1
+'GOAL' D(x[_/.]) @ 1
 
-/*0*/%mod: [true] do $TRACK B(x!1), D(x!1) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK B(x[1]), D(x[1]) [true] repeat [false]
 
-%init: 10 A(x!.)
-%init: 10 D(x!.)
+%init: 10 A(x[.])
+%init: 10 D(x[.])
 
 %mod: [E] = 280 do $STOP

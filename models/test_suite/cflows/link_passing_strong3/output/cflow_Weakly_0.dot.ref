@@ -8,67 +8,67 @@ node_4 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_25 [label="Intro E", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_2 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_5 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_2 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_3 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_6 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_7 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_19 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_19 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_8 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_20 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_20 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_9 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_22 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_22 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_10 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_26 [label="E(x), C(x) -> E(x!1), C(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_10 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_26 [label="E(x[.]), C(x[.]) -> E(x[1]), C(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "7" [shape=plaintext] ;
-node_11 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "8" [shape=plaintext] ;
-node_12 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_12 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "9" [shape=plaintext] ;
-node_13 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_13 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "10" [shape=plaintext] ;
-node_14 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_14 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "11" [shape=plaintext] ;
-node_15 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_15 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "12" [shape=plaintext] ;
-node_16 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_16 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "13" [shape=plaintext] ;
-node_17 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_17 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "14" [shape=plaintext] ;
-node_18 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_18 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "15" [shape=plaintext] ;
-node_21 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_21 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "16" [shape=plaintext] ;
-node_23 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_23 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "17" [shape=plaintext] ;
-node_24 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_24 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "18" [shape=plaintext] ;
-node_27 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_27 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "19" [shape=plaintext] ;
-node_28 [label="A(x), E(x!1), C(x!1) -> A(x!1), E(x!1), C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_28 [label="A(x[.]), E(x[1]), C(x[1]) -> A(x[1]), E(x[1]), C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "20" [shape=plaintext] ;
 node_29 [label="GOAL", style=filled, fillcolor=red] ;

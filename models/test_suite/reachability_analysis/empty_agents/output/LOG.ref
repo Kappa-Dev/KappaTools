@@ -193,10 +193,10 @@ Reachability analysis...
 
 		rule B() -> C() (File "empty_agents.ka", line 3, characters 0-13:) is applied for the first time
 
-	Applying rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:):
+	Applying rule C() -> D(x{u}) (File "empty_agents.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
-		rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:) is applied for the first time
+		rule C() -> D(x{u}) (File "empty_agents.ka", line 4, characters 0-16:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -217,10 +217,10 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule E() -> F(x~u) (File "empty_agents.ka", line 5, characters 0-16:):
+	Applying rule E() -> F(x{u}) (File "empty_agents.ka", line 5, characters 0-16:):
 		the precondition is not satisfied yet
 
-	Applying rule C() -> D(x~u) (File "empty_agents.ka", line 4, characters 0-16:):
+	Applying rule C() -> D(x{u}) (File "empty_agents.ka", line 4, characters 0-16:):
 		the precondition is satisfied
 
 ------------------------------------------------------------

@@ -7,8 +7,8 @@
 %agent: A(x)
 
 %plot: [T]
-'rule' A(x!.), -A(x!.) @ 1
+'rule' A(x[.]), A(x[.])- @ 1
 
-%init: 100 A(x!.)
+%init: 100 A(x[.])
 
 %mod: [E] = 99 do $STOP

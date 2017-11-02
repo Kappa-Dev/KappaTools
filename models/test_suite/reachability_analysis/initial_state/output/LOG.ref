@@ -182,13 +182,13 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u)
 
 
-	Applying rule A(x~p,y~u) -> D(x~u) (File "initial_state.ka", line 5, characters 0-23:):
+	Applying rule A(x{p} y{u}) -> D(x{u}) (File "initial_state.ka", line 5, characters 0-23:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x~u,y~u) -> A(x~p,y~u) (File "initial_state.ka", line 3, characters 0-27:):
+	Applying rule A(x{u} y{u}) -> A(x{p} y{u}) (File "initial_state.ka", line 3, characters 0-27:):
 		the precondition is satisfied
 
-		rule A(x~u,y~u) -> A(x~p,y~u) (File "initial_state.ka", line 3, characters 0-27:) is applied for the first time
+		rule A(x{u} y{u}) -> A(x{p} y{u}) (File "initial_state.ka", line 3, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
@@ -220,10 +220,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u)
 
 
-	Applying rule A(x~u,y~u) -> A(x~u,y~p) (File "initial_state.ka", line 4, characters 0-27:):
+	Applying rule A(x{u} y{u}) -> A(x{u} y{p}) (File "initial_state.ka", line 4, characters 0-27:):
 		the precondition is satisfied
 
-		rule A(x~u,y~u) -> A(x~u,y~p) (File "initial_state.ka", line 4, characters 0-27:) is applied for the first time
+		rule A(x{u} y{u}) -> A(x{u} y{p}) (File "initial_state.ka", line 4, characters 0-27:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 
@@ -255,10 +255,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~p)
 
 
-	Applying rule A(x~p,y~u) -> D(x~u) (File "initial_state.ka", line 5, characters 0-23:):
+	Applying rule A(x{p} y{u}) -> D(x{u}) (File "initial_state.ka", line 5, characters 0-23:):
 		the precondition is satisfied
 
-		rule A(x~p,y~u) -> D(x~u) (File "initial_state.ka", line 5, characters 0-23:) is applied for the first time
+		rule A(x{p} y{u}) -> D(x{u}) (File "initial_state.ka", line 5, characters 0-23:) is applied for the first time
 
 		Updating the views for A(x~,y~)
 	Dealing with creation
@@ -281,17 +281,17 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule A(x~u,y~u) -> A(x~p,y~u) (File "initial_state.ka", line 3, characters 0-27:):
+	Applying rule A(x{u} y{u}) -> A(x{p} y{u}) (File "initial_state.ka", line 3, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule A(x~u,y~u) -> A(x~u,y~p) (File "initial_state.ka", line 4, characters 0-27:):
+	Applying rule A(x{u} y{u}) -> A(x{u} y{p}) (File "initial_state.ka", line 4, characters 0-27:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)
 
-	Applying rule A(x~p,y~u) -> D(x~u) (File "initial_state.ka", line 5, characters 0-23:):
+	Applying rule A(x{p} y{u}) -> D(x{u}) (File "initial_state.ka", line 5, characters 0-23:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~)

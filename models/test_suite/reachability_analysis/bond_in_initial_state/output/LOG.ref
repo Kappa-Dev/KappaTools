@@ -5,13 +5,13 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
-			(rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
-			(rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
-				(rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated 
+			(rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
+			(rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
+				(rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated 
 
-				(rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated 
-				(rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated 
-				(rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated 
+				(rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated 
+				(rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated 
+				(rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated 
 
 	Views in initial state:
 
@@ -27,50 +27,50 @@ Reachability analysis...
 
 
 		A(x~u!1),B(x~u!1)
-		B(x~u!1),A(x~u!1)			(rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
-			(rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
+		B(x~u!1),A(x~u!1)			(rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
+			(rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
 
-	Applying rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:):
+	Applying rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:):
 		the precondition is satisfied
 
-		rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:) is applied for the first time
+		rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:) is applied for the first time
 
-	Applying rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:):
+	Applying rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:):
 		the precondition is not satisfied yet
 
-	Applying rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:):
+	Applying rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:):
+	Applying rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:):
 		the precondition is satisfied
 
-		rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:) is applied for the first time
+		rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:) is applied for the first time
 
 		Updating the views for A(x!)
 	Dealing with side effects
 
 		B(x!free,x~u)
 
-			(rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
-			(rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
-			(rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
-			(rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
+			(rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
+			(rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
+			(rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
+			(rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
 
-	Applying rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:):
+	Applying rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:):
 		the precondition is satisfied
 
-	Applying rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:):
+	Applying rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:):
 		the precondition is satisfied
 
 		Updating the views for A(x!)
 
-	Applying rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:):
+	Applying rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:):
 		the precondition is not satisfied yet
 
-	Applying rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:):
+	Applying rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:):
 		the precondition is satisfied
 
-		rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:) is applied for the first time
+		rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:) is applied for the first time
 
 		Updating the views for B(x!,x~)
 
@@ -83,15 +83,15 @@ Reachability analysis...
 		B(x~p!1),A(x~u!1)
 		A(x~u!1),B(x~p!1)
 
-			(rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
-			(rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
-			(rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
-			(rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
+			(rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
+			(rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
+			(rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:)) should be investigated
+			(rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:)) should be investigated
 
-	Applying rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:):
+	Applying rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:):
 		the precondition is satisfied
 
-	Applying rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:):
+	Applying rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:):
 		the precondition is satisfied
 
 		Updating the views for A(x!)
@@ -99,27 +99,27 @@ Reachability analysis...
 
 		B(x!free,x~p)
 
-			(rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
-			(rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
+			(rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:)) should be investigated
+			(rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:)) should be investigated
 
-	Applying rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:):
+	Applying rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:):
 		the precondition is satisfied
 
-		rule B(x~p) -> B(x~p), B(x~p) (File "initial_state.ka", line 5, characters 0-26:) is applied for the first time
+		rule B(x{p}) -> B(x{p}), B(x{p}) (File "initial_state.ka", line 5, characters 0-26:) is applied for the first time
 
 		Updating the views for B(x!,x~)
 
-	Applying rule B(x~u), B(x~u!_) -> B(x~u), B(x~p!_) (File "initial_state.ka", line 6, characters 0-37:):
+	Applying rule B(x{u}), B(x{u}[_]) -> B(x{u}), B(x{p}[_]) (File "initial_state.ka", line 6, characters 0-37:):
 		the precondition is satisfied
 
 		Updating the views for B(x!,x~)
 
 		Updating the views for B(x!,x~)
 
-	Applying rule  -> A(x~u!1), B(x~u!1) (File "initial_state.ka", line 3, characters 0-23:):
+	Applying rule  -> A(x{u}[1]), B(x{u}[1]) (File "initial_state.ka", line 3, characters 0-23:):
 		the precondition is satisfied
 
-	Applying rule A(x!_) ->  (File "initial_state.ka", line 4, characters 0-12:):
+	Applying rule A(x[_]) ->  (File "initial_state.ka", line 4, characters 0-12:):
 		the precondition is satisfied
 
 		Updating the views for A(x!)

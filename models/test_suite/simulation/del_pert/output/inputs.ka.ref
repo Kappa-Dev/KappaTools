@@ -7,12 +7,12 @@
 %agent: A(A1!A2.A, A2~n~p!A1.A)
 
 %plot: [T]
-'r' A(A1!./!1), A(A2!./!1) @ 0.0001 {1}
-'r_op' A(A1!1/!.), A(A2!1/!.) @ 0.1
+'r' A(A1[./1]), A(A2[./1]) @ 0.0001 {1}
+'r_op' A(A1[1/.]), A(A2[1/.]) @ 0.1
 
-/*0*/%mod: ([T] > 1) do $ADD 1 A(A1, A2~n) repeat ([false])
-/*1*/%mod: ([T] > 2) do $DEL 1 A() repeat ([false])
+/*0*/%mod: ([T] > 1) do $ADD 1 A(A1[.] A2{n}[.]) repeat [false]
+/*1*/%mod: ([T] > 2) do $DEL 1 A() repeat [false]
 
-%init: 2 A(A1!., A2~n!.)
+%init: 2 A(A1[.] A2{n}[.])
 
 %mod: [E] = 0 do $STOP

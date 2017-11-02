@@ -33,13 +33,13 @@ end species
 
 
 begin reactions
-# rule    : A(), A() -> A() 
+# rule    : A(), A() -> A(), . 
 # A() + A() -> A()  
 1 1,1 1 k3
-# rule    : A() ->  
+# rule    : A() -> . 
 # A() ->   
 2 1 k1_
-# rule    :  -> A() 
+# rule    : . -> A() 
 #  -> A()  
 3 2 1,2 k2_
 end reactions

@@ -9,11 +9,11 @@ node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_5 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_6 [label="A(b) -> ", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="C(a[_]) -> C(a[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="A(b[.]) -> .", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_7 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="B(a[.]), C(a{u}[.]) -> B(a[1]), C(a{p}[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
 node_8 [label="D", style=filled, fillcolor=red] ;

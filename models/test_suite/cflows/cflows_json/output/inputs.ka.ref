@@ -8,22 +8,22 @@
 %agent: A(a~u~p!a.B!b.B)
 %agent: B(a~u~p!a.A, b!a.A)
 
-%var:/*0*/ 'ApBp' |A(a~p!.)|*|B(a~p!.)|
-%var:/*1*/ 'ABA' |A(a~p!1), B(a~p!1, b!2), A(a~p!2)|
+%var:/*0*/ 'ApBp' |A(a{p}[.])|*|B(a{p}[.])|
+%var:/*1*/ 'ABA' |A(a{p}[1]), B(a{p}[1] b[2]), A(a{p}[2])|
 %plot: [T]
 %plot: ApBp
 %plot: ABA
 
-'Ap' A(a~u/~p!.) @ 0.01
-'Bp' B(a~u/~p!.) @ 0.01
-'A.B' A(a~p!./!1), B(a~p!./!1) @ 0.01
-'A..B' A(a~p!1/!.), B(a~p!1/!.) @ 0.01
-'A.B.A' A(a~p!./!1), B(a~p!./!1, b!./!2), A(a~p!./!2) @ 0.01
+'Ap' A(a{u/p}[.]) @ 0.01
+'Bp' B(a{u/p}[.]) @ 0.01
+'A.B' A(a{p}[./1]), B(a{p}[./1]) @ 0.01
+'A..B' A(a{p}[1/.]), B(a{p}[1/.]) @ 0.01
+'A.B.A' A(a{p}[./1]), B(a{p}[./1] b[./2]), A(a{p}[./2]) @ 0.01
 
-/*0*/%mod: [true] do $TRACK A(a~p!.), B(a~p!.) [true] repeat ([false])
-/*1*/%mod: [true] do $TRACK A(a~p!1), B(a~p!1, b!2), A(a~p!2) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK A(a{p}[.]), B(a{p}[.]) [true] repeat [false]
+/*1*/%mod: [true] do $TRACK A(a{p}[1]), B(a{p}[1] b[2]), A(a{p}[2]) [true] repeat [false]
 
-%init: 1000 A(a~u!.)
-%init: 1000 B(a~u!., b!.)
+%init: 1000 A(a{u}[.])
+%init: 1000 B(a{u}[.] b[.])
 
 %mod: [E] = 98 do $STOP

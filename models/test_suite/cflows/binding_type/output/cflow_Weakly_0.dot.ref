@@ -11,10 +11,10 @@ node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_3 [label="A(x), K(x) -> A(x!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="A(x[.]), K(x[.]) -> A(x[1]), K(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="A(x!x.K,y~u) -> A(x!x.K,y~p)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="A(x[x.K] y{u}[.]) -> A(x[x.K] y{p}[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
 node_5 [label="GOAL", style=filled, fillcolor=red] ;

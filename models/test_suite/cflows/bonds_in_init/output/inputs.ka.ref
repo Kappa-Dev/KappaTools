@@ -10,18 +10,18 @@
 %agent: S(k!s.K, l!s.L, z!s.Z, x~u~p, y~u~p)
 %agent: K(s!k.S, x~u~p)
 
-%var:/*0*/ 'L' |L(z!.)|
+%var:/*0*/ 'L' |L(z[.])|
 %plot: [T]
-'Signal' K(x~u/~p!.) @ 1
-'K.S' K(s!./!0, x~p!.), S(k!./!0) @ 1
-'K.S_op' K(s!0/!., x~p!.), S(k!0/!.) @ 1
-'KpSx' K(s!0), S(k!0, x~u/~p!.) @ 1
-'KpSy' K(s!0), S(k!0, y~u/~p!.) @ 1
-'S.L.Z' S(l!./!1, z!./!2, x~p!., y~p!.), L(z!0, s!./!1), Z(l!0, s!./!2) @ 1
-'S..L..Z' S(l!1/!., z!2/!.), L(z!0/!., s!1/!.), Z(l!0/!., s!2/!.) @ 1
+'Signal' K(x{u/p}[.]) @ 1
+'K.S' K(s[./0] x{p}[.]), S(k[./0]) @ 1
+'K.S_op' K(s[0/.] x{p}[.]), S(k[0/.]) @ 1
+'KpSx' K(s[0]), S(k[0] x{u/p}[.]) @ 1
+'KpSy' K(s[0]), S(k[0] y{u/p}[.]) @ 1
+'S.L.Z' S(l[./1] z[./2] x{p}[.] y{p}[.]), L(z[0] s[./1]), Z(l[0] s[./2]) @ 1
+'S..L..Z' S(l[1/.] z[2/.]), L(z[0/.] s[1/.]), Z(l[0/.] s[2/.]) @ 1
 
-/*0*/%mod: [true] do $TRACK L(z!.) [true] repeat ([false])
+/*0*/%mod: [true] do $TRACK L(z[.]) [true] repeat [false]
 
-%init: 10 K(s!., x~u!.), S(k!., l!., z!., x~u!., y~u!.), L(z!1, s!.), Z(l!1, s!.)
+%init: 10 K(s[.] x{u}[.]), S(k[.] l[.] z[.] x{u}[.] y{u}[.]), L(z[1] s[.]), Z(l[1] s[.])
 
 %mod: [E] = 686 do $STOP
