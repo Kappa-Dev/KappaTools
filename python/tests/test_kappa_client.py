@@ -190,7 +190,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
         """
         project_id = str(uuid.uuid1())
         runtime = self.getRuntime(project_id)
-        info = runtime.info()
+        info = runtime.get_info()
         self.assertIsNotNone('environment_projects' in info)
         self.assertIsNotNone('environment_build' in info)
 

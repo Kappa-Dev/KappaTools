@@ -111,7 +111,7 @@ def main():
                 print("plot")
                 print(plot_detail)
         else:
-            print(runtime.info())
+            print(runtime.get_info())
     except kappa_common.KappaError as exception:
         print(exception.errors)
     return None
