@@ -5,6 +5,7 @@ __all__ = ['KappaRest']
 
 import json
 from urllib import error, request, parse
+from os.path import join
 
 from kappy.kappa_common import KappaError, hydrate_file, hydrate_file_metadata,\
                                PlotLimit
@@ -19,18 +20,20 @@ class KappaRest(object):
         self.url = "{0}/v2".format(endpoint)
         self.project_id = project_id
         if not project_id in self.project_info():
-            self.project_create(project_id)
+            self.project_create()
+        return
 
     def __del__(self):
         self.project_delete()
 
-    def dispatch(self, method, url, data):
+    def _dispatch(self, method, sub_url=None, data=None):
+        if sub_url is not None:
+            url = join(self.url, sub_url)
         handler = request.HTTPHandler()
         opener = request.build_opener(handler)
         if data is not None:
             code = json.dumps(data)
-            request = request.Request(url,
-                                             data=code.encode("utf-8"))
+            request = request.Request(url, data=code.encode("utf-8"))
         else:
             request = request.Request(url)
         request.get_method = lambda: method
@@ -49,6 +52,26 @@ class KappaRest(object):
         else:
             return details
 
+    def _get(self, sub_url=None, data=None):
+        """Thin wrapper around _dispatch function using method GET"""
+        return self._dispatch('GET', sub_url, data)
+
+    def _post(self, sub_url=None, data=None):
+        """Thin wrapper around _dispatch function using method POST"""
+        return self._dispatch("POST", sub_url, data)
+
+    def _delete(self, sub_url=None, data=None):
+        """Thin wrapper around _dispatch function using method DELETE"""
+        return self._dispatch("DELETE", sub_url, data)
+
+    def _put(self, sub_url=None, data=None):
+        """Thin wrapper around _dispatch function using method PUT"""
+        return self._dispatch("PUT", sub_url, data)
+
+    def in_project(self, *elements):
+        """Method to ease navigating the path structure within a project."""
+        return join('projects', self.project_id, *elements)
+    
     def shutdown(self, key):
         """Shut down kappa instance.
         
@@ -79,132 +102,124 @@ class KappaRest(object):
         else:
             raise exception
 
-    def info(self):
-        method = "GET"
-        url = "{0}".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
+    def get_info(self):
+        """Get a json dict with info about the kappa server."""
+        return self._get(self.url)
 
-    def project_create(self,project_id):
-        method = "POST"
-        url = "{0}/projects".format(self.url)
-        body = { "project_id" : project_id }
-        return(self.dispatch(method,url,body))
+    def project_create(self):
+        """Create this project with given."""
+        return self._post('projects', {"project_id": self.project_id})
 
     def project_info(self):
-        method = "GET"
-        url = "{0}/projects".format(self.url)
-        body = None
-        return(self.dispatch(method,url,body))
+        """Get json with info about all the projects."""
+        return self._get('projects')
 
     def project_delete(self):
-        method = "DELETE"
-        url = "{0}/projects/{1}".format(self.url,self.project_id)
-        body = None
-        return(self.dispatch(method,url,body))
+        """Delete this project.
+        
+        Note that the project can still be recreated with `project_create`
+        method. The effect of these two commands would be to clear the project.
+        """
+        return self._delete(self.in_project())
 
-    def project_parse(self,overwrites=[]):
-        method = "POST"
-        url = "{0}/projects/{1}/parse".format(self.url,self.project_id)
-        body = overwrites
-        return(self.dispatch(method,url,body))
+    def project_parse(self, overwrites=None):
+        """Parse all the files added to the project so simulations can run."""
+        if overwrites is None:
+            overwrites = []
+        return self._post(self.in_project('parse'), overwrites)
 
-    def file_create(self,file_object):
-        method = "POST"
-        url = "{0}/projects/{1}/files".format(self.url,self.project_id)
-        body = file_object.toJSON()
-        return(self.dispatch(method,url,body))
+    def file_create(self, file_object):
+        """Create the given file object on the server as JSON."""
+        # TODO: Get file id back?
+        return self._post(self.in_project('files'), file_object.toJSON())
 
-    def file_delete(self,file_id):
-        method = "DELETE"
-        url = "{0}/projects/{1}/files/{2}".format(self.url,self.project_id,file_id)
-        body = None
-        return(self.dispatch(method,url,body))
+    def file_delete(self, file_id):
+        """Delete the file given by file_id from the server."""
+        return self._delete(self.in_project('files', file_id))
 
-    def file_get(self,file_id):
-        method = "GET"
-        url = "{0}/projects/{1}/files/{2}".format(self.url,self.project_id,file_id)
-        body = None
-        file = self.dispatch(method,url,body)
-        return(hydrate_file(file))
+    def file_get(self, file_id):
+        """Get a file object from the server."""
+        file = self._get(self.in_project('files', file_id))
+        return hydrate_file(file)
 
     def file_info(self):
-        method = "GET"
-        url = "{0}/projects/{1}/files".format(self.url,self.project_id)
-        body = None
-        info = self.dispatch(method,url,body)
-        #return(list(map(hydrate_filemetada,info)))
-        return(map(hydrate_file_metadata,info))
+        """Get info on all the files in the project."""
+        info = self._get(self.in_project('files'))
+        return map(hydrate_file_metadata, info)
 
     def simulation_delete(self):
-        method = "DELETE"
-        url = "{0}/projects/{1}/simulation".format(self.url,self.project_id)
-        body = None
-        return(self.dispatch(method,url,body))
+        return self._delete(self.in_project('simulation'))
 
-    def simulation_file_line(self,file_line_id):
-        url = "{0}/projects/{1}/simulation/file_lines/{2}".format(self.url,self.project_id,file_line_id)
-        return(self.dispatch("GET",url,None))
+    def simulation_file_line(self, file_line_id):
+        sub_url = self.in_project('simulation', 'file_lines', file_line_id)
+        return self._get(sub_url)
 
-    def simulation_DIN(self,flux_map_id):
-        url = "{0}/projects/{1}/simulation/fluxmaps/{2}".format(self.url,self.project_id,flux_map_id)
-        return(self.dispatch("GET",url,None))
+    def simulation_DIN(self, flux_map_id):
+        return self._get(self.in_project('simulation', 'fluxmaps', flux_map_id))
 
     def simulation_log_messages(self):
-        url = "{0}/projects/{1}/simulation/logmessages".format(self.url,self.project_id)
-        return(self.dispatch("GET",url,None))
+        return self._get(self.in_project('simulation', 'logmessages'))
 
-    def simulation_plot(self, limit = None) :
+    def simulation_plot(self, limit=None):
+        """Get plot data from the simulation.
+        
+        Note: No actual plot is produced as a result of this function call.
+        
+        Inputs
+        ------
+        limit -- (default None) A kappy PlotLimit object used to specify the
+            resolution and size of the data returned.
+
+        Returns
+        -------
+        simulation_results -- a json containing the data from the simulation.
+        """
         if limit is not None:
             parameter = limit.toURL()
         else:
             parameter = PlotLimit().toURL()
-        url = "{0}/projects/{1}/simulation/plot?{2}".format(self.url,self.project_id,parameter)
-        return(self.dispatch("GET",url,None))
-
-    def simulation_snapshot(self,snapshot_id):
-        url = "{0}/projects/{1}/simulation/snapshots/{2}".format(self.url,self.project_id,snapshot_id)
-        return(self.dispatch("GET",url,None))
+        plot_query = "plot?%s" % parameter
+        return self._get(self.in_project('simulation', plot_query))
 
     def simulation_info(self):
-        url = "{0}/projects/{1}/simulation".format(self.url,self.project_id)
-        return(self.dispatch("GET",url,None))
+        return self._get(self.in_project('simulation'))
 
     def simulation_info_file_line(self):
-        url = "{0}/projects/{1}/simulation/file_lines".format(self.url,self.project_id)
-        return(self.dispatch("GET",url,None))
+        return self._get(self.in_project('simulation', 'file_lines'))
 
     def simulation_DINs(self):
-        url = "{0}/projects/{1}/simulation/fluxmaps".format(self.url,self.project_id)
-        return(self.dispatch("GET",url,None))
+        return self._get(self.in_project('simulation', 'fluxmaps'))
 
     def simulation_snapshots(self):
-        url = "{0}/projects/{1}/simulation/snapshots".format(self.url,
-                                                             self.project_id)
-        return(self.dispatch("GET",url,None))
+        return self._get(self.in_project('simulation', 'snapshots'))
+
+    def simulation_snapshot(self,snapshot_id):
+        return self._get(self.in_project('simulation', 'snapshots',
+                                            snapshot_id))
 
     def simulation_delete(self):
-        url = "{0}/projects/{1}/simulation".format(self.url,
-                                                   self.project_id)
-        return(self.dispatch("DELETE",url,None))
+        return self._delete(self.in_project('simulation'))
 
     def simulation_pause(self):
-        message = { "action" : "pause" }
-        url = "{0}/projects/{1}/simulation/pause".format(self.url,
-                                                   self.project_id)
-        return(self.dispatch("PUT",url,message ))
+        return self._put(self.in_project('simulation', 'pause'),
+                         {'action': 'pause'})
 
-    def simulation_perturbation(self,perturbation_code):
-        url = "{0}/projects/{1}/simulation/perturbation".format(self.url,
-                                                   self.project_id)
-        message = { "perturbation_code" : perturbation_code }
-        return(self.dispatch("PUT",url,message ))
+    def simulation_perturbation(self, perturbation_code):
+        return self._put(self.in_project('simulation', 'perturbation'),
+                         {'perturbation_code': perturbation_code})
 
-    def simulation_start(self,simulation_parameter):
-        url = "{0}/projects/{1}/simulation".format(self.url,self.project_id)
-        message = simulation_parameter.toJSON()
-        return(self.dispatch("POST",url,message ))
+    def simulation_start(self, simulation_parameter):
+        """Start the simulation.
 
-    def simulation_continue(self,pause_condition):
-        url = "{0}/projects/{1}/simulation/continue".format(self.url,self.project_id)
-        return(self.dispatch("PUT",url,pause_condition))
+        Inputs
+        ------
+        simulation_parameter -- a kappy SimulationParameter object which
+            as teh name suggests defines the simulation parameters.
+        """
+        return self._post(self.in_project('simulation'),
+                          simulation_parameter.toJSON())
+
+    def simulation_continue(self, pause_condition):
+        """Continue a paused simulation."""
+        return self._put(self.in_project('simulation', 'continue'),
+                         pause_condition)
