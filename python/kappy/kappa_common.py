@@ -10,7 +10,9 @@ import json
 class FileMetadata(object):
      # NOTE: Two of these input names should be changed: `id` to `file_id`, or
      # `compile` to `do_compile` to avoid conflicting with buildins.
-    def __init__(self, id, position, compile=True, file_version=[]):
+    def __init__(self, id, position, compile=True, file_version=None):
+        if file_version is None:
+            file_version = []
         self.id = id
         self.position = position
         self.compile = compile
