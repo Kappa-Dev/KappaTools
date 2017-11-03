@@ -74,6 +74,9 @@ dist/
 python/*.egg-info
 .idea
 
+# eclipse
+.project
+
 \#*#
 .\#*
 
