@@ -95,7 +95,7 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "sanity.ka", line 9, characters 4-34:) will never be applied.
+rule r0 (File "sanity.ka", line 9, characters 5-51:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa dead_agents.ka --no-compute-contact-map --influence-map-accuracy-level Low --debugging-mode --output-directory output -syntax 3
+#Command line is: KaSa dead_agents.ka --no-compute-contact-map --influence-map-accuracy-level Low --debugging-mode --output-directory output -syntax 4
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
@@ -14,8 +14,8 @@ digraph G{
 "5:A(x~u?)->A(x~p?)" [shape="box" fillcolor="#87ceeb" style=filled];
 "6:A(x~u!_)->A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
 "7:A(x~u!_)->A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"8:D(x)->A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"9:E(x!_)->A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"8:D(x),.->.,A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"9:E(x!_),.->.,A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
 "0:A(x~q),B(x~u)->A(x~u),B(x~p)" -> "2:B(x~p)->B(x~u)" [label="[1->0]" color="green"];
 "0:A(x~q),B(x~u)->A(x~u),B(x~p)" -> "3:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
 "0:A(x~q),B(x~u)->A(x~u),B(x~p)" -> "5:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
@@ -34,18 +34,18 @@ digraph G{
 "6:A(x~u!_)->A(x~p)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
 "7:A(x~u!_)->A(x~p)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
 "7:A(x~u!_)->A(x~p)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "3:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "5:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "6:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
-"8:D(x)->A(x~u)" -> "7:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "3:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "4:A(x~p?)->A(x~u?)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "5:A(x~u?)->A(x~p?)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "6:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
-"9:E(x!_)->A(x~u)" -> "7:A(x~u!_)->A(x~p)" [label="[0->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[1->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "3:A(x~u?)->A(x~p?)" [label="[1->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "4:A(x~p?)->A(x~u?)" [label="[1->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "5:A(x~u?)->A(x~p?)" [label="[1->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "6:A(x~u!_)->A(x~p)" [label="[1->0]" color="green"];
+"8:D(x),.->.,A(x~u)" -> "7:A(x~u!_)->A(x~p)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "3:A(x~u?)->A(x~p?)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "4:A(x~p?)->A(x~u?)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "5:A(x~u?)->A(x~p?)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "6:A(x~u!_)->A(x~p)" [label="[1->0]" color="green"];
+"9:E(x!_),.->.,A(x~u)" -> "7:A(x~u!_)->A(x~p)" [label="[1->0]" color="green"];
 "0:A(x~q),B(x~u)->A(x~u),B(x~p)" -> "1:B(x~u)->B(x~p)" [label="[1->0]" color="red" arrowhead="tee"];
 "1:B(x~u)->B(x~p)" -> "0:A(x~q),B(x~u)->A(x~u),B(x~p)" [label="[0->1]" color="red" arrowhead="tee"];
 "3:A(x~u?)->A(x~p?)" -> "5:A(x~u?)->A(x~p?)" [label="[0->0]" color="red" arrowhead="tee"];

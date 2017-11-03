@@ -312,9 +312,9 @@ Influence_map:Wake_up_map:rule(3):'' A(x~a?)->A(x~a) -> rule(4):'' A(x~b)->A(x~a
 Influence_map:Wake_up_map:rule(3):'' A(x~a?)->A(x~a) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0*->1];[0->1]
 Influence_map:Wake_up_map:rule(4):'' A(x~b)->A(x~a) -> rule(0):'' A(x~a?)->A(x~b?)[0->0]
 Influence_map:Wake_up_map:rule(4):'' A(x~b)->A(x~a) -> rule(3):'' A(x~a?)->A(x~a)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(x?)-> -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0*->0];[0*->1]
-Influence_map:Wake_up_map:rule(5):'' A(x?)-> -> rule(4):'' A(x~b)->A(x~a)[0*->0]
-Influence_map:Wake_up_map:rule(5):'' A(x?)-> -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0*->1]
+Influence_map:Wake_up_map:rule(5):'' A(x?)->. -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0*->0];[0*->1]
+Influence_map:Wake_up_map:rule(5):'' A(x?)->. -> rule(4):'' A(x~b)->A(x~a)[0*->0]
+Influence_map:Wake_up_map:rule(5):'' A(x?)->. -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0*->1]
 Influence_map:Wake_up_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0*->0];[0*->1]
 Influence_map:Wake_up_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(4):'' A(x~b)->A(x~a)[0*->0]
 Influence_map:Wake_up_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0*->1]
@@ -322,12 +322,12 @@ Influence_map:Inhibition_map:rule(0):'' A(x~a?)->A(x~b?) -> rule(3):'' A(x~a?)->
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->1];[1->0]
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(4):'' A(x~b)->A(x~a)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1];[1->1]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(0):'' A(x~a?)->A(x~b?)[0->0]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(1):'' A(x?)->A(x)[0->0]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(3):'' A(x~a?)->A(x~a)[0->0]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(4):'' A(x~b)->A(x~a)[0->0]
-Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(0):'' A(x~a?)->A(x~b?)[0->0]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(1):'' A(x?)->A(x)[0->0]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(3):'' A(x~a?)->A(x~a)[0->0]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(4):'' A(x~b)->A(x~a)[0->0]
+Influence_map:Inhibition_map:rule(5):'' A(x?)->. -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->0];[0->1]
 Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1];[1->0];[1->1]
 Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(4):'' A(x~b)->A(x~a)[0->0];[1->0]
 Influence_map:Inhibition_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1]
@@ -336,13 +336,13 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "question_marks.ka", line 3, characters 0-21: will never be applied.
-rule File "question_marks.ka", line 4, characters 0-16: will never be applied.
-rule File "question_marks.ka", line 5, characters 0-29: will never be applied.
-rule File "question_marks.ka", line 6, characters 0-20: will never be applied.
-rule File "question_marks.ka", line 7, characters 0-19: will never be applied.
-rule File "question_marks.ka", line 8, characters 0-11: will never be applied.
-rule File "question_marks.ka", line 9, characters 0-30: will never be applied.
+rule File "question_marks.ka", line 3, characters 0-28: will never be applied.
+rule File "question_marks.ka", line 4, characters 0-22: will never be applied.
+rule File "question_marks.ka", line 5, characters 0-38: will never be applied.
+rule File "question_marks.ka", line 6, characters 0-28: will never be applied.
+rule File "question_marks.ka", line 7, characters 0-28: will never be applied.
+rule File "question_marks.ka", line 8, characters 0-16: will never be applied.
+rule File "question_marks.ka", line 9, characters 0-38: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

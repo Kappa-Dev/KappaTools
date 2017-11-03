@@ -17,33 +17,33 @@ Generating the raw contact map...
 Compilation:Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:Ghost
 Compilation:rules:0:lhs:agent_id_1:
-Compilation:rules:0:lhs:agent_id_1:Ghost
 Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
-Compilation:rules:0:rhs:agent_id_0:Ghost
 Compilation:rules:0:rhs:agent_id_1:
+Compilation:rules:0:rhs:agent_id_1:Ghost
 Compilation:rules:0:direct:
-Compilation:rules:0:direct:agent_id_1:
+Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:reverse:
-Compilation:rules:0:reverse:agent_id_0:
-Compilation:rules:0:actions:deletion:(agent_id_0,agent_type_0)
-Compilation:rules:0:actions:creation:(agent_id_1,agent_type_1)
+Compilation:rules:0:reverse:agent_id_1:
+Compilation:rules:0:actions:deletion:(agent_id_1,agent_type_0)
+Compilation:rules:0:actions:creation:(agent_id_0,agent_type_1)
 Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:Ghost
 Compilation:rules:1:lhs:agent_id_1:
-Compilation:rules:1:lhs:agent_id_1:Ghost
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
-Compilation:rules:1:rhs:agent_id_0:Ghost
 Compilation:rules:1:rhs:agent_id_1:
+Compilation:rules:1:rhs:agent_id_1:Ghost
 Compilation:rules:1:direct:
-Compilation:rules:1:direct:agent_id_1:
+Compilation:rules:1:direct:agent_id_0:
 Compilation:rules:1:reverse:
-Compilation:rules:1:reverse:agent_id_0:
-Compilation:rules:1:actions:deletion:(agent_id_0,agent_type_1)
-Compilation:rules:1:actions:creation:(agent_id_1,agent_type_2)
+Compilation:rules:1:reverse:agent_id_1:
+Compilation:rules:1:actions:deletion:(agent_id_1,agent_type_1)
+Compilation:rules:1:actions:creation:(agent_id_0,agent_type_2)
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -70,28 +70,28 @@ Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:0,rule:0->[0]
-Quarks:agent_test**:agent_type:1,rule:1->[0]
+Quarks:agent_test**:agent_type:0,rule:0->[1]
+Quarks:agent_test**:agent_type:1,rule:1->[1]
 Quarks:agent_modif+:agent_type:1,rule:0->[0]
 Quarks:agent_modif+:agent_type:2,rule:1->[0]
-Quarks:agent_modif-:agent_type:0,rule:0->[0]
-Quarks:agent_modif-:agent_type:1,rule:1->[0]
+Quarks:agent_modif-:agent_type:0,rule:0->[1]
+Quarks:agent_modif-:agent_type:1,rule:1->[1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' .,A()->B(),. -> rule(1):'r1' .,B()->C(),.[0->1]
 Reachability analysis...
 
-	Applying rule r0 (File "create.ka", line 11, characters 4-18:):
+	Applying rule r0 (File "create.ka", line 11, characters 5-23:):
 		the precondition is not satisfied yet
 
-	Applying rule r1 (File "create.ka", line 12, characters 4-18:):
+	Applying rule r1 (File "create.ka", line 12, characters 5-23:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "create.ka", line 11, characters 4-18:) will never be applied.
-rule r1 (File "create.ka", line 12, characters 4-18:) will never be applied.
+rule r0 (File "create.ka", line 11, characters 5-23:) will never be applied.
+rule r1 (File "create.ka", line 12, characters 5-23:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

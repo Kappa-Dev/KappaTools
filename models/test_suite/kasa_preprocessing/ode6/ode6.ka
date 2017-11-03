@@ -1,15 +1,15 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
+// Signatures
 
 %agent: ab(x)
-%agent: Sh(x~u~p,y)
+%agent: Sh(x{u p},y)
 %agent: R(x,y,z,k,t)
 %agent: E(x,y)
 
-#### Rules
-'r0' Sh(x~u,y), ab(x) -> Sh(x~p!1,y), ab(x!1) @1
-'r1' Sh(x~u,y), R(x,y,z) -> Sh(x~p,y!1), R(x,y,z!1) @1
-'r2' R(x,y,z), R(k,t) -> R(x,y!1,z), R(k!1,t) @1
-'r3' R(k,t), E(y) -> R(k,t!1), E(y!1) @1
-'r4' R(x,y,z), E(x) -> R(x!1,y,z), E(x!1) @1
+// Rules
+'r0' Sh(x{u}[.],y[.]), ab(x[.]) -> Sh(x{p}[1],y[.]), ab(x[1]) @ 1
+'r1' Sh(x{u}[.],y[.]), R(x[.],y[.],z[.]) -> Sh(x{p}[.],y[1]), R(x[.],y[.],z[1]) @ 1
+'r2' R(x[.],y[.],z[.]), R(k[.],t[.]) -> R(x[.],y[1],z[.]), R(k[1],t[.]) @ 1
+'r3' R(k[.],t[.]), E(y[.]) -> R(k[.],t[1]), E(y[1]) @ 1
+'r4' R(x[.],y[.],z[.]), E(x[.]) -> R(x[1],y[.],z[.]), E(x[1]) @ 1

@@ -118,8 +118,8 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "sanity1.ka", line 9, characters 4-34:) will never be applied.
-rule r1 (File "sanity1.ka", line 10, characters 4-24:) will never be applied.
+rule r0 (File "sanity1.ka", line 9, characters 5-51:) will never be applied.
+rule r1 (File "sanity1.ka", line 10, characters 5-33:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

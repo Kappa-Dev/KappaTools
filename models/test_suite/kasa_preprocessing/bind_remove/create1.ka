@@ -1,12 +1,12 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
+// Signatures
 
 %agent: A(x)
 %agent: B(x)
 %agent: C(x)
 
-#### Rules
+// Rules
 
-'r0' A(x), B(x) -> A(x!1),B(x!1) @1
-'r1' B(x!_) -> C(x) @1
+'r0' A(x[.]), B(x[.]) -> A(x[1]), B(x[1]) @ 1
+'r1' B(x[_]),. -> .,C(x[.]) @ 1

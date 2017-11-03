@@ -1,12 +1,12 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
+// Signatures
 
 %agent: A(x, y)
 %agent: B(x, y)
-%agent: C(x~u, y~p)
+%agent: C(x{u}, y{p})
 
-#### Rules
+// Rules
 
-'r0' A(x,y),B(x,y) <-> A(x!1,y!2),B(x!1,y!2) @1,2
-'r1' B(x!_,y!_),C(x~u,y~p) <-> B(x!1,y!2),C(x~u!1,y~p!2) @1,2
+'r0' A(x[.],y[.]),B(x[.],y[.]) <-> A(x[1],y[2]),B(x[1],y[2]) @ 1,2
+'r1' B(x[_],y[_]),C(x{u}[.],y{p}[.]) <-> B(x[1],y[2]),C(x{u}[1],y{p}[2]) @ 1,2

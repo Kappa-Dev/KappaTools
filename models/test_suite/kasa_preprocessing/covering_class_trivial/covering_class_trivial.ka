@@ -1,9 +1,9 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+/* TEMPLATE MODEL AS DESCRIBED IN THE MANUAL */
 
-#### Signatures
+// Signatures
 %agent: A(x,y,z)
 
-#### Rules
-'r0' A(x~u, y~u) -> A(x~u,y~p) @1
-'r1' A(x~u, z~u) -> A(x~u,z~p) @1
-'r2' A(x~u, y~u, z~u) -> A(x~u,y~u,z~u) @1
+// Rules
+'r0' A(x{u}[.], y{u}[.]) -> A(x{u}[.],y{p}[.]) @ 1
+'r1' A(x{u}[.], z{u}[.]) -> A(x{u}[.],z{p}[.]) @ 1
+'r2' A(x{u}[.], y{u}[.], z{u}[.]) -> A(x{u}[.],y{u}[.],z{u}[.]) @ 1

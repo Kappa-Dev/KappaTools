@@ -234,28 +234,28 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Wake_up_map:rule(0):'' A(x),B(x)->A(x!1),B(x!1) -> rule(2):'' B(x!_)->B(x)[1->0]
 Influence_map:Wake_up_map:rule(1):'' A(x!_)->A(x) -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0*->1];[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x!_)->A(x) -> rule(4):'' B(x)->[0*->0]
+Influence_map:Wake_up_map:rule(1):'' A(x!_)->A(x) -> rule(4):'' B(x)->.[0*->0]
 Influence_map:Wake_up_map:rule(2):'' B(x!_)->B(x) -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0*->0];[0->1]
-Influence_map:Wake_up_map:rule(2):'' B(x!_)->B(x) -> rule(4):'' B(x)->[0->0]
-Influence_map:Wake_up_map:rule(3):'' A()-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0*->1]
-Influence_map:Wake_up_map:rule(3):'' A()-> -> rule(4):'' B(x)->[0*->0]
-Influence_map:Inhibition_map:rule(0):'' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'' B(x)->[1->0]
+Influence_map:Wake_up_map:rule(2):'' B(x!_)->B(x) -> rule(4):'' B(x)->.[0->0]
+Influence_map:Wake_up_map:rule(3):'' A()->. -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0*->1]
+Influence_map:Wake_up_map:rule(3):'' A()->. -> rule(4):'' B(x)->.[0*->0]
+Influence_map:Inhibition_map:rule(0):'' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'' B(x)->.[1->0]
 Influence_map:Inhibition_map:rule(1):'' A(x!_)->A(x) -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(2):'' B(x!_)->B(x) -> rule(1):'' A(x!_)->A(x)[0*->0]
-Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->0]
-Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
-Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
-Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
+Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->0]
+Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(1):'' A(x!_)->A(x)[0->0]
+Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(2):'' B(x!_)->B(x)[0*->0]
+Influence_map:Inhibition_map:rule(4):'' B(x)->. -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Reachability analysis...
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "side_effect.ka", line 8, characters 0-29: will never be applied.
-rule File "side_effect.ka", line 9, characters 0-17: will never be applied.
-rule File "side_effect.ka", line 10, characters 0-17: will never be applied.
-rule File "side_effect.ka", line 11, characters 0-10: will never be applied.
-rule File "side_effect.ka", line 12, characters 0-10: will never be applied.
+rule File "side_effect.ka", line 8, characters 0-38: will never be applied.
+rule File "side_effect.ka", line 9, characters 0-22: will never be applied.
+rule File "side_effect.ka", line 10, characters 0-22: will never be applied.
+rule File "side_effect.ka", line 11, characters 0-12: will never be applied.
+rule File "side_effect.ka", line 12, characters 0-16: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

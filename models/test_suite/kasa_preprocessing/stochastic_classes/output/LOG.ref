@@ -409,17 +409,17 @@ Quarks:site_modif-:agent_type:5,site_type:0,state:0,rule:6->[0]
 Quarks:site_modif-:agent_type:5,site_type:1,state:0,rule:7->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Inhibition_map:rule(4):'r4' E(x~u,y~u)-> -> rule(5):'r5' E(y~p),E(z~p)->[0->1]
-Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(4):'r4' E(x~u,y~u)->[1->0]
-Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(5):'r5' E(y~p),E(z~p)->[0->1];[1->0]
-Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0]
-Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
+Influence_map:Inhibition_map:rule(4):'r4' E(x~u,y~u)->. -> rule(5):'r5' E(y~p),E(z~p)->.,.[0->1]
+Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)->.,. -> rule(4):'r4' E(x~u,y~u)->.[1->0]
+Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)->.,. -> rule(5):'r5' E(y~p),E(z~p)->.,.[0->1];[1->0]
+Influence_map:Inhibition_map:rule(6):'r6' F(x~u)->. -> rule(7):'r7' F(y~p)->.[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' F(y~p)->. -> rule(6):'r6' F(x~u)->.[0->0]
 Reachability analysis...
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 5-38:):
 		the precondition is satisfied
 
-		rule r1 (File "stochastic_create.ka", line 8, characters 4-26:) is applied for the first time
+		rule r1 (File "stochastic_create.ka", line 8, characters 5-38:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -459,10 +459,10 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
 		the precondition is satisfied
 
-		rule r3 (File "stochastic_create.ka", line 10, characters 4-21:) is applied for the first time
+		rule r3 (File "stochastic_create.ka", line 10, characters 5-32:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -502,43 +502,43 @@ EXTENSIONAL DESCRIPTION:
 		D(x~u)
 
 
-	Applying rule r6 (File "stochastic_create.ka", line 13, characters 4-17:):
+	Applying rule r6 (File "stochastic_create.ka", line 13, characters 5-24:):
 		the precondition is not satisfied yet
 
-	Applying rule r7 (File "stochastic_create.ka", line 14, characters 4-17:):
+	Applying rule r7 (File "stochastic_create.ka", line 14, characters 5-24:):
 		the precondition is not satisfied yet
 
-	Applying rule r5 (File "stochastic_create.ka", line 12, characters 4-24:):
+	Applying rule r5 (File "stochastic_create.ka", line 12, characters 5-37:):
 		the precondition is not satisfied yet
 
-	Applying rule r4 (File "stochastic_create.ka", line 11, characters 4-21:):
+	Applying rule r4 (File "stochastic_create.ka", line 11, characters 5-32:):
 		the precondition is not satisfied yet
 
-	Applying rule r2 (File "stochastic_create.ka", line 9, characters 4-32:):
+	Applying rule r2 (File "stochastic_create.ka", line 9, characters 5-49:):
 		the precondition is not satisfied yet
 
-	Applying rule r1 (File "stochastic_create.ka", line 8, characters 4-26:):
+	Applying rule r1 (File "stochastic_create.ka", line 8, characters 5-38:):
 		the precondition is satisfied
 
-	Applying rule r8 (File "stochastic_create.ka", line 15, characters 4-38:):
+	Applying rule r8 (File "stochastic_create.ka", line 15, characters 5-55:):
 		the precondition is not satisfied yet
 
-	Applying rule r0 (File "stochastic_create.ka", line 7, characters 4-41:):
+	Applying rule r0 (File "stochastic_create.ka", line 7, characters 5-57:):
 		the precondition is not satisfied yet
 
-	Applying rule r3 (File "stochastic_create.ka", line 10, characters 4-21:):
+	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
 		the precondition is satisfied
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "stochastic_create.ka", line 7, characters 4-41:) will never be applied.
-rule r2 (File "stochastic_create.ka", line 9, characters 4-32:) will never be applied.
-rule r4 (File "stochastic_create.ka", line 11, characters 4-21:) will never be applied.
-rule r5 (File "stochastic_create.ka", line 12, characters 4-24:) will never be applied.
-rule r6 (File "stochastic_create.ka", line 13, characters 4-17:) will never be applied.
-rule r7 (File "stochastic_create.ka", line 14, characters 4-17:) will never be applied.
-rule r8 (File "stochastic_create.ka", line 15, characters 4-38:) will never be applied.
+rule r0 (File "stochastic_create.ka", line 7, characters 5-57:) will never be applied.
+rule r2 (File "stochastic_create.ka", line 9, characters 5-49:) will never be applied.
+rule r4 (File "stochastic_create.ka", line 11, characters 5-32:) will never be applied.
+rule r5 (File "stochastic_create.ka", line 12, characters 5-37:) will never be applied.
+rule r6 (File "stochastic_create.ka", line 13, characters 5-24:) will never be applied.
+rule r7 (File "stochastic_create.ka", line 14, characters 5-24:) will never be applied.
+rule r8 (File "stochastic_create.ka", line 15, characters 5-55:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

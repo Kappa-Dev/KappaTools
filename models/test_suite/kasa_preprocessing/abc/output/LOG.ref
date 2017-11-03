@@ -631,10 +631,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x1~u,x2~u,x1!free,x2!free)
 
 
-	Applying rule a.b (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		rule a.b (File "abc.ka", line 10, characters 5-56:) is applied for the first time
+		rule a.b (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
 		Updating the views for A(x!,c!)
 
@@ -686,19 +686,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x!A@x)
 
 
-	Applying rule a.b_op (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		rule a.b_op (File "abc.ka", line 10, characters 5-56:) is applied for the first time
+		rule a.b_op (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for B(x!)
 
-	Applying rule ab.c (File "abc.ka", line 12, characters 6-58:):
+	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
-		rule ab.c (File "abc.ka", line 12, characters 6-58:) is applied for the first time
+		rule ab.c (File "abc.ka", line 12, characters 7-71:) is applied for the first time
 
 		Updating the views for A(x!,c!)
 
@@ -780,10 +780,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x1~u,x2~u,x1!A@c,x2!free)
 
 
-	Applying rule mod x1 (File "abc.ka", line 13, characters 8-53:):
+	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
 		the precondition is satisfied
 
-		rule mod x1 (File "abc.ka", line 13, characters 8-53:) is applied for the first time
+		rule mod x1 (File "abc.ka", line 13, characters 9-64:) is applied for the first time
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
@@ -837,10 +837,10 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for A(x!,c!)
 
-	Applying rule a.c (File "abc.ka", line 14, characters 5-64:):
+	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
-		rule a.c (File "abc.ka", line 14, characters 5-64:) is applied for the first time
+		rule a.c (File "abc.ka", line 14, characters 6-88:) is applied for the first time
 
 		Updating the views for A(x!,c!)
 
@@ -922,10 +922,10 @@ EXTENSIONAL DESCRIPTION:
 		C(x1~p,x2~u,x1!free,x2!A@c)
 
 
-	Applying rule mod x2 (File "abc.ka", line 15, characters 8-68:):
+	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
 		the precondition is satisfied
 
-		rule mod x2 (File "abc.ka", line 15, characters 8-68:) is applied for the first time
+		rule mod x2 (File "abc.ka", line 15, characters 9-92:) is applied for the first time
 
 		Updating the views for A(x!,c!)
 
@@ -979,7 +979,7 @@ EXTENSIONAL DESCRIPTION:
 		C(x1~p,x2~p,x1!free,x2!free)
 
 
-	Applying rule a.b (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
@@ -1014,14 +1014,14 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x!)
 
-	Applying rule ab.c (File "abc.ka", line 12, characters 6-58:):
+	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
-	Applying rule a.b_op (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
@@ -1056,42 +1056,42 @@ EXTENSIONAL DESCRIPTION:
 
 		Updating the views for B(x!)
 
-	Applying rule mod x1 (File "abc.ka", line 13, characters 8-53:):
+	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
 		the precondition is satisfied
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 		Updating the views for A(x!,c!)
 
-	Applying rule a.c (File "abc.ka", line 14, characters 5-64:):
+	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
-	Applying rule mod x2 (File "abc.ka", line 15, characters 8-68:):
+	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
-	Applying rule a.b (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for B(x!)
 
-	Applying rule ab.c (File "abc.ka", line 12, characters 6-58:):
+	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
-	Applying rule a.b_op (File "abc.ka", line 10, characters 5-56:):
+	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
 		Updating the views for A(x!,c!)

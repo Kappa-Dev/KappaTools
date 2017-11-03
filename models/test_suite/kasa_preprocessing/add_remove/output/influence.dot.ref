@@ -1,20 +1,20 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa add_remove.ka --debugging-mode --output-directory output -syntax 3
+#Command line is: KaSa add_remove.ka --debugging-mode --output-directory output -syntax 4
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
 "1:A(x~p)->A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
 "2:B(x~u)->B(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
 "3:B(x~p)->B(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)" [label="[1->0]" color="green"];
-"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->0]" color="green"];
-"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="green"];
+"0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" -> "1:A(x~p)->A(x~u)" [label="[2->0]" color="green"];
+"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" [label="[0->0]" color="green"];
+"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" [label="[0->1]" color="green"];
 "2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)" [label="[0->0]" color="green"];
 "3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)" [label="[0->0]" color="green"];
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "3:B(x~p)->B(x~u)" [label="[1->0]" color="red" arrowhead="tee"];
-"3:B(x~p)->B(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="red" arrowhead="tee"];
+"0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" -> "3:B(x~p)->B(x~u)" [label="[1->0]" color="red" arrowhead="tee"];
+"3:B(x~p)->B(x~u)" -> "0:A(x~u),B(x~p),.->A(x~u),.,A(x~p)" [label="[0->1]" color="red" arrowhead="tee"];
 }

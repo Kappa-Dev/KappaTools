@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa create.ka --debugging-mode --output-directory output -syntax 3
+#Command line is: KaSa create.ka --debugging-mode --output-directory output -syntax 4
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
@@ -8,5 +8,5 @@
 digraph G{
 "r0" [shape="box" fillcolor="#87ceeb" style=filled];
 "r1" [shape="box" fillcolor="#87ceeb" style=filled];
-"r0" -> "r1" [label="[0->0]" color="green"];
+"r0" -> "r1" [label="[0->1]" color="green"];
 }

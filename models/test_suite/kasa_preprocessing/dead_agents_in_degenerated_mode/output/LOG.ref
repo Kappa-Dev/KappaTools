@@ -351,8 +351,8 @@ Quarks:agent_test**:agent_type:1,rule:1->[0]
 Quarks:agent_test**:agent_type:1,rule:2->[0]
 Quarks:agent_test**:agent_type:2,rule:8->[0]
 Quarks:agent_test**:agent_type:3,rule:9->[0]
-Quarks:agent_modif+:agent_type:0,rule:8->[0]
-Quarks:agent_modif+:agent_type:0,rule:9->[0]
+Quarks:agent_modif+:agent_type:0,rule:8->[1]
+Quarks:agent_modif+:agent_type:0,rule:9->[1]
 Quarks:agent_modif-:agent_type:2,rule:8->[0]
 Quarks:agent_modif-:agent_type:3,rule:9->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:0->[0]
@@ -367,16 +367,16 @@ Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:1->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:2->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:4->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:8->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:9->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:8->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:9->[1]
 Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:3->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:5->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:6->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:7->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:6->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:7->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:8->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:9->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:8->[1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:9->[1]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:2->[0]
@@ -408,18 +408,18 @@ Influence_map:Wake_up_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(0):'' A(x~q),B(x~u
 Influence_map:Wake_up_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
 Influence_map:Wake_up_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->0]
 Influence_map:Wake_up_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[1->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[1->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[1->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[1->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[1->0]
+Influence_map:Wake_up_map:rule(8):'' D(x),.->.,A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[1->0]
+Influence_map:Wake_up_map:rule(9):'' E(x!_),.->.,A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[1->0]
 Influence_map:Inhibition_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(1):'' B(x~u)->B(x~p)[1->0]
 Influence_map:Inhibition_map:rule(1):'' B(x~u)->B(x~p) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->1]
 Influence_map:Inhibition_map:rule(3):'' A(x~u?)->A(x~p?) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
@@ -484,19 +484,19 @@ EXTENSIONAL DESCRIPTION:
 		B(x~u)
 
 
-	Applying rule D(x) -> A(x{u}) (File "dead_agents.ka", line 17, characters 0-18:):
+	Applying rule D(x[.]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 17, characters 0-29:):
 		the precondition is not satisfied yet
 
-	Applying rule E(x[_]) -> A(x{u}) (File "dead_agents.ka", line 18, characters 0-20:):
+	Applying rule E(x[_]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 18, characters 0-29:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{q}), B(x{u}) -> A(x{u}), B(x{p}) (File "dead_agents.ka", line 10, characters 0-33:):
+	Applying rule A(x{q}[.]), B(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]) (File "dead_agents.ka", line 10, characters 0-50:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
-		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
+		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-31:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
@@ -528,24 +528,24 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,x!free)
 
 
-	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
-		rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-25:) is applied for the first time
+		rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-22:):
+	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-22:) is applied for the first time
+		rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:) is applied for the first time
 
 		Updating the views for A(x~,x!)
 
-	Applying rule B(x{u}) -> B(x{p}) (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:):
 		the precondition is satisfied
 
-		rule B(x{u}) -> B(x{p}) (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
+		rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:) is applied for the first time
 
 		Updating the views for B(x~)
 
@@ -567,44 +567,44 @@ EXTENSIONAL DESCRIPTION:
 		B(x~p)
 
 
-	Applying rule B(x{p}) -> B(x{u}) (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x{p}[.]) -> B(x{u}[.]) (File "dead_agents.ka", line 11, characters 0-31:):
 		the precondition is satisfied
 
-		rule B(x{p}) -> B(x{u}) (File "dead_agents.ka", line 11, characters 0-23:) is applied for the first time
+		rule B(x{p}[.]) -> B(x{u}[.]) (File "dead_agents.ka", line 11, characters 0-31:) is applied for the first time
 
 		Updating the views for B(x~)
 
-	Applying rule A(x{u}[_]) -> A(x{p}) (File "dead_agents.ka", line 14, characters 0-22:):
+	Applying rule A(x{u}[_]) -> A(x{p}[.]) (File "dead_agents.ka", line 14, characters 0-28:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u}[_]) -> A(x{p}) (File "dead_agents.ka", line 15, characters 0-22:):
+	Applying rule A(x{u}[_]) -> A(x{p}[.]) (File "dead_agents.ka", line 15, characters 0-28:):
 		the precondition is not satisfied yet
 
-	Applying rule E(x[_]) -> A(x{u}) (File "dead_agents.ka", line 18, characters 0-20:):
+	Applying rule E(x[_]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 18, characters 0-29:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{q}), B(x{u}) -> A(x{u}), B(x{p}) (File "dead_agents.ka", line 10, characters 0-33:):
+	Applying rule A(x{q}[.]), B(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]) (File "dead_agents.ka", line 10, characters 0-50:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule D(x) -> A(x{u}) (File "dead_agents.ka", line 17, characters 0-18:):
+	Applying rule D(x[.]), . -> ., A(x{u}[.]) (File "dead_agents.ka", line 17, characters 0-29:):
 		the precondition is not satisfied yet
 
-	Applying rule B(x{u}) -> B(x{p}) (File "dead_agents.ka", line 11, characters 0-23:):
+	Applying rule B(x{u}[.]) -> B(x{p}[.]) (File "dead_agents.ka", line 11, characters 0-31:):
 		the precondition is satisfied
 
 		Updating the views for B(x~)
 
-	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-25:):
+	Applying rule A(x{p}[#]) -> A(x{u}[#]) (File "dead_agents.ka", line 12, characters 0-31:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
 
-	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-22:):
+	Applying rule A(x{u}[#]) -> A(x{p}[#]) (File "dead_agents.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,x!)
@@ -612,11 +612,11 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "dead_agents.ka", line 10, characters 0-33: will never be applied.
-rule File "dead_agents.ka", line 14, characters 0-22: will never be applied.
-rule File "dead_agents.ka", line 15, characters 0-22: will never be applied.
-rule File "dead_agents.ka", line 17, characters 0-18: will never be applied.
-rule File "dead_agents.ka", line 18, characters 0-20: will never be applied.
+rule File "dead_agents.ka", line 10, characters 0-50: will never be applied.
+rule File "dead_agents.ka", line 14, characters 0-28: will never be applied.
+rule File "dead_agents.ka", line 15, characters 0-28: will never be applied.
+rule File "dead_agents.ka", line 17, characters 0-29: will never be applied.
+rule File "dead_agents.ka", line 18, characters 0-29: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

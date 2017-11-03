@@ -149,14 +149,14 @@ Quarks:agent_test**:agent_type:0,rule:1->[0]
 Quarks:agent_test**:agent_type:1,rule:0->[1]
 Quarks:agent_test**:agent_type:1,rule:2->[0]
 Quarks:agent_test**:agent_type:1,rule:3->[0]
-Quarks:agent_modif+:agent_type:0,rule:0->[1]
+Quarks:agent_modif+:agent_type:0,rule:0->[2]
 Quarks:agent_modif-:agent_type:1,rule:0->[1]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:1->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:0->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:3->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:2->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[2]
 Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:2->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:3->[0]
@@ -166,25 +166,25 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:2->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:1->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(1):'' A(x~p)->A(x~u)[1->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~p)->A(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(2):'' B(x~u)->B(x~p) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
+Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p),.->A(x~u),.,A(x~p) -> rule(1):'' A(x~p)->A(x~u)[2->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~p)->A(x~u) -> rule(0):'' A(x~u),B(x~p),.->A(x~u),.,A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(2):'' B(x~u)->B(x~p) -> rule(0):'' A(x~u),B(x~p),.->A(x~u),.,A(x~p)[0->1]
 Influence_map:Wake_up_map:rule(2):'' B(x~u)->B(x~p) -> rule(3):'' B(x~p)->B(x~u)[0->0]
 Influence_map:Wake_up_map:rule(3):'' B(x~p)->B(x~u) -> rule(2):'' B(x~u)->B(x~p)[0->0]
-Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):'' B(x~p)->B(x~u)[1->0]
-Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
+Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p),.->A(x~u),.,A(x~p) -> rule(3):'' B(x~p)->B(x~u)[1->0]
+Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p),.->A(x~u),.,A(x~p)[0->1]
 Reachability analysis...
 
-	Applying rule A(x{u}), B(x{p}) -> A(x{u}), A(x{p}) (File "add_remove.ka", line 7, characters 0-33:):
+	Applying rule A(x{u}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., A(x{p}[.]) (File "add_remove.ka", line 7, characters 0-54:):
 		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "add_remove.ka", line 7, characters 0-33: will never be applied.
-rule File "add_remove.ka", line 8, characters 0-19: will never be applied.
-rule File "add_remove.ka", line 9, characters 0-19: will never be applied.
-rule File "add_remove.ka", line 10, characters 0-19: will never be applied.
+rule File "add_remove.ka", line 7, characters 0-54: will never be applied.
+rule File "add_remove.ka", line 8, characters 0-28: will never be applied.
+rule File "add_remove.ka", line 9, characters 0-28: will never be applied.
+rule File "add_remove.ka", line 10, characters 0-28: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

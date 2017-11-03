@@ -1,7 +1,7 @@
-#### Signatures 
+// Signatures 
 %agent: A(x)
 %agent: B(x) 
 
-'bind' A(x),B(x) -> A(x!1),B(x!1) @1
-'remove' A(x),A(x) -> A(x),B(x),A(x) @1
+'bind' A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
+'remove' A(x[.]),A(x[.]),.,. -> A(x[.]),.,B(x[.]),A(x[.]) @ 1
 

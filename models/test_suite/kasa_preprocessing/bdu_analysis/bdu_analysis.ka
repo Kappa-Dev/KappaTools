@@ -1,16 +1,16 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
+// Signatures
 
 %agent: A(x,y)
 %agent: B(x)
 %agent: C(x)
 
-'r0' -> A(x~u, y~u) @1
-'r1' -> A(x!1), B(x!1) @1
-'r2' -> A(x,y!1), C(x!1) @1
-'r3' A() -> @1
-'r4' A(x) -> @1
-'r5' A(x!x.B) -> A(x) @1
-'r6' A(x), B(x) -> A(x!1),B(x!1) @1
-'r7' A(x, y), C(x) -> A(x,y!1), C(x!1) @1
+'r0' . -> A(x{u}[.], y{u}[.]) @ 1
+'r1' .,. -> A(x[1]), B(x[1]) @ 1
+'r2' .,. -> A(x,y[1]), C(x[1]) @ 1
+'r3' A() -> . @ 1
+'r4' A(x[.]) -> . @ 1
+'r5' A(x[x.B]) -> A(x[.]) @ 1
+'r6' A(x[.]), B(x[.]) -> A(x[1]),B(x[1]) @ 1
+'r7' A(x[.], y[.]), C(x[.]) -> A(x[.],y[1]), C(x[1]) @ 1

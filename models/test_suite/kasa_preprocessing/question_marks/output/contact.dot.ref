@@ -1,6 +1,6 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa question_marks.ka --output-directory output --debugging-mode -syntax 3
+#Command line is: KaSa question_marks.ka --output-directory output --debugging-mode -syntax 4
 #
 #This file contains the description of the contact map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF

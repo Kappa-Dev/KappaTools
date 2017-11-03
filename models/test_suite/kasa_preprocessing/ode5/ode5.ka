@@ -1,15 +1,15 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
+// Signatures
 
-%agent: A(x~u~p,y~u~p,z)
+%agent: A(x{u p},y{u p},z)
 %agent: B(x,y)
 %agent: C(x,y)
 %agent: D(x,y,z)
 
-#### Rules
-'r0' A(x~u), B(x) -> A(x~p!1), B(x!1) @1
-'r1' A(y~u), C(x) -> A(y~p!1), C(x!1) @1
-'r2' B(x!_,y), D(x) -> B(x!_,y!1), D(x!1) @1
-'r3' C(x!_,y), D(y) -> C(x!_,y!1), D(y!1) @1
-'r4' D(x!_,y!_,z), A(x!_,y!_,z) -> D(x!_,y!_,z!1), A(x!_,y!_,z!1) @1
+// Rules
+'r0' A(x{u}[.]), B(x[.]) -> A(x{p}[1]), B(x[1]) @ 1
+'r1' A(y{u}[.]), C(x[.]) -> A(y{p}[1]), C(x[1]) @ 1
+'r2' B(x[_],y[.]), D(x[.]) -> B(x[_],y[1]), D(x[1]) @ 1
+'r3' C(x[_],y[.]), D(y[.]) -> C(x[_],y[1]), D(y[1]) @ 1
+'r4' D(x[_],y[_],z[.]), A(x[_],y[_],z[.]) -> D(x[_],y[_],z[1]), A(x[_],y[_],z[1]) @ 1

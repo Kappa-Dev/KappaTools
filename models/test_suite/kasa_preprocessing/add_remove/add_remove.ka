@@ -1,11 +1,11 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
-%agent: A(x~u~p) 
-%agent: B(x~u~p)
+// Signatures
+%agent: A(x{u p}) 
+%agent: B(x{u p})
 
-A(x~u),B(x~p) -> A(x~u),A(x~p) @1
-A(x~p) -> A(x~u) @1
-B(x~u) -> B(x~p) @1
-B(x~p) -> B(x~u) @1
+A(x{u}[.]),B(x{p}[.]),. -> A(x{u}[.]),.,A(x{p}[.]) @ 1
+A(x{p}[.]) -> A(x{u}[.]) @ 1
+B(x{u}[.]) -> B(x{p}[.]) @ 1
+B(x{p}[.]) -> B(x{u}[.]) @ 1
 

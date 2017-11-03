@@ -458,11 +458,11 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r0 (File "ode6.ka", line 11, characters 4-48:) will never be applied.
-rule r1 (File "ode6.ka", line 12, characters 4-54:) will never be applied.
-rule r2 (File "ode6.ka", line 13, characters 4-48:) will never be applied.
-rule r3 (File "ode6.ka", line 14, characters 4-40:) will never be applied.
-rule r4 (File "ode6.ka", line 15, characters 4-44:) will never be applied.
+rule r0 (File "ode6.ka", line 11, characters 5-65:) will never be applied.
+rule r1 (File "ode6.ka", line 12, characters 5-83:) will never be applied.
+rule r2 (File "ode6.ka", line 13, characters 5-75:) will never be applied.
+rule r3 (File "ode6.ka", line 14, characters 5-55:) will never be applied.
+rule r4 (File "ode6.ka", line 15, characters 5-65:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

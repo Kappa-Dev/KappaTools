@@ -1,21 +1,21 @@
-############ TEST ACTIONS ##############
+/* TEST ACTIONS */
 
-#### Signatures
-#%agent: A(x~u~p~q) 
-#%agent: B(x~u~p~q)
-#%agent: D(x~u~p~q)
-#%agent: E(x~u~p~q)
-#%agent: F(x~u~p~q)
+// Signatures
+//%agent: A(x{u p q}) 
+//%agent: B(x{u p q})
+//%agent: D(x{u p q})
+//%agent: E(x{u p q})
+//%agent: F(x{u p q})
 
-A(x~q),B(x~u) -> A(x~u),B(x~p) @1
-B(x~u) <-> B(x~p) @ 1,2
-A(x~u?) <-> A(x~p?) @ 1,2
-A(x~u?) -> A(x~p?) @ 1
-A(x~u!_) -> A(x~p) @ 1
-A(x~u!_) -> A(x~p) @ 1
-#A(x~u!x.B) -> A(x~u) @ 1
-D(x) -> A(x~u) @ 1
-E(x!_) -> A(x~u) @ 1
+A(x{q}[.]),B(x{u}[.]) -> A(x{u}[.]),B(x{p}[.]) @ 1
+B(x{u}[.]) <-> B(x{p}[.]) @ 1,2
+A(x{u}[#]) <-> A(x{p}[#]) @ 1,2
+A(x{u}[#]) -> A(x{p}[#]) @ 1
+A(x{u}[_]) -> A(x{p}[.]) @ 1
+A(x{u}[_]) -> A(x{p}[.]) @ 1
+//A(x{u}[x.B]) -> A(x{u}[.]) @ 1
+D(x[.]),. -> .,A(x{u}[.]) @ 1
+E(x[_]),. -> .,A(x{u}[.]) @ 1
 
-%init: 1 A(x~u)
-%init: 1 B(x~u)
+%init: 1 A(x{u}[.])
+%init: 1 B(x{u}[.])

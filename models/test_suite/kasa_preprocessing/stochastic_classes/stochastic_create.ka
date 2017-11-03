@@ -1,15 +1,15 @@
-####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+/* TEMPLATE MODEL AS DESCRIBED IN THE MANUAL */
 
-#### Signatures
-#%agent: A(x~u~p,y~u~p)
+// Signatures
+//%agent: A(x{u p},y{u p})
 
-#### Rules
-'r0' A(x~u), A(y~u) -> A(x~p) , A(y~p) @1
-'r1'  -> B(x~u), B(y~u) @1
-'r2' C(x~u,y~u) -> C(x~p,y~u) @1
-'r3' -> D(x~u,y~u) @1
-'r4' E(x~u,y~u) -> @1
-'r5' E(y~p),E(z~p) -> @1
-'r6' F(x~u) -> @1
-'r7' F(y~p) -> @1
-'r8' A(z~u),A(t~u) -> A(z~p),A(t~u) @1
+// Rules
+'r0' A(x{u}[.]), A(y{u}[.]) -> A(x{p}[.]), A(y{p}[.]) @ 1
+'r1' .,. -> B(x{u}[.]), B(y{u}[.]) @ 1
+'r2' C(x{u}[.],y{u}[.]) -> C(x{p}[.],y{u}[.]) @ 1
+'r3' . -> D(x{u}[.],y{u}[.]) @ 1
+'r4' E(x{u}[.],y{u}[.]) -> . @ 1
+'r5' E(y{p}[.]),E(z{p}[.]) -> .,. @ 1
+'r6' F(x{u}[.]) -> . @ 1
+'r7' F(y{p}[.]) -> . @ 1
+'r8' A(z{u}[.]),A(t{u}[.]) -> A(z{p}[.]),A(t{u}[.]) @ 1
