@@ -59,6 +59,8 @@ let set a i j =
     let p, q = euclideen i max_array_size1 in
     set2 a p q j
 
+let set_with_map _ = set
+
 let make = create
 
 let init n f =

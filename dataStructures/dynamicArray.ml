@@ -37,6 +37,14 @@ module DynArray =
          let () = t.array <- array' in
          t.current_size <- n'
 
+       let expand_map f t =
+         let n = length t in
+         let n' = max (n+1) (n*2) in
+         let array' = G.init n' f in
+         let () = G.blit t.array 0 array' 0 n in
+         let () = t.array <- array' in
+         t.current_size <- n'
+
        let get a i =
          if length a > i then G.get a.array i else a.default
 
@@ -46,6 +54,13 @@ module DynArray =
          else
            let () = expand a in
            set a i v
+
+       let rec set_with_map f a i v =
+         let n = length a in
+         if n>i then G.set a.array i v
+         else
+           let () = expand_map f a in
+           set_with_map f a i v
 
        let make = create
 

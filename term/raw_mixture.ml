@@ -19,63 +19,91 @@ type agent =
 
 type t = agent list
 
-(* we are looking for an increment agent linked to ag:
-  find the agent with the 'VAL i' link value and with a different type *)
-let find_ag_with_link mix i ag_ty =
-  List.fold_left
-    (fun acc a ->
-      if ag_ty = a.a_type then acc
-      else
-        Tools.array_fold_lefti
-          (fun pid acc' p -> match p with
-             | FREE -> acc'
-             | VAL i' -> if (i=i') then (a.a_type,pid)
-                         else acc')
-          acc a.a_ports) (-1,-1) mix
+type incr_t = {
+    father : int Mods.DynArray.t;
+    rank : (int * (bool * bool)) Mods.DynArray.t;
+   }
 
-(* we are looking for the current increment agent:
-  find the agent with the same link value, the same type and the same port
-  then check the link value of the other port *)
-let rec counter_value mix i ?limit (ag_ty,pid) count =
-  try
-    let incr =
-      List.find
-        (fun a ->
-          ag_ty = a.a_type &&
-            Tools.array_fold_lefti
-              (fun pid' acc p ->
-                (pid = pid' &&
-                   (match p with
-                    | FREE -> false
-                    | VAL i' -> i=i')) || acc)
-              false a.a_ports) mix in
-    Array.fold_left
-      (fun acc el ->
-        match el with
-        | FREE -> acc
-        | VAL i' ->
-           if (i=i') then acc else counter_value mix i' ?limit (ag_ty,pid) (acc+1))
-      count incr.a_ports
-  with Not_found ->
-    if not(limit = None) then count else
-      raise (ExceptionDefn.Internal_Error
-               (Locality.dummy_annot
-                  ("Link"^ string_of_int i ^"is broken")))
+let create n =
+  { father = Mods.DynArray.init n (fun i -> i);
+    rank = Mods.DynArray.make n (1,(true,false));
+  }
 
-let counters_chain_length mix i limit =
-  let (ag_ty,pid) = find_ag_with_link mix i (-1) in
-  if ag_ty = -1 then None else
-    Some (counter_value mix i ~limit (ag_ty,pid) 0)
+let rec find_aux a i =
+  let ai =
+    if (Mods.DynArray.length a) <= i then i else
+      Mods.DynArray.get a i in
+  if ai == i then i
+  else
+    let root = find_aux a ai in
+    let () = Mods.DynArray.set_with_map (fun i -> i) a i root in
+    root
 
-let print_link mix sigs ag_ty f = function
+let find h x =
+  find_aux h.father x
+
+let combine_ranks (ix,(bx,_)) (iy,(by,_)) = (ix+iy,(bx&&by,true))
+
+let union h x y =
+  let root_x = find h x in
+  let root_y = find h y in
+  if root_x == root_y then ()
+  else
+    let rank_x = Mods.DynArray.get h.rank root_x in
+    let rank_y = Mods.DynArray.get h.rank root_y in
+    if (fst rank_x) > (fst rank_y) then
+      let () = Mods.DynArray.set h.rank root_x (combine_ranks rank_x rank_y) in
+      Mods.DynArray.set_with_map (fun i -> i) h.father root_y root_x
+    else if (fst rank_x) < (fst rank_y) then
+      let () = Mods.DynArray.set h.rank root_y (combine_ranks rank_x rank_y) in
+      Mods.DynArray.set_with_map (fun i -> i) h.father root_x root_y
+    else
+      let () = Mods.DynArray.set h.rank root_x (combine_ranks rank_x rank_y) in
+      Mods.DynArray.set_with_map (fun i -> i) h.father root_y root_x
+
+let incr_agent sigs =
+  match sigs with
+    None -> (0,1)
+  | Some s ->
+    let id = Signature.num_of_agent ("__incr",Locality.dummy) s in
+    let incr = Signature.get s id in
+    let after = Signature.num_of_site ("a",Locality.dummy) incr in
+    let before = Signature.num_of_site ("b",Locality.dummy) incr in
+    (before,after)
+
+let union_find_counters sigs mix =
+  let t = create 1 in
+  let () =
+    List.iter
+      (fun ag ->
+        if Signature.is_counter ag.a_type sigs then
+          let (before,after) = incr_agent sigs in
+          let a = ag.a_ports.(after) in
+          let b = ag.a_ports.(before) in
+          match b with
+          | FREE -> ()
+          | VAL lnk_b ->
+             match a with
+             | FREE ->
+                (* in this case the endpoint of the chain of increments is raw:
+                   the agent is created with a counter value*)
+                let root = find t lnk_b in
+                let (s,_) = Mods.DynArray.get t.rank root in
+                Mods.DynArray.set t.rank root (s-1,(true,true))
+             | VAL lnk_a -> union t lnk_b lnk_a) mix in
+  t
+
+
+let print_link incr_agents f = function
   | FREE -> Format.pp_print_string f "[.]"
   | VAL i ->
-     let (dst_ag,dst_port) = find_ag_with_link mix i ag_ty in
-     if not(dst_ag = -1) && (Signature.is_counter dst_ag sigs) &&
-          not(!Parameter.debugModeOn) then
-       let counter = counter_value mix i (dst_ag,dst_port) 0 in
-       Format.fprintf f "{=%d}" counter
-     else Format.fprintf f "[%i]" i
+     try
+       let root = find incr_agents i in
+       let (counter,(_,is_counter)) = Mods.DynArray.get incr_agents.rank root in
+       if (is_counter)&&not(!Parameter.debugModeOn) then
+         Format.fprintf f "{=%d}" counter
+       else Format.fprintf f "[%i]" i
+     with Invalid_argument _ -> Format.fprintf f "[%i]" i
 
 let aux_pp_si sigs a s f i =
   match sigs with
@@ -85,14 +113,14 @@ let aux_pp_si sigs a s f i =
     | Some i -> Format.fprintf f "%i{%i}" s i
     | None -> Format.pp_print_int f s
 
-let print_intf with_link ?sigs mix ag_ty f (ports,ints) =
+let print_intf with_link ?sigs incr_agents ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
           f "%t%a%a"
           (if empty then Pp.empty else Pp.space)
           (aux_pp_si sigs ag_ty i) ints.(i)
-          (if with_link then print_link mix sigs ag_ty else (fun _ _ -> ()))
+          (if with_link then print_link incr_agents else (fun _ _ -> ()))
           ports.(i) in
       aux false (succ i) in
   aux true 0
@@ -102,19 +130,20 @@ let aux_pp_ag sigs f a =
   | Some sigs -> Signature.print_agent sigs f a
   | None -> Format.pp_print_int f a
 
-let print_agent created link ?sigs mix f ag =
+let print_agent created link ?sigs incr_agents f ag =
   Format.fprintf f "%a(@[<h>%a@])%t"
       (aux_pp_ag sigs) ag.a_type
-      (print_intf link ?sigs mix ag.a_type) (ag.a_ports, ag.a_ints)
+      (print_intf link ?sigs incr_agents ag.a_type) (ag.a_ports, ag.a_ints)
       (fun f -> if created then Format.pp_print_string f "+")
 
 let print ~created ?sigs f mix =
   let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
       (fun ag -> not(Signature.is_counter ag.a_type sigs)) mix in
+  let incr_agents = union_find_counters sigs mix in
   Pp.list
     Pp.comma
-    (print_agent created true ?sigs mix)
+    (print_agent created true ?sigs incr_agents)
     f mix_without_counters
 
 let agent_to_json a =

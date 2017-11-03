@@ -14,6 +14,7 @@ module type GenArray = sig
     val length: 'a t -> int
     val get: 'a t -> int -> 'a
     val set: 'a t -> int -> 'a -> unit
+    val set_with_map : (int ->  'a) -> 'a t -> int -> 'a -> unit
     val init: int -> (int -> 'a) -> 'a t
     val make: int -> 'a -> 'a t
     val append: 'a t -> 'a t -> 'a t
