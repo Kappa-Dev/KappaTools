@@ -1,138 +1,158 @@
 """ Shared functions of api client for the kappa programming language
 """
-__all__ = ['FileMetadata', 'hydrate_file_metadata', 'string_as_file', 'File',
-           'hydrate_file', 'SimulationParameter', 'get_plot_parameter',
-           'PlotLimit', 'KappaError'] 
+__all__ = ['FileMetadata', 'File', 'SimulationParameter', 'PlotLimit',
+           'KappaError'] 
 
 import json
 
 
 class FileMetadata(object):
-     # NOTE: Two of these input names should be changed: `id` to `file_id`, or
-     # `compile` to `do_compile` to avoid conflicting with buildins.
-    def __init__(self, id, position, compile=True, file_version=None):
-        if file_version is None:
-            file_version = []
+    """An object to hold the metadata for a file.
+
+    Note that it is commmon to initialized this function with a dict, in the
+    form FileMetaData(**metadeta). If so, the dict must have arguments
+    matching those below, including at least 'id' and 'position'.
+
+    Init
+    ----
+    id -- The id of corresponding file.
+    position -- where you are to start in the file.
+    compile -- (boolean, default True) Indicate whether the file should be
+        compiled or not.
+    file_version -- (list, default empty/None) the version of the file.
+
+    Methods
+    -------
+    toJSON -- get a json (dict) representation of this data.
+    """
+
+    def __init__(self, id, position, compile=True, version=None):
+        if version is None:
+            version = []
         self.id = id
         self.position = position
         self.compile = compile
-        self.file_version = file_version
+        self.version = version
+        return
+
+    @classmethod
+    def from_metadata_list(cls, metadata_list):
+        """Get metadata objects from a list of metadata."""
+        return map(lambda info: cls(**info), metadata_list)
 
     def toJSON(self):
+        """Get a json dict of the attributes of this object."""
         return { "id" : self.id ,
                  "compile" : self.compile ,
                  "position" : self.position ,
-                 "version" : self.file_version }
-
-    # NOTE: This isn't really needed, it's actually longer than just calling 
-    # `<varname>.id`.
-    def get_file_id(self):
-        return self.id
-
-
-# NOTE: This is not really necessary in python. The equivalent task could be
-# accomplished by simply calling `FileMetadata(**info)` with the appropriate
-# keys defined in FileMetadata. as shown.
-def hydrate_file_metadata(info):
-    """Generate a FileMetadata object using a dict `info`.
-
-    The dict must contain the keys 'id', 'position', and 'compile'.
-    """
-    return FileMetadata(
-        info["id"],
-        info["position"],
-        info["compile"] ,
-        [] #hydrate_file_version(info["version"])
-        )
-
-
-def string_as_file(content,position=1):
-    return File(FileMetadata("inlined_input",position),content)
+                 "version" : self.version }
 
 
 class File(object):
+    """An object that represents a kappa file.
 
-    def __init__(self,
-                 file_metadata,
-                 file_content):
-        self.file_metadata = file_metadata
-        self.file_content = file_content
+    Init
+    ----
+    metadata -- this may be either a dict with keys matching the inits of
+        FileMetadata, or an existing FileMetadata object.
+    content -- The content of the file.
+
+    Class Methods
+    -------------
+    from_string -- get a file object from a string.
+
+    Methods
+    -------
+    toJSON -- get a JSON dict of the data in this file.
+    get_file_id -- get the id of the file from the metadata.
+    get_content -- get the content of the file.
+    """
+
+    def __init__(self, metadata, content):
+        if isinstance(metadata, FileMetadata):
+            self.file_metadata = metadata
+        elif isinstance(metadata, dict):
+            self.file_metadata = FileMetadata(**metadata)
+        else:
+            raise KappaError("Incorrect type for metadata. "
+                             "Require dict or FileMetadata object, but got "
+                             "%s." % type(metadata))
+        self.file_content = content
+        return
+
+    @classmethod
+    def from_string(cls, content, position=1):
+        """Convenience method to create a file from a string.
+        
+        This file object's metadata will have the id 'inlined_input'.
+        
+        Inputs
+        ------
+        content -- the content of the file (a string).
+        position -- the position to start reading the file (passed to
+            FileMetadata).
+        """
+        return cls(FileMetadata('inlined_input', position), content)
 
     def toJSON(self):
+        """Get a JSON dict of the data in this file."""
         return { "metadata" : self.file_metadata.toJSON() ,
                  "content" : self.file_content }
 
     def get_file_id(self):
-        return self.file_metadata.get_file_id()
+        """Get the id of the file from the metadata."""
+        return self.file_metadata.id
 
     def get_content(self):
+        """Get the file's contents."""
         return self.file_content
 
 
-def hydrate_file(info):
-    """Generate a File object given a dict `info`.
-    
-    `info` is a dict with attributes 'metadata' and 'content', which will be
-    processed and used to generate a File object, which is returned. The
-    'metadata' attribute will be passed to `hydrate_file_metadata`, and must
-    therefore have the appropriate items ('id', 'position', and 'compile').
-    """
-    return File(hydrate_file_metadata(info["metadata"]), info["content"])
-
-
 class SimulationParameter(object):
+    # TODO: Add docs.
 
-    def __init__(self,
-                 simulation_plot_period,
-                 simulation_pause_condition,
-                 simulation_seed = None,
-                 simulation_store_trace = False) :
-        self.simulation_plot_period = simulation_plot_period
-        self.simulation_pause_condition = simulation_pause_condition
-        self.simulation_seed = simulation_seed
-        self.simulation_store_trace = simulation_store_trace
+    def __init__(self, plot_period, pause_condition, seed=None,
+                 store_trace = False):
+        self.plot_period = plot_period
+        self.pause_condition = pause_condition
+        self.seed = seed
+        self.store_trace = store_trace
 
     def toJSON(self):
-        return { "plot_period" : self.simulation_plot_period,
-                 "pause_condition": self.simulation_pause_condition ,
-                 "store_trace": self.simulation_store_trace ,
-                 "seed" : self.simulation_seed }
+        return { "plot_period" : self.plot_period,
+                 "pause_condition": self.pause_condition ,
+                 "store_trace": self.store_trace ,
+                 "seed" : self.seed }
 
 class PlotLimit(object):
+    # TODO: add docs.
 
-    def __init__(self,
-                 plot_limit_offset = None,
-                 plot_limit_points = None) :
-        self.plot_limit_offset = plot_limit_offset
-        self.plot_limit_points = plot_limit_points
+    def __init__(self, offset=None, points=None) :
+        self.offset = offset
+        self.points = points
 
     def toURL(self):
-        if self.plot_limit_offset is not None :
-            url_plot_limit_offset = "&plot_limit_offset={0}".format(self.plot_limit_offset)
+        if self.offset is not None :
+            url_offset = "&plot_limit_offset={0}".format(self.offset)
         else :
-            url_plot_limit_offset = ""
+            url_offset = ""
 
-        if self.plot_limit_points is not None :
-            url_plot_limit_points = "&plot_limit_points={0}".format(self.plot_limit_points)
+        if self.points is not None :
+            url_points = "&plot_limit_points={0}".format(self.points)
         else :
-            url_plot_limit_points = ""
+            url_points = ""
 
-        url_plot_limit = "{0}{1}".format(url_plot_limit_offset,
-                                         url_plot_limit_points)
+        url_plot_limit = "{0}{1}".format(url_offset,
+                                         url_points)
         return url_plot_limit
 
     def toJSON(self):
-        return { "offset" : self.plot_limit_offset ,
-                 "nb_points" : self.plot_limit_points }
-
-
-def get_plot_parameter(plot_limit_offset=None, plot_limit_points=None) :
-    return PlotLimit(plot_limit_offset, plot_limit_points)
+        return { "offset" : self.offset ,
+                 "nb_points" : self.points }
 
 
 class KappaError(Exception):
-    """ Error returned from the Kappa server
-    """
+    """ Error returned from the Kappa server"""
     def __init__(self, errors):
         Exception.__init__(self, errors)
         self.errors = errors

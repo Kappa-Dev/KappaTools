@@ -10,8 +10,7 @@ import json
 import abc
 from pkg_resources import resource_filename
 
-from kappy.kappa_common import KappaError, hydrate_file, hydrate_file_metadata,\
-                               PlotLimit
+from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File
 
 
 class KappaStd(object):
@@ -127,15 +126,14 @@ class KappaStd(object):
         Returns file file_id stored in the project
         """
         f = self._dispatch("FileGet", file_id)
-        return hydrate_file(f)
+        return File(**f)
 
     def file_info(self):
         """
         Lists the files of the project (returns the FileMetadata
         """
         info = self._dispatch("FileCatalog")
-        #return list(map(hydrate_filemetadata,info)))
-        return map(hydrate_file_metadata, info)
+        return FileMetadata.from_metadata_list(info)
 
     def simulation_delete(self):
         """

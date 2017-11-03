@@ -7,8 +7,7 @@ import json
 from urllib import error, request, parse
 from os.path import join
 
-from kappy.kappa_common import KappaError, hydrate_file, hydrate_file_metadata,\
-                               PlotLimit
+from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit
 
 class KappaRest(object):
     """Client to a Kappa tools driver run as a server.
@@ -139,13 +138,13 @@ class KappaRest(object):
 
     def file_get(self, file_id):
         """Get a file object from the server."""
-        file = self._get(self.in_project('files', file_id))
-        return hydrate_file(file)
+        file_json = self._get(self.in_project('files', file_id))
+        return File(**file_json)
 
     def file_info(self):
         """Get info on all the files in the project."""
         info = self._get(self.in_project('files'))
-        return map(hydrate_file_metadata, info)
+        return FileMetadata.from_metadata_list(info)
 
     def simulation_delete(self):
         return self._delete(self.in_project('simulation'))
