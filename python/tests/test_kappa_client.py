@@ -9,9 +9,9 @@ import subprocess
 import random
 import string
 import time
-from kappy import kappa_rest
-import kappy
 import uuid
+
+import kappy
 
 def file_catalog_file_id (file_catalog):
     return(map((lambda entry: entry.file_metadata_id),file_catalog))
@@ -169,7 +169,7 @@ class RestClientTest(KappaClientTest,unittest.TestCase):
         time.sleep(1)
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
     def getRuntime(self,project_id):
-        return(kappa_rest.KappaRest(self.endpoint,project_id))
+        return(kappy.KappaRest(self.endpoint,project_id))
     @classmethod
     def tearDownClass(self):
         """ tear down test by shutting down"""

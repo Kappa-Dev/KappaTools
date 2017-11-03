@@ -5,7 +5,7 @@ import sys
 import getopt
 import time
 import uuid
-from kappy import kappa_rest
+
 import kappy
 
 def main():
@@ -67,23 +67,23 @@ def main():
     try:
         project_id = "{0}-{1}".format(cmd,str(uuid.uuid1()))
         if url and url.startswith('http'):
-            runtime = kappa_rest.KappaRest(url,project_id)
+            runtime = kappy.KappaRest(url,project_id)
         else:
-            runtime = kappa_std.KappaStd(url)
+            runtime = kappy.KappaStd(url)
         print("project_id : {0}".format(project_id))
         if inputfile:
             with open(inputfile) as f:
                 code = f.read()
                 file_content = str(code)
-                file_metadata = kappa_common.FileMetadata(inputfile,0)
-                file_object = kappa_common.File(file_metadata,file_content)
+                file_metadata = kappy.FileMetadata(inputfile,0)
+                file_object = kappy.File(file_metadata,file_content)
                 runtime.file_create(file_object)
                 runtime.project_parse()
 
                 end_time = 10.0
-                simulation_parameter = kappa_common.SimulationParameter(plot_period,
-                                                                        pause_condition,
-                                                                        seed)
+                simulation_parameter = kappy.SimulationParameter(plot_period,
+                                                                 pause_condition,
+                                                                 seed)
                 runtime.simulation_start(simulation_parameter)
 
                 simulation_info = runtime.simulation_info()
@@ -112,7 +112,7 @@ def main():
                 print(plot_detail)
         else:
             print(runtime.get_info())
-    except kappa_common.KappaError as exception:
+    except kappy.KappaError as exception:
         print(exception.errors)
     return None
     None
