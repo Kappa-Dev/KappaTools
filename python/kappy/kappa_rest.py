@@ -4,7 +4,7 @@
 __all__ = ['KappaRest']
 
 import json
-from urllib import error, request, parse
+from requests import exceptions, request
 from os.path import join
 
 from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit
@@ -28,25 +28,15 @@ class KappaRest(object):
     def _dispatch(self, method, sub_url=None, data=None):
         if sub_url is not None:
             url = join(self.url, sub_url)
-        handler = request.HTTPHandler()
-        opener = request.build_opener(handler)
-        if data is not None:
-            code = json.dumps(data)
-            request = request.Request(url, data=code.encode("utf-8"))
-        else:
-            request = request.Request(url)
-        request.get_method = lambda: method
+        if isinstance(data, str):
+            data = json.dumps(data)
         try:
-            connection = opener.open(request)
-        except request.HTTPError as exception:
-            message = exception.read()
-            error = json.loads(message.decode("utf-8"))
-            raise KappaError(error)
-        except request.URLError as exception:
-            raise KappaError(exception.reason)
-        text = connection.read()
-        details = json.loads(text.decode("utf-8"))
-        if 400 <= connection.code < 500:
+            r = request(method, url, data=data)
+        except exceptions.HTTPError as e:
+            msg = e.read()
+            raise KappaError(json.loads(msg, encoding='utf-8'))
+        details = r.json(encoding='utf-8')
+        if 400 <= r.status_code < 500:
             raise KappaError(details)
         else:
             return details
@@ -76,30 +66,28 @@ class KappaRest(object):
         
         Given a key to a kappa service shutdown a running kappa instance.
         """
-        method = "POST"
-        handler = request.HTTPHandler()
-        opener = request.build_opener(handler)
         parse_url = "{0}/shutdown".format(self.url)
+        try:
+            r = request('GET', parse_url)
+        except exceptions.HTTPError as e:
+            pass
         request = request.Request(parse_url, data=key.encode('utf-8'))
         request.get_method = lambda: method
         try:
             connection = opener.open(request)
         except error.HTTPError as exception:
             connection = exception
-        except error.URLError as exception:
+        except request.URLError as exception:
             raise KappaError(exception.reason)
-        if connection.code == 200:
-            text = connection.read()
-            return text
-        elif connection.code == 400:
-            text = connection.read()
-            print(text)
-            raise KappaError(text)
-        elif connection.code == 401:
-            text = connection.read()
-            raise KappaError(text)
+        if r.status_code == 200:
+            return r.text
+        elif r.status_code == 400:
+            print(r.text, r.reason)
+            raise KappaError(r.text)
+        elif r.status_code == 401:
+            raise KappaError(r.text)
         else:
-            raise exception
+            raise KappaError(r.reason)
 
     def get_info(self):
         """Get a json dict with info about the kappa server."""
