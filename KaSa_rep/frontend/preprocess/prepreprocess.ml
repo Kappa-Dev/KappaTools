@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 28 2017>
+ * Last modification: Time-stamp: <Nov 04 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -425,7 +425,7 @@ let length mixture =
   let rec aux mixture k =
     match mixture with
     | [] -> k
-    | _ :: mixture (*| Ast.DOT(_,_,mixture) | Ast.PLUS(_,_,mixture)*) -> aux mixture (k+1)
+    | _ :: mixture  -> aux mixture (k+1)
   in aux mixture 0
 
 
@@ -800,6 +800,15 @@ let translate_compil parameters error compil =
            | Ast.Arrow a ->
              (a.Ast.lhs,a.Ast.rhs),
              longuest_prefix a.Ast.lhs a.Ast.rhs in
+         if
+           Remanent_parameters.get_syntax_version parameters = Ast.V4
+         && (tail_lhs>0 || tail_rhs>0 )
+         then
+           let error, list =
+             Exception.warn parameters error ~pos:p ~message:"missaligned rule: the rule is ignored" __POS__ Exit list
+           in error, id_set, list
+         else
+
          let error,lhs =
            refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in
          let error,rhs =
