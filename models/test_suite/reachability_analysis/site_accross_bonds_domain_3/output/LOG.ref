@@ -539,7 +539,9 @@ Quarks:rule_id:1,agent_type:4,site_type:0,state:1
 Quarks:rule_id:1,agent_type:0,site_type:0,state: bound
 Quarks:rule_id:1,agent_type:0,site_type:0,state:1
 Quarks:rule_id:1,agent_type:0,site_type:1,state: bound
+Quarks:rule_id:1,agent_type:0,site_type:1,state:1
 Quarks:rule_id:1,agent_type:1,site_type:0,state: bound
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
 Quarks:rule_id:1,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:rule_id:1,agent_type:4,site_type:0,state: bound
@@ -547,10 +549,26 @@ Quarks:rule_id:1,agent_type:4,site_type:0,state:2
 Quarks:HALF BOND BREAKING
 Quarks:MODIF PLUS rule_id:1,agent_type:5,site_type:0,state: BOUND
 Quarks:rule_id:1,agent_type:5,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:MODIF PLUS rule_id:1,agent_type:5,site_type:0,state: BOUND
 Quarks:rule_id:1,agent_type:5,site_type:0,state:1
 Quarks:MODIF MOINS: rule_id:1,agent_type:4,site_type:0,state: BOUND
 Quarks:rule_id:1,agent_type:4,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:MODIF MOINS: rule_id:1,agent_type:4,site_type:0,state: BOUND
 Quarks:rule_id:1,agent_type:4,site_type:0,state:1
 Quarks:Rule 2
@@ -653,7 +671,9 @@ Quarks:rule_id:4,agent_type:4,site_type:0,state:3
 Quarks:rule_id:4,agent_type:2,site_type:0,state: bound
 Quarks:rule_id:4,agent_type:2,site_type:0,state:1
 Quarks:rule_id:4,agent_type:2,site_type:1,state: bound
+Quarks:rule_id:4,agent_type:2,site_type:1,state:1
 Quarks:rule_id:4,agent_type:3,site_type:0,state: bound
+Quarks:rule_id:4,agent_type:3,site_type:0,state:1
 Quarks:rule_id:4,agent_type:3,site_type:1,state: bound
 Quarks:rule_id:4,agent_type:3,site_type:1,state:1
 Quarks:rule_id:4,agent_type:5,site_type:0,state: bound
@@ -661,10 +681,26 @@ Quarks:rule_id:4,agent_type:5,site_type:0,state:3
 Quarks:HALF BOND BREAKING
 Quarks:MODIF PLUS rule_id:4,agent_type:6,site_type:0,state: BOUND
 Quarks:rule_id:4,agent_type:6,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:2,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:2,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:2,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:2,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:3,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:3,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:3,site_type:1,state:1
 Quarks:MODIF PLUS rule_id:4,agent_type:7,site_type:0,state: BOUND
 Quarks:rule_id:4,agent_type:7,site_type:0,state:1
 Quarks:MODIF MOINS: rule_id:4,agent_type:4,site_type:0,state: BOUND
 Quarks:rule_id:4,agent_type:4,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:4,agent_type:2,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:2,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:4,agent_type:2,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:2,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:4,agent_type:3,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:3,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:4,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:3,site_type:1,state:1
 Quarks:MODIF MOINS: rule_id:4,agent_type:5,site_type:0,state: BOUND
 Quarks:rule_id:4,agent_type:5,site_type:0,state:1
 
@@ -743,10 +779,14 @@ Quarks:site_modif-:agent_type:4,site_type:0,state:2,rule:1->[3]
 Quarks:site_modif-:agent_type:4,site_type:0,state:3,rule:4->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:1->[1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:2->[0*]
+Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:1->[1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:1->[2]
 Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:1->[2]
 Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:2->[0*]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:2->[0*]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:4->[1]
+Quarks:site_modif-:agent_type:2,site_type:1,state:1,rule:4->[1]
+Quarks:site_modif-:agent_type:3,site_type:0,state:1,rule:4->[2]
 Quarks:site_modif-:agent_type:3,site_type:1,state:1,rule:4->[2]
 Quarks:site_modif-:agent_type:5,site_type:0,state:3,rule:4->[3]
 Refining the influence map...

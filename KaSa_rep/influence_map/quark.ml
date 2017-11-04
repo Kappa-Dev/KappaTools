@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Mar 11 2017>
+ * Last modification: Time-stamp: <Nov 04 2017>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -447,9 +447,26 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
       new_agent
       map
 
-let clean_bound_modif parameter error (map1,set1) (map2,set2) =
-  let set1' = Quark_type.BoundSite.Set.minus set1 set2 in
-  let set2' = Quark_type.BoundSite.Set.minus set2 set1 in
+let clean_bound_modif parameter error common_prefix (map1,set1) (map2,set2) =
+  let agent_id_of_label l =
+    let n =
+      if l >= 0
+      then l
+      else 1-l
+    in
+    Ckappa_sig.agent_id_of_int n
+  in
+  let filter  =
+    Quark_type.BoundSite.Set.filter
+      (fun (_,agent_id,_,_) ->
+         Ckappa_sig.compare_agent_id
+           (agent_id_of_label  agent_id)
+           common_prefix < 0)
+  in
+  let set1_ = filter set1 in
+  let set2_ = filter set2 in
+  let set1' = Quark_type.BoundSite.Set.minus set1 set2_ in
+  let set2' = Quark_type.BoundSite.Set.minus set2 set1_ in
   let error, map1 =
     Quark_type.BoundSite.Set.fold
       (fun (rule_id,agent_id,agent_type,site_type) (error, map)->
@@ -740,6 +757,9 @@ let is_tested_and_not_question_mark parameter error agent_id site views =
       else error, false
 
 let scan_rule parameter error handler rule_id rule quarks =
+  let common_prefix =
+    Ckappa_sig.agent_id_of_int rule.Cckappa_sig.prefix
+  in
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let viewsrhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
   let agent_test =  quarks.Quark_type.agent_test in
@@ -941,7 +961,7 @@ let scan_rule parameter error handler rule_id rule quarks =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error _agent_id agent (site_modif_plus,site_bound_modif_plus) ->
+      (fun parameter error agent_id agent (site_modif_plus,site_bound_modif_plus) ->
          let error,kasim_id =
            Quark_type.Labels.label_of_int parameter error
              (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
@@ -986,10 +1006,16 @@ let scan_rule parameter error handler rule_id rule quarks =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error _agent_id agent (site_modif_minus,site_bound_modif_minus) ->
+      (fun parameter error agent_id agent (site_modif_minus,site_bound_modif_minus) ->
          let error,kasim_id =
            Quark_type.Labels.label_of_int parameter error
              (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
+         in
+         let is_in_common_prefix =
+           Ckappa_sig.compare_agent_id
+             agent_id
+             (Ckappa_sig.agent_id_of_int rule.Cckappa_sig.prefix)
+           < 0
          in
          let agent_type = agent.Cckappa_sig.agent_name in
          Ckappa_sig.Site_map_and_set.Map.fold
@@ -1014,10 +1040,15 @@ let scan_rule parameter error handler rule_id rule quarks =
                   (error,site_modif_minus)
                 else
                   let site_modif_minus =
-                    match member_site parameter error rule_id kasim_id agent_type site k site_modif_plus
+                    if is_in_common_prefix
+                    then
+                      match
+                        member_site parameter error rule_id kasim_id agent_type site k site_modif_plus
                     with
                     | error, true -> error, site_modif_minus
                     | error, false ->
+                      add_site parameter error rule_id kasim_id agent_type site k site_modif_minus
+                    else
                       add_site parameter error rule_id kasim_id agent_type site k site_modif_minus
                   in
                   aux
@@ -1089,7 +1120,7 @@ let scan_rule parameter error handler rule_id rule quarks =
       rule.Cckappa_sig.actions.Cckappa_sig.half_break
   in
   let error, site_bound_modif_plus, site_bound_modif_minus = (* if a quark appers in both, remove them *)
-    clean_bound_modif parameter error
+    clean_bound_modif parameter error common_prefix
       (quarks.Quark_type.site_modif_bound_plus,site_bound_modif_plus)
       (quarks.Quark_type.site_modif_bound_minus,site_bound_modif_minus)
   in
