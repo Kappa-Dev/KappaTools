@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 28 2017>
+  * Last modification: Time-stamp: <Nov 04 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -80,6 +80,12 @@ let fetch_rate_convention f =
   | x ->
     let () = Printf.eprintf "%s is not a valid rate convention !!!" x in raise Exit
 
+let get_syntax_version () =
+  match !Config.syntax_version with
+  | "4" | "v4" | "V4" -> Ast.V4
+  | "3" | "v3" | "V3" -> Ast.V3
+  | _ -> failwith "Syntax version should be either V3 or V4"
+
 let get_symbols () =
   {
     Remanent_parameters_sig.bound = "!" ;
@@ -93,8 +99,13 @@ let get_symbols () =
     Remanent_parameters_sig.agent_sep_dot = "." ;
     Remanent_parameters_sig.btype_sep = ".";
     Remanent_parameters_sig.site_sep_comma = "," ;
-    Remanent_parameters_sig.ghost_agent = "Ghost" ;
-    Remanent_parameters_sig.show_ghost = false ;
+    Remanent_parameters_sig.ghost_agent = "." ;
+    Remanent_parameters_sig.show_ghost =
+      begin
+        match get_syntax_version () with
+        | Ast.V4 -> true
+        | Ast.V3 -> false
+      end ;
     Remanent_parameters_sig.internal = "~" ;
     Remanent_parameters_sig.uni_arrow = "->" ;
     Remanent_parameters_sig.rev_arrow = "<-" ;
@@ -337,13 +348,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
-        Remanent_parameters_sig.syntax_version =
-          begin
-            match !Config.syntax_version with
-            | "4" | "v4" | "V4" -> Ast.V4
-            | "3" | "v3" | "V3" -> Ast.V3
-            | _ -> failwith "Syntax version should be either V3 or V4"
-          end ;
+        Remanent_parameters_sig.syntax_version = get_syntax_version () ;
         Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ;
         Remanent_parameters_sig.do_scc = !Config.do_scc ;
         Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
