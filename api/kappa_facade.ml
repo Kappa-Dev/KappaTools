@@ -140,7 +140,7 @@ let rec compile_file
       { compile with Ast.filenames = file.file_id :: compile.Ast.filenames } in
     Lwt.catch
       (fun () ->
-         (Lwt.wrap2 Kparser4.model Klexer4.token lexbuf) >>=
+         (Lwt.wrap1 Klexer4.model lexbuf) >>=
          (fun (insts,err) ->
             (yield ()) >>=
             (fun () ->
@@ -390,11 +390,8 @@ let start
         | None -> Random.State.make_self_init ()
         | Some seed -> Random.State.make [|seed|] in
       let () = reinitialize random_state t in
-      Lwt.wrap2 Kparser4.standalone_bool_expr Klexer4.token lexbuf >>=
-      function
-      | Result.Error (message,region) ->
-        Lwt_result.fail [Api_data.api_message_errors ~region message]
-      | Result.Ok pause ->
+      try
+        let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
         Lwt.wrap4 (Evaluator.get_pause_criteria
                      ~max_sharing:false ~syntax_version:Ast.V4)
           t.contact_map t.env t.graph pause >>=
@@ -437,7 +434,9 @@ let start
                       let () = t.error_messages <- e in
                       Lwt.return_unit) e
             ) in
-        Lwt_result.return ())
+        Lwt_result.return ()
+      with ExceptionDefn.Syntax_Error (message,region) ->
+        Lwt_result.fail [Api_data.api_message_errors ~region message])
     (catch_error
        (fun e ->
           let () = t.error_messages <- e in
@@ -485,11 +484,8 @@ let perturbation
        if t.is_running then
          Lwt_result.fail [Api_data.api_message_errors msg_process_not_paused]
        else
-         Lwt.wrap2 Kparser4.standalone_effect_list Klexer4.token lexbuf >>=
-         function
-         | Result.Error (message,region) ->
-           Lwt_result.fail [Api_data.api_message_errors ~region message]
-         | Result.Ok e ->
+         try
+           let e = Kparser4.standalone_effect_list Klexer4.token lexbuf in
            let log_buffer = Buffer.create 512 in
            let log_form = Format.formatter_of_buffer log_buffer in
            Lwt.wrap6
@@ -501,7 +497,9 @@ let perturbation
            let () = t.env <- env' in
            let () = t.graph <- graph'' in
            let () = t.state <- state' in
-           Lwt.return (Result_util.ok (Buffer.contents log_buffer)))
+           Lwt.return (Result_util.ok (Buffer.contents log_buffer))
+         with ExceptionDefn.Syntax_Error (message,region) ->
+           Lwt_result.fail [Api_data.api_message_errors ~region message])
     (catch_error (fun e -> Lwt_result.fail e))
 
 let continue
@@ -516,11 +514,8 @@ let continue
        if t.is_running then
          Lwt.return (Result_util.ok ())
        else
-         Lwt.wrap2 Kparser4.standalone_bool_expr Klexer4.token lexbuf >>=
-         function
-         | Result.Error (message,region) ->
-           Lwt_result.fail [Api_data.api_message_errors ~region message]
-         | Result.Ok pause ->
+         try
+           let pause = Kparser4.standalone_bool_expr Klexer4.token lexbuf in
            Lwt.wrap4 (Evaluator.get_pause_criteria
                         ~max_sharing:false ~syntax_version:Ast.V4)
              t.contact_map t.env t.graph pause >>=
@@ -543,7 +538,8 @@ let continue
                (fun () ->
                   run_simulation ~system_process:system_process ~t:t false) in
            Lwt.return (Result_util.ok ())
-    )
+         with ExceptionDefn.Syntax_Error (message,region) ->
+           Lwt_result.fail [Api_data.api_message_errors ~region message])
     (catch_error
        (fun e -> Lwt.return (Result_util.error e)))
 

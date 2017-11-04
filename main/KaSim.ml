@@ -291,9 +291,9 @@ let () =
                 | Ast.V3 ->
                   KappaParser.interactive_command KappaLexer.token lexbuf
                 | Ast.V4 ->
-                  match Kparser4.interactive_command Klexer4.token lexbuf with
-                  | Result.Ok x -> x
-                  | Result.Error r -> raise (ExceptionDefn.Malformed_Decl r) in
+                  try Kparser4.interactive_command Klexer4.token lexbuf
+                  with ExceptionDefn.Syntax_Error r ->
+                    raise (ExceptionDefn.Malformed_Decl r) in
               match command with
               | Ast.RUN b ->
                 let env',graph',b'' = Evaluator.get_pause_criteria

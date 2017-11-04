@@ -122,7 +122,10 @@ rule token = parse
     | s -> UNKNOWN s
     }
   | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
-  | _ as c { UNKNOWN (String.make 1 c) }
+  | _ as c { raise (ExceptionDefn.Syntax_Error
+      ("Unknown character: "^String.make 1 c,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf))) }
 
 and inline_comment acc = parse
   | ([^'\n' '*' '\"' '\'' '/'] *) as x { inline_comment (x::acc) lexbuf }
@@ -144,7 +147,18 @@ and inline_comment acc = parse
     { inline_comment ("*/"::(inline_comment ["/*"] lexbuf):: acc) lexbuf }
   | '/' '\n' { Lexing.new_line lexbuf; inline_comment ("/\n"::acc) lexbuf }
 
+and recovery = parse
+  | [^'\r''\n']* (eol | eof) {Lexing.new_line lexbuf}
+
 {
+  let rec aux_model err lex =
+  try (Kparser4.model token lex,err)
+  with ExceptionDefn.Syntax_Error e ->
+    let () = recovery lex in
+    aux_model (e::err) lex
+
+  let model lex = aux_model [] lex
+
   let compile logger compil fic =
     let d = open_in fic in
     let lexbuf = Lexing.from_channel d in
@@ -152,12 +166,13 @@ and inline_comment acc = parse
       {lexbuf.Lexing.lex_curr_p with Lexing.pos_fname = fic} in
     let compil = { compil with Ast.filenames = fic :: compil.Ast.filenames } in
     let () = Format.fprintf logger "Parsing %s...@." fic in
-    let out,err = Kparser4.model token lexbuf in
+    let (out,err) = model lexbuf in
     let () = Format.fprintf logger "done@." in
     let () = match err with
       | [] -> ()
       | (msg,pos)::_ ->
         let () = Pp.error Format.pp_print_string (msg,pos) in
         exit 3 in
-    let () = close_in d in Cst.append_to_ast_compil out compil
+    let () = close_in d in
+    Cst.append_to_ast_compil out compil
 }
