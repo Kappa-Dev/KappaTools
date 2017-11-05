@@ -425,6 +425,8 @@ variable_declaration:
   | ID annot error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos ("Illegal definition of variable '"^$1^"'"))) }
+  | error
+    { raise (ExceptionDefn.Syntax_Error (add_pos ("label expected"))) }
   ;
 
 init_declaration:
