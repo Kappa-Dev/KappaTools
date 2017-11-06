@@ -1,8 +1,8 @@
 #Command-line:
-"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 3 -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings || exit 0
-"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 3 -d output --with-symmetries true --octave-output sym1_occ.m --count occurrences || exit 0
-"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 3 -d output --with-symmetries backward --octave-output sym1_emb_back.m --count embeddings || exit 0
-"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 3 -d output --with-symmetries backward --octave-output sym1_occ_back.m --count occurrences || exit 0
+"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 4 -d output --with-symmetries true --octave-output sym1_emb.m --count embeddings || exit 0
+"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 4 -d output --with-symmetries true --octave-output sym1_occ.m --count occurrences || exit 0
+"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 4 -d output --with-symmetries backward --octave-output sym1_emb_back.m --count embeddings || exit 0
+"${KAPPABIN}"KaDE -p 0.1 sym_alg.ka -syntax 4 -d output --with-symmetries backward --octave-output sym1_occ_back.m --count occurrences || exit 0
 
 #test case for isomorphism and symmetries
 #we have to check to occurrence/embedding numbers are corrected.

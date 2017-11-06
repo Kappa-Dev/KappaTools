@@ -1,12 +1,12 @@
-%agent: A(x~u~p,y~u~p,z)
-%init: 10 A(x~u,y~u,z)
+%agent: A(x{u p},y{u p},z)
+%init: 10 A(x{u}[.],y{u}[.],z[.])
 
-%var: 'a' |A(z!_)|
-%var: 'b' |A(x~u,y~u,z!1),A(x~p,y~p,z!1)|
-%var: 'c' |A(z!_),A(x~p,y~u,z!1),A(x~u,y~p,z!1)|
+%var: 'a' |A(z[_])|
+%var: 'b' |A(x{u}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])|
+%var: 'c' |A(z[_]),A(x{p}[.],y{u}[.],z[1]),A(x{u}[.],y{p}[.],z[1])|
 
 %token: d
 
-A(z),A(z) -> A(z!1),A(z!1) @1
-A(x~u) -> A(x~p) @1
-A(y~u) -> A(y~p) | |A(z!_),A(x~u,y~u,z!1),A(x~p,y~p,z!1)|:d @1
+A(z[.]),A(z[.]) -> A(z[1]),A(z[1]) @ 1
+A(x{u}[.]) -> A(x{p}[.]) @ 1
+A(y{u}[.]) -> A(y{p}[.]) | |A(z[_]),A(x{u}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])| d @ 1

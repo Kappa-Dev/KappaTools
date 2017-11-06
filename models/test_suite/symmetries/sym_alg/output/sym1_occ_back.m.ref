@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' '-p' '0.1' 'sym_alg.ka' '-syntax' '3' '-d' 'output''--with-symmetries' 'backward' '--octave-output' 'sym1_occ_back.m' '--count''occurrences'
+%      'KaDE' '-p' '0.1' 'sym_alg.ka' '-syntax' '4' '-d' 'output''--with-symmetries' 'backward' '--octave-output' 'sym1_occ_back.m' '--count''occurrences'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -166,7 +166,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE -p 0.1 sym_alg.ka -syntax 3 -d output --with-symmetries backward --octave-output sym1_occ_back.m --count occurrences\n')
+fprintf(fid,'# KaDE -p 0.1 sym_alg.ka -syntax 4 -d output --with-symmetries backward --octave-output sym1_occ_back.m --count occurrences\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'GOAL,')

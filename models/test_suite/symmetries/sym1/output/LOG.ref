@@ -1054,10 +1054,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~u)
 
 
-	Applying rule A(x{u} y{u} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{u} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1099,29 +1099,29 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~u)
 
 
-	Applying rule A(x{p} y{u} z{u}) -> A(x{u} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{u}) -> A(x{u} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{p} y{u} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 5, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 5, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1163,17 +1163,17 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~u)
 
 
-	Applying rule A(x{p} y{p} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 5, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 5, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{u} z{u}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 6, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{u}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 6, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1215,20 +1215,20 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~u,z~p)
 
 
-	Applying rule A(x{p} y{u} z{p}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 6, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{p}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 6, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{p} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1270,13 +1270,13 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~p,z~u)
 
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is not satisfied yet
 
-	Applying rule A(x{p} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1318,10 +1318,10 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~u,z~p)
 
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 10, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 10, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1363,31 +1363,31 @@ EXTENSIONAL DESCRIPTION:
 		A(x~u,y~p,z~p)
 
 
-	Applying rule A(x{u} y{p} z{p}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 10, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{p} z{p}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 10, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 11, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{u} z{p}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 11, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 11, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{p} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 11, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{p} z{u}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 13, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{u}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 13, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
@@ -1429,144 +1429,144 @@ EXTENSIONAL DESCRIPTION:
 		A(x~p,y~p,z~p)
 
 
-	Applying rule A(x{p} y{p} z{p}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 13, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{p}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 13, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 13, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{p}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 14, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{p} z{p}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 14, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{p} z{p}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 14, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{p}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 14, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 14, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{u} z{p}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 15, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} z{p}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 15, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{p} z{p}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 15, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{p}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 15, characters 0-39:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 15, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{u} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:):
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{p} y{u} z{u}) -> A(x{u} y{u} z{u}) (File "sym1.ka", line 1, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:):
-		the precondition is satisfied
-
-		rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:) is applied for the first time
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:):
-		the precondition is satisfied
-
-		rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 2, characters 0-39:) is applied for the first time
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:):
-		the precondition is satisfied
-
-		rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:) is applied for the first time
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:):
-		the precondition is satisfied
-
-		rule A(x{u} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 3, characters 0-39:) is applied for the first time
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{p} y{u} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 5, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{u}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 1, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{p} z{u}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 5, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 2, characters 0-63:) is applied for the first time
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 3, characters 0-63:) is applied for the first time
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{u} z{u}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 6, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 5, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{u} z{p}) -> A(x{p} y{u} z{u}) (File "sym1.ka", line 6, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{u}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:):
-		the precondition is satisfied
-
-		rule A(x{u} y{p} z{u}) -> A(x{p} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:) is applied for the first time
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{p} y{p} z{u}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 7, characters 0-39:):
+	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{u}[.]) (File "sym1.ka", line 6, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
-		rule A(x{u} y{u} z{p}) -> A(x{p} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:) is applied for the first time
+		rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:) is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{u} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 9, characters 0-39:):
-		the precondition is satisfied
-
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule A(x{u} y{p} z{u}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 10, characters 0-39:):
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 7, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{p}) -> A(x{u} y{p} z{u}) (File "sym1.ka", line 10, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
+		the precondition is satisfied
+
+		rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{p}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:) is applied for the first time
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{p}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 9, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{u} z{p}) -> A(x{u} y{p} z{p}) (File "sym1.ka", line 11, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{u}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{u} y{p} z{p}) -> A(x{u} y{u} z{p}) (File "sym1.ka", line 11, characters 0-39:):
+	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{u}[.]) (File "sym1.ka", line 10, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule A(x{p} y{p} z{u}) -> A(x{p} y{p} z{p}) (File "sym1.ka", line 13, characters 0-39:):
+	Applying rule A(x{u}[.] y{u}[.] z{p}[.]) -> A(x{u}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{u}[.] y{p}[.] z{p}[.]) -> A(x{u}[.] y{u}[.] z{p}[.]) (File "sym1.ka", line 11, characters 0-63:):
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule A(x{p}[.] y{p}[.] z{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.]) (File "sym1.ka", line 13, characters 0-63:):
 		the precondition is satisfied
 
 		Updating the views for A(x~,y~,z~)

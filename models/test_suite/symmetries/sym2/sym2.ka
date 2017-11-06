@@ -1,7 +1,7 @@
-A(x,y),A(x,y) <-> A(x!1,y),A(x!1,y) @ 2,3
-A(x,y),A(x,y) <-> A(x,y!1),A(x!1,y) @ 1,1
-A(x,y),A(x,y) <-> A(x!1,y),A(x,y!1) @ 1,1
-A(x,y),A(x,y) <-> A(x,y!1),A(x,y!1) @ 2,2
+A(x[.],y[.]),A(x[.],y[.]) <-> A(x[1],y[.]),A(x[1],y[.]) @ 2,3
+A(x[.],y[.]),A(x[.],y[.]) <-> A(x[.],y[1]),A(x[1],y[.]) @ 1,1
+A(x[.],y[.]),A(x[.],y[.]) <-> A(x[1],y[.]),A(x[.],y[1]) @ 1,1
+A(x[.],y[.]),A(x[.],y[.]) <-> A(x[.],y[1]),A(x[.],y[1]) @ 2,2
 
 %init: 10 A()
-#Symmetric with the biochemist convention (rate constants are divided by the nbr of auto common to the lhs and the rhs)
+//Symmetric with the biochemist convention (rate constants are divided by the nbr of auto common to the lhs and the rhs)

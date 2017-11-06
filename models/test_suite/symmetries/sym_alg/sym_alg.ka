@@ -1,24 +1,24 @@
-%agent: A(x~u~p,y~u~p,z)
-%agent: B(y~u~p)
-%init: 10 A(x~u,y~u,z)
-%init: 10 B(y~u)
+%agent: A(x{u p},y{u p},z)
+%agent: B(y{u p})
+%init: 10 A(x{u}[.],y{u}[.],z[.])
+%init: 10 B(y{u}[.])
 
-%var: 'a' |A(z!_)|
-%var: 'b' |A(x~u,y~u,z!1),A(x~p,y~p,z!1)|
-%var: 'c' |A(x~u,y~u,z!1),A(x~p,y~p,z!1)|
-%var: 'e' |A(x~u,y~p,z!1),A(x~p,y~p,z!1)|
-%var: 'f' |A(x~p,y~u,z!1),A(x~p,y~p,z!1)|
-%var: 'g' |A(x~p,y~u,z!1),A(x~p,y~u,z!1)|
-%var: 'h' |A(x~u,y~p,z!1),A(x~p,y~u,z!1)|
+%var: 'a' |A(z[_])|
+%var: 'b' |A(x{u}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])|
+%var: 'c' |A(x{u}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])|
+%var: 'e' |A(x{u}[.],y{p}[.],z[1]),A(x{p}[.],y{p}[.],z[1])|
+%var: 'f' |A(x{p}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])|
+%var: 'g' |A(x{p}[.],y{u}[.],z[1]),A(x{p}[.],y{u}[.],z[1])|
+%var: 'h' |A(x{u}[.],y{p}[.],z[1]),A(x{p}[.],y{u}[.],z[1])|
 
 %token: d
 
-A(z),A(z) -> A(z!1),A(z!1) @1
-A(x~u) -> A(x~p) @1
-A(y~u) -> A(y~p) @1
-B(y~u) -> B(y~p) | |A(z!_)|:d @1
-B(y~u) -> B(y~p) | |A(x~u,y~u,z!1),A(x~p,y~p,z!1)|:d @1
-B(y~u) -> B(y~p) | |A(x~u,y~p,z!1),A(x~p,y~p,z!1)|:d @1
-B(y~u) -> B(y~p) | |A(x~p,y~u,z!1),A(x~p,y~p,z!1)|:d @1
+A(z[.]),A(z[.]) -> A(z[1]),A(z[1]) @ 1
+A(x{u}[.]) -> A(x{p}[.]) @ 1
+A(y{u}[.]) -> A(y{p}[.]) @ 1
+B(y{u}[.]) -> B(y{p}[.]) | |A(z[_])| d @ 1
+B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])| d @ 1
+B(y{u}[.]) -> B(y{p}[.]) | |A(x{u}[.],y{p}[.],z[1]),A(x{p}[.],y{p}[.],z[1])| d @ 1
+B(y{u}[.]) -> B(y{p}[.]) | |A(x{p}[.],y{u}[.],z[1]),A(x{p}[.],y{p}[.],z[1])| d @ 1
 
-%obs: 'GOAL' |B(y~p)|
+%obs: 'GOAL' |B(y{p}[.])|
