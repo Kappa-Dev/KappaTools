@@ -61,23 +61,17 @@ let union h x y =
       let () = Mods.DynArray.set h.rank root_x (combine_ranks rank_x rank_y) in
       Mods.DynArray.set h.father root_y root_x
 
-let incr_agent sigs =
-  let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in
-  let incr = Signature.get sigs id in
-  let after = Signature.num_of_site ("a",Locality.dummy) incr in
-  let before = Signature.num_of_site ("b",Locality.dummy) incr in
-  (before,after)
-
 let union_find_counters sigs mix =
   let t = create 1 in
   let () =
     match sigs with
     | None -> ()
-    | Some rsigs ->
-      let (before,after) = incr_agent rsigs in
+    | Some sigs ->
       List.iter
         (fun ag ->
-           if Signature.is_counter ag.a_type sigs then
+           match Signature.ports_if_counter_agent sigs ag.a_type with
+           | None -> ()
+           | Some (before,after) ->
              let a = ag.a_ports.(after) in
              let b = ag.a_ports.(before) in
              match b with
@@ -138,7 +132,7 @@ let print_agent created link ?sigs incr_agents f ag =
 let print ~created ?sigs f mix =
   let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
-      (fun ag -> not(Signature.is_counter ag.a_type sigs)) mix in
+      (fun ag -> not(Signature.is_counter_agent sigs ag.a_type)) mix in
   let incr_agents = union_find_counters sigs mix in
   Pp.list
     Pp.comma

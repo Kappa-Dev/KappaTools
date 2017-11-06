@@ -8,7 +8,6 @@
 
 val compile : Ast.parsing_compil -> Ast.parsing_compil * bool
 
-val incr_agent : Signature.s -> int * int * int * int
 val make_counter : int -> string -> Ast.counter
 
 val remove_counter_rule :
@@ -38,13 +37,6 @@ val annotate_counters_with_diff :
   Signature.s -> string Locality.annot -> Ast.counter list -> Ast.counter list ->
   LKappa.rule_agent -> (int -> int -> int -> int -> unit) ->
   LKappa.rule_agent LKappa.rule_agent_counters
-
-val add_incr :
-  (string Locality.annot * string Locality.annot list) list ->
-  string Locality.annot *
-    (unit NamedDecls.t *
-       ((string Locality.annot * string Locality.annot) list) *
-         (int * int) option) NamedDecls.t
 
 val add_counter_to_contact_map :
   Signature.s -> (int -> int -> int -> int -> unit) -> unit

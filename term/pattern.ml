@@ -447,8 +447,8 @@ let print_cc
               (true,out)
             | Link (dst_a,dst_p) ->
               let dst_ty = find_ty cc dst_a in
-              if (Signature.is_counter dst_ty sigs)
-                 &&not(!Parameter.debugModeOn) then
+              if Signature.is_counter_agent sigs dst_ty
+              && not(!Parameter.debugModeOn) then
                 let counter = counter_value cc.nodes (dst_a,dst_p) 0 in
                 let () = Format.fprintf f "{=%d}" counter in
                 true,out
@@ -473,8 +473,8 @@ let print_cc
     Mods.IntMap.fold
       (fun x el (not_empty,link_ids) ->
          let ag_x = (x,find_ty cc x) in
-         if not(Signature.is_counter (snd ag_x) sigs)
-            ||(!Parameter.debugModeOn) then
+         if (not (Signature.is_counter_agent sigs (snd ag_x)))
+            || (!Parameter.debugModeOn) then
          let () =
            Format.fprintf
              f "%t@[<h>%a("

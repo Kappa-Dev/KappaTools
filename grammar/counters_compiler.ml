@@ -275,17 +275,9 @@ let compile c =
     ({c with Ast.rules},true)
   else (c,false)
 
-let incr_agent sigs =
-  let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in
-  let incr = Signature.get sigs id in
-  let arity = Signature.arity sigs id in
-  let after = Signature.num_of_site ("a",Locality.dummy) incr in
-  let before = Signature.num_of_site ("b",Locality.dummy) incr in
-  (id,arity,before,after)
-
 let make_counter_agent sigs
       (first,dst) (last,equal) i j pos created =
-  let (ra_type,arity,incr_b,incr_a) = incr_agent sigs in
+  let (ra_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
   let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), LKappa.Maintained) in
   let before_switch =
     if first&&created then LKappa.Linked i else LKappa.Maintained in
@@ -305,7 +297,7 @@ let make_counter_agent sigs
 
 let raw_counter_agent
       (first,first_lnk) (last,last_lnk) i j sigs equal =
-  let (incr_type,arity,incr_b,incr_a) = incr_agent sigs in
+  let (incr_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
   let ports = Array.make arity (Raw_mixture.FREE) in
   let internals =
     Array.init arity
@@ -345,7 +337,7 @@ let rec link_incr sigs i nb ag_info equal lnk pos delta =
     ra_agent::(link_incr sigs (i+1) nb ag_info equal lnk pos delta)
 
 let rec erase_incr sigs i incrs delta lnk =
-  let (_,_,incr_b,_) = incr_agent sigs in
+  let (_,_,incr_b,_) = Signature.incr_agent sigs in
   match incrs with
   | hd::tl ->
      if (i = abs(delta)) then
@@ -361,7 +353,7 @@ let rec erase_incr sigs i incrs delta lnk =
   | [] -> []
 
 let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
-  let (incr_type,_,incr_b,_) = incr_agent sigs in
+  let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
   let start_lnk_for_created = start_lnk_nb + test +1 in
   let lnk_for_erased = start_lnk_nb + abs(delta) in
   let ag_info = p_id,ra.LKappa.ra_type in
@@ -504,7 +496,7 @@ let remove_counter_rule sigs mix created =
        (List.map (fun ag -> ag.LKappa.ra) created)
 
 let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
-  let (incr_type,_,incr_b,_) = incr_agent sigs in
+  let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -558,7 +550,7 @@ let make_counter i name =
    count_test = Some (Ast.CEQ i,Locality.dummy); count_delta =(0,Locality.dummy)}
 
 let add_counter_to_contact_map sigs add_link_contact_map =
-  let (incr_id,_,incr_b,incr_a) = incr_agent sigs in
+  let (incr_id,_,incr_b,incr_a) = Signature.incr_agent sigs in
   add_link_contact_map incr_id incr_a incr_id incr_b
 
 let annotate_dropped_counters sign counts ra arity agent_name aux =
@@ -583,7 +575,7 @@ let annotate_edit_counters
   let arity = Signature.arity sigs ag_id in
   let ra_counters = Array.make arity None in
   let register_counter_modif c_id =
-    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
     add_link_contact_map ag_id c_id incr_id incr_b in
   let _ =
     List.fold_left
@@ -604,7 +596,7 @@ let annotate_counters_with_diff
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let register_counter_modif c c_id =
-    let (incr_id,_,incr_b,_) = incr_agent sigs in
+    let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
     let () = add_link_contact_map ag_id c_id incr_id incr_b in
     (c, LKappa.Maintained) in
   let ra_counters = Array.make arity None in
@@ -670,7 +662,7 @@ let annotate_created_counters
           | None -> ()) ra_counters in
 
     let register_counter_modif c_id =
-      let (incr_id,_,incr_b,_) = incr_agent sigs in
+      let (incr_id,_,incr_b,_) = Signature.incr_agent sigs in
       add_link_contact_map ag_id c_id incr_id incr_b in
     let _ =
       List.fold_left
@@ -684,18 +676,3 @@ let annotate_created_counters
           let () = ra_counters.(p_id) <- Some (c,LKappa.Maintained) in
           pset') Mods.IntSet.empty counts in
     {LKappa.ra;ra_counters;}
-
-let add_incr counters =
-  let annot = Locality.dummy in
-  let a_port = ("a",annot) in
-  let b_port = ("b",annot) in
-  let incr = ("__incr",Locality.dummy) in
-  let after = (a_port,(NamedDecls.create [||],[(b_port,incr)],None)) in
-  let before_lnks =
-    List.fold_right
-      (fun (ag,counts) acc ->
-        (List.map (fun c -> (c,ag)) counts)@acc) counters [(a_port,incr)] in
-  let before = (b_port,(NamedDecls.create [||],before_lnks,None)) in
-  let lnks = NamedDecls.create [|after;before|] in
-  let counter_agent = (incr,lnks) in
-  counter_agent

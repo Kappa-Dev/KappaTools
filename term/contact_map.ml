@@ -52,7 +52,8 @@ let print_kappa sigs f c =
   Format.fprintf f "@[<v>%a@]"
     (Pp.array Pp.space
        (fun ag f intf ->
-         if not(Signature.is_counter ag (Some sigs))||(!Parameter.debugModeOn) then
+          if Signature.ports_if_counter_agent sigs ag = None
+          || (!Parameter.debugModeOn) then
            begin
            Format.fprintf f "@[<h>%%agent: %a(%a)@]"
            (Signature.print_agent sigs) ag

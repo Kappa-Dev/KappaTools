@@ -175,11 +175,12 @@ let union_find_counters sigs mix =
   let () =
     match sigs with
     | None -> ()
-    | Some rsigs ->
-      let (before,after) = Raw_mixture.incr_agent rsigs in
+    | Some sigs ->
       List.iter
         (fun ag ->
-           if Signature.is_counter ag.ra_type sigs then
+           match Signature.ports_if_counter_agent sigs ag.ra_type with
+           | None -> ()
+           | Some (before,after) ->
              let ((a,_),_) = ag.ra_ports.(after) in
              let ((b,_),_) = ag.ra_ports.(before) in
              match b with
@@ -213,7 +214,7 @@ let print_rule_agent sigs ~ltypes counters created_counters f ag =
 let print_rule_mixture sigs ~ltypes created f mix =
   let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
-      (fun ag -> not(Signature.is_counter ag.ra_type (Some sigs))) mix in
+      (fun ag -> not(Signature.is_counter_agent (Some sigs) ag.ra_type)) mix in
   let incr_agents = union_find_counters (Some sigs) mix in
   let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
   Pp.list Pp.comma

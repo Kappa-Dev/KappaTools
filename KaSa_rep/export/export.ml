@@ -1476,8 +1476,8 @@ let get_scc_decomposition
        )
 
 let dump_scc_decomposition
-    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
-    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    ?(accuracy_level_cm=Public_data.Low)
+    ?(accuracy_level_scc=Public_data.Low)
     state =
   ()
 (*internal contact map*)
@@ -1674,7 +1674,7 @@ let compute_signature show_title state =
           ))::list)
       (state,[]) l
   in
-  let signature = Signature.create true (Array.of_list l) in
+  let signature = Signature.create ~counters:[] true l in
   Remanent_state.set_signature signature state,
   signature
 

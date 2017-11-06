@@ -25,11 +25,12 @@ val has_counter : t -> bool
 type s (** Store of all the agents *)
 
 val create :
+  counters:(string Locality.annot * string Locality.annot list) list ->
   bool ->
   (string Locality.annot *
    (unit NamedDecls.t *
     (string Locality.annot * string Locality.annot) list *
-      (int * int) option) NamedDecls.t) array ->
+      (int * int) option) NamedDecls.t) list ->
   s
 
 val size : s -> int
@@ -76,5 +77,7 @@ val print : Format.formatter -> s -> unit
 val to_json : s -> Yojson.Basic.json
 val of_json : Yojson.Basic.json -> s
 
-val is_counter : int -> s option -> bool
+val is_counter_agent : s option -> int -> bool
+val ports_if_counter_agent : s -> int -> (int*int) option
 val site_is_counter : s -> int -> int -> bool
+val incr_agent : s -> (int * int * int * int) (** id, arity, before, after *)

@@ -104,19 +104,19 @@ let cc_to_user_cc sigs cc =
   let (cc_list,indexes,_) =
     Tools.array_fold_lefti
          (fun i (acc,indexes,pos) ag ->
-           if not(Signature.is_counter ag.node_type (Some sigs))
-           then
-             let indexes' =
-               if i = pos then indexes else
-                 match Renaming.add i pos indexes with
-                 | None ->
-                    raise
-                      (ExceptionDefn.Internal_Error
-                         (Locality.dummy_annot
-                            "Injectivity of renaming in snapshot"))
-                 | Some r -> r in
-             (ag::acc,indexes',pos+1)
-           else (acc,indexes,pos))
+          match Signature.ports_if_counter_agent sigs ag.node_type with
+          | None ->
+            let indexes' =
+              if i = pos then indexes else
+                match Renaming.add i pos indexes with
+                | None ->
+                  raise
+                    (ExceptionDefn.Internal_Error
+                       (Locality.dummy_annot
+                          "Injectivity of renaming in snapshot"))
+                | Some r -> r in
+            (ag::acc,indexes',pos+1)
+          | Some _ -> (acc,indexes,pos))
          ([],r,0) cc in
   let cc_without_counters = Array.of_list (List.rev cc_list) in
   Array.map
@@ -133,25 +133,29 @@ let cc_to_user_cc sigs cc =
                      (match si.site_state with
                       | None -> []
                       | Some s ->
-                         [Format.asprintf
-                            "%a" (Signature.print_internal_state
-                                    sigs ag.node_type id)
-                            s]) in
+                        [Format.asprintf
+                           "%a" (Signature.print_internal_state
+                                   sigs ag.node_type id)
+                           s]) in
                    match si.site_link with
                    | None ->
-                      User_graph.Port
-                        {User_graph.port_links = []; User_graph.port_states}
+                     User_graph.Port
+                       {User_graph.port_links = []; User_graph.port_states}
                    | Some (dn_id,s) ->
-                      let dn_id' =
-                        try Renaming.apply indexes dn_id with
-                          Renaming.Undefined | Invalid_argument _ -> dn_id in
-                      if not(Signature.is_counter (cc.(dn_id)).node_type (Some sigs)) then
+                     let dn_id' =
+                       try Renaming.apply indexes dn_id with
+                         Renaming.Undefined | Invalid_argument _ -> dn_id in
+                      match Signature.ports_if_counter_agent
+                              sigs (cc.(dn_id)).node_type with
+                      | None ->
                         User_graph.Port
-                          {User_graph.port_links = [(dn_id',s)]; User_graph.port_states}
-                      else User_graph.Counter (counter_value cc (dn_id,s) 0)
-                      })
-                      ag.node_sites;
-    })
+                          {User_graph.port_links = [(dn_id',s)];
+                           User_graph.port_states}
+                      | Some _ ->
+                        User_graph.Counter (counter_value cc (dn_id,s) 0)
+               })
+             ag.node_sites;
+       })
     cc_without_counters
 
 let export sigs s =

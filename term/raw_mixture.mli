@@ -28,5 +28,3 @@ val union_find_counters : Signature.s option -> t -> incr_t
 val find : incr_t -> int -> int
 val union: incr_t -> int -> int -> unit
 val create : int -> incr_t
-
-val incr_agent : Signature.s -> int * int

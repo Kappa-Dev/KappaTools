@@ -24,16 +24,11 @@ let add_link_contact_map ?contact_map sty sp dty dp =
 
 let rule_induces_link_permutation ~pos ?dst_ty sigs sort site =
   let warning_for_counters =
-    let () = Signature.print_agent sigs (Format.str_formatter) sort in
-    let sort_nme = Format.flush_str_formatter () in
-    if (String.compare sort_nme "__incr") == 0 then true
+    if Signature.is_counter_agent (Some sigs) sort then true
     else
     match dst_ty with
     | None -> false
-    | Some s ->
-       let () = Signature.print_agent sigs (Format.str_formatter) s in
-       let sort_src_nme = Format.flush_str_formatter () in
-       (String.compare sort_src_nme "__incr") == 0 in
+    | Some s -> Signature.is_counter_agent (Some sigs) s in
 
   if not(warning_for_counters) then
   ExceptionDefn.warning
@@ -1190,30 +1185,30 @@ let create_t sites incr_info =
   NamedDecls.create (Array.of_list aux),counters
 
 let create_sig l =
-  let (with_counters,with_contact_map) =
+  let with_contact_map =
     List.fold_left
-      (fun (count,contact) -> function
+      (fun contact -> function
          | Ast.Absent pos ->
            raise
              (ExceptionDefn.Malformed_Decl
                 ("Absent agent are forbidden in signature",pos))
          | Ast.Present (_,sites,_) ->
-        List.fold_left
-          (fun (count',contact') site ->
-            match site with
-            | Ast.Counter _ -> (true,contact')
-            | Ast.Port p ->
-               let contact'' =
-                 List.fold_left (fun acc -> function
-                 | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc
-                 | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
-                 raise
-                   (ExceptionDefn.Malformed_Decl
-                      ("Forbidden link status inside a definition of signature",
-                       pos))
-                 | Ast.LNK_TYPE (_,_), _ -> true) false p.Ast.port_lnk in
-               (count',contact''||contact')) (count,contact) sites)
-      (false,false) l in
+           List.fold_left
+             (fun contact' site ->
+                match site with
+                | Ast.Counter _ -> contact'
+                | Ast.Port p ->
+                  contact'||
+                  List.fold_left (fun acc -> function
+                      | (Ast.LNK_FREE | Ast.ANY_FREE | Ast.LNK_ANY), _ -> acc
+                      | (Ast.LNK_SOME | Ast.LNK_VALUE _), pos ->
+                        raise
+                          (ExceptionDefn.Malformed_Decl
+                             ("Forbidden link status inside a definition of signature",
+                              pos))
+                      | Ast.LNK_TYPE (_,_), _ -> true) false p.Ast.port_lnk)
+             contact sites)
+      false l in
   let annot = Locality.dummy in
   let (sigs,counters) =
     List.fold_right
@@ -1221,13 +1216,13 @@ let create_sig l =
          match ag with
          | Ast.Absent _ -> (acc,counters)
          | Ast.Present (name,sites,_) ->
-           let (lnks,counters') =
+           let (lnks,counters_ag) =
              create_t sites (("b",annot),("__incr",annot)) in
-           ((name,lnks)::acc,(name,counters')::counters))
+           let counters' = if counters_ag = [] then counters
+               else (name,counters_ag)::counters in
+           ((name,lnks)::acc,counters'))
       l ([],[]) in
-  let sigs' = if with_counters then (Counters_compiler.add_incr counters)::sigs else sigs in
-  let t = Array.of_list sigs' in
-  Signature.create with_contact_map t
+  Signature.create ~counters with_contact_map sigs
 
 let compil_of_ast ~syntax_version overwrite c =
   let (c,with_counters) = Counters_compiler.compile c in
