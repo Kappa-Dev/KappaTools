@@ -17,14 +17,14 @@ module DynArray =
          {
            mutable array: 'a G.t;
            mutable current_size: int;
-           default: 'a
+           default: int -> 'a
          }
 
        let create n a =
          {
            array = G.create n a;
            current_size = n;
-           default = a;
+           default = fun _ -> a;
          }
 
        let length a = a.current_size
@@ -32,21 +32,13 @@ module DynArray =
        let expand t =
          let n = length t in
          let n' = max (n+1) (n*2) in
-         let array' = G.create n' t.default in
-         let () = G.blit t.array 0 array' 0 n in
-         let () = t.array <- array' in
-         t.current_size <- n'
-
-       let expand_map f t =
-         let n = length t in
-         let n' = max (n+1) (n*2) in
-         let array' = G.init n' f in
+         let array' = G.init n' t.default in
          let () = G.blit t.array 0 array' 0 n in
          let () = t.array <- array' in
          t.current_size <- n'
 
        let get a i =
-         if length a > i then G.get a.array i else a.default
+         if length a > i then G.get a.array i else a.default i
 
        let rec set a i v =
          let n = length a in
@@ -55,20 +47,13 @@ module DynArray =
            let () = expand a in
            set a i v
 
-       let rec set_with_map f a i v =
-         let n = length a in
-         if n>i then G.set a.array i v
-         else
-           let () = expand_map f a in
-           set_with_map f a i v
-
        let make = create
 
        let init n f =
          {
            array = G.init n f ;
            current_size = n ;
-           default = f 0
+           default = f
          }
 
        let append a b =
@@ -125,15 +110,12 @@ module DynArray =
          then raise (Invalid_argument "Dynamic_array.fill")
          else aux 0 start
 
-       let of_list l =
-         match l with
-         | [] -> raise (Invalid_argument "DynamicArray.of_list")
-         | t::_ ->
-           {
-             current_size = List.length l;
-             array = G.of_list l;
-             default = t
-           }
+       let of_list ~default l =
+         {
+           current_size = List.length l;
+           array = G.of_list ~default l;
+           default = fun _ -> default;
+         }
        let iter f a = G.iter f a.array
        let iteri f a = G.iteri f a.array
        let fold_lefti f b a = G.fold_lefti f b a.array

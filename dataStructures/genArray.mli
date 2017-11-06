@@ -14,7 +14,6 @@ module type GenArray = sig
     val length: 'a t -> int
     val get: 'a t -> int -> 'a
     val set: 'a t -> int -> 'a -> unit
-    val set_with_map : (int ->  'a) -> 'a t -> int -> 'a -> unit
     val init: int -> (int -> 'a) -> 'a t
     val make: int -> 'a -> 'a t
     val append: 'a t -> 'a t -> 'a t
@@ -22,7 +21,7 @@ module type GenArray = sig
     val sub: 'a t -> int -> int -> 'a t
     val copy: 'a t -> 'a t
     val fill: 'a t -> int -> int -> 'a -> unit
-    val of_list: 'a list -> 'a t
+    val of_list: default:'a -> 'a list -> 'a t
     val iter: ('a -> unit) -> 'a t -> unit
     val iteri: (int -> 'a -> unit) -> 'a t -> unit
     val blit: 'a t -> int -> 'a t -> int -> int -> unit

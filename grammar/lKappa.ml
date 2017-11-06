@@ -173,32 +173,34 @@ let print_rule_intf
 let union_find_counters sigs mix =
   let t = Raw_mixture.create 1 in
   let () =
-    List.iter
-      (fun ag ->
-        if Signature.is_counter ag.ra_type sigs then
-          let (before,after) = Raw_mixture.incr_agent sigs in
-          let ((a,_),_) = ag.ra_ports.(after) in
-          let ((b,_),_) = ag.ra_ports.(before) in
-          match b with
-          | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
-            | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
-          | Ast.LNK_VALUE (lnk_b,_) ->
-             match a with
-             | Ast.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
-             | Ast.ANY_FREE | Ast.LNK_FREE ->
-                let root = Raw_mixture.find t lnk_b in
-                let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
-                Mods.DynArray.set t.Raw_mixture.rank root (s,(true,true))
-
-             | Ast.LNK_ANY ->
-                let root = Raw_mixture.find t lnk_b in
-                let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
-                Mods.DynArray.set t.Raw_mixture.rank root (s,(false,true))
-             | Ast.LNK_TYPE _ | Ast.LNK_SOME ->
-                raise (ExceptionDefn.Internal_Error
-                         (Locality.dummy_annot
-                            ("Port a of __incr agent not well specified"))))
-      mix in
+    match sigs with
+    | None -> ()
+    | Some rsigs ->
+      let (before,after) = Raw_mixture.incr_agent rsigs in
+      List.iter
+        (fun ag ->
+           if Signature.is_counter ag.ra_type sigs then
+             let ((a,_),_) = ag.ra_ports.(after) in
+             let ((b,_),_) = ag.ra_ports.(before) in
+             match b with
+             | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
+             | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
+             | Ast.LNK_VALUE (lnk_b,_) ->
+               match a with
+               | Ast.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
+               | Ast.ANY_FREE | Ast.LNK_FREE ->
+                 let root = Raw_mixture.find t lnk_b in
+                 let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
+                 Mods.DynArray.set t.Raw_mixture.rank root (s,(true,true))
+               | Ast.LNK_ANY ->
+                 let root = Raw_mixture.find t lnk_b in
+                 let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
+                 Mods.DynArray.set t.Raw_mixture.rank root (s,(false,true))
+               | Ast.LNK_TYPE _ | Ast.LNK_SOME ->
+                 raise (ExceptionDefn.Internal_Error
+                          (Locality.dummy_annot
+                             ("Port a of __incr agent not well specified"))))
+        mix in
   t
 
 let print_rule_agent sigs ~ltypes counters created_counters f ag =

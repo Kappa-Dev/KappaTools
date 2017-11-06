@@ -59,8 +59,6 @@ let set a i j =
     let p, q = euclideen i max_array_size1 in
     set2 a p q j
 
-let set_with_map _ = set
-
 let make = create
 
 let init n f =
@@ -131,7 +129,7 @@ let fill a start len x =
       if k < len then let () = set a i x in aux (k + 1) (i + 1) in
     aux 0 start
 
-let of_list = function
+let of_list ~default = function
   | [] -> Unary [||]
   | t::_ as l ->
     let size = List.length l in

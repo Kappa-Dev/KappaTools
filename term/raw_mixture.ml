@@ -36,7 +36,7 @@ let rec find_aux a i =
   if ai == i then i
   else
     let root = find_aux a ai in
-    let () = Mods.DynArray.set_with_map (fun i -> i) a i root in
+    let () = Mods.DynArray.set a i root in
     root
 
 let find h x =
@@ -53,46 +53,45 @@ let union h x y =
     let rank_y = Mods.DynArray.get h.rank root_y in
     if (fst rank_x) > (fst rank_y) then
       let () = Mods.DynArray.set h.rank root_x (combine_ranks rank_x rank_y) in
-      Mods.DynArray.set_with_map (fun i -> i) h.father root_y root_x
+      Mods.DynArray.set h.father root_y root_x
     else if (fst rank_x) < (fst rank_y) then
       let () = Mods.DynArray.set h.rank root_y (combine_ranks rank_x rank_y) in
-      Mods.DynArray.set_with_map (fun i -> i) h.father root_x root_y
+      Mods.DynArray.set h.father root_x root_y
     else
       let () = Mods.DynArray.set h.rank root_x (combine_ranks rank_x rank_y) in
-      Mods.DynArray.set_with_map (fun i -> i) h.father root_y root_x
+      Mods.DynArray.set h.father root_y root_x
 
 let incr_agent sigs =
-  match sigs with
-    None -> (0,1)
-  | Some s ->
-    let id = Signature.num_of_agent ("__incr",Locality.dummy) s in
-    let incr = Signature.get s id in
-    let after = Signature.num_of_site ("a",Locality.dummy) incr in
-    let before = Signature.num_of_site ("b",Locality.dummy) incr in
-    (before,after)
+  let id = Signature.num_of_agent ("__incr",Locality.dummy) sigs in
+  let incr = Signature.get sigs id in
+  let after = Signature.num_of_site ("a",Locality.dummy) incr in
+  let before = Signature.num_of_site ("b",Locality.dummy) incr in
+  (before,after)
 
 let union_find_counters sigs mix =
   let t = create 1 in
   let () =
-    List.iter
-      (fun ag ->
-        if Signature.is_counter ag.a_type sigs then
-          let (before,after) = incr_agent sigs in
-          let a = ag.a_ports.(after) in
-          let b = ag.a_ports.(before) in
-          match b with
-          | FREE -> ()
-          | VAL lnk_b ->
-             match a with
-             | FREE ->
-                (* in this case the endpoint of the chain of increments is raw:
-                   the agent is created with a counter value*)
-                let root = find t lnk_b in
-                let (s,_) = Mods.DynArray.get t.rank root in
-                Mods.DynArray.set t.rank root (s-1,(true,true))
-             | VAL lnk_a -> union t lnk_b lnk_a) mix in
+    match sigs with
+    | None -> ()
+    | Some rsigs ->
+      let (before,after) = incr_agent rsigs in
+      List.iter
+        (fun ag ->
+           if Signature.is_counter ag.a_type sigs then
+             let a = ag.a_ports.(after) in
+             let b = ag.a_ports.(before) in
+             match b with
+             | FREE -> ()
+             | VAL lnk_b ->
+               match a with
+               | FREE ->
+                 (* in this case the endpoint of the chain of increments is raw:
+                    the agent is created with a counter value*)
+                 let root = find t lnk_b in
+                 let (s,_) = Mods.DynArray.get t.rank root in
+                 Mods.DynArray.set t.rank root (s-1,(true,true))
+               | VAL lnk_a -> union t lnk_b lnk_a) mix in
   t
-
 
 let print_link incr_agents f = function
   | FREE -> Format.pp_print_string f "[.]"

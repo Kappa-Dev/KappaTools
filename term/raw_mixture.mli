@@ -29,4 +29,4 @@ val find : incr_t -> int -> int
 val union: incr_t -> int -> int -> unit
 val create : int -> incr_t
 
-val incr_agent : Signature.s option -> int * int
+val incr_agent : Signature.s -> int * int
