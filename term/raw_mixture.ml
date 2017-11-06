@@ -130,14 +130,17 @@ let print_agent created link ?sigs incr_agents f ag =
       (fun f -> if created then Format.pp_print_string f "+")
 
 let print ~created ?sigs f mix =
-  let mix_without_counters = if (!Parameter.debugModeOn) then mix else
-    List.filter
-      (fun ag -> not(Signature.is_counter_agent sigs ag.a_type)) mix in
   let incr_agents = union_find_counters sigs mix in
-  Pp.list
-    Pp.comma
-    (print_agent created true ?sigs incr_agents)
-    f mix_without_counters
+  let rec aux_print some = function
+    | [] -> ()
+    | h::t ->
+      if Signature.is_counter_agent sigs h.a_type && not !Parameter.debugModeOn
+      then aux_print some t
+      else
+        let () = if some then Pp.comma f in
+        let () = print_agent created true ?sigs incr_agents f h in
+        aux_print true t in
+  aux_print false mix
 
 let agent_to_json a =
   `Assoc

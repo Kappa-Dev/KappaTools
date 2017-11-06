@@ -212,14 +212,19 @@ let print_rule_agent sigs ~ltypes counters created_counters f ag =
     (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
 
 let print_rule_mixture sigs ~ltypes created f mix =
-  let mix_without_counters = if (!Parameter.debugModeOn) then mix else
-    List.filter
-      (fun ag -> not(Signature.is_counter_agent (Some sigs) ag.ra_type)) mix in
   let incr_agents = union_find_counters (Some sigs) mix in
   let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
-  Pp.list Pp.comma
-    (print_rule_agent sigs ~ltypes incr_agents created_incr)
-    f mix_without_counters
+  let rec aux_print some = function
+    | [] -> ()
+    | h::t ->
+      if Signature.is_counter_agent (Some sigs) h.ra_type
+      && not !Parameter.debugModeOn
+      then aux_print some t
+      else
+        let () = if some then Pp.comma f in
+        let () = print_rule_agent sigs ~ltypes incr_agents created_incr f h in
+        aux_print true t in
+  aux_print false mix
 
 let print_internal_lhs sigs ag_ty site f = function
   | I_ANY -> ()
