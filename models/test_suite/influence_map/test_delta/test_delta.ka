@@ -1,15 +1,15 @@
-A(x~u),B(x~p),B(x~p) <-> A(x~u),C(x~u) @1,1
-A(x~u),C(x~p) <-> A(x~u),B(x~u),B(x~u) @1,1
+A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. <-> A(x{u}[.]),.,.,C(x{u}[.]) @ 1,1
+A(x{u}[.]),C(x{p}[.]),.,. <-> A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) @ 1,1
 
 %obs: 'qb' |B()|
 %obs: 'qc' |C()|
 
-%agent: A(x~u~p)
-%agent: B(x~u~p)
-%agent: C(x~u~p)
-%init: 10 A(x~u)
-%init: 10 A(x~p)
-%init: 10 B(x~u)
-%init: 10 B(x~p)
-%init: 10 C(x~u)
-%init: 10 C(x~p)
+%agent: A(x{u p})
+%agent: B(x{u p})
+%agent: C(x{u p})
+%init: 10 A(x{u}[.])
+%init: 10 A(x{p}[.])
+%init: 10 B(x{u}[.])
+%init: 10 B(x{p}[.])
+%init: 10 C(x{u}[.])
+%init: 10 C(x{p}[.])

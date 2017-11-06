@@ -1,7 +1,7 @@
-%agent: A(x~u~p)
-%agent: B(x~u~p)
+%agent: A(x{u p})
+%agent: B(x{u p})
 
-'label' A(x~u),B(x~p) -> A(x~u),A(x~p) @1
-A(x~p) -> A(x~u) @1
-B(x~u) -> B(x~p) @1
-B(x~p) -> B(x~u) @1
+'label' A(x{u}[.]),B(x{p}[.]),. -> A(x{u}[.]),.,A(x{p}[.]) @ 1
+A(x{p}[.]) -> A(x{u}[.]) @ 1
+B(x{u}[.]) -> B(x{p}[.]) @ 1
+B(x{p}[.]) -> B(x{u}[.]) @ 1

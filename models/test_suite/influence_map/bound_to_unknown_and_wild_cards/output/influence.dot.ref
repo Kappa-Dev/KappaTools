@@ -1,15 +1,15 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa influence.ka --debugging-mode --output-directory output -syntax 3
+#Command line is: KaSa influence.ka --debugging-mode --output-directory output -syntax 4
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x!1,y!_),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="green"];
-"2:A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="green"];
-"0:A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="red" arrowhead="tee"];
+"0:A(x!1,y?),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x!1,y!_),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x!1,y),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x!1,y?),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="green"];
+"2:A(x!1,y),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="green"];
+"0:A(x!1,y?),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1),.->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="red" arrowhead="tee"];
 }

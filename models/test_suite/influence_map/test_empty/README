@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSa test_empty.ka --influence-map-accuracy-level Realisable --debugging-mode --output-directory output -syntax 3 || exit 0
+"${KAPPABIN}"KaSa test_empty.ka --influence-map-accuracy-level Realisable --debugging-mode --output-directory output -syntax 4 || exit 0
 
 
 #Test shift of agents in bidirectional rules.

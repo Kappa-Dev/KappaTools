@@ -1,6 +1,6 @@
-%agent: A(x~u~p~q)
+%agent: A(x{u p q})
 
-'veryveryveryveryverylonglonglonglabel' A(x~u) -> A(x~p) @1
-'otherotherveryveryveryverylonglabel' A(x~p) -> A(x~q) @1
-'"0' A(x~q) -> A(x~u) @1
-'\0' A(x~q) -> A(x~p) @1
+'veryveryveryveryverylonglonglonglabel' A(x{u}[.]) -> A(x{p}[.]) @ 1
+'otherotherveryveryveryverylonglabel' A(x{p}[.]) -> A(x{q}[.]) @ 1
+'"0' A(x{q}[.]) -> A(x{u}[.]) @ 1
+'\0' A(x{q}[.]) -> A(x{p}[.]) @ 1

@@ -340,10 +340,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x~u,y~u)
 
 
-	Applying rule A(x{u}) -> A(x{p}) (File "high_res.ka", line 1, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(x{u}) -> A(x{p}) (File "high_res.ka", line 1, characters 0-19:) is applied for the first time
+		rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~,z~,w~)
 
@@ -415,10 +415,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x~p,y~u)
 
 
-	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "high_res.ka", line 2, characters 0-27:):
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u}) -> A(x{p} y{p}) (File "high_res.ka", line 2, characters 0-27:) is applied for the first time
+		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~,z~,w~)
 
@@ -482,10 +482,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 		Influence_map:A(x~p,y~p)
 
 
-	Applying rule A(y{p} z{u}) -> A(y{p} z{p}) (File "high_res.ka", line 3, characters 0-27:):
+	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
-		rule A(y{p} z{u}) -> A(y{p} z{p}) (File "high_res.ka", line 3, characters 0-27:) is applied for the first time
+		rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~,z~,w~)
 
@@ -560,10 +560,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u} z{p} w{u}) -> A(x{u} z{p} w{p}) (File "high_res.ka", line 4, characters 0-35:):
+	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
-		rule A(x{u} z{p} w{u}) -> A(x{u} z{p} w{p}) (File "high_res.ka", line 4, characters 0-35:) is applied for the first time
+		rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~,z~,w~)
 
@@ -609,10 +609,10 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u} z{u}) -> A(x{u} z{p}) (File "high_res.ka", line 5, characters 0-27:):
+	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
-		rule A(x{u} z{u}) -> A(x{u} z{p}) (File "high_res.ka", line 5, characters 0-27:) is applied for the first time
+		rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:) is applied for the first time
 
 		Influence_map:Updating the views for A(x~,z~,w~)
 
@@ -648,7 +648,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u}) -> A(x{p}) (File "high_res.ka", line 1, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)
@@ -693,7 +693,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "high_res.ka", line 2, characters 0-27:):
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "high_res.ka", line 2, characters 0-44:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)
@@ -702,7 +702,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(y{p} z{u}) -> A(y{p} z{p}) (File "high_res.ka", line 3, characters 0-27:):
+	Applying rule A(y{p}[.] z{u}[.]) -> A(y{p}[.] z{p}[.]) (File "high_res.ka", line 3, characters 0-44:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)
@@ -711,7 +711,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u} z{p} w{u}) -> A(x{u} z{p} w{p}) (File "high_res.ka", line 4, characters 0-35:):
+	Applying rule A(x{u}[.] z{p}[.] w{u}[.]) -> A(x{u}[.] z{p}[.] w{p}[.]) (File "high_res.ka", line 4, characters 0-60:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)
@@ -720,7 +720,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u} z{u}) -> A(x{u} z{p}) (File "high_res.ka", line 5, characters 0-27:):
+	Applying rule A(x{u}[.] z{u}[.]) -> A(x{u}[.] z{p}[.]) (File "high_res.ka", line 5, characters 0-44:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)
@@ -729,7 +729,7 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		Influence_map:Updating the views for A(x~,y~)
 
-	Applying rule A(x{u}) -> A(x{p}) (File "high_res.ka", line 1, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "high_res.ka", line 1, characters 0-28:):
 		the precondition is satisfied
 
 		Influence_map:Updating the views for A(x~,z~,w~)

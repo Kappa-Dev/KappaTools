@@ -294,11 +294,11 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule r1 (File "bound_to.ka", line 4, characters 4-26:) will never be applied.
-rule r2 (File "bound_to.ka", line 5, characters 4-34:) will never be applied.
-rule r3 (File "bound_to.ka", line 6, characters 4-34:) will never be applied.
-rule r4 (File "bound_to.ka", line 7, characters 4-34:) will never be applied.
-rule r5 (File "bound_to.ka", line 8, characters 4-24:) will never be applied.
+rule r1 (File "bound_to.ka", line 4, characters 5-33:) will never be applied.
+rule r2 (File "bound_to.ka", line 5, characters 5-43:) will never be applied.
+rule r3 (File "bound_to.ka", line 6, characters 5-43:) will never be applied.
+rule r4 (File "bound_to.ka", line 7, characters 5-43:) will never be applied.
+rule r5 (File "bound_to.ka", line 8, characters 5-29:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

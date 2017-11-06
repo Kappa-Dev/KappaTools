@@ -150,10 +150,10 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule veryveryveryveryverylonglonglonglabel (File "labels.ka", line 3, characters 39-59:) will never be applied.
-rule otherotherveryveryveryverylonglabel (File "labels.ka", line 4, characters 37-57:) will never be applied.
-rule "0 (File "labels.ka", line 5, characters 4-24:) will never be applied.
-rule \0 (File "labels.ka", line 6, characters 4-24:) will never be applied.
+rule veryveryveryveryverylonglonglonglabel (File "labels.ka", line 3, characters 40-68:) will never be applied.
+rule otherotherveryveryveryverylonglabel (File "labels.ka", line 4, characters 38-66:) will never be applied.
+rule "0 (File "labels.ka", line 5, characters 5-33:) will never be applied.
+rule \0 (File "labels.ka", line 6, characters 5-33:) will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 

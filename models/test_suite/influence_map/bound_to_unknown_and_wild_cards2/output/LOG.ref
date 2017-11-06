@@ -308,9 +308,9 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "influence.ka", line 1, characters 0-58: will never be applied.
-rule File "influence.ka", line 2, characters 0-59: will never be applied.
-rule File "influence.ka", line 3, characters 0-57: will never be applied.
+rule File "influence.ka", line 1, characters 0-69: will never be applied.
+rule File "influence.ka", line 2, characters 0-69: will never be applied.
+rule File "influence.ka", line 3, characters 0-69: will never be applied.
 
 ------------------------------------------------------------
 * There are some non creatable agents 
