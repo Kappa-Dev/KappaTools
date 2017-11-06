@@ -1,7 +1,7 @@
 """ Shared functions of api client for the kappa programming language
 """
 __all__ = ['FileMetadata', 'File', 'SimulationParameter', 'PlotLimit',
-           'KappaError'] 
+           'KappaError']
 
 import json
 
@@ -10,16 +10,27 @@ class FileMetadata(object):
     """An object to hold the metadata for a file.
 
     Note that it is commmon to initialized this function with a dict, in the
-    form FileMetaData(**metadeta). If so, the dict must have arguments
+    form FileMetaData(**metadata). If so, the dict must have arguments
     matching those below, including at least 'id' and 'position'.
 
     Init
     ----
     id -- The id of corresponding file.
-    position -- where you are to start in the file.
+    position -- where the file should be inserted in the middle of the
+        other files of the model.
+        When you add a file at position 'i' in a model that contains 'k >= i'
+        files, the new file is indeed at position 'i' and all the files at
+        position 'j>=i' are pushed at position 'j+1'.
+
+    options that won't probably stay
     compile -- (boolean, default True) Indicate whether the file should be
-        compiled or not.
+        compiled or not next time project will be parsed. To be dropped as
+        not compiled files could as well si;ply be deleted...
     file_version -- (list, default empty/None) the version of the file.
+        Way too complicated logic meant to deal with the case where several
+        clients works at the same time on the same stuff (in the REST API).
+        Can be safely ignored in Std mode, Should not be trusted in Rest mode...
+        In one word, to replace and erase!
 
     Methods
     -------
@@ -83,14 +94,14 @@ class File(object):
     @classmethod
     def from_string(cls, content, position=1):
         """Convenience method to create a file from a string.
-        
+
         This file object's metadata will have the id 'inlined_input'.
-        
+
         Inputs
         ------
         content -- the content of the file (a string).
-        position -- the position to start reading the file (passed to
-            FileMetadata).
+        position -- (default 1) rank among all files of the model while parsing
+          see FileMetadata
         """
         return cls(FileMetadata('inlined_input', position), content)
 
@@ -109,7 +120,19 @@ class File(object):
 
 
 class SimulationParameter(object):
-    # TODO: Add docs.
+    """Parameters needed to run a simulation
+
+    Init
+    ----
+    plot_period -- (float) How often values of observables should be computed
+        during the simulation
+    pause_condition -- (string representing a boolean kappa expression)
+        When the simulation will stop itself and wait for further actions.
+    seed -- (int optionnal) specify the seed of the random number generator
+        used by the simulator
+    store_trace -- (boolean) Because simulation traces become huge, you must
+       specify before starting a simulation whether you may query it later
+    """
 
     def __init__(self, plot_period, pause_condition, seed=None,
                  store_trace = False):
@@ -125,7 +148,16 @@ class SimulationParameter(object):
                  "seed" : self.seed }
 
 class PlotLimit(object):
-    # TODO: add docs.
+    """Parameters of plot query
+
+
+    Init
+    ----
+    points -- maximum number of column that the reply should
+       contains. (None means unlimited)
+    offset -- At what column number the reply should start
+       (None means return the end of the simulation)
+    """
 
     def __init__(self, offset=None, points=None) :
         self.offset = offset
