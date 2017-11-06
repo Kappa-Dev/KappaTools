@@ -103,80 +103,6 @@ let switching_of_json = function
   | `String "Erased"-> Erased
   | x -> Linked (JsonUtil.to_int ~error_msg:"Invalid Switching" x)
 
-let is_counter sigs (_,ag_ty) = Signature.is_counter ag_ty (Some sigs)
-
-let match_link e = function
-  | Ast.LNK_VALUE (i,_) ->
-     begin
-       match e with
-         Ast.LNK_VALUE (i',_) -> (i=i')
-       | Ast.ANY_FREE | Ast.LNK_FREE
-         | Ast.LNK_ANY  | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
-     end
-  | Ast.ANY_FREE | Ast.LNK_FREE
-    | Ast.LNK_ANY  | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
-
-let rec counter_value mix e (pid,ag_ty) count =
-  let incr =
-    List.find
-      (fun a ->
-        ag_ty = a.ra_type &&
-          Tools.array_fold_lefti
-            (fun pid' acc ((e',_),_) ->
-                (pid = pid' && (match_link e e')) || acc)
-              false a.ra_ports) mix in
-  let e' =
-    Array.fold_left
-      (fun acc ((e',_),_) ->
-        if (match_link e e') then acc else e')
-      e incr.ra_ports in
-  match e' with
-  | Ast.ANY_FREE | Ast.LNK_FREE -> Ast.CEQ count
-  | Ast.LNK_ANY -> Ast.CGTE count
-  | Ast.LNK_TYPE _ | Ast.LNK_SOME | Ast.LNK_VALUE _ ->
-     counter_value mix e' (pid,ag_ty) (count+1)
-
-let counter_delta created j = function
-  | Linked i ->
-     begin
-     match (Raw_mixture.counters_chain_length created i true) with
-       None  -> (j-i) (*decrement counter*)
-     | Some c -> c
-     (*incr counter : count nb of chained increments in raw mixture*)
-     end
-  | Freed ->
-     raise (ExceptionDefn.Internal_Error
-              (Locality.dummy_annot("Cannot erase all increment agents")))
-  | Maintained -> 0
-  | Erased -> 0
-
-let add_counter_agent sigs mix created ag =
-  let ra_counters =
-    Array.make (Array.length ag.ra_ports) None in
-  let () =
-    if not(!Parameter.debugModeOn) then
-    Array.iteri
-      (fun id ((e,_),s) ->
-        match e with
-        | Ast.ANY_FREE | Ast.LNK_FREE
-          | Ast.LNK_ANY | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
-        | Ast.LNK_VALUE (i,a) ->
-           if not(is_counter sigs a) then ()
-           else
-             let count_nme =
-               Locality.dummy_annot
-                 (Signature.site_of_num
-                    id (Signature.get sigs ag.ra_type)) in
-             let count_value = counter_value mix e a 0 in
-             let count_test = Some (Locality.dummy_annot count_value) in
-             let count_delta =
-               Locality.dummy_annot
-                 (counter_delta created i s) in
-             ra_counters.(id) <-
-               Some ({Ast.count_nme; count_test; count_delta}, s))
-      ag.ra_ports in
-  ra_counters
-
 let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
   Format.fprintf
     f "[%a%a]"
@@ -186,7 +112,27 @@ let print_rule_link sigs ~show_erased ~ltypes f ((e,_),s) =
     e
     (print_switching ~show_erased) s
 
-let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints,counters) =
+let print_counter_test f = function
+  | (c,true) -> Format.fprintf f "=%i" c
+  | (c,false) -> Format.fprintf f ">=%i" c
+
+let print_counter_delta counters j f switch = match switch with
+  | Linked i ->
+     begin
+       let root = Raw_mixture.find counters i in
+       let (s,(_,is_counter)) =
+         Mods.DynArray.get counters.Raw_mixture.rank root in
+       let delta = if (is_counter) then s-1 else (j-i) in
+       Format.fprintf f "/+=%d" delta
+     end
+  | Freed ->
+     raise (ExceptionDefn.Internal_Error
+              (Locality.dummy_annot("Cannot erase all increment agents")))
+  | Maintained -> ()
+  | Erased -> ()
+
+let print_rule_intf
+      sigs ~show_erased ~ltypes ag_ty f (ports,ints,counters,created_counters) =
   let rec aux empty i =
     if i < Array.length ports then
       if (match ports.(i) with
@@ -194,37 +140,83 @@ let print_rule_intf sigs ~show_erased ~ltypes ag_ty f (ports,ints,counters) =
          | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _) |
             ((Ast.LNK_SOME | Ast.ANY_FREE | Ast.LNK_FREE |
               Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true) then
-        let () =
-          match counters.(i) with
-          | Some (c,_) when not (!Parameter.debugModeOn) ->
-            Format.fprintf f "%t%a"
-              (if empty then Pp.empty else Pp.space) Ast.print_counter c
-          | _ ->
-            Format.fprintf
-              f "%t%a%a%a" (if empty then Pp.empty else Pp.space)
-              (Signature.print_site sigs ag_ty) i
-              (print_rule_internal sigs ~show_erased ag_ty i)
-              ints.(i)
-              (print_rule_link sigs ~show_erased ~ltypes)
-              ports.(i) in
+
+        let ((e,_),switch) = ports.(i) in
+        let is_counter = match e with
+          | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
+            | Ast.LNK_TYPE _ | Ast.LNK_SOME -> false
+          | Ast.LNK_VALUE (j,_) ->
+             try
+               let root = Raw_mixture.find counters j in
+               let (c,(eq,is_counter')) =
+                 Mods.DynArray.get counters.Raw_mixture.rank root in
+               if (is_counter')&&not(!Parameter.debugModeOn) then
+                 let () = Format.fprintf f "%t%a{%a%a}"
+                          (if empty then Pp.empty else Pp.space)
+                          (Signature.print_site sigs ag_ty) i
+                          print_counter_test (c-1,eq)
+                          (print_counter_delta created_counters j) switch
+                 in true else false
+             with Invalid_argument _ -> false in
+        let () = if not(is_counter) then
+                   Format.fprintf
+                     f "%t%a%a%a" (if empty then Pp.empty else Pp.space)
+                     (Signature.print_site sigs ag_ty) i
+                     (print_rule_internal sigs ~show_erased ag_ty i)
+                     ints.(i)
+                     (print_rule_link sigs ~show_erased ~ltypes)
+                     ports.(i) else () in
         aux false (succ i)
       else aux empty (succ i) in
   aux true 0
 
-let print_rule_agent sigs ~ltypes mix created f ag =
-  let ra_counters = add_counter_agent sigs mix created ag in
+let union_find_counters sigs mix =
+  let t = Raw_mixture.create 1 in
+  let () =
+    List.iter
+      (fun ag ->
+        if Signature.is_counter ag.ra_type sigs then
+          let (before,after) = Raw_mixture.incr_agent sigs in
+          let ((a,_),_) = ag.ra_ports.(after) in
+          let ((b,_),_) = ag.ra_ports.(before) in
+          match b with
+          | Ast.ANY_FREE | Ast.LNK_FREE | Ast.LNK_ANY
+            | Ast.LNK_TYPE _ | Ast.LNK_SOME -> ()
+          | Ast.LNK_VALUE (lnk_b,_) ->
+             match a with
+             | Ast.LNK_VALUE (lnk_a,_) -> Raw_mixture.union t lnk_b lnk_a
+             | Ast.ANY_FREE | Ast.LNK_FREE ->
+                let root = Raw_mixture.find t lnk_b in
+                let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
+                Mods.DynArray.set t.Raw_mixture.rank root (s,(true,true))
+
+             | Ast.LNK_ANY ->
+                let root = Raw_mixture.find t lnk_b in
+                let (s,_) = Mods.DynArray.get t.Raw_mixture.rank root in
+                Mods.DynArray.set t.Raw_mixture.rank root (s,(false,true))
+             | Ast.LNK_TYPE _ | Ast.LNK_SOME ->
+                raise (ExceptionDefn.Internal_Error
+                         (Locality.dummy_annot
+                            ("Port a of __incr agent not well specified"))))
+      mix in
+  t
+
+let print_rule_agent sigs ~ltypes counters created_counters f ag =
   Format.fprintf f "%a(@[<h>%a@])%t"
     (Signature.print_agent sigs) ag.ra_type
     (print_rule_intf sigs ~show_erased:false ~ltypes ag.ra_type)
-    (ag.ra_ports,ag.ra_ints,ra_counters)
+    (ag.ra_ports,ag.ra_ints,counters,created_counters)
     (fun f -> if ag.ra_erased then Format.pp_print_string f "-")
 
 let print_rule_mixture sigs ~ltypes created f mix =
   let mix_without_counters = if (!Parameter.debugModeOn) then mix else
     List.filter
       (fun ag -> not(Signature.is_counter ag.ra_type (Some sigs))) mix in
+  let incr_agents = union_find_counters (Some sigs) mix in
+  let created_incr = Raw_mixture.union_find_counters (Some sigs) created in
   Pp.list Pp.comma
-    (print_rule_agent sigs ~ltypes mix created) f mix_without_counters
+    (print_rule_agent sigs ~ltypes incr_agents created_incr)
+    f mix_without_counters
 
 let print_internal_lhs sigs ag_ty site f = function
   | I_ANY -> ()
