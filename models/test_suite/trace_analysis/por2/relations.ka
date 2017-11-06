@@ -1,12 +1,12 @@
-%init: 1 A(x~u,y~u,z~u,w~u,t~u)
+%init: 1 A(x{u}[.],y{u}[.],z{u}[.],w{u}[.],t{u}[.])
 
-'x+' A(x~u)->A(x~p) @1
-'y+' A(y~u)->A(y~p) @1
-'z+' A(x~p,y~p,z~u) -> A(x~p,y~p,z~p) @1
-'w+' A(x~p,y~p,w~u) -> A(x~p,y~p,w~p) @1
-'t+' A(x~p,y~p,z~p,w~p,t~u) -> A(x~p,y~p,z~p,w~p,t~p) @1
-'x-' A(z~u,w~u,x~p) -> A(z~u,w~u,x~u) @1
-'y-' A(z~u,w~u,y~p) -> A(z~u,w~u,y~u) @1
-'z-' A(t~u,z~p) -> A(t~u,z~u) @1
-'w-' A(t~u,w~p) -> A(t~u,w~u) @1
-'t-' A(t~p) -> A(t~u) @1
+'x+' A(x{u}[.]) -> A(x{p}[.]) @ 1
+'y+' A(y{u}[.]) -> A(y{p}[.]) @ 1
+'z+' A(x{p}[.],y{p}[.],z{u}[.]) -> A(x{p}[.],y{p}[.],z{p}[.]) @ 1
+'w+' A(x{p}[.],y{p}[.],w{u}[.]) -> A(x{p}[.],y{p}[.],w{p}[.]) @ 1
+'t+' A(x{p}[.],y{p}[.],z{p}[.],w{p}[.],t{u}[.]) -> A(x{p}[.],y{p}[.],z{p}[.],w{p}[.],t{p}[.]) @ 1
+'x-' A(z{u}[.],w{u}[.],x{p}[.]) -> A(z{u}[.],w{u}[.],x{u}[.]) @ 1
+'y-' A(z{u}[.],w{u}[.],y{p}[.]) -> A(z{u}[.],w{u}[.],y{u}[.]) @ 1
+'z-' A(t{u}[.],z{p}[.]) -> A(t{u}[.],z{u}[.]) @ 1
+'w-' A(t{u}[.],w{p}[.]) -> A(t{u}[.],w{u}[.]) @ 1
+'t-' A(t{p}[.]) -> A(t{u}[.]) @ 1

@@ -1,8 +1,8 @@
-%init: 1 A(x~u,y~u,z~u)
+%init: 1 A(x{u}[.],y{u}[.],z{u}[.])
 
-A(x~u)->A(x~p) @1
-A(y~u)->A(y~p) @1
-A(x~p,y~p,z~u) -> A(x~p,y~p,z~p) @1
-A(x~p,z~u) -> A(x~u,z~u) @1
-A(y~p,z~u) -> A(y~u,z~u) @1
-A(z~p) -> A(z~u) @1
+A(x{u}[.]) -> A(x{p}[.]) @ 1
+A(y{u}[.]) -> A(y{p}[.]) @ 1
+A(x{p}[.],y{p}[.],z{u}[.]) -> A(x{p}[.],y{p}[.],z{p}[.]) @ 1
+A(x{p}[.],z{u}[.]) -> A(x{u}[.],z{u}[.]) @ 1
+A(y{p}[.],z{u}[.]) -> A(y{u}[.],z{u}[.]) @ 1
+A(z{p}[.]) -> A(z{u}[.]) @ 1

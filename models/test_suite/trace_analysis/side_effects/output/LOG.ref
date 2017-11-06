@@ -9,8 +9,8 @@ Reachability analysis...
 ------------------------------------------------------------
 * There are some non applyable rules
 ------------------------------------------------------------
-rule File "side-effects.ka", line 8, characters 0-23: will never be applied.
-rule File "side-effects.ka", line 10, characters 0-23: will never be applied.
+rule File "side-effects.ka", line 8, characters 0-32: will never be applied.
+rule File "side-effects.ka", line 10, characters 0-38: will never be applied.
 ------------------------------------------------------------
 every agent may occur in the model
 

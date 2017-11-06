@@ -1,10 +1,10 @@
-%agent: A(x,y,z~u~p)
+%agent: A(x,y,z{u p})
 %agent: B(x,y)
-%agent: C(a,b~u~p)
+%agent: C(a,b{u p})
 
-%init: 1 C(a!1),A(x!1,y!2),B(y!2,x!3),C(a!3)
+%init: 1 C(a[1]),A(x[1],y[2]),B(y[2],x[3]),C(a[3])
 
-C()-> @1
-B(x,y) -> B(x!1,y!1) @1 
-A(x!_,z~u,y!_) -> A(x!_,z~p,y!_) @ 1
-C(a,b~u) -> C(a,b~p) @1
+C() -> . @ 1
+B(x[.],y[.]) -> B(x[1],y[1]) @ 1
+A(x[_],z{u}[.],y[_]) -> A(x[_],z{p}[.],y[_]) @ 1
+C(a[.],b{u}[.]) -> C(a[.],b{p}[.]) @ 1
