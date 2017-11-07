@@ -423,7 +423,9 @@ type site = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type
 
+(**********************************************************)
 (*move from c*)
+
 type c_binding_state =
   | C_Free
   | C_Lnk_type of c_agent_name * c_site_name
@@ -443,8 +445,6 @@ module Dictionary_of_States =
     with type key = c_state
      and type value = state'
   )
-
-(**)
 
 type internal_state_specification =
   {

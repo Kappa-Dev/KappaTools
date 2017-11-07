@@ -123,6 +123,15 @@ val add_agent :
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
   mixture
 
+val add_bond_to :
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_site_name ->
+  mixture ->
+  Exception.method_handler * mixture
+
 val rename_mixture: Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   (Remanent_parameters_sig.parameters ->

@@ -365,7 +365,6 @@ let string_of_var ?with_rule:(with_rule=true)
   string_of_info
     ~with_rule_name ~with_rule_id ~with_loc ~with_ast ~kind info
 
-
 let convert_id rule var  parameters error handler compiled id =
   let int = Ckappa_sig.int_of_rule_id id in
   let nrules = nrules parameters error handler in
@@ -400,7 +399,6 @@ let convert_id_refined =
          Public_data.var_label=d;
          Public_data.var_ast=e
        })
-
 
 let string_of_rule_or_var
     ?with_rule:(with_rule=true)
@@ -568,11 +566,12 @@ let print_labels parameters error handler couple =
   in error
 
 let get_label_of_rule_txt _parameters error rule = error, rule.Cckappa_sig.e_rule_label
-let get_label_of_rule_dot _parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
 
+let get_label_of_rule_dot _parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
 
 let get_label_of_var_txt _parameters error rule =
   error,fst rule.Cckappa_sig.e_id
+
 let get_label_of_var_dot _parameters error rule =
   error,fst rule.Cckappa_sig.e_id_dot
 

@@ -78,49 +78,6 @@ let init_local_static =
 
 (*******************************************************************)
 
-(*let translate_bond parameters error site_add agent_id site_type_source views =
-  let error, pair =
-    let agent_index_target = site_add.Cckappa_sig.agent_index in
-    let site_type_target = site_add.Cckappa_sig.site in
-    let error, agent_source =
-      match
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameters error agent_id views
-      with
-      | error, None ->
-        Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
-      | error, Some agent -> error, agent
-    in
-    let error, agent_target =
-      match
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameters error agent_index_target views
-      with
-      | error, None ->
-        Exception.warn parameters error __POS__ Exit Cckappa_sig.Ghost
-      | error, Some agent -> error, agent
-    in
-    let error, (agent_type1, state1) =
-      Common_static.collect_agent_type_binding_state
-        parameters
-        error
-        agent_source
-        site_type_source
-    in
-    let error, (agent_type2, state2) =
-      Common_static.collect_agent_type_binding_state
-        parameters
-        error
-        agent_target
-        site_type_target
-    in
-    let pair = ((agent_type1, site_type_source, state1),
-                (agent_type2, site_type_target, state2))
-    in
-    error, pair
-  in
-  error, pair*)
-
 let collect_double_bonds_in_pattern
     parameters error ?tuple_of_interest pattern =
   let good_tuple =

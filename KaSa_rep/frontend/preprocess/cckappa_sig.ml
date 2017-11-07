@@ -365,7 +365,7 @@ type diff_views =
     proper_agent
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
 
-let join_rel parameter error l1 l2 =
+let join_rel error l1 l2 =
   let l = List.rev (List.append l1 l2) in
   let rec clean l current output =
     match l with t::q when t = current -> clean q current output
@@ -480,17 +480,6 @@ let add_site_address parameters error agent_id agent_type site =
   error, site_address
 
 let add_site_map parameters error site site_address map =
-  (*let error, old_site_map =
-    match
-      Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-        parameters error
-        site
-        map
-    with
-    | error, None ->
-      Exception.warn parameters error __POS__ Exit Ckappa_sig.Site_map_and_set.Map.empty
-    | error, Some m -> error, m
-  in*)
   let error', site_map =
     Ckappa_sig.Site_map_and_set.Map.add
       parameters error
@@ -508,10 +497,6 @@ let add_bond_to parameters error agent_id agent_type site mixture =
   let error, site_address =
     add_site_address parameters error agent_id agent_type site
   in
-  (*let error, site_map =
-    add_site_map parameters error site site_address
-      Ckappa_sig.Site_map_and_set.Map.empty
-  in*)
   let error, old_site_map =
     match
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
@@ -538,43 +523,191 @@ let add_bond_to parameters error agent_id agent_type site mixture =
     Exception.check_point Exception.warn parameters error error' __POS__
     ~message:"this bonds is already used" Exit
   in
-  error, agent_id,
+  error,
   {
     mixture with
     bonds = bonds
   }
 
-(*let add_state_interv parameters error kappa_handler agent_id site
-    state_min state_max mixture =
-  let error, agent_op =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+let get_last_entry_in_state_dic parameters error (agent_type, site_type)
+    handler =
+  let error, state_dic =
+    Misc_sa.unsome
+      (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+         parameters
+         error
+         (agent_type, site_type)
+         handler.states_dic)
+      (fun error ->
+         Exception.warn
+           parameters error __POS__ Exit
+           (Ckappa_sig.Dictionary_of_States.init()))
+  in
+  let error, last_entry =
+    Ckappa_sig.Dictionary_of_States.last_entry parameters error
+      state_dic
+  in
+  error, last_entry
+
+let add_state_interv parameters error kappa_handler agent_id
+    agent_type site state_min state_max mixture =
+  let error, agent_opt =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
       parameters error
       agent_id
       mixture.views
   in
-  match agent with
-  | Ghost ->
-  | Agent agent ->
-    let agent_type = agent.agent_name in
+  match agent_opt with
+  | None ->
+  Exception.warn parameters error __POS__
+               ~message:"Unknown agent type" Exit mixture
+  | Some agent ->
+    match agent with
+    | Ghost | Unknown_agent _ ->
+      Exception.warn parameters error __POS__
+        ~message:"Unknown agent type" Exit mixture
+    | Agent agent | Dead_agent (agent, _, _, _) ->
+      let error, port_opt =
+        Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+          parameters error
+          site
+          agent.agent_interface
+      in
+      let error, new_agent_interface =
+        match port_opt with
+        | None ->
+          Exception.warn parameters error __POS__ Exit
+            Ckappa_sig.Site_map_and_set.Map.empty
+        | Some interval ->
+          let site_state =
+            {min = interval.site_state.min; max = interval.site_state.max}
+          in
+          let state = {interval with site_state = site_state} in
+          let error', map =
+            Ckappa_sig.Site_map_and_set.Map.overwrite
+              parameters error
+              site
+              state
+              agent.agent_interface
+          in
+          let error = Exception.check_point
+              Exception.warn parameters error error' __POS__ Exit
+          in
+          error, map
+      in
+      let new_proper_agent =
+        {
+          agent with
+          agent_name = agent_type;
+          agent_interface = new_agent_interface;
+        }
+      in
+      let new_agent = Agent new_proper_agent in
+      let error, views =
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+          parameters error
+          agent_id
+          new_agent
+          mixture.views
+      in
+      error,
+      {
+        mixture with
+        views = views
+      }
 
-  | Dead_agent (agent, _, _, _ ) ->
-  | Unknown_agent (s, _) ->
+let add_state parameters error kappa_handler
+    agent_id agent_type site state mixture =
+  add_state_interv parameters error kappa_handler agent_id agent_type
+    site state state mixture
 
+let id_of_binding_type
+    parameter error handler_kappa
+    agent_type site agent_type' site' =
+  let state = Ckappa_sig.C_Lnk_type (agent_type',site') in
 
-let add_state parameters error kappa_handler agent_id site state mixture =
-  add_state_interv parameters error kappa_handler agent_id site state
-    state mixture
-
-
-let add_bond_type parameters error kappa_handler
-    agent_id agent_type site agent_type' site' mixture =
-  let error, state_id =
-    Handler.id_of_binding_type parameters error kappa_handler
-      agent_type site agent_type' site'
+  let error, state_dic =
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter error
+      (agent_type,site)
+      handler_kappa.states_dic
   in
-add_state parameters error kappa_handler agent_id site state_id mixture
-*)
+  match state_dic with
+  | None ->
+    Exception.warn
+      parameter error __POS__
+      Exit Ckappa_sig.dummy_state_index
+  | Some state_dic ->
+    begin
+      let error, bool =
+        Ckappa_sig.Dictionary_of_States.member
+          parameter error
+          (Ckappa_sig.Binding state)
+          state_dic
+      in
+      if not bool then
+        Exception.warn
+          parameter error __POS__
+          ~message:("agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type))^" site"^
+                    (string_of_int (Ckappa_sig.int_of_site_name site))^"agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type'))^" site"^
+                    (string_of_int (Ckappa_sig.int_of_site_name site')))
+          Exit Ckappa_sig.dummy_state_index
+      else
+        match
+          Ckappa_sig.Dictionary_of_States.allocate_bool
+            parameter error
+            Ckappa_sig.compare_unit_state_index
+            (Ckappa_sig.Binding state)
+            ()
+            Misc_sa.const_unit
+            state_dic
+        with
+        | error, (bool, None) ->
+          Exception.warn
+            parameter error __POS__
+            Exit Ckappa_sig.dummy_state_index
+        | error, (bool, (Some (a,_,_,_))) ->
+          error, a
+    end
 
+let add_bond parameters error kappa_handler
+    agent_id agent_type site
+    agent_id' agent_type' site' mixture =
+  let error_ref = error in
+  let error, state_id =
+    id_of_binding_type
+      parameters error kappa_handler
+      agent_type site
+      agent_type' site'
+  in
+  let error, state_id' =
+    id_of_binding_type
+    parameters error kappa_handler
+    agent_type' site'
+    agent_type site
+  in
+  let error, mixture =
+    add_state parameters error
+      kappa_handler agent_id agent_type site state_id mixture
+  in
+  let error, mixture =
+    add_state parameters error
+      kappa_handler agent_id' agent_type' site' state_id' mixture
+  in
+  if error == error_ref
+  then
+    let error, mixture =
+      add_bond_to parameters error  agent_id agent_type
+        site mixture
+    in
+    let error, mixture =
+      add_bond_to parameters error agent_id' agent_type'
+        site' mixture
+    in
+    error, mixture
+  else
+    Exception.warn parameters error __POS__ ~message:"incompatible binding states"
+      Exit mixture
 
 let join_bonds parameters error bond1 bond2 =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -697,12 +830,12 @@ let join_mixture parameters error f g mixture1 mixture2 =
     Exception.check_point Exception.warn parameters error error'
       __POS__ Exit
   in
-  let error', plus = join_rel parameters error mixture1.plus mixture2.plus in
+  let error', plus = join_rel error mixture1.plus mixture2.plus in
   let error =
     Exception.check_point Exception.warn parameters error error'
       __POS__ Exit
   in
-  let error', dot = join_rel parameters error mixture1.dot mixture2.dot in
+  let error', dot = join_rel error mixture1.dot mixture2.dot in
   let error =
     Exception.check_point Exception.warn parameters error error'
       __POS__ Exit

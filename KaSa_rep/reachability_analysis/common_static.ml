@@ -15,10 +15,6 @@
 
 let trace = false
 
-(**************************************************************************)
-(*TYPE*)
-(**************************************************************************)
-
 (***************************************************************************)
 (*MODIFICATION*)
 (***************************************************************************)
@@ -144,9 +140,6 @@ type common_views =
       Ckappa_sig.Rule_map_and_set.Set.t
         Ckappa_sig.AgentSite_map_and_set.Map.t;
     store_predicate_covering_classes : predicate_covering_classes;
-    (*store_new_index_pair_map :
-      (Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t *
-       Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t)*)
   }
 
 (*****************************************************************************)
@@ -220,7 +213,6 @@ let init_common_views parameters error =
       Ckappa_sig.AgentsSite_map_and_set.Map.empty;
     store_test_modif_map = empty_agentsite;
     store_predicate_covering_classes = init_predicate_covering_classes;
-    (*store_new_index_pair_map = empty_site, empty_site*)
   }
 
 (****************************************************************************)
