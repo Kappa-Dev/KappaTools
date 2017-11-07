@@ -132,13 +132,13 @@ struct
       views = views ;
       string_version = string_version }
 
-  let max_state_index a b =
+  (*let max_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
     then b else a
 
   let min_state_index a b =
     if Ckappa_sig.compare_state_index a b <= 0
-    then a else b
+    then a else b*)
 
   let has_a_binding_state parameter error kappa_handler agent_type site =
     let error,site =
@@ -217,8 +217,8 @@ struct
             if Ckappa_sig.compare_state_index state_min old_max  <= 0
             || Ckappa_sig.compare_state_index state_min old_max <= 0
             then
-              let new_min = max_state_index state_min old_min in
-              let new_max = min_state_index state_max old_max in
+              let new_min = Cckappa_sig.max_state_index state_min old_min in
+              let new_max = Cckappa_sig.min_state_index state_max old_max in
               if new_min = old_min && new_max = old_max
               then
                 error, (map, None)

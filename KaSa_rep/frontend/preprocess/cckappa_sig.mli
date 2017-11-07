@@ -14,7 +14,6 @@
 
 (* eventually, each type will be abtract, no int will appear in type declaration *)
 
-
 type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
@@ -57,8 +56,13 @@ type 'interface proper_agent =
     agent_position  : Ckappa_sig.position
   }
 
-val upgrade_interface: 'a interface proper_agent -> 'b interface -> 'b interface proper_agent
-val map_agent: ('a -> 'b) -> 'a interface proper_agent -> 'b interface proper_agent
+val upgrade_interface:
+  'a interface proper_agent -> 'b interface ->
+  'b interface proper_agent
+
+val map_agent: ('a -> 'b) -> 'a interface proper_agent ->
+  'b interface proper_agent
+
 val upgrade_some_interface:
   'a Ckappa_sig.Site_map_and_set.Map.t proper_agent ->
   'a option Ckappa_sig.Site_map_and_set.Map.t proper_agent
@@ -75,7 +79,8 @@ type bond = site_address * site_address
 val build_address: Ckappa_sig.c_agent_id -> Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name -> site_address
 
-module Address_map_and_set: Map_wrapper.S_with_logs with type elt = site_address
+module Address_map_and_set: Map_wrapper.S_with_logs
+  with type elt = site_address
 
 module KaSim_Site_map_and_set: Map_wrapper.S_with_logs
   with type elt = (string, string) Ckappa_sig.site_type
@@ -83,7 +88,9 @@ module KaSim_Site_map_and_set: Map_wrapper.S_with_logs
 type agent =
   | Ghost
   | Agent of Ckappa_sig.c_state interval interface proper_agent
-  | Dead_agent of Ckappa_sig.c_state interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
+  | Dead_agent of Ckappa_sig.c_state interval interface proper_agent
+                  * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t
+                  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
   (* agent with a site or state that never occur in the rhs or an initial
      state, set of the undefined sites, map of sites with undefined
      internal states, map of sites with undefined binding states*)
@@ -111,6 +118,12 @@ type mixture =
     plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list;
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
+
+val max_state_index :
+  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
+
+val min_state_index :
+  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
 
 val add_agent :
   Remanent_parameters_sig.parameters ->
