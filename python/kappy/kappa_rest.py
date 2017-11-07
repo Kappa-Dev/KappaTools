@@ -32,7 +32,9 @@ class KappaRest(object):
     def _dispatch(self, method, sub_url=None, data=None):
         if sub_url is not None:
             url = join(self.url, sub_url)
-        if isinstance(data, str):
+        else:
+            url = self.url
+        if data is not None:
             data = json.dumps(data)
         try:
             r = request(method, url, data=data)
@@ -72,16 +74,8 @@ class KappaRest(object):
         """
         parse_url = "{0}/shutdown".format(self.url)
         try:
-            r = request('GET', parse_url)
-        except exceptions.HTTPError as e:
-            pass
-        request = request.Request(parse_url, data=key.encode('utf-8'))
-        request.get_method = lambda: method
-        try:
-            connection = opener.open(request)
-        except error.HTTPError as exception:
-            connection = exception
-        except request.URLError as exception:
+            r = request("POST",parse_url, data=key.encode('utf-8'))
+        except exceptions.URLError as exception:
             raise KappaError(exception.reason)
         if r.status_code == 200:
             return r.text
@@ -95,7 +89,7 @@ class KappaRest(object):
 
     def get_info(self):
         """Get a json dict with info about the kappa server."""
-        return self._get(self.url)
+        return self._get()
 
     def _project_create(self):
         """Create this project with given."""

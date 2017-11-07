@@ -60,9 +60,7 @@ setup(name='kappy',
           'build_agents': BuildAgentsCommand,
           'build_ext': MyBuildExtCommand,
       },
-      extras_require={
-          'REST': ['urllib3'],
-      },
+      install_requires=['requests'],
       package_dir={'':'python'},
       include_package_data=True,
       package_data={
