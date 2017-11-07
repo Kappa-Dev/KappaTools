@@ -68,7 +68,7 @@ install:
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen cohttp ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then pip2 install --user . && pip install -v .[REST] ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then pip2 install --user . && pip install -v . ; fi"
 
 script:
   - make all

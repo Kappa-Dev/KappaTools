@@ -22,6 +22,8 @@ class KappaRest(object):
     def __init__(self, endpoint, project_id):
         self.url = "{0}/v2".format(endpoint)
         self.project_id = project_id
+        self.project_ast = None
+        self.analyses_to_init = True
         if not project_id in self.project_info():
             self._project_create()
         return
@@ -110,12 +112,18 @@ class KappaRest(object):
     def project_parse(self, overwrites=None):
         if overwrites is None:
             overwrites = []
-        return self._post(self.in_project('parse'), overwrites)
+        reply = self._post(self.in_project('parse'), overwrites)
+        self.project_ast = json.loads(reply['boxed_ast'])
+        return reply
 
     def file_create(self, file_object):
+        self.project_ast = None
+        self.analyses_to_init = True
         return self._post(self.in_project('files'), file_object.toJSON())
 
     def file_delete(self, file_id):
+        self.project_ast = None
+        self.analyses_to_init = False
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
@@ -175,9 +183,62 @@ class KappaRest(object):
                          {'perturbation_code': perturbation_code})
 
     def simulation_start(self, simulation_parameter):
+        if self.project_ast is None:
+            raise KappaError("Project not parsed since last modification")
         return self._post(self.in_project('simulation'),
                           simulation_parameter.toJSON())
 
     def simulation_continue(self, pause_condition):
         return self._put(self.in_project('simulation', 'continue'),
                          pause_condition)
+
+    def _analyses_init(self):
+        if self.project_ast is None:
+            raise KappaError("Project not parsed since last modification")
+        result = self._put(self.in_project('analyses'),self.project_ast)
+        self.analyses_to_init = False
+        return result
+
+    def analyses_dead_rules(self):
+        if self.analyses_to_init:
+            self._analyses_init()
+        return self._get(self.in_project('analyses','dead_rules'))
+
+    def analyses_constraints_list(self):
+        if self.analyses_to_init:
+            self._analyses_init()
+        return self._get(self.in_project('analyses','constraints'))
+
+    def analyses_contact_map(self,accuracy=None):
+        """
+        Returns the contact of the last parsed model
+
+        Input
+        -----
+        accuracy -- \"high\" means take into account reachability from
+           initial state. \"low\" means don't.
+        """
+        if self.analyses_to_init:
+            self._analyses_init()
+        if accuracy is None:
+            cmd = "contact_map"
+        else:
+            cmd = "contact_map?accuracy=%s" % accuracy
+        return self._get(self.in_project('analyses',cmd))
+
+    def analyses_influence_map(self,accuracy=None):
+        """
+        Returns the influence_map of the last parsed model
+
+        Input
+        -----
+        accuracy -- level can be \"low\", \"medium\", \"high\" or \"full\".
+            Default is medium.
+        """
+        if self.analyses_to_init:
+            self._analyses_init()
+        if accuracy is None:
+            cmd = "influence_map"
+        else:
+            cmd = "influence_map?accuracy=%s" % accuracy
+        return self._get(self.in_project('analyses',cmd))

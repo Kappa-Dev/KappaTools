@@ -93,7 +93,8 @@ class File(object):
 
     @classmethod
     def from_string(cls, content, position=1):
-        """Convenience method to create a file from a string.
+        """
+        Convenience method to create a file from a string.
 
         This file object's metadata will have the id 'inlined_input'.
 
@@ -104,6 +105,23 @@ class File(object):
           see FileMetadata
         """
         return cls(FileMetadata('inlined_input', position), content)
+
+    @classmethod
+    def from_file(cls, path, position=1):
+        """
+        Convience method to create a kappa file object from a file on disk
+
+        Inputs
+        ------
+        path -- to the file on disk
+        position -- (default 1) rank among all files of the model while parsing
+          see FileMetadata
+        """
+        with open(path) as f:
+            code = f.read()
+            file_content = str(code)
+            file_metadata = FileMetadata(path,position)
+            return cls(file_metadata,file_content)
 
     def toJSON(self):
         """Get a JSON dict of the data in this file."""
