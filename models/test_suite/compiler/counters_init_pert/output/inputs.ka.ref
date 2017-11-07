@@ -5,7 +5,7 @@
 %def: "outputFileName" "data.csv"
 
 
-%agent: A(x~u~p, c{=1/+=10})
+%agent: A(x{u p} c{=1/+=10})
 
 %plot: [T]
 A(x{u/p}[.] c{>=0/+=1}),  @ 1

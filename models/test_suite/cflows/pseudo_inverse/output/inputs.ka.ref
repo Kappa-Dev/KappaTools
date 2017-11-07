@@ -4,7 +4,7 @@
 %def: "plotPeriod" "100" "events"
 %def: "outputFileName" "data.csv"
 
-%agent: A(x~a~b~c)
+%agent: A(x{a b c})
 
 %var:/*0*/ 'n_a' 1000
 %var:/*1*/ 'c' |A(x{c})|

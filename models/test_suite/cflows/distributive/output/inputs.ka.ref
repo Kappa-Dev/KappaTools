@@ -5,8 +5,8 @@
 %def: "outputFileName" "data.csv"
 %def: "deltaActivitiesFileName" "activities.json"
 
-%agent: A(y~u~p!x.K, z~u~p!x.K)
-%agent: K(x!y.A!z.A)
+%agent: A(y{u p}[x.K] z{u p}[x.K])
+%agent: K(x[y.A z.A])
 
 %plot: [T]
 A(y[./1]), K(x[./1]) @ 10

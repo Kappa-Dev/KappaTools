@@ -5,8 +5,8 @@
 %def: "outputFileName" "data.csv"
 %def: "traceFileName" "trace.json"
 
-%agent: A(x~a~b!x.B)
-%agent: B(x~a~b!x.A)
+%agent: A(x{a b}[x.B])
+%agent: B(x{a b}[x.A])
 %agent: C()
 
 %plot: [T]

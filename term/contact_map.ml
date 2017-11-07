@@ -54,27 +54,31 @@ let print_kappa sigs f c =
        (fun ag f intf ->
           if Signature.ports_if_counter_agent sigs ag = None
           || (!Parameter.debugModeOn) then
-           begin
-           Format.fprintf f "@[<h>%%agent: %a(%a)@]"
-           (Signature.print_agent sigs) ag
-           (Pp.array Pp.comma
-              (fun s f (is,ls) -> Format.fprintf f "%a%a%a%a"
-                  (Signature.print_site sigs ag) s
-                  (Pp.list Pp.empty
-                     (fun f i -> Format.fprintf f "~%a"
-                         (Signature.print_internal_state sigs ag s) i)) is
-                  (Pp.list Pp.empty (fun f (ad,sd) ->
-                                      if (Signature.site_is_counter sigs ag s)
-                                         &&not(!Parameter.debugModeOn)
-                                      then ()
-                                      else
-                                        Format.fprintf f "!%a.%a"
-                                        (Signature.print_site sigs ad) sd
-                                        (Signature.print_agent sigs) ad)) ls
-                  (fun f id-> if (!Parameter.debugModeOn) then ()
-                              else Signature.print_counter sigs ag f id) s))
-           end
-           intf))
+            Format.fprintf f "@[<hv 2>%%agent:@ %a(@[%a@])@]"
+              (Signature.print_agent sigs) ag
+              (Pp.array Pp.space
+                 (fun s f (is,ls) ->
+                    if (Signature.site_is_counter sigs ag s)
+                    &&not (!Parameter.debugModeOn)
+                    then
+                      Format.fprintf f "@[%a%a@]"
+                        (Signature.print_site sigs ag) s
+                        (Signature.print_counter sigs ag) s
+                    else
+                      Format.fprintf f "@[%a%t%t@]"
+                        (Signature.print_site sigs ag) s
+                        (fun f -> if is <> [] then
+                            Format.fprintf f "{@[%a@]}"
+                              (Pp.list Pp.space
+                                 (Signature.print_internal_state sigs ag s)) is)
+                        (fun f -> if ls <> [] then
+                            Format.fprintf f "@,[@[%a@]]"
+                              (Pp.list Pp.space (fun f (ad,sd) ->
+                                   Format.fprintf f "%a.%a"
+                                     (Signature.print_site sigs ad) sd
+                                     (Signature.print_agent sigs) ad)) ls)
+                 ))
+              intf))
     c
 
 let cut_at i s' l =

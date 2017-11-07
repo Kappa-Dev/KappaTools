@@ -5,8 +5,8 @@
 %def: "outputFileName" "data.csv"
 %def: "traceFileName" "/tmp/cflow-json-trace.json"
 
-%agent: A(a~u~p!a.B!b.B)
-%agent: B(a~u~p!a.A, b!a.A)
+%agent: A(a{u p}[a.B b.B])
+%agent: B(a{u p}[a.A] b[a.A])
 
 %var:/*0*/ 'ApBp' |A(a{p}[.])|*|B(a{p}[.])|
 %var:/*1*/ 'ABA' |A(a{p}[1]), B(a{p}[1] b[2]), A(a{p}[2])|

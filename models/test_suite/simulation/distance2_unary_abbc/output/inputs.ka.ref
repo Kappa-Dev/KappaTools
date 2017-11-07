@@ -4,9 +4,9 @@
 %def: "plotPeriod" "2" "events"
 %def: "outputFileName" "data.svg"
 
-%agent: A(a~u~p!a.B)
-%agent: B(a!a.A, b!b.B, c!c.C)
-%agent: C(c!c.B)
+%agent: A(a{u p}[a.B])
+%agent: B(a[a.A] b[b.B] c[c.C])
+%agent: C(c[c.B])
 
 %var:/*0*/ 'Ap' |A(a{p})|
 %plot: [T]

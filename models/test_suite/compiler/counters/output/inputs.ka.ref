@@ -5,8 +5,8 @@
 %def: "outputFileName" "data.csv"
 
 
-%agent: A(x~u~p!x.B, c{=0/+=3}, d{=1/+=2})
-%agent: B(x!x.A, c{=0/+=3})
+%agent: A(x{u p}[x.B] c{=0/+=3} d{=1/+=2})
+%agent: B(x[x.A] c{=0/+=3})
 
 %var:/*0*/ 'A1' |A(x{u}[.] c{=1})|
 %plot: [T]

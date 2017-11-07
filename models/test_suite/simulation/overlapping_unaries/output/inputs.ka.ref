@@ -4,9 +4,9 @@
 %def: "plotPeriod" "0.84" "t.u."
 %def: "outputFileName" "data.svg"
 
-%agent: fE(c!e.fC, s!e.fS)
-%agent: fC(e!c.fE, s!c.fS)
-%agent: fS(c!s.fC, e!s.fE, s~o~x)
+%agent: fE(c[e.fC] s[e.fS])
+%agent: fC(e[c.fE] s[c.fS])
+%agent: fS(c[s.fC] e[s.fE] s{o x})
 
 %var:/*0*/ 'fS(s{o})' |fS(s{o})|
 %var:/*1*/ 'fS(s{x})' |fS(s{x})|

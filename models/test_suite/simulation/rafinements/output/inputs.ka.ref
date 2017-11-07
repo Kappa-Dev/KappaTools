@@ -4,9 +4,9 @@
 %def: "plotPeriod" "0.008" "t.u."
 %def: "outputFileName" "data.tsv"
 
-%agent: A(c!a.C, b!a.B)
-%agent: B(a!b.A, c!b.C)
-%agent: C(b!c.B, a!c.A)
+%agent: A(c[a.C] b[a.B])
+%agent: B(a[b.A] c[b.C])
+%agent: C(b[c.B] a[c.A])
 
 %var:/*0*/ 'ring_1' |A(c[1] b[2]), B(a[2] c[3]), C(b[3] a[1])|
 %var:/*1*/ 'ring_2' |A(c[1] b[2]), B(a[2] c[3]), C(b[3] a[4]), A(c[4] b[5]), B(a[5] c[6]), C(b[6] a[1])|

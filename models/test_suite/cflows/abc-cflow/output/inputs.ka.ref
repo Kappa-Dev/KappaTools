@@ -4,9 +4,9 @@
 %def: "plotPeriod" "1000" "events"
 %def: "outputFileName" "data.csv"
 
-%agent: A(x!x.B, c!x1.C!x2.C)
-%agent: B(x!x.A)
-%agent: C(x1~u~p!c.A, x2~u~p!c.A)
+%agent: A(x[x.B] c[x1.C x2.C])
+%agent: B(x[x.A])
+%agent: C(x1{u p}[c.A] x2{u p}[c.A])
 
 %var:/*0*/ 'on_rate' 0.001
 %var:/*1*/ 'off_rate' (10 ^ -(1))

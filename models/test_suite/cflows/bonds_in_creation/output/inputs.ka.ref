@@ -5,10 +5,10 @@
 %def: "outputFileName" "data.csv"
 
 %agent: C()
-%agent: L(z!l.Z, s!l.S)
-%agent: Z(l!z.L, s!z.S)
-%agent: S(k!s.K, l!s.L, z!s.Z, x~u~p, y~u~p)
-%agent: K(s!k.S, x~u~p)
+%agent: L(z[l.Z] s[l.S])
+%agent: Z(l[z.L] s[z.S])
+%agent: S(k[s.K] l[s.L] z[s.Z] x{u p} y{u p})
+%agent: K(s[k.S] x{u p})
 
 %var:/*0*/ 'L' |L(z[.])|
 %plot: [T]

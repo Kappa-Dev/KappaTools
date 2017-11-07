@@ -4,9 +4,9 @@
 %def: "plotPeriod" "1" "events"
 %def: "outputFileName" "data.csv"
 
-%agent: A(a!a.B, b, c)
-%agent: B(a!a.A!a.C, b, c)
-%agent: C(a~p~u!a.B!a.C, b, c)
+%agent: A(a[a.B] b c)
+%agent: B(a[a.A a.C] b c)
+%agent: C(a{p u}[a.B a.C] b c)
 
 %plot: [T]
 B(a[./1]), C(a{u/p}[./1]) @ 1
