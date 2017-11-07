@@ -1,4 +1,5 @@
-""" Web api client for the kappa programming language
+"""
+Web api client for the kappa programming language
 """
 
 __all__ = ['KappaRest']
@@ -12,6 +13,9 @@ from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit
 class KappaRest(object):
     """Client to a Kappa tools driver run as a server.
 
+    Same interface as KappaStd (documented there)
+    + a few extra methods to get general information about the server
+
     endpoint -- The url to the kappa server.
     project_id -- An identifier for this particular project.
     """
@@ -19,11 +23,11 @@ class KappaRest(object):
         self.url = "{0}/v2".format(endpoint)
         self.project_id = project_id
         if not project_id in self.project_info():
-            self.project_create()
+            self._project_create()
         return
 
     def __del__(self):
-        self.project_delete()
+        self._project_delete()
 
     def _dispatch(self, method, sub_url=None, data=None):
         if sub_url is not None:
@@ -60,10 +64,10 @@ class KappaRest(object):
     def in_project(self, *elements):
         """Method to ease navigating the path structure within a project."""
         return join('projects', self.project_id, *elements)
-    
+
     def shutdown(self, key):
         """Shut down kappa instance.
-        
+
         Given a key to a kappa service shutdown a running kappa instance.
         """
         parse_url = "{0}/shutdown".format(self.url)
@@ -93,7 +97,7 @@ class KappaRest(object):
         """Get a json dict with info about the kappa server."""
         return self._get(self.url)
 
-    def project_create(self):
+    def _project_create(self):
         """Create this project with given."""
         return self._post('projects', {"project_id": self.project_id})
 
@@ -101,36 +105,30 @@ class KappaRest(object):
         """Get json with info about all the projects."""
         return self._get('projects')
 
-    def project_delete(self):
+    def _project_delete(self):
         """Delete this project.
-        
+
         Note that the project can still be recreated with `project_create`
         method. The effect of these two commands would be to clear the project.
         """
         return self._delete(self.in_project())
 
     def project_parse(self, overwrites=None):
-        """Parse all the files added to the project so simulations can run."""
         if overwrites is None:
             overwrites = []
         return self._post(self.in_project('parse'), overwrites)
 
     def file_create(self, file_object):
-        """Create the given file object on the server as JSON."""
-        # TODO: Get file id back?
         return self._post(self.in_project('files'), file_object.toJSON())
 
     def file_delete(self, file_id):
-        """Delete the file given by file_id from the server."""
         return self._delete(self.in_project('files', file_id))
 
     def file_get(self, file_id):
-        """Get a file object from the server."""
         file_json = self._get(self.in_project('files', file_id))
         return File(**file_json)
 
     def file_info(self):
-        """Get info on all the files in the project."""
         info = self._get(self.in_project('files'))
         return FileMetadata.from_metadata_list(info)
 
@@ -148,19 +146,6 @@ class KappaRest(object):
         return self._get(self.in_project('simulation', 'logmessages'))
 
     def simulation_plot(self, limit=None):
-        """Get plot data from the simulation.
-        
-        Note: No actual plot is produced as a result of this function call.
-        
-        Inputs
-        ------
-        limit -- (default None) A kappy PlotLimit object used to specify the
-            resolution and size of the data returned.
-
-        Returns
-        -------
-        simulation_results -- a json containing the data from the simulation.
-        """
         if limit is not None:
             parameter = limit.toURL()
         else:
@@ -196,17 +181,9 @@ class KappaRest(object):
                          {'perturbation_code': perturbation_code})
 
     def simulation_start(self, simulation_parameter):
-        """Start the simulation.
-
-        Inputs
-        ------
-        simulation_parameter -- a kappy SimulationParameter object which
-            as teh name suggests defines the simulation parameters.
-        """
         return self._post(self.in_project('simulation'),
                           simulation_parameter.toJSON())
 
     def simulation_continue(self, pause_condition):
-        """Continue a paused simulation."""
         return self._put(self.in_project('simulation', 'continue'),
                          pause_condition)

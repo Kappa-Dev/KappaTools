@@ -17,6 +17,7 @@ class KappaStd(object):
     """Kappa tools driver run locally.
 
     path -- where to find kappa executables
+        (None means use the binaries bundled in the package)
     delimiter -- What to use to delimit messages (must not appears in
         message body default '\\x1e')
     args -- arguments to pass to kappa executables
@@ -130,7 +131,7 @@ class KappaStd(object):
 
     def file_info(self):
         """
-        Lists the files of the project (returns the FileMetadata
+        Lists the files of the project (returns a FileMetadata array)
         """
         info = self._dispatch("FileCatalog")
         return FileMetadata.from_metadata_list(info)
@@ -161,11 +162,19 @@ class KappaStd(object):
 
     def simulation_plot(self, limit=None):
         """
-        Returns the plotted values of the simulation
+        Returns the plot data of the simulation
 
+        Note: No actual plot is produced as a result of this function call.
+
+        Inputs
+        ------
         limit -- optionnal boundaries to only get a subplot
         format: { offset : 100, nb_points : 500 }
         returns the last points if offset is Null
+
+        Returns
+        -------
+        simulation_results -- a json containing the data from the simulation.
         """
         if limit is not None:
             parameter = limit.toJSON()
@@ -197,7 +206,7 @@ class KappaStd(object):
         """
         return self._dispatch("SimulationCatalogFluxMap")
 
-    def simulationsnapshots(self):
+    def simulation_snapshots(self):
         """
         Lists snapshots generated during the simulation
         """
@@ -217,9 +226,10 @@ class KappaStd(object):
                               { "perturbation_code" : perturbation_code })
 
     def simulation_start(self,simulation_parameter):
-        """
-        Launches a simulation from a parsed model
+        """Start the simulation from the last parsed model.
 
+        Inputs
+        ------
         simulation_parameter -- is described in kappa_common.SimulationParameter
         """
         return self._dispatch("SimulationStart",
