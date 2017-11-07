@@ -276,7 +276,7 @@ let compile c =
   else (c,false)
 
 let make_counter_agent sigs
-      (first,dst) (last,equal) i j pos created =
+      (first,(dst,ra_erased)) (last,equal) i j pos created =
   let (ra_type,arity,incr_b,incr_a) = Signature.incr_agent sigs in
   let ra_ports = Array.make arity ((Ast.LNK_FREE,pos), LKappa.Maintained) in
   let before_switch =
@@ -292,7 +292,7 @@ let make_counter_agent sigs
       else Ast.LNK_VALUE (j,(ra_type,incr_b)), pos in
   let () = ra_ports.(incr_a) <- (after,LKappa.Maintained) in
   let ra_ints = Array.make arity LKappa.I_ANY in
-  {LKappa.ra_type; ra_erased = false; ra_ports; ra_ints;
+  {LKappa.ra_type; ra_erased; ra_ports; ra_ints;
    ra_syntax = Some (Array.copy ra_ports,Array.copy ra_ints)}
 
 let raw_counter_agent
@@ -356,7 +356,7 @@ let counter_becomes_port sigs ra p_id (delta,pos') pos equal test start_lnk_nb =
   let (incr_type,_,incr_b,_) = Signature.incr_agent sigs in
   let start_lnk_for_created = start_lnk_nb + test +1 in
   let lnk_for_erased = start_lnk_nb + abs(delta) in
-  let ag_info = p_id,ra.LKappa.ra_type in
+  let ag_info = (p_id,ra.LKappa.ra_type),ra.LKappa.ra_erased in
 
   let test_incr =
     link_incr sigs 0 (test+1) ag_info equal start_lnk_nb pos delta in
@@ -507,7 +507,7 @@ let agent_with_max_counter sigs c ((agent_name,_) as ag_ty) =
   let c_id = Signature.num_of_site ~agent_name c_na sign in
   let (max_val,pos) = c.Ast.count_delta in
   let max_val' = max_val+1 in
-  let incrs = link_incr sigs 0 (max_val'+1) (c_id,ag_id) false 1 pos (-1) in
+  let incrs = link_incr sigs 0 (max_val'+1) ((c_id,ag_id),false) false 1 pos (-1) in
   let p = Ast.LNK_VALUE (1,(incr_b,incr_type)),pos in
   let () = ports.(c_id) <- p,LKappa.Maintained in
   let ra =
@@ -553,6 +553,9 @@ let add_counter_to_contact_map sigs add_link_contact_map =
   let (incr_id,_,incr_b,incr_a) = Signature.incr_agent sigs in
   add_link_contact_map incr_id incr_a incr_id incr_b
 
+let forbid_modification (delta,pos) =
+  if delta != 0 then LKappa.forbid_modification pos (Some delta)
+
 let annotate_dropped_counters sign counts ra arity agent_name aux =
   let ra_counters = Array.make arity None in
   let _ =
@@ -563,6 +566,7 @@ let annotate_dropped_counters sign counts ra arity agent_name aux =
         let pset' = Mods.IntSet.add p_id pset in
         let () = if pset == pset' then
              LKappa.several_occurence_of_site agent_name c.Ast.count_nme in
+        let () = forbid_modification c.Ast.count_delta in
         let () = match aux with | Some f -> f p_id | None -> () in
         let () = ra_counters.(p_id) <- Some (c,LKappa.Erased) in pset')
       Mods.IntSet.empty counts in

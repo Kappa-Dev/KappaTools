@@ -12,3 +12,5 @@ File "var_not_spec.ka", line 7, characters 73-74:
 z is not a declared variable
 File "counter_not_declared.ka", line 4, characters 28-29:
 "c" is not a declared site name for agent A.
+File "counter_erase_modify.ka", line 5, characters 24-25:
+A modification is forbidden here.

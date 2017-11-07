@@ -36,5 +36,10 @@
 //generates warning
 'get_zero' A(x{u}[.],c{>=0}) -> A(x{p}[.],c{+= 1}) @ 1
 
+//erase agents with counters
+'r14' A(x{u}[.],c{=2})- @ 1
+'r15' A(x{u}[.],c{>=1}), A(x{u}[.],c{=2})- @ 1
+'r16' A(x{u}[.],c{=1})+, A(x{u}[.],c{=2})- @ 1
+
 //counter in obs
 %obs: 'A1' |A(x{u}[.],c{>=1})|

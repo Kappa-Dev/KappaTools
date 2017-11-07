@@ -1169,14 +1169,17 @@ let create_t sites incr_info =
            | None ->
              let (n,pos) = c.Ast.count_nme in
              raise (ExceptionDefn.Internal_Error
-                      ("Counter "^n^" should have a test by now",pos))
+                      ("Counter "^n^" should have a test in signature",pos))
            | Some (test,pos) ->
              match test with
-             | Ast.CGTE _ | Ast.CVAR _ ->
+             | Ast.CVAR _ ->
                raise (ExceptionDefn.Internal_Error
-                        ("Counter should not have a var by now",pos))
+                        ("Counter should not have a var in signature",pos))
+             | Ast.CGTE _ ->
+                raise (ExceptionDefn.Internal_Error
+                         ("Counter should not have >= in signature",pos))
              | Ast.CEQ j ->
-               (c.Ast.count_nme,
+                (c.Ast.count_nme,
                 (NamedDecls.create [||],
                  [incr_info],
                  Some (j,(fst c.Ast.count_delta))))::acc,
