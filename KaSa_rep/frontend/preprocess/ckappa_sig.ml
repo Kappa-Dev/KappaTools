@@ -283,7 +283,7 @@ let add_link parameters error agent_id agent_name site agent_id' link =
   match link with
   | LNK_VALUE (_ag, _x, _y, _ag', position) ->
     error, LNK_VALUE (agent_id, agent_name, site, agent_id', position)
-  | FREE _ |LNK_ANY _| LNK_SOME _ | LNK_TYPE _ -> error, link
+  | FREE |LNK_ANY _| LNK_SOME _ | LNK_TYPE _ -> error, link
 
 let add_port parameters error agent_id agent_name site agent_id' port =
   let error, port_lnk =

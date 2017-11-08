@@ -132,6 +132,7 @@ let fill a start len x =
 let of_list ~default = function
   | [] -> Unary [||]
   | t::_ as l ->
+    let _iknowwhatimdoing = default in
     let size = List.length l in
     let a = create size t in
     let rec aux k = function
