@@ -29,7 +29,11 @@ class KappaRest(object):
         return
 
     def __del__(self):
-        self._project_delete()
+        try:
+            self._project_delete()
+        except Exception:
+            print("Faild to delete project, system probably shut down or "
+                  "project was already deleted.")
 
     def _dispatch(self, method, sub_url=None, data=None):
         if sub_url is not None:
@@ -76,7 +80,7 @@ class KappaRest(object):
         """
         parse_url = "{0}/shutdown".format(self.url)
         try:
-            r = request("POST",parse_url, data=key.encode('utf-8'))
+            r = request("POST", parse_url, data=key.encode('utf-8'))
         except exceptions.URLError as exception:
             raise KappaError(exception.reason)
         if r.status_code == 200:
@@ -195,21 +199,21 @@ class KappaRest(object):
     def _analyses_init(self):
         if self.project_ast is None:
             raise KappaError("Project not parsed since last modification")
-        result = self._put(self.in_project('analyses'),self.project_ast)
+        result = self._put(self.in_project('analyses'), self.project_ast)
         self.analyses_to_init = False
         return result
 
     def analyses_dead_rules(self):
         if self.analyses_to_init:
             self._analyses_init()
-        return self._get(self.in_project('analyses','dead_rules'))
+        return self._get(self.in_project('analyses', 'dead_rules'))
 
     def analyses_constraints_list(self):
         if self.analyses_to_init:
             self._analyses_init()
-        return self._get(self.in_project('analyses','constraints'))
+        return self._get(self.in_project('analyses', 'constraints'))
 
-    def analyses_contact_map(self,accuracy=None):
+    def analyses_contact_map(self, accuracy=None):
         """
         Returns the contact of the last parsed model
 
@@ -224,9 +228,9 @@ class KappaRest(object):
             cmd = "contact_map"
         else:
             cmd = "contact_map?accuracy=%s" % accuracy
-        return self._get(self.in_project('analyses',cmd))
+        return self._get(self.in_project('analyses', cmd))
 
-    def analyses_influence_map(self,accuracy=None):
+    def analyses_influence_map(self, accuracy=None):
         """
         Returns the influence_map of the last parsed model
 
@@ -241,4 +245,4 @@ class KappaRest(object):
             cmd = "influence_map"
         else:
             cmd = "influence_map?accuracy=%s" % accuracy
-        return self._get(self.in_project('analyses',cmd))
+        return self._get(self.in_project('analyses', cmd))
