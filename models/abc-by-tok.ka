@@ -1,23 +1,23 @@
-#Pure Kappa
+//Pure Kappa
 
 %agent: A(b,c)
 %agent: B(a,c)
 %agent: C(a,b)
 
-A(b),B(a) <-> A(b!1),B(a!1) @ 'kon','koff'
-B(c),C(b) <-> B(c!1),C(b!1) @ 'kon','koff'
-A(c),C(a) <-> A(c!1),C(a!1) @ 'kon','koff'
+A(b[.]),B(a[.]) <-> A(b[1]),B(a[1]) @ 'kon','koff'
+B(c[.]),C(b[.]) <-> B(c[1]),C(b[1]) @ 'kon','koff'
+A(c[.]),C(a[.]) <-> A(c[1]),C(a[1]) @ 'kon','koff'
 
-%obs: 'AB' A(b!1,c),B(a!1,c) 
-%obs: 'AC' A(c!1,b),C(a!1,b) 
-%obs: 'BC' B(c!1,a),C(b!1,a)
-%obs: '*ABC*' B(a!_,c!_)
+%obs: 'AB' |A(b[1],c[.]),B(a[1],c[.])|
+%obs: 'AC' |A(c[1],b[.]),C(a[1],b[.])|
+%obs: 'BC' |B(c[1],a[.]),C(b[1],a[.])|
+%obs: '*ABC*' |B(a[_],c[_])|
 
 %init: 10000 A(),B(),C()
 %var: 'kon' 0.01
 %var: 'koff' 1
 
-#Partial network
+//Partial network
 
 %token: a
 %token: b
@@ -26,48 +26,48 @@ A(c),C(a) <-> A(c!1),C(a!1) @ 'kon','koff'
 %token: ac
 %token: bc
 
-'A to a' A(b,c) -> | 1:a @ 'tokenify'
-'B to b' B(a,c) -> | 1:b @ 'tokenify'
-'C to c' C(a,b) -> | 1:c @ 'tokenify'
+'A to a' A(b[.],c[.]) -> .| 1 a @ 'tokenify'
+'B to b' B(a[.],c[.]) -> .| 1 b @ 'tokenify'
+'C to c' C(a[.],b[.]) -> .| 1 c @ 'tokenify'
 
-'AB to ab' A(b!1,c),B(a!1,c) -> | 1:ab @ 'tokenify'
-'AC to ac' A(c!1,b),C(a!1,b) -> | 1:ac @ 'tokenify'
-'BC to bc' B(c!1,a),C(b!1,a) -> | 1:bc @ 'tokenify'
+'AB to ab' A(b[1],c[.]),B(a[1],c[.]) -> .,.| 1 ab @ 'tokenify'
+'AC to ac' A(c[1],b[.]),C(a[1],b[.]) -> .,.| 1 ac @ 'tokenify'
+'BC to bc' B(c[1],a[.]),C(b[1],a[.]) -> .,.| 1 bc @ 'tokenify'
 
-'netw a+b' | 1:a + 1:b <-> | 1:ab @ ('kon'*|a|*|b|),('koff'*|ab|)
-'netw a+c' | 1:a + 1:c <-> | 1:ac @ ('kon'*|a|*|c|),('koff'*|ac|)
-'netw b+c' | 1:b + 1:c <-> | 1:bc @ ('kon'*|b|*|c|),('koff'*|bc|)
+'netw a+b' | 1 a, 1 b <-> | 1 ab @ ('kon'*|a|*|b|),('koff'*|ab|)
+'netw a+c' | 1 a, 1 c <-> | 1 ac @ ('kon'*|a|*|c|),('koff'*|ac|)
+'netw b+c' | 1 b, 1 c <-> | 1 bc @ ('kon'*|b|*|c|),('koff'*|bc|)
 
-'exit1 ab+c' | 1:ab + 1:c -> A(c,b!1),B(a!1,c!2),C(b!2,a) @ ('kon'*|ab|*|c|)
-'exit2 ab+c' | 1:ab + 1:c -> A(c!2,b!1),B(a!1,c),C(b,a!2) @ ('kon'*|ab|*|c|)
+'exit1 ab+c' .,.,.| 1 ab, 1 c -> A(c[.],b[1]),B(a[1],c[2]),C(b[2],a[.]) @ ('kon'*|ab|*|c|)
+'exit2 ab+c' .,.,.| 1 ab, 1 c -> A(c[2],b[1]),B(a[1],c[.]),C(b[.],a[2]) @ ('kon'*|ab|*|c|)
 
-'exit1 ac+b' | 1:ac + 1:b -> A(c!1,b),B(a,c!2),C(b!2,a!1) @ ('kon'*|ac|*|b|)
-'exit2 ac+b' | 1:ac + 1:b -> A(c!1,b!2),B(a!2,c),C(b,a!1) @ ('kon'*|ac|*|b|)
+'exit1 ac+b' .,.,.| 1 ac, 1 b -> A(c[1],b[.]),B(a[.],c[2]),C(b[2],a[1]) @ ('kon'*|ac|*|b|)
+'exit2 ac+b' .,.,.| 1 ac, 1 b -> A(c[1],b[2]),B(a[2],c[.]),C(b[.],a[1]) @ ('kon'*|ac|*|b|)
 
-'exit1 bc+a' | 1:bc + 1:a -> A(c!2,b),B(a,c!1),C(b!1,a!2) @ ('kon'*|bc|*|a|)
-'exit2 bc+a' | 1:bc + 1:a -> A(c,b!2),B(a!2,c!1),C(b!1,a) @ ('kon'*|bc|*|a|)
+'exit1 bc+a' .,.,.| 1 bc, 1 a -> A(c[2],b[.]),B(a[.],c[1]),C(b[1],a[2]) @ ('kon'*|bc|*|a|)
+'exit2 bc+a' .,.,.| 1 bc, 1 a -> A(c[.],b[2]),B(a[2],c[1]),C(b[1],a[.]) @ ('kon'*|bc|*|a|)
 
-'exit ab+ca' | 1:ab + 1:ac -> A(c,b!1),B(a!1,c!2),C(b!2,a!3),A(c!3,b) @ ('kon'*|ab|*|ac|)
-'exit ab+cb' | 1:ab + 1:bc -> A(c!2,b!1),B(a!1,c),C(b!3,a!2),B(c!3,a) @ ('kon'*|ab|*|bc|)
-'exit ac+bc' | 1:ac + 1:bc -> A(c!1,b!2),C(a!1,b),C(b!3,a),B(c!3,a!2) @ ('kon'*|ac|*|bc|)
+'exit ab+ca' .,.,.,.| 1 ab, 1 ac -> A(c[.],b[1]),B(a[1],c[2]),C(b[2],a[3]),A(c[3],b[.]) @ ('kon'*|ab|*|ac|)
+'exit ab+cb' .,.,.,.| 1 ab, 1 bc -> A(c[2],b[1]),B(a[1],c[.]),C(b[3],a[2]),B(c[3],a[.]) @ ('kon'*|ab|*|bc|)
+'exit ac+bc' .,.,.,. | 1 ac, 1 bc -> A(c[1],b[2]),C(a[1],b[.]),C(b[3],a[.]),B(c[3],a[2]) @ ('kon'*|ac|*|bc|)
 
-'mixte Ac' A(c) | 1:c -> A(c!1),C(a!1,b) @ 'kon'*|c|
-'mixte Acb' A(c) | 1:bc -> A(c!1),C(a!1,b!2),B(c!2,a) @ 'kon'*|bc|
+'mixte Ac' A(c[.]),. | 1 c -> A(c[1]),C(a[1],b[.]) @ 'kon'*|c|
+'mixte Acb' A(c[.]),.,. | 1 bc -> A(c[1]),C(a[1],b[2]),B(c[2],a[.]) @ 'kon'*|bc|
 
-'mixte Ab' A(b) | 1:b -> A(b!1),B(a!1,c) @ 'kon'*|b|
-'mixte Abc' A(b) | 1:bc -> A(b!1),B(a!1,c!2),C(b!2,a) @ 'kon'*|bc|
+'mixte Ab' A(b[.]),. | 1 b -> A(b[1]),B(a[1],c[.]) @ 'kon'*|b|
+'mixte Abc' A(b[.]),.,. | 1 bc -> A(b[1]),B(a[1],c[2]),C(b[2],a[.]) @ 'kon'*|bc|
 
-'mixte Bc' B(c) | 1:c -> B(c!1),C(b!1,a) @ 'kon'*|c|
-'mixte Bca' B(c) | 1:ac -> B(c!1),C(b!1,a!2),A(c!2,b) @ 'kon'*|ac|
+'mixte Bc' B(c[.]),. | 1 c -> B(c[1]),C(b[1],a[.]) @ 'kon'*|c|
+'mixte Bca' B(c[.]),.,. | 1 ac -> B(c[1]),C(b[1],a[2]),A(c[2],b[.]) @ 'kon'*|ac|
 
-'mixte Ba' B(a) | 1:a -> B(a!1),A(b!1,c) @ 'kon'*|a|
-'mixte Bac' B(a) | 1:ac -> B(a!1),A(b!1,c!2),C(a!2,b) @ 'kon'*|ac|
+'mixte Ba' B(a[.]),. | 1 a -> B(a[1]),A(b[1],c[.]) @ 'kon'*|a|
+'mixte Bac' B(a[.]),.,. | 1 ac -> B(a[1]),A(b[1],c[2]),C(a[2],b[.]) @ 'kon'*|ac|
 
-'mixte Ca' C(a) | 1:a -> C(a!1),A(c!1,b) @ 'kon'*|a|
-'mixte Cab' C(a) | 1:ab -> C(a!1),A(c!1,b!2),B(a!2,c) @ 'kon'*|ab|
+'mixte Ca' C(a[.]),. | 1 a -> C(a[1]),A(c[1],b[.]) @ 'kon'*|a|
+'mixte Cab' C(a[.]),.,. | 1 ab -> C(a[1]),A(c[1],b[2]),B(a[2],c[.]) @ 'kon'*|ab|
 
-'mixte Cb' C(b) | 1:b -> C(b!1),B(c!1,a) @ 'kon'*|b|
-'mixte Cba' C(b) | 1:ab -> C(b!1),B(c!1,a!2),A(b!2,c) @ 'kon'*|ab|
+'mixte Cb' C(b[.]),. | 1 b -> C(b[1]),B(c[1],a[.]) @ 'kon'*|b|
+'mixte Cba' C(b[.]),.,. | 1 ab -> C(b[1]),B(c[1],a[2]),A(b[2],c[.]) @ 'kon'*|ab|
 
 %obs: 'ab' |ab| + 'AB'
 %obs: 'ac' |ac| + 'AC'
@@ -75,6 +75,6 @@ A(c),C(a) <-> A(c!1),C(a!1) @ 'kon','koff'
 
 %var: 'tokenify' 0
 
-%mod: [T]>0.001 do (#$UPDATE 'on' 1 ;\
+%mod: [T]>0.001 do (//$UPDATE 'on' 1 ;
 $UPDATE 'tokenify' INF)
 %mod: [true] do $FLUX "all.json" [true]

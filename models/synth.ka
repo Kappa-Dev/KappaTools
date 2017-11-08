@@ -1,41 +1,41 @@
-## Chapter 2: generating initial conditions
+/* Chapter 2: generating initial conditions */
 
-## Section 2.1 Agent signatures
-%agent: N(e3,o,i~A~T~G~C~U~AP,e5) # Signature for a single nucleotide o: outer face, i: inner face, e3 and e5 are resp. the 3' and 5' end 
-%agent: UDG(dbd) # Signature for the UDG protein. dbd: DNA binding domain.
+/* Section 2.1 Agent signatures */
+%agent: N(e3 o i{A T G C U AP} e5) // Signature for a single nucleotide o: outer face, i: inner face, e3 and e5 are resp. the 3' and 5' end
+%agent: UDG(dbd) // Signature for the UDG protein. dbd: DNA binding domain.
 
-## Section 2.2 Growing DNA
+/* Section 2.2 Growing DNA */
 
-#Setting the rate in order to respect the GC content ratio
+//Setting the rate in order to respect the GC content ratio
 %var: 'kGC' 10
 %var: 'kAT' 1.5 * 'kGC'
 %var: 'sGC' 1
 %var: 'sAT' 1.5 * 'sGC'
 
-#Initial state: creating the first base pair.
-'seedAT' -> N(i~A!0),N(i~T!0) | 1:Cpt  @ 'sAT' 
-'seedGC' -> N(i~G!0),N(i~C!0) | 1:Cpt @ 'sGC'
+//Initial state: creating the first base pair.
+'seedAT' .,. -> N(i{A}[0]),N(i{T}[0]) | 1 Cpt  @ 'sAT'
+'seedGC' .,. -> N(i{G}[0]),N(i{C}[0]) | 1 Cpt @ 'sGC'
 
-#Growing rules
-'growAT' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~A!3),N(e5!2,i~T!3) @ 'kAT'
-'growTA' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~T!3),N(e5!2,i~A!3) @ 'kAT'
-'growGC' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~G!3),N(e5!2,i~C!3) @ 'kGC'
-'growCG' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~C!3),N(e5!2,i~G!3) @ 'kGC'
+//Growing rules
+'growAT' N(i[0],e5[.]),N(i[0],e3[.]),.,. -> N(i[0],e5[1]),N(i[0],e3[2]),N(e3[1],i{A}[3]),N(e5[2],i{T}[3]) @ 'kAT'
+'growTA' N(i[0],e5[.]),N(i[0],e3[.]),.,. -> N(i[0],e5[1]),N(i[0],e3[2]),N(e3[1],i{T}[3]),N(e5[2],i{A}[3]) @ 'kAT'
+'growGC' N(i[0],e5[.]),N(i[0],e3[.]),.,. -> N(i[0],e5[1]),N(i[0],e3[2]),N(e3[1],i{G}[3]),N(e5[2],i{C}[3]) @ 'kGC'
+'growCG' N(i[0],e5[.]),N(i[0],e3[.]),.,. -> N(i[0],e5[1]),N(i[0],e3[2]),N(e3[1],i{C}[3]),N(e5[2],i{G}[3]) @ 'kGC'
 
-## Section 2.3 Controlling the number of strands
+/* Section 2.3 Controlling the number of strands */
 
-#Token that will count the number of strands
+//Token that will count the number of strands
 %token: Cpt
-%init: Cpt <- 0
+%init: 0 Cpt
 
 %mod: |Cpt| = 1 do ($UPDATE 'sAT' 0.0 ; $UPDATE 'sGC' 0.0)
 
-## Section 2.4 Checking the DNA production
+/* Section 2.4 Checking the DNA production */
 
-%var: 'C' N(i~C?) #The number of C nucleotides
-%var: 'G' N(i~G?) #The number of G nucleotides
-%var: 'N' N() #The total number of nucleotides
+%var: 'C' |N(i{C})| //The number of C nucleotides
+%var: 'G' |N(i{G})| //The number of G nucleotides
+%var: 'N' |N()| //The total number of nucleotides
 
 %obs: 'GC content' ('C'+'G')/('N'+ 0.01)
 
-%mod: [E]=[Emax] do $SNAPSHOT "dna_".'N'
+%mod: [E]=[Emax] do $SNAPSHOT ("dna_".'N')

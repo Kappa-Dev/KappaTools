@@ -1,8 +1,8 @@
-%var: 'kd' 1.0E-12 #mol*L-1.
-%var: 'subunitC' 4E-7 #M
+%var: 'kd' 1.0E-12 //mol*L-1.
+%var: 'subunitC' 4E-7 //M
 
-#%mod:  [true] do $TRACK 'ABC' [true]
-#%mod:  [T]>2 do ($TRACK 'ABC' [false];$SNAPSHOT "snap1.ka";$STOP)
+//%mod:  [true] do $TRACK 'ABC' [true]
+//%mod:  [T]>2 do ($TRACK 'ABC' [false];$SNAPSHOT "snap1.ka";$STOP)
 
 %def: "displayCompression" "weak"
 
@@ -11,25 +11,24 @@
 %agent: C(b,a)
 
 
-%var: 'AV' 1.35E12 #L*mol-1
-%var: 'V' 2.25E-12 #L
-%var: 'Alpha' 2.53E6 # mol-1*L*s-1
-%var: 'Avogadro' 6.022E23 #mol-1
-%var: 'kon' 'Alpha'/'AV' # s-1 C'est ces deux lignes là que je ne suis pas sur.
-%var: 'koff' 'kd'*'kon'*'AV' # s-1 C'est ces deux lignes là que je ne suis pas sur.
+%var: 'AV' 1.35E12 //L*mol-1
+%var: 'V' 2.25E-12 //L
+%var: 'Alpha' 2.53E6 //mol-1*L*s-1
+%var: 'Avogadro' 6.022E23 //mol-1
+%var: 'kon' 'Alpha'/'AV' //s-1 C'est ces deux lignes là que je ne suis pas sur.
+%var: 'koff' 'kd'*'kon'*'AV' //s-1 C'est ces deux lignes là que je ne suis pas sur.
+
+'A+B'   A(b[.],c[.]),B(a[.],c[.]) -> A(b[1],c[.]),B(a[1],c[.])@ 'kon'
+'A+C'   A(b[.],c[.]),C(a[.],b[.]) -> A(b[.],c[2]),C(a[2],b[.])@ 'kon'
+'B+C'   B(a[.],c[.]),C(a[.],b[.]) -> B(a[.],c[3]),C(a[.],b[3])@ 'kon'
+'AB+C@A'  A(b[1],c[.]),B(a[1],c[.]),C(a[.],b[.]) -> A(b[1],c[2]),B(a[1],c[3]),C(a[2],b[3]) @ 'kon'
+'A+BC@B'  A(b[.],c[.]),B(a[.],c[3]),C(a[.],b[3]) -> A(b[1],c[2]),B(a[1],c[3]),C(a[2],b[3]) @ 'kon'
+'AC+B@A'  A(b[.],c[2]),B(a[.],c[.]),C(a[2],b[.]) -> A(b[1],c[2]),B(a[1],c[3]),C(a[2],b[3]) @ 'kon'
 
 
-'A+B'   A(b,c),B(a,c)        ->    A(b!1,c),B(a!1,c)@ 'kon'
-'A+C'   A(b,c),C(a,b)        ->    A(b,c!2),C(a!2,b)@ 'kon'
-'B+C'   B(a,c),C(a,b)        ->    B(a,c!3),C(a,b!3)@ 'kon'
-'AB+C@A'  A(b!1,c),B(a!1,c),C(a,b) -> A(b!1,c!2),B(a!1,c!3),C(a!2,b!3) @ 'kon'
-'A+BC@B'  A(b,c),B(a,c!3),C(a,b!3) -> A(b!1,c!2),B(a!1,c!3),C(a!2,b!3) @ 'kon'
-'AC+B@A'  A(b,c!2),B(a,c),C(a!2,b) -> A(b!1,c!2),B(a!1,c!3),C(a!2,b!3) @ 'kon'
-
-
-A(b!1,c),B(a!1,c) -> A(b,c),B(a,c) @ 'koff'
-A(b,c!2),C(a!2,b) -> A(b,c),C(a,b) @ 'koff'
-C(b!3,a),B(c!3,a) -> C(a,b),B(a,c) @ 'koff'
+A(b[1],c[.]),B(a[1],c[.]) -> A(b[.],c[.]),B(a[.],c[.]) @ 'koff'
+A(b[.],c[2]),C(a[2],b[.]) -> A(b[.],c[.]),C(a[.],b[.]) @ 'koff'
+C(b[3],a[.]),B(c[3],a[.]) -> C(a[.],b[.]),B(a[.],c[.]) @ 'koff'
 
 
 %var: 'nA' 'subunitC'*'AV'/30
@@ -41,14 +40,14 @@ C(b!3,a),B(c!3,a) -> C(a,b),B(a,c) @ 'koff'
 %init: 'nC' C()
  
 %var: 'zero' 0
-%var: 'ABC' |A(b!1,c!2),B(a!1,c!3),C(b!3,a!2)|
-%var: 'A' |A(b,c)|
-%var: 'B' |B(a,c)|
-%var: 'C' |C(a,b)|
-%var: 'AB' |A(b!1,c),B(a!1,c)|
-%var: 'BC' |B(a,c!3),C(a,b!3)|
-%var: 'AC' |A(b,c!2),C(b,a!2)|
+%var: 'ABC' |A(b[1],c[2]),B(a[1],c[3]),C(b[3],a[2])|
+%var: 'A' |A(b[.],c[.])|
+%var: 'B' |B(a[.],c[.])|
+%var: 'C' |C(a[.],b[.])|
+%var: 'AB' |A(b[1],c[.]),B(a[1],c[.])|
+%var: 'BC' |B(a[.],c[3]),C(a[.],b[3])|
+%var: 'AC' |A(b[.],c[2]),C(b[.],a[2])|
 %obs: 'Monomers' ('A'+'B'+'C')/('nA'+'nB'+'nC')
 %obs: 'Dimers' 2*('AB'+'BC'+'AC')/('nA'+'nB'+'nC')
 %obs: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
-#%mod: [E]=18000 do $SNAPSHOT "dotsnap.dot"
+//%mod: [E]=18000 do $SNAPSHOT "dotsnap.dot"

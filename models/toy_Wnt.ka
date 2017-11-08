@@ -9,69 +9,84 @@ this collapses with the loss of APC. */
 %agent: Axn(GSK,Cat,Ax1,Ax2,APC)
 %agent: APC(Ax1,Ax2,Ax3)
 %agent: GSK(Axn)
-%agent: Cat(Axn,S~x~p)
+%agent: Cat(Axn,S{x p})
 %token: CatGhost
-%var: 'Kon' 1.0e-4		# Binding rate
-%var: 'Koff' 1.0e-1		# Unbinding rate
-%var: 'Kcat' 1.0		# Catalytic rate
-%var: 'pF' 1			# Proximity Factor
-%var: 'r_APC\' 0.0		# Rate for 1st order degradation (i.e. half life)
+%var: 'Kon' 1.0e-4		// Binding rate
+%var: 'Koff' 1.0e-1		// Unbinding rate
+%var: 'Kcat' 1.0		// Catalytic rate
+%var: 'pF' 1			// Proximity Factor
+%var: 'r_APC\' 0.0		// Rate for 1st order degradation (i.e. half life)
 
 /* Binding rules for Axin polymerization. Axin can bind another
 Axin through their respective Ax1 and Ax2 sites. This binding is
 independent of the state of all other sites on Axin. Should they
 be already in the same connected component, their binding
 rate becomes 'pF'. */
-'Axn.Axn+' Axn(Ax1),Axn(Ax2) -> Axn(Ax1!1),Axn(Ax2!1) @ 'Kon'{'pF'}
-'Axn.Axn-' Axn(Ax1!1),Axn(Ax2!1) -> Axn(Ax1),Axn(Ax2) @ 'Koff'
+'Axn.Axn+'
+  Axn(Ax1[.]),Axn(Ax2[.]) ->
+  Axn(Ax1[1]),Axn(Ax2[1]) @ 'Kon'{'pF'}
+'Axn.Axn-'
+  Axn(Ax1[1]),Axn(Ax2[1]) ->
+  Axn(Ax1[.]),Axn(Ax2[.]) @ 'Koff'
 
 /* Binding rules for Axin and APC. Axin can bind APC through
 through their respective APC and Ax_ sites, APC having 3 sites
 for Axin. This binding is independent of the state of all other sites
 on Axin and APC. Should an Axin and an APC already be in the same
 connected component, their binding rate becomes 'pF'. */
-'Axn.APC|1+' Axn(APC),APC(Ax1) -> Axn(APC!1),APC(Ax1!1) @ 'Kon'{'pF'}
-'Axn.APC|1-' Axn(APC!1),APC(Ax1!1) -> Axn(APC),APC(Ax1) @ 'Koff'
-'Axn.APC|2+' Axn(APC),APC(Ax2) -> Axn(APC!1),APC(Ax2!1) @ 'Kon'{'pF'}
-'Axn.APC|2-' Axn(APC!1),APC(Ax2!1) -> Axn(APC),APC(Ax2) @ 'Koff'
-'Axn.APC|3+' Axn(APC),APC(Ax3) -> Axn(APC!1),APC(Ax3!1) @ 'Kon'{'pF'}
-'Axn.APC|3-' Axn(APC!1),APC(Ax3!1) -> Axn(APC),APC(Ax3) @ 'Koff'
+'Axn.APC|1+'
+  Axn(APC[.]),APC(Ax1[.]) -> Axn(APC[1]),APC(Ax1[1]) @ 'Kon'{'pF'}
+'Axn.APC|1-'
+  Axn(APC[1]),APC(Ax1[1]) -> Axn(APC[.]),APC(Ax1[.]) @ 'Koff'
+'Axn.APC|2+' 
+  Axn(APC[.]),APC(Ax2[.]) -> Axn(APC[1]),APC(Ax2[1]) @ 'Kon'{'pF'}
+'Axn.APC|2-'
+  Axn(APC[1]),APC(Ax2[1]) -> Axn(APC[.]),APC(Ax2[.]) @ 'Koff'
+'Axn.APC|3+'
+  Axn(APC[.]),APC(Ax3[.]) -> Axn(APC[1]),APC(Ax3[1]) @ 'Kon'{'pF'}
+'Axn.APC|3-' 
+  Axn(APC[1]),APC(Ax3[1]) -> Axn(APC[.]),APC(Ax3[.]) @ 'Koff'
 
 /* Binding rules for Axn and GSK. Axn can bind a GSK through
 their respective Axn and GSK sites. This binding is independent
 of the state of all other sites on either agent. Since they can
 not be connected elsewhere, the binding rule has not ambiguous
 molecularity.*/
-'GSK.Axn+' GSK(Axn),Axn(GSK) -> GSK(Axn!1),Axn(GSK!1) @ 'Kon'{'pF'}
-'GSK.Axn-' GSK(Axn!1),Axn(GSK!1) -> GSK(Axn),Axn(GSK) @ 'Koff'
+'GSK.Axn+'
+  GSK(Axn[.]),Axn(GSK[.]) -> GSK(Axn[1]),Axn(GSK[1]) @ 'Kon'{'pF'}
+'GSK.Axn-'
+  GSK(Axn[1]),Axn(GSK[1]) -> GSK(Axn[.]),Axn(GSK[.]) @ 'Koff'
 
 /* Binding rules for Cat and Axn. These guys bind through their
 respective Axn and Cat sites. They can only bind if the site S of
 Cat is in state 'x', i.e. unmodified. This means there is no
 product inhibition in the system. As for the unbinding rule, it
 happens regardless of the state of site 'S'.*/
-'Cat|x.Axn+' Cat(Axn,S~x),Axn(Cat) -> Cat(Axn!1,S~x),Axn(Cat!1) @ 'Kon'{'pF'}
-'Cat|x.Axn-' Cat(Axn!1),Axn(Cat!1) -> Cat(Axn),Axn(Cat) @ 'Koff'
+'Cat|x.Axn+'
+  Cat(Axn[.],S{x}[.]),Axn(Cat[.]) ->
+  Cat(Axn[1],S{x}[.]),Axn(Cat[1]) @ 'Kon'{'pF'}
+'Cat|x.Axn-'
+  Cat(Axn[1]),Axn(Cat[1]) -> Cat(Axn[.]),Axn(Cat[.]) @ 'Koff'
 
 /* Recycling rules and mass conservation. The token 'CatGhost'
 is used to track the cumulative number of degradation events.
 I can then obtain the rate of degradation.*/
-'P->S' Cat(Axn,S~p) -> Cat(Axn,S~x) | 1:CatGhost @ INF
-'S->P' GSK(),Cat(S~x) -> GSK(),Cat(S~p) @ 0.0 {'Kcat'}
-'APC\' APC() -> @ 'r_APC\'
+'P->S' Cat(Axn[.],S{p}[.]) -> Cat(Axn[.],S{x}[.]) | 1 CatGhost @ INF
+'S->P' GSK(),Cat(S{x}[.]) -> GSK(),Cat(S{p}[.]) @ 0.0 {'Kcat'}
+'APC\' APC() -> . @ 'r_APC\'
 
-%plot: |Cat()|						# Total number of Cat in the system
-%plot: |Cat(S~x)|					# Number of Cat in state 'x', bound or not
-%plot: |Cat(S~p)|					# Number of Cat in state 'p', bound or not
-%plot: |CatGhost|					# Current value of the token CatGhost
-%plot: |APC()|						# Total number of APC in the system
-%plot: |Axn(APC!1),APC(Ax1!1)|		# Amount of Axn bound to an APC's Ax1 site
-%plot: |Axn(APC!1),APC(Ax2!1)|		# Amount of Axn bound to an APC's Ax2 site
-%plot: |Axn(APC!1),APC(Ax3!1)|		# Amount of Axn bound to an APC's Ax3 site
-%plot: |GSK(Axn!1),Axn(GSK!1)|		# Amount of GSK bound to an Axn
-%plot: |Axn(Ax1!1),Axn(Ax2!1)|		# Amount of Axn bound to another Axn; note a trimer would count as 2 for this pattern
-%plot: |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2)|
-%plot: |Axn(Ax1!1),Axn(Ax2!1,Ax1!2),Axn(Ax2!2,Ax1!3),Axn(Ax2!3)|
+%plot: |Cat()|						// Total number of Cat in the system
+%plot: |Cat(S{x})|					// Number of Cat in state 'x', bound or not
+%plot: |Cat(S{p})|					// Number of Cat in state 'p', bound or not
+%plot: |CatGhost|					// Current value of the token CatGhost
+%plot: |APC()|						// Total number of APC in the system
+%plot: |Axn(APC[1]),APC(Ax1[1])|	// Amount of Axn bound to an APC's Ax1 site
+%plot: |Axn(APC[1]),APC(Ax2[1])|	// Amount of Axn bound to an APC's Ax2 site
+%plot: |Axn(APC[1]),APC(Ax3[1])|	// Amount of Axn bound to an APC's Ax3 site
+%plot: |GSK(Axn[1]),Axn(GSK[1])|	// Amount of GSK bound to an Axn
+%plot: |Axn(Ax1[1]),Axn(Ax2[1])|	// Amount of Axn bound to another Axn; note a trimer would count as 2 for this pattern
+%plot: |Axn(Ax1[1]),Axn(Ax2[1],Ax1[2]),Axn(Ax2[2])|
+%plot: |Axn(Ax1[1]),Axn(Ax2[1],Ax1[2]),Axn(Ax2[2],Ax1[3]),Axn(Ax2[3])|
 
 %init: 1000 Axn()
 %init: 50 GSK()
@@ -88,7 +103,7 @@ I can then obtain the rate of degradation.*/
 %mod: [T] > 450 do $ADD 100 APC()
 %mod: [T] > 500 do $ADD 100 APC()
 %mod: [T] > 550 do $UPDATE 'r_APC\' 5
-#%def: "storeUnaryDistance" "true"
+//%def: "storeUnaryDistance" "true"
 
 %mod: [T] > 110 do $FLUX "lol.json" [true]
 %mod: [T] > 160 do $FLUX "lol.json" [false]
