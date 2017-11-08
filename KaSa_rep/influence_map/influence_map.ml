@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March the 10th of 2011
- * Last modification: Time-stamp: <Aug 06 2016>
+ * Last modification: Time-stamp: <Nov 08 2017>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -325,7 +325,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
       error
       handler
       0
-      quark_maps.Quark_type.dead_agent
+      quark_maps.Quark_type.dead_agent_minus
       quark_maps.Quark_type.dead_agent
       inhibition_map
   in
@@ -362,7 +362,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
       error
       handler
       0
-      quark_maps.Quark_type.dead_sites
+      quark_maps.Quark_type.dead_sites_minus
       quark_maps.Quark_type.dead_sites
       inhibition_map
   in
@@ -401,7 +401,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
       error
       handler
       0
-      quark_maps.Quark_type.dead_states
+      quark_maps.Quark_type.dead_states_minus
       quark_maps.Quark_type.dead_states
       inhibition_map
   in

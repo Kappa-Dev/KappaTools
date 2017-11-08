@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: 2011, the 7th of March
- * Last modification: Time-stamp: <Nov 04 2017>
+ * Last modification: Time-stamp: <Nov 08 2017>
  *
  * Compute the influence relations between rules and sites.
  *
@@ -196,6 +196,44 @@ let add_generic get set parameter error rule_id agent_id key map =
     in
     set parameter error key new_agent map
 
+
+let remove_generic get set parameter error rule_id agent_id key map =
+  let error, old_agent =
+    match get parameter error key map with
+    | error,None ->
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+        parameter
+        error
+        0
+    | error, Some x -> error, x
+  in
+  let error,old_label_set =
+    match
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+        parameter
+        error
+        rule_id
+        old_agent
+    with
+    | error,None -> error, Quark_type.Labels.empty
+    | error,Some x -> error,x
+  in
+  let new_label_set = Quark_type.Labels.remove_set agent_id old_label_set in
+  if new_label_set == old_label_set
+  then
+    error,map
+  else
+    let error,new_agent =
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+        parameter
+        error
+        rule_id
+        new_label_set
+        old_agent
+    in
+    set parameter error key new_agent map
+
+
 let add_agent parameters error rule_id agent_id agent_type =
   let _ = Misc_sa.trace parameters (fun () -> "rule_id:"^
                                               (Ckappa_sig.string_of_rule_id rule_id)^",agent_type:"^
@@ -313,7 +351,7 @@ let add_half_bond_breaking parameter error handler rule_id agent_id
     in
     error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
 
-let add_dead_state s parameters error var_id agent_id agent_type site_type =
+let add_dead_state s parameters error var_id agent_id agent_type site_type map map' =
   let _ = Misc_sa.trace parameters (fun () ->
       s ^ "_id:" ^
       (Ckappa_sig.string_of_rule_id var_id) ^
@@ -322,7 +360,8 @@ let add_dead_state s parameters error var_id agent_id agent_type site_type =
       ",site_type:" ^
       (Ckappa_sig.string_of_site_name site_type) ^ "\n")
   in
-  add_generic
+  let error, map =
+    add_generic
     Quark_type.DeadSiteMap.unsafe_get
     Quark_type.DeadSiteMap.set
     parameters
@@ -330,8 +369,42 @@ let add_dead_state s parameters error var_id agent_id agent_type site_type =
     var_id
     agent_id
     (agent_type, site_type)
+    map
+  in
+  let error, map' =
+    add_generic
+    Quark_type.DeadSiteMap.unsafe_get
+    Quark_type.DeadSiteMap.set
+    parameters
+    error
+    var_id
+    agent_id
+    (agent_type, site_type)
+    map'
+  in
+  error, map, map'
 
-let add_dead_agent s parameters error rule_id agent_id agent_type map =
+let remove_dead_state s parameters error var_id agent_id agent_type site_type map  =
+  let _ = Misc_sa.trace parameters (fun () ->
+      s ^ "_id:" ^
+      (Ckappa_sig.string_of_rule_id var_id) ^
+      ",agent_type:" ^
+      (Ckappa_sig.string_of_agent_name agent_type) ^
+      ",site_type:" ^
+      (Ckappa_sig.string_of_site_name site_type) ^ " (REMOVE)\n")
+  in
+      remove_generic
+      Quark_type.DeadSiteMap.unsafe_get
+      Quark_type.DeadSiteMap.set
+      parameters
+      error
+      var_id
+      agent_id
+      (agent_type, site_type)
+      map
+
+
+let add_dead_agent s parameters error rule_id agent_id agent_type map map' =
   let _ = Misc_sa.trace parameters (fun () ->
       s ^"_id:"^
       (Ckappa_sig.string_of_rule_id rule_id) ^
@@ -339,44 +412,100 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
       agent_type ^
       "(Dead agent)\n")
   in
-  let error,old_agent =
-    match Quark_type.StringMap.find_option agent_type map
-    with
-    | None ->
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
-        parameters
-        error
-        0
-    | Some x -> error,x
+  let f error map =
+      let error,old_agent =
+        match Quark_type.StringMap.find_option agent_type map
+        with
+        | None ->
+          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+            parameters
+            error
+            0
+        | Some x -> error,x
+      in
+      let error,old_label_set =
+        match
+          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+            parameters
+            error
+            rule_id
+            old_agent
+        with
+        | error,None -> error, Quark_type.Labels.empty
+        | error,Some x -> error,x
+      in
+      let new_label_set =
+        Quark_type.Labels.add_set agent_id old_label_set in
+      if new_label_set == old_label_set
+      then
+        error,map
+      else
+        let error,new_agent =
+          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+            parameters
+            error
+            rule_id
+            new_label_set
+            old_agent
+        in
+        error,
+        Quark_type.StringMap.add agent_type new_agent map
   in
-  let error,old_label_set =
-    match
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-        parameters
-        error
-        rule_id
-        old_agent
-    with
-    | error,None -> error, Quark_type.Labels.empty
-    | error,Some x -> error,x
-  in
-  let new_label_set = Quark_type.Labels.add_set agent_id old_label_set in
-  if new_label_set == old_label_set
-  then
-    error,map
-  else
-    let error,new_agent =
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
-        parameters
-        error
-        rule_id
-        new_label_set
-        old_agent
-    in
-    error,
-    Quark_type.StringMap.add agent_type new_agent map
+  let error, map = f error map in
+  let error, map' = f error map' in
+  error, map, map'
 
-let add_dead_sites s parameters error rule_id agent_id agent_type site map =
+let remove_dead_agent s parameters error rule_id agent_id agent_type map  =
+  let _ = Misc_sa.trace parameters (fun () ->
+      s ^"_id:"^
+      (Ckappa_sig.string_of_rule_id rule_id) ^
+      ",agent_type:" ^
+      agent_type ^
+      "(REMOVE Dead agent)\n")
+  in
+  let f error map =
+    let error,old_agent =
+      match Quark_type.StringMap.find_option agent_type map
+      with
+      | None ->
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameters
+          error
+          0
+      | Some x -> error,x
+    in
+    let error,old_label_set =
+      match
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          rule_id
+          old_agent
+      with
+      | error,None -> error, Quark_type.Labels.empty
+      | error,Some x -> error,x
+    in
+    let new_label_set =
+      Quark_type.Labels.remove_set agent_id old_label_set in
+    if new_label_set == old_label_set
+    then
+      error,map
+    else
+      let error,new_agent =
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+          parameters
+          error
+          rule_id
+          new_label_set
+          old_agent
+      in
+      error,
+      Quark_type.StringMap.add agent_type new_agent map
+  in
+  f error map
+
+
+let add_dead_sites s parameters error rule_id agent_id agent_type site map map' =
   let _ = Misc_sa.trace parameters (fun () ->
       s ^ "_id:"^
       (Ckappa_sig.string_of_rule_id rule_id) ^
@@ -384,68 +513,154 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
       (Ckappa_sig.string_of_agent_name agent_type) ^
       "site: todo (Dead site)\n")
   in
-  let error, old_agent =
-    match
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+  let f error map =
+    let error, old_agent =
+      match
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          agent_type
+          map
+      with
+      | error, None ->
+        error,
+        Cckappa_sig.KaSim_Site_map_and_set.Map.empty
+      | error, Some x -> error, x
+    in
+    let error, old_site =
+      match
+        Cckappa_sig.KaSim_Site_map_and_set.Map.find_option_without_logs
+          parameters
+          error
+          site
+          old_agent
+      with
+      (* this is a partial map, not associated key are implicitely associated
+         to an empty map *)
+      | error, None ->
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameters
+          error
+          0
+      | error, Some x -> error, x
+    in
+    let error, old_label_set =
+      match
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          rule_id
+          old_site
+      with
+      | error, None -> error, Quark_type.Labels.empty
+      | error, Some x -> error, x
+    in
+    let new_label_set = Quark_type.Labels.add_set agent_id
+        old_label_set in
+    if new_label_set == old_label_set
+    then
+      error, map
+    else
+      let error,new_site =
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+          parameters
+          error
+          rule_id
+          new_label_set
+          old_site
+      in
+      let error, new_agent =
+        Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite
+          parameters error site new_site old_agent
+      in
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
         parameters
         error
         agent_type
+        new_agent
         map
-    with
-    | error, None -> error, Cckappa_sig.KaSim_Site_map_and_set.Map.empty
-    | error, Some x -> error, x
   in
-  let error, old_site =
-    match
-      Cckappa_sig.KaSim_Site_map_and_set.Map.find_option_without_logs
-        parameters
-        error
-        site
-        old_agent
-    with
-    (* this is a partial map, not associated key are implicitely associated
-       to an empty map *)
-    | error, None ->
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
-        parameters
-        error
-        0
-    | error, Some x -> error, x
+  let error, map = f error map in
+  let error, map' = f error map' in
+  error, map, map'
+
+let remove_dead_sites s parameters error rule_id agent_id agent_type site map  =
+  let _ = Misc_sa.trace parameters (fun () ->
+      s ^ "_id:"^
+      (Ckappa_sig.string_of_rule_id rule_id) ^
+      ",agent_type:" ^
+      (Ckappa_sig.string_of_agent_name agent_type) ^
+      "site: todo (REMOVE Dead site)\n")
   in
-  let error, old_label_set =
-    match
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
-        parameters
-        error
-        rule_id
-        old_site
-    with
-    | error, None -> error, Quark_type.Labels.empty
-    | error, Some x -> error, x
-  in
-  let new_label_set = Quark_type.Labels.add_set agent_id old_label_set in
-  if new_label_set == old_label_set
-  then
-    error, map
-  else
-    let error,new_site =
-      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
-        parameters
-        error
-        rule_id
-        new_label_set
-        old_site
+  let f error map =
+    let error, old_agent =
+      match
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          agent_type
+          map
+      with
+      | error, None ->
+        error,
+        Cckappa_sig.KaSim_Site_map_and_set.Map.empty
+      | error, Some x -> error, x
     in
-    let error, new_agent =
-      Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite
-        parameters error site new_site old_agent
+    let error, old_site =
+      match
+        Cckappa_sig.KaSim_Site_map_and_set.Map.find_option_without_logs
+          parameters
+          error
+          site
+          old_agent
+      with
+      (* this is a partial map, not associated key are implicitely associated
+         to an empty map *)
+      | error, None ->
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameters
+          error
+          0
+      | error, Some x -> error, x
     in
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
-      parameters
-      error
-      agent_type
-      new_agent
-      map
+    let error, old_label_set =
+      match
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameters
+          error
+          rule_id
+          old_site
+      with
+      | error, None -> error, Quark_type.Labels.empty
+      | error, Some x -> error, x
+    in
+    let new_label_set = Quark_type.Labels.remove_set agent_id
+        old_label_set in
+    if new_label_set == old_label_set
+    then
+      error, map
+    else
+      let error,new_site =
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+          parameters
+          error
+          rule_id
+          new_label_set
+          old_site
+      in
+      let error, new_agent =
+        Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite
+          parameters error site new_site old_agent
+      in
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
+        parameters
+        error
+        agent_type
+        new_agent
+        map
+  in
+  f error map
+
 
 let clean_bound_modif parameter error common_prefix (map1,set1) (map2,set2) =
   let agent_id_of_label l =
@@ -580,7 +795,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
             Quark_type.Labels.label_of_int parameter error
               (Ckappa_sig.int_of_agent_id id_int)
           in
-          let error, dead_agents =
+          let error, dead_agents, _ =
             add_dead_agent
               "var"
               parameter
@@ -588,6 +803,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
               var_id
               kasim_id
               string
+              dead_agents
               dead_agents
           in
           error, (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states)
@@ -606,9 +822,9 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
               error
               (agent_var, site_var,site_bound_var)
           in
-          let error, dead_sites =
+          let error, dead_sites, _ =
             Cckappa_sig.KaSim_Site_map_and_set.Set.fold
-              (fun s (error, deadsite) ->
+              (fun s (error, deadsite,dead_site_) ->
                  add_dead_sites
                    "var"
                    parameter
@@ -617,13 +833,15 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                    kasim_id
                    agent.Cckappa_sig.agent_name
                    s
-                   deadsite)
+                   deadsite
+                   dead_site_)
+
               deadsite
-              (error, dead_sites)
+              (error, dead_sites, dead_sites)
           in
-          let error,dead_states =
+          let error,dead_states,_ =
             Ckappa_sig.Site_map_and_set.Map.fold
-              (fun s _ (error, dead_states) ->
+              (fun s _ (error, dead_states, dead_states_) ->
                  add_dead_state
                    "var"
                    parameter
@@ -632,13 +850,14 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                    kasim_id
                    agent.Cckappa_sig.agent_name
                    s
-                   dead_states)
+                   dead_states
+                   dead_states_)
               deadstate
-              (error, dead_states)
+              (error, dead_states, dead_states)
           in
-          let error, dead_states =
+          let error, dead_states,_ =
             Ckappa_sig.Site_map_and_set.Map.fold
-              (fun s _ (error, dead_states) ->
+              (fun s _ (error, dead_states, dead_states_) ->
                  add_dead_state
                    "var"
                    parameter
@@ -647,9 +866,10 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                    kasim_id
                    agent.Cckappa_sig.agent_name
                    s
-                   dead_states)
+                   dead_states
+                   dead_states_)
               deadstate'
-              (error, dead_states)
+              (error, dead_states, dead_states)
           in
           error, (agent_var,site_var,site_bound_var, dead_agents,dead_sites,dead_states)
         | Cckappa_sig.Agent agent ->
@@ -765,9 +985,12 @@ let scan_rule parameter error handler rule_id rule quarks =
   let agent_test =  quarks.Quark_type.agent_test in
   let site_test = quarks.Quark_type.site_test in
   let site_bound_test = quarks.Quark_type.site_test_bound in
-  let dead_agents = quarks.Quark_type.dead_agent in
-  let dead_sites = quarks.Quark_type.dead_sites in
-  let dead_states = quarks.Quark_type.dead_states in
+  let dead_agents_test = quarks.Quark_type.dead_agent in
+  let dead_sites_test = quarks.Quark_type.dead_sites in
+  let dead_states_test = quarks.Quark_type.dead_states in
+  let dead_agents_minus = quarks.Quark_type.dead_agent_minus in
+  let dead_sites_minus = quarks.Quark_type.dead_sites_minus in
+  let dead_states_minus = quarks.Quark_type.dead_states_minus in
   let agent_modif_plus = quarks.Quark_type.agent_modif_plus in
   let agent_modif_minus = quarks.Quark_type.agent_modif_minus in
   let site_modif_plus = quarks.Quark_type.site_modif_plus in
@@ -775,11 +998,11 @@ let scan_rule parameter error handler rule_id rule quarks =
   let site_bound_modif_plus = Quark_type.BoundSite.Set.empty in
   let site_bound_modif_minus = Quark_type.BoundSite.Set.empty in
   let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
-  let error,(agent_test,site_test,_site_bound_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
+  let error,(agent_test,site_test,_site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus) = (*what is tested in the lhs*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error _agent_id agent (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) ->
+      (fun parameter error _agent_id agent (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus) ->
          let dealwith agent error (agent_test,site_test,site_bound_test) =
            let error,kasim_id =
              Quark_type.Labels.label_of_int
@@ -823,45 +1046,99 @@ let scan_rule parameter error handler rule_id rule quarks =
              Quark_type.Labels.label_of_int parameter error
                (Ckappa_sig.int_of_agent_id id_int)
            in
-           let error,dead_agents = add_dead_agent "rule" parameter error rule_id kasim_id string dead_agents in
-           error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
+           let error,dead_agents,dead_agents_minus = add_dead_agent "rule" parameter error rule_id kasim_id string dead_agents dead_agents_minus in
 
-         | Cckappa_sig.Ghost -> error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
+           error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus)
+
+         | Cckappa_sig.Ghost -> error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus)
          | Cckappa_sig.Dead_agent (agent,deadsite,deadstate,deadstate') ->
            let error,kasim_id =
              Quark_type.Labels.label_of_int parameter error
                (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
            in
            let error,(agent_test,site_test,site_bound_test) = dealwith agent error (agent_test,site_test,site_bound_test) in
-           let error,dead_sites =
+           let error,dead_sites,dead_sites_minus =
              Cckappa_sig.KaSim_Site_map_and_set.Set.fold
-               (fun s (error,deadsite) ->
-                  add_dead_sites "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s deadsite)
+               (fun s (error,deadsite,deadsite_minus) ->
+                  add_dead_sites "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s deadsite deadsite_minus)
                deadsite
-               (error,dead_sites)
+               (error,dead_sites,dead_sites_minus)
            in
-           let error,dead_states =
+           let error,dead_states,dead_states_minus =
              Ckappa_sig.Site_map_and_set.Map.fold
-               (fun s _ (error,dead_states) ->
-                  add_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states)
+               (fun s _ (error,dead_states,dead_states_minus) ->
+                  add_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states dead_states_minus)
                deadstate
-               (error,dead_states)
+               (error,dead_states,dead_states_minus)
            in
-           let error,dead_states =
+           let error,dead_states, dead_states_minus =
              Ckappa_sig.Site_map_and_set.Map.fold
-               (fun s _ (error,dead_states) ->
-                  add_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states)
+               (fun s _ (error,dead_states,dead_states_minus) ->
+                  add_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states dead_states_minus)
                deadstate'
-               (error,dead_states)
+               (error,dead_states,dead_states_minus)
            in
-           error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
+           error,(agent_test,site_test,site_bound_test,dead_agents,
+                  dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus)
          | Cckappa_sig.Agent agent ->
            let error,(agent_test,site_test,site_bound_test) = dealwith agent error (agent_test,site_test,site_bound_test) in
-           error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
+           error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states,dead_agents_minus,dead_sites_minus,dead_states_minus)
 
       )
       viewslhs
-      (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
+      (agent_test,site_test,site_bound_test,dead_agents_test,dead_sites_test,dead_states_test ,dead_agents_minus,dead_sites_minus,dead_states_minus)
+  in
+  let _ = Misc_sa.trace parameter (fun () ->"CLEANING QUARKS FOR DEAD AGENTS\n") in
+
+  let error,(dead_agents_minus,dead_sites_minus,dead_states_minus) = (*what is dead in the rhs*)
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameter
+      error
+      (fun parameter error _agent_id agent (dead_agents_minus,dead_sites_minus,dead_states_minus)
+         ->
+         match agent with
+         | Cckappa_sig.Unknown_agent (string,id_int) ->
+           let error,kasim_id =
+             Quark_type.Labels.label_of_int parameter error
+               (Ckappa_sig.int_of_agent_id id_int)
+           in
+           let error,dead_agents_minus = remove_dead_agent "rule" parameter error rule_id kasim_id string dead_agents_minus in
+           error,(dead_agents_minus,dead_sites_minus,dead_states_minus)
+
+         | Cckappa_sig.Ghost -> error,(dead_agents_minus,dead_sites_minus,dead_states_minus)
+         | Cckappa_sig.Dead_agent (agent,deadsite,deadstate,deadstate') ->
+           let error,kasim_id =
+             Quark_type.Labels.label_of_int parameter error
+               (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
+           in
+           let error,dead_sites_minus =
+             Cckappa_sig.KaSim_Site_map_and_set.Set.fold
+               (fun s (error,deadsite_minus) ->
+                  remove_dead_sites "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s deadsite_minus)
+               deadsite
+               (error,dead_sites_minus)
+           in
+           let error,dead_states_minus =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun s _ (error,dead_states_minus) ->
+                  remove_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states_minus)
+               deadstate
+               (error,dead_states_minus)
+           in
+           let error,dead_states_minus =
+             Ckappa_sig.Site_map_and_set.Map.fold
+               (fun s _ (error,dead_states_minus) ->
+                  remove_dead_state "rule" parameter error rule_id kasim_id agent.Cckappa_sig.agent_name s dead_states_minus)
+               deadstate'
+               (error,dead_states_minus)
+           in
+           error,(dead_agents_minus,dead_sites_minus,dead_states_minus)
+         | Cckappa_sig.Agent agent ->
+           error,(dead_agents_minus,dead_sites_minus,dead_states_minus)
+
+      )
+      viewsrhs
+      (dead_agents_minus,dead_sites_minus,dead_states_minus)
   in
   let _ = Misc_sa.trace parameter (fun () ->"CREATION\n") in
   let error,agent_modif_plus = (*the agents that are created*)
@@ -1128,9 +1405,12 @@ let scan_rule parameter error handler rule_id rule quarks =
   {quarks with
    Quark_type.agent_test = agent_test ;
    Quark_type.site_test = site_test ;
-   Quark_type.dead_agent = dead_agents;
-   Quark_type.dead_sites = dead_sites;
-   Quark_type.dead_states = dead_states;
+   Quark_type.dead_agent = dead_agents_test;
+   Quark_type.dead_sites = dead_sites_test;
+   Quark_type.dead_states = dead_states_test;
+   Quark_type.dead_agent_minus = dead_agents_minus;
+   Quark_type.dead_sites_minus = dead_sites_minus;
+   Quark_type.dead_states_minus = dead_states_minus;
    Quark_type.agent_modif_plus = agent_modif_plus ;
    Quark_type.site_modif_plus = site_modif_plus ;
    Quark_type.agent_modif_minus = agent_modif_minus ;

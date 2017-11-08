@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 7th 2011
- * Last modification: Time-stamp: <Apr 10 2017>
+ * Last modification: Time-stamp: <Nov 08 2017>
  * *
  * Labels to be associated with influence relations
  *
@@ -60,6 +60,7 @@ sig
   val empty_couple: label_set_couple
   val is_empty_couple: label_set_couple -> bool
   val add_set:     label -> label_set -> label_set
+  val remove_set: label -> label_set -> label_set
   val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler
   val dump_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple -> Exception.method_handler
@@ -83,6 +84,7 @@ module Empty =
     let member _label _labelset = false
     let is_empty_couple _ = false
     let add_set _ _ = ()
+    let remove_set _ _ = ()
     let add_couple _ error _ _ _ _ = error,()
     let dump _ error _ _ = error
     let to_string _ error _ _ = error,[]
@@ -114,6 +116,7 @@ module Extensive =
        let empty_couple = Pair_Set.Set.empty
        let is_empty_couple = Pair_Set.Set.is_empty
        let add_set = Set.add
+       let remove_set = Set.remove
        let add_couple _remanent error bool a b sol =
          Set.fold
            (fun a (error,sol) ->
@@ -247,6 +250,7 @@ module Implicit =
        let empty_couple  = []
        let is_empty_couple x = x=[]
        let add_set = Set.add
+       let remove_set = Set.remove 
        let add_couple _remanent error _bool a b sol = error,(a,b)::sol
 
        let dump parameter error _handler a =
