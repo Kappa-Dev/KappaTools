@@ -1,5 +1,0 @@
-[{ "method" : "GET"
- , "url" : "/v2"
- , "arguments" : ""
- , "code" : 200
- , "comment" : "checking server info" }]
