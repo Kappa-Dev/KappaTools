@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: September, the 27th of 2015
-   * Last modification: Time-stamp: <Oct 27 2017>
+   * Last modification: Time-stamp: <Nov 08 2017>
    * *
    * algebraic check for the influence map.
    *
@@ -14,7 +14,7 @@
 
 exception False of Exception.method_handler
 
-let check parameters error _handler mixture1 mixture2 (i,j) =
+let check ~allow_dead_agent parameters error _handler mixture1 mixture2 (i,j) =
   let add (n1,n2) error to_do (inj1,inj2) =
     let im1 =
       Ckappa_sig.Agent_id_setmap.Map.find_option
@@ -155,6 +155,8 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
           | Cckappa_sig.Unknown_agent _ -> raise (False error)
           | Cckappa_sig.Dead_agent (ag1,_,l11,l12) ->
             begin
+              if not allow_dead_agent then raise (False error)
+              else
               match ag2 with
               | Cckappa_sig.Unknown_agent _ -> raise (False error)
               | Cckappa_sig.Ghost ->
@@ -216,7 +218,9 @@ let check parameters error _handler mixture1 mixture2 (i,j) =
                   Exit (true,(to_do,already_done))
               | Cckappa_sig.Dead_agent (ag2,_,l21,l22) ->
                 begin
-                  begin
+                  if not allow_dead_agent then raise (False error)
+                  else
+                    begin
                     deal_with error
                       (fun parameter error ->
                          Ckappa_sig.Site_map_and_set.Map.iter2
@@ -278,6 +282,7 @@ let shift_agent_id bool rule id =
 
 let filter_influence parameters error handler compilation map bool =
   let nrules = Handler.nrules parameters error handler in
+  let allow_dead_agent = true in
   let get_var v =
     match
       snd (v.Cckappa_sig.e_variable)
@@ -311,6 +316,7 @@ let filter_influence parameters error handler compilation map bool =
        | Some rule2 -> shift_agent_id  false rule2 y)
     in
     check
+      ~allow_dead_agent
       parameters
       error
       handler
@@ -423,8 +429,9 @@ let filter_influence_high maybe_reachable
     parameters handler error compilation
     static dynamic
     map bool =
+  let dynamic_ref = ref dynamic in 
   let nrules = Handler.nrules parameters error handler in
-
+  let allow_dead_agent = false in
   let get_var v =
     match
       snd (v.Cckappa_sig.e_variable)
@@ -457,13 +464,19 @@ let filter_influence_high maybe_reachable
        | None -> y
        | Some rule2 -> shift_agent_id false rule2 y)
     in
-    check
-      parameters
-      error
-      handler
-      (get_bool rule1)
-      mixt
-      (updt_pos pos)
+    begin
+      try
+        check
+          ~allow_dead_agent
+          parameters
+          error
+          handler
+          (get_bool rule1)
+          mixt
+          (updt_pos pos)
+      with
+      | False error -> error, None
+    end
   in
   Ckappa_sig.PairRule_setmap.Map.fold
     (fun (a,b) couple ((error,dynamic),map') ->
@@ -581,6 +594,7 @@ let filter_influence_high maybe_reachable
                         let error, dynamic, bool =
                           maybe_reachable static dynamic error join
                         in
+                        let () = dynamic_ref := dynamic in
                         let error =
                           if Remanent_parameters.get_trace parameters
                           then
@@ -641,8 +655,9 @@ let filter_influence_high maybe_reachable
                    couple
                in
                (error,dynamic),couple'
-             with False (error) -> (error,dynamic),couple
-             (* dynamic should be passed as well*)
+             with False (error) ->
+               let dynamic = !dynamic_ref in
+               (error,dynamic),couple
            in
            if Quark_type.Labels.is_empty_couple couple'
            then  (error,dynamic),map'
@@ -650,7 +665,10 @@ let filter_influence_high maybe_reachable
                 Ckappa_sig.PairRule_setmap.Map.add
                   (a,b) couple' map'
          end
-       with Pass error -> ((error,dynamic),map') (* dynamic should be passed as well*)
+       with Pass error ->
+         let dynamic = !dynamic_ref in
+         ((error,dynamic),map')
+
     )
     map
     ((error,dynamic),
