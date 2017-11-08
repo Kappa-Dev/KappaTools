@@ -30,7 +30,7 @@ Domain:
   /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
   /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
-  %init: 100 A(x!1), B(x!1)
+  %init: 100 A(x[1]), B(x[1])
   
 Environment:
   
@@ -58,7 +58,7 @@ Domain:
   /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
   /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
-  %init: 100 A(x!1), B(x!1)
+  %init: 100 A(x[1]), B(x[1])
   
 Environment:
   
@@ -86,5 +86,5 @@ Domain:
   /*cc2*/ B/*2*/(x[.]) [rate_of_rule [0]] -> ()
   /*cc3*/ A/*1*/(x[1]), B/*2*/(x[1]) [rate_of_rule [1]] -> ()
 Intial graph;
-  %init: 300 A(x!1), B(x!1)
+  %init: 300 A(x[1]), B(x[1])
   

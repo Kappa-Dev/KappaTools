@@ -156,9 +156,7 @@ let snapshot s =
       (Kappa_files.wrap_formatter (fun f -> Data.print_snapshot ~uuid f s))
 
 let print_species time f mixture =
-  Format.fprintf
-    f "%g: @[<h>%a@]@." time
-    (User_graph.print_cc ~explicit_free:false ~compact:false) mixture
+  Format.fprintf f "%g: @[<h>%a@]@." time User_graph.print_cc mixture
 
 let go = function
   | Data.Snapshot s -> snapshot s

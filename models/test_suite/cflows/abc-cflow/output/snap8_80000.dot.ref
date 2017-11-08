@@ -2,12 +2,12 @@
 digraph G{
 subgraph cluster0{
   counter0 [label = "10000 instance(s)", shape=none];
-  node0_0 [label = "C(x1~p,x2~p)", color = "#e36019", style=filled];
+  node0_0 [label = "C(x1{p} x2{p})", color = "#e36019", style=filled];
   node0_0 -> counter0 [style=invis];
   }
 subgraph cluster1{
   counter1 [label = "744 instance(s)", shape=none];
-  node1_0 [label = "A(x,c)", color = "#1f2bc2", style=filled];
+  node1_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node1_0 -> counter1 [style=invis];
   node1_1 [label = "B(x)", color = "#6fd754", style=filled];
   node1_1 -> counter1 [style=invis];
@@ -20,7 +20,7 @@ subgraph cluster2{
   }
 subgraph cluster3{
   counter3 [label = "256 instance(s)", shape=none];
-  node3_0 [label = "A(x,c)", color = "#1f2bc2", style=filled];
+  node3_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node3_0 -> counter3 [style=invis];
   }
 }

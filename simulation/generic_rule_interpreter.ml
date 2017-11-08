@@ -331,8 +331,7 @@ module Make (Instances:Instances_sig.S) = struct
     Format.fprintf
       f "@[<v>%a@,%a@]"
       (Pp.list Pp.space (fun f (i,mix) ->
-           Format.fprintf f "%%init: %i @[<h>%a@]" i
-             (User_graph.print_cc ~explicit_free:false ~compact:false) mix))
+           Format.fprintf f "%%init: %i @[<h>%a@]" i User_graph.print_cc mix))
       (Edges.build_snapshot sigs state.edges)
       (Pp.array Pp.space (fun i f el ->
            Format.fprintf

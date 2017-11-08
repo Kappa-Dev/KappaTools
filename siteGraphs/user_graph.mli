@@ -22,9 +22,7 @@ type cc_site = {
 }
 type connected_component = cc_node array
 
-val print_cc :
-  explicit_free:bool -> compact:bool ->
-  Format.formatter -> connected_component -> unit
+val print_cc : Format.formatter -> connected_component -> unit
 
 val print_dot_cc : int -> Format.formatter -> connected_component -> unit
 

@@ -23,55 +23,58 @@ type cc_node = {
 }
 type connected_component = cc_node array
 
-let print_link ~explicit_free (dandling,free_id) p f = function
-  | [] -> if explicit_free then Format.pp_print_string f "!."
+let print_link (dandling,free_id) p f = function
+  | [] -> Format.pp_print_string f "[.]"
   | l ->
     let myself =
       ref (Mods.Int2Map.find_default Mods.Int2Map.empty p !dandling) in
     let () =
-      Pp.list
-        Pp.empty
-        (fun f p' ->
-           let i =
-             if p = p' then -1 else
-               match Option_util.bind
-                       (Mods.Int2Map.find_option p)
-                       (Mods.Int2Map.find_option p' !dandling) with
-               | None ->
-                 let () = incr free_id in
-                 let () = myself := Mods.Int2Map.add p' !free_id !myself in
-                 !free_id
-               | Some va -> va in
-           Format.fprintf f "!%i" i)
-        f l in
+      Format.fprintf f"[%a]"
+        (Pp.list
+           Pp.space
+           (fun f p' ->
+              let i =
+                if p = p' then -1 else
+                  match Option_util.bind
+                          (Mods.Int2Map.find_option p)
+                          (Mods.Int2Map.find_option p' !dandling) with
+                  | None ->
+                    let () = incr free_id in
+                    let () = myself := Mods.Int2Map.add p' !free_id !myself in
+                    !free_id
+                  | Some va -> va in
+              Format.fprintf f "%i" i)) l in
     dandling := Mods.Int2Map.add p !myself !dandling
 
-let print_port ~explicit_free with_link node p id f=
+let print_port with_link node p id f =
   Format.fprintf f "%a%a"
-  (Pp.list Pp.empty (fun f i -> Format.fprintf f "~%s" i)) p.port_states
+    (fun f l ->
+       if l <> [] then
+         Format.fprintf f "{%a}"
+           (Pp.list Pp.space (fun f i -> Format.fprintf f "%s" i)) l)
+    p.port_states
   (match with_link with
-   | Some pack -> print_link ~explicit_free pack (node,id)
+   | Some pack -> print_link pack (node,id)
    | None -> (fun _ _ -> ()))
   p.port_links
 
-let print_intf ~explicit_free compact with_link node =
+let print_intf with_link node =
   Pp.array
-    (if compact then Pp.compact_comma else Pp.comma)
+    Pp.space
     (fun id f si ->
        let () = Format.fprintf f "%s" si.site_name in
          (match si.site_type with
-          | Port p -> print_port ~explicit_free with_link node p id f
-          | Counter i -> Format.fprintf f ":%i" i))
+          | Port p -> print_port with_link node p id f
+          | Counter i -> Format.fprintf f "{=%i}" i))
 
-let print_agent ~explicit_free compact link node f ag =
+let print_agent link node f ag =
   Format.fprintf f "%s(@[<h>%a@])"
-    ag.node_type
-    (print_intf ~explicit_free compact link node)
+    ag.node_type (print_intf link node)
     ag.node_sites
 
-let print_cc ~explicit_free ~compact f mix =
+let print_cc f mix =
   let link = Some (ref(Mods.Int2Map.empty),ref 0) in
-  Pp.array Pp.comma (print_agent ~explicit_free compact link) f mix
+  Pp.array Pp.comma (print_agent link) f mix
 
 let get_color =
   let store = Hashtbl.create 10 in
@@ -88,7 +91,7 @@ let print_dot_cc nb_cc f mix =
     (fun i f ag ->
        Format.fprintf
          f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-         nb_cc i (print_agent ~explicit_free:false true None i) ag
+         nb_cc i (print_agent None i) ag
          (get_color ag.node_type);
        Format.fprintf
          f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;

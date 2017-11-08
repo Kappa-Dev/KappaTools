@@ -7,7 +7,7 @@ subgraph cluster0{
   }
 subgraph cluster1{
   counter1 [label = "1000 instance(s)", shape=none];
-  node1_0 [label = "A(x,c)", color = "#1f2bc2", style=filled];
+  node1_0 [label = "A(x c)", color = "#1f2bc2", style=filled];
   node1_0 -> counter1 [style=invis];
   }
 }

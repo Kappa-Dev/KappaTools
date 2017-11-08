@@ -24,7 +24,7 @@ let print_snapshot ?uuid f s =
     (Pp.list Pp.space (fun f (i,mix) ->
          Format.fprintf f "%%init: %i /*%i agents*/ @[<h>%a@]" i
            (Array.length mix)
-           (User_graph.print_cc ~explicit_free:false ~compact:false) mix))
+           User_graph.print_cc mix))
     s.snapshot_agents
     (Pp.array Pp.space (fun _ f (na,el) ->
          Format.fprintf
