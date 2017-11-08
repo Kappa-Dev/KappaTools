@@ -98,6 +98,7 @@ Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+

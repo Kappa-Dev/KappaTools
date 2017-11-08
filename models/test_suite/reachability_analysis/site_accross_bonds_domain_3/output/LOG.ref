@@ -465,6 +465,7 @@ Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:0,agent_type:4
 Quarks:rule_id:0,agent_type:1
@@ -510,6 +511,7 @@ Quarks:rule_id:1,agent_type:1,site_type:0,state:1
 Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:rule_id:1,agent_type:4
 Quarks:rule_id:1,agent_type:4,site_type:0,state:2
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:1,agent_type:5
 Quarks:rule_id:1,agent_type:1
@@ -574,6 +576,7 @@ Quarks:rule_id:1,agent_type:4,site_type:0,state:1
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:4
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:rule_id:2,agent_type:4
@@ -597,6 +600,7 @@ Quarks:MODIF MOINS: rule_id:2,agent_type:2,site_type:0,state: BOUND
 Quarks:rule_id:2,agent_type:2,site_type:0,state:1
 Quarks:Rule 3
 Quarks:TEST
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:3,agent_type:5
 Quarks:rule_id:3,agent_type:3
@@ -642,6 +646,7 @@ Quarks:rule_id:4,agent_type:3,site_type:0,state:1
 Quarks:rule_id:4,agent_type:3,site_type:1,state:1
 Quarks:rule_id:4,agent_type:5
 Quarks:rule_id:4,agent_type:5,site_type:0,state:3
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:4,agent_type:7
 Quarks:rule_id:4,agent_type:3

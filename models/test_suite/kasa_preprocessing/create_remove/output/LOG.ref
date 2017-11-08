@@ -49,6 +49,7 @@ Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
 Quarks:rule_id:0,agent_type:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:0,agent_type:1
 Quarks:REMOVAL
@@ -59,6 +60,7 @@ Quarks:HALF BOND BREAKING
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:1,agent_type:2
 Quarks:REMOVAL

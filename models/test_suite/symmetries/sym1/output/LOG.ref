@@ -447,6 +447,7 @@ Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0,site_type:1,state:0
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -460,6 +461,7 @@ Quarks:rule_id:1,agent_type:0
 Quarks:rule_id:1,agent_type:0,site_type:0,state:1
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:rule_id:1,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -473,6 +475,7 @@ Quarks:rule_id:2,agent_type:0
 Quarks:rule_id:2,agent_type:0,site_type:0,state:0
 Quarks:rule_id:2,agent_type:0,site_type:1,state:1
 Quarks:rule_id:2,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -484,6 +487,7 @@ Quarks:rule_id:3,agent_type:0
 Quarks:rule_id:3,agent_type:0,site_type:0,state:0
 Quarks:rule_id:3,agent_type:0,site_type:1,state:1
 Quarks:rule_id:3,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -495,6 +499,7 @@ Quarks:rule_id:4,agent_type:0
 Quarks:rule_id:4,agent_type:0,site_type:0,state:0
 Quarks:rule_id:4,agent_type:0,site_type:1,state:0
 Quarks:rule_id:4,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -506,6 +511,7 @@ Quarks:rule_id:5,agent_type:0
 Quarks:rule_id:5,agent_type:0,site_type:0,state:0
 Quarks:rule_id:5,agent_type:0,site_type:1,state:0
 Quarks:rule_id:5,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -517,6 +523,7 @@ Quarks:rule_id:6,agent_type:0
 Quarks:rule_id:6,agent_type:0,site_type:0,state:1
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
 Quarks:rule_id:6,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -530,6 +537,7 @@ Quarks:rule_id:7,agent_type:0
 Quarks:rule_id:7,agent_type:0,site_type:0,state:1
 Quarks:rule_id:7,agent_type:0,site_type:1,state:1
 Quarks:rule_id:7,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -543,6 +551,7 @@ Quarks:rule_id:8,agent_type:0
 Quarks:rule_id:8,agent_type:0,site_type:0,state:1
 Quarks:rule_id:8,agent_type:0,site_type:1,state:0
 Quarks:rule_id:8,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -556,6 +565,7 @@ Quarks:rule_id:9,agent_type:0
 Quarks:rule_id:9,agent_type:0,site_type:0,state:1
 Quarks:rule_id:9,agent_type:0,site_type:1,state:0
 Quarks:rule_id:9,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -569,6 +579,7 @@ Quarks:rule_id:10,agent_type:0
 Quarks:rule_id:10,agent_type:0,site_type:0,state:0
 Quarks:rule_id:10,agent_type:0,site_type:1,state:1
 Quarks:rule_id:10,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -582,6 +593,7 @@ Quarks:rule_id:11,agent_type:0
 Quarks:rule_id:11,agent_type:0,site_type:0,state:1
 Quarks:rule_id:11,agent_type:0,site_type:1,state:1
 Quarks:rule_id:11,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -595,6 +607,7 @@ Quarks:rule_id:12,agent_type:0
 Quarks:rule_id:12,agent_type:0,site_type:0,state:0
 Quarks:rule_id:12,agent_type:0,site_type:1,state:0
 Quarks:rule_id:12,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -608,6 +621,7 @@ Quarks:rule_id:13,agent_type:0
 Quarks:rule_id:13,agent_type:0,site_type:0,state:1
 Quarks:rule_id:13,agent_type:0,site_type:1,state:0
 Quarks:rule_id:13,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -621,6 +635,7 @@ Quarks:rule_id:14,agent_type:0
 Quarks:rule_id:14,agent_type:0,site_type:0,state:0
 Quarks:rule_id:14,agent_type:0,site_type:1,state:1
 Quarks:rule_id:14,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -634,6 +649,7 @@ Quarks:rule_id:15,agent_type:0
 Quarks:rule_id:15,agent_type:0,site_type:0,state:0
 Quarks:rule_id:15,agent_type:0,site_type:1,state:1
 Quarks:rule_id:15,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -647,6 +663,7 @@ Quarks:rule_id:16,agent_type:0
 Quarks:rule_id:16,agent_type:0,site_type:0,state:0
 Quarks:rule_id:16,agent_type:0,site_type:1,state:0
 Quarks:rule_id:16,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -660,6 +677,7 @@ Quarks:rule_id:17,agent_type:0
 Quarks:rule_id:17,agent_type:0,site_type:0,state:0
 Quarks:rule_id:17,agent_type:0,site_type:1,state:1
 Quarks:rule_id:17,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -673,6 +691,7 @@ Quarks:rule_id:18,agent_type:0
 Quarks:rule_id:18,agent_type:0,site_type:0,state:1
 Quarks:rule_id:18,agent_type:0,site_type:1,state:1
 Quarks:rule_id:18,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -686,6 +705,7 @@ Quarks:rule_id:19,agent_type:0
 Quarks:rule_id:19,agent_type:0,site_type:0,state:1
 Quarks:rule_id:19,agent_type:0,site_type:1,state:1
 Quarks:rule_id:19,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -699,6 +719,7 @@ Quarks:rule_id:20,agent_type:0
 Quarks:rule_id:20,agent_type:0,site_type:0,state:0
 Quarks:rule_id:20,agent_type:0,site_type:1,state:1
 Quarks:rule_id:20,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -712,6 +733,7 @@ Quarks:rule_id:21,agent_type:0
 Quarks:rule_id:21,agent_type:0,site_type:0,state:1
 Quarks:rule_id:21,agent_type:0,site_type:1,state:1
 Quarks:rule_id:21,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -725,6 +747,7 @@ Quarks:rule_id:22,agent_type:0
 Quarks:rule_id:22,agent_type:0,site_type:0,state:1
 Quarks:rule_id:22,agent_type:0,site_type:1,state:0
 Quarks:rule_id:22,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -738,6 +761,7 @@ Quarks:rule_id:23,agent_type:0
 Quarks:rule_id:23,agent_type:0,site_type:0,state:1
 Quarks:rule_id:23,agent_type:0,site_type:1,state:1
 Quarks:rule_id:23,agent_type:0,site_type:2,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+

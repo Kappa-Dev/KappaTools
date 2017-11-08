@@ -92,6 +92,7 @@ Quarks:TEST
 Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -104,6 +105,7 @@ Quarks:TEST
 Quarks:rule_id:1,agent_type:0
 Quarks:rule_id:1,agent_type:0,site_type:0,state:0
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -116,6 +118,7 @@ Quarks:TEST
 Quarks:rule_id:2,agent_type:0
 Quarks:rule_id:2,agent_type:0,site_type:0,state:1
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:2,agent_type:1
 Quarks:REMOVAL

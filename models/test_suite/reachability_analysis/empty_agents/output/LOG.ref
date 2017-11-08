@@ -106,6 +106,7 @@ Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:0,agent_type:0
 Quarks:REMOVAL
@@ -115,6 +116,7 @@ Quarks:HALF BOND BREAKING
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:1,agent_type:1
 Quarks:REMOVAL
@@ -125,6 +127,7 @@ Quarks:HALF BOND BREAKING
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:2,agent_type:2
 Quarks:REMOVAL
@@ -135,6 +138,7 @@ Quarks:HALF BOND BREAKING
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:2
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:3,agent_type:3
 Quarks:REMOVAL
@@ -146,6 +150,7 @@ Quarks:HALF BOND BREAKING
 Quarks:Rule 4
 Quarks:TEST
 Quarks:rule_id:4,agent_type:4
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
 Quarks:CREATION
 Quarks:rule_id:4,agent_type:5
 Quarks:REMOVAL
