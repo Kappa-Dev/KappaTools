@@ -22,20 +22,18 @@ let options (t :t)  : (string * Arg.spec * string) list = [
   ("--log",
    Arg.String
      (fun file_name ->
-       if file_name = "-" then
-   let _ =
-     Lwt_log.channel
-       ~close_mode:(`Keep)
-       ~channel:(Lwt_io.stderr) ()
-   in
-   ()
- else
-   let _ =
-     Lwt_log.file
-       ~mode:`Append
-       ~file_name:file_name ()
-   in
-   ()
+        let () =
+          Lwt.bind
+            (if file_name = "-" then
+               Lwt.return
+                 (Lwt_log.channel
+                    ~close_mode:(`Keep) ~channel:(Lwt_io.stdout) ())
+             else
+               Lwt_log.file ~mode:`Append ~file_name ())
+            (fun l -> let () = Lwt_log_core.default := l in
+              Lwt.return_unit) |> Lwt.ignore_result
+        in
+        ()
      ),
    "path to log file path '-' logs to stdout");
   ("--level",
