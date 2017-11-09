@@ -1,14 +1,16 @@
-"""
-Web api client for the kappa programming language
-"""
+"""Web api client for the kappa programming language"""
+from __future__ import absolute_import, print_function, unicode_literals
+from builtins import dict, str
 
 __all__ = ['KappaRest']
 
 import json
-from requests import exceptions, request
+
 from os.path import join
+from requests import exceptions, request
 
 from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit
+
 
 class KappaRest(object):
     """Client to a Kappa tools driver run as a server.
