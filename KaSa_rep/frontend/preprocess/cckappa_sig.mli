@@ -125,7 +125,7 @@ val max_state_index :
 val min_state_index :
   Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
 
-val add_agent :
+(*val add_agent :
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
@@ -143,7 +143,7 @@ val add_bond_to :
   Ckappa_sig.c_agent_name ->
   Ckappa_sig.c_site_name ->
   mixture ->
-  Exception.method_handler * mixture
+  Exception.method_handler * mixture*)
 
 val rename_mixture: Remanent_parameters_sig.parameters ->
   Exception.method_handler ->

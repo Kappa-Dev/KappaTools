@@ -16,8 +16,6 @@ module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 
 let local_trace = true
 
-(****************************************************************************)
-
 type position       = Locality.t
 type agent_name     = string
 type site_name      = string
@@ -28,82 +26,6 @@ type c_agent_id   = int
 type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
-
-(****************************************************************************)
-
-let rule_id_to_json x =
-      `Assoc ["rule_id", `Int x]
-
-let rule_id_of_json json =
-  match
-    json
-  with
-  | `Assoc [s,json] when s = "rule_id"
-    -> Yojson.Basic.Util.to_int json
-  | _ ->
-    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id",json))
-
-let write_c_rule_id ob f =
-  Yojson.Basic.to_outbuf ob (rule_id_to_json f)
-
-let string_of_c_rule_id ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  write_c_rule_id ob x;
-  Bi_outbuf.contents ob
-
-let read_c_rule_id p lb =
-  rule_id_of_json (Yojson.Basic.from_lexbuf ~stream:true p lb)
-
-let c_rule_id_of_string s =
-  read_c_rule_id (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-
-let dummy_agent_name = 0
-let dummy_site_name = 0
-let dummy_state_index = 0
-let dummy_rule_id = 0
-let dummy_agent_id = 0
-
-let dummy_site_name_1 = 1
-let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
-
-let fst_site = 1
-let snd_site = 2
-
-let dummy_state_index_1 = 1
-
-let string_of_agent_name (a: c_agent_name) : string = string_of_int a
-let int_of_agent_name (a: c_agent_name) : int = a
-let agent_name_of_int (a: int) : c_agent_name = a
-
-let site_name_of_int (a: int) : c_site_name = a
-let int_of_site_name (a : c_site_name) : int = a
-let string_of_site_name (a: c_site_name) : string = string_of_int a
-
-let state_index_of_int (a:int) : c_state = a
-let int_of_state_index (a:c_state) : int = a
-let string_of_state_index (a:c_state) : string = string_of_int a
-
-let int_of_rule_id (a: c_rule_id) : int = a
-let rule_id_of_int (a: int) : c_rule_id = a
-let string_of_rule_id (a: c_rule_id) : string = string_of_int a
-
-let int_of_agent_id (a: c_agent_id) : int = a
-let agent_id_of_int (a: int) : c_agent_id = a
-let string_of_agent_id (a: c_agent_id) : string = string_of_int a
-
-let get_agent_shape n_sites parameters =
-  Misc_sa.fetch_array
-    (int_of_site_name n_sites)
-    (Remanent_parameters.get_agent_shape_array parameters)
-    (Remanent_parameters.get_agent_shape_def parameters)
-
-let get_agent_color n_sites parameters =
-  Misc_sa.fetch_array
-    (int_of_site_name n_sites)
-    (Remanent_parameters.get_agent_color_array parameters)
-    (Remanent_parameters.get_agent_color_def parameters)
-
-(***************************************************************)
 
 type binding_state =
   | Free
@@ -145,12 +67,128 @@ and link =
   | LNK_SOME  of position
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
 
+type direction = Direct | Reverse
+
+type 'pattern rule =
+  {
+    position: Locality.t;
+    prefix: int;
+    interprete_delta: direction ;
+    delta: int;
+    (* to go from Ckappa id to KaSim id: *)
+    (* in direct mode:
+          substract delta to agents with id >= prefix in the rhs *)
+    (* in reverse mode:
+          substract delta to agents with id >= prefix in the lhs *)
+    lhs   : 'pattern;
+    rhs   : 'pattern;
+    k_def : ('pattern,string) Alg_expr.e Locality.annot;
+    k_un  : ('pattern,string) Alg_expr.e Locality.annot option;
+    ast: string ;
+    ast_no_rate: string ;
+    original_ast: string ;
+    original_ast_no_rate: string ;
+    from_a_biderectional_rule: bool;
+  }
+
+type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
+
+type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
+
+type 'pattern variable     = ('pattern,string) Ast.variable_def
+
+type ('agent,'pattern,'mixture,'rule) compil =
+  ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
+
+type ('a, 'b) site_type =
+  | Internal of 'a
+  | Binding  of 'b
+
+type site = (site_name, site_name) site_type
+
+type state = (internal_state, binding_state) site_type
+
+(****************************************************************************)
+
+let rule_id_to_json x =
+      `Assoc ["rule_id", `Int x]
+
+let rule_id_of_json json =
+  match
+    json
+  with
+  | `Assoc [s,json] when s = "rule_id"
+    -> Yojson.Basic.Util.to_int json
+  | _ ->
+    raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "rule id",json))
+
+let write_c_rule_id ob f =
+  Yojson.Basic.to_outbuf ob (rule_id_to_json f)
+
+let string_of_c_rule_id ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_c_rule_id ob x;
+  Bi_outbuf.contents ob
+
+let read_c_rule_id p lb =
+  rule_id_of_json (Yojson.Basic.from_lexbuf ~stream:true p lb)
+
+let c_rule_id_of_string s =
+  read_c_rule_id (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+
+let dummy_agent_name = 0
+let dummy_site_name = 0
+let dummy_state_index = 0
+let dummy_rule_id = 0
+let dummy_agent_id = 0
+let dummy_site_name_1 = 1
+let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
+let dummy_state_index_1 = 1
 let dummy_agent =
   {
     ag_nme = "" ;
     ag_intf = EMPTY_INTF ;
     ag_nme_pos = Locality.dummy
   }
+
+let fst_site = 1
+let snd_site = 2
+
+let string_of_agent_name (a: c_agent_name) : string = string_of_int a
+let int_of_agent_name (a: c_agent_name) : int = a
+let agent_name_of_int (a: int) : c_agent_name = a
+
+let site_name_of_int (a: int) : c_site_name = a
+let int_of_site_name (a : c_site_name) : int = a
+let string_of_site_name (a: c_site_name) : string = string_of_int a
+
+let state_index_of_int (a:int) : c_state = a
+let int_of_state_index (a:c_state) : int = a
+let string_of_state_index (a:c_state) : string = string_of_int a
+
+let int_of_rule_id (a: c_rule_id) : int = a
+let rule_id_of_int (a: int) : c_rule_id = a
+let string_of_rule_id (a: c_rule_id) : string = string_of_int a
+
+let int_of_agent_id (a: c_agent_id) : int = a
+let agent_id_of_int (a: int) : c_agent_id = a
+let string_of_agent_id (a: c_agent_id) : string = string_of_int a
+
+let get_agent_shape n_sites parameters =
+  Misc_sa.fetch_array
+    (int_of_site_name n_sites)
+    (Remanent_parameters.get_agent_shape_array parameters)
+    (Remanent_parameters.get_agent_shape_def parameters)
+
+let get_agent_color n_sites parameters =
+  Misc_sa.fetch_array
+    (int_of_site_name n_sites)
+    (Remanent_parameters.get_agent_color_array parameters)
+    (Remanent_parameters.get_agent_color_def parameters)
+
+(***************************************************************)
+(*RENAME*)
+(***************************************************************)
 
 let rename_link parameters error f link =
   match
@@ -164,6 +202,106 @@ let rename_link parameters error f link =
   | LNK_ANY _
   | LNK_SOME _
   | LNK_TYPE _ -> error, link
+
+let rename_port parameters error f port =
+  let error, port_lnk = rename_link parameters error f port.port_lnk in
+  error,
+  {
+    port with
+    port_lnk = port_lnk
+  }
+
+let rec rename_interface parameters error f interface =
+  match
+    interface
+  with
+  | EMPTY_INTF -> error, EMPTY_INTF
+  | PORT_SEP (port, interface) ->
+    let error, port = rename_port parameters error f port in
+    let error, interface = rename_interface parameters error f interface in
+    error, PORT_SEP (port, interface)
+
+let rename_agent parameters error f agent =
+  let error, interface =
+    rename_interface parameters error f agent.ag_intf
+  in
+  error, { agent with ag_intf = interface}
+
+let rename_mixture parameters error f mixture =
+  let rec aux parameters error f pos mixture =
+    match
+      mixture
+    with
+    | SKIP m ->
+      let error, map, dot, plus = aux parameters error f (pos+1) m in
+      error, map, dot, plus
+    | COMMA (agent,m) ->
+      let error, agent = rename_agent parameters error f agent in
+      let error, m, dot, plus = aux  parameters error f (pos+1) m in
+      let error, pos = f parameters error pos in
+      error, Mods.IntMap.add pos agent m, dot, plus
+    | DOT (id, agent, mixture) ->
+      let error, id = f parameters error id in
+      let error, agent = rename_agent parameters error f agent in
+      let error, m, dot, plus = aux parameters error f (pos+1) mixture in
+      let error, pos = f parameters error pos in
+      let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
+      error, Mods.IntMap.add pos agent m, Mods.IntMap.add min max dot, plus
+    | PLUS (id, agent, mixture) ->
+      let error, id = f parameters error id in
+      let error, agent = rename_agent parameters error f agent in
+      let error, m, dot, plus = aux parameters error f (pos+1) mixture in
+      let error, pos = f parameters error pos in
+      let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
+      error, Mods.IntMap.add pos agent m, dot, Mods.IntMap.add min max plus
+    | EMPTY_MIX -> error, Mods.IntMap.empty, Mods.IntMap.empty, Mods.IntMap.empty
+  in
+  let error, m, dot, plus = aux parameters error f 0 mixture in (* first agent has id 0 ???*)
+  let list_m = Mods.IntMap.bindings m in
+  let dot = Mods.IntMap.bindings dot in
+  let plus = Mods.IntMap.bindings plus in
+  let rec aux parameters error pos list_m dot plus =
+    match
+      list_m
+    with
+    | [] -> error, EMPTY_MIX
+    | (pos',agent)::tail->
+      if compare pos pos' >= 0
+      then
+        let opt1, dot =
+          match dot
+          with
+            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | _ -> None, dot
+        in
+        let opt2, plus =
+          match plus
+          with
+            (pos',pos'')::q when pos=pos' -> Some pos'', q
+          | _ -> None, plus
+        in
+        let error, mixture = aux parameters error (pos+1) tail dot plus in
+        match
+          opt1, opt2
+        with
+        | Some _ , Some _
+          -> Exception.warn parameters error __POS__ Exit (SKIP(mixture))
+        | Some pos'', None ->
+          error,
+          DOT (pos'', agent, mixture)
+        | None, Some pos'' ->
+          error,
+          PLUS (pos'',agent, mixture)
+        | None, None ->
+          error,
+          COMMA (agent,mixture)
+      else aux parameters error (pos+1) list_m dot plus
+  in
+  aux parameters error 0 list_m dot plus
+
+(***************************************************************)
+(*JOIN*)
+(***************************************************************)
 
 let join_link parameters error link1 link2 =
   if link1 = link2
@@ -187,14 +325,6 @@ let join_link parameters error link1 link2 =
     | (LNK_VALUE _ | LNK_TYPE _ ), (LNK_VALUE _ | LNK_TYPE _ ) ->
       Exception.warn parameters error __POS__ Exit (LNK_ANY Locality.dummy)
 
-let rename_port parameters error f port =
-  let error, port_lnk = rename_link parameters error f port.port_lnk in
-  error,
-  {
-    port with
-    port_lnk = port_lnk
-  }
-
 let join_port parameters error port1 port2 =
   if port1.port_nme = port2.port_nme
   && port1.port_int = port2.port_int
@@ -209,16 +339,6 @@ let join_port parameters error port1 port2 =
     }
   else
     Exception.warn parameters error __POS__ Exit port1
-
-let rec rename_interface parameters error f interface =
-  match
-    interface
-  with
-  | EMPTY_INTF -> error, EMPTY_INTF
-  | PORT_SEP (port, interface) ->
-    let error, port = rename_port parameters error f port in
-    let error, interface = rename_interface parameters error f interface in
-    error, PORT_SEP (port, interface)
 
 let rev_list_of_interface x =
   let rec aux x output =
@@ -265,10 +385,6 @@ let join_interface parameters error interface1 interface2 =
   let list = List.rev_map snd list in
   error, rev_interface_of_list list
 
-let rename_agent parameters error f agent =
-  let error, interface = rename_interface parameters error f agent.ag_intf in
-  error, { agent with ag_intf = interface}
-
 let join_agent parameters error agent1 agent2 =
   if  agent1.ag_nme = agent2.ag_nme
   then
@@ -279,11 +395,47 @@ let join_agent parameters error agent1 agent2 =
   else
     Exception.warn parameters error __POS__ Exit dummy_agent
 
+let rec join_mixture parameters error mixture1 mixture2 =
+  match
+    mixture1, mixture2
+  with
+  | EMPTY_MIX, _ -> error, mixture2
+  | _, EMPTY_MIX -> error, mixture1
+  | SKIP m, SKIP m'->
+    let error, m'' = join_mixture parameters error m m' in
+    error, SKIP m''
+  | SKIP m, COMMA (ag, m') | COMMA(ag,m), SKIP m'->
+    let error, m'' = join_mixture parameters error m m' in
+    error, COMMA (ag, m'')
+  | SKIP m, DOT(id, ag, m') | DOT(id,ag,m), SKIP m' ->
+    let error, m'' = join_mixture parameters error m m' in
+    error, DOT(id, ag, m'')
+  | SKIP m, PLUS(id, ag, m') | PLUS(id,ag,m), SKIP m' ->
+    let error, m'' = join_mixture parameters error m m' in
+    error, PLUS(id, ag, m'')
+  | COMMA(ag,m), COMMA(ag',m') ->
+    let error, ag = join_agent parameters error ag ag' in
+    let error, m'' = join_mixture parameters error m m' in
+    error, COMMA(ag,m'')
+  | DOT(_), _
+  | PLUS(_), _
+  | _,DOT(_)
+  | _,PLUS(_)->
+    Exception.warn parameters error __POS__ Exit EMPTY_MIX
+
+(*let join_mixture _parameters error _mixture1 _mixture2 =
+  error, EMPTY_MIX*)
+(*TO DO*)
+
+(**********************************************************)
+(*ADD*)
+(**********************************************************)
+
 let add_link parameters error agent_id agent_name site agent_id' link =
   match link with
   | LNK_VALUE (_ag, _x, _y, _ag', position) ->
     error, LNK_VALUE (agent_id, agent_name, site, agent_id', position)
-  | FREE |LNK_ANY _| LNK_SOME _ | LNK_TYPE _ -> error, link
+  | FREE | LNK_ANY _ | LNK_SOME _ | LNK_TYPE _ -> error, link
 
 let add_port parameters error agent_id agent_name site agent_id' port =
   let error, port_lnk =
@@ -291,8 +443,9 @@ let add_port parameters error agent_id agent_name site agent_id' port =
       agent_id agent_name site agent_id' port.port_lnk
   in
   error,
-  {port with
-   port_lnk = port_lnk
+  {
+    port with
+    port_lnk = port_lnk
   }
 
 let rec add_interface parameters error agent_id agent_name site agent_id' interface =
@@ -326,6 +479,58 @@ let add_agent parameters error agent_id agent_name site agent_id' agent mixture 
     ag_nme = agent_name;
     ag_intf = agent_interface
   }
+
+(*let add_mixture parameters error agent_id mixture =
+  let rec aux parameters error agent_id mixture =
+    match mixture with
+    | SKIP mixture -> aux parameters error agent_id mixture
+    | COMMA (agent, mixture) ->
+      let error, agent =
+        add_agent parameters error agent_id agent
+      in
+      let error, mixture =
+        aux parameters error agent_id mixture
+      in
+      error, COMMA (agent, mixture)
+    | DOT (id, agent, mixture) ->
+      if agent_id = id
+      then
+        let error, agent =
+          add_agent parameters error agent_id agent
+        in
+        let error, mixture =
+          aux parameters error agent_id mixture
+        in
+        error, DOT (agent_id, agent, mixture)
+      else
+        let error, agent =
+          add_agent parameters error agent_id agent
+        in
+        let error, mixture =
+          aux parameters error agent_id mixture
+        in
+        error, DOT (agent_id, agent, mixture)
+    | PLUS (id, agent, mixture) ->
+      if id = agent_id
+      then
+        let error, agent =
+          add_agent parameters error agent_id agent
+        in
+        let error, mixture =
+          aux parameters error agent_id mixture
+        in
+        error, PLUS (agent_id, agent, mixture)
+      else
+        let error, agent =
+          add_agent parameters error agent_id agent
+        in
+        let error, mixture =
+          aux parameters error agent_id mixture
+        in
+        error, PLUS (agent_id, agent, mixture)
+    | EMPTY -> error, EMPTy
+  in
+  aux parameters error agent_id mixture*)
 
 let add_mixture parameters error agent_id agent_name site agent_id' mixture =
   let error', mixture =
@@ -363,153 +568,9 @@ let add_mixture parameters error agent_id agent_name site agent_id' mixture =
   in
   error, mixture
 
-
-let rename_mixture parameters error f mixture =
-  let rec aux parameters error f pos mixture =
-  match
-    mixture
-  with
-  | SKIP m ->
-    let error, map, dot, plus = aux parameters error f (pos+1) m in
-    error, map, dot, plus
-  | COMMA (agent,m) ->
-   let error, agent = rename_agent parameters error f agent in
-   let error, m, dot, plus = aux  parameters error f (pos+1) m in
-   let error, pos = f parameters error pos in
-   error, Mods.IntMap.add pos agent m, dot, plus
-  | DOT (id, agent, mixture) ->
-    let error, id = f parameters error id in
-    let error, agent = rename_agent parameters error f agent in
-    let error, m, dot, plus = aux parameters error f (pos+1) mixture in
-    let error, pos = f parameters error pos in
-    let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
-    error, Mods.IntMap.add pos agent m, Mods.IntMap.add min max dot, plus
-  | PLUS (id, agent, mixture) ->
-    let error, id = f parameters error id in
-    let error, agent = rename_agent parameters error f agent in
-    let error, m, dot, plus = aux parameters error f (pos+1) mixture in
-    let error, pos = f parameters error pos in
-    let min,max = if compare id pos < 0 then (id,pos) else (pos,id) in
-    error, Mods.IntMap.add pos agent m, dot, Mods.IntMap.add min max plus
-  | EMPTY_MIX -> error, Mods.IntMap.empty, Mods.IntMap.empty, Mods.IntMap.empty
-  in
-  let error, m, dot, plus = aux parameters error f 0 mixture in (* first agent has id 0 ???*)
-  let list_m = Mods.IntMap.bindings m in
-  let dot = Mods.IntMap.bindings dot in
-  let plus = Mods.IntMap.bindings plus in
-  let rec aux parameters error pos list_m dot plus =
-    match
-      list_m
-    with
-    | [] -> error, EMPTY_MIX
-    | (pos',agent)::tail->
-      if compare pos pos' >= 0
-      then
-        let opt1, dot =
-          match dot
-          with
-            (pos',pos'')::q when pos=pos' -> Some pos'', q
-          | _ -> None, dot
-        in
-        let opt2, plus =
-          match plus
-          with
-            (pos',pos'')::q when pos=pos' -> Some pos'', q
-          | _ -> None, plus
-        in
-        let error, mixture = aux parameters error (pos+1) tail dot plus in
-        match
-          opt1, opt2
-        with
-        | Some _ , Some _
-          -> Exception.warn parameters error __POS__ Exit (SKIP(mixture))
-        | Some pos'', None ->
-          error,
-          DOT (pos'', agent, mixture)
-        | None, Some pos'' ->
-          error,
-          PLUS (pos'',agent, mixture)
-        | None, None ->
-          error,
-          COMMA (agent,mixture)
-      else aux parameters error (pos+1) list_m dot plus
-  in
-  aux parameters error 0 list_m dot plus
-
-let rec join_mixture parameters error mixture1 mixture2 =
-  match
-    mixture1, mixture2
-  with
-  | EMPTY_MIX, _ -> error, mixture2
-  | _, EMPTY_MIX -> error, mixture1
-  | SKIP m, SKIP m'->
-    let error, m'' = join_mixture parameters error m m' in
-    error, SKIP m''
-  | SKIP m, COMMA (ag, m') | COMMA(ag,m), SKIP m'->
-    let error, m'' = join_mixture parameters error m m' in
-    error, COMMA (ag, m'')
-  | SKIP m, DOT(id, ag, m') | DOT(id,ag,m), SKIP m' ->
-    let error, m'' = join_mixture parameters error m m' in
-    error, DOT(id, ag, m'')
-  | SKIP m, PLUS(id, ag, m') | PLUS(id,ag,m), SKIP m' ->
-    let error, m'' = join_mixture parameters error m m' in
-    error, PLUS(id, ag, m'')
-  | COMMA(ag,m), COMMA(ag',m') ->
-    let error, ag = join_agent parameters error ag ag' in
-    let error, m'' = join_mixture parameters error m m' in
-    error, COMMA(ag,m'')
-  | DOT(_), _
-  | PLUS(_), _
-  | _,DOT(_)
-  | _,PLUS(_)->
-    Exception.warn parameters error __POS__ Exit EMPTY_MIX
-
-let join_mixture _parameters error _mixture1 _mixture2 = error, EMPTY_MIX
-(*TO DO*)
-
-type direction = Direct | Reverse
-
-type 'pattern rule =
-  {
-    position: Locality.t;
-    prefix: int;
-    interprete_delta: direction ;
-    delta: int;
-    (* to go from Ckappa id to KaSim id: *)
-    (* in direct mode:
-        substract delta to agents with id >= prefix in the rhs *)
-    (* in reverse mode:
-        substract delta to agents with id >= prefix in the lhs *)
-    lhs   : 'pattern;
-    rhs   : 'pattern;
-    k_def : ('pattern,string) Alg_expr.e Locality.annot;
-    k_un  : ('pattern,string) Alg_expr.e Locality.annot option;
-    ast: string ;
-    ast_no_rate: string ;
-    original_ast: string ;
-    original_ast_no_rate: string ;
-    from_a_biderectional_rule: bool;
-  }
-
-type 'pattern perturbation = ('pattern,'pattern,string) Ast.perturbation
-
-type 'pattern modif_expr   = ('pattern,'pattern,string) Ast.modif_expr
-
-type 'pattern variable     = ('pattern,string) Ast.variable_def
-
-type ('agent,'pattern,'mixture,'rule) compil =
-  ('agent, 'pattern, 'mixture, string, 'rule) Ast.compil
-
-type ('a, 'b) site_type =
-  | Internal of 'a
-  | Binding  of 'b
-
-type site = (site_name, site_name) site_type
-
-type state = (internal_state, binding_state) site_type
-
 (**********************************************************)
-(*move from c*)
+(*TYPE C*)
+(**********************************************************)
 
 type c_binding_state =
   | C_Free
@@ -771,6 +832,8 @@ let introduceable_species_in_pertubation parameter error f ((_,_,list,_),_) =
     (error,[])
     list
 
+(***************************************************************************)
+(*MODULE*)
 (***************************************************************************)
 
 module Agent_type_nearly_Inf_Int_storage_Imperatif =

@@ -1,8 +1,0 @@
-digraph G{
-"Init_2" [label="" style="invis" width="0px" height="0px"];
-"Node_1" [label="A(y~p)"];
-"Node_2" [label="A(y~u)"];
-"Node_1" -> "Node_2" [label="b_op"];
-"Node_2" -> "Node_1" [label="b"];
-"Init_2" -> "Node_2" [label=""];
-}
