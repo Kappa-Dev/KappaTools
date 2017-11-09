@@ -1,21 +1,23 @@
 """Integration test for kappa clients"""
-import unittest
-import nose
-
 import json
 import subprocess
 import random
 import string
 import time
 import uuid
+import sys
+import unittest
+import nose
 
 from os import path
-import sys
 
 import kappy
 
-KASIM_DIR = path.normpath(path.join(path.dirname(path.abspath(__file__)), *([path.pardir]*2)))
-KAPPA_BIN = path.join(KASIM_DIR,"bin")
+KASIM_DIR = path.normpath(
+    path.join(path.dirname(path.abspath(__file__)), *([path.pardir]*2))
+    )
+BIN_DIR = path.join(KASIM_DIR, "bin")
+MODELS_DIR = path.join(KASIM_DIR, "models")
 
 def _get_id(name):
     return "%s-%s" % (name, uuid.uuid1())
@@ -50,9 +52,9 @@ class _KappaClientTest(unittest.TestCase):
         runtime = self.getRuntime(project_id=_get_id('test_proj'))
         file_1_id = _get_id("file1.ka")
         file_2_id = _get_id("file2.ka")
-        test_dir = "../models/test_suite/compiler/file_order/"
-        with open(test_dir+"file2.ka") as file_2:
-            with open(test_dir+"file1.ka") as file_1:
+        test_dir = path.join(MODELS_DIR, "test_suite", "compiler", "file_order")
+        with open(path.join(test_dir, "file2.ka")) as file_2:
+            with open(path.join(test_dir, "file1.ka")) as file_1:
                 data_1 = file_1.read()
                 file_1_metadata = kappy.FileMetadata(file_1_id,1)
                 file_1_object = kappy.File(file_1_metadata,data_1)
@@ -73,7 +75,7 @@ class _KappaClientTest(unittest.TestCase):
         project_id = str(uuid.uuid1())
         runtime = self.getRuntime(project_id)
         file_id = str(uuid.uuid1())
-        with open("../models/abc-pert.ka") as kappa_file:
+        with open(path.join(MODELS_DIR, "abc-pert.ka")) as kappa_file:
             data = kappa_file.read()
             file_content = str(data)
             file_metadata = kappy.FileMetadata(file_id,0)
@@ -137,16 +139,19 @@ class _KappaClientTest(unittest.TestCase):
 class RestClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
     def __init__(self, *args, **kwargs):
-        """ initalize test by launching kappa server """
-        self.websim = path.join(KAPPA_BIN, "WebSim")
+        """Initalize test by launching kappa server"""
+        self.websim = path.join(BIN_DIR, "WebSim")
         self.key = self.generate_key()
         self.port = 6666
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
-        super(RestClientTest, self).__init__(*args, **kwargs)
-
+        return super(RestClientTest, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        """ set up unit test by launching client"""
+        """Set up unit test by launching client
+
+        Note: This is run automatically by nosetests before EACH test method,
+        so there is no object permanence between tests.
+        """
         print("Starting server")
         subprocess.Popen([
             self.websim,
@@ -159,20 +164,24 @@ class RestClientTest(_KappaClientTest):
         return
 
     def tearDown(self):
-        """ tear down test by shutting down"""
-        runtime = self.getRuntime("__foo")
+        """Tear down test by shutting down.
+
+        Note: This is run automatically by nosetests afer EACH test method,
+        so there is no object permanence between tests.
+        """
+        runtime = self.getRuntime("test_proj")
         print("Closing server...")
         resp = runtime.shutdown(self.key)
         time.sleep(1)
         print("Closed", resp)
         return
 
-    def getRuntime(self,project_id):
-        return kappy.KappaRest(self.endpoint,project_id)
+    def getRuntime(self, project_id):
+        return kappy.KappaRest(self.endpoint, project_id)
 
     @classmethod
     def generate_key(cls):
-        """ generate random key for kappa server. """
+        """Generate random key for kappa server. """
         return ''.join(random.
                        SystemRandom().
                        choice(string.ascii_uppercase + string.digits)
@@ -190,7 +199,7 @@ class StdClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
 
     def getRuntime(self,project_id):
-        return(kappy.KappaStd(KAPPA_BIN))
+        return kappy.KappaStd(BIN_DIR)
 
 if __name__ == '__main__':
     module_name = sys.modules[__name__].__file__
