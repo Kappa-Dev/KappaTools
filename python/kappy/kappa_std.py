@@ -1,14 +1,15 @@
-"""
-Client for the kappa programming language through standard channel api
-"""
+"""Client for the kappa programming language through standard channel api"""
+from __future__ import absolute_import, print_function, unicode_literals
+from builtins import dict, str
 
 __all__ = ['KappaStd']
 
 import subprocess
 import threading
 import json
-from os.path import join
 import abc
+
+from os.path import join
 from pkg_resources import resource_filename
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File

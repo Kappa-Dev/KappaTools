@@ -1,5 +1,7 @@
-""" Shared functions of api client for the kappa programming language
-"""
+""" Shared functions of api client for the kappa programming language"""
+from __future__ import absolute_import, print_function, unicode_literals
+from builtins import dict, str
+
 __all__ = ['FileMetadata', 'File', 'SimulationParameter', 'PlotLimit',
            'KappaError']
 
