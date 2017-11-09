@@ -163,6 +163,7 @@ class RestClientTest(_KappaClientTest):
         runtime = self.getRuntime("__foo")
         print("Closing server...")
         resp = runtime.shutdown(self.key)
+        time.sleep(1)
         print("Closed", resp)
         return
 
