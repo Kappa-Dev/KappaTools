@@ -1,16 +1,18 @@
 """Integration test for kappa clients"""
+
+import sys
 import json
 import subprocess
 import random
 import string
 import time
 import uuid
-import sys
-import unittest
-import nose
 
 from os import path
+from datetime import datetime
 
+import unittest
+import nose
 import kappy
 
 KASIM_DIR = path.normpath(
@@ -146,6 +148,14 @@ class RestClientTest(_KappaClientTest):
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
         return super(RestClientTest, self).__init__(*args, **kwargs)
 
+    def _mark_log_file(self, msg):
+        """A convenience method to mark sections of a continuous log file."""
+        with open('WebSim_test.log', 'a') as logfile:
+            logfile.write("-"*80 + '\n')
+            logfile.write('%s at %s.\n' % (msg, datetime.now()))
+            logfile.write("-"*80 + '\n')
+        return
+
     def setUp(self):
         """Set up unit test by launching client
 
@@ -153,11 +163,13 @@ class RestClientTest(_KappaClientTest):
         so there is no object permanence between tests.
         """
         print("Starting server")
+        self._mark_log_file('Starting server')
         subprocess.Popen([
             self.websim,
             '--shutdown-key', self.key,
             '--port', str(self.port),
-            '--level', 'info'
+            '--level', 'fatal',  # TODO: This is temporary until --log works.
+            '--log', 'WebSim_test.log'
             ])
         time.sleep(1)
         print("Started")
@@ -172,6 +184,7 @@ class RestClientTest(_KappaClientTest):
         runtime = self.getRuntime("test_proj")
         print("Closing server...")
         resp = runtime.shutdown(self.key)
+        self._mark_log_file('Stopping server')
         time.sleep(1)
         print("Closed", resp)
         return
