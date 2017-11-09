@@ -12,12 +12,14 @@ git clone --depth 10 --quiet -b master https://${KAPPAGITHUBTOKEN}:@github.com/K
 case $1 in
     native )
         empty_or_create ${PLAYGROUND}/docs/KaSim-manual-master
-        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/generated_img
         cp man/*.htm man/*.css ${PLAYGROUND}/docs/KaSim-manual-master/
-        cp -r man/img ${PLAYGROUND}/docs/KaSim-manual-master/
-        cp -r man/gkappa_img ${PLAYGROUND}/docs/KaSim-manual-master/
-
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/img
+        cp man/img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/img/
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/gkappa_img
+        cp man/gkappa_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/gkappa_img/
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/generated_img
         cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
+
         empty_or_create  ${PLAYGROUND}/docs/KaSim-API-master
         cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
 
