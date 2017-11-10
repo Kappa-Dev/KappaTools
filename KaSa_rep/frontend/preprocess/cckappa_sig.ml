@@ -169,13 +169,12 @@ type enriched_rule =
   }
 
 type enriched_init =
-  {
-    e_init_factor     : (Ckappa_sig.mixture, string) Alg_expr.e;
-    e_init_c_factor   : (mixture, string) Alg_expr.e;
-    e_init_string_pos : string Locality.annot option;
-    e_init_mixture    : Ckappa_sig.mixture;
-    e_init_c_mixture  : mixture
-  }
+    {
+      e_init_factor     : (Ckappa_sig.mixture, string) Alg_expr.e;
+      e_init_c_factor   : (mixture, string) Alg_expr.e;
+      e_init_mixture    : Ckappa_sig.mixture;
+      e_init_c_mixture  : mixture
+    }
 
 type compil =
   {
@@ -217,7 +216,6 @@ let dummy_init parameters error =
   {
     e_init_factor     = Alg_expr.CONST (Nbr.I 0);
     e_init_c_factor   = Alg_expr.CONST (Nbr.I 0);
-    e_init_string_pos = None;
     e_init_mixture    = Ckappa_sig.EMPTY_MIX;
     e_init_c_mixture  =
       {
@@ -1191,11 +1189,4 @@ let add_common_dot_and_plus parameters error l dot_or_plus =
       error' __POS__ Exit
   in
   error, new_dot_or_plus
-
-let add_plus parameters error plus_list plus =
-  add_common_dot_and_plus parameters error plus_list plus
-
-let add_dot parameters error dots dot =
-  add_common_dot_and_plus parameters error dots dot
-
   *)

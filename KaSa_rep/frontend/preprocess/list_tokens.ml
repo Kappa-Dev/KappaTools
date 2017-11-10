@@ -424,15 +424,15 @@ let scan_alg _parameters remanent _alg = (*TO DO*)
 
 let scan_initial_states parameters =
   List.fold_left
-    (fun remanent (_,(alg,_pos),init_t) ->
+    (fun remanent ((alg,_pos),init_t) ->
        let remanent = scan_alg parameters remanent alg in
        match
          init_t
        with
-       | Ast.INIT_MIX mixture,_pos' ->
+       | Ast.INIT_MIX (mixture,_pos') ->
          scan_mixture parameters remanent mixture
-       | Ast.INIT_TOK tok,pos' ->
-         scan_token parameters remanent (tok,pos'))
+       | Ast.INIT_TOK tk_l ->
+         List.fold_left (scan_token parameters) remanent tk_l)
 
 let scan_declarations parameters  =
   List.fold_left

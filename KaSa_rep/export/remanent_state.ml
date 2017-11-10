@@ -22,7 +22,7 @@ type init =
   | Files of string list
 
 type initial_state =
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list
+  (Primitives.alg_expr * Primitives.elementary_rule) list
 
 type refined_compilation =
   (Ckappa_sig.agent, Ckappa_sig.mixture, Ckappa_sig.mixture, string,
@@ -272,7 +272,7 @@ type ('static,'dynamic) state =
     init : init ;
     env : Model.t option option ;
     contact_map_int : Contact_map.t option option;
-    init_state: initial_state option option ;
+    init_state: initial_state option ;
     compilation   : compilation option ;
     refined_compilation : refined_compilation option ;
     c_compil : Cckappa_sig.compil option ;

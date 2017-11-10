@@ -1721,36 +1721,35 @@ let lift_allowing_question_marks parameters handler =
      clean_question_marks parameters a c b)
 
 
-let translate_pert_init error a (alg,_) (c_alg,_) mixture c_mixture  _pos' =
+let translate_pert_init error (alg,_) (c_alg,_) mixture c_mixture  _pos' =
     error,
     {Cckappa_sig.e_init_factor = alg ;
      Cckappa_sig.e_init_c_factor = c_alg ;
      Cckappa_sig.e_init_mixture = mixture ;
-     Cckappa_sig.e_init_c_mixture = c_mixture ;
-     Cckappa_sig.e_init_string_pos = a}
+     Cckappa_sig.e_init_c_mixture = c_mixture }
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 
-let translate_pert parameters error handler a alg (mixture,pos') =
+let translate_pert parameters error handler alg (mixture,pos') =
   (*  let mixture = c_mixture.Cckappa_sig.c_mixture in*)
   let error,c_mixture,_ = translate_mixture parameters error handler mixture in
   let error, c_alg = alg_with_pos_map (lift_allowing_question_marks parameters handler) error alg in
-  translate_pert_init error a alg c_alg mixture c_mixture pos'
+  translate_pert_init error alg c_alg mixture c_mixture pos'
 
 
-let translate_init parameters error handler (a,(alg,pos_alg),init_t) =
+let translate_init parameters error handler ((alg,pos_alg),init_t) =
   let error,c_alg =
     Prepreprocess.alg_map
       (lift_allowing_question_marks parameters handler) error alg in
   match
     init_t
     with
-    | Ast.INIT_MIX mixture,pos' ->
+    | Ast.INIT_MIX (mixture,pos') ->
     let error,c_mixture,_ = translate_mixture parameters error handler mixture in
-    translate_pert_init error a
+    translate_pert_init error
       (alg,pos_alg) (c_alg,pos_alg) mixture c_mixture pos'
-    | Ast.INIT_TOK _,_ -> (*TO DO*)
+    | Ast.INIT_TOK _ -> (*TO DO*)
        let error,dft = Cckappa_sig.dummy_init parameters error in
        Exception.warn
          parameters error __POS__

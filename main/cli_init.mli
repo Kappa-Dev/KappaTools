@@ -13,7 +13,7 @@ val get_compilation :
   ?compileModeOn:bool -> ?kasim_args:Kasim_args.t -> Run_cli_args.t ->
   (Configuration.t * Counter.progressBar * Model.t * Contact_map.t * int list *
    (bool*bool*bool) option * string * string option *
-   (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list) *
+   (Primitives.alg_expr * Primitives.elementary_rule) list) *
   Counter.t
 
 val get_ast_from_list_of_files:
@@ -36,5 +36,5 @@ val get_compilation_from_preprocessed_ast :
   Run_cli_args.t -> preprocessed_ast ->
   (Configuration.t * Counter.progressBar * Model.t * Contact_map.t * int list *
    (bool*bool*bool) option * string * string option *
-   (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list) *
+   (Primitives.alg_expr * Primitives.elementary_rule) list) *
   Counter.t

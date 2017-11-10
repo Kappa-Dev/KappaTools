@@ -19,8 +19,7 @@ sig
   type rule
 
   type init =
-    ((connected_component array list,int) Alg_expr.e * rule
-     * Locality.t) list
+    ((connected_component array list,int) Alg_expr.e * rule) list
 
   val empty_cache: compil -> cache
 
@@ -183,12 +182,12 @@ sig
     Model.t ->
     Contact_map.t ->
     Pattern.PreEnv.t ->
-    ('b * Primitives.elementary_rule * 'c) list ->
+    ('b * Primitives.elementary_rule) list ->
     Pattern.PreEnv.t * Pattern.cc list
 
   val species_of_initial_state : compil ->
     cache ->
-    ('b * Primitives.elementary_rule * 'c) list ->
+    ('b * Primitives.elementary_rule) list ->
     cache * Pattern.cc list
 
   val detect_symmetries :

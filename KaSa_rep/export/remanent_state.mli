@@ -18,7 +18,7 @@ type init =
   | Files of string list
 
 type initial_state =
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list
+  (Primitives.alg_expr * Primitives.elementary_rule) list
 
 type internal_contact_map =
   (Ckappa_sig.c_state list *
@@ -151,7 +151,7 @@ val of_json: Yojson.Basic.json ->
 
 val create_state:
   ?errors:Exception.method_handler -> ?env:Model.t option ->
-  ?init_state:initial_state option -> ?reset:bool ->
+  ?init_state:initial_state -> ?reset:bool ->
   Remanent_parameters_sig.parameters -> init -> ('static, 'dynamic) state
 
 val set_parameters: Remanent_parameters_sig.parameters -> ('static, 'dynamic) state -> ('static, 'dynamic) state
@@ -169,11 +169,10 @@ val get_env: ('static, 'dynamic) state -> Model.t option option
 
 val set_env: Model.t option -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
-val get_init_state: ('static, 'dynamic) state -> initial_state option option
+val get_init_state: ('static, 'dynamic) state -> initial_state option
 
 val set_init_state:
-  initial_state option -> ('static, 'dynamic) state ->
-  ('static, 'dynamic) state
+  initial_state -> ('static, 'dynamic) state -> ('static, 'dynamic) state
 
 (*contact map int*)
 

@@ -816,7 +816,7 @@ let introduceable_species_in_pertubation parameter error f ((_,_,list,_),_) =
        match mixture_of_modif a
        with
        | Some (a,b) ->
-         let error, elt = f parameter error None a b in
+         let error, elt = f parameter error a b in
          error, elt::list
        | None -> error,list)
     (error,[])

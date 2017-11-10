@@ -31,7 +31,7 @@
 %token <int> INT
 %token <float> FLOAT
 %token <string> ID LABEL STRING
-%token <string> SPACE COMMENT UNKNOWN
+%token <string> SPACE COMMENT
 
 %start model
 %type <Ast.parsing_instruction list> model
@@ -461,19 +461,26 @@ variable_declaration:
     { raise (ExceptionDefn.Syntax_Error (add_pos 1 ("label expected"))) }
   ;
 
+id_list:
+  | ID annot { [ $1,rhs_pos 1 ] }
+  | ID annot COMMA annot id_list { ($1,rhs_pos 1) :: $5 }
+  ;
+
 init_declaration:
   | alg_expr pattern
     { let (v,_,_) = $1 in
       let (p,pend,_) = $2 in
-      (None,v,(Ast.INIT_MIX p,Locality.of_pos (start_pos 2) pend)) }
+      (v,Ast.INIT_MIX (p,Locality.of_pos (start_pos 2) pend)) }
   | alg_expr OP_PAR annot pattern CL_PAR annot
     { let (v,_,_) = $1 in
       let (p,pend,_) = $4 in
-      (None,v,(Ast.INIT_MIX p,Locality.of_pos (start_pos 4) pend)) }
-  | alg_expr ID annot
-    { let (v,_,_) = $1 in (None,v,(Ast.INIT_TOK $2,rhs_pos 2)) }
-  | ID OP_CUR annot init_declaration CL_CUR annot
-    { let (_,alg,init) = $4 in (Some ($1,rhs_pos 1),alg,init) }
+      (v,Ast.INIT_MIX (p,Locality.of_pos (start_pos 4) pend)) }
+  | alg_expr id_list
+    { let (v,_,_) = $1 in (v,Ast.INIT_TOK $2) }
+/*
+  | ID annot OP_CUR annot init_declaration CL_CUR annot
+    { let (_,alg,init) = $5 in (Some ($1,rhs_pos 1),alg,init) }
+*/
   | error
     { raise (ExceptionDefn.Syntax_Error
                (add_pos 1 "Malformed initial condition")) }
@@ -616,7 +623,7 @@ an algebraic expression is expected")) }
     { let (i,v,_,_) = $3 in add (Ast.DECLARE (i,v)) }
   | OBS annot variable_declaration { let (i,v,_,_) = $3 in add (Ast.OBS (i,v)) }
   | INIT annot init_declaration
-    { let (opt_vol,alg,init) = $3 in add (Ast.INIT (opt_vol,alg,init)) }
+    { let (alg,init) = $3 in add (Ast.INIT (alg,init)) }
   | PERT perturbation_declaration { add (Ast.PERT ($2, rhs_pos 2)) }
   | CONFIG annot STRING annot value_list
     { add (Ast.CONFIG (($3,rhs_pos 3),$5)) }

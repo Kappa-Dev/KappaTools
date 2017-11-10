@@ -214,7 +214,7 @@ let initial_inputs conf env contact_map init ~filename =
   let sigs = Model.signatures env in
   let () = Format.fprintf inputs_form "@.@[<v>%a@]@."
       (Pp.list Pp.space
-         (fun f (n,r,_) ->
+         (fun f (n,r) ->
             let ins_fresh,_,_ =
               Primitives.Transformation.raw_mixture_of_fresh
                 sigs r.Primitives.inserted in

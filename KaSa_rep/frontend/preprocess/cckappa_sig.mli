@@ -161,7 +161,6 @@ type enriched_init =
   {
     e_init_factor     : (Ckappa_sig.mixture,string) Alg_expr.e;
     e_init_c_factor   : (mixture,string) Alg_expr.e;
-    e_init_string_pos : string Locality.annot option;
     e_init_mixture    : Ckappa_sig.mixture;
     e_init_c_mixture  : mixture
   }

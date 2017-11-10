@@ -424,7 +424,7 @@ let pert_of_result
 let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
   let init_l,_ =
     List_util.fold_right_map
-      (fun (_opt_vol,alg,init_t) preenv -> (*TODO deal with volumes*)
+      (fun (alg,init_t) preenv ->
          let () =
            if Alg_expr.has_mix ~var_decls:(Model.get_alg env) (fst alg) then
              raise
@@ -435,7 +435,7 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
            | None -> alg
            | Some r -> Alg_expr.mult alg (Alg_expr.float r) in
          match init_t with
-         | INIT_MIX raw_mix,mix_pos ->
+         | INIT_MIX (raw_mix,mix_pos) ->
            let sigs = Model.signatures env in
            let (preenv',alg') =
              compile_alg ?bwd_bisim ~compileModeOn contact_map preenv alg in
@@ -453,7 +453,7 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
                  preenv' ~syntax_ref:0 (fake_rule,mix_pos)
              with
              | domain'',_,[ compiled_rule ] ->
-               (fst alg',compiled_rule,mix_pos),domain''
+               (fst alg',compiled_rule),domain''
              | _,_,_ ->
                raise (ExceptionDefn.Malformed_Decl
                         (Format.asprintf
@@ -461,10 +461,12 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
                            (Raw_mixture.print ~created:true ~sigs) raw_mix,
                          mix_pos)) in
            preenv'',state'
-         | INIT_TOK tk_id,pos_tk ->
+         | INIT_TOK tk_l ->
+           let r_delta_tokens =
+             List.map (fun (tk_id,_pos_tk) -> (alg,tk_id)) tk_l in
            let fake_rule = {
              LKappa.r_mix = []; LKappa.r_created = [];
-             LKappa.r_delta_tokens = [(alg, tk_id)];
+             LKappa.r_delta_tokens;
              LKappa.r_rate = Alg_expr.const Nbr.zero;
              LKappa.r_un_rate = None; LKappa.r_editStyle = false;
            } in
@@ -474,7 +476,7 @@ let compile_inits ?rescale ?bwd_bisim ~compileModeOn contact_map env inits =
                (Locality.dummy_annot fake_rule)
            with
            | domain'',_,[ compiled_rule ] ->
-             (Alg_expr.CONST Nbr.one,compiled_rule,pos_tk),domain''
+             (Alg_expr.CONST Nbr.one,compiled_rule),domain''
            | _,_,_ -> assert false
       ) inits (Pattern.PreEnv.empty (Model.signatures env)) in
   init_l

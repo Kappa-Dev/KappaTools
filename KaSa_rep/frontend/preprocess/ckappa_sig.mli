@@ -414,7 +414,7 @@ val introduceable_species_in_pertubation:
   Exception.method_handler ->
   (Remanent_parameters_sig.parameters ->
    Exception.method_handler ->
-   string Locality.annot option -> ('a, string) Alg_expr.e Locality.annot ->
+   ('a, string) Alg_expr.e Locality.annot ->
    'a Locality.annot -> Exception.method_handler * 'b) -> 'a perturbation ->
   Exception.method_handler * 'b list
 

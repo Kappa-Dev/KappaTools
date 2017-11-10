@@ -238,7 +238,8 @@ let compute_env_init
          Remanent_state.state)
   =
   match Remanent_state.get_init state with
-  | Remanent_state.Compil _compil -> state, None, None, None
+  | Remanent_state.Compil compil ->
+    state, None, None, None
   | Remanent_state.Files files ->
     let () = show_title state in
     let cli = Run_cli_args.default in
@@ -252,12 +253,12 @@ let compute_env_init
     in
     let state =
       Remanent_state.set_init_state
-        (Some init)
+        init
         (Remanent_state.set_env (Some env)
            (Remanent_state.set_contact_map_int
               (Some contactmap) state))
     in
-    state, Some (env:Model.t), Some (init), Some (contactmap)
+    state, Some (env:Model.t), Some init, Some (contactmap)
 
 let compute_env show_title state =
   let state, env, _, _ = compute_env_init show_title state in
@@ -276,7 +277,7 @@ let compute_init show_title state =
 let get_init =
   get_gen
     ~phase:StoryProfiling.LKappa_signature
-    Remanent_state.get_init_state
+    (fun x -> Some (Remanent_state.get_init_state x))
     compute_init
 
 (******************************************************************)

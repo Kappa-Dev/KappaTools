@@ -124,22 +124,18 @@ type ('pattern,'id) variable_def =
   string Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot
 
 type ('mixture,'id) init_t =
-  | INIT_MIX of 'mixture
-  | INIT_TOK of 'id
+  | INIT_MIX of 'mixture Locality.annot
+  | INIT_TOK of 'id Locality.annot list
 
 type ('pattern,'mixture,'id) init_statment =
-  string Locality.annot option *
-  ('pattern,'id) Alg_expr.e Locality.annot *
-  ('mixture,'id) init_t Locality.annot
+  (*  string Locality.annot option * (*volume*)*)
+  ('pattern,'id) Alg_expr.e Locality.annot * ('mixture,'id) init_t
 
 type ('agent,'pattern,'mixture,'id,'rule) instruction =
   | SIG      of 'agent
   | TOKENSIG of string Locality.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
-  | INIT     of
-      (string Locality.annot option *
-      ('pattern,'id) Alg_expr.e Locality.annot *
-      ('mixture,'id) init_t Locality.annot)
+  | INIT     of ('pattern,'mixture,'id) init_statment
   (*volume, init, position *)
   | DECLARE  of ('pattern,'id) variable_def
   | OBS      of ('pattern,'id) variable_def (*for backward compatibility*)
@@ -168,10 +164,7 @@ type ('agent,'pattern,'mixture,'id,'rule) compil =
     observables :
       ('pattern,'id) Alg_expr.e Locality.annot list;
     (*list of patterns to plot*)
-    init :
-      (string Locality.annot option *
-       ('pattern,'id) Alg_expr.e Locality.annot *
-       ('mixture,'id) init_t Locality.annot) list;
+    init : ('pattern,'mixture,'id) init_statment list;
     (*initial graph declaration*)
     perturbations :
       ('pattern,'mixture,'id) perturbation list;
@@ -471,13 +464,19 @@ let agent_of_json filenames = function
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
-let init_to_json f_mix f_var = function
-  | INIT_MIX m -> `List [`String "mixture"; f_mix m ]
-  | INIT_TOK t -> `List [`String "token"; f_var t ]
+let init_to_json ~filenames f_mix f_var = function
+  | INIT_MIX m ->
+    `List [`String "mixture"; Locality.annot_to_yojson ~filenames f_mix m ]
+  | INIT_TOK t ->
+    `List [`String "token";
+           JsonUtil.of_list (Locality.annot_to_yojson ~filenames f_var) t ]
 
-let init_of_json f_mix f_var = function
-  | `List [`String "mixture"; m ] -> INIT_MIX (f_mix m)
-  | `List [`String "token"; t ] -> INIT_TOK (f_var t)
+let init_of_json ~filenames f_mix f_var = function
+  | `List [`String "mixture"; m ] ->
+    INIT_MIX (Locality.annot_of_yojson ~filenames f_mix m)
+  | `List [`String "token"; t ] ->
+    INIT_TOK (JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "INIT_TOK")
+    (Locality.annot_of_yojson ~filenames f_var) t)
   | x -> raise (Yojson.Basic.Util.Type_error ("Invalid Ast init statement",x))
 
 let print_tok pr_mix pr_tok pr_var f ((nb,_),(n,_)) =
@@ -884,8 +883,9 @@ let merge_tokens =
 let sig_from_inits =
   List.fold_left
     (fun (ags,toks) -> function
-       | _,_,(INIT_MIX m,_) -> (merge_agents ags m,toks)
-       | _,na,(INIT_TOK t,pos) -> (ags,merge_tokens toks [na,(t,pos)]))
+       | _,INIT_MIX (m,_) -> (merge_agents ags m,toks)
+       | na,INIT_TOK l ->
+         (ags,merge_tokens toks (List.map (fun x -> (na,x)) l)))
 
 let sig_from_rules =
   List.fold_left
@@ -992,9 +992,8 @@ let compil_to_json c =
         (JsonUtil.of_pair
            (Locality.annot_to_yojson ~filenames
               (Alg_expr.e_to_yojson ~filenames mix_to_json var_to_json))
-           (Locality.annot_to_yojson ~filenames
-              (init_to_json mix_to_json var_to_json)))
-        (List.map (fun (_,a,i) -> (a,i)) c.init);
+           (init_to_json ~filenames mix_to_json var_to_json))
+        c.init;
       "perturbations", JsonUtil.of_list
         (Locality.annot_to_yojson ~filenames
            (fun (alarm,pre,modif,post) ->
@@ -1058,15 +1057,12 @@ let compil_of_json = function
                  (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
               (List.assoc "observables" l);
           init =
-            List.map
-              (fun (a,i) -> (None,a,i))
-              (JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST init")
-                 (JsonUtil.to_pair
-                    (Locality.annot_of_yojson ~filenames
-                       (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
-                    (Locality.annot_of_yojson ~filenames
-                       (init_of_json mix_of_json var_of_json)))
-                 (List.assoc "init" l));
+            JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST init")
+              (JsonUtil.to_pair
+                 (Locality.annot_of_yojson ~filenames
+                    (Alg_expr.e_of_yojson ~filenames mix_of_json var_of_json))
+                 (init_of_json ~filenames mix_of_json var_of_json))
+              (List.assoc "init" l);
           perturbations =
             JsonUtil.to_list ~error_msg:(JsonUtil.build_msg "AST perturbations")
               (Locality.annot_of_yojson

@@ -123,13 +123,11 @@ type ('pattern,'id) variable_def =
   string Locality.annot * ('pattern,'id) Alg_expr.e Locality.annot
 
 type ('mixture,'id) init_t =
-  | INIT_MIX of 'mixture
-  | INIT_TOK of 'id
+  | INIT_MIX of 'mixture Locality.annot
+  | INIT_TOK of 'id Locality.annot list
 
 type ('pattern,'mixture,'id) init_statment =
-  string Locality.annot option *
-  ('pattern,'id) Alg_expr.e Locality.annot *
-  ('mixture,'id) init_t Locality.annot
+  ('pattern,'id) Alg_expr.e Locality.annot * ('mixture,'id) init_t
 
 type ('agent,'pattern,'mixture,'id,'rule) instruction =
   | SIG      of 'agent

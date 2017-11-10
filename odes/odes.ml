@@ -1176,9 +1176,9 @@ struct
   let get_reactions network = network.reactions
 
   let convert_initial_state parameters compil intro network =
-    let b,c,a = intro in
+    let b,c = intro in
     let network, expr_init =
-      convert_alg_expr parameters compil network (b,a)
+      convert_alg_expr parameters compil network (Locality.dummy_annot b)
     in
     expr_init,
     match I.token_vector_of_init c with
@@ -1395,7 +1395,7 @@ struct
     let cache = network.cache in
     let cache, list =
       List.fold_left
-        (fun (cache,list) (_,r,_) ->
+        (fun (cache,list) (_,r) ->
            let b = I.mixture_of_init compil r in
            let cache', acc =
              I.connected_components_of_mixture compil cache b

@@ -19,7 +19,7 @@ val initialize :
   bind:('a -> (bool * Rule_interpreter.t * t -> 'a) -> 'a) ->
   return:(bool * Rule_interpreter.t * t -> 'a) -> outputs:(Data.t -> unit) ->
   Model.t -> Counter.t -> Rule_interpreter.t -> t ->
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list ->
+  (Primitives.alg_expr * Primitives.elementary_rule) list ->
   'a
 (** [initial env counter graph state] builds up the initial state *)
 

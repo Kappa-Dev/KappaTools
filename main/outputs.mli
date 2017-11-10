@@ -14,7 +14,7 @@ val initialize :
 
 val initial_inputs :
   Configuration.t -> Model.t -> Contact_map.t ->
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list ->
+  (Primitives.alg_expr * Primitives.elementary_rule) list ->
   filename:string -> unit
 
 val input_modifications : Model.t -> int -> Primitives.modification list -> unit

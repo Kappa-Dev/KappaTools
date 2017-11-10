@@ -77,7 +77,10 @@ rule token = parse
     | "obs" -> OBS
     | "def" -> CONFIG
     | "token" -> TOKEN
-    | _ as s -> UNKNOWN s
+    | _ as s -> raise (ExceptionDefn.Syntax_Error
+      ("Unknown directive: "^s,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))
     }
   | '[' blank* '?' blank* ']' { THEN }
   | '[' blank* ':' blank* ']' { ELSE }
@@ -103,7 +106,10 @@ rule token = parse
     | "Emax" -> EMAX
     | "Tmax" -> TMAX
     | "not" -> NOT
-    | _ as s -> UNKNOWN s
+    | _ as s -> raise (ExceptionDefn.Syntax_Error
+      ("Unknown primitive: "^s,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))
     }
   | '$' (id as s) {
     match s with
@@ -119,7 +125,10 @@ rule token = parse
     | "PLOTENTRY" -> PLOTENTRY
     | "RUN" -> RUN
     | "SPECIES_OF" -> SPECIES_OF
-    | s -> UNKNOWN s
+    | s -> raise (ExceptionDefn.Syntax_Error
+      ("Unknown intervention: "^s,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))
     }
   | eof { lexbuf.Lexing.lex_eof_reached <- true; EOF }
   | _ as c { raise (ExceptionDefn.Syntax_Error

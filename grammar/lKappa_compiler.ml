@@ -1026,15 +1026,18 @@ let perturbation_of_ast
   up_vars'
 
 let init_of_ast ~syntax_version sigs tok contact_map = function
-  | Ast.INIT_MIX who,pos ->
+  | Ast.INIT_MIX (who,pos) ->
     Ast.INIT_MIX
-      (raw_mixture_of_ast ~syntax_version sigs ~contact_map who),pos
-  | Ast.INIT_TOK lab,pos ->
-    match Mods.StringMap.find_option lab tok with
-    | Some x -> Ast.INIT_TOK x,pos
-    | None ->
-      raise (ExceptionDefn.Malformed_Decl
-               (lab ^" is not a declared token",pos))
+      (raw_mixture_of_ast ~syntax_version sigs ~contact_map who,pos)
+  | Ast.INIT_TOK lab ->
+    Ast.INIT_TOK
+      (List.map (fun (lab,pos) ->
+           match Mods.StringMap.find_option lab tok with
+           | Some x -> x,pos
+           | None ->
+             raise (ExceptionDefn.Malformed_Decl
+                      (lab ^" is not a declared token",pos)))
+          lab)
 
 let add_un_variable k_un acc rate_var =
   match k_un with
@@ -1227,6 +1230,12 @@ let create_sig l =
       l ([],[]) in
   Signature.create ~counters with_contact_map sigs
 
+let init_of_ast ~syntax_version sigs contact_map tok algs inits =
+  List.map (fun (expr,ini) ->
+      alg_expr_of_ast ~syntax_version sigs tok algs expr,
+      init_of_ast ~syntax_version sigs tok contact_map ini)
+    inits
+
 let compil_of_ast ~syntax_version overwrite c =
   let (c,with_counters) = Counters_compiler.compile c in
   let c =
@@ -1302,22 +1311,13 @@ let compil_of_ast ~syntax_version overwrite c =
           alg_expr_of_ast ~syntax_version sigs tok algs expr)
         c.Ast.observables;
     Ast.init =
-      List.map (fun (lab,expr,ini) ->
-          lab,alg_expr_of_ast ~syntax_version sigs tok algs expr,
-          init_of_ast ~syntax_version sigs tok contact_map ini)
-        c.Ast.init;
+      init_of_ast ~syntax_version sigs contact_map tok algs c.Ast.init;
     Ast.perturbations = perts'';
     Ast.volumes = c.Ast.volumes;
     Ast.tokens = c.Ast.tokens;
     Ast.signatures = c.Ast.signatures;
     Ast.configurations = c.Ast.configurations;
   }
-
-let init_of_ast ~syntax_version sigs contact_map tok algs inits =
-  List.map (fun (lab,expr,ini) ->
-      lab,alg_expr_of_ast ~syntax_version sigs tok algs expr,
-      init_of_ast ~syntax_version sigs tok contact_map ini)
-    inits
 
 let of_user_graph sigs g =
   let out,_ =

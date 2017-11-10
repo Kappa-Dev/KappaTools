@@ -426,13 +426,13 @@ let compute_initial_state error static =
             Ckappa_sig.introduceable_species_in_pertubation
               parameters
               error
-              (fun p e a (alg,pos) (mixture,pos')->
+              (fun p e (alg,pos) (mixture,pos')->
                  let mixture' = mixture.Cckappa_sig.c_mixture in
                  let e,alg' =
                    Prepreprocess.alg_map
                      (fun e m -> e,m.Cckappa_sig.c_mixture) e alg in
                  Preprocess.translate_pert
-                   p e kappa_handler a
+                   p e kappa_handler
                    (alg',pos)
                    (mixture',pos') )
                 perturbation

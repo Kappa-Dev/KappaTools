@@ -201,7 +201,7 @@ let do_modifications ~outputs env counter graph state list =
 let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
   let mgraph =
     List.fold_left
-      (fun mstate (alg,compiled_rule,pos) ->
+      (fun mstate (alg,compiled_rule) ->
          bind
            mstate
            (fun (stop,state,state0) ->
@@ -226,7 +226,7 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                      | Rule_interpreter.Success s -> s
                      | (Rule_interpreter.Clash | Rule_interpreter.Corrected | Rule_interpreter.Blocked) ->
                        raise (ExceptionDefn.Internal_Error
-                                ("Bugged initial rule",pos)))
+                                (Locality.dummy_annot "Bugged initial rule")))
                   state value,state0))) (return (false,graph0,state0)) init_l in
   bind
     mgraph

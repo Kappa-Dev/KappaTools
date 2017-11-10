@@ -689,12 +689,15 @@ let refine_token parameters error token =
   error,token
 
 let refine_init_t parameters error = function
-  | Ast.INIT_MIX mixture,pos ->
+  | Ast.INIT_MIX (mixture,pos) ->
     let error,mixture = refine_mixture parameters error mixture in
-    error,(Ast.INIT_MIX mixture,pos)
-  | Ast.INIT_TOK token,pos ->
-    let error,(token,_) = refine_token parameters error (token,pos) in
-    error,(Ast.INIT_TOK token,pos)
+    error,(Ast.INIT_MIX (mixture,pos))
+  | Ast.INIT_TOK tk_l ->
+    let tk_l',error =
+      List_util.fold_right_map
+        (fun x error -> let (a,b) = refine_token parameters error x in (b,a))
+        tk_l error in
+    error,(Ast.INIT_TOK tk_l')
 
 let refine_agent parameters error agent_set agent =
   let error,agent_set =
@@ -899,11 +902,11 @@ let translate_compil parameters error compil =
   in
   let error,init_rev =
     List.fold_left
-      (fun (error,list) (id,alg_ex,init_t) ->
+      (fun (error,list) (alg_ex,init_t) ->
          let error,alg =
            alg_with_pos_map (refine_mixture parameters) error alg_ex in
          let error,init = refine_init_t parameters error init_t in
-         error,(id,alg,init)::list)
+         error,(alg,init)::list)
       (error,[])
       compil.Ast.init in
   let error,perturbations_rev =

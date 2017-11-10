@@ -10,11 +10,13 @@ module SyntacticRuleSetMap = Mods.IntSetMap
 type preprocessed_ast = Cli_init.preprocessed_ast
 type ast = Ast.parsing_compil
 
+type init = (Primitives.alg_expr * rule) list
+
 type compil =
   {
     contact_map: (int list * (int * int) list) array array ;
     environment: Model.t ;
-    init: (Primitives.alg_expr * rule * Locality.t) list;
+    init: init;
     rule_rate_convention: Remanent_parameters_sig.rate_convention ;
     reaction_rate_convention: Remanent_parameters_sig.rate_convention option;
     show_reactions: bool ;
@@ -104,8 +106,6 @@ let get_sym_cache cache = cache.representative_cache
 
 let set_sym_cache sym_cache cache =
   {cache with representative_cache = sym_cache}
-
-type init = (Primitives.alg_expr * rule * Locality.t) list
 
 let get_init compil= compil.init
 
@@ -622,7 +622,7 @@ let species_of_initial_state_env env contact_map_int cache list =
   let sigs = Model.signatures env in
   let cache, list =
     List.fold_left
-      (fun (cache,list) (_,r,_) ->
+      (fun (cache,list) (_,r) ->
          let b = mixture_of_init_sigs env r in
          let cache', acc =
            connected_components_of_mixture_sigs sigs cache

@@ -34,12 +34,12 @@ val compile_inits:
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool -> Contact_map.t -> Model.t ->
   (LKappa.rule_mixture, Raw_mixture.t, int) Ast.init_statment list ->
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list
+  (Primitives.alg_expr * Primitives.elementary_rule) list
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
   return:(Model.t * bool (*has_tracking*) *
-          (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list -> 'b) ->
+          (Primitives.alg_expr * Primitives.elementary_rule) list -> 'b) ->
   max_sharing:bool ->
   ?bwd_bisim:LKappa_group_action.bwd_bisim_info ->
   compileModeOn:bool ->
@@ -53,4 +53,4 @@ val build_initial_state :
   return:(bool * Rule_interpreter.t * State_interpreter.t -> 'a) ->
   outputs:(Data.t -> unit) -> Counter.t -> Model.t -> with_trace:bool ->
   with_delta_activities:bool -> Random.State.t ->
-  (Primitives.alg_expr * Primitives.elementary_rule * Locality.t) list -> 'a
+  (Primitives.alg_expr * Primitives.elementary_rule) list -> 'a

@@ -76,8 +76,8 @@ start_rule:
 			 {r with Ast.tokens=str_pos::r.Ast.tokens}
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 {r with Ast.volumes=(vol_type,vol,vol_param)::r.Ast.volumes}
-		      | Ast.INIT (opt_vol,alg,init_t) ->
-			 {r with Ast.init=(opt_vol,alg,init_t)::r.Ast.init}
+		      | Ast.INIT (alg,init_t) ->
+			 {r with Ast.init=(alg,init_t)::r.Ast.init}
 		      | Ast.DECLARE var ->
 			 {r with Ast.variables = var::r.Ast.variables}
 		      | Ast.OBS ((lbl,pos),_ as var) ->
@@ -106,8 +106,7 @@ instruction:
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
-    | INIT init_declaration
-	   {let (opt_vol,alg,init) = $2 in Ast.INIT (opt_vol,alg,init)}
+    | INIT init_declaration {Ast.INIT $2}
     | INIT error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Malformed initial condition"))}
@@ -124,13 +123,11 @@ instruction:
 
 init_declaration:
     | alg_expr non_empty_mixture
-    { (None,$1,(Ast.INIT_MIX $2,rhs_pos 2)) }
+    { ($1,Ast.INIT_MIX ($2,rhs_pos 2)) }
     | alg_expr OP_PAR non_empty_mixture CL_PAR
-    { (None,$1,(Ast.INIT_MIX $3, rhs_pos 3)) }
-    | ID LAR alg_expr {(None,$3,(Ast.INIT_TOK $1,rhs_pos 1))}
-    | alg_expr ID {(None,$1,(Ast.INIT_TOK $2,rhs_pos 2))}
-    | ID OP_CUR init_declaration CL_CUR
-	 {let _,alg,init = $3 in (Some ($1,rhs_pos 1),alg,init)}
+    { ($1,Ast.INIT_MIX ($3, rhs_pos 3)) }
+    | ID LAR alg_expr {($3,Ast.INIT_TOK [$1,rhs_pos 1])}
+    | alg_expr ID {($1,Ast.INIT_TOK [$2,rhs_pos 2])}
     ;
 
 value_list:
