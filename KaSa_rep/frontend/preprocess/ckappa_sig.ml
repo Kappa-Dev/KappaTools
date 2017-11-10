@@ -431,34 +431,80 @@ let rec join_mixture parameters error mixture1 mixture2 =
 (*ADD*)
 (**********************************************************)
 
-let add_link parameters error agent_id agent_name site agent_id' link =
+(*let id_of_binding_type
+    parameter error handler_kappa
+    agent_type site agent_type' site' =
+  let state = C_Lnk_type (agent_type',site') in
+  let error, state_dic =
+    Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter error
+      (agent_type,site)
+      handler_kappa.states_dic
+  in
+  match state_dic with
+  | None ->
+    Exception.warn
+      parameter error __POS__
+      Exit dummy_state_index
+  | Some state_dic ->
+    begin
+      let error, bool =
+        Dictionary_of_States.member
+          parameter error
+          (Binding state)
+          state_dic
+      in
+      if not bool then
+        Exception.warn
+          parameter error __POS__
+          ~message:("agent "^(string_of_int (int_of_agent_name agent_type))^" site"^
+                    (string_of_int (int_of_site_name site))^"agent "^
+                    (string_of_int (int_of_agent_name agent_type'))^" site"^
+                    (string_of_int (int_of_site_name site')))
+          Exit dummy_state_index
+      else
+        match
+          Dictionary_of_States.allocate
+            parameter error
+            compare_unit_state_index
+            (Binding state)
+            ()
+            Misc_sa.const_unit
+            state_dic
+        with
+        | error, None ->
+          Exception.warn
+            parameter error __POS__
+            Exit dummy_state_index
+        | error, (Some (a,_,_,_)) ->
+          error, a
+    end*)
+
+let add_link error agent_id agent_type site link =
   match link with
-  | LNK_VALUE (_ag, _x, _y, _ag', position) ->
-    error, LNK_VALUE (agent_id, agent_name, site, agent_id', position)
+  | LNK_VALUE (agent_id', agent_type', site', agent_id'', position) ->
+    (*CHECK ag'?*)
+    error, LNK_VALUE (agent_id, agent_type, site, agent_id'', position)
   | FREE | LNK_ANY _ | LNK_SOME _ | LNK_TYPE _ -> error, link
 
-let add_port parameters error agent_id agent_name site agent_id' port =
-  let error, port_lnk =
-    add_link parameters error
-      agent_id agent_name site agent_id' port.port_lnk
-  in
+let add_port error port_lnk port =
   error,
   {
     port with
     port_lnk = port_lnk
   }
 
-let rec add_interface parameters error agent_id agent_name site agent_id' interface =
+let rec add_interface parameters error interface =
   let error', agent_interface =
     match interface with
     | EMPTY_INTF ->
       Exception.warn parameters error __POS__ Exit EMPTY_INTF
     | PORT_SEP (port, interface)->
       let error, new_port =
-        add_port parameters error agent_id agent_name site agent_id' port
+        add_port error port.port_lnk port
       in
       let error, new_interface  =
-        add_interface parameters error agent_id agent_name site agent_id' interface
+        add_interface parameters error interface
       in
       error, PORT_SEP (new_port, new_interface)
   in
@@ -468,10 +514,9 @@ let rec add_interface parameters error agent_id agent_name site agent_id' interf
   in
   error, agent_interface
 
-let add_agent parameters error agent_id agent_name site agent_id' agent mixture =
+let add_agent parameters error agent_name agent =
   let error, agent_interface =
-    add_interface parameters error
-      agent_id agent_name site agent_id' agent.ag_intf
+    add_interface parameters error agent.ag_intf
   in
   error,
   {
@@ -480,84 +525,29 @@ let add_agent parameters error agent_id agent_name site agent_id' agent mixture 
     ag_intf = agent_interface
   }
 
-(*let add_mixture parameters error agent_id mixture =
-  let rec aux parameters error agent_id mixture =
-    match mixture with
-    | SKIP mixture -> aux parameters error agent_id mixture
-    | COMMA (agent, mixture) ->
-      let error, agent =
-        add_agent parameters error agent_id agent
-      in
-      let error, mixture =
-        aux parameters error agent_id mixture
-      in
-      error, COMMA (agent, mixture)
-    | DOT (id, agent, mixture) ->
-      if agent_id = id
-      then
-        let error, agent =
-          add_agent parameters error agent_id agent
-        in
-        let error, mixture =
-          aux parameters error agent_id mixture
-        in
-        error, DOT (agent_id, agent, mixture)
-      else
-        let error, agent =
-          add_agent parameters error agent_id agent
-        in
-        let error, mixture =
-          aux parameters error agent_id mixture
-        in
-        error, DOT (agent_id, agent, mixture)
-    | PLUS (id, agent, mixture) ->
-      if id = agent_id
-      then
-        let error, agent =
-          add_agent parameters error agent_id agent
-        in
-        let error, mixture =
-          aux parameters error agent_id mixture
-        in
-        error, PLUS (agent_id, agent, mixture)
-      else
-        let error, agent =
-          add_agent parameters error agent_id agent
-        in
-        let error, mixture =
-          aux parameters error agent_id mixture
-        in
-        error, PLUS (agent_id, agent, mixture)
-    | EMPTY -> error, EMPTy
-  in
-  aux parameters error agent_id mixture*)
-
-let add_mixture parameters error agent_id agent_name site agent_id' mixture =
+let add_mixture parameters error agent_name mixture =
   let error', mixture =
     let rec aux parameters error mixture =
       match mixture with
       | SKIP mixture -> aux parameters error mixture
-      | COMMA (agent, mixture)->
+      | COMMA (agent, mixture) ->
         let error, agent =
-          add_agent parameters error agent_id agent_name
-            site agent_id' agent mixture
+          add_agent parameters error agent_name agent
         in
         let error, mixture = aux parameters error mixture in
         error, COMMA (agent, mixture)
-      | DOT (id, agent, mixture)->
+      | DOT (id, agent, mixture) ->(*CHECK new agent_id?*)
         let error, agent =
-          add_agent parameters error agent_id agent_name site
-            agent_id' agent mixture
+          add_agent parameters error agent_name agent
         in
         let error, mixture = aux parameters error mixture in
-        error, DOT (agent_id, agent, mixture)
+        error, DOT (id, agent, mixture)
       | PLUS (id, agent, mixture) ->
         let error, agent =
-          add_agent parameters error agent_id agent_name site
-            agent_id' agent mixture
+          add_agent parameters error agent_name agent
         in
         let error, mixture = aux parameters error mixture in
-        error, PLUS (agent_id, agent, mixture)
+        error, PLUS (id, agent, mixture)
       | EMPTY_MIX -> error, EMPTY_MIX
     in
     aux parameters error mixture

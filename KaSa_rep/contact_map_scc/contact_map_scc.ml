@@ -143,97 +143,100 @@ let mixture_of_edge
        A(x!1), B(x!1, y!2), C(x!2)
        ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
     *)
-    (*get agend_id of ag(st!1)*)
-    (*let error, init_views =
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
-        parameters error
-        0
-    in
     let fresh_agent_id = Ckappa_sig.dummy_agent_id in
     let ag_id' = Ckappa_sig.next_agent_id fresh_agent_id in
     let ag_id'' = Ckappa_sig.next_agent_id ag_id' in
     let ag_id''' = Ckappa_sig.next_agent_id ag_id'' in
-    (*build bond *)
-    let site_address1 =
-      {
-        Cckappa_sig.agent_index = fresh_agent_id;
-        Cckappa_sig.site = st;
-        Cckappa_sig.agent_type = ag;
-      }
+    let error, mixture = Preprocess.empty_mixture parameters error in
+    let error, mixture =
+      Cckappa_sig.add_mixture parameters error
+        fresh_agent_id
+        ag
+        mixture
     in
-    let error, site_map1 =
-      Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-        parameters error
-        st
-        site_address1
-        Ckappa_sig.Site_map_and_set.Map.empty
+    let error, c_mixture =
+      Ckappa_sig.add_mixture parameters error
+        (Ckappa_sig.string_of_agent_name ag)
+        mixture.Cckappa_sig.c_mixture
     in
-    let site_address2 =
-      {
-        Cckappa_sig.agent_index = ag_id';
-        Cckappa_sig.site = st';
-        Cckappa_sig.agent_type = ag';
-      }
-    in
-    let error, site_map2 =
-    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters error
-      st'
-      site_address2
-      site_map1
-    in
-    let site_address3 =
-      {
-        Cckappa_sig.agent_index = ag_id'';
-        Cckappa_sig.site = st'';
-        Cckappa_sig.agent_type = ag'';
-      }
-    in
-    let error, site_map3 =
-    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters error
-      st''
-      site_address3
-      site_map2
-    in
-    let site_address4 =
-      {
-        Cckappa_sig.agent_index = ag_id''';
-        Cckappa_sig.site = st''';
-        Cckappa_sig.agent_type = ag''';
-      }
-    in
-    let error, site_map4 =
-    Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-      parameters error
-      st'''
-      site_address4
-      site_map3
-    in
-    let error, init_bonds =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
-      parameters error
-      0
+    let error, views =
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameters error
+          fresh_agent_id
+          mixture.Cckappa_sig.views
+      with
+      | error, None ->
+        let error, empty =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
+            error 0
+        in
+        Exception.warn parameters error __POS__ Exit
+          empty
+      | error, Some agent ->
+        let error, agent =
+          Cckappa_sig.add_agent parameters
+            error
+            fresh_agent_id
+            ag
+            st
+            agent
+        in
+        let error, views =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+            parameters
+            error
+            fresh_agent_id
+            agent
+            mixture.Cckappa_sig.views
+        in
+        error, views
     in
     let error, bonds =
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-        parameters error
-        ag_id'''
-        site_map4
-        init_bonds
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameters error fresh_agent_id
+          mixture.Cckappa_sig.bonds
+      with
+      | error, None ->
+        let error, empty =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
+            error 0
+        in
+        Exception.warn parameters error __POS__ Exit
+          empty
+      | error, Some site_map ->
+        let error, site_address =
+          Cckappa_sig.add_site_address parameters error
+            fresh_agent_id
+            ag
+            st
+        in
+        let error, site_map =
+          Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+            parameters
+            error
+            st
+            site_address
+            site_map
+        in
+        let error, bonds =
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+            parameters
+            error
+            fresh_agent_id
+            site_map
+            mixture.Cckappa_sig.bonds
+        in
+        error, bonds
     in
-    let error, mixture =
-      error,
-      {
-        Cckappa_sig.views = init_views;
-        Cckappa_sig.bonds = bonds;
-        Cckappa_sig.plus = [];
-        Cckappa_sig.dot = [];
-        Cckappa_sig.c_mixture = Ckappa_sig.EMPTY_MIX
-      }
-      in*)
-    let error, mixture = Preprocess.empty_mixture parameters error in
-    error, mixture
+    error,
+    {
+      mixture with
+      c_mixture = c_mixture;
+      views = views;
+      bonds = bonds;
+    }
 
 (* *)
 exception Pass of Exception.method_handler

@@ -56,17 +56,6 @@ type 'interface proper_agent =
     agent_position  : Ckappa_sig.position
   }
 
-val upgrade_interface:
-  'a interface proper_agent -> 'b interface ->
-  'b interface proper_agent
-
-val map_agent: ('a -> 'b) -> 'a interface proper_agent ->
-  'b interface proper_agent
-
-val upgrade_some_interface:
-  'a Ckappa_sig.Site_map_and_set.Map.t proper_agent ->
-  'a option Ckappa_sig.Site_map_and_set.Map.t proper_agent
-
 type site_address =
   {
     agent_index : Ckappa_sig.c_agent_id;
@@ -75,9 +64,6 @@ type site_address =
   }
 
 type bond = site_address * site_address
-
-val build_address: Ckappa_sig.c_agent_id -> Ckappa_sig.c_agent_name ->
-  Ckappa_sig.c_site_name -> site_address
 
 module Address_map_and_set: Map_wrapper.S_with_logs
   with type elt = site_address
@@ -119,54 +105,6 @@ type mixture =
     dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
   }
 
-val max_state_index :
-  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
-
-val min_state_index :
-  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
-
-(*val add_agent :
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
-  agent ->
-  Ckappa_sig.c_agent_name ->
-  mixture ->
-  Exception.method_handler *
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key *
-  mixture
-
-val add_bond_to :
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.key ->
-  Ckappa_sig.c_agent_name ->
-  Ckappa_sig.c_site_name ->
-  mixture ->
-  Exception.method_handler * mixture*)
-
-val rename_mixture: Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   Ckappa_sig.c_agent_id ->
-   Exception.method_handler * Ckappa_sig.c_agent_id) ->
-  mixture ->
-  Exception.method_handler * mixture
-
-val join_mixture: Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   Ckappa_sig.c_agent_id ->
-   Exception.method_handler * Ckappa_sig.c_agent_id) ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   Ckappa_sig.c_agent_id ->
-   Exception.method_handler * Ckappa_sig.c_agent_id) ->
-   mixture -> mixture ->
-  Exception.method_handler * mixture
-
 type enriched_variable =
   {
     e_id       : string * Ckappa_sig.position ;
@@ -184,7 +122,6 @@ type actions =
     half_break : (site_address * (Ckappa_sig.c_state interval option)) list
   }
 
-val empty_actions: actions
 
 type rule =
   {
@@ -229,8 +166,6 @@ type enriched_init =
     e_init_c_mixture  : mixture
   }
 
-val dummy_init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * enriched_init
-
 type compil =
   {
     variables : enriched_variable Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
@@ -247,3 +182,87 @@ type compil =
     perturbations :
       mixture Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t
   }
+
+(**********************************************************)
+val empty_actions: actions
+
+val dummy_init:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  Exception.method_handler * enriched_init
+
+val upgrade_interface:
+  'a interface proper_agent -> 'b interface ->
+  'b interface proper_agent
+
+val map_agent: ('a -> 'b) -> 'a interface proper_agent ->
+  'b interface proper_agent
+
+val upgrade_some_interface:
+  'a Ckappa_sig.Site_map_and_set.Map.t proper_agent ->
+  'a option Ckappa_sig.Site_map_and_set.Map.t proper_agent
+
+val build_address: Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_site_name -> site_address
+
+val max_state_index :
+  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
+
+val min_state_index :
+  Ckappa_sig.c_state -> Ckappa_sig.c_state -> Ckappa_sig.c_state
+
+val rename_mixture: Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+  mixture ->
+  Exception.method_handler * mixture
+
+val join_mixture: Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.c_agent_id ->
+   Exception.method_handler * Ckappa_sig.c_agent_id) ->
+   mixture -> mixture ->
+  Exception.method_handler * mixture
+
+val add_agent : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
+  agent -> Exception.method_handler * agent
+
+val add_views : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_agent_id ->
+  views -> Exception.method_handler * views
+
+val add_site_address : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
+  Exception.method_handler * site_address
+
+val add_site_map : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_site_name ->
+  site_address Ckappa_sig.Site_map_and_set.Map.t ->
+  Exception.method_handler *
+  site_address Ckappa_sig.Site_map_and_set.Map.t
+
+val add_bonds: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_agent_id ->
+  site_address Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t ->
+  Exception.method_handler *
+  site_address Ckappa_sig.Site_map_and_set.Map.t
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
+
+val add_mixture : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_agent_name -> mixture ->
+  Exception.method_handler * mixture

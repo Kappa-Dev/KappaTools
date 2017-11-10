@@ -137,38 +137,6 @@ and link =
   | LNK_SOME  of position
   | LNK_TYPE  of (string Locality.annot * string Locality.annot)
 
-val rename_link:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   c_agent_id ->
-   Exception.method_handler * c_agent_id) ->
-  link ->
-  Exception.method_handler * link
-
-val rename_mixture:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  (Remanent_parameters_sig.parameters ->
-   Exception.method_handler ->
-   c_agent_id ->
-   Exception.method_handler * c_agent_id) ->
-  mixture ->
-  Exception.method_handler * mixture
-
-val join_link:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  link -> link ->
-  Exception.method_handler * link
-
-val join_mixture:
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  mixture -> mixture ->
-  Exception.method_handler * mixture
-
 type direction = Direct | Reverse
 
 type 'pattern rule =
@@ -209,6 +177,62 @@ type ('a,'b) site_type =
 type site  = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type
+
+val rename_link:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   c_agent_id ->
+   Exception.method_handler * c_agent_id) ->
+  link ->
+  Exception.method_handler * link
+
+val rename_mixture:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   c_agent_id ->
+   Exception.method_handler * c_agent_id) ->
+  mixture ->
+  Exception.method_handler * mixture
+
+val join_link:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  link -> link ->
+  Exception.method_handler * link
+
+val join_mixture:
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  mixture -> mixture ->
+  Exception.method_handler * mixture
+
+val add_link : Exception.method_handler ->
+  c_agent_id -> agent_name -> site_name ->
+  link -> Exception.method_handler * link
+
+val add_port :
+  Exception.method_handler -> link -> port ->
+  Exception.method_handler * port
+
+val add_interface : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> interface ->
+  Exception.method_handler * interface
+
+val add_agent : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> agent_name -> agent ->
+  Exception.method_handler * agent
+
+val add_mixture : Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> agent_name -> mixture ->
+  Exception.method_handler * mixture
+
+(*******************************************************)
+(*C type*)
+(*******************************************************)
 
 type c_binding_state =
   | C_Free
@@ -365,6 +389,8 @@ type c_compil =
     c_perturbations :
       c_mixture Locality.annot perturbation Int_storage.Nearly_inf_Imperatif.t
   }
+
+(*******************************************************)
 
 module Rule_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_rule_id

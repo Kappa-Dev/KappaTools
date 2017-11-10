@@ -779,14 +779,35 @@ let add_agent parameters error agent_id agent_type site agent =
         add_agent_interface parameters error
           site
           agent.agent_interface
-      in (*TODO: ckappa_sig.add_link*)
-      (*let error, bonds =
-        Ckappa_sig.Site_map_and_set.Map.fold
-          (fun key value (error, map) ->
-             Ckappa_sig.Site_map_and_set.Map.add parameters error
-               key value map
-          ) bonds (error, Ckappa_sig.Site_map_and_set.Map.empty)
-      in*)
+      in
+      let error, bonds =
+        match
+          Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+            parameters
+            error
+            site
+            bonds
+        with
+        | error, None ->
+          Exception.warn parameters error __POS__ Exit
+            Ckappa_sig.Site_map_and_set.Map.empty
+        | error, Some link ->
+          let error, link =
+            Ckappa_sig.add_link error
+              agent_id
+              (Ckappa_sig.string_of_agent_name agent_type)
+              (Ckappa_sig.string_of_site_name site)
+              link
+          in
+          let error, bonds =
+            Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+              parameters error
+              site
+              link
+              bonds
+          in
+          error, bonds
+      in
       error,
       Dead_agent (
         {agent with
@@ -876,95 +897,6 @@ let add_site_map parameters error site site_map =
   in
   error, site_map
 
-let id_of_binding_type
-    parameter error handler_kappa
-    agent_type site agent_type' site' =
-  let state = Ckappa_sig.C_Lnk_type (agent_type',site') in
-  let error, state_dic =
-    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-      parameter error
-      (agent_type,site)
-      handler_kappa.states_dic
-  in
-  match state_dic with
-  | None ->
-    Exception.warn
-      parameter error __POS__
-      Exit Ckappa_sig.dummy_state_index
-  | Some state_dic ->
-    begin
-      let error, bool =
-        Ckappa_sig.Dictionary_of_States.member
-          parameter error
-          (Ckappa_sig.Binding state)
-          state_dic
-      in
-      if not bool then
-        Exception.warn
-          parameter error __POS__
-          ~message:("agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type))^" site"^
-                    (string_of_int (Ckappa_sig.int_of_site_name site))^"agent "^(string_of_int (Ckappa_sig.int_of_agent_name agent_type'))^" site"^
-                    (string_of_int (Ckappa_sig.int_of_site_name site')))
-          Exit Ckappa_sig.dummy_state_index
-      else
-        match
-          Ckappa_sig.Dictionary_of_States.allocate
-            parameter error
-            Ckappa_sig.compare_unit_state_index
-            (Ckappa_sig.Binding state)
-            ()
-            Misc_sa.const_unit
-            state_dic
-        with
-        | error, None ->
-          Exception.warn
-            parameter error __POS__
-            Exit Ckappa_sig.dummy_state_index
-        | error, (Some (a,_,_,_)) ->
-          error, a
-    end
-
-  (*let add_bond_to parameters error agent_id agent_type site state =
-    let error, site_address =
-      add_site_address parameters error agent_id agent_type site
-    in
-
-  let add_binding_state parameters error kappa_handler
-      agent_id agent_type site
-      agent_id' agent_type' site' port =
-    let error_ref = error in
-    let error, state_id =
-      id_of_binding_type
-        parameters error kappa_handler
-        agent_type site
-        agent_type' site'
-    in
-    let error, state_id' =
-      id_of_binding_type
-        parameters error kappa_handler
-        agent_type' site'
-        agent_type site
-    in
-    let error, state =
-      add_state parameters error site state_id port
-    in
-    let error, state' =
-      add_state parameters error site' state_id' port
-    in
-    if error == error_ref
-    then
-      let error, _ =
-        add_bond_to parameters error agent_id agent_type site state
-      in
-      let error, _ =
-        add_bond_to parameters error agent_id' agent_type' site' state'
-      in
-      error, _
-  else
-    Exception.warn parameters error __POS__
-      ~message:"incompatible binding states"
-      Exit _*)
-
 let add_bonds parameters error agent_id bonds =
   match
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
@@ -994,30 +926,94 @@ let add_bonds parameters error agent_id bonds =
     in
     error, bonds
 
-let add_mixture parameters error agent_id mixture =
-  (*let error, c_mixture =
-  in*)
+let add_common_dot_and_plus parameters error l =
+  let error', new_dot_or_plus =
+    List.fold_left (fun (error, store) (id, id') ->
+        error, (id, id') :: store
+      ) (error, []) l
+  in
+  let error =
+    Exception.check_point Exception.warn parameters error
+      error' __POS__ Exit
+  in
+  error, new_dot_or_plus
+
+let add_plus parameters error plus =
+  add_common_dot_and_plus parameters error plus
+
+let add_dot parameters error dot =
+  add_common_dot_and_plus parameters error dot
+
+let add_mixture parameters error agent_id agent_type mixture =
+  let error, c_mixture =
+    Ckappa_sig.add_mixture parameters error
+      (Ckappa_sig.string_of_agent_name agent_type)
+      mixture.c_mixture
+  in
   let error, views =
     add_views parameters error agent_id mixture.views
   in
   let error, bonds =
     add_bonds parameters error agent_id mixture.bonds
   in
-  (*let error, plus =
+  let error, plus =
+    add_plus parameters error mixture.plus
   in
   let error, dot =
-  in*)
+    add_dot parameters error mixture.dot
+  in
   error,
   {
-    mixture with
-    (*c_mixture = c_mixture;*)
+    c_mixture = c_mixture;
     views = views;
     bonds = bonds;
-    (*plus = plus;
-    dot = dot*)
+    plus = plus;
+    dot = dot
   }
 
 (*******************************************************)
+
+
+(*let add_bond_to parameters error agent_id agent_type site state =
+  let error, site_address =
+    add_site_address parameters error agent_id agent_type site
+  in
+
+  let add_binding_state parameters error kappa_handler
+    agent_id agent_type site
+    agent_id' agent_type' site' port =
+  let error_ref = error in
+  let error, state_id =
+    id_of_binding_type
+      parameters error kappa_handler
+      agent_type site
+      agent_type' site'
+  in
+  let error, state_id' =
+    id_of_binding_type
+      parameters error kappa_handler
+      agent_type' site'
+      agent_type site
+  in
+  let error, state =
+    add_state parameters error site state_id port
+  in
+  let error, state' =
+    add_state parameters error site' state_id' port
+  in
+  if error == error_ref
+  then
+    let error, _ =
+      add_bond_to parameters error agent_id agent_type site state
+    in
+    let error, _ =
+      add_bond_to parameters error agent_id' agent_type' site' state'
+    in
+    error, _
+  else
+  Exception.warn parameters error __POS__
+    ~message:"incompatible binding states"
+    Exit _*)
 
 (*REMOVE*)
 (*let add_bond_to parameters error agent_id agent_type site mixture =
