@@ -26,7 +26,7 @@ type t_gui =
     plotPeriod_gui          : float option ref;
     outputDataFile_gui      : string option ref;
     outputDirectory_gui     : string ref;
-    syntaxVersion_gui       : int ref;
+    syntaxVersion_gui       : string ref;
     batchmode_gui           : string ref;
   }
 
@@ -50,7 +50,7 @@ let default_gui =
     plotPeriod_gui = ref (Some 0.01);
     outputDataFile_gui = ref (Some "data.csv");
     outputDirectory_gui = ref ".";
-    syntaxVersion_gui = ref 4;
+    syntaxVersion_gui = ref "4";
     batchmode_gui = ref "interactive";
   }
 
@@ -72,7 +72,10 @@ let get_from_gui t_gui =
     inputKappaFileNames = !(t_gui.inputKappaFileNames_gui);
     outputDataFile = !(t_gui.outputDataFile_gui);
     outputDirectory = !(t_gui.outputDirectory_gui);
-    syntaxVersion = if !(t_gui.syntaxVersion_gui) = 4 then Ast.V4 else Ast.V3;
+    syntaxVersion = (match !(t_gui.syntaxVersion_gui) with
+        | "3" | "v3" | "V3" -> Ast.V3
+        | "4" | "v4" | "V4" -> Ast.V4
+        | _s -> Ast.V4);
     batchmode  = (Tools.lowercase (!(t_gui.batchmode_gui)))="batch" ;
     interactive = (Tools.lowercase (!(t_gui.batchmode_gui)))="interactive";
 }
@@ -154,8 +157,13 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
     "either \"batch\" to never ask anything to the user or \"interactive\" to ask something before doing anything",
     [Common_args.output,7;Common_args.debug_mode,7], Superarg.Expert) ;
    ("-syntax",
-    Arg.Int (fun v -> t.syntaxVersion <- if v = 4 then Ast.V4 else Ast.V3),
-    Superarg.Int t_gui.syntaxVersion_gui,
+    Arg.String (function
+        | "3" | "v3" | "V3" -> t.syntaxVersion <- Ast.V3
+        | "4" | "v4" | "V4" -> t.syntaxVersion <- Ast.V4
+        | s -> raise (Arg.Bad ("\""^s^"\" is not a valid syntax version"))
+      ),
+    Superarg.Choice
+      (["3","old";"v3","old";"V3","old";"4","new";"v4","new";"V4","new"],[],t_gui.syntaxVersion_gui),
     "Use explicit notation for free site",
     [], Superarg.Hidden);
 ]
