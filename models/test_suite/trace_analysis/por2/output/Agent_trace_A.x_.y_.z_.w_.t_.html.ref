@@ -1,0 +1,82 @@
+<!---->
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>output/Agent_trace_A.x_.y_.z_.w_.t_</title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
+  <style>
+    dt {float: left; clear: left; width: 20em;}
+    dd {font-weight: bold; margin: 0 0 0 21em;}
+    .node rect {stroke: #333; fill: #fff;}
+    .edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+  <h1>output/Agent_trace_A.x_.y_.z_.w_.t_</h1>
+  <svg width=960 height=600><g/></svg>
+  <script>
+  // Create a new directed graph
+  var g = new dagreD3.graphlib.Graph().setGraph({});
+  g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
+  g.setNode(2, { label: "A(x~p,y~p,z~u,w~u,t~u)" });
+  g.setNode(3, { label: "A(x~p,y~p,z~p,w~p,t~p)" });
+  g.setNode(4, { label: "A(x~p,y~p,z~p,w~p,t~u)" });
+  g.setNode(5, { label: "A(x~p,y~p,w~p,t~u)" });
+  g.setNode(6, { label: "A(x~p,y~p,w~u,t~u)" });
+  g.setNode(7, { label: "A(x~p,y~p,z~p,t~u)" });
+  g.setNode(8, { label: "A(x~p,y~p,z~u,t~u)" });
+  g.setNode(9, { label: "A(y~p,z~u,w~u,t~u)" });
+  g.setNode(10, { label: "A(y~u,z~u,w~u,t~u)" });
+  g.setNode(11, { label: "A(x~p,z~u,w~u,t~u)" });
+  g.setNode(12, { label: "A(x~u,z~u,w~u,t~u)" });
+  g.setNode(13, { label: "A(x~u,y~u,z~u,w~u,t~u)" });
+  g.setNode(14, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
+  g.setNode(15, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
+  g.setNode(16, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
+  g.setEdge(14,10,{  });
+  g.setEdge(14,13,{  });
+  g.setEdge(14,12,{  });
+  g.setEdge(15,7,{  });
+  g.setEdge(15,5,{  });
+  g.setEdge(15,4,{  });
+  g.setEdge(16,11,{  });
+  g.setEdge(16,9,{  });
+  g.setEdge(16,8,{  });
+  g.setEdge(16,6,{  });
+  g.setEdge(16,2,{  });
+  g.setEdge(1,13,{ label: "" });
+  g.setEdge(10,9,{ label: "y+" });
+  g.setEdge(12,11,{ label: "x+" });
+  g.setEdge(11,12,{ label: "x-" });
+  g.setEdge(9,10,{ label: "y-" });
+  g.setEdge(8,7,{ label: "z+" });
+  g.setEdge(7,8,{ label: "z-" });
+  g.setEdge(6,5,{ label: "w+" });
+  g.setEdge(5,6,{ label: "w-" });
+  g.setEdge(4,3,{ label: "t+" });
+  g.setEdge(3,4,{ label: "t-" });
+  var svg = d3.select("svg"),inner = svg.select("g");
+  // Set up zoom support
+  var zoom = d3.behavior.zoom().on("zoom", function() {
+  inner.attr("transform", "translate(" + d3.event.translate + ")" +
+  "scale(" + d3.event.scale + ")");
+  });
+  svg.call(zoom);// Create the renderer
+   var render = new dagreD3.render();
+  // Run the renderer. This is what draws the final graph.
+  render(inner, g);
+  // Center the graph
+  var initialScale = 0.75;
+  zoom
+  .translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+  .scale(initialScale)
+  .event(svg);
+  svg.attr('height', g.graph().height * initialScale + 40);
+  </script>
+  </div>
+  </body>
+</html>

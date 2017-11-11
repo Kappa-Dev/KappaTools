@@ -1,0 +1,74 @@
+Parsing bonds_in_init.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 28 (sub)observables 32 navigation steps
+	 -initial conditions
++ Building initial state (64 agents)
+Done
++ Command line to rerun is: 'KaSim' 'bonds_in_init.ka' '-l' '40' '-seed' '611463625' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: -583 events 
++ Producing causal compressions
+	- splitting initial events: +30 events 
+	 - blackboard generation
+	- alpha-conversion
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 154
+ longest story    : 42
+ average length   : 13.27
+ geometric mean   : 16.34
+
+	 - causal flow compression (10)
+
+____________________________________________________________
+############################################################
+
+	- simplify the trace, 153 events 
+		- start iteration 1, 153 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -51 events 
+				- detecting pseudo inverse events: -6 events 
+		- start iteration 2, 96 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -2 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 3, 94 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 94 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (10)
+
+
+	 - weak flow compression (6)
+
+____________________________________________________________
+############################################################
+
+	 - strong flow compression (3)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 6 flows
++ Pretty printing 3 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

@@ -1,0 +1,77 @@
+<!---->
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>output/Agent_trace_P.a1_.a2_.b1_.b2_.g^</title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
+  <style>
+    dt {float: left; clear: left; width: 20em;}
+    dd {font-weight: bold; margin: 0 0 0 21em;}
+    .node rect {stroke: #333; fill: #fff;}
+    .edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+  <h1>output/Agent_trace_P.a1_.a2_.b1_.b2_.g^</h1>
+  <svg width=960 height=600><g/></svg>
+  <script>
+  // Create a new directed graph
+  var g = new dagreD3.graphlib.Graph().setGraph({});
+  g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
+  g.setNode(2, { label: "P(a1~p,a2~p,b1~p,b2~p,g!K@x)" });
+  g.setNode(3, { label: "P(a1~p,a2~p,b1~p,b2~p,g!free)" });
+  g.setNode(4, { label: "P(a2~p,b2~p,g!free)" });
+  g.setNode(5, { label: "P(a2~u,b2~p,g!free)" });
+  g.setNode(6, { label: "P(a2~p,b2~u,g!free)" });
+  g.setNode(7, { label: "P(a2~u,b2~u,g!free)" });
+  g.setNode(8, { label: "P(a1~p,b1~p,g!free)" });
+  g.setNode(9, { label: "P(a1~p,b1~u,g!free)" });
+  g.setNode(10, { label: "P(a1~u,b1~u,g!free)" });
+  g.setNode(11, { label: "P(a1~u,a2~u,b1~u,b2~u,g!free)" });
+  g.setNode(12, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
+  g.setNode(13, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
+  g.setEdge(12,11,{  });
+  g.setEdge(12,10,{  });
+  g.setEdge(12,7,{  });
+  g.setEdge(13,8,{  });
+  g.setEdge(13,4,{  });
+  g.setEdge(13,3,{  });
+  g.setEdge(1,11,{ label: "" });
+  g.setEdge(10,9,{ label: "a1+" });
+  g.setEdge(9,10,{ label: "a1-" });
+  g.setEdge(9,8,{ label: "b1+" });
+  g.setEdge(8,9,{ label: "b1-" });
+  g.setEdge(7,6,{ label: "a2+" });
+  g.setEdge(6,7,{ label: "a2-" });
+  g.setEdge(6,4,{ label: "b2+" });
+  g.setEdge(5,7,{ label: "b2-" });
+  g.setEdge(5,4,{ label: "a2+" });
+  g.setEdge(4,6,{ label: "b2-" });
+  g.setEdge(4,5,{ label: "a2-" });
+  g.setEdge(3,2,{ label: "P.K" });
+  g.setEdge(2,3,{ label: "P/K" });
+  var svg = d3.select("svg"),inner = svg.select("g");
+  // Set up zoom support
+  var zoom = d3.behavior.zoom().on("zoom", function() {
+  inner.attr("transform", "translate(" + d3.event.translate + ")" +
+  "scale(" + d3.event.scale + ")");
+  });
+  svg.call(zoom);// Create the renderer
+   var render = new dagreD3.render();
+  // Run the renderer. This is what draws the final graph.
+  render(inner, g);
+  // Center the graph
+  var initialScale = 0.75;
+  zoom
+  .translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+  .scale(initialScale)
+  .event(svg);
+  svg.attr('height', g.graph().height * initialScale + 40);
+  </script>
+  </div>
+  </body>
+</html>

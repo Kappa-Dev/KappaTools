@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- command line:  -->
+<!--       KaDE   erre.ka   -syntax   3   -d   output   -l   1   -p   0.1   -ode-backend  SBML  -->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
+<model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+maxstep - maximal time step for numerical integration
+reltol - relative error tolerance;
+abstol - absolute error tolerance;
+period - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
+-->
+<listOfUnitDefinitions>
+<unitDefinition metaid="substance" id="substance" name="substance">
+<listOfUnits>
+<unit metaid="CMD2"  kind="mole"/>
+</listOfUnits>
+</unitDefinition>
+<unitDefinition metaid="volume" id="volume" name="volume">
+<listOfUnits>
+<unit metaid="CMD1" kind="litre"/>
+</listOfUnits>
+</unitDefinition>
+</listOfUnitDefinitions>
+<listOfCompartments>
+<compartment metaid="default" id="default" size="1" units="volume"/>
+</listOfCompartments>
+<listOfSpecies>
+<species metaid="CMD12" id="s1" name="R(e[.] r[.])" compartment="default" initialAmount="100" substanceUnits="substance"/>
+<species metaid="CMD13" id="s2" name="E(r[.] s[.])" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD14" id="s3" name="R(e[1] r[.]), E(r[1] s[.])" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD15" id="s4" name="R(e[1] r[.]), E(r[.] s[1])" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD16" id="s5" name="R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3])" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD17" id="s6" name="R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.])" compartment="default" initialAmount="0" substanceUnits="substance"/>
+<species metaid="CMD18" id="s7" name="R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.])" compartment="default" initialAmount="0" substanceUnits="substance"/>
+</listOfSpecies>
+<listOfParameters>
+<parameter metaid="CMD3" id="tinit" value="0." units="time"/>
+<parameter metaid="CMD4" id="tend" value="1." units="time"/>
+<parameter metaid="CMD5" id="period" value="0.1" units="time"/>
+<parameter metaid="CMD6" id="k1" value="1"/>
+<parameter metaid="CMD7" id="k2" value="1"/>
+<parameter metaid="CMD8" id="k3" value="2"/>
+<parameter metaid="CMD9" id="k4" value="3"/>
+<parameter metaid="CMD10" id="k5" value="4"/>
+<parameter metaid="CMD11" id="k6" value="5"/>
+</listOfParameters>
+<listOfReactions>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) + R(e[1] r[.]), E(r[1] s[.]) -->
+<reaction id="re1" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD19" species="s6" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD20" species="s3" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><apply>
+<divide/><ci> s6 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) + E(r[.] s[.]) -->
+<reaction id="re2" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD21" species="s6" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD22" species="s2"/>
+<speciesReference metaid="CMD23" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><apply>
+<divide/><ci> s6 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) + R(e[1] r[.]), E(r[1] s[.]) -->
+<reaction id="re3" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD24" species="s6" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD25" species="s3" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><apply>
+<divide/><ci> s6 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) + E(r[.] s[.]) -->
+<reaction id="re4" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD26" species="s6" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD27" species="s2"/>
+<speciesReference metaid="CMD28" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><apply>
+<divide/><ci> s6 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[1] s[.]) -->
+<reaction id="re5" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD29" species="s7"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD30" species="s3"/>
+<speciesReference metaid="CMD31" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><ci> s7 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) + E(r[.] s[.]) -->
+<reaction id="re6" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD32" species="s7"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD33" species="s2"/>
+<speciesReference metaid="CMD34" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><ci> s7 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[1] s[.]) -->
+<reaction id="re7" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD35" species="s7"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD36" species="s3"/>
+<speciesReference metaid="CMD37" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><ci> s7 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -> R(e[1] r[.]), E(r[.] s[1]) + E(r[.] s[.]) -->
+<reaction id="re8" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD38" species="s7"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD39" species="s2"/>
+<speciesReference metaid="CMD40" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><ci> s7 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[1] s[.]) + R(e[1] r[.]), E(r[.] s[1]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -->
+<reaction id="re9" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD41" species="s3"/>
+<speciesReference metaid="CMD42" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD43" species="s7"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply>
+<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
+<times/><ci> s4 </ci><ci> s3 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[1] s[.]) + R(e[1] r[.]), E(r[.] s[1]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -->
+<reaction id="re10" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD44" species="s3"/>
+<speciesReference metaid="CMD45" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD46" species="s7"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply>
+<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
+<times/><ci> s4 </ci><ci> s3 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[1] s[.]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -->
+<reaction id="re11" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD47" species="s3"/>
+<speciesReference metaid="CMD48" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD49" species="s7"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply>
+<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
+<times/><ci> s3 </ci><ci> s4 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[1] s[.]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[3] s[.]) -->
+<reaction id="re12" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD50" species="s3"/>
+<speciesReference metaid="CMD51" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD52" species="s7"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><apply>
+<divide/><ci> k4 </ci><cn type="integer"> 2 </cn>
+</apply>
+<apply>
+<times/><ci> s3 </ci><ci> s4 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[1] s[.]) + R(e[1] r[.]), E(r[1] s[.]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[1] s[.]), E(r[3] s[.]) -->
+<reaction id="re13" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD53" species="s3" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD54" species="s6" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k4 </ci><apply>
+<times/><ci> s3 </ci><ci> s3 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]) -> R(e[.] r[.]) -->
+<!-- reaction: R(e[1] r[.]), E(r[1] s[.]) -> R(e[.] r[.]) + E(r[.] s[.]) -->
+<reaction id="re14" name="R(e[_] r[.]) -> R(e[.] r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD55" species="s3"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD56" species="s1"/>
+<speciesReference metaid="CMD57" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k3 </ci><ci> s3 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -> R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[.] s[1]) -->
+<reaction id="re15" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD58" species="s5" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD59" species="s4" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><apply>
+<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -> R(e[1] r[.]), E(r[.] s[1]) + E(r[.] s[.]) -->
+<reaction id="re16" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD60" species="s5" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD61" species="s2"/>
+<speciesReference metaid="CMD62" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><apply>
+<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> R(r[.]) -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -> R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[.] s[1]) -->
+<reaction id="re17" name="R(r[_]) -> R(r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD63" species="s5" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD64" species="s4" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k6 </ci><apply>
+<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(r[_]) -> . -->
+<!-- reaction: R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -> R(e[1] r[.]), E(r[.] s[1]) + E(r[.] s[.]) -->
+<reaction id="re18" name="R(r[_]) -> ." reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD65" species="s5" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD66" species="s2"/>
+<speciesReference metaid="CMD67" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k5 </ci><apply>
+<divide/><ci> s5 </ci><cn type="integer"> 2 </cn></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[.] s[1]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -->
+<reaction id="re19" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD68" species="s4" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD69" species="s5" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k4 </ci><apply>
+<times/><ci> s4 </ci><ci> s4 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[.] s[1]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -->
+<reaction id="re20" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD70" species="s4" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD71" species="s5" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k4 </ci><apply>
+<times/><ci> s4 </ci><ci> s4 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) + R(e[1] r[.]), E(r[.] s[1]) -> R(e[1] r[2]), R(e[3] r[2]), E(r[.] s[1]), E(r[.] s[3]) -->
+<reaction id="re21" name="R(e[_] r[.]), R(e[_] r[.]) -> R(e[_] r[1]), R(e[_] r[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD72" species="s4" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD73" species="s5" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k4 </ci><apply>
+<times/><ci> s4 </ci><ci> s4 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : R(e[_] r[.]) -> R(e[.] r[.]) -->
+<!-- reaction: R(e[1] r[.]), E(r[.] s[1]) -> R(e[.] r[.]) + E(r[.] s[.]) -->
+<reaction id="re22" name="R(e[_] r[.]) -> R(e[.] r[.])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD74" species="s4"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD75" species="s1"/>
+<speciesReference metaid="CMD76" species="s2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k3 </ci><ci> s4 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : E(r[.] s[.]), R(e[.]) -> E(r[.] s[1]), R(e[1]) -->
+<!-- reaction: R(e[.] r[.]) + E(r[.] s[.]) -> R(e[1] r[.]), E(r[.] s[1]) -->
+<reaction id="re23" name="E(r[.] s[.]), R(e[.]) -> E(r[.] s[1]), R(e[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD77" species="s1"/>
+<speciesReference metaid="CMD78" species="s2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD79" species="s4"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k2 </ci><apply>
+<times/><ci> s2 </ci><ci> s1 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : E(r[.] s[.]), R(e[.]) -> E(r[1] s[.]), R(e[1]) -->
+<!-- reaction: R(e[.] r[.]) + E(r[.] s[.]) -> R(e[1] r[.]), E(r[1] s[.]) -->
+<reaction id="re24" name="E(r[.] s[.]), R(e[.]) -> E(r[1] s[.]), R(e[1])" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD80" species="s1"/>
+<speciesReference metaid="CMD81" species="s2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD82" species="s3"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><apply>
+<times/><ci> s2 </ci><ci> s1 </ci></apply>
+</apply>
+</math>
+</kineticLaw>
+</reaction>
+</listOfReactions>
+</model>
+</sbml>

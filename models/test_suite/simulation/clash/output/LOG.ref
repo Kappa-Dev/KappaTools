@@ -1,0 +1,21 @@
+Parsing clash.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 3 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (2 agents)
+Done
++ Command line to rerun is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-u' 'event' '-l' '3' '-d' 'output' '-syntax' '4'
+____________________________________________________________
+############################################################
+Simulation ended
+50.00% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%

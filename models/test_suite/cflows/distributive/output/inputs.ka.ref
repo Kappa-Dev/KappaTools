@@ -1,0 +1,24 @@
+%def: "seed" "240056667"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+%def: "deltaActivitiesFileName" "activities.json"
+
+%agent: A(y{u p}[x.K] z{u p}[x.K])
+%agent: K(x[y.A z.A])
+
+%plot: [T]
+A(y[./1]), K(x[./1]) @ 10
+K(x[_/.]) @ 1
+A(z[./1]), K(x[./1]) @ 10
+A(y{u/p}[1]), K(x[1]) @ 1
+A(z{u/p}[1]), K(x[1]) @ 1
+'GOAL' A(y{p}[.] z{p}[.]) @ 10
+
+/*0*/%mod: [true] do $TRACK A(y{p}[.] z{p}[.]) [true] repeat [false]
+
+%init: 10 A(y{u}[.] z{u}[.])
+%init: 10 K(x[.])
+
+%mod: [E] = 250 do $STOP

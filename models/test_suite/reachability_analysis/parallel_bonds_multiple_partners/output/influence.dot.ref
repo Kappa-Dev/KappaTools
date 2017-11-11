@@ -1,0 +1,48 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa essai.ka --output-directory output --debugging-mode -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:->A(x~u,y~u,z~u,a~u,b~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x~u)->A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x~p,y~u)->A(x~p,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:A(y~p)->A(y~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"5:A(z~u)->A(z~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"6:A(z~p,a~u)->A(z~p,a~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"8:A(a~p)->A(a~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"10:A(b~p)->A(b~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:->A(x~u,y~u,z~u,a~u,b~u)" -> "1:A(x~u)->A(x~p)" [label="[0->0]" color="green"];
+"0:->A(x~u,y~u,z~u,a~u,b~u)" -> "5:A(z~u)->A(z~p)" [label="[0->0]" color="green"];
+"1:A(x~u)->A(x~p)" -> "2:A(x~p,y~u)->A(x~p,y~p)" [label="[0->0]" color="green"];
+"1:A(x~u)->A(x~p)" -> "3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" [label="[0->0]" color="green"];
+"1:A(x~u)->A(x~p)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="green"];
+"2:A(x~p,y~u)->A(x~p,y~p)" -> "4:A(y~p)->A(y~u)" [label="[0->0]" color="green"];
+"2:A(x~p,y~u)->A(x~p,y~p)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="green"];
+"3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" -> "1:A(x~u)->A(x~p)" [label="[0->0]" color="green"];
+"4:A(y~p)->A(y~u)" -> "2:A(x~p,y~u)->A(x~p,y~p)" [label="[0->0]" color="green"];
+"4:A(y~p)->A(y~u)" -> "3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" [label="[0->0]" color="green"];
+"5:A(z~u)->A(z~p)" -> "6:A(z~p,a~u)->A(z~p,a~p)" [label="[0->0]" color="green"];
+"5:A(z~u)->A(z~p)" -> "7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" [label="[0->0]" color="green"];
+"5:A(z~u)->A(z~p)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="green"];
+"6:A(z~p,a~u)->A(z~p,a~p)" -> "8:A(a~p)->A(a~u)" [label="[0->0]" color="green"];
+"6:A(z~p,a~u)->A(z~p,a~p)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="green"];
+"7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" -> "5:A(z~u)->A(z~p)" [label="[0->0]" color="green"];
+"8:A(a~p)->A(a~u)" -> "6:A(z~p,a~u)->A(z~p,a~p)" [label="[0->0]" color="green"];
+"8:A(a~p)->A(a~u)" -> "7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" [label="[0->0]" color="green"];
+"9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" -> "10:A(b~p)->A(b~u)" [label="[0->0]" color="green"];
+"10:A(b~p)->A(b~u)" -> "3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" [label="[0->0]" color="green"];
+"10:A(b~p)->A(b~u)" -> "7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" [label="[0->0]" color="green"];
+"10:A(b~p)->A(b~u)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="green"];
+"2:A(x~p,y~u)->A(x~p,y~p)" -> "3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" [label="[0->0]" color="red" arrowhead="tee"];
+"3:A(x~p,y~u,b~u)->A(x~u,y~u,b~u)" -> "2:A(x~p,y~u)->A(x~p,y~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"4:A(y~p)->A(y~u)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"6:A(z~p,a~u)->A(z~p,a~p)" -> "7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" [label="[0->0]" color="red" arrowhead="tee"];
+"7:A(z~p,a~u,b~u)->A(z~u,a~u,b~u)" -> "6:A(z~p,a~u)->A(z~p,a~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"8:A(a~p)->A(a~u)" -> "9:A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)" [label="[0->0]" color="red" arrowhead="tee"];
+}

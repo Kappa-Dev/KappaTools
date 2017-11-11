@@ -1,0 +1,65 @@
+Parsing create.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 8 (sub)observables 4 navigation steps
+	 -initial conditions
++ Building initial state (1024 agents)
+Done
++ Command line to rerun is: 'KaSim' 'create.ka' '-seed' '931056658' '-u' 'event' '-l' '500' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: -6 events 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	- simplify the trace, 1553 events 
+		- start iteration 1, 1553 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -1241 events 
+				- detecting pseudo inverse events: -4 events 
+		- start iteration 2, 308 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -2 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 3, 306 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 306 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (59)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - weak flow compression (4)
+
+____________________________________________________________
+############################################################
+
+	 - strong flow compression (1)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 1 weakly compressed flow
++ Pretty printing 1 strongly compressed flow
+Simulation ended
+99.60% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%

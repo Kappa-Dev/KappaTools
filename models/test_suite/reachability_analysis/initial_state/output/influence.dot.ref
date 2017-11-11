@@ -1,0 +1,15 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa initial_state.ka --debugging-mode --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(x~u,y~u)->A(x~p,y~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x~u,y~u)->A(x~u,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x~p,y~u)->D(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)" [label="[0->0]" color="green"];
+"0:A(x~u,y~u)->A(x~p,y~u)" -> "1:A(x~u,y~u)->A(x~u,y~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"1:A(x~u,y~u)->A(x~u,y~p)" -> "0:A(x~u,y~u)->A(x~p,y~u)" [label="[0->0]" color="red" arrowhead="tee"];
+}

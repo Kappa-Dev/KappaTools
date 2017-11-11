@@ -1,0 +1,11 @@
+digraph G{
+"Init_3" [label="" style="invis" width="0px" height="0px"];
+"Final_3" [label="" style="invis" width="0px" height="0px"];
+"Final_4" [label="" style="invis" width="0px" height="0px"];
+"Node_4" [label="B(x!free)"];
+"Node_3" [label="B(x!A@y)"];
+"Node_3" -> "Node_4" [label="2"];
+"Init_3" -> "Node_3" [label=""];
+"Node_3" -> "Final_3" [label="0"];
+"Node_4" -> "Final_4" [label="0"];
+}

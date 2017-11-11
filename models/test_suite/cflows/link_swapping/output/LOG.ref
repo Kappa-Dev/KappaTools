@@ -1,0 +1,43 @@
+Parsing link_swapping.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 7 (sub)observables 2 navigation steps
+	 -initial conditions
++ Building initial state (2 agents)
+Done
++ Command line to rerun is: 'KaSim' 'link_swapping.ka' '-seed' '924556145' '-u' 'event' '-l' '3' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: nothing has changed 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	- simplify the trace, 7 events 
+		- start iteration 1, 7 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 7 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (2)
+
+
+	 - weak flow compression (1)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 1 weakly compressed flow
+Simulation ended
+50.00% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%

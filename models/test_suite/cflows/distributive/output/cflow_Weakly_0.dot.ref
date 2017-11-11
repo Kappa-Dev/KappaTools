@@ -1,0 +1,43 @@
+/* Compression of 17 causal flows obtained in average at 5.823245E+00 t.u */
+/* Compressed causal flows were: [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;
+17] */
+digraph G{
+ ranksep=.5 ;
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ;
+node_3 [label="A(z[.]), K(x[.]) -> A(z[1]), K(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="A(y[.]), K(x[.]) -> A(y[1]), K(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ;
+node_4 [label="A(z{u}[1]), K(x[1]) -> A(z{p}[1]), K(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="A(y{u}[1]), K(x[1]) -> A(y{p}[1]), K(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="K(x[_]) -> K(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="K(x[_]) -> K(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ;
+node_10 [label="GOAL", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"];
+"1" -> "2" [style="invis"];
+"2" -> "3" [style="invis"];
+node_1 -> node_3
+node_2 -> node_3
+node_3 -> node_4
+node_1 -> node_6
+node_5 -> node_6
+node_6 -> node_7
+node_6 -> node_8
+node_3 -> node_9
+node_4 -> node_10
+node_7 -> node_10
+node_8 -> node_10
+node_9 -> node_10
+node_8 -> node_7 [style=dotted, arrowhead = tee]
+node_9 -> node_4 [style=dotted, arrowhead = tee]
+}
+/*
+*/

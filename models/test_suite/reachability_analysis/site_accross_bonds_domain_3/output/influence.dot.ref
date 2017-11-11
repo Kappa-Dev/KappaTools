@@ -1,0 +1,22 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa site_accross_bonds_domain.ka --debugging-mode --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:->C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)->D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:C()->" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:->C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)->G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:->C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)" -> "1:C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)->D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3)" [label="[0->0];[1->1];[2->2];[3->3]" color="green"];
+"0:->C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)" -> "2:C()->" [label="[0->0];[3->0]" color="green"];
+"3:->C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)" -> "2:C()->" [label="[0->0]" color="green"];
+"3:->C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)" -> "4:C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)->G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3)" [label="[0->0];[1->1];[2->2];[3->3]" color="green"];
+"1:C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)->D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3)" -> "2:C()->" [label="[0->0];[3->0]" color="red" arrowhead="tee"];
+"2:C()->" -> "1:C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3)->D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3)" [label="[0*->1];[0*->2];[0->0];[0->3]" color="red" arrowhead="tee"];
+"2:C()->" -> "4:C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)->G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3)" [label="[0*->1];[0->0]" color="red" arrowhead="tee"];
+"4:C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3)->G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3)" -> "2:C()->" [label="[0->0]" color="red" arrowhead="tee"];
+}

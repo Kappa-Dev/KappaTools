@@ -1,0 +1,80 @@
+<!--
+Download sources/binaries at https://github.com/Kappa-Dev/KaSim<Br>
+<Br>
+Command line is: KaSa -syntax 4 ../../cflows/abc/abc.ka --output-directory output --output-contact-map cm --output-influence-map if --contact-map-format DOT --influence-map-format HTML<Br>
+<Br>
+This file contains the description of the influence map in dot.<Br>
+Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF<Br>
+<Br>
+-->
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Influence_map</title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
+  <style>
+    dt {float: left; clear: left; width: 20em;}
+    dd {font-weight: bold; margin: 0 0 0 21em;}
+    .node rect {stroke: #333; fill: #fff;}
+    .edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+  <h1>Influence_map</h1>
+  <svg width=960 height=600><g/></svg>
+  <script>
+  // Create a new directed graph
+  var g = new dagreD3.graphlib.Graph().setGraph({});
+  g.setNode(1, { label: "a.b", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(2, { label: "a.b_op", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(3, { label: "ab.c", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(4, { label: "mod x1", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(5, { label: "a.c", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(6, { label: "mod x2", shape: "rect", style: "fill: #8ce"  });
+  <Br>
+g.setNode(7, { label: "on_rate", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(8, { label: "off_rate", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(9, { label: "mod_rate", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(10, { label: "AB", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(11, { label: "Cuu", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(12, { label: "Cpu", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(13, { label: "Cpp", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(14, { label: "n_ab", shape: "ellipse", style: "fill: #9f9"  });
+g.setNode(15, { label: "n_c", shape: "ellipse", style: "fill: #9f9"  });
+g.setEdge(1,10,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(1,2,{ label: "[0->0];[1->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(1,5,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(1,3,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(1,6,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(2,10,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(2,1,{ label: "[0->0];[1->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(2,5,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(2,3,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(2,6,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(5,12,{ label: "[1->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(5,6,{ label: "[0->0];[1->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(3,11,{ label: "[1->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
+g.setEdge(3,4,{ label: "[0->1];[1->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(4,13,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(4,12,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(4,5,{ label: "[0->1];[1->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(4,3,{ label: "[1->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(4,6,{ label: "[0->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(6,13,{ label: "[1->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+g.setEdge(6,5,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
+var svg = d3.select("svg"),inner = svg.select("g");// Set up zoom support
+var zoom = d3.behavior.zoom().on("zoom", function() {
+inner.attr("transform", "translate(" + d3.event.translate + ")" +
+"scale(" + d3.event.scale + ")");});svg.call(zoom);// Create the renderer
+ var render = new dagreD3.render();
+// Run the renderer. This is what draws the final graph.render(inner, g);
+// Center the graphvar initialScale = 0.75;zoom
+.translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+.scale(initialScale).event(svg);
+svg.attr('height', g.graph().height * initialScale + 40);</script></div>
+</body>
+</html>

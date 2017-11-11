@@ -1,0 +1,54 @@
+Parsing sym_alg_wrong.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute symmetric sites... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 10 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 
+Parsing sym_alg_wrong.ka...
+done
++ simulation parameters
++ Sanity checks
++ compute symmetric sites... 
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 10 (sub)observables 48 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 

@@ -1,0 +1,66 @@
+Parsing cube.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 17 (sub)observables 49 navigation steps
+	 -initial conditions
++ Building initial state (16384 agents)
+Done
++ Command line to rerun is: 'KaSim' 'cube.ka' '-u' 'event' '-l' '30000' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: nothing has changed 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	 - blackboard generation
+	- alpha-conversion
+	 - computing causal past of each observed events (5994)
+Stats:
+ number of step   : 45995
+ longest story    : 8
+ average length   : 3.371
+ geometric mean   : 3.743
+
+	 - causal flow compression (5994)
+
+____________________________________________________________
+############################################################
+
+	- simplify the trace, 45994 events 
+		- start iteration 1, 45994 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -17170 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 2, 28824 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 28824 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (5994)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - weak flow compression (2)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 2 flows
++ Pretty printing 1 weakly compressed flow
+Simulation ended

@@ -1,0 +1,2485 @@
+Parsing parallel_bonds.ka...
+done
+Scan rules!
+Signature:
+Signature:agents:
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:agents:agent_type:3:D
+Signature:agents:agent_type:4:E
+Signature:agents:agent_type:5:F
+Signature:sites:
+Signature:sites:0:
+Signature:sites:0:site_type:0->z(binding state)
+Signature:sites:0:site_type:1->t(binding state)
+Signature:sites:1:
+Signature:sites:1:site_type:0->z(binding state)
+Signature:sites:1:site_type:1->t(binding state)
+Signature:sites:2:
+Signature:sites:2:site_type:0->z(binding state)
+Signature:sites:2:site_type:1->t(binding state)
+Signature:sites:3:
+Signature:sites:3:site_type:0->z(binding state)
+Signature:sites:3:site_type:1->t(binding state)
+Signature:sites:4:
+Signature:sites:4:site_type:0->z(binding state)
+Signature:sites:4:site_type:1->t(binding state)
+Signature:sites:5:
+Signature:sites:5:site_type:0->z(binding state)
+Signature:sites:5:site_type:1->t(binding state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->free
+Signature:states:0:0:state_id:1->agent_type:0@site_type:0
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->free
+Signature:states:0:1:state_id:1->agent_type:0@site_type:1
+Signature:states:1:
+Signature:states:1:0:
+Signature:states:1:0:state_id:0->free
+Signature:states:1:0:state_id:1->agent_type:1@site_type:1
+Signature:states:1:1:
+Signature:states:1:1:state_id:0->free
+Signature:states:1:1:state_id:1->agent_type:1@site_type:0
+Signature:states:2:
+Signature:states:2:0:
+Signature:states:2:0:state_id:0->free
+Signature:states:2:0:state_id:1->agent_type:2@site_type:1
+Signature:states:2:1:
+Signature:states:2:1:state_id:0->free
+Signature:states:2:1:state_id:1->agent_type:2@site_type:0
+Signature:states:3:
+Signature:states:3:0:
+Signature:states:3:0:state_id:0->free
+Signature:states:3:0:state_id:1->agent_type:3@site_type:1
+Signature:states:3:1:
+Signature:states:3:1:state_id:0->free
+Signature:states:3:1:state_id:1->agent_type:3@site_type:0
+Signature:states:3:1:state_id:2->agent_type:3@site_type:1
+Signature:states:4:
+Signature:states:4:0:
+Signature:states:4:0:state_id:0->free
+Signature:states:4:0:state_id:1->agent_type:4@site_type:0
+Signature:states:4:1:
+Signature:states:4:1:state_id:0->free
+Signature:states:4:1:state_id:1->agent_type:4@site_type:1
+Signature:states:5:
+Signature:states:5:0:
+Signature:states:5:0:state_id:0->free
+Signature:states:5:0:state_id:1->agent_type:5@site_type:0
+Signature:states:5:0:state_id:2->agent_type:5@site_type:1
+Signature:states:5:1:
+Signature:states:5:1:state_id:0->free
+Signature:states:5:1:state_id:1->agent_type:5@site_type:0
+Signature:duals: 
+Signature:duals:0:
+Signature:duals:0:0:
+Signature:duals:0:0:1:
+Signature:duals:0:0:1:agent_type:0,site_type:0,state_id:1
+Signature:duals:0:1:
+Signature:duals:0:1:1:
+Signature:duals:0:1:1:agent_type:0,site_type:1,state_id:1
+Signature:duals:1:
+Signature:duals:1:0:
+Signature:duals:1:0:1:
+Signature:duals:1:0:1:agent_type:1,site_type:1,state_id:1
+Signature:duals:1:1:
+Signature:duals:1:1:1:
+Signature:duals:1:1:1:agent_type:1,site_type:0,state_id:1
+Signature:duals:2:
+Signature:duals:2:0:
+Signature:duals:2:0:1:
+Signature:duals:2:0:1:agent_type:2,site_type:1,state_id:1
+Signature:duals:2:1:
+Signature:duals:2:1:1:
+Signature:duals:2:1:1:agent_type:2,site_type:0,state_id:1
+Signature:duals:3:
+Signature:duals:3:0:
+Signature:duals:3:0:1:
+Signature:duals:3:0:1:agent_type:3,site_type:1,state_id:1
+Signature:duals:3:1:
+Signature:duals:3:1:1:
+Signature:duals:3:1:1:agent_type:3,site_type:0,state_id:1
+Signature:duals:3:1:2:
+Signature:duals:3:1:2:agent_type:3,site_type:1,state_id:2
+Signature:duals:4:
+Signature:duals:4:0:
+Signature:duals:4:0:1:
+Signature:duals:4:0:1:agent_type:4,site_type:0,state_id:1
+Signature:duals:4:1:
+Signature:duals:4:1:1:
+Signature:duals:4:1:1:agent_type:4,site_type:1,state_id:1
+Signature:duals:5:
+Signature:duals:5:0:
+Signature:duals:5:0:1:
+Signature:duals:5:0:1:agent_type:5,site_type:0,state_id:1
+Signature:duals:5:0:2:
+Signature:duals:5:0:2:agent_type:5,site_type:1,state_id:1
+Signature:duals:5:1:
+Signature:duals:5:1:1:
+Signature:duals:5:1:1:agent_type:5,site_type:0,state_id:2
+Compiling...
+Generating the raw contact map...
+Compilation:Compilation:rules:0:
+Compilation:rules:0:lhs:
+Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:lhs:agent_id_1:
+Compilation:rules:0:lhs:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:lhs:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:
+Compilation:rules:0:rhs:agent_id_0:
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:rhs:agent_id_1:
+Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:rhs:bonds:agent_id_0:
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_1
+Compilation:rules:0:rhs:bonds:agent_id_1:
+Compilation:rules:0:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+Compilation:rules:0:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_1
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_0:
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:direct:agent_id_1:
+Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:reverse:
+Compilation:rules:0:reverse:agent_id_0:
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:agent_id_1:
+Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_0)@site_type_0
+Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_0)@site_type_1
+Compilation:rules:1:
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:lhs:agent_id_1:
+Compilation:rules:1:lhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:lhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:rhs:agent_id_1:
+Compilation:rules:1:rhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:rhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:rhs:bonds:agent_id_0:
+Compilation:rules:1:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_1
+Compilation:rules:1:rhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_0
+Compilation:rules:1:rhs:bonds:agent_id_1:
+Compilation:rules:1:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_1
+Compilation:rules:1:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_0
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:agent_id_1:
+Compilation:rules:1:direct:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:reverse:
+Compilation:rules:1:reverse:agent_id_0:
+Compilation:rules:1:reverse:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:reverse:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:reverse:agent_id_1:
+Compilation:rules:1:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:reverse:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:actions:binding:(agent_id_0,agent_type_1)@site_type_0----(agent_id_1,agent_type_1)@site_type_1
+Compilation:rules:1:actions:binding:(agent_id_0,agent_type_1)@site_type_1----(agent_id_1,agent_type_1)@site_type_0
+Compilation:rules:2:
+Compilation:rules:2:lhs:
+Compilation:rules:2:lhs:agent_id_0:
+Compilation:rules:2:lhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:lhs:agent_id_0:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:lhs:agent_id_1:
+Compilation:rules:2:lhs:agent_id_1:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:lhs:agent_id_2:
+Compilation:rules:2:lhs:agent_id_2:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:rhs:
+Compilation:rules:2:rhs:agent_id_0:
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:rhs:agent_id_1:
+Compilation:rules:2:rhs:agent_id_1:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:rhs:agent_id_2:
+Compilation:rules:2:rhs:agent_id_2:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:rhs:bonds:agent_id_0:
+Compilation:rules:2:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_1
+Compilation:rules:2:rhs:bonds:agent_id_0:site_type_1->agent_id_2.site_type_0
+Compilation:rules:2:rhs:bonds:agent_id_1:
+Compilation:rules:2:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_0
+Compilation:rules:2:rhs:bonds:agent_id_2:
+Compilation:rules:2:rhs:bonds:agent_id_2:site_type_0->agent_id_0.site_type_1
+Compilation:rules:2:direct:
+Compilation:rules:2:direct:agent_id_0:
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:direct:agent_id_1:
+Compilation:rules:2:direct:agent_id_1:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:direct:agent_id_2:
+Compilation:rules:2:direct:agent_id_2:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:reverse:
+Compilation:rules:2:reverse:agent_id_0:
+Compilation:rules:2:reverse:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:reverse:agent_id_0:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:reverse:agent_id_1:
+Compilation:rules:2:reverse:agent_id_1:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:reverse:agent_id_2:
+Compilation:rules:2:reverse:agent_id_2:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:actions:binding:(agent_id_0,agent_type_2)@site_type_0----(agent_id_1,agent_type_2)@site_type_1
+Compilation:rules:2:actions:binding:(agent_id_0,agent_type_2)@site_type_1----(agent_id_2,agent_type_2)@site_type_0
+Compilation:rules:3:
+Compilation:rules:3:lhs:
+Compilation:rules:3:lhs:agent_id_0:
+Compilation:rules:3:lhs:agent_id_0:agent_type_3:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:3:lhs:agent_id_0:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:lhs:agent_id_1:
+Compilation:rules:3:lhs:agent_id_1:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:lhs:agent_id_2:
+Compilation:rules:3:lhs:agent_id_2:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:rhs:
+Compilation:rules:3:rhs:agent_id_0:
+Compilation:rules:3:rhs:agent_id_0:agent_type_3:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:3:rhs:agent_id_0:agent_type_3:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:3:rhs:agent_id_1:
+Compilation:rules:3:rhs:agent_id_1:agent_type_3:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:3:rhs:agent_id_2:
+Compilation:rules:3:rhs:agent_id_2:agent_type_3:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:3:rhs:bonds:agent_id_0:
+Compilation:rules:3:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_1
+Compilation:rules:3:rhs:bonds:agent_id_0:site_type_1->agent_id_2.site_type_1
+Compilation:rules:3:rhs:bonds:agent_id_1:
+Compilation:rules:3:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_0
+Compilation:rules:3:rhs:bonds:agent_id_2:
+Compilation:rules:3:rhs:bonds:agent_id_2:site_type_1->agent_id_0.site_type_1
+Compilation:rules:3:direct:
+Compilation:rules:3:direct:agent_id_0:
+Compilation:rules:3:direct:agent_id_0:agent_type_3:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:3:direct:agent_id_0:agent_type_3:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:3:direct:agent_id_1:
+Compilation:rules:3:direct:agent_id_1:agent_type_3:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:3:direct:agent_id_2:
+Compilation:rules:3:direct:agent_id_2:agent_type_3:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:3:reverse:
+Compilation:rules:3:reverse:agent_id_0:
+Compilation:rules:3:reverse:agent_id_0:agent_type_3:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:3:reverse:agent_id_0:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:reverse:agent_id_1:
+Compilation:rules:3:reverse:agent_id_1:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:reverse:agent_id_2:
+Compilation:rules:3:reverse:agent_id_2:agent_type_3:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:3:actions:binding:(agent_id_0,agent_type_3)@site_type_0----(agent_id_1,agent_type_3)@site_type_1
+Compilation:rules:3:actions:binding:(agent_id_0,agent_type_3)@site_type_1----(agent_id_2,agent_type_3)@site_type_1
+Compilation:rules:4:
+Compilation:rules:4:lhs:
+Compilation:rules:4:lhs:agent_id_0:
+Compilation:rules:4:lhs:agent_id_0:agent_type_4:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:lhs:agent_id_0:agent_type_4:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:4:lhs:agent_id_1:
+Compilation:rules:4:lhs:agent_id_1:agent_type_4:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:lhs:agent_id_2:
+Compilation:rules:4:lhs:agent_id_2:agent_type_4:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:4:rhs:
+Compilation:rules:4:rhs:agent_id_0:
+Compilation:rules:4:rhs:agent_id_0:agent_type_4:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:agent_id_0:agent_type_4:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:agent_id_1:
+Compilation:rules:4:rhs:agent_id_1:agent_type_4:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:agent_id_2:
+Compilation:rules:4:rhs:agent_id_2:agent_type_4:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:bonds:agent_id_0:
+Compilation:rules:4:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
+Compilation:rules:4:rhs:bonds:agent_id_0:site_type_1->agent_id_2.site_type_1
+Compilation:rules:4:rhs:bonds:agent_id_1:
+Compilation:rules:4:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+Compilation:rules:4:rhs:bonds:agent_id_2:
+Compilation:rules:4:rhs:bonds:agent_id_2:site_type_1->agent_id_0.site_type_1
+Compilation:rules:4:direct:
+Compilation:rules:4:direct:agent_id_0:
+Compilation:rules:4:direct:agent_id_0:agent_type_4:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:direct:agent_id_0:agent_type_4:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:4:direct:agent_id_1:
+Compilation:rules:4:direct:agent_id_1:agent_type_4:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:direct:agent_id_2:
+Compilation:rules:4:direct:agent_id_2:agent_type_4:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:4:reverse:
+Compilation:rules:4:reverse:agent_id_0:
+Compilation:rules:4:reverse:agent_id_0:agent_type_4:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:reverse:agent_id_0:agent_type_4:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:4:reverse:agent_id_1:
+Compilation:rules:4:reverse:agent_id_1:agent_type_4:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:reverse:agent_id_2:
+Compilation:rules:4:reverse:agent_id_2:agent_type_4:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:4:actions:binding:(agent_id_0,agent_type_4)@site_type_0----(agent_id_1,agent_type_4)@site_type_0
+Compilation:rules:4:actions:binding:(agent_id_0,agent_type_4)@site_type_1----(agent_id_2,agent_type_4)@site_type_1
+Compilation:rules:5:
+Compilation:rules:5:lhs:
+Compilation:rules:5:lhs:agent_id_0:
+Compilation:rules:5:lhs:agent_id_0:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_0:agent_type_5:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_1:
+Compilation:rules:5:lhs:agent_id_1:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_2:
+Compilation:rules:5:lhs:agent_id_2:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:rhs:
+Compilation:rules:5:rhs:agent_id_0:
+Compilation:rules:5:rhs:agent_id_0:agent_type_5:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:agent_id_0:agent_type_5:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:agent_id_1:
+Compilation:rules:5:rhs:agent_id_1:agent_type_5:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:agent_id_2:
+Compilation:rules:5:rhs:agent_id_2:agent_type_5:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:5:rhs:bonds:agent_id_0:
+Compilation:rules:5:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
+Compilation:rules:5:rhs:bonds:agent_id_0:site_type_1->agent_id_2.site_type_0
+Compilation:rules:5:rhs:bonds:agent_id_1:
+Compilation:rules:5:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+Compilation:rules:5:rhs:bonds:agent_id_2:
+Compilation:rules:5:rhs:bonds:agent_id_2:site_type_0->agent_id_0.site_type_1
+Compilation:rules:5:direct:
+Compilation:rules:5:direct:agent_id_0:
+Compilation:rules:5:direct:agent_id_0:agent_type_5:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:direct:agent_id_0:agent_type_5:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:5:direct:agent_id_1:
+Compilation:rules:5:direct:agent_id_1:agent_type_5:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:direct:agent_id_2:
+Compilation:rules:5:direct:agent_id_2:agent_type_5:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:5:reverse:
+Compilation:rules:5:reverse:agent_id_0:
+Compilation:rules:5:reverse:agent_id_0:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:reverse:agent_id_0:agent_type_5:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:5:reverse:agent_id_1:
+Compilation:rules:5:reverse:agent_id_1:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:reverse:agent_id_2:
+Compilation:rules:5:reverse:agent_id_2:agent_type_5:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:actions:binding:(agent_id_0,agent_type_5)@site_type_0----(agent_id_1,agent_type_5)@site_type_0
+Compilation:rules:5:actions:binding:(agent_id_0,agent_type_5)@site_type_1----(agent_id_2,agent_type_5)@site_type_0
+Compilation:initial_states:0:
+Compilation:initial_states:0:mixture:
+Compilation:initial_states:0:mixture:agent_id_0:
+Compilation:initial_states:1:
+Compilation:initial_states:1:mixture:
+Compilation:initial_states:1:mixture:agent_id_0:
+Compilation:initial_states:2:
+Compilation:initial_states:2:mixture:
+Compilation:initial_states:2:mixture:agent_id_0:
+Compilation:initial_states:3:
+Compilation:initial_states:3:mixture:
+Compilation:initial_states:3:mixture:agent_id_0:
+Compilation:initial_states:4:
+Compilation:initial_states:4:mixture:
+Compilation:initial_states:4:mixture:agent_id_0:
+Compilation:initial_states:5:
+Compilation:initial_states:5:mixture:
+Compilation:initial_states:5:mixture:agent_id_0:
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:0,site_type:1,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:rule_id:0,agent_type:0,site_type:0,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:0,site_type:1,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:rule_id:1,agent_type:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:1,site_type:0,state: bound
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1,site_type:1,state: bound
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state: bound
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1,site_type:1,state: bound
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:1,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
+Quarks:Rule 2
+Quarks:TEST
+Quarks:rule_id:2,agent_type:2
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
+Quarks:rule_id:2,agent_type:2,site_type:1,state:0
+Quarks:rule_id:2,agent_type:2
+Quarks:rule_id:2,agent_type:2,site_type:1,state:0
+Quarks:rule_id:2,agent_type:2
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:2,site_type:0,state: bound
+Quarks:rule_id:2,agent_type:2,site_type:0,state:1
+Quarks:rule_id:2,agent_type:2,site_type:1,state: bound
+Quarks:rule_id:2,agent_type:2,site_type:1,state:1
+Quarks:rule_id:2,agent_type:2,site_type:1,state: bound
+Quarks:rule_id:2,agent_type:2,site_type:1,state:1
+Quarks:rule_id:2,agent_type:2,site_type:0,state: bound
+Quarks:rule_id:2,agent_type:2,site_type:0,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
+Quarks:rule_id:2,agent_type:2,site_type:1,state:0
+Quarks:rule_id:2,agent_type:2,site_type:1,state:0
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:0,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:1,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:1,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:0,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:0,state:1
+Quarks:Rule 3
+Quarks:TEST
+Quarks:rule_id:3,agent_type:3
+Quarks:rule_id:3,agent_type:3,site_type:0,state:0
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:rule_id:3,agent_type:3
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:rule_id:3,agent_type:3
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_type:3,site_type:0,state: bound
+Quarks:rule_id:3,agent_type:3,site_type:0,state:1
+Quarks:rule_id:3,agent_type:3,site_type:1,state: bound
+Quarks:rule_id:3,agent_type:3,site_type:1,state:2
+Quarks:rule_id:3,agent_type:3,site_type:1,state: bound
+Quarks:rule_id:3,agent_type:3,site_type:1,state:1
+Quarks:rule_id:3,agent_type:3,site_type:1,state: bound
+Quarks:rule_id:3,agent_type:3,site_type:1,state:2
+Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_type:3,site_type:0,state:0
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:3,agent_type:3,site_type:0,state: BOUND
+Quarks:rule_id:3,agent_type:3,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:3,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:3,agent_type:3,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:3,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:3,agent_type:3,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:3,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:3,agent_type:3,site_type:1,state:1
+Quarks:Rule 4
+Quarks:TEST
+Quarks:rule_id:4,agent_type:4
+Quarks:rule_id:4,agent_type:4,site_type:0,state:0
+Quarks:rule_id:4,agent_type:4,site_type:1,state:0
+Quarks:rule_id:4,agent_type:4
+Quarks:rule_id:4,agent_type:4,site_type:0,state:0
+Quarks:rule_id:4,agent_type:4
+Quarks:rule_id:4,agent_type:4,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:4,site_type:0,state: bound
+Quarks:rule_id:4,agent_type:4,site_type:0,state:1
+Quarks:rule_id:4,agent_type:4,site_type:1,state: bound
+Quarks:rule_id:4,agent_type:4,site_type:1,state:1
+Quarks:rule_id:4,agent_type:4,site_type:0,state: bound
+Quarks:rule_id:4,agent_type:4,site_type:0,state:1
+Quarks:rule_id:4,agent_type:4,site_type:1,state: bound
+Quarks:rule_id:4,agent_type:4,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:4,agent_type:4,site_type:0,state:0
+Quarks:rule_id:4,agent_type:4,site_type:1,state:0
+Quarks:rule_id:4,agent_type:4,site_type:0,state:0
+Quarks:rule_id:4,agent_type:4,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:4,agent_type:4,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:4,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:4,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:4,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:4,site_type:0,state: BOUND
+Quarks:rule_id:4,agent_type:4,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:4,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:4,site_type:1,state:1
+Quarks:Rule 5
+Quarks:TEST
+Quarks:rule_id:5,agent_type:5
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:rule_id:5,agent_type:5,site_type:1,state:0
+Quarks:rule_id:5,agent_type:5
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:rule_id:5,agent_type:5
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_type:5,site_type:0,state: bound
+Quarks:rule_id:5,agent_type:5,site_type:0,state:1
+Quarks:rule_id:5,agent_type:5,site_type:1,state: bound
+Quarks:rule_id:5,agent_type:5,site_type:1,state:1
+Quarks:rule_id:5,agent_type:5,site_type:0,state: bound
+Quarks:rule_id:5,agent_type:5,site_type:0,state:1
+Quarks:rule_id:5,agent_type:5,site_type:0,state: bound
+Quarks:rule_id:5,agent_type:5,site_type:0,state:2
+Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:rule_id:5,agent_type:5,site_type:1,state:0
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:rule_id:5,agent_type:5,site_type:0,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:5,agent_type:5,site_type:0,state: BOUND
+Quarks:rule_id:5,agent_type:5,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:5,agent_type:5,site_type:1,state: BOUND
+Quarks:rule_id:5,agent_type:5,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:5,agent_type:5,site_type:0,state: BOUND
+Quarks:rule_id:5,agent_type:5,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:5,agent_type:5,site_type:0,state: BOUND
+Quarks:rule_id:5,agent_type:5,site_type:0,state:1
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:0->[0;1]
+Quarks:agent_test**:agent_type:1,rule:1->[0;1]
+Quarks:agent_test**:agent_type:2,rule:2->[0;1;2]
+Quarks:agent_test**:agent_type:3,rule:3->[0;1;2]
+Quarks:agent_test**:agent_type:4,rule:4->[0;1;2]
+Quarks:agent_test**:agent_type:5,rule:5->[0;1;2]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0;1]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[0;1]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:1->[0;1]
+Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:1->[0;1]
+Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:2->[0;2]
+Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:2->[0;1]
+Quarks:site_test**:agent_type:3,site_type:0,state:0,rule:3->[0]
+Quarks:site_test**:agent_type:3,site_type:1,state:0,rule:3->[0;1;2]
+Quarks:site_test**:agent_type:4,site_type:0,state:0,rule:4->[0;1]
+Quarks:site_test**:agent_type:4,site_type:1,state:0,rule:4->[0;2]
+Quarks:site_test**:agent_type:5,site_type:0,state:0,rule:5->[0;1;2]
+Quarks:site_test**:agent_type:5,site_type:1,state:0,rule:5->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0;1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0;1]
+Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:1->[0;1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:1->[0;1]
+Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:2->[0;2]
+Quarks:site_modif+:agent_type:2,site_type:1,state:1,rule:2->[0;1]
+Quarks:site_modif+:agent_type:3,site_type:0,state:1,rule:3->[0]
+Quarks:site_modif+:agent_type:3,site_type:1,state:2,rule:3->[0;2]
+Quarks:site_modif+:agent_type:3,site_type:1,state:1,rule:3->[1]
+Quarks:site_modif+:agent_type:4,site_type:0,state:1,rule:4->[0;1]
+Quarks:site_modif+:agent_type:4,site_type:1,state:1,rule:4->[0;2]
+Quarks:site_modif+:agent_type:5,site_type:0,state:1,rule:5->[0;1]
+Quarks:site_modif+:agent_type:5,site_type:0,state:2,rule:5->[2]
+Quarks:site_modif+:agent_type:5,site_type:1,state:1,rule:5->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0;1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0;1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:1->[0;1]
+Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:1->[0;1]
+Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:2->[0;2]
+Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:2->[0;1]
+Quarks:site_modif-:agent_type:3,site_type:0,state:0,rule:3->[0]
+Quarks:site_modif-:agent_type:3,site_type:1,state:0,rule:3->[0;1;2]
+Quarks:site_modif-:agent_type:4,site_type:0,state:0,rule:4->[0;1]
+Quarks:site_modif-:agent_type:4,site_type:1,state:0,rule:4->[0;2]
+Quarks:site_modif-:agent_type:5,site_type:0,state:0,rule:5->[0;1;2]
+Quarks:site_modif-:agent_type:5,site_type:1,state:0,rule:5->[0]
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Inhibition_map:rule(0):'r1' A(z,t),A(z,t)->A(z!1,t!2),A(z!1,t!2) -> rule(0):'r1' A(z,t),A(z,t)->A(z!1,t!2),A(z!1,t!2)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(1):'r2' B(z,t),B(z,t)->B(z!1,t!2),B(z!2,t!1) -> rule(1):'r2' B(z,t),B(z,t)->B(z!1,t!2),B(z!2,t!1)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(2):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(t!1),C(z!2) -> rule(2):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(t!1),C(z!2)[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(t!2) -> rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(t!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
+Influence_map:Inhibition_map:rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2) -> rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2)[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2) -> rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
+Reachability analysis...
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(z!free,t!free)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		B(z!free,t!free)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!free,t!free)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!free,t!free)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!free,t!free)
+
+	Views in initial state:
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		F(z!free,t!free)
+
+
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
+		the precondition is satisfied
+
+		rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:) is applied for the first time
+
+		Updating the views for A(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		A(z!A@z,t!A@t)
+
+
+		Updating the views for A(z!,t!)
+
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
+		the precondition is satisfied
+
+		rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:) is applied for the first time
+
+		Updating the views for F(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		F(z!F@z,t!F@z)
+
+
+		Updating the views for F(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		F(z!F@z,t!free)
+
+
+		Updating the views for F(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=25
+ Node(site_type:1<2)
+  Id=0
+   Leaf False 
+
+  Id=24
+   Node(site_type:1<3)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		F(z!F@t,t!free)
+
+
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
+		the precondition is satisfied
+
+		rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:) is applied for the first time
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!E@z,t!E@t)
+
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!E@z,t!free)
+
+
+		Updating the views for E(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		E(z!free,t!E@t)
+
+
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
+		the precondition is satisfied
+
+		rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:) is applied for the first time
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=37
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=36
+   Node(site_type:1<2)
+    Id=35
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=34
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!D@t,t!D@t)
+
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!free,t!D@z)
+
+
+		Updating the views for D(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=43
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=42
+   Node(site_type:1<1)
+    Id=35
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=34
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		D(z!free,t!D@t)
+
+
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
+		the precondition is satisfied
+
+		rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:) is applied for the first time
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!C@t,t!C@z)
+
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!free,t!C@z)
+
+
+		Updating the views for C(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		C(z!C@t,t!free)
+
+
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
+		the precondition is satisfied
+
+		rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:) is applied for the first time
+
+		Updating the views for B(z!,t!)
+
+INTENSIONAL DESCRIPTION:
+Id=13
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+		B(z!B@t,t!B@z)
+
+
+		Updating the views for B(z!,t!)
+
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
+		the precondition is satisfied
+
+		Updating the views for A(z!,t!)
+
+		Updating the views for A(z!,t!)
+
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
+		the precondition is satisfied
+
+		Updating the views for F(z!,t!)
+
+		Updating the views for F(z!,t!)
+
+		Updating the views for F(z!,t!)
+
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
+		the precondition is satisfied
+
+		Updating the views for E(z!,t!)
+
+		Updating the views for E(z!,t!)
+
+		Updating the views for E(z!,t!)
+
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
+		the precondition is satisfied
+
+		Updating the views for D(z!,t!)
+
+		Updating the views for D(z!,t!)
+
+		Updating the views for D(z!,t!)
+
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
+		the precondition is satisfied
+
+		Updating the views for C(z!,t!)
+
+		Updating the views for C(z!,t!)
+
+		Updating the views for C(z!,t!)
+
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
+		the precondition is satisfied
+
+		Updating the views for B(z!,t!)
+
+		Updating the views for B(z!,t!)
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=12
+     Node(site_type:1<2)
+      Id=11
+       Node(site_type:2<1)
+        Id=0
+         Leaf False 
+
+        Id=10
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+agent_type:1:B:cv_id:0
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=12
+     Node(site_type:1<2)
+      Id=11
+       Node(site_type:2<1)
+        Id=0
+         Leaf False 
+
+        Id=10
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+agent_type:2:C:cv_id:0
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=21
+   Node(site_type:1<2)
+    Id=20
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+agent_type:3:D:cv_id:0
+Id=46
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=45
+   Node(site_type:1<1)
+    Id=44
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=34
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=36
+     Node(site_type:1<2)
+      Id=35
+       Node(site_type:2<2)
+        Id=0
+         Leaf False 
+
+        Id=34
+         Node(site_type:2<3)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+agent_type:4:E:cv_id:0
+Id=31
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=21
+   Node(site_type:1<2)
+    Id=20
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+agent_type:5:F:cv_id:0
+Id=28
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=26
+     Node(site_type:1<2)
+      Id=20
+       Node(site_type:2<0)
+        Id=0
+         Leaf False 
+
+        Id=10
+         Node(site_type:2<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=24
+       Node(site_type:1<3)
+        Id=5
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=4
+           Node(site_type:2<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=56
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=55
+   Node(site_type:1<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=58
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=57
+   Node(site_type:0<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A() => [ A(t) v A(t!A.t) ]
+A() => [ A(z) v A(z!A.z) ]
+B() => [ B(t) v B(t!B.z) ]
+B() => [ B(z) v B(z!B.t) ]
+C() => [ C(t) v C(t!C.z) ]
+C() => [ C(z) v C(z!C.t) ]
+D() => [ D(t) v D(t!D.z) v D(t!D.t) ]
+D() => [ D(z) v D(z!D.t) ]
+E() => [ E(t) v E(t!E.t) ]
+E() => [ E(z) v E(z!E.z) ]
+F() => [ F(t) v F(t!F.z) ]
+F() => [ F(z) v F(z!F.z) v F(z!F.t) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=61
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=60
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=59
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=61
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=60
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=59
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=67
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=66
+   Node(site_type:0<1)
+    Id=56
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=55
+       Node(site_type:1<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=65
+     Node(site_type:0<2)
+      Id=64
+       Node(site_type:1<2)
+        Id=0
+         Leaf False 
+
+        Id=55
+         Node(site_type:1<3)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=72
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=71
+     Node(site_type:0<2)
+      Id=52
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=70
+       Node(site_type:0<3)
+        Id=3
+         Node(site_type:1<0)
+          Id=0
+           Leaf False 
+
+          Id=2
+           Node(site_type:1<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(z!A.z) <=> A(t!A.t)
+B(z!B.t) <=> B(t!B.z)
+D(z!D.t) => D(t!D.t,z!D.t)
+F(z!F.t) => F(t,z!F.t)
+F(z) => F(t,z)
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+A(t!A.t,z!A.z) => A(t!2,z!1),A(t!2,z!1)
+B(t!B.z,z!B.t) => [ B(t!2,z!1),B(t!1,z!2) v B(t!1,z!1) ]
+C(t!C.z,z!C.t) => C(t!2,z!1),C(t!1),C(z!2)
+E(t!E.t,z!E.z) => E(t!2,z!1),E(z!1),E(t!2)
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=56
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=55
+   Node(site_type:1<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=58
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=57
+   Node(site_type:0<3)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=61
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=60
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=59
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=61
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=60
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=59
+     Node(site_type:0<2)
+      Id=17
+       Node(site_type:1<1)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=67
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=66
+   Node(site_type:0<1)
+    Id=56
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=55
+       Node(site_type:1<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=65
+     Node(site_type:0<2)
+      Id=64
+       Node(site_type:1<2)
+        Id=0
+         Leaf False 
+
+        Id=55
+         Node(site_type:1<3)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=0
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=52
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=54
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=53
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=72
+   Node(site_type:0<1)
+    Id=3
+     Node(site_type:1<0)
+      Id=0
+       Leaf False 
+
+      Id=2
+       Node(site_type:1<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=71
+     Node(site_type:0<2)
+      Id=52
+       Node(site_type:1<0)
+        Id=0
+         Leaf False 
+
+        Id=16
+         Node(site_type:1<2)
+          Id=1
+           Leaf True 
+
+          Id=0
+           Leaf False 
+
+      Id=70
+       Node(site_type:0<3)
+        Id=3
+         Node(site_type:1<0)
+          Id=0
+           Leaf False 
+
+          Id=2
+           Node(site_type:1<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+F()=> [
+		  F(z)
+		v F(z!F.z)
+		v F(z!F.t)]
+F()=> [
+		  F(t)
+		v F(t!F.z)]
+E()=> [
+		  E(z)
+		v E(z!E.z)]
+E()=> [
+		  E(t)
+		v E(t!E.t)]
+D()=> [
+		  D(z)
+		v D(z!D.t)]
+D()=> [
+		  D(t)
+		v D(t!D.z)
+		v D(t!D.t)]
+C()=> [
+		  C(z)
+		v C(z!C.t)]
+C()=> [
+		  C(t)
+		v C(t!C.z)]
+B()=> [
+		  B(z)
+		v B(z!B.t)]
+B()=> [
+		  B(t)
+		v B(t!B.z)]
+A()=> [
+		  A(z)
+		v A(z!A.z)]
+A()=> [
+		  A(t)
+		v A(t!A.t)]
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+F(z)=> [F(t,z)]
+F(z!F.t)=> [F(t,z!F.t)]
+D(z!D.t)=> [D(t!D.t,z!D.t)]
+A(z!A.z)=> [A(t!A.t)]
+B(z!B.t)=> [B(t!B.z)]
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+A(t!A.t,z!A.z)=> [A(t!2,z!1),A(t!2,z!1)]
+B(t!B.z,z!B.t)=> [
+		  B(t!2,z!1),B(t!1,z!2)
+		v B(t!1,z!1)]
+C(t!C.z,z!C.t)=> [C(t!2,z!1),C(t!1),C(z!2)]
+E(t!E.t,z!E.z)=> [E(t!2,z!1),E(z!1),E(t!2)]
+
+execution finished without any exception

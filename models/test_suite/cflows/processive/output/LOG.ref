@@ -1,0 +1,74 @@
+Parsing processive.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 12 (sub)observables 6 navigation steps
+	 -initial conditions
++ Building initial state (32 agents)
+Done
++ Command line to rerun is: 'KaSim' '-i' 'processive.ka' '-seed' '240056667' '-u' 'event' '-l' '30000' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: -29517 events 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	 - blackboard generation
+	- alpha-conversion
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 514
+ longest story    : 51
+ average length   : 14.41
+ geometric mean   : 16.59
+
+	 - causal flow compression (10)
+
+____________________________________________________________
+############################################################
+
+	- simplify the trace, 513 events 
+		- start iteration 1, 513 events remaining 
+				- alpha-conversion
+				- detecting siphons: +48 events 
+				- alpha-conversion
+				- cutting concurrent events: -456 events 
+				- detecting pseudo inverse events: -18 events 
+		- start iteration 2, 87 events remaining 
+				- alpha-conversion
+				- detecting siphons: +6 events 
+				- alpha-conversion
+				- cutting concurrent events: -15 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 3, 78 events remaining 
+				- alpha-conversion
+				- detecting siphons: +6 events 
+				- alpha-conversion
+				- cutting concurrent events: -6 events 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 78 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (10)
+
+
+	 - weak flow compression (3)
+
+____________________________________________________________
+############################################################
+
+	 - strong flow compression (3)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 10 flows
++ Pretty printing 3 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

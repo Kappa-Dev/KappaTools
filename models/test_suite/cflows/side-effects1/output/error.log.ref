@@ -1,0 +1,2 @@
+File "side-effects.ka", line 5, characters 13-14:
+Warning: breaking a semi-link on site 'a' will induce a side effect

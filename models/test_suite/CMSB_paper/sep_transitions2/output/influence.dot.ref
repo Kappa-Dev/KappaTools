@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa sep_transitions2.ka --compute-separating-transitions --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"init" [shape="box" fillcolor="#87ceeb" style=filled];
+"init_op" [shape="box" fillcolor="#87ceeb" style=filled];
+"x" [shape="box" fillcolor="#87ceeb" style=filled];
+"x_op" [shape="box" fillcolor="#87ceeb" style=filled];
+"y" [shape="box" fillcolor="#87ceeb" style=filled];
+"y_op" [shape="box" fillcolor="#87ceeb" style=filled];
+"z" [shape="box" fillcolor="#87ceeb" style=filled];
+"init" -> "init_op" [label="[0->0]" color="green"];
+"init" -> "x" [label="[0->0]" color="green"];
+"init" -> "z" [label="[0->0]" color="green"];
+"init_op" -> "init" [label="[0->0]" color="green"];
+"x" -> "x_op" [label="[0->0]" color="green"];
+"x_op" -> "init_op" [label="[0->0]" color="green"];
+"x_op" -> "x" [label="[0->0]" color="green"];
+"y" -> "y_op" [label="[0->0]" color="green"];
+"y_op" -> "y" [label="[0->0]" color="green"];
+"z" -> "y" [label="[0->0]" color="green"];
+"z" -> "y_op" [label="[0->0]" color="green"];
+"init_op" -> "x" [label="[0->0]" color="red" arrowhead="tee"];
+"init_op" -> "z" [label="[0->0]" color="red" arrowhead="tee"];
+"x" -> "init_op" [label="[0->0]" color="red" arrowhead="tee"];
+"z" -> "init_op" [label="[0->0]" color="red" arrowhead="tee"];
+"z" -> "x" [label="[0->0]" color="red" arrowhead="tee"];
+"z" -> "x_op" [label="[0->0]" color="red" arrowhead="tee"];
+}

@@ -1,0 +1,17 @@
+%def: "seed" "148153191"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(x[x.A] y b[b.B] c[c.C])
+%agent: B(b[b.A] c[b.C])
+%agent: C(b[c.B] c[c.A])
+
+%plot: [T]
+'side_effect' A(x[1] y[#] b[2] c[3])-, A(x[1] y[#] b[#] c[#])-, B(b[2] c[#])-, C(b[#] c[3])- @ 1
+
+%init: 0 A(x[.] y[.] b[.] c[.]), B(b[.] c[.]), C(b[.] c[.])
+%init: 1 A(x[1] y[.] b[2] c[4]), A(x[1] y[.] b[.] c[.]), B(b[2] c[3]), C(b[3] c[4])
+
+%mod: [E] = 1 do $STOP

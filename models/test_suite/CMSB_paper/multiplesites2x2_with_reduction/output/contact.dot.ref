@@ -1,0 +1,22 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa ../protein2x2.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces --ignore-trivial-losanges -syntax 3
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "a1" shape =ellipse color = green size = "5"]
+   0.1 [style = filled label = "a2" shape =ellipse color = green size = "5"]
+   0.2 [style = filled label = "b1" shape =ellipse color = green size = "5"]
+   0.3 [style = filled label = "b2" shape =ellipse color = green size = "5"]
+   0.4 [style = filled label = "g" shape =circle color = yellow size = "5"]
+label =  "P";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+label =  "K";  shape = rectangle; color = red
+} ; 
+0.4 -- 1.0
+}

@@ -1,0 +1,30 @@
+Parsing initial_state.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A() => [ A(y~u) v A(y~p) ]
+A() => [ A(x~u) v A(x~p) ]
+D() => D(x~u)
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+A(x~p) => A(x~p,y~u)
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+execution finished without any exception

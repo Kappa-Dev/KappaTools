@@ -1,0 +1,27 @@
+digraph G{
+"Init_19" [label="" style="invis" width="0px" height="0px"];
+"Final_27" [label="" style="invis" width="0px" height="0px"];
+"Final_16" [label="" style="invis" width="0px" height="0px"];
+"Node_16" [label="A(x!free,y!free,z~u)"];
+"Node_27" [label="A(x!free,y!B@x,z~u)"];
+"Node_26" [label="A(x!free,y!free,z~p)"];
+"Node_25" [label="A(x!free,y!B@x,z~p)"];
+"Node_24" [label="A(x!B@y,y!free,z~u)"];
+"Node_23" [label="A(x!B@y,y!free,z~p)"];
+"Node_21" [label="A(x!B@y,y!B@x,z~p)"];
+"Node_19" [label="A(x!B@y,y!B@x,z~u)"];
+"Node_19" -> "Node_21" [label="1"];
+"Node_19" -> "Node_27" [label="0"];
+"Node_21" -> "Node_25" [label="0"];
+"Node_24" -> "Node_16" [label="0"];
+"Node_23" -> "Node_26" [label="0"];
+"Node_19" -> "Node_16" [label="0"];
+"Node_21" -> "Node_26" [label="0"];
+"Node_27" -> "Node_16" [label="0"];
+"Node_25" -> "Node_26" [label="0"];
+"Node_19" -> "Node_24" [label="0"];
+"Node_21" -> "Node_23" [label="0"];
+"Init_19" -> "Node_19" [label=""];
+"Node_27" -> "Final_27" [label="2"];
+"Node_16" -> "Final_16" [label="2"];
+}

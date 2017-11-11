@@ -1,0 +1,24 @@
+%def: "seed" "501792230"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+%def: "traceFileName" "trace.json"
+
+%agent: A(x{a b}[x.B])
+%agent: B(x{a b}[x.A])
+%agent: C()
+
+%plot: [T]
+C()+ @ 1
+A(x[_/.]) @ 1
+A(x{a/b}[./1]), B(x[./1]) @ 1
+A(x{b/a}[./1]), B(x[./1]) @ 1
+'GOAL' A(x{b}[1])-, B(x{b}[1])- @ 1
+
+/*0*/%mod: [true] do $TRACK A(x{b}[1]), B(x{b}[1]) [true] repeat [false]
+
+%init: 1 A(x{a}[1]), B(x{b}[1])
+%init: 10 B(x{a}[.])
+
+%mod: [E] = 199 do $STOP

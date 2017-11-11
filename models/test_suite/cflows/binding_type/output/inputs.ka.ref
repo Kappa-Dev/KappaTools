@@ -1,0 +1,21 @@
+%def: "seed" "924556145"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+
+%agent: A(x[x.K] y{u p})
+%agent: K(x[x.A])
+
+%plot: [T]
+A(x[./1]), K(x[./1]) @ 2
+A(x[1/.]), K(x[1/.]) @ 1
+A(x[x.K] y{u/p}[.]) @ 1
+'GOAL' A(y{p}[.]) @ 1
+
+/*0*/%mod: [true] do $TRACK A(y{p}) [true] repeat [false]
+
+%init: 100 A(x[.] y{u}[.])
+%init: 100 K(x[.])
+
+%mod: [E] = 10000 do $STOP

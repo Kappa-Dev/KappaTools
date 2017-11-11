@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
+<title>Output of 'KaSim' '-u' 'event' '-l' '200' '-seed' '438438234' '-o' 'data.svg' '-d' 'output' '-p' '2' 'abbc.ka' '-syntax' '4'</title>
+
+<style type="text/css" >
+<![CDATA[
+#legend text {text-anchor:end; baseline-shift:-.4em;}
+#axis_t text {text-anchor:middle; baseline-shift:-1em;}
+#axis_va text {text-anchor:end; baseline-shift:-.4em;}
+#axes {color:black;stroke:currentColor;stroke-size:1px;}
+#axes text {stroke:none;fill:currentColor;}
+]]>
+</style>
+
+<defs>
+<path id="plus" class="point" stroke="currentColor" d="M-3.5,0 h7 M0,-3.5 v7"/>
+<path id="cross" class="point" stroke="currentColor" d="M-3.5,-3.5 L3.5,3.5 M3.5,-3.5 L-3.5,3.5"/>
+<circle id="point" class="point" r="2.5" stroke="none" fill="currentColor"/>
+</defs>
+
+<g id="axes">
+<g id="axis_va">
+  <title>Observable values</title>
+  <path d="M 70,10 L 70,575"/>
+  <text x="62.000000" y="575.000000">0</text>
+  <line x1="65.000000" y1="575.000000" x2="75.000000" y2="575.000000"/>
+  <text x="62.000000" y="512.222222">4.89</text>
+  <line x1="65.000000" y1="512.222222" x2="75.000000" y2="512.222222"/>
+  <text x="62.000000" y="449.444444">9.78</text>
+  <line x1="65.000000" y1="449.444444" x2="75.000000" y2="449.444444"/>
+  <text x="62.000000" y="386.666667">14.7</text>
+  <line x1="65.000000" y1="386.666667" x2="75.000000" y2="386.666667"/>
+  <text x="62.000000" y="323.888889">19.6</text>
+  <line x1="65.000000" y1="323.888889" x2="75.000000" y2="323.888889"/>
+  <text x="62.000000" y="261.111111">24.4</text>
+  <line x1="65.000000" y1="261.111111" x2="75.000000" y2="261.111111"/>
+  <text x="62.000000" y="198.333333">29.3</text>
+  <line x1="65.000000" y1="198.333333" x2="75.000000" y2="198.333333"/>
+  <text x="62.000000" y="135.555556">34.2</text>
+  <line x1="65.000000" y1="135.555556" x2="75.000000" y2="135.555556"/>
+  <text x="62.000000" y="72.777778">39.1</text>
+  <line x1="65.000000" y1="72.777778" x2="75.000000" y2="72.777778"/>
+  <text x="62.000000" y="10.000000">44</text>
+  <line x1="65.000000" y1="10.000000" x2="75.000000" y2="10.000000"/>
+  </g>
+<g id="axis_t">
+  <title>Time (arbitrary unit)</title>
+  <path d="M 70,575 L 790,575"/>
+  <text x="70.000000" y="583.000000">0</text>
+  <line x1="70.000000" y1="570.000000" x2="70.000000" y2="580.000000"/>
+  <text x="135.454545" y="583.000000">0.124</text>
+  <line x1="135.454545" y1="570.000000" x2="135.454545" y2="580.000000"/>
+  <text x="200.909091" y="583.000000">0.248</text>
+  <line x1="200.909091" y1="570.000000" x2="200.909091" y2="580.000000"/>
+  <text x="266.363636" y="583.000000">0.372</text>
+  <line x1="266.363636" y1="570.000000" x2="266.363636" y2="580.000000"/>
+  <text x="331.818182" y="583.000000">0.496</text>
+  <line x1="331.818182" y1="570.000000" x2="331.818182" y2="580.000000"/>
+  <text x="397.272727" y="583.000000">0.62</text>
+  <line x1="397.272727" y1="570.000000" x2="397.272727" y2="580.000000"/>
+  <text x="462.727273" y="583.000000">0.743</text>
+  <line x1="462.727273" y1="570.000000" x2="462.727273" y2="580.000000"/>
+  <text x="528.181818" y="583.000000">0.867</text>
+  <line x1="528.181818" y1="570.000000" x2="528.181818" y2="580.000000"/>
+  <text x="593.636364" y="583.000000">0.991</text>
+  <line x1="593.636364" y1="570.000000" x2="593.636364" y2="580.000000"/>
+  <text x="659.090909" y="583.000000">1.12</text>
+  <line x1="659.090909" y1="570.000000" x2="659.090909" y2="580.000000"/>
+  <text x="724.545455" y="583.000000">1.24</text>
+  <line x1="724.545455" y1="570.000000" x2="724.545455" y2="580.000000"/>
+  <text x="790.000000" y="583.000000">1.36</text>
+  <line x1="790.000000" y1="570.000000" x2="790.000000" y2="580.000000"/>
+  </g>
+</g>
+
+<g id="legend">
+  
+  <text x="785" y="10">Ap</text>
+  <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
+</g>
+
+<g id="data">
+<g id="data_0" style="color:blue">
+  <use xlink:href="#plus" x="790.000000" y="10.000000">
+  <title>Ap t=1.36303 v=44</title></use>
+  <use xlink:href="#plus" x="745.864203" y="22.840909">
+  <title>Ap t=1.27948 v=43</title></use>
+  <use xlink:href="#plus" x="742.142440" y="35.681818">
+  <title>Ap t=1.27243 v=42</title></use>
+  <use xlink:href="#plus" x="733.300198" y="35.681818">
+  <title>Ap t=1.25569 v=42</title></use>
+  <use xlink:href="#plus" x="729.091341" y="48.522727">
+  <title>Ap t=1.24773 v=41</title></use>
+  <use xlink:href="#plus" x="721.288354" y="61.363636">
+  <title>Ap t=1.23295 v=40</title></use>
+  <use xlink:href="#plus" x="719.110869" y="61.363636">
+  <title>Ap t=1.22883 v=40</title></use>
+  <use xlink:href="#plus" x="716.656772" y="87.045455">
+  <title>Ap t=1.22419 v=38</title></use>
+  <use xlink:href="#plus" x="701.262902" y="87.045455">
+  <title>Ap t=1.19504 v=38</title></use>
+  <use xlink:href="#plus" x="696.529293" y="99.886364">
+  <title>Ap t=1.18608 v=37</title></use>
+  <use xlink:href="#plus" x="688.130535" y="112.727273">
+  <title>Ap t=1.17018 v=36</title></use>
+  <use xlink:href="#plus" x="678.573253" y="125.568182">
+  <title>Ap t=1.15209 v=35</title></use>
+  <use xlink:href="#plus" x="658.546761" y="138.409091">
+  <title>Ap t=1.11418 v=34</title></use>
+  <use xlink:href="#plus" x="645.189960" y="138.409091">
+  <title>Ap t=1.08889 v=34</title></use>
+  <use xlink:href="#plus" x="635.855933" y="151.250000">
+  <title>Ap t=1.07122 v=33</title></use>
+  <use xlink:href="#plus" x="626.857836" y="164.090909">
+  <title>Ap t=1.05419 v=32</title></use>
+  <use xlink:href="#plus" x="617.124061" y="176.931818">
+  <title>Ap t=1.03576 v=31</title></use>
+  <use xlink:href="#plus" x="574.559463" y="176.931818">
+  <title>Ap t=0.955182 v=31</title></use>
+  <use xlink:href="#plus" x="571.681341" y="189.772727">
+  <title>Ap t=0.949733 v=30</title></use>
+  <use xlink:href="#plus" x="559.098075" y="189.772727">
+  <title>Ap t=0.925912 v=30</title></use>
+  <use xlink:href="#plus" x="553.624187" y="202.613636">
+  <title>Ap t=0.915549 v=29</title></use>
+  <use xlink:href="#plus" x="551.601437" y="215.454545">
+  <title>Ap t=0.91172 v=28</title></use>
+  <use xlink:href="#plus" x="541.720245" y="228.295455">
+  <title>Ap t=0.893014 v=27</title></use>
+  <use xlink:href="#plus" x="532.288648" y="241.136364">
+  <title>Ap t=0.875159 v=26</title></use>
+  <use xlink:href="#plus" x="523.385884" y="241.136364">
+  <title>Ap t=0.858305 v=26</title></use>
+  <use xlink:href="#plus" x="501.977574" y="241.136364">
+  <title>Ap t=0.817777 v=26</title></use>
+  <use xlink:href="#plus" x="492.782875" y="253.977273">
+  <title>Ap t=0.80037 v=25</title></use>
+  <use xlink:href="#plus" x="486.862681" y="266.818182">
+  <title>Ap t=0.789163 v=24</title></use>
+  <use xlink:href="#plus" x="471.832749" y="266.818182">
+  <title>Ap t=0.76071 v=24</title></use>
+  <use xlink:href="#plus" x="468.243113" y="279.659091">
+  <title>Ap t=0.753914 v=23</title></use>
+  <use xlink:href="#plus" x="457.125431" y="279.659091">
+  <title>Ap t=0.732867 v=23</title></use>
+  <use xlink:href="#plus" x="453.846976" y="279.659091">
+  <title>Ap t=0.726661 v=23</title></use>
+  <use xlink:href="#plus" x="449.889299" y="292.500000">
+  <title>Ap t=0.719168 v=22</title></use>
+  <use xlink:href="#plus" x="438.812882" y="292.500000">
+  <title>Ap t=0.6982 v=22</title></use>
+  <use xlink:href="#plus" x="431.830217" y="305.340909">
+  <title>Ap t=0.684981 v=21</title></use>
+  <use xlink:href="#plus" x="431.477814" y="318.181818">
+  <title>Ap t=0.684314 v=20</title></use>
+  <use xlink:href="#plus" x="430.037706" y="331.022727">
+  <title>Ap t=0.681587 v=19</title></use>
+  <use xlink:href="#plus" x="416.533236" y="331.022727">
+  <title>Ap t=0.656022 v=19</title></use>
+  <use xlink:href="#plus" x="409.803785" y="343.863636">
+  <title>Ap t=0.643283 v=18</title></use>
+  <use xlink:href="#plus" x="404.428625" y="356.704545">
+  <title>Ap t=0.633107 v=17</title></use>
+  <use xlink:href="#plus" x="400.740127" y="369.545455">
+  <title>Ap t=0.626124 v=16</title></use>
+  <use xlink:href="#plus" x="393.797243" y="382.386364">
+  <title>Ap t=0.612981 v=15</title></use>
+  <use xlink:href="#plus" x="383.688362" y="382.386364">
+  <title>Ap t=0.593843 v=15</title></use>
+  <use xlink:href="#plus" x="357.817624" y="382.386364">
+  <title>Ap t=0.544868 v=15</title></use>
+  <use xlink:href="#plus" x="352.860689" y="395.227273">
+  <title>Ap t=0.535484 v=14</title></use>
+  <use xlink:href="#plus" x="347.566652" y="408.068182">
+  <title>Ap t=0.525461 v=13</title></use>
+  <use xlink:href="#plus" x="341.856866" y="420.909091">
+  <title>Ap t=0.514652 v=12</title></use>
+  <use xlink:href="#plus" x="334.005901" y="420.909091">
+  <title>Ap t=0.49979 v=12</title></use>
+  <use xlink:href="#plus" x="331.888330" y="433.750000">
+  <title>Ap t=0.495781 v=11</title></use>
+  <use xlink:href="#plus" x="317.898372" y="433.750000">
+  <title>Ap t=0.469296 v=11</title></use>
+  <use xlink:href="#plus" x="316.751708" y="459.431818">
+  <title>Ap t=0.467126 v=9</title></use>
+  <use xlink:href="#plus" x="290.304732" y="459.431818">
+  <title>Ap t=0.417059 v=9</title></use>
+  <use xlink:href="#plus" x="286.180570" y="459.431818">
+  <title>Ap t=0.409251 v=9</title></use>
+  <use xlink:href="#plus" x="284.849107" y="459.431818">
+  <title>Ap t=0.406731 v=9</title></use>
+  <use xlink:href="#plus" x="272.477370" y="459.431818">
+  <title>Ap t=0.38331 v=9</title></use>
+  <use xlink:href="#plus" x="271.270061" y="472.272727">
+  <title>Ap t=0.381024 v=8</title></use>
+  <use xlink:href="#plus" x="267.404883" y="472.272727">
+  <title>Ap t=0.373707 v=8</title></use>
+  <use xlink:href="#plus" x="255.647108" y="472.272727">
+  <title>Ap t=0.351449 v=8</title></use>
+  <use xlink:href="#plus" x="253.315558" y="485.113636">
+  <title>Ap t=0.347035 v=7</title></use>
+  <use xlink:href="#plus" x="244.693126" y="485.113636">
+  <title>Ap t=0.330712 v=7</title></use>
+  <use xlink:href="#plus" x="237.907518" y="485.113636">
+  <title>Ap t=0.317866 v=7</title></use>
+  <use xlink:href="#plus" x="234.611061" y="497.954545">
+  <title>Ap t=0.311625 v=6</title></use>
+  <use xlink:href="#plus" x="230.021824" y="510.795455">
+  <title>Ap t=0.302937 v=5</title></use>
+  <use xlink:href="#plus" x="228.836994" y="510.795455">
+  <title>Ap t=0.300694 v=5</title></use>
+  <use xlink:href="#plus" x="226.158656" y="510.795455">
+  <title>Ap t=0.295624 v=5</title></use>
+  <use xlink:href="#plus" x="216.897429" y="523.636364">
+  <title>Ap t=0.278092 v=4</title></use>
+  <use xlink:href="#plus" x="214.158056" y="523.636364">
+  <title>Ap t=0.272906 v=4</title></use>
+  <use xlink:href="#plus" x="213.162148" y="523.636364">
+  <title>Ap t=0.27102 v=4</title></use>
+  <use xlink:href="#plus" x="206.297534" y="523.636364">
+  <title>Ap t=0.258025 v=4</title></use>
+  <use xlink:href="#plus" x="203.838753" y="536.477273">
+  <title>Ap t=0.25337 v=3</title></use>
+  <use xlink:href="#plus" x="198.194964" y="536.477273">
+  <title>Ap t=0.242686 v=3</title></use>
+  <use xlink:href="#plus" x="196.716246" y="536.477273">
+  <title>Ap t=0.239887 v=3</title></use>
+  <use xlink:href="#plus" x="191.515362" y="536.477273">
+  <title>Ap t=0.230041 v=3</title></use>
+  <use xlink:href="#plus" x="181.508089" y="536.477273">
+  <title>Ap t=0.211096 v=3</title></use>
+  <use xlink:href="#plus" x="180.763050" y="549.318182">
+  <title>Ap t=0.209686 v=2</title></use>
+  <use xlink:href="#plus" x="173.535563" y="549.318182">
+  <title>Ap t=0.196003 v=2</title></use>
+  <use xlink:href="#plus" x="171.257192" y="549.318182">
+  <title>Ap t=0.19169 v=2</title></use>
+  <use xlink:href="#plus" x="170.558200" y="549.318182">
+  <title>Ap t=0.190367 v=2</title></use>
+  <use xlink:href="#plus" x="161.063484" y="549.318182">
+  <title>Ap t=0.172392 v=2</title></use>
+  <use xlink:href="#plus" x="157.030348" y="549.318182">
+  <title>Ap t=0.164757 v=2</title></use>
+  <use xlink:href="#plus" x="151.206536" y="549.318182">
+  <title>Ap t=0.153732 v=2</title></use>
+  <use xlink:href="#plus" x="142.006577" y="562.159091">
+  <title>Ap t=0.136316 v=1</title></use>
+  <use xlink:href="#plus" x="138.011717" y="562.159091">
+  <title>Ap t=0.128753 v=1</title></use>
+  <use xlink:href="#plus" x="131.811207" y="562.159091">
+  <title>Ap t=0.117015 v=1</title></use>
+  <use xlink:href="#plus" x="126.855676" y="562.159091">
+  <title>Ap t=0.107633 v=1</title></use>
+  <use xlink:href="#plus" x="123.892704" y="562.159091">
+  <title>Ap t=0.102024 v=1</title></use>
+  <use xlink:href="#plus" x="122.286486" y="575.000000">
+  <title>Ap t=0.0989836 v=0</title></use>
+  <use xlink:href="#plus" x="117.416523" y="575.000000">
+  <title>Ap t=0.0897642 v=0</title></use>
+  <use xlink:href="#plus" x="112.584912" y="575.000000">
+  <title>Ap t=0.0806175 v=0</title></use>
+  <use xlink:href="#plus" x="106.817632" y="575.000000">
+  <title>Ap t=0.0696995 v=0</title></use>
+  <use xlink:href="#plus" x="104.156946" y="575.000000">
+  <title>Ap t=0.0646625 v=0</title></use>
+  <use xlink:href="#plus" x="101.140410" y="575.000000">
+  <title>Ap t=0.0589519 v=0</title></use>
+  <use xlink:href="#plus" x="92.090004" y="575.000000">
+  <title>Ap t=0.0418186 v=0</title></use>
+  <use xlink:href="#plus" x="90.957053" y="575.000000">
+  <title>Ap t=0.0396738 v=0</title></use>
+  <use xlink:href="#plus" x="88.144341" y="575.000000">
+  <title>Ap t=0.0343491 v=0</title></use>
+  <use xlink:href="#plus" x="85.333612" y="575.000000">
+  <title>Ap t=0.0290281 v=0</title></use>
+  <use xlink:href="#plus" x="82.808972" y="575.000000">
+  <title>Ap t=0.0242487 v=0</title></use>
+  <use xlink:href="#plus" x="77.787412" y="575.000000">
+  <title>Ap t=0.0147424 v=0</title></use>
+  <use xlink:href="#plus" x="74.200170" y="575.000000">
+  <title>Ap t=0.00795134 v=0</title></use>
+  <use xlink:href="#plus" x="72.710160" y="575.000000">
+  <title>Ap t=0.0051306 v=0</title></use>
+  <use xlink:href="#plus" x="70.000000" y="575.000000">
+  <title>Ap t=0 v=0</title></use>
+  </g>
+</g>
+
+</svg>

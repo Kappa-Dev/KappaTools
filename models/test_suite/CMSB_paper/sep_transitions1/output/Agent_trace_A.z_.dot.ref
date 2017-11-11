@@ -1,0 +1,7 @@
+digraph G{
+"Init_7" [label="" style="invis" width="0px" height="0px"];
+"Node_6" [label="A(z~p)"];
+"Node_7" [label="A(z~u)"];
+"Node_7" -> "Node_6" [label="c"];
+"Init_7" -> "Node_7" [label=""];
+}

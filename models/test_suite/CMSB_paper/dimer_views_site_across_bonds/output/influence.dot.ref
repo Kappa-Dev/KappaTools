@@ -1,0 +1,40 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa ../dimer.ka --disable-every-domain --views-domain --sites-across-bonds-domain --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"E.R" [shape="box" fillcolor="#87ceeb" style=filled];
+"E/R" [shape="box" fillcolor="#87ceeb" style=filled];
+"R.R" [shape="box" fillcolor="#87ceeb" style=filled];
+"R/R" [shape="box" fillcolor="#87ceeb" style=filled];
+"R.int" [shape="box" fillcolor="#87ceeb" style=filled];
+"R/int" [shape="box" fillcolor="#87ceeb" style=filled];
+"obs" [shape="box" fillcolor="#87ceeb" style=filled];
+"E.R" -> "E/R" [label="[0->0];[1->1]" color="green"];
+"E.R" -> "R.R" [label="[1->0];[1->1]" color="green"];
+"E/R" -> "E.R" [label="[0->0];[1->1]" color="green"];
+"E/R" -> "obs" [label="[1->0]" color="green"];
+"R.R" -> "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R.R" -> "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R/R" -> "E/R" [label="[0->1];[1->1]" color="green"];
+"R/R" -> "R.R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R.int" -> "R/int" [label="[0->0];[1->1]" color="green"];
+"R/int" -> "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R/int" -> "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"obs" -> "R/R" [label="[0*->0];[0*->1]" color="green"];
+"obs" -> "R.int" [label="[0*->0];[0*->1]" color="green"];
+"E.R" -> "obs" [label="[1->0]" color="red" arrowhead="tee"];
+"E/R" -> "R.R" [label="[1->0];[1->1]" color="red" arrowhead="tee"];
+"R.R" -> "E/R" [label="[0->1];[1->1]" color="red" arrowhead="tee"];
+"R.R" -> "R.R" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"R/R" -> "R/R" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"R/R" -> "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"R.int" -> "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="red" arrowhead="tee"];
+"R.int" -> "R.int" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"R/int" -> "obs" [label="[0->0];[1->0]" color="red" arrowhead="tee"];
+"obs" -> "R/int" [label="[0*->0];[0*->1];[0->0];[0->1]" color="red" arrowhead="tee"];
+"obs" -> "obs" [label="[0*->0]" color="red" arrowhead="tee"];
+}

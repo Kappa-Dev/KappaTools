@@ -1,0 +1,21 @@
+Parsing del_pert.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 7 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (2 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka' '-syntax' '4'
+____________________________________________________________
+############################################################
+Simulation ended
+0.00% of event loops were productive. Null event cause:
+	Clashing instance: 100.00%

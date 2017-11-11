@@ -1,0 +1,8 @@
+File "lhs.ka", line 3, characters 26-27:
+Site 'x' occurs more than once in this agent 'A'
+File "rhs.ka", line 3, characters 2-3:
+Site 'x' occurs more than once in this agent 'A'
+File "internal.ka", line 3, characters 26-27:
+Site 'x' occurs more than once in this agent 'A'
+File "remove.ka", line 3, characters 26-27:
+Site 'x' occurs more than once in this agent 'A'

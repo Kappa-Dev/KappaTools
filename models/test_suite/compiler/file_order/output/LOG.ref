@@ -1,0 +1,18 @@
+Parsing file2.ka...
+done
+Parsing file1.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 0 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (1 agents)
+Done
++ Command line to rerun is: 'KaSim' 'file1.ka' 'file2.ka' '-mode' 'batch' '--compile' '-d' 'output' '-l' '0' '-syntax' '4'

@@ -1,0 +1,19 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa initial_state.ka --verbosity-level-for-view-analysis Full --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:->A(x~u!1),B(x~u!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x!_)->" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:B(x~p)->B(x~p),B(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:->A(x~u!1),B(x~u!1)" -> "1:A(x!_)->" [label="[0->0]" color="green"];
+"0:->A(x~u!1),B(x~u!1)" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[1->1]" color="green"];
+"1:A(x!_)->" -> "2:B(x~p)->B(x~p),B(x~p)" [label="[0*->0]" color="green"];
+"1:A(x!_)->" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[0*->0]" color="green"];
+"2:B(x~p)->B(x~p),B(x~p)" -> "2:B(x~p)->B(x~p),B(x~p)" [label="[1->0]" color="green"];
+"1:A(x!_)->" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[0*->1]" color="red" arrowhead="tee"];
+}

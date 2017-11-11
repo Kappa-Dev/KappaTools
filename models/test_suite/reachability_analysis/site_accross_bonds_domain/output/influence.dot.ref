@@ -1,0 +1,32 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa site_accross_bonds_domain.ka --debugging-mode --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"r0" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1" [shape="box" fillcolor="#87ceeb" style=filled];
+"r2" [shape="box" fillcolor="#87ceeb" style=filled];
+"r3" [shape="box" fillcolor="#87ceeb" style=filled];
+"r4" [shape="box" fillcolor="#87ceeb" style=filled];
+"r5" [shape="box" fillcolor="#87ceeb" style=filled];
+"r6" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1" -> "r6" [label="[0->1]" color="green"];
+"r2" -> "r5" [label="[0->0];[1->1]" color="green"];
+"r3" -> "r2" [label="[0->1]" color="green"];
+"r3" -> "r4" [label="[0->0]" color="green"];
+"r4" -> "r1" [label="[0->0]" color="green"];
+"r4" -> "r3" [label="[0->0]" color="green"];
+"r5" -> "r6" [label="[0->0];[1->1]" color="green"];
+"r6" -> "r1" [label="[1->0]" color="green"];
+"r6" -> "r5" [label="[0->0];[1->1]" color="green"];
+"r0" -> "r2" [label="[0->0]" color="red" arrowhead="tee"];
+"r1" -> "r5" [label="[0->1]" color="red" arrowhead="tee"];
+"r2" -> "r0" [label="[0->0]" color="red" arrowhead="tee"];
+"r2" -> "r4" [label="[1->0]" color="red" arrowhead="tee"];
+"r3" -> "r1" [label="[0->0]" color="red" arrowhead="tee"];
+"r4" -> "r2" [label="[0->1]" color="red" arrowhead="tee"];
+"r5" -> "r1" [label="[1->0]" color="red" arrowhead="tee"];
+}

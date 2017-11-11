@@ -1,0 +1,22 @@
+_____(1)
+
+_____(1)
+
+Environment:
+  %token: tt
+  
+  %plot: [T]
+  
+  /*0*/%mod: ([E] = 5) do tt <- (22 - |tt|) + |tt| repeat [false]
+  Signatures:
+    %agent: A(x)
+  Rules:
+    
+Polymers:
+  
+Domain:
+  /*cc0*/  -> ()
+  /*cc1*/ A/*1*/(x[.]) -> ()
+Intial graph;
+  
+  %init: 33 tt

@@ -1,0 +1,53 @@
+Parsing abc-cflow.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 21 (sub)observables 37 navigation steps
+	 -initial conditions
++ Building initial state (2048 agents)
+Done
++ Command line to rerun is: 'KaSim' 'abc-cflow.ka' '-seed' '924556145' '-u' 'event' '-l' '100000' '-d' 'output' '-p' '1000' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: -89666 events 
++ Producing causal compressions
+	- splitting initial events: +1000 events 
+	- simplify the trace, 22344 events 
+		- start iteration 1, 22344 events remaining 
+				- alpha-conversion
+				- detecting siphons: +1644 events 
+				- alpha-conversion
+				- cutting concurrent events: -23852 events 
+				- detecting pseudo inverse events: -2 events 
+		- start iteration 2, 134 events remaining 
+				- alpha-conversion
+				- detecting siphons: +10 events 
+				- alpha-conversion
+				- cutting concurrent events: -11 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 3, 133 events remaining 
+				- alpha-conversion
+				- detecting siphons: +10 events 
+				- alpha-conversion
+				- cutting concurrent events: -10 events 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 133 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (10)
+
+
+	 - weak flow compression (4)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 1 weakly compressed flow
+Simulation ended

@@ -1,0 +1,22 @@
+Parsing abbc.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 11 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (512 agents)
+Done
++ Command line to rerun is: 'KaSim' '-u' 'e' '-l' '200' '-seed' '904918633' '-o' 'data.svg' '-d' 'output' '-p' '4' 'abbc.ka' '-syntax' '4'
+____________________________________________________________
+############################################################
+Simulation ended
+41.41% of event loops were productive. Null event cause:
+	Valid embedding but no longer unary when required: 98.94%
+	Clashing instance: 1.06%

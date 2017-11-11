@@ -1,0 +1,8 @@
+File "link_swapping_strong1.ka", line 7, characters 17-18:
+Warning: rule induces a link permutation on site 'x' of agent 'B'
+File "link_swapping_strong1.ka", line 7, characters 22-23:
+Warning: rule induces a link permutation on site 'y' of agent 'B'
+File "link_swapping_strong1.ka", line 7, characters 4-5:
+Warning: rule induces a link permutation on site 'x' of agent 'A'
+File "link_swapping_strong1.ka", line 7, characters 9-10:
+Warning: rule induces a link permutation on site 'y' of agent 'A'

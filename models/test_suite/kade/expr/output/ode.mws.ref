@@ -1,0 +1,216 @@
+# command line: 
+#      'KaDE' 'expr.ka' '-syntax' '3' '-d' 'output' '-l' '1' '-p' '0.1''--ode-backend''MAPLE'
+## THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+## 
+## init - the initial abundances of each species and token
+## tinit - the initial simulation time (likely 0)
+## tend - the final simulation time 
+## initialstep - initial time step at the beginning of numerical integration
+## maxstep - maximal time step for numerical integration
+## reltol - relative error tolerance;
+## abstol - absolute error tolerance;
+## period - the time period between points to return
+##
+## variables (initi(t),yi(t)) denote numbers of embeddings 
+## rule rates are corrected by the number of automorphisms in the lhs of rules
+
+
+tinit:=0:
+tend:=1:
+initialstep:=1e-05:
+maxstep:=0.02:
+reltol:=0.001:
+abstol:=0.001:
+period:=0.1:
+
+nodevar:=6:
+max_stoc_coef:=1:
+nvar:=4:
+nobs:=1:
+nrules:=6:
+
+init1:=0:
+init2:=0:
+init3:=0:
+init4:=0:
+init5:=0:
+
+
+var3:=(t -> 2): # c
+init1:=10: # A(x{u}[.] y{u}[.])
+var1:=(t -> init1+init2+init3+init5): # a
+var2:=(t -> var1(0)*var1(0)*var1(0)*t): # b
+
+k1:=(t -> 1): # A(x{u}[.]) -> A(x{p}[.])
+k3:=(t -> 1): # A(y{u}[.]) -> A(y{p}[.])
+
+
+
+
+
+
+
+
+
+
+
+var1:=(t -> y1(t)+y2(t)+y3(t)+y5(t)): # a
+var2:=(t -> var1(t)*var1(t)*var1(t)*t): # b
+
+k2:=(t -> var1(t)):
+k4:=(t -> var3(t)):
+stoc5_1:=(t -> var1(t)*var1(t)*t):
+k5:=(t -> var2(t)):
+stoc6_1:=(t -> var1(t)*var1(t)*t):
+k6:=(t -> var2(t)):
+
+dydt1(t):=0:
+dydt2(t):=0:
+dydt3(t):=0:
+dydt4(t):=0:
+dydt5(t):=0:
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{u}[.] y{p}[.]) -> A(x{u}[.] y{p}[.]) | ((a * a) * [T]) tt
+
+dydt2(t):=dydt2(t)-k6(t)*y2(t):
+dydt2(t):=dydt2(t)+k6(t)*y2(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{u}[.] y{p}[.]) -> A(x{u}[.] y{p}[.]) | ((a * a) * [T]) tt
+
+dydt2(t):=dydt2(t)-k5(t)*y2(t):
+dydt2(t):=dydt2(t)+k5(t)*y2(t):
+
+# rule    : A(x{u}[.]) -> A(x{p}[.])
+# reaction: A(x{u}[.] y{p}[.]) -> A(x{p}[.] y{p}[.])
+
+dydt2(t):=dydt2(t)-k1(t)*y2(t):
+dydt5(t):=dydt5(t)+k1(t)*y2(t):
+
+# rule    : A(y{p}[.]) -> A(y{u}[.])
+# reaction: A(x{u}[.] y{p}[.]) -> A(x{u}[.] y{u}[.])
+
+dydt2(t):=dydt2(t)-k4(t)*y2(t):
+dydt1(t):=dydt1(t)+k4(t)*y2(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{p}[.] y{p}[.]) -> A(x{p}[.] y{p}[.]) | ((a * a) * [T]) tt
+
+dydt5(t):=dydt5(t)-k6(t)*y5(t):
+dydt5(t):=dydt5(t)+k6(t)*y5(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{p}[.] y{p}[.]) -> A(x{p}[.] y{p}[.]) | ((a * a) * [T]) tt
+
+dydt5(t):=dydt5(t)-k5(t)*y5(t):
+dydt5(t):=dydt5(t)+k5(t)*y5(t):
+
+# rule    : A(x{p}[.]) -> A(x{u}[.])
+# reaction: A(x{p}[.] y{p}[.]) -> A(x{u}[.] y{p}[.])
+
+dydt5(t):=dydt5(t)-k2(t)*y5(t):
+dydt2(t):=dydt2(t)+k2(t)*y5(t):
+
+# rule    : A(y{p}[.]) -> A(y{u}[.])
+# reaction: A(x{p}[.] y{p}[.]) -> A(x{p}[.] y{u}[.])
+
+dydt5(t):=dydt5(t)-k4(t)*y5(t):
+dydt3(t):=dydt3(t)+k4(t)*y5(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | ((a * a) * [T]) tt
+
+dydt3(t):=dydt3(t)-k6(t)*y3(t):
+dydt3(t):=dydt3(t)+k6(t)*y3(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{u}[.]) | ((a * a) * [T]) tt
+
+dydt3(t):=dydt3(t)-k5(t)*y3(t):
+dydt3(t):=dydt3(t)+k5(t)*y3(t):
+
+# rule    : A(x{p}[.]) -> A(x{u}[.])
+# reaction: A(x{p}[.] y{u}[.]) -> A(x{u}[.] y{u}[.])
+
+dydt3(t):=dydt3(t)-k2(t)*y3(t):
+dydt1(t):=dydt1(t)+k2(t)*y3(t):
+
+# rule    : A(y{u}[.]) -> A(y{p}[.])
+# reaction: A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.])
+
+dydt3(t):=dydt3(t)-k3(t)*y3(t):
+dydt5(t):=dydt5(t)+k3(t)*y3(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{u}[.]) | ((a * a) * [T]) tt
+
+dydt1(t):=dydt1(t)-k6(t)*y1(t):
+dydt1(t):=dydt1(t)+k6(t)*y1(t):
+
+# rule    : A() -> A() | ((a * a) * [T]) tt
+# reaction: A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{u}[.]) | ((a * a) * [T]) tt
+
+dydt1(t):=dydt1(t)-k5(t)*y1(t):
+dydt1(t):=dydt1(t)+k5(t)*y1(t):
+
+# rule    : A(x{u}[.]) -> A(x{p}[.])
+# reaction: A(x{u}[.] y{u}[.]) -> A(x{p}[.] y{u}[.])
+
+dydt1(t):=dydt1(t)-k1(t)*y1(t):
+dydt3(t):=dydt3(t)+k1(t)*y1(t):
+
+# rule    : A(y{u}[.]) -> A(y{p}[.])
+# reaction: A(x{u}[.] y{u}[.]) -> A(x{u}[.] y{p}[.])
+
+dydt1(t):=dydt1(t)-k3(t)*y1(t):
+dydt2(t):=dydt2(t)+k3(t)*y1(t):
+dydt6:=(t -> 1):
+
+
+
+
+
+
+obs1:=(t -> t): # [T]
+
+
+
+sol :=
+   dsolve(
+      {
+
+         diff(y1(t),t) = dydt1(t),
+         y1(0) = init1, 
+         diff(y2(t),t) = dydt2(t),
+         y2(0) = init2, 
+         diff(y3(t),t) = dydt3(t),
+         y3(0) = init3, 
+         diff(y4(t),t) = dydt4(t),
+         y4(0) = init4, 
+         diff(y5(t),t) = dydt5(t),
+         y5(0) = init5
+      },
+      {
+         y1(t), 
+         y2(t), 
+         y3(t), 
+         y4(t), 
+         y5(t)
+      },
+      numeric, range=tinit..tend):
+
+
+fid := fopen ("data.csv",WRITE):
+fprintf(fid,"# KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend MAPLE\n"):
+fprintf(fid,"# "):
+fprintf(fid,"[T],"):
+fprintf(fid,"\n"):
+for j from tinit to tend by period  do
+        fprintf(fid,"%f,",eval(obs1(t),sol(j))):
+    fprintf(fid,"\n"):
+end:
+fclose(fid):
+
+
+

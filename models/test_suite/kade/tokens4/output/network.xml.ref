@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- command line:  -->
+<!--       KaDE   tokens4.ka   -syntax   3   -d   output   -l   1   -p   0.1   -ode-backend  SBML  -->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
+<model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+maxstep - maximal time step for numerical integration
+reltol - relative error tolerance;
+abstol - absolute error tolerance;
+period - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
+-->
+<listOfUnitDefinitions>
+<unitDefinition metaid="substance" id="substance" name="substance">
+<listOfUnits>
+<unit metaid="CMD2"  kind="mole"/>
+</listOfUnits>
+</unitDefinition>
+<unitDefinition metaid="volume" id="volume" name="volume">
+<listOfUnits>
+<unit metaid="CMD1" kind="litre"/>
+</listOfUnits>
+</unitDefinition>
+</listOfUnitDefinitions>
+<listOfCompartments>
+<compartment metaid="default" id="default" size="1" units="volume"/>
+</listOfCompartments>
+<listOfSpecies>
+<species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="t2" name="t" compartment="default" initialAmount="1" substanceUnits="substance"/>
+<species metaid="CMD10" id="t3" name="u" compartment="default" initialAmount="0" substanceUnits="substance"/>
+</listOfSpecies>
+<listOfParameters>
+<parameter metaid="CMD3" id="tinit" value="0." units="time"/>
+<parameter metaid="CMD4" id="tend" value="1." units="time"/>
+<parameter metaid="CMD5" id="period" value="0.1" units="time"/>
+<parameter metaid="CMD6" id="nT" value="10"/>
+<parameter metaid="CMD7" id="k1" value="1"/>
+</listOfParameters>
+<listOfReactions>
+<!-- rule    : expo -->
+<!-- reaction: T() -> T() + T() -->
+<reaction id="re1" name="expo" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD11" species="s1"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD12" species="s1" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s1 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : expo3 -->
+<!-- reaction:  ->  | 2.2 t, -(2) u, -(((|T()| + |t|) + nT)) t -->
+<reaction id="re2" name="expo3" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD13" species="t3" stoichiometry="2"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD14" species="t2" stoichiometry="2.2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD15" species="t2"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<ci>t2</ci></math>
+</kineticLaw>
+</reaction>
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+<!-- rule    : expo2 -->
+<!-- reaction:  ->  | 2 t, -(|t|) t -->
+<reaction id="re3" name="expo2" reversible="false" fast="false">
+<listOfProducts>
+<speciesReference metaid="CMD16" species="t2" stoichiometry="2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD17" species="t2"/>
+<modifierSpeciesReference metaid="CMD18" species="t3"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply><plus/><ci>t2</ci><ci>t3</ci></apply></math>
+</kineticLaw>
+</reaction>
+<!-- line 0, characters -1--1:Expressions for token consumption/production should be constants: cowardly replace it with 0 -->
+</listOfReactions>
+</model>
+</sbml>

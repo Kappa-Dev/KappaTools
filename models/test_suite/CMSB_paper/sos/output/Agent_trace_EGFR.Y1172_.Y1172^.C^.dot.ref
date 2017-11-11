@@ -1,0 +1,23 @@
+digraph G{
+"Init_70" [label="" style="invis" width="0px" height="0px"];
+"Node_78" [label="EGFR(Y1172~u,Y1172!free,C!EGFR@N)"];
+"Node_77" [label="EGFR(Y1172~p,Y1172!Shc@PTB,C!free)"];
+"Node_75" [label="EGFR(Y1172~p,Y1172!free,C!free)"];
+"Node_74" [label="EGFR(Y1172~p,Y1172!Shc@PTB,C!EGFR@N)"];
+"Node_72" [label="EGFR(Y1172~p,Y1172!free,C!EGFR@N)"];
+"Node_70" [label="EGFR(Y1172~u,Y1172!free,C!free)"];
+"Node_75" -> "Node_70" [label="uY1172@R"];
+"Node_72" -> "Node_78" [label="uY1172@R"];
+"Node_78" -> "Node_72" [label="pY1172@R"];
+"Node_78" -> "Node_70" [label="R/int"];
+"Node_74" -> "Node_77" [label="R/int"];
+"Node_72" -> "Node_75" [label="R/int"];
+"Node_70" -> "Node_78" [label="R.int"];
+"Node_77" -> "Node_74" [label="R.int"];
+"Node_75" -> "Node_72" [label="R.int"];
+"Node_77" -> "Node_75" [label="R/Shc"];
+"Node_74" -> "Node_72" [label="R/Shc"];
+"Node_75" -> "Node_77" [label="R.Shc"];
+"Node_72" -> "Node_74" [label="R.Shc"];
+"Init_70" -> "Node_70" [label=""];
+}

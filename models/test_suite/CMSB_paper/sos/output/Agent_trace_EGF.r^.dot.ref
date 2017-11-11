@@ -1,0 +1,8 @@
+digraph G{
+"Init_40" [label="" style="invis" width="0px" height="0px"];
+"Node_37" [label="EGF(r!EGFR@L)"];
+"Node_40" [label="EGF(r!free)"];
+"Node_37" -> "Node_40" [label="E/R"];
+"Node_40" -> "Node_37" [label="E.R"];
+"Init_40" -> "Node_40" [label=""];
+}

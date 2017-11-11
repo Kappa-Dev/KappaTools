@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa empty_agents.ka --debugging-mode --output-directory output -syntax 3
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [shape = plaintext label = ""]
+label =  "A";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [shape = plaintext label = ""]
+label =  "B";  shape = rectangle; color = red
+} ; 
+subgraph cluster2 {
+   2.0 [shape = plaintext label = ""]
+label =  "C";  shape = rectangle; color = red
+} ; 
+subgraph cluster3 {
+   3.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+label =  "D";  shape = rectangle; color = red
+} ; 
+subgraph cluster4 {
+   4.0 [shape = plaintext label = ""]
+label =  "E";  shape = rectangle; color = red
+} ; 
+subgraph cluster5 {
+   5.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+label =  "F";  shape = rectangle; color = red
+} ; 
+}

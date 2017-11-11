@@ -1,0 +1,51 @@
+Parsing agents_without_sites.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 3 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (16384 agents)
+Done
++ Command line to rerun is: 'KaSim' 'agents_without_sites.ka' '-seed' '924556145' '-u' 'event' '-l' '10000' '-d' 'output' '-p' '100' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: nothing has changed 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	- simplify the trace, 23185 events 
+		- start iteration 1, 23185 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -10445 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 2, 12740 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 12740 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (3185)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - weak flow compression (1)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 1 weakly compressed flow
+Simulation ended

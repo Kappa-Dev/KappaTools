@@ -1,0 +1,17 @@
+Parsing remove_nodes_and_link.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 13 (sub)observables 8 navigation steps
+	 -initial conditions
++ Building initial state (4 agents)
+Done
++ Command line to rerun is: 'KaSim' '-l' '1' '-d' 'output' '-seed' '148153191' 'remove_nodes_and_link.ka' '-syntax' '4'
+Simulation ended

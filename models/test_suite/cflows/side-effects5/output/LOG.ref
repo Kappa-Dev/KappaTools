@@ -1,0 +1,62 @@
+Parsing side-effects.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 5 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (2 agents)
+Done
++ Command line to rerun is: 'KaSim' '-i' 'side-effects.ka' '-u' 'event' '-l' '25' '-seed' '253329392' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: -1 events 
++ Producing causal compressions
+	- splitting initial events: +1 events 
+	 - blackboard generation
+	- alpha-conversion
+	 - computing causal past of each observed events (3)
+Stats:
+ number of step   : 30
+ longest story    : 24
+ average length   : 9.667
+ geometric mean   : 11.68
+
+	 - causal flow compression (3)
+
+____________________________________________________________
+############################################################
+
+	- simplify the trace, 29 events 
+		- start iteration 1, 29 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: -1 events 
+				- detecting pseudo inverse events: nothing has changed 
+		- start iteration 2, 28 events remaining 
+				- alpha-conversion
+				- detecting siphons: nothing has changed 
+				- alpha-conversion
+				- cutting concurrent events: nothing has changed 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 28 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (3)
+
+
+	 - weak flow compression (3)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 3 flows
++ Pretty printing 3 weakly compressed flows
+Simulation ended

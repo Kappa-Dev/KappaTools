@@ -1,0 +1,48 @@
+Parsing protein2x2.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+P() => [ P(a2~u) v P(a2~p) ]
+P() => [ P(a1~u) v P(a1~p) ]
+P() => [ P(b1~u) v P(b1~p) ]
+P() => [ P(b2~u) v P(b2~p) ]
+P() => [ P(g) v P(g!K.x) ]
+K() => [ K(x) v K(x!P.g) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+P() =>
+   [
+	  P(a1~p,a2~u,b1~p,b2~u,g)
+	v P(a1~p,a2~u,b1~p,b2~p,g)
+	v P(a1~p,a2~u,b1~u,b2~u,g)
+	v P(a1~p,a2~u,b1~u,b2~p,g)
+	v P(a1~p,a2~p,b1~p,b2~u,g)
+	v P(a1~p,a2~p,b1~p,b2~p,g!K.x)
+	v P(a1~p,a2~p,b1~p,b2~p,g)
+	v P(a1~p,a2~p,b1~u,b2~u,g)
+	v P(a1~p,a2~p,b1~u,b2~p,g)
+	v P(a1~u,a2~u,b1~u,b2~u,g)
+	v P(a1~u,a2~u,b1~u,b2~p,g)
+	v P(a1~u,a2~p,b1~u,b2~u,g)
+	v P(a1~u,a2~p,b1~u,b2~p,g)
+   ]
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+execution finished without any exception

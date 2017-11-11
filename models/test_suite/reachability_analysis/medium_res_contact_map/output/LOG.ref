@@ -1,0 +1,37 @@
+Parsing ../contact_map.ka...
+done
+Compiling...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule r2 (File "../contact_map.ka", line 10, characters 4-45:) will never be applied.
+rule r3 (File "../contact_map.ka", line 11, characters 4-36:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+C cannot occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+A() => [ A(z~u?) v A(z~p?) ]
+A() => A(z)
+A() => [ A(y~u?) v A(y~p?) ]
+A() => A(y)
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+A(y~p?) <=> A(z~p?)
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+execution finished without any exception

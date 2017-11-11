@@ -1,0 +1,29 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa relations.ka --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(x~u)->A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(y~u)->A(y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A(x~p,z~u)->A(x~u,z~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:A(y~p,z~u)->A(y~u,z~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"5:A(z~p)->A(z~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x~u)->A(x~p)" -> "2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [label="[0->0]" color="green"];
+"0:A(x~u)->A(x~p)" -> "3:A(x~p,z~u)->A(x~u,z~u)" [label="[0->0]" color="green"];
+"1:A(y~u)->A(y~p)" -> "2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [label="[0->0]" color="green"];
+"1:A(y~u)->A(y~p)" -> "4:A(y~p,z~u)->A(y~u,z~u)" [label="[0->0]" color="green"];
+"2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" -> "5:A(z~p)->A(z~u)" [label="[0->0]" color="green"];
+"3:A(x~p,z~u)->A(x~u,z~u)" -> "0:A(x~u)->A(x~p)" [label="[0->0]" color="green"];
+"4:A(y~p,z~u)->A(y~u,z~u)" -> "1:A(y~u)->A(y~p)" [label="[0->0]" color="green"];
+"5:A(z~p)->A(z~u)" -> "2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [label="[0->0]" color="green"];
+"5:A(z~p)->A(z~u)" -> "3:A(x~p,z~u)->A(x~u,z~u)" [label="[0->0]" color="green"];
+"5:A(z~p)->A(z~u)" -> "4:A(y~p,z~u)->A(y~u,z~u)" [label="[0->0]" color="green"];
+"2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" -> "3:A(x~p,z~u)->A(x~u,z~u)" [label="[0->0]" color="red" arrowhead="tee"];
+"2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" -> "4:A(y~p,z~u)->A(y~u,z~u)" [label="[0->0]" color="red" arrowhead="tee"];
+"3:A(x~p,z~u)->A(x~u,z~u)" -> "2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"4:A(y~p,z~u)->A(y~u,z~u)" -> "2:A(x~p,y~p,z~u)->A(x~p,y~p,z~p)" [label="[0->0]" color="red" arrowhead="tee"];
+}

@@ -1,0 +1,30 @@
+%def: "seed" "656095496"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "2" "events"
+%def: "outputFileName" "data.svg"
+
+%agent: A(a{u p}[a.B])
+%agent: B(a[a.A] b[b.B b1.B] b1[b.B b1.B] c[c.C])
+%agent: C(c{u p}[c.B])
+
+%var:/*0*/ 'Ap' |A(a{p})|
+%var:/*1*/ 'Cp' |C(c{u})|
+%plot: [T]
+%plot: Ap
+%plot: Cp
+
+'ab' A(a[./1]), B(a[./1]) @ 0.01
+'bb' B(b[./1]), B(b[./1]) @ 0.01
+'bb1' B(b[./1]), B(b1[./1]) @ 0.01
+'b1b1' B(b1[./1]), B(b1[./1]) @ 0.01
+'bc' B(c[./1]), C(c[./1]) @ 0.01
+'ap' A(a{u/p}[#]), C() @ 0 {100 :3}
+'cp' C(c{u/p}[#]), B() @ 0 {100}
+
+
+%init: 100 A(a{u}[.])
+%init: 100 B(a[.] b[.] b1[.] c[.])
+%init: 100 C(c{u}[.])
+
+%mod: [E] = 200 do $STOP

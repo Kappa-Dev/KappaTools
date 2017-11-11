@@ -1,0 +1,26 @@
+Parsing several_partners.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 6 (sub)observables 0 navigation steps
+	 -initial conditions
++ generate the network... 
+	 -initial states 
+	 -saturating the set of molecular species 
+	 -tokens 
+	 -variables 
+	 -observables 
+	 -check time homogeneity 
++ exporting the network... 
+	 -main function 
+	 -initial state 
+	 -ode system 
+	 -jacobian 
+	 -observables 

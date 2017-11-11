@@ -1,0 +1,90 @@
+/* Compression of 2 causal flows obtained in average at 2.214169E+01 t.u */
+/* Compressed causal flows were: [15;50] */
+digraph G{
+ ranksep=.5 ;
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro E", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ;
+node_3 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ;
+node_4 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ;
+node_5 [label="E(x[.]), C(x[.]) -> E(x[1]), C(x[1])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ;
+node_10 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ;
+node_11 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ;
+node_12 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ;
+node_13 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ;
+node_14 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "9" [shape=plaintext] ;
+node_15 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "10" [shape=plaintext] ;
+node_16 [label="A(x[.]), . -> ., B(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "11" [shape=plaintext] ;
+node_17 [label="B(x[.]), . -> ., C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "12" [shape=plaintext] ;
+node_18 [label="C(x[.]), . -> ., A(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "13" [shape=plaintext] ;
+node_19 [label="A(x[.]), E(x[1]), C(x[1]) -> A(x[1]), E(x[1]), C(x[.])", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "14" [shape=plaintext] ;
+node_20 [label="GOAL", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"];
+"1" -> "2" [style="invis"];
+"2" -> "3" [style="invis"];
+"3" -> "4" [style="invis"];
+"4" -> "5" [style="invis"];
+"5" -> "6" [style="invis"];
+"6" -> "7" [style="invis"];
+"7" -> "8" [style="invis"];
+"8" -> "9" [style="invis"];
+"9" -> "10" [style="invis"];
+"10" -> "11" [style="invis"];
+"11" -> "12" [style="invis"];
+"12" -> "13" [style="invis"];
+"13" -> "14" [style="invis"];
+node_1 -> node_3
+node_3 -> node_4
+node_2 -> node_5
+node_4 -> node_5
+node_6 -> node_7
+node_7 -> node_8
+node_8 -> node_9
+node_9 -> node_10
+node_10 -> node_11
+node_11 -> node_12
+node_12 -> node_13
+node_13 -> node_14
+node_14 -> node_15
+node_15 -> node_16
+node_16 -> node_17
+node_17 -> node_18
+node_5 -> node_19
+node_18 -> node_19
+node_19 -> node_20
+}
+/*
+*/

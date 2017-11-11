@@ -1,0 +1,23 @@
+digraph G{
+"Init_90" [label="" style="invis" width="0px" height="0px"];
+"Node_98" [label="Shc(Y~u,Y!free,PTB!EGFR@Y1172)"];
+"Node_97" [label="Shc(Y~p,Y!Grb2@SH2,PTB!free)"];
+"Node_95" [label="Shc(Y~p,Y!free,PTB!free)"];
+"Node_94" [label="Shc(Y~p,Y!Grb2@SH2,PTB!EGFR@Y1172)"];
+"Node_92" [label="Shc(Y~p,Y!free,PTB!EGFR@Y1172)"];
+"Node_90" [label="Shc(Y~u,Y!free,PTB!free)"];
+"Node_95" -> "Node_90" [label="uY@Shc"];
+"Node_92" -> "Node_98" [label="uY@Shc"];
+"Node_98" -> "Node_92" [label="pY@Shc"];
+"Node_98" -> "Node_90" [label="R/Shc"];
+"Node_94" -> "Node_97" [label="R/Shc"];
+"Node_92" -> "Node_95" [label="R/Shc"];
+"Node_90" -> "Node_98" [label="R.Shc"];
+"Node_97" -> "Node_94" [label="R.Shc"];
+"Node_95" -> "Node_92" [label="R.Shc"];
+"Node_97" -> "Node_95" [label="Shc/Grb2"];
+"Node_94" -> "Node_92" [label="Shc/Grb2"];
+"Node_95" -> "Node_97" [label="Shc.Grb2"];
+"Node_92" -> "Node_94" [label="Shc.Grb2"];
+"Init_90" -> "Node_90" [label=""];
+}

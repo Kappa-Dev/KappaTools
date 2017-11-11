@@ -1,0 +1,26 @@
+%def: "seed" "126704914"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "0.2" "t.u."
+%def: "outputFileName" "data.csv"
+
+%agent: A(x[x.B])
+%agent: B(x[x.A])
+%agent: C()
+
+%var:/*0*/ 'goal' |C()|
+%plot: [T]
+%plot: goal
+
+A(x[#])- @ 1
+A(x[.])+ @ 1
+B(x[#])- @ 0
+A(x[./1]), B(x[./1]) @ 1
+A(x[1]), B(x[1]), C()+ @ 1
+
+/*0*/%mod: ([T] < 100) do $TRACK C() [true] repeat [false]
+
+%init: 10 B(x[.])
+%init: 1 A(x[.])
+
+%mod: [E] = 19 do $STOP

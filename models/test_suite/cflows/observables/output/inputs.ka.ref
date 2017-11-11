@@ -1,0 +1,20 @@
+%def: "seed" "924556145"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+
+%agent: A(a{u p})
+%agent: B(a{u p})
+
+%plot: [T]
+A(a{u/p}[.]), B(a{u/p}[.]) @ 1
+A(a{p/u}[.]), B(a{p/u}[.]) @ 1
+'C' A(a{u}[.]), B(a{p}[.]) @ 1
+
+/*0*/%mod: [true] do $TRACK A(a{u}), B(a{p}) [true] repeat [false]
+
+%init: 1 A(a{u}[.])
+%init: 1 B(a{u}[.])
+
+%mod: [E] = 10000 do $STOP

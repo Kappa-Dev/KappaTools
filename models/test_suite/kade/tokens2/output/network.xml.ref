@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- command line:  -->
+<!--       KaDE   ../../simulation/activity/activity.ka   -d   output   -l   1   -p  0.1   -syntax   4    -ode-backend  SBML  -->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
+<model name="KaDe output:">
+<!--
+THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
+
+init - the initial abundances of each species and token
+tinit - the initial simulation time (likely 0)
+tend - the final simulation time 
+initialstep - initial time step at the beginning of numerical integration
+maxstep - maximal time step for numerical integration
+reltol - relative error tolerance;
+abstol - absolute error tolerance;
+period - the time period between points to return
+
+variables denote number of embeddings 
+rule rates are corrected by the number of automorphisms in the lhs of rules
+reaction rates are corrected by the product, for each species, of the factorial of the number of occurrence of this species in the lhs
+-->
+<listOfUnitDefinitions>
+<unitDefinition metaid="substance" id="substance" name="substance">
+<listOfUnits>
+<unit metaid="CMD2"  kind="mole"/>
+</listOfUnits>
+</unitDefinition>
+<unitDefinition metaid="volume" id="volume" name="volume">
+<listOfUnits>
+<unit metaid="CMD1" kind="litre"/>
+</listOfUnits>
+</unitDefinition>
+</listOfUnitDefinitions>
+<listOfCompartments>
+<compartment metaid="default" id="default" size="1" units="volume"/>
+</listOfCompartments>
+<listOfSpecies>
+<species metaid="CMD8" id="s1" name="T()" compartment="default" initialAmount="10" substanceUnits="substance"/>
+<species metaid="CMD9" id="t2" name="t" compartment="default" initialAmount="1" substanceUnits="substance"/>
+</listOfSpecies>
+<listOfParameters>
+<parameter metaid="CMD3" id="tinit" value="0." units="time"/>
+<parameter metaid="CMD4" id="tend" value="1." units="time"/>
+<parameter metaid="CMD5" id="period" value="0.1" units="time"/>
+<parameter metaid="CMD6" id="nT" value="10"/>
+<parameter metaid="CMD7" id="k1" value="1"/>
+</listOfParameters>
+<listOfReactions>
+<!-- rule    : expo -->
+<!-- reaction: T() -> T() + T() -->
+<reaction id="re1" name="expo" reversible="false" fast="false">
+<listOfReactants>
+<speciesReference metaid="CMD10" species="s1"/>
+</listOfReactants>
+<listOfProducts>
+<speciesReference metaid="CMD11" species="s1" stoichiometry="2"/>
+</listOfProducts>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<apply>
+<times/><ci> k1 </ci><ci> s1 </ci></apply>
+</math>
+</kineticLaw>
+</reaction>
+<!-- rule    : expo2 -->
+<!-- reaction:  ->  | 1 t -->
+<reaction id="re2" name="expo2" reversible="false" fast="false">
+<listOfProducts>
+<speciesReference metaid="CMD12" species="t2"/>
+</listOfProducts>
+<listOfModifiers>
+<modifierSpeciesReference metaid="CMD13" species="t2"/>
+</listOfModifiers>
+<kineticLaw>
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+<ci>t2</ci></math>
+</kineticLaw>
+</reaction>
+</listOfReactions>
+</model>
+</sbml>

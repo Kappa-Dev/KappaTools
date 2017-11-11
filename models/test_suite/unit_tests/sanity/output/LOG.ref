@@ -1,0 +1,815 @@
+execution finished without any exception
+
+
+First test
+
+2+(0:1-3:(0:1-2:1))+((4:5-4:3)^2)
+
+ There are 41 chemical species.
+
+
+ There are 41 chemical species.
+
+
+Second test
+
++oo
+
+ There are +oo chemical species.
+
+
+ There are +oo chemical species.
+l':  if(mvbdu_id:10) x1 < 2 then 
+l':   false
+l':  else 
+l':   if(mvbdu_id:2) x1 < 3 then 
+l':    true
+l':   else 
+l':    false
+l'':  true
+mvbdu: if(mvbdu_id:20) x1 < 3 then 
+mvbdu:  false
+mvbdu: else 
+mvbdu:  if(mvbdu_id:19) x1 < 4 then 
+mvbdu:   if(mvbdu_id:18) x2 < 2 then 
+mvbdu:    false
+mvbdu:   else 
+mvbdu:    if(mvbdu_id:17) x2 < 3 then 
+mvbdu:     if(mvbdu_id:16) x4 < 1 then 
+mvbdu:      false
+mvbdu:     else 
+mvbdu:      if(mvbdu_id:15) x4 < 2 then 
+mvbdu:       true
+mvbdu:      else 
+mvbdu:       false
+mvbdu:    else 
+mvbdu:     false
+mvbdu:  else 
+mvbdu:   false
+Memoization tables:
+Print Hash_1:
+Memoization tables:not:0:
+Memoization tables:not:0: false
+Memoization tables:not:1:
+Memoization tables:not:1: true
+Memoization tables:clean_head:3:
+Memoization tables:clean_head:3: true
+Memoization tables:clean_head:10:
+Memoization tables:clean_head:10: true
+Print Hash_2:
+Memoization tables:and:0:
+Memoization tables:and:0:0:
+Memoization tables:and:0:0: true
+Memoization tables:and:0:1:
+Memoization tables:and:0:1: false
+Memoization tables:and:1:
+Memoization tables:and:1:0:
+Memoization tables:and:1:0: false
+Memoization tables:and:1:1:
+Memoization tables:and:1:1: false
+Memoization tables:or:0:
+Memoization tables:or:0:0:
+Memoization tables:or:0:0: true
+Memoization tables:or:0:1:
+Memoization tables:or:0:1: true
+Memoization tables:or:1:
+Memoization tables:or:1:0:
+Memoization tables:or:1:0: true
+Memoization tables:or:1:1:
+Memoization tables:or:1:1: false
+Memoization tables:xor:0:
+Memoization tables:xor:0:0:
+Memoization tables:xor:0:0: false
+Memoization tables:xor:0:1:
+Memoization tables:xor:0:1: true
+Memoization tables:xor:1:
+Memoization tables:xor:1:0:
+Memoization tables:xor:1:0: true
+Memoization tables:xor:1:1:
+Memoization tables:xor:1:1: false
+Memoization tables:nand:0:
+Memoization tables:nand:0:0:
+Memoization tables:nand:0:0: false
+Memoization tables:nand:0:1:
+Memoization tables:nand:0:1: true
+Memoization tables:nand:1:
+Memoization tables:nand:1:0:
+Memoization tables:nand:1:0: true
+Memoization tables:nand:1:1:
+Memoization tables:nand:1:1: true
+Memoization tables:<=:0:
+Memoization tables:<=:0:0:
+Memoization tables:<=:0:0: true
+Memoization tables:<=:0:1:
+Memoization tables:<=:0:1: true
+Memoization tables:<=:1:
+Memoization tables:<=:1:0:
+Memoization tables:<=:1:0: false
+Memoization tables:<=:1:1:
+Memoization tables:<=:1:1: true
+Memoization tables:=>:0:
+Memoization tables:=>:0:0:
+Memoization tables:=>:0:0: true
+Memoization tables:=>:0:1:
+Memoization tables:=>:0:1: false
+Memoization tables:=>:1:
+Memoization tables:=>:1:0:
+Memoization tables:=>:1:0: true
+Memoization tables:=>:1:1:
+Memoization tables:=>:1:1: true
+Memoization tables:not <=:0:
+Memoization tables:not <=:0:0:
+Memoization tables:not <=:0:0: false
+Memoization tables:not <=:0:1:
+Memoization tables:not <=:0:1: false
+Memoization tables:not <=:1:
+Memoization tables:not <=:1:0:
+Memoization tables:not <=:1:0: true
+Memoization tables:not <=:1:1:
+Memoization tables:not <=:1:1: false
+Memoization tables:not =>:0:
+Memoization tables:not =>:0:0:
+Memoization tables:not =>:0:0: false
+Memoization tables:not =>:0:1:
+Memoization tables:not =>:0:1: true
+Memoization tables:not =>:1:
+Memoization tables:not =>:1:0:
+Memoization tables:not =>:1:0: false
+Memoization tables:not =>:1:1:
+Memoization tables:not =>:1:1: false
+Memoization tables:not:0:
+Memoization tables:not:0:0:
+Memoization tables:not:0:0: false
+Memoization tables:not:0:1:
+Memoization tables:not:0:1: false
+Memoization tables:not:1:
+Memoization tables:not:1:0:
+Memoization tables:not:1:0: false
+Memoization tables:not:1:1:
+Memoization tables:not:1:1: true
+Memoization tables:not fst:0:
+Memoization tables:not fst:0:0:
+Memoization tables:not fst:0:0: false
+Memoization tables:not fst:0:1:
+Memoization tables:not fst:0:1: false
+Memoization tables:not fst:1:
+Memoization tables:not fst:1:0:
+Memoization tables:not fst:1:0: true
+Memoization tables:not fst:1:1:
+Memoization tables:not fst:1:1: true
+Memoization tables:not snd:0:
+Memoization tables:not snd:0:0:
+Memoization tables:not snd:0:0: false
+Memoization tables:not snd:0:1:
+Memoization tables:not snd:0:1: true
+Memoization tables:not snd:1:
+Memoization tables:not snd:1:0:
+Memoization tables:not snd:1:0: false
+Memoization tables:not snd:1:1:
+Memoization tables:not snd:1:1: true
+Memoization tables:reset:0:
+Memoization tables:reset:0:1:
+Memoization tables:reset:0:1: if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:0:1:  false
+Memoization tables:reset:0:1: else 
+Memoization tables:reset:0:1:  if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:0:1:   true
+Memoization tables:reset:0:1:  else 
+Memoization tables:reset:0:1:   false
+Memoization tables:reset:0:2:
+Memoization tables:reset:0:2: if(mvbdu_id:18) x2 < 2 then 
+Memoization tables:reset:0:2:  false
+Memoization tables:reset:0:2: else 
+Memoization tables:reset:0:2:  if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:0:2:   if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:0:2:    false
+Memoization tables:reset:0:2:   else 
+Memoization tables:reset:0:2:    if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:0:2:     true
+Memoization tables:reset:0:2:    else 
+Memoization tables:reset:0:2:     false
+Memoization tables:reset:0:2:  else 
+Memoization tables:reset:0:2:   false
+Memoization tables:reset:1:
+Memoization tables:reset:1:0:
+Memoization tables:reset:1:0: false
+Memoization tables:reset:1:1:
+Memoization tables:reset:1:1: false
+Memoization tables:reset:1:2:
+Memoization tables:reset:1:2: false
+Memoization tables:reset:10:
+Memoization tables:reset:10:3:
+Memoization tables:reset:10:3: if(mvbdu_id:20) x1 < 3 then 
+Memoization tables:reset:10:3:  false
+Memoization tables:reset:10:3: else 
+Memoization tables:reset:10:3:  if(mvbdu_id:19) x1 < 4 then 
+Memoization tables:reset:10:3:   if(mvbdu_id:18) x2 < 2 then 
+Memoization tables:reset:10:3:    false
+Memoization tables:reset:10:3:   else 
+Memoization tables:reset:10:3:    if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:10:3:     if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:10:3:      false
+Memoization tables:reset:10:3:     else 
+Memoization tables:reset:10:3:      if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:10:3:       true
+Memoization tables:reset:10:3:      else 
+Memoization tables:reset:10:3:       false
+Memoization tables:reset:10:3:    else 
+Memoization tables:reset:10:3:     false
+Memoization tables:reset:10:3:  else 
+Memoization tables:reset:10:3:   false
+Memoization tables:reset:11:
+Memoization tables:reset:11:2:
+Memoization tables:reset:11:2: if(mvbdu_id:19) x1 < 4 then 
+Memoization tables:reset:11:2:  if(mvbdu_id:18) x2 < 2 then 
+Memoization tables:reset:11:2:   false
+Memoization tables:reset:11:2:  else 
+Memoization tables:reset:11:2:   if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:11:2:    if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:11:2:     false
+Memoization tables:reset:11:2:    else 
+Memoization tables:reset:11:2:     if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:11:2:      true
+Memoization tables:reset:11:2:     else 
+Memoization tables:reset:11:2:      false
+Memoization tables:reset:11:2:   else 
+Memoization tables:reset:11:2:    false
+Memoization tables:reset:11:2: else 
+Memoization tables:reset:11:2:  false
+Memoization tables:reset:12:
+Memoization tables:reset:12:2:
+Memoization tables:reset:12:2: if(mvbdu_id:20) x1 < 3 then 
+Memoization tables:reset:12:2:  false
+Memoization tables:reset:12:2: else 
+Memoization tables:reset:12:2:  if(mvbdu_id:19) x1 < 4 then 
+Memoization tables:reset:12:2:   if(mvbdu_id:18) x2 < 2 then 
+Memoization tables:reset:12:2:    false
+Memoization tables:reset:12:2:   else 
+Memoization tables:reset:12:2:    if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:12:2:     if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:12:2:      false
+Memoization tables:reset:12:2:     else 
+Memoization tables:reset:12:2:      if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:12:2:       true
+Memoization tables:reset:12:2:      else 
+Memoization tables:reset:12:2:       false
+Memoization tables:reset:12:2:    else 
+Memoization tables:reset:12:2:     false
+Memoization tables:reset:12:2:  else 
+Memoization tables:reset:12:2:   false
+Memoization tables:reset:13:
+Memoization tables:reset:13:1:
+Memoization tables:reset:13:1: if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:13:1:  if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:13:1:   false
+Memoization tables:reset:13:1:  else 
+Memoization tables:reset:13:1:   if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:13:1:    true
+Memoization tables:reset:13:1:   else 
+Memoization tables:reset:13:1:    false
+Memoization tables:reset:13:1: else 
+Memoization tables:reset:13:1:  false
+Memoization tables:reset:14:
+Memoization tables:reset:14:1:
+Memoization tables:reset:14:1: if(mvbdu_id:18) x2 < 2 then 
+Memoization tables:reset:14:1:  false
+Memoization tables:reset:14:1: else 
+Memoization tables:reset:14:1:  if(mvbdu_id:17) x2 < 3 then 
+Memoization tables:reset:14:1:   if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:14:1:    false
+Memoization tables:reset:14:1:   else 
+Memoization tables:reset:14:1:    if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:14:1:     true
+Memoization tables:reset:14:1:    else 
+Memoization tables:reset:14:1:     false
+Memoization tables:reset:14:1:  else 
+Memoization tables:reset:14:1:   false
+Memoization tables:reset:16:
+Memoization tables:reset:16:0:
+Memoization tables:reset:16:0: if(mvbdu_id:16) x4 < 1 then 
+Memoization tables:reset:16:0:  false
+Memoization tables:reset:16:0: else 
+Memoization tables:reset:16:0:  if(mvbdu_id:15) x4 < 2 then 
+Memoization tables:reset:16:0:   true
+Memoization tables:reset:16:0:  else 
+Memoization tables:reset:16:0:   false
+Print Hash_3:
+Print Hash_4:
+Print Hash_5:
+Print Hash_6:
+Print Hash_7:
+Print Hash_8:
+Print Hash_9:
+Some exceptions have been raised
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 767; exception:Exit
+Some exceptions have been raised
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 767; exception:Exit
+Some exceptions have been raised
+error: file_name: KaSa_rep/data_structures/mvbdu/mvbdu_wrapper.ml; message: line 767; exception:Exit
+Mvbdu.001: ok
+Mvbdu.002: ok
+Mvbdu.003: ok
+Mvbdu.004: ok
+Mvbdu.005: ok
+Mvbdu.006: ok
+Mvbdu.007: ok
+Mvbdu.008: ok
+Mvbdu.009: ok
+Mvbdu.010: ok
+Mvbdu.011: ok
+Mvbdu.012: ok
+Mvbdu.013: ok
+Mvbdu.014: ok
+Mvbdu.015: ok
+Mvbdu.016: ok
+Mvbdu.017: ok
+Mvbdu.018: ok
+Mvbdu.019: ok
+Mvbdu.020: ok
+Mvbdu.021: ok
+Mvbdu.022: ok
+Mvbdu.023: ok
+Mvbdu.024: ok
+Mvbdu.025: ok
+Mvbdu.026: ok
+Mvbdu.027: ok
+Mvbdu.028: ok
+Mvbdu.029: ok
+Mvbdu.030: ok
+Mvbdu.031: ok
+Mvbdu.032: ok
+Mvbdu.033: ok
+Mvbdu.034: ok
+Mvbdu.035: ok
+Mvbdu.036: ok
+Mvbdu.037: ok
+Mvbdu.038: ok
+Mvbdu.039: ok
+Mvbdu.040: ok
+Mvbdu.041: ok
+Mvbdu.042: ok
+Mvbdu.043: ok
+Mvbdu.044: ok
+Mvbdu.045: ok
+Mvbdu.046: ok
+Mvbdu.047: ok
+Mvbdu.048: ok
+Mvbdu.049: ok
+Mvbdu.050: ok
+Mvbdu.051: ok
+Mvbdu.052: ok
+Mvbdu.053: ok
+Mvbdu.054: ok
+Mvbdu.055: ok
+Mvbdu.056: ok
+Mvbdu.057: ok
+Mvbdu.058: ok
+Mvbdu.059: ok
+Mvbdu.060: ok
+Mvbdu.061: ok
+Mvbdu.062: ok
+Mvbdu.063: ok
+Mvbdu.064: ok
+Mvbdu.065: ok
+Mvbdu.066: ok
+Mvbdu.067: ok
+Mvbdu.068: ok
+Mvbdu.069: ok
+Mvbdu.070: ok
+Mvbdu.071: ok
+Mvbdu.072: ok
+Mvbdu.073: ok
+Mvbdu.074: ok
+Mvbdu.075: ok
+Mvbdu.076: ok
+Mvbdu.077: ok
+Mvbdu.078: ok
+Mvbdu.079: ok
+Mvbdu.080: ok
+Mvbdu.081: ok
+Mvbdu.082: ok
+Mvbdu.083: ok
+Mvbdu.084: ok
+Mvbdu.085: ok
+Mvbdu.086: ok
+Mvbdu.087: ok
+Mvbdu.088: ok
+Mvbdu.089: ok
+Mvbdu.090: ok
+Mvbdu.091: ok
+Mvbdu.092: ok
+Mvbdu.093: ok
+Mvbdu.094: ok
+Mvbdu.095: ok
+Mvbdu.096: ok
+Mvbdu.097: ok
+Mvbdu.098: ok
+Mvbdu.099: ok
+Mvbdu.100: ok
+Mvbdu.101: ok
+Mvbdu.102: ok
+Mvbdu.103: ok
+Mvbdu.104: ok
+Mvbdu.105: ok
+Mvbdu.106: ok
+Mvbdu.107: ok
+Mvbdu.108: ok
+Mvbdu.109: ok
+Mvbdu.110: ok
+Mvbdu.111: ok
+Mvbdu.112: ok
+Mvbdu.113: ok
+Mvbdu.114: ok
+Mvbdu.115: ok
+Mvbdu.116: ok
+Mvbdu.117: ok
+Mvbdu.118: ok
+true00: ok
+true01: ok
+true02: ok
+true03: ok
+true04: ok
+true05: ok
+true06: ok
+true07: ok
+true08: ok
+true09: ok
+true10: ok
+true11: ok
+true12: ok
+true13: ok
+true14: ok
+true15: ok
+true16: ok
+true17: ok
+true18: ok
+true19: ok
+true20: ok
+true21: ok
+true22: ok
+true23: ok
+true24: ok
+true25: ok
+true26: ok
+true27: ok
+true28: ok
+true29: ok
+true30: ok
+true31: ok
+true32: ok
+true33: ok
+true00': ok
+true01': ok
+true02': ok
+true03': ok
+true04': ok
+true05': ok
+true06': ok
+true07': ok
+true08': ok
+true09': ok
+true10': ok
+true11': ok
+true12': ok
+true13': ok
+true14': ok
+true15': ok
+true16': ok
+true17': ok
+true18': ok
+true19': ok
+true20': ok
+true21': ok
+true22': ok
+true23': ok
+true24': ok
+true25': ok
+true26': ok
+true27': ok
+true28': ok
+true29': ok
+true30': ok
+true31': ok
+true32': ok
+true00'': ok
+true01'': ok
+true02'': ok
+true03'': ok
+true04'': ok
+true05'': ok
+true06'': ok
+true07'': ok
+true08'': ok
+true09'': ok
+true10'': ok
+true11'': ok
+true12'': ok
+true13'': ok
+true14'': ok
+true15'': ok
+true16'': ok
+true17'': ok
+true18'': ok
+true19'': ok
+true20'': ok
+true21'': ok
+true22'': ok
+true23'': ok
+true24'': ok
+true25'': ok
+true26'': ok
+true27'': ok
+true28'': ok
+true29'': ok
+true30'': ok
+true31'': ok
+true32'': ok
+true00''': ok
+true01''': ok
+true02''': ok
+true03''': ok
+true04''': ok
+true05''': ok
+true06''': ok
+true07''': ok
+true08''': ok
+true09''': ok
+true10''': ok
+true11''': ok
+true12''': ok
+true13''': ok
+true14''': ok
+true15''': ok
+true16''': ok
+true17''': ok
+true18''': ok
+true19''': ok
+true20''': ok
+true21''': ok
+true22''': ok
+true23''': ok
+true24''': ok
+true25''': ok
+true26''': ok
+true27''': ok
+true28''': ok
+true29''': ok
+true30''': ok
+true31''': ok
+true32''': ok
+true00'''': ok
+true01'''': ok
+true02'''': ok
+true03'''': ok
+true04'''': ok
+true05'''': ok
+true06'''': ok
+true07'''': ok
+true08'''': ok
+true09'''': ok
+true10'''': ok
+true11'''': ok
+true12'''': ok
+true13'''': ok
+true14'''': ok
+true15'''': ok
+true16'''': ok
+true17'''': ok
+true18'''': ok
+true19'''': ok
+true20'''': ok
+true21'''': ok
+true22'''': ok
+true23'''': ok
+true24'''': ok
+true25'''': ok
+true26'''': ok
+true27'''': ok
+true28'''': ok
+true29'''': ok
+true30'''': ok
+true31'''': ok
+true32'''': ok
+false00: ok
+false01: ok
+false02: ok
+false03: ok
+false04: ok
+false05: ok
+false06: ok
+false07: ok
+false08: ok
+false09: ok
+false10: ok
+false11: ok
+false12: ok
+false13: ok
+false14: ok
+false15: ok
+false16: ok
+false17: ok
+false18: ok
+false19: ok
+false20: ok
+false21: ok
+false22: ok
+false23: ok
+false24: ok
+false25: ok
+false26: ok
+false27: ok
+false28: ok
+false29: ok
+false30: ok
+false31: ok
+false32: ok
+false00': ok
+false01': ok
+false02': ok
+false03': ok
+false04': ok
+false05': ok
+false06': ok
+false07': ok
+false08': ok
+false09': ok
+false10': ok
+false11': ok
+false12': ok
+false13': ok
+false14': ok
+false15': ok
+false16': ok
+false17': ok
+false18': ok
+false19': ok
+false20': ok
+false21': ok
+false22': ok
+false23': ok
+false24': ok
+false25': ok
+false26': ok
+false27': ok
+false28': ok
+false29': ok
+false30': ok
+false31': ok
+false32': ok
+false00'': ok
+false01'': ok
+false02'': ok
+false03'': ok
+false04'': ok
+false05'': ok
+false06'': ok
+false07'': ok
+false08'': ok
+false09'': ok
+false10'': ok
+false11'': ok
+false12'': ok
+false13'': ok
+false14'': ok
+false15'': ok
+false16'': ok
+false17'': ok
+false18'': ok
+false19'': ok
+false20'': ok
+false21'': ok
+false22'': ok
+false23'': ok
+false24'': ok
+false25'': ok
+false26'': ok
+false27'': ok
+false28'': ok
+false29'': ok
+false30'': ok
+false31'': ok
+false32'': ok
+false00''': ok
+false01''': ok
+false02''': ok
+false03''': ok
+false04''': ok
+false05''': ok
+false06''': ok
+false07''': ok
+false08''': ok
+false09''': ok
+false10''': ok
+false11''': ok
+false12''': ok
+false13''': ok
+false14''': ok
+false15''': ok
+false16''': ok
+false17''': ok
+false18''': ok
+false19''': ok
+false20''': ok
+false21''': ok
+false22''': ok
+false23''': ok
+false24''': ok
+false25''': ok
+false26''': ok
+false27''': ok
+false28''': ok
+false29''': ok
+false30''': ok
+false31''': ok
+false32''': ok
+false00'''': ok
+false01'''': ok
+false02'''': ok
+false03'''': ok
+false04'''': ok
+false05'''': ok
+false06'''': ok
+false07'''': ok
+false08'''': ok
+false09'''': ok
+false10'''': ok
+false11'''': ok
+false12'''': ok
+false13'''': ok
+false14'''': ok
+false15'''': ok
+false16'''': ok
+false17'''': ok
+false18'''': ok
+false19'''': ok
+false20'''': ok
+false21'''': ok
+false22'''': ok
+false23'''': ok
+false24'''': ok
+false25'''': ok
+false26'''': ok
+false27'''': ok
+false28'''': ok
+false29'''': ok
+false30'''': ok
+false31'''': ok
+false32'''': ok
+Non initialisation detection (MVBDU): ok
+Initialisation (MVBDU): ok
+Initialisation detection (MVBDU): ok
+Refuse to reinitialise (MVBDU): ok
+Non initialisation detection (MVBDU): ok
+Initialisation (MVBDU): ok
+Initialisation detection (MVBDU): ok
+Refuse to reinitialise (MVBDU): ok
+Non initialisation detection (MVBDU): ok
+Initialisation detection (MVBDU): ok
+Non initialisation detection (MVBDU): ok
+Initialisation detection (MVBDU): ok
+List.001: ok
+List.002: ok
+List.003: ok
+List.004: ok
+List.005: ok
+List.006: ok
+List.007: ok
+List.008: ok
+List.009: ok
+List.010: ok
+List.011: ok
+List.012: ok
+List.013: ok
+List.014: ok
+List.015: ok
+List.016: ok
+List.017: ok
+List.018: ok
+List.019: ok
+List.020: ok
+List.021: ok
+map1: ok
+map2: ok
+map3: ok
+map4: ok
+map5: ok
+nowarn_add: ok
+nowarn_overwrite: ok
+nowarn_overwrite_or_add: ok
+warn_add: ok
+warn_overwrite: ok
+nowarn_proj1: ok
+nowarn_proj2: ok
+nowarn_proj3: ok
+nowarn_proj4: ok
+proj1: ok
+proj2: ok
+proj3: ok
+proj4: ok
+proj5: ok
+proj6: ok
+Counting0: ok
+Counting1: ok
+Counting2: ok
+Counting3: ok
+END SANITY

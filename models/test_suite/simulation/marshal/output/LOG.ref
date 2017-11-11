@@ -1,0 +1,24 @@
+Parsing model.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 3 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (256 agents)
+Done
++ Command line to rerun is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '496408597' '-d' 'output' 'model.ka' '-syntax' '4'
++ Loading simulation package /tmp/KaSim-test-blob-marshal...
++ Building initial state (256 agents)
+Done
++ Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '958076642' '-d' 'output' '-syntax' '4'
++ Loading simulation package /tmp/KaSim-test-blob-marshal...
++ Building initial state (1024 agents)
+Done
++ Command line to rerun is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob-marshal' '-seed' '458154606' '-d' 'output' '-var' 'init' '300' '-syntax' '4'

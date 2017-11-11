@@ -1,0 +1,51 @@
+Parsing link_passing_strong3.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 6 (sub)observables 0 navigation steps
+	 -initial conditions
++ Building initial state (32 agents)
+Done
++ Command line to rerun is: 'KaSim' 'link_passing_strong3.ka' '-seed' '611463625' '-u' 'event' '-l' '280' '-d' 'output' '--time-independent' '-syntax' '4'
+____________________________________________________________
+############################################################
++ Loading trace
+	- removing events occurring after the last observable: nothing has changed 
++ Producing causal compressions
+	- splitting initial events: nothing has changed 
+	- simplify the trace, 366 events 
+		- start iteration 1, 366 events remaining 
+				- alpha-conversion
+				- detecting siphons: +63 events 
+				- alpha-conversion
+				- cutting concurrent events: -9 events 
+				- detecting pseudo inverse events: nothing has changed 
+	- a fixpoint has been reached, 366 events remaining 
+	- blackboard generation 
+	- computing causal past of each observed events (66)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - weak flow compression (64)
+
+____________________________________________________________
+############################################################
+
+	 - strong flow compression (21)
+
+____________________________________________________________
+############################################################
+
++ Pretty printing 21 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

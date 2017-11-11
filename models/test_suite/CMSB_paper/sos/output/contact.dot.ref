@@ -1,0 +1,50 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa sos.ka perturb.ka --compute-local-traces --output-directory output -syntax 3
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "r" shape =circle color = yellow size = "5"]
+label =  "EGF";  shape = rectangle; color = red
+} ; 
+subgraph cluster1 {
+   1.0 [style = filled label = "Y1016" shape =ellipse color = green size = "5"]
+   1.1 [style = filled label = "Y1092" shape =ellipse color = green size = "5"]
+   1.2 [style = filled label = "Y1172" shape =ellipse color = green size = "5"]
+   1.3 [style = filled label = "L" shape =circle color = yellow size = "5"]
+   1.4 [style = filled label = "CR" shape =circle color = yellow size = "5"]
+   1.5 [style = filled label = "Y1092" shape =circle color = yellow size = "5"]
+   1.6 [style = filled label = "Y1172" shape =circle color = yellow size = "5"]
+   1.7 [style = filled label = "N" shape =circle color = yellow size = "5"]
+   1.8 [style = filled label = "C" shape =circle color = yellow size = "5"]
+label =  "EGFR";  shape = rectangle; color = red
+} ; 
+subgraph cluster2 {
+   2.0 [style = filled label = "S" shape =ellipse color = green size = "5"]
+   2.1 [style = filled label = "PR" shape =circle color = yellow size = "5"]
+label =  "SoS";  shape = rectangle; color = red
+} ; 
+subgraph cluster3 {
+   3.0 [style = filled label = "Y" shape =ellipse color = green size = "5"]
+   3.1 [style = filled label = "PTB" shape =ellipse color = green size = "5"]
+   3.2 [style = filled label = "Y" shape =circle color = yellow size = "5"]
+   3.3 [style = filled label = "PTB" shape =circle color = yellow size = "5"]
+label =  "Shc";  shape = rectangle; color = red
+} ; 
+subgraph cluster4 {
+   4.0 [style = filled label = "SH2" shape =ellipse color = green size = "5"]
+   4.1 [style = filled label = "SH2" shape =circle color = yellow size = "5"]
+   4.2 [style = filled label = "SH3n" shape =circle color = yellow size = "5"]
+label =  "Grb2";  shape = rectangle; color = red
+} ; 
+0.0 -- 1.3
+1.4 -- 1.4
+1.5 -- 4.1
+1.6 -- 3.3
+1.7 -- 1.8
+2.1 -- 4.2
+3.2 -- 4.1
+}

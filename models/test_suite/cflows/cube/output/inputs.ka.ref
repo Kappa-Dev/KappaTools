@@ -1,0 +1,22 @@
+%def: "seed" "240056667"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+
+%agent: A(x{u p} y{u p} z{u p})
+
+%plot: [T]
+'x++' A(x{u/p}[.] z{u}[.]) @ 10
+'x--' A(x{p/u}[.] y{p}[.] z{p}[.]) @ 10
+'x++_' A(x{u/p}[.] y{u}[.] z{p}[.]) @ 10
+'z++' A(x{p}[.] z{u/p}[.]) @ 10
+'y++' A(x{u}[.] y{u/p}[.] z{u}[.]) @ 10
+'y--' A(x{u}[.] y{p/u}[.] z{p}[.]) @ 10
+'GOAL' A(x{p}[.] y{u}[.] z{p}[.])- @ 0
+
+/*0*/%mod: [true] do $TRACK A(x{p} y{u} z{p}) [true] repeat [false]
+
+%init: 10000 A(x{u}[.] y{u}[.] z{u}[.])
+
+%mod: [E] = 30000 do $STOP

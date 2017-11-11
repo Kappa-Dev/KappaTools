@@ -1,0 +1,74 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa covering_classes.ka --debugging-mode --output-directory output -syntax 3
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"r0" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1" [shape="box" fillcolor="#87ceeb" style=filled];
+"r2" [shape="box" fillcolor="#87ceeb" style=filled];
+"r3" [shape="box" fillcolor="#87ceeb" style=filled];
+"r4" [shape="box" fillcolor="#87ceeb" style=filled];
+"r5" [shape="box" fillcolor="#87ceeb" style=filled];
+"r6" [shape="box" fillcolor="#87ceeb" style=filled];
+"r7" [shape="box" fillcolor="#87ceeb" style=filled];
+"r8" [shape="box" fillcolor="#87ceeb" style=filled];
+"r9" [shape="box" fillcolor="#87ceeb" style=filled];
+"r10" [shape="box" fillcolor="#87ceeb" style=filled];
+"r11" [shape="box" fillcolor="#87ceeb" style=filled];
+"r12" [shape="box" fillcolor="#87ceeb" style=filled];
+"r0" -> "r4" [label="[0->0]" color="green"];
+"r0" -> "r5" [label="[0->0]" color="green"];
+"r0" -> "r9" [label="[0->0]" color="green"];
+"r0" -> "r10" [label="[0->0]" color="green"];
+"r1" -> "r4" [label="[0->1]" color="green"];
+"r1" -> "r9" [label="[0->1]" color="green"];
+"r2" -> "r5" [label="[0->2]" color="green"];
+"r2" -> "r10" [label="[0->2]" color="green"];
+"r3" -> "r4" [label="[0*->1]" color="green"];
+"r3" -> "r5" [label="[0*->1]" color="green"];
+"r3" -> "r9" [label="[0*->1]" color="green"];
+"r3" -> "r10" [label="[0*->1];[0*->2]" color="green"];
+"r4" -> "r3" [label="[0->0]" color="green"];
+"r5" -> "r6" [label="[0->1];[2->0]" color="green"];
+"r5" -> "r7" [label="[2->0]" color="green"];
+"r7" -> "r4" [label="[0*->0]" color="green"];
+"r7" -> "r5" [label="[0*->0]" color="green"];
+"r7" -> "r9" [label="[0*->0]" color="green"];
+"r7" -> "r10" [label="[0*->0]" color="green"];
+"r8" -> "r4" [label="[0*->1]" color="green"];
+"r8" -> "r5" [label="[0*->1];[0*->2]" color="green"];
+"r8" -> "r9" [label="[0*->1]" color="green"];
+"r8" -> "r10" [label="[0*->1]" color="green"];
+"r9" -> "r8" [label="[0->0]" color="green"];
+"r10" -> "r11" [label="[0->1];[2->0]" color="green"];
+"r10" -> "r12" [label="[2->0]" color="green"];
+"r12" -> "r4" [label="[0*->0]" color="green"];
+"r12" -> "r5" [label="[0*->0]" color="green"];
+"r12" -> "r9" [label="[0*->0]" color="green"];
+"r12" -> "r10" [label="[0*->0]" color="green"];
+"r3" -> "r8" [label="[0->0]" color="red" arrowhead="tee"];
+"r3" -> "r9" [label="[0->0]" color="red" arrowhead="tee"];
+"r3" -> "r10" [label="[0->0]" color="red" arrowhead="tee"];
+"r3" -> "r11" [label="[0*->0];[0->1]" color="red" arrowhead="tee"];
+"r3" -> "r12" [label="[0*->0]" color="red" arrowhead="tee"];
+"r4" -> "r5" [label="[0->0]" color="red" arrowhead="tee"];
+"r5" -> "r4" [label="[0->0]" color="red" arrowhead="tee"];
+"r7" -> "r6" [label="[0*->1];[0->0]" color="red" arrowhead="tee"];
+"r7" -> "r10" [label="[0->2]" color="red" arrowhead="tee"];
+"r7" -> "r11" [label="[0*->1];[0->0]" color="red" arrowhead="tee"];
+"r7" -> "r12" [label="[0->0]" color="red" arrowhead="tee"];
+"r8" -> "r3" [label="[0->0]" color="red" arrowhead="tee"];
+"r8" -> "r4" [label="[0->0]" color="red" arrowhead="tee"];
+"r8" -> "r5" [label="[0->0]" color="red" arrowhead="tee"];
+"r8" -> "r6" [label="[0*->0];[0->1]" color="red" arrowhead="tee"];
+"r8" -> "r7" [label="[0*->0]" color="red" arrowhead="tee"];
+"r9" -> "r10" [label="[0->0]" color="red" arrowhead="tee"];
+"r10" -> "r9" [label="[0->0]" color="red" arrowhead="tee"];
+"r12" -> "r5" [label="[0->2]" color="red" arrowhead="tee"];
+"r12" -> "r6" [label="[0*->1];[0->0]" color="red" arrowhead="tee"];
+"r12" -> "r7" [label="[0->0]" color="red" arrowhead="tee"];
+"r12" -> "r11" [label="[0*->1];[0->0]" color="red" arrowhead="tee"];
+}
