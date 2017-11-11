@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Oct 27 2017>
+  * Last modification: Time-stamp: <Nov 11 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -130,7 +130,7 @@ let convert_contact_map parameters error contact_map =
     ) contact_map (error,graph)
 
 let mixture_of_edge
-    parameters error
+    parameters error handler
     (((ag, st), (ag', st')),
       ((ag'', st''), (ag''', st'''))) =
   let _ = ag, ag''', st, st''' in
@@ -143,100 +143,40 @@ let mixture_of_edge
        A(x!1), B(x!1, y!2), C(x!2)
        ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
     *)
-    let fresh_agent_id = Ckappa_sig.dummy_agent_id in
-    let ag_id' = Ckappa_sig.next_agent_id fresh_agent_id in
+    let ag_id = Ckappa_sig.dummy_agent_id in
+    let ag_id' = Ckappa_sig.next_agent_id ag_id in
     let ag_id'' = Ckappa_sig.next_agent_id ag_id' in
-    let ag_id''' = Ckappa_sig.next_agent_id ag_id'' in
     let error, mixture = Preprocess.empty_mixture parameters error in
     let error, mixture =
-      Cckappa_sig.add_mixture parameters error
-        fresh_agent_id
-        ag
-        mixture
+      Preprocess.add_agent parameters error handler ag_id ag mixture
     in
-    let error, c_mixture =
-      Ckappa_sig.add_mixture parameters error
-        (Ckappa_sig.string_of_agent_name ag)
-        mixture.Cckappa_sig.c_mixture
+    let error, mixture =
+      Preprocess.add_agent parameters error handler ag_id' ag' mixture
     in
-    let error, views =
-      match
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameters error
-          fresh_agent_id
-          mixture.Cckappa_sig.views
-      with
-      | error, None ->
-        let error, empty =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
-            error 0
-        in
-        Exception.warn parameters error __POS__ Exit
-          empty
-      | error, Some agent ->
-        let error, agent =
-          Cckappa_sig.add_agent parameters
-            error
-            fresh_agent_id
-            ag
-            st
-            agent
-        in
-        let error, views =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-            parameters
-            error
-            fresh_agent_id
-            agent
-            mixture.Cckappa_sig.views
-        in
-        error, views
+    let error, mixture =
+      Preprocess.add_agent parameters error handler ag_id'' ag''' mixture
     in
-    let error, bonds =
-      match
-        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-          parameters error fresh_agent_id
-          mixture.Cckappa_sig.bonds
-      with
-      | error, None ->
-        let error, empty =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters
-            error 0
-        in
-        Exception.warn parameters error __POS__ Exit
-          empty
-      | error, Some site_map ->
-        let error, site_address =
-          Cckappa_sig.add_site_address parameters error
-            fresh_agent_id
-            ag
-            st
-        in
-        let error, site_map =
-          Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
-            parameters
-            error
-            st
-            site_address
-            site_map
-        in
-        let error, bonds =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
-            parameters
-            error
-            fresh_agent_id
-            site_map
-            mixture.Cckappa_sig.bonds
-        in
-        error, bonds
+    let error, mixture =
+      Preprocess.add_site parameters error handler ag_id st mixture
     in
-    error,
-    {
-      mixture with
-      c_mixture = c_mixture;
-      views = views;
-      bonds = bonds;
-    }
+    let error, mixture =
+      Preprocess.add_site parameters error handler ag_id' st' mixture
+    in
+    let error, mixture =
+      Preprocess.add_site parameters error handler ag_id' st'' mixture
+    in
+    let error, mixture =
+      Preprocess.add_site parameters error handler ag_id'' st''' mixture
+    in
+    let lnk = Ckappa_sig.dummy_link_value in
+    let lnk' = Ckappa_sig.next_lnk_value lnk in
+    let error, mixture =
+      Preprocess.add_link parameters error handler ag_id st ag_id' st' lnk mixture
+    in
+    let error, mixture =
+      Preprocess.add_link parameters error handler ag_id' st'' ag_id'' st''' lnk' mixture 
+    in
+    error, mixture
 
 (* *)
 exception Pass of Exception.method_handler

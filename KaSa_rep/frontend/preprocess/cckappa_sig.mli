@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Oct 27 2017>
+  * Last modification: Time-stamp: <Nov 11 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -233,12 +233,13 @@ val join_mixture: Remanent_parameters_sig.parameters ->
    mixture -> mixture ->
   Exception.method_handler * mixture
 
-val add_agent : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> Ckappa_sig.c_agent_id ->
-  Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name ->
-  agent -> Exception.method_handler * agent
-
-val add_views : Remanent_parameters_sig.parameters ->
+(*val add_agent : Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Ckappa_sig.c_agent_name -> Exception.method_handler * Ckappa_sig.agent_name) ->
+  'a -> Ckappa_sig.c_agent_id ->
+  Ckappa_sig.c_agent_name -> Exception.method_handler * agent
+*)
+(*val add_views : Remanent_parameters_sig.parameters ->
   Exception.method_handler -> Ckappa_sig.c_agent_id ->
   views -> Exception.method_handler * views
 
@@ -264,4 +265,4 @@ val add_bonds: Remanent_parameters_sig.parameters ->
 val add_mixture : Remanent_parameters_sig.parameters ->
   Exception.method_handler -> Ckappa_sig.c_agent_id ->
   Ckappa_sig.c_agent_name -> mixture ->
-  Exception.method_handler * mixture
+  Exception.method_handler * mixture*)

@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 26 2017>
+ * Last modification: Time-stamp: <Nov 11 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -26,7 +26,7 @@ type c_agent_id   = int
 type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
-
+type c_link_value  = int
 type binding_state =
   | Free
   | Lnk_type of agent_name * site_name
@@ -150,6 +150,7 @@ let dummy_agent =
     ag_intf = EMPTY_INTF ;
     ag_nme_pos = Locality.dummy
   }
+let dummy_link_value = 1
 
 let fst_site = 1
 let snd_site = 2
@@ -157,6 +158,11 @@ let snd_site = 2
 let string_of_agent_name (a: c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
 let agent_name_of_int (a: int) : c_agent_name = a
+
+let int_of_lnk_value (a: c_link_value) : int = a
+let lnk_value_of_int (a: int) : c_link_value = a
+let dummy_lnk_value: c_link_value  = 0
+let next_lnk_value (i: c_link_value) : c_link_value = i+1
 
 let site_name_of_int (a: int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
@@ -173,6 +179,8 @@ let string_of_rule_id (a: c_rule_id) : string = string_of_int a
 let int_of_agent_id (a: c_agent_id) : int = a
 let agent_id_of_int (a: int) : c_agent_id = a
 let string_of_agent_id (a: c_agent_id) : string = string_of_int a
+
+let string_of_c_link_value (a: c_link_value) : string = string_of_int a
 
 let get_agent_shape n_sites parameters =
   Misc_sa.fetch_array
@@ -480,7 +488,7 @@ let rec join_mixture parameters error mixture1 mixture2 =
           error, a
     end*)
 
-let add_link error agent_id agent_type site link =
+(*let add_link error agent_id agent_type site link =
   match link with
   | LNK_VALUE (agent_id', agent_type', site', agent_id'', position) ->
     (*CHECK ag'?*)
@@ -512,20 +520,229 @@ let rec add_interface parameters error interface =
     Exception.check_point Exception.warn parameters error error'
       __POS__ Exit
   in
-  error, agent_interface
+  error, agent_interface*)
 
-let add_agent parameters error agent_name agent =
-  let error, agent_interface =
-    add_interface parameters error agent.ag_intf
+let add_agent parameters error agent_id agent_name mixture =
+  let agent =
+    {dummy_agent with ag_nme = agent_name}
   in
-  error,
-  {
-    agent with
-    ag_nme = agent_name;
-    ag_intf = agent_interface
-  }
+  let k = int_of_agent_id agent_id in
+  let rec aux k mixture =
+    match mixture with
+    | SKIP mixture' ->
+      let error, mixture'' = aux (k-1) mixture' in
+      if k=0 then
+        error, COMMA(agent,mixture'')
+      else
+        error, SKIP mixture'
+    | COMMA(agent,mixture') ->
+      if k=0 then
+        Exception.warn parameters error __POS__ Exit mixture
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, COMMA(agent, mixture'')
+    | DOT(id,agent,mixture') ->
+      if k=0 then
+        Exception.warn parameters error __POS__ Exit mixture
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, DOT(id,agent, mixture'')
+    | PLUS(id,agent,mixture') ->
+      if
+        k=0
+      then
+        Exception.warn parameters error __POS__ Exit mixture
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, PLUS(id,agent, mixture'')
+    | EMPTY_MIX ->
+        let rec aux2 k =
+          if k=0 then
+            COMMA(agent, EMPTY_MIX)
+          else
+            let mixture' = aux2 (k-1) in
+            SKIP(mixture')
+        in error, aux2 k
+  in
+  aux k mixture
 
-let add_mixture parameters error agent_name mixture =
+let mod_agent_gen parameters error agent_id f mixture =
+  let k = int_of_agent_id agent_id in
+  let rec aux k mixture =
+    match mixture with
+    | SKIP mixture' ->
+      if k=0
+      then
+        Exception.warn parameters error __POS__ Exit mixture
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, SKIP mixture''
+    | COMMA(agent,mixture') ->
+      if k=0
+      then
+        let error, agent = f parameters error agent in
+        error, COMMA(agent, mixture')
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, COMMA(agent, mixture'')
+    | DOT(id,agent,mixture') ->
+        if k=0
+        then
+          let error, agent = f parameters error agent in
+          error, DOT(id, agent, mixture')
+        else
+          let error, mixture'' = aux (k-1) mixture' in
+          error, DOT(id, agent, mixture'')
+    | PLUS(id,agent,mixture') ->
+      if k=0
+      then
+        let error, agent = f parameters error agent in
+        error, PLUS(id, agent, mixture')
+      else
+        let error, mixture'' = aux (k-1) mixture' in
+        error, PLUS(id, agent, mixture'')
+    | EMPTY_MIX ->
+      Exception.warn parameters error __POS__ Exit mixture
+  in
+  aux k mixture
+
+let rec has_site x interface =
+  match interface with
+  | EMPTY_INTF -> false
+  | PORT_SEP (p,intf) ->
+    if p.port_nme = x then true else has_site x intf
+
+let add_site parameters error agent_id site_name mixture =
+  mod_agent_gen parameters error agent_id
+    (fun _parameters error agent ->
+       if has_site site_name agent.ag_intf
+       then error, agent
+       else
+         let port =
+           {
+             port_nme = site_name;
+             port_lnk = LNK_ANY Locality.dummy ;
+             port_int = [];
+             port_free = None
+           } in
+         let interface = PORT_SEP (port,agent.ag_intf) in
+         error, {agent with ag_intf = interface})
+    mixture
+
+let mod_site_gen parameters error agent_id site_name f mixture =
+  mod_agent_gen parameters error agent_id
+    (fun parameters error agent ->
+       let rec aux interface =
+         match interface with
+         | EMPTY_INTF -> error, EMPTY_INTF
+         | PORT_SEP (port, intf)  ->
+           if port.port_nme = site_name
+           then
+             let error, port = f parameters error port in
+             error, PORT_SEP (port, intf)
+           else
+             let error, intf = aux intf in
+             error, PORT_SEP (port, intf)
+       in
+       let error, interface = aux agent.ag_intf in
+       error, {agent with ag_intf = interface})
+    mixture
+
+
+let add_binding_state  parameters error agent_id site_name p state bool_opt mixture =
+  mod_site_gen parameters error agent_id site_name
+    (fun parameters error port ->
+       if p port.port_lnk
+       then
+         error, {port with port_lnk = state ; port_free = bool_opt}
+       else
+         Exception.warn parameters error __POS__ Exit port)
+    mixture
+
+let add_free parameters error agent_id site_name mixture =
+  add_binding_state parameters error agent_id site_name
+    (fun lnk ->
+       match lnk with
+       | LNK_ANY _ -> true
+       | FREE | LNK_VALUE _ | LNK_SOME _ | LNK_TYPE _ -> false)
+    FREE
+    (Some true)
+    mixture
+
+let add_binding_type parameters error agent_id site_name agent_name' site_name' mixture =
+  add_binding_state parameters error agent_id site_name
+  (fun lnk ->
+     match lnk with
+       | LNK_SOME _ | LNK_ANY _ -> true
+       | FREE | LNK_VALUE _ | LNK_TYPE _ -> false)
+  (LNK_TYPE (Locality.dummy_annot agent_name', Locality.dummy_annot site_name'))
+  (Some false)
+  mixture
+
+
+let add_bound parameters error agent_id site_name mixture =
+  add_binding_state parameters error agent_id site_name
+    (fun lnk ->
+       match lnk with
+       | LNK_ANY _ -> true
+       | LNK_SOME _ | FREE | LNK_VALUE _ | LNK_TYPE _ -> false)
+    (LNK_SOME Locality.dummy)
+    (Some false)
+    mixture
+
+let add_pointer parameters error agent_id site_name agent_id' agent_name' site_name' lnk_value mixture =
+  add_binding_state parameters error agent_id site_name
+    (fun lnk ->
+       match lnk with
+       | LNK_SOME _ | LNK_ANY _ -> true
+       | LNK_TYPE ((agent_name'',_),(site_name'',_)) ->
+         agent_name'' = agent_name' && site_name'' = site_name'
+       | FREE | LNK_VALUE _ -> false)
+    (LNK_VALUE (agent_id',agent_name', site_name', lnk_value, Locality.dummy))
+    (Some false)
+    mixture
+
+let rec get_agent_name parameters error k mixture =
+  match mixture with
+  | SKIP mixture ->
+    if k=0 then
+      Exception.warn parameters error __POS__ Exit ""
+    else
+      get_agent_name parameters error (k-1) mixture
+  | COMMA (agent, mixture)
+  | DOT(_,agent,mixture)
+  | PLUS(_,agent,mixture) ->
+    if k=0 then error, agent.ag_nme
+    else
+      get_agent_name parameters error (k-1) mixture
+  | EMPTY_MIX -> Exception.warn parameters error __POS__ Exit ""
+
+let get_agent_name ?agent_name parameters error k mixture =
+  match agent_name with
+  | None -> get_agent_name parameters error k mixture
+  | Some ag -> error, ag
+
+let add_link parameters error agent_id ?agent_name site_name agent_id' ?agent_name' site_name' lnk_value mixture =
+  let error, agent_name = get_agent_name parameters error agent_id ?agent_name mixture in
+  let error, agent_name' = get_agent_name parameters error agent_id' ?agent_name:agent_name'  mixture in
+  let error, mixture =
+    add_pointer parameters error
+      agent_id site_name agent_id' agent_name' site_name' lnk_value mixture
+  in
+  add_pointer parameters error
+    agent_id' site_name' agent_id agent_name site_name lnk_value mixture
+
+
+let add_internal_state parameters error agent_id (site_name:site_name) (state:internal_state) mixture =
+  mod_site_gen parameters error agent_id site_name
+    (fun parameters error port ->
+       match port.port_int with
+       | [] ->
+         error, {port with port_int = [state]}
+       | _::_ ->
+         Exception.warn parameters error __POS__ Exit port)
+    mixture
+(*let add_mixture parameters error agent_name mixture =
   let error', mixture =
     let rec aux parameters error mixture =
       match mixture with
@@ -556,7 +773,7 @@ let add_mixture parameters error agent_name mixture =
     Exception.check_point Exception.warn parameters error error'
       __POS__ Exit
   in
-  error, mixture
+  error, mixture*)
 
 (**********************************************************)
 (*TYPE C*)
@@ -974,6 +1191,17 @@ module Agent_id_map_and_set =
          let print = Format.pp_print_int
        end
        ))
+
+module Lnk_id_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_link_value
+         let compare = compare
+         let print = Format.pp_print_int
+       end
+       ))
+
 
 module Rule_map_and_set =
   Map_wrapper.Make

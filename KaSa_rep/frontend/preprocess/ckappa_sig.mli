@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Oct 26 2017>
+ * Last modification: Time-stamp: <Nov 11 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -28,6 +28,7 @@ type c_site_name
 type c_state
 type c_rule_id
 type c_agent_id
+type c_link_value
 
 (****************************************************************************)
 
@@ -37,16 +38,18 @@ val write_c_rule_id : Bi_outbuf.t -> c_rule_id -> unit
 val string_of_c_rule_id : ?len:int -> c_rule_id -> string
 val read_c_rule_id : Yojson.Safe.lexer_state -> Lexing.lexbuf -> c_rule_id
 val c_rule_id_of_string : string -> c_rule_id
+val string_of_c_link_value: c_link_value -> string
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_state_index : c_state
 val dummy_rule_id : c_rule_id
 val dummy_agent_id : c_agent_id
-
+val dummy_link_value: c_link_value
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 
+val next_lnk_value: c_link_value -> c_link_value
 val fst_site : c_site_name
 val snd_site : c_site_name
 
@@ -70,6 +73,7 @@ val string_of_rule_id : c_rule_id -> string
 
 val int_of_agent_id : c_agent_id -> int
 val agent_id_of_int : int -> c_agent_id
+val lnk_value_of_int: int -> c_link_value
 val add_agent_id: c_agent_id -> int -> c_agent_id
 val sub_rule_id: c_rule_id -> int -> c_rule_id
 val add_rule_id: c_rule_id -> int -> c_rule_id
@@ -131,7 +135,7 @@ and port =
 and internal = string list
 
 and link =
-  | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
+  | LNK_VALUE of (c_agent_id * agent_name * site_name * c_link_value * position)
   | FREE
   | LNK_ANY   of position
   | LNK_SOME  of position
@@ -210,7 +214,28 @@ val join_mixture:
   mixture -> mixture ->
   Exception.method_handler * mixture
 
-val add_link : Exception.method_handler ->
+val add_agent: Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  c_agent_id -> agent_name -> mixture -> Exception.method_handler * mixture
+
+val add_site: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> site_name -> mixture -> Exception.method_handler * mixture
+
+val add_internal_state: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> site_name -> internal_state -> mixture -> Exception.method_handler * mixture
+
+val add_link: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> ?agent_name:agent_name -> site_name -> c_agent_id -> ?agent_name':agent_name -> site_name -> c_link_value -> mixture -> Exception.method_handler * mixture
+
+val add_binding_type: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> site_name -> agent_name -> site_name -> mixture -> Exception.method_handler * mixture
+
+val add_bound: Remanent_parameters_sig.parameters ->
+  Exception.method_handler -> c_agent_id -> site_name -> mixture -> Exception.method_handler * mixture
+
+val add_free: Remanent_parameters_sig.parameters ->
+    Exception.method_handler -> c_agent_id -> site_name -> mixture -> Exception.method_handler * mixture
+(*val add_link : Exception.method_handler ->
   c_agent_id -> agent_name -> site_name ->
   link -> Exception.method_handler * link
 
@@ -228,7 +253,7 @@ val add_agent : Remanent_parameters_sig.parameters ->
 
 val add_mixture : Remanent_parameters_sig.parameters ->
   Exception.method_handler -> agent_name -> mixture ->
-  Exception.method_handler * mixture
+  Exception.method_handler * mixture*)
 
 (*******************************************************)
 (*C type*)
@@ -496,6 +521,9 @@ module Agent_map_and_set: Map_wrapper.S_with_logs
 
 module Agent_id_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id
+
+module Lnk_id_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_link_value
 
 module Rule_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_rule_id

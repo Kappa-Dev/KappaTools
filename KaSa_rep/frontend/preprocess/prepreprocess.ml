@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 04 2017>
+ * Last modification: Time-stamp: <Nov 11 2017>
  * *
  * Translation from kASim ast to ckappa representation,
  *
@@ -47,6 +47,25 @@ let add_entry parameters id agent site index (error,map) =
     ((agent, site, index) :: old_list)
     map
 
+let add_entry_lnk parameters id agent site index (error,map) =
+  let error,old_list =
+    Ckappa_sig.Lnk_id_map_and_set.Map.find_default_without_logs
+      parameters
+      error
+      []
+      id
+      map
+(* this is a partial map which stores the occurrences of binding
+
+             labels *)
+  in
+  Ckappa_sig.Lnk_id_map_and_set.Map.add_or_overwrite
+    parameters
+    error
+    id
+    ((agent, site, index) :: old_list)
+    map
+
 let rev_ast = List.rev
 (*mixture =
   let rec aux mixture sol =
@@ -59,21 +78,21 @@ let rev_ast = List.rev
 
 let pop_entry parameters error id (map,set) =
   let error,list =
-    Ckappa_sig.Agent_id_map_and_set.Map.find_option
+    Ckappa_sig.Lnk_id_map_and_set.Map.find_option
       parameters
       error
       id
       map
   in
   if
-    Ckappa_sig.Agent_id_map_and_set.Set.mem
+    Ckappa_sig.Lnk_id_map_and_set.Set.mem
       id
       set
   then
     match list with
     | Some [_] ->
       let error,map =
-        Ckappa_sig.Agent_id_map_and_set.Map.remove
+        Ckappa_sig.Lnk_id_map_and_set.Map.remove
           parameters
           error
           id
@@ -90,7 +109,7 @@ let pop_entry parameters error id (map,set) =
         Exit (None,map)
     | Some (_::t) ->
       let error,map =
-        Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+        Ckappa_sig.Lnk_id_map_and_set.Map.overwrite
           parameters
           error
           id
@@ -110,7 +129,7 @@ let pop_entry parameters error id (map,set) =
     match list with
     | Some [a] ->
       let error,map =
-        Ckappa_sig.Agent_id_map_and_set.Map.remove
+        Ckappa_sig.Lnk_id_map_and_set.Map.remove
           parameters
           error
           id
@@ -119,7 +138,7 @@ let pop_entry parameters error id (map,set) =
       error,(Some a,map)
     | Some [b;a] ->
       let error,map =
-        Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+        Ckappa_sig.Lnk_id_map_and_set.Map.overwrite
           parameters
           error
           id
@@ -129,7 +148,7 @@ let pop_entry parameters error id (map,set) =
       error,(Some b,map)
     | Some (_::t) ->
       let error,map =
-        Ckappa_sig.Agent_id_map_and_set.Map.overwrite
+        Ckappa_sig.Lnk_id_map_and_set.Map.overwrite
           parameters
           error
           id
@@ -164,9 +183,9 @@ let rec scan_interface parameters k agent interface ((error,a),set as remanent)=
     scan_interface parameters k agent interface
       ((match port.Ast.port_lnk with
           | [Ast.LNK_VALUE (i,()),_] ->
-            add_entry
+            add_entry_lnk
               parameters
-              (Ckappa_sig.agent_id_of_int i)
+              (Ckappa_sig.lnk_value_of_int i)
               agent
               (fst port.Ast.port_nme)
               k
@@ -181,7 +200,7 @@ let scan_agent parameters k ag remanent =
     fst (scan_interface parameters k name intf (remanent,Mods.StringSet.empty))
 
 let rec collect_binding_label
-    parameters mixture f (k:Ckappa_sig.c_agent_id) remanent =
+    parameters mixture f k remanent =
   match mixture with
   | agent :: mixture (*| Ast.DOT (_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
     collect_binding_label
@@ -192,7 +211,7 @@ let rec collect_binding_label
       (scan_agent parameters (f k) agent remanent)
   | [] -> remanent
 
-let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanent =
+let collect_binding_label parameters mixture f k remanent =
   let error,map =
     collect_binding_label
       parameters
@@ -201,19 +220,19 @@ let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanen
       k
       remanent
   in
-  Ckappa_sig.Agent_id_map_and_set.Map.fold
+  Ckappa_sig.Lnk_id_map_and_set.Map.fold
     (fun x l (error,(map,set)) ->
        if (List.length l = 1)
        then
          let error,map =
-           Ckappa_sig.Agent_id_map_and_set.Map.remove
+           Ckappa_sig.Lnk_id_map_and_set.Map.remove
              parameters
              error
              x
              map
          in
          let error,set =
-           Ckappa_sig.Agent_id_map_and_set.Set.add
+           Ckappa_sig.Lnk_id_map_and_set.Set.add
              parameters
              error
              x
@@ -227,7 +246,7 @@ let collect_binding_label parameters mixture f (k:Ckappa_sig.c_agent_id) remanen
          (error,(map,set)))
     map
     (error, (map,
-             Ckappa_sig.Agent_id_map_and_set.Set.empty
+             Ckappa_sig.Lnk_id_map_and_set.Set.empty
             ))
 
 let translate_lnk_state parameters lnk_state remanent =
@@ -239,7 +258,7 @@ let translate_lnk_state parameters lnk_state remanent =
         pop_entry
           parameters
           error
-          (Ckappa_sig.agent_id_of_int id) (*NOTE: I don't want to change the type in Ast*)
+          (Ckappa_sig.lnk_value_of_int id) (*NOTE: I don't want to change the type in Ast*)
           remanent
       in
       match triple with
@@ -266,7 +285,7 @@ let translate_lnk_state parameters lnk_state remanent =
             (index,
              agent,
              site,
-             (Ckappa_sig.agent_id_of_int id),
+             (Ckappa_sig.lnk_value_of_int id),
              pos),
           (error, (map, (snd remanent)))
     end
@@ -468,7 +487,7 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mix
       f
       Ckappa_sig.dummy_agent_id
       (error,
-       Ckappa_sig.Agent_id_map_and_set.Map.empty
+       Ckappa_sig.Lnk_id_map_and_set.Map.empty
       )
   in
   let mixture,(error,_map) =
@@ -490,7 +509,7 @@ let refine_mixture parameters error mixture =
       (fun i -> i)
       Ckappa_sig.dummy_agent_id
       (error,
-       Ckappa_sig.Agent_id_map_and_set.Map.empty
+       Ckappa_sig.Lnk_id_map_and_set.Map.empty
       )
   in
   let mixture,(error,_map) = translate_mixture parameters mixture remanent in
@@ -711,7 +730,7 @@ let refine_agent parameters error agent_set agent =
       Ckappa_sig.dummy_agent_id
       agent
       (error,
-       Ckappa_sig.Agent_id_map_and_set.Map.empty
+       Ckappa_sig.Lnk_id_map_and_set.Map.empty
       )
   in
 
@@ -719,7 +738,7 @@ let refine_agent parameters error agent_set agent =
     translate_agent
       parameters true agent
       (error, (map,
-               Ckappa_sig.Agent_id_map_and_set.Set.empty
+               Ckappa_sig.Lnk_id_map_and_set.Set.empty
               ))
   in
   error, agent_set, agent

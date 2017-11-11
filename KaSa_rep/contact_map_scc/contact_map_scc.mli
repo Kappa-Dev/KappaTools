@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 26th of October
-  * Last modification: Time-stamp: <Oct 27 2017>
+  * Last modification: Time-stamp: <Nov 11 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -25,6 +25,7 @@ val convert_contact_map:
 val mixture_of_edge:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
+  Cckappa_sig.kappa_handler -> 
   edge -> Exception.method_handler * Cckappa_sig.mixture
 
 val filter_edges_in_converted_contact_map:

@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Oct 18 2017>
+   * Last modification: Time-stamp: <Nov 11 2017>
    * *
    * Primitives to use a kappa handler
    *

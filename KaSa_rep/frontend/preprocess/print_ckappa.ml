@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: March, the 23rd of 2011
- * Last modification: Time-stamp: <Mar 11 2017>
+ * Last modification: Time-stamp: <Nov 11 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -48,7 +48,7 @@ let print_link_state parameter error link =
         let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "%s%s"
             (Remanent_parameters.get_bound_symbol parameter)
-            (Ckappa_sig.string_of_agent_id link_index)
+            (Ckappa_sig.string_of_c_link_value link_index)
         in
         error
       | Remanent_parameters_sig.Site_address ->

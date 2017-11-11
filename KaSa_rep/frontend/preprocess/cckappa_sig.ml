@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: January, the 17th of 2011
-  * Last modification: Time-stamp: <Nov 01 2017>
+  * Last modification: Time-stamp: <Nov 11 2017>
   * *
   * Signature for prepreprocessing language ckappa
   *
@@ -751,7 +751,7 @@ let add_agent_interface parameters error site agent_interface =
   in
   error, agent_interface
 
-let add_agent parameters error agent_id agent_type site agent =
+(*let add_agent parameters error agent_id agent_type site agent =
   (* you should not use the dummy agent id *)
   (* put the agent_id as an argument of add_agent instead *)
   (* this will be up to the caller to ensure that this is fresh *)
@@ -820,8 +820,38 @@ let add_agent parameters error agent_id agent_type site agent =
     Exception.check_point Exception.warn parameters error error' __POS__
       ~message:"this agent is already used" Exit
   in
-  error, agent
+  error, agent*)
 
+(*
+let add_agent parameters error string_of_agent handler agent_id agent_type mixture =
+  let error, agent_string =
+    string_of_agent parameters error handler agent_type
+  in
+  let error, c_mixture =
+    Ckappa_sig.add_agent parameters error agent_id agent_string
+      mixture.c_mixture
+  in
+  let agent =
+    {
+      agent_kasim_id = agent_id ;
+      agent_name = agent_type ;
+      agent_interface = Ckappa_sig.Site_map_and_set.Map.empty;
+      agent_position = Locality.dummy
+    }
+  in
+  let error, views =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
+      parameters error
+      agent_id (Agent agent)  mixture.views
+  in
+error,
+  { mixture
+    with
+      c_mixture = c_mixture ;
+      views = views
+  }
+  *)
+    (*
 let add_views parameters error agent_id views =
   match
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
@@ -967,7 +997,7 @@ let add_mixture parameters error agent_id agent_type mixture =
     bonds = bonds;
     plus = plus;
     dot = dot
-  }
+  }*)
 
 (*******************************************************)
 
