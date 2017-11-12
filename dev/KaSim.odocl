@@ -75,6 +75,10 @@ Ode_interface
 Odes
 Rule_modes
 
+Ckappa_sig
+Cckappa_sig
+Build_graph
+ 
 Analyzer
 Analyzer_headers
 Analyzer_domain_sig

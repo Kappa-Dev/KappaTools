@@ -1096,9 +1096,10 @@ struct
       then
         error, map
       else
+        let a,b,_,_ = __POS__ in
         warn
           parameter error "setMap.ml "
-          (Some ("SetMap line 895"^"Attempt to add an association over a former one in a map"))
+          (Some (a^" line: "^(string_of_int b)^": Attempt to add an association over a former one in a map"))
           (Failure "Set_and_Map.Map.add"),
         map
 

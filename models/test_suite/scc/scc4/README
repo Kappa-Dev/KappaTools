@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa --compute-potential-cycles scc4.ka --output-directory output || exit 0
+
+#No cycle, asymetric dimerisation only.

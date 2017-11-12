@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Oct 28 2017>
+  * Last modification: Time-stamp: <Nov 12 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1445,14 +1445,32 @@ let compute_scc_decomposition
     _show_title state =
   let parameters = Remanent_state.get_parameters state in
   let accuracy_level = accuracy_level_cm in
-    let state, contact_map = get_internal_contact_map ~accuracy_level state in
-    let state, handler = get_handler state in
-    let errors = get_errors state in
-    let errors, cm_graph =
-      Contact_map_scc.convert_contact_map
-        parameters errors contact_map
+  let state, contact_map = get_internal_contact_map ~accuracy_level state in
+  let errors = get_errors state in
+  let errors, cm_graph =
+    Contact_map_scc.convert_contact_map
+      parameters errors contact_map
+  in
+  let state, (static, dynamic) =
+    get_reachability_analysis state
+  in
+  let state, handler = get_handler state in
+  let errors, dynamic, cm_graph =
+    match
+      accuracy_level_scc
+    with
+    | Public_data.Low -> errors, dynamic, cm_graph
+    | Public_data.Medium
+    | Public_data.High
+    | Public_data.Full ->
+      let maybe_reachable parameters error static dynamic =
+        Reachability.maybe_reachable static dynamic error Analyzer_headers.Embeddings
     in
-    let errors, graph_scc =
+      Contact_map_scc.filter_edges_in_converted_contact_map
+        parameters errors handler static dynamic maybe_reachable cm_graph
+  in
+  let state = Remanent_state.set_reachability_result (static, dynamic) state in
+  let errors, graph_scc =
       Contact_map_scc.compute_graph_scc
         parameters errors cm_graph
     in

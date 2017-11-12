@@ -1,0 +1,13 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa --compute-potential-cycles scc3.ka --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{
+"0:A(x,y),B(y)->A(x,y!1),B(y!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x,y),B(x)->A(x!1,y),B(x!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x,y),B(y)->A(x,y!1),B(y!1)" -> "1:A(x,y),B(x)->A(x!1,y),B(x!1)" [label="[0->0]" color="red" arrowhead="tee"];
+"1:A(x,y),B(x)->A(x!1,y),B(x!1)" -> "0:A(x,y),B(y)->A(x,y!1),B(y!1)" [label="[0->0]" color="red" arrowhead="tee"];
+}

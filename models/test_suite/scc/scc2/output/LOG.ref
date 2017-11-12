@@ -1,24 +1,22 @@
-Parsing scc.ka...
+Parsing scc2.ka...
 done
 Compiling...
 Generating the raw contact map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule File "scc.ka", line 5, characters 0-40: will never be applied.
-rule File "scc.ka", line 6, characters 0-40: will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+A() => [ A(y) v A(y!C.x) ]
+A() => [ A(x) v A(x!B.y) ]
+B() => [ B(x) v B(x!C.y) ]
+B() => [ B(y) v B(y!A.x) ]
+C() => [ C(x) v C(x!A.y) ]
+C() => [ C(y) v C(y!B.x) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -30,6 +28,8 @@ B cannot occur in the model
 * Properties of pairs of bonds
 ------------------------------------------------------------
 Graph of strongly connected components:
+(C,y!)--(B,x!); (B,y!)--(A,x!); (A,y!)--(C,x!); 
+(C,x!)--(A,y!); (A,x!)--(B,y!); (B,x!)--(C,y!); 
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception

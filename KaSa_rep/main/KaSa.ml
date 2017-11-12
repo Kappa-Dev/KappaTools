@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Oct 26 2017>
+ * Last modification: Time-stamp: <Nov 12 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -81,7 +81,7 @@ let main () =
         | Remanent_parameters_sig.High
         | Remanent_parameters_sig.Full -> Public_data.Full
       in
-      let accuracy_level_scc = Public_data.Low in
+      let accuracy_level_scc = Public_data.High in
       let state, graph_scc =
         Export_to_KaSa.get_scc_decomposition
           ~accuracy_level_cm ~accuracy_level_scc state

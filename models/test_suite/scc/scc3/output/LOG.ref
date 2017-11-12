@@ -1,28 +1,25 @@
-Parsing scc.ka...
+Parsing scc3.ka...
 done
 Compiling...
 Generating the raw contact map...
 Reachability analysis...
-
 ------------------------------------------------------------
-* There are some non applyable rules
+every rule may be applied
 ------------------------------------------------------------
-rule File "scc.ka", line 5, characters 0-40: will never be applied.
-rule File "scc.ka", line 6, characters 0-40: will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
+every agent may occur in the model
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+A() => [ A(x) v A(x!B.x) ]
+A() => [ A(y) v A(y!B.y) ]
+B() => [ B(x) v B(x!A.x) ]
+B() => [ B(y) v B(y!A.y) ]
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+A(y!B.y) => A(x,y!B.y)
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------

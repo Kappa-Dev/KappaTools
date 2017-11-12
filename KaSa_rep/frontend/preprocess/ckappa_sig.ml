@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: 01/17/2011
- * Last modification: Time-stamp: <Nov 11 2017>
+ * Last modification: Time-stamp: <Nov 12 2017>
  * *
  * Signature for prepreprocessing language ckappa
  *
@@ -431,62 +431,10 @@ let rec join_mixture parameters error mixture1 mixture2 =
   | _,PLUS(_)->
     Exception.warn parameters error __POS__ Exit EMPTY_MIX
 
-(*let join_mixture _parameters error _mixture1 _mixture2 =
-  error, EMPTY_MIX*)
-(*TO DO*)
 
 (**********************************************************)
 (*ADD*)
 (**********************************************************)
-
-(*let id_of_binding_type
-    parameter error handler_kappa
-    agent_type site agent_type' site' =
-  let state = C_Lnk_type (agent_type',site') in
-  let error, state_dic =
-    Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-      parameter error
-      (agent_type,site)
-      handler_kappa.states_dic
-  in
-  match state_dic with
-  | None ->
-    Exception.warn
-      parameter error __POS__
-      Exit dummy_state_index
-  | Some state_dic ->
-    begin
-      let error, bool =
-        Dictionary_of_States.member
-          parameter error
-          (Binding state)
-          state_dic
-      in
-      if not bool then
-        Exception.warn
-          parameter error __POS__
-          ~message:("agent "^(string_of_int (int_of_agent_name agent_type))^" site"^
-                    (string_of_int (int_of_site_name site))^"agent "^
-                    (string_of_int (int_of_agent_name agent_type'))^" site"^
-                    (string_of_int (int_of_site_name site')))
-          Exit dummy_state_index
-      else
-        match
-          Dictionary_of_States.allocate
-            parameter error
-            compare_unit_state_index
-            (Binding state)
-            ()
-            Misc_sa.const_unit
-            state_dic
-        with
-        | error, None ->
-          Exception.warn
-            parameter error __POS__
-            Exit dummy_state_index
-        | error, (Some (a,_,_,_)) ->
-          error, a
-    end*)
 
 (*let add_link error agent_id agent_type site link =
   match link with

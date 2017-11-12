@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa --compute-potential-cycles scc2.ka --output-directory output || exit 0
