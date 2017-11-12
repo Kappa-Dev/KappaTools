@@ -165,7 +165,7 @@ let options_gen (t :t) (t_gui :t_gui) : (string * Arg.spec * Superarg.spec * str
     Superarg.Choice
       (["3","old";"v3","old";"V3","old";"4","new";"v4","new";"V4","new"],[],t_gui.syntaxVersion_gui),
     "Use explicit notation for free site",
-    [], Superarg.Hidden);
+    [Common_args.semantics,8], Superarg.Normal);
 ]
 
 let options t =
