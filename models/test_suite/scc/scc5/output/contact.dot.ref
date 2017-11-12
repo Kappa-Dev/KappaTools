@@ -1,0 +1,17 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa --compute-potential-cycles ../scc4/scc4.ka --output-directory output --polymer-detection-accuracy-level Low
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+   0.1 [style = filled label = "y" shape =circle color = yellow size = "5"]
+   0.2 [style = filled label = "z" shape =circle color = yellow size = "5"]
+label =  "R";  shape = rectangle; color = red
+} ; 
+0.0 -- 0.0
+0.1 -- 0.2
+}

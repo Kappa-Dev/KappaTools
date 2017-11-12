@@ -1,0 +1,31 @@
+Parsing ../scc4/scc4.ka...
+done
+Compiling...
+Generating the raw contact map...
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+R() => [ R(y) v R(y!R.z) ]
+R() => [ R(z) v R(z!R.y) ]
+R() => [ R(x) v R(x!R.x) ]
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+Graph of strongly connected components:
+(R,z!)--(R,y!); (R,x!)--(R,x!); (R,y!)--(R,z!); 
+Generating the raw influence map...
+Refining the influence map...
+execution finished without any exception

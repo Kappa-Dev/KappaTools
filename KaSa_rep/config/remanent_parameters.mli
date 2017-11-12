@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Oct 28 2017>
+  * Last modification: Time-stamp: <Nov 12 2017>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -52,6 +52,7 @@ val set_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_paramet
 val get_link_mode: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.link_mode
 val get_influence_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 val get_contact_map_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
+val get_scc_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.accuracy_level
 
 (** Kappa pretty-printing *)
 val get_btype_sep_symbol: Remanent_parameters_sig.parameters -> string

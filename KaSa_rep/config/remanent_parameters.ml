@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 04 2017>
+  * Last modification: Time-stamp: <Nov 12 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -409,6 +409,9 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         ;
           Remanent_parameters_sig.contact_map_accuracy_level =
             fetch_accuracy_level Config.contact_map_accuracy_level ;
+        Remanent_parameters_sig.scc_accuracy_level =
+          fetch_accuracy_level Config.scc_accuracy_level ;
+
           Remanent_parameters_sig.view_accuracy_level =
             fetch_accuracy_level Config.view_accuracy_level ;
           Remanent_parameters_sig.called_from = called_from ;
@@ -580,6 +583,7 @@ let get_do_reachability_analysis_1        marshalisable =
 (**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
 let get_contact_map_accuracy_level_1      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_accuracy_level
+let get_scc_accuracy_level_1              marshalisable = marshalisable.Remanent_parameters_sig.scc_accuracy_level
 let get_view_accuracy_level_1             marshalisable = marshalisable.Remanent_parameters_sig.view_accuracy_level
 let get_launching_date_1                             marshalisable =
   let t = marshalisable.Remanent_parameters_sig.launching_date in
@@ -642,6 +646,7 @@ let get_prefix = upgrade_from_marshal_field get_prefix_1
 let get_call_stack = upgrade_from_marshal_field get_call_stack_1
 let get_link_mode = upgrade_from_marshal_field get_link_mode_1
 let get_contact_map_accuracy_level = upgrade_from_marshal_field get_contact_map_accuracy_level_1
+let get_scc_accuracy_level = upgrade_from_marshal_field get_scc_accuracy_level_1
 let get_influence_map_accuracy_level = upgrade_from_marshal_field get_influence_map_accuracy_level_1
 let get_view_accuracy_level = upgrade_from_marshal_field get_view_accuracy_level_1
 

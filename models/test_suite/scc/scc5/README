@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa --compute-potential-cycles ../scc4/scc4.ka --output-directory output --polymer-detection-accuracy-level Low || exit 0
+
+#No cycle, asymetric dimerisation only, but the accuracy is too low to detect it.

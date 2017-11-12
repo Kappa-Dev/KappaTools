@@ -81,7 +81,16 @@ let main () =
         | Remanent_parameters_sig.High
         | Remanent_parameters_sig.Full -> Public_data.Full
       in
-      let accuracy_level_scc = Public_data.High in
+      let accuracy_level_scc =
+        match
+          Remanent_parameters.get_scc_accuracy_level parameters
+        with
+        | Remanent_parameters_sig.None
+        | Remanent_parameters_sig.Low -> Public_data.Low
+        | Remanent_parameters_sig.Medium
+        | Remanent_parameters_sig.High
+        | Remanent_parameters_sig.Full -> Public_data.High
+      in
       let state, graph_scc =
         Export_to_KaSa.get_scc_decomposition
           ~accuracy_level_cm ~accuracy_level_scc state

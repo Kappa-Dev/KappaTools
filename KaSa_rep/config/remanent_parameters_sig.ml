@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification:  Time-stamp: <Oct 28 2017>
+  * Last modification:  Time-stamp: <Nov 12 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -150,6 +150,7 @@ type marshalisable_parameters =
    reachability_map_output : reachability_map_output;
    influence_map_accuracy_level: accuracy_level ;
    contact_map_accuracy_level: accuracy_level ;
+   scc_accuracy_level: accuracy_level ; 
    view_accuracy_level: accuracy_level ;
    kasa_state : Remanent_state_signature.engine_state ;
    launching_date: Unix.tm ;

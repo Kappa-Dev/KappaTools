@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <Oct 28 2017>
+  * Last modification: Time-stamp: <Nov 12 2017>
   * *
   * primitive to parse command-line options
   *
@@ -280,10 +280,20 @@ let options =
       [contact_map,6],
       Expert;
 
+      "--polymer-detection-accuracy-level",
+      (Choice
+         (["Low","based only on the contact map";
+           "High","use reachability analysis as well";
+          ],[],
+          Config.scc_accuracy_level)),
+      "Tune the accuracy level of the detection of polymers",
+      [contact_map,7],
+      Expert;
+
       "--pure-contact",
       Bool Config.pure_contact,
       "show in the contact map  only the sites with a binding state",
-      [contact_map,7],
+      [contact_map,8],
       Expert;
 
 
