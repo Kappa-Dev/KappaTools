@@ -2,7 +2,7 @@
 
 set -e
 
-function empty_or_create
+empty_or_create ()
 {
     [ -d "$1" ] && find "$1" -delete || mkdir -p "$1"
 }
