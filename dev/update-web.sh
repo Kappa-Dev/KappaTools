@@ -13,7 +13,7 @@ case $1 in
         cp -r man/gkappa_img ${PLAYGROUND}/docs/KaSim-manual-master/
         cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
         cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
-	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy \
+	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
 	    ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
     js )
@@ -36,7 +36,7 @@ case $1 in
 	<noscript><p><img src="https://coutosuisse.fagny.fr/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>\
 	<!-- End Piwik Code -->\
         ' site/index.html > ${PLAYGROUND}/try/index.html
-	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy \
+	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
 	    ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
     webserver )
