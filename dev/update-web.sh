@@ -13,7 +13,8 @@ case $1 in
         cp -r man/gkappa_img ${PLAYGROUND}/docs/KaSim-manual-master/
         cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
         cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
-	scp -i dev/travis-deploy ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
+	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy \
+	    ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
     js )
         [ -d ${PLAYGROUND}/try ] || mkdir ${PLAYGROUND}/try
@@ -35,7 +36,8 @@ case $1 in
 	<noscript><p><img src="https://coutosuisse.fagny.fr/analytics/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>\
 	<!-- End Piwik Code -->\
         ' site/index.html > ${PLAYGROUND}/try/index.html
-	scp -i dev/travis-deploy ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
+	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy \
+	    ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
     webserver )
         ;;
@@ -45,7 +47,7 @@ case $1 in
         [ -d ${PLAYGROUND}/binaries ] || mkdir ${PLAYGROUND}/binaries
 	codesign -s - Kappapp.app && \
 	    zip -r ${PLAYGROUND}/binaries/Kappapp.app.zip Kappapp.app
-	scp -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.app.zip \
+	scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy ${PLAYGROUND}/binaries/Kappapp.app.zip \
 	    travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/nightly-builds/
 	;;
 esac
