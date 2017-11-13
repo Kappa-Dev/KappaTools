@@ -236,7 +236,7 @@ clean_ide:
 	rm -f KaSaAgent bin/KaSaAgent
 	rm -rf ide/Kappa.iconset
 	rm -f ide/Kappa.icns ide/Info.plist
-	rm -rf Kappapp.app
+	rm -rf Kappapp.app Kappapp.app.zip
 	rm -rf site
 	rm -rf python/__pycache__/
 

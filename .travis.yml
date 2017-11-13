@@ -57,19 +57,29 @@ matrix:
           - tex4ht
   - os: osx
     env: CHECKED=MacOS
+  - env: CHECKED=windows
+    addons:
+      apt:
+        sources:
+          - avsm
+        packages:
+          - aspcud
+          - opam
+          - gcc-mingw-w64-x86-64
 
 before_install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew install opam ; fi"
   - ( umask 077 && openssl aes-256-cbc -K $encrypted_942f740de87b_key -iv $encrypted_942f740de87b_iv -in dev/travis-deploy.enc -out dev/travis-deploy -d )
 
 install:
-  - opam init --compiler=4.04.0 -a git://github.com/ocaml/opam-repository && eval $(opam config env)
-  - opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = windows ] ; then opam init --compiler=4.04.0 ; else opam init -a git://github.com/ocaml/opam-repository ; fi
+  - eval $(opam config env) && opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
   - opam install -y ocamlbuild yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen cohttp ; fi"
   - sh -c "if [ '$CHECKED' = webserver ] ; then pip2 install --user . nose && pip install -v . nose ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 atdgen-windows lwt-windows ; fi"
 
 script:
   - make all
@@ -79,6 +89,7 @@ script:
   - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python && python3 tests/test_kappa_client.py && python2 tests/test_kappa_client.py ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
+  - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"
 
 deploy:
   provider: script
