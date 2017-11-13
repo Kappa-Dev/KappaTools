@@ -208,3 +208,80 @@ class KappaError(Exception):
     def __init__(self, errors):
         Exception.__init__(self, errors)
         self.errors = errors
+
+
+class KappaApi(object):
+    """General api for a kappa interface."""
+
+    def project_parse(self, overwrites=None):
+        raise NotImplementedError()
+
+    def file_create(self,file_object):
+        raise NotImplementedError()
+
+    def file_delete(self,file_id):
+        raise NotImplementedError()
+
+    def file_get(self,file_id):
+        raise NotImplementedError()
+
+    def file_info(self):
+        raise NotImplementedError()
+
+    def simulation_delete(self):
+        raise NotImplementedError()
+
+    def simulation_file_line(self, file_line_id):
+        raise NotImplementedError()
+
+    def simulation_DIN(self,DIN_id):
+        raise NotImplementedError()
+
+    def simulation_log_messages(self):
+        raise NotImplementedError()
+
+    def simulation_plot(self, limit=None):
+        raise NotImplementedError()
+
+    def simulation_snapshot(self, snapshot_id):
+        raise NotImplementedError()
+
+    def simulation_info(self):
+        raise NotImplementedError()
+
+    def simulation_info_file_line(self):
+        raise NotImplementedError()
+
+    def simulation_DINs(self):
+        raise NotImplementedError()
+
+    def simulation_snapshots(self):
+        raise NotImplementedError()
+
+    def simulation_pause(self):
+        raise NotImplementedError()
+
+    def simulation_perturbation(self,perturbation_code):
+        raise NotImplementedError()
+
+    def simulation_start(self,simulation_parameter):
+        raise NotImplementedError()
+
+    def simulation_continue(self,pause_condition):
+        raise NotImplementedError()
+
+    def _analyses_init(self):
+        raise NotImplementedError()
+
+    def analyses_dead_rules(self):
+        raise NotImplementedError()
+
+    def analyses_constraints_list(self):
+        raise NotImplementedError()
+
+    def analyses_contact_map(self,accuracy=None):
+        raise NotImplementedError()
+
+    def analyses_influence_map(self,accuracy=None):
+        raise NotImplementedError()
+
