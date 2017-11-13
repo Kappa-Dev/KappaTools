@@ -4,7 +4,7 @@ set -e
 
 empty_or_create ()
 {
-    [ -d "$1" ] && find "$1" -delete || mkdir -p "$1"
+    [ -d "$1" ] && find "$1" -mindepth 1 -delete || mkdir -p "$1"
 }
 
 PLAYGROUND=$(mktemp -d -t kappaXXXX)
