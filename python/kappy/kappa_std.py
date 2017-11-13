@@ -12,10 +12,11 @@ import abc
 from os.path import join
 from pkg_resources import resource_filename
 
-from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File
+from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
+                               KappaApi
 
 
-class KappaStd(object):
+class KappaStd(KappaApi):
     """Kappa tools driver run locally.
 
     path -- where to find kappa executables

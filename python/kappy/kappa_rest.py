@@ -9,10 +9,11 @@ import json
 from os.path import join
 from requests import exceptions, request
 
-from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit
+from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit, \
+                               KappaApi
 
 
-class KappaRest(object):
+class KappaRest(KappaApi):
     """Client to a Kappa tools driver run as a server.
 
     Same interface as KappaStd (documented there)
