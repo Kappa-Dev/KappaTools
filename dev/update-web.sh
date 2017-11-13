@@ -2,7 +2,7 @@
 
 set -e
 
-function empty_or_create()
+function empty_or_create
 {
     [ -d "$1" ] && find "$1" -delete || mkdir -p "$1"
 }
@@ -73,3 +73,4 @@ git add ${PLAYGROUND}/docs/KaSim-manual-master/ ${PLAYGROUND}/try/ \
     ${PLAYGROUND}/docs/KaSim-API-master/ && \
     { git commit -m "Sync website for $1 with Kappa-Dev/KaSim@${COMMITNAME}" && \
     git push -q origin master || echo "No Changes" ; }
+cd ${HOME} && rm -rf ${PLAYGROUND}
