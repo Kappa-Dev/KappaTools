@@ -41,7 +41,7 @@ class RestClientTest(_KappaClientTest):
             self.websim,
             '--shutdown-key', self.key,
             '--port', str(self.port),
-            '--level', 'fatal',  # TODO: This is temporary until --log works.
+            '--level', 'info',  # TODO: This is temporary until --log works.
             '--log', 'WebSim_test.log'
             ])
         sleep(1)
