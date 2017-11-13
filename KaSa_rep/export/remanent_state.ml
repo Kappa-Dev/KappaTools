@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June, the 25th of 2016
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -286,6 +286,7 @@ type ('static,'dynamic) state =
     internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
     contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
     internal_scc_decomposition: internal_scc_decomposition Public_data.AccuracyMap.t Public_data.AccuracyMap.t ;
+    scc_decomposition: Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
     reachability_state: ('static, 'dynamic) reachability_result option ;
@@ -299,27 +300,7 @@ type ('static,'dynamic) state =
     constraints_list : constraints_list option;
     symmetric_sites : symmetric_sites Public_data.AccuracyMap.t;
     separating_transitions : separating_transitions option ;
-    contact_map_converted : (*TODO: remove later*)
-      (*(Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t *
-        Graphs.node list Ckappa_sig.AgentSite_map_and_set.Map.t)*)
-        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-          Ckappa_sig.AgentSite_map_and_set.Map.t option;
-    graph_scc :
-      Graphs.Nodearray.key list list Ckappa_sig.AgentSite_map_and_set.Map.t option
   }
-
-let get_contact_map_converted state =
-  state.contact_map_converted
-
-let set_contact_map_converted cm state =
-  {state with contact_map_converted = Some cm }
-
-let get_graph_scc state =
-  state.graph_scc
-
-let set_graph_scc scc state =
-  {state with graph_scc = Some scc }
-
 
 let get_data state =
   state.handler, state.dead_rules, state.separating_transitions
@@ -362,6 +343,7 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     local_influence_map_blackboard = None ;
     internal_contact_map = Public_data.AccuracyMap.empty ;
     internal_scc_decomposition = Public_data.AccuracyMap.empty ;
+    scc_decomposition = Public_data.AccuracyMap.empty ;
     contact_map = Public_data.AccuracyMap.empty ;
     signature = None ;
     bdu_handler = handler_bdu ;
@@ -376,8 +358,6 @@ let create_state ?errors ?env ?init_state ?reset parameters init =
     constraints_list = None;
     symmetric_sites = Public_data.AccuracyMap.empty;
     separating_transitions = None;
-    contact_map_converted = None; (*REMOVE later*)
-    graph_scc = None
   }
 
 (**************)
@@ -430,7 +410,6 @@ let get_map empty add of_json label json =
 let get_contact_map_map state = state.contact_map
 let get_influence_map_map state = state.influence_map
 let get_constraints_list state = state.constraints_list
-(*let get_separating_transitions state = state.separating_transitions*)
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 
@@ -440,6 +419,9 @@ let add_contact_map_to_json state l
     contactmaps contactmap Public_data.contact_map_to_json
     state l
 
+
+let add_scc_map_to_json state l =
+  l (* TODO: Quyen *)
 
 let add_influence_map_to_json state l =
   add_map get_influence_map_map
@@ -486,6 +468,7 @@ let to_json state =
   let l = add_dead_rules_to_json state l in
   let l = add_influence_map_to_json state l in
   let l = add_contact_map_to_json state l in
+  let l = add_scc_map_to_json state l in
   let l = add_separating_transitions state l in
   ((`Assoc  l): Yojson.Basic.json)
 
@@ -681,6 +664,30 @@ let get_internal_scc_decomposition accuracy accuracy' state =
   | None -> None
   | Some a ->
     Public_data.AccuracyMap.find_option accuracy' a
+
+let set_scc_decomposition accuracy accuracy' dec state =
+  let old =
+    Public_data.AccuracyMap.find_default
+      Public_data.AccuracyMap.empty
+      accuracy state.scc_decomposition
+  in
+  {state with
+   scc_decomposition =
+     Public_data.AccuracyMap.add
+       accuracy
+       (Public_data.AccuracyMap.add accuracy' dec old)
+       state.scc_decomposition
+  }
+
+let get_scc_decomposition accuracy accuracy' state =
+  match
+    Public_data.AccuracyMap.find_option
+      accuracy state.scc_decomposition
+  with
+  | None -> None
+  | Some a ->
+    Public_data.AccuracyMap.find_option accuracy' a
+
 
 let get_reachability_result state = state.reachability_state
 

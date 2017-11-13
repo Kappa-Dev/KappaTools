@@ -27,7 +27,7 @@ C() => [ C(y) v C(y!B.x) ]
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Graph of strongly connected components:
+Potential polymerization:
 (C,y!)--(B,x!); (B,y!)--(A,x!); (A,y!)--(C,x!); 
 (C,x!)--(A,y!); (A,x!)--(B,y!); (B,x!)--(C,y!); 
 Generating the raw influence map...

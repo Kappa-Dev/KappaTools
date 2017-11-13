@@ -70,6 +70,20 @@ let extract_contact_map = function
   | `Assoc [ "contact map", `Assoc [ "map", contact; "accuracy", acc ] ] -> acc,contact
   | _ -> failwith "Wrong ugly contact_map extractor"
 
+let extract_contact_scc json =
+  match json with
+  | `Assoc [ "scc", `Assoc l] when List.length l = 3 ->
+    begin
+      try
+      let acc_cm = List.assoc "accuracy_cm" l in
+      let acc_scc = List.assoc "accuracy_scc" l in
+      let scc = List.assoc "map" l in
+      acc_cm, acc_scc, scc
+    with _ ->
+      failwith "Wrong ugly scc extractor"
+  end
+  | _ -> failwith "Wrong ugly scc extractor"
+
 let _ = React.S.l2
     (fun _ acc ->
        State_project.with_project

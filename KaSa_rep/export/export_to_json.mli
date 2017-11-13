@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 21 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -19,6 +19,11 @@ module type Type =
 
     val get_contact_map:
       ?accuracy_level:Public_data.accuracy_level ->
+      state -> state * Yojson.Basic.json
+
+    val get_scc_decomposition:
+      ?accuracy_level_cm:Public_data.accuracy_level ->
+      ?accuracy_level_scc:Public_data.accuracy_level ->
       state -> state * Yojson.Basic.json
 
     val get_influence_map:
@@ -40,7 +45,6 @@ module type Type =
     val get_dead_rules: state -> state * Yojson.Basic.json
 
     val get_constraints_list: state -> state * Yojson.Basic.json
-
     val get_errors: state -> Exception_without_parameter.method_handler
     val get_errors_json: state -> Yojson.Basic.json
 

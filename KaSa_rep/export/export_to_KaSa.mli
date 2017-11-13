@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -69,10 +69,10 @@ sig
     state -> state *
              internal_scc_decomposition
 
-  val dump_scc_decomposition :
+  val output_scc_decomposition :
     ?accuracy_level_cm:Public_data.accuracy_level ->
     ?accuracy_level_scc:Public_data.accuracy_level ->
-    state -> unit
+    state -> state
 
 (**************************************************)
 

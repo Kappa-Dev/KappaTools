@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: Aug 23 2016
-  * Last modification: Time-stamp: <Aug 21 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -21,6 +21,11 @@ sig
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Yojson.Basic.json
 
+  val get_scc_decomposition:
+      ?accuracy_level_cm:Public_data.accuracy_level ->
+      ?accuracy_level_scc:Public_data.accuracy_level ->
+      state -> state * Yojson.Basic.json
+
   val get_influence_map:
     ?accuracy_level:Public_data.accuracy_level ->
     state -> state * Yojson.Basic.json
@@ -36,7 +41,6 @@ sig
     state -> (int,int) Public_data.influence_node option  -> state * Yojson.Basic.json
   val previous_node_in_influence_map:
     state -> (int,int) Public_data.influence_node option -> state * Yojson.Basic.json
-
 
   val get_dead_rules: state -> state * Yojson.Basic.json
 
@@ -69,6 +73,14 @@ functor (A:Analyzer.Analyzer) ->
         ?accuracy_level:(accuracy_level=Public_data.Low) state =
       let state, cm = get_contact_map ~accuracy_level state in
       state, Public_data.contact_map_to_json (accuracy_level,cm)
+
+    let get_scc_decomposition
+        ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+        ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+        state =
+      let state, scc = get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state in
+      state,
+      Public_data.scc_to_json (accuracy_level_cm, accuracy_level_scc, scc)
 
     let get_influence_map
         ?accuracy_level:(accuracy_level=Public_data.Low) state =

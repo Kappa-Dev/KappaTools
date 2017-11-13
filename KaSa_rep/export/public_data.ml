@@ -53,6 +53,7 @@ let fwd_string = "fwd"
 let bwd_string = "bwd"
 let direction = "direction"
 let rule_hidden = "hidden"
+let scc = "scc"
 
 (*******************)
 (* Accuracy levels *)
@@ -262,6 +263,17 @@ let contact_map_of_json =
       | _ -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
     end
   | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
+
+
+type scc = ((string * string) * (string * string)) list list
+
+let scc_to_json (_cm_acc,_scc_acc,_scc) =
+  (* TODO -> Quyen: see js/tab_contact.ml for the labels of the fields *)
+  `Null
+
+let scc_of_json _json =
+  (* TODO -> Quyen *)
+  Low, Low, []
 
 (******************************************************************************)
 

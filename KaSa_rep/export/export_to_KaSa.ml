@@ -4,7 +4,7 @@
   * Jérôme Feret, project Antique, INRIA Paris
   *
   * Creation: June 30 2016
-  * Last modification: Time-stamp: <Oct 26 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -67,34 +67,16 @@ val dump_contact_map :
 Public_data.accuracy_level ->
 state -> unit
 
-  (*WORK IN PROCESS*)
+val get_scc_decomposition :
+  ?accuracy_level_cm:Public_data.accuracy_level ->
+  ?accuracy_level_scc:Public_data.accuracy_level ->
+  state -> state *
+           internal_scc_decomposition
 
-  val get_scc_decomposition :
-    ?accuracy_level_cm:Public_data.accuracy_level ->
-    ?accuracy_level_scc:Public_data.accuracy_level ->
-    state -> state *
-             internal_scc_decomposition
-
-  val dump_scc_decomposition :
-    ?accuracy_level_cm:Public_data.accuracy_level ->
-    ?accuracy_level_scc:Public_data.accuracy_level ->
-    state -> unit
-
-
-
-  (*val output_contact_map_converted:
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    (Graphs.node list * (int * int) list)
-      Ckappa_sig.AgentSite_map_and_set.Map.t*)
-
-  (*val output_graph_scc :
-    ?accuracy_level:Public_data.accuracy_level ->
-    state ->
-    Exception.method_handler *
-    Graphs.Nodearray.key list list
-      Ckappa_sig.AgentSite_map_and_set.Map.t*)
+val output_scc_decomposition :
+  ?accuracy_level_cm:Public_data.accuracy_level ->
+  ?accuracy_level_scc:Public_data.accuracy_level ->
+  state -> state
 
 (**************************************************)
 
@@ -157,17 +139,20 @@ module Export =
 
       let get_contact_map = get_contact_map
       let dump_contact_map = dump_contact_map
-      let get_scc_contact_map = get_scc_decomposition
+      let get_scc_contact_map = get_internal_scc_decomposition
 
 
       let get_internal_contact_map = get_internal_contact_map
       let get_influence_map = get_internal_influence_map
       let get_local_influence_map = get_local_internal_influence_map
+      let get_scc_decomposition = get_internal_scc_decomposition
 
       let get_constraints_list = get_internal_constraints_list
       let output_internal_contact_map = output_internal_contact_map
       let output_influence_map = output_internal_influence_map
       let output_local_influence_map = output_local_internal_influence_map
       let output_constraints_list = output_internal_constraints_list
+      let output_scc_decomposition = dump_internal_scc_decomposition
+
       let empty_constraints_list = []
     end

@@ -26,7 +26,7 @@ A(y!B.y) => A(x,y!B.y)
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-Graph of strongly connected components:
+Potential polymerization:
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception

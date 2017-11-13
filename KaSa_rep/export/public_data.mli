@@ -16,6 +16,7 @@ val free:string
 val bound:string
 val wildcard:string
 val influencemap: string
+val scc:string
 
 type accuracy_level = Low | Medium | High | Full
 val accuracy_levels : accuracy_level list
@@ -38,6 +39,13 @@ val contact_map_to_json:
 val contact_map_of_json:
   Yojson.Basic.json -> accuracy_level * contact_map
 
+type scc = ((string * string) * (string * string)) list list
+
+val scc_to_json:
+  accuracy_level * accuracy_level * scc -> Yojson.Basic.json
+
+val scc_of_json:
+  Yojson.Basic.json -> accuracy_level * accuracy_level * scc
 
 type rule_direction =
     | Direct_rule
@@ -53,7 +61,7 @@ type rule =
     rule_ast: string;
     rule_position: Locality.t;
     rule_direction: rule_direction ;
-    rule_hidden : bool ; 
+    rule_hidden : bool ;
   }
 
 type var =

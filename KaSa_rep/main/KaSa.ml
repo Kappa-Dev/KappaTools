@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <Nov 12 2017>
+ * Last modification: Time-stamp: <Nov 13 2017>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -91,57 +91,15 @@ let main () =
         | Remanent_parameters_sig.High
         | Remanent_parameters_sig.Full -> Public_data.High
       in
-      let state, graph_scc =
-        Export_to_KaSa.get_scc_decomposition
+      let state =
+        Export_to_KaSa.output_scc_decomposition
           ~accuracy_level_cm ~accuracy_level_scc state
       in
-      let state, handler = Export_to_KaSa.get_handler state in
-      let error = Export_to_KaSa.get_errors state in
-      let error =
-        Loggers.fprintf
-          (Remanent_parameters.get_logger parameters)
-          "Graph of strongly connected components:\n";
-        List.fold_left
-          (fun error list ->
-             let error =
-               List.fold_left
-                 (fun error ((ag,st),(ag',st')) ->
-                    let error, agent_name =
-                      Handler.string_of_agent parameters error handler ag
-                    in
-                    let error, site_name =
-                      Handler.string_of_site parameters   error handler ag st
-                    in
-                    let error, agent_name' =
-                      Handler.string_of_agent parameters error handler ag'
-                    in
-                    let error, site_name' =
-                      Handler.string_of_site parameters   error handler ag' st'
-                    in
-                    let () =
-                      Loggers.fprintf
-                        (Remanent_parameters.get_logger parameters)
-                        "(%s,%s)--(%s,%s); "
-                        agent_name site_name agent_name' site_name'
-                    in error
-                 )
-                 error
-                 list
-             in
-             let () =
-               Loggers.print_newline
-                 (Remanent_parameters.get_logger parameters)
-             in error
-          )
-          error
-          graph_scc
-      in
-      let state = Export_to_KaSa.set_errors error state in
       state
-    else state
+    else
+      state
   in
-      (*-----------------------------------------------------------------------*)
-  (**)
+  (*-----------------------------------------------------------------------*)
   let state =
     if Remanent_parameters.get_do_influence_map parameters
     then

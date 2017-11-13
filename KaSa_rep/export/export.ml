@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: December, the 9th of 2014
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Nov 13 2017>
   * *
   *
   * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -1437,7 +1437,7 @@ let dump_contact_map accuracy state =
   | Some contact_map ->
     print_contact_map (Remanent_state.get_parameters state) contact_map
 
-let compute_scc_decomposition
+let compute_internal_scc_decomposition
     ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
     ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
     ?do_we_show_title:(_do_we_show_title=(fun _ -> false))
@@ -1463,7 +1463,7 @@ let compute_scc_decomposition
     | Public_data.Medium
     | Public_data.High
     | Public_data.Full ->
-      let maybe_reachable parameters error static dynamic =
+      let maybe_reachable _parameters error static dynamic =
         Reachability.maybe_reachable static dynamic error Analyzer_headers.Embeddings
     in
       Contact_map_scc.filter_edges_in_converted_contact_map
@@ -1480,26 +1480,186 @@ let compute_scc_decomposition
     let state = Remanent_state.set_errors errors state in
     state, graph_scc
 
-let get_scc_decomposition
+let get_internal_scc_decomposition
     ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
     ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
   =
   get_gen
     (Remanent_state.get_internal_scc_decomposition
        accuracy_level_cm accuracy_level_scc)
-    (compute_scc_decomposition
+    (compute_internal_scc_decomposition
        ~accuracy_level_cm
        ~accuracy_level_scc
        ~do_we_show_title:(fun _ -> true)
        ~log_title:("Decompose the contact map in strongly connected components")
        )
 
-let dump_scc_decomposition
-    ?(accuracy_level_cm=Public_data.Low)
-    ?(accuracy_level_scc=Public_data.Low)
-    state =
-  ()
 (*internal contact map*)
+
+let translate_scc_decomposition state (internal_scc:internal_scc_decomposition) =
+  (* TODO: Quyen*)
+  ([]:Public_data.scc)
+
+let compute_map2_gen
+    get
+    store convert ?(accuracy_level_cm=Public_data.Low)
+    ?(accuracy_level_scc=Public_data.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title state =
+  let show_title =
+    match log_title with
+    | None -> (fun _ -> ())
+    | Some log_title ->
+      compute_show_title do_we_show_title (log_title accuracy_level_cm accuracy_level_scc)
+  in
+  let () = show_title state in
+  let state, internal =
+    get
+      ?accuracy_level_cm:(Some accuracy_level_cm)
+      ?accuracy_level_scc:(Some accuracy_level_scc)
+      state
+  in
+  let rep = convert state internal in
+  store accuracy_level_cm accuracy_level_scc rep state, rep
+
+let compute_scc_map
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    _show_title =
+  compute_map2_gen
+    get_internal_scc_decomposition
+    Remanent_state.set_scc_decomposition
+    translate_scc_decomposition
+    ~accuracy_level_cm ~accuracy_level_scc
+
+let get_scc_decomposition
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title:(log_title=
+                (fun _ _ ->Some "Detect potential polymers")) =
+  get_gen
+    (Remanent_state.get_scc_decomposition accuracy_level_cm accuracy_level_scc)
+    (compute_scc_map
+       ~accuracy_level_cm ~accuracy_level_scc  ~do_we_show_title ~log_title)
+
+let dump_internal_scc_decomposition
+    ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+    ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+    state =
+  let parameters = Remanent_state.get_parameters state in
+  let state, handler = get_handler state in
+  let logger = Remanent_parameters.get_logger parameters in
+  let state, graph_scc = get_internal_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state in
+  let error = get_errors state in
+  let () =
+    Loggers.fprintf
+      logger
+      "Potential polymerization:"
+  in
+  let () =
+    Loggers.print_newline
+      logger
+  in
+  let error =
+    List.fold_left
+      (fun error list ->
+         let error =
+           List.fold_left
+             (fun error ((ag,st),(ag',st')) ->
+                let error, agent_name =
+                  Handler.string_of_agent parameters error handler ag
+                in
+                let error, site_name =
+                  Handler.string_of_site parameters error handler ag st
+                in
+                let error, agent_name' =
+                  Handler.string_of_agent parameters error handler ag'
+                in
+                let error, site_name' =
+                  Handler.string_of_site parameters error handler ag' st'
+                in
+                let () =
+                  Loggers.fprintf
+                    logger
+                    "(%s,%s)--(%s,%s); "
+                    agent_name site_name agent_name' site_name'
+                in error
+             )
+             error
+             list
+         in
+         let () =
+           Loggers.print_newline
+             logger
+         in error
+      )
+      error
+      graph_scc
+  in
+  let state = set_errors error state in
+  state
+
+let dump_scc_decomposition   ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+  ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
+  state =
+let parameters = Remanent_state.get_parameters state in
+let logger = Remanent_parameters.get_logger parameters in
+let state, graph_scc = get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state in
+let error = get_errors state in
+let () =
+  Loggers.fprintf
+    logger
+    "Potential polymerization:"
+in
+let () =
+  Loggers.print_newline
+    logger
+in
+let error =
+  List.fold_left
+    (fun error list ->
+       let error =
+         List.fold_left
+           (fun error ((agent_name,site_name),(agent_name',site_name')) ->
+              let () =
+                Loggers.fprintf
+                  logger
+                  "(%s,%s)--(%s,%s); "
+                  agent_name site_name agent_name' site_name'
+              in error
+           )
+           error
+           list
+       in
+       let () =
+         Loggers.print_newline
+           logger
+       in error
+    )
+    error
+    graph_scc
+in
+let state = set_errors error state in
+state
+
+
+
+let get_influence_map
+    ?accuracy_level:(accuracy_level=Public_data.Low)
+    ?do_we_show_title:(do_we_show_title=(fun _ -> true))
+    ?log_title:(log_title=
+                (fun x ->
+                   match x with
+                   | Public_data.Low ->
+                     Some "Compute the influence map"
+                   | Public_data.Medium
+                   | Public_data.High | Public_data.Full ->
+                     Some "Refine the influence map")) =
+  get_gen
+    (Remanent_state.get_influence_map accuracy_level)
+    (compute_influence_map ~accuracy_level ~do_we_show_title ~log_title)
+
 
 let output_internal_contact_map ?logger
     ?accuracy_level:(accuracy_level=Public_data.Low) state =
@@ -1701,41 +1861,6 @@ let get_signature =
   get_gen
     Remanent_state.get_signature
     compute_signature
-
-(******************************************************************)
-(*work in process*)
-
-(*let compute_graph_scc show_title state =
-  let state, handler = get_handler state in
-  let state, contact_map = get_contact_map_int state in
-  let () = show_title state in
-  let parameters = Remanent_state.get_parameters state in
-  let error = Remanent_state.get_errors state in
-  let state, int_contact_map = get_internal_contact_map state in
-  let error =
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
-        " contact map\n"
-    in
-    Contact_map_scc.convert_contact_map_to_graph parameters error
-      int_contact_map
-  in
-  let error, output =
-    match contact_map with
-    | None -> error, []
-    | Some cm ->
-      let error, output =
-        Contact_map_scc.convert_int_to_nodes parameters error handler cm in
-      error, output
-  in
-  Remanent_state.set_errors error
-    (Remanent_state.set_graph_scc output state), output
-
-let get_graph_scc =
-  get_gen
-    ~log_prefix:"Graphs scc:"
-    ~log_title:"Graphs scc"
-    Remanent_state.get_graph_scc
-    compute_graph_scc*)
 
 (******************************************************************)
 (*Dump*)
