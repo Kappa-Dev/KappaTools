@@ -63,7 +63,7 @@ before_install:
   - ( umask 077 && openssl aes-256-cbc -K $encrypted_942f740de87b_key -iv $encrypted_942f740de87b_iv -in dev/travis-deploy.enc -out dev/travis-deploy -d )
 
 install:
-  - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
+  - opam init --compiler=4.04.0 -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install -y conf-which base-bytes #Hack so that opam choose a version of cppo & yojson recent enough
   - opam install -y ocamlbuild yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
