@@ -7,6 +7,8 @@ __all__ = ['SimulationParameter', 'PlotLimit', 'KappaError']
 import sys
 import abc
 from os import path
+from time import sleep
+from datetime import datetime
 
 
 if sys.version_info >= (3, 4):
@@ -290,6 +292,32 @@ class KappaApi(ABC):
         if self.__default_param is None:
             raise KappaError("Default simulation parameter not yet set.")
         return self.__default_param
+
+    def get_is_sim_running(self):
+        """Check if the current simulation is running."""
+        sim_info = self.simulation_info()
+        try:
+            progress_info = sim_info['simulation_info_progress']
+            ret = progress_info['simulation_progress_is_running']
+        except KeyError:  # Simulation has not been created.
+            ret = False
+        return ret
+
+    def wait_for_simulation_stop(self, timeout=None):
+        """Block until the simulation is done or timeout seconds exceeded.
+
+        If the simulation stops before timeout, siminfo is returned.
+        """
+        start = datetime.now()
+        while self.get_is_sim_running():
+            sleep(0.5)
+            if timeout is not None:
+                if (datetime.now() - start).seconds >= timeout:
+                    ret = None
+                    break
+        else:
+            ret = self.simulation_info()
+        return ret
 
     # Abstract methods to standardize the API. Docs given here are applied to
     # the corresponding methods in children by default when @KappaApi._fixdocs
