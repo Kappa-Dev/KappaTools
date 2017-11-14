@@ -3,14 +3,15 @@ from builtins import dict, str
 
 import random
 import string
+import inspect
 from os import path
 from subprocess import Popen
 from time import sleep
 from datetime import datetime
 
-from util import _KappaClientTest, _get_id, run_nose
 import kappy
 from kappy.kappa_std import BIN_DIR
+from util import _KappaClientTest, _get_id, run_nose
 
 
 class RestClientTest(_KappaClientTest):
@@ -86,8 +87,8 @@ class RestClientTest(_KappaClientTest):
 
 
 def test_docs():
-    kappa_rest_doc = kappy.KappaRest.file_create.__doc__
-    kappa_abst_doc = kappy.kappa_common.KappaApi.file_create.__doc__
+    kappa_rest_doc = inspect.getdoc(kappy.KappaRest.file_create)
+    kappa_abst_doc = inspect.getdoc(kappy.kappa_common.KappaApi.file_create)
     assert kappa_rest_doc is not None and kappa_rest_doc == kappa_abst_doc, \
         "Doc fixing failed: parent method doc not inheritted by KappaRest."
 

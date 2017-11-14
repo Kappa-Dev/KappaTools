@@ -238,6 +238,15 @@ class KappaApi(ABC):
 
     @classmethod
     def _fix_docs(this_abc, child_class):
+        """Make api method docs inheritted.
+
+        Specifically, insepect.getdoc will return values inheritted from this
+        abc for standardized api methods.
+        """
+        # After python 3.5, this is basically handled automatically
+        if sys.version_info >= (3, 5):
+            return child_class
+
         if not issubclass(child_class, this_abc):
             raise KappaError('Cannot fix docs of class that is not decendent.')
 
