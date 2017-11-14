@@ -8,8 +8,10 @@ from subprocess import Popen
 from time import sleep
 from datetime import datetime
 
-from util import _KappaClientTest, _get_id, BIN_DIR, run_nose
+from util import _KappaClientTest, _get_id, run_nose
 import kappy
+from kappy.kappa_std import BIN_DIR
+
 
 class RestClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
