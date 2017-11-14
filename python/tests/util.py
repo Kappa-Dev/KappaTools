@@ -75,8 +75,8 @@ class _KappaClientTest(unittest.TestCase):
 
         print("Start simulation...")
         pause_condition = "[T] > 10.0"
-        simulation_parameter = kappy.SimulationParameter(0.1, pause_condition)
-        runtime.simulation_start_with_param(simulation_parameter)
+        runtime.set_default_sim_param(0.1, pause_condition)
+        runtime.simulation_start()
 
         print("Waiting for simulation to stop...")
         simulation_info = runtime.simulation_info()

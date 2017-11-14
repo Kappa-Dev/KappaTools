@@ -266,13 +266,17 @@ class KappaStd(KappaApi):
         return self._dispatch("SimulationPerturbation",
                               {"perturbation_code": perturbation_code})
 
-    def simulation_start_with_param(self, simulation_parameter):
+    def simulation_start(self, simulation_parameter=None):
         """Start the simulation from the last parsed model.
 
         Inputs
         ------
-        simulation_parameter -- a kappa_common.SimulationParameter instance.
+        simulation_parameter -- (optional) a kappa_common.SimulationParameter
+            instance. The default is set using the `set_default_sim_param`
+            method.
         """
+        if simulation_parameter is None:
+            simulation_parameter = self.get_default_sim_param()
         if self.project_ast is None:
             raise KappaError("Project not parsed since last modification")
         return self._dispatch("SimulationStart",

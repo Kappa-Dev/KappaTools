@@ -232,6 +232,9 @@ else:
 
 class KappaApi(ABC):
     """General api for a kappa interface."""
+    def __init__(self):
+        self.__default_param = None
+        return
 
     def add_model_string(self, model_str, position=1, file_id=None):
         ret_data = self.file_create(File.from_string(model_str, position,
@@ -242,6 +245,28 @@ class KappaApi(ABC):
         ret_data = self.file_create(File.from_file(model_fpath, position,
                                                    file_id))
         return ret_data
+
+    def set_default_sim_param(self, *args, **kwargs):
+        """Set the simulatin default simulation parameters.
+
+        You can pass one of two things in as input:
+        - a kappa_common.SimulationParameter instance
+        - the arguments and keyword argument to create such an instance.
+
+        The parameters you specify will be used by default in simulations run
+        by this client.
+        """
+        if len(args) is 1 and isinstance(args[0], SimulationParameter):
+            self.__default_param = args[0]
+        else:
+            self.__default_param = SimulationParameter(*args, **kwargs)
+        return
+
+    def get_default_sim_param(self):
+        """Get the default SimulationParameter instance."""
+        if self.__default_param is None:
+            raise KappaError("Default simulation parameter not yet set.")
+        return self.__default_param
 
     @abc.abstractmethod
     def project_parse(self, overwrites=None): pass
@@ -295,7 +320,7 @@ class KappaApi(ABC):
     def simulation_perturbation(self, perturbation_code): pass
 
     @abc.abstractmethod
-    def simulation_start_with_param(self, simulation_parameter): pass
+    def simulation_start(self, simulation_parameter=None): pass
 
     @abc.abstractmethod
     def simulation_continue(self, pause_condition): pass
