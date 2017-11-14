@@ -1,0 +1,269 @@
+// Simplified Kai system with counters
+// WF 02/27/2017
+
+/*
+constants
+*/
+
+%var: 'Avogadro'         6.0221413E+23 // Avogadro's number
+%var: 'R'                0.008314      // gas constant in kJ/(K mol)
+%var: 'VSynechococcus'   2.8E-09       // in litres (2512 um x 1118 um on average)
+%var: 'Vhypothetical'    2.8E-15       // in litres (2512 um x 1118 um on average)
+
+/*
+basic parameters
+*/
+
+%var: 'scale'     0.5
+//%var: 'V'        'scale' * 'VSynechococcus' // model volume
+%var: 'V'         'scale' * 'Vhypothetical' // model volume
+
+/*
+derived constants
+*/
+
+%var:   'stoch'   'Avogadro' * 'V'
+
+/*
+signatures
+*/
+
+%agent: KaiC(x1{u p},x2{u p},x3{u p},x4{u p},x5{u p},x6{u p},s{active inactive},a,b1,b2,tag,p{=0 / +=8})
+%agent: KaiA(c,b)
+%agent: KaiB(c,a)
+
+/*
+init
+*/
+
+%init:  [int]((2 * 0.58E-06 * 'stoch')) KaiA(c,b)  // quantity in mol
+%init:  [int]((2 * 1.75E-06 * 'stoch')) KaiB(c,a)
+%init:  [int]((0.58E-06 * 'stoch')) KaiC(x1{u},x2{u},x3{u},x4{u},x5{u},x6{u},s{active},a,b1,b2,tag,p{=0})
+
+/*
+observables
+*/
+
+%var: 'p0' |KaiC(p{=0})|
+%var: 'p1' |KaiC(p{=1})|
+%var: 'p2' |KaiC(p{=2})|
+%var: 'p3' |KaiC(p{=3})|
+%var: 'p4' |KaiC(p{=4})|
+%var: 'p5' |KaiC(p{=5})|
+%var: 'p6' |KaiC(p{=6})|
+
+%obs: '<p>' ('p1'+2*'p2'+3*'p3'+4*'p4'+5*'p5'+6*'p6')/(6*|KaiC()|)
+
+/*
+spontaneous phosphorylation and dephosphorylation of (in)active KaiC (no KaiA bound)
+
+The phosphorylation rate must be lower than the dephosphorylation rate.
+
+Here we deploy a counter construct to keep track of global hexamer state.
+Note that these rules apply also to KaiB-bound and KaiA.KaiB-bound hexamers
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// The values of these rate constants are not free and have to be carefully chosen,
+// because their sum determines the relaxation rate of the phosphorylation level of
+// KaiC (in the absence of KaiA), while their ratio determines the steady-state
+// phosphorylation level of KaiC (in the absence of KaiA).
+
+%var: 'k_p+'  	 0.01	// h^{-1}  [original]
+%var: 'k_p-'  	 0.16 	// h^{-1}  [original]
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//------------------------------------------------------------------------------
+'pCa_1'		KaiC(x1{u}[.],a[.]) ->
+			KaiC(x1{p}[.],a[.],p{+=1}) @ 'k_p+'
+'pCa_2'		KaiC(x2{u}[.],a[.]) ->
+			KaiC(x2{p}[.],a[.],p{+=1}) @ 'k_p+'
+'pCa_3'		KaiC(x3{u}[.],a[.]) ->
+			KaiC(x3{p}[.],a[.],p{+=1}) @ 'k_p+'
+'pCa_4'		KaiC(x4{u}[.],a[.]) ->
+			KaiC(x4{p}[.],a[.],p{+=1}) @ 'k_p+'
+'pCa_5'		KaiC(x5{u}[.],a[.]) ->
+			KaiC(x5{p}[.],a[.],p{+=1}) @ 'k_p+'
+'pCa_6'		KaiC(x6{u}[.],a[.]) ->
+			KaiC(x6{p}[.],a[.],p{+=1}) @ 'k_p+'
+
+'pCa_1_op'	KaiC(x1{p}[.],a[.]) ->
+			KaiC(x1{u}[.],a[.],p{-=1}) @ 'k_p-'
+'pCa_2_op'	KaiC(x2{p}[.],a[.]) ->
+			KaiC(x2{u}[.],a[.],p{-=1}) @ 'k_p-'
+'pCa_3_op'	KaiC(x3{p}[.],a[.]) ->
+			KaiC(x3{u}[.],a[.],p{-=1}) @ 'k_p-'
+'pCa_4_op'	KaiC(x4{p}[.],a[.]) ->
+			KaiC(x4{u}[.],a[.],p{-=1}) @ 'k_p-'
+'pCa_5_op'	KaiC(x5{p}[.],a[.]) ->
+			KaiC(x5{u}[.],a[.],p{-=1}) @ 'k_p-'
+'pCa_6_op'	KaiC(x6{p}[.],a[.]) ->
+			KaiC(x6{u}[.],a[.],p{-=1}) @ 'k_p-'
+//------------------------------------------------------------------------------
+
+
+/*
+conformational flipping as a function of phosphorylation state
+
+it is important that: 1) in the absence of KaiB, the active state has a lower
+free energy than the inactive one; 2) the hexamers should not flip at intermediate
+phosphorylation levels.
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%var: 'd'  	  2		// h^{-1}  [original]
+%var: 'g'  	  0.1 	// h^{-1}  [original]
+%var: 'flip-' 100	// h^{-1}  [original]
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//------------------------------------------------------------------------------
+'flip'		KaiC(s{active}[.],a[.],b1[.],b2[.],p{=x}) ->
+			KaiC(s{inactive}[.],a[.],b1[.],b2[.])
+			@ 10*'d'*('g'^(6-x))
+'flip_op' 	KaiC(s{inactive}[.],a[.],b1[.],b2[.]) ->
+			KaiC(s{active}[.],a[.],b1[.],b2[.])
+			@ 'flip-'
+//------------------------------------------------------------------------------
+
+/*
+KaiA un/binding to KaiC
+
+(here only 1 KaiA binds to a KaiC hexamer)
+
+The differential affinity mechanism requires that the affinity of KaiA for
+KaiC be high, but decrease substantially as the phosphorylation level of the KaiC
+hexamer increases.
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%var: 'k_A+'  	 1.72E+11 / 'stoch'		// molecules^{-1} h^{-1}  [original 1.72E+08] **
+%var: 'k_A-0'  	10 				// h^{-1}  [original]
+%var: 'a'        3  				// [original]
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//------------------------------------------------------------------------------
+'A.Ca'	KaiC(a[.],s{active}[.]), KaiA(c[.],b[.]) -> KaiC(a[1],s{active}[.]), KaiA(c[1],b[.]) @ 'k_A+'
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+'A..Ca'		KaiC(a[11],s{active}[.],p{=x}), KaiA(c[11]) ->
+			KaiC(a[.],s{active}[.]), KaiA(c[.])
+			@ 'k_A-0'*('a'^x)
+//------------------------------------------------------------------------------
+
+/*
+KaiA-facilitated phosphorylation. Note that KaiA is liberated in the process.
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// This value is an experimental fit
+//
+%var: 'k_pA'  	 1		// h^{-1}  [original 1]
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+'A..pC_1'	KaiC(a[11],x1{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x1{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+'A..pC_2'	KaiC(a[11],x2{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x2{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+'A..pC_3'	KaiC(a[11],x3{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x3{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+'A..pC_4'	KaiC(a[11],x4{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x4{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+'A..pC_5'	KaiC(a[11],x5{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x5{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+'A..pC_6'	KaiC(a[11],x6{u}[.]), KaiA(c[11]) ->
+			KaiC(a[.],x6{p}[.],p{+=1}), KaiA(c[.])
+			@ 'k_pA'
+
+/*
+Two KaiB bind to inactive KaiC
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%var: 'k_B+0'  	 2.97E+10 / 'stoch'		// molecules^{-1} h^{-1} [original 2.97E+12]
+%var: 'k_B-0'  	 1.0E+02 				// h^{-1}  [original]
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+// 0-state is special
+
+'B.Ci1_0'	KaiC(b1[.],s{inactive}[.],p{=0}), KaiB(c[.]) ->
+			KaiC(b1[11],s{inactive}[.]), KaiB(c[11])
+			@ 'k_B+0'*0.01
+
+'B.Ci2_0'	KaiC(b2[.],s{inactive}[.],p{=0}), KaiB(c[.]) ->
+			KaiC(b2[11],s{inactive}[.]), KaiB(c[11])
+			@ 'k_B+0'*0.01
+
+'B.Ci1_0_op'	KaiC(b1[11],s{inactive}[.],p{=0}), KaiB(c[11]) ->
+			KaiC(b1[.],s{inactive}[.]), KaiB(c[.])
+			@ 'k_B-0'*100
+
+'B.Ci2_0_op'	KaiC(b2[11],s{inactive}[.],p{=0}), KaiB(c[11]) ->
+			KaiC(b2[.],s{inactive}[.]), KaiB(c[.])
+			@ 'k_B-0'*100
+
+// the rest
+
+'B.Ci1_g0'	KaiC(b1[.],s{inactive}[.],p{>=1}), KaiB(c[.]) ->
+			KaiC(b1[11],s{inactive}[.]), KaiB(c[11])
+			@ 'k_B+0'
+'B.Ci2_g0'	KaiC(b2[.],s{inactive}[.],p{>=1}), KaiB(c[.]) ->
+			KaiC(b2[11],s{inactive}[.]), KaiB(c[11])
+			@ 'k_B+0'
+
+'B.Ci1_g0_op'	KaiC(b1[11],s{inactive}[.],p{>=1}), KaiB(c[11]) ->
+			KaiC(b1[.],s{inactive}[.]), KaiB(c[.])
+			@ 'k_B-0'
+'B.Ci2_g0_op'	KaiC(b2[11],s{inactive}[.],p{>=1}), KaiB(c[11]) ->
+			KaiC(b2[.],s{inactive}[.]), KaiB(c[.])
+			@ 'k_B-0'
+
+/*
+KaiA binds to KaiB on inactive KaiC
+
+A variant of differential affinity.
+*/
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%var: 'k_BA+0'  	 2.97E+18 / 'stoch'		// molecules^{-1} h^{-1}  [original]
+%var: 'k_BA-'  	 	 1.0E+01 				// h^{-1}  [original 1.0E+02]  **
+
+/* E+15 is good; */
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//off
+
+'A..B'		KaiB(a[1]), KaiA(b[1]) -> KaiB(a[.]), KaiA(b[.]) @ 'k_BA-'
+
+// on
+
+'A.B1_1'	KaiC(b1[11],p{=1}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b1[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*1
+'A.B1_2'	KaiC(b1[11],p{=2}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b1[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*100
+'A.B1_3'	KaiC(b1[11],p{=3}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b1[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*100
+'A.B1_4'	KaiC(b1[11],p{=4}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b1[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*1
+
+'A.B2_1'	KaiC(b2[11],p{=1}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b2[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*1
+'A.B2_2'	KaiC(b2[11],p{=2}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b2[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*100
+'A.B2_3'	KaiC(b2[11],p{=3}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b2[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*100
+'A.B2_4'	KaiC(b2[11],p{=4}), KaiB(c[11],a[.]), KaiA(c[.],b[.]) ->
+			KaiC(b2[11]), KaiB(c[11],a[12]), KaiA(c[.],b[12])
+			@ 'k_BA+0'*1
