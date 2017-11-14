@@ -271,7 +271,7 @@ class KappaStd(KappaApi):
         return self._dispatch("SimulationPerturbation",
                               { "perturbation_code" : perturbation_code })
 
-    def simulation_start(self,simulation_parameter):
+    def simulation_start_with_param(self,simulation_parameter):
         """Start the simulation from the last parsed model.
 
         Inputs

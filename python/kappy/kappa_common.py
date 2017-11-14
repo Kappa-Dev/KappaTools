@@ -1,12 +1,12 @@
 """ Shared functions of api client for the kappa programming language"""
 from __future__ import absolute_import, print_function, unicode_literals
 from builtins import dict, str
-import abc
 
-__all__ = ['FileMetadata', 'File', 'SimulationParameter', 'PlotLimit',
-           'KappaError']
+__all__ = ['SimulationParameter', 'PlotLimit', 'KappaError']
 
+import sys
 import json
+import abc
 
 
 class FileMetadata(object):
@@ -95,7 +95,7 @@ class File(object):
         return
 
     @classmethod
-    def from_string(cls, content, position=1):
+    def from_string(cls, content, position=1, file_id=None):
         """
         Convenience method to create a file from a string.
 
@@ -105,26 +105,33 @@ class File(object):
         ------
         content -- the content of the file (a string).
         position -- (default 1) rank among all files of the model while parsing
-          see FileMetadata
+            see FileMetadata
+        file_id -- (default 'inlined_input') the file_id that will be used by
+            kappa.
         """
-        return cls(FileMetadata('inlined_input', position), content)
+        if file_id is None:
+            file_id = 'inlined_input'
+        return cls(FileMetadata(file_id, position), content)
 
     @classmethod
-    def from_file(cls, path, position=1):
+    def from_file(cls, fpath, position=1, file_id=None):
         """
         Convience method to create a kappa file object from a file on disk
 
         Inputs
         ------
-        path -- to the file on disk
+        fpath -- path to the file on disk
         position -- (default 1) rank among all files of the model while parsing
-          see FileMetadata
+            see FileMetadata
+        file_id -- (default = fpath) the file_id that will be used by kappa.
         """
-        with open(path) as f:
+        if file_id is None:
+            file_id = fpath
+        with open(fpath) as f:
             code = f.read()
             file_content = str(code)
-            file_metadata = FileMetadata(path,position)
-            return cls(file_metadata,file_content)
+            file_metadata = FileMetadata(file_id, position)
+            return cls(file_metadata, file_content)
 
     def toJSON(self):
         """Get a JSON dict of the data in this file."""
@@ -214,6 +221,16 @@ class KappaError(Exception):
 class KappaApi(abc.ABC):
     """General api for a kappa interface."""
 
+    def add_model_string(self, model_str, position=1, file_id=None):
+        ret_data = self.file_create(File.from_string(model_str, position,
+                                                     file_id))
+        return ret_data
+
+    def add_model_file(self, model_fpath, position=1, file_id=None):
+        ret_data = self.file_create(File.from_file(model_fpath, position,
+                                                   file_id))
+        return ret_data
+
     @abc.abstractmethod
     def project_parse(self, overwrites=None): pass
 
@@ -266,7 +283,7 @@ class KappaApi(abc.ABC):
     def simulation_perturbation(self,perturbation_code): pass
 
     @abc.abstractmethod
-    def simulation_start(self,simulation_parameter): pass
+    def simulation_start_with_param(self,simulation_parameter): pass
 
     @abc.abstractmethod
     def simulation_continue(self,pause_condition): pass
@@ -282,4 +299,3 @@ class KappaApi(abc.ABC):
 
     @abc.abstractmethod
     def analyses_influence_map(self,accuracy=None): pass
-
