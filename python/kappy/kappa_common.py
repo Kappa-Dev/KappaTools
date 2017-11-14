@@ -218,7 +218,13 @@ class KappaError(Exception):
         self.errors = errors
 
 
-class KappaApi(abc.ABC):
+if sys.version_info >= (3, 4):
+    ABC = abc.ABC
+else:
+    ABC = abc.ABCMeta('ABC'.encode(), (), {})
+
+
+class KappaApi(ABC):
     """General api for a kappa interface."""
 
     def add_model_string(self, model_str, position=1, file_id=None):
