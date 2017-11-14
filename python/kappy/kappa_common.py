@@ -5,7 +5,6 @@ from builtins import dict, str
 __all__ = ['SimulationParameter', 'PlotLimit', 'KappaError']
 
 import sys
-import json
 import abc
 
 
@@ -32,8 +31,8 @@ class FileMetadata(object):
     file_version -- (list, default empty/None) the version of the file.
         Way too complicated logic meant to deal with the case where several
         clients works at the same time on the same stuff (in the REST API).
-        Can be safely ignored in Std mode, Should not be trusted in Rest mode...
-        In one word, to replace and erase!
+        Can be safely ignored in Std mode, Should not be trusted in Rest
+        mode...in one word, to replace and erase!
 
     Methods
     -------
@@ -56,10 +55,10 @@ class FileMetadata(object):
 
     def toJSON(self):
         """Get a json dict of the attributes of this object."""
-        return { "id" : self.id ,
-                 "compile" : self.compile ,
-                 "position" : self.position ,
-                 "version" : self.version }
+        return {"id": self.id,
+                "compile": self.compile,
+                "position": self.position,
+                "version": self.version}
 
 
 class File(object):
@@ -135,8 +134,8 @@ class File(object):
 
     def toJSON(self):
         """Get a JSON dict of the data in this file."""
-        return { "metadata" : self.file_metadata.toJSON() ,
-                 "content" : self.file_content }
+        return {"metadata": self.file_metadata.toJSON(),
+                "content": self.file_content}
 
     def get_file_id(self):
         """Get the id of the file from the metadata."""
@@ -163,17 +162,18 @@ class SimulationParameter(object):
     """
 
     def __init__(self, plot_period, pause_condition, seed=None,
-                 store_trace = False):
+                 store_trace=False):
         self.plot_period = plot_period
         self.pause_condition = pause_condition
         self.seed = seed
         self.store_trace = store_trace
 
     def toJSON(self):
-        return { "plot_period" : self.plot_period,
-                 "pause_condition": self.pause_condition ,
-                 "store_trace": self.store_trace ,
-                 "seed" : self.seed }
+        return {"plot_period": self.plot_period,
+                "pause_condition": self.pause_condition,
+                "store_trace": self.store_trace,
+                "seed": self.seed}
+
 
 class PlotLimit(object):
     """Parameters of plot query
@@ -187,19 +187,19 @@ class PlotLimit(object):
        (None means return the end of the simulation)
     """
 
-    def __init__(self, offset=None, points=None) :
+    def __init__(self, offset=None, points=None):
         self.offset = offset
         self.points = points
 
     def toURL(self):
-        if self.offset is not None :
+        if self.offset is not None:
             url_offset = "&plot_limit_offset={0}".format(self.offset)
-        else :
+        else:
             url_offset = ""
 
-        if self.points is not None :
+        if self.points is not None:
             url_points = "&plot_limit_points={0}".format(self.points)
-        else :
+        else:
             url_points = ""
 
         url_plot_limit = "{0}{1}".format(url_offset,
@@ -207,8 +207,8 @@ class PlotLimit(object):
         return url_plot_limit
 
     def toJSON(self):
-        return { "offset" : self.offset ,
-                 "nb_points" : self.points }
+        return {"offset": self.offset,
+                "nb_points": self.points}
 
 
 class KappaError(Exception):
@@ -241,13 +241,13 @@ class KappaApi(ABC):
     def project_parse(self, overwrites=None): pass
 
     @abc.abstractmethod
-    def file_create(self,file_object): pass
+    def file_create(self, file_object): pass
 
     @abc.abstractmethod
-    def file_delete(self,file_id): pass
+    def file_delete(self, file_id): pass
 
     @abc.abstractmethod
-    def file_get(self,file_id): pass
+    def file_get(self, file_id): pass
 
     @abc.abstractmethod
     def file_info(self): pass
@@ -259,7 +259,7 @@ class KappaApi(ABC):
     def simulation_file_line(self, file_line_id): pass
 
     @abc.abstractmethod
-    def simulation_DIN(self,DIN_id): pass
+    def simulation_DIN(self, DIN_id): pass
 
     @abc.abstractmethod
     def simulation_log_messages(self): pass
@@ -286,13 +286,13 @@ class KappaApi(ABC):
     def simulation_pause(self): pass
 
     @abc.abstractmethod
-    def simulation_perturbation(self,perturbation_code): pass
+    def simulation_perturbation(self, perturbation_code): pass
 
     @abc.abstractmethod
-    def simulation_start_with_param(self,simulation_parameter): pass
+    def simulation_start_with_param(self, simulation_parameter): pass
 
     @abc.abstractmethod
-    def simulation_continue(self,pause_condition): pass
+    def simulation_continue(self, pause_condition): pass
 
     @abc.abstractmethod
     def analyses_dead_rules(self): pass
@@ -301,7 +301,7 @@ class KappaApi(ABC):
     def analyses_constraints_list(self): pass
 
     @abc.abstractmethod
-    def analyses_contact_map(self,accuracy=None): pass
+    def analyses_contact_map(self, accuracy=None): pass
 
     @abc.abstractmethod
-    def analyses_influence_map(self,accuracy=None): pass
+    def analyses_influence_map(self, accuracy=None): pass
