@@ -85,5 +85,12 @@ class RestClientTest(_KappaClientTest):
         self.assertIsNotNone('environment_build' in info)
 
 
+def test_docs():
+    kappa_rest_doc = kappy.KappaRest.file_create.__doc__
+    kappa_abst_doc = kappy.kappa_common.KappaApi.file_create.__doc__
+    assert kappa_rest_doc is not None and kappa_rest_doc == kappa_abst_doc, \
+        "Doc fixing failed: parent method doc not inheritted by KappaRest."
+
+
 if __name__ == '__main__':
     run_nose(__file__)
