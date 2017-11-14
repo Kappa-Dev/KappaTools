@@ -13,6 +13,7 @@ from kappy.kappa_common import KappaError, PlotLimit, KappaApi, File, \
                                FileMetadata
 
 
+@KappaApi._fix_docs
 class KappaRest(KappaApi):
     """Client to a Kappa tools driver run as a server.
 
@@ -116,6 +117,15 @@ class KappaRest(KappaApi):
         """
         return self._delete(self.in_project())
 
+    def _analyses_init(self):
+        if self.project_ast is None:
+            raise KappaError("Project not parsed since last modification")
+        result = self._put(self.in_project('analyses'), self.project_ast)
+        self.analyses_to_init = False
+        return result
+
+    # Standardized API methods. Docs are provided by parent.
+
     def project_parse(self, overwrites=None):
         if overwrites is None:
             overwrites = []
@@ -198,13 +208,6 @@ class KappaRest(KappaApi):
         return self._put(self.in_project('simulation', 'continue'),
                          pause_condition)
 
-    def _analyses_init(self):
-        if self.project_ast is None:
-            raise KappaError("Project not parsed since last modification")
-        result = self._put(self.in_project('analyses'), self.project_ast)
-        self.analyses_to_init = False
-        return result
-
     def analyses_dead_rules(self):
         if self.analyses_to_init:
             self._analyses_init()
@@ -216,14 +219,6 @@ class KappaRest(KappaApi):
         return self._get(self.in_project('analyses', 'constraints'))
 
     def analyses_contact_map(self, accuracy=None):
-        """
-        Returns the contact of the last parsed model
-
-        Input
-        -----
-        accuracy -- \"high\" means take into account reachability from
-           initial state. \"low\" means don't.
-        """
         if self.analyses_to_init:
             self._analyses_init()
         if accuracy is None:
@@ -233,14 +228,6 @@ class KappaRest(KappaApi):
         return self._get(self.in_project('analyses', cmd))
 
     def analyses_influence_map(self, accuracy=None):
-        """
-        Returns the influence_map of the last parsed model
-
-        Input
-        -----
-        accuracy -- level can be \"low\", \"medium\", \"high\" or \"full\".
-            Default is medium.
-        """
         if self.analyses_to_init:
             self._analyses_init()
         if accuracy is None:
