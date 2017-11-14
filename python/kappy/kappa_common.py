@@ -12,8 +12,6 @@ from os import path
 KASIM_DIR = path.normpath(
     path.join(path.dirname(path.abspath(__file__)), *([path.pardir]*2))
     )
-BIN_DIR = path.join(KASIM_DIR, "bin")
-MODELS_DIR = path.join(KASIM_DIR, "models")
 
 
 class FileMetadata(object):

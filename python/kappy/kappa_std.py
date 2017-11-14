@@ -7,18 +7,19 @@ __all__ = ['KappaStd']
 import subprocess
 import threading
 import json
-import abc
 
-from os.path import join
+from os import path
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
-                               KappaApi, BIN_DIR
+                               KappaApi, KASIM_DIR
+
+BIN_DIR = path.join(KASIM_DIR, 'bin')
 
 
 class KappaStd(KappaApi):
     """Kappa tools driver run locally.
 
-    path -- where to find kappa executables
+    kappa_bin_path -- where to find kappa executables
         (None means use the binaries bundled in the package)
     delimiter -- What to use to delimit messages (must not appears in
         message body default '\\x1e')
@@ -30,7 +31,7 @@ class KappaStd(KappaApi):
         self.analyses_to_init = True
         if kappa_bin_path is None:
             kappa_bin_path = BIN_DIR
-        sim_args = [join(kappa_bin_path, "KaSimAgent"),
+        sim_args = [path.join(kappa_bin_path, "KaSimAgent"),
                     "--delimiter",
                     "\\x{:02x}".format(ord(self.delimiter)),
                     "--log",
@@ -43,7 +44,7 @@ class KappaStd(KappaApi):
                                           stdin=subprocess.PIPE,
                                           stdout=subprocess.PIPE,
                                           stderr=subprocess.STDOUT)
-        sa_args = [join(kappa_bin_path, "KaSaAgent"), "--delimiter",
+        sa_args = [path.join(kappa_bin_path, "KaSaAgent"), "--delimiter",
                    "\\x{:02x}".format(ord(self.delimiter)), ]
         if args:
             sa_args = sa_args + args
@@ -112,10 +113,6 @@ class KappaStd(KappaApi):
         finally:
             self.lock.release()
 
-    @abc.abstractmethod
-    def projection(self, response):
-        pass
-
     def shutdown(self):
         if hasattr(self, 'sim_agent'):
             self.sim_agent.stdin.close()
@@ -147,7 +144,7 @@ class KappaStd(KappaApi):
         self.project_ast = json.loads(reply['boxed_ast'])
         return reply
 
-    def file_create(self,file_object):
+    def file_create(self, file_object):
         """
         Add a file to the project
 
@@ -158,7 +155,7 @@ class KappaStd(KappaApi):
         self.analyses_to_init = True
         return self._dispatch("FileCreate", file_data)
 
-    def file_delete(self,file_id):
+    def file_delete(self, file_id):
         """
         Remove a file from the project
         """
@@ -166,7 +163,7 @@ class KappaStd(KappaApi):
         self.analyses_to_init = True
         return self._dispatch("FileDelete", file_id)
 
-    def file_get(self,file_id):
+    def file_get(self, file_id):
         """
         Returns file file_id stored in the project
         """
@@ -192,11 +189,11 @@ class KappaStd(KappaApi):
         """
         return self._dispatch("SimulationDetailFileLine", file_line_id)
 
-    def simulation_DIN(self,DIN_id):
+    def simulation_DIN(self, DIN_id):
         """
         Returns a given generated DIN
         """
-        return self._dispatch("SimulationDetailFluxMap", flux_map_id)
+        return self._dispatch("SimulationDetailFluxMap", DIN_id)
 
     def simulation_log_messages(self):
         """
@@ -262,30 +259,30 @@ class KappaStd(KappaApi):
         """
         return self._dispatch("SimulationPause")
 
-    def simulation_perturbation(self,perturbation_code):
+    def simulation_perturbation(self, perturbation_code):
         """
         Fires a perturbation in a paused simulation
         """
         return self._dispatch("SimulationPerturbation",
-                              { "perturbation_code" : perturbation_code })
+                              {"perturbation_code": perturbation_code})
 
-    def simulation_start_with_param(self,simulation_parameter):
+    def simulation_start_with_param(self, simulation_parameter):
         """Start the simulation from the last parsed model.
 
         Inputs
         ------
-        simulation_parameter -- is described in kappa_common.SimulationParameter
+        simulation_parameter -- a kappa_common.SimulationParameter instance.
         """
         if self.project_ast is None:
             raise KappaError("Project not parsed since last modification")
         return self._dispatch("SimulationStart",
                               simulation_parameter.toJSON())
 
-    def simulation_continue(self,pause_condition):
+    def simulation_continue(self, pause_condition):
         """
         Restarts a paused simulation
         """
-        return self._dispatch("SimulationContinue",pause_condition)
+        return self._dispatch("SimulationContinue", pause_condition)
 
     def _analyses_init(self):
         """
@@ -293,7 +290,7 @@ class KappaStd(KappaApi):
         """
         if self.project_ast is None:
             raise KappaError("Project not parsed since last modification")
-        result = self._dispatch_sa(["INIT",self.project_ast])
+        result = self._dispatch_sa(["INIT", self.project_ast])
         self.analyses_to_init = False
         return result
 
@@ -313,7 +310,7 @@ class KappaStd(KappaApi):
             self._analyses_init()
         return self._dispatch_sa(["CONSTRAINTS"])
 
-    def analyses_contact_map(self,accuracy=None):
+    def analyses_contact_map(self, accuracy=None):
         """
         Returns the contact of the last parsed model
 
@@ -327,10 +324,10 @@ class KappaStd(KappaApi):
         if accuracy is None:
             cmd = ["CONTACT_MAP"]
         else:
-            cmd = ["CONTACT_MAP",accuracy]
+            cmd = ["CONTACT_MAP", accuracy]
         return self._dispatch_sa(cmd)
 
-    def analyses_influence_map(self,accuracy=None):
+    def analyses_influence_map(self, accuracy=None):
         """
         Returns the influence_map of the last parsed model
 
@@ -344,5 +341,5 @@ class KappaStd(KappaApi):
         if accuracy is None:
             cmd = ["INFLUENCE_MAP"]
         else:
-            cmd = ["INFLUENCE_MAP",accuracy]
+            cmd = ["INFLUENCE_MAP", accuracy]
         return self._dispatch_sa(cmd)
