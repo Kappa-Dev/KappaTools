@@ -1,9 +1,10 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from builtins import dict, str
 
-from util import _KappaClientTest, BIN_DIR, run_nose
+from util import _KappaClientTest, run_nose
 
 import kappy
+from kappy.kappa_std import BIN_DIR
 
 
 class StdClientTest(_KappaClientTest):

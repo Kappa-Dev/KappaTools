@@ -4,16 +4,12 @@ from builtins import dict, str
 import sys
 import uuid
 import unittest
-import nose
 from os import path
+from time import sleep
 
 import kappy
+from kappy.kappa_common import KASIM_DIR
 
-
-KASIM_DIR = path.normpath(
-    path.join(path.dirname(path.abspath(__file__)), *([path.pardir]*2))
-    )
-BIN_DIR = path.join(KASIM_DIR, "bin")
 MODELS_DIR = path.join(KASIM_DIR, "models")
 
 
@@ -31,17 +27,15 @@ class _KappaClientTest(unittest.TestCase):
 
         print("Creating the file...")
         file_id = _get_id("test_file")
-        file_content = str("")
-        file_metadata = kappy.FileMetadata(file_id,0)
-        file_object = kappy.File(file_metadata,file_content)
-        runtime.file_create(file_object)
+        model_str = ''
+        runtime.add_model_string(model_str, 0, file_id)
 
         print("Getting the file names")
         file_names = [entry.id for entry in runtime.file_info()]
 
         print("Running checks...")
         self.assertIn(file_id, file_names)
-        self.assertEqual(runtime.file_get(file_id).get_content(), file_content)
+        self.assertEqual(runtime.file_get(file_id).get_content(), model_str)
         runtime.file_delete(file_id)
         try:
             runtime.file_delete(file_id)
@@ -53,92 +47,92 @@ class _KappaClientTest(unittest.TestCase):
         runtime = self.getRuntime(project_id=_get_id('test_proj'))
         file_1_id = _get_id("file1.ka")
         file_2_id = _get_id("file2.ka")
-        test_dir = path.join(MODELS_DIR, "test_suite", "compiler", "file_order")
-        with open(path.join(test_dir, "file2.ka")) as file_2:
-            with open(path.join(test_dir, "file1.ka")) as file_1:
-                data_1 = file_1.read()
-                file_1_metadata = kappy.FileMetadata(file_1_id,1)
-                file_1_object = kappy.File(file_1_metadata,data_1)
-                runtime.file_create(file_1_object)
-
-                data_2 = file_2.read()
-                file_2_metadata = kappy.FileMetadata(file_2_id,2)
-                file_2_object = kappy.File(file_2_metadata,data_2)
-                runtime.file_create(file_2_object)
-                runtime.project_parse()
-                with self.assertRaises(kappy.KappaError):
-                    runtime.file_create(file_2_object)
-                file_names = [entry.id for entry in runtime.file_info()]
-                self.assertIn(file_1_id,file_names)
-                self.assertIn(file_2_id,file_names)
+        test_dir = path.join(MODELS_DIR, "test_suite", "compiler",
+                             "file_order")
+        f1_path = path.join(test_dir, 'file1.ka')
+        runtime.add_model_file(f1_path, 1, file_1_id)
+        f2_path = path.join(test_dir, 'file2.ka')
+        runtime.add_model_file(f2_path, 2, file_2_id)
+        with self.assertRaises(kappy.KappaError):
+            runtime.add_model_file(f2_path, 2, file_2_id)
+        file_names = [entry.id for entry in runtime.file_info()]
+        self.assertIn(file_1_id, file_names)
+        self.assertIn(file_2_id, file_names)
+        return
 
     def test_run_simulation(self):
         project_id = str(uuid.uuid1())
+        print("Getting runtime %s..." % project_id)
         runtime = self.getRuntime(project_id)
+
         file_id = str(uuid.uuid1())
-        with open(path.join(MODELS_DIR, "abc-pert.ka")) as kappa_file:
-            data = kappa_file.read()
-            file_content = str(data)
-            file_metadata = kappy.FileMetadata(file_id,0)
-            file_object = kappy.File(file_metadata,file_content)
-            runtime.file_create(file_object)
-            runtime.project_parse()
-            pause_condition = "[T] > 10.0"
-            simulation_parameter = kappy.SimulationParameter(0.1,pause_condition)
-            runtime.simulation_start(simulation_parameter)
+        print("Adding model file %s..." % file_id)
+        fpath = path.join(MODELS_DIR, "abc-pert.ka")
+        runtime.add_model_file(fpath, 0, file_id)
 
+        print("Parse project...")
+        runtime.project_parse()
+
+        print("Start simulation...")
+        pause_condition = "[T] > 10.0"
+        simulation_parameter = kappy.SimulationParameter(0.1, pause_condition)
+        runtime.simulation_start_with_param(simulation_parameter)
+
+        print("Waiting for simulation to stop...")
+        simulation_info = runtime.simulation_info()
+        while simulation_info["simulation_info_progress"]["simulation_progress_is_running"]:
+            sleep(1)
             simulation_info = runtime.simulation_info()
 
-            while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
-                time.sleep(1)
-                simulation_info = runtime.simulation_info()
+        print("Checking that no limit returns all entries...")
+        last_status = runtime.simulation_plot()
+        test_count = 101
+        self.assertEqual(test_count, len(last_status['series']))
 
-            # test that no limit returns all entries
-            last_status = runtime.simulation_plot()
-            test_count = 101
-            self.assertEqual(test_count, len(last_status['series']))
+        print("Got simulation info at end:\n%s" % simulation_info)
+        print("Doing other checks...")
+        plot_limit_offset = 100
+        test_time = 10.0
+        test_count = 1
+        limit = kappy.PlotLimit(plot_limit_offset)
+        last_status = runtime.simulation_plot(limit)
+        self.assertEqual(test_count, len(last_status['series']))
+        self.assertEqual(test_time, last_status['series'][0][0])
 
-            print(simulation_info)
-            plot_limit_offset = 100
-            test_time = 10.0
-            test_count = 1
-            limit = kappy.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_plot(limit)
-            self.assertEqual(test_count, len(last_status['series']))
-            self.assertEqual(test_time, last_status['series'][0][0])
+        plot_limit_offset = 10
+        plot_limit_points = 1
+        test_time = 1.0
+        test_count = 1
+        limit = kappy.PlotLimit(plot_limit_offset, plot_limit_points)
+        last_status = runtime.simulation_plot(limit)
+        self.assertEqual(test_count, len(last_status['series']))
+        self.assertEqual(test_time, last_status['series'][0][0])
 
-            plot_limit_offset = 10
-            plot_limit_points = 1
-            test_time = 1.0
-            test_count = 1
-            limit = kappy.PlotLimit(plot_limit_offset,plot_limit_points)
-            last_status = runtime.simulation_plot(limit)
-            self.assertEqual(test_count, len(last_status['series']))
-            self.assertEqual(test_time, last_status['series'][0][0])
+        plot_limit_offset = 50
+        test_time = 10.0
+        test_count = 51
+        limit = kappy.PlotLimit(plot_limit_offset)
+        last_status = runtime.simulation_plot(limit)
+        self.assertEqual(test_count, len(last_status['series']))
+        self.assertEqual(test_time, last_status['series'][0][0])
 
-            plot_limit_offset = 50
-            test_time = 10.0
-            test_count = 51
-            limit = kappy.PlotLimit(plot_limit_offset)
-            last_status = runtime.simulation_plot(limit)
-            self.assertEqual(test_count, len(last_status['series']))
-            self.assertEqual(test_time, last_status['series'][0][0])
+        print("Continuing simulation...")
+        runtime.simulation_continue("[T] > 35")
 
-            runtime.simulation_continue("[T] > 35")
-
+        print("Waiting for second simulation to end...")
+        simulation_info = runtime.simulation_info()
+        while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
+            sleep(1)
             simulation_info = runtime.simulation_info()
 
-            while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
-                time.sleep(1)
-                simulation_info = runtime.simulation_info()
-
-            # test that no limit returns all entries
-            last_status = runtime.simulation_plot()
-            self.assertEqual(351, len(last_status['series']))
+        # test that no limit returns all entries
+        last_status = runtime.simulation_plot()
+        self.assertEqual(351, len(last_status['series']))
+        return
 
 
 def run_nose(fname):
     import nose
-    fpath = os.path.abspath(fname)
+    fpath = path.abspath(fname)
     print("Running nose for package: %s" % fname)
     return nose.run(argv=[sys.argv[0], fpath] + sys.argv[1:])
