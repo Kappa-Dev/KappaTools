@@ -79,10 +79,7 @@ class _KappaClientTest(unittest.TestCase):
         runtime.simulation_start()
 
         print("Waiting for simulation to stop...")
-        simulation_info = runtime.simulation_info()
-        while simulation_info["simulation_info_progress"]["simulation_progress_is_running"]:
-            sleep(1)
-            simulation_info = runtime.simulation_info()
+        simulation_info = runtime.wait_for_simulation_stop()
 
         print("Checking that no limit returns all entries...")
         last_status = runtime.simulation_plot()
@@ -120,10 +117,7 @@ class _KappaClientTest(unittest.TestCase):
         runtime.simulation_continue("[T] > 35")
 
         print("Waiting for second simulation to end...")
-        simulation_info = runtime.simulation_info()
-        while simulation_info["simulation_info_progress"]["simulation_progress_is_running"] :
-            sleep(1)
-            simulation_info = runtime.simulation_info()
+        runtime.wait_for_simulation_stop()
 
         # test that no limit returns all entries
         last_status = runtime.simulation_plot()
