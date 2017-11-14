@@ -6,6 +6,7 @@ __all__ = ['SimulationParameter', 'PlotLimit', 'KappaError']
 
 import sys
 import abc
+import uuid
 from os import path
 from time import sleep
 from datetime import datetime
@@ -260,6 +261,10 @@ class KappaApi(ABC):
                     parent_func = getattr(this_abc, name)
                     child_func.__doc__ = parent_func.__doc__
         return child_class
+
+    @classmethod
+    def make_unique_id(cls, name):
+        return "%s-%s" % (name, uuid.uuid1())
 
     def add_model_string(self, model_str, position=1, file_id=None):
         """Add a kappa model given in a string to the project."""

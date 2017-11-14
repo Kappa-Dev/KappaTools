@@ -2,19 +2,13 @@ from __future__ import absolute_import, print_function, unicode_literals
 from builtins import dict, str
 
 import sys
-import uuid
 import unittest
 from os import path
-from time import sleep
 
 import kappy
 from kappy.kappa_common import KASIM_DIR
 
 MODELS_DIR = path.join(KASIM_DIR, "models")
-
-
-def _get_id(name):
-    return "%s-%s" % (name, uuid.uuid1())
 
 
 class _KappaClientTest(unittest.TestCase):
@@ -23,10 +17,10 @@ class _KappaClientTest(unittest.TestCase):
 
     def test_file_crud(self):
         print("Getting the runtime object...")
-        runtime = self.getRuntime(project_id=_get_id('test_proj'))
+        runtime = self.getRuntime()
 
         print("Creating the file...")
-        file_id = _get_id("test_file")
+        file_id = runtime.make_unique_id("test_file")
         model_str = ''
         runtime.add_model_string(model_str, 0, file_id)
 
@@ -44,9 +38,9 @@ class _KappaClientTest(unittest.TestCase):
             pass
 
     def test_parse_multiple_files(self):
-        runtime = self.getRuntime(project_id=_get_id('test_proj'))
-        file_1_id = _get_id("file1.ka")
-        file_2_id = _get_id("file2.ka")
+        runtime = self.getRuntime()
+        file_1_id = runtime.make_unique_id("file1.ka")
+        file_2_id = runtime.make_unique_id("file2.ka")
         test_dir = path.join(MODELS_DIR, "test_suite", "compiler",
                              "file_order")
         f1_path = path.join(test_dir, 'file1.ka')
@@ -61,11 +55,10 @@ class _KappaClientTest(unittest.TestCase):
         return
 
     def test_run_simulation(self):
-        project_id = str(uuid.uuid1())
-        print("Getting runtime %s..." % project_id)
-        runtime = self.getRuntime(project_id)
+        print("Getting runtime...")
+        runtime = self.getRuntime()
 
-        file_id = str(uuid.uuid1())
+        file_id = runtime.make_unique_id('abc-pert')
         print("Adding model file %s..." % file_id)
         fpath = path.join(MODELS_DIR, "abc-pert.ka")
         runtime.add_model_file(fpath, 0, file_id)
