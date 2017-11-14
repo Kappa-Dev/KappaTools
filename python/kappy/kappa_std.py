@@ -10,10 +10,9 @@ import json
 import abc
 
 from os.path import join
-from pkg_resources import resource_filename
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
-                               KappaApi
+                               KappaApi, BIN_DIR
 
 
 class KappaStd(KappaApi):
@@ -25,13 +24,13 @@ class KappaStd(KappaApi):
         message body default '\\x1e')
     args -- arguments to pass to kappa executables
     """
-    def __init__(self, path=None, delimiter='\x1e', args=None):
+    def __init__(self, kappa_bin_path=None, delimiter='\x1e', args=None):
         self.delimiter = delimiter
         self.project_ast = None
         self.analyses_to_init = True
-        if not path:
-            path = resource_filename(__name__,"bin")
-        sim_args = [join(path,"KaSimAgent"),
+        if kappa_bin_path is None:
+            kappa_bin_path = BIN_DIR
+        sim_args = [join(kappa_bin_path, "KaSimAgent"),
                     "--delimiter",
                     "\\x{:02x}".format(ord(self.delimiter)),
                     "--log",
@@ -44,9 +43,8 @@ class KappaStd(KappaApi):
                                           stdin=subprocess.PIPE,
                                           stdout=subprocess.PIPE,
                                           stderr=subprocess.STDOUT)
-        sa_args = [join(path,"KaSaAgent"),
-                    "--delimiter",
-                    "\\x{:02x}".format(ord(self.delimiter)), ]
+        sa_args = [join(kappa_bin_path, "KaSaAgent"), "--delimiter",
+                   "\\x{:02x}".format(ord(self.delimiter)), ]
         if args:
             sa_args = sa_args + args
         self.sa_agent = subprocess.Popen(sa_args,
@@ -71,16 +69,16 @@ class KappaStd(KappaApi):
         try:
             self.lock.acquire()
             message_id = self._get_message_id()
-            message = {'id': message_id,'data': data}
+            message = {'id': message_id, 'data': data}
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.sim_agent.stdin.write(message.encode('utf-8'))
             self.sim_agent.stdin.flush()
-            buffer = bytearray()
+            buff = bytearray()
             c = self.sim_agent.stdout.read(1)
             while c != self.delimiter.encode('utf-8') and c:
-                buffer.extend(c)
+                buff.extend(c)
                 c = self.sim_agent.stdout.read(1)
-            response = json.loads(buffer.decode('utf-8'))
+            response = json.loads(buff.decode('utf-8'))
             if response["id"] != message_id:
                 raise KappaError(
                         "expect id {0} got {1}".format(response["id"],
@@ -96,16 +94,16 @@ class KappaStd(KappaApi):
         try:
             self.lock.acquire()
             message_id = self._get_message_id()
-            message = {'id': message_id,'data': data}
+            message = {'id': message_id, 'data': data}
             message = "{0}{1}".format(json.dumps(message), self.delimiter)
             self.sa_agent.stdin.write(message.encode('utf-8'))
             self.sa_agent.stdin.flush()
-            buffer = bytearray()
+            buff = bytearray()
             c = self.sa_agent.stdout.read(1)
             while c != self.delimiter.encode('utf-8') and c:
-                buffer.extend(c)
+                buff.extend(c)
                 c = self.sa_agent.stdout.read(1)
-            response = json.loads(buffer.decode('utf-8'))
+            response = json.loads(buff.decode('utf-8'))
             if response['code'] == "SUCCESS":
                 return response['data']
             else:
