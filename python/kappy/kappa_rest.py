@@ -6,11 +6,11 @@ __all__ = ['KappaRest']
 
 import json
 
-from os.path import join
+from os import path
 from requests import exceptions, request
 
-from kappy.kappa_common import KappaError, File, FileMetadata, PlotLimit, \
-                               KappaApi
+from kappy.kappa_common import KappaError, PlotLimit, KappaApi, File, \
+                               FileMetadata
 
 
 class KappaRest(KappaApi):
@@ -27,7 +27,7 @@ class KappaRest(KappaApi):
         self.project_id = project_id
         self.project_ast = None
         self.analyses_to_init = True
-        if not project_id in self.project_info():
+        if project_id not in self.project_info():
             self._project_create()
         return
 
@@ -40,7 +40,7 @@ class KappaRest(KappaApi):
 
     def _dispatch(self, method, sub_url=None, data=None):
         if sub_url is not None:
-            url = join(self.url, sub_url)
+            url = path.join(self.url, sub_url)
         else:
             url = self.url
         if data is not None:
@@ -74,7 +74,7 @@ class KappaRest(KappaApi):
 
     def in_project(self, *elements):
         """Method to ease navigating the path structure within a project."""
-        return join('projects', self.project_id, *elements)
+        return path.join('projects', self.project_id, *elements)
 
     def shutdown(self, key):
         """Shut down kappa instance.
@@ -84,7 +84,7 @@ class KappaRest(KappaApi):
         parse_url = "{0}/shutdown".format(self.url)
         try:
             r = request("POST", parse_url, data=key.encode('utf-8'))
-        except exceptions.URLError as exception:
+        except exceptions.HTTPError as exception:
             raise KappaError(exception.reason)
         if r.status_code == 200:
             return r.text
@@ -141,15 +141,12 @@ class KappaRest(KappaApi):
         info = self._get(self.in_project('files'))
         return FileMetadata.from_metadata_list(info)
 
-    def simulation_delete(self):
-        return self._delete(self.in_project('simulation'))
-
     def simulation_file_line(self, file_line_id):
         sub_url = self.in_project('simulation', 'file_lines', file_line_id)
         return self._get(sub_url)
 
-    def simulation_DIN(self, flux_map_id):
-        return self._get(self.in_project('simulation', 'fluxmaps', flux_map_id))
+    def simulation_DIN(self, DIN_id):
+        return self._get(self.in_project('simulation', 'fluxmaps', DIN_id))
 
     def simulation_log_messages(self):
         return self._get(self.in_project('simulation', 'logmessages'))
@@ -174,9 +171,9 @@ class KappaRest(KappaApi):
     def simulation_snapshots(self):
         return self._get(self.in_project('simulation', 'snapshots'))
 
-    def simulation_snapshot(self,snapshot_id):
+    def simulation_snapshot(self, snapshot_id):
         return self._get(self.in_project('simulation', 'snapshots',
-                                            snapshot_id))
+                                         snapshot_id))
 
     def simulation_delete(self):
         return self._delete(self.in_project('simulation'))
