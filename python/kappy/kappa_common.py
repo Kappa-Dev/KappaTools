@@ -1,6 +1,7 @@
 """ Shared functions of api client for the kappa programming language"""
 from __future__ import absolute_import, print_function, unicode_literals
 from builtins import dict, str
+import abc
 
 __all__ = ['FileMetadata', 'File', 'SimulationParameter', 'PlotLimit',
            'KappaError']
@@ -210,78 +211,75 @@ class KappaError(Exception):
         self.errors = errors
 
 
-class KappaApi(object):
+class KappaApi(abc.ABC):
     """General api for a kappa interface."""
 
-    def project_parse(self, overwrites=None):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def project_parse(self, overwrites=None): pass
 
-    def file_create(self,file_object):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def file_create(self,file_object): pass
 
-    def file_delete(self,file_id):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def file_delete(self,file_id): pass
 
-    def file_get(self,file_id):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def file_get(self,file_id): pass
 
-    def file_info(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def file_info(self): pass
 
-    def simulation_delete(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_delete(self): pass
 
-    def simulation_file_line(self, file_line_id):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_file_line(self, file_line_id): pass
 
-    def simulation_DIN(self,DIN_id):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_DIN(self,DIN_id): pass
 
-    def simulation_log_messages(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_log_messages(self): pass
 
-    def simulation_plot(self, limit=None):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_plot(self, limit=None): pass
 
-    def simulation_snapshot(self, snapshot_id):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_snapshot(self, snapshot_id): pass
 
-    def simulation_info(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_info(self): pass
 
-    def simulation_info_file_line(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_info_file_line(self): pass
 
-    def simulation_DINs(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_DINs(self): pass
 
-    def simulation_snapshots(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_snapshots(self): pass
 
-    def simulation_pause(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_pause(self): pass
 
-    def simulation_perturbation(self,perturbation_code):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_perturbation(self,perturbation_code): pass
 
-    def simulation_start(self,simulation_parameter):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_start(self,simulation_parameter): pass
 
-    def simulation_continue(self,pause_condition):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def simulation_continue(self,pause_condition): pass
 
-    def _analyses_init(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def analyses_dead_rules(self): pass
 
-    def analyses_dead_rules(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def analyses_constraints_list(self): pass
 
-    def analyses_constraints_list(self):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def analyses_contact_map(self,accuracy=None): pass
 
-    def analyses_contact_map(self,accuracy=None):
-        raise NotImplementedError()
-
-    def analyses_influence_map(self,accuracy=None):
-        raise NotImplementedError()
+    @abc.abstractmethod
+    def analyses_influence_map(self,accuracy=None): pass
 
