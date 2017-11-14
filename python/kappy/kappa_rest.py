@@ -189,7 +189,7 @@ class KappaRest(KappaApi):
         return self._put(self.in_project('simulation', 'perturbation'),
                          {'perturbation_code': perturbation_code})
 
-    def simulation_start(self, simulation_parameter):
+    def simulation_start_with_param(self, simulation_parameter):
         if self.project_ast is None:
             raise KappaError("Project not parsed since last modification")
         return self._post(self.in_project('simulation'),
