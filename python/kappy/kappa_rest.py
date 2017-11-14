@@ -23,8 +23,10 @@ class KappaRest(KappaApi):
     endpoint -- The url to the kappa server.
     project_id -- An identifier for this particular project.
     """
-    def __init__(self, endpoint, project_id):
+    def __init__(self, endpoint, project_id=None):
         self.url = "{0}/v2".format(endpoint)
+        if project_id is None:
+            project_id = self.make_unique_id('project')
         self.project_id = project_id
         self.project_ast = None
         self.analyses_to_init = True

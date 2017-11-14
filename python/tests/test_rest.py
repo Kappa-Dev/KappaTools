@@ -65,7 +65,9 @@ class RestClientTest(_KappaClientTest):
         print("Closed", resp)
         return
 
-    def getRuntime(self, project_id):
+    def getRuntime(self, project_id=None):
+        if project_id is None:
+            project_id = kappy.KappaRest.make_unique_id('test_project')
         return kappy.KappaRest(self.endpoint, project_id)
 
     @classmethod
