@@ -49,6 +49,10 @@ let contactmaps="contact maps"
 let influencemaps="influence maps"
 let separating_transitions = "separating transitions"
 let errors = "errors"
+let scc_contact_maps = "scc contact maps"
+let scc_contact_map = "scc contact map"
+let accuracy_scc = "accuracy scc"
+let scc = "scc"
 
 type dead_rules = Public_data.dead_rules
 
@@ -277,9 +281,11 @@ type ('static,'dynamic) state =
     local_influence_map_blackboard :
       local_influence_map_blackboard option ;
     internal_contact_map: internal_contact_map Public_data.AccuracyMap.t;
-    contact_map   : Public_data.contact_map Public_data.AccuracyMap.t ;
+    contact_map : Public_data.contact_map Public_data.AccuracyMap.t ;
     internal_scc_decomposition: internal_scc_decomposition Public_data.AccuracyMap.t Public_data.AccuracyMap.t ;
-    scc_decomposition: Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t ;
+    scc_decomposition:
+      Public_data.scc Public_data.AccuracyMap.t
+        Public_data.AccuracyMap.t ;
     signature     : Signature.s option;
     bdu_handler: Mvbdu_wrapper.Mvbdu.handler ;
     reachability_state: ('static, 'dynamic) reachability_result option ;
@@ -411,8 +417,68 @@ let add_contact_map_to_json state l =
     contactmaps contactmap Public_data.contact_map_to_json
     state l
 
+let get_scc_decomposition state = state.scc_decomposition
+
+let add_triple get title label to_json state l =
+  JsonUtil.of_triple
+    ~lab1:accuracy_string
+    ~lab2:accuracy_scc
+    ~lab3:scc
+    Public_data.accuracy_to_json
+    Public_data.accuracy_to_json
+    (fun x ->
+       match to_json x with
+       | `Assoc[s,m] when s = label -> m
+       | x -> raise (Yojson.Basic.Util.Type_error(JsonUtil.build_msg title,x))
+    )
+
+let annotate_triple map =
+  Public_data.AccuracyMap.fold
+    (fun x ((ag,st),(ag',st')) l ->
+       (x,(x,((ag,st),(ag',st')))) :: l)
+    map []
+
+(*let add_map_triple get title lable to_json state l =
+  let map = get state in
+  if Public_data.AccuracyMap.is_empty map then l
+  else
+    let y = annotate_triple (get state) in
+    (title,
+     (JsonUtil.of_list
+        (JsonUtil.of_list
+           (add_triple get title lable to_json state l)
+        )
+       ) (List.rev y)) :: l
+
+let add_map_map_triple get title lable to_json state l =
+  let map = get state in
+  if Public_data.AccuracyMap.is_empty map then l
+  else
+    let y = annotate_triple (get state) in
+    (title,
+     (JsonUtil.of_list
+        (add_map_triple  get title label to_json state l)
+     )(List.rev y)) :: l
+
+
+let get_map_triple get title lable to_json state l =
+  let map_triple = get state in
+  if Public_data.AccuracyMap.is_empty map_triple then l
+  else
+    let y = annotate (get state) in
+    (title, JsonUtil.of_list
+
+       )
+)*)
 
 let add_scc_map_to_json state l =
+  (*let l =
+    add_map get_scc_decomposition scc_contact_maps
+      scc_contact_map
+      Public_data.scc_to_json
+      state l
+  in*)
+
   l (* TODO: Quyen *)
 
 let add_influence_map_to_json state l =
