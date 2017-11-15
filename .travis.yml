@@ -69,7 +69,6 @@ matrix:
 
 before_install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew install opam ; fi"
-  - ( umask 077 && openssl aes-256-cbc -K $encrypted_942f740de87b_key -iv $encrypted_942f740de87b_iv -in dev/travis-deploy.enc -out dev/travis-deploy -d )
 
 install:
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = windows ] ; then opam init -a --compiler=4.04.0 ; else opam init -a git://github.com/ocaml/opam-repository ; fi"
@@ -94,7 +93,9 @@ script:
 
 deploy:
   provider: script
-  script: dev/update-web.sh "$CHECKED"
+  script:
+  - ( umask 077 && openssl aes-256-cbc -K $encrypted_942f740de87b_key -iv $encrypted_942f740de87b_iv -in dev/travis-deploy.enc -out dev/travis-deploy -d )
+  - dev/update-web.sh "$CHECKED"
   skip_cleanup: true
   on:
     branch: master
