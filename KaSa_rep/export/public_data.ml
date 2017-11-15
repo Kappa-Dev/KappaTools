@@ -54,6 +54,9 @@ let bwd_string = "bwd"
 let direction = "direction"
 let rule_hidden = "hidden"
 let scc = "scc"
+let accuracy_cm = "accuracy_cm"
+let accuracy_scc = "accuracy_scc"
+let contactmapscc="contact map scc"
 
 (*******************)
 (* Accuracy levels *)
@@ -233,7 +236,7 @@ function
   end
 | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "site node",x))
 
-let contact_map_to_json contact_map=
+let contact_map_to_json contact_map =
   `Assoc
     [contactmap,
      JsonUtil.of_pair
@@ -264,16 +267,71 @@ let contact_map_of_json =
     end
   | x -> raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "contact map",x))
 
+(**********************************************************)
+(*strongly connected component*)
 
 type scc = ((string * string) * (string * string)) list list
 
-let scc_to_json (_cm_acc,_scc_acc,_scc) =
-  (* TODO -> Quyen: see js/tab_contact.ml for the labels of the fields *)
-  `Null
+let scc_pair_string_to_json (a,b) =
+  JsonUtil.of_pair
+    ~lab1:agent ~lab2:sitename
+    JsonUtil.of_string
+    JsonUtil.of_string
+    (a,b)
 
-let scc_of_json _json =
-  (* TODO -> Quyen *)
-  Low, Low, []
+let scc_pair_of_pair_to_json (a,b) =
+  JsonUtil.of_pair
+    scc_pair_string_to_json
+    scc_pair_string_to_json
+    (a,b)
+
+let scc_pair_of_pair_of_list_to_json l =
+  JsonUtil.of_list
+    scc_pair_of_pair_to_json
+    l
+
+let scc_to_json (cm_acc,scc_acc,scc) =
+  `Assoc [
+    contactmapscc,
+    JsonUtil.of_triple
+      ~lab1:accuracy_cm ~lab2:accuracy_scc ~lab3:map
+      accuracy_to_json
+      accuracy_to_json
+      (JsonUtil.of_list
+         scc_pair_of_pair_of_list_to_json)
+      (cm_acc, scc_acc, scc)
+  ]
+
+let pair_of_json (json:Yojson.Basic.json) : string * string  =
+  let (agent_name, site_name) =
+    JsonUtil.to_pair ~lab1:agent ~lab2:site
+      (fun json_a -> JsonUtil.to_string json_a)
+      (fun json_b -> JsonUtil.to_string json_b)
+      json
+  in
+  (agent_name,site_name)
+
+let pair_of_pair_of_json json : (string * string) * (string * string) =
+  let (agent_name, site_name) =
+    pair_of_json
+      json
+  in
+  let (agent_name', site_name') =
+    pair_of_json
+      json
+  in
+  (agent_name, site_name), (agent_name', site_name')
+
+let list_of_pair_of_json json =
+  JsonUtil.to_list ~error_msg:"site graph"
+    pair_of_pair_of_json json
+
+let scc_of_json json =
+  let scc =
+    JsonUtil.to_list ~error_msg:"scc"
+      list_of_pair_of_json json
+  in
+  Low, Low, scc
 
 (******************************************************************************)
 
@@ -521,7 +579,6 @@ let nodes_list_of_json =
   JsonUtil.to_list
     refined_influence_node_of_json
 
-
 let influence_map_to_json influence_map =
   `Assoc
     [influencemap,
@@ -653,15 +710,11 @@ let local_influence_map_of_json =
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "influence map",x))
 
-
-
 type dead_rules = rule list
 
 let dead_rules_to_json json =
   `Assoc
     [dead_rules, JsonUtil.of_list rule_to_json json]
-
-
 
 (***************)
 (* dead rules *)
@@ -678,8 +731,6 @@ let dead_rules_of_json =
     end
   | x ->
     raise (Yojson.Basic.Util.Type_error (JsonUtil.build_msg "dead rules",x))
-
-
 
 (***************)
 (* dead agents *)

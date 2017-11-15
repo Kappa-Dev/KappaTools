@@ -78,7 +78,8 @@ functor (A:Analyzer.Analyzer) ->
         ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
         ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
         state =
-      let state, scc = get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state in
+      let state, scc =
+        get_scc_decomposition ~accuracy_level_cm ~accuracy_level_scc state in
       state,
       Public_data.scc_to_json (accuracy_level_cm, accuracy_level_scc, scc)
 

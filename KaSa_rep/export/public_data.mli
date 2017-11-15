@@ -113,14 +113,14 @@ type influence_map =
 val influence_map_to_json:
     accuracy_level * influence_map -> Yojson.Basic.json
 
-  val influence_map_of_json:
-    Yojson.Basic.json -> accuracy_level * influence_map
+val influence_map_of_json:
+  Yojson.Basic.json -> accuracy_level * influence_map
 
-  val local_influence_map_to_json:
-    accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
+val local_influence_map_to_json:
+  accuracy_level * int * int option * int option * influence_map -> Yojson.Basic.json
 
-  val local_influence_map_of_json:
-    Yojson.Basic.json -> accuracy_level * int * int option * int option * influence_map
+val local_influence_map_of_json:
+  Yojson.Basic.json -> accuracy_level * int * int option * int option * influence_map
 
 type dead_rules = rule list
 
@@ -144,7 +144,6 @@ type binding_state =
   | Bound_to of int
   | Binding_type of string * string
 
-
 type agent = string * (string * string option * binding_state option) list
 
 val lemma_to_json:
@@ -159,10 +158,7 @@ val lemmas_list_of_json:
 val agent_gen_of_json:
   (Yojson.Basic.json -> 'interface) -> Yojson.Basic.json -> string * 'interface
 
-
-
-val agent_of_json:
-  Yojson.Basic.json -> agent
+val agent_of_json: Yojson.Basic.json -> agent
 
 type 'site_graph poly_constraints_list =
   (string * 'site_graph lemma list) list
@@ -172,4 +168,5 @@ val poly_constraints_list_of_json:
   Yojson.Basic.json -> 'site_graph poly_constraints_list
 
 val get_hyp: 'site_graph lemma -> 'site_graph
+
 val get_refinement: 'site_graph lemma -> 'site_graph list

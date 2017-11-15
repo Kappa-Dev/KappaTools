@@ -89,13 +89,15 @@ type agent =
        Wrapped_modules.LoggedStringMap.t
 
 type constraints_list = agent list Public_data.poly_constraints_list
+
 val lemmas_list_to_json : constraints_list -> Yojson.Basic.json
 
 val lemmas_list_of_json : Yojson.Basic.json -> constraints_list
 
-
 (*******************************************************************)
+
 type symmetric_sites = Symmetries.symmetries option
+
 (*******************************************************************)
 
 type influence_edge = Quark_type.Labels.label_set_couple

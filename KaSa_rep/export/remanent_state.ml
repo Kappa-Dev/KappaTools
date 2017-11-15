@@ -50,8 +50,6 @@ let influencemaps="influence maps"
 let separating_transitions = "separating transitions"
 let errors = "errors"
 
-
-
 type dead_rules = Public_data.dead_rules
 
 let info_to_rule (s1,loc,direction,s2,id) =
@@ -77,12 +75,7 @@ let separating_transitions_to_json =
        Ckappa_sig.rule_id_to_json
        JsonUtil.of_string)
 
-
 (******************************************************************************)
-(******************************************************************************)
-
-(******************************************************************************)
-
 (*********************)
 (* refinement lemmas *)
 (*********************)
@@ -136,7 +129,8 @@ let agent_to_json =
     JsonUtil.of_string
     interface_to_json
 
-let agent_of_json json = Public_data.agent_gen_of_json interface_of_json json
+let agent_of_json json =
+  Public_data.agent_gen_of_json interface_of_json json
 
 (***************************************************************************)
 
@@ -146,17 +140,16 @@ let pair_to_json (p: string * string): Yojson.Basic.json =
     (fun b ->  JsonUtil.of_string b)
     p
 
-let pair_of_json (json:Yojson.Basic.json) : string * string  =
+(*let pair_of_json (json:Yojson.Basic.json) : string * string  =
   let (agent_name, site_name) =
     JsonUtil.to_pair ~lab1:agent ~lab2:site
       (fun json_a -> JsonUtil.to_string json_a)
       (fun json_b -> JsonUtil.to_string json_b)
       json
   in
-  (agent_name,site_name)
+  (agent_name,site_name)*)
 
 type constraints_list = agent list Public_data.poly_constraints_list
-
 
 let poly_constraints_list_to_json site_graph_to_json (constraints:constraints_list) =
   JsonUtil.of_list

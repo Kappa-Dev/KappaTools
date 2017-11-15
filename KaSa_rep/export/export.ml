@@ -1496,8 +1496,15 @@ let get_internal_scc_decomposition
 
 (*internal contact map*)
 
-let translate_scc_decomposition state (internal_scc:internal_scc_decomposition) =
+(*((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name)*
+  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name))  list list*)
+
+(*scc = ((string * string) * (string * string)) list list*)
+
+let translate_scc_decomposition state
+    (internal_scc:internal_scc_decomposition) =
   (* TODO: Quyen*)
+
   ([]:Public_data.scc)
 
 let compute_map2_gen

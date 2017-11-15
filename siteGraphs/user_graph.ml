@@ -10,17 +10,21 @@ type cc_port = {
   port_links: (int * int) list;
   port_states: string list;
 }
+
 type site =
   | Port of cc_port
   | Counter of int
+
 type cc_site = {
   site_name: string;
   site_type: site
 }
+
 type cc_node = {
   node_type: string;
   node_sites: cc_site array;
 }
+
 type connected_component = cc_node array
 
 let print_link (dandling,free_id) p f = function
