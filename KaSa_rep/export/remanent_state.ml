@@ -372,8 +372,7 @@ let annotate map =
     map
     []
 
-let add_map get title label to_json state
-    (l: (string * Yojson.Basic.json) list) =
+let add_map get title label to_json state l =
   let map = get state in
   if Public_data.AccuracyMap.is_empty map then l
   else
@@ -413,8 +412,7 @@ let get_constraints_list state = state.constraints_list
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 
-let add_contact_map_to_json state
-    (l:(string * Yojson.Basic.json) list) : (string * Yojson.Basic.json) list =
+let add_contact_map_to_json state l =
   add_map get_contact_map_map
     contactmaps contactmap Public_data.contact_map_to_json
     state l
@@ -431,11 +429,14 @@ let add_triple title label to_json =
     ~lab3:scc
     Public_data.accuracy_to_json
     Public_data.accuracy_to_json
-    (fun (l:Public_data.scc) ->
+    (fun
+      (l:(Public_data.accuracy_level *
+          Public_data.accuracy_level * Public_data.scc)) ->
        match to_json l with
        | `Assoc[s,m] when s = label -> m
-       | x -> raise (Yojson.Basic.Util.Type_error(JsonUtil.build_msg title,x))
-    )
+       | x -> raise
+                (Yojson.Basic.Util.Type_error
+                   (JsonUtil.build_msg title,x)))
 
 let add_list_triple title lable to_json =
   JsonUtil.of_list
@@ -446,19 +447,20 @@ let add_list_of_list_of_triple title lable to_json =
     (add_list_triple title lable to_json)
 
 let annotate_triple (map:Public_data.scc Public_data.AccuracyMap.t):
-  (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc) list =
+  (Public_data.accuracy_level * Public_data.accuracy_level *
+   (Public_data.accuracy_level * Public_data.accuracy_level *
+    Public_data.scc)) list =
   Public_data.AccuracyMap.fold
     (fun x scc l ->
-       (x,x,scc) :: l
+       (x,x,(x,x,scc)) :: l
     ) map []
 
 let annotate_map_triple
-    (map:Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t):
-  (Public_data.accuracy_level * Public_data.accuracy_level * Public_data.scc) list list  =
+    (map:Public_data.scc Public_data.AccuracyMap.t Public_data.AccuracyMap.t)  =
   Public_data.AccuracyMap.fold
     (fun x map l ->
        let map = annotate_triple map in
-       map :: l
+        map :: l
     ) map [[]]
 
 let add_scc_map get title label to_json state
@@ -472,14 +474,13 @@ let add_scc_map get title label to_json state
        (List.rev y)) :: l
 
 let add_scc_map_to_json state (l:(string * Yojson.Basic.json)list)
-  : (string * Yojson.Basic.json)list  = l
-  (* TODO: Quyen l*)
-  (*add_scc_map
+  : (string * Yojson.Basic.json)list  =
+  add_scc_map
     get_scc_decomposition
     scc_contact_map
     scc_contact_maps
     Public_data.scc_to_json
-    state l*)
+    state l
 
 let add_influence_map_to_json state l =
   add_map get_influence_map_map
