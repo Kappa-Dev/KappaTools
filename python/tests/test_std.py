@@ -12,7 +12,7 @@ from util import _KappaClientTest, run_nose
 class StdClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
 
-    def getRuntime(self, project_id):
+    def getRuntime(self):
         return kappy.KappaStd(BIN_DIR)
 
 

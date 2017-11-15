@@ -11,7 +11,7 @@ from datetime import datetime
 
 import kappy
 from kappy.kappa_std import BIN_DIR
-from util import _KappaClientTest, _get_id, run_nose
+from util import _KappaClientTest, run_nose
 
 
 class RestClientTest(_KappaClientTest):
@@ -81,8 +81,7 @@ class RestClientTest(_KappaClientTest):
     # Rest Tests ==============================================================
 
     def test_get_rest_service_info(self):
-        project_id = _get_id("dummy")
-        runtime = self.getRuntime(project_id)
+        runtime = self.getRuntime()
         info = runtime.get_info()
         self.assertIsNotNone('environment_projects' in info)
         self.assertIsNotNone('environment_build' in info)
