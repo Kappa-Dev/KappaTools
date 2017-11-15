@@ -406,8 +406,7 @@ let get_constraints_list state = state.constraints_list
 let add_errors state l =
   (errors, Exception_without_parameter.to_json state.errors)::l
 
-let add_contact_map_to_json state l
-     =
+let add_contact_map_to_json state l =
   add_map get_contact_map_map
     contactmaps contactmap Public_data.contact_map_to_json
     state l

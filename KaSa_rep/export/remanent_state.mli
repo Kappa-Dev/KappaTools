@@ -64,7 +64,6 @@ type local_influence_map_blackboard =
     blackboard_to_be_explored: bool array
   }
 
-
 type internal_influence_map =
   Ckappa_sig.c_rule_id list *
   Quark_type.Labels.label_set_couple Ckappa_sig.PairRule_setmap.Map.t *
@@ -115,29 +114,6 @@ type bidirectional_influence_map =
   }
 
 type ('static, 'dynamic) state
-
-(*******************************************************************)
-(*work in process*)
-    (*
-val get_contact_map_converted : ('static, 'dynamic)  state ->
-  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-    Ckappa_sig.AgentSite_map_and_set.Map.t option
-
-val set_contact_map_converted :
-  (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name) list
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
-  ('static, 'dynamic)  state ->
-  ('static, 'dynamic)  state
-
-val get_internal_scc : ('static, 'dynamic)  state ->
-  Graphs.Nodearray.key list list
-    Ckappa_sig.AgentSite_map_and_set.Map.t option
-
-val set_internal_scc :
-  Graphs.Nodearray.key list list
-    Ckappa_sig.AgentSite_map_and_set.Map.t ->
-  ('static, 'dynamic)  state ->
-  ('static, 'dynamic)  state*)
 
 (*******************************************************************)
 
@@ -225,14 +201,14 @@ val set_internal_scc_decomposition:
   internal_scc_decomposition ->
   ('static, 'compile) state -> ('static, 'compile) state
 
-  val get_scc_decomposition:
-    Public_data.accuracy_level  -> Public_data.accuracy_level ->
-    ('static, 'compile) state -> Public_data.scc option
+val get_scc_decomposition:
+  Public_data.accuracy_level  -> Public_data.accuracy_level ->
+  ('static, 'compile) state -> Public_data.scc option
 
-  val set_scc_decomposition:
-    Public_data.accuracy_level  -> Public_data.accuracy_level ->
-     Public_data.scc ->
-    ('static, 'compile) state -> ('static, 'compile) state
+val set_scc_decomposition:
+  Public_data.accuracy_level  -> Public_data.accuracy_level ->
+  Public_data.scc ->
+  ('static, 'compile) state -> ('static, 'compile) state
 
 val set_contact_map:
   Public_data.accuracy_level -> Public_data.contact_map ->

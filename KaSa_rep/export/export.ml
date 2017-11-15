@@ -1502,10 +1502,37 @@ let get_internal_scc_decomposition
 (*scc = ((string * string) * (string * string)) list list*)
 
 let translate_scc_decomposition state
-    (internal_scc:internal_scc_decomposition) =
+    (internal_scc:internal_scc_decomposition): Public_data.scc =
   (* TODO: Quyen*)
-
-  ([]:Public_data.scc)
+  let error = Remanent_state.get_errors state in
+  let error, scc =
+    List.fold_left (fun (error, store_result) list ->
+        let error, store_list =
+          List.fold_left (fun (error, store_result) ((ag,st),(ag',st')) ->
+              let error, store_result =
+                let agent =
+                  Ckappa_sig.string_of_agent_name ag
+                in
+                let site =
+                  Ckappa_sig.string_of_site_name st
+                in
+                let agent' =
+                  Ckappa_sig.string_of_agent_name ag'
+                in
+                let site' =
+                  Ckappa_sig.string_of_site_name st'
+                in
+                let pair = ((agent, site), (agent', site')) in
+                error, pair :: store_result
+              in
+              error, store_result
+            ) (error, []) list
+        in
+        error, store_list :: store_result
+      ) (error, [[]]) internal_scc
+  in
+  (*let state = set_errors error state in*)
+  scc
 
 let compute_map2_gen
     get
@@ -1607,7 +1634,7 @@ let dump_internal_scc_decomposition
   let state = set_errors error state in
   state
 
-let dump_scc_decomposition   ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
+let dump_scc_decomposition ?accuracy_level_cm:(accuracy_level_cm=Public_data.Low)
   ?accuracy_level_scc:(accuracy_level_scc=Public_data.Low)
   state =
 let parameters = Remanent_state.get_parameters state in
@@ -1649,8 +1676,6 @@ let error =
 in
 let state = set_errors error state in
 state
-
-
 
 let get_influence_map
     ?accuracy_level:(accuracy_level=Public_data.Low)
