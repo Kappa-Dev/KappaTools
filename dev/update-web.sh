@@ -11,17 +11,18 @@ PLAYGROUND=$(mktemp -d -t kappaXXXX)
 git clone --depth 10 --quiet -b master https://${KAPPAGITHUBTOKEN}:@github.com/Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
 case $1 in
     native )
-        empty_or_create ${PLAYGROUND}/docs/KaSim-manual-master
-        cp man/*.htm man/*.css ${PLAYGROUND}/docs/KaSim-manual-master/
-        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/img
-        cp man/img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/img/
-        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/gkappa_img
-        cp man/gkappa_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/gkappa_img/
-        mkdir ${PLAYGROUND}/docs/KaSim-manual-master/generated_img
-        cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
+        empty_or_create ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}
+        cp man/*.htm man/*.css ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/
+	cp man/KaSim_manual.pdf ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}.pdf
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/img
+        cp man/img/*.png ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/img/
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/gkappa_img
+        cp man/gkappa_img/*.png ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/gkappa_img/
+        mkdir ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/generated_img
+        cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/generated_img/
 
-        empty_or_create  ${PLAYGROUND}/docs/KaSim-API-master
-        cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
+        empty_or_create  ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}
+        cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}/
 
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/docs travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
@@ -71,8 +72,8 @@ COMMITNAME=$(git show --pretty=oneline -s --no-color)
 cd ${PLAYGROUND}
 git config user.email "kappa-dev@listes.sc.univ-paris-diderot.fr"
 git config user.name "KappaBot"
-git add ${PLAYGROUND}/docs/KaSim-manual-master/ ${PLAYGROUND}/try/ \
-    ${PLAYGROUND}/docs/KaSim-API-master/ && \
-    { git commit -m "Sync website for $1 with Kappa-Dev/KaSim@${COMMITNAME}" && \
+git add ${PLAYGROUND}/docs/KaSim-manual-${TRAVIS_BRANCH}/ ${PLAYGROUND}/try/ \
+    ${PLAYGROUND}/docs/KaSim-API-${TRAVIS_BRANCH}/ && \
+    { git commit -m "Sync website for $1 with Kappa-Dev/KaSim@${TRAVIS_COMMIT}" && \
     git push -q origin master || echo "No Changes" ; }
 cd ${HOME} && rm -rf ${PLAYGROUND}
