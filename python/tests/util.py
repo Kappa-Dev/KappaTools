@@ -19,7 +19,10 @@ def find_path(top_dir, fname, force_type=None):
     return None
 
 
-MODELS_DIR = find_path('../..', 'models', force_type='directory')
+THIS_DIR = path.dirname(path.abspath(__file__))
+UP_TWO = path.normpath(path.join(THIS_DIR, '..', '..'))
+
+MODELS_DIR = find_path(UP_TWO, 'models', force_type='directory')
 assert MODELS_DIR is not None, "Could not find models folder."
 
 
