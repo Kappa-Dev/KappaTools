@@ -3,12 +3,24 @@ from builtins import dict, str
 
 import sys
 import unittest
-from os import path
+from os import path, walk
 
 import kappy
-from kappy.kappa_common import KASIM_DIR
 
-MODELS_DIR = path.join(KASIM_DIR, "models")
+
+def find_path(top_dir, fname, force_type=None):
+    """Find the path a given file somewhere bellow the top_dir."""
+    for dirpath, sub_dirs, file_contents in walk(top_dir):
+        if fname in file_contents and not force_type == 'directory':
+            return path.join(dirpath, fname)
+        elif fname in sub_dirs and not force_type == 'file':
+            return path.join(dirpath, fname)
+
+    return None
+
+
+MODELS_DIR = find_path('../..', 'models', force_type='directory')
+assert MODELS_DIR is not None, "Could not find models folder."
 
 
 class _KappaClientTest(unittest.TestCase):
