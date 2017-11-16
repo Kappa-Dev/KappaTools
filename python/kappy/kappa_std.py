@@ -17,7 +17,7 @@ def find_agent_bin():
     agent_names = ['KaSimAgent', 'KaSaAgent']
     for potential_dir in [KAPPY_DIR, KASIM_DIR]:
         bin_dir = path.join(potential_dir, 'bin')
-        contents = os.listdir(bin_dir)
+        contents = listdir(bin_dir)
         if all([agent in contents for agent in agent_names]):
             break
     else:
