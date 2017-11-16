@@ -23,7 +23,7 @@ matrix:
       - PY_VERSION=2.7
     language: python
     python: 2.7
-     addons:
+    addons:
       apt:
         sources:
           - avsm
@@ -36,7 +36,7 @@ matrix:
       - PY_VERSION=3.5
     language: python
     python: 3.5
-      addons:
+    addons:
       apt:
         sources:
           - avsm
