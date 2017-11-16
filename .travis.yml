@@ -50,6 +50,7 @@ matrix:
           - opam
           - gnuplot-nox
           - graphviz
+          - ghostscript
           - latex-xcolor
           - texlive-latex-recommended
           - texlive-fonts-recommended
