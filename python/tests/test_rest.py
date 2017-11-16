@@ -16,11 +16,11 @@ from util import _KappaClientTest, run_nose, find_path
 
 def find_websim():
     # Look bellow the KAPPY_DIR first, then KASIM_DIR
-    for top_dir in ['../..']:
-        sim_path = find_path(top_dir, 'WebSim')
-        if sim_path is not None:
-            return sim_path
-
+    up_two = path.normpath(path.join(path.dirname(path.abspath(__file__)),
+                                     '..', '..'))
+    sim_path = find_path(up_two, 'WebSim')
+    if sim_path is not None:
+        return sim_path
     raise KappaError('WebSim could not be found.')
 
 
