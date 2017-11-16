@@ -4,21 +4,39 @@ from builtins import dict, str
 import random
 import string
 import inspect
-from os import path
+from os import path, walk
 from subprocess import Popen
 from time import sleep
 from datetime import datetime
 
 import kappy
-from kappy.kappa_std import BIN_DIR
+from kappy.kappa_common import KAPPY_DIR, KASIM_DIR, KappaError
 from util import _KappaClientTest, run_nose
+
+
+def find_path(top_dir, fname):
+    """Find the path a given file somewhere bellow the top_dir."""
+    for dirpath, _, contents in walk(top_dir):
+        if fname in contents:
+            return path.join(dirpath, fname)
+    return None
+
+
+def find_websim():
+    # Look bellow the KAPPY_DIR first, then KASIM_DIR
+    for top_dir in [KAPPY_DIR, KASIM_DIR]:
+        sim_path = find_path(top_dir, 'WebSim')
+        if sim_path is not None:
+            return sim_path
+
+    raise KappaError('WebSim could not be found.')
 
 
 class RestClientTest(_KappaClientTest):
     """ Integration test for kappa client"""
     def __init__(self, *args, **kwargs):
         """Initalize test by launching kappa server"""
-        self.websim = path.join(BIN_DIR, "WebSim")
+        self.websim = find_websim()
         self.key = self.generate_key()
         self.port = 6666
         self.endpoint = "http://127.0.0.1:{0}".format(self.port)
