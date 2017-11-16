@@ -4,27 +4,19 @@ from builtins import dict, str
 import random
 import string
 import inspect
-from os import path, walk
+from os import path
 from subprocess import Popen
 from time import sleep
 from datetime import datetime
 
 import kappy
-from kappy.kappa_common import KAPPY_DIR, KASIM_DIR, KappaError
-from util import _KappaClientTest, run_nose
-
-
-def find_path(top_dir, fname):
-    """Find the path a given file somewhere bellow the top_dir."""
-    for dirpath, _, contents in walk(top_dir):
-        if fname in contents:
-            return path.join(dirpath, fname)
-    return None
+from kappy.kappa_common import KappaError
+from util import _KappaClientTest, run_nose, find_path
 
 
 def find_websim():
     # Look bellow the KAPPY_DIR first, then KASIM_DIR
-    for top_dir in [KAPPY_DIR, KASIM_DIR]:
+    for top_dir in ['../..']:
         sim_path = find_path(top_dir, 'WebSim')
         if sim_path is not None:
             return sim_path
