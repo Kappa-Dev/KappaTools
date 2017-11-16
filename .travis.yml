@@ -9,15 +9,6 @@ env:
 
 matrix:
   include:
-  - env: CHECKED=webserver
-    addons:
-      apt:
-        sources:
-          - avsm
-        packages:
-          - ocaml-nox
-          - aspcud
-          - opam
   - env:
       - CHECKED=python
       - PY_VERSION=2.7
