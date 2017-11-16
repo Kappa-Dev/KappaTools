@@ -8,12 +8,24 @@ import subprocess
 import threading
 import json
 
-from os import path
+from os import path, listdir
 
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
-                               KappaApi, KASIM_DIR
+                               KappaApi, KASIM_DIR, KAPPY_DIR
 
-BIN_DIR = path.join(KASIM_DIR, 'bin')
+def find_agent_bin():
+    agent_names = ['KaSimAgent', 'KaSaAgent']
+    for potential_dir in [KAPPY_DIR, KASIM_DIR]:
+        bin_dir = path.join(potential_dir, 'bin')
+        contents = os.listdir(bin_dir)
+        if all([agent in contents for agent in agent_names]):
+            break
+    else:
+        raise KappaError("Could not find directory with agents.")
+    return bin_dir
+
+
+BIN_DIR = find_agent_bin()
 
 
 @KappaApi._fix_docs

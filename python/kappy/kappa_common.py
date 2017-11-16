@@ -7,7 +7,7 @@ __all__ = ['SimulationParameter', 'PlotLimit', 'KappaError']
 import sys
 import abc
 import uuid
-from os import path
+from os import path, environ
 from time import sleep
 from datetime import datetime
 
@@ -18,9 +18,10 @@ else:
     ABC = abc.ABCMeta('ABC'.encode(), (), {})
 
 
-KASIM_DIR = path.normpath(
-    path.join(path.dirname(path.abspath(__file__)), *([path.pardir]*2))
-    )
+KAPPY_DIR = path.dirname(path.abspath(__file__))
+KAPPY_DIR = environ.get('KAPPY_DIR', KAPPY_DIR)
+KASIM_DIR = path.normpath(path.join(KAPPY_DIR, *([path.pardir]*2)))
+KASIM_DIR = environ.get('KASIM_DIR', KASIM_DIR)
 
 
 class FileMetadata(object):
