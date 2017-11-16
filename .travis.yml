@@ -86,7 +86,7 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python && python3 tests/test_kappa_client.py && python2 tests/test_kappa_client.py ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python && python3 tests/test_rest.py && python3 tests/test_std.py && python2 tests/test_rest.py && python2 tests/test_std.py; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"
