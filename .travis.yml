@@ -10,11 +10,33 @@ env:
 matrix:
   include:
   - env: CHECKED=webserver
-    language: python
-    python:
-      - "2.7"
-      - "3.5"
     addons:
+      apt:
+        sources:
+          - avsm
+        packages:
+          - ocaml-nox
+          - aspcud
+          - opam
+  - env:
+      - CHECKED=python
+      - PY_VERSION=2.7
+    language: python
+    python: 2.7
+     addons:
+      apt:
+        sources:
+          - avsm
+        packages:
+          - ocaml-nox
+          - aspcud
+          - opam
+  - env:
+      - CHECKED=python
+      - PY_VERSION=3.5
+    language: python
+    python: 3.5
+      addons:
       apt:
         sources:
           - avsm
@@ -80,8 +102,8 @@ install:
   - opam install -y ocamlbuild yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen cohttp ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then pip install --user -v . nose ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] || ['$CHECKED' = python ] ; then opam install -y atdgen cohttp ; fi"
+  - sh -c "if [ '$CHECKED' = python ] ; then pip install --user -v . nose ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 atdgen-windows lwt-windows ; fi"
 
 script:
@@ -89,7 +111,7 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make META kappalib ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then make agents bin/WebSim && cd python && nosetests -v ; fi"
+  - sh -c "if [ '$CHECKED' = python ] ; then make agents bin/WebSim && cd python && nosetests -v ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then make Kappapp.app ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then make KappaBin.zip ; fi"
