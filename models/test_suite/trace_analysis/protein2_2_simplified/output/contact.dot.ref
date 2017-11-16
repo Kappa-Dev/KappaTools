@@ -18,5 +18,5 @@ subgraph cluster1 {
    1.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
 label =  "K";  shape = rectangle; color = red
 } ; 
-0.4 -- 1.0
+0.4 -- 1.0 [color=red]
 }

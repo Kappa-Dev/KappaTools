@@ -15,7 +15,9 @@
 let trace = false
 let local_trace = false
 
-let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
+let string_of_port port =
+  "["^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^
+  (string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
 let string_of_rule_var
     parameters error handler compilation

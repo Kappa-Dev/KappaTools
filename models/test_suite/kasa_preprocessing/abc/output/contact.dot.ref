@@ -22,7 +22,7 @@ subgraph cluster2 {
    2.3 [style = filled label = "x2" shape =circle color = yellow size = "5"]
 label =  "C";  shape = rectangle; color = red
 } ; 
-0.0 -- 1.0
-0.1 -- 2.2
-0.1 -- 2.3
+0.0 -- 1.0 [color=red]
+0.1 -- 2.2 [color=red]
+0.1 -- 2.3 [color=red]
 }

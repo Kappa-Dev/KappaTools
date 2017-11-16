@@ -17,5 +17,5 @@ subgraph cluster1 {
    1.2 [style = filled label = "t" shape =ellipse color = green size = "5"]
 label =  "B";  shape = rectangle; color = red
 } ; 
-0.0 -- 1.1
+0.0 -- 1.1 [color=red]
 }

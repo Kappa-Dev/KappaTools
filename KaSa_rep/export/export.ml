@@ -1503,7 +1503,6 @@ let get_internal_scc_decomposition
 
 let translate_scc_decomposition state
     (internal_scc:internal_scc_decomposition): Public_data.scc =
-  (* TODO: Quyen*)
   let error = Remanent_state.get_errors state in
   let error, scc =
     List.fold_left (fun (error, store_result) list ->
