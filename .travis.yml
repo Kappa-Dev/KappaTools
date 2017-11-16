@@ -102,7 +102,7 @@ install:
   - opam install -y ocamlbuild yojson lwt
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
   - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] || [ '$CHECKED' = js ] || [ '$CHECKED' = windows ] ; then opam install -y lwt_react tyxml-ppx js_of_ocaml-lwt js_of_ocaml-tyxml atdgen ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] || ['$CHECKED' = python ] ; then opam install -y atdgen cohttp ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] || [ '$CHECKED' = python ] ; then opam install -y atdgen cohttp ; fi"
   - sh -c "if [ '$CHECKED' = python ] ; then pip install -v . nose ; fi"
   - sh -c "if [ '$CHECKED' = windows ] ; then opam install -y ocaml-windows64 atdgen-windows lwt-windows ; fi"
 
