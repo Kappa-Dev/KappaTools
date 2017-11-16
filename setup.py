@@ -62,7 +62,7 @@ setup(name='kappy',
           'build_agents': BuildAgentsCommand,
           'build_ext': MyBuildExtCommand,
       },
-      install_requires=['requests'],
+      install_requires=['requests', 'future'],
       package_dir={'':'python'},
       include_package_data=True,
       package_data={
