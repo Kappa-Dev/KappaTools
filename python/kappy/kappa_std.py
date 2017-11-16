@@ -13,10 +13,13 @@ from os import path, listdir
 from kappy.kappa_common import KappaError, PlotLimit, FileMetadata, File, \
                                KappaApi, KASIM_DIR, KAPPY_DIR
 
+
 def find_agent_bin():
     agent_names = ['KaSimAgent', 'KaSaAgent']
     for potential_dir in [KAPPY_DIR, KASIM_DIR]:
         bin_dir = path.join(potential_dir, 'bin')
+        if not path.exists(bin_dir):
+            continue
         contents = listdir(bin_dir)
         if all([agent in contents for agent in agent_names]):
             break
