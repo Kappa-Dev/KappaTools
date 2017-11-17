@@ -1,10 +1,10 @@
 digraph G{
 "Init_15" [label="" style="invis" width="0px" height="0px"];
-"Node_21" [label="A(x~p,y~p,z~p)"];
-"Node_19" [label="A(x~p,y~p,z~u)"];
-"Node_18" [label="A(x~u,y~p,z~u)"];
-"Node_16" [label="A(x~p,y~u,z~u)"];
-"Node_15" [label="A(x~u,y~u,z~u)"];
+"Node_21" [label="A(x{p},y{p},z{p})"];
+"Node_19" [label="A(x{p},y{p},z{u})"];
+"Node_18" [label="A(x{u},y{p},z{u})"];
+"Node_16" [label="A(x{p},y{u},z{u})"];
+"Node_15" [label="A(x{u},y{u},z{u})"];
 "Node_21" -> "Node_19" [label="5"];
 "Node_18" -> "Node_15" [label="4"];
 "Node_19" -> "Node_16" [label="4"];

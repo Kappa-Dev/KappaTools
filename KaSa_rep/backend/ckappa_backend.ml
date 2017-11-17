@@ -326,7 +326,12 @@ struct
           let new_internal_state =
             match internal_state_string_opt with
             | None -> old_state
-            | Some x -> Some ("~"^x)
+            | Some x ->
+              begin
+                match Remanent_parameters.get_syntax_version parameter with
+                | Ast.V4 -> Some ("{"^x^"}")
+                | Ast.V3 -> Some ("~"^x)
+              end
           in
           let error, new_binding_state =
             match
@@ -569,12 +574,43 @@ struct
            in
            let () =
              match binding with
-             | None | Some Free -> ()
-             | Some Wildcard -> Loggers.fprintf logger "?"
-             | Some Bound_to_unknown -> Loggers.fprintf logger "!_"
-             | Some (Bound_to int) -> Loggers.fprintf logger "!%i" int
+             | None | Some Free ->
+               begin
+                 match Remanent_parameters.get_syntax_version parameter with
+                 | Ast.V4 -> Loggers.fprintf logger "[.]"
+                 | Ast.V3 -> ()
+               end
+             | Some Wildcard -> begin
+               match Remanent_parameters.get_syntax_version parameter with
+               | Ast.V4 ->
+                 Loggers.fprintf logger "[#]"
+               | Ast.V3 ->
+                 Loggers.fprintf logger "?"
+             end
+             | Some Bound_to_unknown ->
+               begin
+                 match Remanent_parameters.get_syntax_version parameter with
+                 | Ast.V4 ->
+                   Loggers.fprintf logger "[_]"
+                 | Ast.V3 ->
+                 Loggers.fprintf logger "!_"
+               end
+             | Some (Bound_to int) ->
+               begin
+                 match Remanent_parameters.get_syntax_version parameter with
+                 | Ast.V4 ->
+                   Loggers.fprintf logger "[%i]" int
+                 | Ast.V3 ->
+                 Loggers.fprintf logger "!%i" int
+               end
              | Some (Binding_type (ag,st)) ->
-               Loggers.fprintf logger "!%s.%s" ag st
+               begin
+                 match Remanent_parameters.get_syntax_version parameter with
+                 | Ast.V4 ->
+                   Loggers.fprintf logger "[%s.%s]" ag st
+                 | Ast.V3 ->
+                 Loggers.fprintf logger "!%s.%s" ag st
+               end
            in
            true
         ) site_map false

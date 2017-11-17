@@ -27,6 +27,7 @@ type c_site_name  = int
 type c_state      = int
 type c_rule_id    = int
 type c_link_value  = int
+
 type binding_state =
   | Free
   | Lnk_type of agent_name * site_name

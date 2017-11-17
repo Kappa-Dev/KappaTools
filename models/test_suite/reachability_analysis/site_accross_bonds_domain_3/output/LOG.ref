@@ -837,7 +837,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z!C@x,t!B@t)
+		A( z!C@x ,t!B@t )
 
 	Dealing with creation
 
@@ -866,7 +866,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(t!A@t,z!C@x)
+		B( t!A@t ,z!C@x )
 
 	Dealing with creation
 
@@ -885,8 +885,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x!B@z)
-		C(x!A@z)
+		C( x!B@z )
+		C( x!A@z )
 
 
 	Applying rule C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) -> D(x[1]), A(z[1] t[2]), B(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 10, characters 0-77:):
@@ -928,7 +928,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z!D@x,t!B@t)
+		A( z!D@x ,t!B@t )
 
 	Dealing with creation
 
@@ -957,7 +957,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(t!A@t,z!D@x)
+		B( t!A@t ,z!D@x )
 
 	Dealing with creation
 
@@ -976,8 +976,8 @@ Id=10
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x!B@z)
-		D(x!A@z)
+		D( x!B@z )
+		D( x!A@z )
 
 
 	Applying rule  -> C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) (File "site_accross_bonds_domain.ka", line 12, characters 0-41:):
@@ -1011,7 +1011,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(z!C@x,t!F@t)
+		E( z!C@x ,t!F@t )
 
 	Dealing with creation
 
@@ -1040,7 +1040,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F(t!E@t,z!D@x)
+		F( t!E@t ,z!D@x )
 
 	Dealing with creation
 
@@ -1059,7 +1059,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x!E@z)
+		C( x!E@z )
 
 	Dealing with creation
 
@@ -1078,7 +1078,7 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x!F@z)
+		D( x!F@z )
 
 
 	Applying rule C(x[1]), E(z[1] t[2]), F(t[2] z[3]), D(x[3]) -> G(x[1]), E(z[1] t[2]), F(t[2] z[3]), H(x[3]) (File "site_accross_bonds_domain.ka", line 13, characters 0-77:):
@@ -1120,7 +1120,7 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(z!G@x,t!F@t)
+		E( z!G@x ,t!F@t )
 
 	Dealing with creation
 
@@ -1149,7 +1149,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F(t!E@t,z!H@x)
+		F( t!E@t ,z!H@x )
 
 	Dealing with creation
 
@@ -1168,7 +1168,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		G(x!E@z)
+		G( x!E@z )
 
 	Dealing with creation
 
@@ -1187,7 +1187,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		H(x!F@z)
+		H( x!F@z )
 
 
 	Applying rule C() ->  (File "site_accross_bonds_domain.ka", line 11, characters 0-10:):
@@ -1221,7 +1221,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z!free,t!B@t)
+		A( z!free ,t!B@t )
 
 	Dealing with side effects
 
@@ -1250,7 +1250,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(t!A@t,z!free)
+		B( t!A@t ,z!free )
 
 	Dealing with side effects
 
@@ -1279,7 +1279,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(z!free,t!F@t)
+		E( z!free ,t!F@t )
 
 
 	Applying rule  -> C(x[1]), A(z[1] t[2]), B(t[2] z[3]), C(x[3]) (File "site_accross_bonds_domain.ka", line 9, characters 0-41:):

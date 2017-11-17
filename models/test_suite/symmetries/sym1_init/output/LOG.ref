@@ -166,7 +166,7 @@ Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:0->[0;1]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:0->[0;1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Inhibition_map:rule(0):'' A(z),A(z)->A(z!1),A(z!1) -> rule(0):'' A(z),A(z)->A(z!1),A(z!1)[0->1];[1->0]
+Influence_map:Inhibition_map:rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1]) -> rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1])[0->1];[1->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -185,7 +185,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z!free)
+		A( z[.] )
 
 	Views in initial state:
 
@@ -204,7 +204,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y~p)
+		A( y{p} )
 
 	Views in initial state:
 
@@ -223,7 +223,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u)
+		A( x{u} )
 
 	Views in initial state:
 
@@ -242,7 +242,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y~u)
+		A( y{u} )
 
 	Views in initial state:
 
@@ -261,7 +261,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p)
+		A( x{p} )
 
 	Views in initial state:
 
@@ -280,7 +280,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z!A@z)
+		A( z[A@z] )
 
 
 	Applying rule A(z[.]), A(z[.]) -> A(z[1]), A(z[1]) (File "sym_init1.ka", line 9, characters 0-38:):
@@ -288,9 +288,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule A(z[.]), A(z[.]) -> A(z[1]), A(z[1]) (File "sym_init1.ka", line 9, characters 0-38:) is applied for the first time
 
-		Updating the views for A(z!)
+		Updating the views for A(z[])
 
-		Updating the views for A(z!)
+		Updating the views for A(z[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -390,9 +390,9 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y~p) v A(y~u) ]
-A() => [ A(z) v A(z!A.z) ]
-A() => [ A(x~u) v A(x~p) ]
+A() => [ A(y{p}[.]) v A(y{u}[.]) ]
+A() => [ A(z[.]) v A(z[A.z]) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -542,14 +542,14 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(x~u)
-		v A(x~p)]
+		  A(x{u}[.])
+		v A(x{p}[.])]
 A()=> [
-		  A(z)
-		v A(z!A.z)]
+		  A(z[.])
+		v A(z[A.z])]
 A()=> [
-		  A(y~p)
-		v A(y~u)]
+		  A(y{p}[.])
+		v A(y{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

@@ -501,7 +501,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,y~u,z~u,a~u,b~u)
+		A( x~u ,y~u ,z~u ,a~u ,b~u )
 
 
 	Applying rule  -> A(x{u} y{u} z{u} a{u} b{u}) (File "essai.ka", line 5, characters 0-28:):
@@ -571,7 +571,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~u,a~u,b~u)
+		A( x~p ,y~u ,z~u ,a~u ,b~u )
 
 
 	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "essai.ka", line 7, characters 0-27:):
@@ -636,7 +636,7 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~p,z~u,a~u,b~u)
+		A( x~p ,y~p ,z~u ,a~u ,b~u )
 
 
 	Applying rule A(x{p} y{u} b{u}) -> A(x{u} y{u} b{u}) (File "essai.ka", line 8, characters 0-35:):
@@ -760,9 +760,9 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~p,a~u,b~u)
-		A(x~p,y~p,z~p,a~u,b~u)
-		A(x~u,y~u,z~p,a~u,b~u)
+		A( x~p ,y~u ,z~p ,a~u ,b~u )
+		A( x~p ,y~p ,z~p ,a~u ,b~u )
+		A( x~u ,y~u ,z~p ,a~u ,b~u )
 
 
 	Applying rule A(z{p} a{u}) -> A(z{p} a{p}) (File "essai.ka", line 11, characters 0-27:):
@@ -872,9 +872,9 @@ Id=79
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~p,a~p,b~u)
-		A(x~p,y~p,z~p,a~p,b~u)
-		A(x~u,y~u,z~p,a~p,b~u)
+		A( x~p ,y~u ,z~p ,a~p ,b~u )
+		A( x~p ,y~p ,z~p ,a~p ,b~u )
+		A( x~u ,y~u ,z~p ,a~p ,b~u )
 
 
 	Applying rule A(z{p} a{u} b{u}) -> A(z{u} a{u} b{u}) (File "essai.ka", line 12, characters 0-35:):
@@ -953,7 +953,7 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~p,z~p,a~p,b~p)
+		A( x~p ,y~p ,z~p ,a~p ,b~p )
 
 
 	Applying rule A(b{p}) -> A(b{u}) (File "essai.ka", line 15, characters 0-19:):
@@ -1041,7 +1041,7 @@ Id=133
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~p,a~p,b~p)
+		A( x~p ,y~u ,z~p ,a~p ,b~p )
 
 
 	Applying rule A(z{u}) -> A(z{p}) (File "essai.ka", line 10, characters 0-19:):
@@ -1119,8 +1119,8 @@ Id=167
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~p,a~u,b~p)
-		A(x~p,y~p,z~p,a~u,b~p)
+		A( x~p ,y~u ,z~p ,a~u ,b~p )
+		A( x~p ,y~p ,z~p ,a~u ,b~p )
 
 
 	Applying rule A(x{p} y{p} z{p} a{p} b{u}) -> A(x{p} y{p} z{p} a{p} b{p}) (File "essai.ka", line 14, characters 0-51:):

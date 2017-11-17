@@ -473,28 +473,28 @@ Influence_map:Wake_up_map:rule(0):'r0' ->A(y~u),A(x~p) -> rule(4):'r4' A(x!_),A(
 Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[0->0]
 Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->1];[1->1]
 Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->1];[1->1]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->0];[1->0];[1->1];[1->2]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(7):'r7' B(),B(x!A.x),B(x!C.x)->[0->0];[1->0];[1->1];[1->2]
 Influence_map:Wake_up_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'r4' A(x!_),A()->A(x)[0->0]
-Influence_map:Wake_up_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[1->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(7):'r7' B(),B(x!A.x),B(x!C.x)->[1->1]
 Influence_map:Wake_up_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[1*->0];[0*->0]
 Influence_map:Wake_up_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[1*->1];[0*->1];[0->0]
 Influence_map:Wake_up_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[1*->1];[0*->1]
 Influence_map:Wake_up_map:rule(5):'r5' ->C(x) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->0]
-Influence_map:Wake_up_map:rule(6):'r6' C(x),B(x)->C(x!1),B(x!1) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[1->2]
-Influence_map:Wake_up_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[1*->0];[0*->0]
-Influence_map:Wake_up_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[2*->0];[0*->0]
+Influence_map:Wake_up_map:rule(6):'r6' C(x),B(x)->C(x!1),B(x!1) -> rule(7):'r7' B(),B(x!A.x),B(x!C.x)->[1->2]
+Influence_map:Wake_up_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[1*->0];[0*->0]
+Influence_map:Wake_up_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[2*->0];[0*->0]
 Influence_map:Inhibition_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[1->0]
 Influence_map:Inhibition_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[1->1]
 Influence_map:Inhibition_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[1->0]
 Influence_map:Inhibition_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(4):'r4' A(x!_),A()->A(x)[1->0]
-Influence_map:Inhibition_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[1*->1];[0*->1]
+Influence_map:Inhibition_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(7):'r7' B(),B(x!A.x),B(x!C.x)->[1*->1];[0*->1]
 Influence_map:Inhibition_map:rule(6):'r6' C(x),B(x)->C(x!1),B(x!1) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[1->0]
 Influence_map:Inhibition_map:rule(6):'r6' C(x),B(x)->C(x!1),B(x!1) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[1->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[0->0]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(4):'r4' A(x!_),A()->A(x)[1*->0];[0*->0]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->1]
-Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->1]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(4):'r4' A(x!_),A()->A(x)[1*->0];[0*->0]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->1]
+Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!A.x),B(x!C.x)-> -> rule(7):'r7' B(),B(x!A.x),B(x!C.x)->[0->1];[0->2];[1->0];[2->0]
 Reachability analysis...
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 4-24:):
@@ -518,7 +518,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!free)
+		A( x!free )
 
 	Dealing with creation
 
@@ -537,8 +537,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(y~u)
-		A(y~p)
+		A( y~u )
+		A( y~p )
 
 	Dealing with creation
 
@@ -557,8 +557,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p)
-		A(x~u)
+		A( x~p )
+		A( x~u )
 
 
 	Applying rule r1 (File "double_agents.ka", line 6, characters 4-24:):
@@ -632,8 +632,8 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,y~u,x!free)
-		B(x~p,y~p,x!free)
+		B( x~u ,y~u ,x!free )
+		B( x~p ,y~p ,x!free )
 
 
 	Applying rule r5 (File "double_agents.ka", line 10, characters 4-15:):
@@ -657,7 +657,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x!free)
+		C( x!free )
 
 
 	Applying rule r3 (File "double_agents.ka", line 8, characters 4-34:):
@@ -682,7 +682,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!B@x)
+		A( x!B@x )
 
 
 		Updating the views for B(x~,y~,x!)
@@ -752,8 +752,8 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,y~u,x!A@x)
-		B(x~p,y~p,x!A@x)
+		B( x~u ,y~u ,x!A@x )
+		B( x~p ,y~p ,x!A@x )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 4-26:):
@@ -785,7 +785,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x!B@x)
+		C( x!B@x )
 
 
 		Updating the views for B(x~,y~,x!)
@@ -855,8 +855,8 @@ Id=53
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,y~u,x!C@x)
-		B(x~p,y~p,x!C@x)
+		B( x~u ,y~u ,x!C@x )
+		B( x~p ,y~p ,x!C@x )
 
 
 	Applying rule r7 (File "double_agents.ka", line 12, characters 4-32:):
@@ -910,7 +910,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~q,y~q,x!free)
+		B( x~q ,y~q ,x!free )
 
 
 	Applying rule r0 (File "double_agents.ka", line 5, characters 4-24:):
@@ -964,7 +964,7 @@ Id=86
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~q,y~q,x!A@x)
+		B( x~q ,y~q ,x!A@x )
 
 
 	Applying rule r6 (File "double_agents.ka", line 11, characters 4-34:):
@@ -1009,7 +1009,7 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~q,y~q,x!C@x)
+		B( x~q ,y~q ,x!C@x )
 
 
 	Applying rule r4 (File "double_agents.ka", line 9, characters 4-26:):

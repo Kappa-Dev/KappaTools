@@ -243,7 +243,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,y~u)
+		A( x~u ,y~u )
 
 
 	Applying rule A(x{p} y{u}) -> D(x{u}) (File "creation.ka", line 4, characters 0-23:):
@@ -281,7 +281,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u)
+		A( x~p ,y~u )
 
 
 	Applying rule A(x{u} y{u}) -> A(x{u} y{p}) (File "creation.ka", line 3, characters 0-27:):
@@ -316,7 +316,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,y~p)
+		A( x~u ,y~p )
 
 
 	Applying rule D(x{u}) -> D(x{p}) (File "creation.ka", line 5, characters 0-19:):
@@ -348,7 +348,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~u)
+		D( x~u )
 
 
 	Applying rule A(x{u} y{u}) -> A(x{p} y{u}) (File "creation.ka", line 2, characters 0-27:):
@@ -383,7 +383,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~p)
+		D( x~p )
 
 
 	Applying rule A(x{p} y{u}) -> D(x{u}) (File "creation.ka", line 4, characters 0-23:):

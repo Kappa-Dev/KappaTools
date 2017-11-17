@@ -1,7 +1,7 @@
 digraph G{
 "Init_19" [label="" style="invis" width="0px" height="0px"];
-"Node_23" [label="B(y!A@y,x!free)"];
-"Node_19" [label="B(y!A@y,x!C@a)"];
+"Node_23" [label="B(y[A@y],x[.])"];
+"Node_19" [label="B(y[A@y],x[C@a])"];
 "Node_19" -> "Node_23" [label="0"];
 "Init_19" -> "Node_19" [label=""];
 }

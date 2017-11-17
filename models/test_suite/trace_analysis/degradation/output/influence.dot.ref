@@ -7,10 +7,10 @@
 #
 digraph G{
 "0:B()->." [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x!_,z~u,y!_)->A(x!_,z~p,y!_)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x,z~u)->." [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x[_],z{u}[.],y[_])->A(x[_],z{p}[.],y[_])" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x[.],z{u}[.])->." [shape="box" fillcolor="#87ceeb" style=filled];
 "3:B()->B()" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:B()->." -> "2:A(x,z~u)->." [label="[0*->0]" color="green"];
-"0:B()->." -> "1:A(x!_,z~u,y!_)->A(x!_,z~p,y!_)" [label="[0*->0]" color="red" arrowhead="tee"];
+"0:B()->." -> "2:A(x[.],z{u}[.])->." [label="[0*->0]" color="green"];
+"0:B()->." -> "1:A(x[_],z{u}[.],y[_])->A(x[_],z{p}[.],y[_])" [label="[0*->0]" color="red" arrowhead="tee"];
 "0:B()->." -> "3:B()->B()" [label="[0->0]" color="red" arrowhead="tee"];
 }

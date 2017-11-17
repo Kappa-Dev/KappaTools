@@ -29,11 +29,11 @@ Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a P
   <script>
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
-  g.setNode(1, { label: "0:A(x~u)->A(x~p)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(2, { label: "1:A(x~p,y~u)->A(x~p,y~p)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(3, { label: "2:A(y~p,z~u)->A(y~p,z~p)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(4, { label: "3:A(x~u,z~p,w~u)->A(x~u,z~p,w~p)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(5, { label: "4:A(x~u,z~u)->A(x~u,z~p)", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(1, { label: "0:A(x{u}[.])->A(x{p}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(2, { label: "1:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(3, { label: "2:A(y{p}[.],z{u}[.])->A(y{p}[.],z{p}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(4, { label: "3:A(x{u}[.],z{p}[.],w{u}[.])->A(x{u}[.],z{p}[.],w{p}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(5, { label: "4:A(x{u}[.],z{u}[.])->A(x{u}[.],z{p}[.])", shape: "rect", style: "fill: #8ce"  });
   g.setEdge(1,2,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   g.setEdge(1,4,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });
   g.setEdge(1,5,{ label: "[0->0]", style: "stroke: #f00; fill: white", arrowheadStyle: "fill: #f00; stroke: #f00" });

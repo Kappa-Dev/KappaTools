@@ -30,9 +30,9 @@ Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a P
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
   g.setNode(1, { label: "label", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(2, { label: "1:A(x~p)->A(x~u)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(3, { label: "2:B(x~u)->B(x~p)", shape: "rect", style: "fill: #8ce"  });
-  g.setNode(4, { label: "3:B(x~p)->B(x~u)", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(2, { label: "1:A(x{p}[.])->A(x{u}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(3, { label: "2:B(x{u}[.])->B(x{p}[.])", shape: "rect", style: "fill: #8ce"  });
+  g.setNode(4, { label: "3:B(x{p}[.])->B(x{u}[.])", shape: "rect", style: "fill: #8ce"  });
   g.setEdge(2,1,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   g.setEdge(3,4,{ label: "[0->0]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });
   g.setEdge(3,1,{ label: "[0->1]", style: "stroke: #0f0; fill: white", arrowheadStyle: "fill: #0f0; stroke: #0f0" });

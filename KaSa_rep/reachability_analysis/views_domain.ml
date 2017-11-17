@@ -623,7 +623,7 @@ struct
           (fun (error, bool) site_type ->
              let error, site_string =
                try
-                 Handler.string_of_site parameters error handler_kappa
+                 Handler.string_of_site_update_views parameters error handler_kappa
                    agent_type site_type
                with
                | _ ->
@@ -632,10 +632,13 @@ struct
                    (Ckappa_sig.string_of_site_name site_type)
              in
              let () =
-               Loggers.fprintf log "%s%s" (if bool then "," else "") site_string
+               Loggers.fprintf log "%s%s"
+               (if bool then "," else "")
+               site_string
              in
              error, true)
-          (error, false) site_correspondence
+          (error, false)
+          site_correspondence
       in
       let () = Loggers.fprintf log ")" in
       let () = Loggers.print_newline log  in
@@ -821,11 +824,19 @@ struct
                         Loggers.fprintf log ","
                       else
                         Loggers.fprintf log
-                          "\t\t%s%s(" prefix agent_string
+                          "\t\t%s%s( " prefix agent_string
                     in
-                    let () = (*Print the information of views*)
-                      Loggers.fprintf log
-                        "%s%s" site_string state_string
+                    let () =
+                      match Remanent_parameters.get_syntax_version parameters with
+                      | Ast.V4 ->
+                        Loggers.fprintf log
+                          "%s%s " site_string state_string
+                      | Ast.V3 ->
+                      let () = (*Print the information of views*)
+                        Loggers.fprintf log
+                          "%s%s " site_string state_string
+                      in
+                      ()
                     in
                     error, true
                  )

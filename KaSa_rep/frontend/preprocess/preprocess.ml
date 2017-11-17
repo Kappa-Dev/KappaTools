@@ -2152,7 +2152,8 @@ let dot_of_contact_map ?logger parameters (error:Exception.method_handler) handl
                        then
                          let _ =
                            Loggers.fprintf
-                             (Remanent_parameters.get_logger parameters_dot) "%s.%s -- %s.%s [color=red]\n"
+                             (Remanent_parameters.get_logger parameters_dot)
+                             "%s.%s -- %s.%s [color=red]\n"
                              (Ckappa_sig.string_of_agent_name i)
                              (Ckappa_sig.string_of_site_name j)
                              (Ckappa_sig.string_of_agent_name i')

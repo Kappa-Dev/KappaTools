@@ -511,27 +511,27 @@ Quarks:site_modif-:agent_type:2,site_type:3,state:1,rule:5->[1]
 Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:5->[1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x)[0->0];[1->1]
-Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(2):'ab.c' A(x!_,c),C(x1~u)->A(x!_,c!2),C(x1~u!2)[0->0]
-Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> var(3):'AB' A(x!x.B)[0->0]
-Influence_map:Wake_up_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1)[0->0];[1->1]
-Influence_map:Wake_up_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[0->0]
-Influence_map:Wake_up_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p)[0->0]
-Influence_map:Wake_up_map:rule(2):'ab.c' A(x!_,c),C(x1~u)->A(x!_,c!2),C(x1~u!2) -> rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c)[0->1];[1->0]
-Influence_map:Wake_up_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> rule(2):'ab.c' A(x!_,c),C(x1~u)->A(x!_,c!2),C(x1~u!2)[1->0]
-Influence_map:Wake_up_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[0->1];[1->0]
-Influence_map:Wake_up_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p)[0->1]
-Influence_map:Wake_up_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(5):'Cpu' C(x1~p?,x2~u?)[0->0]
-Influence_map:Wake_up_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(6):'Cpp' C(x1~p?,x2~p?)[0->0]
-Influence_map:Wake_up_map:rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1) -> rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p)[0->0];[1->1]
-Influence_map:Wake_up_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[0->0]
-Influence_map:Wake_up_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(6):'Cpp' C(x1~p?,x2~p?)[1->0]
-Influence_map:Inhibition_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[0->0]
-Influence_map:Inhibition_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p)[0->0]
-Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(2):'ab.c' A(x!_,c),C(x1~u)->A(x!_,c!2),C(x1~u!2)[0->0]
-Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3):'AB' A(x!x.B)[0->0]
-Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
-Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
+Influence_map:Wake_up_map:rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.])[0->0];[1->1]
+Influence_map:Wake_up_map:rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(2):'ab.c' A(x[_],c[.]),C(x1{u}[.])->A(x[_],c[2]),C(x1{u}[2])[0->0]
+Influence_map:Wake_up_map:rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> var(3):'AB' A(x[B.x])[0->0]
+Influence_map:Wake_up_map:rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.]) -> rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->0];[1->1]
+Influence_map:Wake_up_map:rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.]) -> rule(4):'a.c' A(x[.],c[.]),C(x1{p}[.],x2{u}[.])->A(x[.],c[1]),C(x1{p}[.],x2{u}[1])[0->0]
+Influence_map:Wake_up_map:rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.]) -> rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(2):'ab.c' A(x[_],c[.]),C(x1{u}[.])->A(x[_],c[2]),C(x1{u}[2]) -> rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.])[0->1];[1->0]
+Influence_map:Wake_up_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> rule(2):'ab.c' A(x[_],c[.]),C(x1{u}[.])->A(x[_],c[2]),C(x1{u}[2])[1->0]
+Influence_map:Wake_up_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> rule(4):'a.c' A(x[.],c[.]),C(x1{p}[.],x2{u}[.])->A(x[.],c[1]),C(x1{p}[.],x2{u}[1])[0->1];[1->0]
+Influence_map:Wake_up_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.])[0->1]
+Influence_map:Wake_up_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> var(5):'Cpu' C(x1{p}[#],x2{u}[#])[0->0]
+Influence_map:Wake_up_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> var(6):'Cpp' C(x1{p}[#],x2{p}[#])[0->0]
+Influence_map:Wake_up_map:rule(4):'a.c' A(x[.],c[.]),C(x1{p}[.],x2{u}[.])->A(x[.],c[1]),C(x1{p}[.],x2{u}[1]) -> rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.])[0->0];[1->1]
+Influence_map:Wake_up_map:rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.]) -> rule(4):'a.c' A(x[.],c[.]),C(x1{p}[.],x2{u}[.])->A(x[.],c[1]),C(x1{p}[.],x2{u}[1])[0->0]
+Influence_map:Wake_up_map:rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.]) -> var(6):'Cpp' C(x1{p}[#],x2{p}[#])[1->0]
+Influence_map:Inhibition_map:rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(4):'a.c' A(x[.],c[.]),C(x1{p}[.],x2{u}[.])->A(x[.],c[1]),C(x1{p}[.],x2{u}[1])[0->0]
+Influence_map:Inhibition_map:rule(0):'a.b' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.]) -> rule(2):'ab.c' A(x[_],c[.]),C(x1{u}[.])->A(x[_],c[2]),C(x1{u}[2])[0->0]
+Influence_map:Inhibition_map:rule(1):'a.b_op' A(x[1]),B(x[1])->A(x[.]),B(x[.]) -> var(3):'AB' A(x[B.x])[0->0]
+Influence_map:Inhibition_map:rule(3):'mod x1' C(x1{u}[1]),A(c[1])->C(x1{p}[.]),A(c[.]) -> var(4):'Cuu' C(x1{u}[#],x2{u}[#])[0->0]
+Influence_map:Inhibition_map:rule(5):'mod x2' A(x[.],c[1]),C(x1{p}[.],x2{u}[1])->A(x[.],c[.]),C(x1{p}[.],x2{p}[.]) -> var(5):'Cpu' C(x1{p}[#],x2{u}[#])[1->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -560,7 +560,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!free,c!free)
+		A( x[.] ,c[.] )
 
 	Views in initial state:
 
@@ -579,7 +579,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x!free)
+		B( x[.] )
 
 	Views in initial state:
 
@@ -628,7 +628,7 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x1~u,x2~u,x1!free,x2!free)
+		C( x1{u} ,x2{u} ,x1[.] ,x2[.] )
 
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
@@ -636,7 +636,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule a.b (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -663,10 +663,10 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!B@x,c!free)
+		A( x[B@x] ,c[.] )
 
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -683,7 +683,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x!A@x)
+		B( x[A@x] )
 
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
@@ -691,16 +691,16 @@ EXTENSIONAL DESCRIPTION:
 
 		rule a.b_op (File "abc.ka", line 10, characters 6-64:) is applied for the first time
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
 		rule ab.c (File "abc.ka", line 12, characters 7-71:) is applied for the first time
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
 Id=51
@@ -727,10 +727,10 @@ Id=51
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!B@x,c!C@x1)
+		A( x[B@x] ,c[C@x1] )
 
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
 Id=61
@@ -777,7 +777,7 @@ Id=61
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x1~u,x2~u,x1!A@c,x2!free)
+		C( x1{u} ,x2{u} ,x1[A@c] ,x2[.] )
 
 
 	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
@@ -785,7 +785,7 @@ EXTENSIONAL DESCRIPTION:
 
 		rule mod x1 (File "abc.ka", line 13, characters 9-64:) is applied for the first time
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -832,17 +832,17 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x1~p,x2~u,x1!free,x2!free)
+		C( x1{p} ,x2{u} ,x1[.] ,x2[.] )
 
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
 		rule a.c (File "abc.ka", line 14, characters 6-88:) is applied for the first time
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -869,10 +869,10 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!free,c!C@x2)
+		A( x[.] ,c[C@x2] )
 
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
 Id=41
@@ -919,7 +919,7 @@ Id=41
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x1~p,x2~u,x1!free,x2!A@c)
+		C( x1{p} ,x2{u} ,x1[.] ,x2[A@c] )
 
 
 	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
@@ -927,9 +927,9 @@ EXTENSIONAL DESCRIPTION:
 
 		rule mod x2 (File "abc.ka", line 15, characters 9-92:) is applied for the first time
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 INTENSIONAL DESCRIPTION:
 Id=90
@@ -976,13 +976,13 @@ Id=90
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x1~p,x2~p,x1!free,x2!free)
+		C( x1{p} ,x2{p} ,x1[.] ,x2[.] )
 
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
 Id=105
@@ -1009,22 +1009,22 @@ Id=105
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!B@x,c!C@x2)
+		A( x[B@x] ,c[C@x2] )
 
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 INTENSIONAL DESCRIPTION:
 Id=68
@@ -1051,52 +1051,52 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x!free,c!C@x1)
+		A( x[.] ,c[C@x1] )
 
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 
 	Applying rule mod x1 (File "abc.ka", line 13, characters 9-64:):
 		the precondition is satisfied
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
 	Applying rule a.c (File "abc.ka", line 14, characters 6-88:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 	Applying rule mod x2 (File "abc.ka", line 15, characters 9-92:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 	Applying rule a.b (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 
 	Applying rule ab.c (File "abc.ka", line 12, characters 7-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for C(x1~,x2~,x1!,x2!)
+		Updating the views for C(x1{},x2{},x1[],x2[])
 
 	Applying rule a.b_op (File "abc.ka", line 10, characters 6-64:):
 		the precondition is satisfied
 
-		Updating the views for A(x!,c!)
+		Updating the views for A(x[],c[])
 
-		Updating the views for B(x!)
+		Updating the views for B(x[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1356,13 +1356,13 @@ Id=111
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(c) v A(c!C.x1) v A(c!C.x2) ]
-A() => [ A(x) v A(x!B.x) ]
-B() => [ B(x) v B(x!A.x) ]
-C() => [ C(x2~u?) v C(x2~p?) ]
-C() => [ C(x1) v C(x1!A.c) ]
-C() => [ C(x2) v C(x2!A.c) ]
-C() => [ C(x1~u?) v C(x1~p?) ]
+A() => [ A(c[.]) v A(c[C.x1]) v A(c[C.x2]) ]
+A() => [ A(x[.]) v A(x[B.x]) ]
+B() => [ B(x[.]) v B(x[A.x]) ]
+C() => [ C(x2{u}[#]) v C(x2{p}[#]) ]
+C() => [ C(x1[.]) v C(x1[A.c]) ]
+C() => [ C(x2[.]) v C(x2[A.c]) ]
+C() => [ C(x1{u}[#]) v C(x1{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1519,11 +1519,11 @@ Id=197
 EXTENSIONAL DESCRIPTION:
 C() =>
    [
-	  C(x1~p,x2~u)
-	v C(x1~p,x2~u!A.c)
-	v C(x1~p,x2~p)
-	v C(x1~u!A.c,x2~u)
-	v C(x1~u,x2~u)
+	  C(x1{p}[.],x2{u}[.])
+	v C(x1{p}[.],x2{u}[A.c])
+	v C(x1{p}[.],x2{p}[.])
+	v C(x1{u}[A.c],x2{u}[.])
+	v C(x1{u}[.],x2{u}[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1790,37 +1790,37 @@ EXTENSIONAL DESCRIPTION:
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x1~u?)
-		v C(x1~p?)]
+		  C(x1{u}[#])
+		v C(x1{p}[#])]
 C()=> [
-		  C(x2)
-		v C(x2!A.c)]
+		  C(x2[.])
+		v C(x2[A.c])]
 C()=> [
-		  C(x1)
-		v C(x1!A.c)]
+		  C(x1[.])
+		v C(x1[A.c])]
 C()=> [
-		  C(x2~u?)
-		v C(x2~p?)]
+		  C(x2{u}[#])
+		v C(x2{p}[#])]
 B()=> [
-		  B(x)
-		v B(x!A.x)]
+		  B(x[.])
+		v B(x[A.x])]
 A()=> [
-		  A(x)
-		v A(x!B.x)]
+		  A(x[.])
+		v A(x[B.x])]
 A()=> [
-		  A(c)
-		v A(c!C.x1)
-		v A(c!C.x2)]
+		  A(c[.])
+		v A(c[C.x1])
+		v A(c[C.x2])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x1~p,x2~u)
-		v C(x1~p,x2~u!A.c)
-		v C(x1~p,x2~p)
-		v C(x1~u!A.c,x2~u)
-		v C(x1~u,x2~u)]
+		  C(x1{p}[.],x2{u}[.])
+		v C(x1{p}[.],x2{u}[A.c])
+		v C(x1{p}[.],x2{p}[.])
+		v C(x1{u}[A.c],x2{u}[.])
+		v C(x1{u}[.],x2{u}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

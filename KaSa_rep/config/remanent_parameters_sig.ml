@@ -30,12 +30,16 @@ type rate_convention =
   | Biochemist
   | Common
 
+type bound =
+  |  Bound_v3 of string
+  |  Bound_v4 of string
+
 type symbol_table =
   {
-   bound : string ;
+   bound : bound ;
    at : string ;
-   link_to_any : string ;
-   link_to_some : string ;
+   link_to_any : bound ;
+   link_to_some : bound ;
    agent_open : string ;
    agent_close : string ;
    site_sep_comma : string ;
@@ -45,7 +49,7 @@ type symbol_table =
    agent_sep_plus : string ;
    ghost_agent : string ;
    show_ghost : bool ;
-   internal : string ;
+   internal : bound ;
    uni_arrow : string ;
    rev_arrow : string ;
    bi_arrow : string ;
@@ -150,7 +154,7 @@ type marshalisable_parameters =
    reachability_map_output : reachability_map_output;
    influence_map_accuracy_level: accuracy_level ;
    contact_map_accuracy_level: accuracy_level ;
-   scc_accuracy_level: accuracy_level ; 
+   scc_accuracy_level: accuracy_level ;
    view_accuracy_level: accuracy_level ;
    kasa_state : Remanent_state_signature.engine_state ;
    launching_date: Unix.tm ;

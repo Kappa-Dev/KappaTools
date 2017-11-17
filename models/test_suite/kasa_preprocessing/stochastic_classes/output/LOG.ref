@@ -409,11 +409,11 @@ Quarks:site_modif-:agent_type:5,site_type:0,state:0,rule:6->[0]
 Quarks:site_modif-:agent_type:5,site_type:1,state:0,rule:7->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Inhibition_map:rule(4):'r4' E(x~u,y~u)->. -> rule(5):'r5' E(y~p),E(z~p)->.,.[0->1]
-Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)->.,. -> rule(4):'r4' E(x~u,y~u)->.[1->0]
-Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)->.,. -> rule(5):'r5' E(y~p),E(z~p)->.,.[0->1];[1->0]
-Influence_map:Inhibition_map:rule(6):'r6' F(x~u)->. -> rule(7):'r7' F(y~p)->.[0->0]
-Influence_map:Inhibition_map:rule(7):'r7' F(y~p)->. -> rule(6):'r6' F(x~u)->.[0->0]
+Influence_map:Inhibition_map:rule(4):'r4' E(x{u}[.],y{u}[.])->. -> rule(5):'r5' E(y{p}[.]),E(z{p}[.])->.,.[0->1]
+Influence_map:Inhibition_map:rule(5):'r5' E(y{p}[.]),E(z{p}[.])->.,. -> rule(4):'r4' E(x{u}[.],y{u}[.])->.[1->0]
+Influence_map:Inhibition_map:rule(5):'r5' E(y{p}[.]),E(z{p}[.])->.,. -> rule(5):'r5' E(y{p}[.]),E(z{p}[.])->.,.[0->1];[1->0]
+Influence_map:Inhibition_map:rule(6):'r6' F(x{u}[.])->. -> rule(7):'r7' F(y{p}[.])->.[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' F(y{p}[.])->. -> rule(6):'r6' F(x{u}[.])->.[0->0]
 Reachability analysis...
 
 	Applying rule r1 (File "stochastic_create.ka", line 8, characters 5-38:):
@@ -437,7 +437,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(y~u)
+		B( y{u} )
 
 	Dealing with creation
 
@@ -456,7 +456,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u)
+		B( x{u} )
 
 
 	Applying rule r3 (File "stochastic_create.ka", line 10, characters 5-32:):
@@ -480,7 +480,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(y~u)
+		D( y{u} )
 
 	Dealing with creation
 
@@ -499,7 +499,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~u)
+		D( x{u} )
 
 
 	Applying rule r6 (File "stochastic_create.ka", line 13, characters 5-24:):
@@ -671,10 +671,10 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B() => B(y~u)
-B() => B(x~u)
-D() => D(y~u)
-D() => D(x~u)
+B() => B(y{u}[.])
+B() => B(x{u}[.])
+D() => D(y{u}[.])
+D() => D(x{u}[.])
 
 ------------------------------------------------------------
 * Relational properties:
@@ -868,10 +868,10 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D()=> [D(x~u)]
-D()=> [D(y~u)]
-B()=> [B(x~u)]
-B()=> [B(y~u)]
+D()=> [D(x{u}[.])]
+D()=> [D(y{u}[.])]
+B()=> [B(x{u}[.])]
+B()=> [B(y{u}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

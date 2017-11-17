@@ -88,12 +88,27 @@ let get_syntax_version () =
 
 let get_symbols () =
   {
-    Remanent_parameters_sig.bound = "!" ;
+    Remanent_parameters_sig.bound =
+    begin
+      match get_syntax_version () with
+      | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "["
+      | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "!"
+    end;
     Remanent_parameters_sig.at = "@" ;
-    Remanent_parameters_sig.link_to_any = "?" ;
-    Remanent_parameters_sig.link_to_some = "!_" ;
+    Remanent_parameters_sig.link_to_any =
+      begin
+        match get_syntax_version () with
+        | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "[#"
+        | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "?"
+      end;
+    Remanent_parameters_sig.link_to_some =
+      begin
+        match get_syntax_version () with
+        | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "[_]"
+        | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "!_"
+      end;
     Remanent_parameters_sig.agent_open = "(" ;
-    Remanent_parameters_sig.agent_close = ")" ;
+    Remanent_parameters_sig.agent_close =  ")" ;
     Remanent_parameters_sig.agent_sep_comma = "," ;
     Remanent_parameters_sig.agent_sep_plus = "+" ;
     Remanent_parameters_sig.agent_sep_dot = "." ;
@@ -106,7 +121,12 @@ let get_symbols () =
         | Ast.V4 -> true
         | Ast.V3 -> false
       end ;
-    Remanent_parameters_sig.internal = "~" ;
+    Remanent_parameters_sig.internal =
+      begin
+      match get_syntax_version () with
+      | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "{"
+      | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "~"
+      end;
     Remanent_parameters_sig.uni_arrow = "->" ;
     Remanent_parameters_sig.rev_arrow = "<-" ;
     Remanent_parameters_sig.bi_arrow = "<->" ;
@@ -367,7 +387,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         Remanent_parameters_sig.do_reachability_analysis =
           !Config.do_reachability_analysis ;
 
-        (**)
+        (*GET SYMBOLS*)
         Remanent_parameters_sig.file = !Config.file ;
         Remanent_parameters_sig.symbols = get_symbols () ;
         Remanent_parameters_sig.influence_map_output = get_influence_map () ;

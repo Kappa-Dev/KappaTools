@@ -6,25 +6,25 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),." [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),." [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." [shape="box" fillcolor="#87ceeb" style=filled];
 
 "qb" [shape="ellipse" fillcolor="#98fb98" style=filled];
 "qc" [shape="ellipse" fillcolor="#98fb98" style=filled];
-"0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" -> "1:A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),." [label="[3->3]" color="green"];
-"0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" -> "qc" [label="[3->0]" color="green"];
-"1:A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),." -> "0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" [label="[1->1];[1->2];[2->1];[2->2]" color="green"];
-"1:A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),." -> "qb" [label="[1->0];[2->0]" color="green"];
-"2:A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)" -> "3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." [label="[2->2];[2->3];[3->2];[3->3]" color="green"];
-"2:A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)" -> "qb" [label="[2->0];[3->0]" color="green"];
-"3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." -> "2:A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)" [label="[1->1]" color="green"];
-"3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." -> "qc" [label="[1->0]" color="green"];
-"0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" -> "0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" [label="[1->2];[2->1]" color="red" arrowhead="tee"];
-"0:A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)" -> "qb" [label="[1->0];[2->0]" color="red" arrowhead="tee"];
-"1:A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),." -> "qc" [label="[3->0]" color="red" arrowhead="tee"];
-"2:A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)" -> "qc" [label="[1->0]" color="red" arrowhead="tee"];
-"3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." -> "3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." [label="[2->3];[3->2]" color="red" arrowhead="tee"];
-"3:A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,." -> "qb" [label="[2->0];[3->0]" color="red" arrowhead="tee"];
+"0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" -> "1:A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),." [label="[3->3]" color="green"];
+"0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" -> "qc" [label="[3->0]" color="green"];
+"1:A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),." -> "0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" [label="[1->1];[1->2];[2->1];[2->2]" color="green"];
+"1:A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),." -> "qb" [label="[1->0];[2->0]" color="green"];
+"2:A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])" -> "3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." [label="[2->2];[2->3];[3->2];[3->3]" color="green"];
+"2:A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])" -> "qb" [label="[2->0];[3->0]" color="green"];
+"3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." -> "2:A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])" [label="[1->1]" color="green"];
+"3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." -> "qc" [label="[1->0]" color="green"];
+"0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" -> "0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" [label="[1->2];[2->1]" color="red" arrowhead="tee"];
+"0:A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])" -> "qb" [label="[1->0];[2->0]" color="red" arrowhead="tee"];
+"1:A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),." -> "qc" [label="[3->0]" color="red" arrowhead="tee"];
+"2:A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])" -> "qc" [label="[1->0]" color="red" arrowhead="tee"];
+"3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." -> "3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." [label="[2->3];[3->2]" color="red" arrowhead="tee"];
+"3:A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,." -> "qb" [label="[2->0];[3->0]" color="red" arrowhead="tee"];
 }

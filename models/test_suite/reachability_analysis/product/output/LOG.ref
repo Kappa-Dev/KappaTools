@@ -643,7 +643,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~u,z!free,t!free)
+		A( z~u ,z!free ,t!free )
 
 
 	Applying rule r0 (File "product.ka", line 7, characters 4-62:):
@@ -694,7 +694,7 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~p,z!free,t!free)
+		A( z~p ,z!free ,t!free )
 
 
 	Applying rule r3 (File "product.ka", line 10, characters 4-29:):
@@ -746,7 +746,7 @@ Id=40
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~u,z!A@z,t!free)
+		A( z~u ,z!A@z ,t!free )
 
 
 		Updating the views for A(z~,z!,t!)
@@ -793,7 +793,7 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~u,z!free,t!A@t)
+		A( z~u ,z!free ,t!A@t )
 
 
 		Updating the views for A(z~,z!,t!)
@@ -840,7 +840,7 @@ Id=52
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~p,z!A@z,t!free)
+		A( z~p ,z!A@z ,t!free )
 
 
 		Updating the views for A(z~,z!,t!)
@@ -887,7 +887,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(z~p,z!free,t!A@t)
+		A( z~p ,z!free ,t!A@t )
 
 
 		Updating the views for A(z~,z!,t!)

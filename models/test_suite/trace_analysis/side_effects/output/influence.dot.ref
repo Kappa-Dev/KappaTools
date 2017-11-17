@@ -7,10 +7,10 @@
 #
 digraph G{
 "0:C()->." [shape="box" fillcolor="#87ceeb" style=filled];
-"1:B(x,y)->B(x!1,y!1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x!_,z~u,y!_)->A(x!_,z~p,y!_)" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:C(a,b~u)->C(a,b~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:C()->." -> "1:B(x,y)->B(x!1,y!1)" [label="[0*->0]" color="green"];
-"0:C()->." -> "2:A(x!_,z~u,y!_)->A(x!_,z~p,y!_)" [label="[0*->0]" color="red" arrowhead="tee"];
-"0:C()->." -> "3:C(a,b~u)->C(a,b~p)" [label="[0->0]" color="red" arrowhead="tee"];
+"1:B(x[.],y[.])->B(x[1],y[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x[_],z{u}[.],y[_])->A(x[_],z{p}[.],y[_])" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:C(a[.],b{u}[.])->C(a[.],b{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:C()->." -> "1:B(x[.],y[.])->B(x[1],y[1])" [label="[0*->0]" color="green"];
+"0:C()->." -> "2:A(x[_],z{u}[.],y[_])->A(x[_],z{p}[.],y[_])" [label="[0*->0]" color="red" arrowhead="tee"];
+"0:C()->." -> "3:C(a[.],b{u}[.])->C(a[.],b{p}[.])" [label="[0->0]" color="red" arrowhead="tee"];
 }

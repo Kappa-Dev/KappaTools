@@ -316,7 +316,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,y~u,z~u)
+		A( x~u ,y~u ,z~u )
 
 
 	Applying rule A(x{u}) -> A(x{p}) (File "relations.ka", line 2, characters 0-17:):
@@ -361,7 +361,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~u,z~u)
+		A( x~p ,y~u ,z~u )
 
 
 	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "relations.ka", line 3, characters 0-27:):
@@ -406,7 +406,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,y~p,z~u)
+		A( x~p ,y~p ,z~u )
 
 
 	Applying rule A(x{p} y{p} z{u}) -> A(x{0} y{p} z{q}) (File "relations.ka", line 4, characters 0-35:):
@@ -451,7 +451,7 @@ Id=44
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~0,y~p,z~q)
+		A( x~0 ,y~p ,z~q )
 
 
 	Applying rule A(x{u}) -> A(x{q}) (File "relations.ka", line 5, characters 0-17:):
@@ -496,7 +496,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~q,y~u,z~u)
+		A( x~q ,y~u ,z~u )
 
 
 	Applying rule A(x{q} y{u}) -> A(x{q} y{q}) (File "relations.ka", line 6, characters 0-25:):
@@ -541,7 +541,7 @@ Id=55
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~q,y~q,z~u)
+		A( x~q ,y~q ,z~u )
 
 
 	Applying rule A(y{q} z{u}) -> A(y{q} z{q}) (File "relations.ka", line 7, characters 0-27:):
@@ -586,7 +586,7 @@ Id=66
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~q,y~q,z~q)
+		A( x~q ,y~q ,z~q )
 
 
 	Applying rule  -> A(x{u} y{u} z{u}) (File "relations.ka", line 1, characters 0-20:):

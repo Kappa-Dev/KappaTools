@@ -195,7 +195,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(z!free,t!free)
+		C( z!free ,t!free )
 
 
 	Applying rule r3 (File "crash.ka", line 4, characters 4-52:):
@@ -230,7 +230,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(z!C@z,t!C@z)
+		C( z!C@z ,t!C@z )
 
 
 		Updating the views for C(z!,t!)
@@ -263,8 +263,8 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(z!C@t,t!free)
-		C(z!C@z,t!free)
+		C( z!C@t ,t!free )
+		C( z!C@z ,t!free )
 
 	Dealing with side effects
 
@@ -293,7 +293,7 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(z!free,t!C@z)
+		C( z!free ,t!C@z )
 
 
 	Applying rule r3 (File "crash.ka", line 4, characters 4-52:):

@@ -6,20 +6,20 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2]" color="green"];
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2];[0->0]" color="green"];
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2]" color="green"];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2]" color="green"];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2]" color="green"];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0*->2]" color="green"];
-"2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0]" color="green"];
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[2->2]" color="red" arrowhead="tee"];
-"0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[0->0];[2->2]" color="red" arrowhead="tee"];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[2->2]" color="red" arrowhead="tee"];
-"1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[2->2]" color="red" arrowhead="tee"];
-"2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "0:A(x!1,y?),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[2->2]" color="red" arrowhead="tee"];
-"2:A(x!1,y),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" -> "1:A(x!1,y!_),B(x!1),C(y)->A(x!1,y!2),B(x!1),C(y!2)" [label="[2->2]" color="red" arrowhead="tee"];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2]" color="green"];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2];[0->0]" color="green"];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2]" color="green"];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2]" color="green"];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2]" color="green"];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0*->2]" color="green"];
+"2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0->0]" color="green"];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[2->2]" color="red" arrowhead="tee"];
+"0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[0->0];[2->2]" color="red" arrowhead="tee"];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[2->2]" color="red" arrowhead="tee"];
+"1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[2->2]" color="red" arrowhead="tee"];
+"2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "0:A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[2->2]" color="red" arrowhead="tee"];
+"2:A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" -> "1:A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])" [label="[2->2]" color="red" arrowhead="tee"];
 }

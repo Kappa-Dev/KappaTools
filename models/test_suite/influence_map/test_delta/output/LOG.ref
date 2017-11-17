@@ -315,20 +315,20 @@ Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:1->[3]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:2->[1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),.[3->3]
-Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> var(1):'qc' C()[3->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)[1->1];[1->2];[2->1];[2->2]
-Influence_map:Wake_up_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> var(0):'qb' B()[1->0];[2->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,.[2->2];[2->3];[3->2];[3->3]
-Influence_map:Wake_up_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> var(0):'qb' B()[2->0];[3->0]
-Influence_map:Wake_up_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)[1->1]
-Influence_map:Wake_up_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> var(1):'qc' C()[1->0]
-Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)[1->2];[2->1]
-Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> var(0):'qb' B()[1->0];[2->0]
-Influence_map:Inhibition_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> var(1):'qc' C()[3->0]
-Influence_map:Inhibition_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> var(1):'qc' C()[1->0]
-Influence_map:Inhibition_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,.[2->3];[3->2]
-Influence_map:Inhibition_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> var(0):'qb' B()[2->0];[3->0]
+Influence_map:Wake_up_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.[3->3]
+Influence_map:Wake_up_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> var(1):'qc' C()[3->0]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])[1->1];[1->2];[2->1];[2->2]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> var(0):'qb' B()[1->0];[2->0]
+Influence_map:Wake_up_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,.[2->2];[2->3];[3->2];[3->3]
+Influence_map:Wake_up_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> var(0):'qb' B()[2->0];[3->0]
+Influence_map:Wake_up_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])[1->1]
+Influence_map:Wake_up_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> var(1):'qc' C()[1->0]
+Influence_map:Inhibition_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])[1->2];[2->1]
+Influence_map:Inhibition_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> var(0):'qb' B()[1->0];[2->0]
+Influence_map:Inhibition_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> var(1):'qc' C()[3->0]
+Influence_map:Inhibition_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> var(1):'qc' C()[1->0]
+Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,.[2->3];[3->2]
+Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> var(0):'qb' B()[2->0];[3->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -347,7 +347,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A(x~u)
+		Influence_map:A( x{u} )
 
 	Views in initial state:
 
@@ -366,7 +366,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:A(x~p)
+		Influence_map:A( x{p} )
 
 	Views in initial state:
 
@@ -385,7 +385,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:B(x~u)
+		Influence_map:B( x{u} )
 
 	Views in initial state:
 
@@ -404,7 +404,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:B(x~p)
+		Influence_map:B( x{p} )
 
 	Views in initial state:
 
@@ -423,7 +423,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:C(x~u)
+		Influence_map:C( x{u} )
 
 	Views in initial state:
 
@@ -442,7 +442,7 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 Influence_map:EXTENSIONAL DESCRIPTION:
-		Influence_map:C(x~p)
+		Influence_map:C( x{p} )
 
 
 	Applying rule A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., ., C(x{u}[.]) (File "test_delta.ka", line 1, characters 0-70:):
@@ -450,40 +450,40 @@ Influence_map:EXTENSIONAL DESCRIPTION:
 
 		rule A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . -> A(x{u}[.]), ., ., C(x{u}[.]) (File "test_delta.ka", line 1, characters 0-70:) is applied for the first time
 
-		Influence_map:Updating the views for A(x~)
+		Influence_map:Updating the views for A(x{})
 
-		Influence_map:Updating the views for B(x~)
+		Influence_map:Updating the views for B(x{})
 
-		Influence_map:Updating the views for B(x~)
+		Influence_map:Updating the views for B(x{})
 
 	Applying rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), ., ., C(x{u}[.]) -> A(x{u}[.]), B(x{p}[.]), B(x{p}[.]), . (File "test_delta.ka", line 1, characters 0-70:) is applied for the first time
 
-		Influence_map:Updating the views for A(x~)
+		Influence_map:Updating the views for A(x{})
 
-		Influence_map:Updating the views for C(x~)
+		Influence_map:Updating the views for C(x{})
 
 	Applying rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), C(x{p}[.]), ., . -> A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) (File "test_delta.ka", line 2, characters 0-70:) is applied for the first time
 
-		Influence_map:Updating the views for A(x~)
+		Influence_map:Updating the views for A(x{})
 
-		Influence_map:Updating the views for C(x~)
+		Influence_map:Updating the views for C(x{})
 
 	Applying rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:):
 		the precondition is satisfied
 
 		rule A(x{u}[.]), ., B(x{u}[.]), B(x{u}[.]) -> A(x{u}[.]), C(x{p}[.]), ., . (File "test_delta.ka", line 2, characters 0-70:) is applied for the first time
 
-		Influence_map:Updating the views for A(x~)
+		Influence_map:Updating the views for A(x{})
 
-		Influence_map:Updating the views for B(x~)
+		Influence_map:Updating the views for B(x{})
 
-		Influence_map:Updating the views for B(x~)
+		Influence_map:Updating the views for B(x{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -583,9 +583,9 @@ Influence_map:    Id=0
 Influence_map:     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x~u) v A(x~p) ]
-B() => [ B(x~u) v B(x~p) ]
-C() => [ C(x~u) v C(x~p) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+B() => [ B(x{u}[.]) v B(x{p}[.]) ]
+C() => [ C(x{u}[.]) v C(x{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -2241,32 +2241,32 @@ Influence_map:agent_id_2:agent_type_1:site_type_0->state:[state_min:0;state_max:
 Influence_map:agent_id_3:
 Influence_map:agent_id_3:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),.[3->3]
-Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> var(1):'qc' C()[3->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)[1->1];[1->2];[2->1];[2->2]
-Influence_map:Wake_up_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> var(0):'qb' B()[1->0];[2->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,.[2->2];[2->3];[3->2];[3->3]
-Influence_map:Wake_up_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> var(0):'qb' B()[2->0];[3->0]
-Influence_map:Wake_up_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u)[1->1]
-Influence_map:Wake_up_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> var(1):'qc' C()[1->0]
-Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u)[1->2];[2->1]
-Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p),B(x~p),.->A(x~u),.,.,C(x~u) -> var(0):'qb' B()[1->0];[2->0]
-Influence_map:Inhibition_map:rule(1):'' A(x~u),.,.,C(x~u)->A(x~u),B(x~p),B(x~p),. -> var(1):'qc' C()[3->0]
-Influence_map:Inhibition_map:rule(2):'' A(x~u),C(x~p),.,.->A(x~u),.,B(x~u),B(x~u) -> var(1):'qc' C()[1->0]
-Influence_map:Inhibition_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,.[2->3];[3->2]
-Influence_map:Inhibition_map:rule(3):'' A(x~u),.,B(x~u),B(x~u)->A(x~u),C(x~p),.,. -> var(0):'qb' B()[2->0];[3->0]
+Influence_map:Wake_up_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.[3->3]
+Influence_map:Wake_up_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> var(1):'qc' C()[3->0]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])[1->1];[1->2];[2->1];[2->2]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> var(0):'qb' B()[1->0];[2->0]
+Influence_map:Wake_up_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,.[2->2];[2->3];[3->2];[3->3]
+Influence_map:Wake_up_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> var(0):'qb' B()[2->0];[3->0]
+Influence_map:Wake_up_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])[1->1]
+Influence_map:Wake_up_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> var(1):'qc' C()[1->0]
+Influence_map:Inhibition_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.])[1->2];[2->1]
+Influence_map:Inhibition_map:rule(0):'' A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),.->A(x{u}[.]),.,.,C(x{u}[.]) -> var(0):'qb' B()[1->0];[2->0]
+Influence_map:Inhibition_map:rule(1):'' A(x{u}[.]),.,.,C(x{u}[.])->A(x{u}[.]),B(x{p}[.]),B(x{p}[.]),. -> var(1):'qc' C()[3->0]
+Influence_map:Inhibition_map:rule(2):'' A(x{u}[.]),C(x{p}[.]),.,.->A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.]) -> var(1):'qc' C()[1->0]
+Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,.[2->3];[3->2]
+Influence_map:Inhibition_map:rule(3):'' A(x{u}[.]),.,B(x{u}[.]),B(x{u}[.])->A(x{u}[.]),C(x{p}[.]),.,. -> var(0):'qb' B()[2->0];[3->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 C()=> [
-		  C(x~u)
-		v C(x~p)]
+		  C(x{u}[.])
+		v C(x{p}[.])]
 B()=> [
-		  B(x~u)
-		v B(x~p)]
+		  B(x{u}[.])
+		v B(x{p}[.])]
 A()=> [
-		  A(x~u)
-		v A(x~p)]
+		  A(x{u}[.])
+		v A(x{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
@@ -2281,9 +2281,9 @@ A()=> [
 ------------------------------------------------------------
 
 Some exceptions have been raised
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 404; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
 error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 404; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
 error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 404; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
 error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit

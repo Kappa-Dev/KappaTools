@@ -138,13 +138,13 @@ Quarks:site_modif-:agent_type:0,site_type:0,state:2,rule:2->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:2,rule:3->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
-Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
-Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
-Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
-Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
+Influence_map:Wake_up_map:rule(0):'veryveryveryveryverylonglonglonglabel' A(x{u}[.])->A(x{p}[.]) -> rule(1):'otherotherveryveryveryverylonglabel' A(x{p}[.])->A(x{q}[.])[0->0]
+Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x{p}[.])->A(x{q}[.]) -> rule(2):'"0' A(x{q}[.])->A(x{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x{p}[.])->A(x{q}[.]) -> rule(3):'\0' A(x{q}[.])->A(x{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(2):'"0' A(x{q}[.])->A(x{u}[.]) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x{u}[.])->A(x{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(3):'\0' A(x{q}[.])->A(x{p}[.]) -> rule(1):'otherotherveryveryveryverylonglabel' A(x{p}[.])->A(x{q}[.])[0->0]
+Influence_map:Inhibition_map:rule(2):'"0' A(x{q}[.])->A(x{u}[.]) -> rule(3):'\0' A(x{q}[.])->A(x{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(3):'\0' A(x{q}[.])->A(x{p}[.]) -> rule(2):'"0' A(x{q}[.])->A(x{u}[.])[0->0]
 Reachability analysis...
 
 ------------------------------------------------------------

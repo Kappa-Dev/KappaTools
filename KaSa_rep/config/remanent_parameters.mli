@@ -56,10 +56,10 @@ val get_scc_accuracy_level: Remanent_parameters_sig.parameters -> Remanent_param
 
 (** Kappa pretty-printing *)
 val get_btype_sep_symbol: Remanent_parameters_sig.parameters -> string
-val get_bound_symbol: Remanent_parameters_sig.parameters -> string
+val get_bound_symbol: Remanent_parameters_sig.parameters -> (*string*) Remanent_parameters_sig.bound
 val get_at_symbol: Remanent_parameters_sig.parameters -> string
-val get_link_to_any_symbol: Remanent_parameters_sig.parameters -> string
-val get_link_to_some_symbol: Remanent_parameters_sig.parameters -> string
+val get_link_to_any_symbol: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.bound
+val get_link_to_some_symbol: Remanent_parameters_sig.parameters -> (*string*) Remanent_parameters_sig.bound
 val get_agent_open_symbol: Remanent_parameters_sig.parameters -> string
 val get_agent_close_symbol: Remanent_parameters_sig.parameters -> string
 val get_agent_sep_comma_symbol: Remanent_parameters_sig.parameters -> string
@@ -68,7 +68,7 @@ val get_agent_sep_dot_symbol: Remanent_parameters_sig.parameters -> string
 val get_site_sep_comma_symbol: Remanent_parameters_sig.parameters -> string
 val get_ghost_agent_symbol: Remanent_parameters_sig.parameters -> string
 val get_do_we_show_ghost: Remanent_parameters_sig.parameters -> bool
-val get_internal_symbol: Remanent_parameters_sig.parameters -> string
+val get_internal_symbol: Remanent_parameters_sig.parameters -> Remanent_parameters_sig.bound
 val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
 

@@ -6,6 +6,6 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x),A(y)->A(x!1),A(y!1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:B(x),B(y)->B(x!1),B(y!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x[.]),A(y[.])->A(x[1]),A(y[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:B(x[.]),B(y[.])->B(x[1]),B(y[1])" [shape="box" fillcolor="#87ceeb" style=filled];
 }

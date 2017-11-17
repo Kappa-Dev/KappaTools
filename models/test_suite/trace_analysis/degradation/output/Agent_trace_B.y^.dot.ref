@@ -1,7 +1,7 @@
 digraph G{
 "Init_12" [label="" style="invis" width="0px" height="0px"];
 "Final_12" [label="" style="invis" width="0px" height="0px"];
-"Node_12" [label="B(y!A@x)"];
+"Node_12" [label="B(y[A@x])"];
 "Init_12" -> "Node_12" [label=""];
 "Node_12" -> "Final_12" [label="0"];
 }

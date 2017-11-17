@@ -628,9 +628,9 @@ Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u) -> rule(7):'r7' A(x),B(x~p),C(x~
 Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u) -> rule(9):'r9' C()->[0->0]
 Influence_map:Wake_up_map:rule(3):'r3' ->D(x~u) -> rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1)[0->0]
 Influence_map:Wake_up_map:rule(4):'r4' ->E(x~u) -> rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1)[0->1]
-Influence_map:Wake_up_map:rule(5):'r5' A(x!x.B)-> -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->1]
-Influence_map:Wake_up_map:rule(5):'r5' A(x!x.B)-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->1]
-Influence_map:Wake_up_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(5):'r5' A(x!x.B)->[0->0]
+Influence_map:Wake_up_map:rule(5):'r5' A(x!B.x)-> -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(5):'r5' A(x!B.x)-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(5):'r5' A(x!B.x)->[0->0]
 Influence_map:Wake_up_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0->1];[2->0]
 Influence_map:Wake_up_map:rule(9):'r9' C()-> -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->0]
 Influence_map:Wake_up_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->0]
@@ -673,7 +673,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,x!free)
+		A( x~u ,x!free )
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
@@ -707,7 +707,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,x!free)
+		B( x~u ,x!free )
 
 
 	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
@@ -741,7 +741,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x~u,x!free)
+		C( x~u ,x!free )
 
 
 	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
@@ -775,7 +775,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~u,x!free)
+		D( x~u ,x!free )
 
 
 	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
@@ -809,7 +809,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(x~u,x!free)
+		E( x~u ,x!free )
 
 
 	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
@@ -847,7 +847,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,x!B@x)
+		A( x~u ,x!B@x )
 
 
 		Updating the views for B(x~,x!)
@@ -877,7 +877,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~p,x!A@x)
+		B( x~p ,x!A@x )
 
 
 	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
@@ -918,7 +918,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~p,x!E@x)
+		D( x~p ,x!E@x )
 
 
 		Updating the views for E(x~,x!)
@@ -948,7 +948,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(x~p,x!D@x)
+		E( x~p ,x!D@x )
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
@@ -983,7 +983,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~p,x!free)
+		D( x~p ,x!free )
 
 	Dealing with side effects
 
@@ -1012,7 +1012,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E(x~p,x!free)
+		E( x~p ,x!free )
 
 
 	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
@@ -1068,7 +1068,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~p,x!free)
+		B( x~p ,x!free )
 
 
 	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
@@ -1117,7 +1117,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,x!C@x)
+		A( x~u ,x!C@x )
 
 
 		Updating the views for B(x~,x!)
@@ -1149,7 +1149,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C(x~p,x!A@x)
+		C( x~p ,x!A@x )
 
 
 	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
@@ -1186,7 +1186,7 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,x!C@x)
+		A( x~p ,x!C@x )
 
 
 	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
@@ -1232,7 +1232,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,x!free)
+		A( x~p ,x!free )
 
 
 	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
@@ -1292,7 +1292,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,x!B@x)
+		A( x~p ,x!B@x )
 
 
 		Updating the views for B(x~,x!)

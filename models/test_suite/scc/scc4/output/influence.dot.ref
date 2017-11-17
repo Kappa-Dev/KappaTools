@@ -6,7 +6,7 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:R(x),R(x)->R(x!1),R(x!1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:R(y),R(z)->R(y!1),R(z!1)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:R(x),R(x)->R(x!1),R(x!1)" -> "0:R(x),R(x)->R(x!1),R(x!1)" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
+"0:R(x[.]),R(x[.])->R(x[1]),R(x[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:R(y[.]),R(z[.])->R(y[1]),R(z[1])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:R(x[.]),R(x[.])->R(x[1]),R(x[1])" -> "0:R(x[.]),R(x[.])->R(x[1]),R(x[1])" [label="[0->1];[1->0]" color="red" arrowhead="tee"];
 }

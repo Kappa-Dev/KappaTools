@@ -505,7 +505,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,z!free,t!free)
+		A( x~u ,z!free ,t!free )
 
 	Views in initial state:
 
@@ -544,7 +544,7 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,z!free,t!free)
+		B( x~u ,z!free ,t!free )
 
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 4-24:):
@@ -589,7 +589,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,z!free,t!free)
+		A( x~p ,z!free ,t!free )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 4-58:):
@@ -637,8 +637,8 @@ Id=28
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,z!free,t!B@t)
-		A(x~u,z!free,t!B@t)
+		A( x~p ,z!free ,t!B@t )
+		A( x~u ,z!free ,t!B@t )
 
 
 		Updating the views for B(x~,z!,t!)
@@ -678,7 +678,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,z!free,t!A@t)
+		B( x~u ,z!free ,t!A@t )
 
 
 	Applying rule r4 (File "parallel_bonds.ka", line 11, characters 4-50:):
@@ -723,8 +723,8 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,z!B@z,t!B@t)
-		A(x~u,z!B@z,t!B@t)
+		A( x~p ,z!B@z ,t!B@t )
+		A( x~u ,z!B@z ,t!B@t )
 
 
 		Updating the views for B(x~,z!,t!)
@@ -764,7 +764,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,z!A@z,t!A@t)
+		B( x~u ,z!A@z ,t!A@t )
 
 
 	Applying rule r5 (File "parallel_bonds.ka", line 12, characters 4-50:):
@@ -834,9 +834,9 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~p,z!free,t!A@t)
-		B(x~p,z!free,t!free)
-		B(x~p,z!A@z,t!A@t)
+		B( x~p ,z!free ,t!A@t )
+		B( x~p ,z!free ,t!free )
+		B( x~p ,z!A@z ,t!A@t )
 
 
 	Applying rule r7 (File "parallel_bonds.ka", line 14, characters 4-24:):
@@ -893,7 +893,7 @@ Id=78
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~p,z!B@z,t!free)
+		A( x~p ,z!B@z ,t!free )
 
 
 		Updating the views for B(x~,z!,t!)
@@ -933,7 +933,7 @@ Id=78
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~p,z!A@z,t!free)
+		B( x~p ,z!A@z ,t!free )
 
 
 	Applying rule r3 (File "parallel_bonds.ka", line 10, characters 4-34:):
@@ -1004,7 +1004,7 @@ Id=104
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A(x~u,z!B@z,t!free)
+		A( x~u ,z!B@z ,t!free )
 
 
 	Applying rule r2 (File "parallel_bonds.ka", line 9, characters 4-58:):
@@ -1054,7 +1054,7 @@ Id=104
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B(x~u,z!A@z,t!free)
+		B( x~u ,z!A@z ,t!free )
 
 
 	Applying rule r0 (File "parallel_bonds.ka", line 7, characters 4-24:):

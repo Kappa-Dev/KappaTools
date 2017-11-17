@@ -6,20 +6,20 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x~u,y~u)->A(x~p,y~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"1:A(x~u,y~u)->A(x~u,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"2:A(x~u,y~p)->A(x~p,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"3:A(x~p,y~u)->A(x~p,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"4:A(w~u,t~u)->A(w~p,t~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"5:A(w~u,t~u)->A(w~u,t~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"6:A(w~u,t~p)->A(w~p,t~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"7:A(w~p,t~u)->A(w~p,t~p)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:A(x~u,y~u)->A(x~p,y~u)" -> "3:A(x~p,y~u)->A(x~p,y~p)" [label="[0->0]" color="green"];
-"1:A(x~u,y~u)->A(x~u,y~p)" -> "2:A(x~u,y~p)->A(x~p,y~p)" [label="[0->0]" color="green"];
-"4:A(w~u,t~u)->A(w~p,t~u)" -> "7:A(w~p,t~u)->A(w~p,t~p)" [label="[0->0]" color="green"];
-"5:A(w~u,t~u)->A(w~u,t~p)" -> "6:A(w~u,t~p)->A(w~p,t~p)" [label="[0->0]" color="green"];
-"0:A(x~u,y~u)->A(x~p,y~u)" -> "1:A(x~u,y~u)->A(x~u,y~p)" [label="[0->0]" color="red" arrowhead="tee"];
-"1:A(x~u,y~u)->A(x~u,y~p)" -> "0:A(x~u,y~u)->A(x~p,y~u)" [label="[0->0]" color="red" arrowhead="tee"];
-"4:A(w~u,t~u)->A(w~p,t~u)" -> "5:A(w~u,t~u)->A(w~u,t~p)" [label="[0->0]" color="red" arrowhead="tee"];
-"5:A(w~u,t~u)->A(w~u,t~p)" -> "4:A(w~u,t~u)->A(w~p,t~u)" [label="[0->0]" color="red" arrowhead="tee"];
+"0:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x{u}[.],y{p}[.])->A(x{p}[.],y{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:A(w{u}[.],t{u}[.])->A(w{p}[.],t{u}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"5:A(w{u}[.],t{u}[.])->A(w{u}[.],t{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"6:A(w{u}[.],t{p}[.])->A(w{p}[.],t{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"7:A(w{p}[.],t{u}[.])->A(w{p}[.],t{p}[.])" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" -> "3:A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])" [label="[0->0]" color="green"];
+"1:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" -> "2:A(x{u}[.],y{p}[.])->A(x{p}[.],y{p}[.])" [label="[0->0]" color="green"];
+"4:A(w{u}[.],t{u}[.])->A(w{p}[.],t{u}[.])" -> "7:A(w{p}[.],t{u}[.])->A(w{p}[.],t{p}[.])" [label="[0->0]" color="green"];
+"5:A(w{u}[.],t{u}[.])->A(w{u}[.],t{p}[.])" -> "6:A(w{u}[.],t{p}[.])->A(w{p}[.],t{p}[.])" [label="[0->0]" color="green"];
+"0:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" -> "1:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" [label="[0->0]" color="red" arrowhead="tee"];
+"1:A(x{u}[.],y{u}[.])->A(x{u}[.],y{p}[.])" -> "0:A(x{u}[.],y{u}[.])->A(x{p}[.],y{u}[.])" [label="[0->0]" color="red" arrowhead="tee"];
+"4:A(w{u}[.],t{u}[.])->A(w{p}[.],t{u}[.])" -> "5:A(w{u}[.],t{u}[.])->A(w{u}[.],t{p}[.])" [label="[0->0]" color="red" arrowhead="tee"];
+"5:A(w{u}[.],t{u}[.])->A(w{u}[.],t{p}[.])" -> "4:A(w{u}[.],t{u}[.])->A(w{p}[.],t{u}[.])" [label="[0->0]" color="red" arrowhead="tee"];
 }

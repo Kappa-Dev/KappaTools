@@ -219,7 +219,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D(x~u)
+		D( x~u )
 
 
 	Applying rule E() -> F(x{u}) (File "empty_agents.ka", line 5, characters 0-16:):

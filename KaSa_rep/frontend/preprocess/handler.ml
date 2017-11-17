@@ -431,10 +431,25 @@ let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent
   | Some (agent_name, _, _) -> error, agent_name
 
 (*mapping site of type int to string*)
-let print_site_compact site =
+(*let print_site_compact site = (*CHECK*)
   match site with
   | Ckappa_sig.Internal a -> a ^ "~"
-  | Ckappa_sig.Binding a -> a ^ "!"
+  | Ckappa_sig.Binding a -> a ^ "!"*)
+
+let print_site_compact parameters site = (*CHECK*)
+  match site with
+  | Ckappa_sig.Internal a ->
+    begin
+      match Remanent_parameters.get_syntax_version parameters with
+      | Ast.V4 -> a ^ "{"
+      | Ast.V3 -> a ^ "~"
+    end
+  | Ckappa_sig.Binding a ->
+    begin
+    match Remanent_parameters.get_syntax_version parameters with
+      | Ast.V4 -> a ^ "["
+      | Ast.V3 -> a ^ "!"
+    end
 
 let string_of_site_aux
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)
@@ -448,8 +463,9 @@ let string_of_site_aux
         agent_name
         handler_kappa.Cckappa_sig.sites
     with
-    | error, None -> Exception.warn parameter error __POS__ Exit
-                       (Ckappa_sig.Dictionary_of_sites.init())
+    | error, None ->
+      Exception.warn parameter error __POS__ Exit
+        (Ckappa_sig.Dictionary_of_sites.init())
     | error, Some i -> error, i
   in
   let error', site_type =
@@ -460,7 +476,8 @@ let string_of_site_aux
         site_int
         sites_dic
     with
-    | error, None -> Exception.warn parameter error __POS__ Exit (Ckappa_sig.Internal "")
+    | error, None -> Exception.warn parameter error
+                       __POS__ Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
   check_pos parameter ka_pos ml_pos message error error',
@@ -470,11 +487,33 @@ let string_of_site parameter error handler_kappa agent_type site_int =
   let error, site_type =
     string_of_site_aux parameter error handler_kappa agent_type site_int
   in
-  error, (print_site_compact site_type)
+  error, print_site_compact parameter site_type
 
-let string_of_site_in_natural_language parameter error handler_kapp agent_type (site_int: Ckappa_sig.c_site_name) =
+(*this function used in views_domain*)
+let string_of_site_update_views parameter error handler_kappa agent_type site_int =
   let error, site_type =
-    string_of_site_aux parameter error handler_kapp agent_type site_int
+    string_of_site_aux parameter error handler_kappa agent_type site_int
+  in
+  match site_type with
+  | Ckappa_sig.Internal a ->
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 -> error, (print_site_compact parameter site_type) ^ "}"
+      | Ast.V3 -> error, print_site_compact parameter site_type
+    end
+  | Ckappa_sig.Binding a ->
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 ->
+        error, (print_site_compact parameter site_type) ^ "]"
+      | Ast.V3 -> error, print_site_compact parameter site_type
+    end
+
+let string_of_site_in_natural_language parameter error handler_kapp
+    agent_type (site_int: Ckappa_sig.c_site_name) =
+  let error, site_type =
+    string_of_site_aux parameter error handler_kapp
+      agent_type site_int
   in
   match
     site_type
@@ -482,9 +521,11 @@ let string_of_site_in_natural_language parameter error handler_kapp agent_type (
   | Ckappa_sig.Internal x -> error, ("the internal state of site "^ x)
   | Ckappa_sig.Binding x -> error, ("the binding state of site "^ x)
 
-let string_of_site_in_file_name parameter error handler_kapp agent_type (site_int: Ckappa_sig.c_site_name) =
+let string_of_site_in_file_name parameter error handler_kapp
+    agent_type (site_int: Ckappa_sig.c_site_name) =
   let error, site_type =
-    string_of_site_aux parameter error handler_kapp agent_type site_int
+    string_of_site_aux parameter error handler_kapp
+      agent_type site_int
   in
   match
     site_type
@@ -512,24 +553,53 @@ let string_of_site_contact_map
 
 (*mapping state of type int to string*)
 
-let print_state _parameter error _handler_kappa state =
+let print_state parameter error _handler_kappa state =
   match state with
   | Ckappa_sig.Internal a -> error, a
-  | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
+  | Ckappa_sig.Binding Ckappa_sig.C_Free ->
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 ->
+        error, ".]"
+      | Ast.V3 ->
+        error, "free"
+    end
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
-    error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
-           (Ckappa_sig.string_of_site_name b)
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 ->
+        error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
+               (Ckappa_sig.string_of_site_name b) ^ "]"
+      | Ast.V3 ->
+        error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
+               (Ckappa_sig.string_of_site_name b)
+    end
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
-  | Ckappa_sig.Internal a -> error,a
-  | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
+  | Ckappa_sig.Internal a ->
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 -> error, a ^ "}"
+      | Ast.V3 -> error, a
+    end
+  | Ckappa_sig.Binding Ckappa_sig.C_Free ->
+    begin
+      match Remanent_parameters.get_syntax_version parameter with
+      | Ast.V4 -> error, ".]"
+      | Ast.V3 -> error, "free"
+    end
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (agent_name, b) ->
-    let error, ag = string_of_agent parameter error handler_kappa agent_name in
+    let error, ag =
+      string_of_agent parameter error handler_kappa agent_name in
     let error, site =
-      string_of_site_contact_map parameter error handler_kappa agent_name b
+      string_of_site_contact_map
+        parameter error handler_kappa agent_name b
     in
-    error, ag ^ "@" ^ site
+    match Remanent_parameters.get_syntax_version parameter with
+    | Ast.V4 -> error, ag ^"@" ^ site ^ "]"
+    | Ast.V3 ->
+      error, ag ^ "@" ^ site
 
 let string_of_state_gen print_state parameter error handler_kappa agent_name site_name state =
   let error, state_dic =
@@ -540,8 +610,9 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         (agent_name, site_name)
         handler_kappa.Cckappa_sig.states_dic
     with
-    | error, None -> Exception.warn parameter error __POS__ Exit
-                       (Ckappa_sig.Dictionary_of_States.init())
+    | error, None ->
+      Exception.warn parameter error __POS__ Exit
+        (Ckappa_sig.Dictionary_of_States.init())
     | error, Some i -> error, i
   in
   let error, value =
@@ -552,14 +623,17 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         state
         state_dic
     with
-    | error, None -> Exception.warn parameter error __POS__ Exit (Ckappa_sig.Internal "")
+    | error, None ->
+      Exception.warn parameter error __POS__
+        Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
   print_state parameter error handler_kappa value
 
 let string_of_state = string_of_state_gen print_state
 
-let string_of_state_fully_deciphered = string_of_state_gen print_state_fully_deciphered
+let string_of_state_fully_deciphered =
+  string_of_state_gen print_state_fully_deciphered
 
 let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple
