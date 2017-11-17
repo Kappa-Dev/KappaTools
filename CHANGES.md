@@ -49,14 +49,6 @@ Syntax < 4 | Syntax 4
 `A(x?)` | `A(x[#])` or `A(x)`
 `A(y~p?)` | `A(y{p}[#])` or `A(y{p})`
 
-A(x) -> A(x!1) | A(x[./1]
-A(x!1) -> A(x) | A(x[1/.]
-A(x~u) -> A(x~p) | A(x{u/p})
-
-A(x),B(x) <-> A(x!1), B(x!1) | A(x[./1]),B(x[./1])
-A(x!1),B(x!) <-> A(x), B(x) | A(x[1/.]),B(x[1/.]
-C(x1~u!1), A(c!1) -> C(x1~p),A(c) | C(x1{u/p}[1/.]),A(c[1/.])
-
 ### Agent order in rules must be maintained
 
 There is no longest prefix convention anymore. The _i_-th agent on the
