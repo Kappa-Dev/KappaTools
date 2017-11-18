@@ -30,17 +30,6 @@ type rate_convention =
   | Biochemist
   | Common
 
-(*type bound_symbol = {
-  open_binding_state : string;
-  bound_symbol : string;
-}
-*)
-
-
-type bound =
-  |  Bound_v3 of string
-  |  Bound_v4 of string
-
 type symbol_table =
   {
     (*version 4*)
