@@ -50,66 +50,78 @@ let print_binding_state parameter error binding_state =
     error
 
 let get_symbol_v3_v4_lnk_value parameter link_index =
-  match Remanent_parameters.get_bound_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
-    Loggers.fprintf
-      (Remanent_parameters.get_logger parameter)
-      "%s%s]" s
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "%s%s%s"
+      (Remanent_parameters.get_open_binding_state parameter)
       (Ckappa_sig.string_of_c_link_value link_index)
-  | Remanent_parameters_sig.Bound_v3 s ->
+      (Remanent_parameters.get_close_binding_state parameter)
+  | Ast.V3 ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s%s" s
+      "%s%s"
+      (Remanent_parameters.get_bound_symbol parameter)
       (Ckappa_sig.string_of_c_link_value link_index)
 
 let get_bound_symbol parameter =
-  match Remanent_parameters.get_bound_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s" s
-  | Remanent_parameters_sig.Bound_v3 s ->
+      "%s"
+      (Remanent_parameters.get_open_binding_state parameter)
+  | Ast.V3 ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s" s
+      "%s"
+      (Remanent_parameters.get_bound_symbol parameter)
 
 let get_symbol_v3_v4_lnk_type parameter agent_name site_name =
-  match Remanent_parameters.get_bound_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
-      "%s%s%s%s]" s
+      "%s%s%s%s%s"
+      (Remanent_parameters.get_open_binding_state parameter)
       agent_name
-        (Remanent_parameters.get_btype_sep_symbol parameter)
-
+      (Remanent_parameters.get_btype_sep_symbol parameter)
       site_name
-  | Remanent_parameters_sig.Bound_v3 s ->
+      (Remanent_parameters.get_close_binding_state parameter)
+  | Ast.V3 ->
     Loggers.fprintf
       (Remanent_parameters.get_logger parameter)
       "%s%s%s%s"
-      s
+      (Remanent_parameters.get_bound_symbol parameter)
       agent_name
-     (Remanent_parameters.get_btype_sep_symbol parameter)
-     site_name
+      (Remanent_parameters.get_btype_sep_symbol parameter)
+      site_name
 
 let get_symbol_v3_v4_lnk_some parameter =
-  match Remanent_parameters.get_link_to_some_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "%s%s%s"
+      (Remanent_parameters.get_open_binding_state parameter)
+      (Remanent_parameters.get_link_to_some_v4 parameter)
+      (Remanent_parameters.get_close_binding_state parameter)
+  | Ast.V3 ->
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "%s"
-      s
-  | Remanent_parameters_sig.Bound_v3 s ->
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "%s" s
+      (Remanent_parameters.get_link_to_some_v3 parameter)
 
 let get_symbol_v3_v4_lnk_any parameter =
-  match Remanent_parameters.get_link_to_any_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "%s]" s
-  | Remanent_parameters_sig.Bound_v3 s ->
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "%s" s
+      "%s%s%s"
+      (Remanent_parameters.get_open_binding_state parameter)
+      (Remanent_parameters.get_link_to_any_v4 parameter)
+      (Remanent_parameters.get_close_binding_state parameter)
+  | Ast.V3 ->
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "%s"
+      (Remanent_parameters.get_link_to_any_v3 parameter)
 
 let print_link_state parameter error link =
   match link
@@ -119,25 +131,11 @@ let print_link_state parameter error link =
       match Remanent_parameters.get_link_mode parameter
       with
       | Remanent_parameters_sig.Bound_indices ->
-        (*let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%s%s"
-            (Remanent_parameters.get_bound_symbol parameter)
-            (Ckappa_sig.string_of_c_link_value link_index)
-          in*)
         let _ =
           get_symbol_v3_v4_lnk_value parameter link_index
         in
         error
       | Remanent_parameters_sig.Site_address ->
-        (*let () = Loggers.fprintf
-            (Remanent_parameters.get_logger parameter)
-            "%s(%s,%s)%s%s"
-            (Remanent_parameters.get_bound_symbol parameter)
-            agent_name
-            (Ckappa_sig.string_of_agent_id agent_index)
-            (Remanent_parameters.get_at_symbol parameter)
-            site_name
-          in*)
         let () = (*CHECK*)
           get_bound_symbol parameter;
           Loggers.fprintf
@@ -174,70 +172,53 @@ let print_link_state parameter error link =
     begin
       match Remanent_parameters.get_syntax_version parameter with
       | Ast.V4 ->
-        let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "[.]"
+        let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "%s%s%s"
+            (Remanent_parameters.get_open_binding_state parameter)
+            (Remanent_parameters.get_free_symbol parameter)
+            (Remanent_parameters.get_close_binding_state parameter)
+            (*"[.]"*)
         in
         error
       | Ast.V3 -> error
     end
   | Ckappa_sig.LNK_ANY _  ->
-    (*let () =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "%s"
-        (Remanent_parameters.get_link_to_any_symbol parameter)
-      in*)
     let () = get_symbol_v3_v4_lnk_any parameter in
     error
   | Ckappa_sig.LNK_SOME _ ->
-    (*let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "%s"
-        (Remanent_parameters.get_link_to_some_symbol parameter)
-      in*)
     let _ =
       get_symbol_v3_v4_lnk_some parameter
     in
     error
-
   (*MOD:change ex: A(x!B@x) to A(x!x.B) as the input in kappa file*)
   | Ckappa_sig.LNK_TYPE ((agent_type,_),(site_type,_)) ->
-    (*let _ = Loggers.fprintf
-        (Remanent_parameters.get_logger parameter)
-        "%s%s%s%s"
-        (Remanent_parameters.get_bound_symbol parameter)
-        site_type
-        (Remanent_parameters.get_btype_sep_symbol parameter)
-        agent_type
-      in*)
       let () =
         get_symbol_v3_v4_lnk_type parameter agent_type site_type
       in
     error
 
 let get_symbol_v3_v4_internal_state parameter internal =
-  match Remanent_parameters.get_internal_symbol parameter with
-  | Remanent_parameters_sig.Bound_v4 s ->
+  match Remanent_parameters.get_syntax_version parameter with
+  | Ast.V4 ->
+    List.iter
+      (fun x ->
+         Loggers.fprintf (Remanent_parameters.get_logger parameter)
+         "%s%s%s"
+         (Remanent_parameters.get_open_internal_state parameter)
+         x
+         (Remanent_parameters.get_close_internal_state parameter)
+    ) internal
+  | Ast.V3 ->
     List.iter
       (Loggers.fprintf (Remanent_parameters.get_logger parameter)
-         "%s%s}" s) internal
-  | Remanent_parameters_sig.Bound_v3 s ->
-    List.iter
-      (Loggers.fprintf (Remanent_parameters.get_logger parameter)
-         "%s%s" s) internal
-
-(*let print_internal_state parameter _error internal =
-  List.iter
-    (Loggers.fprintf (Remanent_parameters.get_logger parameter)
-       "%s%s"
-       (Remanent_parameters.get_internal_symbol parameter))
-    internal*)
+         "%s%s"
+         (Remanent_parameters.get_internal_state_symbol parameter)
+      )internal
 
 let print_port parameter error port =
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "%s" port.Ckappa_sig.port_nme in
-  (*let _ =
-    print_internal_state parameter error port.Ckappa_sig.port_int
-    in*)
   let _ =
     get_symbol_v3_v4_internal_state parameter port.Ckappa_sig.port_int
   in

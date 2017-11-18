@@ -30,30 +30,46 @@ type rate_convention =
   | Biochemist
   | Common
 
+(*type bound_symbol = {
+  open_binding_state : string;
+  bound_symbol : string;
+}
+*)
+
+
 type bound =
   |  Bound_v3 of string
   |  Bound_v4 of string
 
 type symbol_table =
   {
-   bound : bound ;
-   at : string ;
-   link_to_any : bound ;
-   link_to_some : bound ;
-   agent_open : string ;
-   agent_close : string ;
-   site_sep_comma : string ;
-   btype_sep : string ;
-   agent_sep_comma : string ;
-   agent_sep_dot : string ;
-   agent_sep_plus : string ;
-   ghost_agent : string ;
-   show_ghost : bool ;
-   internal : bound ;
-   uni_arrow : string ;
-   rev_arrow : string ;
-   bi_arrow : string ;
-   uni_arrow_nopoly : string ;
+    (*version 4*)
+    open_binding_state : string; (*[*)
+    bound_symbol : string; (*!*)
+    close_binding_state: string; (*]*)
+    free_symbol : string; (*.*)
+    open_internal_state : string; (*{*)
+    close_internal_state : string;(*}*)
+    internal_state_symbol : string;
+    at : string ;
+    link_to_any_v4 : string;
+    link_to_any_v3 : string;
+    link_to_some_v4 : string;
+    link_to_some_v3 : string;
+   (*version 3*)
+    agent_open : string ;
+    agent_close : string ;
+    site_sep_comma : string ;
+    btype_sep : string ;
+    agent_sep_comma : string ;
+    agent_sep_dot : string ;
+    agent_sep_plus : string ;
+    ghost_agent : string ;
+    show_ghost : bool ;
+    uni_arrow : string ;
+    rev_arrow : string ;
+    bi_arrow : string ;
+    uni_arrow_nopoly : string ;
   }
 
 type influence_map_output =

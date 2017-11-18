@@ -441,14 +441,14 @@ let print_site_compact parameters site = (*CHECK*)
   | Ckappa_sig.Internal a ->
     begin
       match Remanent_parameters.get_syntax_version parameters with
-      | Ast.V4 -> a ^ "{"
-      | Ast.V3 -> a ^ "~"
+      | Ast.V4 -> a ^ (*"{"*) (Remanent_parameters.get_open_internal_state parameters)
+      | Ast.V3 -> a ^ (*"~"*) (Remanent_parameters.get_internal_state_symbol parameters)
     end
   | Ckappa_sig.Binding a ->
     begin
     match Remanent_parameters.get_syntax_version parameters with
-      | Ast.V4 -> a ^ "["
-      | Ast.V3 -> a ^ "!"
+      | Ast.V4 -> a ^ (*"["*) (Remanent_parameters.get_open_binding_state parameters)
+      | Ast.V3 -> a ^ (*"!"*) (Remanent_parameters.get_bound_symbol parameters)
     end
 
 let string_of_site_aux
@@ -498,14 +498,20 @@ let string_of_site_update_views parameter error handler_kappa agent_type site_in
   | Ckappa_sig.Internal a ->
     begin
       match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 -> error, (print_site_compact parameter site_type) ^ "}"
+      | Ast.V4 ->
+        error, (print_site_compact parameter site_type)
+               ^ (*"}"*)
+               (Remanent_parameters.get_close_internal_state parameter)
       | Ast.V3 -> error, print_site_compact parameter site_type
     end
   | Ckappa_sig.Binding a ->
     begin
       match Remanent_parameters.get_syntax_version parameter with
       | Ast.V4 ->
-        error, (print_site_compact parameter site_type) ^ "]"
+        error,
+        (print_site_compact parameter site_type)
+        ^
+        (*"]"*) (Remanent_parameters.get_close_binding_state parameter)
       | Ast.V3 -> error, print_site_compact parameter site_type
     end
 
@@ -560,18 +566,32 @@ let print_state parameter error _handler_kappa state =
     begin
       match Remanent_parameters.get_syntax_version parameter with
       | Ast.V4 ->
-        error, ".]"
+        error,
+        (*(Remanent_parameters.get_open_binding_state parameter) ^*)
+        (Remanent_parameters.get_free_symbol parameter) ^
+        (Remanent_parameters.get_close_binding_state parameter)
+          (*".]"*)
       | Ast.V3 ->
-        error, "free"
+        error, "free" (*TODO*)
     end
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
     begin
       match Remanent_parameters.get_syntax_version parameter with
       | Ast.V4 ->
-        error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
-               (Ckappa_sig.string_of_site_name b) ^ "]"
+        error, (Ckappa_sig.string_of_agent_name a)
+               ^
+               (Remanent_parameters.get_at_symbol parameter)
+                 (*"@" *)
+               ^
+               (Ckappa_sig.string_of_site_name b) ^
+               (*"]"*)
+               (Remanent_parameters.get_close_binding_state parameter)
       | Ast.V3 ->
-        error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
+        error, (Ckappa_sig.string_of_agent_name a)
+               ^
+               (*"@"*)
+               (Remanent_parameters.get_at_symbol parameter)
+               ^
                (Ckappa_sig.string_of_site_name b)
     end
 
@@ -580,14 +600,17 @@ let print_state_fully_deciphered parameter error handler_kappa state =
   | Ckappa_sig.Internal a ->
     begin
       match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 -> error, a ^ "}"
+      | Ast.V4 -> error, a ^ (*"}"*) (Remanent_parameters.get_close_internal_state parameter)
       | Ast.V3 -> error, a
     end
   | Ckappa_sig.Binding Ckappa_sig.C_Free ->
     begin
       match Remanent_parameters.get_syntax_version parameter with
-      | Ast.V4 -> error, ".]"
-      | Ast.V3 -> error, "free"
+      | Ast.V4 -> error,
+                  (Remanent_parameters.get_free_symbol parameter)^
+                  (Remanent_parameters.get_close_binding_state parameter)
+                  (*".]"*)
+      | Ast.V3 -> error, "free" (*TODO*)
     end
   | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (agent_name, b) ->
     let error, ag =
@@ -597,9 +620,22 @@ let print_state_fully_deciphered parameter error handler_kappa state =
         parameter error handler_kappa agent_name b
     in
     match Remanent_parameters.get_syntax_version parameter with
-    | Ast.V4 -> error, ag ^"@" ^ site ^ "]"
+    | Ast.V4 -> error, ag
+                       ^
+                       (Remanent_parameters.get_at_symbol parameter)
+                       (*"@"*)
+                       ^
+                       site
+                       ^
+                       (Remanent_parameters.get_close_binding_state parameter)
+                         (*"]"*)
     | Ast.V3 ->
-      error, ag ^ "@" ^ site
+      error, ag
+             ^
+             (*"@" *)
+             (Remanent_parameters.get_at_symbol parameter)
+             ^
+             site
 
 let string_of_state_gen print_state parameter error handler_kappa agent_name site_name state =
   let error, state_dic =

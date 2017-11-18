@@ -86,27 +86,37 @@ let get_syntax_version () =
   | "3" | "v3" | "V3" -> Ast.V3
   | _ -> failwith "Syntax version should be either V3 or V4"
 
+(*
+                         V3    |   V4
+  - open_binding_state:          |   [
+  - bound_symbol:         !      |
+  - close_binding_state:         |   ]
+  - free_symbol:                 |   .
+  state_spearator:       ,     |   ,
+  binding_state_separator:  .  |   .
+
+  - open_internal_state:         |   {
+  - close_internal_state:        |   }
+  internal_state_symbol
+
+  open_agent_interface:     (  |   (
+  close_agent_interface:    )  |   )
+
+  site_separator            ,  |  ,
+  agent_separat             ,  |  ,
+  *)
+
 let get_symbols () =
   {
-    Remanent_parameters_sig.bound =
-    begin
-      match get_syntax_version () with
-      | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "["
-      | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "!"
-    end;
+    Remanent_parameters_sig.open_binding_state = "[";
+    Remanent_parameters_sig.bound_symbol = "!";
+    Remanent_parameters_sig.close_binding_state = "]";
     Remanent_parameters_sig.at = "@" ;
-    Remanent_parameters_sig.link_to_any =
-      begin
-        match get_syntax_version () with
-        | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "[#"
-        | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "?"
-      end;
-    Remanent_parameters_sig.link_to_some =
-      begin
-        match get_syntax_version () with
-        | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "[_]"
-        | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "!_"
-      end;
+    Remanent_parameters_sig.free_symbol = ".";
+    Remanent_parameters_sig.link_to_any_v4 = "#";
+    Remanent_parameters_sig.link_to_any_v3 = "?";
+    Remanent_parameters_sig.link_to_some_v4 = "_";
+    Remanent_parameters_sig.link_to_some_v3 = "!_";
     Remanent_parameters_sig.agent_open = "(" ;
     Remanent_parameters_sig.agent_close =  ")" ;
     Remanent_parameters_sig.agent_sep_comma = "," ;
@@ -121,12 +131,9 @@ let get_symbols () =
         | Ast.V4 -> true
         | Ast.V3 -> false
       end ;
-    Remanent_parameters_sig.internal =
-      begin
-      match get_syntax_version () with
-      | Ast.V4 -> Remanent_parameters_sig.Bound_v4 "{"
-      | Ast.V3 -> Remanent_parameters_sig.Bound_v3 "~"
-      end;
+    Remanent_parameters_sig.open_internal_state = "{";
+    Remanent_parameters_sig.close_internal_state = "}";
+    Remanent_parameters_sig.internal_state_symbol = "~";
     Remanent_parameters_sig.uni_arrow = "->" ;
     Remanent_parameters_sig.rev_arrow = "<-" ;
     Remanent_parameters_sig.bi_arrow = "<->" ;
@@ -475,10 +482,20 @@ let dummy_parameters ~called_from =
     | Some p -> p
 
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep
-let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound
+let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound_symbol
+let get_open_binding_state_1             symbol = symbol.Remanent_parameters_sig.open_binding_state
+let get_close_binding_state_1             symbol = symbol.Remanent_parameters_sig.close_binding_state
+
+let get_free_symbol_1             symbol = symbol.Remanent_parameters_sig.free_symbol
+
 let get_at_symbol_1                symbol = symbol.Remanent_parameters_sig.at
-let get_link_to_any_symbol_1       symbol = symbol.Remanent_parameters_sig.link_to_any
-let get_link_to_some_symbol_1      symbol = symbol.Remanent_parameters_sig.link_to_some
+
+let get_link_to_any_v4_1       symbol = symbol.Remanent_parameters_sig.link_to_any_v4
+let get_link_to_any_v3_1       symbol = symbol.Remanent_parameters_sig.link_to_any_v3
+
+let get_link_to_some_v4_1      symbol = symbol.Remanent_parameters_sig.link_to_some_v4
+let get_link_to_some_v3_1      symbol = symbol.Remanent_parameters_sig.link_to_some_v3
+
 let get_agent_open_symbol_1        symbol = symbol.Remanent_parameters_sig.agent_open
 let get_agent_close_symbol_1       symbol = symbol.Remanent_parameters_sig.agent_close
 let get_agent_sep_comma_symbol_1   symbol = symbol.Remanent_parameters_sig.agent_sep_comma
@@ -487,7 +504,11 @@ let get_agent_sep_dot_symbol_1     symbol = symbol.Remanent_parameters_sig.agent
 let get_site_sep_comma_symbol_1    symbol = symbol.Remanent_parameters_sig.site_sep_comma
 let get_ghost_agent_symbol_1       symbol = symbol.Remanent_parameters_sig.ghost_agent
 let get_do_we_show_ghost_1         symbol = symbol.Remanent_parameters_sig.show_ghost
-let get_internal_symbol_1          symbol = symbol.Remanent_parameters_sig.internal
+
+let get_open_internal_state_1          symbol = symbol.Remanent_parameters_sig.open_internal_state
+let get_close_internal_state_1          symbol = symbol.Remanent_parameters_sig.close_internal_state
+let get_internal_state_symbol_1          symbol = symbol.Remanent_parameters_sig.internal_state_symbol
+
 let get_uni_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.uni_arrow
 let get_rev_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.rev_arrow
 let get_bi_arrow_symbol_1          symbol = symbol.Remanent_parameters_sig.bi_arrow
@@ -678,9 +699,18 @@ let upgrade_from_reachability_map_field f = compose f get_reachability_map
 let upgrade_from_reachability_analysis_parameters_field f = compose f get_reachability_analysis_parameters
 let get_btype_sep_symbol = upgrade_from_symbols_field get_btype_sep_symbol_1
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1
+let get_open_binding_state = upgrade_from_symbols_field get_open_binding_state_1
+let get_close_binding_state = upgrade_from_symbols_field get_close_binding_state_1
+
+let get_free_symbol = upgrade_from_symbols_field get_free_symbol_1
 let get_at_symbol = upgrade_from_symbols_field get_at_symbol_1
-let get_link_to_any_symbol = upgrade_from_symbols_field get_link_to_any_symbol_1
-let get_link_to_some_symbol = upgrade_from_symbols_field get_link_to_some_symbol_1
+
+let get_link_to_any_v4 = upgrade_from_symbols_field get_link_to_any_v4_1
+let get_link_to_any_v3 = upgrade_from_symbols_field get_link_to_any_v3_1
+
+let get_link_to_some_v4 = upgrade_from_symbols_field get_link_to_some_v4_1
+let get_link_to_some_v3 = upgrade_from_symbols_field get_link_to_some_v3_1
+
 let get_agent_open_symbol = upgrade_from_symbols_field get_agent_open_symbol_1
 let get_agent_close_symbol = upgrade_from_symbols_field get_agent_close_symbol_1
 let get_agent_sep_comma_symbol = upgrade_from_symbols_field get_agent_sep_comma_symbol_1
@@ -689,7 +719,11 @@ let get_agent_sep_dot_symbol = upgrade_from_symbols_field get_agent_sep_dot_symb
 let get_site_sep_comma_symbol = upgrade_from_symbols_field get_site_sep_comma_symbol_1
 let get_ghost_agent_symbol = upgrade_from_symbols_field get_ghost_agent_symbol_1
 let get_do_we_show_ghost = upgrade_from_symbols_field get_do_we_show_ghost_1
-let get_internal_symbol = upgrade_from_symbols_field get_internal_symbol_1
+
+let get_internal_state_symbol = upgrade_from_symbols_field get_internal_state_symbol_1
+let get_open_internal_state = upgrade_from_symbols_field get_open_internal_state_1
+let get_close_internal_state = upgrade_from_symbols_field get_close_internal_state_1
+
 let get_uni_arrow_symbol = upgrade_from_symbols_field get_uni_arrow_symbol_1
 let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1
