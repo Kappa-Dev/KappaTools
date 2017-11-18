@@ -209,240 +209,6 @@ Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_1->state:
 Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
 Compilation:initial_states:0:mixture:agent_id_0:agent_type_0:site_type_4->state:[state_min:0;state_max:0]
-Generating the raw influence map...
-Quarks:Quarkify
-Quarks:Rule 0
-Quarks:TEST
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:rule_id:0,agent_type:0
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:0,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_type:0,site_type:1,state:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:rule_id:0,agent_type:0,site_type:3,state:0
-Quarks:rule_id:0,agent_type:0,site_type:4,state:0
-Quarks:MODIFICATION-
-Quarks:HALF BOND BREAKING
-Quarks:Rule 1
-Quarks:TEST
-Quarks:rule_id:1,agent_type:0
-Quarks:rule_id:1,agent_type:0,site_type:0,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:1,agent_type:0,site_type:0,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:1,agent_type:0,site_type:0,state:0
-Quarks:HALF BOND BREAKING
-Quarks:Rule 2
-Quarks:TEST
-Quarks:rule_id:2,agent_type:0
-Quarks:rule_id:2,agent_type:0,site_type:0,state:1
-Quarks:rule_id:2,agent_type:0,site_type:1,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:2,agent_type:0,site_type:1,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:2,agent_type:0,site_type:1,state:0
-Quarks:HALF BOND BREAKING
-Quarks:Rule 3
-Quarks:TEST
-Quarks:rule_id:3,agent_type:0
-Quarks:rule_id:3,agent_type:0,site_type:0,state:1
-Quarks:rule_id:3,agent_type:0,site_type:1,state:0
-Quarks:rule_id:3,agent_type:0,site_type:4,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:3,agent_type:0,site_type:0,state:0
-Quarks:MODIFICATION-
-Quarks:rule_id:3,agent_type:0,site_type:0,state:1
-Quarks:HALF BOND BREAKING
-Quarks:Rule 4
-Quarks:TEST
-Quarks:rule_id:4,agent_type:0
-Quarks:rule_id:4,agent_type:0,site_type:1,state:1
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:4,agent_type:0,site_type:1,state:0
-Quarks:MODIFICATION-
-Quarks:rule_id:4,agent_type:0,site_type:1,state:1
-Quarks:HALF BOND BREAKING
-Quarks:Rule 5
-Quarks:TEST
-Quarks:rule_id:5,agent_type:0
-Quarks:rule_id:5,agent_type:0,site_type:2,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:5,agent_type:0,site_type:2,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:5,agent_type:0,site_type:2,state:0
-Quarks:HALF BOND BREAKING
-Quarks:Rule 6
-Quarks:TEST
-Quarks:rule_id:6,agent_type:0
-Quarks:rule_id:6,agent_type:0,site_type:2,state:1
-Quarks:rule_id:6,agent_type:0,site_type:3,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:6,agent_type:0,site_type:3,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:6,agent_type:0,site_type:3,state:0
-Quarks:HALF BOND BREAKING
-Quarks:Rule 7
-Quarks:TEST
-Quarks:rule_id:7,agent_type:0
-Quarks:rule_id:7,agent_type:0,site_type:2,state:1
-Quarks:rule_id:7,agent_type:0,site_type:3,state:0
-Quarks:rule_id:7,agent_type:0,site_type:4,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:7,agent_type:0,site_type:2,state:0
-Quarks:MODIFICATION-
-Quarks:rule_id:7,agent_type:0,site_type:2,state:1
-Quarks:HALF BOND BREAKING
-Quarks:Rule 8
-Quarks:TEST
-Quarks:rule_id:8,agent_type:0
-Quarks:rule_id:8,agent_type:0,site_type:3,state:1
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:8,agent_type:0,site_type:3,state:0
-Quarks:MODIFICATION-
-Quarks:rule_id:8,agent_type:0,site_type:3,state:1
-Quarks:HALF BOND BREAKING
-Quarks:Rule 9
-Quarks:TEST
-Quarks:rule_id:9,agent_type:0
-Quarks:rule_id:9,agent_type:0,site_type:0,state:1
-Quarks:rule_id:9,agent_type:0,site_type:1,state:1
-Quarks:rule_id:9,agent_type:0,site_type:2,state:1
-Quarks:rule_id:9,agent_type:0,site_type:3,state:1
-Quarks:rule_id:9,agent_type:0,site_type:4,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:9,agent_type:0,site_type:4,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:9,agent_type:0,site_type:4,state:0
-Quarks:HALF BOND BREAKING
-Quarks:Rule 10
-Quarks:TEST
-Quarks:rule_id:10,agent_type:0
-Quarks:rule_id:10,agent_type:0,site_type:4,state:1
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:10,agent_type:0,site_type:4,state:0
-Quarks:MODIFICATION-
-Quarks:rule_id:10,agent_type:0,site_type:4,state:1
-Quarks:HALF BOND BREAKING
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:0,rule:1->[0]
-Quarks:agent_test**:agent_type:0,rule:2->[0]
-Quarks:agent_test**:agent_type:0,rule:3->[0]
-Quarks:agent_test**:agent_type:0,rule:4->[0]
-Quarks:agent_test**:agent_type:0,rule:5->[0]
-Quarks:agent_test**:agent_type:0,rule:6->[0]
-Quarks:agent_test**:agent_type:0,rule:7->[0]
-Quarks:agent_test**:agent_type:0,rule:8->[0]
-Quarks:agent_test**:agent_type:0,rule:9->[0]
-Quarks:agent_test**:agent_type:0,rule:10->[0]
-Quarks:agent_modif+:agent_type:0,rule:0->[0]
-Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
-Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:2->[0]
-Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:3->[0]
-Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:9->[0]
-Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:2->[0]
-Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:3->[0]
-Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:4->[0]
-Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:9->[0]
-Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:3->[0]
-Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:7->[0]
-Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:9->[0]
-Quarks:site_test**:agent_type:0,site_type:4,state:1,rule:10->[0]
-Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:5->[0]
-Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:6->[0]
-Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:7->[0]
-Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:9->[0]
-Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:6->[0]
-Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:7->[0]
-Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:8->[0]
-Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:9->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:3->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:4->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
-Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:7->[0]
-Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:5->[0]
-Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:8->[0]
-Quarks:site_modif+:agent_type:0,site_type:3,state:1,rule:6->[0]
-Quarks:site_modif+:agent_type:0,site_type:4,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:4,state:0,rule:10->[0]
-Quarks:site_modif+:agent_type:0,site_type:4,state:1,rule:9->[0]
-Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
-Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:3->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:4->[0]
-Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:5->[0]
-Quarks:site_modif-:agent_type:0,site_type:2,state:1,rule:7->[0]
-Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:6->[0]
-Quarks:site_modif-:agent_type:0,site_type:3,state:1,rule:8->[0]
-Quarks:site_modif-:agent_type:0,site_type:4,state:0,rule:9->[0]
-Quarks:site_modif-:agent_type:0,site_type:4,state:1,rule:10->[0]
-Refining the influence map...
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(4):'' A(y~p)->A(y~u)[0->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(8):'' A(a~p)->A(a~u)[0->0]
-Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p) -> rule(10):'' A(b~p)->A(b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Inhibition_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Inhibition_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Inhibition_map:rule(4):'' A(y~p)->A(y~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -1817,6 +1583,244 @@ Id=329
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:rule_id:0,agent_type:0
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:rule_id:0,agent_type:0,site_type:3,state:0
+Quarks:rule_id:0,agent_type:0,site_type:4,state:0
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:0
+Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 2
+Quarks:TEST
+Quarks:rule_id:2,agent_type:0
+Quarks:rule_id:2,agent_type:0,site_type:0,state:1
+Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 3
+Quarks:TEST
+Quarks:rule_id:3,agent_type:0
+Quarks:rule_id:3,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_type:0,site_type:1,state:0
+Quarks:rule_id:3,agent_type:0,site_type:4,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_type:0,site_type:0,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_type:0,site_type:0,state:1
+Quarks:HALF BOND BREAKING
+Quarks:Rule 4
+Quarks:TEST
+Quarks:rule_id:4,agent_type:0
+Quarks:rule_id:4,agent_type:0,site_type:1,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:0,site_type:1,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:4,agent_type:0,site_type:1,state:1
+Quarks:HALF BOND BREAKING
+Quarks:Rule 5
+Quarks:TEST
+Quarks:rule_id:5,agent_type:0
+Quarks:rule_id:5,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:0,site_type:2,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 6
+Quarks:TEST
+Quarks:rule_id:6,agent_type:0
+Quarks:rule_id:6,agent_type:0,site_type:2,state:1
+Quarks:rule_id:6,agent_type:0,site_type:3,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:6,agent_type:0,site_type:3,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:6,agent_type:0,site_type:3,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 7
+Quarks:TEST
+Quarks:rule_id:7,agent_type:0
+Quarks:rule_id:7,agent_type:0,site_type:2,state:1
+Quarks:rule_id:7,agent_type:0,site_type:3,state:0
+Quarks:rule_id:7,agent_type:0,site_type:4,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:7,agent_type:0,site_type:2,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:7,agent_type:0,site_type:2,state:1
+Quarks:HALF BOND BREAKING
+Quarks:Rule 8
+Quarks:TEST
+Quarks:rule_id:8,agent_type:0
+Quarks:rule_id:8,agent_type:0,site_type:3,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:8,agent_type:0,site_type:3,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:8,agent_type:0,site_type:3,state:1
+Quarks:HALF BOND BREAKING
+Quarks:Rule 9
+Quarks:TEST
+Quarks:rule_id:9,agent_type:0
+Quarks:rule_id:9,agent_type:0,site_type:0,state:1
+Quarks:rule_id:9,agent_type:0,site_type:1,state:1
+Quarks:rule_id:9,agent_type:0,site_type:2,state:1
+Quarks:rule_id:9,agent_type:0,site_type:3,state:1
+Quarks:rule_id:9,agent_type:0,site_type:4,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:9,agent_type:0,site_type:4,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:9,agent_type:0,site_type:4,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 10
+Quarks:TEST
+Quarks:rule_id:10,agent_type:0
+Quarks:rule_id:10,agent_type:0,site_type:4,state:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:10,agent_type:0,site_type:4,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:10,agent_type:0,site_type:4,state:1
+Quarks:HALF BOND BREAKING
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:1->[0]
+Quarks:agent_test**:agent_type:0,rule:2->[0]
+Quarks:agent_test**:agent_type:0,rule:3->[0]
+Quarks:agent_test**:agent_type:0,rule:4->[0]
+Quarks:agent_test**:agent_type:0,rule:5->[0]
+Quarks:agent_test**:agent_type:0,rule:6->[0]
+Quarks:agent_test**:agent_type:0,rule:7->[0]
+Quarks:agent_test**:agent_type:0,rule:8->[0]
+Quarks:agent_test**:agent_type:0,rule:9->[0]
+Quarks:agent_test**:agent_type:0,rule:10->[0]
+Quarks:agent_modif+:agent_type:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:9->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:4->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:9->[0]
+Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:7->[0]
+Quarks:site_test**:agent_type:0,site_type:4,state:0,rule:9->[0]
+Quarks:site_test**:agent_type:0,site_type:4,state:1,rule:10->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:5->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:7->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:9->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:6->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:7->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:8->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:9->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:3->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:4->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:7->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:5->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:8->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:1,rule:6->[0]
+Quarks:site_modif+:agent_type:0,site_type:4,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:4,state:0,rule:10->[0]
+Quarks:site_modif+:agent_type:0,site_type:4,state:1,rule:9->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:3->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:4->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:5->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:1,rule:7->[0]
+Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:6->[0]
+Quarks:site_modif-:agent_type:0,site_type:3,state:1,rule:8->[0]
+Quarks:site_modif-:agent_type:0,site_type:4,state:0,rule:9->[0]
+Quarks:site_modif-:agent_type:0,site_type:4,state:1,rule:10->[0]
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(4):'' A(y~p)->A(y~u)[0->0]
+Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Wake_up_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
+Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(8):'' A(a~p)->A(a~u)[0->0]
+Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Wake_up_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
+Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
+Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p) -> rule(10):'' A(b~p)->A(b~u)[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Inhibition_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
+Influence_map:Inhibition_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
+Influence_map:Inhibition_map:rule(4):'' A(y~p)->A(y~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
+Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
+Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

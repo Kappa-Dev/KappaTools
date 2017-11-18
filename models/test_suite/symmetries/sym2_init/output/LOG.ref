@@ -120,39 +120,6 @@ Compilation:initial_states:4:mixture:bonds:agent_id_0:
 Compilation:initial_states:4:mixture:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
 Compilation:initial_states:4:mixture:bonds:agent_id_1:
 Compilation:initial_states:4:mixture:bonds:agent_id_1:site_type_2->agent_id_0.site_type_2
-Generating the raw influence map...
-Quarks:Quarkify
-Quarks:Rule 0
-Quarks:TEST
-Quarks:rule_id:0,agent_type:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:rule_id:0,agent_type:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:REMOVAL
-Quarks:MODIFICATION+
-Quarks:rule_id:0,agent_type:0,site_type:2,state: bound
-Quarks:rule_id:0,agent_type:0,site_type:2,state:1
-Quarks:rule_id:0,agent_type:0,site_type:2,state: bound
-Quarks:rule_id:0,agent_type:0,site_type:2,state:1
-Quarks:MODIFICATION-
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:HALF BOND BREAKING
-Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:2,state: BOUND
-Quarks:rule_id:0,agent_type:0,site_type:2,state:1
-Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:2,state: BOUND
-Quarks:rule_id:0,agent_type:0,site_type:2,state:1
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:0,rule:0->[0;1]
-Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:0->[0;1]
-Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:0->[0;1]
-Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:0->[0;1]
-Refining the influence map...
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Inhibition_map:rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1]) -> rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1])[0->1];[1->0]
 Reachability analysis...
 	Views in initial state:
 
@@ -536,6 +503,45 @@ Id=32
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+0 ;
+SCC0;
+
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:2,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:2,state:1
+Quarks:rule_id:0,agent_type:0,site_type:2,state: bound
+Quarks:rule_id:0,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:2,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:2,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:2,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:2,state:1
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:0->[0;1]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:0->[0;1]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:0->[0;1]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:0->[0;1]
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Inhibition_map:rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1]) -> rule(0):'' A(z[.]),A(z[.])->A(z[1]),A(z[1])[0->1];[1->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

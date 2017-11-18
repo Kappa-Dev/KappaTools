@@ -44,41 +44,6 @@ Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_1:
 Compilation:rules:1:actions:deletion:(agent_id_1,agent_type_1)
 Compilation:rules:1:actions:creation:(agent_id_0,agent_type_2)
-Generating the raw influence map...
-Quarks:Quarkify
-Quarks:Rule 0
-Quarks:TEST
-Quarks:rule_id:0,agent_type:0
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:rule_id:0,agent_type:1
-Quarks:REMOVAL
-Quarks:rule_id:0,agent_type:0
-Quarks:MODIFICATION+
-Quarks:MODIFICATION-
-Quarks:HALF BOND BREAKING
-Quarks:Rule 1
-Quarks:TEST
-Quarks:rule_id:1,agent_type:1
-Quarks:CLEANING QUARKS FOR DEAD AGENTS
-Quarks:CREATION
-Quarks:rule_id:1,agent_type:2
-Quarks:REMOVAL
-Quarks:rule_id:1,agent_type:1
-Quarks:MODIFICATION+
-Quarks:MODIFICATION-
-Quarks:HALF BOND BREAKING
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:0,rule:0->[1]
-Quarks:agent_test**:agent_type:1,rule:1->[1]
-Quarks:agent_modif+:agent_type:1,rule:0->[0]
-Quarks:agent_modif+:agent_type:2,rule:1->[0]
-Quarks:agent_modif-:agent_type:0,rule:0->[1]
-Quarks:agent_modif-:agent_type:1,rule:1->[1]
-Refining the influence map...
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'r0' .,A()->B(),. -> rule(1):'r1' .,B()->C(),.[0->1]
 Reachability analysis...
 
 	Applying rule r0 (File "create.ka", line 11, characters 5-23:):
@@ -117,6 +82,45 @@ C cannot occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:rule_id:0,agent_type:0
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:rule_id:0,agent_type:1
+Quarks:REMOVAL
+Quarks:rule_id:0,agent_type:0
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:1
+Quarks:CLEANING QUARKS FOR DEAD AGENTS
+Quarks:CREATION
+Quarks:rule_id:1,agent_type:2
+Quarks:REMOVAL
+Quarks:rule_id:1,agent_type:1
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:0->[1]
+Quarks:agent_test**:agent_type:1,rule:1->[1]
+Quarks:agent_modif+:agent_type:1,rule:0->[0]
+Quarks:agent_modif+:agent_type:2,rule:1->[0]
+Quarks:agent_modif-:agent_type:0,rule:0->[1]
+Quarks:agent_modif-:agent_type:1,rule:1->[1]
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'r0' .,A()->B(),. -> rule(1):'r1' .,B()->C(),.[0->1]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

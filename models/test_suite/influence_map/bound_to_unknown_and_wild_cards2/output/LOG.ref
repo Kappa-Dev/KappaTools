@@ -171,6 +171,53 @@ Compilation:rules:2:reverse:agent_id_1:
 Compilation:rules:2:reverse:agent_id_2:
 Compilation:rules:2:reverse:agent_id_2:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:2:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_2,agent_type_2)@site_type_0
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "influence.ka", line 1, characters 0-69: will never be applied.
+rule File "influence.ka", line 2, characters 0-69: will never be applied.
+rule File "influence.ka", line 3, characters 0-69: will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+B cannot occur in the model
+C cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+0 ;
+1 ;
+2 ;
+3 ;
+1:2,
+0:3,
+SCC1;
+2;
+0;
+3;
+
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -303,39 +350,6 @@ Influence_map:Inhibition_map:rule(1):'' A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2
 Influence_map:Inhibition_map:rule(1):'' A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2]) -> rule(2):'' A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])[2->2]
 Influence_map:Inhibition_map:rule(2):'' A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2]) -> rule(0):'' A(x[1],y[#]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])[2->2]
 Influence_map:Inhibition_map:rule(2):'' A(x[1],y[.]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2]) -> rule(1):'' A(x[1],y[_]),B(x[1]),C(y[.])->A(x[1],y[2]),B(x[1]),C(y[2])[2->2]
-Reachability analysis...
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule File "influence.ka", line 1, characters 0-69: will never be applied.
-rule File "influence.ka", line 2, characters 0-69: will never be applied.
-rule File "influence.ka", line 3, characters 0-69: will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
-C cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

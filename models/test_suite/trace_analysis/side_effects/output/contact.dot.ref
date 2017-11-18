@@ -22,8 +22,8 @@ subgraph cluster2 {
    2.1 [style = filled label = "x" shape =circle color = yellow size = "5"]
 label =  "B";  shape = rectangle; color = red
 } ; 
-0.0 -- 1.0 [color=red]
-0.0 -- 2.1 [color=red]
-1.1 -- 2.0 [color=red]
-2.0 -- 2.1 [color=red]
+0.0 -- 1.0
+0.0 -- 2.1
+1.1 -- 2.0
+2.0 -- 2.1
 }

@@ -40,11 +40,11 @@ subgraph cluster4 {
    4.2 [style = filled label = "SH3n" shape =circle color = yellow size = "5"]
 label =  "Grb2";  shape = rectangle; color = red
 } ; 
-0.0 -- 1.3 [color=red]
-1.4 -- 1.4 [color=red]
-1.5 -- 4.1 [color=red]
-1.6 -- 3.3 [color=red]
-1.7 -- 1.8 [color=red]
-2.1 -- 4.2 [color=red]
-3.2 -- 4.1 [color=red]
+0.0 -- 1.3
+1.4 -- 1.4
+1.5 -- 4.1
+1.6 -- 3.3
+1.7 -- 1.8
+2.1 -- 4.2
+3.2 -- 4.1
 }

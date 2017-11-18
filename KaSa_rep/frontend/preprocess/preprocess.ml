@@ -1996,7 +1996,8 @@ let export_contact_map parameters error handler =
   in
   error, sol
 
-let dot_of_contact_map ?logger parameters (error:Exception.method_handler) handler contact_map =
+let dot_of_contact_map ?logger parameters error
+    handler contact_map scc_contact_map =
   let parameters_dot =
     match
       logger
@@ -2134,12 +2135,15 @@ let dot_of_contact_map ?logger parameters (error:Exception.method_handler) handl
          error)
       contact_map error
   in
+  (*TODO*)
   let error =
     Ckappa_sig.Agent_map_and_set.Map.fold
       (fun i site_map error ->
          Ckappa_sig.Site_map_and_set.Map.fold
            (fun j (_,b) error ->
-              let error, site = Handler.translate_site parameters_dot error handler i j in
+              let error, site =
+                Handler.translate_site parameters_dot error handler i j
+              in
               let _ =
                 match site with
                 | Ckappa_sig.Internal _ -> error
@@ -2153,7 +2157,7 @@ let dot_of_contact_map ?logger parameters (error:Exception.method_handler) handl
                          let _ =
                            Loggers.fprintf
                              (Remanent_parameters.get_logger parameters_dot)
-                             "%s.%s -- %s.%s [color=red]\n"
+                             "%s.%s -- %s.%s\n"
                              (Ckappa_sig.string_of_agent_name i)
                              (Ckappa_sig.string_of_site_name j)
                              (Ckappa_sig.string_of_agent_name i')
