@@ -1996,6 +1996,35 @@ let export_contact_map parameters error handler =
   in
   error, sol
 
+(**********************************************************)
+
+(*let convert_scc_list_to_set parameters error pair_list =
+  List.fold_left (fun (error, store_result) pair ->
+      let error, store_result =
+        Ckappa_sig.PairAgentSite_map_and_set.Set.add
+          parameters error
+          pair
+          store_result
+      in
+      error, store_result)
+    (error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty) pair_list*)
+
+let convert_scc_list_to_map parameters error internal_scc_decomposition =
+  let error, internal_scc_decomposition_map =
+    List.fold_left (fun (error, store_result) pair_list ->
+        List.fold_left (fun (error, store_result) pair ->
+            Ckappa_sig.PairAgentSite_map_and_set.Map.add
+              parameters
+              error
+              pair
+              pair_list
+              store_result
+          ) (error, store_result) pair_list
+      ) (error, Ckappa_sig.PairAgentSite_map_and_set.Map.empty)
+      internal_scc_decomposition
+  in
+  error, internal_scc_decomposition_map
+
 let dot_of_contact_map ?logger parameters error
     handler contact_map scc_contact_map =
   let parameters_dot =
@@ -2154,15 +2183,44 @@ let dot_of_contact_map ?logger parameters error
                        || (Ckappa_sig.compare_agent_name i i' = 0 &&
                            Ckappa_sig.compare_site_name j j' <= 0)
                        then
+                         let error, scc_decomposition_map =
+                           convert_scc_list_to_map parameters_dot
+                             error scc_contact_map
+                         in
                          let _ =
-                           Loggers.fprintf
-                             (Remanent_parameters.get_logger parameters_dot)
-                             "%s.%s -- %s.%s\n"
-                             (Ckappa_sig.string_of_agent_name i)
-                             (Ckappa_sig.string_of_site_name j)
-                             (Ckappa_sig.string_of_agent_name i')
-                             (Ckappa_sig.string_of_site_name j')
-                         in error
+                           match
+                             Ckappa_sig.PairAgentSite_map_and_set.Map.find_option_without_logs
+                               parameters_dot
+                               error
+                               ((i,j),(i',j'))
+                               scc_decomposition_map
+                           with
+                           | error, None ->
+                             let _ =
+                               Loggers.fprintf
+                                 (Remanent_parameters.get_logger parameters_dot)
+                                 "%s.%s -- %s.%s\n"
+                                 (Ckappa_sig.string_of_agent_name i)
+                                 (Ckappa_sig.string_of_site_name j)
+                                 (Ckappa_sig.string_of_agent_name i')
+                                 (Ckappa_sig.string_of_site_name j')
+                             in
+                             error
+                           | error, Some list ->
+                             let _ =
+                               List.iter (fun ((i,j),(i',j')) ->
+                                   Loggers.fprintf
+                                     (Remanent_parameters.get_logger parameters_dot)
+                                     "%s.%s -- %s.%s [color=red]\n"
+                                     (Ckappa_sig.string_of_agent_name i)
+                                     (Ckappa_sig.string_of_site_name j)
+                                     (Ckappa_sig.string_of_agent_name i')
+                                     (Ckappa_sig.string_of_site_name j')
+                                 ) list
+                               in
+                               error
+                         in
+                         error
                        else
                          error
                     ) error b

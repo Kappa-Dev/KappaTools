@@ -1284,6 +1284,15 @@ module AgentsSitePState_map_and_set =
 (***************************************************************************)
 (*bonds in rhs and lhs*)
 
+(*module Agentnames_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_agent_name
+         let compare = compare
+         let print = Pp.pair Format.pp_print_int Format.pp_print_int
+       end))*)
+
 module PairAgentSite_map_and_set =
   Map_wrapper.Make
     (SetMap.Make

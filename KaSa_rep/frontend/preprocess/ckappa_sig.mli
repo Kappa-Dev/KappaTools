@@ -235,25 +235,6 @@ val add_bound: Remanent_parameters_sig.parameters ->
 
 val add_free: Remanent_parameters_sig.parameters ->
     Exception.method_handler -> c_agent_id -> site_name -> mixture -> Exception.method_handler * mixture
-(*val add_link : Exception.method_handler ->
-  c_agent_id -> agent_name -> site_name ->
-  link -> Exception.method_handler * link
-
-val add_port :
-  Exception.method_handler -> link -> port ->
-  Exception.method_handler * port
-
-val add_interface : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> interface ->
-  Exception.method_handler * interface
-
-val add_agent : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> agent_name -> agent ->
-  Exception.method_handler * agent
-
-val add_mixture : Remanent_parameters_sig.parameters ->
-  Exception.method_handler -> agent_name -> mixture ->
-  Exception.method_handler * mixture*)
 
 (*******************************************************)
 (*C type*)
@@ -551,7 +532,9 @@ module Agent_id_setmap: SetMap.S with type elt = c_agent_id
 
 module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
 
-module PairAgentSite_map_and_set : Map_wrapper.S_with_logs  with type elt = (c_agent_name * c_site_name) * (c_agent_name * c_site_name)
+module PairAgentSite_map_and_set : Map_wrapper.S_with_logs
+  with type elt = (c_agent_name * c_site_name) *
+                  (c_agent_name * c_site_name)
 
 module AgentSite_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_name * c_site_name
@@ -582,13 +565,18 @@ module Views_intbdu: Mvbdu_wrapper.Internalized_mvbdu
 
 (*bonds in rhs and lhs: use in Common_static.ml*)
 
+(*module Agentnames_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_agent_name * c_agent_name*)
+
 module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
-         (c_agent_id * c_agent_name * c_site_name * c_state) * (c_agent_id * c_agent_name * c_site_name * c_state)
+         (c_agent_id * c_agent_name * c_site_name * c_state) *
+         (c_agent_id * c_agent_name * c_site_name * c_state)
 
 module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
-         (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
+         (c_agent_name * c_site_name * c_state) *
+         (c_agent_name * c_site_name * c_state)
 
 module PairAgentSitesState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
