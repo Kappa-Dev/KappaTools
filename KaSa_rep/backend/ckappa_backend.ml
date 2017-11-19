@@ -557,14 +557,14 @@ struct
       agent_string site_map bool =
     let () =
       if bool then
-        Loggers.fprintf logger ","
+        Loggers.fprintf logger "," (* Quyen: use the symbol tab instead *)
     in
-    let () = Loggers.fprintf logger "%s(" agent_string in
+    let () = Loggers.fprintf logger "%s(" agent_string in (* Quyen: use the symbol tab instead *)
     let bool =
       Wrapped_modules.LoggedStringMap.fold
         (fun site_string (internal,binding) bool ->
            let () =
-             if bool then Loggers.fprintf logger ","
+             if bool then Loggers.fprintf logger "," (* Quyen: use the symbol tab instead *)
            in
            let () = Loggers.fprintf logger "%s" site_string in
            let () =
@@ -577,39 +577,39 @@ struct
              | None | Some Free ->
                begin
                  match Remanent_parameters.get_syntax_version parameter with
-                 | Ast.V4 -> Loggers.fprintf logger "[.]"
+                 | Ast.V4 -> Loggers.fprintf logger "[.]" (* Quyen: use the symbol tab instead *)
                  | Ast.V3 -> ()
                end
              | Some Wildcard -> begin
                match Remanent_parameters.get_syntax_version parameter with
                | Ast.V4 ->
-                 Loggers.fprintf logger "[#]"
+                 Loggers.fprintf logger "[#]" (* Quyen: use the symbol tab instead *)
                | Ast.V3 ->
-                 Loggers.fprintf logger "?"
+                 Loggers.fprintf logger "?" (* Quyen: use the symbol tab instead *)
              end
              | Some Bound_to_unknown ->
                begin
                  match Remanent_parameters.get_syntax_version parameter with
                  | Ast.V4 ->
-                   Loggers.fprintf logger "[_]"
+                   Loggers.fprintf logger "[_]" (* Quyen: use the symbol tab instead *)
                  | Ast.V3 ->
-                 Loggers.fprintf logger "!_"
+                   Loggers.fprintf logger "!_" (* Quyen: use the symbol tab instead *)
                end
              | Some (Bound_to int) ->
                begin
                  match Remanent_parameters.get_syntax_version parameter with
                  | Ast.V4 ->
-                   Loggers.fprintf logger "[%i]" int
+                   Loggers.fprintf logger "[%i]" int (* Quyen: use the symbol tab instead *)
                  | Ast.V3 ->
-                 Loggers.fprintf logger "!%i" int
+                   Loggers.fprintf logger "!%i" int (* Quyen: use the symbol tab instead *)
                end
              | Some (Binding_type (ag,st)) ->
                begin
                  match Remanent_parameters.get_syntax_version parameter with
                  | Ast.V4 ->
-                   Loggers.fprintf logger "[%s.%s]" ag st
+                   Loggers.fprintf logger "[%s.%s]" ag st (* Quyen: use the symbol tab instead *)
                  | Ast.V3 ->
-                 Loggers.fprintf logger "!%s.%s" ag st
+                   Loggers.fprintf logger "!%s.%s" ag st (* Quyen: use the symbol tab instead *)
                end
            in
            true
@@ -625,7 +625,7 @@ struct
              print_aux logger parameter error kappa_handler
                agent_string site_map bool
            in
-           let () = Loggers.fprintf logger ")" in
+           let () = Loggers.fprintf logger ")" in (* Quyen: use the symbol tab instead *)
            true
         )
         t.string_version

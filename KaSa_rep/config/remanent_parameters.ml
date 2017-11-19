@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Nov 19 2017>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -105,6 +105,16 @@ let get_syntax_version () =
   site_separator            ,  |  ,
   agent_separat             ,  |  ,
   *)
+
+
+(* Quyen: What you have done is quite complicated and hardly upgradable *)
+(* Please do not duplicate the field of this struct according to the syntax version *)
+(* Instead fill them according to the syntax version *)
+(* let symbol_v3 = { (...) } *)
+(* let symbol_v4 = { (...) } *)
+(* let get_symbols () =
+   match get_syntax_version () with Ast.V3 -> symbol_V3 | Ast.V4 -> symbol_v4 *)
+(* Hopefully, you will not have to test what is the syntax version later on, since the table of symbol would be filled properly *)
 
 let get_symbols () =
   {
