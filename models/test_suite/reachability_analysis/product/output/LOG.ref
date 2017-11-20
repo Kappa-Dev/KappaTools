@@ -954,8 +954,8 @@ COMPUTE BRIDGE:
  Nodes: 
 0 ;
 1 ;
-1:0,
 0:1,
+1:0,
 SCC0;1;
 
 Generating the raw influence map...

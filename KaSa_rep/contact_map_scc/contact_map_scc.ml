@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2017, the 23rd of June
-  * Last modification: Time-stamp: <Nov 12 2017>
+  * Last modification: Time-stamp: <Nov 20 2017>
   *
   * Compute strongly connected component in contact map
   *
@@ -262,83 +262,89 @@ let keep_list l =
   | _::_::_ -> true
 
 let compute_graph_scc parameters error contact_map_converted =
-    let nodes, edges_list =
+  let error, (nodes, edges_list) =
         Ckappa_sig.PairAgentSite_map_and_set.Map.fold
-          (fun node1 potential_sites (nodes, edges) ->
-             let nodes = node1::nodes in
-             let edges =
-               List.fold_left (fun edges node2 ->
-                   (node1, node2) :: edges
-                 ) edges potential_sites
+          (fun node1 potential_sites (error, (nodes, edges)) ->
+             let error, nodes =
+               Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in parameters error node1 nodes in
+             let error, (nodes,edges) =
+               List.fold_left (fun (error, (nodes,edges)) node2 ->
+                   let error, nodes =
+                     Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in parameters error node2 nodes
+                   in
+                   error, (nodes,
+                           (node1, node2) :: edges)
+                 ) (error, (nodes,edges)) potential_sites
              in
-             nodes,edges
-          ) contact_map_converted ([], [])
-    in
-    let n_nodes = List.length nodes in
-    let nodes_array =
-      Array.make n_nodes
-        ((Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name),
-         (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name))
-    in
-    let nodes_map = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
-    let _, nodes, (error, nodes_map) =
-      List.fold_left
-        (fun (i, nodes_list, (error, map)) node ->
-           nodes_array.(i) <- node;
-           i+1,
-           (Graphs.node_of_int i) :: nodes_list,
-           Ckappa_sig.PairAgentSite_map_and_set.Map.add
+             error, (nodes,edges)
+          ) contact_map_converted (error, (Ckappa_sig.PairAgentSite_map_and_set.Set.empty, []))
+  in
+  let nodes = Ckappa_sig.PairAgentSite_map_and_set.Set.elements nodes in
+  let n_nodes = List.length nodes in
+  let nodes_array =
+    Array.make n_nodes
+      ((Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name),
+       (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_site_name))
+  in
+  let nodes_map = Ckappa_sig.PairAgentSite_map_and_set.Map.empty in
+  let _, nodes, (error, nodes_map) =
+    List.fold_left
+      (fun (i, nodes_list, (error, map)) node ->
+         nodes_array.(i) <- node;
+         i+1,
+         (Graphs.node_of_int i) :: nodes_list,
+         Ckappa_sig.PairAgentSite_map_and_set.Map.add
+           parameters error
+           node
+           (Graphs.node_of_int i)
+           map
+      ) (0, [], (error, nodes_map)) nodes
+  in
+  let error, edges =
+    List.fold_left
+      (fun (error, l) (a,b) ->
+         let error, node_opt =
+           Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
              parameters error
-             node
-             (Graphs.node_of_int i)
-             map
-        ) (0, [], (error, nodes_map)) nodes
-    in
-    let error, edges =
-      List.fold_left
-        (fun (error, l) (a,b) ->
-           let error, node_opt =
-            Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
-              parameters error
-              a
-              nodes_map
-           in
-           let error, node_opt' =
-            Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
-              parameters error
-              b
-              nodes_map
-           in
-           match node_opt,node_opt' with
-           | None, _ | _, None ->
-             Exception.warn parameters error __POS__ Exit l
-           | Some a, Some b -> error, (a, (), b) :: l)
-        (error, []) edges_list
-    in
-    (*build a graph_scc*)
-    let graph =
-      Graphs.create parameters error
-        (fun _ -> ())
-        nodes
-        edges
-       in
-       (*compute scc*)
-       let error, _low, _pre, _on_stack, scc =
-         Graphs.compute_scc parameters error
-           (fun () -> "")
-           graph
-       in
-       let scc =
+             a
+             nodes_map
+         in
+         let error, node_opt' =
+           Ckappa_sig.PairAgentSite_map_and_set.Map.find_option
+             parameters error
+             b
+             nodes_map
+         in
+         match node_opt,node_opt' with
+         | None, _ | _, None ->
+           Exception.warn parameters error __POS__ Exit l
+         | Some a, Some b -> error, (a, (), b) :: l)
+      (error, []) edges_list
+  in
+  (*build a graph_scc*)
+  let graph =
+    Graphs.create parameters error
+      (fun _ -> ())
+      nodes
+      edges
+  in
+  (*compute scc*)
+  let error, _low, _pre, _on_stack, scc =
+    Graphs.compute_scc parameters error
+      (fun () -> "")
+      graph
+  in
+  let scc =
+    List.rev_map
+      (fun a ->
          List.rev_map
-           (fun a ->
-              List.rev_map
-                (fun b -> nodes_array.(Graphs.int_of_node b))
-                (List.rev a))
-           (List.rev scc )
-       in
-       let scc =
-         List.fold_left
-           (fun l a -> if keep_list a then a::l else l)
-           [] (List.rev scc)
-       in
-       error, scc
+           (fun b -> nodes_array.(Graphs.int_of_node b))
+           (List.rev a))
+      (List.rev scc )
+  in
+  let scc =
+    List.fold_left
+      (fun l a -> if keep_list a then a::l else l)
+      [] (List.rev scc)
+  in
+  error, scc

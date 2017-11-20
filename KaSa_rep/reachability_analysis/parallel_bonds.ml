@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Jul 19 2017>
+  * Last modification: Time-stamp: <Nov 20 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -556,7 +556,7 @@ struct
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
-  let common_scan parameters error store_value list  =
+  let common_scan parameters error tuple_of_interest store_value list  =
     let rec scan list error =
       match
         list
@@ -571,8 +571,13 @@ struct
               pair
               store_value
           with
-          (*if we do not find the pair on the lhs inside the result, then return undefined, if there is a double bound then returns its value.*)
-          | error, None -> error, Usual_domains.Undefined
+          (*if we do not find the pair on the lhs inside the result, then return undefined if this is a tuple of interest, Any if this is not;  if there is a double bound then returns its value.*)
+          | error, None ->
+            if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem pair tuple_of_interest
+            then
+              error, Usual_domains.Undefined
+            else
+              error, Usual_domains.Any
           | error, Some v -> error, v
         in
         (*matching the value on the lhs*)
@@ -591,6 +596,7 @@ struct
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id)
       precondition =
     let parameters = get_parameter static in
+    let tuples_of_interest = get_tuples_of_interest static in
     (*-----------------------------------------------------------*)
     (*look into the lhs, whether or not there exists a double bound.*)
     let store_rule_has_parallel_bonds_lhs = get_rule_double_bonds_lhs static in
@@ -612,7 +618,7 @@ struct
     (*-----------------------------------------------------------*)
     let store_value = get_value dynamic in
     let error, bool =
-      common_scan parameters error store_value list
+      common_scan parameters error tuples_of_interest store_value list
     in
     if bool
     then error, dynamic, Some precondition
@@ -624,6 +630,7 @@ struct
   (* non parallel bonds in a pattern can be maps to parallel ones through morphisms *)
   (* thus when the flag is Morphisms with ignore non parallel bonds *)
     let parameters = get_parameter static in
+    let tuples_of_interest = get_tuples_of_interest static in
     let error, parallel_map =
       Parallel_bonds_static.collect_double_bonds_in_pattern
         parameters error
@@ -649,7 +656,7 @@ struct
     in
     let store_value = get_value dynamic in
     let error, bool =
-      common_scan parameters error store_value list
+      common_scan parameters error tuples_of_interest store_value list
     in
     if bool
     then error, dynamic, Some precondition

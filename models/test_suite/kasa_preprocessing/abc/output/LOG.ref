@@ -1527,17 +1527,17 @@ COMPUTE BRIDGE:
 3 ;
 4 ;
 5 ;
-4:0,
-3:1,
-2:4,3,
 1:5,
-0:5,
-SCC2;
-3;
+2:4,
+3:1,2,
+4:0,
+5:0,
+SCC3;
+2;
 4;
 1;
-0;
 5;
+0;
 
 Generating the raw influence map...
 Quarks:Quarkify

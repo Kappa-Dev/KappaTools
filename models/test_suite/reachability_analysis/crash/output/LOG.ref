@@ -437,12 +437,12 @@ COMPUTE BRIDGE:
 0 ;
 1 ;
 2 ;
-2:0,
-1:2,1,
-0:0,
+0:2,
+1:0,1,
+2:2,
 SCC1;
-2;
 0;
+2;
 
 Generating the raw influence map...
 Quarks:Quarkify
