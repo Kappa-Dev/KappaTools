@@ -13,14 +13,14 @@ label =  "A";  shape = rectangle; color = red
 } ; 
 0.1 -- 0.1 [color=red]
 0.0 -- 0.0 [color=red]
-0.1 -- 0.0 [color=red]
-0.0 -- 0.1 [color=red]
+0.1 -- 0.0 
+0.0 -- 0.1 
 0.1 -- 0.1 [color=red]
 0.0 -- 0.0 [color=red]
-0.1 -- 0.0 [color=red]
-0.0 -- 0.1 [color=red]
+0.1 -- 0.0 
+0.0 -- 0.1 
 0.1 -- 0.1 [color=red]
 0.0 -- 0.0 [color=red]
-0.1 -- 0.0 [color=red]
-0.0 -- 0.1 [color=red]
+0.1 -- 0.0 
+0.0 -- 0.1 
 }

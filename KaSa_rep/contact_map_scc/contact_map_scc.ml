@@ -53,7 +53,6 @@ Later you can use the dictionary to get (agent, site) from the id,
 and conversely, the pair from the id.
 *)
 
-
 type site = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
 
 type node = site * site
@@ -139,7 +138,7 @@ let mixture_of_edge
     let error, mixture = Preprocess.empty_mixture parameters error in
     Exception.warn parameters error __POS__ Exit mixture
   else
-    (* TO DO build the pattern:
+    (* build the pattern:
        A(x!1), B(x!1, y!2), C(x!2)
        ag(st!1), ag'(st'!1, st''!2), ag'''(st'''!2)
     *)
@@ -261,7 +260,6 @@ let keep_list l =
   | [] -> false
   | [(a,_),(a',_)] -> a=a'
   | _::_::_ -> true
-
 
 let compute_graph_scc parameters error contact_map_converted =
     let nodes, edges_list =
