@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'essai.ka' '-syntax' '3' '-d' 'output' '-l' '1' '-p''0.1'
+%      'KaDE' 'essai.ka' '-syntax' '4' '-d' 'output' '-l' '1' '-p''0.1'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -152,7 +152,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE essai.ka -syntax 3 -d output -l 1 -p 0.1\n')
+fprintf(fid,'# KaDE essai.ka -syntax 4 -d output -l 1 -p 0.1\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')

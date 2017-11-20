@@ -1,6 +1,6 @@
 #Command-line:
-"${KAPPABIN}"KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
-"${KAPPABIN}"KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
-"${KAPPABIN}"KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend MAPLE || exit 0
-"${KAPPABIN}"KaDE expr.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA || exit 0
+"${KAPPABIN}"KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
+"${KAPPABIN}"KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MAPLE || exit 0
+"${KAPPABIN}"KaDE expr.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend MATHEMATICA || exit 0
 #This is the classical expr model.

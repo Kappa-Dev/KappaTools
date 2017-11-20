@@ -1,6 +1,6 @@
 #Command-line:
-"${KAPPABIN}"KaDE modifiers.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
-"${KAPPABIN}"KaDE modifiers.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE modifiers.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
+"${KAPPABIN}"KaDE modifiers.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
 
 #When species are in a rate constant but not in the reactants
 #it should be listed in the modifiers

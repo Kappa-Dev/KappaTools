@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'autos.ka' '-d' 'output' '-syntax' '3' '--output' 'occurrences_bwd''-l' '1' '-p' '0.01' '--rate-convention' 'KaSim' '--with-symmetries''Backward' '--output-plot''occurrences_bwd.csv'
+%      'KaDE' 'autos.ka' '-d' 'output' '-syntax' '4' '--output' 'occurrences_bwd''-l' '1' '-p' '0.01' '--rate-convention' 'KaSim' '--with-symmetries''Backward' '--output-plot''occurrences_bwd.csv'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -155,7 +155,7 @@ end
 
 filename = 'occurrences_bwd.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE autos.ka -d output -syntax 3 --output occurrences_bwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Backward --output-plot occurrences_bwd.csv\n')
+fprintf(fid,'# KaDE autos.ka -d output -syntax 4 --output occurrences_bwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Backward --output-plot occurrences_bwd.csv\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'cst,')

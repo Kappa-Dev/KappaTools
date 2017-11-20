@@ -1,6 +1,6 @@
 #Command-line:
-"${KAPPABIN}"KaDE tokens4.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
-"${KAPPABIN}"KaDE tokens4.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
+"${KAPPABIN}"KaDE tokens4.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE tokens4.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
 
 #floatting point numbers in stoichiometry
 #Time dependent stoichiometry is bad for SBML

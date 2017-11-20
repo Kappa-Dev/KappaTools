@@ -1,8 +1,8 @@
-%init: 10 A(x!1),B(x!1)
+%init: 10 A(x[1]),B(x[1])
 
-A(x!_,y),B(x!_,y)-> A(x!_,y!1),B(x!_,y!1),C() @ 0{100}
+A(x[_],y[.]),B(x[_],y[.]),. -> A(x[_],y[1]),B(x[_],y[1]),C() @ 0{100}
 
-%obs: 'goal' C()
+%obs: 'goal' |C()|
 %agent: A(x,y)
 %agent: B(x,y)
 %agent: C()

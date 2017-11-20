@@ -1,4 +1,4 @@
-%agent: A(x~u~p,y~u~p)
+%agent: A(x{u p},y{u p})
 %token: tt
 %init: 10 A()
 
@@ -6,7 +6,7 @@
 %var: 'b' 'a'*'a'*'a'*[T]
 %var: 'c' 1+1
 
-A(x~u) <-> A(x~p) @1,'a'
-A(y~u) <-> A(y~p) @1,'c'
-A() -> A() | ('a'*'a'*[T]):tt @ 'b'
-A() -> A() | ('a'*'a'*[T]):tt @ 'b'
+A(x{u}[.]) <-> A(x{p}[.]) @ 1,'a'
+A(y{u}[.]) <-> A(y{p}[.]) @ 1,'c'
+A() -> A() | ('a'*'a'*[T]) tt @ 'b'
+A() -> A() | ('a'*'a'*[T]) tt @ 'b'

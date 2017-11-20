@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'hayman.ka' '-syntax' '3' '-d''output'
+%      'KaDE' 'hayman.ka' '-syntax' '4' '-d''output'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -151,7 +151,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE hayman.ka -syntax 3 -d output\n')
+fprintf(fid,'# KaDE hayman.ka -syntax 4 -d output\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')

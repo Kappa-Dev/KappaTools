@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaDE polymers.ka  -d output -syntax 3 --truncate 4 || exit 0
+"${KAPPABIN}"KaDE polymers.ka  -d output -syntax 4 --truncate 4 || exit 0

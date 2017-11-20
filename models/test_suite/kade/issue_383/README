@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaDE essai.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE essai.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
 
 #Stochiometric coef should be evaluated after the set of species is known.

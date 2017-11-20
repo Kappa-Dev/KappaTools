@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'autos.ka' '-d' 'output' '-syntax' '3' '--output' 'embeddings_fwd''--with-symmetries' 'Forward' '-l' '1' '-p' '0.01' '--rate-convention''KaSim' '--output-plot''embeddings_fwd.csv'
+%      'KaDE' 'autos.ka' '-d' 'output' '-syntax' '4' '--output' 'embeddings_fwd''--with-symmetries' 'Forward' '-l' '1' '-p' '0.01' '--rate-convention''KaSim' '--output-plot''embeddings_fwd.csv'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -155,7 +155,7 @@ end
 
 filename = 'embeddings_fwd.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE autos.ka -d output -syntax 3 --output embeddings_fwd --with-symmetries Forward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_fwd.csv\n')
+fprintf(fid,'# KaDE autos.ka -d output -syntax 4 --output embeddings_fwd --with-symmetries Forward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_fwd.csv\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'cst,')

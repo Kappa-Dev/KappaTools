@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaDE auto.ka  -d output -l 1 -p 0.01 -syntax 3 --rate-convention Biochemist || exit 0
+"${KAPPABIN}"KaDE auto.ka  -d output -l 1 -p 0.01 -syntax 4 --rate-convention Biochemist || exit 0
 
 #This is the classical erre model.

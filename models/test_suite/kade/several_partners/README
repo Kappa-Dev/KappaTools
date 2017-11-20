@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaDE several_partners.ka -syntax 3 -d output -l 1 -p 0.01 || exit 0
+"${KAPPABIN}"KaDE several_partners.ka -syntax 4 -d output -l 1 -p 0.01 || exit 0
 
 #Test what happen in case of a side-effect with several potential partner.

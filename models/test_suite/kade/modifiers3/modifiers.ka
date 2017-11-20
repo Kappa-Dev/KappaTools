@@ -1,16 +1,16 @@
 %agent: T(x)
-%agent: U(x,y~u~p)
+%agent: U(x,y{u p})
 
 %var: 'nT' 10
-%var: 'qU' |U(x?)|
+%var: 'qU' |U(x[#])|
 
 %init: 'nT' T()
 %init: 'nT' U()
 
-'essai' U() -> T() @ 1
-'essai2' U(y~u) -> U(y~p) @ 'nT'
-'bind' U(x),T(x) -> U(x!1),T(x!1)   @ 'qU'
-'unbind' U(x!1),T(x!1) -> U(x),T(x) @ |T(x?)|
+'essai' U(),. -> .,T() @ 1
+'essai2' U(y{u}[.]) -> U(y{p}[.]) @ 'nT'
+'bind' U(x[.]),T(x[.]) -> U(x[1]),T(x[1]) @ 'qU'
+'unbind' U(x[1]),T(x[1]) -> U(x[.]),T(x[.]) @ |T(x[#])|
 
-%obs: 't' |U(x)|
-%obs: 'T' |T(x)|
+%obs: 't' |U(x[.])|
+%obs: 'T' |T(x[.])|

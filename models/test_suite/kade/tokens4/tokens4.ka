@@ -4,10 +4,10 @@
 %var: 'nT' 10
 
 %init: 'nT' T()
-%init: t <- 10
+%init: 10 t
 
-'expo'  T() -> T(),T() @1
-'expo2' | |t|:t -> | 2:t @|t|+|u|
-'expo3' | (|T()|+|t|+'nT'):t + 2:u -> | 2.2:t @|t|
+'expo'  T(),. -> T(),T() @ 1
+'expo2' | |t| t -> | 2 t @ |t|+|u|
+'expo3' | (|T()|+|t|+'nT') t , 2 u -> | 2.2 t @ |t|
 %obs: 't' |t|
 %obs: 'T' |T()|

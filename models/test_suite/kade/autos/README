@@ -1,9 +1,9 @@
 #Command-line:
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output embeddings --output-plot embeddings.csv -l 1 -p 0.01 --rate-convention KaSim  || exit 0
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output occurrences -l 1 -p 0.01 --rate-convention KaSim  --output-plot occurrences.csv || exit 0
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output embeddings_bwd --with-symmetries Backward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_bwd.csv || exit 0
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output occurrences_bwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Backward --output-plot occurrences_bwd.csv|| exit 0
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output embeddings_fwd --with-symmetries Forward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_fwd.csv || exit 0
-"${KAPPABIN}"KaDE autos.ka  -d output -syntax 3 --output occurrences_fwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Forward --output-plot occurrences_fwd.csv|| exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output embeddings --output-plot embeddings.csv -l 1 -p 0.01 --rate-convention KaSim  || exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output occurrences -l 1 -p 0.01 --rate-convention KaSim  --output-plot occurrences.csv || exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output embeddings_bwd --with-symmetries Backward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_bwd.csv || exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output occurrences_bwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Backward --output-plot occurrences_bwd.csv|| exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output embeddings_fwd --with-symmetries Forward -l 1 -p 0.01 --rate-convention KaSim --output-plot embeddings_fwd.csv || exit 0
+"${KAPPABIN}"KaDE autos.ka  -d output -syntax 4 --output occurrences_fwd -l 1 -p 0.01 --rate-convention KaSim --with-symmetries Forward --output-plot occurrences_fwd.csv|| exit 0
 
 #check that observables are properly handleds.

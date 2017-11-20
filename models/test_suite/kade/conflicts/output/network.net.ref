@@ -1,5 +1,5 @@
 # command line: 
-#       KaDE   conflicts.ka   -d   output   -syntax   3    -ode-backend  DOTNET 
+#       KaDE   conflicts.ka   -d   output   -syntax   4    -ode-backend  DOTNET 
 # THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 # 
 # init - the initial abundances of each species and token

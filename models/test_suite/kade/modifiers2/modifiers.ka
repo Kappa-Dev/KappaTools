@@ -7,8 +7,8 @@
 %init: 'nT' T()
 %init: 'nT' U()
 
-'bind' U(x),T(x) -> U(x!1),T(x!1) @ 'qU'
-'unbind' U(x!1),T(x!1) -> U(x),T(x) @ |T()|
+'bind' U(x[.]),T(x[.]) -> U(x[1]),T(x[1]) @ 'qU'
+'unbind' U(x[1]),T(x[1]) -> U(x[.]),T(x[.]) @ |T()|
 
-%obs: 't' |U(x)|
-%obs: 'T' |T(x)|
+%obs: 't' |U(x[.])|
+%obs: 'T' |T(x[.])|

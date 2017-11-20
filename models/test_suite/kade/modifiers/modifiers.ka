@@ -2,13 +2,13 @@
 %agent: U(x)
 
 %var: 'nT' 10
-%var: 'qU' |U(x)|
+%var: 'qU' |U(x[.])|
 
 %init: 'nT' T()
 %init: 'nT' U()
 
-'bind' U(x),T(x) -> U(x!1),T(x!1) @ 'qU'
-'unbind' U(x!1),T(x!1) -> U(x),T(x) @ |T(x)|
+'bind' U(x[.]),T(x[.]) -> U(x[1]),T(x[1]) @ 'qU'
+'unbind' U(x[1]),T(x[1]) -> U(x[.]),T(x[.]) @ |T(x[.])|
 
-%obs: 't' |U(x)|
-%obs: 'T' |T(x)|
+%obs: 't' |U(x[.])|
+%obs: 'T' |T(x[.])|

@@ -1,6 +1,6 @@
 function main=main()
 % command line: 
-%      'KaDE' 'polymers.ka' '-d' 'output' '-syntax' '3' '--truncate''4'
+%      'KaDE' 'polymers.ka' '-d' 'output' '-syntax' '4' '--truncate''4'
 %% THINGS THAT ARE KNOWN FROM KAPPA FILE AND KaSim OPTIONS:
 %% 
 %% init - the initial abundances of each species and token
@@ -152,7 +152,7 @@ end
 
 filename = 'data.csv';
 fid = fopen (filename,'w');
-fprintf(fid,'# KaDE polymers.ka -d output -syntax 3 --truncate 4\n')
+fprintf(fid,'# KaDE polymers.ka -d output -syntax 4 --truncate 4\n')
 fprintf(fid,'# ')
 fprintf(fid,'[T],')
 fprintf(fid,'\n')

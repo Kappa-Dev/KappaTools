@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaDE nonneg.ka -syntax 3 -d output -l 1 -p 0.1 || exit 0
+"${KAPPABIN}"KaDE nonneg.ka -syntax 4 -d output -l 1 -p 0.1 || exit 0
 
 
 #Test with tokens and nonnegative concentrations. 

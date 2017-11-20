@@ -1,7 +1,7 @@
-%agent: A(x~u~p,y~u~p)
+%agent: A(x{u p},y{u p})
 %token: d
 
 %init: 10 A()
 
-A(x~u) -> A(x~p) | |A()|:d @1
-A(x~p,y~u) -> A(x~p,y~p) @1
+A(x{u}[.]) -> A(x{p}[.]) | |A()| d @ 1
+A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{p}[.]) @ 1

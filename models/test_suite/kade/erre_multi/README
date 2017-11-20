@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaDE erre.ka -syntax 3 -d output -l 1 -p 0.01 || exit 0
-"${KAPPABIN}"KaDE erre.ka -syntax 3 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
+"${KAPPABIN}"KaDE erre.ka -syntax 4 -d output -l 1 -p 0.01 || exit 0
+"${KAPPABIN}"KaDE erre.ka -syntax 4 -d output -l 1 -p 0.1 --ode-backend SBML || exit 0
 
 #We test what happens in case of ambiguous side effect

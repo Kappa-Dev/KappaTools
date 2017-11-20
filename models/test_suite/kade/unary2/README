@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaDE unary2.ka  -d output -syntax 3 || exit 0
+"${KAPPABIN}"KaDE unary2.ka  -d output -syntax 4 || exit 0
 
 #the rule should apply creating some C()s.
 #Since there is only one semi-links this example is easier than the first one.

@@ -1,21 +1,21 @@
-%agent: A(x~u~p,y~u~p)
-%agent: B(x~u~p,y~u~p)
-%agent: C(x~u~p,y~u~p)
-%agent: D(x~u~p,y~u~p)
+%agent: A(x{u p},y{u p})
+%agent: B(x{u p},y{u p})
+%agent: C(x{u p},y{u p})
+%agent: D(x{u p},y{u p})
 %token: a
 %token: b
 
-A(x~u) <-> A(x~p) @1,1
-B(x~u) <-> B(x~p) @1,1
-B(y~u) <-> B(y~p) @1,1
-C(x~u) <-> C(x~p) @1,1
-C(y~p) <-> C(y~p) @1,1
-D(x~u) <-> D(x~p) @1,1
-D(y~u) <-> D(y~p) @1,1
+A(x{u}[.]) <-> A(x{p}[.]) @ 1,1
+B(x{u}[.]) <-> B(x{p}[.]) @ 1,1
+B(y{u}[.]) <-> B(y{p}[.]) @ 1,1
+C(x{u}[.]) <-> C(x{p}[.]) @ 1,1
+C(y{p}[.]) <-> C(y{p}[.]) @ 1,1
+D(x{u}[.]) <-> D(x{p}[.]) @ 1,1
+D(y{u}[.]) <-> D(y{p}[.]) @ 1,1
 
--> A() @1
-A() -> A() | 1:a @1
-|1:a -> B() @1
-B() -> C() @1
-C() -> D() @1
-D() -> D() | 1:b @1
+. -> A() @ 1
+A() -> A() | 1 a @ 1
+. | 1 a -> B() @ 1
+B(),. -> .,C() @ 1
+C(),. -> .,D() @ 1
+D() -> D() | 1 b @ 1

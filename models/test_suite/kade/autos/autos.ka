@@ -3,10 +3,10 @@
 %var: 'cstt' |A()|
 %init: 10 A()
 
-A(x,y),A(x,y) -> A(x!1,y),A(x!1,y) @ 'cstt'
-A(x,y),A(x,y) -> A(x!1,y),A(x,y!1) @ 'k'
-A(x,y),A(x,y) -> A(x,y!1),A(x,y!1) @ 'k'
+A(x[.],y[.]),A(x[.],y[.]) -> A(x[1],y[.]),A(x[1],y[.]) @ 'cstt'
+A(x[.],y[.]),A(x[.],y[.]) -> A(x[1],y[.]),A(x[.],y[1]) @ 'k'
+A(x[.],y[.]),A(x[.],y[.]) -> A(x[.],y[1]),A(x[.],y[1]) @ 'k'
 
 %obs: 'cst' |A()|
-%obs: 'x_free' |A(x)|
-%obs: 'x_dimer' |A(x!1),A(x!1)|
+%obs: 'x_free' |A(x[.])|
+%obs: 'x_dimer' |A(x[1]),A(x[1])|

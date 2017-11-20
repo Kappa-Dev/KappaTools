@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaDE conflicts.ka  -d output -syntax 3 --ode-backend DOTNET || exit 0
+"${KAPPABIN}"KaDE conflicts.ka  -d output -syntax 4 --ode-backend DOTNET || exit 0
 
 # additional variable for rule rates shall be allocated while avoiding conflicts with existing ones
