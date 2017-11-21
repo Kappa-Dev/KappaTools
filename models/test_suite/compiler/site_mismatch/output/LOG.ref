@@ -1,0 +1,70 @@
+Parsing crash.ka...
+done
++ simulation parameters
++ Sanity checks
+Parsing crash.ka...
+done
+Scan rules!
+Signature:
+Signature:agents:
+Signature:agents:agent_type:0:C
+Signature:sites:
+Signature:sites:0:
+Signature:states: 
+Signature:duals: 
+Compiling...
+Generating the raw contact map...
+Compilation:Compilation:initial_states:0:
+Compilation:initial_states:0:mixture:
+Compilation:initial_states:0:mixture:agent_id_0:
+Reachability analysis...
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
+Generating the raw influence map...
+Quarks:Quarkify
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Refining the influence map...
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+------------------------------------------------------------
+* Export Views domain - non relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Views domain - relational properties to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Connected agents to JSon (internal constraints_list):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Export Parallel bonds to JSon (internal constraints_list):
+------------------------------------------------------------
+
+Some exceptions have been raised
+error: file_name: KaSa_rep/frontend/preprocess/prepreprocess.ml; message: line 830, File "crash.ka", line 4, characters 5-69:: missaligned rule: the rule is ignored; exception:Exit

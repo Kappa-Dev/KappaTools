@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSim -d output --compile -syntax 4 crash.ka || true
+"${KAPPABIN}"KaSa crash.ka --output-directory output --debugging-mode -syntax 4
+exit 0
