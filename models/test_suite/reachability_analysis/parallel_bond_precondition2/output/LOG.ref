@@ -797,13 +797,8 @@ A(t[1]),B(t[1]) =>
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-<<<<<<< HEAD
-A(t[B.t],z[B.z]) => A(t[2],z[1]),B(z[1]),B(t[2])
-B(t[A.t],z[A.z]) => B(t[2],z[1]),A(z[1]),A(t[2])
-=======
 
 
->>>>>>> bugfix parallel bonds
 INTENSIONAL DESCRIPTION:
 Id=31
  Node(site_type:1<0)
@@ -1188,10 +1183,5 @@ A(t[1]),B(t[1])=> [
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
-<<<<<<< HEAD
-A(t[B.t],z[B.z])=> [A(t[2],z[1]),B(z[1]),B(t[2])]
-B(t[A.t],z[A.z])=> [B(t[2],z[1]),A(z[1]),A(t[2])]
-=======
->>>>>>> bugfix parallel bonds
 
 execution finished without any exception
