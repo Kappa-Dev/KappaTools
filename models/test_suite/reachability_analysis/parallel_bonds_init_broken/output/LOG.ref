@@ -126,7 +126,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( t!free )
+		A( t[.] )
 
 	Views in initial state:
 
@@ -145,7 +145,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!free )
+		A( z[.] )
 
 	Views in initial state:
 
@@ -164,7 +164,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t!free )
+		B( t[.] )
 
 	Views in initial state:
 
@@ -183,7 +183,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!free )
+		B( z[.] )
 
 	Views in initial state:
 
@@ -202,7 +202,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( t!B@t )
+		A( t[B@t] )
 
 	Views in initial state:
 
@@ -221,7 +221,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!B@z )
+		A( z[B@z] )
 
 	Views in initial state:
 
@@ -240,7 +240,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( t!A@t )
+		B( t[A@t] )
 
 	Views in initial state:
 
@@ -259,24 +259,24 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!A@z )
+		B( z[A@z] )
 
 
-	Applying rule A(t[_]) -> A(t) (File "parallel_bonds.ka", line 8, characters 0-17:):
+	Applying rule A(t[_]) -> A(t[.]) (File "parallel_bonds.ka", line 8, characters 0-22:):
 		the precondition is satisfied
 
-		rule A(t[_]) -> A(t) (File "parallel_bonds.ka", line 8, characters 0-17:) is applied for the first time
+		rule A(t[_]) -> A(t[.]) (File "parallel_bonds.ka", line 8, characters 0-22:) is applied for the first time
 
-		Updating the views for A(t!)
+		Updating the views for A(t[])
 
-	Applying rule A(t), B(t) -> A(t[1]), B(t[1]) (File "parallel_bonds.ka", line 9, characters 0-29:):
+	Applying rule A(t[.]), B(t[.]) -> A(t[1]), B(t[1]) (File "parallel_bonds.ka", line 9, characters 0-38:):
 		the precondition is satisfied
 
-		rule A(t), B(t) -> A(t[1]), B(t[1]) (File "parallel_bonds.ka", line 9, characters 0-29:) is applied for the first time
+		rule A(t[.]), B(t[.]) -> A(t[1]), B(t[1]) (File "parallel_bonds.ka", line 9, characters 0-38:) is applied for the first time
 
-		Updating the views for A(t!)
+		Updating the views for A(t[])
 
-		Updating the views for B(t!)
+		Updating the views for B(t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -405,10 +405,10 @@ Id=12
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t) v A(t!B.t) ]
-A() => [ A(z) v A(z!B.z) ]
-B() => [ B(t) v B(t!A.t) ]
-B() => [ B(z) v B(z!A.z) ]
+A() => [ A(t[.]) v A(t[B.t]) ]
+A() => [ A(z[.]) v A(z[B.z]) ]
+B() => [ B(t[.]) v B(t[A.t]) ]
+B() => [ B(z[.]) v B(z[A.z]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -675,23 +675,23 @@ Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:0->[0*]
 Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:1->[1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' A(t!_)->A(t) -> rule(1):'' A(t),B(t)->A(t!1),B(t!1)[0*->1];[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(t),B(t)->A(t!1),B(t!1) -> rule(0):'' A(t!_)->A(t)[0->0]
+Influence_map:Wake_up_map:rule(0):'' A(t[_])->A(t[.]) -> rule(1):'' A(t[.]),B(t[.])->A(t[1]),B(t[1])[0*->1];[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(t[.]),B(t[.])->A(t[1]),B(t[1]) -> rule(0):'' A(t[_])->A(t[.])[0->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(z)
-		v B(z!A.z)]
+		  B(z[.])
+		v B(z[A.z])]
 B()=> [
-		  B(t)
-		v B(t!A.t)]
+		  B(t[.])
+		v B(t[A.t])]
 A()=> [
-		  A(z)
-		v A(z!B.z)]
+		  A(z[.])
+		v A(z[B.z])]
 A()=> [
-		  A(t)
-		v A(t!B.t)]
+		  A(t[.])
+		v A(t[B.t])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):

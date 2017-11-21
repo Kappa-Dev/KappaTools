@@ -119,7 +119,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!free ,t!free )
+		A( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -148,15 +148,15 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!free ,t!free )
+		B( z[.] ,t[.] )
 
 
-	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 4-46:):
+	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):
 		the precondition is satisfied
 
-		rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 4-46:) is applied for the first time
+		rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -183,10 +183,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!B@z ,t!B@t )
+		A( z[B@z] ,t[B@t] )
 
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -213,15 +213,15 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!A@z ,t!A@t )
+		B( z[A@z] ,t[A@t] )
 
 
-	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 4-46:):
+	Applying rule r0 (File "atomic_parallel_bonds.ka", line 7, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -372,10 +372,10 @@ Id=23
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t) v A(t!B.t) ]
-A() => [ A(z) v A(z!B.z) ]
-B() => [ B(t) v B(t!A.t) ]
-B() => [ B(z) v B(z!A.z) ]
+A() => [ A(t[.]) v A(t[B.t]) ]
+A() => [ A(z[.]) v A(z[B.z]) ]
+B() => [ B(t[.]) v B(t[A.t]) ]
+B() => [ B(z[.]) v B(z[A.z]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -460,16 +460,16 @@ Id=28
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z!B.z) <=> A(t!B.t)
-B(z!A.z) <=> B(t!A.t)
+A(z[B.z]) <=> A(t[B.t])
+B(z[A.z]) <=> B(t[A.t])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(t!B.t,z!B.z) => A(t!2,z!1),B(t!2,z!1)
-B(t!A.t,z!A.z) => B(t!2,z!1),A(t!2,z!1)
+A(t[B.t],z[B.z]) => A(t[2],z[1]),B(t[2],z[1])
+B(t[A.t],z[A.z]) => B(t[2],z[1]),A(t[2],z[1])
 INTENSIONAL DESCRIPTION:
 Id=20
  Node(site_type:1<0)
@@ -682,23 +682,23 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 B()=> [
-		  B(z)
-		v B(z!A.z)]
+		  B(z[.])
+		v B(z[A.z])]
 B()=> [
-		  B(t)
-		v B(t!A.t)]
+		  B(t[.])
+		v B(t[A.t])]
 A()=> [
-		  A(z)
-		v A(z!B.z)]
+		  A(z[.])
+		v A(z[B.z])]
 A()=> [
-		  A(t)
-		v A(t!B.t)]
+		  A(t[.])
+		v A(t[B.t])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(z!B.z)=> [A(t!B.t)]
-B(z!A.z)=> [B(t!A.t)]
+A(z[B.z])=> [A(t[B.t])]
+B(z[A.z])=> [B(t[A.t])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
@@ -707,7 +707,7 @@ B(z!A.z)=> [B(t!A.t)]
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t!B.t,z!B.z)=> [A(t!2,z!1),B(t!2,z!1)]
-B(t!A.t,z!A.z)=> [B(t!2,z!1),A(t!2,z!1)]
+A(t[B.t],z[B.z])=> [A(t[2],z[1]),B(t[2],z[1])]
+B(t[A.t],z[A.z])=> [B(t[2],z[1]),A(t[2],z[1])]
 
 execution finished without any exception

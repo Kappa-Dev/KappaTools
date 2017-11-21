@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSa empty_agents.ka --debugging-mode --output-directory output -syntax 3 || exit 0
+"${KAPPABIN}"KaSa empty_agents.ka --debugging-mode --output-directory output -syntax 4 || exit 0
 
 #checking that KaSa deals with soundly and accurately with empty agents.
 # D is reachable, but not F.

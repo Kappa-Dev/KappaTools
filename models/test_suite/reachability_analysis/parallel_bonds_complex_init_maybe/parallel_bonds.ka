@@ -1,16 +1,16 @@
-%agent:A(x~u~p,z,t)
-%agent:B(x~u~p,z,t)
+%agent:A(x{u p},z,t)
+%agent:B(x{u p},z,t)
 
-%init: 10 A(x~u,z,t)
-%init: 10 B(x~u,z,t)
+%init: 10 A(x{u},z[.],t[.])
+%init: 10 B(x{u},z[.],t[.])
 
-'r0' A(x~u) -> A(x~p) @1
-'r1' B(x~u) -> B(x~p) @1
-'r2' A(x~p,z,t),B(x~p,z,t) -> A(x~p,z!1,t),B(x~p,z!1,t) @1
-'r3' A(t),B(t) -> A(t!1),B(t!1) @1 #because of this rule
-'r4' A(t!1,z),B(t!1,z) -> A(t!1,z!2),B(t!1,z!2) @1
-'r5' A(t,z!1),B(t,z!1) -> A(t!2,z!1),B(t!2,z!1) @1
-'r6' A(x~p) -> A(x~u) @1
-'r7' B(x~p) -> B(x~u) @1
+'r0' A(x{u}[.]) -> A(x{p}[.]) @ 1
+'r1' B(x{u}[.]) -> B(x{p}[.]) @ 1
+'r2' A(x{p}[.],z[.],t[.]),B(x{p}[.],z[.],t[.]) -> A(x{p}[.],z[1],t[.]),B(x{p}[.],z[1],t[.]) @ 1
+'r3' A(t[.]),B(t[.]) -> A(t[1]),B(t[1]) @ 1 //because of this rule
+'r4' A(t[1],z[.]),B(t[1],z[.]) -> A(t[1],z[2]),B(t[1],z[2]) @ 1
+'r5' A(t[.],z[1]),B(t[.],z[1]) -> A(t[2],z[1]),B(t[2],z[1]) @ 1
+'r6' A(x{p}[.]) -> A(x{u}[.]) @ 1
+'r7' B(x{p}[.]) -> B(x{u}[.]) @ 1
 
-# the answer is maybe/any
+// the answer is maybe/any

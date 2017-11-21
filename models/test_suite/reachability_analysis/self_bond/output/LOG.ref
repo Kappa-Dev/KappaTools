@@ -410,7 +410,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!free ,t!free )
+		A( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -439,7 +439,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!free ,t!free )
+		B( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -468,7 +468,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z!free ,t!free )
+		C( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -497,7 +497,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z!free ,t!free )
+		D( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -526,7 +526,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z!free ,t!free )
+		E( z[.] ,t[.] )
 
 	Views in initial state:
 
@@ -555,15 +555,15 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z!free ,t!free )
+		F( z[.] ,t[.] )
 
 
-	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:):
 		the precondition is satisfied
 
-		rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:) is applied for the first time
+		rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:) is applied for the first time
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -590,17 +590,17 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( z!A@z ,t!A@t )
+		A( z[A@z] ,t[A@t] )
 
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
-	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:):
 		the precondition is satisfied
 
-		rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:) is applied for the first time
+		rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:) is applied for the first time
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -627,10 +627,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z!F@z ,t!F@z )
+		F( z[F@z] ,t[F@z] )
 
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -657,10 +657,10 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z!F@z ,t!free )
+		F( z[F@z] ,t[.] )
 
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=25
@@ -687,15 +687,15 @@ Id=25
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		F( z!F@t ,t!free )
+		F( z[F@t] ,t[.] )
 
 
-	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:):
 		the precondition is satisfied
 
-		rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:) is applied for the first time
+		rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:) is applied for the first time
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -722,10 +722,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z!E@z ,t!E@t )
+		E( z[E@z] ,t[E@t] )
 
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -752,10 +752,10 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z!E@z ,t!free )
+		E( z[E@z] ,t[.] )
 
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -782,15 +782,15 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( z!free ,t!E@t )
+		E( z[.] ,t[E@t] )
 
 
-	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:):
 		the precondition is satisfied
 
-		rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:) is applied for the first time
+		rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:) is applied for the first time
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=37
@@ -817,10 +817,10 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z!D@t ,t!D@t )
+		D( z[D@t] ,t[D@t] )
 
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -847,10 +847,10 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z!free ,t!D@z )
+		D( z[.] ,t[D@z] )
 
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=43
@@ -877,15 +877,15 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( z!free ,t!D@t )
+		D( z[.] ,t[D@t] )
 
 
-	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:):
 		the precondition is satisfied
 
-		rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:) is applied for the first time
+		rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:) is applied for the first time
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -912,10 +912,10 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z!C@t ,t!C@z )
+		C( z[C@t] ,t[C@z] )
 
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -942,10 +942,10 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z!free ,t!C@z )
+		C( z[.] ,t[C@z] )
 
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -972,15 +972,15 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( z!C@t ,t!free )
+		C( z[C@t] ,t[.] )
 
 
-	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:):
 		the precondition is satisfied
 
-		rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:) is applied for the first time
+		rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:) is applied for the first time
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 
 INTENSIONAL DESCRIPTION:
 Id=13
@@ -1007,60 +1007,60 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( z!B@t ,t!B@z )
+		B( z[B@t] ,t[B@z] )
 
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 
-	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 4-46:):
+	Applying rule r1 (File "parallel_bonds.ka", line 14, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
-		Updating the views for A(z!,t!)
+		Updating the views for A(z[],t[])
 
-	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 4-52:):
+	Applying rule r6 (File "parallel_bonds.ka", line 19, characters 5-69:):
 		the precondition is satisfied
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
-		Updating the views for F(z!,t!)
+		Updating the views for F(z[],t[])
 
-	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 4-52:):
+	Applying rule r5 (File "parallel_bonds.ka", line 18, characters 5-69:):
 		the precondition is satisfied
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
-		Updating the views for E(z!,t!)
+		Updating the views for E(z[],t[])
 
-	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 4-52:):
+	Applying rule r4 (File "parallel_bonds.ka", line 17, characters 5-69:):
 		the precondition is satisfied
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
-		Updating the views for D(z!,t!)
+		Updating the views for D(z[],t[])
 
-	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 4-52:):
+	Applying rule r3 (File "parallel_bonds.ka", line 16, characters 5-69:):
 		the precondition is satisfied
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
-		Updating the views for C(z!,t!)
+		Updating the views for C(z[],t[])
 
-	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 4-46:):
+	Applying rule r2 (File "parallel_bonds.ka", line 15, characters 5-63:):
 		the precondition is satisfied
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 
-		Updating the views for B(z!,t!)
+		Updating the views for B(z[],t[])
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1472,18 +1472,18 @@ Id=58
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(t) v A(t!A.t) ]
-A() => [ A(z) v A(z!A.z) ]
-B() => [ B(t) v B(t!B.z) ]
-B() => [ B(z) v B(z!B.t) ]
-C() => [ C(t) v C(t!C.z) ]
-C() => [ C(z) v C(z!C.t) ]
-D() => [ D(t) v D(t!D.z) v D(t!D.t) ]
-D() => [ D(z) v D(z!D.t) ]
-E() => [ E(t) v E(t!E.t) ]
-E() => [ E(z) v E(z!E.z) ]
-F() => [ F(t) v F(t!F.z) ]
-F() => [ F(z) v F(z!F.z) v F(z!F.t) ]
+A() => [ A(t[.]) v A(t[A.t]) ]
+A() => [ A(z[.]) v A(z[A.z]) ]
+B() => [ B(t[.]) v B(t[B.z]) ]
+B() => [ B(z[.]) v B(z[B.t]) ]
+C() => [ C(t[.]) v C(t[C.z]) ]
+C() => [ C(z[.]) v C(z[C.t]) ]
+D() => [ D(t[.]) v D(t[D.z]) v D(t[D.t]) ]
+D() => [ D(z[.]) v D(z[D.t]) ]
+E() => [ E(t[.]) v E(t[E.t]) ]
+E() => [ E(z[.]) v E(z[E.z]) ]
+F() => [ F(t[.]) v F(t[F.z]) ]
+F() => [ F(z[.]) v F(z[F.z]) v F(z[F.t]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1723,21 +1723,21 @@ Id=73
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z!A.z) <=> A(t!A.t)
-B(z!B.t) <=> B(t!B.z)
-D(z!D.t) => D(t!D.t,z!D.t)
-F(z!F.t) => F(t,z!F.t)
-F(z) => F(t,z)
+A(z[A.z]) <=> A(t[A.t])
+B(z[B.t]) <=> B(t[B.z])
+D(z[D.t]) => D(t[D.t],z[D.t])
+F(z[F.t]) => F(t[.],z[F.t])
+F(z[.]) => F(t[.],z[.])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-A(t!A.t,z!A.z) => A(t!2,z!1),A(t!2,z!1)
-B(t!B.z,z!B.t) => [ B(t!2,z!1),B(t!1,z!2) v B(t!1,z!1) ]
-C(t!C.z,z!C.t) => C(t!2,z!1),C(t!1),C(z!2)
-E(t!E.t,z!E.z) => E(t!2,z!1),E(z!1),E(t!2)
+A(t[A.t],z[A.z]) => A(t[2],z[1]),A(t[2],z[1])
+B(t[B.z],z[B.t]) => [ B(t[2],z[1]),B(t[1],z[2]) v B(t[1],z[1]) ]
+C(t[C.z],z[C.t]) => C(t[2],z[1]),C(t[1]),C(z[2])
+E(t[E.t],z[E.z]) => E(t[2],z[1]),E(z[1]),E(t[2])
 INTENSIONAL DESCRIPTION:
 Id=52
  Node(site_type:1<0)
@@ -2455,62 +2455,62 @@ Quarks:site_modif-:agent_type:5,site_type:0,state:0,rule:5->[0;1;2]
 Quarks:site_modif-:agent_type:5,site_type:1,state:0,rule:5->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Inhibition_map:rule(0):'r1' A(z,t),A(z,t)->A(z!1,t!2),A(z!1,t!2) -> rule(0):'r1' A(z,t),A(z,t)->A(z!1,t!2),A(z!1,t!2)[0->1];[1->0]
-Influence_map:Inhibition_map:rule(1):'r2' B(z,t),B(z,t)->B(z!1,t!2),B(z!2,t!1) -> rule(1):'r2' B(z,t),B(z,t)->B(z!1,t!2),B(z!2,t!1)[0->1];[1->0]
-Influence_map:Inhibition_map:rule(2):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(t!1),C(z!2) -> rule(2):'r3' C(z,t),C(t),C(z)->C(z!1,t!2),C(t!1),C(z!2)[0->1];[0->2];[1->0];[2->0]
-Influence_map:Inhibition_map:rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(t!2) -> rule(3):'r4' D(z,t),D(t),D(t)->D(z!1,t!2),D(t!1),D(t!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
-Influence_map:Inhibition_map:rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2) -> rule(4):'r5' E(z,t),E(z),E(t)->E(z!1,t!2),E(z!1),E(t!2)[0->1];[0->2];[1->0];[2->0]
-Influence_map:Inhibition_map:rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2) -> rule(5):'r6' F(z,t),F(z),F(z)->F(z!1,t!2),F(z!1),F(z!2)[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
+Influence_map:Inhibition_map:rule(0):'r1' A(z[.],t[.]),A(z[.],t[.])->A(z[1],t[2]),A(z[1],t[2]) -> rule(0):'r1' A(z[.],t[.]),A(z[.],t[.])->A(z[1],t[2]),A(z[1],t[2])[0->1];[1->0]
+Influence_map:Inhibition_map:rule(1):'r2' B(z[.],t[.]),B(z[.],t[.])->B(z[1],t[2]),B(z[2],t[1]) -> rule(1):'r2' B(z[.],t[.]),B(z[.],t[.])->B(z[1],t[2]),B(z[2],t[1])[0->1];[1->0]
+Influence_map:Inhibition_map:rule(2):'r3' C(z[.],t[.]),C(t[.]),C(z[.])->C(z[1],t[2]),C(t[1]),C(z[2]) -> rule(2):'r3' C(z[.],t[.]),C(t[.]),C(z[.])->C(z[1],t[2]),C(t[1]),C(z[2])[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(3):'r4' D(z[.],t[.]),D(t[.]),D(t[.])->D(z[1],t[2]),D(t[1]),D(t[2]) -> rule(3):'r4' D(z[.],t[.]),D(t[.]),D(t[.])->D(z[1],t[2]),D(t[1]),D(t[2])[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
+Influence_map:Inhibition_map:rule(4):'r5' E(z[.],t[.]),E(z[.]),E(t[.])->E(z[1],t[2]),E(z[1]),E(t[2]) -> rule(4):'r5' E(z[.],t[.]),E(z[.]),E(t[.])->E(z[1],t[2]),E(z[1]),E(t[2])[0->1];[0->2];[1->0];[2->0]
+Influence_map:Inhibition_map:rule(5):'r6' F(z[.],t[.]),F(z[.]),F(z[.])->F(z[1],t[2]),F(z[1]),F(z[2]) -> rule(5):'r6' F(z[.],t[.]),F(z[.]),F(z[.])->F(z[1],t[2]),F(z[1]),F(z[2])[0->1];[0->2];[1->0];[1->2];[2->0];[2->1]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 F()=> [
-		  F(z)
-		v F(z!F.z)
-		v F(z!F.t)]
+		  F(z[.])
+		v F(z[F.z])
+		v F(z[F.t])]
 F()=> [
-		  F(t)
-		v F(t!F.z)]
+		  F(t[.])
+		v F(t[F.z])]
 E()=> [
-		  E(z)
-		v E(z!E.z)]
+		  E(z[.])
+		v E(z[E.z])]
 E()=> [
-		  E(t)
-		v E(t!E.t)]
+		  E(t[.])
+		v E(t[E.t])]
 D()=> [
-		  D(z)
-		v D(z!D.t)]
+		  D(z[.])
+		v D(z[D.t])]
 D()=> [
-		  D(t)
-		v D(t!D.z)
-		v D(t!D.t)]
+		  D(t[.])
+		v D(t[D.z])
+		v D(t[D.t])]
 C()=> [
-		  C(z)
-		v C(z!C.t)]
+		  C(z[.])
+		v C(z[C.t])]
 C()=> [
-		  C(t)
-		v C(t!C.z)]
+		  C(t[.])
+		v C(t[C.z])]
 B()=> [
-		  B(z)
-		v B(z!B.t)]
+		  B(z[.])
+		v B(z[B.t])]
 B()=> [
-		  B(t)
-		v B(t!B.z)]
+		  B(t[.])
+		v B(t[B.z])]
 A()=> [
-		  A(z)
-		v A(z!A.z)]
+		  A(z[.])
+		v A(z[A.z])]
 A()=> [
-		  A(t)
-		v A(t!A.t)]
+		  A(t[.])
+		v A(t[A.t])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-F(z)=> [F(t,z)]
-F(z!F.t)=> [F(t,z!F.t)]
-D(z!D.t)=> [D(t!D.t,z!D.t)]
-A(z!A.z)=> [A(t!A.t)]
-B(z!B.t)=> [B(t!B.z)]
+F(z[.])=> [F(t[.],z[.])]
+F(z[F.t])=> [F(t[.],z[F.t])]
+D(z[D.t])=> [D(t[D.t],z[D.t])]
+A(z[A.z])=> [A(t[A.t])]
+B(z[B.t])=> [B(t[B.z])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):
@@ -2519,11 +2519,11 @@ B(z!B.t)=> [B(t!B.z)]
 ------------------------------------------------------------
 * Export Parallel bonds to JSon (internal constraints_list):
 ------------------------------------------------------------
-A(t!A.t,z!A.z)=> [A(t!2,z!1),A(t!2,z!1)]
-B(t!B.z,z!B.t)=> [
-		  B(t!2,z!1),B(t!1,z!2)
-		v B(t!1,z!1)]
-C(t!C.z,z!C.t)=> [C(t!2,z!1),C(t!1),C(z!2)]
-E(t!E.t,z!E.z)=> [E(t!2,z!1),E(z!1),E(t!2)]
+A(t[A.t],z[A.z])=> [A(t[2],z[1]),A(t[2],z[1])]
+B(t[B.z],z[B.t])=> [
+		  B(t[2],z[1]),B(t[1],z[2])
+		v B(t[1],z[1])]
+C(t[C.z],z[C.t])=> [C(t[2],z[1]),C(t[1]),C(z[2])]
+E(t[E.t],z[E.z])=> [E(t[2],z[1]),E(z[1]),E(t[2])]
 
 execution finished without any exception

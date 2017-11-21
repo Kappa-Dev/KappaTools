@@ -1,12 +1,12 @@
-%agent: A(x~u~p,y~p~u)
-%agent: B(x~p~q~u,y~u~p~q)
+%agent: A(x{u p},y{p u})
+%agent: B(x{p q u},y{u p q})
 %agent: C(x)
 
-'r0' -> A(y~u),A(x~p) @1
-'r1' -> B(x~u),B(y~p) @1
-'r2' B(x~u,y~u) -> B(x~q,y~q) @1
-'r3' A(x),B(x) -> A(x!1),B(x!1) @1
-'r4' A(x!_),A() -> A(x) @1
-'r5' -> C(x) @1
-'r6' C(x),B(x) -> C(x!1),B(x!1) @1
-'r7' B(),B(x!x.A),B(x!x.C) -> @1
+'r0' .,. -> A(y{u}[.]),A(x{p}[.]) @ 1
+'r1' .,. -> B(x{u}[.]),B(y{p}[.]) @ 1
+'r2' B(x{u}[.],y{u}[.]) -> B(x{q}[.],y{q}[.]) @ 1
+'r3' A(x[.]),B(x[.]) -> A(x[1]),B(x[1]) @ 1
+'r4' A(x[_]),A() -> A(x[.]),. @ 1
+'r5' . -> C(x[.]) @ 1
+'r6' C(x[.]),B(x[.]) -> C(x[1]),B(x[1]) @ 1
+'r7' B(),B(x[x.A]),B(x[x.C]) -> .,.,. @ 1

@@ -1,9 +1,9 @@
-%agent:A(z,t)
-%agent:B(z,t)
-%agent:C(z,t)
-%agent:D(z,t)
-%agent:E(z,t)
-%agent:F(z,t)
+%agent: A(z,t)
+%agent: B(z,t)
+%agent: C(z,t)
+%agent: D(z,t)
+%agent: E(z,t)
+%agent: F(z,t)
 %init: 10 A()
 %init: 10 B()
 %init: 10 C()
@@ -11,11 +11,11 @@
 %init: 10 E()
 %init: 10 F()
 
-'r1' A(z,t),A(z,t) -> A(z!1,t!2),A(z!1,t!2) @1
-'r2' B(z,t),B(z,t) -> B(z!1,t!2),B(z!2,t!1) @1
-'r3' C(z,t),C(t),C(z) -> C(z!1,t!2),C(t!1),C(z!2) @1
-'r4' D(z,t),D(t),D(t) -> D(z!1,t!2),D(t!1),D(t!2) @1
-'r5' E(z,t),E(z),E(t) -> E(z!1,t!2),E(z!1),E(t!2) @1
-'r6' F(z,t),F(z),F(z) -> F(z!1,t!2),F(z!1),F(z!2) @1
+'r1' A(z[.],t[.]),A(z[.],t[.]) -> A(z[1],t[2]),A(z[1],t[2]) @ 1
+'r2' B(z[.],t[.]),B(z[.],t[.]) -> B(z[1],t[2]),B(z[2],t[1]) @ 1
+'r3' C(z[.],t[.]),C(t[.]),C(z[.]) -> C(z[1],t[2]),C(t[1]),C(z[2]) @ 1
+'r4' D(z[.],t[.]),D(t[.]),D(t[.]) -> D(z[1],t[2]),D(t[1]),D(t[2]) @ 1
+'r5' E(z[.],t[.]),E(z[.]),E(t[.]) -> E(z[1],t[2]),E(z[1]),E(t[2]) @ 1
+'r6' F(z[.],t[.]),F(z[.]),F(z[.]) -> F(z[1],t[2]),F(z[1]),F(z[2]) @ 1
 
 

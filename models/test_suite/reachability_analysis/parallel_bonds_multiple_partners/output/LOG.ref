@@ -267,20 +267,20 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~u ,y~u ,z~u ,a~u ,b~u )
+		A( x{u} ,y{u} ,z{u} ,a{u} ,b{u} )
 
 
-	Applying rule  -> A(x{u} y{u} z{u} a{u} b{u}) (File "essai.ka", line 5, characters 0-28:):
+	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
 		the precondition is satisfied
 
-		rule  -> A(x{u} y{u} z{u} a{u} b{u}) (File "essai.ka", line 5, characters 0-28:) is applied for the first time
+		rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:) is applied for the first time
 
-	Applying rule A(x{u}) -> A(x{p}) (File "essai.ka", line 6, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(x{u}) -> A(x{p}) (File "essai.ka", line 6, characters 0-19:) is applied for the first time
+		rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=49
@@ -337,15 +337,15 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~u ,z~u ,a~u ,b~u )
+		A( x{p} ,y{u} ,z{u} ,a{u} ,b{u} )
 
 
-	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "essai.ka", line 7, characters 0-27:):
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u}) -> A(x{p} y{p}) (File "essai.ka", line 7, characters 0-27:) is applied for the first time
+		rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=54
@@ -402,29 +402,29 @@ Id=54
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~p ,z~u ,a~u ,b~u )
+		A( x{p} ,y{p} ,z{u} ,a{u} ,b{u} )
 
 
-	Applying rule A(x{p} y{u} b{u}) -> A(x{u} y{u} b{u}) (File "essai.ka", line 8, characters 0-35:):
+	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
 		the precondition is satisfied
 
-		rule A(x{p} y{u} b{u}) -> A(x{u} y{u} b{u}) (File "essai.ka", line 8, characters 0-35:) is applied for the first time
+		rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(y{p}) -> A(y{u}) (File "essai.ka", line 9, characters 0-19:):
+	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(y{p}) -> A(y{u}) (File "essai.ka", line 9, characters 0-19:) is applied for the first time
+		rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{u}) -> A(z{p}) (File "essai.ka", line 10, characters 0-19:):
+	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(z{u}) -> A(z{p}) (File "essai.ka", line 10, characters 0-19:) is applied for the first time
+		rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=65
@@ -526,17 +526,17 @@ Id=65
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~u ,z~p ,a~u ,b~u )
-		A( x~p ,y~p ,z~p ,a~u ,b~u )
-		A( x~u ,y~u ,z~p ,a~u ,b~u )
+		A( x{p} ,y{u} ,z{p} ,a{u} ,b{u} )
+		A( x{p} ,y{p} ,z{p} ,a{u} ,b{u} )
+		A( x{u} ,y{u} ,z{p} ,a{u} ,b{u} )
 
 
-	Applying rule A(z{p} a{u}) -> A(z{p} a{p}) (File "essai.ka", line 11, characters 0-27:):
+	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
 		the precondition is satisfied
 
-		rule A(z{p} a{u}) -> A(z{p} a{p}) (File "essai.ka", line 11, characters 0-27:) is applied for the first time
+		rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=79
@@ -638,31 +638,31 @@ Id=79
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~u ,z~p ,a~p ,b~u )
-		A( x~p ,y~p ,z~p ,a~p ,b~u )
-		A( x~u ,y~u ,z~p ,a~p ,b~u )
+		A( x{p} ,y{u} ,z{p} ,a{p} ,b{u} )
+		A( x{p} ,y{p} ,z{p} ,a{p} ,b{u} )
+		A( x{u} ,y{u} ,z{p} ,a{p} ,b{u} )
 
 
-	Applying rule A(z{p} a{u} b{u}) -> A(z{u} a{u} b{u}) (File "essai.ka", line 12, characters 0-35:):
+	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
 		the precondition is satisfied
 
-		rule A(z{p} a{u} b{u}) -> A(z{u} a{u} b{u}) (File "essai.ka", line 12, characters 0-35:) is applied for the first time
+		rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(a{p}) -> A(a{u}) (File "essai.ka", line 13, characters 0-19:):
+	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(a{p}) -> A(a{u}) (File "essai.ka", line 13, characters 0-19:) is applied for the first time
+		rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(x{p} y{p} z{p} a{p} b{u}) -> A(x{p} y{p} z{p} a{p} b{p}) (File "essai.ka", line 14, characters 0-51:):
+	Applying rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:):
 		the precondition is satisfied
 
-		rule A(x{p} y{p} z{p} a{p} b{u}) -> A(x{p} y{p} z{p} a{p} b{p}) (File "essai.ka", line 14, characters 0-51:) is applied for the first time
+		rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=98
@@ -719,38 +719,38 @@ Id=98
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~p ,z~p ,a~p ,b~p )
+		A( x{p} ,y{p} ,z{p} ,a{p} ,b{p} )
 
 
-	Applying rule A(b{p}) -> A(b{u}) (File "essai.ka", line 15, characters 0-19:):
+	Applying rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:):
 		the precondition is satisfied
 
-		rule A(b{p}) -> A(b{u}) (File "essai.ka", line 15, characters 0-19:) is applied for the first time
+		rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:) is applied for the first time
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule  -> A(x{u} y{u} z{u} a{u} b{u}) (File "essai.ka", line 5, characters 0-28:):
+	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
 		the precondition is satisfied
 
-	Applying rule A(x{u}) -> A(x{p}) (File "essai.ka", line 6, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "essai.ka", line 7, characters 0-27:):
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(x{p} y{u} b{u}) -> A(x{u} y{u} b{u}) (File "essai.ka", line 8, characters 0-35:):
+	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(y{p}) -> A(y{u}) (File "essai.ka", line 9, characters 0-19:):
+	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=133
@@ -807,28 +807,28 @@ Id=133
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~u ,z~p ,a~p ,b~p )
+		A( x{p} ,y{u} ,z{p} ,a{p} ,b{p} )
 
 
-	Applying rule A(z{u}) -> A(z{p}) (File "essai.ka", line 10, characters 0-19:):
+	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{p} a{u}) -> A(z{p} a{p}) (File "essai.ka", line 11, characters 0-27:):
+	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{p} a{u} b{u}) -> A(z{u} a{u} b{u}) (File "essai.ka", line 12, characters 0-35:):
+	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(a{p}) -> A(a{u}) (File "essai.ka", line 13, characters 0-19:):
+	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
 INTENSIONAL DESCRIPTION:
 Id=167
@@ -885,62 +885,62 @@ Id=167
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,y~u ,z~p ,a~u ,b~p )
-		A( x~p ,y~p ,z~p ,a~u ,b~p )
+		A( x{p} ,y{u} ,z{p} ,a{u} ,b{p} )
+		A( x{p} ,y{p} ,z{p} ,a{u} ,b{p} )
 
 
-	Applying rule A(x{p} y{p} z{p} a{p} b{u}) -> A(x{p} y{p} z{p} a{p} b{p}) (File "essai.ka", line 14, characters 0-51:):
+	Applying rule A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{u}[.]) -> A(x{p}[.] y{p}[.] z{p}[.] a{p}[.] b{p}[.]) (File "essai.ka", line 14, characters 0-92:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule  -> A(x{u} y{u} z{u} a{u} b{u}) (File "essai.ka", line 5, characters 0-28:):
+	Applying rule . -> A(x{u}[.] y{u}[.] z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 5, characters 0-51:):
 		the precondition is satisfied
 
-	Applying rule A(x{u}) -> A(x{p}) (File "essai.ka", line 6, characters 0-19:):
+	Applying rule A(x{u}[.]) -> A(x{p}[.]) (File "essai.ka", line 6, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(x{p} y{u}) -> A(x{p} y{p}) (File "essai.ka", line 7, characters 0-27:):
+	Applying rule A(x{p}[.] y{u}[.]) -> A(x{p}[.] y{p}[.]) (File "essai.ka", line 7, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(x{p} y{u} b{u}) -> A(x{u} y{u} b{u}) (File "essai.ka", line 8, characters 0-35:):
+	Applying rule A(x{p}[.] y{u}[.] b{u}[.]) -> A(x{u}[.] y{u}[.] b{u}[.]) (File "essai.ka", line 8, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(y{p}) -> A(y{u}) (File "essai.ka", line 9, characters 0-19:):
+	Applying rule A(y{p}[.]) -> A(y{u}[.]) (File "essai.ka", line 9, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(b{p}) -> A(b{u}) (File "essai.ka", line 15, characters 0-19:):
+	Applying rule A(b{p}[.]) -> A(b{u}[.]) (File "essai.ka", line 15, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{u}) -> A(z{p}) (File "essai.ka", line 10, characters 0-19:):
+	Applying rule A(z{u}[.]) -> A(z{p}[.]) (File "essai.ka", line 10, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{p} a{u}) -> A(z{p} a{p}) (File "essai.ka", line 11, characters 0-27:):
+	Applying rule A(z{p}[.] a{u}[.]) -> A(z{p}[.] a{p}[.]) (File "essai.ka", line 11, characters 0-44:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(z{p} a{u} b{u}) -> A(z{u} a{u} b{u}) (File "essai.ka", line 12, characters 0-35:):
+	Applying rule A(z{p}[.] a{u}[.] b{u}[.]) -> A(z{u}[.] a{u}[.] b{u}[.]) (File "essai.ka", line 12, characters 0-60:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 
-	Applying rule A(a{p}) -> A(a{u}) (File "essai.ka", line 13, characters 0-19:):
+	Applying rule A(a{p}[.]) -> A(a{u}[.]) (File "essai.ka", line 13, characters 0-28:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,y~,z~,a~,b~)
+		Updating the views for A(x{},y{},z{},a{},b{})
 ------------------------------------------------------------
 every rule may be applied
 ------------------------------------------------------------
@@ -1177,11 +1177,11 @@ Id=190
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(y~u) v A(y~p) ]
-A() => [ A(x~u) v A(x~p) ]
-A() => [ A(z~u) v A(z~p) ]
-A() => [ A(a~u) v A(a~p) ]
-A() => [ A(b~u) v A(b~p) ]
+A() => [ A(y{u}[.]) v A(y{p}[.]) ]
+A() => [ A(x{u}[.]) v A(x{p}[.]) ]
+A() => [ A(z{u}[.]) v A(z{p}[.]) ]
+A() => [ A(a{u}[.]) v A(a{p}[.]) ]
+A() => [ A(b{u}[.]) v A(b{p}[.]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1338,19 +1338,19 @@ Id=329
 EXTENSIONAL DESCRIPTION:
 A() =>
    [
-	  A(a~u,b~p,x~p,y~u,z~p)
-	v A(a~u,b~u,x~p,y~u,z~p)
-	v A(a~p,b~p,x~p,y~u,z~p)
-	v A(a~p,b~u,x~p,y~u,z~p)
-	v A(a~u,b~u,x~p,y~u,z~u)
-	v A(a~u,b~p,x~p,y~p,z~p)
-	v A(a~u,b~u,x~p,y~p,z~p)
-	v A(a~p,b~p,x~p,y~p,z~p)
-	v A(a~p,b~u,x~p,y~p,z~p)
-	v A(a~u,b~u,x~p,y~p,z~u)
-	v A(a~u,b~u,x~u,y~u,z~p)
-	v A(a~p,b~u,x~u,y~u,z~p)
-	v A(a~u,b~u,x~u,y~u,z~u)
+	  A(a{u}[.],b{p}[.],x{p}[.],y{u}[.],z{p}[.])
+	v A(a{u}[.],b{u}[.],x{p}[.],y{u}[.],z{p}[.])
+	v A(a{p}[.],b{p}[.],x{p}[.],y{u}[.],z{p}[.])
+	v A(a{p}[.],b{u}[.],x{p}[.],y{u}[.],z{p}[.])
+	v A(a{u}[.],b{u}[.],x{p}[.],y{u}[.],z{u}[.])
+	v A(a{u}[.],b{p}[.],x{p}[.],y{p}[.],z{p}[.])
+	v A(a{u}[.],b{u}[.],x{p}[.],y{p}[.],z{p}[.])
+	v A(a{p}[.],b{p}[.],x{p}[.],y{p}[.],z{p}[.])
+	v A(a{p}[.],b{u}[.],x{p}[.],y{p}[.],z{p}[.])
+	v A(a{u}[.],b{u}[.],x{p}[.],y{p}[.],z{u}[.])
+	v A(a{u}[.],b{u}[.],x{u}[.],y{u}[.],z{p}[.])
+	v A(a{p}[.],b{u}[.],x{u}[.],y{u}[.],z{p}[.])
+	v A(a{u}[.],b{u}[.],x{u}[.],y{u}[.],z{u}[.])
    ]
 ------------------------------------------------------------
 * Properties in connected agents
@@ -1793,70 +1793,70 @@ Quarks:site_modif-:agent_type:0,site_type:4,state:0,rule:9->[0]
 Quarks:site_modif-:agent_type:0,site_type:4,state:1,rule:10->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(4):'' A(y~p)->A(y~u)[0->0]
-Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
-Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Wake_up_map:rule(4):'' A(y~p)->A(y~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(5):'' A(z~u)->A(z~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(8):'' A(a~p)->A(a~u)[0->0]
-Influence_map:Wake_up_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Wake_up_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(5):'' A(z~u)->A(z~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Wake_up_map:rule(8):'' A(a~p)->A(a~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p) -> rule(10):'' A(b~p)->A(b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Wake_up_map:rule(10):'' A(b~p)->A(b~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Inhibition_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u)[0->0]
-Influence_map:Inhibition_map:rule(3):'' A(x~p,y~u,b~u)->A(x~u,y~u,b~u) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Influence_map:Inhibition_map:rule(4):'' A(y~p)->A(y~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
-Influence_map:Inhibition_map:rule(6):'' A(z~p,a~u)->A(z~p,a~p) -> rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u)[0->0]
-Influence_map:Inhibition_map:rule(7):'' A(z~p,a~u,b~u)->A(z~u,a~u,b~u) -> rule(6):'' A(z~p,a~u)->A(z~p,a~p)[0->0]
-Influence_map:Inhibition_map:rule(8):'' A(a~p)->A(a~u) -> rule(9):'' A(x~p,y~p,z~p,a~p,b~u)->A(x~p,y~p,z~p,a~p,b~p)[0->0]
+Influence_map:Wake_up_map:rule(0):'' .->A(x{u}[.],y{u}[.],z{u}[.],a{u}[.],b{u}[.]) -> rule(1):'' A(x{u}[.])->A(x{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(0):'' .->A(x{u}[.],y{u}[.],z{u}[.],a{u}[.],b{u}[.]) -> rule(5):'' A(z{u}[.])->A(z{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.])->A(x{p}[.]) -> rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.])->A(x{p}[.]) -> rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x{u}[.])->A(x{p}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.]) -> rule(4):'' A(y{p}[.])->A(y{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.]) -> rule(1):'' A(x{u}[.])->A(x{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(4):'' A(y{p}[.])->A(y{u}[.]) -> rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(4):'' A(y{p}[.])->A(y{u}[.]) -> rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z{u}[.])->A(z{p}[.]) -> rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z{u}[.])->A(z{p}[.]) -> rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(z{u}[.])->A(z{p}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.]) -> rule(8):'' A(a{p}[.])->A(a{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.]) -> rule(5):'' A(z{u}[.])->A(z{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(8):'' A(a{p}[.])->A(a{u}[.]) -> rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.])[0->0]
+Influence_map:Wake_up_map:rule(8):'' A(a{p}[.])->A(a{u}[.]) -> rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.]) -> rule(10):'' A(b{p}[.])->A(b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b{p}[.])->A(b{u}[.]) -> rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b{p}[.])->A(b{u}[.]) -> rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.])[0->0]
+Influence_map:Wake_up_map:rule(10):'' A(b{p}[.])->A(b{u}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.]) -> rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.])[0->0]
+Influence_map:Inhibition_map:rule(3):'' A(x{p}[.],y{u}[.],b{u}[.])->A(x{u}[.],y{u}[.],b{u}[.]) -> rule(2):'' A(x{p}[.],y{u}[.])->A(x{p}[.],y{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(4):'' A(y{p}[.])->A(y{u}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.]) -> rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.])[0->0]
+Influence_map:Inhibition_map:rule(7):'' A(z{p}[.],a{u}[.],b{u}[.])->A(z{u}[.],a{u}[.],b{u}[.]) -> rule(6):'' A(z{p}[.],a{u}[.])->A(z{p}[.],a{p}[.])[0->0]
+Influence_map:Inhibition_map:rule(8):'' A(a{p}[.])->A(a{u}[.]) -> rule(9):'' A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.])->A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.])[0->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(b~u)
-		v A(b~p)]
+		  A(b{u}[.])
+		v A(b{p}[.])]
 A()=> [
-		  A(a~u)
-		v A(a~p)]
+		  A(a{u}[.])
+		v A(a{p}[.])]
 A()=> [
-		  A(z~u)
-		v A(z~p)]
+		  A(z{u}[.])
+		v A(z{p}[.])]
 A()=> [
-		  A(x~u)
-		v A(x~p)]
+		  A(x{u}[.])
+		v A(x{p}[.])]
 A()=> [
-		  A(y~u)
-		v A(y~p)]
+		  A(y{u}[.])
+		v A(y{p}[.])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 A()=> [
-		  A(a~u,b~p,x~p,y~u,z~p)
-		v A(a~u,b~u,x~p,y~u,z~p)
-		v A(a~p,b~p,x~p,y~u,z~p)
-		v A(a~p,b~u,x~p,y~u,z~p)
-		v A(a~u,b~u,x~p,y~u,z~u)
-		v A(a~u,b~p,x~p,y~p,z~p)
-		v A(a~u,b~u,x~p,y~p,z~p)
-		v A(a~p,b~p,x~p,y~p,z~p)
-		v A(a~p,b~u,x~p,y~p,z~p)
-		v A(a~u,b~u,x~p,y~p,z~u)
-		v A(a~u,b~u,x~u,y~u,z~p)
-		v A(a~p,b~u,x~u,y~u,z~p)
-		v A(a~u,b~u,x~u,y~u,z~u)]
+		  A(a{u}[.],b{p}[.],x{p}[.],y{u}[.],z{p}[.])
+		v A(a{u}[.],b{u}[.],x{p}[.],y{u}[.],z{p}[.])
+		v A(a{p}[.],b{p}[.],x{p}[.],y{u}[.],z{p}[.])
+		v A(a{p}[.],b{u}[.],x{p}[.],y{u}[.],z{p}[.])
+		v A(a{u}[.],b{u}[.],x{p}[.],y{u}[.],z{u}[.])
+		v A(a{u}[.],b{p}[.],x{p}[.],y{p}[.],z{p}[.])
+		v A(a{u}[.],b{u}[.],x{p}[.],y{p}[.],z{p}[.])
+		v A(a{p}[.],b{p}[.],x{p}[.],y{p}[.],z{p}[.])
+		v A(a{p}[.],b{u}[.],x{p}[.],y{p}[.],z{p}[.])
+		v A(a{u}[.],b{u}[.],x{p}[.],y{p}[.],z{u}[.])
+		v A(a{u}[.],b{u}[.],x{u}[.],y{u}[.],z{p}[.])
+		v A(a{p}[.],b{u}[.],x{u}[.],y{u}[.],z{p}[.])
+		v A(a{u}[.],b{u}[.],x{u}[.],y{u}[.],z{u}[.])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

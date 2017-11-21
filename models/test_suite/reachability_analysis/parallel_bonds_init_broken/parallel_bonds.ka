@@ -1,11 +1,11 @@
-%agent:A(z,t)
-%agent:B(z,t)
+%agent: A(z,t)
+%agent: B(z,t)
 
-%init: 10 A(z,t)
-%init: 10 B(z,t)
-%init: 10 A(z!1,t!2),B(z!1,t!2)
+%init: 10 A(z[.],t[.])
+%init: 10 B(z[.],t[.])
+%init: 10 A(z[1],t[2]),B(z[1],t[2])
 
-A(t!_) -> A(t) @1
-A(t),B(t) -> A(t!1),B(t!1) @1
-#the answer is both,
-#the parallel bound may be broken by the first rule and replace by a non parallel one by the second one. 
+A(t[_]) -> A(t[.]) @ 1
+A(t[.]),B(t[.]) -> A(t[1]),B(t[1]) @ 1
+// the answer is both,
+// the parallel bound may be broken by the first rule and replace by a non parallel one by the second one. 

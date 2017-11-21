@@ -332,10 +332,10 @@ Compilation:rules:11:reverse:agent_id_0:agent_type_3:site_type_1->state:[state_m
 Compilation:rules:11:actions:1/2unbinding:(agent_id_0,agent_type_3)@site_type_1
 Reachability analysis...
 
-	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
+	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
 
-		rule r0 (File "side_effects.ka", line 1, characters 4-17:) is applied for the first time
+		rule r0 (File "side_effects.ka", line 1, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -363,13 +363,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~u ,x!free )
+		A( x{u} ,x[.] )
 
 
-	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
+	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
 		the precondition is satisfied
 
-		rule r1 (File "side_effects.ka", line 2, characters 4-17:) is applied for the first time
+		rule r1 (File "side_effects.ka", line 2, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -397,13 +397,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x~u ,x!free )
+		B( x{u} ,x[.] )
 
 
-	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
+	Applying rule r2 (File "side_effects.ka", line 3, characters 5-24:):
 		the precondition is satisfied
 
-		rule r2 (File "side_effects.ka", line 3, characters 4-17:) is applied for the first time
+		rule r2 (File "side_effects.ka", line 3, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -431,13 +431,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x~u ,x!free )
+		C( x{u} ,x[.] )
 
 
-	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
+	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
 		the precondition is satisfied
 
-		rule r3 (File "side_effects.ka", line 4, characters 4-17:) is applied for the first time
+		rule r3 (File "side_effects.ka", line 4, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -465,13 +465,13 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x~u ,x!free )
+		D( x{u} ,x[.] )
 
 
-	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
+	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-		rule r4 (File "side_effects.ka", line 5, characters 4-17:) is applied for the first time
+		rule r4 (File "side_effects.ka", line 5, characters 5-24:) is applied for the first time
 	Dealing with creation
 
 INTENSIONAL DESCRIPTION:
@@ -499,18 +499,18 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x~u ,x!free )
+		E( x{u} ,x[.] )
 
 
-	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
+	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is not satisfied yet
 
-	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
+	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		rule r6 (File "side_effects.ka", line 7, characters 4-38:) is applied for the first time
+		rule r6 (File "side_effects.ka", line 7, characters 5-49:) is applied for the first time
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -537,10 +537,10 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~u ,x!B@x )
+		A( x{u} ,x[B@x] )
 
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -567,21 +567,21 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x~p ,x!A@x )
+		B( x{p} ,x[A@x] )
 
 
-	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
+	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is not satisfied yet
 
-	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
+	Applying rule r8 (File "side_effects.ka", line 9, characters 5-55:):
 		the precondition is not satisfied yet
 
-	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
+	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		rule r10 (File "side_effects.ka", line 11, characters 5-43:) is applied for the first time
+		rule r10 (File "side_effects.ka", line 11, characters 6-56:) is applied for the first time
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -608,10 +608,10 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x~p ,x!E@x )
+		D( x{p} ,x[E@x] )
 
 
-		Updating the views for E(x~,x!)
+		Updating the views for E(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -638,15 +638,15 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x~p ,x!D@x )
+		E( x{p} ,x[D@x] )
 
 
-	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
+	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
 		the precondition is satisfied
 
-		rule r11 (File "side_effects.ka", line 12, characters 5-23:) is applied for the first time
+		rule r11 (File "side_effects.ka", line 12, characters 6-28:) is applied for the first time
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -673,7 +673,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		D( x~p ,x!free )
+		D( x{p} ,x[.] )
 
 	Dealing with side effects
 
@@ -702,35 +702,35 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		E( x~p ,x!free )
+		E( x{p} ,x[.] )
 
 
-	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
+	Applying rule r9 (File "side_effects.ka", line 10, characters 5-17:):
 		the precondition is satisfied
 
-		rule r9 (File "side_effects.ka", line 10, characters 4-14:) is applied for the first time
+		rule r9 (File "side_effects.ka", line 10, characters 5-17:) is applied for the first time
 
-	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
+	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
+	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
+	Applying rule r2 (File "side_effects.ka", line 3, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
+	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
+	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
+	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is satisfied
 
-		rule r5 (File "side_effects.ka", line 6, characters 4-19:) is applied for the first time
+		rule r5 (File "side_effects.ka", line 6, characters 5-23:) is applied for the first time
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 	Dealing with side effects
 
 INTENSIONAL DESCRIPTION:
@@ -758,29 +758,29 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		B( x~p ,x!free )
+		B( x{p} ,x[.] )
 
 
-	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
+	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
+	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x~,x!)
+		Updating the views for E(x{},x[])
 
-	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
+	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
-		rule r7 (File "side_effects.ka", line 8, characters 4-52:) is applied for the first time
+		rule r7 (File "side_effects.ka", line 8, characters 5-71:) is applied for the first time
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -807,12 +807,12 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~u ,x!C@x )
+		A( x{u} ,x[C@x] )
 
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x~,x!)
+		Updating the views for C(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -839,17 +839,17 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		C( x~p ,x!A@x )
+		C( x{p} ,x[A@x] )
 
 
-	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
+	Applying rule r8 (File "side_effects.ka", line 9, characters 5-55:):
 		the precondition is satisfied
 
-		rule r8 (File "side_effects.ka", line 9, characters 4-46:) is applied for the first time
+		rule r8 (File "side_effects.ka", line 9, characters 5-55:) is applied for the first time
 
-		Updating the views for C(x~,x!)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=36
@@ -876,24 +876,24 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,x!C@x )
+		A( x{p} ,x[C@x] )
 
 
-	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
+	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
 		the precondition is satisfied
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
-	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
+	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
+	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
+	Applying rule r2 (File "side_effects.ka", line 3, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
+	Applying rule r9 (File "side_effects.ka", line 10, characters 5-17:):
 		the precondition is satisfied
 	Dealing with side effects
 
@@ -922,40 +922,40 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,x!free )
+		A( x{p} ,x[.] )
 
 
-	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
+	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
+	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
+	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
+	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x~,x!)
+		Updating the views for E(x{},x[])
 
-	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
+	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x~,x!)
+		Updating the views for C(x{},x[])
 
-	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
+	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -982,67 +982,67 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-		A( x~p ,x!B@x )
+		A( x{p} ,x[B@x] )
 
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-	Applying rule r8 (File "side_effects.ka", line 9, characters 4-46:):
+	Applying rule r8 (File "side_effects.ka", line 9, characters 5-55:):
 		the precondition is satisfied
 
-		Updating the views for C(x~,x!)
+		Updating the views for C(x{},x[])
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-	Applying rule r4 (File "side_effects.ka", line 5, characters 4-17:):
+	Applying rule r4 (File "side_effects.ka", line 5, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r11 (File "side_effects.ka", line 12, characters 5-23:):
+	Applying rule r11 (File "side_effects.ka", line 12, characters 6-28:):
 		the precondition is satisfied
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
-	Applying rule r3 (File "side_effects.ka", line 4, characters 4-17:):
+	Applying rule r3 (File "side_effects.ka", line 4, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r2 (File "side_effects.ka", line 3, characters 4-17:):
+	Applying rule r2 (File "side_effects.ka", line 3, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r9 (File "side_effects.ka", line 10, characters 4-14:):
+	Applying rule r9 (File "side_effects.ka", line 10, characters 5-17:):
 		the precondition is satisfied
 
-	Applying rule r10 (File "side_effects.ka", line 11, characters 5-43:):
+	Applying rule r10 (File "side_effects.ka", line 11, characters 6-56:):
 		the precondition is satisfied
 
-		Updating the views for D(x~,x!)
+		Updating the views for D(x{},x[])
 
-		Updating the views for E(x~,x!)
+		Updating the views for E(x{},x[])
 
-	Applying rule r7 (File "side_effects.ka", line 8, characters 4-52:):
+	Applying rule r7 (File "side_effects.ka", line 8, characters 5-71:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-		Updating the views for C(x~,x!)
+		Updating the views for C(x{},x[])
 
-	Applying rule r0 (File "side_effects.ka", line 1, characters 4-17:):
+	Applying rule r0 (File "side_effects.ka", line 1, characters 5-24:):
 		the precondition is satisfied
 
-	Applying rule r5 (File "side_effects.ka", line 6, characters 4-19:):
+	Applying rule r5 (File "side_effects.ka", line 6, characters 5-23:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-	Applying rule r6 (File "side_effects.ka", line 7, characters 4-38:):
+	Applying rule r6 (File "side_effects.ka", line 7, characters 5-49:):
 		the precondition is satisfied
 
-		Updating the views for A(x~,x!)
+		Updating the views for A(x{},x[])
 
-		Updating the views for B(x~,x!)
+		Updating the views for B(x{},x[])
 
-	Applying rule r1 (File "side_effects.ka", line 2, characters 4-17:):
+	Applying rule r1 (File "side_effects.ka", line 2, characters 5-24:):
 		the precondition is satisfied
 ------------------------------------------------------------
 every rule may be applied
@@ -1386,16 +1386,16 @@ Id=50
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A() => [ A(x) v A(x!B.x) v A(x!C.x) ]
-A() => [ A(x~u?) v A(x~p?) ]
-B() => [ B(x) v B(x!A.x) ]
-B() => [ B(x~u?) v B(x~p?) ]
-C() => [ C(x) v C(x!A.x) ]
-C() => [ C(x~u?) v C(x~p?) ]
-D() => [ D(x) v D(x!E.x) ]
-D() => [ D(x~u?) v D(x~p?) ]
-E() => [ E(x) v E(x!D.x) ]
-E() => [ E(x~u?) v E(x~p?) ]
+A() => [ A(x[.]) v A(x[B.x]) v A(x[C.x]) ]
+A() => [ A(x{u}[#]) v A(x{p}[#]) ]
+B() => [ B(x[.]) v B(x[A.x]) ]
+B() => [ B(x{u}[#]) v B(x{p}[#]) ]
+C() => [ C(x[.]) v C(x[A.x]) ]
+C() => [ C(x{u}[#]) v C(x{p}[#]) ]
+D() => [ D(x[.]) v D(x[E.x]) ]
+D() => [ D(x{u}[#]) v D(x{p}[#]) ]
+E() => [ E(x[.]) v E(x[D.x]) ]
+E() => [ E(x{u}[#]) v E(x{p}[#]) ]
 
 ------------------------------------------------------------
 * Relational properties:
@@ -1590,10 +1590,10 @@ Id=58
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A.x) => B(x~p!A.x)
-C(x~p?) <=> C(x!A.x)
-D(x!E.x) => D(x~p!E.x)
-E(x!D.x) => E(x~p!D.x)
+B(x[A.x]) => B(x{p}[A.x])
+C(x{p}[#]) <=> C(x[A.x])
+D(x[E.x]) => D(x{p}[E.x])
+E(x[D.x]) => E(x{p}[D.x])
 ------------------------------------------------------------
 * Properties in connected agents
 ------------------------------------------------------------
@@ -2247,67 +2247,67 @@ Quarks:site_modif-:agent_type:4,site_type:1,state:0,rule:10->[1]
 Quarks:site_modif-:agent_type:4,site_type:1,state:1,rule:11->[0*]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u) -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
-Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u) -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->0]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u) -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0->1]
-Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u) -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
-Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u) -> rule(9):'r9' C()->[0->0]
-Influence_map:Wake_up_map:rule(3):'r3' ->D(x~u) -> rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1)[0->0]
-Influence_map:Wake_up_map:rule(4):'r4' ->E(x~u) -> rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1)[0->1]
-Influence_map:Wake_up_map:rule(5):'r5' A(x!B.x)-> -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->1]
-Influence_map:Wake_up_map:rule(5):'r5' A(x!B.x)-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->1]
-Influence_map:Wake_up_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(5):'r5' A(x!B.x)->[0->0]
-Influence_map:Wake_up_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0->1];[2->0]
-Influence_map:Wake_up_map:rule(9):'r9' C()-> -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->0]
-Influence_map:Wake_up_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->0]
-Influence_map:Wake_up_map:rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1) -> rule(11):'r11' D(x!_)->D(x)[0->0]
-Influence_map:Wake_up_map:rule(11):'r11' D(x!_)->D(x) -> rule(10):'r10' D(x~u),E(x~u)->D(x~p!1),E(x~p!1)[0*->1];[0->0]
-Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->0]
-Influence_map:Inhibition_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
-Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
-Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' .->A(x{u}[.]) -> rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1])[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' .->A(x{u}[.]) -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0->0]
+Influence_map:Wake_up_map:rule(1):'r1' .->B(x{u}[.]) -> rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1])[0->1]
+Influence_map:Wake_up_map:rule(2):'r2' .->C(x{u}[.]) -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0->2]
+Influence_map:Wake_up_map:rule(2):'r2' .->C(x{u}[.]) -> rule(9):'r9' C()->.[0->0]
+Influence_map:Wake_up_map:rule(3):'r3' .->D(x{u}[.]) -> rule(10):'r10' D(x{u}[.]),E(x{u}[.])->D(x{p}[1]),E(x{p}[1])[0->0]
+Influence_map:Wake_up_map:rule(4):'r4' .->E(x{u}[.]) -> rule(10):'r10' D(x{u}[.]),E(x{u}[.])->D(x{p}[1]),E(x{p}[1])[0->1]
+Influence_map:Wake_up_map:rule(5):'r5' A(x[B.x])->. -> rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1])[0*->1]
+Influence_map:Wake_up_map:rule(5):'r5' A(x[B.x])->. -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0*->1]
+Influence_map:Wake_up_map:rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1]) -> rule(5):'r5' A(x[B.x])->.[0->0]
+Influence_map:Wake_up_map:rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1]) -> rule(8):'r8' C(x{p}[1]),A(x{u}[1])->C(x{p}[1]),A(x{p}[1])[0->1];[2->0]
+Influence_map:Wake_up_map:rule(9):'r9' C()->. -> rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1])[0*->0]
+Influence_map:Wake_up_map:rule(9):'r9' C()->. -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0*->0]
+Influence_map:Wake_up_map:rule(10):'r10' D(x{u}[.]),E(x{u}[.])->D(x{p}[1]),E(x{p}[1]) -> rule(11):'r11' D(x[_])->D(x[.])[0->0]
+Influence_map:Wake_up_map:rule(11):'r11' D(x[_])->D(x[.]) -> rule(10):'r10' D(x{u}[.]),E(x{u}[.])->D(x{p}[1]),E(x{p}[1])[0*->1];[0->0]
+Influence_map:Inhibition_map:rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1]) -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1]) -> rule(6):'r6' A(x[.]),B(x{u}[.])->A(x[1]),B(x{p}[1])[0->0]
+Influence_map:Inhibition_map:rule(9):'r9' C()->. -> rule(7):'r7' A(x[.]),B(x{p}[.]),C(x{u}[.])->A(x[1]),B(x{p}[.]),C(x{p}[1])[0->2]
+Influence_map:Inhibition_map:rule(9):'r9' C()->. -> rule(8):'r8' C(x{p}[1]),A(x{u}[1])->C(x{p}[1]),A(x{p}[1])[0*->1];[0->0]
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
 E()=> [
-		  E(x~u?)
-		v E(x~p?)]
+		  E(x{u}[#])
+		v E(x{p}[#])]
 E()=> [
-		  E(x)
-		v E(x!D.x)]
+		  E(x[.])
+		v E(x[D.x])]
 D()=> [
-		  D(x~u?)
-		v D(x~p?)]
+		  D(x{u}[#])
+		v D(x{p}[#])]
 D()=> [
-		  D(x)
-		v D(x!E.x)]
+		  D(x[.])
+		v D(x[E.x])]
 C()=> [
-		  C(x~u?)
-		v C(x~p?)]
+		  C(x{u}[#])
+		v C(x{p}[#])]
 C()=> [
-		  C(x)
-		v C(x!A.x)]
+		  C(x[.])
+		v C(x[A.x])]
 B()=> [
-		  B(x~u?)
-		v B(x~p?)]
+		  B(x{u}[#])
+		v B(x{p}[#])]
 B()=> [
-		  B(x)
-		v B(x!A.x)]
+		  B(x[.])
+		v B(x[A.x])]
 A()=> [
-		  A(x~u?)
-		v A(x~p?)]
+		  A(x{u}[#])
+		v A(x{p}[#])]
 A()=> [
-		  A(x)
-		v A(x!B.x)
-		v A(x!C.x)]
+		  A(x[.])
+		v A(x[B.x])
+		v A(x[C.x])]
 
 ------------------------------------------------------------
 * Export Views domain - relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------
-D(x!E.x)=> [D(x~p!E.x)]
-B(x!A.x)=> [B(x~p!A.x)]
-C(x~p?)=> [C(x!A.x)]
-E(x!D.x)=> [E(x~p!D.x)]
+D(x[E.x])=> [D(x{p}[E.x])]
+B(x[A.x])=> [B(x{p}[A.x])]
+C(x{p}[#])=> [C(x[A.x])]
+E(x[D.x])=> [E(x{p}[D.x])]
 
 ------------------------------------------------------------
 * Export Connected agents to JSon (internal constraints_list):

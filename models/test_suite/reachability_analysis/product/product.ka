@@ -1,17 +1,17 @@
-%agent:A(z~u,t)
+%agent: A(z{u},t)
 
 
 %init: 10 A()
 %init: 10 B()
 
-'r0' A(z~u!1,t!2),A(z~u!1,t!2) -> A(z~p!1,t!2),A(z~u!1,t!2) @1
-'r1' A(z~p!1,t!2),A(z~p!1,t!2) -> A(z~p!1,t!2),A(z~u!1,t!2) @1
-'r2' A(z~u,t) -> A(z~p,t) @ 1
-'r3' A(z~p,t) -> A(z~u,t) @ 1
-'r4' A(z~u,t),A(z~u,t) -> A(z~u!1,t),A(z~u!1,t) @1
-'r5' A(z~u,t),A(z~u,t) -> A(z~u,t!1),A(z~u,t!1) @1
-'r6' A(z~p,t),A(z~p,t) -> A(z~p!1,t),A(z~p!1,t)	@1
-'r7' A(z~p,t),A(z~p,t) -> A(z~p,t!1),A(z~p,t!1) @1
-'r8' A(z~u,t!1),A(z~p,t!1) -> A(z~u!2,t!1),A(z~p!2,t!1) @1
+'r0' A(z{u}[1],t[2]),A(z{u}[1],t[2]) -> A(z{p}[1],t[2]),A(z{u}[1],t[2]) @ 1
+'r1' A(z{p}[1],t[2]),A(z{p}[1],t[2]) -> A(z{p}[1],t[2]),A(z{u}[1],t[2]) @ 1
+'r2' A(z{u}[.],t[.]) -> A(z{p}[.],t[.]) @ 1
+'r3' A(z{p}[.],t[.]) -> A(z{u}[.],t[.]) @ 1
+'r4' A(z{u}[.],t[.]),A(z{u}[.],t[.]) -> A(z{u}[1],t[.]),A(z{u}[1],t[.]) @ 1
+'r5' A(z{u}[.],t[.]),A(z{u}[.],t[.]) -> A(z{u}[.],t[1]),A(z{u}[.],t[1]) @ 1
+'r6' A(z{p}[.],t[.]),A(z{p}[.],t[.]) -> A(z{p}[1],t[.]),A(z{p}[1],t[.]) @ 1
+'r7' A(z{p}[.],t[.]),A(z{p}[.],t[.]) -> A(z{p}[.],t[1]),A(z{p}[.],t[1]) @ 1
+'r8' A(z{u}[.],t[1]),A(z{p}[.],t[1]) -> A(z{u}[2],t[1]),A(z{p}[2],t[1]) @ 1
 
-#i Rules r0, r1, and r8 are dead.
+//i Rules r0, r1, and r8 are dead.

@@ -1,15 +1,15 @@
-%agent: A(x~u~p,y~u~p,z~u~p,a~u~p,b~u~p)
+%agent: A(x{u p},y{u p},z{u p},a{u p},b{u p})
 
-%init: 1 A(x~u,y~u,z~u,a~u,b~u)
+%init: 1 A(x{u}[.],y{u}[.],z{u}[.],a{u}[.],b{u}[.])
 
--> A(x~u,y~u,z~u,a~u,b~u) @1
-A(x~u) -> A(x~p) @1
-A(x~p,y~u) -> A(x~p,y~p) @1
-A(x~p,y~u,b~u) -> A(x~u,y~u,b~u) @1
-A(y~p) -> A(y~u) @1
-A(z~u) -> A(z~p) @1
-A(z~p,a~u) -> A(z~p,a~p) @1
-A(z~p,a~u,b~u) -> A(z~u,a~u,b~u) @1
-A(a~p) -> A(a~u) @1
-A(x~p,y~p,z~p,a~p,b~u) -> A(x~p,y~p,z~p,a~p,b~p) @1
-A(b~p) -> A(b~u) @1
+. -> A(x{u}[.],y{u}[.],z{u}[.],a{u}[.],b{u}[.]) @ 1
+A(x{u}[.]) -> A(x{p}[.]) @ 1
+A(x{p}[.],y{u}[.]) -> A(x{p}[.],y{p}[.]) @ 1
+A(x{p}[.],y{u}[.],b{u}[.]) -> A(x{u}[.],y{u}[.],b{u}[.]) @ 1
+A(y{p}[.]) -> A(y{u}[.]) @ 1
+A(z{u}[.]) -> A(z{p}[.]) @ 1
+A(z{p}[.],a{u}[.]) -> A(z{p}[.],a{p}[.]) @ 1
+A(z{p}[.],a{u}[.],b{u}[.]) -> A(z{u}[.],a{u}[.],b{u}[.]) @ 1
+A(a{p}[.]) -> A(a{u}[.]) @ 1
+A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{u}[.]) -> A(x{p}[.],y{p}[.],z{p}[.],a{p}[.],b{p}[.]) @ 1
+A(b{p}[.]) -> A(b{u}[.]) @ 1

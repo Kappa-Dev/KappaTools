@@ -1,11 +1,11 @@
-%agent:A(z,t)
-%agent:B(z,t)
+%agent: A(z,t)
+%agent: B(z,t)
 
-%init: 10 A(z,t)
-%init: 10 B(z,t)
-%init: 10 A(z!1,t!2),B(z!1,t!2)
+%init: 10 A(z[.],t[.])
+%init: 10 B(z[.],t[.])
+%init: 10 A(z[1],t[2]),B(z[1],t[2])
 
-'r0' A(z,t),B(z,t) -> A(z!1,t),B(z!1,t) @1
-'r1' A(z,t),B(z,t) -> A(z,t!1),B(z,t!1) @1
+'r0' A(z[.],t[.]),B(z[.],t[.]) -> A(z[1],t[.]),B(z[1],t[.]) @ 1
+'r1' A(z[.],t[.]),B(z[.],t[.]) -> A(z[.],t[1]),B(z[.],t[1]) @ 1
 
-#the answer is yes, basic example
+//the answer is yes, basic example

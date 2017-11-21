@@ -1,2 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa parallel_bonds.ka --output-directory output --debugging-mode -syntax 3 || exit 0
+"${KAPPABIN}"KaSa parallel_bonds.ka --output-directory output --debugging-mode -syntax 4 || exit 0

@@ -1,16 +1,16 @@
-%agent:A(z,t~u~p~q)
-%agent:B(z~u~p,t~u~p)
+%agent: A(z,t{u p q})
+%agent: B(z{u p},t{u p})
 
-%init: 10 A(z,t)
-%init: 10 B(z~u,t)
-%init: 10 A(z!1,t~u),B(z~p!1,t~u) # t,t (u,u)
-%init: 10 A(z!1,t~p),B(z~p!1,t~p) # t,t (p,p)
+%init: 10 A(z[.],t[.])
+%init: 10 B(z{u}[.],t[.])
+%init: 10 A(z[1],t{u}[.]),B(z{p}[1],t{u}[.]) // t,t (u,u)
+%init: 10 A(z[1],t{p}[.]),B(z{p}[1],t{p}[.]) // t,t (p,p)
 
-'r0' A(z,t~u),B(z~p,t~u) -> A(z!1,t~u),B(z~p!1,t~u) @1 # t,t (u,u)
-'r1' B(z~u) -> B(z~p) @1 # nothing
-'r2' B(z~p) -> B(z~u) @1 # nothing
- 'r3' A(z!1,t~u),B(z!1,t~u) -> A(z!1,t~p),B(z!1,t~p) @1 # t,t (p,p)
- 'r4' A(z!1,t~p),B(z!1,t~p) -> A(z!1,t~u),B(z!1,t~u) @1 # t,t (u,u)
- 'r5' A(t~p) -> A(t~q) @1 # t,t (q,p)
+'r0' A(z[.],t{u}[.]),B(z{p}[.],t{u}[.]) -> A(z[1],t{u}[.]),B(z{p}[1],t{u}[.]) @ 1 // t,t (u,u)
+'r1' B(z{u}[.]) -> B(z{p}[.]) @ 1 // nothing
+'r2' B(z{p}[.]) -> B(z{u}[.]) @ 1 // nothing
+'r3' A(z[1],t{u}[.]),B(z[1],t{u}[.]) -> A(z[1],t{p}[.]),B(z[1],t{p}[.]) @ 1 // t,t (p,p)
+'r4' A(z[1],t{p}[.]),B(z[1],t{p}[.]) -> A(z[1],t{u}[.]),B(z[1],t{u}[.]) @ 1 // t,t (u,u)
+'r5' A(t{p}[.]) -> A(t{q}[.]) @ 1 // t,t (q,p)
 
-# A.t and B.t is equal to u,u or p,p, q, p when A.z is connected to B.z
+// A.t and B.t is equal to u,u or p,p, q, p when A.z is connected to B.z
