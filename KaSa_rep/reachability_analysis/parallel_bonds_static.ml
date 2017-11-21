@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Jan 13 2017>
+   * Last modification: Time-stamp: <Nov 21 2017>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -31,6 +31,15 @@ type local_static_information =
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.t;
     (* information of partial formation of parallel or non-parallel bonds in
        rules *)
+    store_closure:
+      (Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
+       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state)) *
+       ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *Ckappa_sig.c_state * Ckappa_sig.c_state) *
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state * Ckappa_sig.c_state))
+      ) list
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.t;
+
     store_fst_site_create_parallel_bonds_rhs:
       ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
         Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
@@ -72,6 +81,8 @@ let init_local_static =
     store_rule_double_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
     store_tuple_to_sites =
       Parallel_bonds_type.PairAgentSite_map_and_set.Map.empty;
+    store_closure =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty;
     store_sites_to_tuple =
       Parallel_bonds_type.AgentSite_map_and_set.Map.empty;
   }

@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 20 2017>
+  * Last modification: Time-stamp: <Nov 21 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -127,6 +127,18 @@ struct
         Parallel_bonds_static.store_tuples_of_interest = bonds
       }
       static
+
+  let get_closure static =
+        (get_local_static_information
+           static).Parallel_bonds_static.store_closure
+
+  let set_closure closure static =
+        set_local_static_information
+          {
+            (get_local_static_information static) with
+            Parallel_bonds_static.store_closure = closure
+          }
+          static
 
   let get_rule_double_bonds_rhs static =
     (get_local_static_information
@@ -290,9 +302,104 @@ struct
 (*rules*)
 (****************************************************************)
 
+  let apply_closure_to_tuples_of_interest parameter error tuples_of_interest =
+    let error, array =
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create
+        parameter error 0
+    in
+    let error, array =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
+      (fun tuple  (error, array) ->
+         let ((ag,_,_,_,_),_) = tuple in
+         let error, old =
+           Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+             parameter error
+             ag array
+         in
+         let old =
+           match old with
+           | Some a -> a
+           | None -> []
+         in
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set parameter error ag (tuple::old) array
+      )
+      tuples_of_interest
+      (error, array)
+    in
+    let add_single parameter error proof key tuples_of_interest map =
+      let error, tuples_of_interest =
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.add_when_not_in
+          parameter error
+          key
+          tuples_of_interest
+      in
+      let error, old =
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.find_default
+          parameter error
+          []
+          key
+          map
+      in
+      let error, map =
+        Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.add_or_overwrite
+          parameter error
+          key
+          (proof::old)
+          map
+      in
+      error, (tuples_of_interest, map)
+    in
+    let add parameter error proof p1 p2 tuples_of_interest map =
+      let error, (tuples_of_interest, map) =
+        add_single
+          parameter error proof
+          (p1,p2)
+          tuples_of_interest map
+      in
+      add_single
+        parameter error proof
+        (p2,p1)
+        tuples_of_interest map
+    in
+    let error, (tuples_of_interest, map) =
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameter error
+        (fun parameter error agent list (tuples_of_interest,map) ->
+           let rec aux list (error, (tuples_of_interest,map)) =
+             match list with
+             | [] -> error, (tuples_of_interest,map)
+             | h::t ->
+               let p1,p2 = h in
+               let (_,site1,site1_,_,state1_) = p1 in
+               let (agent2,site2,site2_,_,state2_) = p2 in
+               let error, tuples_of_interest =
+                 List.fold_left
+                   (fun (error, (tuples_of_interest,map)) (p1',p2') ->
+                   let (_,site1',site1_',_,state1_') = p1' in
+                   let (agent2',site2',site2_',_,state2_') = p2' in
+                   if agent2=agent2' && site1 = site1' && site2 = site2'
+                     then
+                       add parameter error
+                         (site1, site2, h, (p1',p2'))
+                         (agent,site1_,site1_',state1_,state1_')
+                         (agent2,site2_,site2_',state2_,state2_')
+                         tuples_of_interest map
+                     else
+                       error, (tuples_of_interest,map))
+
+                   (error, (tuples_of_interest,map)) t in
+                             aux t (error, tuples_of_interest)
+           in
+           aux list (error, (tuples_of_interest,map)))
+        array (tuples_of_interest,
+               Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.empty)
+    in
+    error, (tuples_of_interest,map)
+
   let scan_rules static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
+    let handler = get_kappa_handler static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameters
@@ -321,31 +428,37 @@ struct
       Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.union
         parameters error store_result1 store_result2
     in
+    let error, (store_result,map) =
+      apply_closure_to_tuples_of_interest parameters error store_result
+    in
     let static =
       set_tuples_of_interest store_result static
     in
+    let static =
+      set_closure map static
+    in
     (*------------------------------------------------------*)
-    let tuple_of_interest = store_result in
+    let tuples_of_interest = store_result in
     let store_action_binding = get_action_binding static in
     let error, store_result =
       Parallel_bonds_static.collect_fst_site_create_parallel_bonds_rhs
-        parameters error store_action_binding tuple_of_interest
+        parameters error store_action_binding tuples_of_interest
     in
     let static = set_fst_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
     (*A(x, y!1), B(x, y!1): second site is an action binding *)
     let error, store_result =
       Parallel_bonds_static.collect_snd_site_create_parallel_bonds_rhs
-        parameters error store_action_binding tuple_of_interest
+        parameters error store_action_binding tuples_of_interest
     in
     let static = set_snd_site_create_parallel_bonds_rhs store_result static in
     (*------------------------------------------------------*)
     (*map tuples to sites*)
-    let tuple_of_interest = get_tuples_of_interest static in
+    let tuples_of_interest = get_tuples_of_interest static in
     let error, store_result =
       Parallel_bonds_static.collect_tuple_to_sites
         parameters error
-        tuple_of_interest
+        tuples_of_interest
     in
     let static = set_tuple_to_sites store_result static in
     (*------------------------------------------------------*)
@@ -556,7 +669,7 @@ struct
   (*************************************************************)
   (* if a parallel bound occurs on the lhs, check that this is possible *)
 
-  let common_scan parameters error tuple_of_interest store_value list  =
+  let common_scan parameters error tuples_of_interest store_value list  =
     let rec scan list error =
       match
         list
@@ -573,7 +686,9 @@ struct
           with
           (*if we do not find the pair on the lhs inside the result, then return undefined if this is a tuple of interest, Any if this is not;  if there is a double bound then returns its value.*)
           | error, None ->
-            if Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem pair tuple_of_interest
+            if
+              Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.mem
+                pair tuples_of_interest
             then
               error, Usual_domains.Undefined
             else
@@ -587,7 +702,7 @@ struct
         | Usual_domains.Val b when b <> parallel_or_not -> error, false
         (*otherwise continue until the rest of the list*)
         | Usual_domains.Val _
-        |  Usual_domains.Any -> scan tail error
+        | Usual_domains.Any -> scan tail error
     in
     scan list error
 
@@ -740,9 +855,9 @@ struct
                    agent_id1
                    agent_id1'
                    (z', t')
-                   rule_double_bonds_rhs_map (**)
+                   rule_double_bonds_rhs_map
                then
-                 (error, dynamic, precondition, store_result)
+                   (error, dynamic, precondition, store_result)
                else
                  (*check the agent_type, and site_type1*)
                  let error, old_value =
@@ -782,16 +897,18 @@ struct
                  in
                  let error, dynamic, precondition, store_result =
                    match state_list, state_list' with
-                   | _::_::_, _::_::_ ->
-                     (*we know for sure that none of the two sites have been
+                   (*   | _::_::_, _::_::_ ->*)
+                     (*     (*we know for sure that none of the two sites have been
                        modified*)
-                     error, dynamic, precondition, store_result
+                      q        error, dynamic, precondition, store_result
+                     *)
                    | [], _ | _, [] ->
                      let error, () =
                        Exception.warn parameters error __POS__
                          ~message: "empty list in potential states in post condition" Exit ()
                      in
                      error, dynamic, precondition, store_result
+                   | _::_::_, _::_::_
                    | [_], _ | _, [_] -> (*general case*)
                      let error, potential_list =
                        List.fold_left
@@ -834,7 +951,7 @@ struct
                                s_type1, pre_state1, s_type1', pre_state1'
                            in
                            (*check if the pre_state2 and pre_state2' of the
-                             other sites are bound and if yes which the good
+                             other sites are bound and if yes with the good
                              state?  -
                              Firstly check that if the parallel bonds depend on
                              the state of the second site, it will give a
@@ -858,24 +975,40 @@ struct
                                   2: both sites are bound with the good sites,
                                   then return Any, if not return false*)
                                begin
-                                 if site_other = site_other' &&
+                                 (*   if site_other = site_other' &&
                                     pre_state_other = pre_state_other' &&
                                     not (Ckappa_sig.int_of_state_index
                                            pre_state_other' = 0)
-                                 then
+                                      then*)
                                (*both question1 and 2 are yes: return any*)
+                                 (* let () =
+                                 Format.fprintf
+                                   Format.std_formatter
+                                   "%s %s %s %s -> Any\n"
+                                   (Ckappa_sig.string_of_site_name site_other )
+                                   (Ckappa_sig.string_of_site_name site_other' )
+                                   (Ckappa_sig.string_of_state_index  pre_state_other )
+                                    (Ckappa_sig.string_of_state_index  pre_state_other' ) in*)
                                    let new_value =
                                      Usual_domains.lub value
                                        Usual_domains.Any
                                    in
                                    error, new_value
-                                 else
-                               (*the question1 is true but the question 2 is false -> false*)
+                                     (*                               else
+                                   (*the question1 is true but the question 2 is false -> false*)
+                                   let () =
+                                     Format.fprintf
+                                       Format.std_formatter
+                                       "%s %s %s %s -> False\n"
+                                       (Ckappa_sig.string_of_site_name site_other )
+                                       (Ckappa_sig.string_of_site_name site_other' )
+                                       (Ckappa_sig.string_of_state_index  pre_state_other )
+                                       (Ckappa_sig.string_of_state_index  pre_state_other' ) in
                                    let new_value =
                                      Usual_domains.lub value
                                        (Usual_domains.Val false)
                                    in
-                                   error, new_value
+                                                                      error, new_value*)
                                end
                            end
                          ) (error, old_value) potential_list

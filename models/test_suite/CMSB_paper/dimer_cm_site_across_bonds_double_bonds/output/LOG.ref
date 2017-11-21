@@ -13,8 +13,8 @@ every agent may occur in the model
 ------------------------------------------------------------
 * Properties of pairs of bonds
 ------------------------------------------------------------
-R(c!R.c,cr!R.n) => R(c!1,cr!2),R(c!1,n!2)
-R(c!R.c,n!R.cr) => R(c!1,n!2),R(c!1,cr!2)
+
+
 Generating the raw influence map...
 Refining the influence map...
 execution finished without any exception
