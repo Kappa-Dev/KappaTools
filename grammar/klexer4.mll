@@ -66,6 +66,16 @@ rule token = parse
   | real as f { FLOAT (float_of_string f) }
   | '\'' ([^'\n' '\'']+ as x) '\''{ LABEL(x) }
   | '\"' ([^'\n' '\"']+ as x) '\"'{ STRING(x) }
+  | '\'' ([^'\n' '\'']+ as s) (eof | '\n')
+    { raise (ExceptionDefn.Syntax_Error
+      ("Unterminated label: "^s,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))}
+  | '\"' ([^'\n' '\"']+ as s) (eof | '\n')
+    { raise (ExceptionDefn.Syntax_Error
+      ("Unterminated string: "^s,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))}
   | id as str { keyword_or_id str }
   | '%' (id as lab) ':' {
     match lab with
@@ -146,12 +156,20 @@ and inline_comment acc = parse
   | '*' '/' { String.concat "" (List.rev acc) }
   | eof { String.concat "" (List.rev acc) }
   | '*' '\n' { Lexing.new_line lexbuf; inline_comment ("*\n"::acc) lexbuf }
-  | ('\'' [^'\n' '\'']+ '\'') as x { inline_comment (x::acc) lexbuf }
-  | ('\"' [^'\n' '\"']+ '\"') as x { inline_comment (x::acc) lexbuf }
-  | ('*' '\'' [^'\n' '\'']+ '\'') as x { inline_comment (x::acc) lexbuf }
-  | ('*' '\"' [^'\n' '\"']+ '\"') as x { inline_comment (x::acc) lexbuf }
-  | ('/' '\'' [^'\n' '\'']+ '\'') as x { inline_comment (x::acc) lexbuf }
-  | ('/' '\"' [^'\n' '\"']+ '\"') as x { inline_comment (x::acc) lexbuf }
+  | (('*' | '/')? '\'' [^'\n' '\'']+ '\'') as x
+    { inline_comment (x::acc) lexbuf }
+  | (('*' | '/')? '\'' [^'\n' '\'']+ (eof | '\n')) as x
+     { raise (ExceptionDefn.Syntax_Error
+      ("Unterminated label in comment: "^x,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))}
+  | (('*' | '/')? '\"' [^'\n' '\"']+ (eof | '\n')) as x
+    { inline_comment (x::acc) lexbuf }
+  | (('*' | '/')? '\"' [^'\n' '\"']+ '\"') as x
+    { raise (ExceptionDefn.Syntax_Error
+      ("Unterminated string in comment: "^x,
+       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
+         (Lexing.lexeme_end_p lexbuf)))}
   | '/' '*'
     { inline_comment ("*/"::(inline_comment ["/*"] lexbuf):: acc) lexbuf }
   | '/' '\n' { Lexing.new_line lexbuf; inline_comment ("/\n"::acc) lexbuf }
