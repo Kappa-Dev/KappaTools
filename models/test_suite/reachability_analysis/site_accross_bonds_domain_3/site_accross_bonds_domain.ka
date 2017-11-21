@@ -1,13 +1,13 @@
-%agent:A(z,t)
-%agent:B(z,t)
-%agent:E(z,t)
-%agent:F(z,t)
-%agent:C(x)
-%agent:D(x)
-%agent:G(x)
-%agent:H(x)
--> C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3) @1
-C(x!1),A(z!1,t!2),B(t!2,z!3),C(x!3) -> D(x!1),A(z!1,t!2),B(t!2,z!3),D(x!3) @1
-C() -> @ 1
--> C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3) @1
-C(x!1),E(z!1,t!2),F(t!2,z!3),D(x!3) -> G(x!1),E(z!1,t!2),F(t!2,z!3),H(x!3) @1
+%agent: A(z,t)
+%agent: B(z,t)
+%agent: E(z,t)
+%agent: F(z,t)
+%agent: C(x)
+%agent: D(x)
+%agent: G(x)
+%agent: H(x)
+.,.,.,. -> C(x[1]),A(z[1],t[2]),B(t[2],z[3]),C(x[3]) @ 1
+C(x[1]),A(z[1],t[2]),B(t[2],z[3]),C(x[3]),.,.,.,. -> .,.,.,.,D(x[1]),A(z[1],t[2]),B(t[2],z[3]),D(x[3]) @ 1
+C() -> . @ 1
+.,.,.,. -> C(x[1]),E(z[1],t[2]),F(t[2],z[3]),D(x[3]) @ 1
+C(x[1]),E(z[1],t[2]),F(t[2],z[3]),D(x[3]),.,.,.,. -> .,.,.,.,G(x[1]),E(z[1],t[2]),F(t[2],z[3]),H(x[3]) @ 1

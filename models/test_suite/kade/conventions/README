@@ -1,10 +1,10 @@
 #Command-line:
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Kasim -d output -l 1 -p 0.1 -syntax 3 --ode-backend SBML --sbml-output network_1_1.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Kasim -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_2_1.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Kasim -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_3_1.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_1_2.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_2_2.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_3_2.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_1_3.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_2_3.xml|| exit 0
-"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 3 --ode-backend SBML --sbml-output network_3_3.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Kasim -d output -l 1 -p 0.1 -syntax 4 --ode-backend SBML --sbml-output network_1_1.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Kasim -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_2_1.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Kasim -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_3_1.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_1_2.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_2_2.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Divide_by_nbr_of_autos_in_lhs -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_3_2.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Kasim  --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_1_3.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Divide_by_nbr_of_autos_in_lhs --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_2_3.xml|| exit 0
+"${KAPPABIN}"KaDE convention.ka --rule-rate-convention Biochemist   --reaction-rate-convention Biochemist -d output -l 1 -p 0.1  -syntax 4 --ode-backend SBML --sbml-output network_3_3.xml|| exit 0

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- command line:  -->
-<!--       KaDE   convention.ka    -rule-rate-convention   Kasim   -reaction-rate-convention   Kasim   -d   output   -l   1   -p   0.1  -syntax   3    -ode-backend   SBML    -sbml-output  network_1_1.xml  -->
+<!--       KaDE   convention.ka    -rule-rate-convention   Kasim   -reaction-rate-convention   Kasim   -d   output   -l   1   -p   0.1  -syntax   4    -ode-backend   SBML    -sbml-output  network_1_1.xml  -->
 <sbml xmlns="http://www.sbml.org/sbml/level2/version4" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" level="2" version="4">
 <model name="KaDe output:">
 <!--
