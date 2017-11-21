@@ -223,7 +223,7 @@ dydt(1)=dydt(1)+k(1)*y(1);
 dydt(1)=dydt(1)+k(1)*y(1);
 
 % rule    : expo3
-% reaction:  ->  | 2.2 t, -(2) u, -((|T()| + (|t| + nT))) t
+% reaction:  ->  | 2.2 t, -(2) u, -(((|T()| + |t|) + nT)) t
 
 dydt(2)=dydt(2)+k(3)*stoc(3,1);
 dydt(3)=dydt(3)+k(3)*stoc(3,2);
@@ -289,7 +289,7 @@ jac(1,1)=jac(1,1)+k(1);
 jac(1,1)=jac(1,1)+k(1);
 
 % rule    : expo3
-% reaction:  ->  | 2.2 t, -(2) u, -((|T()| + (|t| + nT))) t
+% reaction:  ->  | 2.2 t, -(2) u, -(((|T()| + |t|) + nT)) t
 
 jac(2,2)=jac(2,2)+jack(3,2)*stoc(3,1);
 jac(2,1)=jac(2,1)+k(3)*jacstoc(3,1,1);

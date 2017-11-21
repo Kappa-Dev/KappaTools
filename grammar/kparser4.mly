@@ -250,14 +250,14 @@ small_alg_expr:
 
 alg_expr_up_to_mod:
   | small_alg_expr annot { ($1,end_pos 1,$2) }
-  | alg_expr_up_to_mod POW annot small_alg_expr annot
-    { let (x,_,_) = $1 in
-      (add_pos 4 (Alg_expr.BIN_ALG_OP(Operator.POW,x,$4)),end_pos 4,$5) }
+  | small_alg_expr annot POW annot alg_expr_up_to_mod
+    { let (x,y,z) = $5 in
+      (add_pos 4 (Alg_expr.BIN_ALG_OP(Operator.POW,$1,x)),y,z) }
   ;
 
 alg_expr_up_to_prod:
   | alg_expr_up_to_mod { $1 }
-  | alg_expr_up_to_mod MOD annot alg_expr_up_to_prod
+  | alg_expr_up_to_prod MOD annot alg_expr_up_to_mod
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP (Operator.MODULO,x,y),
@@ -267,13 +267,13 @@ alg_expr_up_to_prod:
 
 alg_expr_up_to_sum:
   | alg_expr_up_to_prod { $1 }
-  | alg_expr_up_to_prod MULT annot alg_expr_up_to_sum
+  | alg_expr_up_to_sum MULT annot alg_expr_up_to_prod
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.MULT,x,y),
        Locality.of_pos (start_pos 1) pend),
        pend,an) }
-  | alg_expr_up_to_prod DIV annot alg_expr_up_to_sum
+  | alg_expr_up_to_sum DIV annot alg_expr_up_to_prod
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.DIV,x,y),
@@ -283,13 +283,13 @@ alg_expr_up_to_sum:
 
 alg_expr_up_to_if:
   | alg_expr_up_to_sum { $1 }
-  | alg_expr_up_to_sum PLUS annot alg_expr_up_to_if
+  | alg_expr_up_to_if PLUS annot alg_expr_up_to_sum
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.SUM,x,y),
         Locality.of_pos (start_pos 1) pend),
        pend,an) }
-  | alg_expr_up_to_sum MINUS annot alg_expr_up_to_if
+  | alg_expr_up_to_if MINUS annot alg_expr_up_to_sum
     { let (y,pend,an) = $4 in
       let (x,_,_) = $1 in
       ((Alg_expr.BIN_ALG_OP(Operator.MINUS,x,y),
