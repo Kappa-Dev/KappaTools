@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
    *
    * Creation: 2011, the 16th of March
-   * Last modification: Time-stamp: <Nov 11 2017>
+   * Last modification: Time-stamp: <Nov 22 2017>
    * *
    * Primitives to use a kappa handler
    *
@@ -89,6 +89,28 @@ let translate_state
   in
   check_pos parameter ka_pos ml_pos message error error',
   a
+
+let translate_binding_type parameter error handler agent site =
+  let error, agent_name =
+    translate_agent parameter error handler agent
+  in
+  let error, site_name =
+    match
+      translate_site parameter error handler agent site
+    with
+    | error, Ckappa_sig.Binding s -> error, s
+    | error, Ckappa_sig.Internal s -> 
+      Exception.warn parameter error __POS__ Exit s
+  in
+  let binding_type_symbol =
+    Remanent_parameters.get_at_symbol parameter
+  in
+  error,
+  Binding_type.string_of_binding_type
+    ~binding_type_symbol
+    ~agent_name
+    ~site_name
+
 
 let dual
     ?ml_pos:(ml_pos=None) ?ka_pos:(ka_pos=None)

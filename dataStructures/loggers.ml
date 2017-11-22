@@ -639,3 +639,10 @@ let to_json logger =
 let of_json = JsonUtil.to_list ~error_msg:"line list" line_of_json
 let get_edge_map t = !(t.edges_map)
 let get_nodes t = !(t.nodes)
+
+let print_binding_type
+    t ?binding_type_symbol:(binding_type_symbol=".")
+    ~agent_name ~site_name =
+  fprintf t
+    "%s"
+    (Binding_type.string_of_binding_type ~binding_type_symbol ~agent_name ~site_name)

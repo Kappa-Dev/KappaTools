@@ -20,7 +20,7 @@ type encoding =
   | Matrix | HTML_Graph | Js_Graph | HTML | HTML_Tabular
   | DOT | TXT | TXT_Tabular | XLS
   | Octave | Matlab | Maple | Mathematica | SBML | DOTNET
-  | Json 
+  | Json
 
 module type FormatMap =
 sig
@@ -90,3 +90,8 @@ val flag_dangerous: t -> Ode_loggers_sig.variable -> string -> unit
 val has_forbidden_char: t -> string -> bool
 val allocate_fresh_name: t -> string -> string -> string
 val allocate: t -> string -> unit
+
+val print_binding_type:
+  t -> ?binding_type_symbol:string ->
+  agent_name:string ->
+  site_name:string -> unit
