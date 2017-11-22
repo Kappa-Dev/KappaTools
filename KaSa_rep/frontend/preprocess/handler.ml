@@ -99,7 +99,7 @@ let translate_binding_type parameter error handler agent site =
       translate_site parameter error handler agent site
     with
     | error, Ckappa_sig.Binding s -> error, s
-    | error, Ckappa_sig.Internal s -> 
+    | error, Ckappa_sig.Internal s ->
       Exception.warn parameter error __POS__ Exit s
   in
   let binding_type_symbol =

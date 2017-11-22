@@ -107,26 +107,42 @@ let get_syntax_version () =
   *)
 
 
-(* Quyen: What you have done is quite complicated and hardly upgradable *)
-(* Please do not duplicate the field of this struct according to the syntax version *)
+(* Quyen: What you have done is quite complicated and
+   hardly upgradable *)
+(* Please do not duplicate the field of this struct
+   according to the syntax version *)
 (* Instead fill them according to the syntax version *)
 (* let symbol_v3 = { (...) } *)
 (* let symbol_v4 = { (...) } *)
 (* let get_symbols () =
-   match get_syntax_version () with Ast.V3 -> symbol_V3 | Ast.V4 -> symbol_v4 *)
-(* Hopefully, you will not have to test what is the syntax version later on, since the table of symbol would be filled properly *)
+   match get_syntax_version () with
+   Ast.V3 -> symbol_V3
+   | Ast.V4 -> symbol_v4 *)
+(* Hopefully, you will not have to test what is the syntax
+   version later on, since the table of symbol would be
+   filled properly *)
 
-let get_symbols () =
+(*
+I want to have only one table of symbol,
+and only one version of
+each symbol in this table.
+Then this table should be filled with
+the correct symbols by the function
+get_symbols in remanent_parameters.ml.
+*)
+
+let get_symbol_v3 () =
   {
-    Remanent_parameters_sig.open_binding_state = "[";
-    Remanent_parameters_sig.bound_symbol = "!";
-    Remanent_parameters_sig.close_binding_state = "]";
+    Remanent_parameters_sig.bound = "!";
+    Remanent_parameters_sig.open_binding_state = "";
+    Remanent_parameters_sig.close_binding_state = "";
+    Remanent_parameters_sig.link_to_any = "?";
+    Remanent_parameters_sig.link_to_some = "!_";
+    Remanent_parameters_sig.internal_state_symbol = "~";
+    Remanent_parameters_sig.open_internal_state = "";
+    Remanent_parameters_sig.close_internal_state = "";
+    Remanent_parameters_sig.free = "";
     Remanent_parameters_sig.at = "@" ;
-    Remanent_parameters_sig.free_symbol = ".";
-    Remanent_parameters_sig.link_to_any_v4 = "#";
-    Remanent_parameters_sig.link_to_any_v3 = "?";
-    Remanent_parameters_sig.link_to_some_v4 = "_";
-    Remanent_parameters_sig.link_to_some_v3 = "!_";
     Remanent_parameters_sig.agent_open = "(" ;
     Remanent_parameters_sig.agent_close =  ")" ;
     Remanent_parameters_sig.agent_sep_comma = "," ;
@@ -141,15 +157,48 @@ let get_symbols () =
         | Ast.V4 -> true
         | Ast.V3 -> false
       end ;
-    Remanent_parameters_sig.open_internal_state = "{";
-    Remanent_parameters_sig.close_internal_state = "}";
-    Remanent_parameters_sig.internal_state_symbol = "~";
     Remanent_parameters_sig.uni_arrow = "->" ;
     Remanent_parameters_sig.rev_arrow = "<-" ;
     Remanent_parameters_sig.bi_arrow = "<->" ;
     Remanent_parameters_sig.uni_arrow_nopoly = "-!->"
   }
 
+let get_symbol_v4 () =
+  {
+    Remanent_parameters_sig.bound = "";
+    Remanent_parameters_sig.open_binding_state = "[";
+    Remanent_parameters_sig.close_binding_state = "]";
+    Remanent_parameters_sig.link_to_any = "#";
+    Remanent_parameters_sig.link_to_some = "_";
+    Remanent_parameters_sig.internal_state_symbol = "";
+    Remanent_parameters_sig.open_internal_state = "{";
+    Remanent_parameters_sig.close_internal_state = "}";
+    Remanent_parameters_sig.free = ".";
+    Remanent_parameters_sig.at = "@" ;
+    Remanent_parameters_sig.agent_open = "(" ;
+    Remanent_parameters_sig.agent_close =  ")" ;
+    Remanent_parameters_sig.agent_sep_comma = "," ;
+    Remanent_parameters_sig.agent_sep_plus = "+" ;
+    Remanent_parameters_sig.agent_sep_dot = "." ;
+    Remanent_parameters_sig.btype_sep = ".";
+    Remanent_parameters_sig.site_sep_comma = "," ;
+    Remanent_parameters_sig.ghost_agent = "." ;
+    Remanent_parameters_sig.show_ghost =
+      begin
+        match get_syntax_version () with
+        | Ast.V4 -> true
+        | Ast.V3 -> false
+      end ;
+    Remanent_parameters_sig.uni_arrow = "->" ;
+    Remanent_parameters_sig.rev_arrow = "<-" ;
+    Remanent_parameters_sig.bi_arrow = "<->" ;
+    Remanent_parameters_sig.uni_arrow_nopoly = "-!->"
+  }
+
+let get_symbols () =
+  match get_syntax_version () with
+  | Ast.V3 -> get_symbol_v3 ()
+  | Ast.V4 -> get_symbol_v4 ()
 
 let get_influence_map () =
   {
@@ -491,40 +540,32 @@ let dummy_parameters ~called_from =
       p
     | Some p -> p
 
-let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep
-let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound_symbol
-let get_open_binding_state_1             symbol = symbol.Remanent_parameters_sig.open_binding_state
-let get_close_binding_state_1             symbol = symbol.Remanent_parameters_sig.close_binding_state
 
-let get_free_symbol_1             symbol = symbol.Remanent_parameters_sig.free_symbol
-
-let get_at_symbol_1                symbol = symbol.Remanent_parameters_sig.at
-
-let get_link_to_any_v4_1       symbol = symbol.Remanent_parameters_sig.link_to_any_v4
-let get_link_to_any_v3_1       symbol = symbol.Remanent_parameters_sig.link_to_any_v3
-
-let get_link_to_some_v4_1      symbol = symbol.Remanent_parameters_sig.link_to_some_v4
-let get_link_to_some_v3_1      symbol = symbol.Remanent_parameters_sig.link_to_some_v3
-
-let get_agent_open_symbol_1        symbol = symbol.Remanent_parameters_sig.agent_open
-let get_agent_close_symbol_1       symbol = symbol.Remanent_parameters_sig.agent_close
-let get_agent_sep_comma_symbol_1   symbol = symbol.Remanent_parameters_sig.agent_sep_comma
-let get_agent_sep_plus_symbol_1    symbol = symbol.Remanent_parameters_sig.agent_sep_plus
-let get_agent_sep_dot_symbol_1     symbol = symbol.Remanent_parameters_sig.agent_sep_dot
-let get_site_sep_comma_symbol_1    symbol = symbol.Remanent_parameters_sig.site_sep_comma
-let get_ghost_agent_symbol_1       symbol = symbol.Remanent_parameters_sig.ghost_agent
-let get_do_we_show_ghost_1         symbol = symbol.Remanent_parameters_sig.show_ghost
-
-let get_open_internal_state_1          symbol = symbol.Remanent_parameters_sig.open_internal_state
-let get_close_internal_state_1          symbol = symbol.Remanent_parameters_sig.close_internal_state
-let get_internal_state_symbol_1          symbol = symbol.Remanent_parameters_sig.internal_state_symbol
-
-let get_uni_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.uni_arrow
-let get_rev_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.rev_arrow
-let get_bi_arrow_symbol_1          symbol = symbol.Remanent_parameters_sig.bi_arrow
+let get_bound_symbol_1 symbol = symbol.Remanent_parameters_sig.bound
+let get_open_binding_state_1 symbol = symbol.Remanent_parameters_sig.open_binding_state
+let get_close_binding_state_1 symbol = symbol.Remanent_parameters_sig.close_binding_state
+let get_link_to_any_1 symbol = symbol.Remanent_parameters_sig.link_to_any
+let get_link_to_some_1 symbol = symbol.Remanent_parameters_sig.link_to_some
+let get_internal_state_symbol_1 symbol = symbol.Remanent_parameters_sig.internal_state_symbol
+let get_open_internal_state_1 symbol = symbol.Remanent_parameters_sig.open_internal_state
+let get_close_internal_state_1 symbol = symbol.Remanent_parameters_sig.close_internal_state
+let get_free_1 symbol = symbol.Remanent_parameters_sig.free
+let get_at_symbol_1 symbol = symbol.Remanent_parameters_sig.at
+let get_agent_open_symbol_1 symbol = symbol.Remanent_parameters_sig.agent_open
+let get_agent_close_symbol_1 symbol = symbol.Remanent_parameters_sig.agent_close
+let get_agent_sep_comma_symbol_1 symbol = symbol.Remanent_parameters_sig.agent_sep_comma
+let get_agent_sep_plus_symbol_1 symbol = symbol.Remanent_parameters_sig.agent_sep_plus
+let get_agent_sep_dot_symbol_1 symbol = symbol.Remanent_parameters_sig.agent_sep_dot
+let get_btype_sep_symbol_1 symbol = symbol.Remanent_parameters_sig.btype_sep
+let get_site_sep_comma_symbol_1 symbol = symbol.Remanent_parameters_sig.site_sep_comma
+let get_ghost_agent_symbol_1 symbol = symbol.Remanent_parameters_sig.ghost_agent
+let get_do_we_show_ghost_1 symbol = symbol.Remanent_parameters_sig.show_ghost
+let get_uni_arrow_symbol_1 symbol = symbol.Remanent_parameters_sig.uni_arrow
+let get_rev_arrow_symbol_1 symbol = symbol.Remanent_parameters_sig.rev_arrow
+let get_bi_arrow_symbol_1 symbol = symbol.Remanent_parameters_sig.bi_arrow
 let get_uni_arrow_no_poly_symbol_1 symbol = symbol.Remanent_parameters_sig.uni_arrow_nopoly
 
-
+(*Influence*)
 let get_im_format_1            influence = influence.Remanent_parameters_sig.im_format
 let get_im_file_1              influence = influence.Remanent_parameters_sig.im_file
 let get_im_directory_1         influence = influence.Remanent_parameters_sig.im_directory
@@ -588,8 +629,6 @@ let get_add_singular_macrostates_1 r = r.Remanent_parameters_sig.add_singular_ma
 let get_add_singular_microstates_1 r = r.Remanent_parameters_sig.add_singular_microstates
 let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
 let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
-
-
 let get_view_analysis_1 r = r.Remanent_parameters_sig.views
 let get_site_across_bonds_analysis_1 r = r.Remanent_parameters_sig.site_across_bonds
 let get_parallel_bonds_analysis_1 r =
@@ -600,6 +639,7 @@ let get_compute_symmetries_1 marshalisable =
   marshalisable.Remanent_parameters_sig.do_symmetries_analysis
 let get_rate_convention_1 marshalisable =
   marshalisable.Remanent_parameters_sig.rate_convention
+
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output
@@ -707,33 +747,27 @@ let upgrade_from_symbols_field f = compose f get_symbols
 (*add reachability*)
 let upgrade_from_reachability_map_field f = compose f get_reachability_map
 let upgrade_from_reachability_analysis_parameters_field f = compose f get_reachability_analysis_parameters
-let get_btype_sep_symbol = upgrade_from_symbols_field get_btype_sep_symbol_1
+
+(*symbols*)
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1
 let get_open_binding_state = upgrade_from_symbols_field get_open_binding_state_1
 let get_close_binding_state = upgrade_from_symbols_field get_close_binding_state_1
-
-let get_free_symbol = upgrade_from_symbols_field get_free_symbol_1
+let get_internal_state_symbol = upgrade_from_symbols_field get_internal_state_symbol_1
+let get_open_internal_state = upgrade_from_symbols_field get_open_internal_state_1
+let get_close_internal_state = upgrade_from_symbols_field get_close_internal_state_1
+let get_link_to_any = upgrade_from_symbols_field get_link_to_any_1
+let get_link_to_some = upgrade_from_symbols_field get_link_to_some_1
+let get_free_symbol = upgrade_from_symbols_field get_free_1
 let get_at_symbol = upgrade_from_symbols_field get_at_symbol_1
-
-let get_link_to_any_v4 = upgrade_from_symbols_field get_link_to_any_v4_1
-let get_link_to_any_v3 = upgrade_from_symbols_field get_link_to_any_v3_1
-
-let get_link_to_some_v4 = upgrade_from_symbols_field get_link_to_some_v4_1
-let get_link_to_some_v3 = upgrade_from_symbols_field get_link_to_some_v3_1
-
 let get_agent_open_symbol = upgrade_from_symbols_field get_agent_open_symbol_1
 let get_agent_close_symbol = upgrade_from_symbols_field get_agent_close_symbol_1
 let get_agent_sep_comma_symbol = upgrade_from_symbols_field get_agent_sep_comma_symbol_1
 let get_agent_sep_plus_symbol = upgrade_from_symbols_field get_agent_sep_plus_symbol_1
 let get_agent_sep_dot_symbol = upgrade_from_symbols_field get_agent_sep_dot_symbol_1
+let get_btype_sep_symbol = upgrade_from_symbols_field get_btype_sep_symbol_1
 let get_site_sep_comma_symbol = upgrade_from_symbols_field get_site_sep_comma_symbol_1
 let get_ghost_agent_symbol = upgrade_from_symbols_field get_ghost_agent_symbol_1
 let get_do_we_show_ghost = upgrade_from_symbols_field get_do_we_show_ghost_1
-
-let get_internal_state_symbol = upgrade_from_symbols_field get_internal_state_symbol_1
-let get_open_internal_state = upgrade_from_symbols_field get_open_internal_state_1
-let get_close_internal_state = upgrade_from_symbols_field get_close_internal_state_1
-
 let get_uni_arrow_symbol = upgrade_from_symbols_field get_uni_arrow_symbol_1
 let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1

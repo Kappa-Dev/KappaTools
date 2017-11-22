@@ -203,71 +203,145 @@ let print_diffview parameters error handler diff =
 let rec print_short_alg parameters error handler alg =
   match alg with
   |Alg_expr.BIN_ALG_OP(Operator.MULT,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%s" (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "*" in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.BIN_ALG_OP(Operator.SUM,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "+" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%s" (Remanent_parameters.get_agent_sep_plus_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.BIN_ALG_OP(Operator.DIV,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "/" in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.BIN_ALG_OP(Operator.MINUS,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "-" in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.BIN_ALG_OP(Operator.POW,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "**" in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.BIN_ALG_OP(Operator.MODULO,a1,a2),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "mod" in
     let error = print_short_alg parameters error handler a2 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) ")" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.UN_ALG_OP(Operator.LOG,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(log(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%slog%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.UN_ALG_OP(Operator.SQRT,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(sqrt(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssqrt%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.UN_ALG_OP(Operator.EXP,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(exp(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%sexp%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.UN_ALG_OP(Operator.SINUS,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(sin(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%ssin%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.UN_ALG_OP(Operator.COSINUS,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(cos(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%scos%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
      (*  | Ast.UN_ALG_OP(Operator.ABS,a1),_ ->
          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(abs(" in
@@ -275,9 +349,17 @@ let rec print_short_alg parameters error handler alg =
          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
          error  *)
   | Alg_expr.UN_ALG_OP(Operator.TAN,a1),_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(tan(" in
+    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+        "%stan%s"
+        (Remanent_parameters.get_agent_open_symbol parameters)
+        (Remanent_parameters.get_agent_open_symbol parameters)
+    in
     let error = print_short_alg parameters error handler a1 in
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s"
+        (Remanent_parameters.get_agent_close_symbol parameters)
+        (Remanent_parameters.get_agent_close_symbol parameters)
+    in
     error
   | Alg_expr.STATE_ALG_OP Operator.TIME_VAR,_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "#TIME#" in
@@ -389,7 +471,7 @@ let print_remove parameters (index,agent,list) =
         let () =
 	  Loggers.fprintf
             (Remanent_parameters.get_logger parameters_doc)
-	    "%s(agent_id_%s,agent_type_%s)@@site_type_%s"
+            "%s(agent_id_%s,agent_type_%s)@@site_type_%s"
             (Remanent_parameters.get_prefix parameters_doc)
             (Ckappa_sig.string_of_agent_id index)
             (Ckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)

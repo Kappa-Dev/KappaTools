@@ -60,13 +60,8 @@ val get_bound_symbol: Remanent_parameters_sig.parameters -> string
 val get_open_binding_state: Remanent_parameters_sig.parameters -> string
 val get_close_binding_state: Remanent_parameters_sig.parameters -> string
 val get_at_symbol: Remanent_parameters_sig.parameters -> string
-
-val get_link_to_any_v4: Remanent_parameters_sig.parameters -> string
-val get_link_to_any_v3: Remanent_parameters_sig.parameters -> string
-
-val get_link_to_some_v4: Remanent_parameters_sig.parameters -> string
-val get_link_to_some_v3: Remanent_parameters_sig.parameters -> string
-
+val get_link_to_any: Remanent_parameters_sig.parameters -> string
+val get_link_to_some: Remanent_parameters_sig.parameters -> string
 val get_agent_open_symbol: Remanent_parameters_sig.parameters -> string
 val get_agent_close_symbol: Remanent_parameters_sig.parameters -> string
 val get_agent_sep_comma_symbol: Remanent_parameters_sig.parameters -> string
@@ -75,12 +70,10 @@ val get_agent_sep_dot_symbol: Remanent_parameters_sig.parameters -> string
 val get_site_sep_comma_symbol: Remanent_parameters_sig.parameters -> string
 val get_ghost_agent_symbol: Remanent_parameters_sig.parameters -> string
 val get_do_we_show_ghost: Remanent_parameters_sig.parameters -> bool
-
 val get_internal_state_symbol: Remanent_parameters_sig.parameters -> string
 val get_open_internal_state: Remanent_parameters_sig.parameters -> string
 val get_close_internal_state: Remanent_parameters_sig.parameters -> string
 val get_free_symbol: Remanent_parameters_sig.parameters -> string
-
 val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
 

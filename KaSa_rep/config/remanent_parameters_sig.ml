@@ -32,20 +32,16 @@ type rate_convention =
 
 type symbol_table =
   {
-    (*version 4*)
-    open_binding_state : string; (*[*)
-    bound_symbol : string; (*!*)
-    close_binding_state: string; (*]*)
-    free_symbol : string; (*.*)
-    open_internal_state : string; (*{*)
-    close_internal_state : string;(*}*)
+    bound : string;
+    open_binding_state : string;
+    close_binding_state : string;
+    link_to_any : string;
+    link_to_some : string;
     internal_state_symbol : string;
+    free : string;
+    open_internal_state : string;
+    close_internal_state : string;
     at : string ;
-    link_to_any_v4 : string;
-    link_to_any_v3 : string;
-    link_to_some_v4 : string;
-    link_to_some_v3 : string;
-   (*version 3*)
     agent_open : string ;
     agent_close : string ;
     site_sep_comma : string ;
