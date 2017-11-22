@@ -937,8 +937,8 @@ struct
                        list*)
                      let error, value =
                        List.fold_left (fun (error, value) (x', y') ->
-                           let site_other, pre_state_other, site_other',
-                               pre_state_other' =
+                           let _site_other, pre_state_other, _site_other',
+                               _pre_state_other' =
                              match pos with
                              | Fst ->
                                let (_, _, _, s_type2, _, pre_state2) = x' in
@@ -1337,7 +1337,7 @@ struct
 
   (*-----------------------------------------------------------*)
 
-  let apply_event_list static dynamic error _event_list =
+  let apply_event_list _static dynamic error _event_list =
     error, dynamic, []
 
   (****************************************************************)
@@ -1345,6 +1345,7 @@ struct
   let stabilize _static dynamic error = error, dynamic, ()
 
   let print ?dead_rules static dynamic (error:Exception.method_handler) loggers =
+    let _ = dead_rules in 
     let kappa_handler = get_kappa_handler static in
     let parameters = get_parameter static in
     let log = loggers in
