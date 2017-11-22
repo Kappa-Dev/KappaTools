@@ -147,22 +147,15 @@ rule token = parse
          (Lexing.lexeme_end_p lexbuf))) }
 
 and inline_comment acc = parse
-  | ([^'\n' '*' '\"' '\'' '/'] *) as x { inline_comment (x::acc) lexbuf }
+  | ([^'\n' '*' '\"' '/'] *) as x { inline_comment (x::acc) lexbuf }
   | ('/' '/' [^'\r''\n']* as x) eol
     { Lexing.new_line lexbuf; inline_comment (x::acc) lexbuf }
   | eol as x { Lexing.new_line lexbuf; inline_comment (x::acc) lexbuf }
-  | ('*' [^'/' '\n' '\"' '\'']) as x { inline_comment (x::acc) lexbuf }
-  | ('/' [^'*' '\n' '\"' '\'']) as x { inline_comment (x::acc) lexbuf }
+  | ('*' [^'/' '\n' '\"']) as x { inline_comment (x::acc) lexbuf }
+  | ('/' [^'*' '\n' '\"']) as x { inline_comment (x::acc) lexbuf }
   | '*' '/' { String.concat "" (List.rev acc) }
   | eof { String.concat "" (List.rev acc) }
   | '*' '\n' { Lexing.new_line lexbuf; inline_comment ("*\n"::acc) lexbuf }
-(*  | (('*' | '/')? '\'' [^'\n' '\'']+ '\'') as x
-    { inline_comment (x::acc) lexbuf }
-  | (('*' | '/')? '\'' [^'\n' '\'']+ (eof | '\n')) as x
-     { raise (ExceptionDefn.Syntax_Error
-      ("Unterminated label in comment: "^x,
-       Locality.of_pos (Lexing.lexeme_start_p lexbuf)
-         (Lexing.lexeme_end_p lexbuf)))} *)
   | (('*' | '/')? '\"' [^'\n' '\"']+ (eof | '\n')) as x
     { inline_comment (x::acc) lexbuf }
   | (('*' | '/')? '\"' [^'\n' '\"']+ '\"') as x
