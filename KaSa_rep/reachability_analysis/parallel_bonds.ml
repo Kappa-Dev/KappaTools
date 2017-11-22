@@ -4,7 +4,7 @@
   * Jérôme Feret & Ly Kim Quyen, project Antique, INRIA Paris
   *
   * Creation: 2016, the 30th of January
-  * Last modification: Time-stamp: <Nov 21 2017>
+  * Last modification: Time-stamp: <Nov 22 2017>
   *
   * A monolitich domain to deal with all concepts in reachability analysis
   * This module is temporary and will be split according to different concepts
@@ -399,7 +399,6 @@ struct
   let scan_rules static dynamic error =
     let parameters = get_parameter static in
     let compil = get_compil static in
-    let handler = get_kappa_handler static in
     let error, static =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameters

@@ -4,7 +4,7 @@
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
    *
    * Creation: 2016, the 31th of March
-   * Last modification: Time-stamp: <Nov 21 2017>
+   * Last modification: Time-stamp: <Nov 22 2017>
    *
    * Abstract domain to detect whether when two sites of an agent are bound,
    * they must be bound to the same agent.
@@ -361,8 +361,8 @@ let compare_first_pair parameters error x tuple_set store_result =
   let (agent_type_x, site_type_x) = x in (*A,x*)
   Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
     (fun (u, v) (error, store_result) ->
-       let (agent_type, site_type, site_type', state, state') = u in
-       let (agent_type1, site_type1, site_type1', state1, state1') = v in
+       let (agent_type, site_type, _site_type', _state, _state') = u in
+       let (agent_type1, site_type1, _site_type1', _state1, _state1') = v in
        if agent_type_x = agent_type && site_type_x = site_type
        || agent_type_x = agent_type1  && site_type_x = site_type1
        then
@@ -392,8 +392,8 @@ let compare_snd_pair parameters error y tuple_pair store_result =
   let (agent_type_y, site_type_y) = y in (*A,x*)
   Parallel_bonds_type.PairAgentSitesStates_map_and_set.Set.fold
     (fun (u, v) (error, store_result) ->
-       let (agent_type, site_type, site_type', state, state') = u in
-       let (agent_type1, site_type1, site_type1', state1, state1') = v in
+       let (agent_type, _site_type, site_type', _state, _state') = u in
+       let (agent_type1, _site_type1, site_type1', _state1, _state1') = v in
        if agent_type_y = agent_type && site_type_y = site_type'
        || agent_type_y = agent_type1 && site_type_y = site_type1'
        then
