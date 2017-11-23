@@ -2282,8 +2282,8 @@ A()=> [
 
 Some exceptions have been raised
 error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit
 error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit
 error: file_name: KaSa_rep/frontend/preprocess/ckappa_sig.ml; message: line 405; exception:Exit
-error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 632; exception:Exit
+error: file_name: KaSa_rep/frontend/preprocess/cckappa_sig.ml; message: line 631; exception:Exit

@@ -134,19 +134,18 @@ type rule =
     actions            : actions
   }
 
+type modif_expr =
+  | APPLY    of ((mixture,string) Alg_expr.e * rule * Ckappa_sig.position)
+  | UPDATE   of (string * Ckappa_sig.position * (mixture, string) Alg_expr.e * Ckappa_sig.position)
+  (*TODO: pause*)
+  | STOP     of Ckappa_sig.position
+  | SNAPSHOT of Ckappa_sig.position (*maybe later of mixture too*)
+
 type perturbation =
   ((((mixture,string) Alg_expr.bool) * Ckappa_sig.position) *
    (modif_expr list) *
    (((mixture,string) Alg_expr.bool * Ckappa_sig.position)  option)) *
   Ckappa_sig.position
-
-and modif_expr =
-  | INTRO    of ((mixture,string) Alg_expr.e * mixture * Ckappa_sig.position)
-  | DELETE   of ((mixture,string) Alg_expr.e * mixture * Ckappa_sig.position)
-  | UPDATE   of (string * Ckappa_sig.position * (mixture, string) Alg_expr.e * Ckappa_sig.position)
-  (*TODO: pause*)
-  | STOP     of Ckappa_sig.position
-  | SNAPSHOT of Ckappa_sig.position (*maybe later of mixture too*)
 
 type enriched_rule =
   {

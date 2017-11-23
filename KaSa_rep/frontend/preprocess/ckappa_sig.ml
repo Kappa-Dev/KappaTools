@@ -873,19 +873,18 @@ type c_rule =
     c_side_effects       : action list
   }
 
+type c_modif_expr =
+  | C_APPLY    of ((c_mixture,string) Alg_expr.e * c_rule * position)
+  | C_UPDATE   of
+      (string * (c_mixture,string) Alg_expr.e * position) (*TODO: pause*)
+  | C_STOP     of position
+  | C_SNAPSHOT of position (*maybe later of mixture too*)
+
 type c_perturbation =
   ((((c_mixture,string) Alg_expr.bool) * position)
    * (c_modif_expr list)
    * ((c_mixture,string) Alg_expr.bool * position) option)
   * position
-
-and c_modif_expr =
-  | C_INTRO    of ((c_mixture,string) Alg_expr.e * c_mixture * position)
-  | C_DELETE   of ((c_mixture,string) Alg_expr.e * c_mixture * position)
-  | C_UPDATE   of
-      (string * (c_mixture,string) Alg_expr.e * position) (*TODO: pause*)
-  | C_STOP     of position
-  | C_SNAPSHOT of position (*maybe later of mixture too*)
 
 type enriched_rule =
   {
