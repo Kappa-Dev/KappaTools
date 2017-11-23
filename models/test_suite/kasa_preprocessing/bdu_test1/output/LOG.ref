@@ -51,6 +51,40 @@ Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min
 Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_0:
 Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule r0 (File "sanity1.ka", line 9, characters 5-51:) will never be applied.
+rule r1 (File "sanity1.ka", line 10, characters 5-33:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -113,36 +147,6 @@ Influence_map:Inhibition_map:rule(0):'r0' A(x{u}[.],y{u}[.])->A(x{p}[.],y{p}[.])
 Influence_map:Inhibition_map:rule(1):'r1' A(y{u}[.])->A(y{p}[.]) -> rule(0):'r0' A(x{u}[.],y{u}[.])->A(x{p}[.],y{p}[.])[0->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(y{u}[.])->A(y{p}[.]) -> var(0):'Auu' A(x{u}[#],y{u}[#])[0->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(y{u}[.])->A(y{p}[.]) -> var(1):'Apu' A(y{u}[#])[0->0]
-Reachability analysis...
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule r0 (File "sanity1.ka", line 9, characters 5-51:) will never be applied.
-rule r1 (File "sanity1.ka", line 10, characters 5-33:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

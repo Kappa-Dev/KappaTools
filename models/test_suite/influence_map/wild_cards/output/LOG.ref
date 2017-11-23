@@ -89,6 +89,54 @@ Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_1
 Compilation:rules:0:actions:creation:(agent_id_2,agent_type_2)
 Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_2,agent_type_2)@site_type_0
+Reachability analysis...
+
+	Applying rule r1 (File "wild_cards.ka", line 5, characters 5-68:):
+		the precondition is not satisfied yet
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule r1 (File "wild_cards.ka", line 5, characters 5-68:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+B cannot occur in the model
+C cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+0 ;
+1 ;
+2 ;
+3 ;
+2:1,
+3:0,
+SCC3;
+2;
+1;
+0;
+
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -132,40 +180,6 @@ Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:0->[0*]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Reachability analysis...
-
-	Applying rule r1 (File "wild_cards.ka", line 5, characters 5-68:):
-		the precondition is not satisfied yet
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule r1 (File "wild_cards.ka", line 5, characters 5-68:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
-C cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

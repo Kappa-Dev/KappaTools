@@ -108,6 +108,48 @@ Compilation:rules:4:reverse:agent_id_0:
 Compilation:rules:4:reverse:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:4:actions:deletion:(agent_id_0,agent_type_1)
 Compilation:rules:4:actions:deletion:documented_site:(agent_id_0,agent_type_1)@site_type_0
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule File "side_effect.ka", line 8, characters 0-38: will never be applied.
+rule File "side_effect.ka", line 9, characters 0-22: will never be applied.
+rule File "side_effect.ka", line 10, characters 0-22: will never be applied.
+rule File "side_effect.ka", line 11, characters 0-12: will never be applied.
+rule File "side_effect.ka", line 12, characters 0-16: will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+B cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+0 ;
+1 ;
+SCC1;
+0;
+
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -246,40 +288,6 @@ Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(0):'' A(x[.]),B(x[.])->A(
 Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(1):'' A(x[_])->A(x[.])[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()->. -> rule(2):'' B(x[_])->B(x[.])[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x[.])->. -> rule(0):'' A(x[.]),B(x[.])->A(x[1]),B(x[1])[0->1]
-Reachability analysis...
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule File "side_effect.ka", line 8, characters 0-38: will never be applied.
-rule File "side_effect.ka", line 9, characters 0-22: will never be applied.
-rule File "side_effect.ka", line 10, characters 0-22: will never be applied.
-rule File "side_effect.ka", line 11, characters 0-12: will never be applied.
-rule File "side_effect.ka", line 12, characters 0-16: will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

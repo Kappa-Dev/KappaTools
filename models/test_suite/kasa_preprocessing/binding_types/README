@@ -1,0 +1,2 @@
+#Command-line:
+"${KAPPABIN}"KaSa binding_types.ka --debugging-mode --output-directory output -syntax 4 || exit 0

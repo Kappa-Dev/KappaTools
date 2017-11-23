@@ -1,0 +1,13 @@
+/* TEST ACTIONS */
+
+// Signatures
+
+%agent: A(x)
+%agent: B(x{p})
+%agent: C(x)
+
+// Rules
+
+'r0' A(x[.]), B(x[.]{p}) <-> A(x[1]), B(x[1]{p}) @ 1
+'r1' A(x[.]), C(x[.]) -> A(x[1]), C(x[1]) @ 1
+B(x{p}[.]), C(x[x.A]) -> B(x{u}[.]), C(x[x.A]) @ 1

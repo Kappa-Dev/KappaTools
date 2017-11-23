@@ -89,6 +89,48 @@ Compilation:rules:1:actions:deletion:(agent_id_1,agent_type_0)
 Compilation:rules:1:actions:deletion:documented_site:(agent_id_1,agent_type_0)@site_type_0
 Compilation:rules:1:actions:creation:(agent_id_2,agent_type_1)
 Compilation:rules:1:actions:creation:(agent_id_3,agent_type_0)
+Reachability analysis...
+
+	Applying rule remove (File "agent_order.ka", line 6, characters 9-61:):
+		the precondition is not satisfied yet
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule bind (File "agent_order.ka", line 5, characters 7-45:) will never be applied.
+rule remove (File "agent_order.ka", line 6, characters 9-61:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+B cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+0 ;
+1 ;
+SCC1;
+0;
+
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -156,40 +198,6 @@ Influence_map:Wake_up_map:rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]
 Influence_map:Inhibition_map:rule(0):'bind' A(x[.]),B(x[.])->A(x[1]),B(x[1]) -> rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.])[0->0];[0->1]
 Influence_map:Inhibition_map:rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.]) -> rule(0):'bind' A(x[.]),B(x[.])->A(x[1]),B(x[1])[1->0]
 Influence_map:Inhibition_map:rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.]) -> rule(1):'remove' A(x[.]),A(x[.]),.,.->A(x[.]),.,B(x[.]),A(x[.])[1->0]
-Reachability analysis...
-
-	Applying rule remove (File "agent_order.ka", line 6, characters 9-61:):
-		the precondition is not satisfied yet
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule bind (File "agent_order.ka", line 5, characters 7-45:) will never be applied.
-rule remove (File "agent_order.ka", line 6, characters 9-61:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-B cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

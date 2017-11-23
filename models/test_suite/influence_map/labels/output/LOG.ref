@@ -68,6 +68,42 @@ Compilation:rules:3:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min
 Compilation:rules:3:reverse:
 Compilation:rules:3:reverse:agent_id_0:
 Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:2;state_max:2]
+Reachability analysis...
+
+------------------------------------------------------------
+* There are some non applyable rules
+------------------------------------------------------------
+rule veryveryveryveryverylonglonglonglabel (File "labels.ka", line 3, characters 40-68:) will never be applied.
+rule otherotherveryveryveryverylonglabel (File "labels.ka", line 4, characters 38-66:) will never be applied.
+rule "0 (File "labels.ka", line 5, characters 5-33:) will never be applied.
+rule \0 (File "labels.ka", line 6, characters 5-33:) will never be applied.
+
+------------------------------------------------------------
+* There are some non creatable agents 
+------------------------------------------------------------
+A cannot occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -145,38 +181,6 @@ Influence_map:Wake_up_map:rule(2):'"0' A(x{q}[.])->A(x{u}[.]) -> rule(0):'veryve
 Influence_map:Wake_up_map:rule(3):'\0' A(x{q}[.])->A(x{p}[.]) -> rule(1):'otherotherveryveryveryverylonglabel' A(x{p}[.])->A(x{q}[.])[0->0]
 Influence_map:Inhibition_map:rule(2):'"0' A(x{q}[.])->A(x{u}[.]) -> rule(3):'\0' A(x{q}[.])->A(x{p}[.])[0->0]
 Influence_map:Inhibition_map:rule(3):'\0' A(x{q}[.])->A(x{p}[.]) -> rule(2):'"0' A(x{q}[.])->A(x{u}[.])[0->0]
-Reachability analysis...
-
-------------------------------------------------------------
-* There are some non applyable rules
-------------------------------------------------------------
-rule veryveryveryveryverylonglonglonglabel (File "labels.ka", line 3, characters 40-68:) will never be applied.
-rule otherotherveryveryveryverylonglabel (File "labels.ka", line 4, characters 38-66:) will never be applied.
-rule "0 (File "labels.ka", line 5, characters 5-33:) will never be applied.
-rule \0 (File "labels.ka", line 6, characters 5-33:) will never be applied.
-
-------------------------------------------------------------
-* There are some non creatable agents 
-------------------------------------------------------------
-A cannot occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 ------------------------------------------------------------
 * Export Views domain - non relational properties to JSon (internal constraints_list):
 ------------------------------------------------------------

@@ -130,6 +130,53 @@ Compilation:initial_states:4:mixture:agent_id_0:
 Compilation:initial_states:5:
 Compilation:initial_states:5:mixture:
 Compilation:initial_states:5:mixture:agent_id_0:
+Reachability analysis...
+
+	Applying rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:):
+		the precondition is satisfied
+
+		rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
+
+	Applying rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:):
+		the precondition is satisfied
+
+		rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
+
+	Applying rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:):
+		the precondition is satisfied
+
+		rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
+
+	Applying rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:):
+		the precondition is satisfied
+
+		rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
+------------------------------------------------------------
+every rule may be applied
+------------------------------------------------------------
+every agent may occur in the model
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties in connected agents
+------------------------------------------------------------
+------------------------------------------------------------
+* Properties of pairs of bonds
+------------------------------------------------------------
+COMPUTE BRIDGE: 
+ Graph: 
+ Nodes: 
+SCC
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -234,49 +281,6 @@ Influence_map:Inhibition_map:rule(2):'' A(),C(),.,.->A(),.,B(),B() -> var(1):'qc
 Influence_map:Inhibition_map:rule(3):'' A(),.,B(),B()->A(),C(),.,. -> rule(0):'' A(),B(),B(),.->A(),.,.,C()[2->1];[2->2];[3->1];[3->2]
 Influence_map:Inhibition_map:rule(3):'' A(),.,B(),B()->A(),C(),.,. -> rule(3):'' A(),.,B(),B()->A(),C(),.,.[2->3];[3->2]
 Influence_map:Inhibition_map:rule(3):'' A(),.,B(),B()->A(),C(),.,. -> var(0):'qb' B()[2->0];[3->0]
-Reachability analysis...
-
-	Applying rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:):
-		the precondition is satisfied
-
-		rule A(), B(), B(), . -> A(), ., ., C() (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
-
-	Applying rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:):
-		the precondition is satisfied
-
-		rule A(), ., ., C() -> A(), B(), B(), . (File "test_empty.ka", line 1, characters 0-35:) is applied for the first time
-
-	Applying rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:):
-		the precondition is satisfied
-
-		rule A(), C(), ., . -> A(), ., B(), B() (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
-
-	Applying rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:):
-		the precondition is satisfied
-
-		rule A(), ., B(), B() -> A(), C(), ., . (File "test_empty.ka", line 2, characters 0-35:) is applied for the first time
-------------------------------------------------------------
-every rule may be applied
-------------------------------------------------------------
-every agent may occur in the model
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties in connected agents
-------------------------------------------------------------
-------------------------------------------------------------
-* Properties of pairs of bonds
-------------------------------------------------------------
 Refining further the influence map...
 FST:
 Influence_map:
