@@ -132,13 +132,6 @@ struct
       views = views ;
       string_version = string_version }
 
-  (*let max_state_index a b =
-    if Ckappa_sig.compare_state_index a b <= 0
-    then b else a
-    let min_state_index a b =
-    if Ckappa_sig.compare_state_index a b <= 0
-    then a else b*)
-
   let has_a_binding_state parameter error kappa_handler agent_type site =
     let error,site =
       Handler.translate_site parameter error kappa_handler agent_type site
@@ -283,6 +276,10 @@ struct
                     parameter error kappa_handler
                     agent_type'
                 in
+                (*let error, site_string' =
+                  Handler.translate_binding_type parameter error kappa_handler
+                    agent_type' site'
+                in*)
                 let error, site_string' =
                   Handler.string_of_site_contact_map
                     parameter error kappa_handler
