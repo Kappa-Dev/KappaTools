@@ -16,8 +16,6 @@ subgraph cluster1 {
    1.0 [shape = plaintext label = ""]
 label =  "B";  shape = rectangle; color = red
 } ; 
-0.1 -- 0.1 [color=red]
-0.2 -- 0.2 [color=red]
-0.1 -- 0.1 [color=red]
-0.2 -- 0.2 [color=red]
+0.1 -- 0.1
+0.2 -- 0.2
 }

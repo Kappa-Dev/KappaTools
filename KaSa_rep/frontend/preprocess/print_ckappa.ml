@@ -41,17 +41,16 @@ let print_binding_state parameter error binding_state =
   with
   | Ckappa_sig.Free -> error
   | Ckappa_sig.Lnk_type (agent_name,site_name) -> (*CHANGE to binding_type*)
-    (*let error = print_agent_name parameter error agent_name in
+    let error = print_agent_name parameter error agent_name in
     let _ =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
         "@@"
     in
     let error = print_site_name parameter error site_name in
-      error*)
-    let _ =
+    (*let _ =
       Binding_type.print_binding_type Format.str_formatter
         agent_name site_name
-    in
+    in*)
     error
 
 let print_link_state parameter error link =
