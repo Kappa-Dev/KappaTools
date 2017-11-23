@@ -50,7 +50,7 @@ case $1 in
         scp -o UserKnownHostsFile=dev/deploy_hosts -i dev/travis-deploy -r \
             ${PLAYGROUND}/try travis@api.kappalanguage.org:/var/www/tools.kappalanguage.org/
         ;;
-    webserver )
+    python )
         ;;
     '' )
         ;;

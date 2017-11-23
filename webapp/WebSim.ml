@@ -10,12 +10,12 @@ open Lwt.Infix
 
 let logger (handler : Cohttp_lwt_unix.Server.conn ->
             Cohttp.Request.t ->
-            Cohttp_lwt_body.t ->
-            (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t)
+            Cohttp_lwt.Body.t ->
+            (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t)
     (conn : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
-    (body : Cohttp_lwt_body.t)
-  : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+    (body : Cohttp_lwt.Body.t)
+  : (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   (Lwt.catch
      (fun () -> handler conn request body)
      (fun exn -> Lwt_log.fatal ~exn "" >>=
@@ -79,8 +79,8 @@ let server =
   let route_handler :
     Cohttp_lwt_unix.Server.conn ->
     Cohttp.Request.t ->
-    Cohttp_lwt_body.t ->
-    (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
+    Cohttp_lwt.Body.t ->
+    (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t
     = Webapp.route_handler
       ~shutdown_key:websim_args.Websim_args.shutdown_key
       ()

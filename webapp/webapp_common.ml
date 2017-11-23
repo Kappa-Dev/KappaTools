@@ -12,7 +12,7 @@ open Cohttp_lwt_unix
 type context = { arguments : (string * string) list
                ; connection : Cohttp_lwt_unix.Server.conn
                ; request : Cohttp.Request.t
-               ; body : Cohttp_lwt_body.t }
+               ; body : Cohttp_lwt.Body.t }
 (* Default headers for http requests note support has been
    added for CORS headers.
 *)
@@ -27,7 +27,7 @@ let error_response
     ?(headers = headers)
     ?(status = `Internal_server_error)
     (errors : Api_types_j.errors)
-  : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+  : (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   let error_msg : string = Api_types_j.string_of_errors errors in
   let () =
     Lwt.async
@@ -49,7 +49,7 @@ let error_response
 *)
 let api_result_response
     ~(string_of_success: 'ok -> string)
-  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+  : 'ok Api.result -> (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   Api_common.result_map
     ~ok:(fun (code : Api.manager_code)
           (ok : 'a) ->
@@ -75,7 +75,7 @@ let method_not_allowed_respond meths =
       "Allow"
       (List.map Cohttp.Code.string_of_method meths) in
   Server.respond
-    ~headers ~status:`Method_not_allowed ~body:Cohttp_lwt_body.empty ()
+    ~headers ~status:`Method_not_allowed ~body:Cohttp_lwt.Body.empty ()
 
 let options_respond methods =
   let meths_str = List.map Cohttp.Code.string_of_method methods in
@@ -90,7 +90,7 @@ let options_respond methods =
   let headers =
     Cohttp.Header.add
       headers "Access-Control-Request-Headers" "X-Custom-Header" in
-  Server.respond ~headers ~status:`OK ~body:Cohttp_lwt_body.empty ()
+  Server.respond ~headers ~status:`OK ~body:Cohttp_lwt.Body.empty ()
 
 
 
@@ -100,13 +100,13 @@ type 'a route =
 
 type route_handler =
   (context:context ->
-   (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t)
+   (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t)
     route
 
 type route_filter =
   (context:context ->
-   chain:(context:context -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t) ->
-   (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t)
+   chain:(context:context -> (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t) ->
+   (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t)
     route
 
 type url_matcher =
@@ -196,7 +196,7 @@ let request_handler context = function
 
 let route_handler
     (routes : route_handler list) :
-  context:context -> (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
+  context:context -> (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t =
   let url_matchers : (route_handler * url_matcher ) list =
     List.map
       (fun route -> (route,create_url_matcher route.path)) routes in

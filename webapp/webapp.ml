@@ -12,14 +12,14 @@ let route_handler
   :
     Cohttp_lwt_unix.Server.conn ->
     Cohttp.Request.t ->
-    Cohttp_lwt_body.t ->
-    (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t
+    Cohttp_lwt.Body.t ->
+    (Cohttp.Response.t * Cohttp_lwt.Body.t) Lwt.t
   =
   let intermediate =
     Webapp_common.route_handler (Route_root.route ~shutdown_key) in
   fun (conn : Cohttp_lwt_unix.Server.conn)
     (request : Cohttp.Request.t)
-    (body : Cohttp_lwt_body.t)
+    (body : Cohttp_lwt.Body.t)
     ->
       let context = { Webapp_common.arguments = []
                     ; Webapp_common.connection = conn

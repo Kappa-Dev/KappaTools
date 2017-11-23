@@ -144,7 +144,7 @@ let route
         fun ~context ->
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `POST ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body)
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body)
             >>= (fun body ->
                 match shutdown_key with
                 | Some shutdown_key when shutdown_key = body ->
@@ -188,7 +188,7 @@ let route
                    (JsonUtil.write_list Yojson.Basic.write_string) ?len:None)
               (Api_common.result_ok names)
           | `POST ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.project_parameter_of_string >>=
             (fun param -> add_projects param projects) >>=
             (Webapp_common.api_result_response
@@ -216,7 +216,7 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `POST ->
             let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             (fun s ->
                Yojson.Safe.read_list
                  (Api_types_j.read_overwritten_var)
@@ -239,7 +239,7 @@ let route
           let project_id = project_ref context in
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `POST ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.file_of_string >>= fun file ->
             bind_projects
               (fun manager -> manager#file_create file) project_id projects >>=
@@ -276,7 +276,7 @@ let route
             (Webapp_common.api_result_response
                ~string_of_success:(Mpi_message_j.string_of_file ?len:None))
           | `PUT ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.file_modification_of_string >>= fun modif ->
             bind_projects
               (fun manager -> manager#file_update file_id modif)
@@ -308,7 +308,7 @@ let route
                ~string_of_success:(Mpi_message_j.string_of_simulation_info
                                      ?len:None))
           | `POST ->
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Mpi_message_j.simulation_parameter_of_string >>= fun params ->
             bind_projects
               (fun manager -> manager#simulation_start params)
@@ -540,7 +540,7 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `PUT ->
             let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             (fun s ->
                Yojson.Safe.read_string
                  (Yojson.Safe.init_lexer ()) (Lexing.from_string s))
@@ -577,7 +577,7 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `PUT ->
             let project_id = project_ref context in
-            (Cohttp_lwt_body.to_string context.Webapp_common.body) >|=
+            (Cohttp_lwt.Body.to_string context.Webapp_common.body) >|=
             Api_types_j.simulation_perturbation_of_string >>= fun pert ->
             bind_projects
               (fun manager -> manager#simulation_perturbation pert)
@@ -595,7 +595,7 @@ let route
           match context.Webapp_common.request.Cohttp.Request.meth with
           | `PUT ->
             let project_id = project_ref context in
-            Cohttp_lwt_body.to_string context.Webapp_common.body >>=
+            Cohttp_lwt.Body.to_string context.Webapp_common.body >>=
             fun compil -> tmp_bind_projects
               (fun manager -> manager#init_static_analyser_raw compil)
               project_id projects >>=
