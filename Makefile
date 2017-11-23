@@ -288,7 +288,7 @@ KappaBin.zip:
 	mv _build/odes/KaDE.native KappaBin/bin/KaDE.exe
 	mv _build/agents/KaSimAgent.native KappaBin/bin/KaSimAgent.exe
 	mv _build/agents/KaSaAgent.native KappaBin/bin/KaSaAgent.exe
-	zip -r $@ KappaBin
+	zip -y -r $@ KappaBin
 	rm -r KappaBin
 
 Kappapp.app:
